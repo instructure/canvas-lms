@@ -24,7 +24,7 @@ class AppCenterController < ApplicationController
   def map_tools_to_apps!(context, apps)
     return unless apps
 
-    ContextExternalTool.all_tools_for(context).each do |tool|
+    Lti::ContextToolFinder.all_tools_for(context).each do |tool|
       app = nil
       app_center_id = tool.app_center_id || tool.tool_id
       app = apps.find { |a| app_center_id == a["short_name"] } if app_center_id

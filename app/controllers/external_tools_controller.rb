@@ -119,7 +119,7 @@ class ExternalToolsController < ApplicationController
   def index
     if authorized_action(@context, @current_user, :read)
       @tools = if params[:include_parents]
-                 ContextExternalTool.all_tools_for(@context, user: (params[:include_personal] ? @current_user : nil))
+                 Lti::ContextToolFinder.all_tools_for(@context, user: (params[:include_personal] ? @current_user : nil))
                else
                  @context.context_external_tools.active
                end
@@ -139,7 +139,7 @@ class ExternalToolsController < ApplicationController
   end
 
   def homework_submissions
-    @tools = ContextExternalTool.all_tools_for(@context, user: @current_user, type: :has_homework_submission)
+    @tools = Lti::ContextToolFinder.all_tools_for(@context, user: @current_user, type: :has_homework_submission)
     respond_to do |format|
       format.json { render json: external_tools_json(@tools, @context, @current_user, session) }
     end
@@ -1209,7 +1209,7 @@ class ExternalToolsController < ApplicationController
       favorite_ids << @tool.global_id
       favorite_ids.uniq!
       if favorite_ids.length > 2
-        valid_ids = ContextExternalTool.all_tools_for(@context, placements: [:editor_button]).pluck(:id).map { |id| Shard.global_id_for(id) }
+        valid_ids = Lti::ContextToolFinder.all_tools_for(@context, placements: [:editor_button]).pluck(:id).map { |id| Shard.global_id_for(id) }
         favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
       end
       if favorite_ids.length > 2

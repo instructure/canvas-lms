@@ -280,7 +280,7 @@ module Types
       argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
     end
     def external_tools_connection(filter:)
-      scope = ContextExternalTool.all_tools_for(course, { placements: filter.placement })
+      scope = Lti::ContextToolFinder.all_tools_for(course, { placements: filter.placement })
       filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
     end
 

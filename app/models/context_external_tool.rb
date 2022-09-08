@@ -861,7 +861,7 @@ class ContextExternalTool < ActiveRecord::Base
     return true if url.present? && duplicate_tool.present?
 
     # If tool with same domain is found in the context
-    self.class.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
+    Lti::ContextToolFinder.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
   end
 
   def check_for_duplication(verify_uniqueness)
@@ -920,27 +920,6 @@ class ContextExternalTool < ActiveRecord::Base
       contexts_to_search(context.context)
     else
       []
-    end
-  end
-
-  def self.all_tools_for(context, options = {})
-    placements = * options[:placements] || options[:type]
-    contexts = []
-    if options[:user]
-      contexts << options[:user]
-    end
-    contexts.concat contexts_to_search(context)
-    return nil if contexts.empty?
-
-    context.shard.activate do
-      scope = ContextExternalTool.shard(context.shard).where(context: contexts).active
-      scope = scope.placements(*placements)
-      scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
-      scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
-      if Canvas::Plugin.value_to_boolean(options[:only_visible])
-        scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
-      end
-      scope.order(ContextExternalTool.best_unicode_collation_key("context_external_tools.name")).order(Arel.sql("context_external_tools.id"))
     end
   end
 

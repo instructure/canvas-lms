@@ -415,9 +415,9 @@ class ApplicationController < ActionController::Base
 
     context = context.account if context.is_a?(User)
     tools = GuardRail.activate(:secondary) do
-      ContextExternalTool.all_tools_for(context, { placements: type,
-                                                   root_account: @domain_root_account, current_user: @current_user,
-                                                   tool_ids: tool_ids }).to_a
+      Lti::ContextToolFinder.all_tools_for(context, { placements: type,
+                                                      root_account: @domain_root_account, current_user: @current_user,
+                                                      tool_ids: tool_ids }).to_a
     end
 
     tools.select! do |tool|
