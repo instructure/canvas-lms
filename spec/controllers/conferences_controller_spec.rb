@@ -204,6 +204,15 @@ describe ConferencesController do
       expect(response).to be_successful
     end
 
+    it "rejects conference titles over 255 chars" do
+      long_str = "OriZgOYyEdGdEmC9jiUkwbw3W6VpNLhOMVHblHpR5nehnsl1m6LFb8dwfHnX1IypOxN1ZTeVnggudhEv37dOUbLyzmEMHCRpohlDP2kcazgzu1D4NLlJ2Bfhd7V1nhlqN6llXH6T0om4BG1TLwwPh1LUIuAETiA8Bp6ni2xpBYLb5dKgypvTqT3fMnolBnK0fxtyEpa97OPBfFsc2yJ4wvH33cdiVsl0EDQW8kzdVADYE1zzbR3gRwHBTVnh1tyN"
+      user_session(@teacher)
+      post "create", params: { course_id: @course.id, web_conference: { title: long_str, conference_type: "Wimba" } }, format: "json"
+      expect(response.status).to eq 400
+      res_body = JSON.parse(response.body)
+      expect(res_body["errors"]["title"][0]["message"]).to eq "too_long"
+    end
+
     it "creates a conference with observers removed" do
       user_session(@teacher)
       enrollment = observer_in_course(active_all: true, user: user_with_pseudonym(active_all: true))

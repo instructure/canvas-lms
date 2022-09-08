@@ -32,6 +32,7 @@ class WebConference < ActiveRecord::Base
 
   validates :description, length: { maximum: maximum_text_length, allow_blank: true }
   validates :conference_type, :title, :context_id, :context_type, :user_id, presence: true
+  validates :title, length: { within: 0..255 }
   validate :lti_tool_valid, if: -> { conference_type == "LtiConference" }
 
   MAX_DURATION = 99_999_999
