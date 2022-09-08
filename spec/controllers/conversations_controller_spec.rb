@@ -748,6 +748,30 @@ describe ConversationsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
     end
 
+    it "updates the archived conversation to be read" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
+
+      allow(InstStatsd::Statsd).to receive(:increment)
+      post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "read" } }
+
+      expect(response).to be_successful
+      @conversation.reload
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
+    it "updates the archived conversation to be unread" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
+
+      allow(InstStatsd::Statsd).to receive(:increment)
+      post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "unread" } }
+
+      expect(response).to be_successful
+      @conversation.reload
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
     it "updates the conversation to be unstarred" do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update(starred: true)
