@@ -19,23 +19,23 @@
 import _ from 'underscore'
 import Big from 'big.js'
 
-export function add(a, b) {
+export function add(a: number, b: number): Big {
   return new Big(a || 0).plus(b || 0)
 }
 
-export function divide(a, b) {
+export function divide(a: number, b: number): Big {
   return new Big(a || 0).div(b || 0)
 }
 
-export function multiply(a, b) {
+export function multiply(a: number, b: number): Big {
   return new Big(a || 0).times(b || 0)
 }
 
-export function toNumber(big) {
-  return Number.parseFloat(big, 10)
+export function toNumber(big: Big) {
+  return Number.parseFloat(big)
 }
 
-export function bigSum(values) {
+export function bigSum(values: Big[]) {
   return values.reduce((total, value) => total.plus(value || 0), Big(0))
 }
 
@@ -49,7 +49,7 @@ export function sumBy(collection, attr) {
   return sum(values)
 }
 
-export function scoreToPercentage(score, pointsPossible) {
+export function scoreToPercentage(score: number, pointsPossible: number) {
   const floatingPointResult = (score / pointsPossible) * 100
   if (!Number.isFinite(floatingPointResult)) {
     return floatingPointResult
@@ -58,6 +58,14 @@ export function scoreToPercentage(score, pointsPossible) {
   return toNumber(multiply(divide(score, pointsPossible), 100))
 }
 
-export function weightedPercent({score, possible, weight}) {
+export function weightedPercent({
+  score,
+  possible,
+  weight
+}: {
+  score: number
+  possible: number
+  weight: number
+}) {
   return score && weight && possible ? Big(score).div(possible).times(weight) : Big(0)
 }
