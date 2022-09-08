@@ -25,8 +25,8 @@ module CalendarConferencesHelper
     return nil if calendar_event_params.blank?
 
     valid_params = calendar_event_params.merge(override_params).slice(:web_conference, :title, :context_code, :start_at, :end_at, :description)
-    if calendar_event_params[:id]
-      CalendarEvent.find(calendar_event_params[:id]).tap do |event|
+    if calendar_event_params[:web_conference].calendar_event
+      CalendarEvent.find(calendar_event_params[:web_conference].calendar_event.id).tap do |event|
         if event.grants_right?(@current_user, session, :update)
           event.context = context
           event.assign_attributes(valid_params)

@@ -60,6 +60,7 @@ export const VideoConferenceModal = ({
   )
   const [duration, setDuration] = useState(isEditing ? props.duration : 60)
   const [options, setOptions] = useState(isEditing ? props.options : OPTIONS_DEFAULT)
+
   const [description, setDescription] = useState(isEditing ? props.description : '')
   const [invitationOptions, setInvitationOptions] = useState(
     isEditing ? props.invitationOptions : INVITATION_OPTIONS_DEFAULT
@@ -82,6 +83,16 @@ export const VideoConferenceModal = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const [nameValidationMessages, setNameValidationMessages] = useState([])
+  const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
+  const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
+
+  const onStartDateChange = newValue => {
+    setStartCalendarDate(newValue)
+  }
+
+  const onEndDateChange = newValue => {
+    setEndCalendarDate(newValue)
+  }
 
   const setAndValidateName = nameToBeValidated => {
     if (nameToBeValidated.length > 255) {
@@ -102,9 +113,19 @@ export const VideoConferenceModal = ({
 
   // Detect initial state for calender picker display
   useEffect(() => {
-    const addToCalendar = options.includes('add_to_calendar')
     addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
-  }, [options])
+  }, [addToCalendar])
+
+  // Validate Calendar EndAt > StartAt
+  useEffect(() => {
+    if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
+      setCalendarValidationMessages([
+        {text: I18n.t('End at must be later than Start at'), type: 'error'}
+      ])
+    } else {
+      setCalendarValidationMessages([])
+    }
+  }, [addToCalendar, startCalendarDate, endCalendarDate])
 
   const renderCloseButton = () => {
     return (
@@ -140,10 +161,13 @@ export const VideoConferenceModal = ({
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
           showCalendar={showCalendarOptions}
+          setAddToCalendar={setAddToCalendar}
+          addToCalendar={addToCalendar}
           startDate={startCalendarDate}
           endDate={endCalendarDate}
-          onStartDateChange={setStartCalendarDate}
-          onEndDateChange={setEndCalendarDate}
+          onStartDateChange={onStartDateChange}
+          onEndDateChange={onEndDateChange}
+          calendarValidationMessages={calendarValidationMessages}
           tab={tab}
           setTab={setTab}
           nameValidationMessages={nameValidationMessages}
@@ -208,7 +232,7 @@ export const VideoConferenceModal = ({
       }}
       size="auto"
       label={header}
-      shouldCloseOnDocumentClick={true}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
         {renderCloseButton()}
@@ -234,7 +258,9 @@ export const VideoConferenceModal = ({
           color="primary"
           type="submit"
           data-testid="submit-button"
-          disabled={isLoading || nameValidationMessages.length > 0}
+          disabled={
+            isLoading || nameValidationMessages.length > 0 || calendarValidationMessages.length > 0
+          }
         >
           {isLoading ? (
             <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>

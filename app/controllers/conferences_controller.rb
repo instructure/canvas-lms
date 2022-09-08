@@ -353,12 +353,13 @@ class ConferencesController < ApplicationController
 
   def create
     if authorized_action(@context.web_conferences.temp_record, @current_user, :create)
+      calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
       @conference = @context.web_conferences.build(conference_params)
       @conference.settings[:default_return_url] = named_context_url(@context, :context_url, include_host: true)
       @conference.user = @current_user
       respond_to do |format|
         if @conference.save
-          if params[:web_conference].try(:delete, :calendar_event)
+          if calendar_event_param && calendar_event_param == 1
             calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
             calendar_event&.save
           end
@@ -389,9 +390,17 @@ class ConferencesController < ApplicationController
 
         @conference.invite_users_from_context if sync_attendees
 
+        calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
         if @conference.update(conference_params)
           # TODO: ability to dis-invite people
           @conference.invite_users_from_context(member_ids) unless sync_attendees
+
+          if calendar_event_param && calendar_event_param == 1
+            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+            calendar_event&.save
+          elsif @conference.calendar_event
+            @conference.calendar_event.destroy
+          end
 
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
