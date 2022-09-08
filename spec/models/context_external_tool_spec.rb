@@ -1509,56 +1509,6 @@ describe ContextExternalTool do
     end
   end
 
-  describe "all_tools_for" do
-    it "retrieves all tools in alphabetical order" do
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @account.context_external_tools.create!(name: "c", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      expect(ContextExternalTool.all_tools_for(@course).to_a).to eql(@tools.sort_by(&:name))
-    end
-
-    it "returns all tools that are selectable" do
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
-      @tools << @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
-      tools = ContextExternalTool.all_tools_for(@course, selectable: true)
-      expect(tools.count).to eq 2
-    end
-
-    it "returns multiple requested placements" do
-      tool1 = @course.context_external_tools.create!(name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
-      tool2 = @course.context_external_tools.new(name: "Another Tool", consumer_key: "key", shared_secret: "secret")
-      tool2.settings[:editor_button] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
-      tool2.save!
-      tool3 = @course.context_external_tools.new(name: "Third Tool", consumer_key: "key", shared_secret: "secret")
-      tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
-      tool3.save!
-      placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ["resource_selection"]
-      expect(ContextExternalTool.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
-    end
-
-    it "honors only_visible option" do
-      course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret",
-                                                       settings: { assignment_view: { visibility: "admins" } })
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret",
-                                                       settings: { assignment_view: { visibility: "members" } })
-      tools = ContextExternalTool.all_tools_for(@course)
-      expect(tools.count).to eq 3
-      tools = ContextExternalTool.all_tools_for(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
-      expect(tools.count).to eq 1
-      expect(tools[0].name).to eq "a"
-    end
-  end
-
   describe "placements" do
     it "returns multiple requested placements" do
       tool1 = @course.context_external_tools.create!(name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
@@ -1569,7 +1519,7 @@ describe ContextExternalTool do
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.save!
       placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ["resource_selection"]
-      expect(ContextExternalTool.all_tools_for(@course).placements(*placements).to_a).to eql([tool1, tool3].sort_by(&:name))
+      expect(ContextExternalTool.where(context: @course).placements(*placements).to_a).to contain_exactly(tool1, tool3)
     end
 
     it "only returns a single requested placements" do
@@ -1580,7 +1530,7 @@ describe ContextExternalTool do
       tool3 = @course.context_external_tools.new(name: "Third Tool", consumer_key: "key", shared_secret: "secret")
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements("resource_selection").to_a).to eql([tool3])
+      expect(ContextExternalTool.where(context: @course).placements("resource_selection").to_a).to eql([tool3])
     end
 
     it "doesn't return not selectable tools placements for moudle_item" do
@@ -1592,7 +1542,7 @@ describe ContextExternalTool do
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.not_selectable = true
       tool3.save!
-      expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      expect(ContextExternalTool.where(context: @course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
     end
 
     context "when passed the legacy default placements" do
@@ -1603,7 +1553,7 @@ describe ContextExternalTool do
         @course.context_external_tools.create!(
           name: "First Tool", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret", developer_key: DeveloperKey.create!, lti_version: "1.3"
         )
-        expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+        expect(ContextExternalTool.where(context: @course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
       end
     end
 
@@ -1664,7 +1614,7 @@ describe ContextExternalTool do
       tool2 = @course.context_external_tools.new(name: "2", consumer_key: "key", shared_secret: "secret")
       tool2.settings[:assignment_view] = { url: "http://www.example.com" }.with_indifferent_access
       tool2.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, []).to_a).to eql([tool1, tool2].sort_by(&:name))
+      expect(ContextExternalTool.where(context: @course).visible(@user, @course, nil, []).to_a).to contain_exactly(tool1, tool2)
     end
 
     it "returns nothing if a non-admin requests without specifying placement" do
@@ -1673,7 +1623,7 @@ describe ContextExternalTool do
       tool2 = @course.context_external_tools.new(name: "2", consumer_key: "key", shared_secret: "secret")
       tool2.settings[:assignment_view] = { url: "http://www.example.com" }.with_indifferent_access
       tool2.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, []).to_a).to eql([])
+      expect(ContextExternalTool.where(context: @course).visible(@user, @course, nil, []).to_a).to eql([])
     end
 
     it "returns only tools with placements matching the requested placement" do
@@ -1682,7 +1632,7 @@ describe ContextExternalTool do
       tool2 = @course.context_external_tools.new(name: "2", consumer_key: "key", shared_secret: "secret")
       tool2.settings[:assignment_view] = { url: "http://www.example.com" }.with_indifferent_access
       tool2.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool2])
+      expect(ContextExternalTool.where(context: @course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool2])
     end
 
     it "does not return admin tools to students" do
@@ -1690,7 +1640,7 @@ describe ContextExternalTool do
       tool = @course.context_external_tools.create!(name: "1", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
       tool.settings[:assignment_view] = { url: "http://www.example.com", visibility: "admins" }.with_indifferent_access
       tool.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([])
+      expect(ContextExternalTool.where(context: @course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([])
     end
 
     it "does return member tools to students" do
@@ -1698,21 +1648,21 @@ describe ContextExternalTool do
       tool = @course.context_external_tools.create!(name: "1", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
       tool.settings[:assignment_view] = { url: "http://www.example.com", visibility: "members" }.with_indifferent_access
       tool.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool])
+      expect(ContextExternalTool.where(context: @course).visible(@user, @course, nil, ["assignment_view"]).to_a).to eql([tool])
     end
 
     it "does not return member tools to public" do
       tool = @course.context_external_tools.create!(name: "1", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
       tool.settings[:assignment_view] = { url: "http://www.example.com", visibility: "members" }.with_indifferent_access
       tool.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([])
+      expect(ContextExternalTool.where(context: @course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([])
     end
 
     it "does return public tools to public" do
       tool = @course.context_external_tools.create!(name: "1", url: "http://www.example.com", consumer_key: "key", shared_secret: "secret")
       tool.settings[:assignment_view] = { url: "http://www.example.com", visibility: "public" }.with_indifferent_access
       tool.save!
-      expect(ContextExternalTool.all_tools_for(@course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([tool])
+      expect(ContextExternalTool.where(context: @course).visible(nil, @course, nil, ["assignment_view"]).to_a).to eql([tool])
     end
   end
 

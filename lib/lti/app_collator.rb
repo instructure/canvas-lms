@@ -25,7 +25,7 @@ module Lti
     end
 
     def bookmarked_collection
-      external_tools_scope = ContextExternalTool.all_tools_for(@context)
+      external_tools_scope = Lti::ContextToolFinder.all_tools_for(@context)
       external_tools_collection = BookmarkedCollection.wrap(ExternalToolNameBookmarker, external_tools_scope)
       tool_proxy_scope = ToolProxy.find_installed_proxies_for_context(@context)
       tool_proxy_collection = BookmarkedCollection.wrap(ToolProxyNameBookmarker, tool_proxy_scope)

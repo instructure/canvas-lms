@@ -452,7 +452,7 @@ module Importers
             # If no match is found in the first search, fall back on using the tool ID
             # provided in the migration hash if a tool with that ID is present
             # in the destination context.
-            tool ||= ContextExternalTool.all_tools_for(context).find_by(id: tool_id)
+            tool ||= Lti::ContextToolFinder.all_tools_for(context).find_by(id: tool_id)
 
             tag.content_id = tool&.id
           elsif hash[:external_tool_migration_id]

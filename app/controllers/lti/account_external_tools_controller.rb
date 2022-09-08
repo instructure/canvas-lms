@@ -89,7 +89,7 @@ module Lti
     end
 
     def tools
-      @tools ||= ContextExternalTool.all_tools_for(context)
+      @tools ||= Lti::ContextToolFinder.all_tools_for(context)
     end
 
     def context

@@ -565,7 +565,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.lti_tools(context)
-    ContextExternalTool.all_tools_for(context, placements: :conference_selection) || []
+    Lti::ContextToolFinder.all_tools_for(context, placements: :conference_selection) || []
   end
 
   def self.plugins

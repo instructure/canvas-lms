@@ -2302,8 +2302,8 @@ class Account < ActiveRecord::Base
 
   def get_rce_favorite_tool_ids
     rce_favorite_tool_ids[:value] ||
-      ContextExternalTool.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
-                         .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
+      Lti::ContextToolFinder.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
+                            .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
   end
 
   def effective_course_template

@@ -370,7 +370,7 @@ class AssignmentsController < ApplicationController
         end
 
         @external_tools = if @assignment.submission_types.include?("online_upload") || @assignment.submission_types.include?("online_url")
-                            ContextExternalTool.all_tools_for(@context, user: @current_user, placements: :homework_submission)
+                            Lti::ContextToolFinder.all_tools_for(@context, user: @current_user, placements: :homework_submission)
                           else
                             []
                           end
@@ -590,8 +590,8 @@ class AssignmentsController < ApplicationController
     add_crumb @context.elementary_enabled? ? t("Important Info") : t("#crumbs.syllabus", "Syllabus")
 
     @course_home_sub_navigation_tools =
-      ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
-                                                  root_account: @domain_root_account, current_user: @current_user).to_a
+      Lti::ContextToolFinder.all_tools_for(@context, placements: :course_home_sub_navigation,
+                                                     root_account: @domain_root_account, current_user: @current_user).to_a
     unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
       @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
     end

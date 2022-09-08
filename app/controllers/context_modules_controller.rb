@@ -95,8 +95,8 @@ class ContextModulesController < ApplicationController
         module_menu_modal
       ]
       tools = GuardRail.activate(:secondary) do
-        ContextExternalTool.all_tools_for(@context, placements: placements,
-                                                    root_account: @domain_root_account, current_user: @current_user).to_a
+        Lti::ContextToolFinder.all_tools_for(@context, placements: placements,
+                                                       root_account: @domain_root_account, current_user: @current_user).to_a
       end
 
       @menu_tools = {}
