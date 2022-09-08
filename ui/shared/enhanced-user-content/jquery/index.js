@@ -20,7 +20,6 @@ import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
-import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
 import preventDefault from 'prevent-default'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
@@ -47,8 +46,55 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
+import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 
 const I18n = useI18nScope('instructure_js')
+
+// we're doing this so we can use the svg in the img src attribute
+// rather than just inlining the svg. This simplified keeping the
+// vertical alignment consistent with how it was with the icon font.
+// The optional chaining to .src is because the icons are undefined
+// in jest tests
+const IconDownloadb64src = window.btoa(IconDownloadLine?.src)
+const IconExternalLinkb64src = window.btoa(IconExternalLinkLine?.src)
+
+function makeDownloadButton(download_url, filename) {
+  const a = document.createElement('a')
+  a.setAttribute('class', 'file_download_btn')
+  a.setAttribute('role', 'button')
+  a.setAttribute('download', '')
+  a.setAttribute('style', 'margin-inline-start: 5px; text-decoration: none;')
+  a.setAttribute('href', download_url)
+
+  const img = document.createElement('img')
+  img.setAttribute('style', 'width:16px; height:16px')
+  img.setAttribute('role', 'presentation')
+  img.setAttribute('src', `data:image/svg+xml;base64,${IconDownloadb64src}`)
+  a.appendChild(img)
+
+  const srspan = document.createElement('span')
+  srspan.setAttribute('class', 'screenreader-only')
+  srspan.innerHTML = htmlEscape(I18n.t('Download %{filename}', {filename}))
+  a.appendChild(srspan)
+
+  return a
+}
+
+function makeExternalLinkIcon() {
+  const span = document.createElement('span')
+  const img = document.createElement('img')
+  img.setAttribute('style', 'margin-inline-start: 5px; width:16px; height:16px')
+  img.setAttribute('src', `data:image/svg+xml;base64,${IconExternalLinkb64src}`)
+  img.setAttribute('alt', '')
+  img.setAttribute('role', 'presentation')
+  span.appendChild(img)
+
+  const srspan = document.createElement('span')
+  srspan.setAttribute('class', 'screenreader-only')
+  srspan.innerHTML = htmlEscape(I18n.t('Links to an external site.'))
+  span.appendChild(srspan)
+  return span
+}
 
 let preview_counter = 0
 function previewId() {
@@ -138,7 +184,6 @@ export function enhanceUserContent(visibilityMod) {
     return
   }
   const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
-  const $content = $('#content')
   const visibilityQueryMod = visibilityMod === enhanceUserContent.ANY_VISIBILITY ? '' : ':visible'
   $(`.user_content:not(.enhanced)${visibilityQueryMod}`).addClass('unenhanced')
   $(`.user_content.unenhanced${visibilityQueryMod}`)
@@ -200,19 +245,13 @@ export function enhanceUserContent(visibilityMod) {
     .end()
     .find('a:not(.not_external, .external):external')
     .each(function () {
-      const externalLink = htmlEscape(I18n.t('titles.external_link', 'Links to an external site.'))
       $(this)
         .not(':has(img)')
         .addClass('external')
         .html('<span>' + $(this).html() + '</span>')
         .attr('target', '_blank')
         .attr('rel', 'noreferrer noopener')
-        .append(
-          '<span aria-hidden="true" class="ui-icon ui-icon-extlink ui-icon-inline" title="' +
-            $.raw(externalLink) +
-            '"/>'
-        )
-        .append('<span class="screenreader-only">&nbsp;(' + $.raw(externalLink) + ')</span>')
+        .append($(makeExternalLinkIcon()))
     })
     .end()
 
@@ -248,16 +287,7 @@ export function enhanceUserContent(visibilityMod) {
         /(?:\/(download|preview))?$/,
         '/download'
       )}?${qs}`
-      $download_btn = $(
-        `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px; text-decoration: none;" href="${htmlEscape(
-          download_url
-        )}">
-            <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
-            <span class="screenreader-only">
-              ${htmlEscape(I18n.t('Download %{filename}', {filename}))}
-            </span>
-          </a>`
-      )
+      $download_btn = makeDownloadButton(download_url, filename)
 
       if ($link.hasClass('instructure_scribd_file')) {
         if ($link.hasClass('no_preview')) {
@@ -929,12 +959,7 @@ function makeAllExternalLinksExternalLinks() {
         .not('.not_external')
         .not('.exclude_external_icon')
       if ($linkToReplace.length) {
-        const indicatorText = I18n.t('titles.external_link', 'Links to an external site.')
-        const $linkIndicator = $('<span class="ui-icon ui-icon-extlink ui-icon-inline"/>').attr(
-          'title',
-          indicatorText
-        )
-        $linkIndicator.append($('<span class="screenreader-only"/>').text(indicatorText))
+        const $linkIndicator = makeExternalLinkIcon()
         $linkToReplace
           .addClass('external')
           .children('span.ui-icon-extlink')
@@ -950,7 +975,7 @@ function makeAllExternalLinksExternalLinks() {
 }
 
 export default function enhanceTheEntireUniverse() {
-  [
+  ;[
     retriggerEarlyClicks,
     ellipsifyBreadcrumbs,
     bindKeyboardShortcutsHelpPanel,
@@ -971,6 +996,8 @@ export default function enhanceTheEntireUniverse() {
     doThingsToModuleSequenceFooter,
     showHideRemoveThingsToRightSideMoreLinksWhenClicked,
     confirmAndDeleteRightSideTodoItemsWhenClicked,
-    makeAllExternalLinksExternalLinks,
-  ].map(isolate).map(x => x())
+    makeAllExternalLinksExternalLinks
+  ]
+    .map(isolate)
+    .map(x => x())
 }
