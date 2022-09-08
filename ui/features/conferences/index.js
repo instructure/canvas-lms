@@ -129,7 +129,7 @@ const ConferencesRouter = Backbone.Router.extend({
               window.location.hash = ''
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
-            onSubmit={(e, data) => {
+            onSubmit={async (e, data) => {
               const context =
                 attributes.context_type === 'Course'
                   ? 'courses'
@@ -191,17 +191,17 @@ const ConferencesRouter = Backbone.Router.extend({
               }
 
               if (!context) {
-                return
+                return false
               }
 
-              fetch(`/${context}/${contextId}/conferences`, requestOptions)
-                .then(() => {
-                  // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                  window.location.href = window.location.href.split('#')[0]
-                })
-                .catch(err => {
-                  throw err
-                })
+              const response = await fetch(`/${context}/${contextId}/conferences`, requestOptions)
+
+              if (response.status === 200) {
+                window.location.href = window.location.href.split('#')[0]
+                return true
+              } else {
+                return false
+              }
             }}
           />,
           document.getElementById('react-conference-modal-container')
@@ -272,7 +272,7 @@ const ConferencesRouter = Backbone.Router.extend({
             window.location.hash = ''
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
-          onSubmit={(e, data) => {
+          onSubmit={async (e, data) => {
             const context =
               attributes.context_type === 'Course'
                 ? 'courses'
@@ -339,17 +339,20 @@ const ConferencesRouter = Backbone.Router.extend({
             }
 
             if (!context) {
-              return
+              return false
             }
 
-            fetch(`/${context}/${contextId}/conferences/${conferenceId}`, requestOptions)
-              .then(() => {
-                // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                window.location.href = window.location.href.split('#')[0]
-              })
-              .catch(err => {
-                throw err
-              })
+            const response = await fetch(
+              `/${context}/${contextId}/conferences/${conferenceId}`,
+              requestOptions
+            )
+
+            if (response.status === 200) {
+              window.location.href = window.location.href.split('#')[0]
+              return true
+            } else {
+              return false
+            }
           }}
         />,
         document.getElementById('react-conference-modal-container')
