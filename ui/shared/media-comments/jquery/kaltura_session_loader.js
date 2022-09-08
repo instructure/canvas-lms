@@ -48,6 +48,10 @@ export default class KalturaSessionLoader {
   }
 
   kalturaUrl(endPoint) {
-    return `${window.location.protocol}//${INST.kalturaSettings.domain}${endPoint}`
+    return `${this.kalturaProtocol()}//${INST.kalturaSettings.domain}${endPoint}`
+  }
+
+  kalturaProtocol() {
+    return INST.kalturaSettings.protocol || window.location.protocol
   }
 }
