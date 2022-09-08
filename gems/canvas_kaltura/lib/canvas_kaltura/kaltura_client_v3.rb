@@ -44,6 +44,7 @@ module CanvasKaltura
       @partnerId = config["partner_id"]
       @secret = config["secret_key"]
       @user_secret = config["user_secret_key"]
+      @use_ssl = config["protocol"] != "http"
       @host ||= "www.kaltura.com"
       @endpoint ||= "/api_v3"
       @cache_play_list_seconds = config["cache_play_list_seconds"]&.to_i
@@ -384,8 +385,12 @@ module CanvasKaltura
       response = nil
       CanvasKaltura.with_timeout_protector(fallback_timeout_length: 30) do
         http = Net::HTTP.new(@host, Net::HTTP.https_default_port)
-        http.use_ssl = true
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        http.use_ssl = @use_ssl
+
+        if ENV["RAILS_ENV"] == "development"
+          http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        end
+
         response = http.request(request, body)
       end
       raise Timeout::Error unless response

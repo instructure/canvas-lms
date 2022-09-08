@@ -60,6 +60,12 @@ TEXT
         <div class="hint"><%= t('hints.rtmp_domain', 'For hosted accounts, use "www.kaltura.com"') %></div>
       </td>
     </tr>
+    <% if(ENV["RAILS_ENV"] == "development") %>
+      <tr>
+        <td><%= f.blabel :protocol, :en => "Protocol" %></td>
+        <td><%= f.select :protocol, [t('https'), t('http')] %></td>
+      </tr>
+    <% end %>
     <tr>
       <td colspan="2" class="sub">
         <h3><%= t('headers.account_settings', "Account Settings") %></h3>
