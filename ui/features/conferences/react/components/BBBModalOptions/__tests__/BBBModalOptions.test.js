@@ -28,6 +28,7 @@ describe('BBBModalOptions', () => {
   const setDescription = jest.fn()
   const setInvitationOptions = jest.fn()
   const setAttendeesOptions = jest.fn()
+  const setAddToCalendar = jest.fn()
 
   const defaultProps = {
     name: 'Conference 1',
@@ -48,6 +49,8 @@ describe('BBBModalOptions', () => {
       'send_private_chat'
     ],
     setAttendeesOptions,
+    setAddToCalendar,
+    addToCalendar: false,
     tab: SETTINGS_TAB
   }
 
@@ -69,6 +72,8 @@ describe('BBBModalOptions', () => {
         showCalendar={props.showCalendar}
         startDate={props.startDate}
         endDate={props.endDate}
+        setAddToCalendar={props.setAddToCalendar}
+        addToCalendar={props.addToCalendar}
         tab={props.tab}
       />
     )
@@ -132,5 +137,31 @@ describe('BBBModalOptions', () => {
     window.ENV.bbb_recording_enabled = false
     const container = setup(defaultProps)
     expect(container.getByLabelText('Enable recording for this conference').disabled).toBeTruthy()
+  })
+
+  it('should lock inviteAll equal to true if add_to_calendar is checked', () => {
+    const customProps = defaultProps
+    customProps.options.push('add_to_calendar')
+    customProps.addToCalendar = true
+
+    const container = setup({...customProps, tab: ATTENDEES_TAB})
+    expect(container.getByLabelText('Invite all course members').checked).toBeTruthy()
+    expect(container.getByLabelText('Invite all course members').disabled).toBeTruthy()
+    expect(container.getAllByTestId('inviteAll-tooltip')).toBeTruthy()
+  })
+
+  it('does not show add to calendar when context is group', () => {
+    window.ENV.context_asset_string = 'group_1'
+    const customProps = defaultProps
+    const container = setup({...customProps})
+
+    expect(container.queryByText('Add to Calendar')).not.toBeInTheDocument()
+  })
+
+  it('shows add to calendar when context', () => {
+    window.ENV.context_asset_string = 'course_1'
+    const customProps = defaultProps
+    const container = setup({...customProps})
+    expect(container.queryByText('Add to Calendar')).toBeInTheDocument()
   })
 })

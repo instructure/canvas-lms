@@ -21,18 +21,22 @@ import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {ConferenceAddressBook} from '../ConferenceAddressBook/ConferenceAddressBook'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconInfoLine} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-text-input'
 import {NumberInput} from '@instructure/ui-number-input'
 import {Flex} from '@instructure/ui-flex'
 import {TextArea} from '@instructure/ui-text-area'
 import {Tabs} from '@instructure/ui-tabs'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {DateTimeInput} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
+import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('video_conference')
 
-const BBBModalOptions = props => {
+const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
 
   const contextIsGroup = ENV.context_asset_string?.split('_')[0] === 'group'
@@ -113,7 +117,19 @@ const BBBModalOptions = props => {
                 }}
               />
               <Checkbox label={I18n.t('Enable waiting room')} value="enable_waiting_room" />
-              <Checkbox label={I18n.t('Add to Calendar')} value="add_to_calendar" />
+              {!contextIsGroup && (
+                <Checkbox
+                  label={I18n.t('Add to Calendar')}
+                  value="add_to_calendar"
+                  onChange={event => {
+                    setAddToCalendar(event.target.checked)
+                    // due to calendar api, it sends invite to full course, thus invite_all must be checked
+                    if (event.target.checked) {
+                      props.onSetInvitationOptions(['invite_all'])
+                    }
+                  }}
+                />
+              )}
             </CheckboxGroup>
           </Flex.Item>
           {props.showCalendar && (
@@ -137,6 +153,7 @@ const BBBModalOptions = props => {
                         {I18n.t('Start Date for Conference')}
                       </ScreenReaderContent>
                     }
+                    messages={props.calendarValidationMessages}
                   />
                 </Flex.Item>
                 <Flex.Item padding="small" align="start">
@@ -155,6 +172,7 @@ const BBBModalOptions = props => {
                     description={
                       <ScreenReaderContent>{I18n.t('End Date for Conference')}</ScreenReaderContent>
                     }
+                    messages={props.calendarValidationMessages}
                   />
                 </Flex.Item>
               </Flex>
@@ -185,9 +203,28 @@ const BBBModalOptions = props => {
                 props.onSetInvitationOptions([...value])
               }}
               defaultValue={props.invitationOptions}
-              description={I18n.t('Invitation Options')}
+              description={
+                <View>
+                  {I18n.t('Invitation Options')}
+                  {addToCalendar && (
+                    <Tooltip
+                      renderTip={I18n.t('All course members must be invited to calendar events.')}
+                      placement="end"
+                      on={['click', 'hover', 'focus']}
+                    >
+                      <IconButton
+                        renderIcon={IconInfoLine}
+                        withBackground={false}
+                        withBorder={false}
+                        screenReaderLabel="Toggle Tooltip"
+                        data-testid="inviteAll-tooltip"
+                      />
+                    </Tooltip>
+                  )}
+                </View>
+              }
             >
-              <Checkbox label={inviteAllMemberstext} value="invite_all" />
+              <Checkbox label={inviteAllMemberstext} value="invite_all" disabled={addToCalendar} />
               {!contextIsGroup && (
                 <Checkbox
                   label={I18n.t('Remove all course observer members')}
@@ -248,10 +285,13 @@ BBBModalOptions.propTypes = {
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
   showCalendar: PropTypes.bool,
+  setAddToCalendar: PropTypes.func,
+  addToCalendar: PropTypes.bool,
   onEndDateChange: PropTypes.func,
   onStartDateChange: PropTypes.func,
   startDate: PropTypes.string,
   endDate: PropTypes.string,
+  calendarValidationMessages: PropTypes.array,
   tab: PropTypes.string,
   setTab: PropTypes.func,
   nameValidationMessages: PropTypes.array
