@@ -396,7 +396,7 @@ export default class Calendar {
 
     const newTitle =
       ENV.FEATURES.wrap_calendar_event_titles && _view.name === 'month'
-        ? $.trim(element.find('.fc-title').text())
+        ? $.trim(htmlEscape(element.find('.fc-title').text()))
         : $.trim(
             `${timeString}\n${$element.find('.fc-title').text()}\n\n${I18n.t(
               'Calendar:'
