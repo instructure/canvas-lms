@@ -35,6 +35,11 @@ const I18n = useI18nScope('video_conference')
 const BBBModalOptions = props => {
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
 
+  const contextIsGroup = ENV.context_asset_string?.split('_')[0] === 'group'
+  const inviteAllMemberstext = contextIsGroup
+    ? I18n.t('Invite all group members')
+    : I18n.t('Invite all course members')
+
   return (
     <Tabs
       onRequestTabChange={(e, {id}) => {
@@ -181,11 +186,13 @@ const BBBModalOptions = props => {
               defaultValue={props.invitationOptions}
               description={I18n.t('Invitation Options')}
             >
-              <Checkbox label={I18n.t('Invite all course members')} value="invite_all" />
-              <Checkbox
-                label={I18n.t('Remove all course observer members')}
-                value="remove_observers"
-              />
+              <Checkbox label={inviteAllMemberstext} value="invite_all" />
+              {!contextIsGroup && (
+                <Checkbox
+                  label={I18n.t('Remove all course observer members')}
+                  value="remove_observers"
+                />
+              )}
             </CheckboxGroup>
           </Flex.Item>
           {props.showAddressBook && (

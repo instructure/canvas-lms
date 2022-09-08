@@ -145,6 +145,16 @@ describe('VideoConferenceModal', () => {
 
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByText('Invite all course members')).toBeInTheDocument()
+    expect(container.getByText('Remove all course observer members')).toBeInTheDocument()
+  })
+
+  it('shows correct group options in attendees tab', () => {
+    window.ENV.context_asset_string = 'group_1'
+    const container = setup()
+
+    fireEvent.click(container.getByText('Attendees'))
+    expect(container.getByText('Invite all group members')).toBeInTheDocument()
+    expect(container.queryByText('Remove all course observer members')).not.toBeInTheDocument()
   })
 
   it('shows New Video Conference and Create button when not on editing mode', () => {
