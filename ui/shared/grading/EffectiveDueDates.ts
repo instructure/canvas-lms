@@ -19,25 +19,58 @@
 import _ from 'lodash'
 import timezone from '@canvas/timezone'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
+import type {Submission} from '../../api.d'
 
-export function scopeToUser(dueDateData, userId) {
-  const scopedData = {}
-  _.forEach(dueDateData, (dueDateDataByUserId, assignmentId) => {
-    if (dueDateDataByUserId[userId]) {
-      scopedData[assignmentId] = dueDateDataByUserId[userId]
+type GradingPeriod = {
+  id: string
+  isClosed: boolean
+}
+
+type DueDataData = {
+  due_at: string
+  grading_period_id: string
+  in_closed_grading_period: boolean
+}
+
+type DueDateDataByUser = {
+  [userId: string]: DueDataData
+}
+
+type DueDateDataByAssignmentId = {
+  [assignmentId: string]: DueDateDataByUser
+}
+
+type EffectiveDueDatesbyAssignmentId = {
+  [assignmentId: string]: any
+}
+
+export function scopeToUser(dueDateDataByAssignmentId: DueDateDataByAssignmentId, userId: string) {
+  const scopedData: {
+    [assignmentId: string]: DueDataData
+  } = {}
+  _.forEach(
+    dueDateDataByAssignmentId,
+    (dueDateDataByUserId: DueDateDataByUser, assignmentId: string) => {
+      if (dueDateDataByUserId[userId]) {
+        scopedData[assignmentId] = dueDateDataByUserId[userId]
+      }
     }
-  })
+  )
   return scopedData
 }
 
-export function updateWithSubmissions(effectiveDueDates, submissions, gradingPeriods = []) {
+export function updateWithSubmissions(
+  effectiveDueDates: EffectiveDueDatesbyAssignmentId,
+  submissions: Submission[],
+  gradingPeriods: GradingPeriod[] = []
+): void {
   const helper = new GradingPeriodsHelper(gradingPeriods)
   const sortedPeriods = _.sortBy(gradingPeriods, 'startDate')
 
   submissions.forEach(submission => {
     const dueDate = timezone.parse(submission.cached_due_date)
 
-    let gradingPeriod = null
+    let gradingPeriod: null | GradingPeriod = null
     if (gradingPeriods.length) {
       if (dueDate) {
         gradingPeriod = helper.gradingPeriodForDueAt(dueDate)
