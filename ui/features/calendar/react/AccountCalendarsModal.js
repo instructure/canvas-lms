@@ -236,13 +236,13 @@ const AccountCalendarsModal = ({
 
   return (
     <>
-      <View as="div" padding="small x-small 0 x-small">
+      <View as="div" padding="0 x-small">
         <Link
           data-testid="add-other-calendars-button"
           onClick={() => setIsOpen(true)}
           theme={{color: 'black', hoverColor: 'black'}}
         >
-          <IconPlusLine title={I18n.t('Add other calendar')} />
+          <IconPlusLine size="x-small" title={I18n.t('Add other calendar')} />
         </Link>
       </View>
       <Modal
