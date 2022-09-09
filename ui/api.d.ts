@@ -127,6 +127,8 @@ export type Override = {
 export type Assignment = {
   anonymous_grading: boolean
   anonymize_students: boolean
+  anonymous_peer_reviews?: boolean
+  assessment_requests: AssessmentRequest[]
   assignment_group_id: string
   assignment_group_position: number
   assignment_id: string
@@ -167,6 +169,13 @@ export type AssignmentGroup = {
 
 export type AssignmentGroupMap = {
   [id: string]: AssignmentGroup
+}
+
+export type AssessmentRequest = {
+  anonymous_id?: string
+  user_id?: string
+  user_name?: string
+  available: boolean
 }
 
 export type AttachmentData = {
