@@ -69,7 +69,7 @@ class Progress < ActiveRecord::Base
     update_completion!(100.0 * @current_value / @total)
   end
 
-  def increment_completion!(increment)
+  def increment_completion!(increment = 1)
     raise "`increment_completion!` can only be invoked after a total has been set with `calculate_completion!`" if @total.nil?
 
     @current_value += increment
