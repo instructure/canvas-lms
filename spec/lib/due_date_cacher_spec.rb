@@ -596,6 +596,24 @@ describe DueDateCacher do
       end
     end
 
+    describe "re-adding removed students from a quiz" do
+      it "assigns the correct workflow state to the submission" do
+        @quiz = @course.quizzes.create!
+        @quiz.workflow_state = "available"
+        @quiz.quiz_data = [{ correct_comments: "", assessment_question_id: nil, incorrect_comments: "", question_name: "Question 1", points_possible: 1, question_text: "Write an essay!", name: "Question 1", id: 128, answers: [], question_type: "essay_question" }]
+        @quiz.save!
+
+        @quiz_submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
+        @quiz_submission.update!(workflow_state: "pending_review")
+
+        submission = @quiz_submission.submission
+        submission.update!(workflow_state: "deleted")
+
+        cacher.recompute
+        expect(submission.workflow_state).to eq "pending_review"
+      end
+    end
+
     describe "updated_at" do
       it "updates the updated_at when the workflow_state of a submission changes" do
         submission.update!(workflow_state: "deleted")
