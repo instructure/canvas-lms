@@ -81,6 +81,19 @@ export const VideoConferenceModal = ({
   const [showCalendarOptions, setShowCalendarOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
+  const [nameValidationMessages, setNameValidationMessages] = useState([])
+
+  const setAndValidateName = nameToBeValidated => {
+    if (nameToBeValidated.length > 255) {
+      setNameValidationMessages([
+        {text: I18n.t('Name must be less than 255 characters'), type: 'error'}
+      ])
+    } else {
+      setNameValidationMessages([])
+      setName(nameToBeValidated)
+    }
+  }
+
   // Detect initial state for address book display
   useEffect(() => {
     const inviteAll = invitationOptions.includes('invite_all')
@@ -111,7 +124,7 @@ export const VideoConferenceModal = ({
       return (
         <BBBModalOptions
           name={name}
-          onSetName={setName}
+          onSetName={setAndValidateName}
           duration={duration}
           onSetDuration={setDuration}
           options={options}
@@ -133,6 +146,7 @@ export const VideoConferenceModal = ({
           onEndDateChange={setEndCalendarDate}
           tab={tab}
           setTab={setTab}
+          nameValidationMessages={nameValidationMessages}
         />
       )
     }
@@ -140,7 +154,7 @@ export const VideoConferenceModal = ({
     return (
       <BaseModalOptions
         name={name}
-        onSetName={setName}
+        onSetName={setAndValidateName}
         duration={duration}
         onSetDuration={setDuration}
         options={options}
@@ -153,6 +167,7 @@ export const VideoConferenceModal = ({
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
+        nameValidationMessages={nameValidationMessages}
       />
     )
   }
@@ -215,7 +230,12 @@ export const VideoConferenceModal = ({
         >
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" data-testid="submit-button" disabled={isLoading}>
+        <Button
+          color="primary"
+          type="submit"
+          data-testid="submit-button"
+          disabled={isLoading || nameValidationMessages.length > 0}
+        >
           {isLoading ? (
             <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
               <Spinner
