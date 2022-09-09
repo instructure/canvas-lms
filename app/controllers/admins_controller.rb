@@ -64,8 +64,7 @@ class AdminsController < ApplicationController
   #   created with the given role. Defaults to 'AccountAdmin'.
   #
   # @argument role_id [Integer]
-  #   The user's admin relationship with the account will be created with the
-  #   given role. Defaults to the built-in role for 'AccountAdmin'.
+  #   The user's admin relationship with the account will be created with the given role. Defaults to the built-in role for 'AccountAdmin'.
   #
   # @argument send_confirmation [Boolean]
   #   Send a notification email to
@@ -105,12 +104,10 @@ class AdminsController < ApplicationController
   # Remove the rights associated with an account admin role from a user.
   #
   # @argument role [String]
-  #   [DEPRECATED] Account role to remove from the user. Defaults to
-  #   'AccountAdmin'. Any other account role must be specified explicitly.
+  #   [DEPRECATED] Account role to remove from the user.
   #
-  # @argument role_id [Integer]
-  #   The user's admin relationship with the account will be created with the
-  #   given role. Defaults to the built-in role for 'AccountAdmin'.
+  # @argument role_id [Required, Integer]
+  #   The id of the role representing the user's admin relationship with the account.
   #
   # @returns Admin
   def destroy
