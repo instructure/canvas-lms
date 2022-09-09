@@ -641,6 +641,7 @@ ja:
   account_user: 
     types: 
       account_admin: アカウント管理者
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: アカウント名は空白にできません
@@ -1969,6 +1970,8 @@ ja:
   add_bank: 
     default_name: 名称がありません
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: コースのペーシングにブラックアウトの日付UIを追加します。course_pacesを有効化する必要があります。
+  add_calendar_36da563b: カレンダーを追加する
+  add_calendars_13c82791: カレンダーを追加する
   add_calendars_to_view_your_institution_s_important_df1e42d3: カレンダーを追加して、授業開始日、試験期間など、教育機関の重要な日付を表示することができます
   add_cc_subtitle_a9ef4a66: "CC /字幕を追加"
   add_collaboration_da9665ac: コラボレーションの追加
@@ -2168,6 +2171,7 @@ ja:
   admin_tray_3b680e7b: 管理トレイ
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: 管理者ビュー
+  administrative_links_816228e2: アドミニストレーションのリンク
   administrator_f325c186: 管理者
   administrators_and_author_only_flagged_as_possible_42345cba: 管理者と作成者のみ（スパムの可能性があるとしてフラグ付け）
   administrators_and_author_only_marked_as_spam_184becce: 管理者と作成者のみ（スパムとしてフラグ付け）
@@ -2407,6 +2411,7 @@ ja:
       GraphQL突然変異に関する情報を含むログを表示できます。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: アウトカムをスコアのないコンテンツに合わせることができます
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: 査定担当者は、匿名または司会の割り当てに対してSpeedGrader評価監査トレイを表示できます。
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: コースページをスケジュールで公開できるようにする
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: コースの受講生グループをcsvアップロードで作成できるようにする
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 特定のセクションのアナウンスメント作成を許可します
   allows_creating_discussions_for_a_specific_section_6bf44036: 特定のセクションのディスカッションの作成を許可します
@@ -3168,6 +3173,7 @@ ja:
   an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
     one: "%{count}結果の計算削除中にエラーが発生しました：%{errorMessage}."
     other: "%{count}結果の計算削除中にエラーが発生しました：%{errorMessage}."
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: カレンダー削除中にエラーが発生しました
   an_error_occurred_while_removing_the_outcome_e47c9553: 結果の計算削除中にエラーが発生しました：
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "結果の計算削除中にエラーが発生しました：%{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
@@ -4639,6 +4645,8 @@ ja:
       attendance_help: 出欠についてのヘルプ
   attendance_ca433183: 出席状況
   attendees_eb402bac: 出席者
+  attendees_failed_to_sync_725c8137: " 出席者の同期に失敗しました。"
+  attendees_synced_ee5edd00: " 受講者が同期されました"
   attention_aaca1f1d: 注目！
   attribute_d9f3af72: 属性
   attributes_locked_1a1a0f46: "%{attributes} ロックされています"
@@ -5216,6 +5224,7 @@ ja:
   by_default_students_can_always_create_groups_in_a__dac761d3: "デフォルトでは、受講者はグループを作成できます。受講生がグループを作成するのを制限するには、[コース - 管理/更新]も有効にされていなければならず、コース設定で[受講生が自分のグループを整理する]チェックボックスがオフにされていなければなりません。"
   by_lti_2_registration_url_e421e523: "LTI 2 登録 URL"
   by_url_a163275e: "URL ごと"
+  c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: 閉じる
@@ -5586,6 +5595,7 @@ ja:
     ics_description_user: "次のユーザのカレンダー イベント: %{user_name}"
     ics_title: "%{course_or_group_name} のカレンダー (Canvas)"
     invalid_date_or_time: "%{attr} の日付または日時が無効です"
+  calendar_removed_1c841af4: カレンダーが削除されました
   calendar_series_e1b7a4bc: カレンダーシリーズ
   calendars: 
     event: 
@@ -5638,6 +5648,7 @@ ja:
         delete: イベント/課題の削除
         new: 新しいイベントの作成
   calendars_a756c286: カレンダー
+  calendars_added_successfully_2e443b3: カレンダーが正常に追加されました
   calendars_saved_successfully_bcba8359: カレンダーが正常に保存されました
   calendars_toggle_list_visibility_488db143: "カレンダー: リストの表示/非表示の切り替え"
   campbell_union_high_school_district_grade_report_7f3bb801: "Campbell Union ハイスクール学区評定表"
@@ -5937,6 +5948,7 @@ ja:
   check_to_add_a_user_for_loginid_6cd25597: "チェックボックスをオンにしてユーザーを～に追加する%{loginid}"
   check_to_select_all_98e484f1: チェックしてすべてを選択する
   check_to_skip_adding_a_user_for_loginid_5fa643da: "チェックボックスをオンにして～へのユーザーを追加をスキップする%{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: スペルを確認するか、文字数を減らしてみてください。
   checkbox_examples_dc790142: チェックボックスの例
   checked_883b93fd: チェック済み
   cheerful_panda_holding_a_map_17ba47ee: 地図を持つ元気なパンダ
@@ -5959,6 +5971,7 @@ ja:
   choose_a_quiz_engine_8820d521: 小テストエンジンを選択してください
   choose_a_submission_type_8f45651a: 提出の形式を選択する
   choose_a_timezone_d9c52998: タイムゾーンを変更
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "Canvas のカレンダーに追加するカレンダーを選択します。"
   choose_an_authentication_service_47dc8875: 認証サービスを選択してください
   choose_and_publish_980812cb: 選択して公開する
   choose_assignment_b0132c5e: "-- 課題を選択 --"
@@ -5982,6 +5995,7 @@ ja:
     other: "科目のカレンダーは最大で%{count}選択可能"
   choose_usage_rights_33683854: 使用権を選択...
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: キャンバスカレンダーの「その他のカレンダー」セクションに表示するカレンダーを選択します。そのアカウントに関連付けられている場合、サブアカウントのカレンダーがユーザーに表示されます。デフォルトでは、すべてのカレンダーが非表示になっています。
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "Canvas カレンダーの「その他のカレンダー」セクションに表示するカレンダーを選択します。ユーザーは、自分が関連するアカウントに対してのみ、有効なカレンダーを追加することができます。デフォルトでは、すべてのカレンダーが無効になっています。"
   choose_your_default_skin_tone_f09bf0bd: デフォルトの肌色を選択する
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' は有効な色ではありません。"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' は有効な色ではありません。保存する前に有効な16進コードを入力してください。"
@@ -6539,6 +6553,7 @@ ja:
   conference_name_fdb7e091: 会議名
   conference_participant_count_87e86c5c: 会議参加者数
   conference_recorded_7e776ec2: 会議は録画されました
+  conference_saved_8895cfbc: 会議が保存されました
   conference_selection_ea4050bb: 会議の選択
   conference_type_2f4ac9be: 会議タイプ
   conference_type_7bd581e: 会議タイプ
@@ -6597,6 +6612,7 @@ ja:
       recordings: "%{recordingCount} 件の記録"
       settings: 設定
       start: 開始
+      sync: 出席者を同期する
       type: "%{type}"
       view: 表示
     no_concluded_conferences: 終了した会議はありません
@@ -7588,6 +7604,10 @@ ja:
   count_40eced3b: 数
   count_account_calendars_selected_578d6db8: 
     one: 1つのアカウントカレンダーの表示/非表示
+    other: "%{count}つのアカウントカレンダーが選択されています"
+    zero: アカウントカレンダーが選択されていません
+  count_account_calendars_selected_acbd588: 
+    one: 1つのアカウントカレンダーが選択されています
     other: "%{count}つのアカウントカレンダーが選択されています"
     zero: アカウントカレンダーが選択されていません
   count_alignable_artifacts_7779644a: 
@@ -9304,6 +9324,7 @@ ja:
   date_modified_4d065406: "、修正日： "
   date_modified_e1c8ac8f: 変更日
   date_modified_modifiedat_b839cc8b: "修正日：%{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: 日付は利用可能な日付以降でなければなりません
   date_of_most_recent_bounce_b23d0119: 一番最近のバウンス日
   date_required_a74e077c: 日付は必須
   date_time_options_7abcdea7: 日付/時間オプション
@@ -10721,6 +10742,7 @@ ja:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Canvas のサポートされているエリアで Microsoft Immersive Reader ボタンを有効にします。アカウント管理者がすべてのユーザに対してオンにしている場合、この設定に関わらず、ボタンはコース内で有効になることがあります。"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "「拡張」された[提出]を管理するためのUI機能を有効にします。"
   enabling_the_elementary_theme_will_change_the_font_c944b619: 初級用のテーマを有効にすると、キャンバスインターフェイスのフォントが変更され、コースのすべてのユーザーのコースナビゲーションメニューが簡素化されます。
+  enabling_this_option_automatically_moves_course_pa_15f755b3: このオプションを有効にすると、コースペーシング課題の期限は自動的に終了日以降に移動します。時間、場所、およびカレンダーの入力は無効になります。
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: このオプションを有効にすると、コースペーシング課題の期限は自動的に終了日以降に移動します。
   encourage_class_participation_4e069479: クラスへの参加を促す
   encourage_student_discourse_7836b9f7: 受講者同士の会話を促す
@@ -10731,6 +10753,7 @@ ja:
   end_date_cannot_be_before_start_date_eb62ed6d: 終了日は、開始日の前にすることはできません
   end_date_cdd7a7b6: "終了日:"
   end_date_e0093ed7: 終了日
+  end_date_for_conference_eaff0807: 会議終了日
   end_date_from_cdd9d90: （）から終了日：
   end_date_to_8b17929d: （）まで終了日：
   end_date_value_3d3e8906: "終了日%{value}"
@@ -11743,6 +11766,7 @@ ja:
   failed_to_update_domain_lookup_b2437cf7: ドメイン検索の更新に失敗しました
   failed_to_update_internal_setting_ab3d0a4a: 内部設定の更新に失敗しました
   failed_to_update_permission_33c493f: 権限を更新できませんでした
+  failed_to_update_publication_date_83c5b171: 公開日の更新に失敗しました
   failed_to_update_role_name_8c7b0119: ロール名を更新できませんでした
   failed_to_update_strand_8d1c82d: ストランドの更新に失敗しました
   failed_to_validate_cas_ticket_error_31aa4c63: "CAS チケットの検証に失敗しました：%{error}"
@@ -13156,6 +13180,7 @@ ja:
   grading_period_set_for_account_name_b9823b2a: "%{account_name}の採点期間セット"
   grading_period_set_id_f2377529: 採点期間のセットID
   grading_period_set_title_880a6ec4: 採点期間のセットタイトル
+  grading_period_sets_fb608834: 採点期間設定
   grading_period_title_23b7f8ac: 採点期間タイトル
   grading_period_title_fa470c50: 採点期間タイトル
   grading_period_weight_99b66906: 採点期間比重
@@ -13942,6 +13967,7 @@ ja:
   history_cd3f60a9: 履歴
   history_settings_c63dbaaf: 履歴設定
   hmm_we_can_t_find_any_matching_calendars_25983a51: うーん、一致するカレンダーがありません。
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: ふむ、一致するカレンダーが見当たりません。
   hold_fb369624: 保留
   home_351838cd: ホーム
   home_page_is_not_valid_2e8a25ae: ホームページが無効です
@@ -14237,6 +14263,7 @@ ja:
       RCE 機能強化も有効になっている場合、
       RCE が作業を自動で保存します
   if_set_allows_submission_status_to_be_changed_from_156f57f: "設定されている場合、Speedgrader 内から送信ステータスを変更できます"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: 設定されている場合、割り当て強化がオンになっているオリジナリティレポートを表示します
   if_set_displays_updated_mastery_connect_icon_b6a93002: 設定されている場合、更新された習熟度コネクトアイコンが表示されます
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: 設定されている場合、学生を検索するときに通常発生する遅延を除去します。
   if_set_removes_the_missing_status_from_submissions_43fba750: 設定されている場合、採点時に提出物から未提出ステータスを削除します。
@@ -14759,6 +14786,7 @@ ja:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "統合 ID \"%{integration_id}\" はすでに使用されています！"
   integrations_cadb03f3: インテグレーション
   interactions_report_47c1219e: インタラクションレポート
+  internal_analytics_f02b3fff: 内部分析
   internal_setting_created_f3f72416: 内部設定の作成
   internal_setting_deleted_aaf1dd9d: 内部設定の削除
   internal_setting_updated_87510559: 内部設定の更新
@@ -15816,6 +15844,7 @@ ja:
   manage_groups_4c3a2a9f: グループを管理する
   manage_home_4fc3480b: ホームを管理する
   manage_home_for_coursename_5e5c7661: "%{courseName}のホームを管理する"
+  manage_internal_analytics_fcfa306e: 内部分析の管理
   manage_item_name_6118d4b0: "%{item_name}を管理"
   manage_line_items_244b289f: ライン項目を管理
   manage_lti_8fcdc6ba: LTI　を管理
@@ -18652,6 +18681,7 @@ ja:
   new_slack_api_key_453d04d: "新しい Slack Api キー"
   new_student_group_description_bfeb76aa: 新しい受講者グループの説明
   new_student_group_e31b7cb5: 新しい受講者グループ
+  new_tab_ab7629d2: 新しいタブ
   new_topic_for_course_3d98222a: "%{course} の新しいトピック:"
   new_typography_4eaeca26: 新しいタイポグラフィー
   new_ui_487a624e: 新しいUI
@@ -19486,6 +19516,7 @@ ja:
     ? "yes"
     : はい
   options_3ab0ea65: オプション
+  options_for_name_bfa30aa0: "%{name}のオプション"
   options_for_title_label_17f821ff: "()のオプション%{title_label}"
   or_9b70ccaa: または
   or_a01eec62: または
@@ -19520,6 +19551,7 @@ ja:
   original_job_id_d81afbb3: "元のジョブ ID"
   originality_report_5d461681: オリジナリティレポート
   originality_reports_1e36b935: オリジナリティレポート
+  originality_reports_with_assignment_enhancements_9b2870ff: オリジナリティレポートと課題の強化
   other_1c6d9c79: その他
   other_calendars_toggle_list_visibility_bd7fb67a: 他のカレンダーの切り替えリストの表示/非表示
   other_carrier_45531207: その他の通信事業者
@@ -20051,6 +20083,7 @@ ja:
   please_log_in_to_view_this_content_eec6cd0: このコンテンツを閲覧するにはログインしてください
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: 周囲や画面共有サービスから画面上の画像を誰にもキャプチャされないようにしてください。
   please_note_fbb62e4c: ご注意ください：
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "ご注意ください：Canvas Commons は、Instructure が米国でホストしています。これは、ユーザが Canvas コモンズを利用する際に、ユーザの個人データが米国で保存、処理されるということです。これらの個人情報には、名前、電子メールアドレス、Canvas ユーザ ID、Canvas ログイン名、Canvas アバター、IP アドレス、お気に入りにした Canvas Commons のリソース、およびCanvas Commons のリソースに対してユーザが行ったコメントが含まれます。Instructure のプライバシー保護に関する詳細な情報は、[こちら](%{url}) を参照してください。"
   please_provide_a_field_e5a7d0b3: "～を入力してください%{field}"
   please_provide_a_pairing_code_530d1e9d: ペアリングコードを記入してください。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "有効なメールアドレスを提供してください。Azure Active Directoryの設定を確認すると見つけかります。"
@@ -21179,9 +21212,11 @@ ja:
   public_jwk_url_b5564c1d: "パブリック JWK URL"
   public_message_students: 
     send_message: メッセージを送信
+  publication_options_cbbfc20e: 公開オプション
   publish_5211dca3: 公開
   publish_aa888e3c: "公開:"
   publish_announcement_fec6d7e2: アナウンスを公開
+  publish_at_3fd340d1: 公開場所
   publish_btn_module: 
     buttons: 
       publish: 公開
@@ -23589,6 +23624,7 @@ ja:
   save_and_publish_1b765e7: 保存して公開
   save_changes_698abe77: 変更内容の保存
   save_customizations_dde779d8: カスタマイズを保存
+  save_failed_463cb2a8: 保存に失敗しました。
   save_grading_period_daaaddea: 採点期間を保存する
   save_grading_period_set_e029fa88: 採点期間のセットを保存する
   save_key_b4dede06: 鍵の保存
@@ -23630,6 +23666,8 @@ ja:
   schedule_e5dd4c32: スケジュール
   schedule_student_availability_332154a: 受講者の利用可能状況をスケジュール
   scheduled_date_5b0aedb6: 予定日
+  scheduled_for_publication_c8d3e9a2: 公開予定
+  scheduled_page_publication_ae911741: ページ公開予定
   scheduler_65b5ac91: スケジューラ
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: スケジューラは、Canvas管理者が有効でなければなりません。
   scheduler_must_be_enabled_for_your_account_e6e53972: アカウントでスケジューラが有効でなければなりません。
@@ -24241,6 +24279,7 @@ ja:
   set_name_f83b658: 名前を設定する
   set_of_grading_periods_545b37e9: 採点期間のセット
   set_some_up_now_1749bb44: 今、いくつかを設定する
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: 課題作成後、コースペーシングで期限を設定します。
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: このアカウント内のすべてのコースで使用される熟達スコアスケールを設定します。
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           あなたの熟達評価の学習熟達グレードブック内での表示方法を設定してください。\n\
@@ -25545,6 +25584,7 @@ ja:
   start_date_e937be8a: 開始日
   start_date_end_date_d809dd93: "%{start_date} ～ %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: スタイルガイドの開始日欄
+  start_date_for_conference_1936e809: 会議開始日
   start_date_from_20503757: "（）からの開始日:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}、%{start_time} まで%{end_time}"
   start_date_to_1e6e6bbe: "（）までの開始日:"
@@ -26938,6 +26978,8 @@ ja:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: このコースはコースペーシングを使用しています。期限を管理するには、コースペーシングにアクセスしてください。
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: 公開されるまで、このコースは教員のみに表示されます。
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: この基準がリンクされている学習アウトカムがあります。
+  this_due_date_is_managed_by_cfbb698c: この期日を管理するもの
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: この期限は、コースペーシングによって管理されます。
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: このエレメントは、ドラッグ＆ドロップによる並べ替えよりも便利な方法です。エンター、またはスペースを押して、この質問を移動してください。
   this_email_address_is_unconfirmed_f0fc8c6e: このメールアドレスは、確認されていません。
   this_enables_a_course_setting_to_allow_students_to_fc47219: "これにより、受講生がコースをオフラインのウェブ ZIP ォルダとしてエクスポートできるようにするコース設定が可能となります"
@@ -27212,6 +27254,7 @@ ja:
   this_user_has_been_deleted_77e6c04b: このユーザーは削除されました
   this_user_has_been_deleted_8caa45be: このユーザーは削除されました。
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: このユーザーは、コースに複数のロールを有しています。ロールをここで変更すると、彼らのすべての登録が上書きされることになります。
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: このユーザはまだコースへの招待を受諾していません
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: このユーザーは、このコースにアクセスすることはできません。
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: 「このユーザーは、このコースにアクセスすることはできません」
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: このユーザーは、匿名がオフの間に操作を実行しました
@@ -27747,6 +27790,7 @@ ja:
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "コース SIS ID を編集するには、[コース - 管理/更新]と[SIS データ - 管理]も有効にされていなければなりません。"
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "コースSISIDを編集するには、[コース管理：管理者 - 管理/更新]および[SISデータ-管理]も有効でなければなりません。"
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "コース SIS ID を編集するには、SIS データ - 管理も有効にされていなければなりません。"
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: 期日を編集するには、コースペーシングに移動し、この課題に割り当てられた日数を変更して、更新されたペースを公開します。
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       ユーザーの詳細を編集、ログインの詳細を変更、またはユーザーのパスワードを変更するには、ユーザー - ログインの詳細の管理も有効にされていなければなりません。
       ユーザーページビューを表示するには、統計表示も有効にされていなければなりません。
@@ -28555,6 +28599,7 @@ ja:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "OAuth 2.0フローのアップデートにより、「トークン」認証でのリダイレクトを停止しました。"
   updating_6edbab78: 更新しています
   updating_discussion_failed_aadb2d35: ディスカッションの更新に失敗しました
+  updating_publication_date_62cc1622: 更新された公開日
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Catalog の URL を更新すると、ユーザは古い URL ではアクセスできなくなります。既存の決済代行会社が設定されている場合、変更には Catalog エンジニアの助けが必要です。"
   upload_8b403d05: アップロード
   upload_a_css_file_ec22214b: CSSファイルをアップロード...
@@ -29698,6 +29743,7 @@ ja:
         zero: "%{model} が見つかりません"
     page_gap: "&hellip;"
     previous_label: "&#8592; 前"
+  will_publish_on_publish_date_8b42e1ec: "%{publish_date}に公開されます"
   will_send_to_everyone_if_no_selections_are_made_b13ecf39: (選択されていない場合、全員に送付されます)
   will_unlock_unlock_date_1024c38d: "%{unlock_date} にロック解除"
   wimba_conference: 
