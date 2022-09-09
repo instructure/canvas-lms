@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import Layout from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Layout.js'
+import Layout from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Layout'
 
 QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
   let $container

@@ -105,10 +105,10 @@ class AnonymousSpeedGraderAlert extends React.Component {
         open={this.state.isOpen}
         transition="fade"
         label={I18n.t('Anonymous Mode On')}
-        shouldReturnFocus
+        shouldReturnFocus={true}
         onDismiss={this.close}
       >
-        <Mask fullscreen onClick={this.close}>
+        <Mask fullscreen={true} onClick={this.close}>
           {this.renderAlert()}
         </Mask>
       </Overlay>

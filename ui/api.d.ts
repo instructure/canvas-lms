@@ -123,6 +123,7 @@ export type EffectiveDueDateAssignmentUserMap = {
 export type Assignment = {
   anonymize_students: boolean
   assignment_group_id: string
+  assignment_group_position: number
   assignment_id: string
   assignment_visibility: string[]
   effectiveDueDates: EffectiveDueDateUserMap
@@ -139,6 +140,7 @@ export type Assignment = {
   omit_from_final_grade: boolean
   only_visible_to_overrides: boolean
   overrides: any
+  position: number
   points_possible: number
   published: boolean
   submission_types: string

@@ -26,7 +26,7 @@ import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter
 
 const I18n = useI18nScope(
   'gradebook_default_gradebook_components_content_filters_student_group_filter'
-);
+)
 
 function normalizeStudentGroupSets(studentGroupSets) {
   return studentGroupSets.map(category => ({
@@ -47,7 +47,7 @@ export default function StudentGroupFilter(props) {
       items={normalizeStudentGroupSets(studentGroupSets)}
       label={I18n.t('Student Group Filter')}
       selectedItemId={selectedStudentGroupId}
-      sortAlphabetically
+      sortAlphabetically={true}
     />
   )
 }

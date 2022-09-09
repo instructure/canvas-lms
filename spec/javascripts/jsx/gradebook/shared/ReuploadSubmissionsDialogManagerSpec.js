@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReuploadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/ReuploadSubmissionsDialogManager.js'
+import ReuploadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/ReuploadSubmissionsDialogManager'
 
 QUnit.module('ReuploadSubmissionsDialogManager#constructor')
 

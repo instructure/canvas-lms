@@ -20,8 +20,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {waitFor} from '@testing-library/react'
 
-import AssignmentPostingPolicyTray from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/index.js'
-import * as Api from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Api.js'
+import AssignmentPostingPolicyTray from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/index'
+import * as Api from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Api'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {

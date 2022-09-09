@@ -22,39 +22,35 @@ import {arrayOf, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope(
-  'gradebook_default_gradebook_components_content_filters_assignment_group_filter'
-);
+const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_module_filter')
 
-const ALL_ITEMS_ID = '0'
-
-export default function AssignmentGroupFilter(props) {
-  const {assignmentGroups, selectedAssignmentGroupId, ...filterProps} = props
+export default function ModuleFilter(props) {
+  const {modules, selectedModuleId, ...filterProps} = props
 
   return (
     <ContentFilter
       {...filterProps}
-      allItemsId={ALL_ITEMS_ID}
-      allItemsLabel={I18n.t('All Assignment Groups')}
-      items={assignmentGroups}
-      label={I18n.t('Assignment Group Filter')}
-      selectedItemId={selectedAssignmentGroupId || ALL_ITEMS_ID}
-      sortAlphabetically
+      allItemsId="0"
+      allItemsLabel={I18n.t('All Modules')}
+      items={modules}
+      label={I18n.t('Module Filter')}
+      selectedItemId={selectedModuleId}
+      sortAlphabetically={true}
     />
   )
 }
 
-AssignmentGroupFilter.propTypes = {
-  assignmentGroups: arrayOf(
+ModuleFilter.propTypes = {
+  modules: arrayOf(
     shape({
       id: string.isRequired,
       name: string.isRequired
     })
   ).isRequired,
 
-  selectedAssignmentGroupId: string
+  selectedModuleId: string
 }
 
-AssignmentGroupFilter.defaultProps = {
-  selectedAssignmentGroupId: null
+ModuleFilter.defaultProps = {
+  selectedModuleId: null
 }

@@ -123,7 +123,7 @@ class StatusesModal extends React.Component {
 
     return (
       <Modal
-        open
+        open={true}
         label={I18n.t('Statuses')}
         onDismiss={onClose}
         contentRef={bindContentRef}

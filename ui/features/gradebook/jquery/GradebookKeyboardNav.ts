@@ -134,7 +134,7 @@ export default class GradebookKeyboardNav {
   }
 
   removeGradebookElement(element) {
-    return (this.gradebookElements = this.gradebookElements.filter(function(e) {
+    return (this.gradebookElements = this.gradebookElements.filter(function (e) {
       return e !== element
     }))
   }
@@ -164,18 +164,14 @@ export default class GradebookKeyboardNav {
       this.prevActiveLocation = activeLocation
       this.prevActiveElement = document.activeElement
     }
-    this.getHeaderFromActiveCell()
-      .querySelector('.Gradebook__ColumnHeaderAction button')
-      ?.click()
+    this.getHeaderFromActiveCell().querySelector('.Gradebook__ColumnHeaderAction button')?.click()
   }
 
   gotoAssignment() {
     if (this.currentColumnType() !== 'assignment') {
       return
     }
-    const url = this.getHeaderFromActiveCell()
-      .querySelector('a .assignment-name')
-      .closest('a').href
+    const url = this.getHeaderFromActiveCell().querySelector('a .assignment-name').closest('a').href
     window.location = url
   }
 

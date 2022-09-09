@@ -203,7 +203,7 @@ class ViewOptionsMenu extends React.Component {
         {this.props.filterSettings.available.length > 0 && (
           <Menu contentRef={this.bindFiltersMenuContent} label={I18n.t('Filters')}>
             <Menu.Group
-              allowMultiple
+              allowMultiple={true}
               label={<ScreenReaderContent>{I18n.t('Filters')}</ScreenReaderContent>}
               onSelect={this.onFilterSelect}
               selected={this.props.filterSettings.selected}
@@ -236,7 +236,7 @@ class ViewOptionsMenu extends React.Component {
 
         <Menu.Separator />
 
-        <Menu.Group allowMultiple label={I18n.t('Columns')}>
+        <Menu.Group allowMultiple={true} label={I18n.t('Columns')}>
           <Menu.Item
             disabled={this.props.teacherNotes.disabled}
             onSelect={this.props.teacherNotes.onSelect}
