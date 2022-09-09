@@ -19,13 +19,26 @@
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
+import type {Assignment, StudentMap} from '../../../../api.d'
 
 import AsyncComponents from './AsyncComponents'
 
 const I18n = useI18nScope('gradebook')
 
 const CurveGradesDialogManager = {
-  createCurveGradesAction(assignment, students, {isAdmin, contextUrl, submissionsLoaded} = {}) {
+  createCurveGradesAction(
+    assignment: Assignment,
+    students: StudentMap,
+    {
+      isAdmin,
+      contextUrl,
+      submissionsLoaded
+    }: {
+      isAdmin?: boolean
+      contextUrl?: string
+      submissionsLoaded?: boolean
+    } = {}
+  ) {
     const {grading_type: gradingType, points_possible: pointsPossible} = assignment
     return {
       isDisabled:

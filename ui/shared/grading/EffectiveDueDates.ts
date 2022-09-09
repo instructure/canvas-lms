@@ -19,38 +19,24 @@
 import _ from 'lodash'
 import timezone from '@canvas/timezone'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
-import type {Submission} from '../../api.d'
+import type {
+  GradingPeriod,
+  Submission,
+  DueDate,
+  UserDueDateMap,
+  AssignmentUserDueDateMap
+} from '../../api.d'
 
-type GradingPeriod = {
-  id: string
-  isClosed: boolean
-}
-
-type DueDataData = {
-  due_at: string
-  grading_period_id: string
-  in_closed_grading_period: boolean
-}
-
-type DueDateDataByUser = {
-  [userId: string]: DueDataData
-}
-
-type DueDateDataByAssignmentId = {
-  [assignmentId: string]: DueDateDataByUser
-}
-
-type EffectiveDueDatesbyAssignmentId = {
-  [assignmentId: string]: any
-}
-
-export function scopeToUser(dueDateDataByAssignmentId: DueDateDataByAssignmentId, userId: string) {
+export function scopeToUser(
+  dueDateDataByAssignmentId: AssignmentUserDueDateMap,
+  userId: string
+): UserDueDateMap {
   const scopedData: {
-    [assignmentId: string]: DueDataData
+    [assignmentId: string]: DueDate
   } = {}
   _.forEach(
     dueDateDataByAssignmentId,
-    (dueDateDataByUserId: DueDateDataByUser, assignmentId: string) => {
+    (dueDateDataByUserId: UserDueDateMap, assignmentId: string) => {
       if (dueDateDataByUserId[userId]) {
         scopedData[assignmentId] = dueDateDataByUserId[userId]
       }
@@ -60,12 +46,12 @@ export function scopeToUser(dueDateDataByAssignmentId: DueDateDataByAssignmentId
 }
 
 export function updateWithSubmissions(
-  effectiveDueDates: EffectiveDueDatesbyAssignmentId,
+  effectiveDueDates: AssignmentUserDueDateMap,
   submissions: Submission[],
   gradingPeriods: GradingPeriod[] = []
 ): void {
   const helper = new GradingPeriodsHelper(gradingPeriods)
-  const sortedPeriods = _.sortBy(gradingPeriods, 'startDate')
+  const sortedPeriods: GradingPeriod[] = _.sortBy(gradingPeriods, 'startDate')
 
   submissions.forEach(submission => {
     const dueDate = timezone.parse(submission.cached_due_date)
@@ -79,7 +65,7 @@ export function updateWithSubmissions(
       }
     }
 
-    const assignmentDueDates = effectiveDueDates[submission.assignment_id] || {}
+    const assignmentDueDates: UserDueDateMap = effectiveDueDates[submission.assignment_id] || {}
     assignmentDueDates[submission.user_id] = {
       due_at: submission.cached_due_date,
       grading_period_id: gradingPeriod ? gradingPeriod.id : null,

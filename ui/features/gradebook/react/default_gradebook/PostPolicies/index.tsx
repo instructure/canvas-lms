@@ -21,8 +21,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {getAssignmentColumnId} from '../Gradebook.utils'
 import AsyncComponents from '../AsyncComponents'
+import type Gradebook from '../Gradebook'
 
-function getSubmission(student, assignmentId) {
+function getSubmission(student, assignmentId: string) {
   const submission = student[`assignment_${assignmentId}`] || {
     has_postable_comments: false,
     posted_at: null,
@@ -39,7 +40,13 @@ function getSubmission(student, assignmentId) {
 }
 
 export default class PostPolicies {
-  constructor(gradebook) {
+  _gradebook: Gradebook
+
+  _coursePostPolicy: {
+    postManually: boolean
+  }
+
+  constructor(gradebook: Gradebook) {
     this._coursePostPolicy = {postManually: !!gradebook.options.post_manually}
     this._gradebook = gradebook
 
@@ -48,9 +55,14 @@ export default class PostPolicies {
   }
 
   destroy() {
-    ReactDOM.unmountComponentAtNode(document.getElementById('assignment-posting-policy-tray'))
-    ReactDOM.unmountComponentAtNode(document.getElementById('hide-assignment-grades-tray'))
-    ReactDOM.unmountComponentAtNode(document.getElementById('post-assignment-grades-tray'))
+    ;[
+      'assignment-posting-policy-tray',
+      'hide-assignment-grades-tray',
+      'post-assignment-grades-tray'
+    ].forEach(id => {
+      const node = document.getElementById(id)
+      if (node) ReactDOM.unmountComponentAtNode(node)
+    })
   }
 
   _onGradesPostedOrHidden({assignmentId, postedAt, userIds}) {
@@ -194,10 +206,10 @@ export default class PostPolicies {
   }
 
   setAssignmentPostPolicies({assignmentPostPoliciesById}) {
-    Object.entries(assignmentPostPoliciesById).forEach(([id, postPolicy]) => {
+    Object.keys(assignmentPostPoliciesById).forEach(id => {
       const assignment = this._gradebook.getAssignment(id)
       if (assignment != null) {
-        assignment.post_manually = postPolicy.postManually
+        assignment.post_manually = assignmentPostPoliciesById[id].postManually
       }
     })
 

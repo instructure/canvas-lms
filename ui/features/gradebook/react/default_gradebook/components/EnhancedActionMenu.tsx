@@ -37,16 +37,48 @@ import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('gradebookActionMenu')
 
+const {Item: MenuItem, Separator: MenuSeparator} = Menu as any
+
 const {arrayOf, bool, func, object, shape, string} = PropTypes
 
-function gotoUrl(url) {
+function gotoUrl(url: string) {
   window.location.href = url
 }
 
-export default function EnhancedActionMenu(props) {
+type Lti = {id: string; name: string; onSelect: () => void}
+
+export type EnhancedActionMenuProps = {
+  attachment: any
+  contextAllowsGradebookUploads: boolean
+  currentUserId: string
+  getAssignmentOrder: () => string[]
+  getStudentOrder: () => string[]
+  gradebookExportUrl: string
+  gradebookImportUrl: string
+  gradebookIsEditable: boolean
+  gradingPeriodId: string
+  lastExport: any
+  postGradesFeature: {
+    enabled: boolean
+    returnFocusTo: HTMLElement
+    label: string
+    store: any
+  }
+  postGradesLtis: Lti[]
+  publishGradesToSis: {
+    isEnabled: boolean
+    publishToSisUrl: string
+  }
+  showStudentFirstLastName: boolean
+}
+
+export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
   const [exportInProgress, setExportInProgress] = useState(false)
-  const [previousExportState, setPreviousExportState] = useState(null)
-  const exportManager = useRef(null)
+  const [previousExportState, setPreviousExportState] = useState<null | {
+    label: string
+    attachmentUrl: string
+  }>(null)
+  const exportManager = useRef<GradebookExportManager | null>(null)
 
   useEffect(() => {
     const existingExport = getExistingExport()
@@ -56,7 +88,7 @@ export default function EnhancedActionMenu(props) {
       existingExport
     )
     return () => {
-      if (exportManager) exportManager.current.clearMonitor()
+      if (exportManager.current) exportManager.current.clearMonitor()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -74,6 +106,10 @@ export default function EnhancedActionMenu(props) {
   const handleExport = currentView => {
     setExportInProgress(true)
     $.flashMessage(I18n.t('Gradebook export started'))
+
+    if (!exportManager.current) {
+      throw new Error('exportManager not loaded')
+    }
 
     return exportManager.current
       .startExport(
@@ -143,19 +179,19 @@ export default function EnhancedActionMenu(props) {
     }
 
     if (tools.length) {
-      tools.push(<Menu.Separator key="postGradesSeparator" />)
+      tools.push(<MenuSeparator key="postGradesSeparator" />)
     }
 
     return tools
   }
 
   const renderPostGradesLtis = () => {
-    return props.postGradesLtis.map(tool => {
+    return props.postGradesLtis.map((tool: Lti) => {
       const key = `post_grades_lti_${tool.id}`
       return (
-        <Menu.Item onSelect={tool.onSelect} key={key}>
+        <MenuItem onSelect={tool.onSelect} key={key}>
           <span data-menu-id={key}>{I18n.t('Sync to %{name}', {name: tool.name})}</span>
-        </Menu.Item>
+        </MenuItem>
       )
     })
   }
@@ -163,11 +199,11 @@ export default function EnhancedActionMenu(props) {
   const renderPostGradesFeature = () => {
     const sisName = props.postGradesFeature.label || I18n.t('SIS')
     return (
-      <Menu.Item onSelect={launchPostGrades} key="post_grades_feature_tool">
+      <MenuItem onSelect={launchPostGrades} key="post_grades_feature_tool">
         <span data-menu-id="post_grades_feature_tool">
           {I18n.t('Sync to %{sisName}', {sisName})}
         </span>
-      </Menu.Item>
+      </MenuItem>
     )
   }
 
@@ -198,17 +234,17 @@ export default function EnhancedActionMenu(props) {
     const downloadFrdUrl = previousExport.attachmentUrl
 
     const previousMenu = (
-      <Menu.Item
+      <MenuItem
         key="previousExport"
         onSelect={() => {
           gotoUrl(downloadFrdUrl)
         }}
       >
         <span data-menu-id="previous-export">{lastExportDescription}</span>
-      </Menu.Item>
+      </MenuItem>
     )
 
-    return [<Menu.Separator key="previousExportSeparator" />, previousMenu]
+    return [<MenuSeparator key="previousExportSeparator" />, previousMenu]
   }
 
   const renderPublishGradesToSis = () => {
@@ -219,13 +255,13 @@ export default function EnhancedActionMenu(props) {
     }
 
     return (
-      <Menu.Item
+      <MenuItem
         onSelect={() => {
           handlePublishGradesToSis()
         }}
       >
         <span data-menu-id="publish-grades-to-sis">{I18n.t('Sync grades to SIS')}</span>
-      </Menu.Item>
+      </MenuItem>
     )
   }
 
@@ -233,18 +269,12 @@ export default function EnhancedActionMenu(props) {
     const {isEnabled, publishToSisUrl} = props.publishGradesToSis
     const shouldRenderPublishGradesToSis = isEnabled && publishToSisUrl
     const shouldRenderPostGradesLti = props.postGradesLtis.length > 0
-    const buttonTypographyProps = {
-      weight: 'normal',
-      style: 'normal',
-      size: 'medium',
-      color: 'primary'
-    }
     if (shouldRenderPublishGradesToSis || shouldRenderPostGradesLti) {
       return (
         <Menu
           trigger={
             <Button color="secondary" margin="0 xx-small" renderIcon={IconSisSyncedLine}>
-              <Text {...buttonTypographyProps}>
+              <Text weight="normal" fontStyle="normal" size="medium" color="primary">
                 {I18n.t('Sync')}
                 <IconMiniArrowDownSolid />
               </Text>
@@ -260,13 +290,6 @@ export default function EnhancedActionMenu(props) {
     }
   }
 
-  const buttonTypographyProps = {
-    weight: 'normal',
-    style: 'normal',
-    size: 'medium',
-    color: 'primary'
-  }
-
   return (
     <>
       {renderSyncDropdown()}
@@ -275,7 +298,7 @@ export default function EnhancedActionMenu(props) {
         color="secondary"
         margin="0 xx-small"
         renderIcon={IconGradebookImportLine}
-        interaction={disableImports() ? 'disabled' : null}
+        interaction={disableImports() ? 'disabled' : undefined}
         onClick={handleImport}
       >
         <span data-menu-id="import">{I18n.t('Import')}</span>
@@ -284,14 +307,14 @@ export default function EnhancedActionMenu(props) {
       <Menu
         trigger={
           <Button color="secondary" margin="0 xx-small" renderIcon={IconGradebookExportLine}>
-            <Text {...buttonTypographyProps}>
+            <Text weight="normal" fontStyle="normal" size="medium" color="primary">
               <span data-menu-id="export-dropdown">{I18n.t('Export')}</span>
               <IconMiniArrowDownSolid />
             </Text>
           </Button>
         }
       >
-        <Menu.Item
+        <MenuItem
           disabled={exportInProgress}
           onSelect={() => {
             handleExport(true)
@@ -302,9 +325,9 @@ export default function EnhancedActionMenu(props) {
               ? I18n.t('Export in progress')
               : I18n.t('Export Current Gradebook View')}
           </span>
-        </Menu.Item>
+        </MenuItem>
 
-        <Menu.Item
+        <MenuItem
           disabled={exportInProgress}
           onSelect={() => {
             handleExport(false)
@@ -313,7 +336,7 @@ export default function EnhancedActionMenu(props) {
           <span data-menu-id="export-all">
             {exportInProgress ? I18n.t('Export in progress') : I18n.t('Export Entire Gradebook')}
           </span>
-        </Menu.Item>
+        </MenuItem>
 
         {[...renderPreviousExports()]}
       </Menu>

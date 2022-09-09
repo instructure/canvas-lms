@@ -18,6 +18,7 @@
 
 import ScoreToGradeHelper from './shared/helpers/ScoreToGradeHelper'
 import round from 'round'
+import type {Submission} from '../../../api.d'
 
 const equivalentToNull = [undefined, null, '', 0]
 const intervalTypes = ['day', 'hour']
@@ -26,12 +27,12 @@ function equivalent(a, b) {
   return a === b || (equivalentToNull.includes(a) && equivalentToNull.includes(b))
 }
 
-function isPositive(val) {
-  if (isNaN(val)) {
+function isPositive(val: number | null) {
+  if (Number.isNaN(val)) {
     return false
   }
 
-  return val > 0
+  return (val || 0) > 0
 }
 
 function getEnteredScore(score, pointsDeducted) {
@@ -76,7 +77,7 @@ function submissionIntervalsLate(submission, intervalType) {
   return Math.ceil(intervalType === 'day' ? daysLate : hoursLate)
 }
 
-function latePenalty(submission, assignment, latePolicy) {
+function latePenalty(submission: Submission, assignment, latePolicy) {
   const {
     lateSubmissionDeduction,
     lateSubmissionDeductionEnabled,
@@ -89,13 +90,13 @@ function latePenalty(submission, assignment, latePolicy) {
     return submission.points_deducted
   }
 
-  if (!lateSubmissionDeductionEnabled || !isPositive(submission.entered_score)) {
+  if (!lateSubmissionDeductionEnabled || !isPositive(submission.entered_score || 0)) {
     return 0
   }
 
   const intervalsLate = submissionIntervalsLate(submission, lateSubmissionInterval)
   const minimumPercent = lateSubmissionMinimumPercentEnabled ? lateSubmissionMinimumPercent : 0
-  const rawScorePercent = (submission.entered_score * 100) / assignment.points_possible
+  const rawScorePercent = ((submission.entered_score || 0) * 100) / assignment.points_possible
   const maximumDeduct = Math.max(rawScorePercent - minimumPercent, 0)
   const latePercentDeduct = lateSubmissionDeduction * intervalsLate
 

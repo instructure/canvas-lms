@@ -18,7 +18,21 @@
 
 import StudentDatastore from './stores/StudentDatastore'
 import type {StatusColors} from './constants/colors'
-import type {AttachmentData, Section, StudentGroupCategoryMap, AssignmentGroup} from '../api.d'
+import type {
+  AssignmentGroup,
+  AttachmentData,
+  GradingPeriod,
+  GradingPeriodSet,
+  GradingType,
+  Module,
+  ModuleMap,
+  Section,
+  Student,
+  StudentGroupCategoryMap,
+  StudentMap,
+  SubmissionType,
+  WorkflowState
+} from '../api.d'
 
 export type CourseSettingsType = {
   filter_speed_grader_by_student_group: boolean
@@ -48,7 +62,7 @@ export type GradebookOptions = {
   context_allows_gradebook_uploads: boolean
   context_code: string
   context_id: string
-  context_sis_id: string | null
+  context_sis_id?: string
   context_url: string
   course_is_concluded: boolean
   course_name: string
@@ -74,12 +88,15 @@ export type GradebookOptions = {
   gradebook_score_to_ungraded_progress: ProgressData
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
+  grading_schemes: GradingScheme[]
   grading_standard: boolean
   group_weighting_scheme: string
+  late_policy: LatePolicy
   locale: string
   outcome_gradebook_enabled: boolean
   post_grades_feature: string
   post_grades_ltis: Lti[]
+  post_manually: boolean
   publish_to_sis_enabled: boolean
   publish_to_sis_url: string
   re_upload_submissions_url: string
@@ -98,20 +115,32 @@ export type GradebookOptions = {
   user_asset_string: string
 }
 
+export type GradingScheme = {
+  id?: string
+  data: any
+}
+
+export type LatePolicy = {
+  missing_submission_deduction_enabled: boolean
+  missing_submission_deduction: number
+}
+
+// TODO: remove the need for this type
+export type LatePolicyCamelized = {
+  missingSubmissionDeductionEnabled: boolean
+  missingSubmissionDeduction: number
+}
+
 export type CourseContent = {
-  contextModules: any[]
-  courseGradingScheme: {
-    data: any
-  } | null
-  defaultGradingScheme: {
-    data: any
-  } | null
-  gradingSchemes: any
+  contextModules: Module[]
+  courseGradingScheme: GradingScheme | null
+  defaultGradingScheme: GradingScheme | null
+  gradingSchemes: GradingScheme[]
   gradingPeriodAssignments: any
-  assignmentStudentVisibility: {[key: string]: null | boolean}
-  latePolicy: any
+  assignmentStudentVisibility: {[assignmentId: string]: null | StudentMap}
+  latePolicy: LatePolicyCamelized
   students: StudentDatastore
-  modulesById: any
+  modulesById: ModuleMap
 }
 
 export type ContentLoadStates = {
@@ -212,18 +241,6 @@ export type GradebookFilterApiResponseFilter = {
   updated_at: string
 }
 
-export type GradingPeriod = {
-  id: string
-  title: string
-  startDate: number
-}
-
-export type GradingPeriodSet = {
-  gradingPeriods: GradingPeriod[]
-  displayTotalsForAllGradingPeriods: boolean
-  weighted: any
-}
-
 export type ColumnSizeSettings = {
   [key: string]: string
 }
@@ -235,7 +252,7 @@ export type Lti = {
 }
 
 export type ColumnOrderSettings = {
-  freezeTotalGrade: any
+  freezeTotalGrade: boolean | 'true'
 }
 
 export type Progress = {
@@ -256,4 +273,63 @@ export type FlashMessage = {
   key: string
   message: string
   variant: string
+}
+
+// TODO: remove the need for this type
+export type SubmissionCamelized = {
+  anonymousId: string
+  assignmentId: string
+  assignmentVisible?: boolean
+  attempt: number | null
+  enteredGrade: string | null
+  enteredScore: number | null
+  excused: boolean
+  grade: string | null
+  gradeMatchesCurrentSubmission: boolean
+  cachedDueDate: string | null
+  drop?: boolean
+  gradeLocked: boolean
+  gradingPeriodId: string | null
+  gradingType: GradingType
+  hasPostableComments: boolean
+  hidden: boolean
+  id: string
+  latePolicyStatus: null | string
+  late: boolean
+  missing: boolean
+  pointsDeducted: number | null
+  postedAt: string | null
+  rawGrade: string | null
+  redoRequest: boolean
+  score: null | number
+  secondsLate: number | null
+  submissionType: SubmissionType
+  submittedAt: null | Date
+  url: null | string
+  userId: string
+  workflowState: WorkflowState
+}
+
+export type AssignmentStudentMap = {
+  [assignmentId: string]: StudentMap
+}
+
+export type StudentGrade = {
+  score: number
+  possible: number
+  submissions: any
+}
+
+// TODO: store student grades in separate map so that the
+//   student object isn't rendered "any"
+export type GradebookStudent = Student & {
+  [assignmentGroupGradeKey: `assignment_group_${string}`]: StudentGrade
+} & {
+  [assignmentGradeKey: `assignment_${string}`]: StudentGrade
+} & {
+  [columnGradeKey: `custom_col_${string}`]: any
+}
+
+export type GradebookStudentMap = {
+  [studentId: string]: GradebookStudent
 }

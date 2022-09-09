@@ -29,20 +29,20 @@ import type {
   FilterPreset,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
-  GradingPeriod,
   PartialFilterPreset,
   SubmissionFilterValue
 } from './gradebook.d'
 import type {
   Assignment,
   AssignmentGroup,
+  GradingPeriod,
   Module,
   Section,
   SectionMap,
-  Student,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
+  StudentMap,
   Submission
 } from '../../../../api.d'
 import filterTypes from './constants/filterTypes'
@@ -62,7 +62,7 @@ export function ensureAssignmentVisibility(assignment: Assignment, submission: S
   }
 }
 
-export function forEachSubmission(students: Student[], fn) {
+export function forEachSubmission(students: StudentMap, fn) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {

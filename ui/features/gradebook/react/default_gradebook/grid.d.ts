@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import type {Student} from './gradebook.d'
+import type {GradebookStudent} from './gradebook.d'
 import type {StatusColors} from './constants/colors'
 
 type GridColumn = {
@@ -43,14 +43,24 @@ export type GridData = {
     frozen: string[]
     scrollable: string[]
   }
-  rows: Student[]
+  rows: GradebookStudent[]
 }
+
+export type RowFilterKey = 'sectionId' | 'studentGroupId'
+
+export type ColumnFilterKey =
+  | 'assignmentGroupId'
+  | 'contextModuleId'
+  | 'gradingPeriodId'
+  | 'submissions'
+  | 'startDate'
+  | 'endDate'
 
 export type FilterColumnsOptions = {
   assignmentGroupId: null | string
   contextModuleId: null | string
   gradingPeriodId: null | string
-  submissions: null | 'has-ungraded-submissions' | 'has-submissions'
+  submissions: null | string // 'has-ungraded-submissions' | 'has-submissions'
   startDate: null | string
   endDate: null | string
 }
@@ -59,7 +69,7 @@ export type GridDisplaySettings = {
   colors: StatusColors
   enterGradesAs: string
   filterColumnsBy: FilterColumnsOptions
-  filterRowsBy: {sectionId: null; studentGroupId: null}
+  filterRowsBy: {sectionId: string | null; studentGroupId: string | null}
   hideTotal: boolean
   selectedPrimaryInfo: string
   selectedSecondaryInfo: string
@@ -72,8 +82,8 @@ export type GridDisplaySettings = {
   }
   submissionTray: {
     open: boolean
-    studentId: null | string
-    assignmentId: null | string
+    studentId: string
+    assignmentId: string
     comments: any[]
     commentsLoaded: boolean
     commentsUpdating: boolean
