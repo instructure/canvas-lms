@@ -180,6 +180,7 @@ export default function JobsIndex() {
           dispatch({type: 'CHANGE_GROUP_TEXT', payload: text})
         }}
         onClickHeader={col => dispatch({type: 'CHANGE_GROUP_ORDER', payload: col})}
+        onUnblock={() => dispatch({type: 'REFRESH_ALL'})}
         timeZone={state.time_zone}
       />
       {state.groups_page_count > 1 ? (
@@ -214,7 +215,7 @@ export default function JobsIndex() {
             />
           </Flex.Item>
         ) : null}
-        <Flex.Item size="33%" shouldGrow padding="large 0 small 0">
+        <Flex.Item size="33%" shouldGrow={true} padding="large 0 small 0">
           <SearchBox
             bucket={state.bucket}
             group={state.group_type}
@@ -267,7 +268,7 @@ export default function JobsIndex() {
             {I18n.t('Details')}
           </Heading>
         </Flex.Item>
-        <Flex.Item size="33%" shouldGrow padding="large 0 small 0">
+        <Flex.Item size="33%" shouldGrow={true} padding="large 0 small 0">
           <JobLookup
             manualSelection={state.job?.id || ''}
             setSelectedItem={item => {

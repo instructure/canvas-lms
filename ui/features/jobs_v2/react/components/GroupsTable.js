@@ -36,6 +36,7 @@ export default function GroupsTable({
   sortColumn,
   onClickGroup,
   onClickHeader,
+  onUnblock,
   timeZone
 }) {
   const renderColHeader = useCallback(
@@ -83,7 +84,11 @@ export default function GroupsTable({
                   <Table.Row key={tag_or_strand}>
                     <Table.Cell>
                       {group.orphaned ? (
-                        <OrphanedStrandIndicator name={tag_or_strand} type={type} />
+                        <OrphanedStrandIndicator
+                          name={tag_or_strand}
+                          type={type}
+                          onComplete={onUnblock}
+                        />
                       ) : null}
                       <Link onClick={() => onClickGroup(tag_or_strand)}>{tag_or_strand}</Link>
                     </Table.Cell>
