@@ -17,6 +17,7 @@
  */
 
 import _ from 'lodash'
+import type {GradebookStudent, GradebookStudentMap} from '../gradebook.d'
 
 function createStudentPlaceholder(id: string) {
   return {
@@ -31,9 +32,13 @@ function createStudentPlaceholder(id: string) {
 }
 
 export default class StudentDatastore {
-  studentIds = []
+  studentIds: string[] = []
 
-  constructor(userStudentMap, testStudentMap) {
+  userStudentMap: {[id: string]: GradebookStudent}
+
+  testStudentMap: {[id: string]: GradebookStudent}
+
+  constructor(userStudentMap: GradebookStudentMap, testStudentMap: GradebookStudentMap) {
     this.userStudentMap = userStudentMap
     this.testStudentMap = testStudentMap
   }
@@ -42,7 +47,7 @@ export default class StudentDatastore {
     return this.studentIds
   }
 
-  setStudentIds(studentIds) {
+  setStudentIds(studentIds: string[]) {
     this.studentIds = studentIds
     const idsOfStoredStudents = Object.keys(this.userStudentMap)
     _.difference(idsOfStoredStudents, studentIds).forEach(removedStudentId => {
@@ -54,19 +59,19 @@ export default class StudentDatastore {
     })
   }
 
-  addUserStudents(students) {
+  addUserStudents(students: GradebookStudent[]) {
     students.forEach(student => {
       this.userStudentMap[student.id] = student
     })
   }
 
-  addTestStudents(students) {
+  addTestStudents(students: GradebookStudent[]) {
     students.forEach(student => {
       this.testStudentMap[student.id] = student
     })
   }
 
-  student(id, {includePlaceholder = true} = {}) {
+  student(id: string, {includePlaceholder = true} = {}) {
     const user = this.userStudentMap[id] || this.testStudentMap[id]
     if (!user && includePlaceholder) {
       return createStudentPlaceholder(id)
@@ -76,7 +81,7 @@ export default class StudentDatastore {
   }
 
   listStudents({includePlaceholders = true} = {}) {
-    return this.studentIds.reduce((students, id) => {
+    return this.studentIds.reduce((students: GradebookStudent[], id: string) => {
       const student =
         this.userStudentMap[id] || this.testStudentMap[id] || createStudentPlaceholder(id)
       if (includePlaceholders || !student.isPlaceholder) {

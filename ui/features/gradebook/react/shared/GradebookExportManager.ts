@@ -21,7 +21,26 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebookSharedGradebookexportManager')
 
+type Export = {
+  progressId: string
+  attachmentId: string
+}
+
 class GradebookExportManager {
+  export?: Export
+
+  pollingInterval: number
+
+  exportingUrl: string
+
+  monitoringBaseUrl: string
+
+  attachmentBaseUrl: string
+
+  currentUserId: string
+
+  exportStatusPoll: number | null = null
+
   static DEFAULT_POLLING_INTERVAL = 2000
 
   static DEFAULT_MONITORING_BASE_URL = '/api/v1/progress'
@@ -88,39 +107,40 @@ class GradebookExportManager {
     }
 
     this.exportStatusPoll = window.setInterval(() => {
-      axios.get(this.monitoringUrl()).then(response => {
-        const workflowState = response.data.workflow_state
+      axios
+        .get(this.monitoringUrl() || '')
+        .then(response => {
+          const workflowState = response.data.workflow_state
 
-        if (GradebookExportManager.exportCompleted(workflowState)) {
-          this.clearMonitor()
+          if (GradebookExportManager.exportCompleted(workflowState)) {
+            this.clearMonitor()
 
-          // Export is complete => let's get the attachment url
-          axios
-            .get(this.attachmentUrl())
-            .then(attachmentResponse => {
-              const resolution = {
-                attachmentUrl: attachmentResponse.data.url,
-                updatedAt: attachmentResponse.data.updated_at
-              }
+            // Export is complete => let's get the attachment url
+            axios
+              .get(this.attachmentUrl() || '')
+              .then(attachmentResponse => {
+                const resolution = {
+                  attachmentUrl: attachmentResponse.data.url,
+                  updatedAt: attachmentResponse.data.updated_at
+                }
 
-              this.export = undefined
+                this.export = undefined
 
-              resolve(resolution)
-            })
-            .catch(error => {
-              reject(error)
-            })
-        } else if (GradebookExportManager.exportFailed(workflowState)) {
-          this.clearMonitor()
+                resolve(resolution)
+              })
+              .catch(reject)
+          } else if (GradebookExportManager.exportFailed(workflowState)) {
+            this.clearMonitor()
 
-          reject(I18n.t('Error exporting gradebook: %{msg}', {msg: response.data.message}))
-        }
-      })
+            reject(I18n.t('Error exporting gradebook: %{msg}', {msg: response.data.message}))
+          }
+        })
+        .catch(reject)
     }, this.pollingInterval)
   }
 
   startExport(
-    gradingPeriodId,
+    gradingPeriodId: string | null,
     getAssignmentOrder,
     showStudentFirstLastName = false,
     getStudentOrder,
@@ -138,7 +158,9 @@ class GradebookExportManager {
     const params = {
       grading_period_id: gradingPeriodId,
       show_student_first_last_name: showStudentFirstLastName,
-      current_view: currentView
+      current_view: currentView,
+      assignment_order: undefined,
+      student_order: undefined
     }
 
     const assignmentOrder = getAssignmentOrder()
@@ -157,7 +179,10 @@ class GradebookExportManager {
         attachmentId: response.data.attachment_id
       }
 
-      return new Promise(this.monitorExport.bind(this))
+      return new Promise<{
+        attachmentUrl: string
+        updatedAt: string
+      }>(this.monitorExport.bind(this))
     })
   }
 }

@@ -19,11 +19,70 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/keycodes'
+import type GridSupport from '../react/default_gradebook/GradebookGrid/GridSupport/index'
+
+type KeyBinding = {
+  key: string
+  handler?: string
+  desc: string
+}
+
+type Location = {region: string; cell?: any; row?: any; columnId?: string}
 
 const I18n = useI18nScope('gradebookGradebookKeyboardNav')
 
+type GradebookKeyboardNavOptions = {
+  getColumnTypeForColumnId: (columnId: string) => string
+  gridSupport: GridSupport
+  toggleDefaultSort: (columnId: string) => void
+  openSubmissionTray: (studentId: string, assignmentId: string) => void
+}
+
+const defaultkeyBindings: KeyBinding[] = [
+  {
+    //   handler: function
+    //   key: the string representation of the key pressed - for use in the help dialog
+    //   desc: string describing what the shortcut does - for use in the help dialog
+    handler: 'sortOnHeader',
+    key: I18n.t('keycodes.sort', 's'),
+    desc: I18n.t('keyboard_sort_desc', 'Sort the grid on the current active column')
+  },
+  {
+    handler: 'toggleColumnHeaderMenu',
+    key: I18n.t('keycodes.menu', 'm'),
+    desc: I18n.t('keyboard_menu_desc', 'Open menu for the active column')
+  },
+  {
+    // this one is just for display in the dialog, the menu will take care of itself
+    key: I18n.t('keycodes.close_menu', 'esc'),
+    desc: I18n.t('keyboard_close_menu', 'Close the currently active menu')
+  },
+  {
+    handler: 'gotoAssignment',
+    key: I18n.t('keycodes.goto_assignment', 'g'),
+    desc: I18n.t('keyboard_assignment_desc', "Go to the current assignment's detail page")
+  },
+  {
+    handler: 'showSubmissionTray',
+    key: 'c',
+    desc: I18n.t('Open the grade detail tray')
+  }
+]
+
 export default class GradebookKeyboardNav {
-  constructor(options) {
+  gradebookElements: (HTMLElement | null)[]
+
+  gridSupport: GridSupport
+
+  options: GradebookKeyboardNavOptions
+
+  prevActiveElement: Element | null = null
+
+  prevActiveLocation: Location | null = null
+
+  keyBindings: KeyBinding[] = defaultkeyBindings
+
+  constructor(options: GradebookKeyboardNavOptions) {
     this.shouldHandleEvent = this.shouldHandleEvent.bind(this)
     this.haveLocation = this.haveLocation.bind(this)
     this.preprocessKeydown = this.preprocessKeydown.bind(this)
@@ -73,14 +132,14 @@ export default class GradebookKeyboardNav {
     return false
   }
 
-  haveLocation(usePrevActiveLocation) {
+  haveLocation(usePrevActiveLocation: boolean) {
     if (this.gridSupport.state.getActiveLocation().cell != null) {
       return true
     }
     return usePrevActiveLocation && this.prevActiveLocation != null
   }
 
-  preprocessKeydown(handler, usePrevActiveLocation) {
+  preprocessKeydown(handler, usePrevActiveLocation: boolean) {
     return e => {
       if (!this.shouldHandleEvent(e) || !this.haveLocation(usePrevActiveLocation)) {
         return
@@ -110,7 +169,9 @@ export default class GradebookKeyboardNav {
         this.prevActiveLocation.region,
         this.prevActiveLocation
       )
-      this.prevActiveElement.focus()
+      if (this.prevActiveElement instanceof HTMLElement) {
+        this.prevActiveElement.focus()
+      }
     } else {
       this.gridSupport.state.setActiveLocation(
         this.prevActiveLocation.region,
@@ -127,13 +188,13 @@ export default class GradebookKeyboardNav {
     return (this.prevActiveElement = null)
   }
 
-  addGradebookElement(element) {
+  addGradebookElement(element: HTMLElement) {
     if (!this.gradebookElements.includes(element)) {
       return this.gradebookElements.push(element)
     }
   }
 
-  removeGradebookElement(element) {
+  removeGradebookElement(element: HTMLElement) {
     return (this.gradebookElements = this.gradebookElements.filter(function (e) {
       return e !== element
     }))
@@ -156,7 +217,7 @@ export default class GradebookKeyboardNav {
     }
   }
 
-  toggleColumnHeaderMenu(e) {
+  toggleColumnHeaderMenu(e: KeyboardEvent) {
     // Prevent sending keystroke to text input of editable cells
     e.preventDefault()
     const activeLocation = this.gridSupport.state.getActiveLocation()
@@ -187,34 +248,3 @@ export default class GradebookKeyboardNav {
     }
   }
 }
-
-GradebookKeyboardNav.prototype.keyBindings = [
-  {
-    //   handler: function
-    //   key: the string representation of the key pressed - for use in the help dialog
-    //   desc: string describing what the shortcut does - for use in the help dialog
-    handler: 'sortOnHeader',
-    key: I18n.t('keycodes.sort', 's'),
-    desc: I18n.t('keyboard_sort_desc', 'Sort the grid on the current active column')
-  },
-  {
-    handler: 'toggleColumnHeaderMenu',
-    key: I18n.t('keycodes.menu', 'm'),
-    desc: I18n.t('keyboard_menu_desc', 'Open menu for the active column')
-  },
-  {
-    // this one is just for display in the dialog, the menu will take care of itself
-    key: I18n.t('keycodes.close_menu', 'esc'),
-    desc: I18n.t('keyboard_close_menu', 'Close the currently active menu')
-  },
-  {
-    handler: 'gotoAssignment',
-    key: I18n.t('keycodes.goto_assignment', 'g'),
-    desc: I18n.t('keyboard_assignment_desc', "Go to the current assignment's detail page")
-  },
-  {
-    handler: 'showSubmissionTray',
-    key: 'c',
-    desc: I18n.t('Open the grade detail tray')
-  }
-]

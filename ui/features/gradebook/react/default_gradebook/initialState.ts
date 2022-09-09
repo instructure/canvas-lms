@@ -18,7 +18,12 @@
 
 import studentRowHeaderConstants from './constants/studentRowHeaderConstants'
 import StudentDatastore from './stores/StudentDatastore'
-import type {InitialActionStates, CourseContent, ContentLoadStates} from './gradebook.d'
+import type {
+  ContentLoadStates,
+  CourseContent,
+  GradebookOptions,
+  InitialActionStates
+} from './gradebook.d'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
 import {camelize} from 'convert-case'
 
@@ -105,7 +110,7 @@ export function getInitialContentLoadStates(options): ContentLoadStates {
   }
 }
 
-export function getInitialCourseContent(options): CourseContent {
+export function getInitialCourseContent(options: GradebookOptions): CourseContent {
   const courseGradingScheme = options.grading_standard
     ? {
         data: options.grading_standard

@@ -393,8 +393,8 @@ describe('getDefaultSettingKeyForColumnType', () => {
     gradebook.sortRowsWithFunction(sortFn)
     const [firstRow, secondRow] = gradebook.gridData.rows
 
-    expect(firstRow.sortable_name).toStrictEqual('A Firstington', 'A Firstington sorts first')
-    expect(secondRow.sortable_name).toStrictEqual('Z Lastington', 'Z Lastington sorts second')
+    expect(firstRow.sortable_name).toStrictEqual('A Firstington') // 'A Firstington sorts first'
+    expect(secondRow.sortable_name).toStrictEqual('Z Lastington') //  'Z Lastington sorts second'
   })
 })
 

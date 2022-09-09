@@ -106,42 +106,51 @@ export type StudentGroupCategoryMap = {
   [id: string]: StudentGroupCategory
 }
 
-export type AssignmentDueDate = {
-  due_at: string
+export type DueDate = {
+  due_at: string | null
   grading_period_id: string | null
   in_closed_grading_period: boolean
 }
 
-export type EffectiveDueDateUserMap = {
-  [user_id: string]: AssignmentDueDate
+export type UserDueDateMap = {
+  [user_id: string]: DueDate
 }
 
-export type EffectiveDueDateAssignmentUserMap = {
-  [assignment_id: string]: EffectiveDueDateUserMap
+export type AssignmentUserDueDateMap = {
+  [assignment_id: string]: UserDueDateMap
+}
+
+export type Override = {
+  title: string
+  id: string
+  due_at: string | null
+  course_section_id: string | null
 }
 
 export type Assignment = {
+  anonymous_grading: boolean
   anonymize_students: boolean
   assignment_group_id: string
   assignment_group_position: number
   assignment_id: string
   assignment_visibility: string[]
-  effectiveDueDates: EffectiveDueDateUserMap
-  grades_published: any
+  effectiveDueDates: UserDueDateMap
+  grades_published: boolean
   grading_standard_id: string | null
   grading_type: string
   hasDownloadedSubmissions: boolean
   hidden: boolean
   id: string
   inClosedGradingPeriod: boolean
-  moderated_grading: any
+  moderated_grading: boolean
   module_ids: string[]
   name: string
   omit_from_final_grade: boolean
   only_visible_to_overrides: boolean
-  overrides: any
-  position: number
+  overrides: Override[]
   points_possible: number
+  position: number
+  post_manually: boolean
   published: boolean
   submission_types: string
   user_id: string
@@ -177,6 +186,10 @@ export type Module = {
   id: string
   name: string
   position: number
+}
+
+export type ModuleMap = {
+  [id: string]: Module
 }
 
 export type Section = {
@@ -258,4 +271,18 @@ export type SubmissionCommentData = {
   group_comment: 1 | 0
   text_comment: string
   attempt?: number
+}
+
+export type GradingPeriod = {
+  id: string
+  title: string
+  startDate: Date
+  endDate: Date
+  isClosed: boolean
+}
+
+export type GradingPeriodSet = {
+  gradingPeriods: GradingPeriod[]
+  displayTotalsForAllGradingPeriods: boolean
+  weighted: boolean
 }
