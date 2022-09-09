@@ -642,6 +642,7 @@ pt:
   account_user: 
     types: 
       account_admin: "Administrador de conta"
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "O nome da conta não pode ficar em branco"
@@ -1970,6 +1971,8 @@ pt:
   add_bank: 
     default_name: "Sem nome"
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Adicionar IU de datas de blackout ao ritmo da disciplina. Necessário course_paces ativado."
+  add_calendar_36da563b: "Adicionar Calendário"
+  add_calendars_13c82791: "Adicionar Calendários"
   add_calendars_to_view_your_institution_s_important_df1e42d3: "Adicione calendários para ver as datas importantes da sua instituição, tais como o primeiro dia de aulas, períodos de exames, etc"
   add_cc_subtitle_a9ef4a66: "Adicionar CC/legenda"
   add_collaboration_da9665ac: "Adicionar colaboração"
@@ -2169,6 +2172,7 @@ pt:
   admin_tray_3b680e7b: "Bandeja de administração"
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Vista de administração"
+  administrative_links_816228e2: "Ligações administrativas"
   administrator_f325c186: Administrador
   administrators_and_author_only_flagged_as_possible_42345cba: "Apenas administradores e autor (assinalado como possível spam)"
   administrators_and_author_only_marked_as_spam_184becce: "Apenas administradores e autor (marcado como spam)"
@@ -2409,6 +2413,7 @@ pt:
       GraphQL
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permite alinhar resultados a conteúdos sem pontuação"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permite que os assessores visualizem a bandeja de auditoria de avaliação SpeedGrader para atribuições anónimas ou moderadas."
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permite que as páginas da disciplina sejam publicadas num horário"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Permite que os grupos de alunos da disciplina sejam criados por carregamento csv"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite criar anúncios para uma seção específica"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permite criar discussões para uma seção específica"
@@ -3168,6 +3173,7 @@ pt:
   an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
     one: "Ocorreu um erro ao remover o resultado: %{errorMessage}."
     other: "Ocorreu um erro ao remover %{count} resultados: %{errorMessage}."
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: "Ocorreu um erro ao remover o calendário"
   an_error_occurred_while_removing_the_outcome_e47c9553: "Ocorreu um erro ao retirar o resultado."
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Ocorreu um erro ao remover o resultado: %{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
@@ -4645,6 +4651,8 @@ pt:
       attendance_help: "Ajuda com presença"
   attendance_ca433183: Presença
   attendees_eb402bac: Participantes
+  attendees_failed_to_sync_725c8137: " Participantes falharam na sincronia."
+  attendees_synced_ee5edd00: " Participantes Sincronizados!"
   attention_aaca1f1d: Atenção!
   attribute_d9f3af72: Atributo
   attributes_locked_1a1a0f46: "%{attributes} Bloqueado"
@@ -5219,6 +5227,7 @@ pt:
   by_default_students_can_always_create_groups_in_a__dac761d3: "Por padrão, os alunos sempre podem criar grupos em uma disciplina. Para restringir os alunos de criar grupos, as Disciplinas - gerir / atualizar devem ser ativados, e a caixa de verificação Deixar os alunos organizarem os seus próprios grupos em Definições de Disciplinas não deve ser selecionada."
   by_lti_2_registration_url_e421e523: "Por URL de registo LTI 2"
   by_url_a163275e: "Por URL"
+  c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: fechar
@@ -5589,6 +5598,7 @@ pt:
     ics_description_user: "Eventos do calendário para o utilizador, %{user_name}"
     ics_title: "%{course_or_group_name} Calendário (Canvas)"
     invalid_date_or_time: "Data inválida ou data/hora inválida para %{attr}"
+  calendar_removed_1c841af4: "Calendário removido"
   calendar_series_e1b7a4bc: "Séries do calendário"
   calendars: 
     event: 
@@ -5641,6 +5651,7 @@ pt:
         delete: "Excluir um evento/tarefa"
         new: "Criar um novo evento"
   calendars_a756c286: Calendários
+  calendars_added_successfully_2e443b3: "Calendários adicionados com sucesso"
   calendars_saved_successfully_bcba8359: "Calendários guardados com sucesso"
   calendars_toggle_list_visibility_488db143: "Alternar visibilidade da lista de Calendários"
   campbell_union_high_school_district_grade_report_7f3bb801: "Relatório de classificação do distrito de Campbell Union High School"
@@ -5940,6 +5951,7 @@ pt:
   check_to_add_a_user_for_loginid_6cd25597: "Marque para adicionar um utilizador %{loginid}"
   check_to_select_all_98e484f1: "Marque para selecionar todos"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Marque para ignorar a adição de um utilizador para %{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: "Verifique a sua ortografia ou tente menos letras."
   checkbox_examples_dc790142: "Exemplos de caixas de verificação"
   checked_883b93fd: verificado
   cheerful_panda_holding_a_map_17ba47ee: "Panda alegre segurando um mapa"
@@ -5962,6 +5974,7 @@ pt:
   choose_a_quiz_engine_8820d521: "Escolha um motor de teste"
   choose_a_submission_type_8f45651a: "Escolha um tipo de entrega"
   choose_a_timezone_d9c52998: "Escolher fuso horário"
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "Escolha calendários adicionais para adicionar ao seu calendário no Canvas."
   choose_an_authentication_service_47dc8875: "Escolha um serviço de autenticação"
   choose_and_publish_980812cb: "Escolher e publicar"
   choose_assignment_b0132c5e: "-- Escolha a tarefa --"
@@ -5985,6 +5998,7 @@ pt:
     other: "Escolher até %{count} calendários de assunto"
   choose_usage_rights_33683854: "Escolher direitos de utilização..."
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Escolha que calendários são visíveis na secção Outro Calendário no Canvas Calendar. Os calendários da subconta são visíveis para os utilizadores se estiverem associados à conta. Por defeito, todos os calendários estão ocultos."
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "Escolha que calendários os seus utilizadores podem adicionar na secção \"Outros Calendários\" do seu calendário no Canvas. Os utilizadores só poderão adicionar calendários habilitados para as contas a que estão associados. Por defeito, todos os calendários estão desativados."
   choose_your_default_skin_tone_f09bf0bd: "Escolha o seu tom de pele predefinido"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' não é uma cor válida."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' não é uma cor válida. Introduza um código hexcode válido antes de guardar."
@@ -6550,6 +6564,7 @@ pt:
   conference_name_fdb7e091: "Nome da Conferência"
   conference_participant_count_87e86c5c: "contagem dos participantes da conferência"
   conference_recorded_7e776ec2: "conferência gravada"
+  conference_saved_8895cfbc: "Conferência Guardada!"
   conference_selection_ea4050bb: "Seleção da Conferência"
   conference_type_2f4ac9be: "Tipo de Conferência"
   conference_type_7bd581e: "tipo de conferência"
@@ -6608,6 +6623,7 @@ pt:
       recordings: "%{recordingCount} gravações"
       settings: Configurações
       start: Início
+      sync: "Sincronizar Participantes"
       type: "%{type}"
       view: Ver
     no_concluded_conferences: "Não existem conferências concluídas"
@@ -7602,6 +7618,10 @@ pt:
     one: "1 Calendário de contas seleccionado"
     other: "%{count} Calendários de contas selecionados"
     zero: "Sem calendários de contas seleccionados"
+  count_account_calendars_selected_acbd588: 
+    one: "1 Calendário de contas selecionado"
+    other: "%{count} Calendários de contas selecionados"
+    zero: "Sem calendários de contas selecionados"
   count_alignable_artifacts_7779644a: 
     one: "%{count} ARTEFATO ALINHÁVEL"
     other: "%{count} ARTEFATOS ALINHÁVEIS"
@@ -9319,6 +9339,7 @@ pt:
   date_modified_4d065406: ", data modificada: "
   date_modified_e1c8ac8f: "Data de modificação"
   date_modified_modifiedat_b839cc8b: "data modificada: %{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: "A data deve ser posterior à data disponível"
   date_of_most_recent_bounce_b23d0119: "Data da pontuação mais recente"
   date_required_a74e077c: "Data requerida"
   date_time_options_7abcdea7: "Opções de data/hora"
@@ -10735,6 +10756,7 @@ pt:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Permite o botão Microsoft Immersive Reader em áreas suportadas do Canvas. O botão pode ainda ser ativado numa disciplina, independentemente desta definição, se o administrador da conta o tiver ativado para todos os utilizadores."
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Habilita funcionalidades de IU para gerir submissões \"alargadas\"."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "A ativação do Tema Elementary irá alterar a fonte na interface do Canvas e simplificar o Menu de Navegação da Disciplina para todos os utilizadores da sua disciplina."
+  enabling_this_option_automatically_moves_course_pa_15f755b3: "A ativação desta opção move automaticamente as datas limite dos Pacotes de Disciplina para após a data final. A entrada para Hora, Localização e Calendário será desativada."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "A ativação desta opção move automaticamente as datas limite dos Pacotes de Disciplina para após a data final."
   encourage_class_participation_4e069479: "Incentivar a participação de classe"
   encourage_student_discourse_7836b9f7: "Incentivar o discurso dos alunos"
@@ -10745,6 +10767,7 @@ pt:
   end_date_cannot_be_before_start_date_eb62ed6d: "A data final não pode ser anterior à data de início"
   end_date_cdd7a7b6: "Data final:"
   end_date_e0093ed7: "Data de fim"
+  end_date_for_conference_eaff0807: "Data final para a Conferência"
   end_date_from_cdd9d90: "Data Final De:"
   end_date_to_8b17929d: "Data Final Para:"
   end_date_value_3d3e8906: "Data de fim %{value}"
@@ -11756,6 +11779,7 @@ pt:
   failed_to_update_domain_lookup_b2437cf7: "Falha em atualizar a pesquisa de domínio"
   failed_to_update_internal_setting_ab3d0a4a: "Falha na actualização da configuração interna"
   failed_to_update_permission_33c493f: "Falha ao atualizar a permissão"
+  failed_to_update_publication_date_83c5b171: "Falha em actualizar a data de publicação"
   failed_to_update_role_name_8c7b0119: "Falha ao atualizar o nome da função"
   failed_to_update_strand_8d1c82d: "Falha na atualização do fio"
   failed_to_validate_cas_ticket_error_31aa4c63: "Falha ao validar o bilhete do CAS: %{error}"
@@ -13173,6 +13197,7 @@ pt:
   grading_period_set_for_account_name_b9823b2a: "Período de Avaliação definido para %{account_name}"
   grading_period_set_id_f2377529: "Id do Período de classificação definido"
   grading_period_set_title_880a6ec4: "Título do Período de Classificação Definido"
+  grading_period_sets_fb608834: "Conjuntos de períodos de classificação"
   grading_period_title_23b7f8ac: "Título do Período de Classificação"
   grading_period_title_fa470c50: "Título do Período de Classificação"
   grading_period_weight_99b66906: "Classificar Peso do Período"
@@ -13960,6 +13985,7 @@ pt:
   history_cd3f60a9: Histórico
   history_settings_c63dbaaf: "Configurações do Histórico"
   hmm_we_can_t_find_any_matching_calendars_25983a51: "Hmm, não conseguimos encontrar Calendários correspondentes."
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: "Hmm, não conseguimos encontrar calendários correspondentes."
   hold_fb369624: "colocar em espera"
   home_351838cd: Início
   home_page_is_not_valid_2e8a25ae: "A página inicial não é válida"
@@ -14255,6 +14281,7 @@ pt:
       Se o Aprimoramentos RCE também estiver ativado,
       o RCE salvará seu trabalho automaticamente à medida que você for
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Se definido, permite que o status de envio seja alterado de dentro do Speedgrader"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: "Se definido, exibe relatórios de originalidade com Assignment Enhancements ativados"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Se definido, exibe o ícone de conexão de domínio atualizado"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Se definido, remove o atraso que normalmente ocorre quando se procura por alunos."
   if_set_removes_the_missing_status_from_submissions_43fba750: "Se definido, remove o estado em falta das submissões quando classificado"
@@ -14779,6 +14806,7 @@ pt:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "O ID de integração \"%{integration_id}\" já está em uso"
   integrations_cadb03f3: Integrações
   interactions_report_47c1219e: "Relatório de Interações"
+  internal_analytics_f02b3fff: "Analítica Interna"
   internal_setting_created_f3f72416: "Definição interna criada"
   internal_setting_deleted_aaf1dd9d: "Configuração interna apagada"
   internal_setting_updated_87510559: "Definição interna actualizada"
@@ -15837,6 +15865,7 @@ pt:
   manage_groups_4c3a2a9f: "Gerir grupos"
   manage_home_4fc3480b: "Gerir Página Inicial"
   manage_home_for_coursename_5e5c7661: "Gerir Página Inicial para %{courseName}"
+  manage_internal_analytics_fcfa306e: "Gerir a Análise Interna"
   manage_item_name_6118d4b0: "Gerir %{item_name}"
   manage_line_items_244b289f: "Gerir itens de linha"
   manage_lti_8fcdc6ba: "Gerir LTI"
@@ -18672,6 +18701,7 @@ pt:
   new_slack_api_key_453d04d: "Nova Chave da API Slack"
   new_student_group_description_bfeb76aa: "Descrição do novo grupo de alunos"
   new_student_group_e31b7cb5: "Novo Grupo de Alunos"
+  new_tab_ab7629d2: "Nova Guia"
   new_topic_for_course_3d98222a: "Novo tópico para %{course}"
   new_typography_4eaeca26: "Nova Tipografia"
   new_ui_487a624e: "Novo UI"
@@ -19508,6 +19538,7 @@ pt:
     ? "yes"
     : Sim
   options_3ab0ea65: Opções
+  options_for_name_bfa30aa0: "Opções para %{name}"
   options_for_title_label_17f821ff: "Opções para %{title_label}"
   or_9b70ccaa: Ou
   or_a01eec62: OU
@@ -19543,6 +19574,7 @@ pt:
   original_job_id_d81afbb3: "ID do trabalho original"
   originality_report_5d461681: "Relatório de Originalidade"
   originality_reports_1e36b935: "Relatórios de originalidade"
+  originality_reports_with_assignment_enhancements_9b2870ff: "Relatórios de Originalidade com Melhorias de Atribuição"
   other_1c6d9c79: Outro
   other_calendars_toggle_list_visibility_bd7fb67a: "Outros Calendários visibilidade da lista de alternância"
   other_carrier_45531207: "Outra operadora"
@@ -20076,6 +20108,7 @@ pt:
   please_log_in_to_view_this_content_eec6cd0: "Por favor, logue-se para ver este conteúdo"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Por favor certifique-se de que ninguém consegue captar a imagem no seu ecrã a partir do seu ambiente ou de um serviço de partilha de ecrã."
   please_note_fbb62e4c: "Por favor observe:"
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Por favor observe: A estrutura hospeda o Canvas Commons nos EUA. Isto significa que quando utilizar o Canvas Commons os teus dados pessoais serão armazenados e processados nos EUA. Estes elementos de dados pessoais incluem: nome, endereço de e-mail, ID de utilizador do Canvas, nome de login no Canvas, Avatar do Canvas, endereço IP, recursos do Canvas Commons por si preferidos, e comentários que fizer a quaisquer recursos no Canvas Commons. Pode encontrar mais informações sobre as Práticas de privacidade de infraestrutura [aqui](%{url})."
   please_provide_a_field_e5a7d0b3: "Forneça um %{field}"
   please_provide_a_pairing_code_530d1e9d: "Favor fornecer um código de emparelhamento."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Por favor, forneça um domínio de inquilino válido. Verifique as definições do seu Azure Active Directory para o encontrar."
@@ -21208,9 +21241,11 @@ pt:
   public_message_students: 
     message_student: "Mensagem a alunos para %{course_name}"
     send_message: "Enviar Mensagem"
+  publication_options_cbbfc20e: "Opções de publicação"
   publish_5211dca3: Publicar
   publish_aa888e3c: "Publicar:"
   publish_announcement_fec6d7e2: "Publicar anúncio"
+  publish_at_3fd340d1: "Publicar em"
   publish_btn_module: 
     buttons: 
       publish: Publicar
@@ -23618,6 +23653,7 @@ pt:
   save_and_publish_1b765e7: "Guardar e publicar"
   save_changes_698abe77: "Guardar alterações"
   save_customizations_dde779d8: "Guardar personalizações"
+  save_failed_463cb2a8: "Guardar falhou."
   save_grading_period_daaaddea: "Guardar Período de Classificação"
   save_grading_period_set_e029fa88: "Guardar Período de Classificação Definido"
   save_key_b4dede06: "Guardar chave"
@@ -23659,6 +23695,8 @@ pt:
   schedule_e5dd4c32: Cronograma
   schedule_student_availability_332154a: "Agendar disponibilidade de alunos"
   scheduled_date_5b0aedb6: "Data prevista"
+  scheduled_for_publication_c8d3e9a2: "Agendada para publicação"
+  scheduled_page_publication_ae911741: "Publicação da página agendada"
   scheduler_65b5ac91: Agenda
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "O Scheduler deve ser ativado pelo administrador do Canvas."
   scheduler_must_be_enabled_for_your_account_e6e53972: "O agendador deve estar ativado para sua conta."
@@ -24272,6 +24310,7 @@ pt:
   set_name_f83b658: "Definir nome"
   set_of_grading_periods_545b37e9: "Definir Períodos de Classificação"
   set_some_up_now_1749bb44: "Definir agora"
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: "Fixar a data de vencimento no Pacote de Disciplina após a criação da tarefa."
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Definir a escala de domínio a ser utilizada para todas as disciplinas dentro desta conta."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Defina como suas Classificações de Proficiência aparecem dentro da Lista de Notas de Domínio em Aprendizagem.\n\
@@ -25585,6 +25624,7 @@ pt:
   start_date_e937be8a: "Data de início"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "Campo de Data Inicial para assunto"
+  start_date_for_conference_1936e809: "Data de início da Conferência"
   start_date_from_20503757: "Data de Início De:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} para %{end_time}"
   start_date_to_1e6e6bbe: "Data de Início Para:"
@@ -26983,6 +27023,8 @@ pt:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: "Esta disciplina está a utilizar o Pacote da Disciplina. Ir para Pacote da Disciplina para gerir as datas limite."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Esta disciplina está visível apenas para professores até ser publicada."
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este critério está vinculado ao resultado de aprendizado"
+  this_due_date_is_managed_by_cfbb698c: "Esta data de vencimento é gerida por"
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Esta data de vencimento é gerida pelo Pacote de Disciplina."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Este elemento é uma alternativa mais acessível a reordenação através de arrastar e largar. Pressione Enter ou Espaço para mover esta questão."
   this_email_address_is_unconfirmed_f0fc8c6e: "Este endereço de email não está confirmado"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Isso permite que uma configuração de disciplina permita que os alunos exportem a disciplina como uma pasta zip offline na Web"
@@ -27257,6 +27299,7 @@ pt:
   this_user_has_been_deleted_77e6c04b: "Este utilizador foi eliminado"
   this_user_has_been_deleted_8caa45be: "Este utilizador foi eliminado."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "Este utilizador tem várias funções na disciplina. Alterar a sua função aqui vai remover todos os seus registos."
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Este utilizador ainda não aceitou o convite para aderir à disciplina."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "Este utilizador atualmente não consegue aceder à disciplina"
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Este utilizador realizou ações enquanto o anónimo estava desativado"
@@ -27792,6 +27835,7 @@ pt:
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "Para editar a disciplina SIS ID, Disciplinas- gerir / atualizar e Dados SIS - gerir também tem de ser ativado."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "Para editar a ID SIS Disciplina , Gerir Disciplinas: Admin - gerir / atualizar e SIS Data - gerir também deve ser ativada."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "Para editar o ID da disciplina, o SIS Data - gerir também deve estar ativado."
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: "Para editar a data de vencimento, vá ao Pacote de Disciplina, altere o número de dias atribuídos a esta tarefa, e publique o ritmo atualizado."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       Para editar detalhes do utilizador, modificar detalhes de login ou alterar senhas de utilizadores, os Utilizadores - gerir detalhes de login também devem estar ativados.
       Para visualizar as visualizações de páginas do utilizador, ver Estatísticas também deve estar ativada.
@@ -28600,6 +28644,7 @@ pt:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Actualizações ao fluxo OAuth 2.0 para parar o redireccionamento na autenticação 'token"
   updating_6edbab78: Atualizando
   updating_discussion_failed_aadb2d35: "A atualização da discussão falhou"
+  updating_publication_date_62cc1622: "Atualização da data de publicação"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Atualizar o URL do Catálogo tornará o seu antigo URL inacessível para os utilizadores com efeito imediato! Se já existir um processador de pagamento configurado, as alterações necessitarão da ajuda de um engenheiro de Catálogo."
   upload_8b403d05: Carregar
   upload_a_css_file_ec22214b: "Carregar um ficheiro CSS..."
@@ -29752,6 +29797,7 @@ pt:
         zero: "Nenhum %{model} encontrado"
     page_gap: "&hellip;"
     previous_label: "&#8592; Anterior"
+  will_publish_on_publish_date_8b42e1ec: "Será publicado em %{publish_date}"
   will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(vai enviar para todos se não forem feitas seleções)"
   will_unlock_unlock_date_1024c38d: "Vai desbloquear %{unlock_date}"
   wimba_conference: 
