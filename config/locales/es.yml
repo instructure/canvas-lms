@@ -641,6 +641,7 @@ es:
   account_user: 
     types: 
       account_admin: "Administrador de la cuenta"
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "El nombre de la cuenta no puede estar en blanco"
@@ -1969,6 +1970,8 @@ es:
   add_bank: 
     default_name: "Sin nombre"
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Agregar la interfaz de usuario de fechas restringidas al ritmo del curso. Requiere que course_paces esté habilitado."
+  add_calendar_36da563b: "Agregar calendario"
+  add_calendars_13c82791: "Agregar calendarios"
   add_calendars_to_view_your_institution_s_important_df1e42d3: "Agregue calendarios para ver las fechas importantes de su institución, como el primer día de clases, los períodos de exámenes, etc."
   add_cc_subtitle_a9ef4a66: "Agregar subtítulos"
   add_collaboration_da9665ac: "Agregar colaboración"
@@ -2168,6 +2171,7 @@ es:
   admin_tray_3b680e7b: "Bandeja del administrador"
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: "Vista del administrador"
+  administrative_links_816228e2: "Enlaces administrativos"
   administrator_f325c186: Administrador
   administrators_and_author_only_flagged_as_possible_42345cba: "Solo administradores y autor (marcado como posible correo no deseado)"
   administrators_and_author_only_marked_as_spam_184becce: "Solo administradores y autor (marcado como correo no deseado)"
@@ -2407,6 +2411,7 @@ es:
       GraphQL realizadas recientemente
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permite alinear las competencias con el contenido sin puntaje"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permite a los evaluadores ver la bandeja de auditorías para evaluaciones en SpeedGrader para asignaciones anónimas o moderadas."
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Permite publicar las páginas del curso en un cronograma"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Permite crear grupos de estudiantes del curso mediante la carga de CSV"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite crear anuncios para una sección específica"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permite crear foros para una sección específica"
@@ -3166,6 +3171,7 @@ es:
   an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
     one: "Ocurrió un error mientras se eliminaba la competencia: %{errorMessage}."
     other: "Ocurrió un error mientras se eliminaban %{count} competencias: %{errorMessage}."
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: "Ha ocurrido un error al eliminar el calendario"
   an_error_occurred_while_removing_the_outcome_e47c9553: "Ocurrió un error mientras se removía la competencia."
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Ocurrió un error mientras se removía la competencia: %{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
@@ -4642,6 +4648,8 @@ es:
       attendance_help: "Ayuda de Asistencia"
   attendance_ca433183: Asistencia
   attendees_eb402bac: Asistentes
+  attendees_failed_to_sync_725c8137: " Los asistentes no se han podido sincronizar."
+  attendees_synced_ee5edd00: " ¡Los asistentes se han sincronizado!"
   attention_aaca1f1d: ¡Atención!
   attribute_d9f3af72: Atributo
   attributes_locked_1a1a0f46: "%{attributes} bloqueado"
@@ -5213,6 +5221,7 @@ es:
   by_default_students_can_always_create_groups_in_a__dac761d3: "Por defecto, los estudiantes siempre pueden crear grupos en un curso. Para restringir la creación de grupos por parte de los estudiantes debe habilitarse la opción de Cursos: administrar/actualizar y no debe seleccionarse la casilla de verificación Permitir que los estudiantes organicen sus propios grupos en la Configuración del curso."
   by_lti_2_registration_url_e421e523: "A través de la URL de registro LTI 2"
   by_url_a163275e: "Por URL"
+  c4e_analytics_66e0fc46: "Analíticas del C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: cerrar
@@ -5583,6 +5592,7 @@ es:
     ics_description_user: "Eventos de calendario para el usuario, %{user_name}"
     ics_title: "Calendario (Canvas) %{course_or_group_name}"
     invalid_date_or_time: "Fecha no válida o fecha y hora no válida para %{attr}"
+  calendar_removed_1c841af4: "Calendario eliminado"
   calendar_series_e1b7a4bc: "Series del calendario"
   calendars: 
     event: 
@@ -5635,6 +5645,7 @@ es:
         delete: "Eliminar un evento/Tarea"
         new: "Crear un nuevo evento"
   calendars_a756c286: Calendarios
+  calendars_added_successfully_2e443b3: "Calendarios agregados con éxito"
   calendars_saved_successfully_bcba8359: "Calendarios guardados correctamente"
   calendars_toggle_list_visibility_488db143: "Calendarios alternan la visibilidad de la lista"
   campbell_union_high_school_district_grade_report_7f3bb801: "Reporte de calificación del distrito de Union High School de Capmbell."
@@ -5934,6 +5945,7 @@ es:
   check_to_add_a_user_for_loginid_6cd25597: "Marque para agregar un usuario para %{loginid}"
   check_to_select_all_98e484f1: "Marcar para seleccionar todo"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Marque para saltar agregar un usuario para %{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: "Revise su ortografía o pruebe con menos letras."
   checkbox_examples_dc790142: "Ejemplos de casilla de verificación"
   checked_883b93fd: marcado
   cheerful_panda_holding_a_map_17ba47ee: "Un panda alegre sosteniendo un mapa"
@@ -5956,6 +5968,7 @@ es:
   choose_a_quiz_engine_8820d521: "Elija un Motor de examen"
   choose_a_submission_type_8f45651a: "Elegir un tipo de presentación"
   choose_a_timezone_d9c52998: "Elegir una zona horaria"
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "Elija calendarios adicionales para añadirlos a su calendario de Canvas."
   choose_an_authentication_service_47dc8875: "Escoger un servicio de autenticación"
   choose_and_publish_980812cb: "Elegir y publicar"
   choose_assignment_b0132c5e: "-- Escoger tarea --"
@@ -5979,6 +5992,7 @@ es:
     other: "Elija hasta %{count} calendarios de asignaturas"
   choose_usage_rights_33683854: "Elegir derechos de uso..."
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Elija qué calendarios son visibles en la sección Otros calendarios en el calendario de Canvas. Los calendarios de las subcuentas son visibles para los usuarios si están asociados a la cuenta. Por defecto, todos los calendarios están ocultos."
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "Elija qué calendarios pueden agregar sus usuarios en la sección \"Otros calendarios\" de su calendario de Canvas. Los usuarios solo podrán agregar calendarios para las cuentas a las que están asociados. Por defecto, todos los calendarios están desabilitados."
   choose_your_default_skin_tone_f09bf0bd: "Elija su tono de piel predeterminado"
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' no es un color válido."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' no es un color válido. Ingresar un código hexadecimal antes de guardar."
@@ -6543,6 +6557,7 @@ es:
   conference_name_fdb7e091: "Nombre de la conferencia"
   conference_participant_count_87e86c5c: "cantidad de participantes de la conferencia"
   conference_recorded_7e776ec2: "conferencia grabada"
+  conference_saved_8895cfbc: "¡Conferencia guardada!"
   conference_selection_ea4050bb: "Selección de la conferencia"
   conference_type_2f4ac9be: "Tipo de conferencia"
   conference_type_7bd581e: "tipo de conferencia"
@@ -6601,6 +6616,7 @@ es:
       recordings: "%{recordingCount} grabaciones"
       settings: Configuraciones
       start: Comenzar
+      sync: "Sincronizar asistentes"
       type: "%{type}"
       view: Vista
     no_concluded_conferences: "No hay conferencias finalizadas"
@@ -7594,6 +7610,10 @@ es:
     one: "1 calendario de la cuenta seleccionado"
     other: "%{count} calendarios de la cuenta seleccionados"
     zero: "No hay calendarios de la cuenta seleccionados"
+  count_account_calendars_selected_acbd588: 
+    one: "1 calendario de cuenta seleccionado"
+    other: "%{count} calendarios de cuenta seleccionados"
+    zero: "No se han seleccionado calendarios de cuenta"
   count_alignable_artifacts_7779644a: 
     one: "%{count} ARTEFACTO ALINEABLE"
     other: "%{count} ARTEFACTOS ALINEABLES"
@@ -9311,6 +9331,7 @@ es:
   date_modified_4d065406: ", fecha de modificación: "
   date_modified_e1c8ac8f: "Fecha de modificación"
   date_modified_modifiedat_b839cc8b: "fecha de modificación: %{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: "La fecha debe ser posterior a la fecha disponible"
   date_of_most_recent_bounce_b23d0119: "Fecha del rebote más reciente"
   date_required_a74e077c: "Fecha requerida"
   date_time_options_7abcdea7: "Opciones de fecha/hora"
@@ -10725,6 +10746,7 @@ es:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Habilita el botón Lector inmersivo de Microsoft en áreas compatibles de Canvas. El botón podría, de todas maneras, habilitarse en un curso sin importar la configuración si el administrador de la cuenta lo ha habilitado para los usuarios."
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Activa las funcionalidades de la IU para la gestión de las entregas \"extendidas\"."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Si se activa el Tema para primaria, se cambiará la fuente en la interfaz de Canvas y se simplificará el menú de Navegación del curso (Course Navigation) para todos los usuarios en su curso."
+  enabling_this_option_automatically_moves_course_pa_15f755b3: "La activación de esta opción mueve automáticamente las fechas de entrega de las tareas de ritmo del curso a una fecha posterior a la fecha de finalización. La entrada de la hora, el lugar y el calendario se deshabilitará."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "La activación de esta opción mueve automáticamente las fechas de entrega de las tareas de ritmo del curso a una fecha posterior a la fecha de finalización."
   encourage_class_participation_4e069479: "Fomentar la participación en clase"
   encourage_student_discourse_7836b9f7: "Fomente el debate entre estudiantes"
@@ -10735,6 +10757,7 @@ es:
   end_date_cannot_be_before_start_date_eb62ed6d: "La fecha de término debe ser antes de la fecha de comienzo"
   end_date_cdd7a7b6: "Fecha de finalización"
   end_date_e0093ed7: "Fecha de finalización"
+  end_date_for_conference_eaff0807: "Fecha de finalización de la conferencia"
   end_date_from_cdd9d90: "Fecha de finalización desde:"
   end_date_to_8b17929d: "Fecha de finalización hasta:"
   end_date_value_3d3e8906: "Fecha de finalización %{value}"
@@ -11746,6 +11769,7 @@ es:
   failed_to_update_domain_lookup_b2437cf7: "No se pudo actualizar la búsqueda de dominio"
   failed_to_update_internal_setting_ab3d0a4a: "Se produjo un error al actualizar la configuración interna"
   failed_to_update_permission_33c493f: "No se pudo actualizar el permiso"
+  failed_to_update_publication_date_83c5b171: "No se ha podido actualizar la fecha de publicación"
   failed_to_update_role_name_8c7b0119: "No se pudo actualizar el nombre del rol"
   failed_to_update_strand_8d1c82d: "Error al actualizar hilo"
   failed_to_validate_cas_ticket_error_31aa4c63: "Error al validar el boleto de CAS: %{error}"
@@ -13158,6 +13182,7 @@ es:
   grading_period_set_for_account_name_b9823b2a: "Conjunto de período de calificación para %{account_name}"
   grading_period_set_id_f2377529: "Identificador del conjunto de período de calificación"
   grading_period_set_title_880a6ec4: "Título del conjunto de período de calificación"
+  grading_period_sets_fb608834: "Conjuntos de períodos de calificación"
   grading_period_title_23b7f8ac: "Título del período de calificación"
   grading_period_title_fa470c50: "Título del período de calificación"
   grading_period_weight_99b66906: "Ponderación del período de calificación"
@@ -13944,6 +13969,7 @@ es:
   history_cd3f60a9: Historial
   history_settings_c63dbaaf: "Configuraciones del historial"
   hmm_we_can_t_find_any_matching_calendars_25983a51: "Mmm, no podemos encontrar ningún Calendario que coincida."
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: "No podemos encontrar ningún calendario que coincida."
   hold_fb369624: esperar
   home_351838cd: "Página de inicio"
   home_page_is_not_valid_2e8a25ae: "La página de inicio no es válida"
@@ -14237,6 +14263,7 @@ es:
       Si las mejoras del RCE también están habilitadas,
       este guardará automáticamente el trabajo a medida que usted lo realiza
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Si se establece, permite cambiar el estado del envío desde dentro de Speedgrader"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: "Si está configurado, muestra los informes de originalidad con las mejoras de tareas activadas"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Si está configurado, muestra el ícono de conexión de dominio actualizado"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Al establecerse, elimina el retraso que suele ocurrir cuando se buscan estudiantes."
   if_set_removes_the_missing_status_from_submissions_43fba750: "Si está configurado, retira el estado faltante de las entregas cuando está calificado."
@@ -14759,6 +14786,7 @@ es:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "La identificación de la integración \"%{integration_id}\" ya está en uso"
   integrations_cadb03f3: Integraciones
   interactions_report_47c1219e: "Reporte de interacciones"
+  internal_analytics_f02b3fff: "Analíticas internas"
   internal_setting_created_f3f72416: "Se creó la configuración interna"
   internal_setting_deleted_aaf1dd9d: "Se eliminó la configuración interna"
   internal_setting_updated_87510559: "Se actualizó la configuración interna"
@@ -15816,6 +15844,7 @@ es:
   manage_groups_4c3a2a9f: "Administrar grupos"
   manage_home_4fc3480b: "Administrar el inicio"
   manage_home_for_coursename_5e5c7661: "Administrar el inicio para %{courseName}"
+  manage_internal_analytics_fcfa306e: "Administrar analíticas internas"
   manage_item_name_6118d4b0: "Administrar %{item_name}"
   manage_line_items_244b289f: "Gestionar los elementos de línea"
   manage_lti_8fcdc6ba: "Administrar LTI"
@@ -18654,6 +18683,7 @@ es:
   new_slack_api_key_453d04d: "Nueva clave API de Slack"
   new_student_group_description_bfeb76aa: "Descripción del nuevo grupo de estudiantes"
   new_student_group_e31b7cb5: "Nuevo grupo de estudiantes"
+  new_tab_ab7629d2: "Nueva pestaña"
   new_topic_for_course_3d98222a: "Nuevo tema para %{course}"
   new_typography_4eaeca26: "Nueva tipografía"
   new_ui_487a624e: "Nuevo IU"
@@ -18678,7 +18708,7 @@ es:
   next_module_66f58e91: "Módulo siguiente"
   next_module_item_19e835f3: "Ítem del módulo siguiente"
   next_module_item_9bb8a222: "Siguiente módulo/Item"
-  next_month_749b1778: "Próximo mes"
+  next_month_749b1778: "Mes siguiente"
   next_month_b55a387c: "Próximo mes"
   next_page_d2a39853: "Próxima página"
   next_question_f37bac25: "Próxima pregunta"
@@ -19488,6 +19518,7 @@ es:
     ? "yes"
     : Sí
   options_3ab0ea65: Opciones
+  options_for_name_bfa30aa0: "Opciones para %{name}"
   options_for_title_label_17f821ff: "Opciones para %{title_label}"
   or_9b70ccaa: O
   or_a01eec62: O
@@ -19523,6 +19554,7 @@ es:
   original_job_id_d81afbb3: "Identificador del trabajo original"
   originality_report_5d461681: "Informe de originalidad"
   originality_reports_1e36b935: "Informes de originalidad"
+  originality_reports_with_assignment_enhancements_9b2870ff: "Informes de originalidad con mejoras para la tarea"
   other_1c6d9c79: Otro
   other_calendars_toggle_list_visibility_bd7fb67a: "Visibilidad de la lista para alternar Otros calendarios"
   other_carrier_45531207: "Otro proveedor de telefonía móvil"
@@ -20056,6 +20088,7 @@ es:
   please_log_in_to_view_this_content_eec6cd0: "Inicie sesión para ver este contenido"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Asegúrese de que nadie a su alrededor pueda capturar la imagen en su pantalla o hacerlo desde un servicio de uso compartido de pantalla."
   please_note_fbb62e4c: "Importante:"
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Importante: Instructure aloja Canvas Commons en los Estados Unidos. Esto significa que, cuando usa Canvas Commons, sus datos personales se almacenarán y procesarán en los Estados Unidos. Estos elementos de datos personales incluyen los siguientes: nombre, dirección de correo electrónico, identificación de usuario de Canvas, nombre de usuario de Canvas, avatar de Canvas, dirección IP, recursos de Canvas Commons que usted haya marcado como favoritos y comentarios que haga a cualquier recurso en Canvas Commons. Puede encontrar más información sobre las prácticas de privacidad de Instructure [aquí](%{url})."
   please_provide_a_field_e5a7d0b3: "Suministrar un %{field}"
   please_provide_a_pairing_code_530d1e9d: "Proporcione un código de emparejamiento."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Proporcione un dominio de inquilino válido. Verifique sus configuraciones de Azure Active Directory para encontrarlo."
@@ -21183,9 +21216,11 @@ es:
   public_jwk_url_b5564c1d: "URL pública de JWK"
   public_message_students: 
     send_message: "Enviar mensaje"
+  publication_options_cbbfc20e: "Opciones de publicación"
   publish_5211dca3: Publicar
   publish_aa888e3c: "Publicar:"
   publish_announcement_fec6d7e2: "Publicar anuncio"
+  publish_at_3fd340d1: "Publicar en"
   publish_btn_module: 
     buttons: 
       publish: Publicar
@@ -23593,6 +23628,7 @@ es:
   save_and_publish_1b765e7: "Guardar y publicar"
   save_changes_698abe77: "Guardar los cambios"
   save_customizations_dde779d8: "Guardar personalizaciones"
+  save_failed_463cb2a8: "No se pudo guardar."
   save_grading_period_daaaddea: "Guardar el período de calificación"
   save_grading_period_set_e029fa88: "Guardar el conjunto de período de calificación"
   save_key_b4dede06: "Guardar la clave"
@@ -23634,6 +23670,8 @@ es:
   schedule_e5dd4c32: Programación
   schedule_student_availability_332154a: "Programar la disponibilidad de los estudiantes"
   scheduled_date_5b0aedb6: "Fecha programada"
+  scheduled_for_publication_c8d3e9a2: "Publicación programada"
+  scheduled_page_publication_ae911741: "Publicación programada de la página"
   scheduler_65b5ac91: Planificador
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "El Planificador debe ser habilitado por el administrador de Canvas."
   scheduler_must_be_enabled_for_your_account_e6e53972: "El Planificador debe estar habilitado para su cuenta."
@@ -24245,6 +24283,7 @@ es:
   set_name_f83b658: "Establecer nombre"
   set_of_grading_periods_545b37e9: "Conjunto de períodos de calificación"
   set_some_up_now_1749bb44: "Configurar ahora algunas"
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: "Establezca la fecha de entrega del ritmo del curso una vez creada la tarea."
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Establecer la escala de dominio que se usará en todos los cursos dentro de esta cuenta."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Configure cómo aparecerán las Valoraciones de competencia dentro del Libro de calificaciones del dominio del aprendizaje.\n\
@@ -25546,6 +25585,7 @@ es:
   start_date_e937be8a: "Fecha de inicio"
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: "El campo de fecha de comienzo para la guía de estilo"
+  start_date_for_conference_1936e809: "Fecha de inicio de la conferencia"
   start_date_from_20503757: "Fecha de inicio desde:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} a %{end_time}"
   start_date_to_1e6e6bbe: "Fecha de comienzo hasta:"
@@ -26934,6 +26974,8 @@ es:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: "Este curso está usando el ritmo del curso. Vaya a Ritmo del curso para administrar las fechas de entrega."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Hasta que se publique, este curso está visible solo para profesores."
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Este criterio depende de una competencia de aprendizaje"
+  this_due_date_is_managed_by_cfbb698c: "Esta fecha de entrega es administrada por"
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Esta fecha de entrega es administrada por el ritmo del curso."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Este elemento ofrece una alternativa más accesible a la reordenación mediante la función arrastrar y soltar. Presione Entrar o Espacio para mover esta pregunta."
   this_email_address_is_unconfirmed_f0fc8c6e: "Esta dirección de correo electrónico no está confirmada"
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Esto habilita una configuración del curso que les permite a los estudiantes exportar el curso como una carpeta .zip web fuera de línea"
@@ -27206,6 +27248,7 @@ es:
   this_user_has_been_deleted_77e6c04b: "Este usuario se ha eliminado"
   this_user_has_been_deleted_8caa45be: "Se eliminó este usuario."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "Este usuario tiene múltiples roles en el curso. Cambiando su rol aquí anulará todas sus inscripciones actuales."
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Este usuario no ha aceptado aún la invitación para el curso"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Actualmente este usuario no puede acceder al curso"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "\"Actualmente este usuario no puede acceder al curso\""
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: "Este usuario realizó acciones mientras el anónimo estaba desactivado."
@@ -27741,6 +27784,7 @@ es:
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "Para editar la identificación de SIS del curso, también debe habilitarse Cursos: administrar/actualizar y Datos de SIS: administrar."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "Para editar la Identificación de SIS del curso, Administrar cursos: Administrador: administrar / actualizar y Datos del SIS: administrar también deben estar habilitados."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "Para editar la identificación del SIS del curso, también debe estar habilitado Datos del SIS: administrar."
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: "Para editar la fecha de entrega, diríjase a Ritmo del curso (Course Pacing), cambie el número de días asignados a esta tarea y publique el ritmo actualizado."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       Para editar los detalles del usuario, modificar los detalles de inicio de sesión o cambiar las contraseñas del usuario, también debe estar habilitado Usuarios: administrar detalles de inicio de sesión.
       Para ver las vistas de página del usuario, también debe estar habilitado Estadísticas: ver.
@@ -28549,6 +28593,7 @@ es:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Actualizaciones del estado de flujo de OAuth 2.0 para detener el redireccionamiento en la autenticación del “token”"
   updating_6edbab78: Actualizando
   updating_discussion_failed_aadb2d35: "No se ha podido actualizar el foro de discusión"
+  updating_publication_date_62cc1622: "Actualización de la fecha de publicación"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "¡Actualizar el URL del catálogo hará que su URL vieja no sea accesible para los usuarios de forma inmediata! Si hay un procesador de pagos existente, los cambios requerirán la ayuda de un ingeniero de catálogos."
   upload_8b403d05: Cargar
   upload_a_css_file_ec22214b: "Cargar un archivo CSS"
@@ -29692,6 +29737,7 @@ es:
         zero: "No se han encontrado %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; Anterior"
+  will_publish_on_publish_date_8b42e1ec: "Se publicará el %{publish_date}"
   will_send_to_everyone_if_no_selections_are_made_b13ecf39: "(se enviará a todos si no se realizan selecciones)"
   will_unlock_unlock_date_1024c38d: "Se desbloqueará el %{unlock_date}"
   wimba_conference: 
