@@ -641,6 +641,7 @@ zh-Hans:
   account_user: 
     types: 
       account_admin: 帐户管理员
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: 帐户名不能为空
@@ -1969,6 +1970,8 @@ zh-Hans:
   add_bank: 
     default_name: 无名
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "向课程节奏添加不适用日期 UI。必须启用 course_paces。"
+  add_calendar_36da563b: 添加日历
+  add_calendars_13c82791: 添加日历
   add_calendars_to_view_your_institution_s_important_df1e42d3: 添加日历以查看您所在机构的重要日期，如开课第一天、考试时间等
   add_cc_subtitle_a9ef4a66: 添加CC/副标题
   add_collaboration_da9665ac: 添加协作
@@ -2168,6 +2171,7 @@ zh-Hans:
   admin_tray_3b680e7b: 管理员托盘
   admin_user_name_29dd115a: admin_user_name
   admin_view_a2f4cd5c: 管理员视图
+  administrative_links_816228e2: 管理链接
   administrator_f325c186: 管理员、行政人员
   administrators_and_author_only_flagged_as_possible_42345cba: 仅管理员和作者（标记为潜在垃圾邮件）
   administrators_and_author_only_marked_as_spam_184becce: 仅管理员和作者（标记为垃圾邮件）
@@ -2405,6 +2409,7 @@ zh-Hans:
       GraphQL突变的信息日志。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: 允许根据非评分内容来调整结果
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: 允许评估者查看SpeedGrader评估审核托盘中的匿名或已核对作业。
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: 允许在日程中发布课程页面
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "允许通过上传 csv 创建课程学生组"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 允许为特定分组创建公告
   allows_creating_discussions_for_a_specific_section_6bf44036: 允许为特定分组创建讨论
@@ -3166,6 +3171,7 @@ zh-Hans:
   an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
     one: "删除 %{count} 个结果时发生错误：%{errorMessage}。"
     other: "删除 %{count} 个结果时发生错误：%{errorMessage}。"
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: 删除日历时出错
   an_error_occurred_while_removing_the_outcome_e47c9553: 删除结果时发生错误。
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "删除结果时发生错误：%{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
@@ -4635,6 +4641,8 @@ zh-Hans:
       attendance_help: 参与帮助
   attendance_ca433183: 出勤
   attendees_eb402bac: 参加者
+  attendees_failed_to_sync_725c8137: " 参与者同步失败。"
+  attendees_synced_ee5edd00: " 参与者已同步！"
   attention_aaca1f1d: 注意!
   attribute_d9f3af72: 属性
   attributes_locked_1a1a0f46: "%{attributes} 已锁定"
@@ -5207,6 +5215,7 @@ zh-Hans:
   by_default_students_can_always_create_groups_in_a__dac761d3: "默认情况下，学生可以随时在课程中创建组。要限制学生创建组，必须启用“课程 - 管理/更新”，且不能选中课程设置中的“让学生自行整理组”复选框。"
   by_lti_2_registration_url_e421e523: "按照 LTI 2 注册 URL"
   by_url_a163275e: "通过 URL"
+  c4e_analytics_66e0fc46: "C4E Analytics"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   c_modal_form: 
     close: 关闭
@@ -5577,6 +5586,7 @@ zh-Hans:
     ics_description_user: "用户 %{user_name} 的日历事件"
     ics_title: "%{course_or_group_name} 日历 (Canvas)"
     invalid_date_or_time: "%{attr} 的日期或日期时间无效"
+  calendar_removed_1c841af4: 已删除日历
   calendar_series_e1b7a4bc: 日历系列
   calendars: 
     event: 
@@ -5629,6 +5639,7 @@ zh-Hans:
         delete: 删除事件/作业
         new: 创建新事件
   calendars_a756c286: 日历
+  calendars_added_successfully_2e443b3: 已成功添加日历
   calendars_saved_successfully_bcba8359: 已成功保存日历
   calendars_toggle_list_visibility_488db143: 日历切换可视列表
   campbell_union_high_school_district_grade_report_7f3bb801: "Campbell Union 高中地区评分报告"
@@ -5928,6 +5939,7 @@ zh-Hans:
   check_to_add_a_user_for_loginid_6cd25597: "勾选以为……添加用户%{loginid}"
   check_to_select_all_98e484f1: 选中所有
   check_to_skip_adding_a_user_for_loginid_5fa643da: "勾选以跳过为……添加用户%{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: 请检查拼写或尝试输入更少字母。
   checkbox_examples_dc790142: 复选框示例
   checked_883b93fd: 已勾选
   cheerful_panda_holding_a_map_17ba47ee: 熊猫高兴地拿着地图
@@ -5950,6 +5962,7 @@ zh-Hans:
   choose_a_quiz_engine_8820d521: 选择测验引擎
   choose_a_submission_type_8f45651a: 选择提交类型
   choose_a_timezone_d9c52998: 选择一个时区
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "选择其他要添加到 Canvas 日历中的日历。"
   choose_an_authentication_service_47dc8875: 选择认证服务
   choose_and_publish_980812cb: 选择并发布
   choose_assignment_b0132c5e: "-- 选择作业 --"
@@ -5973,6 +5986,7 @@ zh-Hans:
     other: "选择最多 %{count} 个主题日历"
   choose_usage_rights_33683854: 选择使用权限...
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: 在Canvas日历的“其他日历”部分中选择可见的日历。如果子帐户日历与帐户关联，则用户可以看到这些日历。默认情况下，所有日历隐藏。
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "选择用户可以将哪些日历添加到 Canvas 日历的“其他日历”部分。用户只能在关联的帐户中添加已启用的日历。默认情况下，所有日历都已禁用。"
   choose_your_default_skin_tone_f09bf0bd: 选择默认肤色
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' 不是有效的颜色。"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' 不是有效的颜色。输入有效的十六进制代码，然后再保存。"
@@ -6530,6 +6544,7 @@ zh-Hans:
   conference_name_fdb7e091: 会议名称
   conference_participant_count_87e86c5c: 会议出席人数
   conference_recorded_7e776ec2: 录制的会议
+  conference_saved_8895cfbc: 已保存会议！
   conference_selection_ea4050bb: 会议选择
   conference_type_2f4ac9be: 会议类型
   conference_type_7bd581e: 会议类型
@@ -6588,6 +6603,7 @@ zh-Hans:
       recordings: "%{recordingCount} 个录音"
       settings: 设置
       start: 开始
+      sync: 同步参与者
       type: "%{type}"
       view: 查看
     no_concluded_conferences: 没有已结束的会议
@@ -7580,6 +7596,10 @@ zh-Hans:
   count_account_calendars_selected_578d6db8: 
     one: 已选择1个帐户日历
     other: "已选择%{count}个帐户日历"
+    zero: 未选择帐户日历
+  count_account_calendars_selected_acbd588: 
+    one: "已选择 1 个帐户日历"
+    other: "已选择 %{count} 个帐户日历"
     zero: 未选择帐户日历
   count_alignable_artifacts_7779644a: 
     one: "%{count} 个可对齐的项目"
@@ -9293,6 +9313,7 @@ zh-Hans:
   date_modified_4d065406: "，修改日期： "
   date_modified_e1c8ac8f: 修改日期
   date_modified_modifiedat_b839cc8b: "修改日期：%{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: 日期必须晚于可用日期
   date_of_most_recent_bounce_b23d0119: 最近的反弹日期
   date_required_a74e077c: 日期是必填项
   date_time_options_7abcdea7: 日期/时间选项
@@ -10710,6 +10731,7 @@ zh-Hans:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "在 Canvas 中受支持的区域启用 Microsoft 沉浸式阅读器按钮。进行此设置后，如果帐户管理员已经为所有用户启用该按钮，它可能仍然会在课程中启用。"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "启用用于管理“扩展”提交项的 UI 功能。"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "启用基本主题将更改 Canvas 界面中的字体并简化您的课程中的所有用户的“课程导航菜单”。"
+  enabling_this_option_automatically_moves_course_pa_15f755b3: 自动启用此选项会使课程进度分配截止日期移至结束日期后。将禁止输入时间、位置和日历。
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: 自动启用此选项会使课程进度分配截止日期移至结束日期后。
   encourage_class_participation_4e069479: 鼓励课堂参与
   encourage_student_discourse_7836b9f7: 鼓励学生多说
@@ -10720,6 +10742,7 @@ zh-Hans:
   end_date_cannot_be_before_start_date_eb62ed6d: 结束日期不能在开始日期之前
   end_date_cdd7a7b6: 结束日期：
   end_date_e0093ed7: 结束日期
+  end_date_for_conference_eaff0807: 会议结束日期
   end_date_from_cdd9d90: 结束日期从：
   end_date_to_8b17929d: 结束日期到：
   end_date_value_3d3e8906: "结束日期 %{value}"
@@ -11731,6 +11754,7 @@ zh-Hans:
   failed_to_update_domain_lookup_b2437cf7: 更新域查找失败
   failed_to_update_internal_setting_ab3d0a4a: 无法更新内部设置
   failed_to_update_permission_33c493f: 更新权限失败
+  failed_to_update_publication_date_83c5b171: 无法更新发布日期
   failed_to_update_role_name_8c7b0119: 更新角色名称失败
   failed_to_update_strand_8d1c82d: 更新部分失败
   failed_to_validate_cas_ticket_error_31aa4c63: "验证 CAS 票证失败：%{error}"
@@ -13146,6 +13170,7 @@ zh-Hans:
   grading_period_set_for_account_name_b9823b2a: "为 %{account_name} 的评分周期集"
   grading_period_set_id_f2377529: "成绩周期集 id"
   grading_period_set_title_880a6ec4: 评分周期集的标题
+  grading_period_sets_fb608834: 评分周期集
   grading_period_title_23b7f8ac: 评分周期的标题
   grading_period_title_fa470c50: 评分周期的标题
   grading_period_weight_99b66906: 评分周期权重
@@ -13929,6 +13954,7 @@ zh-Hans:
   history_cd3f60a9: 历史记录
   history_settings_c63dbaaf: 历史记录设置
   hmm_we_can_t_find_any_matching_calendars_25983a51: 呃，找不到匹配的日历。
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: 嗯，未找到匹配的日历。
   hold_fb369624: 按住
   home_351838cd: 首页
   home_page_is_not_valid_2e8a25ae: 主页无效
@@ -14222,6 +14248,7 @@ zh-Hans:
       如果也启用 RCE 增强，
       RCE 将在您离开时自动保存您的工作
   if_set_allows_submission_status_to_be_changed_from_156f57f: "如果设置，则允许在 Speedgrader 中更改提交状态"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: 如果设置，则显示启用了作业增强功能的原创性报告
   if_set_displays_updated_mastery_connect_icon_b6a93002: 如果设置，则显示更新的掌握程度连接图标
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: 如果已设置，请移除在搜索学生时通常会遇到的延迟。
   if_set_removes_the_missing_status_from_submissions_43fba750: 如果设置，在评分时从提交项移除缺失状态
@@ -14741,6 +14768,7 @@ zh-Hans:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "集成 ID“%{integration_id}”已经有人使用"
   integrations_cadb03f3: 整合
   interactions_report_47c1219e: 互动报告
+  internal_analytics_f02b3fff: 内部分析工具
   internal_setting_created_f3f72416: 已创建内部设置
   internal_setting_deleted_aaf1dd9d: 已删除内部设置
   internal_setting_updated_87510559: 已更新内部设置
@@ -15798,6 +15826,7 @@ zh-Hans:
   manage_groups_4c3a2a9f: 管理小组
   manage_home_4fc3480b: 管理主页
   manage_home_for_coursename_5e5c7661: "管理%{courseName}主页"
+  manage_internal_analytics_fcfa306e: 管理内部分析工具
   manage_item_name_6118d4b0: "管理%{item_name}"
   manage_line_items_244b289f: 管理行项目
   manage_lti_8fcdc6ba: "管理 LTI"
@@ -18634,6 +18663,7 @@ zh-Hans:
   new_slack_api_key_453d04d: "新的 Slack API 密钥"
   new_student_group_description_bfeb76aa: 新学生组描述
   new_student_group_e31b7cb5: 新学生组
+  new_tab_ab7629d2: 新选项卡
   new_topic_for_course_3d98222a: "%{course} 的新主题"
   new_typography_4eaeca26: 新排版
   new_ui_487a624e: 新的用户界面
@@ -19468,6 +19498,7 @@ zh-Hans:
     ? "yes"
     : 是
   options_3ab0ea65: 选项
+  options_for_name_bfa30aa0: "%{name}的选项"
   options_for_title_label_17f821ff: "选项%{title_label}"
   or_9b70ccaa: 或
   or_a01eec62: 或者、或
@@ -19500,6 +19531,7 @@ zh-Hans:
   original_job_id_d81afbb3: "原始作业 ID"
   originality_report_5d461681: 原创性报告
   originality_reports_1e36b935: 原创性报告
+  originality_reports_with_assignment_enhancements_9b2870ff: 具有作业增强功能的原创性报告
   other_1c6d9c79: 其他
   other_calendars_toggle_list_visibility_bd7fb67a: 其他日历切换列表可见性
   other_carrier_45531207: 其他运营商
@@ -20033,6 +20065,7 @@ zh-Hans:
   please_log_in_to_view_this_content_eec6cd0: 请登录以查看此内容
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: 请确保没有人可以在您的附近或从屏幕共享服务捕获您的屏幕图像。
   please_note_fbb62e4c: 请注意：
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "请注意：Instructure 在美国托管 Canvas Commons。这意味着当您使用 Canvas Commons 时，您的个人数据将在美国存储和处理。这些个人数据元素包括：姓名、电子邮件地址、Canvas 用户 ID、Canvas 登录名、Canvas 头像、IP 地址、您喜欢的 Canvas Commons 资源，以及您对 Canvas Commons 中任何资源所做的评论。您可以在 [此处](%{url}) 找到有关 Instructure 隐私实践的更多信息。"
   please_provide_a_field_e5a7d0b3: "请提供%{field}"
   please_provide_a_pairing_code_530d1e9d: 请提供配对码。
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "请提供有效的租户域。检查您的 Azure Active Directory 设置以找到它。"
@@ -21159,9 +21192,11 @@ zh-Hans:
   public_jwk_url_b5564c1d: "公共 JWK URL"
   public_message_students: 
     send_message: 发送消息
+  publication_options_cbbfc20e: 发布选项
   publish_5211dca3: 发布、出版
   publish_aa888e3c: 发布：
   publish_announcement_fec6d7e2: 发布公告
+  publish_at_3fd340d1: 发布于
   publish_btn_module: 
     buttons: 
       publish: 发布
@@ -23569,6 +23604,7 @@ zh-Hans:
   save_and_publish_1b765e7: 保存并发布
   save_changes_698abe77: 保存更改
   save_customizations_dde779d8: 保持自定义
+  save_failed_463cb2a8: 保存失败。
   save_grading_period_daaaddea: 保存评分周期
   save_grading_period_set_e029fa88: 保存评分周期集
   save_key_b4dede06: 保存密钥
@@ -23610,6 +23646,8 @@ zh-Hans:
   schedule_e5dd4c32: 计划
   schedule_student_availability_332154a: 学生时间表的可用性
   scheduled_date_5b0aedb6: 预定日期
+  scheduled_for_publication_c8d3e9a2: 已计划发布
+  scheduled_page_publication_ae911741: 已计划页面发布
   scheduler_65b5ac91: 评价量规
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: 必须由Canvas管理员启用评价量规。
   scheduler_must_be_enabled_for_your_account_e6e53972: 必须为您的帐户启用评价量规。
@@ -24221,6 +24259,7 @@ zh-Hans:
   set_name_f83b658: 设置名称
   set_of_grading_periods_545b37e9: 评分周期的集合
   set_some_up_now_1749bb44: 现在该设置一些
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: 创建作业后，在课程进度中设置截止日期。
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: 设置要对该帐户中的所有课程使用的掌握程度量表。
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           设置熟练程度评分在学习掌握程度评分册中的显示方式。\n\
@@ -25520,6 +25559,7 @@ zh-Hans:
   start_date_e937be8a: 开始日期
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_field_for_styleguide_8a8ab1d6: 风格指南的起始栏目
+  start_date_for_conference_1936e809: 会议开始日期
   start_date_from_20503757: 开始日期从：
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}，从%{start_time}到%{end_time}"
   start_date_to_1e6e6bbe: 开始日期到：
@@ -26910,6 +26950,8 @@ zh-Hans:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: 本课程使用了课程进度。前往“课程进度”管理截止日期。
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: 在发布之前只有教师才能看见此课程。
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: 此标准已链接至学习结果
+  this_due_date_is_managed_by_cfbb698c: 此截止日期通过...管理
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: 此截止日期通过课程进度管理。
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: 此元素是一个拖放和重新排序的更方便的替代。按输入键或空格键来移动这个问题。
   this_email_address_is_unconfirmed_f0fc8c6e: 此电子邮件地址是未经证实
   this_enables_a_course_setting_to_allow_students_to_fc47219: 此操作启用课程设置，让学生能够把课程导出为离线网页压缩文件夹
@@ -27184,6 +27226,7 @@ zh-Hans:
   this_user_has_been_deleted_77e6c04b: 已删除此用户
   this_user_has_been_deleted_8caa45be: 该用户已被删除。
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: 该用户在课程中承担多个角色。在此改变自己的角色将覆盖所有他们目前的注册。
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: 此用户尚未接受课程邀请
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: 此用户目前不能够访问课程
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: “此用户目前无法访问课程”
   this_user_performed_actions_while_anonymous_was_of_2f3c1de1: 此用户在禁用匿名时执行操作
@@ -27719,6 +27762,7 @@ zh-Hans:
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "要编辑课程 SIS ID，还必须启用“课程 - 管理/更新”和“SIS 数据 - 管理”。"
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "要编辑课程SIS ID，还必须启用“管理课程：管理员 - 管理/更新”和“SIS数据 - 管理”。"
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "要编辑课程SIS ID，还必须启用“SIS数据 - 管理”。"
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: 要编辑截止日期，请跳转到课程进度，更改分配给此作业的天数，并发布更新的进度。
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       要编辑用户详细信息、修改登录详细信息或更改用户密码，还必须启用“用户 - 管理登录详细信息”。
       要查看用户页面视图，还必须启用“统计信息 - 视图”。
@@ -28522,6 +28566,7 @@ zh-Hans:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "更新到 OAuth 2.0 流以阻止在“令牌”身份验证中重定向"
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新讨论失败
+  updating_publication_date_62cc1622: 正在更新发布日期
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: 更新目录网址将使用户立即无法访问您原来的网址！如果配置了任何现有的支付处理系统，将要求在目录工程师的帮助下进行更改。
   upload_8b403d05: 上传
   upload_a_css_file_ec22214b: 上传一个CSS的文件
@@ -29661,6 +29706,7 @@ zh-Hans:
         zero: "找不到 %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; 上一个"
+  will_publish_on_publish_date_8b42e1ec: "将在 %{publish_date} 发布"
   will_send_to_everyone_if_no_selections_are_made_b13ecf39: (如果没有作出选择，则将发送给每个人)
   will_unlock_unlock_date_1024c38d: "将在%{unlock_date} 解锁"
   wimba_conference: 
