@@ -20,6 +20,7 @@ import $ from 'jquery'
 import 'jqueryui/menu'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
+
 const I18n = useI18nScope('LongTextEditor')
 /*
  * this is just LongTextEditor from slick.editors.js but with i18n and a
@@ -33,7 +34,7 @@ function LongTextEditor(args) {
   let defaultValue
   const scope = this
 
-  this.init = function() {
+  this.init = function () {
     const $container = args.alt_container ? $(args.alt_container) : $('body')
 
     $wrapper = $('<div/>')
@@ -66,12 +67,8 @@ function LongTextEditor(args) {
       .appendTo($wrapper)
     const saveText = I18n.t('save', 'Save')
     const cancelText = I18n.t('cancel', 'Cancel')
-    $saveButton = $('<button/>')
-      .append(htmlEscape(saveText))
-      .appendTo(buttonContainer)
-    $cancelButton = $('<button/>')
-      .append(htmlEscape(cancelText))
-      .appendTo(buttonContainer)
+    $saveButton = $('<button/>').append(htmlEscape(saveText)).appendTo(buttonContainer)
+    $cancelButton = $('<button/>').append(htmlEscape(cancelText)).appendTo(buttonContainer)
 
     $saveButton.click(this.save)
     $cancelButton.click(this.cancel)
@@ -81,7 +78,7 @@ function LongTextEditor(args) {
     $input.focus().select()
   }
 
-  this.handleKeyDown = function(event) {
+  this.handleKeyDown = function (event) {
     const keyCode = event.which
     const target = event.target
 
@@ -121,24 +118,24 @@ function LongTextEditor(args) {
     }
   }
 
-  this.save = function() {
+  this.save = function () {
     args.commitChanges()
   }
 
-  this.cancel = function() {
+  this.cancel = function () {
     $input.val(defaultValue)
     args.cancelChanges()
   }
 
-  this.hide = function() {
+  this.hide = function () {
     $wrapper.hide()
   }
 
-  this.show = function() {
+  this.show = function () {
     $wrapper.show()
   }
 
-  this.position = function() {
+  this.position = function () {
     $wrapper.position({
       my: 'center top',
       at: 'center top',
@@ -146,32 +143,32 @@ function LongTextEditor(args) {
     })
   }
 
-  this.destroy = function() {
+  this.destroy = function () {
     $wrapper.remove()
   }
 
-  this.focus = function() {
+  this.focus = function () {
     $input.focus()
   }
 
-  this.loadValue = function(item) {
+  this.loadValue = function (item) {
     $input.val((defaultValue = item[args.column.field]))
     $input.select()
   }
 
-  this.serializeValue = function() {
+  this.serializeValue = function () {
     return $input.val()
   }
 
-  this.applyValue = function(item, state) {
+  this.applyValue = function (item, state) {
     item[args.column.field] = state
   }
 
-  this.isValueChanged = function() {
+  this.isValueChanged = function () {
     return !($input.val() === '' && defaultValue == null) && $input.val() !== defaultValue
   }
 
-  this.validate = function() {
+  this.validate = function () {
     return {
       valid: true,
       msg: null

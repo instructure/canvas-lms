@@ -39,6 +39,7 @@ import type {
   Module,
   Section,
   SectionMap,
+  Student,
   StudentGroup,
   StudentGroupCategory,
   StudentGroupCategoryMap,
@@ -61,7 +62,7 @@ export function ensureAssignmentVisibility(assignment: Assignment, submission: S
   }
 }
 
-export function forEachSubmission(students, fn) {
+export function forEachSubmission(students: Student[], fn) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {

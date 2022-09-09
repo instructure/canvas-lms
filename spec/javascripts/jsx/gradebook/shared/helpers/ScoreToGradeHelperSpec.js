@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ScoreToGradeHelper from 'ui/features/gradebook/react/shared/helpers/ScoreToGradeHelper.js'
+import ScoreToGradeHelper from 'ui/features/gradebook/react/shared/helpers/ScoreToGradeHelper'
 
 QUnit.module('ScoreToGradeHelper#scoreToGrade')
 

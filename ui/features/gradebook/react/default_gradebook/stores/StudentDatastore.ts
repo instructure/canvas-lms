@@ -18,7 +18,7 @@
 
 import _ from 'lodash'
 
-function createStudentPlaceholder(id) {
+function createStudentPlaceholder(id: string) {
   return {
     enrollments: [],
     id,

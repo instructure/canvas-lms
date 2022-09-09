@@ -17,40 +17,52 @@
  */
 
 import React from 'react'
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, shape, string, bool, func} from 'prop-types'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ContentFilter from '@canvas/gradebook-content-filters/react/ContentFilter'
 
-const I18n = useI18nScope('gradebook_default_gradebook_components_content_filters_module_filter')
+const I18n = useI18nScope(
+  'gradebook_default_gradebook_components_content_filters_grading_period_filter'
+)
 
-export default function ModuleFilter(props) {
-  const {modules, selectedModuleId, ...filterProps} = props
+function normalizeGradingPeriods(gradingPeriods) {
+  return gradingPeriods.map(gradingPeriod => ({
+    id: gradingPeriod.id,
+    name: gradingPeriod.title
+  }))
+}
+
+export default function GradingPeriodFilter(props) {
+  const {disabled, onSelect, gradingPeriods, selectedGradingPeriodId, ...filterProps} = props
 
   return (
     <ContentFilter
       {...filterProps}
+      disabled={disabled}
+      onSelect={onSelect}
       allItemsId="0"
-      allItemsLabel={I18n.t('All Modules')}
-      items={modules}
-      label={I18n.t('Module Filter')}
-      selectedItemId={selectedModuleId}
-      sortAlphabetically
+      allItemsLabel={I18n.t('All Grading Periods')}
+      items={normalizeGradingPeriods(gradingPeriods)}
+      label={I18n.t('Grading Period Filter')}
+      selectedItemId={selectedGradingPeriodId}
     />
   )
 }
 
-ModuleFilter.propTypes = {
-  modules: arrayOf(
+GradingPeriodFilter.propTypes = {
+  disabled: bool.isRequired,
+  onSelect: func.isRequired,
+  gradingPeriods: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      title: string.isRequired
     })
   ).isRequired,
 
-  selectedModuleId: string
+  selectedGradingPeriodId: string
 }
 
-ModuleFilter.defaultProps = {
-  selectedModuleId: null
+GradingPeriodFilter.defaultProps = {
+  selectedGradingPeriodId: null
 }

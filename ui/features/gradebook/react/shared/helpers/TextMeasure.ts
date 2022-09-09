@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-export function getWidth(text) {
+export function getWidth(text: string) {
   let $textMeasure = $('#text-measure')
   if (!$textMeasure.length) {
     $textMeasure = $('<span id="text-measure" style="padding: 10px; display: none;" />').appendTo(

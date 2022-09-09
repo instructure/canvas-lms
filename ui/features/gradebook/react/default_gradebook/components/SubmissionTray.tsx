@@ -46,7 +46,7 @@ const I18n = useI18nScope('gradebook')
 function renderAvatar(name, avatarUrl) {
   return (
     <div id="SubmissionTray__Avatar">
-      <Avatar name={name} src={avatarUrl} size="auto" data-fs-exclude />
+      <Avatar name={name} src={avatarUrl} size="auto" data-fs-exclude={true} />
     </div>
   )
 }
@@ -323,7 +323,7 @@ export default class SubmissionTray extends React.Component {
         contentRef={this.props.contentRef}
         label={I18n.t('Submission tray')}
         open={this.props.isOpen}
-        shouldContainFocus
+        shouldContainFocus={true}
         placement="end"
         onDismiss={this.props.onRequestClose}
         onClose={this.props.onClose}

@@ -57,9 +57,7 @@ const PostGradesStore = state => {
     overrideForEveryone(a) {
       const overrides = this.allOverrideIds(a)
       const sections = _.keys(this.getState().sections)
-      const section_ids_with_no_overrides = $(sections)
-        .not(overrides)
-        .get()
+      const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = _.find(section_ids_with_no_overrides, o => {
         return state.selected.id == o

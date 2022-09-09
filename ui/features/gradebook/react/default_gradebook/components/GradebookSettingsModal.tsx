@@ -314,7 +314,7 @@ export default class GradebookSettingsModal extends React.Component {
         <Flex direction="column" height="100vh">
           <Flex.Item as="header" padding="medium">
             <Flex direction="row">
-              <Flex.Item shouldGrow shouldShrink>
+              <Flex.Item shouldGrow={true} shouldShrink={true}>
                 <Heading level="h3">{I18n.t('Gradebook Settings')}</Heading>
               </Flex.Item>
 
@@ -327,7 +327,7 @@ export default class GradebookSettingsModal extends React.Component {
               </Flex.Item>
             </Flex>
           </Flex.Item>
-          <Flex.Item shouldGrow shouldShrink overflowX="hidden">
+          <Flex.Item shouldGrow={true} shouldShrink={true} overflowX="hidden">
             <Tabs onRequestTabChange={this.changeTab}>
               <Tabs.Panel
                 renderTitle={I18n.t('Late Policies')}

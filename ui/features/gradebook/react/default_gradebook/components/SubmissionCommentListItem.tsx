@@ -113,7 +113,7 @@ export default class SubmissionCommentListItem extends React.Component {
                 alt={I18n.t('Avatar for %{author}', {author: this.props.author})}
                 src={this.props.authorAvatarUrl}
                 margin="0 x-small 0 0"
-                data-fs-exclude
+                data-fs-exclude={true}
               />
             </Link>
 
