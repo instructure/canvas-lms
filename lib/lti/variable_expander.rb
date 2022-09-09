@@ -457,14 +457,29 @@ module Lti
                        -> { Lti::Asset.opaque_identifier_for(@context) },
                        default_name: "context_id"
 
-    # The sourced Id of the context.
+    # If the context is a Course, returns sourced Id of the context
     # @example
     #   ```
     #   1234
     #   ```
+    #
+    # If the placement is :user_navigation, it works like $Person.sourcedId: returns the sis source id for the primary
+    # pseudonym for the user for the account
+    # This may not be the pseudonym the user is actually logged in with.
+    # @duplicates Person.sourcedId
+    # @example
+    #   ```
+    #   "sis_user_42"
+    #   ```
     register_expansion "Context.sourcedId", [],
-                       -> { @context.sis_source_id },
-                       COURSE_GUARD
+                       lambda {
+                         if @context.is_a? User
+                           sis_pseudonym.sis_user_id
+                         else
+                           @context.sis_source_id
+                         end
+                       },
+                       -> { @context.is_a?(Course) || (@placement == :user_navigation && @context.is_a?(User) && sis_pseudonym) }
 
     # Returns a string with a comma-separated list of the context ids of the
     # courses in reverse chronological order from which content has been copied.
