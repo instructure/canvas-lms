@@ -61,6 +61,7 @@ const BBBModalOptions = props => {
                 props.onSetName(value)
               }}
               isRequired={true}
+              messages={props.nameValidationMessages}
             />
           </Flex.Item>
           <Flex.Item padding="small">
@@ -252,7 +253,8 @@ BBBModalOptions.propTypes = {
   startDate: PropTypes.string,
   endDate: PropTypes.string,
   tab: PropTypes.string,
-  setTab: PropTypes.func
+  setTab: PropTypes.func,
+  nameValidationMessages: PropTypes.array
 }
 
 export default BBBModalOptions

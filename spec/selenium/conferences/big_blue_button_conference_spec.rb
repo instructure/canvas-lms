@@ -50,14 +50,39 @@ describe "BigBlueButton conferences" do
     user_session(@teacher)
   end
 
+  after do
+    accept_alert if alert_present?
+  end
+
   after { close_extra_windows }
 
-  context "when bbb_modal_update is ON" do
+  context "when bbb_modal_update is ON", ignore_js_errors: true do
     before(:once) do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
 
-    it "persists selected settings", ignore_js_errors: true do
+    it "validates name length" do
+      initial_conference_count = WebConference.count
+      get conferences_index_page
+      name_255_chars = "Y3298V7EQwLC8chKnXTz5IFARakIP0k2Yk0nLQ7owgidY6zDQnh9nCmH8z033TnJ1ssFwYtCkKwyhB7HkUN9ZF3u2s1shsj4vYqUlsEQmPljTGFBtO43pCh1QquQUnM2yCsiS5nnCRefjTK7jMwAiOXTZeyFvPk3tLzPAmOwf1Od6vtOB5nfXFSPVYyxSNcl85ySG8SlBoOULqF1IZV0BwE4TLthJV8Ab1h7xW0CbjHaJLMTQtnWK6ntTLxSNi4"
+      f("button[title='New Conference']").click
+      f("input[placeholder='Conference Name']").clear
+      f("input[placeholder='Conference Name']").send_keys name_255_chars
+      f("input[placeholder='Conference Name']").send_keys "a" # 256th char
+      expect(fj("span:contains('Name must be less than 255 characters')")).to be_present
+      expect(f("button[data-testid='submit-button']")).not_to be_enabled
+
+      # bring it back down to 255 chars
+      f("input[placeholder='Conference Name']").send_keys :backspace
+      expect(f("body")).not_to contain_jqcss("span:contains('Name must be less than 255 characters')")
+      expect(f("button[data-testid='submit-button']")).to be_enabled
+
+      f("button[data-testid='submit-button']").click
+      wait_for_ajaximations
+      expect(WebConference.count).to be > initial_conference_count
+    end
+
+    it "persists selected settings" do
       get conferences_index_page
       f("button[title='New Conference']").click
 
