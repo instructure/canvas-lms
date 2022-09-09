@@ -2461,6 +2461,7 @@ CanvasRails::Application.routes.draw do
       get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
+      put "jobs2/unstuck", action: :unstuck
     end
   end
 

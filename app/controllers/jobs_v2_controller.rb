@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class JobsV2Controller < ApplicationController
+  include Api::V1::Progress
+
   BUCKETS = %w[queued running future failed].freeze
   SEARCH_LIMIT = 100
 
-  MANAGE_ENDPOINTS = %i[manage requeue].freeze
+  MANAGE_ENDPOINTS = %i[manage requeue unstuck].freeze
   before_action :require_view_jobs, except: MANAGE_ENDPOINTS
   before_action :require_manage_jobs, only: MANAGE_ENDPOINTS
 
@@ -266,8 +268,7 @@ class JobsV2Controller < ApplicationController
     Delayed::Job.transaction do
       Delayed::Job.advisory_lock(strand)
       count = Delayed::Job.where(strand: strand).update_all(update_args)
-      # TODO: revisit this after DE-1158
-      unleash_more_jobs(strand, update_args[:max_concurrent]) if update_args[:max_concurrent]
+      SwitchmanInstJobs::JobsMigrator.unblock_strand!(strand, new_parallelism: update_args[:max_concurrent]) if update_args[:max_concurrent]
     end
     render json: { status: "OK", count: count }
   end
@@ -282,6 +283,51 @@ class JobsV2Controller < ApplicationController
     failed_job = Delayed::Job::Failed.find(params[:id])
     job = failed_job.requeue!
     render json: job_json(job)
+  end
+
+  # @{not an}API unstuck orphaned strands/singletons
+  #
+  # Given a strand or singleton that cannot progress because no job is next_in_strand,
+  # unstuck the jobs by setting next_in_strand on the appropriate number of stuck jobs
+  #
+  # if a +strand+ or +singleton+ is supplied, it will be unstucked synchronously and status "OK"
+  # will be returned.
+  #
+  # otherwise, a job will be queued to run the unblocker on all strands and singletons in the region
+  # and status "pending" will be returned along with progress information.
+  #
+  # if a strand or singleton is blocked by the shard migrator, status "blocked" will be returned.
+  #
+  # @argument strand [Optional,String]
+  #   The name of the strand to unstuck
+  #
+  # @argument singleton [Optional,String]
+  #   The name of the singleton to unstuck
+  #
+  def unstuck
+    if params[:strand].present?
+      begin
+        count = SwitchmanInstJobs::JobsMigrator.unblock_strand!(params[:strand])
+        raise ActiveRecord::RecordNotFound if count.nil?
+
+        render json: { status: "OK", count: count }
+      rescue SwitchmanInstJobs::JobsBlockedError
+        render json: { status: "blocked" }
+      end
+    elsif params[:singleton].present?
+      begin
+        count = SwitchmanInstJobs::JobsMigrator.unblock_singleton!(params[:singleton])
+        raise ActiveRecord::RecordNotFound if count.nil?
+
+        render json: { status: "OK", count: count }
+      rescue SwitchmanInstJobs::JobsBlockedError
+        render json: { status: "blocked" }
+      end
+    else
+      progress = Progress.create(context: @current_user, tag: "JobsV2Controller::run_unstucker!")
+      progress.process_job(JobsV2Controller, :run_unstucker!, { priority: Delayed::HIGH_PRIORITY })
+      render json: { status: "pending", progress: progress_json(progress, @current_user, session) }
+    end
   end
 
   protected
@@ -439,13 +485,6 @@ class JobsV2Controller < ApplicationController
     add_crumb t("#crumbs.jobs", "Jobs")
   end
 
-  def unleash_more_jobs(strand, new_parallelism)
-    needed_jobs = new_parallelism - Delayed::Job.where(strand: strand, next_in_strand: true).count
-    if needed_jobs > 0
-      Delayed::Job.where(strand: strand, next_in_strand: false, locked_by: nil, singleton: nil).order(:id).limit(needed_jobs).update_all(next_in_strand: true)
-    end
-  end
-
   # returns a hash from strand name to boolean indicating the strand or singleton is orphaned
   # (i.e., no job in the group has next_in_strand set)
   def get_group_statuses(jobs, strand_or_singleton)
@@ -464,5 +503,16 @@ class JobsV2Controller < ApplicationController
       .pluck("#{strand_or_singleton}, BOOL_OR(next_in_strand)")
       .to_h
       .transform_values(&:!)
+  end
+
+  class << self
+    def run_unstucker!(progress)
+      dj_shards = Shard.delayed_jobs_shards
+      progress.calculate_completion!(0, dj_shards.size)
+      dj_shards.each do |dj_shard|
+        SwitchmanInstJobs::JobsMigrator.unblock_strands(dj_shard)
+        progress.increment_completion!
+      end
+    end
   end
 end
