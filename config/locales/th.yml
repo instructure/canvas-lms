@@ -466,6 +466,7 @@ th:
   account_user: 
     types: 
       account_admin: ผู้ดูแลระบบบัญชี
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: ชื่อบัญชีปล่อยว่างไม่ได้
@@ -1552,6 +1553,8 @@ th:
   add_bank: 
     default_name: ไม่มีชื่อ
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "เพิ่ม UI วันที่ไม่พร้อมใช้งานไปยังการกำหนดลำดับเส้นทางบทเรียน ต้องเปิดใช้งาน course_paces"
+  add_calendar_36da563b: เพิ่มไปยังปฏิทิน
+  add_calendars_13c82791: เพิ่มไปยังปฏิทิน
   add_calendars_to_view_your_institution_s_important_df1e42d3: "เพิ่มปฏิทินเพื่อดูกำหนดเวลาที่สำคัญสำหรับสถาบันของคุณ เช่น วันแรกของชั้นเรียน เวลาสอบ ฯลฯ"
   add_cc_subtitle_a9ef4a66: "เพิ่ม CC/คำบรรยาย"
   add_collaboration_da9665ac: เพิ่มความร่วมมือ
@@ -1701,6 +1704,7 @@ th:
   admin_tour_36d89fbb: ทัวร์ผู้ดูแลระบบ
   admin_tray_3b680e7b: ถาดรายการผู้ดูแลระบบ
   admin_user_name_29dd115a: admin_user_name
+  administrative_links_816228e2: ลิงค์จัดการ
   administrator_f325c186: ผู้ดูแลระบบ
   administrators_and_author_only_flagged_as_possible_42345cba: "ผู้ดูแลระบบและผู้จัดทำเท่านั้น (กำกับว่าอาจเป็นข้อมูลขยะ)"
   administrators_and_author_only_marked_as_spam_184becce: "ผู้ดูแลระบบและผู้จัดทำเท่านั้น (กำกับว่าเป็นข้อมูลขยะ)"
@@ -1892,6 +1896,7 @@ th:
       อนุญาตให้ผู้ดูแลระบบดูบันทึกประวัติที่มีข้อมูลเกี่ยวกับการแปลง
       GraphQL ที่ดำเนินการทั้งหมดเมื่อเร็ว ๆ นี้
   allows_aligning_outcomes_to_non_scoring_content_537ce399: อนุญาตการประสานผลลัพธ์กับเนื้อหาที่ไม่มีการให้คะแนน
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: สามารถเผยแพร่เพจบทเรียนในตารางเวลา
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "อนุญาตลิงค์ความช่วยเหลือให้กำกับเป็น นำเสนอ หรือ ใหม่ และจัดแสดงลิงค์ความช่วยเหลือที่นำเสนอไว้อย่างชัดเจนในเมนูความช่วยเหลือ"
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวม
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "อนุญาตให้ผู้สอนปรับใช้คะแนนกับผลงานจัดส่งที่ไม่ได้ให้เกรดในภาพรวมจากกลุ่มภารกิจและเมนูคอลัมน์รวมในสมุดบันทึกเกรด (Gradebook)"
@@ -2283,6 +2288,7 @@ th:
     other: "เกิดข้อผิดพลาดขณะย้ายผลลัพธ์เหล่านี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
   an_error_occurred_while_moving_this_group_please_t_4f3baa9f: "เกิดข้อผิดพลาดขณะย้ายกลุ่มนี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
   an_error_occurred_while_performingsometask_errorme_d87d8197: "เกิดข้อผิดพลาดขณะ %{performingSomeTask}: %{errorMessage}"
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: เกิดข้อผิดพลาดขณะลบปฏิทิน
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
     one: "เกิดข้อผิดพลาดขณะลบผลลัพธ์นี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
     other: "เกิดข้อผิดพลาดขณะลบผลลัพธ์เหล่านี้ กรุณาลองใหม่อีกครั้งในภายหลัง"
@@ -3357,6 +3363,8 @@ th:
   attempts_allowed_8441aadf: การดำเนินการที่อนุญาต
   attendance_ca433183: การเข้าร่วม
   attendees_eb402bac: ผู้เข้าร่วม
+  attendees_failed_to_sync_725c8137: " ผู้เข้าร่วมไม่สามารถซิงค์ได้"
+  attendees_synced_ee5edd00: " ซิงค์ผู้เข้าร่วมแล้ว!"
   attention_aaca1f1d: ข้อควรทราบ!
   attribute_d9f3af72: คุณลักษณะ
   attributes_locked_1a1a0f46: "%{attributes} ล็อคอยู่"
@@ -3752,6 +3760,7 @@ th:
   by_default_students_can_always_create_groups_in_a__dac761d3: "ตามค่าเริ่มต้น ผู้เรียนสามารถจัดทำกลุ่มในบทเรียนได้ตลอดเวลา จำกัดผู้เรียนไม่ให้จัดทำกลุ่มโดยจะต้องเปิดใช้งาน บทเรียน - จัดการ / อัพเดต ไว้ด้วย และจะต้องไม่เลือกช่องทำเครื่องหมาย ให้ผู้เรียนจัดกลุ่มของตนเอง ใน ค่าปรับตั้งบทเรียน"
   by_lti_2_registration_url_e421e523: "จาก URL การลงทะเบียน LTI 2"
   by_url_a163275e: "จาก URL"
+  c4e_analytics_66e0fc46: "ข้อมูลวิเคราะห์ C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: ล้างแคชเสร็จสิ้น
   calculation_d82f6181: การคำนวณ
@@ -4058,6 +4067,7 @@ th:
     ics_description_user: "กิจกรรมในปฏิทินสำหรับผู้ใช้, %{user_name}"
     ics_title: "ปฏิทินของ %{course_or_group_name} (Canvas)"
     invalid_date_or_time: "วันที่หรือวันที่และเวลาไม่ถูกต้องสำหรับ %{attr}"
+  calendar_removed_1c841af4: ลบปฏิทินแล้ว
   calendar_series_e1b7a4bc: ชุดรายการในปฏิทิน
   calendars: 
     event: 
@@ -4073,6 +4083,7 @@ th:
       page_title_header: ปฏิทิน
       undated_items: ไม่ได้กำกับวันที่
   calendars_a756c286: ปฏิทิน
+  calendars_added_successfully_2e443b3: เพิ่มปฏิทินเสร็จสิ้น
   calendars_saved_successfully_bcba8359: บันทึกปฏิทินเสร็จสิ้น
   calendars_toggle_list_visibility_488db143: การแสดงผลรายการปฏิทิน
   campbell_union_high_school_district_grade_report_7f3bb801: "รายงานเกรดของเขตพื้นที่การศึกษาสำหรับ Campbell Union High School"
@@ -4327,6 +4338,7 @@ th:
   check_to_add_a_user_for_loginid_6cd25597: "ทำเครื่องหมายเพื่อเพิ่มผู้ใช้สำหรับ %{loginid}"
   check_to_select_all_98e484f1: ทำเครื่องหมายเพื่อเลือกทั้งหมด
   check_to_skip_adding_a_user_for_loginid_5fa643da: "ทำเครื่องหมายเพื่อข้ามการเพิ่มผู้ใช้สำหรับ %{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: ตรวจสอบตัวสะกดหรือลองลดจำนวนอักขระลง
   checked_883b93fd: ตรวจสอบแล้ว
   cheerful_panda_holding_a_map_17ba47ee: แพนด้าอารมณ์ดีกำลังถือแผนที่
   child_course_must_belong_to_the_same_root_account__66ed7b8e: บทเรียนเชื่อมโยงจะต้องเป็นของบัญชีรากเดียวกับบทเรียนหลัก
@@ -4345,6 +4357,7 @@ th:
   choose_a_file_to_upload_from_your_device_d1b50d4c: เลือกไฟล์ที่จะอัพโหลดจากอุปกรณ์ของคุณ
   choose_a_quiz_engine_8820d521: เลือกเอนจินทดสอบ
   choose_a_submission_type_8f45651a: เลือกประเภทการจัดส่ง
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "เลือกปฏิทินเพิ่มเติมเพื่อเพิ่มปฏิทิน Canvas ของคุณ"
   choose_an_authentication_service_47dc8875: เลือกบริการตรวจรับรอง
   choose_and_publish_980812cb: เลือกและเผยแพร่
   choose_assignment_b0132c5e: "-- เลือกภารกิจ --"
@@ -4366,6 +4379,7 @@ th:
     other: "เลือกได้สูงสุด %{count} ปฏิทินวิชา"
   choose_usage_rights_33683854: เลือกสิทธิ์การใช้งาน...
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: "เลือกปฏิทินที่จะแสดงผลในหัวข้อปฏิทินอื่น (Other Calendar) ในปฏิทิน Canvas (Canvas Calendar) ปฏิทินสำหรับบัญชีย่อยจะแสดงให้กับผู้ใช้หากถูกเชื่อมโยงไว้กับบัญชีผู้ใช้ดังกล่าว ตามค่าเริ่มต้น ปฏิทินทั้งหมดจะถูกซ่อนไว้"
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "เลือกปฏิทินที่ผู้ใช้ของคุณสามารถเพิ่มไปยังหัวข้อ “ปฏิทินอื่น ๆ (Other Calendars)” สำหรับปฏิทิน Canvas ของพวกเขา ผู้ใช้จะสามารถเพิ่มปฏิทินที่เปิดใช้งานไว้สำหรับบัญชีผู้ใช้ที่เชื่อมโยงไว้กับตนเอง ตามค่าเริ่มต้น ปฏิทินทั้งหมดจะถูกปิดใช้งาน"
   choose_your_default_skin_tone_f09bf0bd: เลือกสกินโทนเริ่มต้นของคุณ
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' ไม่ใช่สีที่ถูกต้อง"
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' ไม่ใช่สีที่ถูกต้อง กรอก hexcode ที่ถูกต้องก่อนทำการบันทึก"
@@ -4858,6 +4872,7 @@ th:
   conference_name_fdb7e091: ชื่อการประชุม
   conference_participant_count_87e86c5c: จำนวนผู้เข้าร่วมการประชุม
   conference_recorded_7e776ec2: บันทึกการประชุมแล้ว
+  conference_saved_8895cfbc: บันทึกการประชุมแล้ว!
   conference_selection_ea4050bb: การเลือกการประชุม
   conference_type_2f4ac9be: ประเภทการประชุม
   conference_type_7bd581e: ประเภทการประชุม
@@ -4912,6 +4927,7 @@ th:
       recordings: "%{recordingCount} ผลงานบันทึก"
       settings: ค่าปรับตั้ง
       start: เริ่ม
+      sync: ซิงค์ผู้เข้าร่วม
       type: "%{type}"
     no_concluded_conferences: ไม่มีการประชุมที่สรุปแล้ว
     no_new_conferences: ไม่มีการประชุมใหม่
@@ -5676,6 +5692,10 @@ th:
     one: "เลือกปฏิทินบัญชีผู้ใช้ 1 รายการแล้ว"
     other: "เลือกปฏิทินบัญชีผู้ใช้ %{count} รายการแล้ว"
     zero: "ไม่มีปฏิทินบัญชีผู้ใช้ (Account Calendars) ที่เลือก"
+  count_account_calendars_selected_acbd588: 
+    one: "เลือก 1 ปฏิทินสำหรับบัญชีผู้ใช้ไว้"
+    other: "%{count} ปฏิทินสำหรับบัญชีผู้ใช้ที่ถูกเลือก"
+    zero: ไม่ได้เลือกปฏิทินสำหรับบัญชีผผู้ใช้
   count_alignable_artifacts_7779644a: 
     one: "%{count} ผลงานที่ปรับประสานได้"
     other: "%{count} ผลงานที่ปรับประสานได้"
@@ -6970,6 +6990,7 @@ th:
   date_is_required_9c6f5e83: ต้องระบุวันที่!
   date_modified_e1c8ac8f: วันที่ปรับแต่ง
   date_modified_modifiedat_b839cc8b: "วันที่ปรับแต่ง: %{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: วันที่จะต้องอยู่หลังจากวันที่พร้อมใช้งาน
   date_of_most_recent_bounce_b23d0119: วันที่ที่มีการตีกลับล่าสุด
   date_required_a74e077c: ต้องระบุวันที่
   date_time_options_7abcdea7: ตัวเลือกวันที่/เวลา
@@ -7952,6 +7973,7 @@ th:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "เปิดใช้งานปุ่ม Microsoft Immersive Reader ในพื้นที่ของ Canvas ที่รองรับ ปุ่มอาจยังเปิดใช้งานอยู่ในบทเรียนไม่ว่าจะตั้งค่านี้ไว้อย่างไรก็ตาม หากผู้ดูแลบัญชีผู้ใช้เปิดใช้งานไว้สำหรับผู้ใช้ทุกราย"
   enables_ui_features_for_managing_extended_submissi_841f45bc: "เปิดใช้งานคุณสมบัติต่าง ๆ ของ UI สำหรับการจัดการผลงานจัดส่ง “แบบเพิ่มเติม”"
   enabling_the_elementary_theme_will_change_the_font_c944b619: "การเปิดใช้งานธีมระดับประถมศึกษาจะเป็นการเปลี่ยนแบบอักษรในอินเทอร์เฟซ Canvas และลดความซับซ้อนของเมนูการสืบค้นเนื้อหาบทเรียนสำหรับผู้ใช้ทั้งหมดในบทเรียนของคุณ"
+  enabling_this_option_automatically_moves_course_pa_15f755b3: "การเปิดใช้ตัวเลือกนี้จะเป็นการย้ายวันครบกำหนดส่วนการจัดสรร Course Pacing เป็นหลังจากวันที่สิ้นสุด ฟังก์ชั่น กรอกเวลา สถานที่และปฏิทิน (Input for Time, Location and Calendar) จะถูกปิดใช้งาน"
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "การเปิดใช้ตัวเลือกนี้จะเป็นการย้ายวันครบกำหนดส่วนการจัดสรรเส้นทางการเรียนรู้ของบทเรียน (Course Pacing) เป็นหลังจากวันที่สิ้นสุด"
   encourage_student_discourse_7836b9f7: สนับสนุนการพูดคุยเชิงลึกของผู้เรียน
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedids แบบเข้ารหัสสำหรับผลลัพธ์พื้นฐาน"
@@ -7959,6 +7981,7 @@ th:
   end_course_set_up_tutorial_f358b85d: สิ้นสุดข้อมูลแนะนำการตั้งค่าบทเรียน
   end_date_cannot_be_before_start_date_eb62ed6d: วันที่สิ้นสุดจะอยู่ก่อนวันที่เริ่มต้นไม่ได้
   end_date_e0093ed7: วันที่สิ้นสุด
+  end_date_for_conference_eaff0807: วันที่สิ้นสุดสำหรับการประชุม
   end_date_from_cdd9d90: "วันที่สิ้นสุด จาก:"
   end_date_to_8b17929d: "วันที่สิ้นสุด ถึง:"
   end_date_value_3d3e8906: "วันที่สิ้นสุด %{value}"
@@ -8723,6 +8746,7 @@ th:
   failed_to_update_domain_lookup_b2437cf7: ไม่สามารถอัพเดตส่วนการค้นหาโดเมน
   failed_to_update_internal_setting_ab3d0a4a: ไม่สามารถอัพเดตค่าปรับตั้งภายในได้
   failed_to_update_permission_33c493f: ไม่สามารถอัพเดตสิทธิ์อนุญาต
+  failed_to_update_publication_date_83c5b171: ไม่สามารถอัพโหลดวันที่เผยแพร่ได้
   failed_to_update_role_name_8c7b0119: ไม่สามารถอัพเดตชื่อบทบาท
   failed_to_update_strand_8d1c82d: ไม่สามารถอัพเดตชุดกระบวนงานได้
   failed_to_validate_cas_ticket_error_31aa4c63: "ไม่สามารถยืนยันตั๋ว CAS: %{error}"
@@ -9446,6 +9470,7 @@ th:
   grading_period_set_for_account_name_b9823b2a: "ระยะเวลาการให้เกรดที่กำหนดสำหรับ %{account_name}"
   grading_period_set_id_f2377529: "Id ระยะเวลาการให้เกรดที่กำหนด"
   grading_period_set_title_880a6ec4: ชื่อระยะเวลาการให้เกรดที่กำหนด
+  grading_period_sets_fb608834: ชุดระยะเวลาการให้เกรด
   grading_period_title_23b7f8ac: ชื่อระยะเวลาการให้เกรด
   grading_period_weight_99b66906: น้ำหนักระยะเวลาการให้เกรด
   grading_period_weights_aaea757f: น้ำหนักระยะเวลาการให้เกรด
@@ -10005,6 +10030,7 @@ th:
   history_cd3f60a9: ประวัติ
   history_settings_c63dbaaf: ค่าปรับตั้งประวัติ
   hmm_we_can_t_find_any_matching_calendars_25983a51: "อืม เราไม่พบปฏิทินที่ตรงกัน"
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: "อืม เราไม่พบปฏิทินที่ตรงกัน"
   hold_fb369624: พักค้าง
   home_351838cd: หน้าหลัก
   home_page_is_not_valid_2e8a25ae: หน้าหลักไม่ถูกต้อง
@@ -10241,6 +10267,7 @@ th:
       หากเปิดใช้งานส่วนการปรับปรุงการทำงาน RCE ด้วย
       RCE จะบันทึกงานขของคุณอัตโนมัติระหว่างดำเนินการ
   if_set_allows_submission_status_to_be_changed_from_156f57f: "หากตั้งค่าไว้ สถานะผลงานจัดส่งจะสามารถแก้ไขได้จากภายใน Speedgrader"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: "หากกำหนดค่าไว้ จะแสดงรายงานต้นขั้วพร้อมการเปิดใช้งานส่วนการปรับปรุงภารกิจ (Assignment Enhancements)"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "หากกำหนดค่าไว้ จะจัดแสดงไอคอน Mastery Connect ล่าสุด"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "หากตั้งค่าไว้ ให้ลบระยะหน่วงที่ปกติจะเกิดขึ้นขณะค้นหาผู้เรียน"
   if_set_removes_the_missing_status_from_submissions_43fba750: "หากกำหนดค่าไว้ สถานะที่ขดหายจากผลงานจัดส่งเมื่อให้เกรดจะถูกนำออกไป"
@@ -10558,6 +10585,7 @@ th:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "ID การผสานรวม \"%{integration_id}\" ถูกใช้งานอยู่แล้ว"
   integrations_cadb03f3: การผสานการทำงาน
   interactions_report_47c1219e: รายงานการปฏิสัมพันธ์
+  internal_analytics_f02b3fff: "ข้อมูลวิเคราะห์ภายใน (Internal Analytics)"
   internal_setting_created_f3f72416: จัดทำค่าปรับตั้งภายในแล้ว
   internal_setting_deleted_aaf1dd9d: ลบค่าปรับตั้งภายในแล้ว
   internal_setting_updated_87510559: อัพเดตค่าปรับตั้งภายในแล้ว
@@ -11475,6 +11503,7 @@ th:
   manage_groups_4c3a2a9f: จัดการกลุ่ม
   manage_home_4fc3480b: จัดการหน้าหลัก
   manage_home_for_coursename_5e5c7661: "จัดการหน้าหลักสำหรับ %{courseName}"
+  manage_internal_analytics_fcfa306e: "จัดการข้อมูลวิเคราะห์ภายใน (Internal Analytics)"
   manage_item_name_6118d4b0: "จัดการ %{item_name}"
   manage_lti_8fcdc6ba: "จัดการ LTI"
   manage_module_name_dfe16816: "จัดการ %{module_name}"
@@ -13765,6 +13794,7 @@ th:
   new_slack_api_key_453d04d: "คีย์ Slack API ใหม่"
   new_student_group_description_bfeb76aa: รายละเอียดกลุ่มผู้เรียนใหม่
   new_student_group_e31b7cb5: กลุ่มผู้เรียนใหม่
+  new_tab_ab7629d2: แท็บใหม่
   new_topic_for_course_3d98222a: "หัวข้อใหม่สำหรับ %{course}"
   new_user_s_name_909b6267: ชื่อผู้ใช้ใหม่
   new_user_tutorial_cdd3a446: ข้อมูลแนะนำผู้ใช้ใหม่
@@ -13783,6 +13813,7 @@ th:
   next_module_66f58e91: หน่วยการเรียนถัดไป
   next_module_item_19e835f3: รายการหน่วยการเรียนถัดไป
   next_module_item_9bb8a222: หน่วยการเรียน/รายการถัดไป
+  next_month_749b1778: เดือนถัดไป
   next_month_b55a387c: เดือนถัดไป
   next_page_d2a39853: เพจถัดไป
   next_question_f37bac25: คำถามถัดไป
@@ -14454,6 +14485,7 @@ th:
     ? "true"
     : ใช่
   options_3ab0ea65: ตัวเลือก
+  options_for_name_bfa30aa0: "ตัวเลือกสำหรับ %{name}"
   options_for_title_label_17f821ff: "ตัวเลือกสำหรับ %{title_label}"
   or_9b70ccaa: หรือ
   or_choose_files_b795006d: หรือเลือกไฟล์
@@ -14479,6 +14511,7 @@ th:
   original_job_id_d81afbb3: "ID งานเดิม"
   originality_report_5d461681: รายงานต้นขั้ว
   originality_reports_1e36b935: รายงานต้นขั้ว
+  originality_reports_with_assignment_enhancements_9b2870ff: "รายงานต้นขั้ว (Original Reports) พร้อมสว่นการปรับปรุงสำหรับภารกิจ (Assignment Enhancements)"
   other_1c6d9c79: "อื่น ๆ"
   other_calendars_toggle_list_visibility_bd7fb67a: "การแสดงผลรายการเปิดปิดสำหรับปฏิทินอื่น ๆ"
   other_carrier_45531207: ผู้ให้บริการอื่น
@@ -14890,6 +14923,7 @@ th:
   please_log_in_to_view_this_content_eec6cd0: กรุณาล็อกอินเพื่อดูเนื้อหานี้
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: กรุณาตรวจสอบว่าไม่มีใครที่สามารถเก็บภาพนี้ในหน้าจอของคุณจากพื้นที่แวดล้อมหรือจากบริการแชร์หน้าจอ
   please_note_fbb62e4c: "หมายเหตุ:"
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "หมายเหตุ: Instructure ให้บริการ Canvas Commons จากในสหรัฐอเมริกา ซึ่งหมายความว่าขณะคุณใช้งาน Canvas Commons ข้อมูลส่วนบุคคลของคุณจะถูกจัดเก็บและประมวลผลในสหรัฐอเมริกา ข้อมูลส่วนบุคคลเหล่านี้อาจได้แก่ ชื่อ อีเมลแอดเดรส ID ผู้ใช้ Canvas ชื่อล็อกอินไปยัง Canvas ภาพประจำตัวใน Canvas ที่อยู่ IP ข้อมูลใน Canvas Commons ที่คุณชื่นชอบ และความเห็นของคุณในแหล่งข้อมูลต่าง ๆ ใน Canvas Commons คุณสามารถตรวจสอบรายละเอียดเพิ่มเติมเกี่ยวกับนโยบายความเป็นส่วนตัวของ Instructure ได้ [ที่นี่](%{url})."
   please_provide_a_field_e5a7d0b3: "กรุณาแจ้ง %{field}"
   please_provide_a_pairing_code_530d1e9d: กรุณาระบุรหัสเข้าคู่
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "กรุณาระบุโดเมน tenant ที่ถูกต้อง ตรวจสอบค่าปรับตั้ง Azure Active Directory ของคุณเพื่อทำการค้นหา"
@@ -15454,6 +15488,7 @@ th:
   previous_module_item_2bb5e499: หน่วยการเรียน/รายการก่อนหน้า
   previous_module_item_a9e57348: รายการหน่วยการเรียนก่อนหน้า
   previous_month_7adf1380: เดือนก่อนหน้า
+  previous_month_bb1e3c84: เดือนก่อนหน้า
   previous_page_928fc112: หน้าที่แล้ว
   previous_question_162c4048: คำถามก่อนหน้า
   previous_snapshots_d8cd4820: สแนปช็อตก่อนหน้า
@@ -15828,9 +15863,11 @@ th:
   public_jwk_url_b5564c1d: "JWK URL สาธารณะ"
   public_message_students: 
     send_message: ส่งข้อความ
+  publication_options_cbbfc20e: ตัวเลือกในการเผยแพร่
   publish_5211dca3: เผยแพร่
   publish_aa888e3c: "เผยแพร่:"
   publish_announcement_fec6d7e2: เผยแพร่ประกาศ
+  publish_at_3fd340d1: เผยแพร่เมื่อ
   publish_btn_module: 
     buttons: 
       publish: เผยแพร่
@@ -17671,6 +17708,7 @@ th:
   save_11a80ec3: บันทึก
   save_and_publish_1b765e7: บันทึกและเผยแพร่
   save_changes_698abe77: บันทึกการเปลี่ยนแปลง
+  save_failed_463cb2a8: บันทึกล้มเหลว
   save_grading_period_daaaddea: บันทึกระยะเวลาการให้เกรด
   save_grading_period_set_e029fa88: บันทึกชุดระยะเวลาการให้เกรด
   save_label_6ed4a68e: บันทึกฉลากกำกับ
@@ -17709,6 +17747,8 @@ th:
   schedule_e5dd4c32: กำหนดเวลา
   schedule_student_availability_332154a: กำหนดเวลาความพร้อมของผู้เรียน
   scheduled_date_5b0aedb6: "วันที่ที่กำหนด: "
+  scheduled_for_publication_c8d3e9a2: กำหนดเวลาสำหรับการเผยแพร่แล้ว
+  scheduled_page_publication_ae911741: กำหนดเวลาสำหรับการเผยแพร่เพจแล้ว
   scheduler_65b5ac91: ระบบกำหนดเวลา
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "ระบบกำหนดเวลาจะต้องเปิดใช้งานโดยผู้ดูแลระบบ Canvas ของคุณ"
   scheduler_must_be_enabled_for_your_account_e6e53972: ระบบกำหนดเวลาจะต้องเปิดใช้งานสำหรับบัญชีผู้ใช้ของคุณ
@@ -18244,6 +18284,7 @@ th:
   set_name_d14182d7: กำหนดชื่อ...
   set_name_f83b658: กำหนดชื่อ
   set_of_grading_periods_545b37e9: การกำหนดระยะเวลาการให้เกรด
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: "กำหนดวันครบกำหนดใน Course Pacing หลังจากจัดทำภารกิจแล้ว"
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           กำหนดค่าการแสดงประเมินความเชี่ยวชาญของคุณในสมุดบันทึกเกรดความเชี่ยวชาญด้านการเรียนรู้\n\
       \x20           ปรับตัวเลขคะแนนประเมิน ระดับความเชี่ยวชาญ คะแนนและสี\n\
@@ -19112,6 +19153,7 @@ th:
   start_auto_refresh_e2feafb2: เริ่มรีเฟรชอัตโนมัติ
   start_date_e937be8a: วันที่เริ่มต้น
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
+  start_date_for_conference_1936e809: วันที่เริ่มต้นสำหรับการประชุม
   start_date_from_20503757: "วันที่เริ่มต้น จาก:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} ถึง %{end_time}"
   start_date_to_1e6e6bbe: "วันที่เริ่มต้น ถึง:"
@@ -20258,6 +20300,8 @@ th:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: "บทเรียนนี้ใช้ Course Pacing ไปที่ Course Pacing เพื่อจัดการวันครบกำหนด"
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: บทเรียนนี้จะแสดงเฉพาะกับผู้สอนจนกว่าจะมีการเผยแพร่
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: เกณฑ์นี้เชื่อมโยงไว้กับผลการเรียนรู้
+  this_due_date_is_managed_by_cfbb698c: วันครบกำหนดนี้จัดการโดย
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: "วันครบกำหนดนี้จัดการโดยเส้นทางการเรียนรู้บทเรียน (Course Pacing)"
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "องค์ประกอบนี้เป็นทางเลือกที่เข้าถึงได้มากกว่าเพื่อจัดลำดับใหม่แบบลากและวาง กด Enter หรือ Space เพื่อย้ายคำถามนี้"
   this_email_address_is_unconfirmed_f0fc8c6e: อีเมลแอดเดรสนี้ยกเลิกการยืนยันแล้ว
   this_enables_users_to_generate_and_download_course_4c69c531: "ทั้งนี้เพื่อให้ผู้ใช้สามารถจัดทำและดาวน์โหลด ePub บทเรียน"
@@ -20444,6 +20488,7 @@ th:
   this_update_will_allow_more_options_for_bbb_confer_3d7d1d08: "การอัพเดตนี้มาพร้อมกับตัวเลือกที่มากขึ้นสำหรับการประชุม BBB"
   this_user_has_been_deleted_8caa45be: ผู้ใช้นี้ถูกลบแล้ว
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "ผู้ใช้นี้มีหลายบทบาทในบทเรียน การแก้ไขบทบาทจะเป็นการเขียนทับการลงทะเบียนในปัจจุบันทั้งหมดของคนเหล่านี้"
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: ผู้ใช้รายนี้ยังไม่ได้ตอบรับคำเชิญสำหรับบทเรียน
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: ผู้ใช้นี้ปัจจุบันไม่สามารถเข้าไปยังบทเรียนได้
   this_user_will_be_created_in_3b2a2b52: "ผู้ใช้นี้จะถูกจัดทำใน:"
   this_was_already_happening_for_images_in_the_quest_58edf4fb: |-
@@ -20833,6 +20878,7 @@ th:
   to_edit_the_course_sis_id_courses_manage_and_sis_d_dfe90e4e: "แก้ไข SIS ID ของบทเรียน โดยจะต้องเปิดใช้งาน บทเรียน - จัดการ และ ข้อมูล SIS - จัดการ ไว้ด้วย"
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "แก้ไข SIS ID ของบทเรียนโดยจะต้องเปิดใช้งาน บทเรียน - จัดการ / อัพเดต และ ข้อมูล SIS - จัดการ ไว้ด้วย"
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "แก้ไข SIS ID ของบทเรียนโดยจะต้องเปิดใช้งาน ข้อมูล SIS - จัดการ (SIS Data - manage) ไว้ด้วย"
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: "แก้ไขวันครบกำหนดโดยไปที่ Course Pacing แก้ไขจำนวนวันที่จัดสรรไว้สำหรับภารกิจนี้ แล้วเผยแพร่เส้นทางการเรียนรู้ที่มีการอัพเดต"
   to_edit_user_details_modify_login_details_or_chang_63aa95a5: "แก้ไขรายละเอียดผู้ใช้ แก้ไขรายละเอียดล็อกอิน หรือแก้ไขรหัสผ่านผู้ใช้โดยจะต้องเปิดใช้งาน ผู้ใช้ - จัดการายละเอียดล็อกอิน ไว้ด้วย"
   to_enable_microsoft_teams_sync_please_provide_a_te_44c6d180: "เปิดใช้งาน Microsoft Teams Sync โดยแจ้ง tenant คุณลักษณะการล็อกอินและคุณลักษณะการทำงานระยะไกล"
   to_end_a_long_running_conference_the_course_conten_63e3f993: "เพื่อสิ้นสุดการประชุมที่ใช้เวลานาน จะต้องเปิดใช้งานสิทธิ์อนุญาตเนื้อหาบทเรียนไว้ด้วย"
@@ -21318,6 +21364,7 @@ th:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "ข้อมูลอัพเดตสำหรับโครงสร้าง OAuth เพื่อหยุดเปลี่ยนเส้นทางในการตรวจรับรอง “ชุดข้อมูล”"
   updating_6edbab78: กำลังอัพเดต
   updating_discussion_failed_aadb2d35: อัพเดตการพูดคุยล้มเหลว
+  updating_publication_date_62cc1622: กำลังอัพเดตวันที่เผยแพร่
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "การอัพเดต URL แคตาล้อกจะทำให้ URL เก่าของคุณไม่สามารถใช้งานได้สำหรับผู้ใช้โดยมีผลในทันที หากมีการกำหนดค่าผู้ดำเนินการชำระเงินในปัจจุบันไว้ การแก้ไขจะต้องอาศัยความช่วยเหลือจากวิศวกรสำหรับแคตาล็อก"
   upload_8b403d05: อัพโหลด
   upload_a_file_228b8cf9: อัพโหลดไฟล์
@@ -22246,6 +22293,7 @@ th:
         zero: "ไม่พบ %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; ก่อนหน้า"
+  will_publish_on_publish_date_8b42e1ec: "จะเผยแพร่เมื่อ %{publish_date}"
   wimba_conference: 
     external_urls: 
       archive: จัดเก็บแยก
