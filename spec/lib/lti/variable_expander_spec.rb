@@ -2105,6 +2105,34 @@ module Lti
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq "username"
           end
+
+          context "when in the :user_navigation placement" do
+            let(:variable_expander_opts) { super().merge({ placement: :user_navigation }) }
+
+            before do
+              pseudonym.sis_user_id = "1a2b3c"
+            end
+
+            context "when the context is a User" do
+              let(:variable_expander_opts) { super().merge({ context: user }) }
+
+              it "has substitution for $Context.sourcedId" do
+                exp_hash = { test: "$Context.sourcedId" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "1a2b3c"
+              end
+            end
+
+            context "when the context is not a User" do
+              let(:variable_expander_opts) { super().merge({ context: account }) }
+
+              it "does not have substitution for $Context.sourcedId" do
+                exp_hash = { test: "$Context.sourcedId" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "$Context.sourcedId"
+              end
+            end
+          end
         end
 
         context "attachment" do
