@@ -5939,7 +5939,7 @@ nn:
   confirmation_code_required_22984955: "Kode for stadfesting (obligatorisk)"
   confirmation_failed_please_try_again_ae566d37: "Stadfesting mislukkast. Prøv på nytt seinare."
   confused_panda_questioning_what_to_do_next_42941484: "Forvirra Panda funderar på kva han skal gjere no"
-  consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar med tanke på studentar som kan hende ikkje får til å lage merknader"
+  consider_selecting_multiple_submission_types_to_ac_f7e624d5: "Vurder å velje fleire innleveringstypar for å tilpasse innleveringen for studentar som kanskje ikkje får til å lage merknader"
   consumer_key_57d9fcf1: Forbrukarnøkkel
   consumer_key_6f94ba11: Forbrukarnøkkel
   contact_your_administrator_if_you_need_to_change_c_9002a501: "Kontakt ein administrator dersom du må endre synlegheita for emnet."
@@ -6836,7 +6836,7 @@ nn:
     other: "%{count} kriterium"
   count_days_de0c6a32: 
     one: "1 dag"
-    other: "%{count} dager"
+    other: "%{count} dagar"
   count_discussions_found_fc326362: "%{count} diskusjonar funne."
   count_errors_prohibited_this_note_from_being_saved_fb546efe: 
     one: "1 feil forhindra lagring av notatet:"
@@ -7004,7 +7004,7 @@ nn:
   count_users_374d6e47: "(%{count} brukarar)"
   count_weeks_11fbd2dc: 
     one: "1 uke"
-    other: "%{count} uker"
+    other: "%{count} veker"
   count_words_e0b79b82: 
     one: "1 ord"
     other: "%{count} ord"
@@ -7285,14 +7285,14 @@ nn:
   course_roles_can_only_manage_blueprint_courses_if__12964fbb: "Deltagere kan berre administrera Blåkopiemne hvis dei er lagt til blåkopiemnet som ein faglærar, undervisningsassistent eller designar. "
   course_roles_can_only_manage_blueprint_courses_if__4902d00b: "Emneroller kan kun administrere Blueprint-emne dersom dei er lagd til Blueprint-emnet som ein faglærar, undervisingsassistent eller designar. For å få tilgang til Blueprint-menyen, må 'Emne - legg til / rediger / slett emne' vere aktivert. For å legge til eit tilknytta emne, må 'Emne - vis liste' og 'Emne - legg til / rediger / slett' òg vere aktivert. For å redigere låseinnstillingar for alle Blueprint-objekt, må 'Emne - legg til / rediger / slett' vere aktivert. "
   course_roles_can_only_manage_content_in_blueprint__a37c5e0a: "Deltagere kan berre administrera innhald i Blåkopiemne hvis dei er lagt til blåkopiemnet som ein faglærar, undervisningsassistent eller designar. "
-  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Deltagere kan berre administrera innhald i Blåkopiemne hvis dei er lagt til blåkopiemnet med ein faglærar, undervisningsassistent eller designarrolle. "
+  course_roles_can_only_manage_content_in_blueprint__c4b14b26: "Deltagere kan berre administrera innhald i Blåkopiemne hvis dei er lagt til blåkopiemnet med ein rolle som faglærar, undervisningsassistent eller designar. "
   course_roles_d2d5d666: Emneroller
   course_roster_78f70e97: Emneliste
   course_rubrics_881dcf0: "Vurderingsskjema for emne"
   course_search: 
     cant_be_blank: "Kan ikkje stå tom"
   course_section: 
-    integration_id_taken: "Integrasjonsid \"%{integration_id}\" er allereie i bruk"
+    integration_id_taken: "Integrasjons id \"%{integration_id}\" er allereie i bruk"
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
   course_section_7a988066: Emneseksjonar
   course_section_name_ea880ed1: "Emneseksjonar %{name}"
