@@ -20076,6 +20076,7 @@ nl:
   please_log_in_to_view_this_content_eec6cd0: "Log in om deze inhoud te bekijken"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Zorg dat niemand anders het beeld op je scherm kan opnemen vanaf een plek rondom je of via een service voor gedeeld scherm."
   please_note_fbb62e4c: "Let op:"
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Let op: Instructure fungeert als host voor Canvas Commons in de VS. Dit betekent dat wanneer je Canvas Commons gebruikt, je persoonsgegevens in de VS worden opgeslagen en verwerkt. Tot die persoonsgegevens behoren naam, e-mailadres, Canvas-gebruikers-ID, Canvas-aanmeldingsnaam, Canvas Avatar, IP-adres, Canvas Commons-resources die je vaak bezoekt en opmerkingen die je invoert bij resources in Canvas Commons. Meer informatie over het privacybeleid van Instructure vind je [hier](%{url})."
   please_provide_a_field_e5a7d0b3: "Verstrek een %{field}"
   please_provide_a_pairing_code_530d1e9d: "Verstrek een koppelingscode."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Geef een geldig tenant-domein op. Controleer je Azure Active Directory-instellingen om dit te vinden."
