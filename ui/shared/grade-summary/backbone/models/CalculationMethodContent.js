@@ -118,7 +118,6 @@ export default class CalculationMethodContent {
   }
 
   toJSON() {
-    const outcomeAllowAverageCalculationFF = ENV.OUTCOME_AVERAGE_CALCULATION
     const alternativeCalculationValues = this.is_individual_outcome
       ? {
           decaying_average: {
@@ -232,22 +231,20 @@ export default class CalculationMethodContent {
         exampleScores: alternativeCalculationValues.highest.exampleScores,
         exampleResult: alternativeCalculationValues.highest.exampleResult
       },
-      ...(outcomeAllowAverageCalculationFF && {
-        average: {
-          method: alternativeCalculationValues.average.method,
-          friendlyCalculationMethod: I18n.t('Average'),
-          exampleText: I18n.t(
-            'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
-          ),
-          exampleWarning: I18n.t(
-            'Average is not a good fit for most outcomes-based or mastery-based learning use cases because students may need time to reach mastery of an outcome and early poorer performance can bring down an average.'
-          ),
-          exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
-          exampleResult: numberFormat.outcomeScore(
-            this.average(this.exampleScoreIntegers().slice(0, 7))
-          )
-        }
-      })
+      average: {
+        method: alternativeCalculationValues.average.method,
+        friendlyCalculationMethod: I18n.t('Average'),
+        exampleText: I18n.t(
+          'Central value in a set of results. Calculated by dividing the sum of all item scores by the number of scores.'
+        ),
+        exampleWarning: I18n.t(
+          'Average is not a good fit for most outcomes-based or mastery-based learning use cases because students may need time to reach mastery of an outcome and early poorer performance can bring down an average.'
+        ),
+        exampleScores: this.exampleScoreIntegers().slice(0, 7).join(', '),
+        exampleResult: numberFormat.outcomeScore(
+          this.average(this.exampleScoreIntegers().slice(0, 7))
+        )
+      }
     }
   }
 }
