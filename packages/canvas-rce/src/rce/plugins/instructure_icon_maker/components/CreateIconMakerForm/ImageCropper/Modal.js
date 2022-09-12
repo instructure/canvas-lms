@@ -67,20 +67,13 @@ const renderBody = (settings, dispatch, message, loading) => {
   )
 }
 
-const renderFooter = (settings, onSubmit, onClose) => {
+const renderFooter = (settings, onClose) => {
   return (
     <>
       <Button onClick={onClose} margin="0 x-small 0 0">
         {formatMessage('Cancel')}
       </Button>
-      <Button
-        color="primary"
-        type="submit"
-        onClick={e => {
-          e.preventDefault()
-          handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
-        }}
-      >
+      <Button color="primary" type="submit">
         {formatMessage('Save')}
       </Button>
     </>
@@ -106,16 +99,31 @@ export const ImageCropperModal = ({
   }, [cropSettings])
 
   return (
-    <Modal size="large" open={open} onDismiss={onClose} shouldCloseOnDocumentClick={false}>
+    <Modal
+      data-mce-component={true}
+      as="form"
+      label={formatMessage('Crop Image')}
+      size="large"
+      open={open}
+      onDismiss={onClose}
+      onSubmit={e => {
+        e.preventDefault()
+        handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
+      }}
+      shouldCloseOnDocumentClick={false}
+    >
       <Modal.Header id="imageCropperHeader">
-        <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
+        <CloseButton
+          placement="end"
+          offset="small"
+          onClick={onClose}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading>{formatMessage('Crop Image')}</Heading>
       </Modal.Header>
       <Modal.Body>{renderBody(settings, dispatch, message, loading)}</Modal.Body>
       {!loading && (
-        <Modal.Footer id="imageCropperFooter">
-          {renderFooter(settings, onSubmit, onClose)}
-        </Modal.Footer>
+        <Modal.Footer id="imageCropperFooter">{renderFooter(settings, onClose)}</Modal.Footer>
       )}
     </Modal>
   )
