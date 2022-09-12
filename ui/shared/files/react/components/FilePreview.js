@@ -38,7 +38,14 @@ const I18n = useI18nScope('file_preview')
 
 export default class FilePreview extends React.PureComponent {
   static propTypes = {
-    currentFolder: customPropTypes.folder,
+    currentFolder: PropTypes.oneOfType([
+      customPropTypes.folder,
+      PropTypes.shape({
+        files: PropTypes.shape({
+          models: PropTypes.arrayOf(PropTypes.instanceOf(File)),
+        }),
+      }),
+    ]),
     query: PropTypes.object,
     collection: PropTypes.object,
     params: PropTypes.object,
