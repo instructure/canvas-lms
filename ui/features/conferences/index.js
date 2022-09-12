@@ -145,6 +145,9 @@ const ConferencesRouter = Backbone.Router.extend({
               const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
               const start_at = calendar_event ? data.startCalendarDate : null
               const end_at = calendar_event ? data.endCalendarDate : null
+
+              const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
               const payload = {
                 _method: 'POST',
                 title: data.name,
@@ -161,7 +164,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 description: data.description,
                 'web_conference[description]': data.description,
                 'user[all]': inviteAll,
-                'observers[remove]': 0,
+                'observers[remove]': remove_observers,
                 'web_conference[start_at]': start_at,
                 'web_conference[end_at]': end_at,
                 'web_conference[calendar_event]': calendar_event
@@ -299,6 +302,8 @@ const ConferencesRouter = Backbone.Router.extend({
             const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
             const start_at = calendar_event ? data.startCalendarDate : null
             const end_at = calendar_event ? data.endCalendarDate : null
+            const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
             const payload = {
               _method: 'PUT',
               title: data.name,
@@ -315,7 +320,7 @@ const ConferencesRouter = Backbone.Router.extend({
               description: data.description,
               'web_conference[description]': data.description,
               'user[all]': inviteAll,
-              'observers[remove]': 0,
+              'observers[remove]': remove_observers,
               'web_conference[start_at]': start_at,
               'web_conference[end_at]': end_at,
               'web_conference[calendar_event]': calendar_event

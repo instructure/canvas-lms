@@ -229,6 +229,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                 <Checkbox
                   label={I18n.t('Remove all course observer members')}
                   value="remove_observers"
+                  disabled={addToCalendar || !props.invitationOptions.includes('invite_all')}
                 />
               )}
             </CheckboxGroup>
