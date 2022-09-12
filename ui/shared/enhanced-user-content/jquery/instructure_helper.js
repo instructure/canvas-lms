@@ -17,28 +17,8 @@
  */
 
 // create a global object "INST" that we will have be Instructure's namespace.
-import INST from 'browser-sniffer'
 import $ from 'jquery'
 import 'jqueryui/dialog'
-
-function getTld(hostname) {
-  hostname = (hostname || '').split(':')[0]
-  const parts = hostname.split('.'),
-    length = parts.length
-  return (length > 1 ? [parts[length - 2], parts[length - 1]] : parts).join('')
-}
-const locationTld = getTld(window.location.hostname)
-$.expr[':'].external = function (element) {
-  const href = $(element).attr('href')
-  // if a browser doesnt support <a>.hostname then just dont mark anything as external, better to not get false positives.
-  return !!(
-    href &&
-    href.length &&
-    !href.match(/^(mailto\:|javascript\:)/) &&
-    element.hostname &&
-    getTld(element.hostname) != locationTld
-  )
-}
 
 window.equella = {
   ready(data) {
@@ -68,8 +48,4 @@ window.external_tool_dialog = {
     $('#resource_selection_dialog').dialog('close')
     $('#homework_selection_dialog:visible').dialog('close')
   },
-}
-
-window.jsonFlickrApi = function (data) {
-  $('#instructure_image_search').triggerHandler('search_results', data)
 }

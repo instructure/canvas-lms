@@ -21,11 +21,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import preventDefault from 'prevent-default'
+import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import ReactDOM from 'react-dom'
-import React from 'react'
-import {Link} from '@instructure/ui-link'
+import {enhanceUserContent, makeAllExternalLinksExternalLinks} from '@canvas/enhanced-user-content2'
 import './instructure_helper'
 import 'jqueryui/draggable'
 import '@canvas/jquery/jquery.ajaxJSON'
@@ -46,325 +44,8 @@ import 'jquery-tinypubsub' /* /\.publish\(/ */
 import 'jqueryui/resizable'
 import 'jqueryui/sortable'
 import 'jqueryui/tabs'
-import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 
 const I18n = useI18nScope('instructure_js')
-
-// we're doing this so we can use the svg in the img src attribute
-// rather than just inlining the svg. This simplified keeping the
-// vertical alignment consistent with how it was with the icon font.
-// The optional chaining to .src is because the icons are undefined
-// in jest tests
-const IconDownloadb64src = window.btoa(IconDownloadLine?.src)
-const IconExternalLinkb64src = window.btoa(IconExternalLinkLine?.src)
-
-function makeDownloadButton(download_url, filename) {
-  const a = document.createElement('a')
-  a.setAttribute('class', 'file_download_btn')
-  a.setAttribute('role', 'button')
-  a.setAttribute('download', '')
-  a.setAttribute('style', 'margin-inline-start: 5px; text-decoration: none;')
-  a.setAttribute('href', download_url)
-
-  const img = document.createElement('img')
-  img.setAttribute('style', 'width:16px; height:16px')
-  img.setAttribute('role', 'presentation')
-  img.setAttribute('src', `data:image/svg+xml;base64,${IconDownloadb64src}`)
-  a.appendChild(img)
-
-  const srspan = document.createElement('span')
-  srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(I18n.t('Download %{filename}', {filename}))
-  a.appendChild(srspan)
-
-  return a
-}
-
-function makeExternalLinkIcon() {
-  const span = document.createElement('span')
-  const img = document.createElement('img')
-  img.setAttribute('style', 'margin-inline-start: 5px; width:16px; height:16px')
-  img.setAttribute('src', `data:image/svg+xml;base64,${IconExternalLinkb64src}`)
-  img.setAttribute('alt', '')
-  img.setAttribute('role', 'presentation')
-  span.appendChild(img)
-
-  const srspan = document.createElement('span')
-  srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(I18n.t('Links to an external site.'))
-  span.appendChild(srspan)
-  return span
-}
-
-let preview_counter = 0
-function previewId() {
-  return `preview_${++preview_counter}`
-}
-
-function handleYoutubeLink() {
-  const $link = $(this)
-  const href = $link.attr('href')
-  const id = $.youTubeID(href || '')
-  if (id && !$link.hasClass('inline_disabled')) {
-    const $after = $(`
-      <a
-        href="${htmlEscape(href)}"
-        class="youtubed"
-      >
-        <img src="/images/play_overlay.png"
-          class="media_comment_thumbnail"
-          style="background-image: url(//img.youtube.com/vi/${htmlEscape(id)}/2.jpg)"
-          alt="${htmlEscape($link.data('preview-alt') || '')}"
-        />
-      </a>
-    `)
-    $after.click(
-      preventDefault(function () {
-        const $video = $(`
-        <span class='youtube_holder' style='display: block;'>
-          <iframe
-            src='//www.youtube.com/embed/${htmlEscape(id)}?autoplay=1&rel=0&hl=en_US&fs=1'
-            frameborder='0'
-            width='425'
-            height='344'
-            allowfullscreen
-          ></iframe>
-          <br/>
-          <a
-            href='#'
-            style='font-size: 0.8em;'
-            class='hide_youtube_embed_link'
-          >
-            ${htmlEscape(I18n.t('links.minimize_youtube_video', 'Minimize Video'))}
-          </a>
-        </span>
-      `)
-        $video.find('.hide_youtube_embed_link').click(
-          preventDefault(() => {
-            $video.remove()
-            $after.show()
-          })
-        )
-        $(this).after($video).hide()
-      })
-    )
-    $link.addClass('youtubed').after($after)
-  }
-}
-
-function buildUrl(url) {
-  try {
-    return new URL(url)
-  } catch (e) {
-    // Don't raise an error
-  }
-}
-
-// Rendering a temporary Link element so we can copy its classnames to anchors with images inside,
-// since '@instructure/ui-link' doesn't provide a way to use its CSS themed classes directly.
-function handleAnchorsWithImage() {
-  const temp = document.createElement('div')
-  const tempLinkComponent = React.createElement(
-    Link,
-    {
-      elementRef: e => {
-        $('.user_content a:has(img)').each(function () {
-          $(this).addClass(e.className)
-        })
-      },
-    },
-    // Children prop is required
-    React.createElement('img')
-  )
-  ReactDOM.render(tempLinkComponent, temp)
-}
-
-export function enhanceUserContent(visibilityMod) {
-  if (ENV.SKIP_ENHANCING_USER_CONTENT) {
-    return
-  }
-  const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
-  const visibilityQueryMod = visibilityMod === enhanceUserContent.ANY_VISIBILITY ? '' : ':visible'
-  $(`.user_content:not(.enhanced)${visibilityQueryMod}`).addClass('unenhanced')
-  $(`.user_content.unenhanced${visibilityQueryMod}`)
-    .each(function () {
-      const $this = $(this)
-      $this.find('img').each((i, img) => {
-        // if the image file is unpublished it's replaced with the lock image
-        // and canvas adds hidden=1 to the URL.
-        // we also need to strip the alt text
-        if (/hidden=1$/.test(img.getAttribute('src'))) {
-          img.setAttribute('alt', I18n.t('This image is currently unavailable'))
-        }
-      })
-      $this.data('unenhanced_content_html', $this.html())
-    })
-    .find('.enhanceable_content')
-    .show()
-    .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE)
-    .ifExists($elements => {
-      const msg =
-        'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
-        "You're relying on undocumented functionality where Canvas makes " +
-        'jQueryUI widgets out of rich content that has the following class names: ' +
-        JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
-        '.\n\n' +
-        'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
-        "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
-        'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements) // eslint-disable-line no-console
-    })
-    .end()
-    .filter('.dialog')
-    .each(function () {
-      const $dialog = $(this)
-      $dialog.hide()
-      $dialog
-        .closest('.user_content')
-        .find("a[href='#" + $dialog.attr('id') + "']")
-        .click(event => {
-          event.preventDefault()
-          $dialog.dialog()
-        })
-    })
-    .end()
-    .filter('.draggable')
-    .draggable()
-    .end()
-    .filter('.resizable')
-    .resizable()
-    .end()
-    .filter('.sortable')
-    .sortable()
-    .end()
-    .filter('.tabs')
-    .each(function () {
-      $(this).tabs()
-    })
-    .end()
-    .end()
-    .find('a:not(.not_external, .external):external')
-    .each(function () {
-      $(this)
-        .not(':has(img)')
-        .addClass('external')
-        .html('<span>' + $(this).html() + '</span>')
-        .attr('target', '_blank')
-        .attr('rel', 'noreferrer noopener')
-        .append($(makeExternalLinkIcon()))
-    })
-    .end()
-
-  handleAnchorsWithImage()
-
-  $('a.instructure_file_link, a.instructure_scribd_file').each(function () {
-    const $link = $(this)
-    const href = buildUrl($link[0].href)
-
-    // Don't attempt to enhance links with no href
-    if (!href) return
-
-    const matchesCanvasFile = href.pathname.match(
-      /(?:\/(courses|groups|users)\/(\d+))?\/files\/(\d+)/
-    )
-    if (!matchesCanvasFile) {
-      // a bug in the new RCE added instructure_file_link class name to all links
-      // only proceed if this is a canvas file link
-      return
-    }
-    let $download_btn, $preview_link
-    if ($.trim($link.text())) {
-      const filename = this.textContent
-      // instructure_file_link_holder is used to find file_preview_link
-      const $span = $(
-        "<span class='instructure_file_holder link_holder instructure_file_link_holder'/>"
-      )
-
-      const qs = href.searchParams
-      qs.delete('wrap')
-      qs.append('download_frd', '1')
-      const download_url = `${href.origin}${href.pathname.replace(
-        /(?:\/(download|preview))?$/,
-        '/download'
-      )}?${qs}`
-      $download_btn = makeDownloadButton(download_url, filename)
-
-      if ($link.hasClass('instructure_scribd_file')) {
-        if ($link.hasClass('no_preview')) {
-          // link downloads
-          $link.attr('href', download_url)
-          $link.removeAttr('target')
-        } else if ($link.hasClass('inline_disabled')) {
-          // link opens in overlay
-          $link.addClass('preview_in_overlay')
-        } else {
-          // link opens inline preview
-          $link.addClass('file_preview_link')
-        }
-      }
-      $link.removeClass('instructure_file_link')
-      $link.removeClass('instructure_scribd_file').before($span).appendTo($span)
-      $span.append($preview_link)
-      $span.append($download_btn)
-    }
-  })
-
-  // Some schools have been using 'file_preview_link' for inline previews
-  // outside of the RCE so find them all after we've gone through and
-  // added our own (above)
-  $('.instructure_file_link_holder')
-    .find('a.file_preview_link, a.scribd_file_preview_link')
-    .each(function () {
-      const $link = $(this)
-      if ($link.siblings('.preview_container').length) {
-        return
-      }
-
-      const preview_id = previewId()
-      $link.attr('aria-expanded', 'false')
-      $link.attr('aria-controls', preview_id)
-      const $preview_container = $('<div role="region" class="preview_container" />')
-        .attr('id', preview_id)
-        .css('display', 'none')
-      $link.parent().append($preview_container)
-      if ($link.hasClass('auto_open')) {
-        $link.click()
-      }
-    })
-
-  $('.user_content.unenhanced a,.user_content.unenhanced+div.answers a')
-    .find('img.media_comment_thumbnail')
-    .each(function () {
-      $(this).closest('a').addClass('instructure_inline_media_comment')
-    })
-    .end()
-    .filter('.instructure_inline_media_comment')
-    .removeClass('no-underline')
-    .mediaCommentThumbnail('normal')
-    .end()
-    .filter('.instructure_video_link, .instructure_audio_link')
-    .mediaCommentThumbnail('normal', true)
-    .end()
-    .not('.youtubed')
-    .each(handleYoutubeLink)
-  $('.user_content.unenhanced').removeClass('unenhanced').addClass('enhanced')
-  setTimeout(() => {
-    $('.user_content form.user_content_post_form:not(.submitted)').submit().addClass('submitted')
-  }, 10)
-  // Remove sandbox attribute from user content iframes to fix busted
-  // third-party content, like Google Drive documents.
-  document
-    .querySelectorAll('.user_content iframe[sandbox="allow-scripts allow-forms allow-same-origin"]')
-    .forEach(frame => {
-      frame.removeAttribute('sandbox')
-      const src = frame.src
-      frame.src = src
-    })
-}
-
-// we need an override control for jest since ":visible" jQuery modifier will
-// always say false there
-enhanceUserContent.ANY_VISIBILITY = {}
 
 export function formatTimeAgoTitle(date) {
   const fudgedDate = $.fudgeDateForProfileTimezone(date)
@@ -399,6 +80,56 @@ export function formatTimeAgoDate(date) {
   } else {
     return formatTimeAgoTitle(date)
   }
+}
+
+// this code was lifted from the original jquery version of enhanceUserContent
+// it's what wires up jquery widgets to DOM elements with magic class names
+function enhanceUserJQueryWidgetContent() {
+  const JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE = '.dialog, .draggable, .resizable, .sortable, .tabs'
+  $('.user_content.unenhanced')
+    .find('.enhanceable_content')
+    .show()
+    .filter(JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE)
+    .ifExists($elements => {
+      const msg =
+        'Deprecated use of magic jQueryUI widget markup detected:\n\n' +
+        "You're relying on undocumented functionality where Canvas makes " +
+        'jQueryUI widgets out of rich content that has the following class names: ' +
+        JQUERY_UI_WIDGETS_WE_TRY_TO_ENHANCE +
+        '.\n\n' +
+        'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
+        "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
+        'you should use your own custom JS file to do any such customizations.'
+      console.error(msg, $elements) // eslint-disable-line no-console
+    })
+    .end()
+    .filter('.dialog')
+    .each(function () {
+      const $dialog = $(this)
+      $dialog.hide()
+      $dialog
+        .closest('.user_content')
+        .find("a[href='#" + $dialog.attr('id') + "']")
+        .on('click', event => {
+          event.preventDefault()
+          $dialog.dialog()
+        })
+    })
+    .end()
+    .filter('.draggable')
+    .draggable()
+    .end()
+    .filter('.resizable')
+    .resizable()
+    .end()
+    .filter('.sortable')
+    .sortable()
+    .end()
+    .filter('.tabs')
+    .each(function () {
+      $(this).tabs()
+    })
+    .end()
 }
 
 function retriggerEarlyClicks() {
@@ -600,113 +331,28 @@ function openDialogsWhenClicked() {
   })
 }
 
-function previewFilesWhenClicked() {
-  $('a.file_preview_link, a.scribd_file_preview_link').live('click', function (event) {
-    if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
-      // if any modifier keys are pressed, do the browser default thing
-      return
-    }
-    event.preventDefault()
-    const $link = $(this)
-    if ($link.attr('aria-expanded') === 'true') {
-      // close the preview by clicking the "Minimize File Preview" link
-      $link.parent().find('.hide_file_preview_link').click()
-      return
-    }
-    $link.loadingImage({image_size: 'small', horizontal: 'right!'})
-    $link.attr('aria-expanded', 'true')
-    $.ajaxJSON(
-      $link
-        .attr('href')
-        .replace(/\/(download|preview)/, '') // download as part of the path
-        .replace(/wrap=1&?/, '') // wrap=1 as part of the query_string
-        .replace(/[?&]$/, ''), // any trailing chars if wrap=1 was at the end
-      'GET',
-      {},
-      data => {
-        const attachment = data && data.attachment
-        $link.loadingImage('remove')
-        if (
-          attachment &&
-          ($.isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
-        ) {
-          const $div = $(`[id="${$link.attr('aria-controls')}"]`)
-          $div.css('display', 'block').loadDocPreview({
-            canvadoc_session_url: attachment.canvadoc_session_url,
-            mimeType: attachment.content_type,
-            public_url: attachment.public_url,
-            attachment_preview_processing:
-              attachment.workflow_state === 'pending_upload' ||
-              attachment.workflow_state === 'processing',
-          })
-          const $minimizeLink = $(
-            '<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' +
-              htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) +
-              '</a>'
-          ).click(event => {
-            event.preventDefault()
-            $link.attr('aria-expanded', 'false')
-            $link.show()
-            $link.focus()
-            $div.html('').css('display', 'none')
-          })
-          $div.prepend($minimizeLink)
-          if (Object.prototype.hasOwnProperty.call(event, 'originalEvent')) {
-            // Only focus this link if the open preview link was initiated by a real browser event
-            // If it was triggered by our auto_open stuff it shouldn't focus here.
-            $minimizeLink.focus()
-          }
-        }
-      },
-      () => {
-        $link.loadingImage('remove').hide()
-      }
-    )
-  })
-
-  $('a.preview_in_overlay').live('click', event => {
-    let target = null
-    if (event.target.href) {
-      target = event.target
-    } else if (event.currentTarget?.href) {
-      target = event.currentTarget
-    }
-    const matches = target?.href.match(/\/files\/(\d+)/)
-    if (matches) {
-      if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
-        // if any modifier keys are pressed, do the browser default thing
-        return
-      }
-      event.preventDefault()
-      const url = new URL(target.href)
-      const verifier = url?.searchParams.get('verifier')
-      const file_id = matches[1]
-      import('../react/showFilePreview')
-        .then(module => {
-          module.showFilePreview(file_id, verifier)
-        })
-        .catch(_err => {
-          $.flashError(I18n.t('Something went wrong loading the file previewer.'))
-        })
-    }
-  })
-}
-
+let enhanceUserContentTimeout
 function enhanceUserContentWhenAsked() {
-  // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
-  let enhanceUserContentTimeout
-  $.subscribe('userContent/change', () => {
-    clearTimeout(enhanceUserContentTimeout)
-    enhanceUserContentTimeout = setTimeout(enhanceUserContent, 50)
-  })
-  $(document).bind('user_content_change', enhanceUserContent)
+  clearTimeout(enhanceUserContentTimeout)
+  enhanceUserContentTimeout = setTimeout(
+    () => enhanceUserContent(document, enhanceUserJQueryWidgetContent),
+    50
+  )
 }
 
+let user_content_mutation_observer = null
 function enhanceUserContentRepeatedly() {
-  $(() => {
-    setInterval(enhanceUserContent, 15000)
-    setTimeout(enhanceUserContent, 15)
-  })
+  if (!user_content_mutation_observer) {
+    user_content_mutation_observer = new MutationObserver(mutationList => {
+      if (mutationList.filter(m => m.addedNodes.length > 0).length > 0) {
+        enhanceUserContentWhenAsked()
+      }
+    })
+    user_content_mutation_observer.observe(document.getElementById('content') || document.body, {
+      subtree: true,
+      childList: true,
+    })
+  }
 }
 
 // app/views/discussion_topics/_entry.html.erb
@@ -780,6 +426,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         let submission = null
         for (const idx in data) {
           const s = data[idx].submission
+          // eslint-disable-next-line eqeqeq
           if (s.user_id == user_id) {
             submission = s
           }
@@ -881,13 +528,18 @@ function doThingsToModuleSequenceFooter() {
   const sf = $('#sequence_footer')
   if (sf.length) {
     const el = $(sf[0])
-    import('@canvas/module-sequence-footer').then(() => {
-      el.moduleSequenceFooter({
-        courseID: el.attr('data-course-id'),
-        assetType: el.attr('data-asset-type'),
-        assetID: el.attr('data-asset-id'),
+    import('@canvas/module-sequence-footer')
+      .then(() => {
+        el.moduleSequenceFooter({
+          courseID: el.attr('data-course-id'),
+          assetType: el.attr('data-asset-type'),
+          assetID: el.attr('data-asset-id'),
+        })
       })
-    })
+      .catch(ex => {
+        // eslint-disable-next-line no-console
+        console.error(ex)
+      })
   }
 }
 
@@ -940,38 +592,36 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
   })
 }
 
-function makeAllExternalLinksExternalLinks() {
-  // in 100ms (to give time for everything else to load), find all the external links and add give them
-  // the external link look and behavior (force them to open in a new tab)
-  setTimeout(function () {
-    const content = document.getElementById('content')
-    if (!content) return
-    const links = content.querySelectorAll(
-      `a[href*="//"]:not([href*="${window.location.hostname}"])`
-    ) // technique for finding "external" links copied from https://davidwalsh.name/external-links-css
-    for (let i = 0; i < links.length; i++) {
-      const $link = $(links[i])
-      // don't mess with the ones that were already processed in enhanceUserContent
-      if ($link.hasClass('external')) continue
-      const $linkToReplace = $link
-        .not('.open_in_a_new_tab')
-        .not(':has(img)')
-        .not('.not_external')
-        .not('.exclude_external_icon')
-      if ($linkToReplace.length) {
-        const $linkIndicator = makeExternalLinkIcon()
-        $linkToReplace
-          .addClass('external')
-          .children('span.ui-icon-extlink')
-          .remove()
-          .end()
-          .html('<span>' + $link.html() + '</span>')
-          .attr('target', '_blank')
-          .attr('rel', 'noreferrer noopener')
-          .append($linkIndicator)
-      }
+// this really belongs in enhanced-user-content2/instructure_helper
+// but it uses FilePreview to render the file preview overlay, and
+// that has so many dependencies on things like @canvas/files/backbone/models/File.coffee
+// this it'll be too time consuming to decouple it from canvas in our
+// timeframe. Solve it for now by using postMessage from enhanced-user-content2
+// (which we hope to decouple from canvas) to ask canvas to render the preview
+function showFilePreviewInOverlayHandler({file_id, verifier}) {
+  import('../react/showFilePreview')
+    .then(module => {
+      module.showFilePreview(file_id, verifier)
+    })
+    .catch(err => {
+      showFlashAlert({
+        message: I18n.t('Something went wrong loading the file previewer.'),
+        type: 'error',
+      })
+      // eslint-disable-next-line no-console
+      console.log(err)
+    })
+}
+
+function wireUpFilePreview() {
+  window.addEventListener('message', event => {
+    if (event.origin !== window.location.origin) {
+      return
     }
-  }, 100)
+    if (event.data.subject === 'preview_file') {
+      showFilePreviewInOverlayHandler(event.data)
+    }
+  })
 }
 
 export default function enhanceTheEntireUniverse() {
@@ -983,7 +633,6 @@ export default function enhanceTheEntireUniverse() {
     expandQuotedTextWhenClicked,
     previewEquellaContentWhenClicked,
     openDialogsWhenClicked,
-    previewFilesWhenClicked,
     enhanceUserContentWhenAsked,
     enhanceUserContentRepeatedly,
     showDiscussionTopicSubMessagesWhenClicked,
@@ -997,6 +646,7 @@ export default function enhanceTheEntireUniverse() {
     showHideRemoveThingsToRightSideMoreLinksWhenClicked,
     confirmAndDeleteRightSideTodoItemsWhenClicked,
     makeAllExternalLinksExternalLinks,
+    wireUpFilePreview,
   ]
     .map(isolate)
     .map(x => x())

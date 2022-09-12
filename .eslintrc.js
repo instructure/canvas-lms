@@ -22,7 +22,7 @@ module.exports = {
   env: {
     es6: true,
     amd: true,
-    browser: true
+    browser: true,
   },
   extends: [
     'airbnb',
@@ -30,14 +30,14 @@ module.exports = {
     'plugin:jest/recommended',
     'plugin:prettier/recommended',
     'plugin:eslint-comments/recommended',
-    'plugin:promise/recommended'
+    'plugin:promise/recommended',
   ],
   parserOptions: {
     ecmaVersion: 2020,
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
-    sourceType: 'module'
+    sourceType: 'module',
   },
   parser: '@typescript-eslint/parser',
 
@@ -46,7 +46,7 @@ module.exports = {
     JSX: true,
     INST: true,
     tinyMCE: true,
-    tinymce: true
+    tinymce: true,
   },
   plugins: [
     'promise',
@@ -59,7 +59,7 @@ module.exports = {
     'react',
     'react-hooks',
     'babel',
-    '@typescript-eslint'
+    '@typescript-eslint',
   ],
   rules: {
     'no-cond-assign': ['error', 'except-parens'],
@@ -100,7 +100,7 @@ module.exports = {
     'jsx-a11y/label-has-for': 'off',
     'jsx-a11y/anchor-is-valid': ['error', {components: []}], // InstUI has special behavior around this
     'promise/always-return': 'off',
-    'promise/catch-or-return': 'warn', // The recommendation is to error on this, but we downgrade it to a warning
+    'promise/catch-or-return': ['warn', {allowFinally: true}], // The recommendation is to error on this, but we downgrade it to a warning
     'promise/avoid-new': 'off',
     'promise/no-nesting': 'off',
     'react/destructuring-assignment': 'off',
@@ -126,46 +126,46 @@ module.exports = {
       {
         object: 'arguments',
         property: 'callee',
-        message: 'arguments.callee is deprecated'
+        message: 'arguments.callee is deprecated',
       },
       {
         object: 'global',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead'
+        message: 'Please use Number.isFinite instead',
       },
       {
         object: 'self',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead'
+        message: 'Please use Number.isFinite instead',
       },
       {
         object: 'window',
         property: 'isFinite',
-        message: 'Please use Number.isFinite instead'
+        message: 'Please use Number.isFinite instead',
       },
       {
         object: 'global',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead'
+        message: 'Please use Number.isNaN instead',
       },
       {
         object: 'self',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead'
+        message: 'Please use Number.isNaN instead',
       },
       {
         object: 'window',
         property: 'isNaN',
-        message: 'Please use Number.isNaN instead'
+        message: 'Please use Number.isNaN instead',
       },
       {
         property: '__defineGetter__',
-        message: 'Please use Object.defineProperty instead.'
+        message: 'Please use Object.defineProperty instead.',
       },
       {
         property: '__defineSetter__',
-        message: 'Please use Object.defineProperty instead.'
-      }
+        message: 'Please use Object.defineProperty instead.',
+      },
     ],
 
     'no-restricted-syntax': [
@@ -174,13 +174,13 @@ module.exports = {
       {
         selector: 'LabeledStatement',
         message:
-          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.'
+          'Labels are a form of GOTO; using them makes code confusing and hard to maintain and understand.',
       },
       {
         selector: 'WithStatement',
         message:
-          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.'
-      }
+          '`with` is disallowed in strict mode because it makes code impossible to predict and optimize.',
+      },
     ],
 
     // These are discouraged, but allowed
@@ -205,8 +205,8 @@ module.exports = {
         templateFile: path.join(__dirname, 'config', 'copyright-template.js'),
         // purposely lenient so we don't automatically put our copyright notice on
         // top of something already copyrighted by someone else.
-        mustMatch: 'Copyright '
-      }
+        mustMatch: 'Copyright ',
+      },
     ],
     'no-unused-expressions': 'off', // the babel version allows optional chaining a?.b
     'babel/no-unused-expressions': ['error', {allowShortCircuit: true, allowTernary: true}],
@@ -224,36 +224,36 @@ module.exports = {
         argsIgnorePattern: '^_',
 
         // allows `const {propIUse, propIDontUseButDontWantToPassOn, ...propsToPassOn} = this.props`
-        ignoreRestSiblings: true
-      }
+        ignoreRestSiblings: true,
+      },
     ],
     semi: 'off',
-    '@typescript-eslint/semi': ['error', 'never']
+    '@typescript-eslint/semi': ['error', 'never'],
   },
   settings: {
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'] // add Typescript extensions
-      }
+        extensions: ['.js', '.jsx', '.json', '.ts', '.tsx', '.d.ts'], // add Typescript extensions
+      },
     },
     react: {
-      version: 'detect'
-    }
+      version: 'detect',
+    },
   },
   overrides: [
     {
       files: require('./jest.config').testMatch,
       plugins: ['jest'],
       env: {
-        'jest/globals': true
+        'jest/globals': true,
       },
       rules: {
         'jest/prefer-to-be-null': 'error',
         'jest/prefer-to-be-undefined': 'error',
         'jest/prefer-to-contain': 'error',
         'jest/no-test-return-statement': 'error',
-        'jest/no-large-snapshots': 'warn'
-      }
+        'jest/no-large-snapshots': 'warn',
+      },
     },
     {
       files: ['ui/**/*', 'spec/**/*', 'public/**/*'],
@@ -268,8 +268,8 @@ module.exports = {
         'import/no-nodejs-modules': 'error',
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
-        'import/no-webpack-loader-syntax': 'off'
-      }
+        'import/no-webpack-loader-syntax': 'off',
+      },
     },
     {
       files: ['jest/**/*'],
@@ -277,21 +277,21 @@ module.exports = {
         'import/extensions': 'off',
         'import/no-commonjs': 'off',
         'import/no-extraneous-dependencies': 'off',
-        'import/order': 'off'
-      }
+        'import/order': 'off',
+      },
     },
     {
       files: [
         'ui/features/quiz_log_auditing/**/*',
         'ui/features/quiz_statistics/**/*',
         'ui/shared/quiz-legacy-client-apps/**/*',
-        'ui/shared/quiz-log-auditing/**/*'
+        'ui/shared/quiz-log-auditing/**/*',
       ],
       rules: {
         'react/prop-types': 'off',
         'prefer-const': 'warn',
-        'react/no-string-refs': 'warn'
-      }
-    }
-  ]
+        'react/no-string-refs': 'warn',
+      },
+    },
+  ],
 }
