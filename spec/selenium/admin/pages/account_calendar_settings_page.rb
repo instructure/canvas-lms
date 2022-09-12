@@ -34,6 +34,13 @@ module AccountCalendarSettingsPage
     "[aria-label = '#{account_name} (#{number_of_subitems})'] button"
   end
 
+  def apply_changes_button_selector
+    "[data-testid='save-button']"
+  end
+
+  def calendars_selected_text_selector
+    "[data-testid='calendars-selected-text']"
+  end
   # ---------------------- Elements ----------------------
 
   def account_calendar_navigation
@@ -48,14 +55,34 @@ module AccountCalendarSettingsPage
     f(account_folder_selector(account_name, number_of_items))
   end
 
+  def apply_changes_button
+    f(apply_changes_button_selector)
+  end
+
+  def calendars_selected_text
+    f(calendars_selected_text_selector)
+  end
+
   # ---------------------- Actions -----------------------
+
+  def account_checked?(checkbox_selector)
+    is_checked(checkbox_selector)
+  end
 
   def click_account_calendar_navigation
     account_calendar_navigation.click
   end
 
+  def click_account_checkbox(checkbox_element)
+    checkbox_element.click
+  end
+
   def click_account_folder(account_name, number_of_subfolders)
     account_folder(account_name, number_of_subfolders).click
+  end
+
+  def click_apply_changes_button
+    apply_changes_button.click
   end
 
   # ---------------------- Methods -----------------------

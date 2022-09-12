@@ -75,4 +75,50 @@ describe "Account Calendar Settings" do
     click_account_folder(account.name, 3)
     expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_truthy
   end
+
+  it "enables the calendar in the list when clicked and applied", ignore_js_errors: true do
+    get("/accounts/#{account.id}/calendar_settings")
+
+    expect(apply_changes_button).to be_disabled
+
+    click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+    expect(apply_changes_button).to be_enabled
+
+    click_apply_changes_button
+    @sub2_account.reload
+    expect(@sub2_account.account_calendar_visible).to be_truthy
+  end
+
+  it "disables the calendar in the list when clicked and applied" do
+    @sub2_account.account_calendar_visible = true
+    @sub2_account.save!
+
+    get("/accounts/#{account.id}/calendar_settings")
+
+    expect(apply_changes_button).to be_disabled
+
+    click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+    expect(apply_changes_button).to be_enabled
+
+    click_apply_changes_button
+
+    @sub2_account.reload
+    expect(@sub2_account.account_calendar_visible).to be_falsey
+  end
+
+  it "shows text at bottom of page with number of calendars selected" do
+    get("/accounts/#{account.id}/calendar_settings")
+
+    expect(calendars_selected_text).to include_text("No account calendars selected")
+
+    click_account_checkbox(account_checkboxes(account.name, 3)[0])
+
+    expect(calendars_selected_text).to include_text("1 Account calendar selected")
+
+    click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+    expect(calendars_selected_text).to include_text("2 Account calendars selected")
+  end
 end
