@@ -193,19 +193,20 @@ export default class UploadMedia extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     this.setBodySize(prevState)
 
-    // If the specified tabs have not changed, don't attempt
-    // to set the selected panel state (this would trigger
-    // and endless loop).
-    if (isEqual(prevProps.tabs, this.props.tabs)) return
-
     const invalidPanelSelected = () =>
       (this.state.selectedPanel === PANELS.COMPUTER && !this.props.tabs.upload) ||
       (this.state.selectedPanel === PANELS.RECORD && !this.props.tabs.record)
 
+    // If the specified tabs have not changed and the selected panel is valid,
+    // don't attempt to set the selected panel state (this would trigger an
+    // endless loop).
+    if (isEqual(prevProps.tabs, this.props.tabs) && !invalidPanelSelected()) return
+
     if (prevState.selectedPanel === -1 || invalidPanelSelected()) {
       // The tabs prop has changed and the selectedPanel was
-      // never set in the constructor. Attempt to infer the
-      // selected panel based on the new tabs list
+      // never set in the constructor, or the selectedPanel is invalid
+      // given the available tabs. Attempt to infer the selected panel
+      // based on the new tabs list
       this.setState({selectedPanel: this.inferSelectedPanel(this.props.tabs)})
     }
   }
@@ -244,7 +245,11 @@ export default class UploadMedia extends React.Component {
       <Tabs
         maxWidth="large"
         onRequestTabChange={(_, {index}) => {
-          this.setState({selectedPanel: index})
+          const {tabs} = this.props
+          // You can only change tabs if more than one tab is available
+          if (tabs.upload && tabs.record) {
+            this.setState({selectedPanel: index})
+          }
         }}
       >
         {this.props.tabs.upload && (
@@ -296,7 +301,7 @@ export default class UploadMedia extends React.Component {
   onModalClose = () => {
     this.setState({
       hasUploadedFile: false,
-      selectedPanel: 0,
+      selectedPanel: this.inferSelectedPanel(this.props.tabs),
       computerFile: null
     })
     this.props.onDismiss()
