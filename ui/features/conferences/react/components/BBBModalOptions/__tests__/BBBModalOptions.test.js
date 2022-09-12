@@ -139,7 +139,7 @@ describe('BBBModalOptions', () => {
     expect(container.getByLabelText('Enable recording for this conference').disabled).toBeTruthy()
   })
 
-  it('should lock inviteAll equal to true if add_to_calendar is checked', () => {
+  it('should lock Invitation Options & set inviteAll equal to true if add_to_calendar is checked', () => {
     const customProps = defaultProps
     customProps.options.push('add_to_calendar')
     customProps.addToCalendar = true
@@ -147,7 +147,17 @@ describe('BBBModalOptions', () => {
     const container = setup({...customProps, tab: ATTENDEES_TAB})
     expect(container.getByLabelText('Invite all course members').checked).toBeTruthy()
     expect(container.getByLabelText('Invite all course members').disabled).toBeTruthy()
+    expect(container.getByLabelText('Remove all course observer members').disabled).toBeTruthy()
+    expect(container.getByLabelText('Remove all course observer members').checked).toBeFalsy()
     expect(container.getAllByTestId('inviteAll-tooltip')).toBeTruthy()
+  })
+
+  it('should lock Remove Observers if Invite All is not checked', () => {
+    const customProps = defaultProps
+    customProps.invitationOption = []
+
+    const container = setup({...customProps, tab: ATTENDEES_TAB})
+    expect(container.getByLabelText('Remove all course observer members').disabled).toBeTruthy()
   })
 
   it('does not show add to calendar when context is group', () => {
