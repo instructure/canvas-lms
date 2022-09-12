@@ -371,6 +371,290 @@ describe OutcomeResultsController do
       expect(json["linked"]["outcomes"][0]["ratings"].map { |r| r["percent"] }).to eq [50, 50]
     end
 
+    context "with outcome_service_results_to_canvas FF" do
+      let(:time) { Time.zone.now }
+
+      def mock_os_lor_results(user, outcome, assignment, score, args = {})
+        title = "#{user.name}, #{assignment.name}"
+        mastery = (score || 0) >= outcome.mastery_points
+        submitted_at = args[:submitted_at] || time
+        submission = Submission.find_by(user_id: user.id, assignment_id: assignment.id)
+        alignment = ContentTag.create!(
+          {
+            title: "content",
+            context: outcome_course,
+            learning_outcome: outcome,
+            content_type: "Assignment",
+            content_id: assignment.id
+          }
+        )
+        lor = LearningOutcomeResult.new(
+          learning_outcome: outcome,
+          user: user,
+          context: outcome_course,
+          alignment: alignment,
+          artifact: submission,
+          associated_asset: assignment,
+          title: title,
+          score: score,
+          possible: outcome.points_possible,
+          mastery: mastery,
+          created_at: submitted_at,
+          updated_at: submitted_at,
+          submitted_at: submitted_at,
+          assessed_at: submitted_at
+        )
+        if args[:include_rubric]
+          lor.association_type = "RubricAssociation"
+          lor.association_id = outcome_rubric.id
+        end
+        lor
+      end
+
+      context "user_rollups" do
+        it "disabled - only display rollups for canvas" do
+          @course.disable_feature!(:outcome_service_results_to_canvas)
+          create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+          expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+          json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
+          expect(json["rollups"].length).to be 1
+        end
+
+        context "enabled" do
+          before do
+            @course.enable_feature!(:outcome_service_results_to_canvas)
+          end
+
+          it "no OS results found - display canvas rollups only" do
+            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 1, page: 1))
+            expect(json["rollups"].length).to be 1
+          end
+
+          it "OS results found - no Canvas results - displays only OS rollups" do
+            # removing LearningOutcomeResults for those users that have results
+            # creating in the first before do after the rollups context
+            LearningOutcomeResult.where(user_id: @student.id).update(workflow_state: "deleted")
+            LearningOutcomeResult.where(user_id: @student1.id).update(workflow_state: "deleted")
+            LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
+            student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+            mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              [mocked_results]
+            )
+            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 5, page: 1))
+            # will be 4 because the exclude: "missing_user_results" parameter is not included
+            # in the rollups call
+            expect(json["rollups"].length).to be 4
+            # need to loop through each rollup to make sure there is only 1 rollup with scores
+            score_count = 0
+            json["rollups"].each do |r|
+              score_count += 1 unless r["scores"].empty?
+            end
+            expect(score_count).to be 1
+          end
+
+          it "OS results found - display both Canvas and OS rollups" do
+            # already existing results for @student1 & @student2
+            # creating result for @student
+            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+            # results are already created for @student2 in Canvas
+            student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+            mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              [mocked_results]
+            )
+            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc", per_page: 5, page: 1))
+            expect(json["rollups"].length).to be 4
+          end
+        end
+
+        context "aggregate_user_rollups" do
+          it "disabled - only display rollups for canvas" do
+            @course.disable_feature!(:outcome_service_results_to_canvas)
+            # already existing results for @student1 & @student2
+            # creating result for @student
+            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
+            expect(json["rollups"].length).to be 1
+            expect(json["rollups"][0]["scores"][0]["count"]).to be 3
+          end
+
+          context "enabled" do
+            before do
+              @course.enable_feature!(:outcome_service_results_to_canvas)
+            end
+
+            it "no OS results found - display canvas rollups only" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+              json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 1
+              expect(json["rollups"][0]["scores"][0]["count"]).to be 3
+            end
+
+            it "OS results found - no Canvas results - displays only OS rollups" do
+              # removing LearningOutcomeResults for users that have results (@student1, @student, @student2)
+              # creating in the first before do after the rollups context
+              LearningOutcomeResult.where(user_id: @student.id).update(workflow_state: "deleted")
+              LearningOutcomeResult.where(user_id: @student1.id).update(workflow_state: "deleted")
+              LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 1
+              expect(json["rollups"][0]["scores"][0]["count"]).to be 1
+            end
+
+            it "OS results found - display both Canvas and OS rollups" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              # results are already created for @student2 in Canvas
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+                [mocked_results]
+              )
+              json = parse_response(get_rollups(aggregate: "course", aggregate_stat: "mean", per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 1
+              expect(json["rollups"][0]["scores"][0]["count"]).to be 4
+            end
+          end
+        end
+
+        context "remove_users_with_no_results" do
+          it "disabled - only display rollups for canvas" do
+            @course.disable_feature!(:outcome_service_results_to_canvas)
+            # already existing results for @student1 & @student2
+            # creating result for @student
+            create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(nil)
+            json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                              exclude: ["missing_user_rollups"],
+                                              per_page: 5, page: 1))
+            expect(json["rollups"].length).to be 3
+          end
+
+          context "enabled" do
+            before do
+              @course.enable_feature!(:outcome_service_results_to_canvas)
+            end
+
+            it "no OS results found - display canvas rollups only" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(nil)
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 3
+            end
+
+            it "OS results found - no Canvas results - display only OS results" do
+              # removing LearningOutcomeResults for those users that have results
+              # creating in the first before do after the rollups context
+              LearningOutcomeResult.where(user_id: @student.id).update(workflow_state: "deleted")
+              LearningOutcomeResult.where(user_id: @student1.id).update(workflow_state: "deleted")
+              LearningOutcomeResult.where(user_id: @student2.id).update(workflow_state: "deleted")
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+                [mocked_results]
+              )
+              # per_page is the number of students to display on 1 page of results
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 1
+            end
+
+            it "OS results found - display both Canvas and OS rollups" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              # results are already created for @student2 in Canvas
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+                [mocked_results]
+              )
+              # per_page is the number of students to display on 1 page of results
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 4
+            end
+
+            it "removes student with no results" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              # results are already created for @student2 in Canvas
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              # Creating another student in the course which will make 5 students enrolled
+              # and will not create results for this student
+              student_in_course(active_all: true, course: outcome_course)
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).twice.and_return(
+                [mocked_results]
+              )
+              # per_page is the number of students to display on 1 page of results
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["missing_user_rollups"],
+                                                per_page: 5, page: 1))
+              # the rollups should be for only the 4 that have results
+              expect(json["rollups"].length).to be 4
+            end
+
+            it "removes concluded student" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              # creating and enrolling student 4 in the course
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+                [mocked_results]
+              )
+              # concluding student 3 in the course which will remove the student from the results
+              StudentEnrollment.find_by(user_id: @student3.id).conclude
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["concluded_enrollments"],
+                                                per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 3
+            end
+
+            it "removes inactive student" do
+              # already existing results for @student1 & @student2
+              # creating result for @student
+              create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
+              # creating and enrolling student 4 in the course
+              student4 = student_in_course(active_all: true, course: outcome_course, name: "OS user").user
+              mocked_results = mock_os_lor_results(student4, @outcome, outcome_assignment, 2)
+              expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+                [mocked_results]
+              )
+              # deactivating student 3 in the course which will remove the student from the results
+              StudentEnrollment.find_by(user_id: @student3.id).deactivate
+              json = parse_response(get_rollups(sort_by: "student", sort_order: "desc",
+                                                exclude: ["inactive_enrollments"],
+                                                per_page: 5, page: 1))
+              expect(json["rollups"].length).to be 3
+            end
+          end
+        end
+      end
+    end
+
     context "with the account_mastery_scales FF" do
       context "enabled" do
         before do
@@ -445,7 +729,7 @@ describe OutcomeResultsController do
           @course.root_account.enable_feature!(:improved_outcomes_management)
         end
 
-        it "returns outcomes with friendlly_description" do
+        it "returns outcomes with friendly_description" do
           create_result(@student.id, @outcome, outcome_assignment, 2, { possible: 5 })
           json = parse_response(get_rollups(include: ["outcomes"]))
           expect(json["linked"]["outcomes"][0]["friendly_description"]).to eq "A friendly description"

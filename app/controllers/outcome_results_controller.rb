@@ -232,15 +232,28 @@ class OutcomeResultsController < ApplicationController
   #    {
   #      outcome_results: [OutcomeResult]
   #    }
+  # used in sLMGB
   def index
     include_hidden_value = value_to_boolean(params[:include_hidden])
     @results = find_results(
       include_hidden: include_hidden_value
     )
-    @outcome_service_results_rollups = find_outcomes_service_results(
-      include_hidden: include_hidden_value
-    )
-
+    # used in sLMGB.
+    # TODO: implement OS results back in OUT-5297
+    # @outcome_service_results = find_outcomes_service_results(
+    #   include_hidden: include_hidden_value
+    # )
+    # linked_include_collections needs to be updated to include
+    # aligned assessed assignments.  See OUT-5298
+    # json = nil
+    # if @outcome_service_results.nil?
+    #   @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
+    #   json = outcome_results_json(@results)
+    # else
+    #   @outcome_service_results.push(@results).flatten!
+    #   @outcome_service_results = Api.paginate(@outcome_service_results, self, api_v1_course_outcome_results_url)
+    #   json = outcome_results_json(@outcome_service_results)
+    # end
     @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
     json = outcome_results_json(@results)
     json[:linked] = linked_include_collections if params[:include].present?
@@ -371,13 +384,20 @@ class OutcomeResultsController < ApplicationController
     )
   end
 
+  # used in sLMGB/LMGB
   def user_rollups(opts = {})
     excludes = Api.value_to_array(params[:exclude]).uniq
     filter_users_by_excludes
 
     @results = find_results(opts).preload(:user)
-    @outcome_service_results_rollups = find_outcomes_service_results(opts)
-    outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+    ActiveRecord::Associations.preload(@results, :learning_outcome)
+    @outcome_service_results = find_outcomes_service_results(opts)
+    if @outcome_service_results.nil?
+      outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+    else
+      @outcome_service_results.push(@results).flatten!
+      outcome_results_rollups(results: @outcome_service_results, users: @users, excludes: excludes, context: @context)
+    end
   end
 
   def filter_users_by_excludes(aggregate = false)
@@ -400,14 +420,21 @@ class OutcomeResultsController < ApplicationController
     @users = @users.reject { |u| u.enrollments.all? { |e| filters.include? e.workflow_state } }
   end
 
+  # used in LMGB
   # For merge & after performance testing
   # Flagging potential issue - no reason to pull all the results for finding users
   # why not send the already pulled results to the definition and use that to filter
   def remove_users_with_no_results
     userids_with_results = find_results.pluck(:user_id).uniq
-    @outcome_service_results_rollups = find_outcomes_service_results
+    os_userids_with_results = find_outcomes_service_results
 
-    @users = @users.select { |u| userids_with_results.include? u.id }
+    if os_userids_with_results.nil?
+      @users = @users.select { |u| userids_with_results.include? u.id }
+    else
+      os_userids_with_results = os_userids_with_results.pluck(:user_id).uniq
+      os_userids_with_results.push(userids_with_results).flatten!
+      @users = @users.select { |u| os_userids_with_results.include? u.id }
+    end
   end
 
   def current_user_enrollments
@@ -469,14 +496,22 @@ class OutcomeResultsController < ApplicationController
     json
   end
 
+  # used in LMGB
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
     filter_users_by_excludes(true)
     @results = find_results(all_users: false).preload(:user)
-    @outcome_service_results = find_outcomes_service_results(all_users: false)
+    ActiveRecord::Associations.preload(@results, :learning_outcome)
 
-    aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
+    @outcome_service_results = find_outcomes_service_results(all_users: false)
+    aggregate_rollups = nil
+    if @outcome_service_results.nil?
+      aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
+    else
+      @outcome_service_results.push(@results).flatten!
+      aggregate_rollups = [aggregate_outcome_results_rollup(@outcome_service_results, @context, params[:aggregate_stat])]
+    end
     aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
   end
