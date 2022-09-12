@@ -4130,32 +4130,18 @@ class Course < ActiveRecord::Base
     available? && valid_workflow_states.include?(workflow_state_before_last_save)
   end
 
-  def unpublishing?
-    workflow_state_before_last_save == "available" && workflow_state == "claimed"
-  end
-
   def log_course_pacing_publish_update
-    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
-
     if publishing?
+      statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
       InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
-    end
-
-    if unpublishing?
-      InstStatsd::Statsd.decrement("course.#{statsd_bucket}.paced_courses")
     end
   end
 
   def log_course_format_publish_update
-    statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
-    course_format_value = course_format.nil? ? "unset" : course_format
-
     if publishing?
+      statsd_bucket = enable_course_paces? ? "paced" : "unpaced"
+      course_format_value = course_format.nil? ? "unset" : course_format
       InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{course_format_value}")
-    end
-
-    if unpublishing?
-      InstStatsd::Statsd.decrement("course.#{statsd_bucket}.#{course_format_value}")
     end
   end
 
@@ -4212,10 +4198,9 @@ class Course < ActiveRecord::Base
     setting_changes = saved_changes[:settings]
     new_enable_paces_setting = setting_changes[1][:enable_course_paces]
 
-    statsd_bucket_list = new_enable_paces_setting ? %w[paced unpaced] : %w[unpaced paced]
+    statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
 
-    InstStatsd::Statsd.increment("course.#{statsd_bucket_list[0]}.paced_courses")
-    InstStatsd::Statsd.decrement("course.#{statsd_bucket_list[1]}.paced_courses")
+    InstStatsd::Statsd.increment("course.#{statsd_bucket}.paced_courses")
 
     log_course_format_update unless @course_format_change
   end
@@ -4224,17 +4209,9 @@ class Course < ActiveRecord::Base
     setting_changes = saved_changes[:settings]
     new_enable_paces_setting = setting_changes[1][:enable_course_paces]
 
-    old_stats_course_format = setting_changes[0][:course_format].nil? ? "unset" : setting_changes[0][:course_format]
     new_stats_course_format = setting_changes[1][:course_format].nil? ? "unset" : setting_changes[1][:course_format]
 
-    if @enable_paces_change
-      statsd_bucket_list = new_enable_paces_setting ? %w[paced unpaced] : %w[unpaced paced]
-      InstStatsd::Statsd.decrement("course.#{statsd_bucket_list[1]}.#{old_stats_course_format}")
-      InstStatsd::Statsd.increment("course.#{statsd_bucket_list[0]}.#{new_stats_course_format}")
-    else
-      statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
-      InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{new_stats_course_format}")
-      InstStatsd::Statsd.decrement("course.#{statsd_bucket}.#{old_stats_course_format}")
-    end
+    statsd_bucket = new_enable_paces_setting ? "paced" : "unpaced"
+    InstStatsd::Statsd.increment("course.#{statsd_bucket}.#{new_stats_course_format}")
   end
 end
