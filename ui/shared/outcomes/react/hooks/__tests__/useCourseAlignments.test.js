@@ -57,7 +57,7 @@ describe('useCourseAlignments', () => {
             }
           }
         }}
-        f
+        f={true}
       >
         {children}
       </OutcomesContext.Provider>
@@ -129,18 +129,63 @@ describe('useCourseAlignments', () => {
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
   })
 
-  it("should flash an error message and return the error when coudn't load outcomes", async () => {
-    mocks = courseAlignmentMocks({groupId: '2'})
-    const {result} = renderHook(() => useCourseAlignments(), {
-      wrapper
+  describe('should call showFlashAlert', () => {
+    it("and return the error when coudn't load outcomes", async () => {
+      mocks = courseAlignmentMocks({groupId: '2'})
+      const {result} = renderHook(() => useCourseAlignments(), {
+        wrapper
+      })
+
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'An error occurred while loading outcome alignments.',
+        type: 'error'
+      })
+      expect(result.current.error).not.toBe(null)
     })
 
-    await act(async () => jest.runAllTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while loading outcome alignments.',
-      type: 'error'
+    it('when search returns results', async () => {
+      mocks = searchMocks
+      const hook = renderHook(() => useCourseAlignments(), {
+        wrapper
+      })
+      hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'Showing Search Results Below',
+        type: 'info',
+        srOnly: true
+      })
     })
-    expect(result.current.error).not.toBe(null)
+
+    it('when more outcomes are loaded', async () => {
+      mocks = searchMocks
+      const hook = renderHook(() => useCourseAlignments(), {wrapper})
+
+      hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
+      await act(async () => jest.runAllTimers())
+      act(() => hook.result.current.loadMore())
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'More Search Results Have Been Loaded',
+        type: 'info',
+        srOnly: true
+      })
+    })
+
+    it('when search returns zero results', async () => {
+      mocks = courseAlignmentMocks({numOfOutcomes: 0, searchQuery: 'TEST'})
+      const hook = renderHook(() => useCourseAlignments(), {
+        wrapper
+      })
+      hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
+      await act(async () => jest.runAllTimers())
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'No Search Results Found',
+        type: 'info',
+        srOnly: true
+      })
+    })
   })
 
   it('should load outcomes if no search string or if search string > 2', async () => {

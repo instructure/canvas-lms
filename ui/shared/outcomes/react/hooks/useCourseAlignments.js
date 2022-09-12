@@ -29,6 +29,7 @@ const I18n = useI18nScope('AlignmentSummary')
 const useCourseAlignments = () => {
   const {contextType, contextId, rootOutcomeGroup} = useCanvasContext()
   const [searchFilter, setSearchFilter] = useState('ALL_OUTCOMES')
+  const [lastSearch, setLastSearch] = useState(null)
   const {search: searchString, onChangeHandler, onClearHandler} = useSearch()
 
   // Don't trigger search if search string < 3 chars
@@ -61,6 +62,28 @@ const useCourseAlignments = () => {
       })
     }
   }, [error])
+
+  useEffect(() => {
+    if (!loading && !error) {
+      const isSameSearch = searchString === lastSearch
+      let screenreaderText = I18n.t('No Search Results Found')
+      if (data?.group?.outcomes?.edges?.length > 0) {
+        screenreaderText = searchString
+          ? isSameSearch
+            ? I18n.t('More Search Results Have Been Loaded')
+            : I18n.t('Showing Search Results Below')
+          : isSameSearch
+          ? I18n.t('More Outcomes Have Been Loaded')
+          : ''
+      }
+      showFlashAlert({
+        message: screenreaderText,
+        type: 'info',
+        srOnly: true
+      })
+      setLastSearch(searchString)
+    }
+  }, [data]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadMore = () => {
     if (!loading) {
