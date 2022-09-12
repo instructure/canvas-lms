@@ -26,7 +26,13 @@ import {ResetControls} from './ResetControls'
 
 export const Controls = ({settings, dispatch}) => {
   return (
-    <Flex id="imageCropperControls" direction="row" margin="x-small" alignItems="start">
+    <Flex
+      id="imageCropperControls"
+      direction="row"
+      margin="x-small"
+      alignItems="start"
+      role="group"
+    >
       <ShapeControls
         shape={settings.shape}
         onChange={shape => dispatch({type: actions.SET_SHAPE, payload: shape})}

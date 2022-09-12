@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconRotateLeftLine, IconRotateRightLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {CustomNumberInput} from './CustomNumberInput'
 import {calculateRotation, getNearestRectAngle} from './utils'
 import {BUTTON_ROTATION_DEGREES} from '../constants'
@@ -48,8 +49,8 @@ export const RotationControls = ({rotation, onChange}) => {
     onChange(calculateRotation(getNearestRectAngle(rotation, false) + BUTTON_ROTATION_DEGREES))
 
   return (
-    <>
-      <Flex.Item margin="0 small 0 0">
+    <Flex.Item margin="0 medium 0 0" title={formatMessage('Rotation')} role="toolbar" tabindex="-1">
+      <View display="inline-block" margin="0 small 0 0">
         <CustomNumberInput
           value={rotation}
           parseValueCallback={parseRotationText}
@@ -58,24 +59,21 @@ export const RotationControls = ({rotation, onChange}) => {
           placeholder={formatMessage('Rotation')}
           onChange={value => onChange(value)}
         />
-      </Flex.Item>
-      <Flex.Item margin="0 small 0 0">
-        <IconButton
-          onClick={rotateLeftCallback}
-          screenReaderLabel={formatMessage('Rotate image -90 degrees')}
-        >
-          <IconRotateLeftLine />
-        </IconButton>
-      </Flex.Item>
-      <Flex.Item margin="0 medium 0 0">
-        <IconButton
-          onClick={rotateRightCallback}
-          screenReaderLabel={formatMessage('Rotate image 90 degrees')}
-        >
-          <IconRotateRightLine />
-        </IconButton>
-      </Flex.Item>
-    </>
+      </View>
+      <IconButton
+        margin="0 small 0 0"
+        onClick={rotateLeftCallback}
+        screenReaderLabel={formatMessage('Rotate image -90 degrees')}
+      >
+        <IconRotateLeftLine />
+      </IconButton>
+      <IconButton
+        onClick={rotateRightCallback}
+        screenReaderLabel={formatMessage('Rotate image 90 degrees')}
+      >
+        <IconRotateRightLine />
+      </IconButton>
+    </Flex.Item>
   )
 }
 

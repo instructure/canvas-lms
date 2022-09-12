@@ -20,6 +20,7 @@ import React from 'react'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconZoomInLine, IconZoomOutLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
 import {calculateScaleRatio, calculateScalePercentage} from './utils'
 import round from '../../../../utils/round'
 import {MAX_SCALE_RATIO, MIN_SCALE_RATIO, BUTTON_SCALE_STEP} from '../constants'
@@ -68,8 +69,8 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
   }
 
   return (
-    <>
-      <Flex.Item margin="0 small 0 0">
+    <Flex.Item title={formatMessage('Zoom')} role="toolbar" tabindex="-1">
+      <View display="inline-block" margin="0 small 0 0">
         <CustomNumberInput
           value={round(scaleRatio * 100)}
           parseValueCallback={parseZoomText}
@@ -78,27 +79,24 @@ export const ZoomControls = ({scaleRatio, onChange}) => {
           placeholder={formatMessage('Zoom')}
           onChange={value => onZoomChange(round(value / 100))}
         />
-      </Flex.Item>
-      <Flex.Item margin="0 small 0 0">
-        <IconButton
-          onClick={zoomOutCallback}
-          interaction={scaleRatio > MIN_SCALE_RATIO ? 'enabled' : 'disabled'}
-          screenReaderLabel={formatMessage('Zoom out image')}
-        >
-          <IconZoomOutLine />
-        </IconButton>
-      </Flex.Item>
-      <Flex.Item>
-        <IconButton
-          data-testid="zoom-in-button"
-          onClick={zoomInCallback}
-          interaction={scaleRatio < MAX_SCALE_RATIO ? 'enabled' : 'disabled'}
-          screenReaderLabel={formatMessage('Zoom in image')}
-        >
-          <IconZoomInLine />
-        </IconButton>
-      </Flex.Item>
-    </>
+      </View>
+      <IconButton
+        margin="0 small 0 0"
+        onClick={zoomOutCallback}
+        interaction={scaleRatio > MIN_SCALE_RATIO ? 'enabled' : 'disabled'}
+        screenReaderLabel={formatMessage('Zoom out image')}
+      >
+        <IconZoomOutLine />
+      </IconButton>
+      <IconButton
+        data-testid="zoom-in-button"
+        onClick={zoomInCallback}
+        interaction={scaleRatio < MAX_SCALE_RATIO ? 'enabled' : 'disabled'}
+        screenReaderLabel={formatMessage('Zoom in image')}
+      >
+        <IconZoomInLine />
+      </IconButton>
+    </Flex.Item>
   )
 }
 
