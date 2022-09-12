@@ -57,7 +57,7 @@ export const Footer: React.FC<ComponentProps> = ({
   return (
     <Flex alignItems="center" justifyItems="end">
       {initialEnabledCalendarsCount !== undefined && (
-        <Text>
+        <Text data-testid="calendars-selected-text">
           {I18n.t(
             {
               zero: 'No account calendars selected',
