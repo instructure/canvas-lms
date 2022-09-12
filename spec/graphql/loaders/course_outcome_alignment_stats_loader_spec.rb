@@ -19,60 +19,178 @@
 #
 
 describe Loaders::CourseOutcomeAlignmentStatsLoader do
-  before :once do
-    outcome_alignment_stats_model
-    @course.account.enable_feature!(:outcome_alignment_summary)
-  end
+  context "with only direct alignments" do
+    before :once do
+      outcome_alignment_stats_model
+      @course.account.enable_feature!(:outcome_alignment_summary)
+    end
 
-  it "returns nil if course is invalid" do
-    GraphQL::Batch.batch do
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(nil).then do |alignment_stats|
-        expect(alignment_stats).to be_nil
+    it "returns nil if course is invalid" do
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(nil).then do |alignment_stats|
+          expect(alignment_stats).to be_nil
+        end
       end
     end
-  end
 
-  it "returns nil if outcome alignment summary FF is disabled" do
-    @course.account.disable_feature!(:outcome_alignment_summary)
+    it "returns nil if outcome alignment summary FF is disabled" do
+      @course.account.disable_feature!(:outcome_alignment_summary)
 
-    GraphQL::Batch.batch do
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |alignment_stats|
-        expect(alignment_stats).to be_nil
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |alignment_stats|
+          expect(alignment_stats).to be_nil
+        end
       end
     end
-  end
 
-  it "returns outcome alignment stats" do
-    GraphQL::Batch.batch do
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
-        expect(stats).not_to be_nil
-        expect(stats[:total_outcomes]).to eq 2
-        expect(stats[:aligned_outcomes]).to eq 1
-        expect(stats[:total_alignments]).to eq 3
-        expect(stats[:total_artifacts]).to eq 4
-        expect(stats[:aligned_artifacts]).to eq 2
-        expect(stats[:artifact_alignments]).to eq 2
-      end
-    end
-  end
-
-  context "when an outcome is aligned to a question bank" do
-    before do
-      assessment_question_bank_with_questions
-      @outcome3 = outcome_model(context: @course, title: "outcome 3 - aligned to question bank")
-      @outcome3.align(@bank, @bank.context)
-    end
-
-    it "returns correct outcome alignment stats" do
+    it "returns outcome alignment stats" do
       GraphQL::Batch.batch do
         Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
           expect(stats).not_to be_nil
-          expect(stats[:total_outcomes]).to eq 3
-          expect(stats[:aligned_outcomes]).to eq 2
-          expect(stats[:total_alignments]).to eq 4
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 3
           expect(stats[:total_artifacts]).to eq 4
           expect(stats[:aligned_artifacts]).to eq 2
           expect(stats[:artifact_alignments]).to eq 2
+        end
+      end
+    end
+  end
+
+  context "returns stats with indirect alignments" do
+    before do
+      course_model
+      @teacher = User.create!
+      @course.enroll_teacher(@teacher, enrollment_state: "active")
+      @course.account.enable_feature!(:outcome_alignment_summary)
+
+      assessment_question_bank_with_questions
+      @outcome = outcome_model(context: @course, title: "outcome - aligned to question bank")
+      @outcome.align(@bank, @bank.context)
+
+      @quiz_item = assignment_quiz([], { course: @course })
+      @quiz_assignment = @assignment
+
+      @association_params = {
+        hide_score_total: "0",
+        purpose: "grading",
+        skip_updating_points_possible: false,
+        update_if_existing: true,
+        use_for_grading: "1",
+        association_object: @quiz_assignment
+      }
+    end
+
+    it "when a quiz uses a question from the question bank" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's)
+      # artifact alignments = 1 (q1 from quiz aligned to out through bank)
+      @quiz.add_assessment_questions [@q1]
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 1
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 11
+          expect(stats[:total_artifacts]).to eq 1
+          expect(stats[:aligned_artifacts]).to eq 1
+          expect(stats[:artifact_alignments]).to eq 1
+        end
+      end
+    end
+
+    it "when a rubric is aligned to a quiz and the quiz uses questions from the question bank" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's) + 1 (out to rubric) + 1 (out to quiz via rubric)
+      # artifact alignments = 1 (q1 from quiz aligned to out through bank) + 1 (quiz aligned to out through rubric)
+      outcome_with_rubric({ outcome: @outcome })
+      RubricAssociation.generate(@teacher, @rubric, @course, @association_params)
+      @quiz.add_assessment_questions [@q1]
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 1
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 13
+          expect(stats[:total_artifacts]).to eq 1
+          expect(stats[:aligned_artifacts]).to eq 1
+          expect(stats[:artifact_alignments]).to eq 2
+        end
+      end
+    end
+
+    it "when an outcome is aligned to a rubric and assignment" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's) + 1 (out2 to rubric) + 1 (out2 to quiz via rubric) + 1 (out2 to assignment)
+      # artifact alignments = 1 (out2 to assignment) + 1 (quiz aligned to out2 through rubric)
+      @outcome2 = outcome_model(context: @course, title: "outcome 2 - aligned to rubric and assignment 2")
+      outcome_with_rubric({ outcome: @outcome2 })
+      RubricAssociation.generate(@teacher, @rubric, @course, @association_params)
+      @assignment = Assignment.create!(course: @course)
+      @outcome2.align(@assignment, @course)
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 2
+          expect(stats[:total_alignments]).to eq 14
+          expect(stats[:total_artifacts]).to eq 2
+          expect(stats[:aligned_artifacts]).to eq 2
+          expect(stats[:artifact_alignments]).to eq 2
+        end
+      end
+    end
+
+    it "when a quiz uses multiple questions from a question bank and there is an unaligned outcome and artifact" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's)
+      # artifact alignments = 3 (q1, q2, and q3 from quiz aligned to out through bank)
+      @outcome2 = outcome_model(context: @course, title: "outcome 2 - not aligned")
+      Assignment.create!(course: @course)
+      @quiz.add_assessment_questions [@q1, @q2, @q3]
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 2
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 11
+          expect(stats[:total_artifacts]).to eq 2
+          expect(stats[:aligned_artifacts]).to eq 1
+          expect(stats[:artifact_alignments]).to eq 3
+        end
+      end
+    end
+
+    it "doesn't include aligned questions that were removed from the quiz" do
+      # total alignments = 1 (out to bank) + 10 (out to bank with 10 q's)
+      # artifact alignments = 1 (q1 from quiz aligned to out through bank)
+      @quiz.add_assessment_questions [@q1, @q2]
+      @quiz.quiz_questions.last.destroy!
+      @quiz.save!
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 1
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 11
+          expect(stats[:total_artifacts]).to eq 1
+          expect(stats[:aligned_artifacts]).to eq 1
+          expect(stats[:artifact_alignments]).to eq 1
+        end
+      end
+    end
+
+    it "doesn't include questions that were removed from the question bank" do
+      # total alignments = 1 (out to bank) + 9 (out to bank with 9 q's)
+      # artifact alignments = 1 (q1 from quiz aligned to out through bank)
+      @bank.assessment_questions.last.destroy!
+      @bank.save!
+      GraphQL::Batch.batch do
+        Loaders::CourseOutcomeAlignmentStatsLoader.load(@course).then do |stats|
+          expect(stats).not_to be_nil
+          expect(stats[:total_outcomes]).to eq 1
+          expect(stats[:aligned_outcomes]).to eq 1
+          expect(stats[:total_alignments]).to eq 10
+          expect(stats[:total_artifacts]).to eq 1
+          expect(stats[:aligned_artifacts]).to eq 0
+          expect(stats[:artifact_alignments]).to eq 0
         end
       end
     end
