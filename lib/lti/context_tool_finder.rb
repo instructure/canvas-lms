@@ -19,7 +19,8 @@
 #
 
 # Class concerned with finding available ContextExternalTools for a particular
-# context, with other possible options.
+# context, with other possible options. Looks in the context and parents, which
+# may include a federated parent, so tools may be on another shard.
 module Lti
   class ContextToolFinder
     attr_reader :context, :options
@@ -29,29 +30,44 @@ module Lti
       @options = options
     end
 
-    # Temporary shim functions until we can switch away from them
+    def self.all_tools_scope_union(*args)
+      Lti::ScopeUnion.new(new(*args).send(:scopes))
+    end
+
+    # TEMPORARY shim function until we can switch away from it.
+    # Returns a scope, only on the context's shard, so doesn't look at
+    # the context's root account's federated parent account
     def self.all_tools_for(*args)
       new(*args).single_shard_scope
     end
 
+    # TEMPORARY shim function until we can switch away from it
     def single_shard_scope
+      scopes.first
+    end
+
+    private
+
+    def scopes
       placements = * options[:placements] || options[:type]
       contexts = []
       if options[:user]
         contexts << options[:user]
       end
-      contexts.concat ContextExternalTool.contexts_to_search(context)
-      return nil if contexts.empty?
+      contexts.concat ContextExternalTool.contexts_to_search(context, include_federated_parent: true)
 
-      context.shard.activate do
-        scope = ContextExternalTool.shard(context.shard).where(context: contexts).active
+      return [] if contexts.empty?
+
+      Shard.partition_by_shard(contexts) do |contexts_by_shard|
+        scope = ContextExternalTool.where(context: contexts_by_shard).active
         scope = scope.placements(*placements)
         scope = scope.selectable if Canvas::Plugin.value_to_boolean(options[:selectable])
         scope = scope.where(tool_id: options[:tool_ids]) if options[:tool_ids].present?
         if Canvas::Plugin.value_to_boolean(options[:only_visible])
           scope = scope.visible(options[:current_user], context, options[:session], options[:visibility_placements], scope)
         end
-        scope.order(ContextExternalTool.best_unicode_collation_key("context_external_tools.name")).order(Arel.sql("context_external_tools.id"))
+        scope = scope.order(ContextExternalTool.best_unicode_collation_key("context_external_tools.name")).order(Arel.sql("context_external_tools.id"))
+        [scope] # partition_by_shard expects an array
       end
     end
   end

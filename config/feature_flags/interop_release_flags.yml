@@ -97,3 +97,10 @@ ags_scores_file_error_improvements:
     refrain from saving any data or making any changes to submissions based on the request data,
     letting tools retry these requests more easily.
   applies_to: RootAccount
+lti_tools_from_federated_parents:
+  state: hidden
+  display_name: Show LTI tools from federated parent accounts
+  description: |-
+    If enabled, LTI tools installed in federated parent accounts will be
+    available / visible in child accounts.
+  applies_to: SiteAdmin

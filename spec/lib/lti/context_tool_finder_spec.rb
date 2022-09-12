@@ -25,11 +25,7 @@ describe Lti::ContextToolFinder do
     course_model(account: @account)
   end
 
-  describe "all_tools_for" do
-    it "returns a scope" do
-      expect(Lti::ContextToolFinder.all_tools_for(@course)).to be_a(ActiveRecord::Relation)
-    end
-
+  shared_examples_for "a method creating a scope for all tools for a context" do
     it "retrieves all tools in alphabetical order" do
       @tools = []
       @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
@@ -38,7 +34,7 @@ describe Lti::ContextToolFinder do
       @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
       @tools << @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tools << @account.context_external_tools.create!(name: "c", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      expect(Lti::ContextToolFinder.all_tools_for(@course).to_a).to eql(@tools.sort_by(&:name))
+      expect(method_returning_scope.call(@course).to_a).to eql(@tools.sort_by(&:name))
     end
 
     it "returns all tools that are selectable" do
@@ -47,7 +43,7 @@ describe Lti::ContextToolFinder do
       @tools << @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
       @tools << @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
       @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
-      tools = Lti::ContextToolFinder.all_tools_for(@course, selectable: true)
+      tools = method_returning_scope.call(@course, selectable: true)
       expect(tools.count).to eq 2
     end
 
@@ -60,7 +56,7 @@ describe Lti::ContextToolFinder do
       tool3.settings[:resource_selection] = { url: "http://www.example.com", icon_url: "http://www.example.com", selection_width: 100, selection_height: 100 }.with_indifferent_access
       tool3.save!
       placements = Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS + ["resource_selection"]
-      expect(Lti::ContextToolFinder.all_tools_for(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
+      expect(method_returning_scope.call(@course, placements: placements).to_a).to eql([tool1, tool3].sort_by(&:name))
     end
 
     it "honors only_visible option" do
@@ -71,11 +67,43 @@ describe Lti::ContextToolFinder do
                                                        settings: { assignment_view: { visibility: "admins" } })
       @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret",
                                                        settings: { assignment_view: { visibility: "members" } })
-      tools = Lti::ContextToolFinder.all_tools_for(@course)
+      tools = method_returning_scope.call(@course)
       expect(tools.count).to eq 3
-      tools = Lti::ContextToolFinder.all_tools_for(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
+      tools = method_returning_scope.call(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
       expect(tools.count).to eq 1
       expect(tools[0].name).to eq "a"
+    end
+  end
+
+  describe ".all_tools_scope_union" do
+    it "returns a ScopeUnion with a scope for the tool" do
+      expect(described_class.all_tools_scope_union(@course)).to be_a(Lti::ScopeUnion)
+    end
+
+    it_behaves_like "a method creating a scope for all tools for a context" do
+      let(:method_returning_scope) do
+        lambda do |*args|
+          described_class.all_tools_scope_union(*args).scopes.first
+        end
+      end
+    end
+  end
+
+  describe "all_tools_for" do
+    it "returns a scope" do
+      expect(described_class.all_tools_for(@course)).to be_a(ActiveRecord::Relation)
+    end
+
+    it "returns nil if context is nil" do
+      expect(described_class.all_tools_for(nil)).to eq(nil)
+    end
+
+    it_behaves_like "a method creating a scope for all tools for a context" do
+      let(:method_returning_scope) do
+        lambda do |*args|
+          described_class.all_tools_for(*args)
+        end
+      end
     end
   end
 end

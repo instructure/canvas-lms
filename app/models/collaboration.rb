@@ -197,7 +197,8 @@ class Collaboration < ActiveRecord::Base
     plugin_collabs = collaboration_types.any? do |type|
       collaboration_class(type["type"].titleize.gsub(/\s/, "")).present?
     end
-    external_tool_collabs = Lti::ContextToolFinder.all_tools_for(context, placements: :collaboration).exists?
+    external_tool_collabs =
+      Lti::ContextToolFinder.all_tools_scope_union(context, placements: :collaboration).exists?
     plugin_collabs || external_tool_collabs
   end
 

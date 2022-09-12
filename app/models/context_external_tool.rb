@@ -908,18 +908,34 @@ class ContextExternalTool < ActiveRecord::Base
     ) || tag.content
   end
 
-  def self.contexts_to_search(context)
+  def self.contexts_to_search(context, include_federated_parent: false)
     case context
     when Course
-      [context] + context.account_chain
+      [:self, :account_chain]
     when Group
-      [context] + (context.context ? contexts_to_search(context.context) : context.account_chain)
+      if context.context
+        [:self, :recursive]
+      else
+        [:self, :account_chain]
+      end
     when Account
-      context.account_chain
+      [:account_chain]
     when Assignment
-      contexts_to_search(context.context)
+      [:recursive]
     else
       []
+    end.flat_map do |component|
+      case component
+      when :self
+        context
+      when :recursive
+        contexts_to_search(context.context, include_federated_parent: include_federated_parent)
+      when :account_chain
+        inc_fp = include_federated_parent &&
+                 Account.site_admin.feature_enabled?(:lti_tools_from_federated_parents) &&
+                 !context.root_account.primary_settings_root_account?
+        context.account_chain(include_federated_parent: inc_fp)
+      end
     end
   end
 
