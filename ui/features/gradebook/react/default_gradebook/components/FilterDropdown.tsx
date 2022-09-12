@@ -38,7 +38,7 @@ type Props = {
   filterItems: FilterDrilldownData
 }
 
-const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props) => {
+const FilterDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props) => {
   const [currentItemId, setTempItemId] = useState<string>(rootId)
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLElement>()
@@ -53,8 +53,7 @@ const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props
     return acc
   }, [])
 
-  const sortedItemGroups =
-    currentObj?.itemGroups?.concat().sort((a, b) => a.id.localeCompare(b.id)) || []
+  const sortedItemGroups = currentObj?.itemGroups || []
 
   const selectedFilterIndices = Object.values(filterItems).reduce<number[]>(
     (acc, current, index) => {
@@ -258,4 +257,4 @@ const FiltersDropdown = ({rootId = '1', onOpenTray, dataMap, filterItems}: Props
   )
 }
 
-export default FiltersDropdown
+export default FilterDropdown

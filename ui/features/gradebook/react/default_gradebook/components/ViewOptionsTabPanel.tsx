@@ -27,6 +27,8 @@ import StatusColorPanel from './StatusColorPanel'
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+const {Option: SimpleSelectOption} = SimpleSelect as any
+
 const I18n = useI18nScope('gradebook')
 
 function buildAssignmentSortOptions(includeModules) {
@@ -109,13 +111,9 @@ export default function ViewOptionsTabPanel({
           value={selectedSortKey.value}
         >
           {sortOptions.map(option => (
-            <SimpleSelect.Option
-              id={`sort-${option.value}`}
-              key={option.value}
-              value={option.value}
-            >
+            <SimpleSelectOption id={`sort-${option.value}`} key={option.value} value={option.value}>
               {option.label}
-            </SimpleSelect.Option>
+            </SimpleSelectOption>
           ))}
         </SimpleSelect>
 

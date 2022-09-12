@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {bool, func, number, shape, string} from 'prop-types'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
@@ -42,10 +41,47 @@ function checkedValue(submission, assignment) {
   return 'none'
 }
 
-export default class SubmissionTrayRadioInputGroup extends React.Component {
+type Props = {
+  assignment: {
+    anonymizeStudents: boolean
+  }
+  colors: {
+    late: string
+    missing: string
+    excused: string
+    extended: string
+  }
+  disabled: boolean
+  locale: string
+  submission: {
+    excused: boolean
+    late: boolean
+    missing: boolean
+    secondsLate: number
+    latePolicyStatus: string
+  }
+  submissionUpdating: boolean
+  updateSubmission: (arg0: PendingUpdateData) => void
+  latePolicy: {
+    lateSubmissionInterval: string
+  }
+  excuse?: boolean
+}
+
+type PendingUpdateData = {
+  excuse?: boolean
+  latePolicyStatus?: string
+  secondsLateOverride?: number
+}
+
+type State = {
+  pendingUpdateData: null | PendingUpdateData
+}
+
+export default class SubmissionTrayRadioInputGroup extends React.Component<Props, State> {
   state = {pendingUpdateData: null}
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     if (
       this.props.submissionUpdating &&
       !nextProps.submissionUpdating &&
@@ -62,7 +98,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       return
     }
 
-    const data = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
+    const data: PendingUpdateData = value === 'excused' ? {excuse: true} : {latePolicyStatus: value}
     if (value === 'late') {
       data.secondsLateOverride = this.props.submission.secondsLate
     }
@@ -104,30 +140,4 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
       </FormFieldGroup>
     )
   }
-}
-
-SubmissionTrayRadioInputGroup.propTypes = {
-  assignment: shape({
-    anonymizeStudents: bool.isRequired
-  }).isRequired,
-  colors: shape({
-    late: string.isRequired,
-    missing: string.isRequired,
-    excused: string.isRequired,
-    extended: string.isRequired
-  }).isRequired,
-  disabled: bool.isRequired,
-  latePolicy: shape({
-    lateSubmissionInterval: string.isRequired
-  }).isRequired,
-  locale: string.isRequired,
-  submission: shape({
-    excused: bool.isRequired,
-    late: bool.isRequired,
-    missing: bool.isRequired,
-    secondsLate: number.isRequired,
-    latePolicyStatus: string.isRequired
-  }).isRequired,
-  submissionUpdating: bool.isRequired,
-  updateSubmission: func.isRequired
 }

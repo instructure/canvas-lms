@@ -23,14 +23,17 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
+import type {Filter} from '../gradebook.d'
 import type {
   AssignmentGroup,
-  Filter,
   GradingPeriod,
   Module,
   Section,
+  StudentGroup,
+  StudentGroupCategory,
   StudentGroupCategoryMap
-} from '../gradebook.d'
+} from '../../../../../api.d'
+import natcompare from '@canvas/util/natcompare'
 
 const I18n = useI18nScope('gradebook')
 
@@ -98,17 +101,25 @@ export default function ({
     }
     case 'student-group': {
       items = [blankItem]
-      itemGroups = Object.values(studentGroupCategories).map(c => [
-        c.id,
-        c.name,
-        c.groups.map(g => [g.id, g.name])
-      ])
+      itemGroups = Object.values(studentGroupCategories)
+        .sort((c1: StudentGroupCategory, c2: StudentGroupCategory) =>
+          natcompare.strings(c1.name, c2.name)
+        )
+        .map((c: StudentGroupCategory) => [
+          c.id,
+          c.name,
+          c.groups
+            .sort((g1: StudentGroup, g2: StudentGroup) => natcompare.strings(g1.name, g2.name))
+            .map(g => [g.id, g.name])
+        ])
       break
     }
     case 'grading-period': {
       const all: MenuItem = ['0', I18n.t('All Grading Periods')]
       const periods: MenuItem[] = gradingPeriods.map(({id, title: name}) => [id, name])
-      items = [blankItem, all, ...periods]
+      if (periods.length > 0) {
+        items = [blankItem, all, ...periods]
+      }
       break
     }
   }

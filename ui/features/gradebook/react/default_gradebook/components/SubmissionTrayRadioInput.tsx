@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {func, number, shape, string, bool} from 'prop-types'
 import {RadioInput} from '@instructure/ui-radio-input'
 
 import classnames from 'classnames'
@@ -30,23 +29,26 @@ function styles({color, showNumberInput}) {
   }
 }
 
-export default class SubmissionTrayRadioInput extends React.Component {
-  static propTypes = {
-    checked: bool.isRequired,
-    color: string,
-    disabled: bool.isRequired,
-    latePolicy: shape({
-      lateSubmissionInterval: string.isRequired
-    }).isRequired,
-    locale: string.isRequired,
-    onChange: func.isRequired,
-    submission: shape({
-      secondsLate: number.isRequired
-    }).isRequired,
-    text: string.isRequired,
-    updateSubmission: func.isRequired,
-    value: string.isRequired
+type Props = {
+  checked: boolean
+  color?: string
+  disabled: boolean
+  locale: string
+  text: string
+  value: string
+  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  latePolicy: {
+    lateSubmissionInterval: string
   }
+  submission: {
+    id: string
+    secondsLate: number
+  }
+  updateSubmission: (submission: {secondsLate: number}) => void
+}
+
+export default class SubmissionTrayRadioInput extends React.Component<Props> {
+  radioInputClasses: string
 
   static defaultProps = {
     color: 'transparent'
@@ -65,9 +67,7 @@ export default class SubmissionTrayRadioInput extends React.Component {
   }
 
   render() {
-    const {
-      props: {color}
-    } = this
+    const {color} = this.props
 
     const showNumberInput = this.props.checked && this.props.value === 'late'
 

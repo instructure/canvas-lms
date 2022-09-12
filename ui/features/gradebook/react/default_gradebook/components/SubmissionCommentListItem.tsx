@@ -17,18 +17,14 @@
  */
 
 import React from 'react'
-import {bool, func} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Avatar} from '@instructure/ui-avatar'
 import {Button} from '@instructure/ui-buttons'
-
 import {IconEditLine, IconTrashLine} from '@instructure/ui-icons'
-
 import DateHelper from '@canvas/datetime/dateHelper'
 import {truncateText} from '@canvas/util/TextHelper'
-import CommentPropTypes from '../propTypes/CommentPropTypes'
 import SubmissionCommentUpdateForm from './SubmissionCommentUpdateForm'
 
 const I18n = useI18nScope('gradebook')
@@ -37,23 +33,31 @@ function submissionCommentDate(date) {
   return DateHelper.formatDatetimeForDisplay(date, 'short')
 }
 
-export default class SubmissionCommentListItem extends React.Component {
-  static propTypes = {
-    ...CommentPropTypes,
-    editing: bool.isRequired,
-    last: bool.isRequired,
-    cancelCommenting: func.isRequired,
-    currentUserIsAuthor: bool.isRequired,
-    deleteSubmissionComment: func.isRequired,
-    editSubmissionComment: func.isRequired,
-    updateSubmissionComment: func.isRequired,
-    processing: bool.isRequired,
-    setProcessing: func.isRequired
-  }
+type Props = {
+  id: string
+  author: string
+  authorAvatarUrl: string
+  authorUrl: string
+  createdAt: Date
+  comment: string
+  editedAt?: Date
+  editing: boolean
+  last: boolean
+  cancelCommenting: () => void
+  currentUserIsAuthor: boolean
+  deleteSubmissionComment: (id: string) => void
+  editSubmissionComment: (id: string) => void
+  updateSubmissionComment: (comment: string, id: string) => void
+  processing: boolean
+  setProcessing: (processing: boolean) => void
+}
+
+export default class SubmissionCommentListItem extends React.Component<Props> {
+  editButton?: HTMLElement
 
   componentDidUpdate(prevProps) {
     if (prevProps.editing && !this.props.editing) {
-      this.editButton.focus()
+      this.editButton?.focus()
     }
   }
 
