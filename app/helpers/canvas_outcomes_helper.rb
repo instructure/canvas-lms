@@ -45,7 +45,15 @@ module CanvasOutcomesHelper
     )
 
     if /^2/.match?(response.code.to_s)
-      JSON.parse(response.body)["results"]
+      results = JSON.parse(response.body).deep_symbolize_keys[:results]
+      results.each do |result|
+        next if result[:attempts].nil?
+
+        result[:attempts].each do |attempt|
+          attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys
+        end
+      end
+      results
     else
       raise "Error retrieving results from Outcomes Service: #{response.body}"
     end
