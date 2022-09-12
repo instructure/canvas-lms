@@ -18,7 +18,6 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {func, shape, string} from 'prop-types'
 import update from 'immutability-helper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Button} from '@instructure/ui-buttons'
@@ -29,17 +28,36 @@ import StatusColorListItem from './StatusColorListItem'
 
 const I18n = useI18nScope('gradebook')
 
-class StatusesModal extends React.Component {
-  static propTypes = {
-    onClose: func.isRequired,
-    colors: shape({
-      late: string.isRequired,
-      missing: string.isRequired,
-      resubmitted: string.isRequired,
-      dropped: string.isRequired,
-      excused: string.isRequired
-    }).isRequired,
-    afterUpdateStatusColors: func.isRequired
+type Props = {
+  onClose: () => void
+  colors: {
+    late: string
+    missing: string
+    excused: string
+    dropped: string
+    resubmitted: string
+  }
+  afterUpdateStatusColors: (colors: any) => void
+}
+
+type State = {
+  colors: {
+    late: string
+    missing: string
+    excused: string
+    dropped: string
+    resubmitted: string
+  }
+  openPopover: null | string
+}
+
+class StatusesModal extends React.Component<Props, State> {
+  colorPickerButtons: {
+    [key: string]: HTMLButtonElement
+  }
+
+  colorPickerContents: {
+    [key: string]: HTMLDivElement
   }
 
   constructor(props) {
@@ -47,7 +65,7 @@ class StatusesModal extends React.Component {
 
     this.colorPickerButtons = {}
     this.colorPickerContents = {}
-    this.state = {colors: props.colors}
+    this.state = {colors: props.colors, openPopover: null}
   }
 
   updateStatusColorsFn = status => (color, successFn, failureFn) => {
@@ -78,7 +96,7 @@ class StatusesModal extends React.Component {
   handleColorPickerAfterClose = status => () => {
     this.setState({openPopover: null}, () => {
       // eslint-disable-next-line react/no-find-dom-node
-      ReactDOM.findDOMNode(this.colorPickerButtons[status]).focus()
+      ReactDOM.findDOMNode(this.colorPickerButtons[status])?.focus()
     })
   }
 

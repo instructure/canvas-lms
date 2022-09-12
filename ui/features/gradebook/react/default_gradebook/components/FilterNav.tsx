@@ -23,20 +23,20 @@ import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import type {Filter, FilterDrilldownData} from '../gradebook.d'
 import type {
   AssignmentGroup,
-  Filter,
-  FilterDrilldownData,
   GradingPeriod,
   Module,
   Section,
   StudentGroupCategoryMap
-} from '../gradebook.d'
+} from '../../../../../api.d'
 import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
 import FilterNavDateModal from './FilterDateModal'
 import FilterTray from './FilterTray'
+import natcompare from '@canvas/util/natcompare'
 
 const I18n = useI18nScope('gradebook')
 
@@ -227,24 +227,30 @@ export default function FilterNav({
       name: I18n.t('Student Groups'),
       parentId: '1',
       isSelected: appliedFilters.some(c => c.type === 'student-group'),
-      itemGroups: Object.values(studentGroupCategories).map(category => ({
-        id: category.id,
-        name: category.name,
-        items: category.groups.map(group => ({
-          id: group.id,
-          name: group.name,
-          isSelected: appliedFilters.some(c => c.type === 'student-group' && c.value === group.id),
-          onToggle: () => {
-            const filter: Filter = {
-              id: uuid(),
-              type: 'student-group',
-              value: group.id,
-              created_at: new Date().toISOString()
-            }
-            toggleFilter(filter)
-          }
+      itemGroups: Object.values(studentGroupCategories)
+        .sort((c1, c2) => natcompare.strings(c1.name, c2.name))
+        .map(category => ({
+          id: category.id,
+          name: category.name,
+          items: category.groups
+            .sort((g1, g2) => natcompare.strings(g1.name, g2.name))
+            .map(group => ({
+              id: group.id,
+              name: group.name,
+              isSelected: appliedFilters.some(
+                c => c.type === 'student-group' && c.value === group.id
+              ),
+              onToggle: () => {
+                const filter: Filter = {
+                  id: uuid(),
+                  type: 'student-group',
+                  value: group.id,
+                  created_at: new Date().toISOString()
+                }
+                toggleFilter(filter)
+              }
+            }))
         }))
-      }))
     }
     dataMap['student-groups'] = filterItems['student-groups']
   }

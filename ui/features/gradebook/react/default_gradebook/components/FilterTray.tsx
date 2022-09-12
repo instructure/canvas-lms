@@ -27,15 +27,14 @@ import FilterTrayPreset from './FilterTrayFilterPreset'
 import useStore from '../stores/index'
 
 import {doFiltersMatch} from '../Gradebook.utils'
+import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
 import type {
-  FilterPreset,
-  PartialFilterPreset,
   Module,
   AssignmentGroup,
   Section,
   GradingPeriod,
   StudentGroupCategoryMap
-} from '../gradebook.d'
+} from '../../../../../api.d'
 
 const {Item: FlexItem} = Flex as any
 

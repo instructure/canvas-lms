@@ -70,9 +70,27 @@ const defaultProps: FilterTrayPresetProps = {
     {id: '9', name: 'Section 9'}
   ],
   gradingPeriods: [
-    {id: '1', title: 'Grading Period 1', startDate: 1},
-    {id: '2', title: 'Grading Period 2', startDate: 2},
-    {id: '3', title: 'Grading Period 3', startDate: 3}
+    {
+      id: '1',
+      title: 'Grading Period 1',
+      startDate: new Date(),
+      endDate: new Date(),
+      isClosed: false
+    },
+    {
+      id: '2',
+      title: 'Grading Period 2',
+      startDate: new Date(),
+      endDate: new Date(),
+      isClosed: false
+    },
+    {
+      id: '3',
+      title: 'Grading Period 3',
+      startDate: new Date(),
+      endDate: new Date(),
+      isClosed: false
+    }
   ],
   studentGroupCategories: {
     '1': {
@@ -81,7 +99,19 @@ const defaultProps: FilterTrayPresetProps = {
       groups: [
         {id: '1', name: 'Student Group 1'},
         {id: '2', name: 'Student Group 2'}
-      ]
+      ],
+      allows_multiple_memberships: false,
+      auto_leader: 'none',
+      context_type: 'Course',
+      course_id: '1',
+      created_at: '2021-11-02T20:56:23.615Z',
+      group_limit: null,
+      is_member: false,
+      protected: false,
+      role: null,
+      self_signup: 'restricted',
+      sis_group_category_id: null,
+      sis_import_id: null
     }
   }
 }

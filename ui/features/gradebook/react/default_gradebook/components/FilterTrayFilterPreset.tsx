@@ -27,17 +27,14 @@ import {Flex} from '@instructure/ui-flex'
 import FilterComponent from './FilterTrayFilter'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
+import type {PartialFilterPreset, FilterPreset, Filter, FilterType} from '../gradebook.d'
 import type {
   AssignmentGroup,
   GradingPeriod,
   Module,
-  PartialFilterPreset,
-  FilterPreset,
-  Filter,
-  FilterType,
   Section,
   StudentGroupCategoryMap
-} from '../gradebook.d'
+} from '../../../../../api.d'
 import {isFilterNotEmpty} from '../Gradebook.utils'
 
 const I18n = useI18nScope('gradebook')
@@ -131,16 +128,13 @@ export default function FilterTrayPreset({
     }
   }
 
-  const ensureFilter = (filters: Filter[], type: FilterType): Filter => {
-    return (
-      filters.find(filter => filter.type === type) || {
-        id: uuid.v4(),
-        type,
-        value: undefined,
-        created_at: new Date().toISOString()
-      }
-    )
-  }
+  const ensureFilter = (filters: Filter[], type: FilterType): Filter =>
+    filters.find(filter => filter.type === type) || {
+      id: uuid.v4(),
+      type,
+      value: undefined,
+      created_at: new Date().toISOString()
+    }
 
   const sectionFilter = sections.length > 0 ? ensureFilter(stagedFilters, 'section') : undefined
 

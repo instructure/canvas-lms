@@ -17,7 +17,6 @@
  */
 
 import React from 'react'
-import {func, string, bool} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconButton} from '@instructure/ui-buttons'
 import {Popover} from '@instructure/ui-popover'
@@ -30,7 +29,12 @@ import {defaultColors} from '../constants/colors'
 
 const I18n = useI18nScope('gradebook')
 
-const colorPickerColors = Object.keys(defaultColors).reduce((obj, key) => {
+type Color = {
+  name: string
+  hexcode: string
+}
+
+const colorPickerColors = Object.keys(defaultColors).reduce((obj: Color[], key: string) => {
   obj.push({hexcode: defaultColors[key], name: key})
   return obj
 }, [])
@@ -42,18 +46,22 @@ function formatColor(color) {
   return color
 }
 
-class StatusColorListItem extends React.Component {
-  static propTypes = {
-    status: string.isRequired,
-    color: string.isRequired,
-    isColorPickerShown: bool.isRequired,
-    colorPickerOnToggle: func.isRequired,
-    colorPickerButtonRef: func.isRequired,
-    colorPickerContentRef: func.isRequired,
-    colorPickerAfterClose: func.isRequired,
-    afterSetColor: func.isRequired
-  }
+type Props = {
+  color: string
+  status: string
+  isColorPickerShown: boolean
+  colorPickerOnToggle: (status: boolean) => void
+  colorPickerButtonRef: (button: HTMLButtonElement) => void
+  colorPickerContentRef: (content: HTMLDivElement) => void
+  colorPickerAfterClose: () => void
+  afterSetColor: (color: string, arg2: any, arg3: any) => void
+}
 
+type State = {
+  color: string
+}
+
+class StatusColorListItem extends React.Component<Props, State> {
   constructor(props) {
     super(props)
 

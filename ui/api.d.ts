@@ -77,26 +77,23 @@ export type StudentGroup = Partial<
   'id' | 'name'
 >
 
-export type StudentGroupCategory = Partial<
-  {
-    allows_multiple_memberships: boolean
-    auto_leader: null | string
-    context_type: string
-    course_id: string
-    created_at: string
-    group_limit: null
-    groups: StudentGroup[]
-    id: string
-    is_member: boolean
-    name: string
-    protected: boolean
-    role: null | string
-    self_signup: null | string
-    sis_group_category_id: null | string
-    sis_import_id: null | string
-  },
-  'id' | 'name' | 'groups'
->
+export type StudentGroupCategory = {
+  allows_multiple_memberships: boolean
+  auto_leader: null | string
+  context_type: string
+  course_id: string
+  created_at: string
+  group_limit: null
+  groups: StudentGroup[]
+  id: string
+  is_member: boolean
+  name: string
+  protected: boolean
+  role: null | string
+  self_signup: null | string
+  sis_group_category_id: null | string
+  sis_import_id: null | string
+}
 
 export type StudentGroupMap = {
   [id: string]: StudentGroup
