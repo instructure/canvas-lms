@@ -211,7 +211,10 @@ class PseudonymsController < ApplicationController
     if pseudonym_exists?
       respond_to do |format|
         format.html { render :new }
-        format.json { render :json => @pseudonym.errors, :status => :bad_request }
+        format.json { render :json => {
+          :message => "Error: duplicate key value violates unique constraint 'index_pseudonyms_on_integration_id'"
+          },
+          :status => :bad_request }
       end
     else
       if api_request?
