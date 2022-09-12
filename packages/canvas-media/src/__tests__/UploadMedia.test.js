@@ -78,6 +78,52 @@ describe('Upload Media', () => {
     })
   })
 
+  describe('when a tab is clicked', () => {
+    it('does not change selectedPanel if there is only one tab visible', () => {
+      const {getByRole} = renderComponent({tabs: {record: false, upload: true}})
+      const tab = getByRole('tab', {name: 'Computer'})
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+      fireEvent.click(tab)
+      expect(setStateSpy).not.toHaveBeenCalledWith(expect.objectContaining({selectedPanel: 0}))
+      setStateSpy.mockRestore()
+    })
+
+    it('changes selectedPanel if there are multiple tabs visible', () => {
+      const {getByRole} = renderComponent({tabs: {record: true, upload: true}})
+      const tab = getByRole('tab', {name: 'Computer'})
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+      fireEvent.click(tab)
+      expect(setStateSpy).toHaveBeenCalledWith(expect.objectContaining({selectedPanel: 0}))
+      setStateSpy.mockRestore()
+    })
+  })
+
+  describe('when the modal is closed', () => {
+    const computerPanel = 0
+
+    it('sets the selectedPanel to "Computer" when "Computer" is the only visible tab', () => {
+      const {getAllByRole} = renderComponent({tabs: {record: false, upload: true}})
+      const closeButton = getAllByRole('button', {name: 'Close'})[0]
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+      fireEvent.click(closeButton)
+      expect(setStateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({selectedPanel: computerPanel})
+      )
+      setStateSpy.mockRestore()
+    })
+
+    it('sets the selectedPanel to "Computer" when both tabs are visible', () => {
+      const {getAllByRole} = renderComponent({tabs: {record: true, upload: true}})
+      const closeButton = getAllByRole('button', {name: 'Close'})[0]
+      const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
+      fireEvent.click(closeButton)
+      expect(setStateSpy).toHaveBeenCalledWith(
+        expect.objectContaining({selectedPanel: computerPanel})
+      )
+      setStateSpy.mockRestore()
+    })
+  })
+
   describe('when the tabs prop changes', () => {
     it('recomputes the selected panel', () => {
       const setStateSpy = jest.spyOn(UploadMedia.prototype, 'setState')
