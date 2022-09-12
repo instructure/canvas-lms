@@ -62,7 +62,7 @@ module OutcomesServiceAuthoritativeResultsHelper
     )
 
     # Retrieves the appropriate proficiency ratings for the outcome at the current context
-    proficiency(context, outcome)
+    proficiency = retrieve_proficiency(context, outcome)
 
     possible = authoritative_result[:points_possible].to_f
     score = authoritative_result[:points].to_f if authoritative_result[:points]
@@ -92,16 +92,54 @@ module OutcomesServiceAuthoritativeResultsHelper
         assessed_at: submitted_at
       )
 
-    learning_outcome_result.calculate_percent!
+    # Don't call calculate_percent! on the learning_outcome_result. That takes features not yet implemented in
+    # new quizzes into account (like outcome score scaling). Instead, percent should always be score / possible
+    learning_outcome_result.percent = calculate_percent(score, possible)
 
     # this implementation ignores mastery as returned by the OS endpoint
-    if score
-      learning_outcome_result.original_mastery =
-        learning_outcome_result.mastery =
-          score >= @proficiency.mastery_points
-    end
+    calculate_mastery!(learning_outcome_result, proficiency)
 
     learning_outcome_result
+  end
+
+  def metadata_to_outcome_question_result(learning_outcome_result, question_metadata, attempt_number)
+    possible = question_metadata[:points_possible].to_f
+    score = question_metadata[:points].to_f if question_metadata[:points]
+    submitted_at = learning_outcome_result.submitted_at
+
+    # Retrieves the appropriate proficiency ratings for the outcome at the current context
+    proficiency = retrieve_proficiency(learning_outcome_result.context, learning_outcome_result.learning_outcome)
+
+    question_result =
+      LearningOutcomeQuestionResult.new(
+        learning_outcome_result: learning_outcome_result,
+        learning_outcome: learning_outcome_result.learning_outcome,
+        associated_asset_id: question_metadata[:quiz_item_id],
+        associated_asset_type: "NewQuizQuestion",
+        attempt: attempt_number,
+        title: "#{learning_outcome_result.title}: #{question_metadata[:quiz_item_title]}",
+        root_account: learning_outcome_result.root_account,
+        possible: possible,
+        score: score,
+        # mastery is computed after the call for calculate_percent!
+        original_possible: possible,
+        original_score: score,
+        created_at: submitted_at,
+        updated_at: submitted_at,
+        submitted_at: submitted_at,
+        assessed_at: submitted_at
+      )
+
+    # We can call calculate_percent! on the question_result because that is always just score / possible
+    question_result.calculate_percent! if score
+
+    # This method was modeled after the quiz_outcome_result_builder.create_outcome_question_result
+    # In that method, after the call to calculate_percent!, mastery is determined by calling
+    # determine_mastery(question_result, alignment). New quizzes does not support alignment mastery, so
+    # mastery is determined by the outcome.
+    calculate_mastery!(question_result, proficiency)
+
+    question_result
   end
 
   # Transforms an OS' learning outcome results into a collection of rollups per user
@@ -113,9 +151,27 @@ module OutcomesServiceAuthoritativeResultsHelper
 
   private
 
-  def proficiency(context, outcome)
-    @proficiency ||= outcome unless context&.root_account&.feature_enabled?(:account_level_mastery_scales)
-    @proficiency ||= context.resolved_outcome_proficiency
-    @proficiency
+  def retrieve_proficiency(context, outcome)
+    proficiency ||= outcome unless context&.root_account&.feature_enabled?(:account_level_mastery_scales)
+    proficiency ||= context.resolved_outcome_proficiency
+    proficiency
+  end
+
+  def round(value)
+    value&.round(4)
+  end
+
+  def calculate_percent(points, points_possible)
+    return 0.0 if points_possible.to_f <= 0
+
+    round(points.to_f / points_possible.to_f)
+  end
+
+  def calculate_mastery!(result, proficiency)
+    if result.percent
+      result.original_mastery =
+        result.mastery =
+          result.percent >= calculate_percent(proficiency.mastery_points, proficiency.points_possible)
+    end
   end
 end

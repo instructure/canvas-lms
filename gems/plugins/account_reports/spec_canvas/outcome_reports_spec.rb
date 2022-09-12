@@ -49,7 +49,7 @@ describe "Outcome Reports" do
       sis_user_id: "user_sis_id_02"
     )
 
-    @course1.enroll_user(@user1, "StudentEnrollment", enrollment_state: "active")
+    @enrollment1 = @course1.enroll_user(@user1, "StudentEnrollment", enrollment_state: "active")
     @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", enrollment_state: "active")
 
     @section = @course1.course_sections.first
@@ -428,6 +428,10 @@ describe "Outcome Reports" do
         outcome_group.add_outcome(@quiz_outcome)
         @quiz_outcome_result = LearningOutcomeResult.find_by(artifact: @quiz_submission)
         @new_quiz = @course1.assignments.create!(title: "New Quiz", submission_types: "external_tool")
+        @new_quiz_submission = @new_quiz.grade_student(@user1, grade: "10", grader: @teacher).first
+        @new_quiz_submission.submission_type = "basic_lti_launch"
+        @new_quiz_submission.submitted_at = 1.week.ago
+        @new_quiz_submission.save!
       end
 
       it "works with quizzes" do
@@ -469,51 +473,110 @@ describe "Outcome Reports" do
         expect(report[0]["learning outcome rating"]).to eq "Does Not Meet Expectations"
       end
 
-      context ":outcome_service_results_to_canvas" do
-        let(:outcome_reports) do
-          account_report = AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1)
-          AccountReports::OutcomeReports.new(account_report)
-        end
+      context "Report does not include results" do
+        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
         let(:assignment_ids) { @new_quiz.id.to_s }
         let(:outcome_ids) { @outcome.id.to_s }
         let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
-        it "filters out users that do not have results" do
+        it "when assignment is deleted" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          @new_quiz.destroy
+          # OS will still be called, but the list of assignment ids should be empty
           expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
-            .and_return([{ "user_uuid" => @user1.uuid,
-                           "external_outcome_id" => @outcome.id,
-                           "associated_asset_id" => @new_quiz.id,
-                           "mastery" => nil }])
+            .with(@course1, "", "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return([])
           results = outcome_reports.send(:outcomes_new_quiz_scope)
 
-          expect(results.length).to eq(1)
-          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results.length).to eq(0)
+        end
+      end
+
+      context "ordering param" do
+        def validate_outcome_ordering(outcome_report, expected_result)
+          expected_result = nil unless AccountReports::OutcomeReports::ORDER_OPTIONS.include? expected_result
+          add_text_calls = expected_result.nil? ? 0 : 1
+
+          expect(outcome_report).to receive(:add_extra_text).exactly(add_text_calls).time
+          outcome_report.send(:add_outcome_order_text)
+
+          expect(outcome_report.send(:determine_order_key)).to eq expected_result
+
+          # default ordering is users
+          expected_result = "users" if expected_result.nil?
+          expect(outcome_report.send(:outcome_order)).to eq AccountReports::OutcomeReports::ORDER_SQL[expected_result]
         end
 
-        it "keeps the result with the latest submission date" do
-          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
-          expect(outcome_reports).to receive(:get_lmgb_results)
-            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
-            .and_return([{ "user_uuid" => @user1.uuid,
-                           "external_outcome_id" => @outcome.id,
-                           "associated_asset_id" => @new_quiz.id,
-                           "points" => "1.0",
-                           "submitted_at" => "2022-09-19T12:00:00.0Z",
-                           "mastery" => nil },
-                         { "user_uuid" => @user1.uuid,
-                           "external_outcome_id" => @outcome.id,
-                           "associated_asset_id" => @new_quiz.id,
-                           "points" => "2.0",
-                           "submitted_at" => "2022-08-19T12:00:00.0Z",
-                           "mastery" => nil }])
-
-          results = outcome_reports.send(:outcomes_new_quiz_scope)
-          expect(results.length).to eq(1)
-          expect(results[0]["student uuid"]).to eq @user1.uuid
-          expect(results[0]["outcome score"]).to eq "1.0"
+        it "order key is valid" do
+          test_cases = %w[users courses outcomes USERS COURSES OUTCOMES Users usErS foo bar]
+          test_cases.each do |test|
+            account_report = AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1)
+            account_report.parameters = { "order" => test }
+            outcome_report = AccountReports::OutcomeReports.new(account_report)
+            validate_outcome_ordering(outcome_report, test.downcase)
+          end
         end
+
+        it "order key is nil if ordering is not present" do
+          account_report = AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1)
+          outcome_report = AccountReports::OutcomeReports.new(account_report)
+          validate_outcome_ordering(outcome_report, nil)
+        end
+      end
+
+      context ":outcome_service_results_to_canvas" do
+        # Column indexes
+        student_name = 0
+        assessment_title = 3
+        assessment_type = 5
+        outcome = 8
+        question = 12
+        question_id = 13
+        course = 14
+
+        # These columns are added/modified to the report when writing the csv file
+        outcome_score = 11
+        learning_outcome_points_possible = 22
+        learning_outcome_mastery_score = 23
+        learning_outcome_mastered = 24
+        learning_outcome_rating = 25
+        learning_outcome_rating_points = 26
+
+        def mock_os_result(user, outcome, quiz, submission_date, attempts = nil)
+          if attempts.nil?
+            attempts = [
+              { id: 2,
+                authoritative_result_id: 2,
+                points: 1.0,
+                points_possible: 1.0,
+                metadata: {
+                  quiz_metadata: {
+                    quiz_title: "Quiz Title",
+                    quiz_id: quiz.id,
+                    points: 1.0,
+                    points_possible: 1.0
+                  }
+                } }
+            ]
+          end
+
+          [{ user_uuid: user.uuid,
+             external_outcome_id: outcome.id,
+             associated_asset_id: quiz.id,
+             attempts: attempts,
+             percent_score: 1.0,
+             points: 5.0,
+             points_possible: 5.0,
+             submitted_at: submission_date,
+             mastery: nil },]
+        end
+
+        let(:account_report) { AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1) }
+        let(:outcome_reports) { AccountReports::OutcomeReports.new(account_report) }
+        let(:assignment_ids) { @new_quiz.id.to_s }
+        let(:outcome_ids) { @outcome.id.to_s }
+        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
         it "does not call OS when FF is off" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
@@ -524,6 +587,373 @@ describe "Outcome Reports" do
 
           results = outcome_reports.send(:outcomes_new_quiz_scope)
           expect(results).to be_empty
+        end
+
+        it "filters out users that do not have results" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+
+          # uuids contains both @user1 and @user2. The mock result only contains data for @user1, so @user2
+          # will not show up in the report.
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z"))
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          # mock_os_result returns a result that has quiz metadata, but no question meta data. This means that
+          # learning outcome points possible and outcome score will be from the authoritative result.
+
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+        end
+
+        it "filters out users that do not have attempts" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", []))
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          expect(results.length).to eq(0)
+        end
+
+        it "keeps the result with the latest submission date" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
+                                          { id: 2,
+                                            authoritative_result_id: 2,
+                                            points: 1.0,
+                                            points_possible: 1.0,
+                                            metadata: {
+                                              question_metadata: [{
+                                                quiz_item_title: "Newer Submission",
+                                                quiz_item_id: @new_quiz.id,
+                                                points: 1.0,
+                                                points_possible: 1.0
+                                              }]
+                                            } }
+                                        ]).concat(mock_os_result(@user1, @outcome, @new_quiz, "2022-08-19T12:00:00.0Z", [
+                                                                   { id: 2,
+                                                                     authoritative_result_id: 2,
+                                                                     points: 1.0,
+                                                                     points_possible: 1.0,
+                                                                     metadata: {
+                                                                       question_metadata: [{
+                                                                         quiz_item_title: "Older Submission",
+                                                                         quiz_item_id: @new_quiz.id,
+                                                                         points: 1.0,
+                                                                         points_possible: 1.0
+                                                                       }]
+                                                                     } }
+                                                                 ]))
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["assessment question"]).to eq "Newer Submission"
+        end
+
+        it "returns points on authoritative result if missing metadata" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
+                                          { id: 2,
+                                            authoritative_result_id: 2,
+                                            points: 7.0,
+                                            points_possible: 21.0, }
+                                        ])
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["learning outcome points possible"]).to eq 5.0
+          expect(results[0]["outcome score"]).to eq 5.0
+        end
+
+        it "returns row for each question on latest attempt" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
+                                          { id: 1,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            created_at: "2022-08-19T12:00:00.0Z",
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "1",
+                                                  quiz_item_title: "Attempt 1 Question 1",
+                                                  points: 0.0,
+                                                  points_possible: 1.0
+                                                },
+                                                {
+                                                  quiz_item_id: "2",
+                                                  quiz_item_title: "Attempt 1 Question 2",
+                                                  points: 1.0,
+                                                  points_possible: 2.0
+                                                }
+                                              ]
+                                            } },
+                                          { id: 2,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            created_at: "2022-08-20T12:00:00.0Z",
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "3",
+                                                  quiz_item_title: "Attempt 2 Question 1",
+                                                  points: 2.0,
+                                                  points_possible: 3.0
+                                                },
+                                                {
+                                                  quiz_item_id: "4",
+                                                  quiz_item_title: "Attempt 2 Question 2",
+                                                  points: 3.0,
+                                                  points_possible: 4.0
+                                                }
+                                              ]
+                                            } }
+                                        ])
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          # We only keep the latest attempt. The latest attempt has 2 questions on it, so we should have 2 results
+          expect(results.length).to eq(2)
+          results.each_index do |i|
+            expect(results[i]["student uuid"]).to eq @user1.uuid
+            expect(results[i]["student name"]).to eq @user1.sortable_name
+            expect(results[i]["assignment id"]).to eq @new_quiz.id
+            expect(results[i]["assessment title"]).to eq @new_quiz.title
+            expect(results[i]["assessment id"]).to eq @new_quiz.id
+            expect(results[i]["submission date"]).to eq @new_quiz_submission.submitted_at
+            expect(results[i]["submission score"]).to eq @new_quiz_submission&.grade&.to_f
+            expect(results[i]["learning outcome name"]).to eq @outcome.short_description
+            expect(results[i]["learning outcome id"]).to eq @outcome.id
+            expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
+            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+
+            # 2 attempts were returned so we are looking at 2nd attempt
+            expect(results[i]["attempt"]).to eq(2)
+            expect(results[i]["learning outcome points hidden"]).to be_nil
+
+            # These equation just make sure we are looking at data from 2nd attempt
+            expect(results[i]["outcome score"]).to eq i + 2
+            expect(results[i]["learning outcome points possible"]).to eq(i + 3)
+            expect(results[i]["assessment question id"]).to eq((i + 3).to_s)
+            expect(results[i]["assessment question"]).to eq "Attempt 2 Question #{i + 1}"
+
+            expect(results[i]["total percent outcome score"]).to eq 1.0
+            expect(results[i]["course name"]).to eq @course1.name
+            expect(results[i]["course id"]).to eq @course1.id
+            expect(results[i]["course sis id"]).to eq @course1.sis_source_id
+            expect(results[i]["assessment type"]).to eq "quiz"
+            expect(results[i]["section name"]).to eq @section.name
+            expect(results[i]["section id"]).to eq @section.id
+            expect(results[i]["section sis id"]).to eq @section.sis_source_id
+            expect(results[i]["enrollment state"]).to eq @enrollment1.workflow_state
+            expect(results[i]["account id"]).to eq @root_account.id
+            expect(results[i]["account name"]).to eq @root_account.name
+          end
+        end
+
+        it "returns results for all students" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z")
+                         .concat(mock_os_result(@user2, @outcome, @new_quiz, "2022-08-19T12:00:00.0Z"))
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results.length).to eq(2)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[1]["student uuid"]).to eq @user2.uuid
+        end
+
+        it "combines results from both canvas and outcome service" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z")
+                         .concat(mock_os_result(@user2, @outcome, @new_quiz, "2022-08-19T12:00:00.0Z", [
+                                                  { id: 1,
+                                                    authoritative_result_id: 2,
+                                                    points: 2.0,
+                                                    points_possible: 2.0,
+                                                    metadata: {
+                                                      question_metadata: [
+                                                        {
+                                                          quiz_item_id: "1",
+                                                          quiz_item_title: "Attempt 1 Question 1",
+                                                          points: 0.0,
+                                                          points_possible: 1.0
+                                                        },
+                                                        {
+                                                          quiz_item_id: "2",
+                                                          quiz_item_title: "Attempt 1 Question 2",
+                                                          points: 2.0,
+                                                          points_possible: 2.0
+                                                        }
+                                                      ]
+                                                    } }
+                                                ]))
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          outcome_reports.outcome_results
+          account_report.reload
+          csv = parse_report(account_report, { order: "skip", header: false })
+
+          # Default ordering is by user id, outcome id, course id
+          # Results are the following:
+          #   - (canvas result) user1, outcome, assignment, score 2 / 3
+          #   - (outcome service result) user1, outcome, new quiz, score 5 / 5
+          #         this record is 2nd because if user id, outcome id, and course id are equal, we use the canvas result first
+          #   - (outcome service result) user2, outcome, new quiz, question 1, score 5 / 5
+          #   - (outcome service result) user2, outcome, new quiz, question 2, score 5 / 5
+          #   - (canvas result) user2, quiz_outcome, classic quiz, question 1
+          #   - (canvas result) user2, quiz_outcome, classic quiz, question 2
+          expect(csv.length).to be 6
+          expect(csv[0][student_name]).to eq @user1.sortable_name
+          expect(csv[0][assessment_title]).to eq @assignment.title
+          expect(csv[0][assessment_type]).to eq "assignment"
+          expect(csv[0][outcome]).to eq @outcome.short_description
+          expect(csv[0][question]).to be_nil
+          expect(csv[0][course]).to eq @course1.name
+          expect(csv[0][outcome_score]).to eq "2.0"
+          expect(csv[0][learning_outcome_points_possible]).to eq @outcome.rubric_criterion[:points_possible].to_s
+          expect(csv[0][learning_outcome_mastery_score]).to eq @outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[0][learning_outcome_mastered]).to eq "0"
+          expect(csv[0][learning_outcome_rating]).to eq "Lame"
+          expect(csv[0][learning_outcome_rating_points]).to eq "0.0" # This is the points associated with the rating
+
+          expect(csv[1][student_name]).to eq @user1.sortable_name
+          expect(csv[1][assessment_title]).to eq @new_quiz.title
+          expect(csv[1][assessment_type]).to eq "quiz"
+          expect(csv[1][outcome]).to eq @outcome.short_description
+          expect(csv[1][question]).to be_nil
+          expect(csv[1][course]).to eq @course1.name
+          expect(csv[1][outcome_score]).to eq "5.0"
+          expect(csv[1][learning_outcome_points_possible]).to eq "5.0"
+          expect(csv[1][learning_outcome_mastery_score]).to eq @outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[1][learning_outcome_mastered]).to eq "1"
+          expect(csv[1][learning_outcome_rating]).to eq "Rockin"
+          expect(csv[1][learning_outcome_rating_points]).to eq "3.0" # This is the points associated with the rating
+
+          expect(csv[2][student_name]).to eq @user2.sortable_name
+          expect(csv[2][assessment_title]).to eq @new_quiz.title
+          expect(csv[2][assessment_type]).to eq "quiz"
+          expect(csv[2][outcome]).to eq @outcome.short_description
+          expect(csv[2][question]).to eq "Attempt 1 Question 1"
+          expect(csv[2][course]).to eq @course1.name
+          expect(csv[2][outcome_score]).to eq "0.0"
+          expect(csv[2][learning_outcome_points_possible]).to eq "1.0"
+          expect(csv[2][learning_outcome_mastery_score]).to eq @outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[2][learning_outcome_mastered]).to eq "0" # 0 / 1 on quiz question
+          expect(csv[2][learning_outcome_rating]).to eq "Rockin"
+          expect(csv[2][learning_outcome_rating_points]).to eq "3.0"
+
+          expect(csv[3][student_name]).to eq @user2.sortable_name
+          expect(csv[3][assessment_title]).to eq @new_quiz.title
+          expect(csv[3][assessment_type]).to eq "quiz"
+          expect(csv[3][outcome]).to eq @outcome.short_description
+          expect(csv[3][question]).to eq "Attempt 1 Question 2"
+          expect(csv[3][course]).to eq @course1.name
+          expect(csv[3][outcome_score]).to eq "2.0"
+          expect(csv[3][learning_outcome_points_possible]).to eq "2.0"
+          expect(csv[3][learning_outcome_mastery_score]).to eq @outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[3][learning_outcome_mastered]).to eq "1" # 2 / 2 on quiz question
+          expect(csv[3][learning_outcome_rating]).to eq "Rockin"
+          expect(csv[3][learning_outcome_rating_points]).to eq "3.0"
+
+          expect(csv[4][student_name]).to eq @user2.sortable_name
+          expect(csv[4][assessment_title]).to eq @quiz.title
+          expect(csv[4][assessment_type]).to eq "quiz"
+          expect(csv[4][outcome]).to eq @quiz_outcome.short_description
+          expect(csv[4][question]).to eq @q1.question_data["name"]
+          expect(csv[4][question_id]).to eq @q1.assessment_question_id.to_s
+          expect(csv[4][course]).to eq @course1.name
+          expect(csv[4][outcome_score]).to eq "45.0"
+          expect(csv[4][learning_outcome_points_possible]).to eq "45.0"
+          expect(csv[4][learning_outcome_mastery_score]).to eq @quiz_outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[4][learning_outcome_mastered]).to eq "1" # 45 / 45 on quiz question
+          expect(csv[4][learning_outcome_rating]).to eq "Does Not Meet Expectations"
+          expect(csv[4][learning_outcome_rating_points]).to eq "0"
+
+          expect(csv[5][student_name]).to eq @user2.sortable_name
+          expect(csv[5][assessment_title]).to eq @quiz.title
+          expect(csv[5][assessment_type]).to eq "quiz"
+          expect(csv[5][outcome]).to eq @quiz_outcome.short_description
+          expect(csv[5][question]).to eq @q2.question_data["name"]
+          expect(csv[5][question_id]).to eq @q2.assessment_question_id.to_s
+          expect(csv[5][course]).to eq @course1.name
+          expect(csv[5][outcome_score]).to eq "0.0"
+          expect(csv[5][learning_outcome_points_possible]).to eq "50.0"
+          expect(csv[5][learning_outcome_mastery_score]).to eq @quiz_outcome.rubric_criterion[:mastery_points].to_s
+          expect(csv[5][learning_outcome_mastered]).to eq "0" # 0 / 50 on quiz question
+          expect(csv[5][learning_outcome_rating]).to eq "Does Not Meet Expectations"
+          expect(csv[5][learning_outcome_rating_points]).to eq "0"
+        end
+
+        it "returns empty report when no results from canvas and OS" do
+          LearningOutcomeResult.delete_all
+          LearningOutcomeQuestionResult.delete_all
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+          outcome_reports.outcome_results
+          account_report.reload
+          csv = parse_report(account_report, { order: "skip", header: false })
+
+          expect(csv.length).to eq 1
+          expect(csv[0][0]).to eq "No outcomes found"
+        end
+
+        it "returns empty report when no results from canvas and empty results from OS" do
+          LearningOutcomeResult.delete_all
+          LearningOutcomeQuestionResult.delete_all
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return([])
+
+          outcome_reports.outcome_results
+          account_report.reload
+          csv = parse_report(account_report, { order: "skip", header: false })
+
+          expect(csv.length).to eq 1
+          expect(csv[0][0]).to eq "No outcomes found"
+        end
+
+        it "returns OS when no canvas results" do
+          LearningOutcomeResult.delete_all
+          LearningOutcomeQuestionResult.delete_all
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z")
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          outcome_reports.outcome_results
+          account_report.reload
+          csv = parse_report(account_report, { order: "skip", header: false })
+
+          expect(csv.length).to eq 1
+          expect(csv[0][student_name]).to eq @user1.sortable_name
+          expect(csv[0][assessment_title]).to eq @new_quiz.title
+          expect(csv[0][assessment_type]).to eq "quiz"
+          expect(csv[0][outcome]).to eq @outcome.short_description
+          expect(csv[0][question]).to be_nil
+          expect(csv[0][course]).to eq @course1.name
         end
       end
 

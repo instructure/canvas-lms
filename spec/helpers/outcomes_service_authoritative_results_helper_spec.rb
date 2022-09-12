@@ -105,7 +105,8 @@ describe OutcomesServiceAuthoritativeResultsHelper do
 
   def create_learning_outcome_result(user, score, args = {})
     title = "#{user.name}, #{@assignment.name}"
-    mastery = (score || 0) >= @outcome.mastery_points
+    possible = args[:points_possible] || @outcome.points_possible
+    mastery = score && (score / possible) * @outcome.points_possible >= @outcome.mastery_points
     submitted_at = args[:submitted_at] || time
     submission = Submission.find_by(user_id: user.id, assignment_id: @assignment.id)
 
@@ -120,7 +121,7 @@ describe OutcomesServiceAuthoritativeResultsHelper do
       association_id: @rubric_association.id,
       title: title,
       score: score,
-      possible: @outcome.points_possible,
+      possible: possible,
       mastery: mastery,
       created_at: submitted_at,
       updated_at: submitted_at,
@@ -150,6 +151,28 @@ describe OutcomesServiceAuthoritativeResultsHelper do
           }
         end
     }.to_json
+  end
+
+  describe "percentage and mastery calculation" do
+    it "where points possible != outcome points possible" do
+      # outcome is a 5 point scale that requires 3 to get mastery (a.k.a 60%)
+      create_outcome
+
+      (0...20).each do |points|
+        create_alignment
+        create_learning_outcome_result @students[0], points, { points_possible: 19.0 }
+      end
+
+      results = json_to_outcome_results(authoritative_results_from_db)
+
+      expect(results.size).to eq 20
+      results.each do |r|
+        # Any score over 12 is over 60%
+        expected_mastery = r.score >= 12.0
+        expect(r.mastery).to eq expected_mastery
+        expect(r.percent).to eq (r.score / 19.0).round(4)
+      end
+    end
   end
 
   describe "#json_to_outcome_result" do

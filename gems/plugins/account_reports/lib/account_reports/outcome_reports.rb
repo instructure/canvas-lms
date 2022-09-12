@@ -20,8 +20,13 @@
 
 module AccountReports
   class OutcomeReports
+    ORDER_OPTIONS = %w[users courses outcomes].freeze
+    ORDER_SQL = { "users" => "u.id, learning_outcomes.id, c.id",
+                  "courses" => "c.id, u.id, learning_outcomes.id",
+                  "outcomes" => "learning_outcomes.id, u.id, c.id" }.freeze
     include ReportHelper
     include CanvasOutcomesHelper
+    include OutcomesServiceAuthoritativeResultsHelper
 
     def initialize(account_report)
       @account_report = account_report
@@ -104,9 +109,10 @@ module AccountReports
 
     # returns rows for each assessed outcome result (or question result)
     def outcome_results
-      # TODO: - Add this 3rd parameter as part of OUT-5167 and update write_outcomes_report to merge the two result sets
-      # write_outcomes_report(self.class.outcome_result_headers, outcome_results_scope, outcomes_new_quiz_scope)
-      write_outcomes_report(self.class.outcome_result_headers, outcome_results_scope)
+      # Add text to the report description if user supplied ordering parameter
+      add_outcome_order_text
+      config_options = { new_quizzes_scope: outcomes_new_quiz_scope }
+      write_outcomes_report(self.class.outcome_result_headers, outcome_results_scope, config_options)
     end
 
     private
@@ -201,6 +207,8 @@ module AccountReports
                           a.id                                        AS "assignment id",
                           a.title                                     AS "assessment title",
                           a.id                                        AS "assessment id",
+                          subs.submitted_at                           AS "submission date",
+                          subs.score                                  AS "submission score",
                           learning_outcomes.short_description         AS "learning outcome name",
                           learning_outcomes.id                        AS "learning outcome id",
                           learning_outcomes.display_name              AS "learning outcome friendly name",
@@ -227,7 +235,10 @@ module AccountReports
                           INNER JOIN #{User.quoted_table_name} u ON u.id = e.user_id
                           INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = u.id
                           INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
-                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course' AND a.submission_types = 'external_tool')
+                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course'
+                           AND a.submission_types = 'external_tool' AND a.workflow_state <> 'deleted')
+                          LEFT OUTER JOIN #{Submission.quoted_table_name} subs ON subs.assignment_id = a.id
+                           AND subs.user_id = u.id AND subs.workflow_state <> 'deleted' AND subs.workflow_state <> 'unsubmitted'
                         SQL
 
       unless @include_deleted
@@ -267,11 +278,11 @@ module AccountReports
         next if os_results.nil?
 
         os_results.each do |r|
-          composite_key = "#{c[:course_id]}_#{r["associated_asset_id"]}_#{r["external_outcome_id"]}_#{r["user_uuid"]}"
+          composite_key = "#{c[:course_id]}_#{r[:associated_asset_id]}_#{r[:external_outcome_id]}_#{r[:user_uuid]}"
           if student_results.key?(composite_key)
             # This should not happen, but if it does we take the result that was submitted last.
             current_result = student_results[composite_key]
-            if r["submitted_at"] > current_result["submitted_at"]
+            if r[:submitted_at] > current_result[:submitted_at]
               student_results[composite_key] = r
             end
           else
@@ -280,34 +291,86 @@ module AccountReports
         end
       end
 
-      # TODO: - We are not .where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
-      #        - The artifact type is 'quizzes.quiz'
-      # If there is not an entry in student_results, the student hasn't taken teh quiz yet and does not need to
+      # If there is not an entry in student_results, the student hasn't taken the quiz yet and does not need to
       # be in the report.
-      students.filter_map do |s|
+      results = []
+      students.each do |s|
         composite_key = "#{s["course id"]}_#{s["assignment id"]}_#{s["learning outcome id"]}_#{s["student uuid"]}"
-        student_results.key?(composite_key) ? combine_result(s, student_results[composite_key]) : nil
+        results.concat(combine_result(s, student_results[composite_key])) if student_results.key?(composite_key)
       end
+      results
     end
 
-    # TODO: - This method will be fully implemented as part of OUT-5167
     def combine_result(student, authoritative_results)
-      student.attributes.merge(
+      learning_outcome_result = json_to_outcome_result(authoritative_results)
+      base_student = student.attributes.merge(
         {
-          "assessment title" => "",
-          "assessment id" => authoritative_results["submitted_at"], # TODO: Should this be question id or quiz id?
-          "submission date" => authoritative_results["submitted_at"],
-          "submission score" => "",
-          "assessment question" => "",
-          "assessment question id" => "",
-          "learning outcome points possible" => authoritative_results["points_possible"],
-          "learning outcome mastered" => authoritative_results["mastery"],
-          "attempt" => "", # TODO: do we need the most recent attempt.
+          "learning outcome mastered" => learning_outcome_result.mastery,
           "learning outcome points hidden" => nil, # TODO: hide_points is a column on AR, but not populated
-          "outcome score" => authoritative_results["points"], # TODO: is this the same as qr.score or r.score?
-          "total percent outcome score" => authoritative_results["percent_score"]
+          "total percent outcome score" => learning_outcome_result.percent,
+
+          # If the outcome is aligned with individual questions, these values will be overwritten by
+          # data on the attempt meta data
+          "learning outcome points possible" => learning_outcome_result.possible,
+          "outcome score" => learning_outcome_result.score,
+
+          # We only care about the most recent attempt. The attempt column is equal to number of attempts
+          "attempt" => authoritative_results[:attempts]&.length
         }
       )
+
+      # If there are no attempts, do not include the result in the report. If there are multiple attempts, we only
+      # include the most recent one in the report. Using the created_at is technically not correct, but is the best
+      # we currently have. We need to at a submission date to the attempt in order to get the correct attempt. See
+      #  - https://instructure.atlassian.net/browse/OUT-5289
+      #  - https://instructure.atlassian.net/browse/OUT-5290
+      #  - https://instructure.atlassian.net/browse/OUT-5291
+      # As part of OSSOT Phase 2, we will make outcome service return only a single attempt with all the relevant
+      # data on it.
+      results = []
+      attempt = authoritative_results[:attempts]&.max_by { |a| a[:created_at] }
+      return results if attempt.nil?
+
+      meta_data = attempt[:metadata]
+      if meta_data.nil?
+        results.push(base_student)
+      else
+        question_metadata = meta_data[:question_metadata]
+
+        # Assessment title and id are populated from the canvas Assignment record. In the future, we can get this from
+        # the quiz_metadata on the attempt. If/When we do this, we will need to change the metadata format of the quiz
+        # to always include quiz id and title. See comment on https://instructure.atlassian.net/browse/OUT-5292
+        if question_metadata.blank?
+          results.push(base_student)
+        else
+          question_metadata.each do |question|
+            question_row = base_student.clone
+            learning_outcome_question_result = metadata_to_outcome_question_result(
+              learning_outcome_result,
+              question,
+              question_row["attempt"]
+            )
+
+            question_row["assessment question id"] = question[:quiz_item_id]
+            question_row["assessment question"] = question[:quiz_item_title]
+            question_row["learning outcome points possible"] = learning_outcome_question_result.possible
+            question_row["outcome score"] = learning_outcome_question_result.score
+            question_row["learning outcome mastered"] = learning_outcome_question_result.mastery
+
+            # We do not want to set the "total percent outcome score" to learning_outcome_question_result.percent
+            # because that is the percentage the student got on the individual question. "total percent outcome score"
+            # was set based of learning_outcome_result.percent (see above), which takes into account all the questions
+            # aligned with this same outcome. "total percent outcome score" is what is used to determine
+            # "learning outcome rating" and "learning outcome rating points". This is weird because
+            # "learning outcome mastered" is set based off the learning_outcome_question_result.mastery, so
+            # it's possible for "learning outcome mastered" to be 0, but "learning outcome mastered" to
+            # be "Exceeds Mastery". The reason for this behavior is to mimic what is in the existing report. In the
+            # future we will reevaluate what columns are in this report.
+            results.push(question_row)
+          end
+        end
+      end
+      results
     end
 
     def outcome_results_scope
@@ -383,22 +446,24 @@ module AccountReports
       students.order(outcome_order)
     end
 
-    def outcome_order
+    def determine_order_key
       param = @account_report.value_for_param("order")
       param = param.downcase if param
-      order_options = %w[users courses outcomes]
-      select = order_options & [param]
+      select = ORDER_OPTIONS & [param]
+      select.first if select.length == 1
+    end
 
-      order_sql = { "users" => "u.id, learning_outcomes.id, c.id",
-                    "courses" => "c.id, u.id, learning_outcomes.id",
-                    "outcomes" => "learning_outcomes.id, u.id, c.id" }
-      if select.length == 1
-        order = order_sql[select.first]
-        add_extra_text(I18n.t("account_reports.outcomes.order",
-                              "Order: %{order}", order: select.first))
-      else
-        order = "u.id, learning_outcomes.id, c.id"
+    def add_outcome_order_text
+      order = determine_order_key
+      if order
+        add_extra_text(I18n.t("account_reports.outcomes.order", "Order: %{order}", order: order))
       end
+    end
+
+    def outcome_order
+      order_key = determine_order_key
+      order = "u.id, learning_outcomes.id, c.id"
+      order = ORDER_SQL[order_key] if order_key
       order
     end
 
@@ -415,18 +480,57 @@ module AccountReports
       end
     end
 
-    def write_outcomes_report(headers, scope, config_options = {})
+    def map_order_to_columns(outcome_order)
+      column_mapping = { "u.id" => "student id",
+                         "c.id" => "course id",
+                         "learning_outcomes.id" => "learning outcome id" }
+      outcome_order.split(",").map do |x|
+        column_mapping[x.strip]
+      end
+    end
+
+    def canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
+      return false if canvas_index >= canvas_scope.length
+      return true if os_index >= os_scope.length
+
+      order = map_order_to_columns(outcome_order)
+
+      canvas = canvas_scope[canvas_index]
+      os = os_scope[os_index]
+      order.each do |column|
+        if canvas[column] != os[column]
+          return canvas[column] < os[column]
+        end
+      end
+      # default is to return true causing canvas data to appear before OS data
+      # we will only default to this if all the oder columns are equal
+      true
+    end
+
+    def write_outcomes_report(headers, canvas_scope, config_options = {})
       config_options[:empty_scope_message] ||= "No outcomes found"
+      config_options[:new_quizzes_scope] ||= []
       header_keys = headers.keys
       header_names = headers.values
       host = root_account.domain
       enable_i18n_features = true
 
+      os_scope = config_options[:new_quizzes_scope]
+
       write_report header_names, enable_i18n_features do |csv|
-        total = scope.length
+        total = canvas_scope.length + os_scope.length
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
-        scope.each do |row|
-          row = row.attributes.dup
+
+        canvas_index = 0
+        os_index = 0
+        while canvas_index < canvas_scope.length || os_index < os_scope.length
+          if canvas_next?(canvas_scope, canvas_index, os_scope, os_index)
+            row = canvas_scope[canvas_index].attributes.dup
+            canvas_index += 1
+          else
+            row = os_scope[os_index]
+            os_index += 1
+          end
 
           row["assignment url"] = "https://#{host}" \
                                   "/courses/#{row["course id"]}" \
