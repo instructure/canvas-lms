@@ -76,7 +76,7 @@ export const AccountCalendarItem: React.FC<ComponentProps> = ({
           <IconCalendarMonthLine width={CALENDAR_ICON_SIZE} height={CALENDAR_ICON_SIZE} />
         </FlexItem>
         <FlexItem>
-          <Text>{item.name}</Text>
+          <Text data-testid="account-calendar-name">{item.name}</Text>
         </FlexItem>
       </Flex>
     </View>

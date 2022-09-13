@@ -96,7 +96,7 @@ export const AccountList: React.FC<ComponentProps> = ({
   if (accounts.length === 0) {
     return (
       <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
-        <FlexItem margin="0 0 medium">
+        <FlexItem data-testid="empty-account-search" margin="0 0 medium">
           <Img src={SpacePandaUrl} />
         </FlexItem>
         <FlexItem>
