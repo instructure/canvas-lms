@@ -24,9 +24,17 @@ const I18n = useI18nScope('gradebookSharedGradebookexportManager')
 type Export = {
   progressId: string
   attachmentId: string
+  filename: string
+}
+
+type StartExportResponse = {
+  attachmentUrl: string
+  updatedAt: Date
 }
 
 class GradebookExportManager {
+  private _exportCancelled: boolean
+
   export?: Export
 
   pollingInterval: number
@@ -37,15 +45,21 @@ class GradebookExportManager {
 
   attachmentBaseUrl: string
 
+  cancelBaseUrl: string
+
   currentUserId: string
 
   exportStatusPoll: number | null = null
+
+  updateExportState?: (name?: string, val?: number) => void
 
   static DEFAULT_POLLING_INTERVAL = 2000
 
   static DEFAULT_MONITORING_BASE_URL = '/api/v1/progress'
 
   static DEFAULT_ATTACHMENT_BASE_URL = '/api/v1/users'
+
+  static DEFAULT_CANCEL_BASE_URL = '/api/v1/progress'
 
   static exportCompleted(workflowState) {
     return workflowState === 'completed'
@@ -62,14 +76,18 @@ class GradebookExportManager {
     exportingUrl,
     currentUserId,
     existingExport,
-    pollingInterval = GradebookExportManager.DEFAULT_POLLING_INTERVAL
+    pollingInterval = GradebookExportManager.DEFAULT_POLLING_INTERVAL,
+    updateExportState?: (name?: string, val?: number) => void
   ) {
     this.pollingInterval = pollingInterval
 
     this.exportingUrl = exportingUrl
     this.monitoringBaseUrl = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
     this.attachmentBaseUrl = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
+    this.cancelBaseUrl = GradebookExportManager.DEFAULT_CANCEL_BASE_URL
     this.currentUserId = currentUserId
+    this.updateExportState = updateExportState
+    this._exportCancelled = false
 
     if (existingExport) {
       const workflowState = existingExport.workflowState
@@ -92,11 +110,34 @@ class GradebookExportManager {
     return `${this.attachmentBaseUrl}/${this.export.attachmentId}`
   }
 
+  cancelUrl() {
+    if (!this.export?.progressId) return ''
+
+    return `${this.cancelBaseUrl}/${this.export.progressId}/cancel`
+  }
+
   clearMonitor() {
     if (this.exportStatusPoll) {
       window.clearInterval(this.exportStatusPoll)
       this.exportStatusPoll = null
     }
+  }
+
+  setExportState(completion?: number, filename?: string) {
+    this.updateExportState?.(filename ?? this.export?.filename, completion)
+  }
+
+  async cancelExport() {
+    this._exportCancelled = true
+    this.setExportState(undefined)
+
+    await axios.post(this.cancelUrl())
+  }
+
+  clearMonitorExport() {
+    this.clearMonitor()
+    this.setExportState(undefined)
+    this.export = undefined
   }
 
   monitorExport(resolve, reject) {
@@ -107,11 +148,22 @@ class GradebookExportManager {
     }
 
     this.exportStatusPoll = window.setInterval(() => {
+      if (this._exportCancelled) {
+        this.clearMonitorExport()
+        resolve()
+      }
+
       axios
         .get(this.monitoringUrl() || '')
         .then(response => {
-          const workflowState = response.data.workflow_state
+          if (this._exportCancelled) {
+            this.clearMonitorExport()
+            resolve()
+          }
 
+          const {workflow_state: workflowState, completion} = response.data
+
+          this.setExportState(completion)
           if (GradebookExportManager.exportCompleted(workflowState)) {
             this.clearMonitor()
 
@@ -119,13 +171,12 @@ class GradebookExportManager {
             axios
               .get(this.attachmentUrl() || '')
               .then(attachmentResponse => {
-                const resolution = {
+                const resolution: StartExportResponse = {
                   attachmentUrl: attachmentResponse.data.url,
                   updatedAt: attachmentResponse.data.updated_at,
                 }
 
                 this.export = undefined
-
                 resolve(resolution)
               })
               .catch(reject)
@@ -155,6 +206,8 @@ class GradebookExportManager {
       return Promise.reject(I18n.t('An export is already in progress.'))
     }
 
+    this._exportCancelled = false
+
     const params = {
       grading_period_id: gradingPeriodId,
       show_student_first_last_name: showStudentFirstLastName,
@@ -174,10 +227,14 @@ class GradebookExportManager {
     }
 
     return axios.post(this.exportingUrl, params).then(response => {
+      const {progress_id: progressId, attachment_id: attachmentId, filename} = response.data
       this.export = {
-        progressId: response.data.progress_id,
-        attachmentId: response.data.attachment_id,
+        progressId,
+        attachmentId,
+        filename
       }
+
+      this.setExportState(0, filename)
 
       return new Promise<{
         attachmentUrl: string

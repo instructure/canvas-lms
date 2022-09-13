@@ -141,6 +141,7 @@ QUnit.module('GradebookExportManager - startExport', {
     const expectedExportFromServer = {
       progress_id: 'newProgressId',
       attachment_id: 'newAttachmentId',
+      filename: 'newfile',
     }
 
     // Initial request to start the export
@@ -255,6 +256,7 @@ test('sets a new existing export and returns a fulfilled promise', function () {
   const expectedExport = {
     progressId: 'newProgressId',
     attachmentId: 'newAttachmentId',
+    filename: 'newfile',
   }
 
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)

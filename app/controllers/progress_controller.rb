@@ -110,4 +110,16 @@ class ProgressController < ApplicationController
       render json: progress_json(progress, @current_user, session)
     end
   end
+
+  # @API Cancel progress
+  # Cancel an asynchronous job associated with a Progress object
+  #
+  # @returns Progress
+  def cancel
+    progress = Progress.find(params[:id])
+    if authorized_action(progress, @current_user, :cancel)
+      progress.update!(workflow_state: "failed")
+      render json: progress_json(progress, @current_user, session)
+    end
+  end
 end

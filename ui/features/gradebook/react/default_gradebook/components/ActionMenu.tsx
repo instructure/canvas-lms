@@ -68,6 +68,8 @@ export type ActionMenuProps = {
     isEnabled: boolean
     publishToSisUrl: string
   }
+  updateExportState?: (name?: string, val?: number) => void
+  setExportManager?: (val?: GradebookExportManager) => void
 }
 
 export type ActionMenuState = {
@@ -107,8 +109,23 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     this.exportManager = new GradebookExportManager(
       this.props.gradebookExportUrl,
       this.props.currentUserId,
-      existingExport
+      existingExport,
+      undefined,
+      this.props.updateExportState
     )
+
+    if (this.props.setExportManager) {
+      this.props.setExportManager(this.exportManager)
+    }
+
+    const {lastExport} = this.props
+    if (
+      lastExport &&
+      lastExport.workflowState !== 'completed' &&
+      lastExport.workflowState !== 'failed'
+    ) {
+      this.handleResumeExport()
+    }
   }
 
   componentWillUnmount() {
@@ -132,7 +149,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
 
   handleExport(currentView) {
     this.setExportInProgress(true)
-    $.flashMessage(I18n.t('Gradebook export started'))
+    $.flashMessage(I18n.t('Gradebook export has started. This may take a few minutes.'))
 
     return this.exportManager
       ?.startExport(
@@ -142,27 +159,55 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
         this.props.getStudentOrder,
         currentView
       )
-      .then(resolution => {
-        this.setExportInProgress(false)
+      .then(resolution => this.handleExportSuccess(resolution))
+      .catch(error => this.handleExportError(error))
+  }
 
-        const attachmentUrl = resolution.attachmentUrl
-        const updatedAt = new Date(resolution.updatedAt)
+  handleResumeExport() {
+    new Promise((resolve, reject) => {
+      this.exportManager?.monitorExport(resolve, reject)
+    })
+      .then(resolution => this.handleExportSuccess(resolution))
+      .catch(error => this.handleExportError(error))
+  }
 
-        const previousExport = {
-          label: `${I18n.t('New Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-          attachmentUrl,
-        }
+  handleUpdateExportState(name?: string, value?: number) {
+    setTimeout(() => {
+      if (this.props.updateExportState) {
+        this.props.updateExportState(name, value)
+      }
+    }, 3500)
+  }
 
-        this.setState({previousExport})
+  handleExportSuccess(resolution) {
+    this.setExportInProgress(false)
 
-        // Since we're still on the page, let's automatically download the CSV for them as well
-        ActionMenu.gotoUrl(attachmentUrl)
-      })
-      .catch(reason => {
-        this.setExportInProgress(false)
+    if (!resolution) {
+      return
+    }
 
-        $.flashError(I18n.t('Gradebook Export Failed: %{reason}', {reason}))
-      })
+    const attachmentUrl = resolution.attachmentUrl
+    const updatedAt = new Date(resolution.updatedAt)
+
+    const previousExport = {
+      label: `${I18n.t('New Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
+      attachmentUrl
+    }
+
+    this.setState({previousExport})
+
+    // Since we're still on the page, let's automatically download the CSV for them as well
+    ActionMenu.gotoUrl(attachmentUrl)
+
+    this.handleUpdateExportState(undefined, undefined)
+
+    $.flashMessage(I18n.t('Gradebook export has completed'))
+  }
+
+  handleExportError(error) {
+    this.setExportInProgress(false)
+
+    $.flashError(I18n.t('Gradebook Export Failed: %{error}', {error}))
   }
 
   handleImport() {

@@ -2097,6 +2097,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :progress) do
       get "progress/:id", action: :show, as: "progress"
+      post "progress/:id/cancel", action: :cancel
     end
 
     scope(controller: :app_center) do

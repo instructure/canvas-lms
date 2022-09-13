@@ -701,6 +701,42 @@ describe GradebookExporter do
         end
       end
     end
+
+    describe "update_completion" do
+      before(:once) do
+        student_in_course(course: @course, active_all: true)
+        @first_group = @course.assignment_groups.create!(name: "first group", position: 1)
+        @last_group = @course.assignment_groups.create!(name: "last group", position: 3)
+        @second_group = @course.assignment_groups.create!(name: "second group", position: 2)
+
+        @assignments = []
+        @first_group_assignment = @course.assignments.create!(name: "First group assignment", assignment_group: @first_group)
+        @assignments[0] = @first_group_assignment
+        @last_group_assignment = @course.assignments.create!(name: "last group assignment", assignment_group: @last_group)
+        @assignments[2] = @last_group_assignment
+        @second_group_assignment = @course.assignments.create!(name: "second group assignment", assignment_group: @second_group)
+        @assignments[1] = @second_group_assignment
+      end
+
+      it "updates progress.completion to 90 when finished" do
+        progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
+        exporter_options = {
+          progress: progress
+        }
+        GradebookExporter.new(@course, @teacher, exporter_options).to_csv
+        expect(progress.reload.completion).to eql(90.0)
+      end
+
+      it "does early return if progress workflow_state has been set to failed" do
+        progress = Progress.create!(context: @course, tag: "gradebook_to_csv")
+        progress.update!(workflow_state: "failed")
+        exporter_options = {
+          progress: progress
+        }
+        GradebookExporter.new(@course, @teacher, exporter_options).to_csv
+        expect(progress.reload.completion).to eql(50.0)
+      end
+    end
   end
 
   context "a course with a student whose name starts with an equals sign" do

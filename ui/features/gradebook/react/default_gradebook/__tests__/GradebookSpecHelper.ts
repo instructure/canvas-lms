@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Gradebook from '../Gradebook'
+import Gradebook, {GradebookProps} from '../Gradebook'
 import GradebookGrid from '../GradebookGrid/index'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
@@ -90,7 +90,7 @@ export const defaultGradebookEnv = {
   student_groups: {},
 }
 
-export const defaultGradebookProps = {
+export const defaultGradebookProps: GradebookProps = {
   appliedFilters: [],
   hideGrid: true,
   isFiltersLoading: false,
@@ -110,9 +110,28 @@ export const defaultGradebookProps = {
   viewOptionsMenuNode: document.createElement('div'),
   gradingPeriodsFilterContainer: document.createElement('div'),
   gradebookEnv: defaultGradebookEnv,
+  colors: {
+    dropped: 'test',
+    excused: 'test',
+    extended: 'test',
+    late: 'test',
+    missing: 'test',
+    resubmitted: 'test'
+  },
+  dispatch: new RequestDispatch(),
+  gradebookGridNode: document.createElement('div'),
+  performanceControls: new PerformanceControls(),
+  isCustomColumnsLoading: false,
+  customColumns: [],
 }
 
-export function createGradebook(options = {}) {
+export function createGradebook(
+  options: {
+    performance_controls?: any
+    gradebook_is_editable?: any
+    gradebookGridNode?: HTMLElement
+  } = {}
+) {
   const performanceControls = new PerformanceControls({
     ...performance_controls,
     ...camelize(options.performance_controls),
