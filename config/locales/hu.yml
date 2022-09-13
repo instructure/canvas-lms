@@ -2536,6 +2536,7 @@ hu:
     errors: 
       frozen_assignments_error: "Zárolt feladatot tartalmazó csoport nem törölhető."
   assignment_groups_bc9cc3c9: Feladatcsoportok
+  assignment_groups_weight_2f1a5a7c: "Feladatcsoport súlyok"
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} értékelve lett erre: %{name}."
   assignment_id_96baa1b7: feladatazonosító
   assignment_id_b040cee0: Feladatazonosító
@@ -4016,8 +4017,8 @@ hu:
   close_17f50799: bezárás
   close_and_return_to_canvas_80544344: "Bezárás és a munka folytatása"
   close_d634289d: Bezárás
-  close_for_comments_37783f56: "Megjegyzések lezárása"
-  close_for_comments_ce0e5d00: "Nem fűzhető hozzá megjegyzés"
+  close_for_comments_37783f56: "Megjegyzések tiltása"
+  close_for_comments_ce0e5d00: "Megjegyzések tiltása"
   close_grade_info_58ef5a20: "Osztályzási információk bezárása"
   close_sidebar_10b0fbb4: "Oldalsáv bezárása"
   close_warning_d61daf2c: "Figyelmeztetés bezárása"
@@ -5659,7 +5660,7 @@ hu:
         toggle_navigation_dragging: Szóköz
       labels: 
         account_id: Alfiók
-        allow_student_discussion_editing: "A hallgatók szerkeszthetik, illetve törölhetik saját fórumbejegyzéseiket"
+        allow_student_discussion_editing: "A hallgatók szerkeszthessék, illetve törölhessék a saját válaszaikat"
         allow_student_discussion_topics: "A hallgatók fórumtémákat hozhatnak létre"
         allow_student_forum_attachments: "A hallgatók fájlokat csatolhatnak a fórumokba"
         allow_student_organized_groups: "A hallgatók saját csoportokat szervezhetnek"
@@ -5863,6 +5864,7 @@ hu:
   create_a_new_account_4cf7c0f9: "Új fiók létrehozása"
   create_a_new_module_6f31b0fe: "Új modul létrehozása"
   create_account_263ec6: "Fiók létrehozása"
+  create_announcements_above_1c36202b: "Hozzon létre új hirdetmény"
   create_assessments_with_new_quizzes_and_migrate_ex_92b5f1ad: "Értékelés létrehozása az Új kvízekkel és korábbi Canvas kvízek migrálása."
   create_assignment_68532ceb: "Feladat létrehozása"
   create_course_9a69b32c: "Kurzus létrehozása"
@@ -6473,6 +6475,7 @@ hu:
     default_user_name: Felhasználónév
   discussion_group_category_locked: "A csoporthalmazok nem állíthatóak be direkt módon a fórumjellegű feladatkiírásban, helyette magában a fórumban kell ezt beállítani."
   discussion_posts_c998c9ad: Fórumbejegyzések
+  discussion_settings_2fbf0b95: "Fórum beállítások"
   discussion_submission_781d5d33: Fórumbeadás
   discussion_topic: 
     atom_no_author: "Nincs szerző"
@@ -6637,7 +6640,7 @@ hu:
       links: 
         peer_reviews: Társértékelések
       loading_replies: "Válaszok betöltése..."
-      lock_topic: "Nem fűzhető hozzá megjegyzés"
+      lock_topic: "Megjegyzések tiltása"
       manage_announcement: "Hirdetmény kezelése"
       manage_discussion: "Fórum kezelése"
       mark_all_as_read: "Az összes megjelölése olvasottként"
@@ -12075,6 +12078,7 @@ hu:
   nickname_1e6da3ad: Becenév
   no_74e9b590: nem
   no_announcements_280df147: "Nincsenek hirdetmények"
+  no_announcements_to_display_fbf9ed1e: "Nincsenek megjeleníthető hirdetmények"
   no_assignment_name_adbb215b: "Nincs feladatnév"
   no_assignments_with_that_name_found_1d7be1: "Ezen a néven nem található feladat"
   no_associated_terms_13bacefc: "Nincsenek társított félévek"
@@ -12473,6 +12477,7 @@ hu:
   number_more_a46966: "%{number}További..."
   number_of_allowed_attempts_3d10b740: "Engedélyezett próbálkozások száma"
   number_of_respondents_e1e7e8b: "Válaszadók száma"
+  number_of_scores_to_ignore_for_each_student_fb94e818: "Az elhagyandó pontszámok száma minden egyes hallgatónál"
   numerical_answer_ec7120bf: "Numerikus válasz"
   o_224cf405: o
   oauth2_provider: 
@@ -15663,13 +15668,16 @@ hu:
   search_23a88d5c: Keresés...
   search_280d00bd: Keresés
   search_a28cbc02: Keresés...
+  search_announcements_by_title_407a998e: "Hirdetmény keresése cím alapján"
   search_by_c559efd: Keresés
   search_by_student_name_26536097: "Keresés a hallgató neve alapján"
   search_by_title_or_author_273a8f49: "Keresés cím vagy szerző szerint..."
+  search_by_title_short_name_or_sis_id_fe84aa12: "Keresés cím, rövid név vagy SIS azonosító alapján"
   search_by_user_dd3ad189: "Keresés felhasználó szerint"
   search_courses_591bc900: "Kurzusok keresése..."
   search_courses_7b5c4ab3: "Kurzusok keresése"
   search_courses_by_teacher_e9760a48: "Kurzusok keresése oktató alapján..."
+  search_discussion_by_title_30466604: "Fórum keresése cím alapján"
   search_entries_or_author_63fb0a86: "Bejegyzések vagy szerzők keresése"
   search_flickr_6f28b02e: "Flickr keresése"
   search_for_files_7541fb28: "Fájlok keresése"
@@ -17790,8 +17798,16 @@ hu:
   top_box_background_6db383e9: "Felső doboz háttere"
   top_box_border_94cee4a7: "Felső doboz szegélye"
   total_71a4807: Összesen
+  total_grade_b0c33841: "Összesen: %{grade}"
+  total_messages_af025be6: "Összes üzenet"
+  total_options_351e2682: "Összes opció"
   total_points_44d76792: Összpontszám
+  total_points_total_f41b2cff: "Összes pont: %{total}"
+  total_points_total_out_of_possible_9056fdb4: "Összes pont: %{total} / %{possible}"
   total_range_45c8549a: "Teljes tartomány"
+  total_results_outcomedetails_cnt_30ff1f8d: "Összesített eredmény: %{outcomeDetails.cnt}"
+  totalcount_total_replies_b6988c0a: "%{totalCount}darab válasz"
+  totals_are_calculated_based_only_on_graded_assignm_7d1bbf55: "Az összesítés számítása csak az értékelt feladatok alapján történt"
   totals_be24703: Összesítések
   treat_ungraded_as_0_d38c2b41: "Osztályzat nélküliek kezelése 0-ként"
   tree_browser: 
@@ -18436,8 +18452,10 @@ hu:
   view_announcements_b6d6d819: "Hirdetmények megtekintése"
   view_app_center_6c89a3fe: "Alkalmazásközpont megtekintése"
   view_app_configurations_52b52441: "Alkalmazáskonfigurációk megtekintése"
+  view_assignment_group_totals_c8db16b2: "A feladatcsoport összesítések megtekintése"
   view_ba339f93: Megtekintés
   view_course_analytics_eefe6b2: "Kurzusanalitika megtekintése"
+  view_coursename_s_assignment_group_totals_bd4b707: " %{courseName} nevű kurzus feladatcsoport összesítéseinek megtekintése"
   view_faculty_journals_ad0e8c8f: "Intézményi hírlevelek megtekintése"
   view_feature_settings_at_an_account_level_ec7f5e10: "Funkció beállítások áttekintése fiók szinten"
   view_feedback_f2feabca: "Visszajelzés megtekintése"
@@ -18524,10 +18542,11 @@ hu:
   week_s_cb1492ee: Hét/(hetek)
   weight_9b308e5b: Súly
   weight_ff579a8e: "Súly:"
+  weight_final_grade_based_on_assignment_groups_3124161: "A végső értékelés súlyozása feladatcsoportok alapján"
   weight_of_final_abbbe82f: "A végső értékelésben a súlya %{weight}"
   welcome_to_the_canvas_theme_editor_73091d1: "Üdvözöljük a Canvas-témaszerkesztőben"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Üdvözöljük a kurzusain! A kurzuslista testreszabásához kattintson az \"Összes kurzus\" linkre, és csillagozza meg a megjeleníteni kívánt kurzusokat."
-  welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Üdvözöljük a kurzusok oldalon! A kurzusok listájának testreszabásához kattintson az \"Összes kurzus\" linkre, és csillagozza meg a megjelenítendő tanfolyamokat."
+  welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Üdvözöljük a kurzusok oldalon! A kurzusok listájának testreszabásához kattintson az \"Összes kurzus\" linkre, és csillagozza meg a megjelenítendő kurzusokat."
   well_below_mastery_37664bdc: "Jóval a jártassági szint alatt"
   welsh_42ab94b1: Walesi
   what_does_provisioning_only_mean_eac9a4a1: "Mit jelent a 'csak létesítés'?"
