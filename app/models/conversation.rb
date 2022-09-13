@@ -767,6 +767,11 @@ class Conversation < ActiveRecord::Base
 
     course = context.is_a?(Course) ? context : context.context
 
+    # Can not reply if the course is hard or soft concluded
+    if course.is_a?(Course) && (course.workflow_state == "completed" || course.soft_concluded?)
+      return true
+    end
+
     # can still reply if a teacher is involved
     if (course.is_a?(Course) && conversation_participants.where(user_id: participants_user_ids).where(user_id: course.admin_enrollments.active.select(:user_id)).exists?) ||
        # can still reply if observing all the other participants
