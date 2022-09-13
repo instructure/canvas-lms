@@ -876,12 +876,7 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,Uno,user1@example.com,active,true,canvas"
     )
 
-    process_csv_data_cleanly(
-      "user_id,login_id,first_name,last_name,email,status,canvas_password_notification,authentication_provider_id",
-      "user_1,user1,User,Uno,user1@example.com,active,true,canvas"
-    )
-
-    expect(Pseudonym.where(account_id: @account, sis_user_id: "user_1").first.user.workflow_state).to eq "pre_registered"
+    expect(Pseudonym.by_unique_id("user1").first.user.workflow_state).to eq "pre_registered"
   end
 
   it "does not send a registration notification email when canvas_password_notification is not provided" do
