@@ -1322,6 +1322,11 @@ class UsersController < ApplicationController
 
       @group_memberships = @user.cached_current_group_memberships_by_date
 
+      # restrict group memberships view for other users
+      if @user != @current_user
+        @group_memberships = @group_memberships.select { |m| m.grants_right?(@current_user, session, :read) }
+      end
+
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
@@ -1331,7 +1336,7 @@ class UsersController < ApplicationController
                           .eager_load(:course)
                           .preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
-      # restrict view for other users
+      # restrict course enrollments view for other users
       if @user != @current_user
         @enrollments = @enrollments.select { |e| e.grants_right?(@current_user, session, :read) }
       end
