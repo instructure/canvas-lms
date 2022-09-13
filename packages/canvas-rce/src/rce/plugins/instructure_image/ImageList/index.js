@@ -17,12 +17,12 @@
  */
 
 import React from 'react'
-import {arrayOf, func, instanceOf, shape} from 'prop-types'
+import {arrayOf, func, instanceOf, shape, bool} from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 
 import Image from './Image'
 
-export default function ImageList({images, lastItemRef, onImageClick}) {
+export default function ImageList({images, lastItemRef, onImageClick, isIconMaker}) {
   return (
     <Flex justifyItems="start" height="100%" margin="xx-small" padding="small" wrap="wrap">
       {images.map((image, index) => {
@@ -38,7 +38,12 @@ export default function ImageList({images, lastItemRef, onImageClick}) {
             margin="xx-small xx-small small xx-small"
             size="6rem"
           >
-            <Image focusRef={focusRef} image={image} onClick={onImageClick} />
+            <Image
+              focusRef={focusRef}
+              image={image}
+              onClick={onImageClick}
+              isIconMaker={isIconMaker}
+            />
           </Flex.Item>
         )
       })}
@@ -51,9 +56,11 @@ ImageList.propTypes = {
   lastItemRef: shape({
     current: instanceOf(Element)
   }).isRequired,
-  onImageClick: func.isRequired
+  onImageClick: func.isRequired,
+  isIconMaker: bool
 }
 
 ImageList.defaultProps = {
-  images: []
+  images: [],
+  isIconMaker: false
 }

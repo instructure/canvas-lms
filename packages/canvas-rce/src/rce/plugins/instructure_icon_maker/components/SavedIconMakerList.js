@@ -46,6 +46,7 @@ const SavedIconMakerList = ({onImageEmbed}) => {
           order: 'desc'
         }}
         onImageEmbed={onImageEmbed}
+        isIconMaker={true}
       />
     </View>
   )
