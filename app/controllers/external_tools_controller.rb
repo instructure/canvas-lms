@@ -210,8 +210,10 @@ class ExternalToolsController < ApplicationController
 
   # @API Get a sessionless launch url for an external tool.
   # Returns a sessionless launch url for an external tool.
+  # Prefers the resource_link_lookup_uuid, but defaults to the other passed
+  #   parameters id, url, and launch_type
   #
-  # NOTE: Either the id or url must be provided unless launch_type is assessment or module_item.
+  # NOTE: Either the resource_link_lookup_uuid, id, or url must be provided unless launch_type is assessment or module_item.
   #
   # @argument id [String]
   #   The external id of the tool to launch.
@@ -229,6 +231,9 @@ class ExternalToolsController < ApplicationController
   #   The type of launch to perform on the external tool. Placement names (eg. "course_navigation")
   #   can also be specified to use the custom launch url for that placement; if done, the tool id
   #   must be provided.
+  #
+  # @argument resource_link_lookup_uuid [String]
+  #   The identifier to lookup a resource link.
   #
   # @response_field id The id for the external tool to be launched.
   # @response_field name The name of the external tool to be launched.
@@ -279,14 +284,20 @@ class ExternalToolsController < ApplicationController
       return render json: @context.errors, status: :service_unavailable
     end
 
-    launch_type = params[:launch_type]
-    case launch_type
-    when "module_item"
-      generate_module_item_sessionless_launch
-    when "assessment"
-      generate_assignment_sessionless_launch
+    if params[:resource_link_lookup_uuid]
+      generate_common_sessionless_launch(options: {
+                                           resource_link_lookup_uuid: params[:resource_link_lookup_uuid]
+                                         })
     else
-      generate_common_sessionless_launch(options: { launch_url: params[:url] })
+      launch_type = params[:launch_type]
+      case launch_type
+      when "module_item"
+        generate_module_item_sessionless_launch
+      when "assessment"
+        generate_assignment_sessionless_launch
+      else
+        generate_common_sessionless_launch(options: { launch_url: params[:url] })
+      end
     end
   end
 
@@ -1378,15 +1389,21 @@ class ExternalToolsController < ApplicationController
     launch_type = params[:launch_type]
     module_item = options[:module_item]
     assignment = options[:assignment]
+    resource_link_lookup_uuid = options[:resource_link_lookup_uuid]
 
-    unless tool_id || launch_url || module_item
-      @context.errors.add(:id, "A tool id, tool url, or module item id must be provided")
-      @context.errors.add(:url, "A tool id, tool url, or module item id must be provided")
-      @context.errors.add(:module_item_id, "A tool id, tool url, or module item id must be provided")
+    unless tool_id || launch_url || module_item || resource_link_lookup_uuid
+      message = "A tool id, tool url, module item id, or resource link lookup uuid must be provided"
+      @context.errors.add(:id, message)
+      @context.errors.add(:url, message)
+      @context.errors.add(:module_item_id, message)
+      @context.errors.add(:resource_link_lookup_uuid, message)
       return render json: @context.errors, status: :bad_request
     end
 
-    if launch_url && module_item.blank?
+    # Prefer resource_link_lookup_uuid when given over other parameters
+    if resource_link_lookup_uuid
+      @tool = find_tool_and_url(resource_link_lookup_uuid, launch_url, context, nil).first
+    elsif launch_url && module_item.blank?
       @tool = ContextExternalTool.find_external_tool(launch_url, @context, tool_id)
     elsif module_item
       @tool = ContextExternalTool.find_external_tool(
@@ -1418,7 +1435,7 @@ class ExternalToolsController < ApplicationController
       # initialize a Canvas session and launch the tool.
       begin
         launch_link = sessionless_launch_link(
-          options.merge(id: tool_id, launch_type: launch_type),
+          options.merge(id: tool_id, launch_type: launch_type, lookup_id: resource_link_lookup_uuid),
           @context,
           @tool,
           generate_session_token

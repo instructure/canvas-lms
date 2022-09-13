@@ -29,7 +29,7 @@ Each launch path is defined in greater detail in the [LTI 2.0 Launches document]
 If, for some reason, you need to make sweeping changes to LTI 2.0 launches, these three entry points should be tested.
 
 ## LTI 1.3 Launches
-Canvas has five primary entry points for initiating LTI 1.1 launches:
+Canvas has five primary entry points for initiating LTI 1.3 launches:
 
 - Users Controller (`/app/controllers/users_controller.rb#external_tool`)
 - Application Controller (`app/controllers/application_controller.rb#content_tag_redirect`)

@@ -250,8 +250,8 @@ describe ExternalToolsController, type: :request do
           code = get_raw_sessionless_launch_url(@course, params)
           expect(code).to eq 400
           json = JSON.parse(response.body)
-          expect(json["errors"]["id"].first["message"]).to eq "A tool id, tool url, or module item id must be provided"
-          expect(json["errors"]["url"].first["message"]).to eq "A tool id, tool url, or module item id must be provided"
+          expect(json["errors"]["id"].first["message"]).to eq "A tool id, tool url, module item id, or resource link lookup uuid must be provided"
+          expect(json["errors"]["url"].first["message"]).to eq "A tool id, tool url, module item id, or resource link lookup uuid must be provided"
         end
       end
     end
