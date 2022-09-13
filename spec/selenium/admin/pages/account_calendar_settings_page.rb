@@ -38,8 +38,28 @@ module AccountCalendarSettingsPage
     "[data-testid='save-button']"
   end
 
+  def calendar_search_selector
+    "[placeholder='Search Calendars']"
+  end
+
   def calendars_selected_text_selector
     "[data-testid='calendars-selected-text']"
+  end
+
+  def calendar_search_list_selector
+    "[data-testid = 'flex-calendar-item']:visible"
+  end
+
+  def visible_account_calendar_text_selector
+    "[data-testid = 'account-calendar-name']:visible"
+  end
+
+  def filter_dropdown_selector
+    "[data-testid = 'account-filter-dropdown']"
+  end
+
+  def search_empty_image_selector
+    "[data-testid='empty-account-search']"
   end
   # ---------------------- Elements ----------------------
 
@@ -59,8 +79,28 @@ module AccountCalendarSettingsPage
     f(apply_changes_button_selector)
   end
 
+  def calendar_search
+    f(calendar_search_selector)
+  end
+
+  def calendar_search_list
+    ffj(calendar_search_list_selector)
+  end
+
   def calendars_selected_text
     f(calendars_selected_text_selector)
+  end
+
+  def visible_account_calendar_text
+    ffj(visible_account_calendar_text_selector)
+  end
+
+  def filter_dropdown
+    f(filter_dropdown_selector)
+  end
+
+  def search_empty_image
+    f(search_empty_image_selector)
   end
 
   # ---------------------- Actions -----------------------
@@ -83,6 +123,12 @@ module AccountCalendarSettingsPage
 
   def click_apply_changes_button
     apply_changes_button.click
+  end
+
+  def input_search_string(search_string)
+    driver.action.send_keys(calendar_search, search_string).perform
+    driver.action.send_keys(calendar_search, :tab).perform
+    driver.action.send_keys(calendar_search, :tab).perform
   end
 
   # ---------------------- Methods -----------------------

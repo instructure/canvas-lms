@@ -48,77 +48,127 @@ describe "Account Calendar Settings" do
     expect(driver.current_url).to include(account_calendar_settings_url)
   end
 
-  it "shows multiple accounts and subaccounts with checkboxes" do
-    get("/accounts/#{account.id}/calendar_settings")
+  context "account calendar listings and checkboxes" do
+    it "shows multiple accounts and subaccounts with checkboxes" do
+      get("/accounts/#{account.id}/calendar_settings")
 
-    expect(account_folder(account.name, 3)).to be_displayed
-    expect(account_folder(@sub1_account.name, 2)).to be_displayed
-    expect(element_exists?(account_folder_selector(@sub2_account.name, 1))).to be_falsey
+      expect(account_folder(account.name, 3)).to be_displayed
+      expect(account_folder(@sub1_account.name, 2)).to be_displayed
+      expect(element_exists?(account_folder_selector(@sub2_account.name, 1))).to be_falsey
 
-    default_account_checkboxes = account_checkboxes(account.name, 3)
+      default_account_checkboxes = account_checkboxes(account.name, 3)
 
-    expect(default_account_checkboxes[0]).to include_text(account.name)
-    expect(default_account_checkboxes[1]).to include_text(@sub2_account.name)
+      expect(default_account_checkboxes[0]).to include_text(account.name)
+      expect(default_account_checkboxes[1]).to include_text(@sub2_account.name)
 
-    click_account_folder(@sub1_account.name, 2)
-    sub1_account_checkboxes = account_checkboxes(@sub1_account.name, 2)
+      click_account_folder(@sub1_account.name, 2)
+      sub1_account_checkboxes = account_checkboxes(@sub1_account.name, 2)
 
-    expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
-    expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
+      expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
+      expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
+    end
+
+    it "expands and hides accounts section" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      click_account_folder(account.name, 3)
+      expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_falsey
+      click_account_folder(account.name, 3)
+      expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_truthy
+    end
+
+    it "enables the calendar in the list when clicked and applied", ignore_js_errors: true do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      expect(apply_changes_button).to be_disabled
+
+      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+      expect(apply_changes_button).to be_enabled
+
+      click_apply_changes_button
+      @sub2_account.reload
+      expect(@sub2_account.account_calendar_visible).to be_truthy
+    end
+
+    it "disables the calendar in the list when clicked and applied" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
+
+      get("/accounts/#{account.id}/calendar_settings")
+
+      expect(apply_changes_button).to be_disabled
+
+      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+      expect(apply_changes_button).to be_enabled
+
+      click_apply_changes_button
+
+      @sub2_account.reload
+      expect(@sub2_account.account_calendar_visible).to be_falsey
+    end
+
+    it "shows text at bottom of page with number of calendars selected" do
+      get("/accounts/#{account.id}/calendar_settings")
+
+      expect(calendars_selected_text).to include_text("No account calendars selected")
+
+      click_account_checkbox(account_checkboxes(account.name, 3)[0])
+
+      expect(calendars_selected_text).to include_text("1 Account calendar selected")
+
+      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+
+      expect(calendars_selected_text).to include_text("2 Account calendars selected")
+    end
   end
 
-  it "expands and hides accounts section" do
-    get("/accounts/#{account.id}/calendar_settings")
+  context "account calendar searching and filtering" do
+    it "can search with 2 characters and find accounts" do
+      get("/accounts/#{account.id}/calendar_settings")
+      input_search_string("su")
+      expect(calendar_search_list.count).to eq(3)
+    end
 
-    click_account_folder(account.name, 3)
-    expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_falsey
-    click_account_folder(account.name, 3)
-    expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_truthy
-  end
+    it "receives no results found image/words when bad search" do
+      get("/accounts/#{account.id}/calendar_settings")
+      input_search_string("blarg")
+      wait_for_ajaximations
+      expect(search_empty_image).to be_displayed
+    end
 
-  it "enables the calendar in the list when clicked and applied", ignore_js_errors: true do
-    get("/accounts/#{account.id}/calendar_settings")
+    it "filtering with no results renders 'no results' image" do
+      get("/accounts/#{account.id}/calendar_settings")
 
-    expect(apply_changes_button).to be_disabled
+      click_option(filter_dropdown_selector, "Show only enabled calendars")
+      expect(search_empty_image).to be_displayed
+    end
 
-    click_account_checkbox(account_checkboxes(account.name, 3)[1])
+    it "can filter by enabled calendars" do
+      @sub2_account.account_calendar_visible = true
+      @sub2_account.save!
 
-    expect(apply_changes_button).to be_enabled
+      get("/accounts/#{account.id}/calendar_settings")
 
-    click_apply_changes_button
-    @sub2_account.reload
-    expect(@sub2_account.account_calendar_visible).to be_truthy
-  end
+      click_option(filter_dropdown_selector, "Show only enabled calendars")
 
-  it "disables the calendar in the list when clicked and applied" do
-    @sub2_account.account_calendar_visible = true
-    @sub2_account.save!
+      calendars_shown = visible_account_calendar_text
 
-    get("/accounts/#{account.id}/calendar_settings")
+      expect(calendars_shown[0]).to include_text(@sub2_account.name)
+    end
 
-    expect(apply_changes_button).to be_disabled
+    it "can filter by disabled calendars" do
+      account.account_calendar_visible = true
+      account.save!
 
-    click_account_checkbox(account_checkboxes(account.name, 3)[1])
+      get("/accounts/#{account.id}/calendar_settings")
 
-    expect(apply_changes_button).to be_enabled
+      click_option(filter_dropdown_selector, "Show only disabled calendars")
 
-    click_apply_changes_button
+      calendars_shown = visible_account_calendar_text.map(&:text)
 
-    @sub2_account.reload
-    expect(@sub2_account.account_calendar_visible).to be_falsey
-  end
-
-  it "shows text at bottom of page with number of calendars selected" do
-    get("/accounts/#{account.id}/calendar_settings")
-
-    expect(calendars_selected_text).to include_text("No account calendars selected")
-
-    click_account_checkbox(account_checkboxes(account.name, 3)[0])
-
-    expect(calendars_selected_text).to include_text("1 Account calendar selected")
-
-    click_account_checkbox(account_checkboxes(account.name, 3)[1])
-
-    expect(calendars_selected_text).to include_text("2 Account calendars selected")
+      expect(calendars_shown).to eq([@sub_sub_account.name, @sub1_account.name, @sub2_account.name])
+    end
   end
 end
