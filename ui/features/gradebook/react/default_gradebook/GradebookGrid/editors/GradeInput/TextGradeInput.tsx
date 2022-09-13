@@ -43,7 +43,7 @@ export default class TextGradeInput extends PureComponent {
     this.handleKeyDown = this.handleKeyDown.bind(this)
     this.handleTextChange = this.handleTextChange.bind(this)
 
-    const {gradeEntry, gradeInfo, pendingGradeInfo} = props // eslint-disable-line no-shadow
+    const {gradeEntry, gradeInfo, pendingGradeInfo} = props
     const effectiveGradeInfo = pendingGradeInfo || gradeInfo
 
     this.state = {

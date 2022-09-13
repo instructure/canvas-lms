@@ -18,7 +18,6 @@
 
 import React, {PureComponent} from 'react'
 import {bool, number, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 
