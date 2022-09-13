@@ -34,7 +34,7 @@ export default class ReadOnlyCell extends CellEditorComponent {
   }
 
   render() {
-    const {gradeEntry, gradeInfo, pendingGradeInfo} = this.props // eslint-disable-line no-shadow
+    const {gradeEntry, gradeInfo, pendingGradeInfo} = this.props
     const displayValue = gradeEntry.formatGradeInfoForDisplay(pendingGradeInfo || gradeInfo)
 
     return (

@@ -36,7 +36,7 @@ describe('ApplyScoreToUngradedModal', () => {
 
   function renderComponent(overrides = {}) {
     return render(
-      <ApplyScoreToUngradedModal onApply={onApply} onClose={onClose} open {...overrides} />
+      <ApplyScoreToUngradedModal onApply={onApply} onClose={onClose} open={true} {...overrides} />
     )
   }
 

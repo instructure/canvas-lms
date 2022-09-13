@@ -173,7 +173,7 @@ export default class StudentContentDataLoader {
     const studentIdChunks = chunk(studentIds, this._performanceControls.studentsChunkSize)
 
     // wait for all chunk requests to have been enqueued
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
           const nextChunkIds = studentIdChunks.shift()
