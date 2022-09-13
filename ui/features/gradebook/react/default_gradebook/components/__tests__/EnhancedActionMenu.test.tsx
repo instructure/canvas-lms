@@ -66,6 +66,8 @@ const workingMenuProps = () => ({
   gradingPeriodId: '1234',
 
   showStudentFirstLastName: true,
+  updateExportState: () => {},
+  setExportManager: () => {},
 })
 
 const previousExportProps = () => ({
@@ -244,7 +246,9 @@ describe('EnhancedActionMenu', () => {
       })
       await waitFor(() => {
         expect(spy).toHaveBeenCalled()
-        expect(spy.mock.calls[0][0]).toEqual('Gradebook export started')
+        expect(spy.mock.calls[0][0]).toEqual(
+          'Gradebook export has started. This may take a few minutes.'
+        )
       })
     })
 
@@ -317,7 +321,7 @@ describe('EnhancedActionMenu', () => {
       })
       const specificMenuItem = document
         .querySelector('[data-menu-id="export-all"]')
-        .closest('[role="menuitem"]')
+        ?.closest('[role="menuitem"]')
       await waitFor(() => {
         expect(specificMenuItem).toHaveTextContent('Export Entire Gradebook')
         expect(specificMenuItem).not.toHaveAttribute('aria-disabled', 'true')
@@ -335,10 +339,32 @@ describe('EnhancedActionMenu', () => {
       })
       const specificMenuItem = document
         .querySelector('[data-menu-id="export"]')
-        .closest('[role="menuitem"]')
+        ?.closest('[role="menuitem"]')
       await waitFor(() => {
         expect(specificMenuItem).toHaveTextContent('Export Current Gradebook View')
         expect(specificMenuItem).not.toHaveAttribute('aria-disabled', 'true')
+      })
+    })
+
+    it('on success, shows a message that the export has completed', async () => {
+      const exportResult = getPromise('resolved')
+      startExport.mockReturnValue(exportResult)
+      const messageSpy = jest.spyOn(window.$, 'flashMessage').mockReturnValue(true)
+      const handleUpdateSpyTimeout = jest.spyOn(global, 'setTimeout')
+
+      act(() => {
+        selectDropdownOption('Export Current Gradebook View')
+      })
+      await waitFor(() => {
+        clickOnDropdown('Export')
+      })
+      await waitFor(() => {
+        expect(messageSpy).toHaveBeenCalled()
+        expect(messageSpy.mock.calls[0][0]).toEqual(
+          'Gradebook export has started. This may take a few minutes.'
+        )
+        expect(messageSpy.mock.calls[1][0]).toEqual('Gradebook export has completed')
+        expect(handleUpdateSpyTimeout).toHaveBeenCalled()
       })
     })
 
@@ -368,10 +394,10 @@ describe('EnhancedActionMenu', () => {
       })
       const exportMenuItem = document
         .querySelector('[data-menu-id="export"]')
-        .closest('[role="menuitem"]')
+        ?.closest('[role="menuitem"]')
       const exportAllMenuItem = document
         .querySelector('[data-menu-id="export-all"]')
-        .closest('[role="menuitem"]')
+        ?.closest('[role="menuitem"]')
       await waitFor(() => {
         expect(exportMenuItem).toHaveTextContent('Export Current Gradebook View')
         expect(exportMenuItem).not.toHaveAttribute('aria-disabled', 'true')
@@ -399,7 +425,7 @@ describe('EnhancedActionMenu', () => {
         gradebookIsEditable: false,
       }
       component = renderComponent(props)
-      const specificMenuItem = document.querySelector('[data-menu-id="import"]').closest('button')
+      const specificMenuItem = document.querySelector('[data-menu-id="import"]')?.closest('button')
       expect(specificMenuItem).toHaveAttribute('disabled', '')
     })
 
@@ -409,7 +435,7 @@ describe('EnhancedActionMenu', () => {
         contextAllowsGradebookUploads: false,
       }
       component = renderComponent(props)
-      const specificMenuItem = document.querySelector('[data-menu-id="import"]').closest('button')
+      const specificMenuItem = document.querySelector('[data-menu-id="import"]')?.closest('button')
       expect(specificMenuItem).toHaveAttribute('disabled', '')
     })
   })

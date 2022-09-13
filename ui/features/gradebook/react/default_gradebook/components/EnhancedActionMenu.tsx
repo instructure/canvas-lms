@@ -70,6 +70,8 @@ export type EnhancedActionMenuProps = {
     publishToSisUrl: string
   }
   showStudentFirstLastName: boolean
+  updateExportState: (name?: string, val?: number) => void
+  setExportManager: (val?: GradebookExportManager) => void
 }
 
 export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
@@ -85,8 +87,22 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     exportManager.current = new GradebookExportManager(
       props.gradebookExportUrl,
       props.currentUserId,
-      existingExport
+      existingExport,
+      undefined,
+      props.updateExportState
     )
+    if (props.setExportManager) {
+      props.setExportManager(exportManager.current)
+    }
+
+    const {lastExport} = props
+    if (
+      lastExport &&
+      lastExport.workflowState !== 'completed' &&
+      lastExport.workflowState !== 'failed'
+    ) {
+      handleResumeExport()
+    }
     return () => {
       if (exportManager.current) exportManager.current.clearMonitor()
     }
@@ -103,43 +119,72 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     }
   }
 
-  const handleExport = currentView => {
+  const handleExport = async currentView => {
     setExportInProgress(true)
-    $.flashMessage(I18n.t('Gradebook export started'))
+    $.flashMessage(I18n.t('Gradebook export has started. This may take a few minutes.'))
 
     if (!exportManager.current) {
       throw new Error('exportManager not loaded')
     }
 
-    return exportManager.current
-      .startExport(
+    try {
+      const resolution = await exportManager.current.startExport(
         props.gradingPeriodId,
         props.getAssignmentOrder,
         props.showStudentFirstLastName,
         props.getStudentOrder,
         currentView
       )
-      .then(resolution => {
-        setExportInProgress(false)
+      return handleExportSuccess(resolution)
+    } catch (reason) {
+      return handleExportError(reason)
+    }
+  }
 
-        const attachmentUrl = resolution.attachmentUrl
-        const updatedAt = new Date(resolution.updatedAt)
+  const handleResumeExport = () => {
+    new Promise((resolve, reject) => {
+      exportManager.current?.monitorExport(resolve, reject)
+    })
+      .then(resolution => handleExportSuccess(resolution))
+      .catch(error => handleExportError(error))
+  }
 
-        const previousExportValue = {
-          label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-          attachmentUrl,
-        }
+  const handleExportSuccess = resolution => {
+    setExportInProgress(false)
 
-        setPreviousExportState(previousExportValue)
+    if (!resolution) {
+      return
+    }
 
-        // Since we're still on the page, let's automatically download the CSV for them as well
-        gotoUrl(attachmentUrl)
-      })
-      .catch(reason => {
-        setExportInProgress(false)
+    const attachmentUrl = resolution.attachmentUrl
+    const updatedAt = new Date(resolution.updatedAt)
 
-        $.flashError(I18n.t('Gradebook Export Failed: %{reason}', {reason}))
-      })
+    const previousExportValue = {
+      label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
+      attachmentUrl,
+    }
+
+    setPreviousExportState(previousExportValue)
+
+    // Since we're still on the page, let's automatically download the CSV for them as well
+    gotoUrl(attachmentUrl)
+
+    handleUpdateExportState(undefined, undefined)
+    $.flashMessage(I18n.t('Gradebook export has completed'))
+  }
+
+  const handleExportError = error => {
+    setExportInProgress(false)
+
+    $.flashError(I18n.t('Gradebook Export Failed: %{error}', {error}))
+  }
+
+  const handleUpdateExportState = (name?: string, value?: number) => {
+    setTimeout(() => {
+      if (props.updateExportState) {
+        props.updateExportState(name, value)
+      }
+    }, 3500)
   }
 
   const handleImport = () => {
@@ -387,6 +432,8 @@ EnhancedActionMenu.propTypes = {
 
   gradingPeriodId: string.isRequired,
   showStudentFirstLastName: bool,
+  updateExportState: PropTypes.func,
+  setExportManager: PropTypes.func,
 }
 
 EnhancedActionMenu.defaultProps = {

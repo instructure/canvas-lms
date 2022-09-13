@@ -96,3 +96,10 @@ describe('GridColor', () => {
     })
   })
 })
+
+describe('ExportProgressBar', () => {
+  it('renders', () => {
+    const {getByTestId} = render(<Gradebook {...defaultGradebookProps} />)
+    expect(getByTestId('export-progress-bar')).toBeInTheDocument()
+  })
+})

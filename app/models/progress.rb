@@ -47,6 +47,11 @@ class Progress < ActiveRecord::Base
     state :failed
   end
 
+  set_policy do
+    given { |user| self.user.present? && self.user == user }
+    can :cancel
+  end
+
   def reset!
     self.results = nil
     self.workflow_state = "queued"

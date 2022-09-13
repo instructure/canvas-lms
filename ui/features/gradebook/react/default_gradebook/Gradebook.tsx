@@ -209,6 +209,8 @@ import {
   getInitialActionStates,
   columnWidths,
 } from './initialState'
+import {ExportProgressBar} from './components/ExportProgressBar'
+import GradebookExportManager from '../shared/GradebookExportManager'
 
 const I18n = useI18nScope('gradebook')
 
@@ -258,6 +260,11 @@ type GradebookState = {
   modules: Module[]
   sections: Section[]
   isStatusesModalOpen: boolean
+  exportState?: {
+    completion?: number
+    filename?: string
+  }
+  exportManager: any
 }
 
 class Gradebook extends React.Component<GradebookProps, GradebookState> {
@@ -419,6 +426,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       modules: [],
       sections: this.options.sections.length > 1 ? this.options.sections : [],
       isStatusesModalOpen: false,
+      exportState: undefined,
+      exportManager: undefined,
     }
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
@@ -1967,6 +1976,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradingPeriodId: this.state.gradingPeriodId,
       getStudentOrder: this.getStudentOrder,
       getAssignmentOrder: this.getAssignmentOrder,
+      updateExportState: (name?: string, val?: number) =>
+        this.setState({
+          exportState: {
+            completion: val,
+            filename: name
+          }
+        }),
+      setExportManager: (manager?: GradebookExportManager) =>
+        this.setState({exportManager: manager}),
     }
     if (this.options.gradebook_csv_progress) {
       const progressData = this.options.gradebook_csv_progress
@@ -4748,6 +4766,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
             variant="DefaultGradebook"
           />
         </Portal>
+        <ExportProgressBar
+          exportState={this.state.exportState}
+          exportManager={this.state.exportManager}
+        />
         {(!this.state.isGridLoaded || !this.state.isEssentialDataLoaded) && (
           <View as="div" width="100%" textAlign="center">
             <Spinner renderTitle={I18n.t('Loading Gradebook')} margin="large auto 0 auto" />

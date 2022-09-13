@@ -53,6 +53,8 @@ const workingMenuProps = () => ({
   },
 
   gradingPeriodId: '1234',
+  updateExportState: () => {},
+  setExportManager: () => {},
 })
 const previousExportProps = () => ({
   lastExport: {
@@ -263,6 +265,8 @@ QUnit.module('ActionMenu - handleExport', {
     this.spies = {}
     this.spies.gotoUrl = sandbox.stub(ActionMenu, 'gotoUrl')
     this.spies.startExport = sandbox.stub(GradebookExportManager.prototype, 'startExport')
+    this.spies.monitorExport = sandbox.stub(GradebookExportManager.prototype, 'monitorExport')
+    this.spies.monitorExport.returns({attachmentUrl: '', updatedAt: ''})
 
     this.wrapper = mount(<ActionMenu {...workingMenuProps()} />, {
       attachTo: document.querySelector('#fixture'),
@@ -298,7 +302,10 @@ test('shows a message to the user indicating the export is in progress', functio
   this.menuItem.click()
 
   equal(this.spies.flashMessage.callCount, 1)
-  equal(this.spies.flashMessage.getCall(0).args[0], 'Gradebook export started')
+  equal(
+    this.spies.flashMessage.getCall(0).args[0],
+    'Gradebook export has started. This may take a few minutes.'
+  )
 
   return exportResult
 })
@@ -404,6 +411,42 @@ test('on success, shows the "New Export" menu item', function () {
 
       equal(previousExportMenu.textContent, 'New Export (Jan 20, 2009 at 5pm)')
     })
+})
+
+test('on success, shows a message that the export has completed', function () {
+  const exportResult = this.getPromise('resolved')
+  this.spies.startExport.returns(exportResult)
+  this.spies.flashMessage = sandbox.stub(window.$, 'flashMessage')
+  const handleUpdateExportState = sandbox.stub(ActionMenu.prototype, 'handleUpdateExportState')
+
+  this.trigger.simulate('click')
+
+  return this.wrapper
+    .instance()
+    .handleExport()
+    .then(() => {
+      equal(this.spies.flashMessage.callCount, 2)
+      equal(this.spies.flashMessage.getCall(1).args[0], 'Gradebook export has completed')
+      equal(handleUpdateExportState.callCount, 1)
+    })
+})
+
+test('handleResumeExport will resume the export with success', function () {
+  const exportResult = 'resolved'
+  this.spies.monitorExport.returns(exportResult)
+
+  this.spies.flashMessage = sandbox.stub(window.$, 'flashMessage')
+  const handleResumeExport = sandbox.stub(ActionMenu.prototype, 'handleResumeExport')
+
+  const propsWithPreviousExport = {
+    ...workingMenuProps(),
+    lastExport: {
+      progressId: '9000',
+      workflowState: 'queued',
+    },
+  }
+  this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
+  equal(handleResumeExport.callCount, 1)
 })
 
 test('on failure, shows a message to the user indicating the export failed', function () {

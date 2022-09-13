@@ -2261,7 +2261,7 @@ class Course < ActiveRecord::Base
   end
 
   def gradebook_to_csv_in_background(filename, user, options = {})
-    progress = progresses.build(tag: "gradebook_to_csv")
+    progress = progresses.build(tag: "gradebook_to_csv", user: user)
     progress.save!
 
     exported_gradebook = gradebook_csvs.where(user_id: user).first_or_initialize
@@ -2277,16 +2277,16 @@ class Course < ActiveRecord::Base
     progress.process_job(
       self,
       :generate_csv,
-      { preserve_method_args: true, priority: Delayed::HIGH_PRIORITY },
+      { priority: Delayed::HIGH_PRIORITY },
       user,
       options,
       attachment
     )
-    { attachment_id: attachment.id, progress_id: progress.id }
+    { attachment_id: attachment.id, progress_id: progress.id, filename: filename }
   end
 
-  def generate_csv(user, options, attachment)
-    csv = GradebookExporter.new(self, user, options).to_csv
+  def generate_csv(progress, user, options, attachment)
+    csv = GradebookExporter.new(self, user, options.merge(progress: progress)).to_csv
     create_attachment(attachment, csv)
   end
 
