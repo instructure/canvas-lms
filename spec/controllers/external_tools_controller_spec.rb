@@ -2284,35 +2284,96 @@ describe ExternalToolsController do
     context "with 1.3 tool" do
       include_context "lti_1_3_spec_helper"
 
-      let(:params) { { course_id: @course.id, id: tool.id } }
       let(:tool) do
         t = tool_configuration.new_external_tool(@course)
         t.save!
         t
       end
-
+      let(:rl) do
+        Lti::ResourceLink.create!(
+          context_external_tool: tool,
+          context: @course,
+          custom: { abc: "def", expans: "$Canvas.user.id" },
+          url: "http://www.example.com/launch"
+        )
+      end
+      let(:params) { { course_id: @course.id, id: tool.id } }
       let(:account) { @course.account }
       let(:access_token) { login_pseudonym.user.access_tokens.create(purpose: "test") }
 
       before { controller.instance_variable_set :@access_token, access_token }
 
-      it "returns the lti 1.3 launch url with a session token" do
+      it "returns the lti 1.3 launch url with a session token when not given url or lookup_id" do
         get :generate_sessionless_launch, params: params
         expect(response).to be_successful
+
         json = JSON.parse(response.body)
         url = URI.parse(json["url"])
+        token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
+
         expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
         expect(url.query).to match(/^display=borderless&session_token=[0-9a-zA-Z_\-]+$/)
+        expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+      end
+
+      it "returns the lti 1.3 launch url with a session token when given a url and tool id" do
+        get :generate_sessionless_launch, params: params.merge(url: "http://lti13testtool.docker/deep_link")
+        expect(response).to be_successful
+
+        json = JSON.parse(response.body)
+        url = URI.parse(json["url"])
+        query_params = URI.decode_www_form(url.query).to_h
         token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
+
+        expect(url.path).to eq("#{course_external_tools_path(@course)}/#{tool.id}")
+        expect(query_params).to have_key("display")
+        expect(query_params).to have_key("launch_url")
+        expect(query_params).to have_key("session_token")
         expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
       end
 
       it "returns the specified launch url for a deep link" do
-        get :generate_sessionless_launch, params: params.merge(url: "http://lti13testtool.docker/deep_link")
+        get :generate_sessionless_launch, params: params.merge(id: tool.id, url: "http://lti13testtool.docker/deep_link")
         expect(response).to be_successful
         json = JSON.parse(response.body)
         url = URI.parse(json["url"])
         expect(CGI.parse(url.query)["launch_url"]).to eq ["http://lti13testtool.docker/deep_link"]
+      end
+
+      context "when not passing tool_id" do
+        let(:params) { { course_id: @course.id } }
+
+        it "returns the lti 1.3 resource link lookup uuid with a session token when given a lookup_uuid" do
+          get :generate_sessionless_launch, params: params.merge(resource_link_lookup_uuid: rl.lookup_uuid)
+          expect(response).to be_successful
+
+          json = JSON.parse(response.body)
+          url = URI.parse(json["url"])
+          query_params = URI.decode_www_form(url.query).to_h
+          token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
+
+          expect(url.path).to eq("#{course_external_tools_path(@course)}/retrieve")
+          expect(query_params).to have_key("display")
+          expect(query_params).to have_key("resource_link_lookup_uuid")
+          expect(query_params).to have_key("session_token")
+          expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+        end
+
+        it "returns the lti 1.3 launch url with a session token when given a url and a lookup_id" do
+          get :generate_sessionless_launch, params: params.merge(url: "http://lti13testtool.docker/deep_link", resource_link_lookup_uuid: rl.lookup_uuid)
+          expect(response).to be_successful
+
+          json = JSON.parse(response.body)
+          url = URI.parse(json["url"])
+          query_params = URI.decode_www_form(url.query).to_h
+          token = SessionToken.parse(CGI.parse(url.query)["session_token"].first)
+
+          expect(url.path).to eq("#{course_external_tools_path(@course)}/retrieve")
+          expect(query_params).to have_key("display")
+          expect(query_params).to have_key("resource_link_lookup_uuid")
+          expect(query_params).to have_key("session_token")
+          expect(token.pseudonym_id).to eq(login_pseudonym.global_id)
+        end
       end
 
       context "when there is no access to token (non-API access)" do
