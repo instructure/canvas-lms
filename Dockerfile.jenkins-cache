@@ -70,6 +70,9 @@ RUN --mount=target=/tmp/src \
     -maxdepth 2 \
     -path "gems/*/lib" \
     -exec cp -rf --parents {} /tmp/dst \; && \
+  find gems \( \
+    -path "*/config/locales" \
+  \) -exec cp -rf --parents {} /tmp/dst \; && \
   find gems/plugins \( \
     -path "*/app/coffeescripts" -o \
     -path "*/app/jsx" -o \
