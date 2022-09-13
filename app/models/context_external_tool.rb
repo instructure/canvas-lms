@@ -1356,6 +1356,11 @@ class ContextExternalTool < ActiveRecord::Base
     internal_tool_domain_allowlist.any? { |d| domain.end_with?(".#{d}") || domain == d }
   end
 
+  # Used in ContextToolFinder
+  def sort_key
+    [Canvas::ICU.collation_key(name), global_id]
+  end
+
   private
 
   # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.

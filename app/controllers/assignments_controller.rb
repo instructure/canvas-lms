@@ -589,12 +589,13 @@ class AssignmentsController < ApplicationController
     rce_js_env
     add_crumb @context.elementary_enabled? ? t("Important Info") : t("#crumbs.syllabus", "Syllabus")
 
-    @course_home_sub_navigation_tools =
-      Lti::ContextToolFinder.all_tools_for(@context, placements: :course_home_sub_navigation,
-                                                     root_account: @domain_root_account, current_user: @current_user).to_a
-    unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-      @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
-    end
+    can_see_admin_tools = @context.grants_any_right?(
+      @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+    )
+    @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
+      @context, type: :course_home_sub_navigation,
+                root_account: @domain_root_account, current_user: @current_user
+    ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)

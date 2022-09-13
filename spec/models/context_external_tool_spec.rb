@@ -2956,4 +2956,14 @@ describe ContextExternalTool do
       end
     end
   end
+
+  describe "#sort_key" do
+    it "is based on the collation key of the name, then id" do
+      sk1 = external_tool_model(opts: { name: "a" }).sort_key
+      # collation key puts "E" after "e"
+      sk2 = external_tool_model(opts: { name: "A" }).sort_key
+      sk3 = external_tool_model(opts: { name: "a" }).sort_key
+      expect([sk1, sk2, sk3].sort).to eq([sk1, sk3, sk2])
+    end
+  end
 end
