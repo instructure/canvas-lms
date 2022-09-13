@@ -88,7 +88,10 @@ async function ltiMessageHandler(e) {
   }
 
   try {
-    const handlerModule = await import(`./subjects/${subject}.js`)
+    const handlerModule = await import(
+      /* webpackExclude: /__tests__/ */
+      `./subjects/${subject}.js`
+    )
     const hasSentResponse = handlerModule.default({
       message,
       event: e,
