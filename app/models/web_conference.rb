@@ -565,7 +565,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.lti_tools(context)
-    Lti::ContextToolFinder.all_tools_for(context, placements: :conference_selection) || []
+    Lti::ContextToolFinder.new(context, placements: :conference_selection).all_tools_sorted_array
   end
 
   def self.plugins

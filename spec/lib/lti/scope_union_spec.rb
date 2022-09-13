@@ -29,4 +29,12 @@ describe Lti::ScopeUnion do
       expect(described_class.new([s1, s3]).exists?).to eq(false)
     end
   end
+
+  describe "to_unsorted_array" do
+    it "concatenates the results of to_a of all the scopes" do
+      course_model
+      scopes = [Course.where(id: @course.id), Account.where(id: @course.account_id)]
+      expect(described_class.new(scopes).to_unsorted_array).to eq([@course, @course.account])
+    end
+  end
 end

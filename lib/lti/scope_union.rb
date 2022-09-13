@@ -22,7 +22,7 @@
 # they involve different shards) that implements many methods a scope would
 # implement.
 # NOTE: if scopes have an "ORDER BY" that would likely have to reimplemented
-# with a ruby sort.
+# with a ruby sort. (See ContextToolFinder#all_tools_sorted_array)
 module Lti
   class ScopeUnion
     attr_reader :scopes
@@ -33,6 +33,10 @@ module Lti
 
     def exists?
       scopes.any?(&:exists?)
+    end
+
+    def to_unsorted_array
+      scopes.flat_map(&:to_a)
     end
   end
 end

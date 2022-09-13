@@ -25,24 +25,32 @@ describe Lti::ContextToolFinder do
     course_model(account: @account)
   end
 
+  def create_tool(context, name, opts)
+    context.context_external_tools.create!(
+      { name: name, consumer_key: "12345", shared_secret: "secret" }.merge(opts)
+    )
+  end
+
   shared_examples_for "a method creating a scope for all tools for a context" do
     it "retrieves all tools in alphabetical order" do
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @account.context_external_tools.create!(name: "c", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret")
+      @tools = [
+        create_tool(@root_account, "f", domain: "google.com"),
+        create_tool(@root_account, "e", url: "http://www.google.com"),
+        create_tool(@account, "d", domain: "google.com"),
+        create_tool(@course, "a", url: "http://www.google.com"),
+        create_tool(@course, "b", domain: "google.com"),
+        create_tool(@account, "c", url: "http://www.google.com"),
+      ]
       expect(method_returning_scope.call(@course).to_a).to eql(@tools.sort_by(&:name))
     end
 
     it "returns all tools that are selectable" do
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @root_account.context_external_tools.create!(name: "e", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
-      @tools << @account.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret", not_selectable: true)
+      @tools = [
+        create_tool(@root_account, "f", domain: "google.com"),
+        create_tool(@root_account, "e", url: "http://www.google.com", not_selectable: true),
+        create_tool(@account, "d", domain: "google.com"),
+        create_tool(@course, "a", url: "http://www.google.com", not_selectable: true),
+      ]
       tools = method_returning_scope.call(@course, selectable: true)
       expect(tools.count).to eq 2
     end
@@ -61,12 +69,14 @@ describe Lti::ContextToolFinder do
 
     it "honors only_visible option" do
       course_with_student(active_all: true, user: user_with_pseudonym, account: @account)
-      @tools = []
-      @tools << @root_account.context_external_tools.create!(name: "f", domain: "google.com", consumer_key: "12345", shared_secret: "secret")
-      @tools << @course.context_external_tools.create!(name: "d", domain: "google.com", consumer_key: "12345", shared_secret: "secret",
-                                                       settings: { assignment_view: { visibility: "admins" } })
-      @tools << @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: "12345", shared_secret: "secret",
-                                                       settings: { assignment_view: { visibility: "members" } })
+      @tools = [
+        create_tool(@root_account, "f", domain: "google.com"),
+        create_tool(@course, "d", domain: "google.com",
+                                  settings: { assignment_view: { visibility: "admins" } }),
+        create_tool(@course, "a", url: "http://www.google.com",
+                                  settings: { assignment_view: { visibility: "members" } })
+      ]
+
       tools = method_returning_scope.call(@course)
       expect(tools.count).to eq 3
       tools = method_returning_scope.call(@course, only_visible: true, current_user: @user, visibility_placements: ["assignment_view"])
@@ -83,8 +93,42 @@ describe Lti::ContextToolFinder do
     it_behaves_like "a method creating a scope for all tools for a context" do
       let(:method_returning_scope) do
         lambda do |*args|
-          described_class.all_tools_scope_union(*args).scopes.first
+          # unlike all_tools_for, this is not sorted (for multiple shards sort needs to happen
+          # in ruby anyway). When we remove all_tools_for we can remove the order(:name) and
+          # tweak the expectations to not expect order.
+          described_class.all_tools_scope_union(*args).scopes.first.order(:name)
         end
+      end
+    end
+  end
+
+  describe "all_tools_sorted_array" do
+    it "returns all the tools, sorted" do
+      create_tool(@root_account, "b", domain: "google.com")
+      create_tool(@account, "d", url: "http://www.google.com")
+      create_tool(@account, "a", domain: "google.com")
+      create_tool(@course, "c", url: "http://www.google.com")
+      result = described_class.new(@course).all_tools_sorted_array
+      expect(result.map(&:name)).to eq(%w[a b c d])
+    end
+
+    context "when exclude_admin_visibility is true" do
+      it "doesn't include admin tools of type options[:type]" do
+        create_tool(
+          @account, "1",
+          domain: "google.com", settings: { assignment_view: { visibility: "admins" } }
+        )
+        tool2 = create_tool(
+          @account, "2",
+          url: "http://www.google.com", settings: { assignment_view: { visibility: "members" } }
+        )
+        create_tool(
+          @account, "3",
+          url: "http://www.google.com", settings: { course_navigation: { visibility: "members" } }
+        )
+
+        finder = described_class.new(@course, type: :assignment_view)
+        expect(finder.all_tools_sorted_array(exclude_admin_visibility: true)).to eq([tool2])
       end
     end
   end
