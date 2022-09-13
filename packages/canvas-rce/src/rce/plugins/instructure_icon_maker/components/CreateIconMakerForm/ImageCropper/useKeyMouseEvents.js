@@ -229,7 +229,7 @@ export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
     }
     if (translateY !== tempTranslateY) {
       tempTranslateYRef.current = translateY
-      _setTempTranslateY(translateX)
+      _setTempTranslateY(translateY)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translateX, translateY])
