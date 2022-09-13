@@ -897,15 +897,13 @@ describe ConversationsController do
       assert_unauthorized
     end
 
-    it "allows new messages in concluded courses for teachers" do
+    it "does not allow new messages in concluded courses for teachers" do
       course_with_teacher_logged_in(active_all: true)
       conversation
       @course.update!({ workflow_state: "completed" })
 
       post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
-      expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
-      expect(response).to be_successful
-      expect(assigns[:conversation]).not_to be_nil
+      expect(response).not_to be_successful
     end
 
     context "soft-concluded course" do
@@ -918,17 +916,16 @@ describe ConversationsController do
         @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
         @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
         @course.save!
+        @course.enrollment_term.save!
       end
 
       it "does not allow a student to reply to a teacher in a soft-concluded course" do
-        skip("Until VICE-3065 is finished")
         teacher_convo = @teacher.initiate_conversation([@student])
         teacher_convo.add_message("test")
         teacher_convo.conversation.update_attribute(:context, @course)
-
+        teacher_convo.save!
         post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
         expect(response).not_to be_successful
-        expect(assigns[:conversation]).to be_nil
       end
 
       it "does not allows a teacher to reply to a student in a soft-concluded course" do
