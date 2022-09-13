@@ -203,6 +203,25 @@ describe UsersController do
       membership = doc.at_css(".courses span.subtitle").to_s
       expect(membership).to match(/CustomTeacherRole/)
     end
+
+    it "does not render group memberships from cross-account when not authorized" do
+      root_account = Account.default
+      sub_account_a = account_model(parent_account: root_account)
+      sub_account_b = account_model(parent_account: root_account)
+      course_1 = course_factory(account: sub_account_a, active_all: true)
+      course_2 = course_factory(account: sub_account_b, active_all: true)
+      student = user_factory(active_all: true)
+      student_in_course(user: student, course: course_1)
+      student_in_course(user: student, course: course_2)
+      group = course_1.groups.create!(name: "My Group")
+      group.add_user(student, "accepted", true)
+      admin = account_admin_user(account: sub_account_b, active_all: true)
+      user_session(admin)
+
+      get "/users/#{student.id}"
+      doc = Nokogiri::HTML5(response.body)
+      expect(doc.at_css(".groups")).to be_nil
+    end
   end
 
   describe "#avatar_image_url" do
