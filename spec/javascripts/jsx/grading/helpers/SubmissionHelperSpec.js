@@ -25,6 +25,7 @@ import {
 
 QUnit.module('SubmissionHelper', suiteHooks => {
   let submission
+  let snakeCasedSubmission
 
   suiteHooks.beforeEach(() => {
     submission = {
@@ -34,6 +35,15 @@ QUnit.module('SubmissionHelper', suiteHooks => {
       submissionComments: [],
       workflowState: 'unsubmitted',
       postedAt: null
+    }
+
+    snakeCasedSubmission = {
+      excused: false,
+      has_postable_comments: false,
+      score: null,
+      submission_comments: [],
+      workflow_state: 'unsubmitted',
+      posted_at: null
     }
   })
 
@@ -70,6 +80,12 @@ QUnit.module('SubmissionHelper', suiteHooks => {
         strictEqual(isPostable(submission), false)
       })
     })
+
+    test('handles snake_cased submission keys', () => {
+      snakeCasedSubmission.score = 1
+      snakeCasedSubmission.workflow_state = 'graded'
+      strictEqual(isPostable(snakeCasedSubmission), true)
+    })
   })
 
   QUnit.module('.isHideable', () => {
@@ -80,6 +96,11 @@ QUnit.module('SubmissionHelper', suiteHooks => {
 
     test('is false when submission is not posted', () => {
       strictEqual(isHideable(submission), false)
+    })
+
+    test('handles snake_cased submission keys', () => {
+      snakeCasedSubmission.posted_at = '2020-10-20T15:24:26Z'
+      strictEqual(isHideable(snakeCasedSubmission), true)
     })
   })
 

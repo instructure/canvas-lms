@@ -20,18 +20,22 @@ import {camelize, underscore} from 'convert-case'
 import originalityReportSubmissionKey from './originalityReportSubmissionKey'
 
 export function isGraded(submission) {
-  const sub = camelize(submission)
-  return (sub.score != null && sub.workflowState === 'graded') || sub.excused
+  // TODO: remove when we no longer camelize data in Gradebook
+  const workflow_state = submission.workflow_state || submission.workflowState
+  return (submission.score != null && workflow_state === 'graded') || submission.excused
 }
 
 export function isPostable(submission) {
-  const sub = camelize(submission)
-  return !sub.postedAt && (isGraded(sub) || !!sub.hasPostableComments)
+  // TODO: remove when we no longer camelize data in Gradebook
+  const posted_at = submission.posted_at || submission.postedAt
+  const has_postable_comments = submission.has_postable_comments || submission.hasPostableComments
+  return !posted_at && (isGraded(submission) || !!has_postable_comments)
 }
 
 export function isHideable(submission) {
-  const sub = camelize(submission)
-  return !!sub.postedAt
+  // TODO: remove when we no longer camelize data in Gradebook
+  const posted_at = submission.posted_at || submission.postedAt
+  return !!posted_at
 }
 // This function returns an object containing plagiarism/originality-related
 // data for the given submission, or null if the submission has no relevant
