@@ -4,14 +4,3 @@
   display: flex;
   justify-content: space-between;
 }
-
-.alignment-summary-stats {
-  @include mobile-only {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-}

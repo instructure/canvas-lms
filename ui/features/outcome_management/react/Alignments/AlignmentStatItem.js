@@ -89,7 +89,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
     <View
       as="span"
       display="inline-block"
-      width={isMobileView ? '17rem' : '30rem'}
+      width={isMobileView ? '100%' : '30rem'}
       padding="small"
       margin="0 small 0 0"
       borderRadius="medium"
