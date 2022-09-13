@@ -702,6 +702,32 @@ describe ConversationsController do
         end
       end
     end
+
+    context "soft-concluded course" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.enrollment_term.start_at = 2.days.ago
+        @course.enrollment_term.end_at = 1.day.ago
+        @course.restrict_student_future_view = true
+        @course.restrict_student_past_view = true
+        @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+        @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+        @course.save!
+      end
+
+      it "does not allow a student to create a new conversation" do
+        post "create", params: { recipients: [@teacher.id.to_s], body: "yo", context_code: @course.asset_string }
+        expect(response).not_to be_successful
+        expect(response.body).to include("Unable to send messages")
+      end
+
+      it "does not allows a teacher to create a new conversation" do
+        user_session(@teacher)
+        post "create", params: { recipients: [@student.id.to_s], body: "yo", context_code: @course.asset_string }
+        expect(response).not_to be_successful
+        expect(response.body).to include("invalid")
+      end
+    end
   end
 
   describe "POST 'update'" do
@@ -882,36 +908,36 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it "allows a student to reply to a teacher in a soft-concluded course" do
-      course_with_student_logged_in(active_all: true)
+    context "soft-concluded course" do
+      before do
+        course_with_student_logged_in(active_all: true)
+        @course.enrollment_term.start_at = 2.days.ago
+        @course.enrollment_term.end_at = 1.day.ago
+        @course.restrict_student_future_view = true
+        @course.restrict_student_past_view = true
+        @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+        @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+        @course.save!
+      end
 
-      teacher_convo = @teacher.initiate_conversation([@student])
-      teacher_convo.add_message("test")
-      teacher_convo.conversation.update_attribute(:context, @course)
+      it "does not allow a student to reply to a teacher in a soft-concluded course" do
+        skip("Until VICE-3065 is finished")
+        teacher_convo = @teacher.initiate_conversation([@student])
+        teacher_convo.add_message("test")
+        teacher_convo.conversation.update_attribute(:context, @course)
 
-      @course.conclude_at = 1.day.ago
-      @course.start_at = 2.days.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.restrict_student_past_view = true
-      @course.save!
-      post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
-      expect(response).to be_successful
-      expect(assigns[:conversation]).not_to be_nil
-    end
+        post "add_message", params: { conversation_id: teacher_convo.conversation_id, body: "hello world", recipients: [@teacher.id.to_s] }
+        expect(response).not_to be_successful
+        expect(assigns[:conversation]).to be_nil
+      end
 
-    it "allows a teacher to reply to a student in a soft-concluded course" do
-      student_in_course(active_all: true)
-      course_with_teacher_logged_in(active_all: true)
-      conversation
-      @course.conclude_at = 1.day.ago
-      @course.start_at = 2.days.ago
-      @course.restrict_enrollments_to_course_dates = true
-      @course.restrict_student_past_view = true
-      @course.save!
-
-      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@student.id.to_s] }
-      expect(response).to be_successful
-      expect(assigns[:conversation]).not_to be_nil
+      it "does not allows a teacher to reply to a student in a soft-concluded course" do
+        user_session(@teacher)
+        conversation
+        post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", recipients: [@student.id.to_s] }
+        expect(response).not_to be_successful
+        expect(assigns[:conversation]).to be_nil
+      end
     end
 
     it "refrains from duplicating the RCE-created media_comment" do
