@@ -19103,10 +19103,10 @@ cy:
     message_student: "Anfon neges at Fyfyrwyr am %{course_name}"
     send_message: "Anfon Neges"
   publication_options_cbbfc20e: "Opsiynau Cyhoeddi"
-  publish_5211dca3: Cyhoeddi
+  publish_5211dca3: "Cyhoeddi yn"
   publish_aa888e3c: "Cyhoeddi:"
   publish_announcement_fec6d7e2: "Cyhoeddi cyhoeddiad"
-  publish_at_3fd340d1: Cyhoeddi
+  publish_at_3fd340d1: "Cyhoeddi yn"
   publish_btn_module: 
     buttons: 
       publish: Cyhoeddi
