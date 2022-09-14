@@ -18,7 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -298,15 +299,15 @@ class ProficiencyRating extends React.Component {
             // mount with focusColorPicker
             shouldFocusContentOnTriggerBlur={true}
             renderTrigger={
-              <Button ref={this.setColorRef} variant="link">
-                <div>
+              <Link as="button" isWithinText={false} ref={this.setColorRef}>
+                <div style={{margin: '0 0.8rem', padding: '0.55rem 0 0'}}>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   <ScreenReaderContent>
                     {I18n.t(`Change color for mastery level %{position}`, {position})}
                   </ScreenReaderContent>
                   <span aria-hidden="true">{I18n.t('Change')}</span>
                 </div>
-              </Button>
+              </Link>
             }
           >
             <ColorPicker

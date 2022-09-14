@@ -1004,7 +1004,7 @@ describe('OutcomeManagementPanel', () => {
       const selectedOutcomesLink = getByText('2 Outcomes Selected').closest('button')
       fireEvent.click(selectedOutcomesLink)
       fireEvent.click(getByText('Clear all'))
-      expect(selectedOutcomesLink).toBeDisabled()
+      expect(selectedOutcomesLink.getAttribute('aria-disabled')).toBe('true')
       expect(selectedOutcomesLink.getAttribute('aria-expanded')).toBe('false')
       expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
     })
