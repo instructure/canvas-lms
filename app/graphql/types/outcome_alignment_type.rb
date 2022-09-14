@@ -27,12 +27,6 @@ module Types
 
     global_id_field :id
 
-    field :_id, ID, null: false
-    def _id
-      return [object.id, object.module_id].join("_") unless object.module_id.nil?
-
-      object.id
-    end
     field :title, String, null: false
     field :content_id, ID, null: false
     field :content_type, String, null: false
@@ -40,27 +34,10 @@ module Types
     field :context_type, String, null: false
     field :learning_outcome_id, ID, null: false
     field :url, String, null: false
-    def url
-      [base_context_url.to_s, "outcomes", object.learning_outcome_id, "alignments", object.id].join("/")
-    end
     field :module_id, String, null: true
     field :module_name, String, null: true
     field :module_url, String, null: true
-    def module_url
-      [base_context_url.to_s, "modules", object.module_id].join("/") if object.module_id
-    end
     field :module_workflow_state, String, null: true
     field :assignment_content_type, String, null: true
-    def assignment_content_type
-      return "quiz" unless object.quizzes_id.nil?
-      return "discussion" unless object.discussion_id.nil?
-      return "assignment" unless object.assignment_id.nil?
-    end
-
-    private
-
-    def base_context_url
-      ["/#{object.context_type.downcase.pluralize}", object.context_id].join("/")
-    end
   end
 end
