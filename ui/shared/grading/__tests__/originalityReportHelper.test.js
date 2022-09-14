@@ -17,6 +17,7 @@
  */
 
 import {getOriginalityData, originalityReportSubmissionKey} from '../originalityReportHelper'
+import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 
 function submission(overrides = {}) {
   return {
@@ -30,6 +31,18 @@ function submission(overrides = {}) {
 describe('originalityReportSubmissionKey', () => {
   it('returns the key for the submission', () => {
     expect(originalityReportSubmissionKey(submission())).toEqual(
+      'submission_1_2011-10-05T14:48:00Z'
+    )
+  })
+
+  it('returns the key for the camelized graphql submission', async () => {
+    const gqlSubmission = await mockSubmission({
+      Submission: {
+        submittedAt: '2011-10-05T14:48:00Z',
+        id: 1
+      }
+    })
+    expect(originalityReportSubmissionKey(gqlSubmission)).toEqual(
       'submission_1_2011-10-05T14:48:00Z'
     )
   })
