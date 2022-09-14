@@ -19,7 +19,8 @@
 import React, {useState, forwardRef} from 'react'
 import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {Button, CloseButton} from '@instructure/ui-buttons'
+import {CloseButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {Popover} from '@instructure/ui-popover'
@@ -59,9 +60,9 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
         shouldReturnFocus={true}
         positionTarget={() => (ref?.current == null ? null : ref.current)}
         renderTrigger={
-          <Button
-            variant="link"
-            size="medium"
+          <Link
+            as="button"
+            isWithinText={false}
             interaction={outcomeCount > 0 ? 'enabled' : 'disabled'}
           >
             {I18n.t(
@@ -73,7 +74,7 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
                 count: outcomeCount
               }
             )}
-          </Button>
+          </Link>
         }
       >
         <View padding="small" display="block" as="div">
@@ -108,9 +109,9 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
           </View>
         </View>
         <View as="div" padding="small" borderWidth="small 0 0">
-          <Button variant="link" size="medium" onClick={closeAndClear}>
+          <Link as="button" isWithinText={false} onClick={closeAndClear}>
             {I18n.t('Clear all')}
-          </Button>
+          </Link>
         </View>
       </Popover>
     </ApplyTheme>

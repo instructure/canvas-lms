@@ -63,7 +63,10 @@ describe('OutcomesPopover', () => {
   it('renders the OutcomesPopover component with 0 outcomes selected', () => {
     const {getByText} = render(<OutcomesPopover {...defaultProps(0)} />)
     expect(getByText('0 Outcomes Selected')).toBeInTheDocument()
-    expect(getByText('0 Outcomes Selected').closest('button')).toBeDisabled()
+    expect(getByText('0 Outcomes Selected').closest('button')).toHaveAttribute(
+      'aria-disabled',
+      'true'
+    )
   })
 
   it('shows details on click', () => {

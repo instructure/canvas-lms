@@ -159,19 +159,20 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         onShowContent={[Function]}
         placement="bottom center"
         renderTrigger={
-          <Button
+          <Link
             as="button"
-            cursor="pointer"
-            display="inline-block"
-            elementRef={[Function]}
-            margin="0"
-            size="medium"
-            textAlign="center"
-            type="button"
-            variant="link"
-            withBackground={true}
+            color="link"
+            iconPlacement="start"
+            isWithinText={false}
           >
-            <div>
+            <div
+              style={
+                Object {
+                  "margin": "0 0.8rem",
+                  "padding": "0.55rem 0 0",
+                }
+              }
+            >
               <span
                 className="colorPickerIcon"
                 style={
@@ -191,7 +192,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
                 Change
               </span>
             </div>
-          </Button>
+          </Link>
         }
         shadow="resting"
         shouldAlignArrow={false}
