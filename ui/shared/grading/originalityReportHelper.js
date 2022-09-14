@@ -17,7 +17,7 @@
  */
 export function originalityReportSubmissionKey(submission) {
   try {
-    let submittedAt = new Date(submission.submitted_at)
+    let submittedAt = new Date(submission.submitted_at || submission.submittedAt)
     submittedAt = `${submittedAt.toISOString().split('.')[0]}Z`
     return (submittedAt && `submission_${submission.id}_${submittedAt}`) || ''
   } catch (_error) {
