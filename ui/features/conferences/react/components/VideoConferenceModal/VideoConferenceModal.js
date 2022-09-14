@@ -83,6 +83,7 @@ export const VideoConferenceModal = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const [nameValidationMessages, setNameValidationMessages] = useState([])
+  const [descriptionValidationMessages, setDescriptionValidationMessages] = useState([])
   const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
   const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
 
@@ -102,6 +103,17 @@ export const VideoConferenceModal = ({
     } else {
       setNameValidationMessages([])
       setName(nameToBeValidated)
+    }
+  }
+
+  const setAndValidateDescription = descriptionToBeValidated => {
+    if (descriptionToBeValidated.length > 2500) {
+      setDescriptionValidationMessages([
+        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'}
+      ])
+    } else {
+      setDescriptionValidationMessages([])
+      setDescription(descriptionToBeValidated)
     }
   }
 
@@ -151,7 +163,7 @@ export const VideoConferenceModal = ({
           options={options}
           onSetOptions={setOptions}
           description={description}
-          onSetDescription={setDescription}
+          onSetDescription={setAndValidateDescription}
           invitationOptions={invitationOptions}
           onSetInvitationOptions={setInvitationOptions}
           attendeesOptions={attendeesOptions}
@@ -171,6 +183,7 @@ export const VideoConferenceModal = ({
           tab={tab}
           setTab={setTab}
           nameValidationMessages={nameValidationMessages}
+          descriptionValidationMessages={descriptionValidationMessages}
         />
       )
     }
@@ -184,7 +197,7 @@ export const VideoConferenceModal = ({
         options={options}
         onSetOptions={setOptions}
         description={description}
-        onSetDescription={setDescription}
+        onSetDescription={setAndValidateDescription}
         invitationOptions={invitationOptions}
         onSetInvitationOptions={setInvitationOptions}
         showAddressBook={showAddressBook}
@@ -192,6 +205,7 @@ export const VideoConferenceModal = ({
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
         nameValidationMessages={nameValidationMessages}
+        descriptionValidationMessages={descriptionValidationMessages}
       />
     )
   }
@@ -259,7 +273,10 @@ export const VideoConferenceModal = ({
           type="submit"
           data-testid="submit-button"
           disabled={
-            isLoading || nameValidationMessages.length > 0 || calendarValidationMessages.length > 0
+            isLoading ||
+            nameValidationMessages.length > 0 ||
+            calendarValidationMessages.length > 0 ||
+            descriptionValidationMessages > 0
           }
         >
           {isLoading ? (

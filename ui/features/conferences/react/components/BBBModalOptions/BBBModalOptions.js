@@ -186,6 +186,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
               onChange={e => {
                 props.onSetDescription(e.target.value)
               }}
+              messages={props.descriptionValidationMessages}
             />
           </Flex.Item>
         </Flex>
@@ -295,7 +296,8 @@ BBBModalOptions.propTypes = {
   calendarValidationMessages: PropTypes.array,
   tab: PropTypes.string,
   setTab: PropTypes.func,
-  nameValidationMessages: PropTypes.array
+  nameValidationMessages: PropTypes.array,
+  descriptionValidationMessages: PropTypes.array
 }
 
 export default BBBModalOptions
