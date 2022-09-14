@@ -813,7 +813,7 @@ class Submission < ActiveRecord::Base
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
         attachment_id: originality_report.attachment_id,
-        report_url: originality_report.originality_report_url,
+        report_url: originality_report.report_launch_path,
         status: originality_report.workflow_state,
         error_message: originality_report.error_message,
         created_at: originality_report.created_at,

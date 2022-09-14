@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {arrayOf, bool, number, oneOf, shape, string} from 'prop-types'
+import {arrayOf, bool, number, oneOf, shape, string, object} from 'prop-types'
 import gql from 'graphql-tag'
 import {MediaObject} from './MediaObject'
 import {SubmissionDraft} from './SubmissionDraft'
@@ -45,6 +45,7 @@ export const SubmissionInterface = {
       mediaObject {
         ...MediaObject
       }
+      originalityData
       resourceLinkLookupUuid
       state
       submissionDraft {
@@ -83,6 +84,7 @@ export const SubmissionInterface = {
     gradingStatus: oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
     latePolicyStatus: string,
     mediaObject: MediaObject.shape,
+    originalityData: object.shape,
     resourceLinkLookupUuid: string,
     state: string.isRequired,
     submissionDraft: SubmissionDraft.shape,
@@ -111,6 +113,7 @@ export const DefaultMocks = {
     gradingStatus: null,
     latePolicyStatus: null,
     mediaObject: null,
+    originalityData: null,
     resourceLinkLookupUuid: null,
     state: 'unsubmitted',
     submissionDraft: null,

@@ -15,13 +15,39 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-export default function originalityReportSubmissionKey(submission) {
+export function originalityReportSubmissionKey(submission) {
   try {
     let submittedAt = new Date(submission.submitted_at)
     submittedAt = `${submittedAt.toISOString().split('.')[0]}Z`
     return (submittedAt && `submission_${submission.id}_${submittedAt}`) || ''
   } catch (_error) {
     return ''
+  }
+}
+
+export function getOriginalityData(submission, index) {
+  let data = null
+  if (submission.submissionType === 'online_text_entry') {
+    data =
+      submission.originalityData[`submission_${originalityReportSubmissionKey(submission)}`] ||
+      submission.originalityData[`submission_${submission._id}`]
+  } else if (submission.submissionType === 'online_upload') {
+    data = submission.originalityData[`attachment_${submission.attachments[index]?._id}`]
+  }
+
+  if (
+    !data?.state ||
+    !data?.report_url ||
+    (!data?.similarity_score && data?.similarity_score !== 0) ||
+    data?.state === 'error'
+  ) {
+    return false
+  } else {
+    return {
+      reportUrl: data.report_url,
+      score: data.similarity_score,
+      status: data.status,
+      state: data.state
+    }
   }
 }

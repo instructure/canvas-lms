@@ -17,7 +17,7 @@
  */
 
 import {camelize, underscore} from 'convert-case'
-import originalityReportSubmissionKey from './originalityReportSubmissionKey'
+import {originalityReportSubmissionKey} from './originalityReportHelper'
 
 export function isGraded(submission) {
   const sub = camelize(submission)
