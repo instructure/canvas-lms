@@ -127,6 +127,7 @@ const BaseModalOptions = props => {
             onChange={e => {
               props.onSetDescription(e.target.value)
             }}
+            messages={props.descriptionValidationMessages}
           />
         </Flex.Item>
       </Flex>
@@ -149,7 +150,8 @@ BaseModalOptions.propTypes = {
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
-  nameValidationMessages: PropTypes.array
+  nameValidationMessages: PropTypes.array,
+  descriptionValidationMessages: PropTypes.array
 }
 
 export default BaseModalOptions
