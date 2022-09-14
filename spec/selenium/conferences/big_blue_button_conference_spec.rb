@@ -125,6 +125,27 @@ describe "BigBlueButton conferences" do
       wait_for_ajaximations
       expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
     end
+
+    it "has a working add to calendar option on create" do
+      get conferences_index_page
+      f("button[title='New Conference']").click
+
+      force_click("input[value='add_to_calendar']")
+      wait_for_ajaximations
+
+      f("input[label='Start Date']").clear
+      f("input[label='Start Date']").send_keys "August 6, 2021"
+      f("input[label='End Date']").clear
+      f("input[label='End Date']").send_keys "August 8, 2021"
+      f("input[label='End Date']").send_keys(:enter)
+      fj("button:contains('Create')").click
+      wait_for_ajaximations
+
+      ce = CalendarEvent.last
+      wc = WebConference.last
+      expect(ce.web_conference_id).to eq wc.id
+      expect(ce.start_at).to eq wc.start_at
+    end
   end
 
   context "when bbb_modal_update is OFF" do
