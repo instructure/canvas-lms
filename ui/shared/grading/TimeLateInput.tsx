@@ -29,6 +29,8 @@ import NumberHelper from '@canvas/i18n/numberHelper'
 
 const I18n = useI18nScope('speed_grader')
 
+const {Item: FlexItem} = Flex as any
+
 function defaultDurationLate(interval, secondsLate) {
   let durationLate = secondsLate / 3600
 
@@ -78,10 +80,10 @@ export default function TimeLateInput(props) {
   return (
     <span className="NumberInput__Container NumberInput__Container-LeftIndent">
       <Flex direction={props.renderLabelBefore ? 'row-reverse' : 'row'}>
-        <Flex.Item>
+        <FlexItem>
           <NumberInput
             value={numberInputValue.toString()}
-            disabled={props.disabled}
+            interaction={props.disabled ? 'disabled' : 'enabled'}
             display="inline-block"
             renderLabel={<ScreenReaderContent>{numberInputLabel}</ScreenReaderContent>}
             locale={props.locale}
@@ -91,14 +93,14 @@ export default function TimeLateInput(props) {
             showArrows={false}
             width={props.width}
           />
-        </Flex.Item>
-        <Flex.Item>
+        </FlexItem>
+        <FlexItem>
           <PresentationContent>
             <View as="div" margin="0 small">
               <Text>{numberInputText}</Text>
             </View>
           </PresentationContent>
-        </Flex.Item>
+        </FlexItem>
       </Flex>
     </span>
   )

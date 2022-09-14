@@ -17,15 +17,25 @@
  */
 
 import React from 'react'
-import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {List} from '@instructure/ui-list'
 import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
+const {Item: ListItem} = List as any
+
 const I18n = useI18nScope('hide_assignment_grades_tray')
 
-export default function SpecificSections(props) {
+type Props = {
+  checked: boolean
+  disabled: boolean
+  onCheck: (checked: boolean) => void
+  sections: Array<{id: string; name: string}>
+  sectionSelectionChanged: (boolean, string) => void
+  selectedSectionIds: string[]
+}
+
+export default function SpecificSections(props: Props) {
   const {checked, disabled, onCheck, sections, sectionSelectionChanged, selectedSectionIds} = props
 
   return (
@@ -50,9 +60,9 @@ export default function SpecificSections(props) {
           overflowY="auto"
           padding="xxx-small 0 xxx-small large"
         >
-          <List isUnstyled margin="xxx-small 0" itemSpacing="small">
+          <List isUnstyled={true} margin="xxx-small 0" itemSpacing="small">
             {sections.map(section => (
-              <List.Item key={section.id}>
+              <ListItem key={section.id}>
                 <Checkbox
                   checked={selectedSectionIds.includes(section.id)}
                   label={
@@ -71,25 +81,11 @@ export default function SpecificSections(props) {
                     sectionSelectionChanged(event.target.checked, section.id)
                   }}
                 />
-              </List.Item>
+              </ListItem>
             ))}
           </List>
         </View>
       )}
     </>
   )
-}
-
-SpecificSections.propTypes = {
-  checked: bool.isRequired,
-  disabled: bool.isRequired,
-  onCheck: func.isRequired,
-  sections: arrayOf(
-    shape({
-      id: string.isRequired,
-      name: string.isRequired
-    })
-  ).isRequired,
-  sectionSelectionChanged: func.isRequired,
-  selectedSectionIds: arrayOf(string).isRequired
 }

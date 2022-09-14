@@ -19,15 +19,9 @@
 import _ from 'underscore'
 import round from 'round'
 import AssignmentGroupGradeCalculator from './AssignmentGroupGradeCalculator'
-import {
-  bigSum,
-  sum,
-  sumBy,
-  toNumber,
-  weightedPercent
-} from './GradeCalculationHelper'
+import {bigSum, sum, sumBy, toNumber, weightedPercent} from './GradeCalculationHelper'
 
-function combineAssignmentGroupGrades(assignmentGroupGrades, includeUngraded, options) {
+function combineAssignmentGroupGrades(assignmentGroupGrades, includeUngraded: boolean, options) {
   const scopedAssignmentGroupGrades = _.map(assignmentGroupGrades, assignmentGroupGrade => {
     const gradeVersion = includeUngraded ? assignmentGroupGrade.final : assignmentGroupGrade.current
     return {...gradeVersion, weight: assignmentGroupGrade.assignmentGroupWeight}

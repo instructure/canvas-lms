@@ -57,12 +57,6 @@ function radioInputContainer() {
 }
 
 QUnit.module('SubmissionTrayRadioInput', hooks => {
-  let updateSubmission
-
-  hooks.beforeEach(() => {
-    updateSubmission = sinon.stub()
-  })
-
   hooks.afterEach(() => {
     wrapper.unmount()
   })
@@ -129,12 +123,12 @@ QUnit.module('SubmissionTrayRadioInput', hooks => {
 
     test('renders with the NumberInput enabled when disabled is false', () => {
       wrapper = mountComponent({value: 'late', checked: true})
-      strictEqual(numberInput().props().disabled, false)
+      strictEqual(numberInput().props().interaction, 'enabled')
     })
 
     test('renders with the NumberInput disabled when disabled is true', () => {
       wrapper = mountComponent({value: 'late', checked: true, disabled: true})
-      strictEqual(numberInput().props().disabled, true)
+      strictEqual(numberInput().props().interaction, 'disabled')
     })
 
     test('renders NumberInput when value is changed to "late"', () => {

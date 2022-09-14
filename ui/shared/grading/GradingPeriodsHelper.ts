@@ -39,7 +39,7 @@ function validateGradingPeriodDates(gradingPeriods) {
   return periods
 }
 
-function validatePeriodID(id) {
+function validatePeriodID(id: string) {
   const valid = _.isString(id)
   if (!valid) throw new Error(`Grading period id \`${id}\` must be a String`)
 }
@@ -49,7 +49,7 @@ class GradingPeriodsHelper {
     this.gradingPeriods = validateGradingPeriodDates(gradingPeriods)
   }
 
-  static isAllGradingPeriods(periodID) {
+  static isAllGradingPeriods(periodID: string) {
     validatePeriodID(periodID)
 
     return periodID === '0'
