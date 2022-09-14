@@ -18,13 +18,15 @@
 
 import round from 'round'
 
-export function indexOfGrade(grade, gradingScheme) {
+type GradingScheme = [string, number]
+
+export function indexOfGrade(grade: string, gradingSchemes: GradingScheme[]) {
   const cleanGrade = `${grade}`.trim().toLowerCase()
-  return gradingScheme.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
+  return gradingSchemes.findIndex(entry => entry[0].toLowerCase() === cleanGrade)
 }
 
-export function gradeToScoreUpperBound(grade, gradingScheme) {
-  const index = indexOfGrade(grade, gradingScheme)
+export function gradeToScoreUpperBound(grade: string, gradingSchemes: GradingScheme[]) {
+  const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
     // if the given grade is not in the scheme, return null
@@ -36,8 +38,8 @@ export function gradeToScoreUpperBound(grade, gradingScheme) {
     return 100
   }
 
-  const matchingSchemeValue = gradingScheme[index][1]
-  const nextHigherSchemeValue = gradingScheme[index - 1][1]
+  const matchingSchemeValue = gradingSchemes[index][1]
+  const nextHigherSchemeValue = gradingSchemes[index - 1][1]
   const schemeValuesDiff = round(nextHigherSchemeValue - matchingSchemeValue, 4) * 100
   let percentageOffset = 1
 
@@ -56,32 +58,36 @@ export function gradeToScoreUpperBound(grade, gradingScheme) {
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
 }
 
-export function gradeToScoreLowerBound(grade, gradingScheme) {
-  const index = indexOfGrade(grade, gradingScheme)
+export function gradeToScoreLowerBound(grade: string, gradingSchemes: GradingScheme[]) {
+  const index = indexOfGrade(grade, gradingSchemes)
 
   if (index === -1) {
     // if the given grade is not in the scheme, return null
     return null
   }
 
-  const matchingSchemeValue = gradingScheme[index][1]
+  const matchingSchemeValue = gradingSchemes[index][1]
 
   return round(matchingSchemeValue * 100, 2)
 }
 
-export function scoreToGrade(score, gradingScheme) {
-  if (gradingScheme == null) {
+export function scoreToGrade(score: number, gradingSchemes: GradingScheme[]) {
+  if (gradingSchemes == null) {
     return null
   }
 
   const roundedScore = round(score, 4)
+  // does the following need .toPrecision(4) ?
   const scoreWithLowerBound = Math.max(roundedScore, 0)
-  const letter = gradingScheme.find((row, i) => {
+  const letter = gradingSchemes.find((row, i) => {
     const schemeScore = (row[1] * 100).toPrecision(4)
     // The precision of the lower bound (* 100) must be limited to eliminate
     // floating-point errors.
     // e.g. 0.545 * 100 returns 54.50000000000001 in JavaScript.
-    return scoreWithLowerBound >= schemeScore || i === gradingScheme.length - 1
-  })
+    return scoreWithLowerBound >= schemeScore || i === gradingSchemes.length - 1
+  }) as GradingScheme
+  if (!letter) {
+    throw new Error('grading scheme not found')
+  }
   return letter[0]
 }

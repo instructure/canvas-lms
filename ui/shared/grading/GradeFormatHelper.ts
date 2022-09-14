@@ -34,7 +34,9 @@ const FAIL_GRADES = ['incomplete', 'fail']
 
 const UNGRADED = '–'
 
-function isPassFail(grade, gradeType) {
+type FormatGradeOptions = {defaultValue?: string; gradingType?: string; delocalize?: boolean}
+
+function isPassFail(grade, gradeType: null | string = null) {
   if (gradeType) {
     return gradeType === PASS_FAIL
   }
@@ -47,7 +49,7 @@ function isPercent(grade, gradeType) {
     return gradeType === PERCENT
   }
 
-  return /%/g.test(grade);
+  return /%/g.test(grade)
 }
 
 function isExcused(grade) {
@@ -132,7 +134,7 @@ function formatCompleteIncompleteGrade(score, grade, options) {
   return passed ? I18n.t('Complete') : I18n.t('Incomplete')
 }
 
-function formatGradeInfo(gradeInfo, options = {}) {
+function formatGradeInfo(gradeInfo, options: {defaultValue?: string} = {}) {
   if (gradeInfo.excused) {
     return excused()
   }
@@ -165,7 +167,7 @@ const GradeFormatHelper = {
    * @return {string} Given grade rounded to two decimal places and formatted with I18n
    * if it is a point or percent grade.
    */
-  formatGrade(grade, options = {}) {
+  formatGrade(grade, options: FormatGradeOptions = {}) {
     let formattedGrade = grade
 
     if (grade == null || grade === '') {
@@ -214,10 +216,10 @@ const GradeFormatHelper = {
       return localizedGrade
     }
 
-    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '');
+    return delocalizedGrade + (/%/g.test(localizedGrade) ? '%' : '')
   },
 
-  parseGrade(grade, options = {}) {
+  parseGrade(grade, options: FormatGradeOptions = {}) {
     let parsedGrade
 
     if (grade == null || grade === '' || typeof grade === 'number') {
@@ -243,7 +245,10 @@ const GradeFormatHelper = {
   formatGradeInfo,
   formatPointsOutOf,
 
-  formatSubmissionGrade(submission, options = {version: 'final'}) {
+  formatSubmissionGrade(
+    submission,
+    options: {version: string; defaultValue?: string; formatType?: string} = {version: 'final'}
+  ) {
     if (submission.excused) {
       return excused()
     }

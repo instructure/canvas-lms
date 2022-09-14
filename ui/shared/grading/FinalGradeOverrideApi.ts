@@ -25,7 +25,7 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
 const I18n = useI18nScope('finalGradeOverrideApi')
 
-export function getFinalGradeOverrides(courseId) {
+export function getFinalGradeOverrides(courseId: string) {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`
 
   return axios
@@ -57,7 +57,8 @@ export function getFinalGradeOverrides(courseId) {
     .catch(() => {
       showFlashAlert({
         message: I18n.t('There was a problem loading final grade overrides.'),
-        type: 'error'
+        type: 'error',
+        err: null
       })
     })
 }
@@ -88,7 +89,8 @@ export function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
     .catch((/* error */) => {
       showFlashAlert({
         message: I18n.t('There was a problem overriding the grade.'),
-        type: 'error'
+        type: 'error',
+        err: null
       })
     })
 }

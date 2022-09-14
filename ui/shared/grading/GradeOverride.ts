@@ -17,7 +17,12 @@
  */
 
 export default class GradeOverride {
-  constructor(attr) {
+  _attr: {
+    percentage: number | null
+    schemeKey: string | null
+  }
+
+  constructor(attr: {percentage?: number | null; schemeKey?: string | null}) {
     this._attr = {
       percentage: null,
       schemeKey: null,

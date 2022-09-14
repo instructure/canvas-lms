@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 import GradingPeriodsHelper from './GradingPeriodsHelper'
-import type {Assignment, Student, Submission} from '../../api.d'
+import type {Assignment, AssignmentMap, Student, Submission} from '../../api.d'
 
 type Cell = {
   locked: boolean
@@ -157,7 +157,7 @@ class SubmissionStateMap {
     this.submissionMap = {}
   }
 
-  setup(students: Student[], assignments: Assignment[]) {
+  setup(students: Student[], assignments: AssignmentMap) {
     students.forEach(student => {
       this.submissionCellMap[student.id] = {}
       this.submissionMap[student.id] = {}
