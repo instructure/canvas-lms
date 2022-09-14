@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -26,17 +26,35 @@ import {ColorInput} from '../../../shared/ColorInput'
 import formatMessage from '../../../../../format-message'
 import {Group} from './Group'
 import {MAX_TOTAL_TEXT_CHARS} from '../../svg/constants'
-import useDebouncedValue from '../../utils/useDebouncedValue'
 
 const TEXT_SIZES = ['small', 'medium', 'large', 'x-large']
 const TEXT_POSITIONS = ['middle', 'bottom-third', 'below']
 
 const getTextSection = () => document.querySelector('#icons-tray-text-section')
 
+const processText = (oldValue, newValue) => {
+  let result = newValue
+  if (newValue.length > MAX_TOTAL_TEXT_CHARS) {
+    if (oldValue.length >= MAX_TOTAL_TEXT_CHARS) {
+      // When typing chars
+      result = oldValue
+    } else {
+      // When pasting text
+      result = result.substring(0, MAX_TOTAL_TEXT_CHARS)
+    }
+  }
+  return result
+}
+
 export const TextSection = ({settings, onChange}) => {
-  const [text, setText] = useDebouncedValue(settings.text, t => {
-    if (t.length <= MAX_TOTAL_TEXT_CHARS) onChange({text: t})
-  })
+  const [text, setText] = useState(settings.text)
+
+  useEffect(() => {
+    if (settings.text !== text) {
+      setText(processText(settings.text))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.text])
 
   return (
     <Group as="section" defaultExpanded summary={formatMessage('Text')}>
@@ -50,7 +68,13 @@ export const TextSection = ({settings, onChange}) => {
           <TextInput
             id="icon-text"
             renderLabel={formatMessage('Text')}
-            onChange={setText}
+            onChange={(e, value) => {
+              const processedText = processText(text, value)
+              if (processedText !== text) {
+                setText(processedText)
+                onChange({text: processedText})
+              }
+            }}
             value={text}
             messages={[
               {

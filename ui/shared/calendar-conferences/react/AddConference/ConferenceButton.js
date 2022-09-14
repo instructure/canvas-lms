@@ -28,7 +28,13 @@ import webConferenceType from '../proptypes/webConferenceType'
 
 const I18n = useI18nScope('conferences')
 
-const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect, inputRef}) => {
+const ConferenceButton = ({
+  conferenceTypes,
+  currentConferenceType,
+  onSelect,
+  inputRef,
+  disabled
+}) => {
   if (!conferenceTypes || conferenceTypes.length === 0) {
     return (
       <Text size="small" color="danger">
@@ -45,6 +51,7 @@ const ConferenceButton = ({conferenceTypes, currentConferenceType, onSelect, inp
         color="primary-inverse"
         size="small"
         onClick={() => onSelect(conferenceType)}
+        disabled={disabled}
       >
         {icon && (
           <PresentationContent>

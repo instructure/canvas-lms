@@ -163,6 +163,12 @@ CanvasRce.propTypes = {
   textareaClassName: string,
   // id of the generated textarea
   textareaId: string.isRequired,
+  // object of 'featureName': bool key/value pairs
+  features: objectOf(bool),
+  // configurable default timeout value for flash alerts
+  flashAlertTimeout: number,
+  // user's timezone
+  timezone: string.isRequired,
   // event handlers
   onFocus: func, // f(RCEWrapper component) (sorry)
   onBlur: func, // f(event)
@@ -177,6 +183,9 @@ CanvasRce.defaultProps = {
   mirroredAttrs: {},
   readOnly: false,
   textareaClassName: 'input-block-level',
+  features: ENV?.FEATURES || {},
+  flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
+  timezone: ENV?.TIMEZONE,
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},

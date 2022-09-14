@@ -54,6 +54,7 @@ const OutcomeManagementPanel = ({
   importNumber,
   createdOutcomeGroupIds,
   onLhsSelectedGroupIdChanged,
+  lhsGroupId,
   handleFileDrop,
   targetGroupIdsToRefetch,
   setTargetGroupIdsToRefetch,
@@ -66,6 +67,7 @@ const OutcomeManagementPanel = ({
   const [scrollContainer, setScrollContainer] = useState(null)
   const [rhsGroupIdsToRefetch, setRhsGroupIdsToRefetch] = useState([])
   const [lhsGroupIdsToRefetch, setLhsGroupIdsToRefetch] = useState([])
+  const [parentsToUnload, setParentsToUnload] = useState([])
   const {
     selectedOutcomeIds,
     selectedOutcomesCount,
@@ -89,7 +91,13 @@ const OutcomeManagementPanel = ({
     updateSearch: onSearchChangeHandler,
     clearSearch: onSearchClearHandler,
     clearCache
-  } = useManageOutcomes({collection: 'OutcomeManagementPanel', importNumber, lhsGroupIdsToRefetch})
+  } = useManageOutcomes({
+    collection: 'OutcomeManagementPanel',
+    importNumber,
+    lhsGroupIdsToRefetch,
+    lhsGroupId,
+    parentsToUnload
+  })
 
   useEffect(() => {
     return () => {
@@ -99,8 +107,18 @@ const OutcomeManagementPanel = ({
   }, [])
 
   useEffect(() => {
+    if (createdOutcomeGroupIds.length > 0 && Object.keys(collections).length > 0) {
+      for (let i = createdOutcomeGroupIds.length - 1; i >= 0; i--) {
+        if (collections[createdOutcomeGroupIds[i]]) {
+          setParentsToUnload(
+            getOutcomeGroupAncestorsWithSelf(collections, createdOutcomeGroupIds[i])
+          )
+          break
+        }
+      }
+    }
     setRhsGroupIdsToRefetch(ids => [...new Set([...ids, ...createdOutcomeGroupIds])])
-  }, [createdOutcomeGroupIds])
+  }, [createdOutcomeGroupIds]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (targetGroupIdsToRefetch.length > 0) {
@@ -352,7 +370,7 @@ const OutcomeManagementPanel = ({
                 isLoadingGroupDetail={loading}
                 outcomesCount={group?.outcomesCount}
                 selectedGroupId={selectedGroupId}
-                showActionLinkForRoot
+                showActionLinkForRoot={true}
                 showOptions={showGroupOptions}
                 setShowOutcomesView={setShowOutcomesView}
               />
@@ -390,7 +408,7 @@ const OutcomeManagementPanel = ({
                   onCollectionToggle={queryCollections}
                   collections={collections}
                   rootId={rootId}
-                  showRootCollection
+                  showRootCollection={true}
                   defaultExpandedIds={[rootId]}
                   onCreateGroup={createGroup}
                   loadedGroups={loadedGroups}
@@ -572,6 +590,7 @@ OutcomeManagementPanel.defaultProps = {
 OutcomeManagementPanel.propTypes = {
   createdOutcomeGroupIds: PropTypes.arrayOf(PropTypes.string),
   onLhsSelectedGroupIdChanged: PropTypes.func,
+  lhsGroupId: PropTypes.string,
   importNumber: PropTypes.number,
   handleFileDrop: PropTypes.func,
   targetGroupIdsToRefetch: PropTypes.arrayOf(PropTypes.string).isRequired,

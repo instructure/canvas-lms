@@ -66,7 +66,8 @@ const fetchApps = cards => {
           id: app.id,
           courses: [course],
           title: app.course_navigation?.text || app.name,
-          icon: app.course_navigation?.icon_url || app.icon_url
+          icon: app.course_navigation?.icon_url || app.icon_url,
+          windowTarget: app.course_navigation?.windowTarget
         })
       }
       return acc

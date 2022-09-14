@@ -54,6 +54,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :selected_calendar_contexts
   add_user_preference :enabled_account_calendars
   add_user_preference :account_calendar_events_seen
+  add_user_preference :visited_tabs
   add_user_preference :send_scores_in_emails_override, use_sub_keys: true
   add_user_preference :unread_submission_annotations, use_sub_keys: true
   add_user_preference :unread_rubric_comments, use_sub_keys: true

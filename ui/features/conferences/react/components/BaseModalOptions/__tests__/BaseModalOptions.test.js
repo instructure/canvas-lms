@@ -33,7 +33,7 @@ describe('BaseModalOptions', () => {
     setName,
     duration: 46,
     setDuration,
-    options: ['no_time_limit'],
+    options: [''],
     setOptions,
     description: 'First conference of all time',
     setDescription,
@@ -80,7 +80,7 @@ describe('BaseModalOptions', () => {
     )
     expect(
       container.getByLabelText('No time limit (for long-running conferences)').checked
-    ).toBeTruthy()
+    ).toBeFalsy()
     expect(container.getByLabelText('Description')).toHaveValue(defaultProps.description)
   })
 })

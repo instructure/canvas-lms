@@ -206,6 +206,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
                 importNumber={importNumber}
                 createdOutcomeGroupIds={createdOutcomeGroupIds}
                 onLhsSelectedGroupIdChanged={setLhsGroupId}
+                lhsGroupId={lhsGroupId}
                 handleFileDrop={onFileDrop}
                 targetGroupIdsToRefetch={targetGroupIdsToRefetch}
                 setTargetGroupIdsToRefetch={setTargetGroupIdsToRefetch}

@@ -23,6 +23,7 @@ import useComputerPanelFocus from './useComputerPanelFocus'
 import {isAudio, isVideo, isPreviewable, sizeMediaPlayer} from './shared/utils'
 import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
+import * as CONSTANTS from './shared/constants'
 
 export {
   UploadMedia as default,
@@ -35,5 +36,6 @@ export {
   sizeMediaPlayer,
   LoadingIndicator,
   saveMediaRecording,
-  saveClosedCaptions
+  saveClosedCaptions,
+  CONSTANTS
 }

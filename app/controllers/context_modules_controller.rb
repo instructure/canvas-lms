@@ -664,6 +664,7 @@ class ContextModulesController < ApplicationController
         published: @tag.published?,
         publishable_id: module_item_publishable_id(@tag),
         unpublishable: module_item_unpublishable?(@tag),
+        publish_at: module_item_publish_at(@tag),
         graded: @tag.graded?,
         content_details: content_details(@tag, @current_user),
         assignment_id: @tag.assignment.try(:id),

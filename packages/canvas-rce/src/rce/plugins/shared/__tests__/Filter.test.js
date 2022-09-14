@@ -189,6 +189,12 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByText('User Files')).toBeInTheDocument()
       expect(component.queryByText('Course Files')).toBeNull()
     })
+
+    it('does not render Content Type when in Edit Course Link Tray', () => {
+      renderComponent({contentSubtype: 'edit'})
+      const contentTypeField = component.queryByLabelText('Content Type')
+      expect(contentTypeField).not.toBeInTheDocument()
+    })
   })
 
   describe('"Content Subtype" field', () => {

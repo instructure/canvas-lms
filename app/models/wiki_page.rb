@@ -30,6 +30,7 @@ class WikiPage < ActiveRecord::Base
   validates :body, length: { maximum: maximum_long_text_length, allow_blank: true }
   validates :wiki_id, presence: true
   include Canvas::SoftDeletable
+  include ScheduledPublication
   include HasContentTags
   include CopyAuthorizedLinks
   include ContextModuleItem
@@ -44,6 +45,7 @@ class WikiPage < ActiveRecord::Base
   restrict_columns :settings, [:editing_roles, :url]
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
+  restrict_columns :availability_dates, [:publish_at]
 
   after_update :post_to_pandapub_when_revised
 
@@ -60,6 +62,7 @@ class WikiPage < ActiveRecord::Base
   before_save :default_submission_values,
               if: proc { context.try(:conditional_release?) }
   before_save :set_revised_at
+
   before_validation :ensure_wiki_and_context
   before_validation :ensure_unique_title
   before_create :set_root_account_id
@@ -206,6 +209,7 @@ class WikiPage < ActiveRecord::Base
     exclude_fields = [:user_id, :updated_at].concat(SIMPLY_VERSIONED_EXCLUDE_FIELDS).map(&:to_s)
     (wp.changes.keys.map(&:to_s) - exclude_fields).present?
   }
+
   after_save :remove_changed_flag
 
   workflow do

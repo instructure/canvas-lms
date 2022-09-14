@@ -273,6 +273,7 @@ describe "Module Items API", type: :request do
                            "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
                            "page_url" => @wiki_page.url,
                            "published" => true,
+                           "publish_at" => nil,
                            "module_id" => @module2.id,
                            "quiz_lti" => false
                          })

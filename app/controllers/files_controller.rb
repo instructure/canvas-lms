@@ -136,7 +136,8 @@ class FilesController < ApplicationController
   before_action :require_context, except: %i[
     assessment_question_show image_thumbnail show_thumbnail
     create_pending s3_success show api_create api_create_success api_create_success_cors
-    api_show api_index destroy api_update api_file_status public_url api_capture reset_verifier
+    api_show api_index destroy api_update api_file_status public_url api_capture icon_metadata
+    reset_verifier
   ]
 
   before_action :open_limited_cors, only: [:show]
@@ -148,7 +149,7 @@ class FilesController < ApplicationController
 
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: %i[
-    api_show api_create_success api_file_status api_update destroy reset_verifier
+    api_show api_create_success api_file_status api_update destroy icon_metadata reset_verifier
   ]
 
   include Api::V1::Attachment
@@ -497,7 +498,7 @@ class FilesController < ApplicationController
   #   file was deleted and replaced by another.
   #
   #   Indicates the context ID Canvas should use when following the "replacement chain." The
-  #   "replacement_chain_context_id" paraamter must also be included.
+  #   "replacement_chain_context_type" parameter must also be included.
   #
   # @example_request
   #
@@ -524,7 +525,7 @@ class FilesController < ApplicationController
     end
 
     params[:include] = Array(params[:include])
-    if read_allowed(@attachment, @current_user, session, params)
+    if access_allowed(@attachment, @current_user, :read, session, params)
       json = attachment_json(@attachment, @current_user, {}, { include: params[:include], omit_verifier_in_app: !value_to_boolean(params[:use_verifiers]) })
 
       # Add canvadoc session URL if the file is unlocked
@@ -603,7 +604,7 @@ class FilesController < ApplicationController
         return
       end
 
-      if read_allowed(@attachment, @current_user, session, params)
+      if access_allowed(@attachment, @current_user, :read, session, params)
         @attachment.ensure_media_object
         verifier_checker = Attachments::Verification.new(@attachment)
 
@@ -1308,6 +1309,86 @@ class FilesController < ApplicationController
     end
   end
 
+  # @API Get icon metadata
+  # Returns the icon maker file attachment metadata
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/1/files/1/metadata' \
+  #         -H 'Authorization: Bearer <token>'
+  #
+  # @example_response
+  #
+  #  {
+  #    "type":"image/svg+xml-icon-maker-icons",
+  #    "alt":"",
+  #    "shape":"square",
+  #    "size":"small",
+  #    "color":"#FFFFFF",
+  #    "outlineColor":"#65499D",
+  #    "outlineSize":"large",
+  #    "text":"Hello",
+  #    "textSize":"x-large",
+  #    "textColor":"#65499D",
+  #    "textBackgroundColor":"#FFFFFF",
+  #    "textPosition":"bottom-third",
+  #    "encodedImage":"data:image/svg+xml;base64,PH==",
+  #    "encodedImageType":"SingleColor",
+  #    "encodedImageName":"Health Icon",
+  #    "x":"50%",
+  #    "y":"50%",
+  #    "translateX":-54,
+  #    "translateY":-54,
+  #    "width":108,
+  #    "height":108,
+  #    "transform":"translate(-54,-54)"
+  #  }
+  #
+  def icon_metadata
+    @icon = Attachment.find(params[:id])
+    @icon = attachment_or_replacement(@icon.context, params[:id]) if @icon.deleted? && @icon.replacement_attachment_id.present?
+    return render json: { errors: [{ message: "The specified resource does not exist." }] }, status: :not_found if @icon.deleted?
+    return unless access_allowed(@icon, @current_user, :download, session, params)
+
+    unless @icon.category == Attachment::ICON_MAKER_ICONS
+      return render json: { errors: [{ message: "The requested attachment does not support viewing metadata." }] }, status: :bad_request
+    end
+
+    sax_doc = MetadataSaxDoc.new
+    parser = Nokogiri::XML::SAX::PushParser.new(sax_doc)
+    @icon.open do |chunk|
+      parser << chunk
+      break if sax_doc.metadata_value.present?
+    end
+    sax_doc.metadata_value.present? ? render(json: { name: @icon.display_name }.merge(JSON.parse(sax_doc.metadata_value))) : head(:no_content)
+  end
+
+  class MetadataSaxDoc < Nokogiri::XML::SAX::Document
+    attr_reader :current_value, :metadata_value, :retain_data
+
+    def start_element(name, _attrs)
+      return unless name == "metadata"
+
+      @current_value = ""
+      @retain_data = true
+    end
+
+    def end_element(name)
+      return unless name == "metadata"
+
+      @metadata_value = current_value
+      @retain_data = false
+    end
+
+    def characters(chars)
+      return unless retain_data
+
+      @current_value ||= ""
+      @current_value += chars
+    end
+  end
+  private_constant :MetadataSaxDoc
+
   # @API Reset link verifier
   #
   # Resets the link verifier. Any existing links to the file using
@@ -1426,19 +1507,19 @@ class FilesController < ApplicationController
     headers["Access-Control-Allow-Methods"] = "GET, HEAD"
   end
 
-  def read_allowed(attachment, user, session, params)
+  def access_allowed(attachment, user, access_type, session, params)
     if params[:verifier]
       verifier_checker = Attachments::Verification.new(attachment)
-      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], :read, session)
+      return true if verifier_checker.valid_verifier_for_permission?(params[:verifier], access_type, session)
     end
 
     submissions = attachment.attachment_associations.where(context_type: "Submission").preload(:context).filter_map(&:context)
-    return true if submissions.any? { |submission| submission.grants_right?(user, session, :read) }
+    return true if submissions.any? { |submission| submission.grants_right?(user, session, access_type) }
 
-    course = api_find(Assignment, params[:assignment_id]).course unless params[:assignment_id].nil?
-    return true if course&.grants_right?(user, session, :read)
+    course = api_find(Assignment, params[:assignment_id]).course if params[:assignment_id].present?
+    return true if course&.grants_right?(user, session, access_type)
 
-    authorized_action(attachment, user, :read)
+    authorized_action(attachment, user, access_type)
   end
 
   def strong_attachment_params

@@ -220,9 +220,7 @@ class GradebookExporter
         row << read_only << read_only << read_only << read_only
         row.concat(buffer_columns(:grading_standard, read_only)) if @course.grading_standard_enabled?
         if include_final_grade_override?
-          allow_importing = Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
-          # Override Score is not read-only if the user can import changes
-          row.concat(buffer_columns(:override_score, allow_importing ? nil : read_only))
+          row.concat(buffer_columns(:override_score))
 
           # Override Grade is always read-only
           row.concat(buffer_columns(:override_grade, read_only)) if @course.grading_standard_enabled?

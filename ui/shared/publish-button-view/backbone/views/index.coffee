@@ -20,6 +20,10 @@ import $ from 'jquery'
 import Backbone from '@canvas/backbone'
 import htmlEscape from 'html-escape'
 import '@canvas/forms/jquery/jquery.instructure_forms'
+import tz from '@canvas/timezone'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import DelayedPublishDialog from '@canvas/publish-button-view/react/components/DelayedPublishDialog'
 
 I18n = useI18nScope('publish_btn_module')
 
@@ -49,6 +53,7 @@ export default class PublishButton extends Backbone.View
   els:
     'i':             '$icon'
     '.publish-text': '$text'
+    '.dpd-mount':    '$dpd_mount'
 
   initialize: ->
     super
@@ -57,12 +62,13 @@ export default class PublishButton extends Backbone.View
 
   setElement: ->
     super
-    @$el.attr 'data-tooltip', ''
     @disable() if !@model.get('unpublishable') && @model.get('published')
 
   # events
 
   hover: ({type}) ->
+    return if @isDelayedPublish()
+
     if type is 'mouseenter'
       return if @keepState or @isPublish() or @isDisabled()
       @renderUnpublish()
@@ -72,6 +78,8 @@ export default class PublishButton extends Backbone.View
       @renderPublished() unless @isPublish() or @isDisabled()
 
   click: (event) ->
+    return @openDelayedPublishDialog() if @isDelayedPublish()
+
     event.preventDefault()
     event.stopPropagation()
     return if @isDisabled()
@@ -130,6 +138,9 @@ export default class PublishButton extends Backbone.View
   isDisabled: ->
     @$el.hasClass @disabledClass
 
+  isDelayedPublish: ->
+    ENV?.FEATURES?.scheduled_page_publication && !@model.get('published') && @model.get('publish_at')
+
   disable: ->
     @$el.addClass @disabledClass
 
@@ -137,9 +148,9 @@ export default class PublishButton extends Backbone.View
     @$el.removeClass @disabledClass
 
   reset: ->
-    @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass}"
+    @$el.removeClass "#{@publishClass} #{@publishedClass} #{@unpublishClass} published-status restricted"
     @$icon.removeClass 'icon-publish icon-unpublish icon-unpublished'
-    @$el.removeAttr 'aria-label'
+    @$el.removeAttr 'title aria-label'
 
   publishLabel: ->
     return @publishText if @publishText
@@ -158,7 +169,7 @@ export default class PublishButton extends Backbone.View
       @$el.attr 'role', 'button'
 
     @$el.attr 'tabindex', '0'
-    @$el.html '<i></i><span class="publish-text"></span>'
+    @$el.html '<i></i><span class="publish-text"></span><span class="dpd-mount"></span>'
     @cacheEls()
 
     # don't read text of button with screenreader
@@ -166,6 +177,8 @@ export default class PublishButton extends Backbone.View
 
     if @model.get('published')
       @renderPublished()
+    else if @isDelayedPublish()
+      @renderDelayedPublish()
     else
       @renderPublish()
     @
@@ -207,6 +220,12 @@ export default class PublishButton extends Backbone.View
       buttonClass: @unpublishClass
       iconClass:   'icon-unpublished'
 
+  renderDelayedPublish: =>
+    @renderState
+      text: I18n.t('Will publish on %{publish_date}', {publish_date: tz.format(@model.get('publish_at'), 'date.formats.short')})
+      iconClass: 'icon-calendar-month'
+      buttonClass: if @$el.is("button") then '' else 'published-status restricted'
+
   renderState: (options) ->
     @reset()
     @$el.addClass options.buttonClass
@@ -240,3 +259,17 @@ export default class PublishButton extends Backbone.View
     @$el.attr 'title', message
     @$el.data 'tooltip', 'left'
     @addAriaLabel(message)
+
+  openDelayedPublishDialog: () ->
+    props =
+      name: @model.get('title') || @model.get('module_item_name')
+      courseId: ENV.COURSE_ID
+      contentId: @model.get('page_url') || @model.get('url') || @model.get('id')
+      publishAt: @model.get('publish_at')
+      onPublish: () => @publish()
+      onUpdatePublishAt: (val) =>
+        @model.set('publish_at', val)
+        @render()
+        @setFocusToElement()
+      onClose: () => ReactDOM.unmountComponentAtNode @$dpd_mount[0]
+    ReactDOM.render React.createElement(DelayedPublishDialog, props), @$dpd_mount[0]

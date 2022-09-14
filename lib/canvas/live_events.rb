@@ -1023,7 +1023,21 @@ module Canvas::LiveEvents
     {
       canvas_course_id: master_template.course.id,
       canvas_course_uuid: master_template.course.uuid,
-      restrictions: master_template.use_default_restrictions_by_type ? master_template.default_restrictions_by_type["Assignment"] : master_template.default_restrictions
+      restrictions: master_template.use_default_restrictions_by_type ? master_template.default_restrictions_by_type : master_template.default_restrictions
+    }
+  end
+
+  def self.blueprint_restrictions_updated(master_content_tag)
+    post_event_stringified("blueprint_restrictions_updated", blueprint_restrictions_updated_data(master_content_tag))
+  end
+
+  def self.blueprint_restrictions_updated_data(master_content_tag)
+    {
+      canvas_assignment_id: master_content_tag.content_id,
+      canvas_course_id: master_content_tag.master_template.course_id,
+      canvas_course_uuid: master_content_tag.master_template.course.uuid,
+      restrictions: master_content_tag.restrictions,
+      use_default_restrictions: master_content_tag.use_default_restrictions
     }
   end
 

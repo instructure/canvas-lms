@@ -272,7 +272,7 @@ module Calendar2Common
   def test_timed_calendar_event_in_tz(time_zone, start_time = "6:30 AM", end_time = "6:30 PM")
     @user.time_zone = time_zone
     @user.save!
-    @date = Time.zone.now.beginning_of_day
+    @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
       new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
@@ -299,7 +299,7 @@ module Calendar2Common
   )
     @user.time_zone = time_zone
     @user.save!
-    @date = Time.zone.now.beginning_of_day
+    @date = @user.time_zone.now.beginning_of_day
     new_date = @date
     new_date =
       new_date.to_date.mday == "15" ? new_date.change({ day: 20 }) : new_date.change({ day: 15 })
@@ -314,7 +314,6 @@ module Calendar2Common
     more_options_submit_button.click
     wait_for_ajaximations
     refresh_page
-
     event_title_on_calendar.click
     expect(
       event_content.find_element(:css, ".event-details-timestring").text
@@ -462,6 +461,19 @@ module Calendar2Common
     expect_new_page_load { edit_calendar_event_form_more_options.click }
   end
 
+  def enable_course_account_calendar
+    @course.account.account_calendar_visible = true
+    @course.account.save!
+    account_admin_user(account: @course.account)
+    user_session(@admin)
+    get "/calendar2"
+    add_other_calendars_button.click
+    # because clicking the checkbox clicks on a sibling span
+    click_account_calendar_modal_checkbox
+    click_account_calendar_modal_save_button.click
+    calendar_flash_alert_message_button.click
+  end
+
   def event_title_on_calendar
     f(".fc-content .fc-title")
   end
@@ -589,5 +601,21 @@ module Calendar2Common
 
   def event_content
     fj(".event-details-content:visible")
+  end
+
+  def add_other_calendars_button
+    f("button[data-testid='add-other-calendars-button']")
+  end
+
+  def click_account_calendar_modal_checkbox
+    driver.execute_script("$('input[data-testid=account-#{@course.account.id}-checkbox]').click()")
+  end
+
+  def click_account_calendar_modal_save_button
+    f("button[data-testid='save-calendars-button']")
+  end
+
+  def calendar_flash_alert_message_button
+    f(".flashalert-message button")
   end
 end

@@ -49,6 +49,7 @@ module OutcomesServiceAuthoritativeResultsHelper
     outcome = LearningOutcome.find(authoritative_result[:external_outcome_id])
     assignment = Assignment.find(authoritative_result[:associated_asset_id])
     user = User.find_by(uuid: authoritative_result[:user_uuid])
+    submission = Submission.find_by(user_id: user.id, assignment_id: assignment.id)
 
     context = assignment.context
     root_account = assignment.root_account
@@ -73,6 +74,7 @@ module OutcomesServiceAuthoritativeResultsHelper
       LearningOutcomeResult.new(
         learning_outcome: outcome,
         associated_asset: assignment,
+        artifact: submission,
         title: "#{user.name}, #{assignment.name}",
         user: user,
         user_uuid: user.uuid,
@@ -81,7 +83,7 @@ module OutcomesServiceAuthoritativeResultsHelper
         root_account: root_account,
         possible: possible,
         score: score,
-        # mastery is computed after the call for caculate_percent!
+        # mastery is computed after the call for calculate_percent!
         original_possible: possible,
         original_score: score,
         created_at: submitted_at,

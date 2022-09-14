@@ -21,6 +21,8 @@ import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
+import {Alert} from '@instructure/ui-alerts'
+import {Spinner} from '@instructure/ui-spinner'
 import formatMessage from '../../../../../../format-message'
 import {cropperSettingsReducer, actions, defaultState} from '../../../reducers/imageCropper'
 import {Preview} from './Preview'
@@ -36,7 +38,64 @@ const handleSubmit = (onSubmit, settings) =>
     )
     .then(base64Image => onSubmit(settings, base64Image))
 
-export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}) => {
+const renderBody = (settings, dispatch, message, loading) => {
+  if (loading) {
+    return (
+      <Flex justifyItems="center" margin="">
+        <Flex.Item>
+          <Spinner margin="small" renderTitle={formatMessage('Loading...')} size="large" />
+        </Flex.Item>
+      </Flex>
+    )
+  }
+  return (
+    <Flex direction="column" margin="none">
+      {message && (
+        <Flex.Item data-testid="alert-message">
+          <Alert variant="info" renderCloseButtonLabel="Close" margin="small" timeout={10000}>
+            {message}
+          </Alert>
+        </Flex.Item>
+      )}
+      <Flex.Item margin="0 0 small 0">
+        <Controls settings={settings} dispatch={dispatch} />
+      </Flex.Item>
+      <Flex.Item>
+        <Preview settings={settings} dispatch={dispatch} />
+      </Flex.Item>
+    </Flex>
+  )
+}
+
+const renderFooter = (settings, onSubmit, onClose) => {
+  return (
+    <>
+      <Button onClick={onClose} margin="0 x-small 0 0">
+        {formatMessage('Cancel')}
+      </Button>
+      <Button
+        color="primary"
+        type="submit"
+        onClick={e => {
+          e.preventDefault()
+          handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
+        }}
+      >
+        {formatMessage('Save')}
+      </Button>
+    </>
+  )
+}
+
+export const ImageCropperModal = ({
+  open,
+  onClose,
+  onSubmit,
+  image,
+  message,
+  cropSettings,
+  loading
+}) => {
   const [settings, dispatch] = useReducer(cropperSettingsReducer, defaultState)
   useEffect(() => {
     dispatch({type: actions.SET_IMAGE, payload: image})
@@ -52,31 +111,12 @@ export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}
         <CloseButton placement="end" offset="small" onClick={onClose} screenReaderLabel="Close" />
         <Heading>{formatMessage('Crop Image')}</Heading>
       </Modal.Header>
-      <Modal.Body>
-        <Flex direction="column" margin="none">
-          <Flex.Item margin="0 0 small 0">
-            <Controls settings={settings} dispatch={dispatch} />
-          </Flex.Item>
-          <Flex.Item>
-            <Preview settings={settings} dispatch={dispatch} />
-          </Flex.Item>
-        </Flex>
-      </Modal.Body>
-      <Modal.Footer id="imageCropperFooter">
-        <Button onClick={onClose} margin="0 x-small 0 0">
-          {formatMessage('Cancel')}
-        </Button>
-        <Button
-          color="primary"
-          type="submit"
-          onClick={e => {
-            e.preventDefault()
-            handleSubmit(onSubmit, settings).then(onClose).catch(onClose)
-          }}
-        >
-          {formatMessage('Save')}
-        </Button>
-      </Modal.Footer>
+      <Modal.Body>{renderBody(settings, dispatch, message, loading)}</Modal.Body>
+      {!loading && (
+        <Modal.Footer id="imageCropperFooter">
+          {renderFooter(settings, onSubmit, onClose)}
+        </Modal.Footer>
+      )}
     </Modal>
   )
 }
@@ -84,14 +124,18 @@ export const ImageCropperModal = ({open, onClose, onSubmit, image, cropSettings}
 ImageCropperModal.propTypes = {
   image: PropTypes.string.isRequired,
   cropSettings: ImageCropperSettingsPropTypes,
+  message: PropTypes.string,
   open: PropTypes.bool,
   onClose: PropTypes.func,
-  onSubmit: PropTypes.func
+  onSubmit: PropTypes.func,
+  loading: PropTypes.bool
 }
 
 ImageCropperModal.defaultProps = {
   open: false,
   cropSettings: null,
+  message: null,
+  loading: false,
   onClose: () => {},
   onSubmit: () => {}
 }

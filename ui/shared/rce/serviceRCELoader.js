@@ -192,7 +192,10 @@ const RCELoader = {
       instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
       maxInitRenderedRCEs: tinyMCEInitOptions.maxInitRenderedRCEs,
       highContrastCSS: window.ENV?.url_for_high_contrast_tinymce_editor_css,
-      use_rce_icon_maker: shouldUseFeature(Feature.IconMaker, window.ENV)
+      use_rce_icon_maker: shouldUseFeature(Feature.IconMaker, window.ENV),
+      features: ENV?.FEATURES || {},
+      flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
+      timezone: ENV?.TIMEZONE
     }
   }
 }

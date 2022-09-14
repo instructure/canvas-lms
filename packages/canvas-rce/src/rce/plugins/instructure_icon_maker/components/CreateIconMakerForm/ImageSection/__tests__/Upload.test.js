@@ -22,6 +22,7 @@ import Upload, {onSubmit} from '../Upload'
 import {actions} from '../../../../reducers/imageSection'
 import FakeEditor from '../../../../../shared/__tests__/FakeEditor'
 import fetchMock from 'fetch-mock'
+import {isAnUnsupportedGifPngImage} from '../utils'
 
 jest.mock('../../../../../../../bridge', () => {
   return {
@@ -30,6 +31,16 @@ jest.mock('../../../../../../../bridge', () => {
     }
   }
 })
+
+jest.mock('../compressionUtils', () => ({
+  ...jest.requireActual('../compressionUtils'),
+  compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk=='))
+}))
+
+jest.mock('../utils', () => ({
+  ...jest.requireActual('../utils'),
+  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false)
+}))
 
 let props
 const subject = () => render(<Upload {...props} />)
@@ -66,14 +77,17 @@ describe('Upload()', () => {
 
   describe('onSubmit()', () => {
     const dispatch = jest.fn()
+    const onChange = jest.fn()
     const theFile = {
       preview:
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
-      name: 'Test Image.png'
+      name: 'Test Image.png',
+      type: 'image/png',
+      size: 100000
     }
 
     const onSubmitCall = () =>
-      onSubmit(dispatch)(
+      onSubmit(dispatch, onChange)(
         {},
         {},
         {},
@@ -101,6 +115,90 @@ describe('Upload()', () => {
 
     it('opens image cropper', () => {
       onSubmitCall()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_CROPPER_OPEN, payload: true})
+    })
+
+    describe('with an unsupported image', () => {
+      beforeAll(() => {
+        isAnUnsupportedGifPngImage.mockReturnValue(true)
+      })
+
+      afterAll(() => {
+        isAnUnsupportedGifPngImage.mockReturnValue(false)
+      })
+
+      it('closes the collection', () => {
+        onSubmitCall()
+        expect(dispatch).toHaveBeenCalledWith({
+          ...actions.SET_IMAGE_COLLECTION_OPEN,
+          payload: false
+        })
+      })
+
+      it('sets the error', () => {
+        onSubmitCall()
+        expect(onChange).toHaveBeenCalledWith({
+          type: 'SetError',
+          payload: 'GIF/PNG format images larger than 250 KB are not currently supported.'
+        })
+      })
+    })
+  })
+
+  describe('onSubmit() with an image to be compressed', () => {
+    const dispatch = jest.fn()
+    const theFile = {
+      preview:
+        'data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAASwAAAEBCAMAAAD1kWivAAADAFBMVEWysrL5nCYYGBj7/+rceo3w1tD+yAfwFTPrIj36',
+      name: 'Test Image.jpeg',
+      type: 'image/jpeg',
+      size: 600000
+    }
+
+    const onSubmitCall = () =>
+      onSubmit(dispatch)(
+        {},
+        {},
+        {},
+        {
+          theFile
+        }
+      )
+
+    const flushPromises = () => new Promise(setTimeout)
+
+    afterEach(() => jest.clearAllMocks())
+
+    it('sets the compression status', async () => {
+      onSubmitCall()
+      await flushPromises()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_COMPRESSION_STATUS, payload: true})
+    })
+
+    it('sets the selected image', async () => {
+      onSubmitCall()
+      await flushPromises()
+      expect(dispatch).toHaveBeenCalledWith({
+        ...actions.SET_IMAGE,
+        payload: 'data:image/jpeg;base64,abcdefghijk=='
+      })
+    })
+
+    it('sets the selected image name', async () => {
+      onSubmitCall()
+      await flushPromises()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_NAME, payload: 'Test Image.jpeg'})
+    })
+
+    it('closes the collection', async () => {
+      onSubmitCall()
+      await flushPromises()
+      expect(dispatch).toHaveBeenCalledWith({...actions.SET_IMAGE_COLLECTION_OPEN, payload: false})
+    })
+
+    it('opens image cropper', async () => {
+      onSubmitCall()
+      await flushPromises()
       expect(dispatch).toHaveBeenCalledWith({...actions.SET_CROPPER_OPEN, payload: true})
     })
   })

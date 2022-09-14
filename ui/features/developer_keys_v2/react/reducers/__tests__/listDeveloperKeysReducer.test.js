@@ -71,6 +71,20 @@ it('responds to listDeveloperKeysSuccessful', () => {
   expect(newState.list).toHaveLength(payload.developerKeys.length)
 })
 
+it('responds to listRemainingDeveloperKeysSuccessful', () => {
+  const state = {
+    listDeveloperKeysPending: true,
+    listDeveloperKeysSuccessful: false,
+    list: []
+  }
+  const payload = {developerKeys: []}
+  const action = actions.listRemainingDeveloperKeysSuccessful(payload)
+  const newState = reducer(state, action)
+  expect(newState.listDeveloperKeysPending).toBe(false)
+  expect(newState.listDeveloperKeysSuccessful).toBe(true)
+  expect(newState.list).toHaveLength(payload.developerKeys.length)
+})
+
 it('responds to listInheritedDeveloperKeysSuccessful', () => {
   const state = {
     listInheritedDeveloperKeysPending: true,
@@ -79,6 +93,20 @@ it('responds to listInheritedDeveloperKeysSuccessful', () => {
   }
   const payload = {developerKeys: [{id: 1}]}
   const action = actions.listInheritedDeveloperKeysSuccessful(payload)
+  const newState = reducer(state, action)
+  expect(newState.listInheritedDeveloperKeysPending).toBe(false)
+  expect(newState.listInheritedDeveloperKeysSuccessful).toBe(true)
+  expect(newState.inheritedList).toHaveLength(payload.developerKeys.length)
+})
+
+it('responds to listRemainingInheritedDeveloperKeysSuccessful', () => {
+  const state = {
+    listInheritedDeveloperKeysPending: true,
+    listInheritedDeveloperKeysSuccessful: false,
+    inheritedList: []
+  }
+  const payload = {developerKeys: [{id: 1}]}
+  const action = actions.listRemainingInheritedDeveloperKeysSuccessful(payload)
   const newState = reducer(state, action)
   expect(newState.listInheritedDeveloperKeysPending).toBe(false)
   expect(newState.listInheritedDeveloperKeysSuccessful).toBe(true)
@@ -113,14 +141,22 @@ it('responds to listInheritedDeveloperKeysFailed', () => {
 
 it('responds to listDeveloperKeysReplace', () => {
   const state = {
-    list: [{id: 11, name: 'a'}, {id: 22, name: 'b'}, {id: 33, name: 'c'}]
+    list: [
+      {id: 11, name: 'a'},
+      {id: 22, name: 'b'},
+      {id: 33, name: 'c'}
+    ]
   }
 
   const payload = {id: 22, name: 'zz'}
   const action = actions.listDeveloperKeysReplace(payload)
   const newState = reducer(state, action)
 
-  expect(newState.list).toEqual([{id: 11, name: 'a'}, {id: 22, name: 'zz'}, {id: 33, name: 'c'}])
+  expect(newState.list).toEqual([
+    {id: 11, name: 'a'},
+    {id: 22, name: 'zz'},
+    {id: 33, name: 'c'}
+  ])
 })
 
 it('listDeveloperKeysReplaceBindingState replaces state in list', () => {
@@ -225,24 +261,38 @@ it('resets key state in SET_BINDING_WORKFLOW_STATE_FAILED if it had no account b
 
 it('responds to listDeveloperKeysDelete', () => {
   const state = {
-    list: [{id: '44', name: 'dd'}, {id: '55', name: 'ee'}, {id: '66', name: 'ff'}]
+    list: [
+      {id: '44', name: 'dd'},
+      {id: '55', name: 'ee'},
+      {id: '66', name: 'ff'}
+    ]
   }
 
   const payload = {id: 55}
   const action = actions.listDeveloperKeysDelete(payload)
   const newState = reducer(state, action)
 
-  expect(newState.list).toEqual([{id: '44', name: 'dd'}, {id: '66', name: 'ff'}])
+  expect(newState.list).toEqual([
+    {id: '44', name: 'dd'},
+    {id: '66', name: 'ff'}
+  ])
 })
 
 it('responds to listDeveloperKeysPrepend', () => {
   const state = {
-    list: [{id: 77, name: 'AA'}, {id: 88, name: 'BB'}]
+    list: [
+      {id: 77, name: 'AA'},
+      {id: 88, name: 'BB'}
+    ]
   }
 
   const payload = {id: 99, name: 'OO'}
   const action = actions.listDeveloperKeysPrepend(payload)
   const newState = reducer(state, action)
 
-  expect(newState.list).toEqual([{id: 99, name: 'OO'}, {id: 77, name: 'AA'}, {id: 88, name: 'BB'}])
+  expect(newState.list).toEqual([
+    {id: 99, name: 'OO'},
+    {id: 77, name: 'AA'},
+    {id: 88, name: 'BB'}
+  ])
 })

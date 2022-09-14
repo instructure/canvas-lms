@@ -89,7 +89,7 @@ export default function CanvasTray({
   function renderHeader() {
     return (
       <Flex as="div" padding={headerPadding}>
-        <Flex.Item grow>
+        <Flex.Item shouldGrow={true}>
           <Heading>
             <TruncateText>{title}</TruncateText>
           </Heading>

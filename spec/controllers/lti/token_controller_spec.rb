@@ -37,7 +37,7 @@ describe Lti::TokenController do
         name: "test tool",
         url: "http://www.tool.com/launch",
         developer_key: developer_key,
-        settings: { use_1_3: true },
+        lti_version: "1.3",
         workflow_state: "public"
       )
     end
@@ -163,7 +163,7 @@ describe Lti::TokenController do
             name: "test tool",
             url: "http://www.tool.com/launch",
             developer_key: other_key,
-            settings: { use_1_3: false },
+            lti_version: "1.3",
             workflow_state: "public"
           )
         end

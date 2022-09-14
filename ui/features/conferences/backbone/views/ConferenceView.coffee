@@ -20,6 +20,9 @@ import $ from 'jquery'
 import {View} from '@canvas/backbone'
 import template from '../../jst/newConference.handlebars'
 import '@canvas/rails-flash-notifications'
+import authenticity_token from '@canvas/authenticity-token'
+
+import '@canvas/forms/jquery/jquery.instructure_forms' # formSubmit
 
 I18n = useI18nScope('conferences')
 
@@ -33,6 +36,7 @@ export default class ConferenceView extends View
 
   events:
     'click .edit_conference_link': 'edit'
+    'click .sync_conference_link': 'syncAttendees'
     'click .delete_conference_link': 'delete'
     'click .close_conference_link': 'close'
     'click .start-button': 'start'
@@ -43,9 +47,31 @@ export default class ConferenceView extends View
     super
     @model.on('change', @render)
 
+  syncAttendees: (e) ->
+    atag = e.target
+    form = atag.parentElement.querySelector('form')
+    conference_name = form.querySelector("[name='web_conference[title]']").value || ''
+    @$(form).formSubmit(
+      object_name: 'web_conference'
+      success: (data) =>
+        @model.set(data)
+        @model.trigger('sync')
+        $.flashMessage(conference_name + I18n.t(" Attendees Synced!"))
+      error: =>
+        @show(@model)
+        $.flashError(conference_name + I18n.t(" Attendees Failed to Sync."))
+    )
+    @$(form).submit()
+    
+
   edit: (e) ->
     # refocus if edit not finalized
     @$el.find('.al-trigger').focus()
+
+  toJSON: ->
+    json = super
+    json['auth_token'] = authenticity_token()
+    json
 
   delete: (e) ->
     e.preventDefault()

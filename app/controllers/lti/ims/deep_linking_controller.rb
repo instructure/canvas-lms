@@ -125,6 +125,10 @@ module Lti
         end
 
         render_content_items
+      rescue => e
+        code ||= response_code_for_rescue(e) if e
+        InstStatsd::Statsd.increment("canvas.deep_linking_controller.request_error", tags: { code: code })
+        raise e
       end
 
       private

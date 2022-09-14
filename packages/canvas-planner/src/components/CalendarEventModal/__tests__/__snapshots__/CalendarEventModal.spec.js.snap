@@ -66,10 +66,9 @@ exports[`renders 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -319,10 +318,9 @@ exports[`renders with allDay 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -572,10 +570,9 @@ exports[`renders with only the startTime 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -825,10 +822,9 @@ exports[`renders with user displayName for calendar 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -1078,10 +1074,9 @@ exports[`renders without address 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -1293,10 +1288,9 @@ exports[`renders without details 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"
@@ -1521,10 +1515,9 @@ exports[`renders without location 1`] = `
       as="ul"
       delimiter="none"
       elementRef={[Function]}
-      isUnstyled={false}
+      isUnstyled={true}
       itemSpacing="small"
       size="medium"
-      variant="unstyled"
     >
       <ListItem
         delimiter="none"

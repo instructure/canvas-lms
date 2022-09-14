@@ -89,6 +89,13 @@ describe('AlignmentItem', () => {
     expect(getByTestId('alignment-item-rubric-icon')).toBeInTheDocument()
   })
 
+  it('displays bank icon if alignment type is question bank', () => {
+    const {getByTestId} = render(
+      <AlignmentItem {...defaultProps({contentType: 'AssessmentQuestionBank'})} />
+    )
+    expect(getByTestId('alignment-item-bank-icon')).toBeInTheDocument()
+  })
+
   it('displays assignment icon by default if assignment content type not matched', () => {
     const {getByTestId} = render(<AlignmentItem {...defaultProps({assignmentContentType: null})} />)
     expect(getByTestId('alignment-item-assignment-icon')).toBeInTheDocument()

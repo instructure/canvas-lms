@@ -165,6 +165,7 @@ describe "assignment groups" do
       first_lock_at_element.clear
       last_due_at_element
         .send_keys(format_date_for_view(due_date, :medium))
+      f("#edit_assignment_form").click
       wait_for_new_page_load { submit_form("#edit_assignment_form") }
       overrides = assign.reload.assignment_overrides
       section_override = overrides.detect { |o| o.set_id == section1.id }

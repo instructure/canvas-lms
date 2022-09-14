@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,5 +15,9 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-export const RCS_MAX_BODY_SIZE = 300000
-export const RCS_REQUEST_SIZE_BUFFER = 5000 // account for the non-file bytes
+
+export const MAX_GIF_PNG_SIZE_BYTES = 250 * 1024
+
+export const isAnUnsupportedGifPngImage = ({type, size}) => {
+  return ['image/gif', 'image/png'].includes(type) && size > MAX_GIF_PNG_SIZE_BYTES
+}

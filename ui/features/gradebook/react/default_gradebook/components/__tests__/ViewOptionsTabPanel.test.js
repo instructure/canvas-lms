@@ -69,55 +69,55 @@ describe('ViewOptionsTabPanel', () => {
 
   describe('.columnSort', () => {
     it('includes options for module sorting if .modulesEnabled is true', () => {
-      const {getByRole} = renderPanel({columnSort: {...props.columnSort, modulesEnabled: true}})
-      const selectButton = getByRole('button', {name: /Arrange By/})
+      const {getByText} = renderPanel({columnSort: {...props.columnSort, modulesEnabled: true}})
+      const selectButton = getByText(/Arrange By/)
       fireEvent.click(selectButton)
-      expect(getByRole('option', {name: /Module - First to Last/})).toBeInTheDocument()
-      expect(getByRole('option', {name: /Module - Last to First/})).toBeInTheDocument()
+      expect(getByText(/Module - First to Last/)).toBeInTheDocument()
+      expect(getByText(/Module - Last to First/)).toBeInTheDocument()
     })
 
     it('omits options for module sorting if .modulesEnabled is false', () => {
-      const {getByRole, queryByRole} = renderPanel({
+      const {getByText, queryByText} = renderPanel({
         columnSort: {...props.columnSort, modulesEnabled: false}
       })
-      const selectButton = getByRole('button', {name: /Arrange By/})
+      const selectButton = getByText(/Arrange By/)
       fireEvent.click(selectButton)
-      expect(queryByRole('option', {name: /Module - First to Last/})).not.toBeInTheDocument()
-      expect(queryByRole('option', {name: /Module - Last to First/})).not.toBeInTheDocument()
+      expect(queryByText(/Module - First to Last/)).not.toBeInTheDocument()
+      expect(queryByText(/Module - Last to First/)).not.toBeInTheDocument()
     })
 
     it('defaults to the sort option expressed by .currentValue', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         columnSort: {
           ...props.columnSort,
           currentValue: {criterion: 'points', direction: 'ascending'}
         }
       })
-      const selectButton = getByRole('button', {name: /Arrange By/})
+      const selectButton = getByLabelText(/Arrange By/)
       expect(selectButton).toHaveValue('Points - Lowest to Highest')
     })
 
     it('defaults to the first sort option if .currentValue does not match a sort order', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         columnSort: {
           ...props.columnSort,
           currentValue: {criterion: 'module_position', direction: 'ascending'},
           modulesEnabled: false
         }
       })
-      const selectButton = getByRole('button', {name: /Arrange By/})
+      const selectButton = getByLabelText(/Arrange By/)
       expect(selectButton).toHaveValue('Default Order')
     })
 
     it('calls .onChange when the user selects a new setting', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({
+      const {getByText} = renderPanel({
         columnSort: {...props.columnSort, onChange}
       })
 
-      const selectButton = getByRole('button', {name: /Arrange By/})
+      const selectButton = getByText(/Arrange By/)
       fireEvent.click(selectButton)
-      const defaultOrder = getByRole('option', {name: /Default Order/})
+      const defaultOrder = getByText(/Default Order/)
       fireEvent.click(defaultOrder)
       expect(onChange).toHaveBeenCalledWith({
         criterion: 'default',
@@ -128,44 +128,44 @@ describe('ViewOptionsTabPanel', () => {
 
   describe('.showNotes', () => {
     it('is checked if .checked is true', () => {
-      const {getByRole} = renderPanel({showNotes: {checked: true, onChange: () => {}}})
-      expect(getByRole('checkbox', {name: 'Notes'})).toBeChecked()
+      const {getByLabelText} = renderPanel({showNotes: {checked: true, onChange: () => {}}})
+      expect(getByLabelText('Notes')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
-      const {getByRole} = renderPanel({showNotes: {checked: false, onChange: () => {}}})
-      expect(getByRole('checkbox', {name: 'Notes'})).not.toBeChecked()
+      const {getByLabelText} = renderPanel({showNotes: {checked: false, onChange: () => {}}})
+      expect(getByLabelText('Notes')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({showNotes: {checked: false, onChange}})
+      const {getByLabelText} = renderPanel({showNotes: {checked: false, onChange}})
 
-      fireEvent.click(getByRole('checkbox', {name: 'Notes'}))
+      fireEvent.click(getByLabelText('Notes'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
 
   describe('.showUnpublishedAssignments', () => {
     it('is checked if .checked is true', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         showUnpublishedAssignments: {checked: true, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Unpublished Assignments'})).toBeChecked()
+      expect(getByLabelText('Unpublished Assignments')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         showUnpublishedAssignments: {checked: false, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Unpublished Assignments'})).not.toBeChecked()
+      expect(getByLabelText('Unpublished Assignments')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({showUnpublishedAssignments: {checked: false, onChange}})
+      const {getByLabelText} = renderPanel({showUnpublishedAssignments: {checked: false, onChange}})
 
-      fireEvent.click(getByRole('checkbox', {name: 'Unpublished Assignments'}))
+      fireEvent.click(getByLabelText('Unpublished Assignments'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
@@ -173,86 +173,86 @@ describe('ViewOptionsTabPanel', () => {
   describe('.viewUngradedAsZero', () => {
     describe('when .allowed is true', () => {
       it('is checked if .checked is true', () => {
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: true, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'View ungraded as 0'})).toBeChecked()
+        expect(getByLabelText('View ungraded as 0')).toBeChecked()
       })
 
       it('is unchecked if .checked is false', () => {
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: false, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'View ungraded as 0'})).not.toBeChecked()
+        expect(getByLabelText('View ungraded as 0')).not.toBeChecked()
       })
 
       it('calls .onChange when the user toggles the item', () => {
         const onChange = jest.fn()
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           viewUngradedAsZero: {allowed: true, checked: false, onChange}
         })
 
-        fireEvent.click(getByRole('checkbox', {name: 'View ungraded as 0'}))
+        fireEvent.click(getByLabelText('View ungraded as 0'))
         expect(onChange).toHaveBeenCalledWith(true)
       })
     })
 
     it('is not present when .allowed is false', () => {
-      const {queryByRole} = renderPanel({
+      const {queryByText} = renderPanel({
         viewUngradedAsZero: {allowed: false, checked: true, onChange: () => {}}
       })
-      expect(queryByRole('checkbox', {name: 'View ungraded as 0'})).not.toBeInTheDocument()
+      expect(queryByText('View ungraded as 0')).not.toBeInTheDocument()
     })
   })
 
   describe('.hideAssignmentGroupTotals', () => {
     it('is checked if .checked is true', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideAssignmentGroupTotals: {checked: true, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Hide Assignment Group Totals'})).toBeChecked()
+      expect(getByLabelText('Hide Assignment Group Totals')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideAssignmentGroupTotals: {allowed: true, checked: false, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Hide Assignment Group Totals'})).not.toBeChecked()
+      expect(getByLabelText('Hide Assignment Group Totals')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideAssignmentGroupTotals: {allowed: true, checked: false, onChange}
       })
 
-      fireEvent.click(getByRole('checkbox', {name: 'Hide Assignment Group Totals'}))
+      fireEvent.click(getByLabelText('Hide Assignment Group Totals'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
 
   describe('.hideTotal', () => {
     it('is checked if .checked is true', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideTotal: {checked: true, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Hide Total and Override Columns'})).toBeChecked()
+      expect(getByLabelText('Hide Total and Override Columns')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideTotal: {allowed: true, checked: false, onChange: () => {}}
       })
-      expect(getByRole('checkbox', {name: 'Hide Total and Override Columns'})).not.toBeChecked()
+      expect(getByLabelText('Hide Total and Override Columns')).not.toBeChecked()
     })
 
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({
+      const {getByLabelText} = renderPanel({
         hideTotal: {allowed: true, checked: false, onChange}
       })
 
-      fireEvent.click(getByRole('checkbox', {name: 'Hide Total and Override Columns'}))
+      fireEvent.click(getByLabelText('Hide Total and Override Columns'))
       expect(onChange).toHaveBeenCalledWith(true)
     })
   })
@@ -260,64 +260,64 @@ describe('ViewOptionsTabPanel', () => {
   describe('.showSeparateFirstLastNames', () => {
     describe('when .allowed is true', () => {
       it('is checked if .checked is true', () => {
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           showSeparateFirstLastNames: {allowed: true, checked: true, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'Split Student Names'})).toBeChecked()
+        expect(getByLabelText('Split Student Names')).toBeChecked()
       })
 
       it('is unchecked if .checked is false', () => {
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           showSeparateFirstLastNames: {allowed: true, checked: false, onChange: () => {}}
         })
-        expect(getByRole('checkbox', {name: 'Split Student Names'})).not.toBeChecked()
+        expect(getByLabelText('Split Student Names')).not.toBeChecked()
       })
 
       it('calls .onChange when the user toggles the item', () => {
         const onChange = jest.fn()
-        const {getByRole} = renderPanel({
+        const {getByLabelText} = renderPanel({
           showSeparateFirstLastNames: {allowed: true, checked: false, onChange}
         })
 
-        fireEvent.click(getByRole('checkbox', {name: 'Split Student Names'}))
+        fireEvent.click(getByLabelText('Split Student Names'))
         expect(onChange).toHaveBeenCalledWith(true)
       })
     })
 
     it('is not present when .allowed is false', () => {
-      const {queryByRole} = renderPanel({
+      const {queryByText} = renderPanel({
         showSeparateFirstLastNames: {allowed: false, checked: true, onChange: () => {}}
       })
-      expect(queryByRole('checkbox', {name: 'Split Student Names'})).not.toBeInTheDocument()
+      expect(queryByText('Split Student Names')).not.toBeInTheDocument()
     })
   })
 
   describe('.statusColors', () => {
     it('renders the status color panel with the colors supplied in .currentValues', () => {
-      const {getByRole} = renderPanel({
+      const {getByText, getByLabelText} = renderPanel({
         statusColors: {
           currentValues: {...statusColors(), excused: '#ffffff'},
           onChange: () => {}
         }
       })
 
-      fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))
-      const colorInput = getByRole('textbox', {name: /Enter a hexcode here/})
+      fireEvent.click(getByText(/Excused Color Picker/i))
+      const colorInput = getByLabelText(/Enter a hexcode here/)
       expect(colorInput).toHaveValue('#ffffff')
     })
 
     it('calls .onChange when the user changes a color', () => {
       const onChange = jest.fn()
-      const {getByRole} = renderPanel({
+      const {getByText} = renderPanel({
         statusColors: {
           currentValues: {...statusColors(), excused: '#ffffff'},
           onChange
         }
       })
 
-      fireEvent.click(getByRole('button', {name: /Excused Color Picker/i}))
-      fireEvent.click(getByRole('radio', {name: /salmon/i}))
-      fireEvent.click(getByRole('button', {name: /Apply/}))
+      fireEvent.click(getByText(/Excused Color Picker/i))
+      fireEvent.click(getByText(/salmon/i))
+      fireEvent.click(getByText(/Apply/))
 
       expect(onChange).toHaveBeenCalledWith(
         expect.objectContaining({excused: defaultColors.salmon})

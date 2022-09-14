@@ -130,6 +130,16 @@ module CoursePacesCommonPageObject
     date
   end
 
+  def format_course_pacing_date(date)
+    format_date_for_view(date, "%a, %b %-d, %Y")
+  end
+
+  def date_of_next(day)
+    date  = Date.parse(day)
+    delta = date > Date.today ? 0 : 7
+    date + delta
+  end
+
   def teacher_setup
     feature_setup
     @course_name = "Course Paces Course"
@@ -140,8 +150,8 @@ module CoursePacesCommonPageObject
       course_name: @course_name,
       name: "CoursePace Teacher"
     )
-    @course.start_at = "2022-04-25"
-    @course.conclude_at = "2022-05-25"
+    @course.start_at = date_of_next("Monday") - 7.days
+    @course.conclude_at = date_of_next("Monday") + 7.days
     @course.restrict_enrollments_to_course_dates = true
     @course.save!
   end

@@ -14,7 +14,9 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "canvas_text_helper"
   spec.add_dependency "nokogiri"
+
   spec.add_dependency "sanitize", "~> 6.0"
+  spec.add_dependency "twitter-text", "~> 3.1"
 
   spec.add_dependency "activesupport", ">= 3.2"
 

@@ -42,17 +42,17 @@ afterEach(() => {
 describe('AccountTree', () => {
   it('loads and displays an account tree', async () => {
     const {findByRole, getByRole, getByText} = render(<AccountTree {...defaultProps} />)
-    expect(await findByRole('button', {name: 'University (24)'})).toBeInTheDocument()
+    expect(await findByRole('button', {name: 'University (25)'})).toBeInTheDocument()
     expect(getByText('University')).toBeInTheDocument()
     expect(getByText('Manually-Created Courses')).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Big Account (15)'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'CPMS (2)'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Elementary (1)'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'Big Account (16)'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'CPMS (3)'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'Elementary (2)'})).toBeInTheDocument()
   })
 
   it('checks accounts only where calendar is visible', async () => {
     const {findByRole, getByRole} = render(<AccountTree {...defaultProps} />)
-    expect(await findByRole('button', {name: 'University (24)'})).toBeInTheDocument()
+    expect(await findByRole('button', {name: 'University (25)'})).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
     const mccCheckbox = getByRole('checkbox', {
       name: 'Show account calendar for Manually-Created Courses'
@@ -68,7 +68,7 @@ describe('AccountTree', () => {
     const {findByRole, getByRole} = render(
       <AccountTree {...defaultProps} onAccountToggled={onAccountToggled} />
     )
-    expect(await findByRole('button', {name: 'University (24)'})).toBeInTheDocument()
+    expect(await findByRole('button', {name: 'University (25)'})).toBeInTheDocument()
     const universityCheckbox = getByRole('checkbox', {name: 'Show account calendar for University'})
     expect(onAccountToggled).not.toHaveBeenCalled()
     act(() => universityCheckbox.click())
@@ -76,16 +76,16 @@ describe('AccountTree', () => {
   })
 
   it('shows a spinner if showSpinner is true', () => {
-    const {getByText} = render(<AccountTree {...defaultProps} showSpinner />)
+    const {getByText} = render(<AccountTree {...defaultProps} showSpinner={true} />)
     expect(getByText('Loading accounts')).toBeInTheDocument()
   })
 
   it('expands tree when a parent account is selected', async () => {
     const {findByRole, getByRole, findByText} = render(<AccountTree {...defaultProps} />)
-    const cpmsButton = await findByRole('button', {name: 'CPMS (2)'})
+    const cpmsButton = await findByRole('button', {name: 'CPMS (3)'})
     act(() => cpmsButton.click())
     expect(await findByText('CPMS')).toBeInTheDocument()
-    expect(getByRole('button', {name: 'CS (1)'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'CS (2)'})).toBeInTheDocument()
   })
 
   it('loads multiple pages properly if needed', async () => {
@@ -101,7 +101,7 @@ describe('AccountTree', () => {
       RESPONSE_ACCOUNT_1.slice(3, 5)
     )
     const {findByRole, getByRole} = render(<AccountTree {...defaultProps} />)
-    expect(await findByRole('button', {name: 'University (24)'})).toBeInTheDocument()
-    expect(getByRole('button', {name: 'Elementary (1)'})).toBeInTheDocument()
+    expect(await findByRole('button', {name: 'University (25)'})).toBeInTheDocument()
+    expect(getByRole('button', {name: 'Elementary (2)'})).toBeInTheDocument()
   })
 })

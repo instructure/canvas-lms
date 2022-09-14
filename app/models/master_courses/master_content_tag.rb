@@ -107,4 +107,10 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
     end
     hash
   end
+
+  def quiz_lti_content?
+    return false if content_type != Assignment.to_s
+
+    content.quiz_lti?
+  end
 end

@@ -55,33 +55,36 @@ export default function AudioOptionsTray({
       {contentProps => (
         <Tray
           key="audio-options-tray"
-          data-mce-component
+          data-mce-component={true}
           label={formatMessage('Audio Options Tray')}
           onDismiss={onDismiss}
           onEntered={onEntered}
           onExited={onExited}
           open={open}
           placement="end"
-          shouldCloseOnDocumentClick
-          shouldContainFocus
-          shouldReturnFocus
+          shouldCloseOnDocumentClick={true}
+          shouldContainFocus={true}
+          shouldReturnFocus={true}
         >
           <Flex direction="column" height={getTrayHeight()}>
             <Flex.Item as="header" padding="medium">
               <Flex direction="row">
-                <Flex.Item grow shrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Heading as="h2">{formatMessage('Audio Options')}</Heading>
                 </Flex.Item>
                 <Flex.Item>
-                  <CloseButton placement="static" variant="icon" onClick={onDismiss}>
-                    {formatMessage('Close')}
-                  </CloseButton>
+                  <CloseButton
+                    placement="static"
+                    color="primary"
+                    onClick={onDismiss}
+                    screenReaderLabel={formatMessage('Close')}
+                  />
                 </Flex.Item>
               </Flex>
             </Flex.Item>
-            <Flex.Item as="form" grow margin="none" shrink>
+            <Flex.Item as="form" shouldGrow={true} margin="none" shouldShrink={true}>
               <Flex justifyItems="space-between" direction="column" height="100%">
-                <Flex.Item grow padding="small" shrink>
+                <Flex.Item shouldGrow={true} padding="small" shouldShrink={true}>
                   <Flex direction="column">
                     <Flex.Item padding="small">
                       <FormFieldGroup description={formatMessage('Closed Captions/Subtitles')}>

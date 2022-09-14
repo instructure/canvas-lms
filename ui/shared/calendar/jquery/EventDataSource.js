@@ -22,6 +22,7 @@ import fcUtil from './fcUtil.coffee'
 import commonEventFactory from './CommonEvent/index'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tinypubsub'
+import moment from 'moment'
 
 export default class EventDataSource {
   constructor(contexts) {
@@ -110,6 +111,18 @@ export default class EventDataSource {
         fetchedUndated: false
       }
     })
+  }
+
+  syncNewContexts(additionalContexts) {
+    if (additionalContexts?.length > 0) {
+      additionalContexts.forEach(additionalContext => {
+        const context = this.contexts.find(c => c.asset_string === additionalContext.asset_string)
+        if (!context) {
+          this.contexts.push(additionalContext)
+        }
+      })
+      this.clearCache()
+    }
   }
 
   removeCachedReservation(event) {
@@ -358,8 +371,8 @@ export default class EventDataSource {
     if (start) start = fcUtil.unwrap(start)
     if (end) end = fcUtil.unwrap(end)
 
-    const paramsForDatedEvents = (start, end, contexts) => {
-      const [startDay, endDay] = this.requiredDateRangeForContexts(start, end, contexts)
+    const paramsForDatedEvents = (startDate, endDate, contextList) => {
+      const [startDay, endDay] = this.requiredDateRangeForContexts(startDate, endDate, contextList)
       if (startDay >= endDay) {
         return null
       }
@@ -367,17 +380,17 @@ export default class EventDataSource {
         // we treat end as an exclusive upper bound. the API treats it as
         // inclusive, so we may get back some events we didn't intend. but
         // addEventToCache handles the duplicate fine, so it's ok
-        context_codes: contexts,
+        context_codes: contextList,
         start_date: startDay.toISOString(),
         end_date: endDay.toISOString()
       }
     }
-    const paramsForUndatedEvents = contexts => {
-      if (!this.needUndatedEventsForContexts(contexts)) {
+    const paramsForUndatedEvents = contextList => {
+      if (!this.needUndatedEventsForContexts(contextList)) {
         return null
       }
       return {
-        context_codes: contexts,
+        context_codes: contextList,
         undated: '1'
       }
     }
@@ -397,7 +410,7 @@ export default class EventDataSource {
       params.per_page = options.per_page
     }
     const requestResults = {}
-    const dataCB = (data, url, params) => {
+    const dataCB = (data, url, parameters) => {
       let key
       if (!data) return
 
@@ -411,7 +424,7 @@ export default class EventDataSource {
         data = this.fillOutPlannerNotes(data, url)
         key = 'type_planner_note'
       } else {
-        key = `type_${params.type}`
+        key = `type_${parameters.type}`
       }
       const requestResult = requestResults[key] || {
         events: []
@@ -420,6 +433,12 @@ export default class EventDataSource {
       data.forEach(e => {
         const event = commonEventFactory(e, this.contexts)
         if (event && event.object.workflow_state !== 'deleted') {
+          if (event.blackout_date && event.end && event.start !== event.end) {
+            // We need to add a day to the end of multiple day events on the calendar because fullcalendar
+            // treats event end dates as exclusive while Canvas blackout date calculations treat them as
+            // inclusive.
+            event.end = moment(event.end.toISOString()).add(1, 'days')
+          }
           newEvents.push(event)
           requestResult.events.push(event)
         }
@@ -540,6 +559,15 @@ export default class EventDataSource {
   }
 
   assignmentParams(params) {
+    // We only want to see assignments from courses that do not use Course Pacing, unless the
+    // user is a student in the course. In that case, they should see their assignments on the calendar
+    if (ENV.CALENDAR?.CONTEXTS) {
+      params.context_codes = ENV.CALENDAR.CONTEXTS.filter(
+        context =>
+          params.context_codes.includes(context.asset_string) &&
+          (!context.course_pacing_enabled || context.can_make_reservation)
+      ).map(context => context.asset_string)
+    }
     return {type: 'assignment', ...params}
   }
 
@@ -555,9 +583,9 @@ export default class EventDataSource {
       return
     }
     this.cache.participants[key] = []
-    const dataCB = (data, url, params) => {
+    const dataCB = data => {
       if (data) {
-        return this.cache.participants[key].push.apply(this.cache.participants[key], data)
+        return this.cache.participants[key].push(...data)
       }
     }
     const doneCB = () => cb(this.cache.participants[key])
@@ -599,11 +627,11 @@ export default class EventDataSource {
     for (let i = 0, len = urlAndParamsArray.length; i < len; i++) {
       const urlAndParams = urlAndParamsArray[i]
       results.push(
-        (urlAndParams =>
+        (urlAndParameters =>
           this.fetchNextBatch(
-            urlAndParams[0],
-            urlAndParams[1],
-            (data, isDone) => wrapperCB(data, isDone, urlAndParams[0], urlAndParams[1]),
+            urlAndParameters[0],
+            urlAndParameters[1],
+            (data, isDone) => wrapperCB(data, isDone, urlAndParameters[0], urlAndParameters[1]),
             options
           ))(urlAndParams)
       )
@@ -639,9 +667,9 @@ export default class EventDataSource {
     return $.ajaxJSON(url, 'GET', params, (data, xhr) => {
       $.publish('EventDataSource/ajaxEnded')
       const linkHeader =
-        typeof xhr.getResponseHeader === 'function' ? xhr.getResponseHeader('Link') : void 0
+        typeof xhr.getResponseHeader === 'function' ? xhr.getResponseHeader('Link') : undefined
       const rels = parseLinkHeader(linkHeader)
-      data.next = rels != null ? rels.next : void 0
+      data.next = rels != null ? rels.next : undefined
       if (rels && rels.next && !options.singlePage) {
         cb(data, false)
         this.fetchNextBatch(rels.next, {}, cb)
@@ -653,7 +681,7 @@ export default class EventDataSource {
 
   // Planner notes are getting pulled from the planner_notes api
   // Add some necessary fields so they can be processed just like a calendar event
-  fillOutPlannerNotes(notes, url) {
+  fillOutPlannerNotes(notes) {
     notes.forEach(note => {
       note.type = 'planner_note'
       note.context_code = note.course_id ? `course_${note.course_id}` : `user_${note.user_id}`

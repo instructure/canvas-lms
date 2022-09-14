@@ -105,6 +105,8 @@ module Api::V1::ContextModule
       hash["page_url"] = content_tag.content.url
     end
 
+    hash["publish_at"] = content_tag.content.publish_at&.iso8601 if content_tag.content.respond_to?(:publish_at)
+
     # add data-api-endpoint link, if applicable
     api_url = nil
     case content_tag.content_type

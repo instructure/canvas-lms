@@ -46,9 +46,13 @@ export default function RestoreAutoSaveModal(props) {
       onDismiss={props.onNo}
     >
       <Modal.Header>
-        <CloseButton placement="end" offset="medium" variant="icon" onClick={props.onNo}>
-          {formatMessage('Close')}
-        </CloseButton>
+        <CloseButton
+          placement="end"
+          offset="medium"
+          color="primary"
+          onClick={props.onNo}
+          screenReaderLabel={formatMessage('Close')}
+        />
         <Heading>{formatMessage('Found auto-saved content')}</Heading>
       </Modal.Header>
       <Modal.Body>

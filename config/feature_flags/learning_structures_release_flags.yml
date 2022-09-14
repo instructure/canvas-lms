@@ -86,17 +86,6 @@ submission_feedback_indicators:
   description: |-
     Adds visual indicators to the submission details page to tell students that unread
     document annotations or rubric comments exist
-word_count_in_speed_grader:
-  state: hidden
-  applies_to: RootAccount
-  display_name: 'Add word count to SpeedGrader'
-  description: |-
-    When enabled, this flag displays a word count in the speed grader for text
-    based submissions.
-  development:
-    state: allowed_on
-  ci:
-    state: allowed_on
 observer_picker:
   applies_to: SiteAdmin
   state: hidden

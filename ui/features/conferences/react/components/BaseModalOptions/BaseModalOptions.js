@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {Checkbox, CheckboxGroup} from '@instructure/ui-checkbox'
 import {ConferenceAddressBook} from '../ConferenceAddressBook/ConferenceAddressBook'
@@ -29,6 +29,8 @@ import {TextArea} from '@instructure/ui-text-area'
 const I18n = useI18nScope('video_conference')
 
 const BaseModalOptions = props => {
+  const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit'))
+
   return (
     <>
       <Flex margin="none none large" direction="column">
@@ -40,7 +42,7 @@ const BaseModalOptions = props => {
             onChange={(e, value) => {
               props.onSetName(value)
             }}
-            isRequired
+            isRequired={true}
           />
         </Flex.Item>
         <Flex.Item padding="medium">
@@ -48,7 +50,7 @@ const BaseModalOptions = props => {
             <NumberInput
               renderLabel={I18n.t('Duration in Minutes')}
               display="inline-block"
-              value={props.duration}
+              value={noTimeLimit ? '' : props.duration}
               onChange={(e, value) => {
                 if (!Number.isInteger(Number(value))) return
 
@@ -65,7 +67,8 @@ const BaseModalOptions = props => {
 
                 props.onSetDuration(props.duration - 1)
               }}
-              isRequired
+              interaction={noTimeLimit ? 'disabled' : 'enabled'}
+              isRequired={!noTimeLimit}
             />
           </span>
         </Flex.Item>
@@ -81,6 +84,9 @@ const BaseModalOptions = props => {
             <Checkbox
               label={I18n.t('No time limit (for long-running conferences)')}
               value="no_time_limit"
+              onChange={event => {
+                setNoTimeLimit(event.target.checked)
+              }}
             />
           </CheckboxGroup>
         </Flex.Item>

@@ -17,8 +17,7 @@
  */
 
 import {BUTTON_ROTATION_DEGREES, MAX_SCALE_RATIO, MIN_SCALE_RATIO} from '../constants'
-
-export const round = (number, digits = 2) => parseFloat(number.toFixed(digits))
+import round from '../../../../utils/round'
 
 export const calculateScaleRatio = scaleRatio => {
   let result = round(scaleRatio)

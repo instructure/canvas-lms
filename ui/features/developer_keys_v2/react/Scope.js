@@ -40,10 +40,10 @@ const DeveloperKeyScope = props => {
             value={props.scope.scope}
             onChange={props.onChange}
             checked={props.checked}
-            inline
+            inline={true}
           />
         </Flex.Item>
-        <Flex.Item grow shrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           {props.scope.scope}
         </Flex.Item>
         <Flex.Item>

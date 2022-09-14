@@ -127,7 +127,7 @@ export default class CalendarEventModal extends React.Component {
           />
         </Modal.Header>
         <Modal.Body padding="medium">
-          <List variant="unstyled" itemSpacing="small">
+          <List isUnstyled itemSpacing="small">
             {this.renderCalendarRow()}
             {this.renderDateTimeRow()}
             {this.renderLocationRow()}

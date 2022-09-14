@@ -691,13 +691,35 @@ class CalendarEvent < ActiveRecord::Base
     end
     can :reserve
 
-    given { |user, session| context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
+    given do |user, session|
+      if account
+        context.grants_right?(user, session, :manage_account_calendar_events)
+      else
+        context.grants_right?(user, session, :manage_calendar)
+      end
+    end
     can :read and can :create
 
-    given { |user, session| (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && context.grants_right?(user, session, :manage_calendar) } # admins.include?(user) }
+    given do |user, session|
+      (!locked? || context.is_a?(AppointmentGroup)) && !deleted? && (
+      if account
+        context.grants_right?(user, session, :manage_account_calendar_events)
+      else
+        context.grants_right?(user, session, :manage_calendar)
+      end
+    )
+    end
     can :update and can :update_content
 
-    given { |user, session| !deleted? && context.grants_right?(user, session, :manage_calendar) }
+    given do |user, session|
+      !deleted? && (
+      if account
+        context.grants_right?(user, session, :manage_account_calendar_events)
+      else
+        context.grants_right?(user, session, :manage_calendar)
+      end
+    )
+    end
     can :delete
   end
 

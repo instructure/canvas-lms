@@ -107,12 +107,14 @@ describe OutcomesServiceAuthoritativeResultsHelper do
     title = "#{user.name}, #{@assignment.name}"
     mastery = (score || 0) >= @outcome.mastery_points
     submitted_at = args[:submitted_at] || time
+    submission = Submission.find_by(user_id: user.id, assignment_id: @assignment.id)
 
     LearningOutcomeResult.create!(
       learning_outcome: @outcome,
       user: user,
       context: @course,
       alignment: @alignment,
+      artifact: submission,
       associated_asset: @assignment,
       association_type: "RubricAssociation",
       association_id: @rubric_association.id,
@@ -143,12 +145,31 @@ describe OutcomesServiceAuthoritativeResultsHelper do
             attempts: nil,
             associated_asset_type: nil,
             associated_asset_id: lor.alignment.content_id,
-            artifact_type: nil,
-            artifact_id: nil,
+            artifact: lor.artifact,
             submitted_at: lor.submitted_at
           }
         end
     }.to_json
+  end
+
+  describe "#json_to_outcome_result" do
+    it "sets artifact to submission" do
+      create_outcome
+      create_alignment
+      create_learning_outcome_result @students[0], 1.0
+      submission = Submission.find_by(user_id: @students[0].id, assignment_id: @assignment.id)
+
+      ar_hash = {
+        external_outcome_id: @outcome.id,
+        associated_asset_id: @assignment.id,
+        user_uuid: @students[0].uuid,
+        associated_asset_type: "canvas.assignment.quizzes"
+      }
+      learning_outcome_result = json_to_outcome_result(ar_hash)
+
+      expect(learning_outcome_result.artifact_id).to eq submission.id
+      expect(learning_outcome_result.artifact_type).to eq "Submission"
+    end
   end
 
   describe "#rollup_user_results" do

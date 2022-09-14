@@ -67,7 +67,7 @@
           <% if !@account_calendar_events_seen %>
           <div class="new-feature-pill"><%= t("New") %></div>
           <% end %>
-          <a role="button" title="<%= t('Add other calendar') %>" class="manage-accounts-btn" tabindex="0"><span aria-hidden="true">+</span></a>
+          <div id="manage-accounts-btn" />
           </div>
         </h2>
       <div id="other-calendars-list-holder" class="editable-list-holder"></div>

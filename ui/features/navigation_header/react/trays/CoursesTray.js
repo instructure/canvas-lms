@@ -43,7 +43,7 @@ export default function CoursesTray({courses, hasLoaded, k5User}) {
             {k5User ? I18n.t('Published Subjects') : I18n.t('Published Courses')}
           </Heading>
         )}
-        <List key="published" variant="unstyled" margin="small small" itemSpacing="small">
+        <List key="published" isUnstyled margin="small small" itemSpacing="small">
           {published.map(renderCourse)}
         </List>
         {unpublished.length > 0 && (
@@ -51,7 +51,7 @@ export default function CoursesTray({courses, hasLoaded, k5User}) {
             {k5User ? I18n.t('Unpublished Subjects') : I18n.t('Unpublished Courses')}
           </Heading>
         )}
-        <List key="unpublished" variant="unstyled" margin="small small" itemSpacing="small">
+        <List key="unpublished" isUnstyled margin="small small" itemSpacing="small">
           {unpublished.map(renderCourse)}
         </List>
       </>
@@ -77,14 +77,14 @@ export default function CoursesTray({courses, hasLoaded, k5User}) {
     const courseList = showSplitList ? (
       renderSplitList()
     ) : (
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         {courses.map(renderCourse)}
       </List>
     )
     return (
       <>
         {courseList}
-        <List variant="unstyled" margin="small 0" itemSpacing="small">
+        <List isUnstyled margin="small 0" itemSpacing="small">
           <List.Item key="hr">
             <hr role="presentation" />
           </List.Item>
@@ -100,7 +100,7 @@ export default function CoursesTray({courses, hasLoaded, k5User}) {
 
   function renderLoading() {
     return (
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         <List.Item>
           <Spinner size="small" renderTitle={I18n.t('Loading')} />
         </List.Item>

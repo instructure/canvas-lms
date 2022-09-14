@@ -25,13 +25,14 @@ describe ContentMigration do
 
     it "copies wiki page attributes" do
       page = @copy_from.wiki_pages.create!(title: "title", body: "<address><ul></ul></address>",
-                                           editing_roles: "teachers", todo_date: Time.zone.now)
+                                           editing_roles: "teachers", todo_date: Time.zone.now,
+                                           publish_at: 1.week.from_now.beginning_of_day)
 
       run_course_copy
 
       page_to = @copy_to.wiki_pages.where(migration_id: mig_id(page)).first
 
-      attrs = %i[title body editing_roles todo_date]
+      attrs = %i[title body editing_roles todo_date publish_at]
       expect(page.attributes.slice(*attrs)).to eq page_to.attributes.slice(*attrs)
       expect(page_to.body.strip).to eq "<address><ul></ul></address>"
     end

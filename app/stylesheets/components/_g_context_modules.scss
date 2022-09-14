@@ -322,6 +322,9 @@ $context_module_bg_color: $ic-color-light;
       display: inline-block;
     }
   }
+  .display_icons .icon-forward{
+    transform: scaleY(-1);
+  }
   &.attachment {
     .icon-document {
       display: none;

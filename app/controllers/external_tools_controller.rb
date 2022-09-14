@@ -600,7 +600,8 @@ class ExternalToolsController < ApplicationController
     expander = variable_expander(assignment: assignment,
                                  tool: tool, launch: lti_launch,
                                  post_message_token: opts[:launch_token],
-                                 secure_params: params[:secure_params])
+                                 secure_params: params[:secure_params],
+                                 placement: opts[:resource_type], launch_url: opts[:launch_url])
 
     adapter = if tool.use_1_3?
                 a = Lti::LtiAdvantageAdapter.new(
@@ -667,6 +668,7 @@ class ExternalToolsController < ApplicationController
       media_types.to_unsafe_h,
       params["export_type"]
     )
+    launch_url = opts[:launch_url] || tool.extension_setting(placement, :url)
     params = Lti::ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @current_user)
                                              .merge({
                                                       # required params
@@ -679,11 +681,11 @@ class ExternalToolsController < ApplicationController
                                                       tool_consumer_instance_name: @domain_root_account.name,
                                                       tool_consumer_instance_contact_email: HostUrl.outgoing_email_address,
                                                     })
-                                             .merge(variable_expander(tool: tool, attachment: content_item_response.file)
+                                             .merge(variable_expander(tool: tool, attachment: content_item_response.file, launch_url: launch_url)
       .expand_variables!(tool.set_custom_fields(placement)))
 
     lti_launch = @tool.settings["post_only"] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
-    lti_launch.resource_url = opts[:launch_url] || tool.extension_setting(placement, :url)
+    lti_launch.resource_url = launch_url
     lti_launch.params = Lti::Security.signed_post_params(
       params,
       lti_launch.resource_url,
@@ -720,7 +722,8 @@ class ExternalToolsController < ApplicationController
 
     base_expander = variable_expander(
       tool: tool,
-      collaboration: collaboration
+      collaboration: collaboration,
+      launch_url: opts[:launch_url]
     )
 
     expander = Lti::PrivacyLevelExpander.new(placement, base_expander)
@@ -1411,7 +1414,7 @@ class ExternalToolsController < ApplicationController
         @context
       ).prepare_tool_launch(
         url_for(@context),
-        variable_expander(assignment: assignment, content_tag: module_item),
+        variable_expander(assignment: assignment, content_tag: module_item, launch_url: opts[:launch_url]),
         opts
       )
 

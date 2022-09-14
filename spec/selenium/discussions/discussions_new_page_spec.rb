@@ -294,6 +294,21 @@ describe "discussions" do
         expect(f(".discussion-availability").text).to include("Not available until #{unlock_text_index_page}")
       end
 
+      it "gives error if Until date isn't after Available From date", priority: "1" do
+        get url
+        wait_for_tiny(f("textarea[name=message]"))
+        replace_content(f("input[name=title]"), "Invalid Until date")
+        type_in_tiny("textarea[name=message]", "This is the discussion description.")
+
+        replace_content(f("#delayed_post_at"), format_time_for_view(1.day.from_now), tab_out: true)
+        replace_content(f("#lock_at"), format_time_for_view(-2.days.from_now), tab_out: true)
+
+        submit_form(".form-actions")
+        expect(
+          fj("div.error_text:contains('Date must be after date available')")
+        ).to be_present
+      end
+
       it "allows a student to create a discussion", priority: "1" do
         skip_if_firefox("known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085")
         get url

@@ -33,9 +33,9 @@ export default function UserSearchSelectorItem({user}) {
   return (
     <Flex>
       <Flex.Item>
-        <Avatar name={name} src={avatar_url} data-fs-exclude />
+        <Avatar name={name} src={avatar_url} data-fs-exclude={true} />
       </Flex.Item>
-      <Flex.Item padding="0 0 0 small" grow>
+      <Flex.Item padding="0 0 0 small" shouldGrow={true}>
         <Flex direction="column">
           <Flex.Item>
             <Text size="medium">{name}</Text>

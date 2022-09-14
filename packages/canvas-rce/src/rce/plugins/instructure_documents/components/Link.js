@@ -33,6 +33,7 @@ import dragHtml from '../../../../sidebar/dragHtml'
 import {getIconFromType} from '../../shared/fileTypeUtils'
 import {isPreviewable} from '../../shared/Previewable'
 import {applyTimezoneOffsetToDate} from '../../shared/dateUtils'
+import RCEGlobals from '../../../RCEGlobals'
 
 export default function Link(props) {
   const [isHovering, setIsHovering] = useState(false)
@@ -41,7 +42,8 @@ export default function Link(props) {
   const Icon = getIconFromType(content_type)
   const color = published ? 'success' : 'primary'
   // Uses user locale and timezone
-  const dateString = formatMessage.date(applyTimezoneOffsetToDate(date, ENV.TIMEZONE), 'long')
+  const configuredTimezone = RCEGlobals.getConfig()?.timezone
+  const dateString = formatMessage.date(applyTimezoneOffsetToDate(date, configuredTimezone), 'long')
   const publishedMsg = published ? formatMessage('published') : formatMessage('unpublished')
 
   function linkAttrsFromDoc() {
@@ -101,7 +103,7 @@ export default function Link(props) {
     return callback
   }
 
-  function dateOrMessage(dateString) {
+  function dateOrMessage(str) {
     if (disabled && disabledMessage) {
       return (
         <View display="block">
@@ -112,8 +114,8 @@ export default function Link(props) {
       )
     }
 
-    if (dateString) {
-      return <View as="div">{dateString}</View>
+    if (str) {
+      return <View as="div">{str}</View>
     }
   }
 
@@ -131,7 +133,7 @@ export default function Link(props) {
   return (
     <div
       data-testid="instructure_links-Link"
-      draggable
+      draggable={true}
       onDragStart={buildCallback(handleDragStart)}
       onDragEnd={buildCallback(handleDragEnd)}
       onMouseEnter={buildCallback(handleHover)}
@@ -160,14 +162,19 @@ export default function Link(props) {
             <Flex.Item margin="0 xx-small 0 0" size="1.125rem">
               {isHovering ? <IconDragHandleLine size="x-small" inline={false} /> : null}
             </Flex.Item>
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Flex>
                 <Flex.Item padding="0 x-small 0 0">
                   <Text color={color}>
                     <Icon size="x-small" />
                   </Text>
                 </Flex.Item>
-                <Flex.Item padding="0 x-small 0 0" grow shrink textAlign="start">
+                <Flex.Item
+                  padding="0 x-small 0 0"
+                  shouldGrow={true}
+                  shouldShrink={true}
+                  textAlign="start"
+                >
                   <View as="div" margin="0">
                     <span style={textStyles()}>{display_name || title || filename}</span>
                   </View>

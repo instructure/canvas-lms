@@ -157,7 +157,6 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         onPositionChanged={[Function]}
         onPositioned={[Function]}
         onShowContent={[Function]}
-        onToggle={[Function]}
         placement="bottom center"
         renderTrigger={
           <Button

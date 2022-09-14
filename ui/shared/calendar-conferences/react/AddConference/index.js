@@ -32,7 +32,8 @@ const AddConference = ({
   currentConferenceType,
   conferenceTypes,
   setConference,
-  inputRef
+  inputRef,
+  disabled
 }) => {
   const localInputRef = useRef(null)
   const [isRetrievingLTI, setRetrievingLTI] = useState(false)
@@ -107,13 +108,14 @@ const AddConference = ({
           conferenceTypes={conferenceTypes}
           currentConferenceType={currentConferenceType}
           onSelect={onSelect}
+          disabled={disabled}
         />
       )}
       {isRetrievingLTI && (
         <AddLtiConferenceDialog
           context={context}
           conferenceType={selectedType}
-          isOpen
+          isOpen={true}
           onRequestClose={onLtiClose}
           onContent={onLtiContent}
         />
@@ -127,12 +129,14 @@ AddConference.propTypes = {
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
   setConference: PropTypes.func.isRequired,
-  inputRef: PropTypes.func
+  inputRef: PropTypes.func,
+  disabled: PropTypes.bool
 }
 
 AddConference.defaultProps = {
   currentConferenceType: null,
-  inputRef: null
+  inputRef: null,
+  disabled: false
 }
 
 export default AddConference

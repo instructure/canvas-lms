@@ -58,7 +58,7 @@ export default function Images(props) {
         </Flex.Item>
 
         {loader.isLoading && (
-          <Flex.Item as="div" grow>
+          <Flex.Item as="div" shouldGrow={true}>
             <LoadingIndicator loader={loader} />
           </Flex.Item>
         )}

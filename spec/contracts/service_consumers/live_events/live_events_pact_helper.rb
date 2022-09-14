@@ -87,15 +87,12 @@ module LiveEvents
         # Canvas Live Event Subscribers
         catalog  = PactConfig::LiveEventConsumers::CATALOG
         outcomes = PactConfig::LiveEventConsumers::OUTCOMES
-        quiz_lti = PactConfig::LiveEventConsumers::QUIZ_LTI
 
         case event_subscriber
         when catalog
           LiveEvents::PactHelper.message_contract_for(catalog, event_name)
         when outcomes
           LiveEvents::PactHelper.message_contract_for(outcomes, event_name)
-        when quiz_lti
-          LiveEvents::PactHelper.message_contract_for(quiz_lti, event_name)
         else
           raise ArgumentError, "Invalid event_subscriber: #{event_subscriber}"
         end

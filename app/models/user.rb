@@ -104,6 +104,7 @@ class User < ActiveRecord::Base
   has_many :current_group_memberships, -> { eager_load(:group).where("group_memberships.workflow_state = 'accepted' AND groups.workflow_state<>'deleted'") }, class_name: "GroupMembership"
   has_many :current_groups, through: :current_group_memberships, source: :group
   has_many :user_account_associations
+  has_many :unordered_associated_accounts, source: :account, through: :user_account_associations
   has_many :associated_accounts, -> { order("user_account_associations.depth") }, source: :account, through: :user_account_associations
   has_many :associated_root_accounts, -> { merge(Account.root_accounts.active) }, source: :account, through: :user_account_associations, multishard: true
   has_many :developer_keys
@@ -1776,6 +1777,11 @@ class User < ActiveRecord::Base
   def mark_rubric_assessments_read!(submission)
     # this will delete the user_preference_value
     set_preference(:unread_rubric_comments, submission.global_id, nil)
+  end
+
+  def add_to_visited_tabs(tab_class)
+    visited_tabs = get_preference(:visited_tabs) || []
+    set_preference(:visited_tabs, [*visited_tabs, tab_class]) unless visited_tabs.include? tab_class
   end
 
   def prefers_high_contrast?

@@ -2011,13 +2011,14 @@ modules.initModuleManagement = function (duplicate) {
     const publishData = {
       moduleType: data.type,
       id: data.publishable_id,
-      moduleItemName: data.moduleItemName,
+      moduleItemName: data.moduleItemName || data.title,
       moduleItemId: data.id,
       moduleId: data.context_module_id,
       courseId: data.context_id,
       published: data.published,
       publishable: data.publishable,
       unpublishable: data.unpublishable,
+      publishAt: data.publish_at,
       content_details: data.content_details,
       isNew: true
     }
@@ -2097,7 +2098,8 @@ modules.initModuleManagement = function (duplicate) {
       course_id: data.courseId,
       published: data.published,
       publishable: data.publishable,
-      unpublishable: data.unpublishable
+      unpublishable: data.unpublishable,
+      publish_at: data.publishAt
     })
 
     const viewOptions = {

@@ -20,6 +20,6 @@
 
 module TokenScopesHelper::SpecHelper
   def self.last_known_accepted_scopes
-    @last_known_accepted_scopes ||= YAML.load_file(__dir__ + "/last_known_scopes.yml")
+    @last_known_accepted_scopes ||= YAML.load_file(__dir__ + "/last_known_scopes.yml").pluck("verb", "path")
   end
 end

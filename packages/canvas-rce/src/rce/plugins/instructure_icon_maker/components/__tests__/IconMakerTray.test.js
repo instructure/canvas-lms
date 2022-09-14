@@ -85,7 +85,9 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   })
 
   afterEach(async () => {
-    await act(async() => { jest.runOnlyPendingTimers() })
+    await act(async () => {
+      jest.runOnlyPendingTimers()
+    })
   })
 
   it('renders the create view', () => {
@@ -140,7 +142,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     })
 
     beforeEach(() => {
-      window.HTMLElement.prototype.focus = jest.fn().mockImplementation(function (args) {
+      window.HTMLElement.prototype.focus = jest.fn().mockImplementation(function (_args) {
         focusedElement = this
       })
     })
@@ -442,24 +444,20 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     beforeEach(() => {
       fetchMock.mock('*', {
         body: `
-          <svg height="100" width="100">
-            <metadata>
-              {
-                "alt":"a test image",
-                "shape":"triangle",
-                "size":"large",
-                "color":"#FF2717",
-                "outlineColor":"#06A3B7",
-                "outlineSize":"small",
-                "text":"Some Text",
-                "textSize":"medium",
-                "textColor":"#009606",
-                "textBackgroundColor":"#E71F63",
-                "textPosition":"below"
-              }
-            </metadata>
-            <circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red"/>
-          </svg>`
+          {
+            "name":"Test Icon.svg",
+            "alt":"a test image",
+            "shape":"triangle",
+            "size":"large",
+            "color":"#FF2717",
+            "outlineColor":"#06A3B7",
+            "outlineSize":"small",
+            "text":"Some Text",
+            "textSize":"medium",
+            "textColor":"#009606",
+            "textBackgroundColor":"#E71F63",
+            "textPosition":"below"
+          }`
       })
     })
 

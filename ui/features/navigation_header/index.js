@@ -23,6 +23,7 @@ import ReactDOM from 'react-dom'
 import Navigation from './react/Navigation'
 import MobileNavigation from './react/MobileNavigation'
 import ready from '@instructure/ready'
+import NewTabIndicator from './react/NewTabIndicator'
 
 const I18n = useI18nScope('common')
 
@@ -77,5 +78,15 @@ ready(() => {
         }
       }
     )
+  }
+
+  const newTabContainers = document.getElementsByClassName('new-tab-indicator')
+  if (newTabContainers) {
+    for (const newTabContainer of newTabContainers) {
+      ReactDOM.render(
+        <NewTabIndicator tabName={newTabContainer.dataset.tabname} />,
+        newTabContainer
+      )
+    }
   }
 })

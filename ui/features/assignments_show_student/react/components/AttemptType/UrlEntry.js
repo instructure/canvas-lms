@@ -166,7 +166,7 @@ class UrlEntry extends React.Component {
             <Flex.Item overflowY="visible">
               <div style={inputStyle}>
                 <Flex justifyItems="center" alignItems="start">
-                  <Flex.Item grow>
+                  <Flex.Item shouldGrow={true}>
                     <TextInput
                       renderLabel={
                         <ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>

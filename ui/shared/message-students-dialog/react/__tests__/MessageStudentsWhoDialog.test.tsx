@@ -524,7 +524,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
     it('"Scored more than" displays students who have scored higher than the score inputted', async () => {
       const mocks = await makeMocks()
       students[0].score = 10
-      students[1].score = 6
+      students[1].score = 5.2
       students[2].score = 4
       students[3].score = 0
       const {getAllByRole, getByRole, getByLabelText, getByText, findByLabelText} = render(
@@ -536,7 +536,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       fireEvent.click(getByText(/Scored more than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5'}})
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5.1'}})
 
       fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
       expect(getByRole('table')).toBeInTheDocument()
@@ -557,7 +557,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const mocks = await makeMocks()
       students[0].score = 10
       students[1].score = 6
-      students[2].score = 4
+      students[2].score = 5.2
       students[3].score = 0
       const {getAllByRole, getByRole, findByLabelText, getByLabelText, getByText} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>
@@ -568,7 +568,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const button = await findByLabelText(/For students who/)
       fireEvent.click(button)
       fireEvent.click(getByText(/Scored less than/))
-      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5'}})
+      fireEvent.change(getByLabelText('Enter score cutoff'), {target: {value: '5.1'}})
 
       fireEvent.click(getByRole('button', {name: 'Show all recipients'}))
       expect(getByRole('table')).toBeInTheDocument()
@@ -576,10 +576,9 @@ describe.skip('MessageStudentsWhoDialog', () => {
       const tableRows = getAllByRole('row') as HTMLTableRowElement[]
       const studentCells = tableRows.map(row => row.cells[0])
       // first cell will be the header
-      expect(studentCells).toHaveLength(3)
+      expect(studentCells).toHaveLength(2)
       expect(studentCells[0]).toHaveTextContent('Students')
       expect(studentCells[1]).toHaveTextContent('Dana Smith')
-      expect(studentCells[2]).toHaveTextContent('Charlie Xi')
     })
 
     it('"Reassigned" displays students who have been asked to resubmit to the assignment', async () => {

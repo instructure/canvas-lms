@@ -29,25 +29,37 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
       end
 
       course_tags = ContentTag.active.where(context: course)
-      outcome_alignments = course_tags.learning_outcome_alignments
 
-      total_outcomes = course_tags.learning_outcome_links.count
-      aligned_outcomes = outcome_alignments.pluck(:learning_outcome_id).uniq.count
-      total_alignments = outcome_alignments.count
+      total_outcomes = course_tags.learning_outcome_links
+      total_outcomes_sub = ContentTag
+                           .select("COUNT(*) as total_outcomes")
+                           .from("(#{total_outcomes.to_sql}) AS s1")
 
-      total_assignments = Assignment.active.where(context: course).count
-      total_rubrics = Rubric.active.where(context: course).count
+      all_outcome_alignments = course_tags.learning_outcome_alignments.where(content_type: %w[Rubric Assignment AssessmentQuestionBank])
+      all_outcome_alignments_sub = ContentTag
+                                   .select("COUNT(*) as total_alignments, COUNT(DISTINCT s2.learning_outcome_id) as aligned_outcomes")
+                                   .from("(#{all_outcome_alignments.to_sql}) AS s2")
 
-      aligned_assignments = outcome_alignments.where(content_type: "Assignment").pluck(:content_id).uniq.count
-      aligned_rubrics = outcome_alignments.where(content_type: "Rubric").pluck(:content_id).uniq.count
+      total_artifacts = Assignment.active.where(context: course)
+      total_artifacts_sub = Assignment
+                            .select("COUNT(*) as total_artifacts")
+                            .from("(#{total_artifacts.to_sql}) AS s3")
 
-      fulfill(course, {
-                total_outcomes: total_outcomes,
-                aligned_outcomes: aligned_outcomes,
-                total_alignments: total_alignments,
-                total_artifacts: total_assignments + total_rubrics,
-                aligned_artifacts: aligned_assignments + aligned_rubrics
-              })
+      outcome_alignments_to_artifacts = course_tags.learning_outcome_alignments.where(content_type: "Assignment")
+      outcome_alignments_to_artifacts_sub = ContentTag
+                                            .select("COUNT(*) as artifact_alignments, COUNT(DISTINCT s4.content_id) as aligned_artifacts")
+                                            .from("(#{outcome_alignments_to_artifacts.to_sql}) AS s4")
+
+      alignment_summary_stats = ContentTag
+                                .select("sub1.total_outcomes, sub2.aligned_outcomes, sub2.total_alignments, sub3.total_artifacts, sub4.aligned_artifacts, sub4.artifact_alignments")
+                                .from("
+                                  (#{total_outcomes_sub.to_sql}) AS sub1,
+                                  (#{all_outcome_alignments_sub.to_sql}) AS sub2,
+                                  (#{total_artifacts_sub.to_sql}) AS sub3,
+                                  (#{outcome_alignments_to_artifacts_sub.to_sql}) AS sub4
+                                ")
+
+      fulfill(course, alignment_summary_stats[0])
     end
   end
 

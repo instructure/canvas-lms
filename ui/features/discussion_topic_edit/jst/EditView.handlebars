@@ -326,7 +326,10 @@
           </label>
           <div class="controls">
             <input type="text" id="discussion_topic_assignment_points_possible" name="assignment[points_possible]"
-              class="input-small" value="{{n assignment.pointsPossible}}" {{readonlyIf lockedItems.points}} />
+              class="input-small" value="{{n assignment.pointsPossible}}"
+              {{#ifAny lockedItems.points cannotEditGrades}}
+                readonly
+              {{/ifAny}} />
           </div>
           <div id=discussion_point_change_warning class="alert form-column-right">
             {{#t}}If you change an assignment's points possible you must regrade the assignment.{{/t}}

@@ -37,7 +37,7 @@ import SectionList from '@canvas/sections/backbone/collections/SectionCollection
 import MissingDateDialog from '@canvas/due-dates/backbone/views/MissingDateDialogView.coffee'
 import MultipleChoiceToggle from './MultipleChoiceToggle'
 import EditorToggle from '@canvas/editor-toggle'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import * as TextHelper from '@canvas/util/TextHelper'
 import INST from 'browser-sniffer' // safari sniffing for VO workarounds
 import QuizFormulaSolution from '../quiz_formula_solution'
 import addAriaDescription from './quiz_labels'

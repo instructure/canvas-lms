@@ -37,6 +37,7 @@
 import React from 'react'
 import {string} from 'prop-types'
 import {Pill} from '@instructure/ui-pill'
+import {Tooltip} from '@instructure/ui-tooltip'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('course_people')
@@ -50,10 +51,12 @@ export const PENDING_STATE = 'invited'
 export const PILL_MAP = {
   [INACTIVE_STATE]: {
     text: I18n.t('inactive'),
+    hintText: I18n.t('This user is currently not able to access the course'),
     color: 'primary'
   },
   [PENDING_STATE]: {
     text: I18n.t('pending'),
+    hintText: I18n.t('This user has not yet accepted the invitation to the course'),
     color: 'info'
   }
 }
@@ -61,12 +64,14 @@ export const PILL_MAP = {
 const StatusPill = ({state}) => {
   if (!PILL_MAP.hasOwnProperty(state)) return null
 
-  const {text, color} = PILL_MAP[state]
+  const {text, hintText, color} = PILL_MAP[state]
 
   return (
-    <Pill color={color} margin="0 0 xx-small 0">
-      {text}
-    </Pill>
+    <Tooltip as="span" renderTip={hintText}>
+      <Pill color={color} margin="0 0 xx-small 0">
+        {text}
+      </Pill>
+    </Tooltip>
   )
 }
 

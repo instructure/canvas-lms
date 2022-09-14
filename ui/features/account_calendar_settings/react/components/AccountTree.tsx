@@ -40,7 +40,6 @@ type ComponentProps = {
   readonly originAccountId: number
   readonly visibilityChanges: VisibilityChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
-  readonly showSpinner: boolean
 }
 
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
@@ -49,8 +48,7 @@ const {Node: TreeBrowserNode} = TreeBrowser as any
 export const AccountTree: React.FC<ComponentProps> = ({
   originAccountId,
   visibilityChanges,
-  onAccountToggled,
-  showSpinner
+  onAccountToggled
 }) => {
   const [expandedCollectionIds, setExpandedCollectionIds] = useState<number[]>([])
   const [collections, setCollections] = useState<Collection>({})
@@ -126,7 +124,7 @@ export const AccountTree: React.FC<ComponentProps> = ({
     )
   }
 
-  if (loadingCollectionIds.includes(originAccountId) || showSpinner) {
+  if (loadingCollectionIds.includes(originAccountId)) {
     return (
       <Flex as="div" alignItems="center" justifyItems="center" padding="x-large">
         <Spinner renderTitle={I18n.t('Loading accounts')} />
@@ -151,7 +149,7 @@ export const AccountTree: React.FC<ComponentProps> = ({
             treeLabel={I18n.t(
               'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
             )}
-            showRootCollection
+            showRootCollection={true}
             collections={renderedCollections}
             items={{}}
             rootId={originAccountId}

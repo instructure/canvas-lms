@@ -137,9 +137,9 @@ describe('JobsIndex', () => {
   })
 
   it('filters by clicking a tag in the jobs list', async () => {
-    const {getByRole} = render(<JobsIndex />)
+    const {getByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByRole('button', {name: 'fake_job_list_tag_value'}))
+    fireEvent.click(getByText('fake_job_list_tag_value', {selector: 'button span'}))
     expect(window.location.search).toMatch(/group_text=fake_job_list_tag_value/)
     expect(doFetchApi).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -150,9 +150,9 @@ describe('JobsIndex', () => {
   })
 
   it('filters by clicking a strand in the jobs list', async () => {
-    const {getByRole} = render(<JobsIndex />)
+    const {getByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByRole('button', {name: 'fake_job_list_strand_value'}))
+    fireEvent.click(getByText('fake_job_list_strand_value', {selector: 'button span'}))
     expect(window.location.search).toMatch(/group_type=strand/)
     expect(window.location.search).toMatch(/group_text=fake_job_list_strand_value/)
     expect(doFetchApi).toHaveBeenCalledWith(
@@ -164,9 +164,9 @@ describe('JobsIndex', () => {
   })
 
   it('filters by clicking a singleton in the jobs list', async () => {
-    const {getByRole} = render(<JobsIndex />)
+    const {getByText} = render(<JobsIndex />)
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByRole('button', {name: 'fake_job_list_singleton_value'}))
+    fireEvent.click(getByText('fake_job_list_singleton_value', {selector: 'button span'}))
     expect(window.location.search).toMatch(/group_type=singleton/)
     expect(window.location.search).toMatch(/group_text=fake_job_list_singleton_value/)
     expect(doFetchApi).toHaveBeenCalledWith(
@@ -202,24 +202,24 @@ describe('JobsIndex', () => {
   })
 
   it('looks up a job by id', async () => {
-    const {getByText, getByRole, getByLabelText} = render(<JobsIndex />)
+    const {getByText, getByLabelText} = render(<JobsIndex />)
     fireEvent.change(getByLabelText('Job lookup'), {
       target: {value: '3606'}
     })
     await act(async () => jest.runAllTimers())
-    fireEvent.click(getByRole('option', {name: /3606/}))
+    fireEvent.click(getByText('3606', {selector: 'button'}))
     expect(getByText('job010001039065:12438')).toBeInTheDocument()
     expect(getByText('10.1.39.65')).toBeInTheDocument()
     expect(getByText('4/2/22, 7:02 AM')).toBeInTheDocument()
   })
 
   it('performs time-zone aware date filtering', async () => {
-    const {getByText, getByRole, getByLabelText} = render(<JobsIndex />)
-    fireEvent.click(getByRole('button', {name: 'Date/Time options'}))
+    const {getByText, getByLabelText} = render(<JobsIndex />)
+    fireEvent.click(getByText('Date/Time options', {selector: 'button span'}))
     changeAndBlurInput(getByLabelText('After'), '2022-04-02 09:00')
     changeAndBlurInput(getByLabelText('Before'), '2022-04-02 23:00')
     fireEvent.click(getByLabelText('View timestamps in time zone'))
-    fireEvent.click(getByRole('option', {name: 'Account (America/New_York)'}))
+    fireEvent.click(getByText('Account (America/New_York)'))
     fireEvent.click(getByText('Accept'))
     expect(window.location.search).toMatch(/time_zone=America%2FNew_York/)
 

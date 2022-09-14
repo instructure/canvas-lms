@@ -106,4 +106,35 @@ describe MasterCourses::MasterContentTag do
       expect(item_restriction_map).to eq({ tag1.id => {}, tag2.id => restrictions })
     end
   end
+
+  describe "#quiz_lti_content?" do
+    context "when the content_type is not 'Assignment'" do
+      it "returns false" do
+        course_module = @course.context_modules.create!(name: "something")
+        restrictions = { content: true }
+        tag = @template.create_content_tag_for!(course_module, { restrictions: restrictions })
+
+        expect(tag.quiz_lti_content?).to eq(false)
+      end
+    end
+
+    context "when the content_type is 'Assignment'" do
+      it "returns false if the assignment is not a New Quiz" do
+        assignment = @course.assignments.create!
+        restrictions = { content: true }
+        tag = @template.create_content_tag_for!(assignment, { restrictions: restrictions })
+
+        expect(tag.quiz_lti_content?).to eq(false)
+      end
+
+      it "returns true if the assignment is a New Quiz" do
+        assignment = @course.assignments.create!
+        restrictions = { content: true }
+        allow_any_instance_of(Assignment).to receive(:quiz_lti?).and_return(true)
+        tag = @template.create_content_tag_for!(assignment, { restrictions: restrictions })
+
+        expect(tag.quiz_lti_content?).to eq(true)
+      end
+    end
+  end
 end

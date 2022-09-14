@@ -44,6 +44,18 @@
             <div id="todo_date_container" />
           </div>
         {{/if}}
+        {{#if CAN.PUBLISH}}
+          {{#if ENV.FEATURES.scheduled_page_publication}}
+            <div class="controls-section">
+              <label for="publish_at_input">
+                {{#t}}Publish At{{/t}}
+                <input id="publish_at_input" type="text" class="datetime_field input-medium" name="publish_at"
+                  value="{{datetimeFormattedWithTz publish_at}}"
+                  data-tooltip='{"position":"top","force_position":"true"}' />
+              </label>
+            </div>
+          {{/if}}
+        {{/if}}
         {{#if ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED}}
           <div class="controls-section">
             <label class="checkbox" for="conditional_content">

@@ -142,7 +142,7 @@ class DeveloperKey extends React.Component {
         <Table.Cell>
           <Flex>
             {this.makeImage(developerKey)}
-            <Flex.Item shrink>{this.getToolName(developerKey)}</Flex.Item>
+            <Flex.Item shouldShrink={true}>{this.getToolName(developerKey)}</Flex.Item>
           </Flex>
         </Table.Cell>
 
@@ -159,12 +159,12 @@ class DeveloperKey extends React.Component {
               <div>
                 <Popover
                   placement="top"
-                  shouldAlignArrow
+                  shouldAlignArrow={true}
                   on="click"
                   isShowingContent={this.state.showKey}
-                  shouldContainFocus
-                  shouldReturnFocus
-                  shouldCloseOnDocumentClick
+                  shouldContainFocus={true}
+                  shouldReturnFocus={true}
+                  shouldCloseOnDocumentClick={true}
                   onHideContent={this.handleShowKey}
                   screenReaderLabel={I18n.t('Key')}
                   renderTrigger={

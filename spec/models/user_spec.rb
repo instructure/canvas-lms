@@ -4078,4 +4078,23 @@ describe User do
     @teacher.destroy
     expect(@teacher.gradebook_filters.count).to eq 0
   end
+
+  describe "add_to_visited_tabs" do
+    before :once do
+      user_factory
+    end
+
+    it "adds the tab to the user's visited_tabs preference" do
+      @user.add_to_visited_tabs("tab_1")
+      expect(@user.reload.get_preference(:visited_tabs)).to eq ["tab_1"]
+      @user.add_to_visited_tabs("tab_2")
+      expect(@user.reload.get_preference(:visited_tabs)).to eq %w[tab_1 tab_2]
+    end
+
+    it "adds a tab only once to the visited_tabs preference" do
+      @user.set_preference(:visited_tabs, ["tab_4"])
+      @user.add_to_visited_tabs("tab_4")
+      expect(@user.reload.get_preference(:visited_tabs)).to eq ["tab_4"]
+    end
+  end
 end

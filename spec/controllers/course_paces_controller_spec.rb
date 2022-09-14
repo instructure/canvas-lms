@@ -400,6 +400,18 @@ describe CoursePacesController, type: :controller do
         expect(m2["items"].second["duration"]).to eq(0)
         expect(m2["items"].second["published"]).to eq(true)
       end
+
+      it "starts the progress' delayed job and returns the progress object if queued" do
+        progress = @course_pace.create_publish_progress
+        delayed_job = progress.delayed_job
+        original_run_at = delayed_job.run_at
+        get :new, { params: { course_id: @course.id } }
+        expect(response).to be_successful
+        json_response = JSON.parse(response.body)
+        expect(json_response["progress"]["workflow_state"]).to eq "queued"
+        expect(json_response["progress"]["context_id"]).to eq @course_pace.id
+        expect(delayed_job.reload.run_at).to be < original_run_at
+      end
     end
 
     context "course_section" do

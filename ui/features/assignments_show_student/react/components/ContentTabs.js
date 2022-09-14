@@ -63,7 +63,7 @@ function LoggedOutContentTabs(props) {
     <div data-testid="assignment-2-student-content-tabs">
       {props.assignment.rubric && (
         <Tabs variant="default">
-          <Tabs.Panel renderTitle={I18n.t('Rubric')} selected>
+          <Tabs.Panel renderTitle={I18n.t('Rubric')} isSelected={true}>
             <Suspense fallback={<LoadingIndicator />}>
               <RubricTab
                 rubric={props.assignment.rubric}

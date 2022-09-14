@@ -125,6 +125,20 @@ describe ConversationsController do
       get "index", params: { scope: "sent" }, format: "json"
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to eql 3
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.sent.pages_loaded.legacy")
+    end
+
+    it "returns all starred conversations" do
+      user_session(@student)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+      [@c1, @c2, @c3].each { |c| c.update(starred: true) }
+
+      get "index", params: { scope: "starred" }, format: "json"
+      expect(response).to be_successful
+      expect(assigns[:conversations_json].size).to eql 3
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.starred.pages_loaded.legacy")
     end
 
     it "returns all unread conversations" do
@@ -138,6 +152,32 @@ describe ConversationsController do
       expect(response).to be_successful
       expect(assigns[:conversations_json].size).to eql 1
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.unread.pages_loaded.legacy")
+    end
+
+    it "returns all archived conversations" do
+      user_session(@student)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+      @c3.update_attribute :workflow_state, "archived"
+
+      get "index", params: { scope: "archived" }, format: "json"
+      expect(response).to be_successful
+      expect(assigns[:conversations_json].size).to eql 1
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.archived.pages_loaded.legacy")
+    end
+
+    it "returns all inbox (default scope) conversations" do
+      user_session(@student)
+      @c1 = conversation
+      @c2 = conversation
+      @c3 = conversation
+
+      get "index", params: { scope: "inbox" }, format: "json"
+      expect(response).to be_successful
+      puts assigns[:conversations_json]
+      expect(assigns[:conversations_json].size).to eql 3
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.legacy")
     end
 
     it "returns conversations matching the specified filter" do

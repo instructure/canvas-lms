@@ -21,12 +21,14 @@ require_relative "../common"
 require_relative "pages/coursepaces_common_page"
 require_relative "pages/coursepaces_page"
 require_relative "../courses/pages/courses_home_page"
+require_relative "../helpers/calendar2_common"
 
 describe "course pace page" do
   include_context "in-process server selenium tests"
   include CoursePacesCommonPageObject
   include CoursePacesPageObject
   include CoursesHomePage
+  include Calendar2Common
 
   before :once do
     teacher_setup
@@ -57,14 +59,14 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
-      blackout_date_start_date_input.send_keys("2022-04-15")
-      blackout_date_end_date_input.send_keys("2022-04-18")
+      blackout_date_start_date_input.send_keys(@course.start_at - 10.days)
+      blackout_date_end_date_input.send_keys(@course.start_at - 7.days)
       click_blackout_dates_add_button
 
       table_text = blackout_dates_table_items[1].text
       expect(table_text).to include("Easter Break")
-      expect(table_text).to include("Fri, Apr 15, 2022")
-      expect(table_text).to include("Mon, Apr 18, 2022")
+      expect(table_text).to include(format_course_pacing_date(@course.start_at - 10.days))
+      expect(table_text).to include(format_course_pacing_date(@course.start_at - 7.days))
     end
 
     it "adds blackout date with one date" do
@@ -73,12 +75,12 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
-      blackout_date_start_date_input.send_keys("2022-04-15")
+      blackout_date_start_date_input.send_keys(@course.start_at - 10.days)
       click_blackout_dates_add_button
       table_text = blackout_dates_table_items[1].text
 
       expect(table_text).to include("Easter Break")
-      expect(table_text).to include("Fri, Apr 15, 2022 Fri, Apr 15, 2022")
+      expect(table_text).to include("#{format_course_pacing_date(@course.start_at - 10.days)} #{format_course_pacing_date(@course.start_at - 10.days)}")
     end
 
     it "deletes a just-added blackout date" do
@@ -87,7 +89,7 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
-      blackout_date_start_date_input.send_keys("2022-04-15")
+      blackout_date_start_date_input.send_keys(@course.start_at - 10.days)
       click_blackout_dates_add_button
 
       blackout_date_delete(blackout_dates_table_items[1]).click
@@ -112,9 +114,28 @@ describe "course pace page" do
       blackout_date_delete(blackout_dates_table_items[1]).click
       expect(blackout_dates_table_items[1].text).to eq("No blackout dates")
       click_blackout_dates_save_button
-      publish_button.click
+      click_publish_button
       wait_for_ajaximations
       expect(CalendarEvent.last.deleted_at).not_to be_nil
+    end
+
+    it "shows the blackout dates in the calendar" do
+      Account.site_admin.enable_feature! :account_level_blackout_dates
+      visit_course_paces_page
+      click_settings_button
+      click_manage_blackout_dates
+
+      blackout_date_title_input.send_keys("Course Time Off")
+      blackout_date_start_date_input.send_keys(Time.zone.now.beginning_of_day)
+      blackout_date_end_date_input.send_keys(Time.zone.now.beginning_of_day + 5.days)
+      click_blackout_dates_add_button
+      click_blackout_dates_save_button
+      click_publish_button
+      wait_for_ajaximations
+      refresh_page
+      user_session(@student)
+      get "/calendar2"
+      assert_title("Course Time Off", false)
     end
   end
 
@@ -130,7 +151,7 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
-      blackout_date_start_date_input.send_keys("2022-04-26")
+      blackout_date_start_date_input.send_keys(@course.start_at + 1.day)
       click_blackout_dates_add_button
       click_blackout_dates_save_button
 
@@ -144,11 +165,11 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Easter Break")
-      blackout_date_start_date_input.send_keys("2022-04-15")
+      blackout_date_start_date_input.send_keys(@course.start_at - 10.days)
       click_blackout_dates_add_button
 
       blackout_date_title_input.send_keys("Me Time Break")
-      blackout_date_start_date_input.send_keys("2022-04-30")
+      blackout_date_start_date_input.send_keys(@course.start_at + 5.days)
       click_blackout_dates_add_button
       click_blackout_dates_save_button
 
@@ -159,18 +180,21 @@ describe "course pace page" do
     end
 
     it "adds the blackout date to the module items list" do
-      @course.blackout_dates.create! event_title: "Blackout test", start_date: "2022-04-28", end_date: "2022-05-02"
+      @course.blackout_dates.create! event_title: "Blackout test",
+                                     start_date: @course.start_at + 3.days,
+                                     end_date: @course.start_at + 7.days
       visit_course_paces_page
 
       expect(blackout_module_item).to be_displayed
     end
 
     it "moves the dates of the existing item to the correct new date" do
-      @course.blackout_dates.create! event_title: "Blackout test", start_date: "2022-04-26", end_date: "2022-04-26"
-
+      @course.blackout_dates.create! event_title: "Blackout test",
+                                     start_date: @course.start_at + 1.day,
+                                     end_date: @course.start_at + 1.day
       visit_course_paces_page
 
-      expect(assignment_due_date.text).to eq("Thu, Apr 28, 2022")
+      expect(assignment_due_date.text).to eq(format_course_pacing_date(@course.start_at + 3.days))
     end
   end
 
@@ -194,24 +218,24 @@ describe "course pace page" do
       click_manage_blackout_dates
 
       blackout_date_title_input.send_keys("Course Break")
-      blackout_date_start_date_input.send_keys("2022-04-27")
+      blackout_date_start_date_input.send_keys(@course.start_at + 1.day) # Tuesday
       click_blackout_dates_add_button
 
       blackout_date_title_input.send_keys("Course Rest")
-      blackout_date_start_date_input.send_keys("2022-04-30")
+      blackout_date_start_date_input.send_keys(@course.start_at + 4.days) # Friday
       click_blackout_dates_add_button
 
       blackout_date_title_input.send_keys("Course Time Off")
-      blackout_date_start_date_input.send_keys("2022-05-04")
+      blackout_date_start_date_input.send_keys(@course.start_at + 9.days) # Wednesday
       click_blackout_dates_add_button
       click_blackout_dates_save_button
 
-      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 Wed, Apr 27, 2022")
-      expect(assignment_due_dates[0].text).to eq("Thu, Apr 28, 2022")
-      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 Sat, Apr 30, 2022")
-      expect(assignment_due_dates[1].text).to eq("Mon, May 2, 2022")
-      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 Wed, May 4, 2022")
-      expect(assignment_due_dates[2].text).to eq("Thu, May 5, 2022")
+      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 1.day)}")
+      expect(assignment_due_dates[0].text).to eq(format_course_pacing_date(@course.start_at + 3.days))
+      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 4.days)}")
+      expect(assignment_due_dates[1].text).to eq(format_course_pacing_date(@course.start_at + 8.days))
+      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 9.days)}")
+      expect(assignment_due_dates[2].text).to eq(format_course_pacing_date(@course.start_at + 11.days))
 
       click_publish_button
 
@@ -225,12 +249,12 @@ describe "course pace page" do
       visit_course_paces_page
       refresh_page
 
-      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 Wed, Apr 27, 2022")
-      expect(assignment_due_dates[0].text).to eq("Thu, Apr 28, 2022")
-      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 Sat, Apr 30, 2022")
-      expect(assignment_due_dates[1].text).to eq("Mon, May 2, 2022")
-      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 Wed, May 4, 2022")
-      expect(assignment_due_dates[2].text).to eq("Thu, May 5, 2022")
+      expect(blackout_module_items[0].text).to eq("Course Break\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 1.day)}")
+      expect(assignment_due_dates[0].text).to eq(format_course_pacing_date(@course.start_at + 3.days))
+      expect(blackout_module_items[1].text).to eq("Course Rest\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 4.days)}")
+      expect(assignment_due_dates[1].text).to eq(format_course_pacing_date(@course.start_at + 8.days))
+      expect(blackout_module_items[2].text).to eq("Course Time Off\nBlackout Date\n1 #{format_course_pacing_date(@course.start_at + 9.days)}")
+      expect(assignment_due_dates[2].text).to eq(format_course_pacing_date(@course.start_at + 11.days))
     end
   end
 end

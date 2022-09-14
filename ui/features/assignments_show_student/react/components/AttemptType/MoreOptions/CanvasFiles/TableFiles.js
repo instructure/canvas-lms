@@ -160,11 +160,15 @@ class TableFiles extends React.Component {
                 tip={file.display_name}
               >
                 {this.renderSRContents(file)}
-                <Flex aria-hidden>
+                <Flex aria-hidden={true}>
                   <Flex.Item padding="xx-small" size={this.props.columnWidths.thumbnailWidth}>
                     {getFileThumbnail(file, 'small')}
                   </Flex.Item>
-                  <Flex.Item padding="xx-small" size={this.props.columnWidths.nameWidth} grow>
+                  <Flex.Item
+                    padding="xx-small"
+                    size={this.props.columnWidths.nameWidth}
+                    shouldGrow={true}
+                  >
                     {this.renderFileName(file.display_name)}
                   </Flex.Item>
                   <Flex.Item padding="xx-small" size={this.props.columnWidths.dateCreatedWidth}>

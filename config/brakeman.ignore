@@ -263,6 +263,29 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
+      "fingerprint": "21efc518929f57de2536d97d99f07d9a7425712d11c77234a089eb24a8de39b6",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/calendar_events_api_controller.rb",
+      "line": 1230,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "InstStatsd::Statsd.count(\"account_calendars.modal.enabled_calendars\", params[:enabled_account_calendars].length)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CalendarEventsApiController",
+        "method": "save_enabled_account_calendars"
+      },
+      "user_input": "params[:enabled_account_calendars].length",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
       "fingerprint": "233c6deb92fd272c8b319e749dd9a31fb5e48ae92b7847be7cb042cfafdd76b7",
       "check_name": "SQL",
       "message": "Possible SQL injection",
@@ -1718,6 +1741,6 @@
       "note": ""
     }
   ],
-  "updated": "2022-08-08 14:54:55 -0600",
-  "brakeman_version": "5.2.3"
+  "updated": "2022-08-23 10:54:50 -0600",
+  "brakeman_version": "5.3.1"
 }

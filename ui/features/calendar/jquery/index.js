@@ -367,7 +367,7 @@ export default class Calendar {
     const startDate = event.startDate()
     const endDate = event.endDate()
     const timeString = (() => {
-      if (!endDate || +startDate === +endDate) {
+      if (!endDate || +startDate === +endDate || event.blackout_date) {
         startDate.locale(calendarDefaults.lang)
         return startDate.format('LT')
       } else {
@@ -1099,6 +1099,19 @@ export default class Calendar {
     this.agenda.viewingGroup = null
     this.header.showSchedulerTitle()
     return this.schedulerNavigator.hide()
+  }
+
+  syncNewContexts = (additionalContexts) => {
+    if (additionalContexts?.length > 0) {
+      additionalContexts.forEach((additionalContext) => {
+        const context = this.contexts.find(c => c.asset_string === additionalContext.asset_string)
+        if (!context) {
+          this.contexts.push(additionalContext)
+          this.contextCodes.push(additionalContext.asset_string);
+        }
+      })
+      this.colorizeContexts()
+    }
   }
 
   colorizeContexts = () => {

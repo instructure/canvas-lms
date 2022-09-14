@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails.js'
+import EditAssignmentDetails from 'ui/features/calendar/backbone/views/EditAssignmentDetails'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 import timezone from 'timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
@@ -49,6 +49,16 @@ QUnit.module('EditAssignmentDetails', {
             asset_string: 'course_2',
             id: '2',
             concluded: false,
+            k5_course: false,
+            can_create_assignments: true,
+            assignment_groups: [{id: '9', name: 'Assignments'}]
+          },
+          {
+            name: 'Course Pacing',
+            asset_string: 'course_3',
+            id: '3',
+            concluded: false,
+            course_pacing_enabled: true,
             k5_course: false,
             can_create_assignments: true,
             assignment_groups: [{id: '9', name: 'Assignments'}]
@@ -249,4 +259,11 @@ test('Should include the important date value when submitting', function () {
   view.$('#calendar_event_important_dates').click()
   const dataToSubmit = view.getFormData()
   equal(dataToSubmit.assignment.important_dates, true)
+})
+
+test('Should disable changing the date if course pacing is enabled', function () {
+  this.event.contextInfo = {course_pacing_enabled: true}
+  const view = createView(commonEvent(), this.event)
+  view.setContext('course_3')
+  equal(view.$('#assignment_due_at').css('disabled'), '')
 })

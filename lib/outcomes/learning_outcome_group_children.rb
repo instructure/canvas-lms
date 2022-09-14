@@ -127,6 +127,7 @@ module Outcomes
                                               .not_deleted
                                               .where(
                                                 tag_type: "learning_outcome",
+                                                content_type: %w[Rubric Assignment AssessmentQuestionBank],
                                                 context: @context
                                               )
                                               .map(&:learning_outcome_id)

@@ -160,12 +160,12 @@ class Header extends Component {
 
         <Flex as="div" margin="large 0 0 0">
           {this.props.graders.length > 0 && (
-            <Flex.Item as="div" flex="1" grow>
+            <Flex.Item as="div" flex="1" shouldGrow={true}>
               <GradersTable />
             </Flex.Item>
           )}
 
-          <Flex.Item align="end" as="div" flex="2" grow>
+          <Flex.Item align="end" as="div" flex="2" shouldGrow={true}>
             <Flex as="div" justifyItems="end">
               <Flex.Item>
                 <ReleaseButton

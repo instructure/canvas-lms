@@ -603,6 +603,11 @@ describe UserMerge do
       add_linked_observer(user1, observer2)
       add_linked_observer(user2, observer2)
 
+      # make sure active link from user 1 comes over even if user 2 has
+      # a destroyed link
+      link = add_linked_observer(user2, observer1)
+      link.destroy
+
       UserMerge.from(user1).into(user2)
       data = UserMergeData.where(user_id: user2).first
       expect(data.records.where(context_type: "UserObservationLink").count).to eq 2

@@ -28,6 +28,7 @@ export function buildMetadata(settings) {
     externalStyle,
     externalWidth,
     externalHeight,
+    error,
     ...embedSettings
   } = settings
   const metadata = createSvgElement('metadata')

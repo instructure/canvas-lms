@@ -29,7 +29,7 @@ const I18n = useI18nScope('assignments_2')
 export default function UnavailablePeerReview() {
   return (
     <Flex textAlign="center" justifyItems="center" margin="0 0 large" direction="column">
-      <Flex.Item>
+      <Flex.Item margin="medium 0 0 0">
         <img
           alt={I18n.t('There are no submissions available to review just yet.')}
           src={unavailablePeerReviewSVG}

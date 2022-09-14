@@ -64,13 +64,13 @@ const ImageOptionsForm = ({
         <Tooltip
           on={['hover', 'focus']}
           placement="top"
-          tip={
+          renderTip={
             <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
               {tooltipText}
             </View>
           }
         >
-          <Button icon={IconQuestionLine} size="small" variant="icon">
+          <Button renderIcon={IconQuestionLine} size="small" variant="icon">
             <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
           </Button>
         </Tooltip>

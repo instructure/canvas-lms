@@ -81,7 +81,7 @@ export default function CommentsTray(props) {
           <Flex.Item>
             <View as="div" padding="medium">
               <Flex>
-                <Flex.Item shouldGrow shouldShrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Heading>{I18n.t('Attempt %{attempt} Feedback', {attempt})}</Heading>
                 </Flex.Item>
 
@@ -99,7 +99,7 @@ export default function CommentsTray(props) {
             </View>
           </Flex.Item>
 
-          <Flex.Item grow>
+          <Flex.Item shouldGrow={true}>
             <TrayContent assignment={props.assignment} submission={props.submission} />
           </Flex.Item>
         </Flex>

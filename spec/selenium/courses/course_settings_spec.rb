@@ -330,7 +330,7 @@ describe "course settings" do
     it "changes course details" do
       course_name = "new course name"
       course_code = "new course-101"
-      locale_text = "English (US)"
+      locale_text = "English (United States)"
       time_zone_value = "Central Time (US & Canada)"
 
       get "/courses/#{@course.id}/settings"

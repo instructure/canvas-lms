@@ -31,6 +31,15 @@ import {ImageCropperModal} from '../ImageCropper'
 import ModeSelect from './ModeSelect'
 import PropTypes from 'prop-types'
 import {ImageCropperSettingsPropTypes} from '../ImageCropper/propTypes'
+import {MAX_IMAGE_SIZE_BYTES} from './compressionUtils'
+
+const getCompressionMessage = () =>
+  formatMessage(
+    'Your image has been compressed for Icon Maker. Images less than {size} KB will not be compressed.',
+    {
+      size: MAX_IMAGE_SIZE_BYTES / 1024
+    }
+  )
 
 function renderImagePreview({image, loading}) {
   return (
@@ -39,7 +48,7 @@ function renderImagePreview({image, loading}) {
       testId="selected-image-preview"
       image={image}
       loading={loading}
-      checkered
+      checkered={true}
     />
   )
 }
@@ -124,6 +133,8 @@ export const ImageOptions = ({state, dispatch, rcsConfig}) => {
             }}
             image={image}
             cropSettings={state.cropperSettings}
+            message={state.compressed ? getCompressionMessage() : null}
+            loading={!image}
           />
         )}
       </Flex.Item>
@@ -138,7 +149,8 @@ ImageOptions.propTypes = {
     mode: PropTypes.string.isRequired,
     loading: PropTypes.bool.isRequired,
     cropperOpen: PropTypes.bool.isRequired,
-    cropperSettings: ImageCropperSettingsPropTypes
+    cropperSettings: ImageCropperSettingsPropTypes,
+    compressed: PropTypes.bool.isRequired
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired

@@ -40,7 +40,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount1.id, @subaccount1a.id)
     end
 
     it "returns only visible calendars" do
@@ -54,7 +54,26 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@root_account.id, @subaccount2.id)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "works fetching account associations across shards" do
+        @student = user_factory(active_all: true)
+        user_session @student
+
+        @shard2.activate { course_with_student(user: @student, active_all: true, account: Account.create!(account_calendar_visible: true)) }
+        course_with_student(user: @student, active_all: true, account: Account.default)
+
+        Account.last.trust_links.create!(managing_account: Account.default)
+        Account.default.trust_links.create!(managing_account: Account.last)
+
+        get :index
+        expect(response).to be_successful
+        expect(json_parse(response.body)["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(Account.default.id, Account.last.id)
+      end
     end
 
     context "with a search term" do
@@ -66,7 +85,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id, @subaccount1a.id)
       end
 
       it "does not include hidden calendars in the search results" do
@@ -78,7 +97,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1a.id)
       end
 
       it "does not include accounts without an association" do
@@ -88,7 +107,7 @@ describe AccountCalendarsApiController do
 
         expect(response).to be_successful
         json = json_parse(response.body)
-        expect(json.map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
+        expect(json["account_calendars"].map { |calendar| calendar["id"] }).to contain_exactly(@subaccount1.id)
       end
     end
 
@@ -109,7 +128,7 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json.map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
+      expect(json["account_calendars"].map { |calendar| calendar["id"] }).to eq([@subaccount1.id, @subaccount1a.id, @subaccount2.id, @root_account.id])
     end
 
     it "returns an empty array for a user without any enrollments" do
@@ -118,7 +137,8 @@ describe AccountCalendarsApiController do
 
       expect(response).to be_successful
       json = json_parse(response.body)
-      expect(json).to eq []
+      expected_json = { "account_calendars" => [], "total_results" => 0 }
+      expect(json).to eq(expected_json)
     end
 
     it "requires the user to be logged in" do
@@ -133,6 +153,27 @@ describe AccountCalendarsApiController do
       get :index
 
       expect(response).to be_not_found
+    end
+
+    context "metrics collection" do
+      before do
+        allow(InstStatsd::Statsd).to receive(:increment)
+        course_with_student_logged_in(user: @user, account: @root_account)
+        @metric_name = "account_calendars.available_calendars_requested"
+      end
+
+      it "emits account_calendars.available_calendars_requested to statsd" do
+        get :index
+        expect(InstStatsd::Statsd).to have_received(:increment).once.with(@metric_name)
+      end
+
+      it "does not emit account_calendars.available_calendars_requested to statsd if a search term is included or if we're not on the first page" do
+        get :index, params: { search_term: "sa-1" }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(@metric_name)
+
+        get :index, params: { per_page: "2", page: "2" }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with(@metric_name)
+      end
     end
   end
 

@@ -115,7 +115,7 @@ class OutcomePopover extends React.Component {
         />
         <Text size="small">
           <Flex alignItems="stretch" direction="row" justifyItems="space-between">
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               {/* word-wrap used for IE support */}
               <div style={{wordWrap: 'break-word', overflowWrap: 'break-word'}}>
                 <Text size="small" weight="bold">
@@ -166,7 +166,7 @@ class OutcomePopover extends React.Component {
           onHideContent={() => this.setState({linkHover: false, linkClicked: false})}
           placement="bottom"
           on={['hover', 'click']}
-          shouldContainFocus
+          shouldContainFocus={true}
           renderTrigger={
             <IconButton
               size="small"

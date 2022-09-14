@@ -180,9 +180,9 @@ module Lti
         client_id: @tool.global_developer_key_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,
-        canvas_region: @context.shard.database_server.config[:region] || "not_configured"
+        canvas_region: @context.shard.database_server.config[:region] || "not_configured",
+        lti_storage_target: "_parent"
       )
-      req.lti_storage_target = "_parent" if Account.site_admin.feature_enabled?(:lti_platform_storage)
       req.as_json
     end
 

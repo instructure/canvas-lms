@@ -345,6 +345,7 @@ class ContextModule < ActiveRecord::Base
   alias_method :published?, :active?
 
   def publish_items!
+    enable_publish_at = context.root_account.feature_enabled?(:scheduled_page_publication)
     content_tags.each do |tag|
       if tag.unpublished?
         if tag.content_type == "Attachment"
@@ -352,7 +353,7 @@ class ContextModule < ActiveRecord::Base
           tag.content.save!
           tag.publish if tag.content.published?
         else
-          tag.publish
+          tag.publish unless enable_publish_at && tag.content.respond_to?(:publish_at) && tag.content.publish_at
         end
       end
       tag.update_asset_workflow_state!

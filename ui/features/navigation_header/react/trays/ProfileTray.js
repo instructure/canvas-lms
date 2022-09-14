@@ -97,7 +97,7 @@ export default function ProfileTray(props) {
         <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List variant="unstyled" margin="none" itemSpacing="small">
+      <List isUnstyled margin="none" itemSpacing="small">
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
         ) : (

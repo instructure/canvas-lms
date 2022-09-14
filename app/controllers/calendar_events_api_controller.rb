@@ -1224,7 +1224,11 @@ class CalendarEventsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def save_enabled_account_calendars
     @current_user.set_preference(:account_calendar_events_seen, value_to_boolean(params[:mark_feature_as_seen])) if params.key?(:mark_feature_as_seen)
-    @current_user.set_preference(:enabled_account_calendars, params[:enabled_account_calendars]) if params.key?(:enabled_account_calendars)
+
+    if params.key?(:enabled_account_calendars)
+      @current_user.set_preference(:enabled_account_calendars, params[:enabled_account_calendars])
+      InstStatsd::Statsd.count("account_calendars.modal.enabled_calendars", params[:enabled_account_calendars].length)
+    end
 
     render json: { status: "ok" }
   end
@@ -1437,13 +1441,13 @@ class CalendarEventsApiController < ApplicationController
     @type ||= params[:type] == "assignment" ? :assignment : :event
 
     @context ||= user
-
+    include_accounts = Account.site_admin.feature_enabled?(:account_calendar_events)
     # only get pertinent contexts if there is a user
     if user
       joined_codes = codes&.join(",")
       get_all_pertinent_contexts(
         include_groups: true,
-        include_accounts: Account.site_admin.feature_enabled?(:account_calendar_events),
+        include_accounts: include_accounts,
         cross_shard: true,
         only_contexts: joined_codes,
         include_contexts: joined_codes
@@ -1461,6 +1465,7 @@ class CalendarEventsApiController < ApplicationController
         context = Context.find_by_asset_string(c)
         @public_to_auth = true if context.is_a?(Course) && user && (context.public_syllabus_to_auth || context.public_syllabus || context.is_public || context.is_public_to_auth_users)
         @contexts.push context if context.is_a?(Course) && (context.is_public || context.public_syllabus || @public_to_auth)
+        @contexts.push context if include_accounts && context.is_a?(Account) && user.associated_accounts.active.where(id: context.id, account_calendar_visible: true).exists?
       end
 
       # filter the contexts to only the requested contexts

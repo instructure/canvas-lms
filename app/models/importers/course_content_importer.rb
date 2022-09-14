@@ -384,6 +384,7 @@ module Importers
         migration.imported_migration_items_by_class(WikiPage).each do |event|
           event.reload
           event.todo_date = shift_date(event.todo_date, shift_options)
+          event.publish_at = shift_date(event.publish_at, shift_options)
           event.save_without_broadcasting
         end
 

@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import RCEGlobals from '../../../RCEGlobals'
 
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
@@ -44,7 +45,7 @@ const mathml = {
       return
     }
     if (!this.isMathJaxLoaded()) {
-      const locale = ENV.LOCALE || 'en'
+      const locale = RCEGlobals.getConfig()?.locale || 'en'
       // signal local config to mathjax as it loads
       window.MathJax = localConfig
       if (window.MathJaxIsLoading) return
@@ -61,7 +62,7 @@ const mathml = {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
-          if (ENV?.FEATURES?.new_math_equation_handling) {
+          if (RCEGlobals.getFeatures()?.new_math_equation_handling) {
             window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function (message) {
               mathImageHelper.catchEquationImages(message[1])
             })
@@ -133,7 +134,7 @@ const mathml = {
   },
 
   isMathInElement(elem) {
-    if (ENV?.FEATURES?.new_math_equation_handling) {
+    if (RCEGlobals.getFeatures()?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
       if (elem.querySelector('.math_equation_latex,.math_equation_mml')) {
         return true
@@ -150,7 +151,7 @@ const mathml = {
       }
     }
 
-    if (ENV?.FEATURES?.new_equation_editor) {
+    if (RCEGlobals.getFeatures()?.new_equation_editor) {
       return elem?.getAttribute('data-testid') === 'mathml-preview-element'
     }
 

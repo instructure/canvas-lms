@@ -93,6 +93,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.master_template_created(obj)
     when MasterCourses::ChildSubscription
       Canvas::LiveEvents.blueprint_subscription_created(obj)
+    when MasterCourses::MasterContentTag
+      Canvas::LiveEvents.blueprint_restrictions_updated(obj) if obj.quiz_lti_content?
     end
   end
 
@@ -197,6 +199,10 @@ module Canvas::LiveEventsCallbacks
     when MasterCourses::MasterTemplate
       if %w[default_restrictions use_default_restrictions_by_type default_restrictions_by_type].any? { |field| changes[field] }
         Canvas::LiveEvents.default_blueprint_restrictions_updated(obj)
+      end
+    when MasterCourses::MasterContentTag
+      if %w[restrictions use_default_restrictions].any? { |f| changes[f] } && obj.quiz_lti_content?
+        Canvas::LiveEvents.blueprint_restrictions_updated(obj)
       end
     end
   end

@@ -50,7 +50,7 @@ export default function SpecificSections(props) {
           overflowY="auto"
           padding="xxx-small 0 xxx-small large"
         >
-          <List margin="xxx-small 0" itemSpacing="small" variant="unstyled">
+          <List isUnstyled margin="xxx-small 0" itemSpacing="small">
             {sections.map(section => (
               <List.Item key={section.id}>
                 <Checkbox

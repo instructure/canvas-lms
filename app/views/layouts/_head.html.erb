@@ -37,6 +37,9 @@
   <%= include_custom_meta_tags %>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="<%= brand_variable('ic-brand-global-nav-bgd') %>">
+  <% unless @allow_robot_indexing %>
+  <meta name="robots" content="noindex" />
+  <% end %>
   <%= benchmark("include_css_bundles") { include_css_bundles } %>
   <%= include_account_css %>
   <script>

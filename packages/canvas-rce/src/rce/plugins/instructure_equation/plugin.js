@@ -20,6 +20,7 @@ import htmlEscape from 'escape-html'
 import formatMessage from '../../../format-message'
 import clickCallback, {oldClickCallback} from './clickCallback'
 import {IconEquationLine} from '@instructure/ui-icons/es/svg'
+import RCEGlobals from '../../RCEGlobals'
 
 function isEquationImage(node) {
   return (
@@ -28,100 +29,56 @@ function isEquationImage(node) {
   )
 }
 
-if (ENV?.FEATURES?.new_equation_editor) {
-  tinymce.create('tinymce.plugins.InstructureEquation', {
-    init(ed) {
-      ed.ui.registry.addIcon('equation', IconEquationLine.src)
+tinymce.create('tinymce.plugins.InstructureEquation', {
+  init(ed) {
+    ed.ui.registry.addIcon('equation', IconEquationLine.src)
 
+    if (RCEGlobals.getFeatures()?.new_equation_editor) {
       ed.addCommand('instructureEquation', clickCallback.bind(this, ed, document))
-
-      ed.ui.registry.addMenuItem('instructure_equation', {
-        text: formatMessage('Equation'),
-        icon: 'equation',
-        onAction: () => ed.execCommand('instructureEquation')
-      })
-
-      ed.ui.registry.addToggleButton('instructure_equation', {
-        tooltip: htmlEscape(
-          formatMessage({
-            default: 'Insert Math Equation',
-            description: 'Title for RCE button to insert a math equation'
-          })
-        ),
-        onAction: () => ed.execCommand('instructureEquation'),
-        icon: 'equation',
-        onSetup(buttonApi) {
-          const toggleActive = eventApi => {
-            buttonApi.setActive(isEquationImage(eventApi.element))
-          }
-          ed.on('NodeChange', toggleActive)
-          return () => ed.off('NodeChange', toggleActive)
-        }
-      })
-
-      ed.ui.registry.addButton('instructure-equation-options', {
-        onAction(/* buttonApi */) {
-          ed.execCommand('instructureEquation')
-        },
-
-        text: formatMessage('Edit Equation')
-      })
-
-      ed.ui.registry.addContextToolbar('instructure-equation-toolbar', {
-        items: 'instructure-equation-options',
-        position: 'node',
-        predicate: isEquationImage,
-        scope: 'node'
-      })
-    }
-  })
-
-  // Register plugin
-  tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation)
-} else {
-  tinymce.create('tinymce.plugins.InstructureEquation', {
-    init(ed) {
-      ed.ui.registry.addIcon('equation', IconEquationLine.src)
+    } else {
       ed.addCommand('instructureEquation', oldClickCallback.bind(this, ed, document))
-      ed.ui.registry.addMenuItem('instructure_equation', {
-        text: formatMessage('Equation'),
-        icon: 'equation',
-        onAction: () => ed.execCommand('instructureEquation')
-      })
-      ed.ui.registry.addToggleButton('instructure_equation', {
-        tooltip: htmlEscape(
-          formatMessage({
-            default: 'Insert Math Equation',
-            description: 'Title for RCE button to insert a math equation'
-          })
-        ),
-        onAction: () => ed.execCommand('instructureEquation'),
-        icon: 'equation',
-
-        onSetup(buttonApi) {
-          const toggleActive = eventApi => {
-            buttonApi.setActive(isEquationImage(eventApi.element))
-          }
-
-          ed.on('NodeChange', toggleActive)
-          return () => ed.off('NodeChange', toggleActive)
-        }
-      })
-      ed.ui.registry.addButton('instructure-equation-options', {
-        onAction /* buttonApi */() {
-          ed.execCommand('instructureEquation')
-        },
-
-        text: formatMessage('Edit Equation')
-      })
-      ed.ui.registry.addContextToolbar('instructure-equation-toolbar', {
-        items: 'instructure-equation-options',
-        position: 'node',
-        predicate: isEquationImage,
-        scope: 'node'
-      })
     }
-  }) // Register plugin
 
-  tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation)
-}
+    ed.ui.registry.addMenuItem('instructure_equation', {
+      text: formatMessage('Equation'),
+      icon: 'equation',
+      onAction: () => ed.execCommand('instructureEquation')
+    })
+
+    ed.ui.registry.addToggleButton('instructure_equation', {
+      tooltip: htmlEscape(
+        formatMessage({
+          default: 'Insert Math Equation',
+          description: 'Title for RCE button to insert a math equation'
+        })
+      ),
+      onAction: () => ed.execCommand('instructureEquation'),
+      icon: 'equation',
+      onSetup(buttonApi) {
+        const toggleActive = eventApi => {
+          buttonApi.setActive(isEquationImage(eventApi.element))
+        }
+        ed.on('NodeChange', toggleActive)
+        return () => ed.off('NodeChange', toggleActive)
+      }
+    })
+
+    ed.ui.registry.addButton('instructure-equation-options', {
+      onAction(/* buttonApi */) {
+        ed.execCommand('instructureEquation')
+      },
+
+      text: formatMessage('Edit Equation')
+    })
+
+    ed.ui.registry.addContextToolbar('instructure-equation-toolbar', {
+      items: 'instructure-equation-options',
+      position: 'node',
+      predicate: isEquationImage,
+      scope: 'node'
+    })
+  }
+})
+
+// Register plugin
+tinymce.PluginManager.add('instructure_equation', tinymce.plugins.InstructureEquation)

@@ -44,18 +44,7 @@ class CoursePacesController < ApplicationController
       end
     end
 
-    progress = latest_progress
-    if progress
-      # start delayed job if it's not already started
-      if progress.queued?
-        if progress.delayed_job.present?
-          progress.delayed_job.update(run_at: Time.now)
-        else
-          progress = publish_course_pace
-        end
-      end
-      progress_json = progress_json(progress, @current_user, session)
-    end
+    load_and_run_progress
 
     status = setup_master_course_restrictions([@course_pace], @context)
 
@@ -73,7 +62,7 @@ class CoursePacesController < ApplicationController
              COURSE_ID: @context.id,
              COURSE_PACE_ID: @course_pace.id,
              COURSE_PACE: CoursePacePresenter.new(@course_pace).as_json,
-             COURSE_PACE_PROGRESS: progress_json,
+             COURSE_PACE_PROGRESS: @progress_json,
              VALID_DATE_RANGE: CourseDateRange.new(@context),
              MASTER_COURSE_DATA: master_course_data
            })
@@ -83,11 +72,10 @@ class CoursePacesController < ApplicationController
   end
 
   def api_show
-    progress = latest_progress
-    progress_json = progress_json(progress, @current_user, session) if progress
+    load_and_run_progress
     render json: {
       course_pace: CoursePacePresenter.new(@course_pace).as_json,
-      progress: progress_json
+      progress: @progress_json
     }
   end
 
@@ -100,6 +88,7 @@ class CoursePacesController < ApplicationController
                    when Enrollment
                      @course.course_paces.for_user(@context.user).not_deleted.take
                    end
+    load_and_run_progress
     if @course_pace.nil?
       pace_params = case @context
                     when Course
@@ -122,7 +111,10 @@ class CoursePacesController < ApplicationController
         end
       end
     end
-    render json: { course_pace: CoursePacePresenter.new(@course_pace).as_json }
+    render json: {
+      course_pace: CoursePacePresenter.new(@course_pace).as_json,
+      progress: @progress_json
+    }
   end
 
   def publish
@@ -213,6 +205,21 @@ class CoursePacesController < ApplicationController
   def latest_progress
     progress = Progress.order(created_at: :desc).find_by(context: @course_pace, tag: "course_pace_publish")
     progress&.workflow_state == "completed" ? nil : progress
+  end
+
+  def load_and_run_progress
+    @progress = latest_progress
+    if @progress
+      # start delayed job if it's not already started
+      if @progress.queued?
+        if @progress.delayed_job.present?
+          @progress.delayed_job.update(run_at: Time.now)
+        else
+          @progress = publish_course_pace
+        end
+      end
+      @progress_json = progress_json(@progress, @current_user, session)
+    end
   end
 
   def enrollments_json(course)

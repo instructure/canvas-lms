@@ -112,6 +112,7 @@ describe UsersController do
           lti_message_hint
           canvas_region
           client_id
+          lti_storage_target
         ]
       end
 

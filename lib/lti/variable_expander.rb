@@ -107,6 +107,14 @@ module Lti
       @controller = controller
       @request = controller.request if controller
       opts.each { |opt, val| instance_variable_set("@#{opt}", val) }
+
+      # This will provide the most accurate version of the actual launch
+      # url used, whether directly provided from a resource link or
+      # calculated from the tool/placement combo. @tool can be an Lti::ToolProxy
+      # or a ContextExternalTool, and this only cares about the latter.
+      if @tool.respond_to? :launch_url
+        @launch_url ||= @tool.launch_url(extension_type: @placement)
+      end
     end
 
     def lti_helper

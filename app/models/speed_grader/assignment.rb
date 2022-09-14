@@ -171,10 +171,8 @@ module SpeedGrader
         end
       end
 
-      word_count_enabled = assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
       res[:submissions] = submissions.map do |sub|
-        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing late_policy_status]
-        submission_methods << :word_count if word_count_enabled
+        submission_methods = %i[submission_history late external_tool_url entered_score entered_grade seconds_late missing late_policy_status word_count]
         json = sub.as_json(
           include_root: false,
           methods: submission_methods,
@@ -227,8 +225,7 @@ module SpeedGrader
           json["submission_history"] = json["submission_history"].map do |version|
             # to avoid a call to the DB in Submission#missing?
             version.assignment = sub.assignment
-            version_methods = %i[versioned_attachments late missing external_tool_url late_policy_status]
-            version_methods << :word_count if word_count_enabled
+            version_methods = %i[versioned_attachments late missing external_tool_url late_policy_status word_count]
             version.as_json(only: submission_json_fields, methods: version_methods).tap do |version_json|
               version_json["submission"]["has_originality_report"] = version.has_originality_report?
               version_json["submission"]["has_plagiarism_tool"] = version.assignment.assignment_configuration_tool_lookup_ids.present?
@@ -264,10 +261,8 @@ module SpeedGrader
                         upload_status: AttachmentUploadStatus.upload_status(a),
                       }
                     )
-                    if word_count_enabled
-                      a.set_word_count if a.word_count.nil? && a.word_count_supported?
-                      attachment_json[:attachment][:word_count] = a.word_count
-                    end
+                    a.set_word_count if a.word_count.nil? && a.word_count_supported?
+                    attachment_json[:attachment][:word_count] = a.word_count
                   end
                 end
               end

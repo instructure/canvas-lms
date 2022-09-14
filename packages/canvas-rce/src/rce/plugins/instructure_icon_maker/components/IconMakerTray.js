@@ -29,14 +29,14 @@ import {CreateIconMakerForm} from './CreateIconMakerForm'
 import {Footer} from './CreateIconMakerForm/Footer'
 import {buildStylesheet, buildSvg} from '../svg'
 import {statuses, useSvgSettings} from '../svg/settings'
-import {defaultState} from '../reducers/svgSettings'
+import {defaultState, actions} from '../reducers/svgSettings'
 import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from '../svg/constants'
 import {FixedContentTray} from '../../shared/FixedContentTray'
 import {useStoreProps} from '../../shared/StoreContext'
 import formatMessage from '../../../../format-message'
 import buildDownloadUrl from '../../shared/buildDownloadUrl'
 import {validIcon} from '../utils/iconValidation'
-import {hasChanges} from '../utils/iconMakerFormHasChanges'
+import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
 
 const INVALID_MESSAGE = formatMessage(
@@ -47,10 +47,10 @@ const UNSAVED_CHANGES_MESSAGE = formatMessage(
   'You have unsaved changes in the Icon Maker tray. Do you want to continue without saving these changes?'
 )
 
-function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, onClose) {
+function renderHeader(title, settings, onKeyDown, onAlertDismissal, onClose) {
   return (
     <View as="div" background="primary">
-      {isInvalid && (
+      {settings.error && (
         <Alert
           variant="error"
           margin="small"
@@ -58,25 +58,24 @@ function renderHeader(title, settings, onKeyDown, isInvalid, onAlertDismissal, o
           onDismiss={onAlertDismissal}
           renderCloseButtonLabel="Close"
         >
-          {INVALID_MESSAGE}
+          {settings.error}
         </Alert>
       )}
       <Flex direction="column">
         <Flex.Item padding="medium medium small">
           <Flex direction="row">
-            <Flex.Item grow shrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Heading as="h2">{title}</Heading>
             </Flex.Item>
             <Flex.Item>
               <CloseButton
                 placement="static"
-                variant="icon"
+                color="primary"
                 onClick={onClose}
                 onKeyDown={onKeyDown}
                 data-testid="icon-maker-close-button"
-              >
-                {formatMessage('Close')}
-              </CloseButton>
+                screenReaderLabel={formatMessage('Close')}
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>
@@ -133,7 +132,8 @@ function renderFooter(status, onClose, handleSubmit, editing, replaceAll, setRep
 
 const checkIfAnyUnsavedChanges = (initialSettings, currentSettings) => {
   let shouldCloseTray = true
-  if (hasChanges(initialSettings, currentSettings)) {
+  const imFormHasChanges = new IconMakerFormHasChanges(initialSettings, currentSettings)
+  if (imFormHasChanges.hasChanges()) {
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
     // eslint-disable-next-line no-restricted-globals, no-alert
@@ -147,7 +147,6 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
-  const [isInvalid, setIsInvalid] = useState(false)
   const [isOpen, setIsOpen] = useState(true)
   const [replaceAll, setReplaceAll] = useState(false)
 
@@ -197,7 +196,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
   useEffect(() => {
     if (validIcon(settings)) {
-      setIsInvalid(false)
+      dispatch({type: actions.SET_ERROR, payload: null})
       setStatus(statuses.IDLE)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -214,7 +213,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     setStatus(statuses.LOADING)
 
     if (!validIcon(settings)) {
-      setIsInvalid(true)
+      dispatch({type: actions.SET_ERROR, payload: INVALID_MESSAGE})
       setStatus(statuses.ERROR)
       return
     }
@@ -306,7 +305,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settingsStatus])
 
-  const handleAlertDismissal = () => setIsInvalid(false)
+  const handleAlertDismissal = () => dispatch({type: actions.SET_ERROR, payload: null})
 
   return (
     <FixedContentTray
@@ -314,9 +313,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       isOpen={isOpen}
       onDismiss={onClose}
       onUnmount={onUnmount}
-      renderHeader={() =>
-        renderHeader(title, settings, onKeyDown, isInvalid, handleAlertDismissal, onClose)
-      }
+      renderHeader={() => renderHeader(title, settings, onKeyDown, handleAlertDismissal, onClose)}
       renderBody={() =>
         renderBody(settings, dispatch, editor, editing, !replaceAll, nameRef, rcsConfig, isLoading)
       }
@@ -324,7 +321,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
         renderFooter(status, onClose, handleSubmit, editing, replaceAll, setReplaceAll, applyRef)
       }
       bodyAs="form"
-      shouldJoinBodyAndFooter
+      shouldJoinBodyAndFooter={true}
     />
   )
 }

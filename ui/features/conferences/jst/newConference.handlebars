@@ -64,11 +64,28 @@
             <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
           </a>
           <ul id="{{id}}-content-1" class="al-options" role="menu" aria-hidden="true" aria-expanded="false" aria-activedescendant="{{id}}-content-2">
+
             {{#if permissions.update}}
+
+              <li role="presentation">
+                <a class="icon-reset sync_conference_link"
+                      id="{{id}}-content-2"
+                      role="menuitem"
+                      title="{{#t "sync"}}Sync Attendees{{/t}}">{{#t "sync"}}Sync Attendees{{/t}}</a>
+                <form action="{{url}}" id="sync_attendees_{{id}}" style="margin:0;padding:0;display:inline" method="POST">
+                  <input type="hidden" name="_method" value="PUT">
+                  <input type="hidden" id="web_conference_sync_attendees"  name="web_conference[sync_attendees]" value="true">
+                  <input type="hidden" id="web_conference_title"  name="web_conference[title]" value="{{title}}">
+                  <div style="margin:0;padding:0;display:inline">
+                  <input name="authenticity_token" type="hidden" value="{{auth_token}}">
+                </div>
+                </form>
+              </li>
+
               <li role="presentation">
                 <a href="#conference_{{ id }}"
                     class="icon-edit edit_conference_link"
-                    id="{{id}}-content-2"
+                    id="{{id}}-content-3"
                     role="menuitem"
                     title="{{#t "edit"}}Edit{{/t}}">{{#t "edit"}}Edit{{/t}}</a>
               </li>
@@ -77,7 +94,7 @@
               <li role="presentation">
                 <a href="{{ url }}"
                     class="icon-trash  delete_conference_link"
-                    id="{{id}}-content-3"
+                    id="{{id}}-content-4"
                     role="menuitem"
                     aria-label="{{#t "delete"}}Delete{{/t}}"
                     title="{{#t "delete"}}Delete{{/t}}">{{#t "delete"}}Delete{{/t}}

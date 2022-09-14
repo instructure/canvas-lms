@@ -168,7 +168,7 @@ export default class IndexHeader extends Component {
     return (
       <View display="block">
         <Flex wrap="wrap" justifyItems="end">
-          <Flex.Item grow>
+          <Flex.Item shouldGrow={true}>
             <FormField
               id="discussion-filter"
               label={<ScreenReaderContent>{I18n.t('Discussion Filter')}</ScreenReaderContent>}
@@ -190,7 +190,7 @@ export default class IndexHeader extends Component {
               </select>
             </FormField>
           </Flex.Item>
-          <Flex.Item grow margin="0 0 0 small">
+          <Flex.Item shouldGrow={true} margin="0 0 0 small">
             <TextInput
               renderLabel={
                 <ScreenReaderContent>{I18n.t('Search discussion by title')}</ScreenReaderContent>

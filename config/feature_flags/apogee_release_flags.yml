@@ -41,11 +41,6 @@ view_ungraded_as_zero:
   description:
     The Gradebook will factor in ungraded submissions as if they were given a score of zero for
     calculations. This is just a view for the teacher, and does not affect actual scoring.
-import_override_scores_in_gradebook:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Import Override Scores in Gradebook
-  description: Allows the Gradebook importer to recognize and apply changes to override scores.
 gradebook_load_assignments_by_grading_period:
   state: hidden
   applies_to: SiteAdmin

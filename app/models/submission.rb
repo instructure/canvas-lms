@@ -2495,8 +2495,7 @@ class Submission < ActiveRecord::Base
 
   def self.json_serialization_full_parameters(additional_parameters = {})
     includes = { quiz_submission: {} }
-    methods = %i[submission_history attachments entered_score entered_grade]
-    methods << :word_count if Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
+    methods = %i[submission_history attachments entered_score entered_grade word_count]
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 

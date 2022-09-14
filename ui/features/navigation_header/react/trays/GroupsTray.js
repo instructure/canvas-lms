@@ -34,7 +34,7 @@ export default function GroupsTray({groups, hasLoaded}) {
         {I18n.t('Groups')}
       </Heading>
       <hr role="presentation" />
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           groups
             .map(group => (

@@ -111,6 +111,7 @@ module.exports = {
     'react/prop-types': ['error', {skipUndeclared: true}],
     'react/default-props-match-prop-types': ['error', {allowRequiredDefaults: true}], // add the `allowRequiredDefaults: true` option to allow specifying something as a required prop (so you get propType error messages), but in case it's not present at runtime, I'll use `[]` as the default (so it is resilient)".
     'react/forbid-foreign-prop-types': ['error', {allowInPropTypes: true}], // You can refer to proptypes within proptypes, but you shouldn't use proptypes in actual app code of the component
+    'react/jsx-boolean-value': [1, 'always'], // React recommends always passing values to props, see https://reactjs.org/docs/jsx-in-depth.html#props-default-to-true
     'react/jsx-no-bind': 'off',
     'react/jsx-props-no-spreading': 'off',
     'react/no-danger': 'off', // dangerouslySetInnerHTML is already pretty explicit on making you aware of its danger

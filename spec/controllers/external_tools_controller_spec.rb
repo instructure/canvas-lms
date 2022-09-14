@@ -155,6 +155,7 @@ describe ExternalToolsController do
             lti_message_hint
             canvas_region
             client_id
+            lti_storage_target
           ]
         end
 
@@ -1853,6 +1854,16 @@ describe ExternalToolsController do
       expect(json["errors"]["config_url"][0]["message"]).to eq "Invalid URL"
     end
 
+    it "stores placement config using string key" do
+      expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
+      user_session(@teacher)
+
+      post "create", params: { course_id: @course.id, external_tool: { name: "tool name", url: "http://example.com",
+                                                                       consumer_key: "key", shared_secret: "secret", config_type: "by_url",
+                                                                       config_url: "http://localhost:9001", course_navigation: { enabled: true } } }, format: "json"
+      expect(assigns[:tool].settings).to have_key "course_navigation"
+    end
+
     context "navigation tabs caching" do
       it "does not clear the navigation tabs cache for non navigtaion tools" do
         enable_cache do
@@ -2438,16 +2449,13 @@ describe ExternalToolsController do
           )
         end
         let(:external_tool) do
-          tool = external_tool_model(
+          external_tool_1_3_model(
             context: assignment.course,
             opts: {
               url: launch_url,
               developer_key: DeveloperKey.create!
             }
           )
-          tool.settings[:use_1_3] = true
-          tool.save!
-          tool
         end
 
         it "returns an assignment launch URL" do
@@ -2509,13 +2517,10 @@ describe ExternalToolsController do
           )
         end
         let(:external_tool) do
-          tool = external_tool_model(
+          external_tool_1_3_model(
             context: course,
             opts: { url: launch_url }
           )
-          tool.settings[:use_1_3] = true
-          tool.save!
-          tool
         end
 
         it { is_expected.to include "http://test.host/courses/#{course.id}/modules/items/#{module_item.id}" }

@@ -58,7 +58,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           <hr role="presentation" style={{marginTop: '0'}} />
         </View>
       )}
-      <List variant="unstyled" margin="small 0" itemSpacing="small">
+      <List isUnstyled margin="small 0" itemSpacing="small">
         {nonFeaturedLinks
           .map(link => {
             const has_new_tag = link.is_new && featuredLinksEnabled

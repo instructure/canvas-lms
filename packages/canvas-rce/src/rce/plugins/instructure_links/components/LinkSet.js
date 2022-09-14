@@ -107,6 +107,8 @@ class LinkSet extends Component {
                 onClick={this.props.onLinkClick}
                 describedByID={this.describedByID}
                 elementRef={refFor(index, array)}
+                editing={this.props.editing}
+                onEditClick={this.props.onEditClick}
               />
             </List.Item>
           ))}
@@ -168,7 +170,9 @@ LinkSet.propTypes = {
   fetchInitialPage: func,
   fetchNextPage: func,
   suppressRenderEmpty: bool,
-  searchString: string
+  searchString: string,
+  editing: bool,
+  onEditClick: func
 }
 
 export default LinkSet

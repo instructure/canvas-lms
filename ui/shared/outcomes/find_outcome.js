@@ -18,7 +18,7 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import TextHelper from '@canvas/util/TextHelper.coffee'
+import {truncateText} from '@canvas/util/TextHelper'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
 import '@canvas/util/templateData'
@@ -74,7 +74,7 @@ var find_outcome = (function() {
                 outcome.title = outcome.short_description
                 const $text = $('<div/>')
                 $text.text(outcome.short_description)
-                outcome.title = TextHelper.truncateText($.trim($text.text()), {max: 35})
+                outcome.title = truncateText($.trim($text.text()), {max: 35})
                 outcome.display_name = outcome.cached_context_short_name || ''
                 $name.fillTemplateData({data: outcome})
                 $dialog.find('.outcomes_selects').append($name.show())

@@ -19,6 +19,8 @@
 
 module I18nTasks
   class GenerateJs
+    PLURAL_KEYWORDS = %w[zero one two few many other].freeze
+
     attr_reader :index
 
     def initialize(index:)
@@ -41,10 +43,28 @@ module I18nTasks
         end
       end
 
+      pool = pluralize(pool)
       pool.sort.to_h
     end
 
     private
+
+    def pluralize(pool)
+      result = Hash.new { |hash, key| hash[key] = {} }
+
+      pool.each do |key, value|
+        key_components = key.split(".")
+        plural_keyword = key_components.last
+        if PLURAL_KEYWORDS.include? plural_keyword
+          new_key = key_components[0...-1].join(".")
+          result[new_key][plural_keyword] = value
+        else
+          result[key] = value
+        end
+      end
+
+      result
+    end
 
     def core_translations(locale)
       pool = {}

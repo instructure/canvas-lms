@@ -133,30 +133,12 @@ export default class EditCalendarEventView extends Backbone.View {
       })
     })
 
+    this.conferencesKey = 0
+    this.hasConferenceField =
+      this.model.get('web_conference') || this.getActiveConferenceTypes().length > 0
+    this.oldConference = this.model.get('web_conference')
+    this.unsavedFields = {}
     return this.model.on('change:use_section_dates', this.toggleUsingSectionClass)
-  }
-
-  render() {
-    super.render(...arguments)
-    this.$('.date_field').date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
-    })
-    this.$('.time_field').time_field()
-    this.$('.date_start_end_row').each((_unused, row) => {
-      const date = $('.start_date', row).first()
-      const start = $('.start_time', row).first()
-      const end = $('.end_time', row).first()
-      return coupleTimeFields(start, end, date)
-    })
-
-    const $textarea = this.$('textarea')
-    RichContentEditor.loadNewEditor($textarea, {focus: true, manageParent: true})
-
-    _.defer(this.toggleDuplicateOptions)
-    _.defer(this.renderConferenceWidget)
-    _.defer(this.disableDatePickers)
-
-    return this
   }
 
   setConference = conference => {
@@ -179,14 +161,76 @@ export default class EditCalendarEventView extends Backbone.View {
       conferenceNode.closest('fieldset').className = ''
       ReactDOM.render(
         <CalendarConferenceWidget
+          key={this.conferencesKey}
           context={this.model.get('context_code')}
           conference={this.model.get('web_conference')}
           setConference={this.setConference}
           conferenceTypes={activeConferenceTypes}
+          disabled={this.conferencesDisabled}
         />,
         conferenceNode
       )
     }
+  }
+
+  render() {
+    super.render(...arguments)
+    this.$('.date_field').date_field({
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
+    })
+    this.$('.time_field').time_field()
+    this.$('.date_start_end_row').each((_unused, row) => {
+      const date = $('.start_date', row).first()
+      const start = $('.start_time', row).first()
+      const end = $('.end_time', row).first()
+      return coupleTimeFields(start, end, date)
+    })
+
+    const enableOrDisable = selector => {
+      if ($('#calendar_event_blackout_date').is(':checked')) {
+        this.unsavedFields[selector] = $(selector).val()
+        $(selector).val('')
+        $(selector).prop('disabled', true)
+      } else {
+        $(selector).val(this.unsavedFields[selector])
+        $(selector).prop('disabled', false)
+      }
+    }
+
+    const enableOrDisableConferenceField = () => {
+      this.conferencesKey++
+      this.conferencesDisabled = !this.conferencesDisabled
+      if (this.conferencesDisabled) {
+        this.oldConference = this.model.get('web_conference')
+        this.model.set('web_conference', null)
+      } else {
+        this.model.set('web_conference', this.oldConference)
+      }
+      this.renderConferenceWidget()
+    }
+
+    const onBlackoutDateCheckboxChange = () => {
+      enableOrDisable('#more_options_start_time')
+      enableOrDisable('#more_options_end_time')
+      enableOrDisable('#calendar_event_location_name', '#ln_blackout_date_tooltip')
+      enableOrDisable('#calendar_event_location_address')
+      if (this.hasConferenceField) {
+        enableOrDisable('#calendar_event_conference_field')
+        enableOrDisableConferenceField()
+      }
+    }
+    if (this.model.get('blackout_date') === 'true') onBlackoutDateCheckboxChange()
+
+    $('#calendar_event_blackout_date').on('change', onBlackoutDateCheckboxChange)
+
+    const $textarea = this.$('textarea')
+    RichContentEditor.loadNewEditor($textarea, {focus: true, manageParent: true})
+
+    _.defer(this.toggleDuplicateOptions)
+    _.defer(this.renderConferenceWidget)
+    _.defer(this.disableDatePickers)
+
+    return this
   }
 
   toggleDuplicateOptions() {
@@ -315,7 +359,7 @@ export default class EditCalendarEventView extends Backbone.View {
     }
 
     const conference = this.model.get('web_conference')
-    if (conference) {
+    if (conference && !eventData.blackout_date) {
       eventData.web_conference = {
         ...conference,
         title: conference.conference_type === 'LtiConference' ? eventData.title : conference.title,
@@ -374,6 +418,13 @@ export default class EditCalendarEventView extends Backbone.View {
 
   getFormData() {
     let data = this.$el.getFormData()
+    data.blackout_date = this.$el.find('#calendar_event_blackout_date').prop('checked')
+    if (data.blackout_date) {
+      data.start_time = data.start_date
+      data.end_time = data.start_date
+      data.location_name = ''
+      data.location_address = ''
+    }
 
     // pull the true, parsed dates from the inputs to calculate start_at and end_at correctly
     const keys = Object.keys(data).filter(key => /start_date/.test(key))
@@ -391,13 +442,13 @@ export default class EditCalendarEventView extends Backbone.View {
       data = _.omit(data, start_date_key, start_time_key, end_time_key)
 
       let start_at = start_date.toString('yyyy-MM-dd')
-      if (start_time) {
+      if (start_time && !data.blackout_date) {
         start_at += start_time.toString(' HH:mm')
       }
       data[start_at_key] = tz.parse(start_at)
 
       let end_at = start_date.toString('yyyy-MM-dd')
-      if (end_time) {
+      if (end_time && !data.blackout_date) {
         end_at += end_time.toString(' HH:mm')
       }
       return (data[end_at_key] = tz.parse(end_at))
@@ -413,7 +464,6 @@ export default class EditCalendarEventView extends Backbone.View {
     }
 
     data.important_dates = this.$el.find('#calendar_event_important_dates').prop('checked')
-    data.blackout_date = this.$el.find('#calendar_event_blackout_date').prop('checked')
     return data
   }
 

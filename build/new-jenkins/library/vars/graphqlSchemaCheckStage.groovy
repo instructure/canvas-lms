@@ -29,10 +29,12 @@ def call() {
     ./build/new-jenkins/docker-with-flakey-network-protection.sh pull ${configuration.apolloImageName()}
     """
 
+    def localSchemaFilePath = "$WORKSPACE/tmp/${configuration.apolloSchemaPath()}"
+    sh "./build/new-jenkins/wait-for-file.sh ${localSchemaFilePath}"
     // Unfortunately, I don't know of a way to get the Apollo Key into the container without passing it as an env var. Jenkins *should* notice we're
     // string interpolating a secret and omit it from the logs, but it's definitely not ideal.
     def status = sh(returnStatus: true, script: """
-    docker run -t -v $WORKSPACE/${configuration.apolloSchemaPath()}:/usr/src/app/${configuration.apolloSchemaPath()} -e APOLLO_KEY=${APOLLO_KEY}  ${configuration.apolloImageName()} bash -lc "rover subgraph check ${configuration.apolloGraphRef()} --name ${configuration.apolloSubgraphName()} --schema /usr/src/app/${configuration.apolloSchemaPath()}"
+    docker run -t -v ${localSchemaFilePath}:/usr/src/app/${configuration.apolloSchemaPath()} -e APOLLO_KEY=${APOLLO_KEY}  ${configuration.apolloImageName()} bash -lc "rover subgraph check ${configuration.apolloGraphRef()} --name ${configuration.apolloSubgraphName()} --schema /usr/src/app/${configuration.apolloSchemaPath()}"
     """)
 
     if (status != 0) {

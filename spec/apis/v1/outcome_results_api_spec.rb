@@ -652,6 +652,22 @@ describe "Outcome Results API", type: :request do
           expect(alignments[1]["html_url"]).to eq course_rubric_url(outcome_course, outcome_rubric)
         end
       end
+
+      describe "contributing_scores parameter" do
+        it "contributing_scores are included in rollups" do
+          outcome_assessment
+          api_call(:get, outcome_rollups_url(outcome_course, contributing_scores: true),
+                   controller: "outcome_results", action: "rollups", format: "json", course_id: outcome_course.id.to_s, contributing_scores: true)
+          json = JSON.parse(response.body)
+          score_links = json["rollups"][0]["scores"][0]["links"]
+          expect(score_links["outcome"]).to be_present
+          cs = score_links["contributing_scores"][0]
+          expect(cs["association_id"]).to be_present
+          expect(cs["association_type"]).to eq "RubricAssociation"
+          expect(cs["title"]).to eq "User, outcome assignment"
+          expect(cs["score"]).to be_present
+        end
+      end
     end
 
     describe "outcomes" do

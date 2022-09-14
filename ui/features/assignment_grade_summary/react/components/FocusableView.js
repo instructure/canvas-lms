@@ -28,11 +28,6 @@ const SCROLL_OFFSET = 50
 
 const style = {margin: 0, padding: 0}
 
-// The following rules allow for edge cases like this component.
-
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-
 function bindHorizontalHandler(handlers, $el) {
   if ($el) {
     handlers[LEFT] = event => {
@@ -107,6 +102,7 @@ export default class FocusableView extends Component {
 
   render() {
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-tabindex
       <div className="FocusableView" onKeyDown={this.handleKeyDown} style={style} tabIndex="0">
         {this.props.children({
           horizontalScrollRef: this.bindHorizontalScroll,

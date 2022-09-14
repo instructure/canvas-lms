@@ -88,13 +88,10 @@ class GradebookUploadsController < ApplicationController
       gradebook_path: course_gradebook_path(@context),
       bulk_update_path: "/api/v1/courses/#{@context.id}/submissions/update_grades",
       bulk_update_custom_columns_path: api_v1_course_custom_gradebook_column_bulk_data_path(@context),
+      bulk_update_override_scores_path: "/api/v1/courses/#{@context.id}/update_final_grade_overrides",
       create_assignment_path: api_v1_course_assignments_path(@context),
-      new_gradebook_upload_path: new_course_gradebook_upload_path(@context),
-    }.tap do |env|
-      if Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
-        env[:bulk_update_override_scores_path] = "/api/v1/courses/#{@context.id}/update_final_grade_overrides"
-      end
-    end
+      new_gradebook_upload_path: new_course_gradebook_upload_path(@context)
+    }
   end
 
   def gradebook_upload

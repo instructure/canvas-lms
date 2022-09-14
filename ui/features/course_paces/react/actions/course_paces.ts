@@ -202,9 +202,11 @@ const thunkActions = {
       await Api.waitForActionCompletion(() => getState().ui.autoSaving)
 
       return Api.getNewCoursePaceFor(getState().course.id, contextType, contextId)
-        .then(coursePace => {
+        .then(({course_pace: coursePace, progress}) => {
           if (!coursePace) throw new Error(I18n.t('Response body was empty'))
           dispatch(afterAction(coursePace))
+          dispatch(coursePaceActions.setProgress(progress))
+          dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(uiActions.hideLoadingOverlay())
         })
         .catch(error => {

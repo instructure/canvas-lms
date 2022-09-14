@@ -23,23 +23,55 @@ import ImageList from '../../../../instructure_image/Images'
 import {useStoreProps} from '../../../../shared/StoreContext'
 import useDataUrl from '../../../../shared/useDataUrl'
 import {actions} from '../../../reducers/imageSection'
+import {canCompressImage, compressImage, shouldCompressImage} from './compressionUtils'
+import {isAnUnsupportedGifPngImage, MAX_GIF_PNG_SIZE_BYTES} from './utils'
+import {actions as svgActions} from '../../../reducers/svgSettings'
+import formatMessage from '../../../../../../format-message'
 
-const Course = ({dispatch, onLoading, onLoaded}) => {
+const dispatchImage = async (dispatch, onChange, dataUrl, dataBlob) => {
+  let image = dataUrl
+
+  if (isAnUnsupportedGifPngImage(dataBlob)) {
+    dispatch({...actions.CLEAR_IMAGE})
+    return onChange({
+      type: svgActions.SET_ERROR,
+      payload: formatMessage(
+        'GIF/PNG format images larger than {size} KB are not currently supported.',
+        {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
+      )
+    })
+  }
+
+  dispatch({...actions.SET_IMAGE, payload: ''})
+  dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+  if (canCompressImage() && shouldCompressImage(dataBlob)) {
+    try {
+      // If compression fails, use the original one
+      // TODO: We can show the user that compression failed in some way
+      image = await compressImage(dataUrl)
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e)
+    }
+    dispatch({...actions.SET_COMPRESSION_STATUS, payload: true})
+  }
+  dispatch({...actions.SET_IMAGE, payload: image})
+}
+
+const Course = ({dispatch, onChange, onLoading, onLoaded}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
-  const {setUrl, dataUrl, dataLoading} = useDataUrl()
+  const {setUrl, dataUrl, dataLoading, dataBlob} = useDataUrl()
 
   const category = 'uncategorized'
 
   // Handle image selection
   useEffect(() => {
     // Don't clear the current image on re-render
-    if (!dataUrl) return
-
-    dispatch({...actions.SET_IMAGE, payload: dataUrl})
-    dispatch({...actions.SET_CROPPER_OPEN, payload: true})
+    if (!dataUrl || !dataBlob) return
+    dispatchImage(dispatch, onChange, dataUrl, dataBlob)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataUrl])
+  }, [dataUrl, dataBlob])
 
   // Handle loading states
   useEffect(() => {
@@ -86,12 +118,14 @@ const Course = ({dispatch, onLoading, onLoaded}) => {
 
 Course.propTypes = {
   dispatch: PropTypes.func,
+  onChange: PropTypes.func,
   onLoading: PropTypes.func,
   onLoaded: PropTypes.func
 }
 
 Course.defaultProps = {
   dispatch: () => {},
+  onChange: () => {},
   onLoading: () => {},
   onLoaded: () => {}
 }

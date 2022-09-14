@@ -46,7 +46,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key_that_should_not_be_resolved_from_request,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -156,7 +156,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -188,7 +188,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -220,7 +220,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -254,7 +254,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -287,7 +287,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end
@@ -313,7 +313,7 @@ shared_examples_for "advantage services" do
           name: "test tool 2",
           url: "http://www.tool2.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end

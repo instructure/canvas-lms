@@ -28,14 +28,11 @@ import {px} from '@instructure/ui-utils'
 import {ProgressBar} from '@instructure/ui-progress'
 import {Text} from '@instructure/ui-text'
 
-import {
-  RCS_MAX_BODY_SIZE,
-  RCS_REQUEST_SIZE_BUFFER
-} from '@instructure/canvas-rce/src/rce/plugins/shared/Upload/constants'
 import {ACCEPTED_FILE_TYPES} from './acceptedMediaFileTypes'
 import LoadingIndicator from './shared/LoadingIndicator'
 import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 import translationShape from './translationShape'
+import {CC_FILE_MAX_BYTES} from './shared/constants'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
@@ -178,7 +175,7 @@ export default class UploadMedia extends React.Component {
             data.mediaObject.media_object.media_id,
             this.state.subtitles,
             this.props.rcsConfig,
-            RCS_MAX_BODY_SIZE - RCS_REQUEST_SIZE_BUFFER
+            CC_FILE_MAX_BYTES
           )
         }
         this.props.onUploadComplete && this.props.onUploadComplete(null, data, captions?.data)

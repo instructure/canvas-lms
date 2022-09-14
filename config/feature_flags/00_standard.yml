@@ -427,3 +427,8 @@ open_todos_in_new_tab:
   state: allowed_on
   display_name: Open to-do items in a new tab
   description: When enabled, this setting automatically opens teacher to-do items in a new tab.
+scheduled_page_publication:
+  applies_to: RootAccount
+  state: hidden
+  display_name: Scheduled page publication
+  description: Allows course pages to be published on a schedule

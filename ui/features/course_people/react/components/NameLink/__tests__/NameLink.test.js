@@ -16,14 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import NameLink from '../NameLink'
 
+const STUDENT_ENROLLMENT = 'StudentEnrollment'
+const TEACHER_ENROLLMENT = 'TeacherEnrollment'
+
 const DEFAULT_PROPS = {
-  _id: '2',
+  studentId: '2',
   name: 'Test User',
-  htmlUrl: 'http://test.host/courses/1/users/2'
+  htmlUrl: 'http://test.host/courses/1/users/2',
+  enrollments: [{type: TEACHER_ENROLLMENT}]
 }
 
 describe('NameLink', () => {
@@ -33,6 +37,8 @@ describe('NameLink', () => {
 
   beforeEach(() => {
     window.ENV = {
+      STUDENT_CONTEXT_CARDS_ENABLED: true,
+      course: {id: '1'},
       current_user: {id: '999'}
     }
   })
@@ -48,24 +54,10 @@ describe('NameLink', () => {
     expect(name).toBeInTheDocument()
   })
 
-  it('should link the current_user to their user detail page when curent_user id matches the argument _id', () => {
-    window.ENV = {...window.ENV, current_user: {id: '2'}}
+  it('should link to the htmlUrl prop', () => {
     const container = setup(DEFAULT_PROPS)
     const link = container.getByRole('link', {name: DEFAULT_PROPS.name})
     expect(link).toHaveAttribute('href', DEFAULT_PROPS.htmlUrl)
-  })
-
-  it('should not have an href attribute when current_user id does not match argument _id', () => {
-    const container = setup(DEFAULT_PROPS)
-    const button = container.getByRole('button', {name: DEFAULT_PROPS.name})
-    expect(button).not.toHaveAttribute('href')
-  })
-
-  it('should trigger its onClick event when its children are clicked', () => {
-    const mockCall = jest.fn()
-    const container = setup({...DEFAULT_PROPS, onClick: mockCall})
-    fireEvent.click(container.getByRole('button', {name: DEFAULT_PROPS.name}))
-    expect(mockCall).toHaveBeenCalled()
   })
 
   it('should not display the user pronouns element if no pronouns prop is passed', () => {
@@ -81,5 +73,13 @@ describe('NameLink', () => {
       const pronounElement = container.getByTestId('user-pronouns', {name: `(${pronounOption})`})
       expect(pronounElement).toBeInTheDocument()
     })
+  })
+
+  it('should have the necessary attributes for the StudentContextCardTrigger component when the user is a student', () => {
+    const propsWithStudentEnrollment = {...DEFAULT_PROPS, enrollments: [{type: STUDENT_ENROLLMENT}]}
+    const {firstChild} = setup(propsWithStudentEnrollment).container
+    expect(firstChild).toHaveAttribute('class', 'student_context_card_trigger')
+    expect(firstChild).toHaveAttribute('data-student_id', DEFAULT_PROPS.studentId)
+    expect(firstChild).toHaveAttribute('data-course_id', window.ENV.course.id)
   })
 })

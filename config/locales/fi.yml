@@ -502,6 +502,7 @@ fi:
   account_user: 
     types: 
       account_admin: "Tilin pääkäyttäjä"
+  accountname_accountcount_a6e2ba71: "%{accountName} (%{accountCount})"
   accountname_subaccountcount_960a41c: "%{accountName} (%{subaccountCount})"
   accounts: 
     account_name_required: "Tilin nimi ei voi olla tyhjä"
@@ -1654,6 +1655,8 @@ fi:
   add_bank: 
     default_name: "Ei nimeä"
   add_blackout_dates_ui_to_course_pacing_requires_co_1b675701: "Lisää katkospäivämäärien UI kurssin tahditukseen. Vaatii, että course_paces on käytössä."
+  add_calendar_36da563b: "Lisää kalenteriin"
+  add_calendars_13c82791: "Lisää kalentereihin"
   add_calendars_to_view_your_institution_s_important_df1e42d3: "Lisää kalentereita tarkastellaksesi laitoksesi tärkeitä päivämääriä, kuten luokkien ensimmäinen päivä, koejaksot, jne."
   add_cc_subtitle_a9ef4a66: "Lisää tekstitys"
   add_collaboration_da9665ac: "Lisää yhteistyö"
@@ -1837,6 +1840,7 @@ fi:
   admin_tour_36d89fbb: Järjestelmäkäyttäjäkierros
   admin_tray_3b680e7b: "Järjestelmävalvojan tietopaneeli"
   admin_user_name_29dd115a: admin_user_name
+  administrative_links_816228e2: "Hallinnolliset linkit"
   administrator_f325c186: Pääkäyttäjä
   administrators_and_author_only_flagged_as_possible_42345cba: "Vain pääkäyttäjä ja tekijä (merkitty mahdolliseksi roskapostiksi)"
   administrators_and_author_only_marked_as_spam_184becce: "Vain pääkäyttäjät ja tekijä (merkitty mahdolliseksi roskapostiksi)"
@@ -2060,6 +2064,7 @@ fi:
       Sallii pääkäyttäjien tarkastelevan lokia, joka sisältää tiedot kaikista viime aikoina suoritetuista
       GraphQL-muutoksista.
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Sallii osaamistulosten liittämisen ei-pisteytettävään sisältöön"
+  allows_course_pages_to_be_published_on_a_schedule_7e12fd52: "Sallii kurssisivujen julkaisemisen aikataulussa"
   allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Sallii kurssin opiskelijaryhmien luonnin csv-latauksen perusteella"
   allows_for_discussion_replies_to_be_sorted_accordi_1065cccc: |-
       Sallii keskustelun vastauksien lajittelun
@@ -2795,6 +2800,7 @@ fi:
   an_error_occurred_while_removing_count_outcomes_er_d30466ce: 
     one: "Ilmeni virhe poistettaessa tulosta: %{errorMessage}."
     other: "Ilmeni virhe poistettaessa %{count} tulosta: %{errorMessage}."
+  an_error_occurred_while_removing_the_calendar_f15bc9a6: "Ilmeni virhe poistettaessa kalenteria"
   an_error_occurred_while_removing_the_outcome_e47c9553: "Ilmeni virhe poistettaessa tulosta."
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Ilmeni virhe poistettaessa tulosta: %{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
@@ -4033,6 +4039,8 @@ fi:
   attempts_allowed_8441aadf: "Sallittuja yrityksiä"
   attendance_ca433183: Osallistuminen
   attendees_eb402bac: Osallistujat
+  attendees_failed_to_sync_725c8137: " Osallistujien synkronisointi ei onnistunut"
+  attendees_synced_ee5edd00: " Osallistujat synkronoitu!"
   attention_aaca1f1d: Huomio!
   attribute_d9f3af72: Määrite
   attributes_locked_1a1a0f46: "%{attributes} lukittu"
@@ -4525,6 +4533,7 @@ fi:
   by_default_students_can_always_create_groups_in_a__dac761d3: "Opiskelijat voivat aina oletuksena luoda ryhmiä kurssilla. Rajoittaaksesi opiskelijoita luomasta ryhmiä, Kurssit - hallitse/päivitä täytyy olla käytössä ja Anna opiskelijoiden organisoida omat ryhmänsä -valintaruutu kurssiasetuksissa täytyy olla valitsematta."
   by_lti_2_registration_url_e421e523: "LTI 2:n rekisteröinti-URL:n avulla"
   by_url_a163275e: "URL:n mukaan"
+  c4e_analytics_66e0fc46: C4E-analyysi
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Välimuistin tyhjennys onnistui"
   calculated_by_4ac40468: "Laskija: "
@@ -4862,6 +4871,7 @@ fi:
     ics_description_user: "Käyttäjän kalenteritapahtumat, %{user_name}"
     ics_title: "%{course_or_group_name} Kalenteri (Canvas)"
     invalid_date_or_time: "Virheellinen päivämäärä tai virheellinen päivämäärä ja aika kohteelle %{attr}"
+  calendar_removed_1c841af4: "Kalenterit lisätty onnistuneesti"
   calendar_series_e1b7a4bc: Kalenterisarjat
   calendars: 
     event: 
@@ -4881,6 +4891,7 @@ fi:
       skip_to_calendar: "Siirry kalenteriin"
       undated_items: Päiväämättömät
   calendars_a756c286: Kalenterit
+  calendars_added_successfully_2e443b3: "Kalentereiden tallennus onnistui"
   calendars_saved_successfully_bcba8359: "Kalentereiden tallennus onnistui"
   calendars_toggle_list_visibility_488db143: "Kalenterit vaihtavat luettelon näkyvyyttä"
   campbell_union_high_school_district_grade_report_7f3bb801: "Campbell Union korkeakoulualueen arvosanaraportti"
@@ -5160,6 +5171,7 @@ fi:
   check_to_add_a_user_for_loginid_6cd25597: "Ruksaa valintaruutu lisätäksesi käyttäjä kohteeseen %{loginid}"
   check_to_select_all_98e484f1: "Valitse kaikki ruksaamalla valintaruutu"
   check_to_skip_adding_a_user_for_loginid_5fa643da: "Ruksaa valintaruutu ohittaaksesi käyttäjän lisääminen kohteeseen %{loginid}"
+  check_your_spelling_or_try_fewer_letters_70769a90: "Tarkista oikeinkirjoituksesi tai yritä vähentää kirjaimia."
   checkbox_examples_dc790142: "Tarkistusruudun esimerkit"
   checked_883b93fd: tarkastettu
   cheerful_panda_holding_a_map_17ba47ee: "Iloinen panda kartan kanssa"
@@ -5179,6 +5191,7 @@ fi:
   choose_a_file_to_upload_from_your_device_d1b50d4c: "Valitse laitteeltasi ladattava tiedosto"
   choose_a_quiz_engine_8820d521: "Valitse testien laatimisen työkalu"
   choose_a_submission_type_8f45651a: "Valitse lähetystyyppi"
+  choose_additional_calendars_to_add_to_your_canvas__fdd2a72a: "Valitse enemmän kalentereita lisättäväksi Canvas-kalenteriin."
   choose_an_authentication_service_47dc8875: "Valitse todennuspalvelu"
   choose_and_publish_980812cb: "Valitse ja julkaise"
   choose_assignment_b0132c5e: "-- Valitse tehtävä --"
@@ -5202,6 +5215,7 @@ fi:
     other: "Valitse enintään  %{count} aihe kalenteriin"
   choose_usage_rights_33683854: "Valitse käyttöoikeudet..."
   choose_which_calendars_are_visible_in_the_other_ca_30fae128: "Valitse, mitkä kalenterit näkyvät Canvas-kalenterin muiden kalentereiden osassa Alitilin kalenterit ovat näkyvissä käyttäjille, jos he littyvät tiliin. Oletuksena kalenterit on piilotettu."
+  choose_which_calendars_your_users_can_add_in_the_o_b73bbb17: "Valitse, mitä kalentereita käyttäjät voivat lisätä Canvas-kalenterin muiden kalentereiden osassa. Käyttäjät voivat lisätä kalentereita vain tileille, joihin he ovat liitoksissa. Kalenterit on oletuksena poistettu käytöstä."
   choose_your_default_skin_tone_f09bf0bd: "Valitse oletusihonsävysi."
   chosencolor_is_not_a_valid_color_5d542cc: "'’%{chosenColor}' ei ole kelvollinen väri."
   chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' ei ole kelvollinen väri. Syötä voimassa oleva heksakoodi ennen tallennusta."
@@ -5709,6 +5723,7 @@ fi:
   conference_name_fdb7e091: "Konferenssin nimi"
   conference_participant_count_87e86c5c: "konferenssin osallistujamäärä"
   conference_recorded_7e776ec2: "nauhoitettu konferenssi"
+  conference_saved_8895cfbc: "Konferenssi tallennettu!"
   conference_selection_ea4050bb: "Konferenssin valinta"
   conference_type_2f4ac9be: "Konferenssin tyyppi"
   conference_type_7bd581e: "konferenssin tyyppi"
@@ -5765,6 +5780,7 @@ fi:
       recordings: "%{recordingCount} nauhoitusta"
       settings: Asetukset
       start: Käynnistä
+      sync: "Synkronisoi osallistujat"
       type: "%{type}"
     no_concluded_conferences: "Ei päättyneitä verkkotapaamisia"
     no_new_conferences: "Ei uusia verkkotapaamisia."
@@ -6576,6 +6592,10 @@ fi:
   couldn_t_update_standards_for_authority_auth_81206187: "Standardin päivitys valtuutukselle %{auth} ei onnistunut"
   count_40eced3b: Määrä
   count_account_calendars_selected_578d6db8: 
+    one: "1 tilin kalenteri valittu"
+    other: "%{count} Tilin kalenterit valittu"
+    zero: "Tilin kalentereita ei ole valittu"
+  count_account_calendars_selected_acbd588: 
     one: "1 tilin kalenteri valittu"
     other: "%{count} Tilin kalenterit valittu"
     zero: "Tilin kalentereita ei ole valittu"
@@ -8042,6 +8062,7 @@ fi:
   date_modified_4d065406: ", muokkauspäivä: "
   date_modified_e1c8ac8f: Muokkauspäivä
   date_modified_modifiedat_b839cc8b: "muokkauspäivä: %{modifiedAt}"
+  date_must_be_after_date_available_b4fbd204: "Päivämäärä täytyy olla käytettävissä olevan päivämäärän jälkeen"
   date_of_most_recent_bounce_b23d0119: "Viimeisimmän toimittamattoman viestin palautuksen päivämäärä"
   date_required_a74e077c: "Tarvitaan päivänä"
   date_time_options_7abcdea7: "Pvm/ajan asetukset"
@@ -9160,6 +9181,7 @@ fi:
   enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Mahdollistaa Microsoft Immerse Reader -painikkeen käytöb Canvasin tuetuilla alueilla. Painike saattaa olla yhä käytössä kurssilla siitä huolimatta, että tilin pääkäyttäjän asetukset on kytketty pois päältä kaikille käyttäjille."
   enables_ui_features_for_managing_extended_submissi_841f45bc: "Ottaa käyttöön käyttöliittymän ominaisuudet \"laajennettujen\" lähetysten hallintaan."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Elementary-teeman ottaminen käyttöön vaihtaa fonttia Canvas-liittymässä ja yksinkertaistaa kurssin navigoingivalikkoa kaikille kurssisi käyttäjille."
+  enabling_this_option_automatically_moves_course_pa_15f755b3: "Tämän vaihtoehdon ottaminen käyttöön siirtää automaattisesti kurssin tahdituksen tehtävän määräpäivät päättymispäivän jälkeen. Syöttö ajalle, paikalle ja kalenterille poistetaan käytöstä."
   enabling_this_option_automatically_moves_course_pa_6ded6d4d: "Tämän vaihtoehdon ottaminen käyttöön siirtää automaattisesti kurssin tahdituksen tehtävän määräpäivät päättymispäivän jälkeen."
   encourage_class_participation_4e069479: "Kannusta osallistumaan luokkaan"
   encourage_student_discourse_7836b9f7: "Rohkaise opiskelijan keskustelua"
@@ -9168,6 +9190,7 @@ fi:
   end_course_set_up_tutorial_f358b85d: "Sulje kurssin määritysten ohje"
   end_date_cannot_be_before_start_date_eb62ed6d: "Päättymispäivä ei voi olla ennen alkamispäivää."
   end_date_e0093ed7: Päättymispäivä
+  end_date_for_conference_eaff0807: "Konferenssin päättymispäivä"
   end_date_from_cdd9d90: "Päättymispäivä lähtien:"
   end_date_to_8b17929d: "Päättymispäivä asti:"
   end_date_value_3d3e8906: "Päättymispäivämäärä %{value}"
@@ -10025,6 +10048,7 @@ fi:
   failed_to_update_domain_lookup_b2437cf7: "Verkkotunnuksen haun päivitys epäonnistui"
   failed_to_update_internal_setting_ab3d0a4a: "Sisäisten asetusten päivitys epäonnistui"
   failed_to_update_permission_33c493f: "Käyttöoikeuden päivittäminen epäonnistui"
+  failed_to_update_publication_date_83c5b171: "Julkaisupäivämäärän päivitys epäonnistui"
   failed_to_update_role_name_8c7b0119: "Roolin nimen päivitys epäonnistui"
   failed_to_update_strand_8d1c82d: "Säikeen päivittäminen epäonnistui"
   failed_to_validate_cas_ticket_error_31aa4c63: "CAS-palvelupyynnön vahvistus epäonnistui: %{error}"
@@ -10974,6 +10998,7 @@ fi:
   grading_period_set_for_account_name_b9823b2a: "Arvosanojen jakson määritys %{account_name}"
   grading_period_set_id_f2377529: "arvosanojen antojaksojen joukon tunnus"
   grading_period_set_title_880a6ec4: "Arvosanojen antojakson joukon otsikko"
+  grading_period_sets_fb608834: "Arvosanojen antojakson määritykset"
   grading_period_title_23b7f8ac: "Arvosanojen antojakson otsikko"
   grading_period_weight_99b66906: "Arvosanojen antojakson painoarvo"
   grading_period_weights_aaea757f: "Arvosanojen antojakson painoarvot"
@@ -11574,6 +11599,7 @@ fi:
   history_cd3f60a9: Historia
   history_settings_c63dbaaf: Historia-asetukset
   hmm_we_can_t_find_any_matching_calendars_25983a51: "Hmm, täsmääviä kalentereita ei löytynyt."
+  hmm_we_can_t_find_any_matching_calendars_6ac53981: "Hmm, täsmääviä kalentereita ei löytynyt."
   hold_fb369624: "aseta pitoon"
   home_351838cd: Aloitussivu
   home_page_is_not_valid_2e8a25ae: "Aloitussivu on virheellinen"
@@ -11854,6 +11880,7 @@ fi:
       Jos sisältöeditorin laajennukset on myös otettu käyttöön,
       editori tallentaa tekemäsi muutokset automaattisesti.
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Jos määritetty, lähetystila om mahdollista vaihtaa Speedgraderin sisällä"
+  if_set_displays_originality_reports_with_assignmen_c5d0276f: "Jos tämä on määritetty, esiin tulevat alkuperäisyysraportit, joissa tehtävien tehostus on päällä"
   if_set_displays_updated_mastery_connect_icon_b6a93002: "Jos määritetty, näyttää päivitetyn hallinnan kytkemiskuvakkeen"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Jos se on määritetty, se poistaa viiveen, joka tapahtuu tavallisesti, kun haetaan opiskelijoita."
   if_set_removes_the_missing_status_from_submissions_43fba750: "Jos tämä on määritetty, puuttuva tila poistetaan palautuksista arvosanan annon yhteydessä."
@@ -12333,6 +12360,7 @@ fi:
   integration_id_integration_id_is_already_in_use_bd1bbb09: "Integraation tunnus \"%{integration_id}\" on jo käytössä"
   integrations_cadb03f3: Integraatiot
   interactions_report_47c1219e: Vuorovaikutusraportti
+  internal_analytics_f02b3fff: "Sisäinen analyysi"
   internal_setting_created_f3f72416: "Sisäiset asetukset luotu"
   internal_setting_deleted_aaf1dd9d: "Sisäiset asetukset poistettu"
   internal_setting_updated_87510559: "Sisäiset asetukset päivitetty"
@@ -13301,6 +13329,7 @@ fi:
   manage_groups_4c3a2a9f: "Hallitse ryhmiä"
   manage_home_4fc3480b: "Hallitse etusivua"
   manage_home_for_coursename_5e5c7661: "Hallitse kohteen %{courseName} etusivua"
+  manage_internal_analytics_fcfa306e: "Hallitse sisäistä analyysia"
   manage_item_name_6118d4b0: "Hallitse %{item_name}"
   manage_line_items_244b289f: "Hallitse rivikohtia"
   manage_lti_8fcdc6ba: "Hallitse LTI:tä"
@@ -15691,6 +15720,7 @@ fi:
   new_slack_api_key_453d04d: "Uusi Slack API -avain"
   new_student_group_description_bfeb76aa: "Uusi opiskelijaryhmän kuvaus"
   new_student_group_e31b7cb5: "Uusi opiskelijaryhmä"
+  new_tab_ab7629d2: "Uusi välilehti"
   new_topic_for_course_3d98222a: "Uusi aihe kohteelle %{course}"
   new_user_s_name_909b6267: "Uuden käyttäjän nimi"
   new_user_tutorial_cdd3a446: "Uuden käyttäjän ohje"
@@ -16453,6 +16483,7 @@ fi:
     ? "true"
     : Kyllä
   options_3ab0ea65: Asetukset
+  options_for_name_bfa30aa0: "Asetukset kohteelle %{name}"
   options_for_title_label_17f821ff: "Asetukset kohteelle %{title_label}"
   or_9b70ccaa: Tai
   or_choose_files_b795006d: "tai valitse tiedostot"
@@ -16483,6 +16514,7 @@ fi:
   original_job_id_d81afbb3: "Alkuperäisen työn tunnus"
   originality_report_5d461681: Alkuperäisyysraportti
   originality_reports_1e36b935: Alkuperäisyysraportit
+  originality_reports_with_assignment_enhancements_9b2870ff: "Alkuperäisyysraportit tehtävän tehostuksille"
   other_1c6d9c79: Muu
   other_calendars_toggle_list_visibility_bd7fb67a: "Muu kalentereiden vaihtoluettelon näkyvyys"
   other_carrier_45531207: "Muu operaattori"
@@ -16965,6 +16997,7 @@ fi:
   please_log_in_to_view_this_content_eec6cd0: "Kirjaudu sisään tarkastellaksesi tätä sisältöä"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Varmista, että kukaan ei pysty sieppaamaan kuvaa näytölläsi ympäristöstäsi tai näytön jaksopalvelusta."
   please_note_fbb62e4c: "Huomaa seuraavaa:"
+  please_note_instructure_hosts_canvas_commons_in_th_53d03739: "Huomaa seuraavaa: Instructure isännöi Canvas Commons -sovellusta USA:ssa Tämän tarkoittaa, että kun käytät Canvas COmmons -sovellusta, henkilökohtaiset tietosi tallennetaan ja käsitellään USA:ssa. Näitä henkilökohtaisia tietoja ovat nimi, sähköpostiosoite, Canvas-käyttäjätunnus, Canvas-sisäänkirjautumisnimi, Canvas-avatar, IP-osoite, suosikeiksi merkitsemäsi Canvas Commons -resurssit ja kommentit, jotka teit joihinkin Canvas Commons -sovelluksen resursseihin. Lisätietoja Instructuren tietosuojakäytännöistä löytyy [täältä](%{url})."
   please_provide_a_field_e5a7d0b3: "Kirjoita %{field}"
   please_provide_a_pairing_code_530d1e9d: "Anna parinmuodotuskoodi."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Anna kelvollinen vuokralaisen verkkotunnus. Löydät sen Azure aktiivisesta hakemistosta."
@@ -17980,9 +18013,11 @@ fi:
   public_jwk_url_b5564c1d: "Julkisen JWK:n URL"
   public_message_students: 
     send_message: "Lähetä viesti"
+  publication_options_cbbfc20e: Julkaisuasetukset
   publish_5211dca3: Julkaise
   publish_aa888e3c: "Julkaise:"
   publish_announcement_fec6d7e2: "Julkaise ilmoitus"
+  publish_at_3fd340d1: Julkaise
   publish_btn_module: 
     buttons: 
       publish: Julkaise
@@ -20023,6 +20058,7 @@ fi:
   save_and_publish_1b765e7: "Tallenna ja julkaise"
   save_changes_698abe77: "Tallenna muutokset"
   save_customizations_dde779d8: "Tallenna mukautukset"
+  save_failed_463cb2a8: "Tallennus epäonnistui."
   save_grading_period_daaaddea: "Tallenna arvosanojen antojakso"
   save_grading_period_set_e029fa88: "Tallenna arvosanojen antojakson joukko"
   save_key_b4dede06: "Tallenna avain"
@@ -20063,6 +20099,8 @@ fi:
   schedule_e5dd4c32: Aikataulu
   schedule_student_availability_332154a: "Aikatauluta opiskelijan saatavissa olo"
   scheduled_date_5b0aedb6: "Ajoitettu päivämäärä"
+  scheduled_for_publication_c8d3e9a2: "Aikataulutettu julkaisua varten"
+  scheduled_page_publication_ae911741: "Aikataulutettu sivun julkaisu"
   scheduler_65b5ac91: Aikatauluttaja
   scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "Canvasin pääkäyttäjän täytyy aktivoida aikatauluttaja käyttöön."
   scheduler_must_be_enabled_for_your_account_e6e53972: "Aikatauluttaja täytyy ottaa käyttöön tilitasolla."
@@ -20621,6 +20659,7 @@ fi:
   set_name_d14182d7: "Joukon nimi..."
   set_name_f83b658: "Joukon nimi"
   set_of_grading_periods_545b37e9: "Arvosanojen antojaksojen joukko"
+  set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: "Aseta määräpäivä kurssin tahdituksessa tehtävän luonnin jälkeen."
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Määritä pääasteikko käytettäväksi kaikille tämän tilin kursseille."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Määritä, kuinka osaamisen luokitukset näkyvät osaamisen hallinnan arvosanakirjassa.\n\
@@ -21657,6 +21696,7 @@ fi:
   start_auto_refresh_e2feafb2: "Aloita automaattinen päivitys"
   start_date_e937be8a: Alkamispäivä
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
+  start_date_for_conference_1936e809: "Konferenssin aloituspäivä"
   start_date_from_20503757: "Aloituspäivämäärä alk.:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} kohteeseen %{end_time}"
   start_date_to_1e6e6bbe: "Aloituspäivämäärä asti:"
@@ -22936,6 +22976,8 @@ fi:
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: "Tämä kurssi käyttää kurssin tahdistinta. Siirry kurssin tahdistukseen hallitaksesi määräpäiviä."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Tämä kurssi on näkyvissä vain opettajille, kunnes se on julkaistu."
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Tämä kriteeri on linkitetty osaamistulokseen"
+  this_due_date_is_managed_by_cfbb698c: "Tätä määräpäivää hallitsee"
+  this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Tätä päivämäärä hallitsee kurssin tahditus."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Tämä elementti on paremmin saavutettavissa oleva vaihtoehto vedä- ja pudota uuteen järjestykseen -tehtävälle. Siirrä tätä kysymystä painamalla Enter tai Välilyönti."
   this_email_address_is_unconfirmed_f0fc8c6e: "Tätä sähköpostiosoitetta ei ole vahvistettu"
   this_enables_users_to_generate_and_download_course_4c69c531: "Tämä mahdollistaa käyttäjien luovan ja lataavan kurssin ePubin."
@@ -23189,6 +23231,7 @@ fi:
   this_user_has_been_deleted_77e6c04b: "Tämä käyttäjä on poistettu"
   this_user_has_been_deleted_8caa45be: "Tämä käyttäjä on poistettu."
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "Tällä käyttäjällä on kurssilla useita rooleja. Hänen roolinsa vaihtaminen täällä korvaa kaikki hänen nykyiset ilmoittautumisensa."
+  this_user_has_not_yet_accepted_the_invitation_to_t_7aef5391: "Tämä käyttäjä ei ole vielä hyväksynyt kutsua kurssille"
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Tällä käyttäjällä ei ole tällä hetkellä pääsyä kurssille"
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "Tämä käyttäjä ei parhaillaan pysty käyttämään tätä kurssia"
   this_user_will_be_created_in_3b2a2b52: "Tämä käyttäjä luodaan kohdassa:"
@@ -23707,6 +23750,7 @@ fi:
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "Jos haluat muokata kurssin SIS-tunnusta, Kurssit - hallitse/päivitä ja SIS-tiedot - hallitse täytyy olla myös käytössä."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "Muokataksesi kurssin SIS ID:ta, hallitse kursseja: Pääkäyttäjä - hallitse/päivitä ja SIS Data - hallitse täytyy myös olla käytössä."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "Jos haluat muokata SIS-tunnusta, SIS-tiedot - hallitse -valinnan täytyy olla myös käytössä."
+  to_edit_the_due_date_go_to_course_pacing_change_th_bae45346: "Voit muokata määräpäivää siirtymällä Kurssin tahditukseen, vaihtamalla tähän tehtävään kohdistettujen päivien määrää ja julkaisemalla päivitetty tahditus."
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       Jos haluat muokata käyttäjätietoja, muokata kirjautumistietoja tai vaihtaa käyttäjän salasanoja, Käyttäjät - hallitse kirjautumistietoja täytyy olla myös käytössä.
       Jos haluat tarkastella sivun tarkasteluja, Tilastot - tarkastele täytyy olla myös käytössä.
@@ -24463,6 +24507,7 @@ fi:
   updates_to_oauth_2_0_flow_to_stop_redirecting_in_t_51c14b07: "Päivitykset OAuth 2.0 virtaukseen pysäyttämällä uudelleenohjaus merkin todennuksessa"
   updating_6edbab78: Päivitetään
   updating_discussion_failed_aadb2d35: "Keskustelun päivittäminen epäonnistui"
+  updating_publication_date_62cc1622: "Julkaisupäivää päivitetään"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Kun luettelon URL-osoite päivitetään, käyttäjät menettävät välittömästi entisen URL-osoitetteen käyttöoikeuden Jos on konfiguroitu olemassa oleva maksunkäsittelijä, muutokset vaativat luettelon insinöörin apua."
   upload_8b403d05: Lataa
   upload_a_file_228b8cf9: "Lataa tiedosto"
@@ -25489,6 +25534,7 @@ fi:
         zero: "Ei löytynyt %{model}"
     page_gap: "&hellip;"
     previous_label: "&#8592; Edellinen"
+  will_publish_on_publish_date_8b42e1ec: "Julkaistaan %{publish_date}"
   wimba_conference: 
     external_urls: 
       archive: Arkisto

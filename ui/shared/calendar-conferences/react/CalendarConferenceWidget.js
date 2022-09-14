@@ -29,7 +29,13 @@ import webConferenceType from './proptypes/webConferenceType'
 
 const I18n = useI18nScope('conferences')
 
-const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConference}) => {
+const CalendarConferenceWidget = ({
+  context,
+  conference,
+  conferenceTypes,
+  setConference,
+  disabled
+}) => {
   const addConferenceRef = useRef(null)
   const removeConferenceRef = useRef(null)
   const currentConferenceType = conference && getConferenceType(conferenceTypes, conference)
@@ -60,6 +66,7 @@ const CalendarConferenceWidget = ({context, conference, conferenceTypes, setConf
           currentConferenceType={currentConferenceType}
           conferenceTypes={conferenceTypes}
           setConference={setConferenceWithAlert}
+          disabled={disabled}
         />
       )}
       {conference && (
@@ -88,12 +95,14 @@ CalendarConferenceWidget.propTypes = {
   context: PropTypes.string.isRequired,
   conference: webConference,
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
-  setConference: PropTypes.func
+  setConference: PropTypes.func,
+  disabled: PropTypes.bool
 }
 
 CalendarConferenceWidget.defaultProps = {
   conference: null,
-  setConference: null
+  setConference: null,
+  disabled: false
 }
 
 export default CalendarConferenceWidget

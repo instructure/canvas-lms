@@ -22,7 +22,7 @@ describe Loaders::OutcomeAlignmentLoader do
   before :once do
     course_model
     outcome_with_rubric
-    # create assignment, discussion assignment and quiz assignment
+    assessment_question_bank_with_questions
     @quiz_item = assignment_quiz([], course: @course, title: "quiz item")
     @quiz_assignment = @assignment
     @assignment = @course.assignments.create!(title: "regular assignment")
@@ -32,16 +32,15 @@ describe Loaders::OutcomeAlignmentLoader do
       title: "discussion item",
       assignment: @discussion_assignment
     )
-    # create modules and assignments
     @module1 = @course.context_modules.create!(name: "module1")
     @module2 = @course.context_modules.create!(name: "module2", workflow_state: "unpublished")
     @tag1 = @module1.add_item type: "assignment", id: @assignment.id
     @module1.add_item type: "discussion_topic", id: @discussion_item.id
     @module2.add_item type: "quiz", id: @quiz_item.id
-    # align rubric with different assignment types
     @rubric.associate_with(@assignment, @course, purpose: "grading")
     @rubric.associate_with(@discussion_assignment, @course, purpose: "grading")
     @rubric.associate_with(@quiz_assignment, @course, purpose: "grading")
+    @outcome.align(@bank, @bank.context)
 
     @course.account.enable_feature!(:outcome_alignment_summary)
   end
@@ -84,7 +83,7 @@ describe Loaders::OutcomeAlignmentLoader do
         @course.id, "Course"
       ).load(@outcome).then do |alignments|
         expect(alignments.is_a?(Array)).to be_truthy
-        expect(alignments.length).to eq 4
+        expect(alignments.length).to eq 5
       end
     end
   end
@@ -113,10 +112,14 @@ describe Loaders::OutcomeAlignmentLoader do
               module_workflow_state = "unpublished"
               title = @quiz_item.title
             end
-          else
+          elsif alignment.content_type == "Rubric"
             content_id = @rubric.id
             content_type = "Rubric"
             title = @rubric.title
+          elsif alignment.content_type == "AssessmentQuestionBank"
+            content_id = @bank.id
+            content_type = "AssessmentQuestionBank"
+            title = @bank.title
           end
 
           expect(alignment.id).not_to be_nil

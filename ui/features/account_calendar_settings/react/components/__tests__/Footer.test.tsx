@@ -64,7 +64,7 @@ describe('Footer', () => {
 
   it('displays the number of calendars selected', async () => {
     const {findByText} = render(<Footer {...defaultProps} />)
-    expect(await findByText('28 Account Calendars selected')).toBeInTheDocument()
+    expect(await findByText('28 Account calendars selected')).toBeInTheDocument()
   })
 
   it('displays an error if the count fails to fetch', async () => {

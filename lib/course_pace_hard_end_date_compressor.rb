@@ -35,7 +35,8 @@ class CoursePaceHardEndDateCompressor
     return items if items.empty?
 
     blackout_dates = course_pace.course.blackout_dates
-    start_date_of_item_group = start_date || enrollment&.start_at || course_pace.start_date
+    enrollment_start_date = enrollment&.start_at || [enrollment&.effective_start_at, enrollment&.created_at].compact.max
+    start_date_of_item_group = start_date || enrollment_start_date&.to_date || course_pace.start_date.to_date
     end_date = course_pace.end_date || course_pace.course.end_at&.to_date || course_pace.course.enrollment_term&.end_at&.to_date
 
     unless CoursePacesDateHelpers.day_is_enabled?(start_date_of_item_group, course_pace.exclude_weekends, blackout_dates)

@@ -22,7 +22,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import {Badge} from '@instructure/ui-badge'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Focusable, FocusableView} from '@instructure/ui-focusable'
+import {Focusable} from '@instructure/ui-focusable'
 
 import {Tooltip} from '@instructure/ui-tooltip'
 
@@ -99,7 +99,7 @@ export default class AuditEvent extends PureComponent {
           {iconView}
         </Flex.Item>
 
-        <Flex.Item as="div" grow margin="none none none x-small" shrink>
+        <Flex.Item as="div" showGrow={true} shouldShrink={true} margin="none none none x-small">
           <Text as="div" weight="bold">
             <TruncateText maxLines={2}>{label}</TruncateText>
           </Text>

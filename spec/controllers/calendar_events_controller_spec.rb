@@ -194,15 +194,6 @@ describe CalendarEventsController do
       assert_unauthorized
     end
 
-    include_examples "accepts web_conference" do
-      let(:make_request) do
-        lambda do |params|
-          get "edit", params: { course_id: @course.id, id: @event.id, web_conference: params }
-        end
-      end
-      let(:get_event) { -> { @event.reload } }
-    end
-
     it "allows editing of event assigned to section" do
       course_with_teacher(active_all: true)
       section = add_section("Section 01", course: @course)
@@ -211,28 +202,6 @@ describe CalendarEventsController do
       get "edit", params: { course_id: @course.id, id: section_event.id }
       assert_status(200)
     end
-
-    # context "with web conferences" do
-    #   it "can update with a new conference" do
-    #     user_session(@teacher)
-    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: conference_params}
-    #     expect(response).to be_successful
-    #     expect(@event.reload.web_conference_id).not_to be nil
-    #   end
-
-    #   it "can update with an existing conference" do
-    #     user_session(@teacher)
-    #     conference = @course.web_conferences.create!(conference_params)
-    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: {id: conference.id, **conference_params}}
-    #     expect(@event.reload.web_conference_id).to eq conference.id
-    #   end
-
-    #   it "cannot create with an existing conference the user doesn't have permission for" do
-    #     user_session(@teacher)
-    #     get 'edit', params: {course_id: @course.id, id: @event.id, web_conference: {id: other_teacher_conference.id}}
-    #     assert_unauthorized
-    #   end
-    # end
   end
 
   describe "PUT 'update'" do

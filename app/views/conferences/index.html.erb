@@ -26,6 +26,7 @@
 
 <div id="big-blue-button-message-container"></div>
 <div id="conference-alternatives-container"></div>
+<div id="react-conference-modal-container"></div>
 
 <% unless @render_alternatives %>
   <% if can_do(WebConference.new(:context => @context), @current_user, :create) %>

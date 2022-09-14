@@ -196,20 +196,44 @@ Rails.configuration.after_initialize do
     )
   end
 
-  Delayed::Periodic.cron "Auditors::ActiveRecord::Partitioner", "0 0 * * *" do
+  # Partitioner jobs
+  # process and/or create once a day at midnight
+  # prune every Saturday, but only after the first Thursday of the month
+  Delayed::Periodic.cron "Auditors::ActiveRecord::Partitioner.process", "0 0 * * *" do
     with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process, jitter: 30.minutes, local_offset: true)
+  end
+
+  Delayed::Periodic.cron "Auditors::ActiveRecord::Partitioner.process(prune: true)", "0 0 * * 6" do
+    if Time.now.day >= 3
+      with_each_shard_by_database(Auditors::ActiveRecord::Partitioner,
+                                  :process, prune: true, jitter: 30.minutes, local_offset: true)
+    end
   end
 
   Delayed::Periodic.cron "Quizzes::QuizSubmissionEventPartitioner.process", "0 0 * * *" do
     with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
-  Delayed::Periodic.cron "SimplyVersioned::Partitioner.process", "0 0 * * *" do
-    with_each_shard_by_database(SimplyVersioned::Partitioner, :process, jitter: 30.minutes, local_offset: true)
+  Delayed::Periodic.cron "Quizzes::QuizSubmissionEventPartitioner.process(prune: true)", "0 0 * * 6" do
+    if Time.now.day >= 3
+      with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner,
+                                  :process, prune: true, jitter: 30.minutes, local_offset: true)
+    end
   end
 
   Delayed::Periodic.cron "Messages::Partitioner.process", "0 0 * * *" do
     with_each_shard_by_database(Messages::Partitioner, :process, jitter: 30.minutes, local_offset: true)
+  end
+
+  Delayed::Periodic.cron "Messages::Partitioner.process(prune: true)", "0 0 * * 6" do
+    if Time.now.day >= 3
+      with_each_shard_by_database(Messages::Partitioner,
+                                  :process, prune: true, jitter: 30.minutes, local_offset: true)
+    end
+  end
+
+  Delayed::Periodic.cron "SimplyVersioned::Partitioner.process", "0 0 * * *" do
+    with_each_shard_by_database(SimplyVersioned::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   if AuthenticationProvider::SAML.enabled?

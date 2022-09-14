@@ -56,6 +56,7 @@ window.ENV.conference_type_details = [
     contexts: null
   }
 ]
+window.ENV.bbb_recording_enabled = true
 
 const Template = args => <VideoConferenceModal {...args} />
 

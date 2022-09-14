@@ -196,6 +196,15 @@ describe('contentInsertion', () => {
       )
     })
 
+    it('includes attributes for course link when supplied', () => {
+      link['data-published'] = true
+      link['data-course-type'] = 'wikiPages'
+      contentInsertion.insertLink(editor, link)
+      expect(editor.content).toEqual(
+        '<a data-course-type="wikiPages" data-published="true" href="/some/path" title="Here Be Links">Click On Me</a>'
+      )
+    })
+
     it('respects the current selection building the link by delegating to tinymce', () => {
       editor.selection.setContent('link me')
       contentInsertion.insertLink(editor, link)

@@ -37,14 +37,36 @@ class ContextExternalTool < ActiveRecord::Base
   validates :context_id, :context_type, :workflow_state, presence: true
   validates :name, :consumer_key, :shared_secret, presence: true
   validates :name, length: { maximum: maximum_string_length }
+  validates :consumer_key, length: { maximum: 2048 }
   validates :config_url, presence: { if: ->(t) { t.config_type == "by_url" } }
   validates :config_xml, presence: { if: ->(t) { t.config_type == "by_xml" } }
   validates :domain, length: { maximum: 253, allow_blank: true }
   validates :lti_version, inclusion: { in: %w[1.1 1.3], message: "%{value} is not a valid LTI version" }
   validate :url_or_domain_is_set
   validate :validate_urls
-  serialize :settings
   attr_reader :config_type, :config_url, :config_xml
+
+  # handles both serialized Hashes and HashWithIndifferentAccesses
+  # and always returns a HashWithIndifferentAccess
+  #
+  # would LOVE to rip this out and not store everything in `settings`
+  class SettingsSerializer
+    def self.load(value)
+      return nil unless value
+
+      obj = YAML.safe_load(value)
+      if obj.respond_to? :with_indifferent_access
+        return obj.with_indifferent_access
+      end
+
+      obj
+    end
+
+    def self.dump(value)
+      YAML.dump(value)
+    end
+  end
+  serialize :settings, SettingsSerializer
 
   # add_identity_hash needs to calculate off of other data in the object, so it
   # should always be the last field change callback to run
@@ -368,11 +390,12 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def has_placement?(type)
-    # Only LTI 1.0 tools (no developer key) support default placements
+    # Only LTI 1.1 tools support default placements
     # (LTI 2 tools also, but those are not handled by this class)
-    if developer_key_id.blank? &&
-       Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s)
-      !!(selectable && (domain || url))
+    if lti_version == "1.1" &&
+       Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include?(type.to_s) &&
+       !!(selectable && (domain || url))
+      true
     else
       context_external_tool_placements.to_a.any? { |p| p.placement_type == type.to_s }
     end
@@ -438,7 +461,7 @@ class ContextExternalTool < ActiveRecord::Base
   private :validate_url
 
   def settings
-    read_or_initialize_attribute(:settings, {})
+    read_or_initialize_attribute(:settings, {}.with_indifferent_access)
   end
 
   def label_for(key, lang = nil)
@@ -550,11 +573,11 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def use_1_3?
-    settings.fetch(:use_1_3, settings["use_1_3"])
+    lti_version == "1.3"
   end
 
   def use_1_3=(bool)
-    settings[:use_1_3] = bool
+    self.lti_version = bool ? "1.3" : "1.1"
   end
 
   def uses_preferred_lti_version?
@@ -640,7 +663,11 @@ class ContextExternalTool < ActiveRecord::Base
 
   def login_or_launch_url(extension_type: nil, content_tag_uri: nil)
     (use_1_3? && developer_key&.oidc_initiation_url) ||
-      content_tag_uri ||
+      launch_url(extension_type: extension_type, content_tag_uri: content_tag_uri)
+  end
+
+  def launch_url(extension_type: nil, content_tag_uri: nil)
+    content_tag_uri ||
       (use_1_3? && extension_setting(extension_type, :target_link_uri)) ||
       extension_setting(extension_type, :url) ||
       url
@@ -1024,7 +1051,7 @@ class ContextExternalTool < ActiveRecord::Base
 
       order_clauses = [
         # prefer 1.3 tools
-        sort_by_sql_string("developer_key_id IS NOT NULL"),
+        sort_by_sql_string("lti_version = '1.3'"),
         # prefer tools that are not duplicates
         sort_by_sql_string("identity_hash != 'duplicate'"),
         # prefer tools from closer contexts
@@ -1039,7 +1066,7 @@ class ContextExternalTool < ActiveRecord::Base
       end
 
       query = ContextExternalTool.where(context: contexts).active
-      query = query.where.not(developer_key_id: nil) if only_1_3
+      query = query.where(lti_version: "1.3") if only_1_3
       query = query.where(developer_key_id: preferred_client_id) if preferred_client_id
       query = query.where.not(id: exclude_tool_id) if exclude_tool_id
 
@@ -1098,17 +1125,15 @@ class ContextExternalTool < ActiveRecord::Base
 
   scope :placements, lambda { |*placements|
     if placements.present?
-      # Default placements are only applicable to LTI 1.0. Ignore
-      # LTI 1.3 tools with developer_key_id IS NULL
+      # Default placements are only applicable to LTI 1.1
       default_placement_sql = if (placements.map(&:to_s) & Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).present?
-                                "(context_external_tools.developer_key_id IS NULL AND
+                                "(context_external_tools.lti_version = '1.1' AND
                            context_external_tools.not_selectable IS NOT TRUE AND
                            ((COALESCE(context_external_tools.url, '') <> '' ) OR
                            (COALESCE(context_external_tools.domain, '') <> ''))) OR "
                               else
                                 ""
                               end
-      return none unless placements
 
       where(default_placement_sql + "EXISTS (?)",
             ContextExternalToolPlacement.where(placement_type: placements)
@@ -1322,7 +1347,30 @@ class ContextExternalTool < ActiveRecord::Base
     directly_associated + indirectly_associated
   end
 
+  # Intended to return true only for Instructure-owned tools that have been
+  # properly configured as "internal" tools. Used for some custom variable substitutions.
+  # Will only return true if the launch_url's domain ends with a domain from the allowlist,
+  # or exactly matches a domain from the allowlist.
+  def internal_service?(launch_url)
+    return false unless developer_key&.internal_service?
+    return false unless launch_url
+
+    domain = URI.parse(launch_url).host rescue nil
+    return false unless domain
+
+    internal_tool_domain_allowlist.any? { |d| domain.end_with?(".#{d}") || domain == d }
+  end
+
   private
+
+  # Locally and in OSS installations, this can be configured in config/dynamic_settings.yml.
+  # Returns an array of strings, each listing a partial or full domain suffix that is considered "internal".
+  # Domains should not have a preceding ".".
+  # For example, ["instructure.com", "inscloudgate.net", "inseng.net"] in Instructure-deployed production Canvas.
+  def internal_tool_domain_allowlist
+    config = DynamicSettings.find("lti", default_ttl: 2.hours)["internal_tool_domain_allowlist"] || "[]"
+    @internal_tool_domain_allowlist ||= YAML.safe_load(config)
+  end
 
   def check_global_navigation_cache
     if context.is_a?(Account) && context.root_account?

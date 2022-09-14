@@ -72,7 +72,7 @@ module Lti
           name: "test tool",
           url: "http://www.tool.com/launch",
           developer_key: developer_key,
-          settings: { use_1_3: true },
+          lti_version: "1.3",
           workflow_state: "public"
         )
       end

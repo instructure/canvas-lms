@@ -34,7 +34,7 @@ describe Lti::IMS::NamesAndRolesSerializer do
       shared_secret: "secret",
       name: "test tool",
       url: "http://www.tool.com/launch",
-      settings: { use_1_3: true },
+      lti_version: "1.3",
       workflow_state: privacy_level
     )
   end

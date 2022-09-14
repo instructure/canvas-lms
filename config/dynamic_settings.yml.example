@@ -47,6 +47,16 @@ development:
         # disabled: true
         app-host: "http://les.docker"
         sad-panda: null
+      lti:
+        # Used by ContextExternalTool#internal_service? to determine if
+        # an Instructure-owned tool is launching to an Instructure-owned URL.
+        # For OSS users: If you have a use case for marking your own tools as
+        # "internal services", then replace this with your tool launch domains,
+        # but this should rarely (if ever) be needed and can be safely ignored.
+        # Domains should not have a preceding "." (ex: "instructure.com")
+        internal_tool_domain_allowlist:
+          - 'docker'
+          - 'localhost'
       math-man:
         base_url: 'http://mathman.docker'
         use_for_svg: 'false'

@@ -147,30 +147,15 @@ describe GradebookUploadsController do
       assert_unauthorized
     end
 
-    describe "js_env.bulk_update_override_scores_path" do
-      it "is set if importing override scores is enabled" do
-        Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
+    it "sets js_env.bulk_update_override_scores_path" do
+      user_session(@teacher)
+      progress = Progress.create!(tag: "test", context: @teacher)
 
-        user_session(@teacher)
-        progress = Progress.create!(tag: "test", context: @teacher)
+      @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
+      @gb_upload.save
 
-        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
-        @gb_upload.save
-
-        get "show", params: { course_id: @course.id }
-        expect(assigns[:js_env]).to have_key(:bulk_update_override_scores_path)
-      end
-
-      it "is not set if importing override scores is not enabled" do
-        user_session(@teacher)
-        progress = Progress.create!(tag: "test", context: @teacher)
-
-        @gb_upload = GradebookUpload.new course: @course, user: @teacher, progress: progress, gradebook: { foo: "bar" }
-        @gb_upload.save
-
-        get "show", params: { course_id: @course.id }
-        expect(assigns[:js_env]).not_to have_key(:bulk_update_override_scores_path)
-      end
+      get "show", params: { course_id: @course.id }
+      expect(assigns[:js_env]).to have_key(:bulk_update_override_scores_path)
     end
   end
 end

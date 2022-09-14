@@ -22,7 +22,6 @@ import template from '../../jst/ContentCheckbox.handlebars'
 import checkboxCollectionTemplate from '../../jst/ContentCheckboxCollection.handlebars'
 import CheckboxCollection from '../collections/ContentCheckboxCollection.coffee'
 import CollectionView from '@canvas/backbone-collection-view'
-import TextHelper from '@canvas/util/TextHelper.coffee'
 
 I18n = useI18nScope('content_migrations')
 
