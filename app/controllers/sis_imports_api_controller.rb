@@ -481,6 +481,10 @@ class SisImportsApiController < ApplicationController
   #         -H "Authorization: Bearer <token>" \
   #         https://<canvas>/api/v1/accounts/<account_id>/sis_imports.json?import_type=instructure_csv&batch_mode=1&batch_mode_term_id=15
   #
+  #   If the attachment is a zip file, the uncompressed file(s) cannot be 100x larger than the zip, or the import will fail.
+  #   For example, if the zip file is 1KB but the total size of the uncompressed file(s) is 100KB or greater the import will
+  #   fail. There is a hard cap of 50 GB.
+  #
   # @argument extension [String]
   #   Recommended for raw post request style imports. This field will be used to
   #   distinguish between zip, xml, csv, and other file format extensions that
