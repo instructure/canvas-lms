@@ -47,7 +47,8 @@ module Lti
                 [:retrieve, account, :external_tools],
                 host: "test.host"
               ),
-              reloadpage: false
+              reloadpage: false,
+              moduleCreated: false
             }
           )
 
@@ -612,6 +613,11 @@ module Lti
                   it "leaves module items unpublished" do
                     subject
                     expect(ContentTag.where(context: course).last.workflow_state).to eq("unpublished")
+                  end
+
+                  it "tells the frontend a module was created" do
+                    subject
+                    expect(assigns.dig(:js_env, :deep_link_response, :moduleCreated)).to be true
                   end
                 end
 
