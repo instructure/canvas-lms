@@ -567,6 +567,19 @@ test('renders due dates in appropriate time zone', function () {
   equal(view.$('#vdd_tooltip_assign_1 div dd').first().text().trim(), 'Aug 27')
 })
 
+test('sets points possible when the assignment has unfrozen points possible', function () {
+  const view = createView(this.assignment2)
+  const data = view.getFormData()
+  equal(data.points_possible, 10)
+})
+
+test('does not set points possible when the assignment has frozen points possible', function () {
+  this.assignment2.set('frozen_attributes', ['points_possible'])
+  const view = createView(this.assignment2)
+  const data = view.getFormData()
+  notOk(data.hasOwnProperty('points_possible'))
+})
+
 QUnit.module('ENV.DEFAULT_DUE_TIME', {
   setup() {
     this.assignment2 = new Assignment(buildAssignment2())
