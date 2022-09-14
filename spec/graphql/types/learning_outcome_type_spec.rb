@@ -175,7 +175,7 @@ describe Types::LearningOutcomeType do
     it "resolves alignments correctly" do
       alignment_ids = outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { _id }")
       expect(alignment_ids.length).to eq 2
-      expect(alignment_ids).to include(@alignment1.id.to_s, @alignment2.id.to_s)
+      expect(alignment_ids).to include(["D", @alignment1.id].join("_"), ["D", @alignment2.id].join("_"))
     end
   end
 end
