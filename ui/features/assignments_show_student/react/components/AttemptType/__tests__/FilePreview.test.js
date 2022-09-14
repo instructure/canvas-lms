@@ -41,23 +41,39 @@ const files = [
     thumbnailUrl: null,
     url: '/url',
     size: '107 GB'
+  },
+  {
+    _id: '3',
+    displayName: 'file_2.zip',
+    id: '3',
+    mimeClass: 'file',
+    submissionPreviewUrl: null,
+    thumbnailUrl: null,
+    url: '/url',
+    size: '10 GB'
   }
 ]
 
-const turnitin_data = [
-  {
-    score: 75,
+const originalityData = {
+  attachment_1: {
+    similarity_score: 75,
     state: 'problem',
-    reportUrl: 'http://example.com',
+    report_url: 'http://example.com',
     status: 'scored'
   },
-  {
-    score: 10,
+  attachment_2: {
+    similarity_score: null,
+    state: 'error',
+    report_url: 'http://example.com',
+    status: 'error'
+  },
+  attachment_3: {
+    similarity_score: 10,
     state: 'acceptable',
-    reportUrl: 'http://example.com',
+    report_url: 'http://example.com',
     status: 'scored'
   }
-]
+}
 
 describe('FilePreview', () => {
   it('renders a message if there are no files to display', async () => {
@@ -103,7 +119,7 @@ describe('FilePreview', () => {
   it('renders orignality reports for each file if turnitin data exists and there is more than one attachment', async () => {
     const props = {
       submission: await mockSubmission({
-        Submission: {attachments: files, turnitinData: turnitin_data}
+        Submission: {attachments: files, originalityData, submissionType: 'online_upload'}
       }),
       originalityReportsForA2: true
     }
@@ -118,7 +134,7 @@ describe('FilePreview', () => {
   it('does not render orignality reports if only one attachment exists', async () => {
     const props = {
       submission: await mockSubmission({
-        Submission: {attachments: [files[0]], turnitinData: turnitin_data}
+        Submission: {attachments: [files[0]], originalityData, submissionType: 'online_upload'}
       }),
       originalityReportsForA2: true
     }
@@ -130,7 +146,7 @@ describe('FilePreview', () => {
   it('does not render orignality reports if FF prop is not enabled', async () => {
     const props = {
       submission: await mockSubmission({
-        Submission: {attachments: files, turnitinData: turnitin_data}
+        Submission: {attachments: files, originalityData, submissionType: 'online_upload'}
       }),
       originalityReportsForA2: false
     }
