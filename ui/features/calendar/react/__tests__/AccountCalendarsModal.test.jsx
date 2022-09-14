@@ -20,12 +20,20 @@ import React from 'react'
 import { act, render, fireEvent, waitFor } from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import MockDate from 'mockdate'
-import { accountCalendarsAPIPage1Response, accountCalendarsAPIPage2Response, allAccountCalendarsResponse, emptyResponse } from './mocks'
+import { accountCalendarsAPIPage1Response, accountCalendarsAPIPage2Response, allAccountCalendarsResponse, emptyResponse, accountCalendarsAPISearchResponse } from './mocks'
 import AccountCalendarsModal, { SEARCH_ENDPOINT, SAVE_PREFERENCES_ENDPOINT } from '../AccountCalendarsModal'
+import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
+
+jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+    return {
+      alertForMatchingAccounts: jest.fn()
+    }
+  })
 
 describe('Other Calendars modal ', () => {
     const page1Results = accountCalendarsAPIPage1Response.account_calendars
     const page2Results = accountCalendarsAPIPage2Response.account_calendars
+    const searchResult = accountCalendarsAPISearchResponse.account_calendars
     const totalCalendars = allAccountCalendarsResponse.total_results
     const getSearchUrl = (searchTerm) => SEARCH_ENDPOINT.concat(`?per_page=2&search_term=${searchTerm}`)
     const markAsSeenUrl = encodeURI(SAVE_PREFERENCES_ENDPOINT.concat(`?mark_feature_as_seen=true`))
@@ -42,9 +50,11 @@ describe('Other Calendars modal ', () => {
         })
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=5'), JSON.stringify(allAccountCalendarsResponse))
         fetchMock.get(SEARCH_ENDPOINT.concat('?per_page=2&page=2'), JSON.stringify(accountCalendarsAPIPage2Response))
-        fetchMock.get(getSearchUrl('Test'), JSON.stringify(emptyResponse))
+        fetchMock.get(getSearchUrl('Test'), JSON.stringify(accountCalendarsAPISearchResponse))
+        fetchMock.get(getSearchUrl('Test2'), JSON.stringify(emptyResponse))
         fetchMock.get(getSearchUrl('T'), JSON.stringify(emptyResponse))
         fetchMock.post(markAsSeenUrl, JSON.stringify({ status: 'ok' }))
+        jest.clearAllMocks()
     })
 
     afterEach(() => {
@@ -203,10 +213,22 @@ describe('Other Calendars modal ', () => {
             const addCalendarButton = getByTestId('add-other-calendars-button')
             openModal(addCalendarButton)
             const searchBar = await findByTestId('search-input')
-            fireEvent.change(searchBar, { target: { value: 'Test' } })
+            fireEvent.change(searchBar, { target: { value: 'Test2' } })
             advance(500)
             expect(await findByText('Hmm, we can’t find any matching calendars.')).toBeInTheDocument()
             expect(await findByTestId('account-calendars-empty-state')).toBeInTheDocument()
         })
+
+        it('announces search results for screen readers',async ()=>{
+            const { findByTestId, getByTestId } = render(
+                <AccountCalendarsModal {...getProps()} />)
+            const addCalendarButton = getByTestId('add-other-calendars-button')
+            openModal(addCalendarButton)
+            const searchBar = await findByTestId('search-input')
+            fireEvent.change(searchBar, { target: { value: 'Test' } })
+            advance(500)
+            await findByTestId(`account-${searchResult[0].id}-checkbox`)
+            expect(alertForMatchingAccounts).toHaveBeenCalledWith(1, false)
+          })
     })
 })

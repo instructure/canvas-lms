@@ -25,6 +25,12 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 import {AccountCalendarSettings} from '../AccountCalendarSettings'
 import {RESPONSE_ACCOUNT_1} from '../../__tests__/fixtures'
 
+jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+  return {
+    alertForMatchingAccounts: jest.fn()
+  }
+})
+
 const defaultProps = {
   accountId: 1
 }
@@ -33,6 +39,7 @@ beforeEach(() => {
   fetchMock.get(/\/api\/v1\/accounts\/1\/account_calendars.*/, RESPONSE_ACCOUNT_1)
   fetchMock.get(/\/api\/v1\/accounts\/1\/visible_calendars_count.*/, RESPONSE_ACCOUNT_1.length)
   jest.useFakeTimers()
+  jest.clearAllMocks()
 })
 
 afterEach(() => {
