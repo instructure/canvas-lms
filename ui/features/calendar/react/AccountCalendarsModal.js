@@ -110,11 +110,7 @@ const AccountCalendarsModal = ({
         setResults(cachedResults)
         setTotalAccounts(cachedResults.length)
       } else {
-        const searchAccounts = async () => {
-          await fetchAccounts({next: false})
-          inputRef.current.focus()
-        }
-        searchAccounts()
+        fetchAccounts({next: false})
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -285,7 +281,6 @@ const AccountCalendarsModal = ({
               messages={messages}
               renderBeforeInput={<IconSearchLine inline={false} />}
               renderAfterInput={renderClearButton()}
-              interaction={isLoading ? 'disabled' : 'enabled'}
             />
             <AccountCalendarResultsArea {...resultsProps} />
           </View>

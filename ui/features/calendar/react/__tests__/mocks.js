@@ -141,6 +141,21 @@ export const accountCalendarsAPIPage2Response = {
   total_results: 4
 }
 
+export const accountCalendarsAPISearchResponse = {
+  account_calendars: [
+    {
+      id: '1',
+      name: 'Test',
+      parent_account_id: null,
+      root_account_id: '0',
+      visible: true,
+      asset_string: 'account_1',
+      type: 'account'
+    }
+  ],
+  total_results: 1
+}
+
 export const allAccountCalendarsResponse = {
   account_calendars: [
     ...accountCalendarsAPIPage1Response.account_calendars,

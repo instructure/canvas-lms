@@ -33,6 +33,7 @@ import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
 import {Account, VisibilityChange} from '../types'
 import {castIdsToInt} from '../utils'
+import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
 const I18n = useI18nScope('account_calendar_settings_account_list')
 
@@ -71,6 +72,12 @@ export const AccountList: React.FC<ComponentProps> = ({
   useEffect(() => {
     setDebouncedSearchTerm(searchValue)
   }, [searchValue, setDebouncedSearchTerm])
+
+  useEffect(() => {
+    if (!isLoading && accounts?.length >= 0) {
+      alertForMatchingAccounts(accounts?.length, debouncedSearchTerm === '')
+    }
+  }, [isLoading, accounts, debouncedSearchTerm])
 
   // @ts-ignore - this hook isn't ts-ified
   useFetchApi({
