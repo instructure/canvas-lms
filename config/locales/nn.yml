@@ -8786,7 +8786,7 @@ nn:
     empty_message: "Inga melding"
   discussion_topic_a7bf935: diskusjonsemne
   discussion_topic_dc85ad4c: Diskusjonsemne
-  discussion_topic_initial_query_error_37c98b4: "Diskusjonsemne første spørringsfeil"
+  discussion_topic_initial_query_error_37c98b4: "Diskusjonsemne fyrste spørsmålsfeil"
   discussion_topic_menu_3d4684c6: "Meny diskusjonsemne"
   discussion_topic_post_error_page_7f7edc49: "Feilmeldingsside for innlegg i diskusjon"
   discussion_topic_title_95b1d6b6: "Diskusjonsemne: %{title}"
@@ -9224,7 +9224,7 @@ nn:
   draft_saved_eba9cfeb: "Utkast lagra"
   drag_a_file_here_39357b48: "Dra fila hit"
   drag_a_file_here_or_1aaf19c1: "Dra ei fil hit, eller"
-  drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Da ei fil her, eller klikk for å velge ein fil å laste opp."
+  drag_a_file_here_or_click_to_select_a_file_to_uplo_ad482dda: "Da ei fil her, eller klikk for å velge ei fil å laste opp."
   drag_and_drop_files_on_modules_and_multi_file_modu_605b469b: "Dra og slipp filer på moduler og fler-fil modulelementopplastning"
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: "Dra og slipp, eller klikk for å hente fil frå disk"
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Dra og slipp, eller klikk for å hente fil frå disk"
@@ -9411,7 +9411,7 @@ nn:
       read_only_rubric: "Dette vurderingsskjemaet er i bruk fleire stader. Dersom du redigerer her, vil det bli oppretta ein kopi av vurderingsskjemaet og endringane vil ikkje påverka det opphavlege skjemaet. Vil du halde fram likevel?"
     rubric: 
       import_outcome: 
-        duplicated_outcome: "Dette læringsmålet blei ikkje lagt til sidan det allereie finnest i vurderingsskjemaet."
+        duplicated_outcome: "Dette læringsmålet blei ikkje lagt til sidan det allereie eksisterer i vurderingsskjemaet."
     titles: 
       criterion_long_description: "Lang skildring av kriterium"
       edit_rubric_rating: "Rediger vurdering"
@@ -9530,8 +9530,8 @@ nn:
   embedded_release_notes_72d79b9b: "Innebygde versjonsnotat"
   embry_riddle_student_activity_tracking_8020dd95: "Embry Riddle sporing av studentaktivitet"
   emoji_categories_a08744ae: Emoji-kategoriar
-  emoji_picker_5bb954f9: "Valg av emoji"
-  emojis_in_submission_comments_72720afc: "Emojiar i kommentarar på oppgåver"
+  emoji_picker_5bb954f9: Emoji-veljer
+  emojis_in_submission_comments_72720afc: "Emojiar i oppgåvekommentarar"
   empty_stub_for_testing_only_37aad38: "Tom stubb (berre for testing)"
   enable_6f5d1328: Aktiver
   enable_ability_to_alter_the_final_grade_for_the_en_e120f72d: "Gjer mogleg å endre sluttresultat for eit heilt emne utan å endre resultat for einskilde oppgåver. "
@@ -9688,8 +9688,8 @@ nn:
   enter_at_least_count_characters_1c7a0b36: "Må vere minst %{count} teikn"
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Skriv inn \"{{CANVAS_USER_ID}}\" som erstatning for brukaren sin unike Canvas-ID"
   enter_grades_as_e113e606: "Legg inn vurderingar som"
-  enter_name_or_code_b4c103f6: "Legg til navn eller kode "
-  enter_new_group_name_b97d5819: "Legg til et nytt gruppenavn"
+  enter_name_or_code_b4c103f6: "Legg til namn eller kode "
+  enter_new_group_name_b97d5819: "Legg til eit nytt gruppenamn"
   enter_one_or_more_external_tool_ids_comma_separate_9a758cd: "Legg til ein eller fleire ID-ar for eksterne verktøy, kommaseparert"
   enter_one_or_more_external_tool_url_domains_comma__7c2d4fe8: "Legg til ein eller fleire URL-domene for eksterne verktøy, kommaseparert"
   enter_or_find_an_external_tool_url_6aebbd0d: "Legg til eller finn URL for eksternt verktøy"
@@ -9699,13 +9699,13 @@ nn:
   enter_the_access_token_for_your_organization_from__cc77493d: "Registrer tilgangstoken for din organisasjon frå *eduappcenter.com*. Når det er lagt inn, vil kun appar som din institusjon har godkjent bli lista ut på den eksterne app-sida. Lær korleis du kan **generere eit tilgangstoken**."
   enter_the_email_addresses_of_the_users_you_would_l_17cef6a0: "Oppgi e-postadressene til brukarane du vil legge til, berre delt av komma"
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: "Oppgi e-postadressene til brukarane du vil legge til, skilde med komma eller linjeskift"
-  enter_the_grade_41d5c97d: "Legg til karakteren"
+  enter_the_grade_41d5c97d: "Skriv inn karakteren"
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Oppgi brukarnamna til brukarane du vil legge til, skilde med komma eller linjeskift"
   enter_the_login_ids_of_the_users_you_would_like_to_d39fb0f7: "Oppgi brukarnamna til brukarane du vil legge til, berre delt av komma"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_1bdce982: "Oppgi SIS-ID-ane til brukarane du vil legge til, berre delt av komma"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Oppgi SIS-ID-ane til brukarane du vil legge til, skilde av komma eller linjeskift"
   enter_url_e8bb8a33: "Legg inn URL"
-  enter_web_url_483c2cbb: "Legg inn URL"
+  enter_web_url_483c2cbb: "Skriv inn URL"
   enter_your_friendly_description_here_b3c230d3: "Skriv inn din venlege beskrivelse her"
   enter_your_question_and_multiple_answers_31370054: "Skriv inn spørsmålet og fleire svar."
   enter_your_question_specifying_where_each_blank_sh_2c6e8035: "Skriv inn spørsmålet og oppgi kvar du vil plassere kvart tomme tekstfelt. Studentane må skrive inn svara i kvart tomme tekstfelt."
@@ -10087,7 +10087,7 @@ nn:
     unsaved_changes: "Du har endringar som ikkje er lagra."
     wrong_file_extension: "Du har ikkje autorisasjon for innlevering av den valde fila med vedlegg  \"%{extension}\""
   estonian_5e8e2fa4: Estisk
-  event_creation_failed_71b75bea: "Oppretting av hendelse feila"
+  event_creation_failed_71b75bea: "Oppretting av hending feila"
   event_date_c9459fe3: Hendingsdato
   event_date_f05219e7: Hendingsdato
   event_end_time_ef830e66: "Sluttidspunkt for hending"
@@ -10096,7 +10096,7 @@ nn:
   event_title_57a50568: "Tittel på hending:"
   event_title_7f1051a6: Hendingstittel
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} endra til"
-  event_update_failed_b6116651: "Oppdatering av hendelse feila"
+  event_update_failed_b6116651: "Oppdatering av hending feila"
   everthing_updated_after_start_date_f3be8ba: "Alt oppdatert etter startdato"
   every_665d821e: Kvar
   everyone_854554dd: Alle
@@ -10256,7 +10256,7 @@ nn:
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Kan ikkje laste Unsynced Changes-komponenten. Er internettkoplinga OK?"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislukkast, rapporter følgande feilkode til systemansvarleg: Feilrapport: %{error};"
   failed_retrieving_media_sources_32aed288: "Kan ikkje hente mediakjelder."
-  failed_sending_message_64001749: "Feil oppstod under sending av melding."
+  failed_sending_message_64001749: "Sending av melding feila."
   failed_the_report_failed_to_generate_a_file_please_60a6582d: "Rapporten kan ikkje generere fil. Prøv på nytt seinare."
   failed_to_add_new_feed_ee1c5ea: "Kan ikkje legge til ny straum"
   failed_to_change_last_attended_date_1e340ba6: "Mislukkast å endre dato for siste deltaking"
@@ -10277,10 +10277,10 @@ nn:
   failed_to_import_some_lti_resource_links_ab124c3f: "Import av nokre LTI ressurslenker mislukkast"
   failed_to_invalidate_portal_path_5bc31b91: "Ugyldiggjering av portal path vart mislukka"
   failed_to_laod_more_submissions_990aacee: "Kunne ikkje laste fleire innleveringar"
-  failed_to_load_announcements_429c16fc: "Feil oppstod under lasting av kunngjeringar. "
-  failed_to_load_apps_db37e651: "Feil oppstod under lasting av apper. "
+  failed_to_load_announcements_429c16fc: "Lasting av kunngjeringar mislukkast. "
+  failed_to_load_apps_db37e651: "Lasting av apper feila. "
   failed_to_load_assignments_in_important_dates_ce3b4227: "Lasting av oppgåver i viktige datoar mislukkast"
-  failed_to_load_conversation_messages_9b4546fc: "Feil oppstod under lasting av samtalemeldingar. "
+  failed_to_load_conversation_messages_9b4546fc: "Lasting av samtalemeldingar feila."
   failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Lasting av emne mislukkast. Last sida på nytt og prøv igjen."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Det oppstod ein feil under lasting av CSP-informasjon, forsøk å laste sida på nytt."
   failed_to_load_events_in_important_dates_2195b227: "Lasting av hendingar i viktige datoar mislukkast"
@@ -10288,12 +10288,12 @@ nn:
   failed_to_load_grade_details_for_coursename_2325cfd2: "Lasting av vurderingsdetaljar for %{courseName} mislukkast"
   failed_to_load_grades_for_the_requested_grading_pe_52cefa9: "Feil under lasting av karakterer for den forventa perioden for karaktersetting. "
   failed_to_load_grading_periods_for_coursename_87ac2b6: "Lasting av vurderingsperiodar for %{courseName} mislukkast"
-  failed_to_load_important_info_da5b24dc: "Feil oppstod under lasting av viktig informasjon. "
+  failed_to_load_important_info_da5b24dc: "Lasting av viktig informasjon feila. "
   failed_to_load_more_submissions_148ff11f: "Det oppstod ein feil under lasting av fleire innleveringar"
   failed_to_load_recent_activity_d3e5adeb: "Kan ikkje hente ny aktivitet"
   failed_to_load_student_annotation_file_data_256d99d2: "Innlasting av datafil for studentmerknadar mislukkast"
-  failed_to_load_the_grades_tab_c6118c57: "Feil oppsto under lasting av karakterfana."
-  failed_to_load_the_schedule_tab_fd7b0911: "Feil oppsto under lasting av timeplanfana."
+  failed_to_load_the_grades_tab_c6118c57: "Lasting av karakterfana feila."
+  failed_to_load_the_schedule_tab_fd7b0911: "Lasting av timeplanfana feila."
   failed_to_load_the_to_do_sidebar_b6169202: "Innlasting av gjeremålsfana mislukkast"
   failed_to_load_todos_93cfc2d2: "Innlasting av gjeremål mislukkast"
   failed_to_log_in_7ceec561: "Kan ikkje logge på"
@@ -10301,7 +10301,7 @@ nn:
   failed_to_publish_draft_comment_853761e9: "Kunne ikkje publisere kommentar til utkast"
   failed_to_remove_catalog_settings_f5359b2b: "Kan ikkje fjerne kataloginnstillingar"
   failed_to_remove_special_catalog_users_8889b686: "Fjerning av spesielle katalogbrukarar vart mislukka"
-  failed_to_remove_the_image_please_try_again_bd3ca65d: "Kan ikkje slette bildet, ver venleg og prøv igjen. "
+  failed_to_remove_the_image_please_try_again_bd3ca65d: "Sletting av bildet mislukkast, vær venleg og prøv igjen. "
   failed_to_remove_user_7ce5e427: "Kan ikkje slette brukar. "
   failed_to_report_the_image_please_try_again_92398b47: "Kan ikkje rapportere bildet, ver venleg og prøv igjen. "
   failed_to_save_changes_errors_6920f334: "Kunne ikkje lagre endringar: %{errors}%"
@@ -10390,7 +10390,7 @@ nn:
   file_filename_could_not_be_included_in_the_epub_do_4bf71a87: "Får ikkje inkludert fila %{filename} i EPUB-dokumentet. Prøv anna ZIP-fil for tilgang."
   file_has_no_data_213a4540: "Fila har ikkje innhald"
   file_has_no_outcomes_data_1517801f: "Fila har ingen data om læringsmål"
-  file_has_not_finished_uploading_cfba3b2f: "Filen er ikkje ferdig opplasta. "
+  file_has_not_finished_uploading_cfba3b2f: "Fila er ikkje ferdig opplasta. "
   file_list_350d08df: Filliste
   file_list_updated_38e2a5ad: "Fillista er oppdatert"
   file_menu_cc0ca54: Filmeny
@@ -12078,7 +12078,7 @@ nn:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
   have_not_been_graded_df2a5fd2: "Har ikkje vorte vurdert"
-  have_not_yet_submitted_57e6a58b: "Har ikkje vorte levert"
+  have_not_yet_submitted_57e6a58b: "Har endå ikkje levert inn"
   haven_t_been_graded_d7dee5bb: "Er ikkje vurdert"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
   he_him_99aea1a8: Han
@@ -12383,7 +12383,7 @@ nn:
   iceland_354_1a03c558: "Island (+354)"
   icelandic_9d6d35de: Islandsk
   icon_215a1dc6: Ikon
-  icon_maker_icons_cc560f7e: Ikondesignar-ikonIkondesignar-ikon
+  icon_maker_icons_cc560f7e: Ikondesignar-ikon
   icon_url_e3d56e89: Ikon-URL
   icon_url_ecce6557: "Ikon-URL:"
   icons: 
@@ -13391,8 +13391,8 @@ nn:
   loading_graders_f6a76142: "Lastar vurderarar"
   loading_grades_446fc226: "Lastar vurderingar..."
   loading_grades_for_coursename_26784c2d: "Lastar vurderingar for %{courseName}"
-  loading_grading_periods_c635d96: "Lastar vurderingsperiode..."
-  loading_grading_periods_for_coursename_bbe46919: "Lastar vurderingsperiode for %{courseName}"
+  loading_grading_periods_c635d96: "Lastar vurderingsperiodar..."
+  loading_grading_periods_for_coursename_bbe46919: "Lastar vurderingsperiodar for %{courseName}"
   loading_grouptitle_dba362d2: "Lastar %{groupTitle}"
   loading_important_date_2d3a29ce: "Lastar viktig dato"
   loading_important_date_details_1b2d2b85: "Lastar viktige datodetaljar"
