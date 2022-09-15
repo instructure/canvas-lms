@@ -186,6 +186,36 @@ describe "calendar2" do
         wait_for_ajaximations
         assert_title(event_title, false)
       end
+
+      context "search bar" do
+        it "can search accounts with at least 2 characters" do
+          saccount1 = @root_account.sub_accounts.create!(name: "Account-1", account_calendar_visible: true)
+          saccount2 = @root_account.sub_accounts.create!(name: "Account-2", account_calendar_visible: true)
+          course_with_student_logged_in(user: @student, account: saccount1)
+          course_with_student_logged_in(user: @student, account: saccount2)
+
+          user_session(@student)
+          get "/calendar2"
+          open_other_calendars_modal
+          expect(account_calendars_list).to contain_css(account_calendar_checkbox_selector(@subaccount1.id))
+          expect(account_calendar_list_items.count).to eq(3)
+
+          search_account("Acc")
+          expect(account_calendars_list).not_to contain_css(account_calendar_checkbox_selector(@subaccount1.id))
+          expect(account_calendar_list_items.count).to eq(2)
+        end
+
+        it "displays an empty state if no matching accounts were found" do
+          user_session(@student)
+          get "/calendar2"
+          open_other_calendars_modal
+          expect(account_calendar_list_items.count).to eq(1)
+          expect(account_calendars_list).not_to contain_css(modal_empty_state_selector)
+
+          search_account("non")
+          expect(modal_empty_state).to be_displayed
+        end
+      end
     end
   end
 end
