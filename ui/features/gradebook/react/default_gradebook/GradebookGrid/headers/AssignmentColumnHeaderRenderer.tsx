@@ -24,12 +24,11 @@ import AssignmentColumnHeader from './AssignmentColumnHeader'
 import type {AssignmentColumnHeaderProps} from './AssignmentColumnHeader'
 import type Gradebook from '../../Gradebook'
 import type {PartialStudent} from '@canvas/grading/grading.d'
-import type {GradebookOptions} from '../../gradebook.d'
 import type {Student} from '../../../../../../api.d'
-import GridSupport from '../GridSupport/index'
+import type GridSupport from '../GridSupport/index'
 import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-function getSubmission(student, assignmentId: string) {
+function getSubmission(student: Student, assignmentId: string) {
   const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
@@ -59,14 +58,12 @@ function getSubmission(student, assignmentId: string) {
   }
 }
 
-function getProps(
-  column: {
-    id: string
-    assignmentId: string
-  },
-  gradebook: Gradebook,
-  options: GradebookOptions
-): AssignmentColumnHeaderProps {
+type Column = {
+  id: string
+  assignmentId: string
+}
+
+function getProps(column: Column, gradebook: Gradebook, options): AssignmentColumnHeaderProps {
   const assignmentId = column.assignmentId
   const columnId = column.id
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
@@ -221,12 +218,12 @@ export default class AssignmentColumnHeaderRenderer {
     this.gradebook = gradebook
   }
 
-  render(column, $container: HTMLElement, _gridSupport: GridSupport, options: GradebookOptions) {
+  render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
+  destroy(_column: Column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

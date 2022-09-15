@@ -79,7 +79,13 @@ export function extractSimilarityInfo(submission) {
 }
 
 function getSimilarityEntries(submission, plagiarismData) {
-  const entries = []
+  const entries: {
+    id: string
+    data: {
+      status: string
+      similarity_score: number
+    }
+  }[] = []
 
   if (submission.submissionType === 'online_upload' && submission.attachments != null) {
     // A submission with attachments may have a plagiarism report for each

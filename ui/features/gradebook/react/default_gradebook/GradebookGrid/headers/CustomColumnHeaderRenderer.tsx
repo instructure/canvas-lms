@@ -44,7 +44,7 @@ function getProps(
 export default class CustomColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 

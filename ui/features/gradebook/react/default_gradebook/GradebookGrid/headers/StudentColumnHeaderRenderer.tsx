@@ -29,7 +29,7 @@ export default class StudentColumnHeaderRenderer {
 
   columnName: string
 
-  constructor(gradebook, element, columnName) {
+  constructor(gradebook: Gradebook, element, columnName: string) {
     this.gradebook = gradebook
     this.element = element
     this.columnName = columnName
@@ -41,7 +41,7 @@ export default class StudentColumnHeaderRenderer {
     ReactDOM.render(<Element {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }
