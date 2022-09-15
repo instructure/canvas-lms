@@ -16,18 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function destroyColumnHeader(column, $node, gridSupport) {
+import slickgrid from 'slickgrid'
+import type GridSupport from './index'
+
+function destroyColumnHeader(column, $node: HTMLElement, gridSupport: GridSupport) {
   if (gridSupport.options.columnHeaderRenderer) {
     gridSupport.options.columnHeaderRenderer.destroyColumnHeader(column, $node, gridSupport)
   }
 }
 
 export default class Columns {
-  grid: any
+  grid: slickgrid.Grid
 
-  gridSupport: any
+  gridSupport: GridSupport
 
-  constructor(grid, gridSupport) {
+  constructor(grid: slickgrid.Grid, gridSupport: GridSupport) {
     this.grid = grid
     this.gridSupport = gridSupport
   }
@@ -71,7 +74,7 @@ export default class Columns {
     }
   }
 
-  getColumnsById(columnIds) {
+  getColumnsById(columnIds: string[]) {
     const columns = this.grid.getColumns()
     const columnMap = columns.reduce((map, column) => ({...map, [column.id]: column}), {})
     return columnIds.map(columnId => columnMap[columnId])
@@ -83,6 +86,15 @@ export default class Columns {
 
       columns.forEach(column => {
         const $node = this.gridSupport.helper.getColumnHeaderNode(column.id)
+
+        if (!this.gridSupport.options.columnHeaderRenderer) {
+          throw new Error('GridSupport.options is undefined')
+        }
+
+        if (!$node) {
+          throw new Error('Could not find column header node')
+        }
+
         this.gridSupport.options.columnHeaderRenderer.renderColumnHeader(
           column,
           $node,

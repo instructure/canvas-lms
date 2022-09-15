@@ -24,9 +24,21 @@ import StudentLastNameCellFormatter from './StudentLastNameCellFormatter'
 import StudentFirstNameCellFormatter from './StudentFirstNameCellFormatter'
 import TotalGradeCellFormatter from './TotalGradeCellFormatter'
 import TotalGradeOverrideCellFormatter from './TotalGradeOverrideCellFormatter'
+import type Gradebook from '../../Gradebook'
 
 class CellFormatterFactory {
-  constructor(gradebook) {
+  formatters: {
+    assignment: AssignmentCellFormatter
+    assignment_group: AssignmentGroupCellFormatter
+    custom_column: CustomColumnCellFormatter
+    student: StudentCellFormatter
+    student_lastname: StudentLastNameCellFormatter
+    student_firstname: StudentFirstNameCellFormatter
+    total_grade: TotalGradeCellFormatter
+    total_grade_override: TotalGradeOverrideCellFormatter
+  }
+
+  constructor(gradebook: Gradebook) {
     this.formatters = {
       assignment: new AssignmentCellFormatter(gradebook),
       assignment_group: new AssignmentGroupCellFormatter(),

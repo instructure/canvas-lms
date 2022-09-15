@@ -20,8 +20,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TotalGradeColumnHeader from './TotalGradeColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
-function getProps(_column, gradebook, gridSupport, options) {
+function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, options) {
   const columnId = 'total_grade'
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
 
@@ -44,7 +45,7 @@ function getProps(_column, gradebook, gridSupport, options) {
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
     grabFocus: gradebook.totalColumnShouldFocus(),
 
     gradeDisplay: {
@@ -69,7 +70,7 @@ function getProps(_column, gradebook, gridSupport, options) {
     },
 
     onApplyScoreToUngraded,
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
 
     sortBySetting: {
       direction: sortRowsBySetting.direction,
@@ -93,16 +94,16 @@ function getProps(_column, gradebook, gridSupport, options) {
 export default class TotalGradeColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(column, $container, gridSupport, options) {
+  render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
     ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

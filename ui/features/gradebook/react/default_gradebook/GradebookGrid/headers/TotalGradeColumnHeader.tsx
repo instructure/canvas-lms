@@ -153,9 +153,6 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
     const displayAsPoints = gradeDisplay.currentDisplay === 'points'
     const showSeparator = !gradeDisplay.hidden
-    const nowrapStyle = {
-      whiteSpace: 'nowrap'
-    }
     const menuShown = this.state.menuShown
     const classes = `Gradebook__ColumnHeaderAction ${menuShown ? 'menuShown' : ''}`
 
@@ -179,14 +176,14 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
               <Grid.Col textAlign="center" width="auto">
                 <div className={classes}>
                   <Menu
-                    contentRef={this.bindOptionsMenuContent}
+                    menuRef={this.bindOptionsMenuContent}
                     onDismiss={this.props.onMenuDismiss}
                     onToggle={this.onToggle}
                     ref={this.bindOptionsMenu}
                     shouldFocusTriggerOnClose={false}
                     trigger={renderTrigger(ref => (this.optionsMenuTrigger = ref))}
                   >
-                    <Menu contentRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
+                    <Menu menuRef={this.bindSortByMenuContent} label={I18n.t('Sort by')}>
                       <MenuGroup
                         label={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}
                       >
@@ -220,7 +217,12 @@ export default class TotalGradeColumnHeader extends ColumnHeader<Props, State> {
                         disabled={this.props.gradeDisplay.disabled}
                         onSelect={this.switchGradeDisplay}
                       >
-                        <span data-menu-item-id="grade-display-switcher" style={nowrapStyle}>
+                        <span
+                          data-menu-item-id="grade-display-switcher"
+                          style={{
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
                           {displayAsPoints
                             ? I18n.t('Display as Percentage')
                             : I18n.t('Display as Points')}

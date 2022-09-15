@@ -65,6 +65,17 @@ import {
 
 const I18n = useI18nScope('public_message_students_who')
 
+export type SendMessageArgs = {
+  attachmentIds?: string[]
+  recipientsIds: string[]
+  subject: string
+  body: string
+  mediaFile?: {
+    id: string
+    type: string
+  }
+}
+
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = Flex as any
 const {Header: ModalHeader, Body: ModalBody, Footer: ModalFooter} = Modal as any
@@ -585,7 +596,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 disabled={isDisabledStudentsCheckbox}
                 onChange={onStudentsCheckboxChanged}
                 checked={isCheckedStudentsCheckbox}
-                defaultChecked
+                defaultChecked={true}
                 label={
                   <Text weight="bold">
                     {I18n.t('%{studentCount} Students', {studentCount: filteredStudents.length})}
@@ -608,7 +619,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
                 }
               />
             </Item>
-            <Item as="div" shouldGrow textAlign="end">
+            <Item as="div" shouldGrow={true} textAlign="end">
               <Link
                 onClick={() => setShowTable(!showTable)}
                 renderIcon={showTable ? <IconArrowOpenUpLine /> : <IconArrowOpenDownLine />}
@@ -675,7 +686,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
           <br />
           <TextArea
             data-testid="message-input"
-            isRequired
+            isRequired={true}
             height="200px"
             label={I18n.t('Message')}
             placeholder={I18n.t('Type your message here…')}
@@ -699,7 +710,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
               </Item>
             )}
 
-            <Item shouldShrink>
+            <Item shouldShrink={true}>
               <AttachmentDisplay
                 attachments={[...attachments, ...pendingUploads]}
                 onDeleteItem={onDeleteAttachment}
@@ -767,7 +778,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
           label: closedCaptionLanguages[key]
         }))}
         rcsConfig={{contextId: userId, contextType: 'user'}}
-        disableSubmitWhileUploading
+        disableSubmitWhileUploading={true}
       />
     </>
   )

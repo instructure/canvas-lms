@@ -21,10 +21,18 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import CustomColumnHeader from './CustomColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
 const I18n = useI18nScope('gradebook')
 
-function getProps(column, gradebook, options) {
+function getProps(
+  column: {
+    title: string
+    customColumnId: string
+  },
+  gradebook,
+  options
+) {
   const customColumn = gradebook.getCustomColumn(column.customColumnId)
 
   return {
@@ -40,12 +48,12 @@ export default class CustomColumnHeaderRenderer {
     this.gradebook = gradebook
   }
 
-  render(column, $container, _gridSupport, options) {
+  render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
     ReactDOM.render(<CustomColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

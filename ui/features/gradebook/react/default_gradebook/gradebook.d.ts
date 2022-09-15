@@ -93,6 +93,9 @@ export type GradebookOptions = {
   group_weighting_scheme: string
   late_policy: LatePolicy
   locale: string
+  login_handle_name: string
+  message_attachment_upload_folder_id: string
+  new_gradebook_development_enabled: boolean
   outcome_gradebook_enabled: boolean
   post_grades_feature: string
   post_grades_ltis: Lti[]
@@ -107,6 +110,7 @@ export type GradebookOptions = {
   settings: GradebookSettings
   show_concluded_enrollments: string
   show_inactive_enrollments: string
+  show_message_students_with_observers_dialog: boolean
   show_similarity_score: boolean
   show_total_grade_as_points: boolean
   sis_name: string

@@ -82,8 +82,8 @@ export function getInitialGridDisplaySettings(settings, colors): GridDisplaySett
     },
     submissionTray: {
       open: false,
-      studentId: null,
-      assignmentId: null,
+      studentId: '',
+      assignmentId: '',
       comments: [],
       commentsLoaded: false,
       commentsUpdating: false,

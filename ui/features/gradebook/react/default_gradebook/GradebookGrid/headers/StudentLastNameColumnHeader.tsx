@@ -22,15 +22,15 @@ import StudentColumnHeader from './StudentColumnHeader'
 const I18n = useI18nScope('gradebook')
 
 export default class StudentLastNameColumnHeader extends StudentColumnHeader {
-  getColumnHeaderName() {
+  getColumnHeaderName(): string {
     return I18n.t('Student Last Name')
   }
 
-  getColumnHeaderOptions() {
+  getColumnHeaderOptions(): string {
     return I18n.t('Student Last Name Options')
   }
 
-  showDisplayAsViewOption() {
+  showDisplayAsViewOption(): boolean {
     return false
   }
 }
