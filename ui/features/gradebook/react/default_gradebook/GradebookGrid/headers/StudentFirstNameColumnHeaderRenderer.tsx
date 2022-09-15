@@ -20,15 +20,16 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import StudentFirstNameColumnHeader from './StudentFirstNameColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
-function getProps(gradebook, options) {
+function getProps(gradebook: Gradebook, options) {
   const columnId = 'student_firstname'
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
     disabled: !gradebook.contentLoadStates.studentsLoaded,
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
     }
@@ -38,16 +39,16 @@ function getProps(gradebook, options) {
 export default class StudentFirstNameColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(_column, $container, _gridSupport, options) {
+  render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(this.gradebook, options)
     ReactDOM.render(<StudentFirstNameColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

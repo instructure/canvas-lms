@@ -16,7 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export function getProps(gradebook, options, columnHeaderName) {
+import type Gradebook from '../../Gradebook'
+
+export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeaderName: string) {
   const columnId = columnHeaderName
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
   const {columnId: currentColumnId, direction, settingKey} = sortRowsBySetting
@@ -25,7 +27,7 @@ export function getProps(gradebook, options, columnHeaderName) {
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
     disabled: !gradebook.contentLoadStates.studentsLoaded,
     loginHandleName: gradebook.options.login_handle_name,
     onHeaderKeyDown: event => {
@@ -37,7 +39,7 @@ export function getProps(gradebook, options, columnHeaderName) {
     onSelectPrimaryInfo: gradebook.setSelectedPrimaryInfo,
     onSelectSecondaryInfo: gradebook.setSelectedSecondaryInfo,
     onToggleEnrollmentFilter: gradebook.toggleEnrollmentFilter,
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     sectionsEnabled: gradebook.sections_enabled,
     selectedEnrollmentFilters: gradebook.getSelectedEnrollmentFilters(),
     selectedPrimaryInfo: gradebook.getSelectedPrimaryInfo(),

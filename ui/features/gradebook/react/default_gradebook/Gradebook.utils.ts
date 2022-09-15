@@ -181,9 +181,9 @@ export function getDefaultSettingKeyForColumnType(columnType: string) {
     columnType === 'total_grade'
   ) {
     return 'grade'
-  } else if (columnType === 'student') {
-    return 'sortable_name'
   }
+  // default value for other column types
+  return 'sortable_name'
 }
 
 export function sectionList(sections: SectionMap) {

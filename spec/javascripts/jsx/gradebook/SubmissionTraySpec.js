@@ -1063,8 +1063,8 @@ QUnit.module('Gradebook#getSubmissionTrayState', {
 test('returns the state of the submission tray', function () {
   const expected = {
     open: false,
-    studentId: null,
-    assignmentId: null,
+    studentId: '',
+    assignmentId: '',
     commentsLoaded: false,
     comments: [],
     commentsUpdating: false,

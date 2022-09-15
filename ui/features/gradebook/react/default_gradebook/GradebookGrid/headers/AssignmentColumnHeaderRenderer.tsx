@@ -21,9 +21,15 @@ import ReactDOM from 'react-dom'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
+import type {AssignmentColumnHeaderProps} from './AssignmentColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type {PartialStudent} from '@canvas/grading/grading.d'
+import type {GradebookOptions} from '../../gradebook.d'
+import type {Student} from '../../../../../../api.d'
+import GridSupport from '../GridSupport/index'
+import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-function getSubmission(student, assignmentId) {
+function getSubmission(student, assignmentId: string) {
   const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
@@ -53,7 +59,14 @@ function getSubmission(student, assignmentId) {
   }
 }
 
-function getProps(column, gradebook, options) {
+function getProps(
+  column: {
+    id: string
+    assignmentId: string
+  },
+  gradebook: Gradebook,
+  options: GradebookOptions
+): AssignmentColumnHeaderProps {
   const assignmentId = column.assignmentId
   const columnId = column.id
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
@@ -64,7 +77,7 @@ function getProps(column, gradebook, options) {
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
-  const processStudent = student => ({
+  const processStudent = (student: Student): PartialStudent => ({
     id: student.id,
     isInactive: student.isInactive,
     isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
@@ -75,14 +88,17 @@ function getProps(column, gradebook, options) {
 
   // Menu options for posting and hiding grades should always take into account
   // all loaded students, regardless of any active filters.
-  const allStudents = Object.values(gradebook.studentsThatCanSeeAssignment(assignmentId)).map(
-    processStudent
+  const studentsThatCanSeeAssignment = gradebook.studentsThatCanSeeAssignment(assignmentId)
+  const allStudents: PartialStudent[] = Object.keys(studentsThatCanSeeAssignment).map(key =>
+    processStudent(studentsThatCanSeeAssignment[key])
   )
 
   // For the "Message Students Who" window, we only want to show students who
   // match active filters, and so must retrieve the list each time.
-  const getCurrentlyShownStudents = () =>
-    Object.values(gradebook.visibleStudentsThatCanSeeAssignment(assignmentId)).map(processStudent)
+  const getCurrentlyShownStudents = () => {
+    const students = gradebook.visibleStudentsThatCanSeeAssignment(assignmentId)
+    return Object.keys(students).map(key => processStudent(students[key]))
+  }
 
   const hasGradesOrPostableComments = allStudents.some(
     student => isGraded(student.submission) || student.submission.hasPostableComments
@@ -90,7 +106,7 @@ function getProps(column, gradebook, options) {
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
 
     allStudents,
     assignment: {
@@ -152,7 +168,7 @@ function getProps(column, gradebook, options) {
       }
     },
 
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),
 
@@ -194,23 +210,23 @@ function getProps(column, gradebook, options) {
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,
 
-    onSendMessageStudentsWho: args => gradebook.sendMessageStudentsWho(args)
+    onSendMessageStudentsWho: (args: SendMessageArgs) => gradebook.sendMessageStudentsWho(args)
   }
 }
 
 export default class AssignmentColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(column, $container, _gridSupport, options) {
+  render(column, $container: HTMLElement, _gridSupport: GridSupport, options: GradebookOptions) {
     const props = getProps(column, this.gradebook, options)
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 
-  destroy(column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }
