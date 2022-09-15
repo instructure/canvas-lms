@@ -58,6 +58,7 @@ function TrayContent(props) {
         assignment={props.assignment}
         submission={props.submission}
         isPeerReviewEnabled={props.isPeerReviewEnabled}
+        reviewerSubmission={props.reviewerSubmission}
       />
     </Suspense>
   )
@@ -66,6 +67,7 @@ function TrayContent(props) {
 TrayContent.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
+  reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool
 }
 
@@ -116,6 +118,7 @@ export default function CommentsTray(props) {
               isPeerReviewEnabled={props.isPeerReviewEnabled}
               assignment={props.assignment}
               submission={props.submission}
+              reviewerSubmission={props.reviewerSubmission}
             />
           </Flex.Item>
         </Flex>
@@ -127,6 +130,7 @@ export default function CommentsTray(props) {
 CommentsTray.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
+  reviewerSubmission: Submission.shape,
   closeTray: func.isRequired,
   open: bool.isRequired,
   isPeerReviewEnabled: bool
