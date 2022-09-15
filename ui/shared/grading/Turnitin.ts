@@ -19,11 +19,29 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {max, invert} from 'underscore'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
+import type {Submission} from '../../api.d'
 
 const I18n = useI18nScope('turnitin')
 
-export const extractDataTurnitin = function (submission) {
-  let attachment, i, item, len, plagData, ref, turnitin
+type PlagiarismData = {
+  state: string
+  similarity_score: number
+}
+
+type SubmissionWithOriginalityReport = Submission & {
+  attachments: Array<{id: string}>
+  has_originality_report: boolean
+  turnitin_data?: {
+    [key: string]: PlagiarismData
+  }
+  vericite_data?: {provider: 'vericite'} & {
+    [key: string]: PlagiarismData
+  }
+}
+
+export const extractDataTurnitin = function (submission: SubmissionWithOriginalityReport) {
+  let attachment, i, item, len, plagData, ref
+  let turnitin: PlagiarismData
   plagData = submission != null ? submission.turnitin_data : undefined
   if (plagData == null) {
     plagData = submission?.vericite_data
@@ -31,9 +49,10 @@ export const extractDataTurnitin = function (submission) {
   if (plagData == null) {
     return
   }
-  const data = {
+  const data: {items: PlagiarismData[]; state?: string} = {
     items: []
   }
+
   if (submission.attachments && submission.submission_type === 'online_upload') {
     ref = submission.attachments
     for (i = 0, len = ref.length; i < len; i++) {
@@ -70,7 +89,7 @@ export const extractDataTurnitin = function (submission) {
   const states = (function () {
     let j, len1
     const ref2 = data.items
-    const results = []
+    const results: number[] = []
     for (j = 0, len1 = ref2.length; j < len1; j++) {
       item = ref2[j]
       results.push(parseInt(stateMap[item.state || 'no'], 10))
@@ -81,7 +100,11 @@ export const extractDataTurnitin = function (submission) {
   return data
 }
 
-export const extractDataForTurnitin = function (submission, key, urlPrefix) {
+export const extractDataForTurnitin = function (
+  submission: SubmissionWithOriginalityReport,
+  key: string,
+  urlPrefix: string
+) {
   let data, type
   data = submission?.turnitin_data
   type = 'turnitin'
