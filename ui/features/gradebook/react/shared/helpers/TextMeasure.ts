@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-export function getWidth(text: string) {
+export default function getTextWidth(text: string) {
   let $textMeasure = $('#text-measure')
   if (!$textMeasure.length) {
     $textMeasure = $('<span id="text-measure" style="padding: 10px; display: none;" />').appendTo(
@@ -26,8 +26,4 @@ export function getWidth(text: string) {
     )
   }
   return $textMeasure.text(text).outerWidth()
-}
-
-export default {
-  getWidth
 }
