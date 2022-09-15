@@ -193,10 +193,6 @@ class BigBlueButtonConference < WebConference
                               :welcome => settings[:record] ? t("This conference may be recorded.") : "",
                               "meta_canvas-recording-ready-user" => recording_ready_user,
                               "meta_canvas-recording-ready-url" => recording_ready_url(current_host),
-                              :lockSettingsDisableCam => settings[:share_webcam].nil? || settings[:share_webcam] ? "false" : "true",
-                              :lockSettingsDisableMic => settings[:share_microphone].nil? || settings[:share_microphone] ? "false" : "true",
-                              :lockSettingsDisablePublicChat => settings[:send_public_chat].nil? || settings[:send_public_chat] ? "false" : "true",
-                              :lockSettingsDisablePrivateChat => settings[:send_private_chat].nil? || settings[:send_private_chat] ? "false" : "true",
                               :guestPolicy => settings[:enable_waiting_room].nil? || settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
                               :webcamsOnlyForModerator => settings[:share_other_webcams].nil? || settings[:share_other_webcams] ? "false" : "true",
                             }) or return nil
