@@ -383,6 +383,50 @@ describe LearningOutcomeResult do
     end
   end
 
+  describe "before create" do
+    describe "check_for_existing_result" do
+      before :once do
+        @assignment = assignment_model
+        @outcome = course.created_learning_outcomes.create!(title: "outcome")
+        @lor = LearningOutcomeResult.create(
+          alignment: ContentTag.create!({
+                                          title: "content",
+                                          context: course,
+                                          learning_outcome: @outcome,
+                                          content_id: @assignment.id
+                                        }),
+          user: student,
+          score: 2,
+          learning_outcome_id: @outcome.id
+        )
+      end
+
+      it "deletes previous LearningOutcomeResult for the same user, learning outcome, and alignment" do
+        same_lor = @lor.clone
+        same_lor.save!
+        expect(LearningOutcomeResult.find(@lor.id).workflow_state).to eq("active")
+        expect(LearningOutcomeResult.find(same_lor.id).workflow_state).to eq("deleted")
+      end
+
+      it "creates a LearningOutcomeResult for the same user and learning outcome if there is none for the alignment" do
+        assignment_2 = assignment_model
+        new_lor = LearningOutcomeResult.create(
+          alignment: ContentTag.create!({
+                                          title: "content",
+                                          context: course,
+                                          learning_outcome: @outcome,
+                                          content_id: assignment_2.id
+                                        }),
+          user: student,
+          score: 2,
+          learning_outcome_id: @outcome.id
+        )
+        expect(LearningOutcomeResult.find(@lor.id).workflow_state).to eq("active")
+        expect(LearningOutcomeResult.find(new_lor.id).workflow_state).to eq("active")
+      end
+    end
+  end
+
   describe "before save" do
     describe "#ensure_user_uuid" do
       it "sets user uuid if one is not present" do
