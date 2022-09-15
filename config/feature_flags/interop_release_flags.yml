@@ -88,15 +88,17 @@ variable_substitution_numeric_to_string:
   description: |-
     If enabled, variable substitutions will return string values instead of numeric values
   applies_to: RootAccount
-ags_scores_file_error_improvements:
+ags_scores_multiple_files:
   state: hidden
-  display_name: Better error handling for file uploads in the AGS Scores API
+  display_name: Allow multiple file AGS submissions to count as only one submission
   description: |-
-    If enabled, AGS Scores API requests that include a file upload from a URL that times out
-    will now return a more clear error than "500 Internal Server Error", and will also
-    refrain from saving any data or making any changes to submissions based on the request data,
-    letting tools retry these requests more easily.
+    This feature makes it so that when multiple files are submitted together by
+    a third party tool via the Assignments and Grade Service API they will be
+    grouped as one submission, rather than creating multiple separate submissions.
   applies_to: RootAccount
+  environments:
+    development:
+      state: on
 lti_tools_from_federated_parents:
   state: hidden
   display_name: Show LTI tools from federated parent accounts
