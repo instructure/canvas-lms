@@ -135,7 +135,7 @@ import DownloadSubmissionsDialogManager from '../shared/DownloadSubmissionsDialo
 import ReuploadSubmissionsDialogManager from '../shared/ReuploadSubmissionsDialogManager'
 import GradebookKeyboardNav from '../../jquery/GradebookKeyboardNav'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
-import {getWidth as getTextWidth} from '../shared/helpers/TextMeasure'
+import getTextWidth from '../shared/helpers/TextMeasure'
 import * as GradeInputHelper from '@canvas/grading/GradeInputHelper'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
