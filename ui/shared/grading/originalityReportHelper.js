@@ -29,8 +29,9 @@ export function getOriginalityData(submission, index) {
   let data = null
   if (submission.submissionType === 'online_text_entry') {
     data =
-      submission.originalityData[`submission_${originalityReportSubmissionKey(submission)}`] ||
-      submission.originalityData[`submission_${submission._id}`]
+      submission.originalityData[
+        originalityReportSubmissionKey({...submission, id: submission._id})
+      ] || submission.originalityData[`submission_${submission._id}`]
   } else if (submission.submissionType === 'online_upload') {
     data = submission.originalityData[`attachment_${submission.attachments[index]?._id}`]
   }

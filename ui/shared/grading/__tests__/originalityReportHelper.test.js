@@ -83,6 +83,13 @@ describe('getOriginalityData', () => {
       report_url: 'http://example.com',
       status: 'scored',
       data: '{}'
+    },
+    'submission_4_2011-10-05T14:48:00Z': {
+      similarity_score: 99,
+      state: 'acceptable',
+      report_url: 'http://example.com',
+      status: 'scored',
+      data: '{}'
     }
   }
 
@@ -134,6 +141,24 @@ describe('getOriginalityData', () => {
   it('returns false if there is no originality data associated with an attachment', () => {
     const sub = submission({submissionType: 'online_upload', attachments, originalityData})
     expect(getOriginalityData(sub, 2)).toBe(false)
+  })
+
+  it('returns the camelized data if there is originality data associated with the text entry using a gql submission', async () => {
+    const gqlSubmission = await mockSubmission({
+      Submission: {
+        id: 'asefasdfasdfasdfasdf',
+        _id: 4,
+        submittedAt: '2011-10-05T14:48:00Z',
+        originalityData,
+        submissionType: 'online_text_entry'
+      }
+    })
+    expect(getOriginalityData(gqlSubmission, 0)).toEqual({
+      score: 99,
+      state: 'acceptable',
+      reportUrl: 'http://example.com',
+      status: 'scored'
+    })
   })
 
   it('returns the camelized data if there is originality data associated with the text entry', () => {
