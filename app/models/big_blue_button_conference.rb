@@ -192,9 +192,7 @@ class BigBlueButtonConference < WebConference
                               :record => settings[:record] ? "true" : "false",
                               :welcome => settings[:record] ? t("This conference may be recorded.") : "",
                               "meta_canvas-recording-ready-user" => recording_ready_user,
-                              "meta_canvas-recording-ready-url" => recording_ready_url(current_host),
-                              :guestPolicy => settings[:enable_waiting_room].nil? || settings[:enable_waiting_room] ? "ASK_MODERATOR" : "ALWAYS_ACCEPT",
-                              :webcamsOnlyForModerator => settings[:share_other_webcams].nil? || settings[:share_other_webcams] ? "false" : "true",
+                              "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
                             }) or return nil
     @conference_active = true
     settings[:create_time] = response[:createTime] if response.present?
