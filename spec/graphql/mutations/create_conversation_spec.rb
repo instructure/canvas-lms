@@ -137,6 +137,7 @@ RSpec.describe Mutations::CreateConversation do
     @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
     result = run_mutation(recipients: [new_user.id.to_s], body: "yo", context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react")
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
@@ -327,6 +328,7 @@ RSpec.describe Mutations::CreateConversation do
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2)
       run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], subject: "yo 2", group_conversation: true, bulk_message: true, context_code: @course.asset_string, media_comment_id: "m-whatever", media_comment_type: "video")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.conversation.created.react", 2).at_least(:twice)
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react").at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 2).at_least(:twice)
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.media.react", 2).at_least(:twice)
       expect(Conversation.count).to eql(@old_count + 4)
