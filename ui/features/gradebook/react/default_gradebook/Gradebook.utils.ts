@@ -49,6 +49,8 @@ import filterTypes from './constants/filterTypes'
 
 const I18n = useI18nScope('gradebook')
 
+const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
+
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
 }
@@ -66,7 +68,6 @@ export function forEachSubmission(students: StudentMap, fn) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {
-      const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
         fn(student[key])
       }
@@ -159,6 +160,18 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
 
 export function hiddenStudentIdsForAssignment(studentIds: string[], assignment: Assignment) {
   return _.difference(studentIds, assignment.assignment_visibility)
+}
+
+export function getColumnTypeForColumnId(columnId: string): string {
+  if (columnId.match(/^custom_col/)) {
+    return 'custom_column'
+  } else if (columnId.match(ASSIGNMENT_KEY_REGEX)) {
+    return 'assignment'
+  } else if (columnId.match(/^assignment_group/)) {
+    return 'assignment_group'
+  } else {
+    return columnId
+  }
 }
 
 export function getDefaultSettingKeyForColumnType(columnType: string) {
