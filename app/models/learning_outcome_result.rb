@@ -42,6 +42,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   has_many :learning_outcome_question_results, dependent: :destroy
   simply_versioned
 
+  before_create :check_for_existing_results
+
   before_save :infer_defaults
   before_save :ensure_user_uuid
   before_save :set_root_account_id
@@ -156,6 +158,20 @@ class LearningOutcomeResult < ActiveRecord::Base
   }
 
   private
+
+  def check_for_existing_results
+    # Find all LearningOutcomeResults for a user for a specific learning_outcome_id
+    out_results = LearningOutcomeResult.active.preload(:alignment).where(learning_outcome_id: alignment.learning_outcome_id, user_id: user.id).to_a
+    # Check if there is a LearningOutcomeResult for the alignment
+    out_results.select! { |res| res.alignment.content_id == alignment.content_id }
+    unless out_results.empty?
+      # Delete current LearningOutcomeResult
+      self.workflow_state = "deleted"
+      # Update existing LearningOutcomeResult
+      out_results.first.score = score
+      out_results.first.save!
+    end
+  end
 
   def infer_defaults
     self.learning_outcome_id = alignment.learning_outcome_id

@@ -1592,13 +1592,15 @@ describe Canvas::LiveEvents do
     def create_and_associate_lor(association_object, associated_asset = nil)
       assignment_model
       outcome = @course.created_learning_outcomes.create!(title: "outcome")
+      student = @course.enroll_student(User.create!, active_all: true).user
 
       LearningOutcomeResult.new(
         alignment: ContentTag.create!({
                                         title: "content",
                                         context: @course,
                                         learning_outcome: outcome
-                                      })
+                                      }),
+        user: student
       ).tap do |lor|
         lor.association_object = association_object
         lor.context = @course

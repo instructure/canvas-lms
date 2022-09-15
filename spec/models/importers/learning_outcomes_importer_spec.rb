@@ -163,6 +163,7 @@ describe "Importing Learning Outcomes" do
   end
 
   it "assessed outcomes cannot change calculation method, calculation int and rubric criterion" do
+    student = @course.enroll_student(User.create!, active_all: true).user
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
@@ -188,7 +189,8 @@ describe "Importing Learning Outcomes" do
                                       title: "content",
                                       context: @course,
                                       learning_outcome: existing_outcome
-                                    })
+                                    }),
+      user: student
     )
     lor.save!
     lo_data[:calculation_method] = "n_mastery"
