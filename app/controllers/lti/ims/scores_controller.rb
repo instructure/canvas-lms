@@ -198,12 +198,12 @@ module Lti::IMS
     #         }
     #   }
     def create
-      ags_scores_file_error_improvements = @domain_root_account.feature_enabled?(:ags_scores_file_error_improvements)
-      return old_create unless ags_scores_file_error_improvements
+      ags_scores_multiple_files = @domain_root_account.feature_enabled?(:ags_scores_multiple_files)
+      return old_create unless ags_scores_multiple_files
 
       json = {}
       preflights_and_attachments = compute_preflights_and_attachments(
-        ags_scores_file_error_improvements: ags_scores_file_error_improvements
+        ags_scores_multiple_files: ags_scores_multiple_files
       )
       attachments = preflights_and_attachments.pluck(:attachment)
       json[Lti::Result::AGS_EXT_SUBMISSION] = { content_items: preflights_and_attachments.pluck(:json) }
@@ -419,12 +419,12 @@ module Lti::IMS
       end
     end
 
-    def compute_preflights_and_attachments(ags_scores_file_error_improvements: false)
+    def compute_preflights_and_attachments(ags_scores_multiple_files: false)
       # We defer submitting the assignment if the file error improvements flag is not on
       #   When this feature flag is turned on, we will never submit the assignment,
       #   and always precreate the attachment here
-      precreate_attachment = ags_scores_file_error_improvements
-      submit_assignment = !ags_scores_file_error_improvements
+      precreate_attachment = ags_scores_multiple_files
+      submit_assignment = !ags_scores_multiple_files
       file_content_items.map do |item|
         # Pt 1 of the file upload process, which for non-InstFS (ie local or open source) is all that's needed.
         # This upload will always be URL-only, so unless InstFS is enabled a job will be created to pull the
@@ -450,7 +450,7 @@ module Lti::IMS
         preflight_json = precreate_attachment ? preflight[:json] : preflight
         attachment = precreate_attachment ? preflight[:attachment] : nil
 
-        if submitted_at && ags_scores_file_error_improvements
+        if submitted_at && ags_scores_multiple_files
           # the file upload process uses the Progress#created_at for the homework submission time
           Progress.find(preflight_json[:progress][:id]).update!(created_at: submitted_at)
         end
