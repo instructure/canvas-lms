@@ -386,6 +386,7 @@ export default class EquationEditorModal extends Component {
 
     return (
       <Modal
+        data-mce-component={true}
         label={label}
         onClose={onModalClose}
         onDismiss={this.handleModalCancel}

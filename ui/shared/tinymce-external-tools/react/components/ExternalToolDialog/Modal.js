@@ -24,6 +24,7 @@ export default function ExternalToolDialogModal(props) {
   const {open, label, onOpen, onClose, onCloseButton, name, children} = props
   return (
     <CanvasModal
+      data-mce-component={true}
       padding="0"
       open={open}
       label={label}
