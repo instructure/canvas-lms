@@ -43,6 +43,7 @@ const BaseModalOptions = props => {
               props.onSetName(value)
             }}
             isRequired={true}
+            messages={props.nameValidationMessages}
           />
         </Flex.Item>
         <Flex.Item padding="medium">
@@ -126,6 +127,7 @@ const BaseModalOptions = props => {
             onChange={e => {
               props.onSetDescription(e.target.value)
             }}
+            messages={props.descriptionValidationMessages}
           />
         </Flex.Item>
       </Flex>
@@ -147,7 +149,9 @@ BaseModalOptions.propTypes = {
   showAddressBook: PropTypes.bool,
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string)
+  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  nameValidationMessages: PropTypes.array,
+  descriptionValidationMessages: PropTypes.array
 }
 
 export default BaseModalOptions

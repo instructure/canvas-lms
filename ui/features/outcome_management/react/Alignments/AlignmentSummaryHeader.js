@@ -34,6 +34,7 @@ const AlignmentSummaryHeader = ({
   totalAlignments,
   totalArtifacts,
   alignedArtifacts,
+  artifactAlignments,
   searchString,
   updateSearchHandler,
   clearSearchHandler,
@@ -44,7 +45,7 @@ const AlignmentSummaryHeader = ({
   const percentCoverage = totalOutcomes !== 0 ? alignedOutcomes / totalOutcomes : 0
   const avgPerOutcome = totalOutcomes !== 0 ? totalAlignments / totalOutcomes : 0
   const percentWithAlignments = totalArtifacts !== 0 ? alignedArtifacts / totalArtifacts : 0
-  const avgPerArtifact = totalArtifacts !== 0 ? totalAlignments / totalArtifacts : 0
+  const avgPerArtifact = totalArtifacts !== 0 ? artifactAlignments / totalArtifacts : 0
   const withAlignments = totalOutcomes !== 0 ? alignedOutcomes : 0
   const withoutAlignments = totalOutcomes !== 0 ? totalOutcomes - alignedOutcomes : 0
 
@@ -137,7 +138,7 @@ const AlignmentSummaryHeader = ({
             as="div"
             padding={isMobileView ? 'xx-small xx-small small' : 'x-small'}
             size={isMobileView ? '100%' : '17rem'}
-            shouldGrow
+            shouldGrow={true}
           >
             <OutcomeSearchBar
               placeholder={I18n.t('Search...')}
@@ -167,6 +168,7 @@ AlignmentSummaryHeader.propTypes = {
   totalAlignments: PropTypes.number,
   totalArtifacts: PropTypes.number,
   alignedArtifacts: PropTypes.number,
+  artifactAlignments: PropTypes.number,
   searchString: PropTypes.string,
   updateSearchHandler: PropTypes.func.isRequired,
   clearSearchHandler: PropTypes.func.isRequired,

@@ -96,17 +96,12 @@ class CalendarEvent < ActiveRecord::Base
     next record.errors.add(attr, t("errors.duplicate_child_event_contexts", "Duplicate child event contexts")) if context_codes != context_codes.uniq
 
     contexts = find_all_by_asset_string(context_codes).group_by(&:asset_string)
-    section_level_calendar_permissions = Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
     context_codes.each do |code|
       context = contexts[code] && contexts[code][0]
-      if section_level_calendar_permissions
-        new_event = events.detect { |e| e[:context_code] == context&.asset_string }
-        existing_event = record.child_events.where(context: context).first
-        event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
-        next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
-      elsif context&.grants_right?(record.updating_user, :manage_calendar) && context.try(:parent_event_context) == record.context
-        next
-      end
+      new_event = events.detect { |e| e[:context_code] == context&.asset_string }
+      existing_event = record.child_events.where(context: context).first
+      event_unchanged = new_event && existing_event && DateTime.parse(new_event[:start_at]) == existing_event.start_at && DateTime.parse(new_event[:end_at]) == existing_event.end_at
+      next if (context&.grants_right?(record.updating_user, :manage_calendar) || event_unchanged) && context.try(:parent_event_context) == record.context
 
       break record.errors.add(attr, t("errors.invalid_child_event_context", "Invalid child event context"))
     end

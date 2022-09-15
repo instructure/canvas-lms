@@ -102,12 +102,14 @@ module Lti::Concerns
       if options[:assignment].present?
         assignment = options[:assignment]
         assignment.prepare_for_ags_if_needed!(tool)
-        return assignment_launch_link(assignment, session_token)
+        assignment_launch_link(assignment, session_token)
+      elsif options[:module_item].present?
+        module_item_link(options[:module_item], session_token)
+      elsif options[:launch_url] && options[:id].blank? && options[:launch_type].blank?
+        retrieve_launch_link(context, session_token, options[:launch_url])
+      else
+        course_or_account_launch_link(context, tool, session_token, options[:launch_url])
       end
-
-      return module_item_link(options[:module_item], session_token) if options[:module_item].present?
-
-      course_or_account_launch_link(context, tool, session_token, options[:launch_url])
     end
 
     def module_item_link(module_item, session_token)
@@ -123,6 +125,18 @@ module Lti::Concerns
       course_assignment_url(
         course_id: assignment.course.id,
         id: assignment.id,
+        display: :borderless,
+        session_token: session_token
+      )
+    end
+
+    def retrieve_launch_link(context, session_token, launch_url)
+      context_type = context.class.to_s.downcase
+
+      send(
+        "retrieve_#{context_type}_external_tools_url",
+        context.id,
+        url: launch_url,
         display: :borderless,
         session_token: session_token
       )

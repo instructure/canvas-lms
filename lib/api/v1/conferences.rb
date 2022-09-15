@@ -24,7 +24,7 @@ module Api::V1::Conferences
       id title conference_type description
       duration ended_at started_at user_ids long_running
       recordings join_url has_advanced_settings conference_key
-      context_type context_id
+      context_type context_id start_at end_at
     ].freeze
   }.freeze
 

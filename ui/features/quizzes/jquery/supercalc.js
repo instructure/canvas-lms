@@ -138,9 +138,10 @@ $.fn.superCalc = function(options, more_options) {
         try {
           const val = calcCmd.computeValue(formula_text)
           const decimals = finds.round.val() || 0
+          const preresult = val.toFixed(decimals + 2)
           res =
             '= ' +
-            I18n.n(parseFloat(val.toFixed(decimals + 1)).toFixed(decimals), {
+            I18n.n(parseFloat(preresult.substr(0, preresult.length - 1)).toFixed(decimals), {
               precision: 5,
               strip_insignificant_zeros: true
             })

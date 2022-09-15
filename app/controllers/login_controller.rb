@@ -148,7 +148,10 @@ class LoginController < ApplicationController
     return_to.query = "" unless return_to.query
     return_to.query.concat("session_token=#{token}")
 
-    render json: { session_url: return_to.to_s }
+    render json: {
+      session_url: return_to.to_s,
+      requires_terms_acceptance: login_pseudonym.account.require_acceptance_of_terms?(@real_current_user || @current_user)
+    }
   end
 
   def clear_file_session

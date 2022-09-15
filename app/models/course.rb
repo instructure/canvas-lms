@@ -3147,8 +3147,6 @@ class Course < ActiveRecord::Base
                    else
                      Course.default_tabs
                    end
-    # can't manage people in template courses
-    default_tabs.delete_if { |t| t[:id] == TAB_PEOPLE } if template?
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do

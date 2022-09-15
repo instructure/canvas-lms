@@ -302,6 +302,7 @@ describe "calendar2" do
     end
 
     it "graded discussion appears on all calendars", priority: "1" do
+      skip("LS-3479 -- flay about 16% of the time for no apparent reason")
       create_graded_discussion
 
       # Even though graded discussion overwrites its assignment's title, less fragile to grab discussion's title

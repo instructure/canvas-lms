@@ -359,6 +359,16 @@ describe('Assignment Student Content View', () => {
         Assignment: {allowedAttempts: 3}
       })
       props.assignment.env.peerReviewModeEnabled = true
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned'
+          }
+        ]
+      }
       const {queryByText} = render(
         <MockedProvider>
           <StudentContent {...props} />
@@ -432,6 +442,16 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission()
       props.assignment.env.peerReviewModeEnabled = true
       props.assignment.env.peerReviewAvailable = false
+      props.reviewerSubmission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned'
+          }
+        ]
+      }
       const {getByText} = render(
         <MockedProvider>
           <StudentContent {...props} />

@@ -40,3 +40,17 @@ export const secondsToStopwatchTime = inputSeconds => {
     return `${padToTwoDigits(floor(inputSeconds / 60))}:${padToTwoDigits(floor(inputSeconds % 60))}`
   }
 }
+
+export const responsiveQuerySizes = ({mobile = false, tablet = false, desktop = false} = {}) => {
+  const querySizes = {}
+  if (mobile) {
+    querySizes.mobile = {maxWidth: '767px'}
+  }
+  if (tablet) {
+    querySizes.tablet = {maxWidth: '1023px'}
+  }
+  if (desktop) {
+    querySizes.desktop = {minWidth: tablet ? '1024px' : '768px'}
+  }
+  return querySizes
+}

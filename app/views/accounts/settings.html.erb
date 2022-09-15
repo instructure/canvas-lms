@@ -376,6 +376,12 @@
                     </td>
                   </tr>
                 <% end %>
+                  <tr>
+                    <td colspan="2">
+                      <%= settings.check_box :allow_additional_email_at_registration, checked: @account.allow_additional_email_at_registration? %>
+                      <%= settings.label :allow_additional_email_at_registration, t("Allow users to submit an additional email at registration.") %>
+                    </td>
+                  </tr>
               <% end %>
             <% end %>
           </table>

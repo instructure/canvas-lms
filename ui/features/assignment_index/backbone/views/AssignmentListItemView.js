@@ -39,6 +39,7 @@ import AssignmentKeyBindingsMixin from '../mixins/AssignmentKeyBindingsMixin'
 import 'jqueryui/tooltip'
 import '@canvas/rails-flash-notifications'
 import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
+import {StudentViewPeerReviews} from '../../react/components/StudentViewPeerReviews'
 
 const I18n = useI18nScope('AssignmentListItemView')
 
@@ -158,7 +159,8 @@ export default AssignmentListItemView = (function () {
           'unlock_at',
           'modules',
           'published',
-          'workflow_state'
+          'workflow_state',
+          'assessment_requests'
         ]
         const observe = attrs.map(attr => `change:${attr}`).join(' ')
         this.model.on(observe, this.render)
@@ -303,6 +305,22 @@ export default AssignmentListItemView = (function () {
         this.editAssignmentView.hide()
         if (this.canEdit()) {
           this.editAssignmentView.setTrigger(this.$editAssignmentButton)
+        }
+      }
+
+      const {attributes = {}} = this.model
+      const {assessment_requests: assessmentRequests} = attributes
+      if (assessmentRequests && assessmentRequests.length) {
+        const peerReviewElem =
+          this.$el.find(`#assignment_student_peer_review_${this.model.id}`) ?? []
+        const mountPoint = peerReviewElem[0]
+        if (mountPoint) {
+          ReactDOM.render(
+            React.createElement(StudentViewPeerReviews, {
+              assignment: attributes
+            }),
+            mountPoint
+          )
         }
       }
 

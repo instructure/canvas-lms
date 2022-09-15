@@ -24,7 +24,7 @@ const exampleData = {
   contextModules: [{id: '2601'}, {id: '2602 '}, {id: '2603'}]
 }
 
-describe('useModules', () => {
+describe('modulesState', () => {
   const url = '/api/v1/courses/1/modules'
   let network
 

@@ -33,6 +33,7 @@ import {AccountCalendarItem} from './AccountCalendarItem'
 import {FilterType} from './FilterControls'
 import {Account, VisibilityChange} from '../types'
 import {castIdsToInt} from '../utils'
+import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
 const I18n = useI18nScope('account_calendar_settings_account_list')
 
@@ -72,6 +73,12 @@ export const AccountList: React.FC<ComponentProps> = ({
     setDebouncedSearchTerm(searchValue)
   }, [searchValue, setDebouncedSearchTerm])
 
+  useEffect(() => {
+    if (!isLoading && accounts?.length >= 0) {
+      alertForMatchingAccounts(accounts?.length, debouncedSearchTerm === '')
+    }
+  }, [isLoading, accounts, debouncedSearchTerm])
+
   // @ts-ignore - this hook isn't ts-ified
   useFetchApi({
     path: `/api/v1/accounts/${originAccountId}/account_calendars`,
@@ -96,7 +103,7 @@ export const AccountList: React.FC<ComponentProps> = ({
   if (accounts.length === 0) {
     return (
       <Flex direction="column" alignItems="center" justifyItems="center" padding="xx-large medium">
-        <FlexItem margin="0 0 medium">
+        <FlexItem data-testid="empty-account-search" margin="0 0 medium">
           <Img src={SpacePandaUrl} />
         </FlexItem>
         <FlexItem>

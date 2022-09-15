@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import MobileNavigation from '../MobileNavigation'
 
 describe('MobileNavigation', () => {
@@ -45,8 +45,12 @@ describe('MobileNavigation', () => {
     const hamburgerMenu = document.createElement('div')
     hamburgerMenu.setAttribute('class', 'mobile-header-hamburger')
     document.body.appendChild(hamburgerMenu)
-    const {findByText} = render(<MobileNavigation DesktopNavComponent={nav} />)
+    const {findByText, queryByText} = render(<MobileNavigation DesktopNavComponent={nav} />)
     fireEvent.click(hamburgerMenu)
-    expect(await findByText(nav.state.unreadInboxCount.toString())).toBeInTheDocument()
+    await waitFor(() => {
+      expect(queryByText('Loading ...')).not.toBeInTheDocument()
+    })
+    const count = await findByText(nav.state.unreadInboxCount.toString())
+    expect(count).toBeInTheDocument()
   })
 })

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator.js'
+import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicator'
 
 QUnit.module('LatePolicyApplicator#processSubmission', function() {
   let assignment

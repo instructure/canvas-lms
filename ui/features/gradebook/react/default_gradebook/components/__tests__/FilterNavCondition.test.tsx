@@ -17,24 +17,31 @@
  */
 
 import React from 'react'
-import FilterNavCondition from '../FilterNavCondition'
+import FilterNavFilter from '../FilterTrayFilter'
+import type {FilterNavFilterProps} from '../FilterTrayFilter'
 import {render, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import '@testing-library/jest-dom/extend-expect'
 
-const defaultProps = {
-  conditionsInFilter: [],
+const defaultProps: FilterNavFilterProps = {
   modules: [],
   gradingPeriods: [],
   assignmentGroups: [],
   sections: [],
-  studentGroupCategories: {}
+  studentGroupCategories: {},
+  onChange: jest.fn(),
+  filter: {
+    id: '123',
+    type: 'submissions',
+    value: 'has-ungraded-submissions',
+    created_at: '2021-11-02T20:56:23.616Z'
+  }
 }
 
 const dateTests = (testType: string) => {
-  let props, condition, onChange, onDelete
+  let props, filter, onChange, onDelete
   beforeEach(() => {
-    condition = {
+    filter = {
       id: '456',
       createdAt: '2021-11-02T20:56:23.616Z',
       type: testType,
@@ -42,7 +49,7 @@ const dateTests = (testType: string) => {
     }
     props = {
       ...defaultProps,
-      condition
+      filter
     }
     onChange = jest.fn()
     onDelete = jest.fn()
@@ -50,17 +57,17 @@ const dateTests = (testType: string) => {
 
   it('renders a date field', () => {
     const {getByTestId} = render(
-      <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
     const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
     expect(dateComponent).toBeInTheDocument()
   })
 
-  it('sets the date field value if the condition value is present', () => {
-    condition.value = 'Fri Dec 03 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
-    props.condition = condition
+  it('sets the date field value if the filter value is present', () => {
+    filter.value = 'Fri Dec 03 2021 02:00:00 GMT-0500 (Colombia Standard Time)'
+    props.filter = filter
     const {getByTestId} = render(
-      <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
     const dateComponent: Partial<HTMLInputElement> = getByTestId('date-input')
     expect(dateComponent.value).toContain('Dec 3, 2021')
@@ -68,7 +75,7 @@ const dateTests = (testType: string) => {
 
   it('changing the date input value triggers onChange', async () => {
     const {getByTestId} = render(
-      <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+      <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
     )
     const dateComponent = getByTestId('date-input')
     fireEvent.change(dateComponent, {
@@ -79,7 +86,7 @@ const dateTests = (testType: string) => {
   })
 }
 
-describe('FilterNavCondition', () => {
+describe('FilterNavFilter', () => {
   describe('Start Date', () => {
     dateTests('start-date')
   })
@@ -88,9 +95,9 @@ describe('FilterNavCondition', () => {
   })
 
   describe('submissions', () => {
-    let props, condition, onChange, onDelete
+    let props, filter, onChange, onDelete
     beforeEach(() => {
-      condition = {
+      filter = {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'submissions',
@@ -98,24 +105,24 @@ describe('FilterNavCondition', () => {
       }
       props = {
         ...defaultProps,
-        condition
+        filter
       }
       onChange = jest.fn()
       onDelete = jest.fn()
     })
 
-    it('renders conditions for submissions', () => {
+    it('renders filters for submissions', () => {
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       const button = getByRole('button', {name: 'Submissions'})
       expect(button).toBeInTheDocument()
     })
 
     it('sets the submissions field if value is present', () => {
-      condition.value = 'has-ungraded-submissions'
+      filter.value = 'has-ungraded-submissions'
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Submissions'})
       expect(button?.value).toContain('Has ungraded submissions')
@@ -123,7 +130,7 @@ describe('FilterNavCondition', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       userEvent.click(getByRole('button', {name: 'Submissions'}))
       userEvent.click(getByRole('option', {name: 'Has ungraded submissions'}))
@@ -137,9 +144,9 @@ describe('FilterNavCondition', () => {
   })
 
   describe('sections', () => {
-    let props, condition, onChange, onDelete
+    let props, filter, onChange, onDelete
     beforeEach(() => {
-      condition = {
+      filter = {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'section',
@@ -147,7 +154,7 @@ describe('FilterNavCondition', () => {
       }
       props = {
         ...defaultProps,
-        condition,
+        filter,
         sections: [
           {id: '1', name: 'Section 1'},
           {id: '2', name: 'Section 2'}
@@ -158,9 +165,9 @@ describe('FilterNavCondition', () => {
     })
 
     it('sets the sections field if value is present', () => {
-      condition.value = '1'
+      filter.value = '1'
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Sections'})
       expect(button.value).toContain('Section 1')
@@ -168,7 +175,7 @@ describe('FilterNavCondition', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       userEvent.click(getByRole('button', {name: 'Sections'}))
       userEvent.click(getByRole('option', {name: 'Section 1'}))
@@ -183,9 +190,9 @@ describe('FilterNavCondition', () => {
   })
 
   describe('grading periods', () => {
-    let props, condition, onChange, onDelete
+    let props, filter, onChange, onDelete
     beforeEach(() => {
-      condition = {
+      filter = {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'grading-period',
@@ -193,7 +200,7 @@ describe('FilterNavCondition', () => {
       }
       props = {
         ...defaultProps,
-        condition,
+        filter,
         gradingPeriods: [
           {id: '1', title: 'Grading Period 1', startDate: 1},
           {id: '2', title: 'Grading Period 2', startDate: 2},
@@ -205,9 +212,9 @@ describe('FilterNavCondition', () => {
     })
 
     it('sets the grading periods field if value is present', () => {
-      condition.value = '1'
+      filter.value = '1'
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Grading Periods'})
       expect(button.value).toContain('Grading Period 1')
@@ -215,7 +222,7 @@ describe('FilterNavCondition', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       userEvent.click(getByRole('button', {name: 'Grading Periods'}))
       userEvent.click(getByRole('option', {name: 'Grading Period 1'}))
@@ -230,9 +237,9 @@ describe('FilterNavCondition', () => {
   })
 
   describe('student groups', () => {
-    let props, condition, onChange, onDelete
+    let props, filter, onChange, onDelete
     beforeEach(() => {
-      condition = {
+      filter = {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'student-group',
@@ -240,7 +247,7 @@ describe('FilterNavCondition', () => {
       }
       props = {
         ...defaultProps,
-        condition,
+        filter,
         studentGroupCategories: {
           '1': {
             id: '1',
@@ -265,9 +272,9 @@ describe('FilterNavCondition', () => {
     })
 
     it('sets the student group field if value is present', () => {
-      condition.value = '1'
+      filter.value = '1'
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       const button: Partial<HTMLButtonElement> = getByRole('button', {name: 'Student Groups'})
       expect(button.value).toContain('Student Group 1')
@@ -275,7 +282,7 @@ describe('FilterNavCondition', () => {
 
     it('changing value triggers onChange', async () => {
       const {getByRole} = render(
-        <FilterNavCondition {...props} onChange={onChange} onDelete={onDelete} />
+        <FilterNavFilter {...props} onChange={onChange} onDelete={onDelete} />
       )
       userEvent.click(getByRole('button', {name: 'Student Groups'}))
       userEvent.click(getByRole('option', {name: 'Student Group 1'}))

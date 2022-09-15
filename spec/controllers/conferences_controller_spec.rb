@@ -258,7 +258,7 @@ describe ConferencesController do
       it "creates a conference and event correctly" do
         user_session(@teacher)
 
-        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true } }, format: "json"
+        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: "1" } }, format: "json"
         created_conference = WebConference.last
         created_calendar_event = created_conference.calendar_event
 
@@ -272,7 +272,7 @@ describe ConferencesController do
         group = @course.groups.create!(name: "some group")
         group.add_user(@student)
 
-        post "create", params: { group_id: group.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true } }, format: "json"
+        post "create", params: { group_id: group.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: "1" } }, format: "json"
         created_conference = WebConference.last
         created_calendar_event = created_conference.calendar_event
 
@@ -280,12 +280,12 @@ describe ConferencesController do
         expect(response).to be_successful
       end
 
-      it "creates a conference when conference start and end date are set" do
+      it "creates a calendar event when calendar_event is set, with start_at and end_at params" do
         user_session(@teacher)
         start_time = Date.today
         end_time = Date.today + 1.day
 
-        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: true, start_at: start_time, end_at: end_time } }, format: "json"
+        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference", conference_type: "Wimba", calendar_event: "1", start_at: start_time, end_at: end_time } }, format: "json"
         created_conference = WebConference.last
         created_calendar_event = created_conference.calendar_event
 
@@ -293,6 +293,19 @@ describe ConferencesController do
         expect(created_calendar_event.context).to eq @course
         expect(created_calendar_event.start_at).to eq start_time
         expect(created_calendar_event.end_at).to eq end_time
+        expect(response).to be_successful
+      end
+
+      it "does not create a calendar_event when checkbox unchecked" do
+        allow(WebConference).to receive(:plugins).and_return(
+          [OpenObject.new(id: "big_blue_button", settings: { domain: "bbb.instructure.com", secret_dec: "secret" }, valid_settings?: true, enabled?: true),]
+        )
+        user_session(@teacher)
+        post "create", params: { course_id: @course.id, web_conference: { title: "My Conference Nwahc", conference_type: "BigBlueButton", calendar_event: "0" } }, format: "json"
+        created_conference = WebConference.last
+
+        expect(created_conference.title).to eq("My Conference Nwahc")
+        expect(created_conference.calendar_event).to be_falsey
         expect(response).to be_successful
       end
     end
@@ -346,6 +359,69 @@ describe ConferencesController do
       expect(body["user_ids"]).to include(@teacher.id)
       expect(body["user_ids"]).to include(@student.id)
       expect(body["user_ids"]).to include(@student2.id)
+    end
+
+    it "deletes calendar event when calendar_event is not set" do
+      user_session(@teacher)
+      allow(WebConference).to receive(:plugins).and_return(
+        [OpenObject.new(id: "big_blue_button", settings: { domain: "bbb.instructure.com", secret_dec: "secret" }, valid_settings?: true, enabled?: true),]
+      )
+
+      @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", duration: 60, user: @teacher)
+      @conference.users << @student
+      @conference.calendar_event = calendar_event_model
+      @conference.save!
+
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+          sync_attendees: true,
+          calendar_event: "0"
+        },
+      }
+
+      post :update, params: params, format: "json"
+
+      created_conference = WebConference.find(@conference.id)
+      created_calendar_event = created_conference.calendar_event
+
+      expect(created_calendar_event).to be_falsey
+      expect(response).to be_successful
+    end
+
+    it "creates a calendar event when calendar_event is set, with start_at and end_at params" do
+      user_session(@teacher)
+      allow(WebConference).to receive(:plugins).and_return(
+        [OpenObject.new(id: "big_blue_button", settings: { domain: "bbb.instructure.com", secret_dec: "secret" }, valid_settings?: true, enabled?: true),]
+      )
+
+      start_time = Date.today
+      end_time = Date.today + 1.day
+      @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", user: @teacher)
+
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+          sync_attendees: true,
+          calendar_event: "1",
+          start_at: start_time,
+          end_at: end_time
+        },
+      }
+
+      post :update, params: params, format: "json"
+      created_conference = WebConference.find(@conference.id)
+      created_calendar_event = created_conference.calendar_event
+
+      expect(created_calendar_event).to be_truthy
+      expect(created_calendar_event.context).to eq @course
+      expect(created_calendar_event.start_at).to eq start_time
+      expect(created_calendar_event.end_at).to eq end_time
+      expect(response).to be_successful
     end
   end
 

@@ -2202,6 +2202,7 @@ nn:
   allow_dashboard_cards_to_be_reordered_for_each_use_81f989d7: "Tillat at kvar brukar kan reorganisere dashbordkorta sine. "
   allow_final_grade_override_8cf4336b: "Tillat å overstyre sluttvurdering"
   allow_final_grade_override_a21a79ee: "Tillat å overstyre sluttvurdering"
+  allow_for_apollo_to_cache_graphql_queries_on_a_use_bda8210d: "Tillat Apollo å cache GraphQL spørringar til ein brukar sin nettlesar for å gjere brukaropplevelsen raskare."
   allow_gradebook_users_to_view_and_export_student_f_68a8084b: "Tillat brukarane av vurderingsoversikta å sjå og eksportere studentane sitt fornavn og etternavn i adskilde kolonner"
   allow_importing_of_qti_and_common_cartridge_into_n_4380a7a2: "Tillat import av QTI og Common Cartridge til New Quizzes."
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Tillat import av QTI og Common Cartridge til Quizzes.Next."
@@ -2862,6 +2863,7 @@ nn:
   an_object_of_type_graphql_type_was_hidden_due_to_i_60998e99: "Eit objekt av typen %{graphql_type} er skjult på grunn av omfangsavgrensing på tilgangstoken"
   an_outcome_group_can_only_have_one_parent_c626c13b: "Ei læringsmålgruppe kan kun ha eit overordna nivå"
   an_outcome_import_is_currently_in_progress_11e6cb38: "Import av læringsmål er i gang akkurat no."
+  an_sftp_user_can_only_be_managed_from_a_root_accou_57d9d8e6: "Ein SFTP-brukar kan berre administrerast frå ein rotkonto."
   an_unexpected_error_has_occurred_see_error_report__f20b878d: "Det oppstod ein uventa feil: sjå feilrapport %{id}"
   an_unknown_error_has_occurred_verify_the_csv_file__96087ece: "Ein ukjend feil har oppstått. Kontroller CSVfila eller prøv igjen seinare."
   an_unknown_error_occurred_please_reach_out_in_canv_43a4da74: |-
@@ -4345,6 +4347,7 @@ nn:
   belgium_32_e5f5b598: "Belgia (+32)"
   belgium_ef8739b6: Belgia
   below_mastery_abd1dca5: "Under meistringsnivå"
+  below_min_rating_78a742c3: "Under minimum vurdering"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedanfor søkefeltet finn du ei liste med %{content_type}. Etter kvart som du skriv blir lista filtrert etter søket ditt. Samtalemeldingar blir filtrerte etter alternativa du vel."
   beta_cb5f307e: Beta
   beta_lti_launch_c200ffdf: "Beta LTI-lansering"
@@ -7696,6 +7699,7 @@ nn:
         course_visibility: Synlegheit
         custom_course_visibility: Tilpass
         default_due_time: "Standard forfallstidspunkt"
+        enable_course_paces: "Skru på emnetempo"
         enrollment_term_id: Semester
         enrollments_from_homeroom: Påmeldingar
         friendly_name: "Vennleg namn"

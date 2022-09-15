@@ -17,7 +17,7 @@
  */
 
 import MockCanvasClient from '../../../support/MockCanvasClient'
-import * as Api from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Api.js'
+import * as Api from 'ui/features/gradebook/react/AssignmentPostingPolicyTray/Api'
 
 QUnit.module('AssignmentPostingPolicyTray Api', () => {
   QUnit.module('.setAssignmentPostPolicy()', hooks => {

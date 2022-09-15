@@ -174,6 +174,16 @@ describe "Jobs V2 API", type: :request do
                           { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "strand", term: "bar" })
           expect(json).to eq({ "bar" => 2 })
         end
+
+        it "flags orphaned strands" do
+          Delayed::Job.where(strand: "bar").update_all(next_in_strand: false)
+          json = api_call(:get, "/api/v1/jobs2/queued/by_strand",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "info" })
+          expect(json[0]["strand"]).to eq "bar"
+          expect(json[0]["orphaned"]).to eq true
+          expect(json[1]["strand"]).to eq "foo"
+          expect(json[1]["orphaned"]).to eq false
+        end
       end
 
       describe "by_singleton" do
@@ -199,6 +209,16 @@ describe "Jobs V2 API", type: :request do
           json = api_call(:get, "/api/v1/jobs2/queued/by_singleton/search?term=2000",
                           { controller: "jobs_v2", action: "search", format: "json", bucket: "queued", group: "singleton", term: "2000" })
           expect(json.to_a).to eq([["foobar2000", 1], ["zombo20001", 1]])
+        end
+
+        it "flags orphaned singletons" do
+          Delayed::Job.where(singleton: "zombo20001").update_all(next_in_strand: false)
+          json = api_call(:get, "/api/v1/jobs2/queued/by_singleton",
+                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "singleton", order: "info" })
+          expect(json[0]["singleton"]).to eq "zombo20001"
+          expect(json[0]["orphaned"]).to eq true
+          expect(json[1]["singleton"]).to eq "foobar2000"
+          expect(json[1]["orphaned"]).to eq false
         end
       end
 

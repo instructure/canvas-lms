@@ -958,6 +958,9 @@ class Assignment < ActiveRecord::Base
       ensure_assignment_group(false)
     end
     self.submission_types ||= "none"
+    if will_save_change_to_submission_types? && ["none", "on_paper"].include?(self.submission_types)
+      self.allowed_attempts = nil
+    end
     self.peer_reviews_assigned = false if peer_reviews_due_at_changed?
     %i[
       all_day could_be_locked grade_group_students_individually
@@ -1091,7 +1094,8 @@ class Assignment < ActiveRecord::Base
 
     modules.each do |mod|
       if mod.context_module_progressions.where(current: true, user_id: student_ids).update_all(current: false) > 0
-        mod.delay_if_production(strand: "module_reeval_#{mod.global_context_id}").evaluate_all_progressions
+        mod.delay_if_production(n_strand: ["evaluate_module_progressions", global_context_id],
+                                singleton: "evaluate_module_progressions:#{mod.global_id}").evaluate_all_progressions
       end
     end
   end

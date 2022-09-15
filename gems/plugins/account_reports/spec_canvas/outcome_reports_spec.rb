@@ -404,7 +404,7 @@ describe "Outcome Reports" do
       before(:once) do
         outcome_group = @root_account.root_outcome_group
         @quiz_outcome = @root_account.created_learning_outcomes.create!(short_description: "new outcome")
-        @quiz = @course1.quizzes.create!(title: "new quiz", shuffle_answers: true, quiz_type: "assignment")
+        @quiz = @course1.quizzes.create!(title: "quiz", shuffle_answers: true, quiz_type: "assignment")
         @q1 = @quiz.quiz_questions.create!(question_data: true_false_question_data)
         @q2 = @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
         bank = @q1.assessment_question.assessment_question_bank
@@ -421,6 +421,7 @@ describe "Outcome Reports" do
         @quiz_outcome.reload
         outcome_group.add_outcome(@quiz_outcome)
         @quiz_outcome_result = LearningOutcomeResult.find_by(artifact: @quiz_submission)
+        @new_quiz = @course1.assignments.create!(title: "New Quiz", submission_types: "external_tool")
       end
 
       it "works with quizzes" do
@@ -462,27 +463,61 @@ describe "Outcome Reports" do
         expect(report[0]["learning outcome rating"]).to eq "Does Not Meet Expectations"
       end
 
-      context ":outcome_service_results_to_canvas feature flag" do
+      context ":outcome_service_results_to_canvas" do
         let(:outcome_reports) do
           account_report = AccountReport.new(report_type: "outcome_export_csv", account: @root_account, user: @user1)
           AccountReports::OutcomeReports.new(account_report)
         end
+        let(:assignment_ids) { @new_quiz.id.to_s }
+        let(:outcome_ids) { @outcome.id.to_s }
+        let(:uuids) { "#{@user1.uuid},#{@user2.uuid}" }
 
-        it "does call OS when FF is on" do
+        it "filters out users that do not have results" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
-          assignment_ids = ""
-          outcome_ids = @outcome.id.to_s
-          uuids = "#{@user1.uuid},#{@user2.uuid}"
-          expect(outcome_reports).to receive(:get_lmgb_results).with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return([{ "user_uuid" => @user1.uuid,
+                           "external_outcome_id" => @outcome.id,
+                           "associated_asset_id" => @new_quiz.id,
+                           "mastery" => nil }])
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
 
-          outcome_reports.send(:outcomes_lmgb_results)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+        end
+
+        it "keeps the result with the latest submission date" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return([{ "user_uuid" => @user1.uuid,
+                           "external_outcome_id" => @outcome.id,
+                           "associated_asset_id" => @new_quiz.id,
+                           "points" => "1.0",
+                           "submitted_at" => "2022-09-19T12:00:00.0Z",
+                           "mastery" => nil },
+                         { "user_uuid" => @user1.uuid,
+                           "external_outcome_id" => @outcome.id,
+                           "associated_asset_id" => @new_quiz.id,
+                           "points" => "2.0",
+                           "submitted_at" => "2022-08-19T12:00:00.0Z",
+                           "mastery" => nil }])
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results.length).to eq(1)
+          expect(results[0]["student uuid"]).to eq @user1.uuid
+          expect(results[0]["outcome score"]).to eq "1.0"
         end
 
         it "does not call OS when FF is off" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
-          expect(outcome_reports).to_not receive(:get_lmgb_results)
+          # get_lmgb_results is still called, but the first line checks is the FF is enabled and returns nil if OFF
+          # In that case, get_lmgb_results returns nil
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
 
-          outcome_reports.send(:outcomes_lmgb_results)
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+          expect(results).to be_empty
         end
       end
 

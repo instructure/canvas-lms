@@ -20,7 +20,7 @@
 full_path_glob = "(/*full_path)"
 
 # allow plugins to prepend routes
-Dir["{gems,vendor}/plugins/*/config/pre_routes.rb"].each do |pre_routes|
+Dir[Rails.root.join("{gems,vendor}/plugins/*/config/pre_routes.rb")].each do |pre_routes|
   load pre_routes
 end
 
@@ -1664,6 +1664,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: :services_api) do
       get "services/kaltura", action: :show_kaltura_config
       post "services/kaltura_session", action: :start_kaltura_session
+      get "services/rce_config", action: :rce_config
     end
 
     scope(controller: :calendar_events_api) do

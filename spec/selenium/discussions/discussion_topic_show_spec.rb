@@ -164,18 +164,18 @@ describe "Discussion Topic Show" do
         get "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
         f("button[data-testid='discussion-topic-reply']").click
         wait_for_ajaximations
-        type_in_tiny "textarea", "@"
-        wait_for_ajaximations
-        driver.action.send_keys(:arrow_down).perform # Jeff
-        driver.action.send_keys(:arrow_down).perform # Jefferson
-        driver.action.send_keys(:arrow_down).perform # Jeffrey
-        driver.action.send_keys(:enter).perform
+        %w[Jeff Jefferson Jeffrey].each do |name|
+          type_in_tiny "textarea", "@"
+          wait_for_ajaximations
+          fj("li:contains('#{name}')").click
+        end
         wait_for_ajaximations
         driver.action.send_keys("HI!").perform
         wait_for_ajaximations
         fj("button:contains('Reply')").click
         wait_for_ajaximations
-        expect(fj("p:contains('@JeffreyHI!')")).to be_present
+        expect(fj("p:contains('@Jeff@Jefferson@JeffreyHI!')")).to be_present
+        expect(ff(".user_content p").count).to eq 1
       end
     end
 

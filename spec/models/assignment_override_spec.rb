@@ -129,6 +129,25 @@ describe AssignmentOverride do
       @student.destroy
       expect(override.reload.notify_change?).to be false
     end
+
+    it "does not notify of change for course that has concluded" do
+      due_date_timestamp = DateTime.now.iso8601
+      assignment = assignment_model(course: @course)
+      override = assignment.assignment_overrides.create!(
+        due_at: due_date_timestamp,
+        due_at_overridden: true
+      )
+      override.assignment_override_students.create!(user: @student)
+      assignment.update(due_at: nil, only_visible_to_overrides: true, created_at: Time.now - 4.hours)
+      expect(override.notify_change?).to be true
+
+      expect do
+        @course.soft_conclude!
+        @course.save!
+      end.to change {
+        override.reload.notify_change?
+      }.from(true).to(false)
+    end
   end
 
   describe "#adhoc?" do

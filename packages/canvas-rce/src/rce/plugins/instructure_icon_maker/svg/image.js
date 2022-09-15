@@ -19,21 +19,50 @@
 import {createSvgElement} from './utils'
 import {CLIP_PATH_ID} from './clipPath'
 import {Shape} from './shape'
-import {Size} from './constants'
+import {Size, STROKE_WIDTH, BASE_SIZE, ICON_PADDING} from './constants'
+
+const STOCK_IMAGE_TYPES = ['SingleColor', 'MultiColor']
+
+const calculateImageHeight = ({size, outlineSize}) => {
+  // Subtract the padding at the top and the bottom
+  // to get the true height of the shape in the icon
+  const iconHeightLessPadding = BASE_SIZE[size] - 2 * ICON_PADDING
+
+  // Shrink it by the size of the stroke width so the
+  // border doesn't cover parts of the cropped image
+  return iconHeightLessPadding - STROKE_WIDTH[outlineSize]
+}
 
 export function buildImage(settings) {
   // Don't attempt to embed an image if none exist
   if (!settings.encodedImage) return
 
+  let imageAttributes
+  if (STOCK_IMAGE_TYPES.includes(settings.encodedImageType)) {
+    imageAttributes = {
+      x: settings.x,
+      y: settings.y,
+      transform: settings.transform,
+      width: settings.width,
+      height: settings.height,
+      href: settings.encodedImage
+    }
+  } else {
+    // we need to embed the encoded image
+    const squareHeight = calculateImageHeight(settings)
+    const translation = translationFor(squareHeight)
+    imageAttributes = {
+      x: '50%',
+      y: '50%',
+      transform: `translate(${translation}, ${translation})`,
+      width: squareHeight,
+      height: squareHeight,
+      href: settings.encodedImage
+    }
+  }
+
   const group = createSvgElement('g', {'clip-path': `url(#${CLIP_PATH_ID})`})
-  const image = createSvgElement('image', {
-    x: settings.x,
-    y: settings.y,
-    transform: settings.transform,
-    width: settings.width,
-    height: settings.height,
-    href: settings.encodedImage
-  })
+  const image = createSvgElement('image', imageAttributes)
 
   group.appendChild(image)
 

@@ -116,7 +116,6 @@
     border: 1px solid;
   }
   .not-checked {
-    color: #888;
     .context-list-toggle-box {
       border-color: #bbbbbb !important;
       background-color: #e6e7e9 !important;
@@ -140,5 +139,38 @@
 
   .context_list_context:focus-within .ContextList__DeleteBtn {
     visibility: visible;
+  }
+}
+
+#other-calendars-section-header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #C7CDD1;
+  #manage-accounts-btn{
+    padding-top: 0.66rem;
+  }
+  h2 {
+    border: none;
+    margin-bottom: 2px;
+  }
+}
+
+#other-calendar-actions-row {
+  line-height: 1;
+  .element_toggler {
+    float: direction(left);
+    margin-top: 1rem !important;
+  }
+  div.new-feature-pill{
+    max-width: 12rem;
+    margin-top: 1rem !important;
+    margin-left: 0.5rem !important;
+    float: direction(right);
+    color: var(--ic-brand-primary);
+    border-radius: 0.5rem;
+    border: 1px solid var(--ic-brand-primary);
+    font-size:0.8rem;
+    text-transform: uppercase;
+    padding: 0.1rem 0.25rem;
   }
 }

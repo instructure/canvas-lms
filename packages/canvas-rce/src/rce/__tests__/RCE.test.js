@@ -21,15 +21,6 @@ import {render, waitFor} from '@testing-library/react'
 import RCE from '../RCE'
 import bridge from '../../bridge'
 
-const requiredProps = {
-  features: {
-    new_equation_editor: true,
-    new_math_equation_handling: true,
-    rce_ux_improvements: true
-  },
-  timezone: 'America/Denver'
-}
-
 describe('RCE', () => {
   let target
 
@@ -47,16 +38,13 @@ describe('RCE', () => {
   })
 
   it('bridges newly rendered editors', async () => {
-    render(<RCE textareaId="textarea3" {...requiredProps} />, target)
+    render(<RCE textareaId="textarea3" />, target)
     await waitFor(() => expect(bridge.activeEditor().constructor.displayName).toEqual('RCEWrapper'))
   })
 
   it('supports getCode() and setCode() on its ref', async () => {
     const rceRef = createRef(null)
-    render(
-      <RCE ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" {...requiredProps} />,
-      target
-    )
+    render(<RCE ref={rceRef} textareaId="textarea3" defaultContent="Hello RCE!" />, target)
 
     await waitFor(() => expect(rceRef.current).not.toBeNull())
 

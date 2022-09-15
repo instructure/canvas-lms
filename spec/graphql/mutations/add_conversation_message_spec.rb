@@ -204,14 +204,15 @@ RSpec.describe Mutations::AddConversationMessage do
     ).to eq "Course concluded, unable to send messages"
   end
 
-  it "allows new messages in concluded courses for teachers" do
+  it "does not allow new messages in concluded courses for teachers" do
     conversation(users: [@teacher])
     @course.update!(workflow_state: "completed")
 
     result = run_mutation({ conversation_id: @conversation.conversation_id, body: "I have the power", recipients: [@teacher.id.to_s, @student.id.to_s] }, @teacher)
     expect(result["errors"]).to be nil
+    expect(result.dig("data", "addConversationMessage", "conversationMessage")).to be nil
     expect(
-      result.dig("data", "addConversationMessage", "conversationMessage", "body")
-    ).to eq "I have the power"
+      result.dig("data", "addConversationMessage", "errors", 0, "message")
+    ).to eq "Unauthorized, unable to add messages to conversation"
   end
 end

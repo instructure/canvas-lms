@@ -111,7 +111,7 @@ const ConferencesRouter = Backbone.Router.extend({
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
       if (ENV.bbb_modal_update) {
-        const {attributes} = conference // || ENV.default_conference
+        const {attributes} = conference
 
         const availableAttendeesList = ENV.users.map(({id, name}) => {
           return {
@@ -129,7 +129,7 @@ const ConferencesRouter = Backbone.Router.extend({
               window.location.hash = ''
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
-            onSubmit={(e, data) => {
+            onSubmit={async (e, data) => {
               const context =
                 attributes.context_type === 'Course'
                   ? 'courses'
@@ -142,6 +142,12 @@ const ConferencesRouter = Backbone.Router.extend({
               const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
               const duration = noTimeLimit ? '' : data.duration
               const record = data.options.includes('recording_enabled') ? 1 : 0
+              const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
+              const start_at = calendar_event ? data.startCalendarDate : null
+              const end_at = calendar_event ? data.endCalendarDate : null
+
+              const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
               const payload = {
                 _method: 'POST',
                 title: data.name,
@@ -158,7 +164,10 @@ const ConferencesRouter = Backbone.Router.extend({
                 description: data.description,
                 'web_conference[description]': data.description,
                 'user[all]': inviteAll,
-                'observers[remove]': 0
+                'observers[remove]': remove_observers,
+                'web_conference[start_at]': start_at,
+                'web_conference[end_at]': end_at,
+                'web_conference[calendar_event]': calendar_event
               }
               if (inviteAll) {
                 ENV.users.forEach(userId => {
@@ -191,17 +200,17 @@ const ConferencesRouter = Backbone.Router.extend({
               }
 
               if (!context) {
-                return
+                return false
               }
 
-              fetch(`/${context}/${contextId}/conferences`, requestOptions)
-                .then(() => {
-                  // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                  window.location.href = window.location.href.split('#')[0]
-                })
-                .catch(err => {
-                  throw err
-                })
+              const response = await fetch(`/${context}/${contextId}/conferences`, requestOptions)
+
+              if (response.status === 200) {
+                window.location.href = window.location.href.split('#')[0]
+                return true
+              } else {
+                return false
+              }
             }}
           />,
           document.getElementById('react-conference-modal-container')
@@ -241,7 +250,9 @@ const ConferencesRouter = Backbone.Router.extend({
         options.push('enable_waiting_room')
       }
 
-      // TBD Add to Calendar
+      if (attributes.start_at && attributes.end_at) {
+        options.push('add_to_calendar')
+      }
 
       ;[
         'share_webcam',
@@ -268,11 +279,13 @@ const ConferencesRouter = Backbone.Router.extend({
           attendeesOptions={attendeesOptions}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={attributes.user_ids}
+          startCalendarDate={attributes.start_at}
+          endCalendarDate={attributes.end_at}
           onDismiss={() => {
             window.location.hash = ''
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
-          onSubmit={(e, data) => {
+          onSubmit={async (e, data) => {
             const context =
               attributes.context_type === 'Course'
                 ? 'courses'
@@ -286,6 +299,11 @@ const ConferencesRouter = Backbone.Router.extend({
             const duration = noTimeLimit ? '' : data.duration
             const record = data.options.includes('recording_enabled') ? 1 : 0
             const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
+            const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
+            const start_at = calendar_event ? data.startCalendarDate : null
+            const end_at = calendar_event ? data.endCalendarDate : null
+            const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
             const payload = {
               _method: 'PUT',
               title: data.name,
@@ -302,7 +320,10 @@ const ConferencesRouter = Backbone.Router.extend({
               description: data.description,
               'web_conference[description]': data.description,
               'user[all]': inviteAll,
-              'observers[remove]': 0
+              'observers[remove]': remove_observers,
+              'web_conference[start_at]': start_at,
+              'web_conference[end_at]': end_at,
+              'web_conference[calendar_event]': calendar_event
             }
 
             if (inviteAll) {
@@ -339,17 +360,20 @@ const ConferencesRouter = Backbone.Router.extend({
             }
 
             if (!context) {
-              return
+              return false
             }
 
-            fetch(`/${context}/${contextId}/conferences/${conferenceId}`, requestOptions)
-              .then(() => {
-                // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                window.location.href = window.location.href.split('#')[0]
-              })
-              .catch(err => {
-                throw err
-              })
+            const response = await fetch(
+              `/${context}/${contextId}/conferences/${conferenceId}`,
+              requestOptions
+            )
+
+            if (response.status === 200) {
+              window.location.href = window.location.href.split('#')[0]
+              return true
+            } else {
+              return false
+            }
           }}
         />,
         document.getElementById('react-conference-modal-container')

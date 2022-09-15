@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect} from 'react'
 import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
@@ -28,6 +28,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Checkbox} from '@instructure/ui-checkbox'
 import SVGWrapper from '@canvas/svg-wrapper'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
 const I18n = useI18nScope('account_calendars_results_area')
 
@@ -49,6 +50,12 @@ const AccountCalendarResultsArea = ({
   selectedCalendars,
   setSelectedCalendars
 }) => {
+  useEffect(() => {
+    if (!isLoading && results?.length >= 0) {
+      alertForMatchingAccounts(results?.length, searchTerm === '')
+    }
+  }, [isLoading, searchTerm, results])
+
   if (isLoading) {
     return (
       <View as="div" textAlign="center">
@@ -103,7 +110,7 @@ const AccountCalendarResultsArea = ({
           <Text weight="bold">{searchTerm}</Text>
         </View>
       )}
-      <List isUnstyled margin="small none">
+      <List isUnstyled={true} margin="small none">
         {results.map(r => (
           <List.Item key={r.id}>
             <View as="div" borderWidth="none none small" theme={{borderColorPrimary: '#e6e6e6'}}>

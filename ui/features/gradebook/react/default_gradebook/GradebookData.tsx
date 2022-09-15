@@ -36,7 +36,7 @@ export default function GradebookData(props) {
   const courseId = props.gradebookEnv.context_id
   const flashMessages = useStore(state => state.flashMessages)
 
-  const appliedFilterConditions = useStore(state => state.appliedFilterConditions, shallow)
+  const appliedFilters = useStore(state => state.appliedFilters, shallow)
   const isFiltersLoading = useStore(state => state.isFiltersLoading)
   const initializeStagedFilter = useStore(state => state.initializeStagedFilter)
   const fetchFilters = useStore(state => state.fetchFilters)
@@ -44,6 +44,10 @@ export default function GradebookData(props) {
   const modules = useStore(state => state.modules)
   const isModulesLoading = useStore(state => state.isModulesLoading)
   const fetchModules = useStore(state => state.fetchModules)
+
+  const customColumns = useStore(state => state.customColumns, shallow)
+  const isCustomColumnsLoading = useStore(state => state.isCustomColumnsLoading)
+  const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
 
   // Initial state
   // We might be able to do this in gradebook/index.tsx instead
@@ -73,9 +77,11 @@ export default function GradebookData(props) {
     if (props.gradebookEnv.has_modules) {
       fetchModules()
     }
+    fetchCustomColumns()
   }, [
     fetchFilters,
     fetchModules,
+    fetchCustomColumns,
     props.gradebookEnv.enhanced_gradebook_filters,
     props.gradebookEnv.has_modules,
     initializeStagedFilter,
@@ -88,10 +94,12 @@ export default function GradebookData(props) {
       {...props}
       flashAlerts={flashMessages}
       hideGrid={false}
-      appliedFilterConditions={appliedFilterConditions}
+      appliedFilters={appliedFilters}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
       modules={modules}
+      customColumns={customColumns}
+      isCustomColumnsLoading={isCustomColumnsLoading}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}

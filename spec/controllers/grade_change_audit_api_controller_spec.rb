@@ -120,8 +120,7 @@ describe GradeChangeAuditApiController do
         events.map { |event| event.dig("links", "assignment") }.uniq
       end
 
-      it "includes override grade change events in the results if the feature flag is enabled and the course allows overrides" do
-        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+      it "includes override grade change events in the results when the course allows overrides" do
         course.enable_feature!(:final_grades_override)
         course.allow_final_grade_override = true
         course.save!
@@ -129,16 +128,7 @@ describe GradeChangeAuditApiController do
         expect(returned_event_assignment_ids).to contain_exactly(assignment.id, nil)
       end
 
-      it "excludes override grade change events from the results if the feature flag is disabled" do
-        # These results should contain only the assignment-level grade changes
-        # we created as part of setup, and not the override grade change we
-        # just added
-        expect(returned_event_assignment_ids).to contain_exactly(assignment.id)
-      end
-
       it "excludes override grade change events from the results when the course does not allow overrides" do
-        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-
         expect(returned_event_assignment_ids).to contain_exactly(assignment.id)
       end
 
@@ -179,8 +169,6 @@ describe GradeChangeAuditApiController do
 
       context "for override grade changes" do
         before do
-          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-
           @course.enable_feature!(:final_grades_override)
           @course.allow_final_grade_override = true
           @course.save!
@@ -431,10 +419,8 @@ describe GradeChangeAuditApiController do
         Auditors::GradeChange.record(override_grade_change: @override_grade_change)
       end
 
-      context "with the Final Grade Override in Gradebook History feature flag enabled" do
+      context "final grade override in Gradebook History" do
         before(:once) do
-          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-
           course.enable_feature!(:final_grades_override)
           course.allow_final_grade_override = true
           course.save!
@@ -459,18 +445,6 @@ describe GradeChangeAuditApiController do
         end
       end
 
-      context "with the Final Grade Override in Gradebook History feature flag disabled" do
-        it "returns only assignment grade changes when no assignment_id value is specified" do
-          get :query, params: params.except(:assignment_id)
-          expect(returned_assignment_ids.uniq).to contain_exactly(assignment.id)
-        end
-
-        it "returns no results when an assignment ID of 'override' is specified" do
-          get :query, params: params.merge({ assignment_id: "override" })
-          expect(returned_events).to be_empty
-        end
-      end
-
       it "returns only grade changes for the assignment when a legitimate assignment ID is specified" do
         get :query, params: params
         expect(returned_assignment_ids.uniq).to contain_exactly(assignment.id)
@@ -490,16 +464,9 @@ describe GradeChangeAuditApiController do
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
       end
 
-      it "returns override grade changes when the Final Grade Override in Gradebook History feature is enabled" do
-        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-
+      it "returns override grade changes" do
         get :query, params: { student_id: student.id }
         expect(returned_assignment_ids).to contain_exactly(assignment.id, nil)
-      end
-
-      it "omits override grade changes when the Final Grade Override in Gradebook History feature is disabled" do
-        get :query, params: { student_id: student.id }
-        expect(returned_assignment_ids).to contain_exactly(assignment.id)
       end
     end
   end

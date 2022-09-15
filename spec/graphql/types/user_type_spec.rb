@@ -504,6 +504,7 @@ describe Types::UserType do
       )
       expect(result.flatten.count).to eq 3
       expect(result.flatten).to match_array ["You get that thing I sent ya?", "oh yea =)", "Whats up?"]
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.inbox.pages_loaded.react")
 
       result = type.resolve(
         "conversationsConnection(scope: \"starred\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
@@ -527,6 +528,19 @@ describe Types::UserType do
       )
       result = type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
       expect(result[0][0]).to eq "Help! Please make me non-random!"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.sent.pages_loaded.react")
+
+      @conversation.update!(workflow_state: "archived")
+      type = GraphQLTypeTester.new(
+        @random_person,
+        current_user: @random_person,
+        domain_root_account: @random_person.account,
+        request: ActionDispatch::TestRequest.create
+      )
+      result = type.resolve("conversationsConnection(scope: \"archived\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+      expect(result[0][0]).to eq "Help! Please make me non-random!"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.archived.pages_loaded.react")
+      @conversation.update!(workflow_state: "read")
     end
   end
 
@@ -909,9 +923,11 @@ describe Types::UserType do
       end
 
       it "can retrieve submission comments" do
+        allow(InstStatsd::Statsd).to receive(:increment)
         query_result = teacher_type.resolve("viewableSubmissionsConnection { nodes { commentsConnection { nodes { comment }} }  }")
         expect(query_result[0].count).to eq 3
         expect(query_result[0]).to match_array ["First comment", "Second comment", "Third comment"]
+        expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.visit.scope.submission_comments.pages_loaded.react")
       end
 
       it "can get createdAt" do

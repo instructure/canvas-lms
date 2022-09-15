@@ -26,7 +26,7 @@ module I18nTasks
       ret = {}
       csv_locales.each do |locale|
         ret[locale.to_sym] = {
-          scope.to_sym => data.map { |row| [row["key"].to_sym, row[locale]] }.to_h
+          scope.to_sym => data.map { |row| [row["key"].to_sym, row[locale]] }.to_h.compact
         }
       end
       ret

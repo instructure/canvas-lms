@@ -17,7 +17,7 @@
  */
 
 import _ from 'underscore'
-import assignmentHelper from 'ui/features/gradebook/react/shared/helpers/assignmentHelper.js'
+import assignmentHelper from 'ui/features/gradebook/react/shared/helpers/assignmentHelper'
 
 QUnit.module('assignmentHelper#getComparator', {
   setup() {},
@@ -40,7 +40,7 @@ QUnit.module('assignmentHelper#compareByDueDate', {
   setup() {},
   teardown() {}
 })
-const generateAssignment = function(options) {
+const generateAssignment = function (options) {
   options = options || {}
   return _.defaults(options, {
     name: 'assignment',

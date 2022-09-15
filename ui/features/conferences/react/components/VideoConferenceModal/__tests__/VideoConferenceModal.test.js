@@ -103,7 +103,7 @@ describe('VideoConferenceModal', () => {
     expect(onSubmit.mock.calls[0][1]).toStrictEqual({
       name: 'A great video conference name',
       duration: 60,
-      options: ['enable_waiting_room', 'recording_enabled'],
+      options: ['recording_enabled'],
       conferenceType: 'BigBlueButton',
       description: 'A great video conference description',
       invitationOptions: ['invite_all'],
@@ -145,6 +145,16 @@ describe('VideoConferenceModal', () => {
 
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByText('Invite all course members')).toBeInTheDocument()
+    expect(container.getByText('Remove all course observer members')).toBeInTheDocument()
+  })
+
+  it('shows correct group options in attendees tab', () => {
+    window.ENV.context_asset_string = 'group_1'
+    const container = setup()
+
+    fireEvent.click(container.getByText('Attendees'))
+    expect(container.getByText('Invite all group members')).toBeInTheDocument()
+    expect(container.queryByText('Remove all course observer members')).not.toBeInTheDocument()
   })
 
   it('shows New Video Conference and Create button when not on editing mode', () => {
@@ -175,5 +185,23 @@ describe('VideoConferenceModal', () => {
 
     fireEvent.click(container.getByText('Attendees'))
     expect(container.getByLabelText('Share webcam').checked).toBeTruthy()
+  })
+
+  it('doesnt call onSubmit when there is an error and you are on the Attendees tab', () => {
+    const container = setup({
+      isEditing: true,
+      name: '',
+      duration: 45,
+      options: ['recording_enabled'],
+      description: '',
+      invitationOptions: [],
+      attendeesOptions: ['share_webcam'],
+      type: 'BigBlueButton'
+    })
+
+    fireEvent.click(container.getByText('Attendees'))
+    fireEvent.click(container.getByTestId('submit-button'))
+
+    expect(onSubmit).not.toHaveBeenCalled()
   })
 })

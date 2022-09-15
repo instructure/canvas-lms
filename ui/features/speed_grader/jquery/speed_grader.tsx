@@ -1052,15 +1052,20 @@ function initGroupAssignmentMode() {
   }
 }
 
-function refreshGrades(callback) {
+function refreshGrades(
+  callback: (submission: Submission) => void,
+  retry?: (submission: Submission, originalSubmission: Submission, numRequests: number) => boolean,
+  retryDelay?: number
+) {
   const courseId = ENV.course_id
-  const assignmentId = EG.currentStudent.submission.assignment_id
-  const studentId = EG.currentStudent.submission[anonymizableUserId]
+  const originalSubmission = {...EG.currentStudent.submission}
+  const assignmentId = originalSubmission.assignment_id
+  const studentId = originalSubmission[anonymizableUserId]
   const resourceSegment = isAnonymous ? 'anonymous_submissions' : 'submissions'
   const params = {'include[]': 'submission_history'}
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/${resourceSegment}/${studentId}.json`
   const currentStudentIDAsOfAjaxCall = EG.currentStudent[anonymizableId]
-  $.getJSON(url, params, submission => {
+  const onSuccess = submission => {
     const studentToRefresh = window.jsonData.studentMap[currentStudentIDAsOfAjaxCall]
     EG.setOrUpdateSubmission(submission)
 
@@ -1072,7 +1077,21 @@ function refreshGrades(callback) {
     if (callback) {
       callback(submission)
     }
-  })
+  }
+
+  let numRequests = 0
+  const fetchSubmission = () => {
+    numRequests += 1
+    $.getJSON(url, params, submission => {
+      if (retry?.(submission, originalSubmission, numRequests)) {
+        retryDelay ? setTimeout(fetchSubmission, retryDelay) : fetchSubmission()
+      } else {
+        onSuccess(submission)
+      }
+    })
+  }
+
+  fetchSubmission()
 }
 
 $.extend(INST, {

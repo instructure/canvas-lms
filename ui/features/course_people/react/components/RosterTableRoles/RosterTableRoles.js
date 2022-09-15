@@ -20,12 +20,13 @@ import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {arrayOf, string, shape} from 'prop-types'
 import {readableRoleName} from '@canvas/k5/react/utils'
+import {Text} from '@instructure/ui-text'
+import {OBSERVER_ENROLLMENT} from '../../../util/constants'
 
 const I18n = useI18nScope('course_people')
-const OBSERVER_ENROLLMENT = 'ObserverEnrollment'
 const DEFAULT_ROLES = ['student', 'ta', 'observer', 'designer', 'teacher']
 
-const getRoleName = ({sisRole, type}) => {
+export const getRoleName = ({sisRole, type}) => {
   if (DEFAULT_ROLES.includes(sisRole)) {
     return readableRoleName(type)
   }
@@ -38,12 +39,16 @@ const RosterTableRoles = ({enrollments}) => {
 
     if (type === OBSERVER_ENROLLMENT) {
       return associatedUser ? (
-        <div key={`role-${associatedUser.id}`}>
+        <Text as="div" wrap="break-word" key={`role-${associatedUser.id}`}>
           {I18n.t('Observing: %{user_name}', {user_name: associatedUser.name})}
-        </div>
+        </Text>
       ) : null
     }
-    return <div key={`role-${id}`}>{getRoleName(enrollment)}</div>
+    return (
+      <Text as="div" wrap="break-word" key={`role-${id}`}>
+        {getRoleName(enrollment)}
+      </Text>
+    )
   })
 
   return enrollmentRoles

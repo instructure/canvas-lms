@@ -23,7 +23,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: %i[course group account]
-  has_one :calendar_event, inverse_of: :web_conference, dependent: :nullify
+  has_one :calendar_event, -> { active.order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user
@@ -311,7 +311,9 @@ class WebConference < ActiveRecord::Base
     self.conference_type ||= config && config[:conference_type]
     self.context_code = "#{context_type.underscore}_#{context_id}" rescue nil
     self.added_user_ids ||= ""
-    self.title ||= context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
+    if title.blank?
+      self.title = context.is_a?(Course) ? t("#web_conference.default_name_for_courses", "Course Web Conference") : t("#web_conference.default_name_for_groups", "Group Web Conference")
+    end
     self.start_at ||= self.started_at
     self.end_at ||= ended_at
     self.end_at ||= self.start_at + duration.minutes if self.start_at && duration
@@ -533,7 +535,7 @@ class WebConference < ActiveRecord::Base
   def as_json(options = {})
     url = options.delete(:url)
     join_url = options.delete(:join_url)
-    options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code])
+    options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code start_at end_at])
     result = super(options.merge(include_root: false, methods: %i[has_advanced_settings long_running user_settings recordings]))
     result["url"] = url
     result["join_url"] = join_url

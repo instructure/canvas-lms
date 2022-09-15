@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {func, instanceOf, number, shape, string} from 'prop-types'
+import {func, instanceOf, number, shape, string, bool} from 'prop-types'
 import {Img} from '@instructure/ui-img'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
@@ -28,7 +28,7 @@ import dragHtml from '../../../../sidebar/dragHtml'
 import formatMessage from '../../../../format-message'
 import {renderImage as renderImageHtml} from '../../../contentRendering'
 
-export default function Image({focusRef, image, onClick}) {
+export default function Image({focusRef, image, onClick, isIconMaker}) {
   const imgTitle = formatMessage('Click to embed {imageName}', {
     imageName: image.display_name
   })
@@ -69,8 +69,8 @@ export default function Image({focusRef, image, onClick}) {
       >
         <Img
           alt={image.display_name}
-          constrain="cover"
-          draggable
+          constrain={isIconMaker ? 'contain' : 'cover'}
+          draggable={true}
           height="6rem"
           display="block"
           onDragStart={handleDragStart}
@@ -100,9 +100,11 @@ Image.propTypes = {
     preview_url: string,
     thumbnail_url: string.isRequired
   }).isRequired,
-  onClick: func.isRequired
+  onClick: func.isRequired,
+  isIconMaker: bool
 }
 
 Image.defaultProps = {
-  focusRef: null
+  focusRef: null,
+  isIconMaker: false
 }

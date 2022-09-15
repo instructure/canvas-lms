@@ -629,8 +629,16 @@ module Canvas::LiveEvents
     # the same ID.
     # The "content-export-" prefix prevents from saving the same migration_id on
     # records that belong to different migrations
-    payload = (content_export.settings[:quizzes2] || {}).merge({ content_export_id: "content-export-#{content_export.global_id}" })
-    post_event_stringified("quiz_export_complete", payload, amended_context(content_export.context))
+    post_event_stringified(
+      "quiz_export_complete",
+      quiz_export_complete_data(content_export),
+      amended_context(content_export.context)
+    )
+  end
+
+  def self.quiz_export_complete_data(content_export)
+    (content_export.settings[:quizzes2] || {}
+    ).merge({ content_export_id: "content-export-#{content_export.global_id}" })
   end
 
   def self.content_migration_completed(content_migration)

@@ -104,12 +104,13 @@ export const FilterControls: React.FC<ComponentProps> = ({
           {filterValue === FilterType.SHOW_ALL ? <IconFilterLine /> : <IconFilterSolid />}
         </View>
         <SimpleSelect
+          data-testid="account-filter-dropdown"
           renderLabel={<ScreenReaderContent>{I18n.t('Filter Calendars')}</ScreenReaderContent>}
           renderBeforeInput={IconEyeLine}
           value={filterValue}
           size="small"
           width="18rem"
-          isInline
+          isInline={true}
           onChange={(_, data) => setFilterValue(data.value)}
         >
           {FILTER_OPTIONS.map(option => (

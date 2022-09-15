@@ -21,7 +21,8 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
-  STUDENT_VIEW_QUERY
+  STUDENT_VIEW_QUERY,
+  STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION
 } from '@canvas/assignments/graphql/student/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {useQuery} from 'react-apollo'
@@ -50,7 +51,9 @@ function getAssignmentEnvVariables() {
     originalityReportsForA2Enabled: ENV.originality_reports_for_a2_enabled,
     peerReviewModeEnabled: ENV.peer_review_mode_enabled,
     peerReviewAvailable: ENV.peer_review_available,
-    peerDisplayName: ENV.peer_display_name
+    peerDisplayName: ENV.peer_display_name,
+    revieweeId: ENV.reviewee_id,
+    anonymousAssetId: ENV.anonymous_asset_id
   }
 
   if (ENV.PREREQS?.items?.[0]?.prev) {
@@ -78,8 +81,16 @@ const ErrorPage = () => {
 }
 
 const LoggedInStudentViewQuery = props => {
-  const {loading, error, data} = useQuery(STUDENT_VIEW_QUERY, {
-    variables: {assignmentLid: props.assignmentLid, submissionID: props.submissionID}
+  const query =
+    props.reviewerSubmissionID === undefined
+      ? STUDENT_VIEW_QUERY
+      : STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION
+  const {loading, error, data} = useQuery(query, {
+    variables: {
+      assignmentLid: props.assignmentLid,
+      submissionID: props.submissionID,
+      reviewerSubmissionID: props.reviewerSubmissionID
+    }
   })
 
   if (loading) return <LoadingIndicator />

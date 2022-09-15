@@ -213,6 +213,7 @@ function StudentContent(props) {
         onChangeSubmission={props.onChangeSubmission}
         scrollThreshold={150}
         submission={props.submission}
+        reviewerSubmission={props.reviewerSubmission}
       />
       {renderContentBaseOnAvailability(props, alertContext)}
     </div>
@@ -223,7 +224,12 @@ StudentContent.propTypes = {
   allSubmissions: PropTypes.arrayOf(Submission.shape),
   assignment: Assignment.shape,
   onChangeSubmission: PropTypes.func.isRequired,
-  submission: Submission.shape
+  submission: Submission.shape,
+  reviewerSubmission: Submission.shape
+}
+
+StudentContent.defaultProps = {
+  reviewerSubmission: null
 }
 
 export default StudentContent

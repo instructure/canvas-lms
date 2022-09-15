@@ -207,6 +207,9 @@ function setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsC
 }
 
 function refreshOtherCalendarsSection($holder, otherCalendars, notify) {
+  otherCalendars.sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
   $holder.html(
     contextListTemplate({
       contexts: otherCalendars,

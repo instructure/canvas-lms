@@ -441,8 +441,4 @@ class Auditors::GradeChange
     scope = Auditors::GradeChange.filter_by_assignment(Auditors::ActiveRecord::GradeChangeRecord.where(conditions))
     EventStream::IndexStrategy::ActiveRecord.for_ar_scope(Auditors::ActiveRecord::GradeChangeRecord, scope, options)
   end
-
-  def self.return_override_grades?
-    Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
-  end
 end

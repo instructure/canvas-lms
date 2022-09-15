@@ -510,17 +510,6 @@ describe Auditors::GradeChange do
     end
   end
 
-  describe ".return_override_grades?" do
-    it "returns true if the final_grade_override_in_gradebook_history flag is enabled" do
-      Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-      expect(Auditors::GradeChange).to be_return_override_grades
-    end
-
-    it "returns false if the final_grade_override_in_gradebook_history flag is not enabled" do
-      expect(Auditors::GradeChange).not_to be_return_override_grades
-    end
-  end
-
   describe Auditors::GradeChange::Record do
     describe "#in_grading_period?" do
       it "returns true if the record has a valid grading period" do

@@ -22,10 +22,17 @@ import {actions} from '../../../../reducers/imageCropper'
 import {ZoomControls} from './ZoomControls'
 import {RotationControls} from './RotationControls'
 import {ShapeControls} from './ShapeControls'
+import {ResetControls} from './ResetControls'
 
 export const Controls = ({settings, dispatch}) => {
   return (
-    <Flex id="imageCropperControls" direction="row" margin="x-small" alignItems="start">
+    <Flex
+      id="imageCropperControls"
+      direction="row"
+      margin="x-small"
+      alignItems="start"
+      role="group"
+    >
       <ShapeControls
         shape={settings.shape}
         onChange={shape => dispatch({type: actions.SET_SHAPE, payload: shape})}
@@ -38,6 +45,8 @@ export const Controls = ({settings, dispatch}) => {
         scaleRatio={settings.scaleRatio}
         onChange={scaleRatio => dispatch({type: actions.SET_SCALE_RATIO, payload: scaleRatio})}
       />
+      <Flex.Item shouldGrow={true} />
+      <ResetControls onReset={() => dispatch({type: actions.RESET_SETTINGS})} />
     </Flex>
   )
 }

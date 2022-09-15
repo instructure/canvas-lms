@@ -256,41 +256,45 @@ describe "conversations new" do
         expect(f("#reply-btn")).to_not be_disabled
       end
 
-      context "with date restricted course" do
+      context "hard concluded course" do
         before do
-          @course.restrict_enrollments_to_course_dates = true
-          @course.restrict_student_past_view = true
-          @course.restrict_student_future_view = true
+          @course.complete!
           @course.save!
         end
 
-        context "teacher inbox" do
-          it "allows teachers to reply to a conversation if the course is soft concluded" do
-            go_to_inbox_and_select_message
-            expect(f("#reply-btn")).to_not be_disabled
-          end
-
-          it "does not allow teachers to reply to a conversation if the course is hard-concluded" do
-            @course.complete!
-            go_to_inbox_and_select_message
-            expect(f("#reply-btn")).to be_disabled
-          end
+        it "does not allow teachers to reply to a conversation", ignore_js_errors: true do
+          user_session(@teacher)
+          go_to_inbox_and_select_message
+          expect(f("#reply-btn")).to be_disabled
         end
 
-        context "student inbox" do
-          it "allows student to reply to a conversation if the course is soft concluded and a teacher is in the conversation" do
-            user_session(@s1)
-            go_to_inbox_and_select_message
-            expect(f("#reply-btn")).to_not be_disabled
-          end
+        it "does not allow students to reply to a conversation", ignore_js_errors: true do
+          user_session(@s1)
+          go_to_inbox_and_select_message
+          expect(f("#reply-btn")).to be_disabled
+        end
+      end
 
-          it "does not allow students to reply to a conversation if the course is hard-concluded" do
-            skip("Unskip in VICE-2785")
-            user_session(@s1)
-            @course.complete!
-            go_to_inbox_and_select_message
-            expect(f("#reply-btn")).to be_disabled
-          end
+      context "soft concluded course" do
+        before do
+          @course.enrollment_term.start_at = 2.days.ago
+          @course.enrollment_term.end_at = 1.day.ago
+          @course.enrollment_term.set_overrides(Account.default, "TeacherEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+          @course.enrollment_term.set_overrides(Account.default, "StudentEnrollment" => { start_at: 1.day.ago, end_at: 2.days.ago })
+          @course.save!
+          @course.enrollment_term.save!
+        end
+
+        it "does not allow teachers to reply to a conversation", ignore_js_errors: true do
+          user_session(@teacher)
+          go_to_inbox_and_select_message
+          expect(f("#reply-btn")).to be_disabled
+        end
+
+        it "does not allow student to reply to a conversation", ignore_js_errors: true do
+          user_session(@s1)
+          go_to_inbox_and_select_message
+          expect(f("#reply-btn")).to be_disabled
         end
       end
     end

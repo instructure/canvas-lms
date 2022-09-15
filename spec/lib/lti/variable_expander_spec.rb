@@ -65,6 +65,7 @@ module Lti
     let(:controller) do
       request_mock = double("request")
       allow(request_mock).to receive(:url).and_return("https://localhost")
+      allow(request_mock).to receive(:host_with_port).and_return("https://localhost")
       allow(request_mock).to receive(:host).and_return("/my/url")
       allow(request_mock).to receive(:scheme).and_return("https")
       allow(request_mock).to receive(:parameters).and_return(
@@ -852,6 +853,12 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq "$ToolProxyBinding.memberships.url"
         end
+
+        it "does not substitute $Context.sourcedId when the context is not a course" do
+          exp_hash = { test: "$Context.sourcedId" }
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq "$Context.sourcedId"
+        end
       end
 
       context "when launching from a group assignment" do
@@ -1211,6 +1218,35 @@ module Lti
             end
 
             it { is_expected.to eq app_host }
+          end
+        end
+
+        describe "$com.instructure.RCS.service_jwt" do
+          subject do
+            exp_hash = { test: "$com.instructure.RCS.service_jwt" }
+            variable_expander.expand_variables!(exp_hash)
+            exp_hash[:test]
+          end
+
+          context "when tool is an internal service" do
+            before do
+              allow(tool).to receive(:internal_service?).with(any_args).and_return(true)
+              allow(Services::RichContent).to receive(:env_for).with(any_args).and_return(JWT: "service-jwt")
+            end
+
+            it { is_expected.to eq("service-jwt") }
+
+            context "when controller is not set" do
+              let(:variable_expander) { VariableExpander.new(root_account, course, nil, tool: tool) }
+
+              it { is_expected.to eq("") }
+            end
+          end
+
+          context "when tool is NOT an internal service" do
+            before { allow(tool).to receive(:internal_service?).with(any_args).and_return(false) }
+
+            it { is_expected.to eq("$com.instructure.RCS.service_jwt") }
           end
         end
 
@@ -2068,6 +2104,34 @@ module Lti
             exp_hash = { test: "$User.username" }
             variable_expander.expand_variables!(exp_hash)
             expect(exp_hash[:test]).to eq "username"
+          end
+
+          context "when in the :user_navigation placement" do
+            let(:variable_expander_opts) { super().merge({ placement: :user_navigation }) }
+
+            before do
+              pseudonym.sis_user_id = "1a2b3c"
+            end
+
+            context "when the context is a User" do
+              let(:variable_expander_opts) { super().merge({ context: user }) }
+
+              it "has substitution for $Context.sourcedId" do
+                exp_hash = { test: "$Context.sourcedId" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "1a2b3c"
+              end
+            end
+
+            context "when the context is not a User" do
+              let(:variable_expander_opts) { super().merge({ context: account }) }
+
+              it "does not have substitution for $Context.sourcedId" do
+                exp_hash = { test: "$Context.sourcedId" }
+                variable_expander.expand_variables!(exp_hash)
+                expect(exp_hash[:test]).to eq "$Context.sourcedId"
+              end
+            end
           end
         end
 

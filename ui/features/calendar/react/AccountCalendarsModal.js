@@ -16,26 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
 import {bool, func, number} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {IconSearchLine, IconPlusLine} from '@instructure/ui-icons'
+import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {IconSearchLine, IconPlusLine, IconXLine} from '@instructure/ui-icons'
 import {Modal} from '@instructure/ui-modal'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
-import {debounce} from 'lodash'
-
+import {debounce, isEqual} from 'lodash'
 import AccountCalendarResultsArea from './AccountCalendarsResultsArea'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('account_calendars_modal')
 
 const TYPING_DEBOUNCE = 500
-const MIN_SEARCH_LENGTH = 3
+const MIN_SEARCH_LENGTH = 2
 export const SEARCH_ENDPOINT = '/api/v1/account_calendars'
 export const SAVE_PREFERENCES_ENDPOINT = '/api/v1/calendar_events/save_enabled_account_calendars'
 
@@ -57,6 +56,8 @@ const AccountCalendarsModal = ({
   const [selectedCalendars, setSelectedCalendars] = useState(getSelectedOtherCalendars())
   const loadNextPage = () => fetchAccounts({next: true})
   const [isFeatureSeen, setIsFeatureSeen] = useState(featureSeen)
+  const [disabled, setDisabled] = useState(false)
+  const inputRef = useRef(null)
   const resultsProps = {
     searchTerm,
     results,
@@ -87,6 +88,17 @@ const AccountCalendarsModal = ({
       }
     ]
   }
+
+  useEffect(() => {
+    if (isOpen) {
+      const modalSelected = selectedCalendars.map(sC => sC.id).sort((a, b) => a - b)
+      const calendarSelected = getSelectedOtherCalendars()
+        .map(sOC => sOC.id)
+        .sort((a, b) => a - b)
+      setDisabled(isEqual(modalSelected, calendarSelected))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, selectedCalendars])
 
   useEffect(() => {
     if (isOpen) setSelectedCalendars(getSelectedOtherCalendars())
@@ -168,6 +180,7 @@ const AccountCalendarsModal = ({
   }
 
   const onSubmit = async () => {
+    setDisabled(true)
     const payload = {
       enabled_account_calendars:
         selectedCalendars.length > 0 ? selectedCalendars.map(sC => sC.id) : ''
@@ -181,7 +194,7 @@ const AccountCalendarsModal = ({
       if (json.status === 'ok') {
         showFlashAlert({
           type: 'success',
-          message: I18n.t('Calendars added successfully')
+          message: I18n.t('Calendars saved successfully')
         })
       }
       onSave(selectedCalendars)
@@ -191,18 +204,41 @@ const AccountCalendarsModal = ({
         err,
         message: I18n.t('An error occurred while saving changes')
       })
+      setDisabled(false)
     }
+  }
+
+  const handleClear = () => {
+    setSearchTerm('')
+    inputRef.current.value = ''
+  }
+
+  const renderClearButton = () => {
+    if (searchTerm) {
+      return (
+        <IconButton
+          screenReaderLabel={I18n.t('Clear')}
+          onClick={handleClear}
+          withBorder={false}
+          withBackground={false}
+          size="small"
+        >
+          <IconXLine />
+        </IconButton>
+      )
+    }
+    return undefined
   }
 
   return (
     <>
-      <View as="div" padding="small x-small 0 x-small">
+      <View as="div" padding="0 x-small">
         <Link
           data-testid="add-other-calendars-button"
           onClick={() => setIsOpen(true)}
           theme={{color: 'black', hoverColor: 'black'}}
         >
-          <IconPlusLine title={I18n.t('Add other calendar')} />
+          <IconPlusLine size="x-small" title={I18n.t('Add other calendar')} />
         </Link>
       </View>
       <Modal
@@ -229,6 +265,7 @@ const AccountCalendarsModal = ({
           </View>
           <View as="div" margin="small medium medium" maxHeight={modalHeight}>
             <TextInput
+              inputRef={e => (inputRef.current = e)}
               data-testid="search-input"
               type="search"
               label=""
@@ -243,7 +280,7 @@ const AccountCalendarsModal = ({
               onChange={updateSearch}
               messages={messages}
               renderBeforeInput={<IconSearchLine inline={false} />}
-              interaction={isLoading ? 'disabled' : 'enabled'}
+              renderAfterInput={renderClearButton()}
             />
             <AccountCalendarResultsArea {...resultsProps} />
           </View>
@@ -254,11 +291,12 @@ const AccountCalendarsModal = ({
           </Button>
           <Button
             data-testid="save-calendars-button"
+            disabled={disabled}
             variant="primary"
             margin="none none none small"
             onClick={onSubmit}
           >
-            {I18n.t('Add Calendars')}
+            {I18n.t('Save Changes')}
           </Button>
         </Modal.Footer>
       </Modal>

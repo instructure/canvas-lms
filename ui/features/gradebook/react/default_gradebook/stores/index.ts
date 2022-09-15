@@ -19,6 +19,7 @@
 import create from 'zustand'
 import filters, {FiltersState} from './filtersState'
 import modules, {ModulesState} from './modulesState'
+import customColumns, {CustomColumnsState} from './customColumnsState'
 import {RequestDispatch} from '@canvas/network'
 import PerformanceControls from '../PerformanceControls'
 import type {FlashMessage} from '../gradebook.d'
@@ -36,7 +37,7 @@ type State = {
   flashMessages: FlashMessage[]
 }
 
-export type GradebookStore = State & ModulesState & FiltersState
+export type GradebookStore = State & ModulesState & FiltersState & CustomColumnsState
 
 const store = create<GradebookStore>((set, get) => ({
   performanceControls: defaultPerformanceControls,
@@ -49,7 +50,9 @@ const store = create<GradebookStore>((set, get) => ({
 
   ...filters(set, get),
 
-  ...modules(set, get)
+  ...modules(set, get),
+
+  ...customColumns(set, get)
 }))
 
 export default store

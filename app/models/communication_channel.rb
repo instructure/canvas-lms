@@ -58,15 +58,26 @@ class CommunicationChannel < ActiveRecord::Base
   attr_reader :send_confirmation
 
   # Constants for the different supported communication channels
-  TYPE_EMAIL    = "email"
-  TYPE_PUSH     = "push"
-  TYPE_SMS      = "sms"
-  TYPE_SLACK    = "slack"
-  TYPE_TWITTER  = "twitter"
+  TYPE_EMAIL          = "email"
+  TYPE_PUSH           = "push"
+  TYPE_SMS            = "sms"
+  TYPE_SLACK          = "slack"
+  TYPE_TWITTER        = "twitter"
+  TYPE_PERSONAL_EMAIL = "personal_email"
 
-  VALID_TYPES = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_SLACK].freeze
+  VALID_TYPES = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_SLACK, TYPE_PERSONAL_EMAIL].freeze
 
   RETIRE_THRESHOLD = 1
+
+  # Generally, "TYPE_PERSONAL_EMAIL" should be treated exactly the same
+  # as TYPE_EMAIL.  It is just kept distinct for the purposes of customers
+  # querying records in Canvas Data.
+  def path_type
+    raw_value = read_attribute(:path_type)
+    return TYPE_EMAIL if raw_value == TYPE_PERSONAL_EMAIL
+
+    raw_value
+  end
 
   def under_user_cc_limit
     max_ccs = Setting.get("max_ccs_per_user", "100").to_i
@@ -385,7 +396,7 @@ class CommunicationChannel < ActiveRecord::Base
   scope :by_path, ->(path) { where(by_path_condition(arel_table[:path]).eq(by_path_condition(path))) }
   scope :path_like, ->(path) { where(by_path_condition(arel_table[:path]).matches(by_path_condition(path))) }
 
-  scope :email, -> { where(path_type: TYPE_EMAIL) }
+  scope :email, -> { where(path_type: [TYPE_EMAIL, TYPE_PERSONAL_EMAIL]) }
   scope :sms, -> { where(path_type: TYPE_SMS) }
 
   scope :active, -> { where(workflow_state: "active") }

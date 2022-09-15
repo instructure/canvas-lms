@@ -27,7 +27,7 @@
 # JSON object into a LearningOutcomeResult object
 
 module OutcomesServiceAuthoritativeResultsHelper
-  include Outcomes::ResultAnalytics
+  Rollup = Struct.new(:context, :scores)
 
   # Transforms an OS' JSON AuthoritativeResult collection into a
   # RollupScore collection

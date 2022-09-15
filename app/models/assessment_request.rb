@@ -131,6 +131,10 @@ class AssessmentRequest < ActiveRecord::Base
     workflow_state == "assigned"
   end
 
+  def available?
+    asset&.submitted_at.present? && assessor_asset&.submitted_at.present?
+  end
+
   on_create_send_to_streams do
     assessor
   end

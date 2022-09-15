@@ -32,6 +32,7 @@ import {
   showOutcomesImporter,
   showOutcomesImporterIfInProgress
 } from '@canvas/outcomes/react/OutcomesImporter'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 const I18n = useI18nScope('OutcomeManagement')
 
@@ -241,6 +242,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             id="alignments"
             padding={isMobileView ? 'small none none' : 'small'}
           >
+            <ScreenReaderContent as="h2">Alignments Tab Content“</ScreenReaderContent>
             <AlignmentSummary />
           </Tabs.Panel>
         )}

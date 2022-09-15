@@ -275,12 +275,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.assignmentGroupsLoader.loadAssignmentGroups.callCount, 0)
     })
 
-    test('does not load custom columns', async () => {
-      sinon.spy(dataLoader.customColumnsLoader, 'loadCustomColumns')
-      await reloadData()
-      strictEqual(dataLoader.customColumnsLoader.loadCustomColumns.callCount, 0)
-    })
-
     test('loads student content', async () => {
       sinon.spy(dataLoader.studentContentDataLoader, 'load')
       await reloadData()

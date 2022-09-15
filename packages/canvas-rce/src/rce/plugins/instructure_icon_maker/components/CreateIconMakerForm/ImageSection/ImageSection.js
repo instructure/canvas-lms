@@ -73,6 +73,14 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   const isMetadataLoaded = useRef(false)
 
   useEffect(() => {
+    dispatch({
+      type: actions.SET_CROPPER_SETTINGS.type,
+      payload: {...state.cropperSettings, shape: settings.shape}
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings.shape])
+
+  useEffect(() => {
     const transform = transformForShape(settings.shape, settings.size)
 
     // Set Q1 crop defaults
@@ -109,12 +117,16 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   }, [onChange, settings.shape, settings.size])
 
   useEffect(() => {
-    if (editing && !!settings.encodedImage) {
+    if (
+      (editing && !!settings.encodedImage) ||
+      (!!settings.encodedImage && settings.encodedImage !== state.image)
+    ) {
       dispatch({
         type: actions.SET_IMAGE.type,
         payload: settings.encodedImage
       })
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editing, settings.encodedImage])
 
   useEffect(() => {
@@ -199,7 +211,12 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
               <Text weight="bold">{formatMessage('Current Image')}</Text>
             </Flex.Item>
             <Flex.Item>
-              <ImageOptions state={state} dispatch={dispatch} rcsConfig={rcsConfig} />
+              <ImageOptions
+                state={state}
+                dispatch={dispatch}
+                rcsConfig={rcsConfig}
+                trayDispatch={onChange}
+              />
             </Flex.Item>
           </Flex>
         </Flex.Item>

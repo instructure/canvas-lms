@@ -269,7 +269,7 @@ module CanvasCache
                           when :mset
                             # This is an array with a single element: an array alternating key/values
                             request.first(&:first).select.with_index { |_, i| i.even? }
-                          when :mget
+                          when :mget, :scan
                             request
                           else
                             request.first

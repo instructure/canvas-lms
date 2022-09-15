@@ -40,8 +40,15 @@ const MentionDropdownPortal = props => {
   // Remove node from RCE when unmounting
   useEffect(() => {
     return () => {
-      node.current.remove()
+      const parentElement = props.rceBodyRef.querySelector('span[id=someTestId]').parentElement
+
+      if (parentElement.tagName === 'P') {
+        props.rceBodyRef.querySelector('span[id=someTestId]').parentElement.remove()
+      } else {
+        node.current.remove()
+      }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return ReactDOM.createPortal(

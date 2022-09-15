@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {act, fireEvent, render} from '@testing-library/react'
+import keycode from 'keycode'
 import {eventFormProps, conference, userContext, courseContext, accountContext} from './mocks'
 import CalendarEventDetailsForm from '../CalendarEventDetailsForm'
 
@@ -32,10 +33,13 @@ const changeValue = (component, role, name, value) => {
   return child
 }
 
-const setTime = (component, label, time) => {
+const setTime = (component, label, halfHours) => {
   const clock = component.getByRole('combobox', {name: label})
   act(() => clock.click())
-  fireEvent.click(component.getByText(time))
+  for (let i = 0; i <= halfHours; i++) {
+    fireEvent.keyDown(clock, {keyCode: keycode.codes.down})
+  }
+  fireEvent.keyDown(clock, {keyCode: keycode.codes.enter})
   return clock
 }
 
@@ -45,12 +49,12 @@ const select = (component, role, name) => {
   act(() => child.click())
 }
 
-const testTimezone = (timezone, inputDate, expectedDate, time) => {
+const testTimezone = (timezone, inputDate, expectedDate, halfHours) => {
   defaultProps.timezone = timezone
   const component = render(<CalendarEventDetailsForm {...defaultProps} />)
   const date = changeValue(component, 'combobox', 'Date:', inputDate)
   expect(date.value).toBe('Thu, Jul 14, 2022')
-  if (time) setTime(component, 'From:', time)
+  if (halfHours) setTime(component, 'From:', halfHours)
   select(component, 'button', 'Submit')
 
   expect(defaultProps.event.save).toHaveBeenCalledWith(
@@ -114,8 +118,8 @@ describe('CalendarEventDetailsForm', () => {
     changeValue(component, 'textbox', 'Title:', 'Class Party')
     changeValue(component, 'textbox', 'Location:', 'The Zoo')
     changeValue(component, 'combobox', 'Date:', '2022-07-23T00:00:00.000Z')
-    setTime(component, 'From:', '2:00 AM')
-    setTime(component, 'To:', '3:00 PM')
+    setTime(component, 'From:', 4) // 2:00
+    setTime(component, 'To:', 30) // 15:00
     select(component, 'button', 'Calendar:')
     select(component, 'option', 'Geometry')
     expect(component.getByText('More Options')).toBeInTheDocument()
@@ -185,12 +189,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Denver at 11:30 PM', async () => {
-    testTimezone(
-      'America/Denver',
-      '2022-07-14T06:00:00.000Z',
-      '2022-07-15T05:30:00.000Z',
-      '11:30 PM'
-    )
+    testTimezone('America/Denver', '2022-07-14T06:00:00.000Z', '2022-07-15T05:30:00.000Z', 47)
   })
 
   it('can change the date in Shanghai at 12:00 AM', async () => {
@@ -198,12 +197,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Shanghai at 11:30 PM', async () => {
-    testTimezone(
-      'Asia/Shanghai',
-      '2022-07-13T16:00:00.000Z',
-      '2022-07-14T15:30:00.000Z',
-      '11:30 PM'
-    )
+    testTimezone('Asia/Shanghai', '2022-07-13T16:00:00.000Z', '2022-07-14T15:30:00.000Z', 47)
   })
 
   it('can change the date in Adelaide at 12:00 AM', async () => {
@@ -211,12 +205,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Adelaide at 11:30 PM', async () => {
-    testTimezone(
-      'Australia/Adelaide',
-      '2022-07-13T14:30:00.000Z',
-      '2022-07-14T14:00:00.000Z',
-      '11:30 PM'
-    )
+    testTimezone('Australia/Adelaide', '2022-07-13T14:30:00.000Z', '2022-07-14T14:00:00.000Z', 47)
   })
 
   it('can change the date in Tokyo at 12:00 AM', async () => {
@@ -224,7 +213,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in Tokyo at 11:30 PM', async () => {
-    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', '11:30 PM')
+    testTimezone('Asia/Tokyo', '2022-07-13T15:00:00.000Z', '2022-07-14T14:30:00.000Z', 47)
   })
 
   it('can change the date in the UK at 12:00 AM', async () => {
@@ -232,7 +221,7 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in the UK at 11:30 PM', async () => {
-    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', '11:30 PM')
+    testTimezone('Etc/UTC', '2022-07-14T00:00:00.000Z', '2022-07-14T23:30:00.000Z', 47)
   })
 
   it('can change the date in eastern Brazil at 12:00 AM', async () => {
@@ -240,14 +229,14 @@ describe('CalendarEventDetailsForm', () => {
   })
 
   it('can change the date in eastern Brazil at 11:30 PM', async () => {
-    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', '11:30 PM')
+    testTimezone('Brazil/East', '2022-07-14T03:00:00.000Z', '2022-07-15T02:30:00.000Z', 47)
   })
 
   it('cannot have end time before start time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const start = setTime(component, 'From:', '5:00 AM')
-    setTime(component, 'To:', '4:00 AM')
+    const start = setTime(component, 'From:', 9)
+    setTime(component, 'To:', 8)
 
     const errMessage = component.getByText('End time cannot be before Start time')
     expect(errMessage).toBeInTheDocument()
@@ -259,8 +248,8 @@ describe('CalendarEventDetailsForm', () => {
   it('cannot have start time after end time', async () => {
     const component = render(<CalendarEventDetailsForm {...defaultProps} />)
 
-    const end = setTime(component, 'To:', '2:00 AM')
-    setTime(component, 'From:', '2:30 AM')
+    const end = setTime(component, 'To:', 4)
+    setTime(component, 'From:', 5)
 
     const errMessage = component.getByText('Start Time cannot be after End Time')
     expect(errMessage).toBeInTheDocument()

@@ -53,13 +53,6 @@ module Canvas
         end
       end
 
-      # canvas redis is patched to disallow "scan" operations,
-      # but clearing the whole thing does technically remove any
-      # keys matching this pattern
-      def delete_matched(_pattern)
-        clear
-      end
-
       def write_set(hash, ttl: nil)
         opts = { expires_in: ttl }
         ms = 1000 * Benchmark.realtime do

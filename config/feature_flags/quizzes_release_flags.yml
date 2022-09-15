@@ -64,3 +64,9 @@ new_quizzes_skip_to_build_module_button:
   description: Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page, Assignments page, and Quizzes page.
   applies_to: SiteAdmin
   state: hidden
+new_quizzes_by_default:
+  state: allowed
+  display_name: Default to New Quizzes
+  description: Use New Quizzes as the default quizzing engine. Removes the ability to create classic quizzes.
+  applies_to: Course
+  visible_on: quizzes_next_visible_on_hook
