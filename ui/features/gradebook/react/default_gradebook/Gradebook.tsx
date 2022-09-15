@@ -168,6 +168,7 @@ import {
   getAssignmentColumnId,
   getAssignmentGroupColumnId,
   getAssignmentGroupPointsPossible,
+  getColumnTypeForColumnId,
   getCourseFeaturesFromOptions,
   getCourseFromOptions,
   getCustomColumnId,
@@ -2691,7 +2692,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.gradebookGrid.grid.onCellChange.subscribe(this.onCellChange)
     this.keyboardNav = new GradebookKeyboardNav({
       gridSupport: this.gradebookGrid.gridSupport,
-      getColumnTypeForColumnId: this.getColumnTypeForColumnId,
+      getColumnTypeForColumnId,
       toggleDefaultSort: this.toggleDefaultSort,
       openSubmissionTray: this.openSubmissionTray
     })
@@ -2919,18 +2920,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid?.invalidate()
   }
 
-  getColumnTypeForColumnId = (columnId: string): string => {
-    if (columnId.match(/^custom_col/)) {
-      return 'custom_column'
-    } else if (columnId.match(ASSIGNMENT_KEY_REGEX)) {
-      return 'assignment'
-    } else if (columnId.match(/^assignment_group/)) {
-      return 'assignment_group'
-    } else {
-      return columnId
-    }
-  }
-
   idSort(a, b, {asc = true}) {
     return NumberCompare(Number(a.id), Number(b.id), {
       descending: !asc
@@ -3056,7 +3045,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   sortGridRows = () => {
     const {columnId, settingKey, direction} = this.getSortRowsBySetting()
-    const columnType = this.getColumnTypeForColumnId(columnId)
+    const columnType = getColumnTypeForColumnId(columnId)
     switch (columnType) {
       case 'custom_column':
         this.sortByCustomColumn(columnId, direction)
@@ -4043,7 +4032,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   toggleDefaultSort = (columnId: string): void => {
     let direction
     const sortSettings = this.getSortRowsBySetting()
-    const columnType = this.getColumnTypeForColumnId(columnId)
+    const columnType = getColumnTypeForColumnId(columnId)
     const settingKey = getDefaultSettingKeyForColumnType(columnType)
     direction = 'ascending'
     if (
