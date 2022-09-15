@@ -22,6 +22,19 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('gradebooksharedMessageStudentsWhoHelper')
 
+type MessageStudentParams = {
+  recipients: string[]
+  subject: string
+  body: string
+  context_code: string
+  mode: string
+  group_conversation: boolean
+  bulk_message: boolean
+  media_comment_id?: string
+  media_comment_type?: string
+  attachment_ids?: string[]
+}
+
 export function hasSubmitted(submission) {
   if (submission.excused) {
     return true
@@ -63,15 +76,24 @@ const MessageStudentsWhoHelper = {
     }
   },
 
-  sendMessageStudentsWho(recipientsIds, subject, body, contextCode, mediaFile, attachmentIds) {
-    const params = {
+  sendMessageStudentsWho(
+    recipientsIds: string[],
+    subject: string,
+    body: string,
+    contextCode: string,
+    mediaFile: {id: string; type: string},
+    attachmentIds: string[]
+  ) {
+    const params: MessageStudentParams = {
       recipients: recipientsIds,
       subject,
       body,
       context_code: contextCode,
       mode: 'async',
       group_conversation: true,
-      bulk_message: true
+      bulk_message: true,
+      media_comment_id: undefined,
+      media_comment_type: undefined
     }
 
     if (mediaFile) {

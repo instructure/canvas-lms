@@ -46,13 +46,10 @@ import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {TextArea} from '@instructure/ui-text-area'
 import {TextInput} from '@instructure/ui-text-input'
-
 import _ from 'lodash'
 import {OBSERVER_ENROLLMENTS_QUERY} from '../graphql/Queries'
 import Pill from './Pill'
-
 import {useQuery} from 'react-apollo'
-
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
   FileAttachmentUpload,
@@ -62,8 +59,7 @@ import {
   addAttachmentsFn,
   removeAttachmentFn
 } from '@canvas/message-attachments'
-
-const I18n = useI18nScope('public_message_students_who')
+import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
 export type SendMessageArgs = {
   attachmentIds?: string[]
@@ -76,6 +72,8 @@ export type SendMessageArgs = {
   }
 }
 
+const I18n = useI18nScope('public_message_students_who')
+
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 const {Item} = Flex as any
 const {Header: ModalHeader, Body: ModalBody, Footer: ModalFooter} = Modal as any
@@ -84,40 +82,25 @@ const {Body: TableBody, Cell, ColHeader, Head: TableHead, Row} = Table as any
 
 export type Student = {
   id: string
-  grade?: string
+  grade?: string | null
   name: string
   redoRequest?: boolean
-  score?: number
+  score?: number | null
   sortableName: string
-  submittedAt?: Date
-}
-
-export type Assignment = {
-  allowedAttempts: number
-  courseId: string
-  dueDate: Date | null
-  gradingType: string
-  id: string
-  name: string
-  submissionTypes: string[]
+  submittedAt: null | Date
 }
 
 export type Props = {
-  assignment: Assignment
+  assignment: CamelizedAssignment
   onClose: () => void
   students: Student[]
-  onSend: (args: SendArgs) => void
+  onSend: (args: SendMessageArgs) => void
   messageAttachmentUploadFolderId: string
   userId: string
 }
 
 type Attachment = {
   id: string
-}
-
-type MediaFile = {
-  id: string
-  type: string
 }
 
 type MediaTrack = {
@@ -137,24 +120,16 @@ type MediaUploadFile = {
 
 type FilterCriterion = {
   readonly requiresCutoff: boolean
-  readonly shouldShow: (assignment: Assignment) => boolean
+  readonly shouldShow: (assignment: CamelizedAssignment) => boolean
   readonly title: string
   readonly value: string
 }
 
-type SendArgs = {
-  attachmentIds?: string[]
-  recipientsIds: number[]
-  subject: string
-  body: string
-  mediaFile?: MediaFile
-}
-
-const isScored = (assignment: Assignment) =>
+const isScored = (assignment: CamelizedAssignment) =>
   ['points', 'percent', 'letter_grade', 'gpa_scale'].includes(assignment.gradingType)
 
-const isReassignable = (assignment: Assignment) =>
-  (assignment.allowedAttempts === -1 || assignment.allowedAttempts > 1) &&
+const isReassignable = (assignment: CamelizedAssignment) =>
+  (assignment.allowedAttempts === -1 || (assignment.allowedAttempts || 0) > 1) &&
   assignment.dueDate != null &&
   !assignment.submissionTypes.includes(
     'on_paper' || 'external_tool' || 'none' || 'discussion_topic' || 'online_quiz'
@@ -269,14 +244,14 @@ function defaultSubject(criterion, assignment, cutoff) {
   }
 }
 
-const MessageStudentsWhoDialog: React.FC<Props> = ({
+const MessageStudentsWhoDialog = ({
   assignment,
   onClose,
   students,
   onSend,
   messageAttachmentUploadFolderId,
   userId
-}) => {
+}: Props) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
   const [sending, setSending] = useState(false)
@@ -424,10 +399,10 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       const recipientsIds = [
         ...selectedStudents,
         ...Object.values(selectedObservers).flat()
-      ] as number[]
-      const uniqueRecipientsIds: number[] = [...new Set(recipientsIds)]
+      ] as string[]
+      const uniqueRecipientsIds: string[] = [...new Set(recipientsIds)]
 
-      const args: SendArgs = {
+      const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
         subject,
         body: message
@@ -520,7 +495,7 @@ const MessageStudentsWhoDialog: React.FC<Props> = ({
       setSelectedObservers(
         filteredStudents.reduce((map, student) => {
           const observers = observersByStudentID[student.id] || []
-          map[student.id] = Object.values(observers).map(observer => observer._id)
+          map[student.id] = Object.keys(observers).map(key => observers[key]._id)
           return map
         }, {})
       )

@@ -40,8 +40,7 @@ type SubmissionWithOriginalityReport = Submission & {
 }
 
 export const extractDataTurnitin = function (submission: SubmissionWithOriginalityReport) {
-  let attachment, i, item, len, plagData, ref
-  let turnitin: PlagiarismData
+  let attachment, i, item, len, plagData, ref, turnitin
   plagData = submission != null ? submission.turnitin_data : undefined
   if (plagData == null) {
     plagData = submission?.vericite_data
@@ -49,10 +48,13 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
   if (plagData == null) {
     return
   }
-  const data: {items: PlagiarismData[]; state?: string} = {
-    items: []
+  const data: {
+    items: Array<{id: string; data: PlagiarismData}>
+    state: string
+  } = {
+    items: [],
+    state: 'none'
   }
-
   if (submission.attachments && submission.submission_type === 'online_upload') {
     ref = submission.attachments
     for (i = 0, len = ref.length; i < len; i++) {

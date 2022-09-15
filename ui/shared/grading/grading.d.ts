@@ -32,15 +32,15 @@ export type PartialStudent = {
   name: string
   sortableName: string
   submission: {
-    excused: any
-    grade: any
-    hasPostableComments: any
-    latePolicyStatus: any
-    redoRequest: any
-    postedAt: any
-    score: any
-    submittedAt: any
-    workflowState: any
+    excused: boolean
+    grade: null | string
+    hasPostableComments: boolean
+    latePolicyStatus: null | string
+    redoRequest: boolean
+    postedAt: null | Date
+    score: null | number
+    submittedAt: null | Date
+    workflowState: WorkflowState
   }
 }
 

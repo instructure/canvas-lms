@@ -125,34 +125,79 @@ export type Override = {
 }
 
 export type Assignment = {
-  anonymous_grading: boolean
+  allowed_attmpts: number
+  allowed_extensions: string[]
+  annotatable_attachment_id: null | string
   anonymize_students: boolean
-  anonymous_peer_reviews?: boolean
+  anonymous_grading: boolean
+  anonymous_instructor_annotations: boolean
+  anonymous_peer_reviews: boolean
   assessment_requests: AssessmentRequest[]
   assignment_group_id: string
-  assignment_group_position: number
+  assignment_group: AssignmentGroup
   assignment_id: string
   assignment_visibility: string[]
+  automatic_peer_reviews: boolean
+  can_duplicate: boolean
+  course_id: string
+  created_at: string
+  due_at: string | null
+  due_date_required: boolean
   effectiveDueDates: UserDueDateMap
+  final_grader_id: null | string
+  grade_group_students_individually: boolean
+  graded_submissions_exist: boolean
+  grader_comments_visible_to_graders: boolean
+  grader_count: number
+  grader_names_visible_to_final_grader: boolean
+  graders_anonymous_to_graders: boolean
   grades_published: boolean
   grading_standard_id: string | null
   grading_type: string
-  hasDownloadedSubmissions: boolean
-  hidden: boolean
+  group_category_id: string | null
+  has_overrides: boolean
+  has_submitted_submissions: boolean
+  html_url: string
   id: string
+  important_dates: boolean
+  in_quiz_assignment: boolean
   inClosedGradingPeriod: boolean
+  integration_data: any
+  integration_id: string
+  intra_group_peer_reviews: boolean
+  lock_at: null | string
+  locked_for_user: boolean
+  lti_context_id: string
+  max_name_length: number
   moderated_grading: boolean
   module_ids: string[]
+  module_positions: string[]
+  muted: boolean
   name: string
   omit_from_final_grade: boolean
   only_visible_to_overrides: boolean
+  original_assignment_id: null | string
+  original_assignment_name: null | string
+  original_course_id: null | string
+  original_lti_resource_link_id: null | string
+  original_quiz_id: null | string
   overrides: Override[]
+  peer_reviews: boolean
   points_possible: number
   position: number
   post_manually: boolean
+  post_to_sis: boolean
   published: boolean
-  submission_types: string
+  require_lockdown_browser: boolean
+  secure_params: string
+  sis_assignment_id: null | string
+  submission_types: string[]
+  submissions_download_url: string
+  unlock_at: null | string
+  unpublishable: boolean
+  updated_at: string
   user_id: string
+  workflow_state: WorkflowState
 }
 
 export type AssignmentMap = {

@@ -15,18 +15,31 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+import type {SubmissionOriginalityData, OriginalityData} from '@canvas/grading/grading.d'
+
 export function originalityReportSubmissionKey(submission) {
   try {
-    let submittedAt = new Date(submission.submitted_at || submission.submittedAt)
-    submittedAt = `${submittedAt.toISOString().split('.')[0]}Z`
-    return (submittedAt && `submission_${submission.id}_${submittedAt}`) || ''
+    const submittedAtDate = new Date(submission.submitted_at || submission.submittedAt)
+    const submittedAtString = `${submittedAtDate.toISOString().split('.')[0]}Z`
+    return (submittedAtString && `submission_${submission.id}_${submittedAtString}`) || ''
   } catch (_error) {
     return ''
   }
 }
 
-export function getOriginalityData(submission, index) {
-  let data = null
+export function getOriginalityData(
+  submission: {
+    _id: string
+    submissionType: string
+    originalityData: {
+      [key: string]: SubmissionOriginalityData
+    }
+    attachments
+  },
+  index: number
+): false | OriginalityData {
+  let data: null | SubmissionOriginalityData = null
   if (submission.submissionType === 'online_text_entry') {
     data =
       submission.originalityData[
