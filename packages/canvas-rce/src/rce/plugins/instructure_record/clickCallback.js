@@ -81,6 +81,7 @@ export default function (ed, document) {
       <StoreProvider {...trayProps}>
         {contentProps => (
           <UploadMedia
+            data-mce-component={true}
             rcsConfig={{
               contextType: ed.settings.canvas_rce_user_context.type,
               contextId: ed.settings.canvas_rce_user_context.id,
@@ -88,7 +89,7 @@ export default function (ed, document) {
               headers: headerFor(contentProps.jwt)
             }}
             languages={Bridge.languages}
-            open
+            open={true}
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}
             onUploadComplete={(err, data) =>
