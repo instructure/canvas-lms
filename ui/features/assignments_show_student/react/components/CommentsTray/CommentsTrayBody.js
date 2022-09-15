@@ -144,7 +144,11 @@ export default function CommentsTrayBody(props) {
             )}
 
             <Flex.Item padding="x-small medium">
-              <CommentTextArea assignment={props.assignment} submission={props.submission} />
+              <CommentTextArea
+                assignment={props.assignment}
+                submission={props.submission}
+                reviewerSubmission={props.reviewerSubmission}
+              />
             </Flex.Item>
           </Flex>
         )}
@@ -156,6 +160,7 @@ export default function CommentsTrayBody(props) {
 CommentsTrayBody.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
+  reviewerSubmission: Submission.shape,
   isPeerReviewEnabled: bool
 }
 

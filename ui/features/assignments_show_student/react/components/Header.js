@@ -301,6 +301,7 @@ class Header extends React.Component {
 
                 <CommentsTray
                   submission={this.props.submission}
+                  reviewerSubmission={this.props.reviewerSubmission}
                   assignment={this.props.assignment}
                   open={this.state.commentsTrayOpen}
                   closeTray={this.closeCommentsTray}

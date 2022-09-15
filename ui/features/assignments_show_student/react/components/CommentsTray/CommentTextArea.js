@@ -47,7 +47,8 @@ const languages = Object.keys(closedCaptionLanguages).map(key => {
 export default class CommentTextArea extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    submission: Submission.shape
+    submission: Submission.shape,
+    reviewerSubmission: Submission.shape
   }
 
   state = {
@@ -172,7 +173,8 @@ export default class CommentTextArea extends Component {
           comment: this.state.commentText,
           fileIds: attachmentIds,
           mediaObjectId: mediaObject.media_object.media_id,
-          mediaObjectType: mediaObject.media_object.media_type
+          mediaObjectType: mediaObject.media_object.media_type,
+          reviewerSubmissionId: this.props.reviewerSubmission?.id
         }
       })
 
