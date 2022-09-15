@@ -116,6 +116,7 @@ RSpec.describe Mutations::AddConversationMessage do
     )
 
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.react")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.react")
     expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
     expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.react")

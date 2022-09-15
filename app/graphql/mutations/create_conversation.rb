@@ -108,6 +108,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
                                                .order("visible_last_authored_at DESC, last_message_at DESC, id DESC")
         Conversation.preload_participants(conversations.map(&:conversation))
         ConversationParticipant.preload_latest_messages(conversations, @current_user)
+        InstStatsd::Statsd.increment("inbox.message.sent.react")
         InstStatsd::Statsd.count("inbox.conversation.created.react", conversations.count)
         InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
@@ -142,6 +143,7 @@ class Mutations::CreateConversation < Mutations::BaseMutation
           cc_author: true
         )
         InstStatsd::Statsd.increment("inbox.conversation.created.react")
+        InstStatsd::Statsd.increment("inbox.message.sent.react")
         InstStatsd::Statsd.increment("inbox.conversation.sent.react")
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
         if message.has_media_objects || input[:media_comment_id]
