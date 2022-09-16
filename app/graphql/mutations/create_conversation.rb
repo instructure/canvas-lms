@@ -117,6 +117,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         if message.has_media_objects || input[:media_comment_id]
           InstStatsd::Statsd.count("inbox.message.sent.media.react", conversations.count)
         end
+        if message[:attachment_ids].present?
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
+        end
         if input[:user_note]
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.react")
         end
@@ -143,6 +146,9 @@ class Mutations::CreateConversation < Mutations::BaseMutation
         InstStatsd::Statsd.count("inbox.message.sent.recipients.react", recipients.count)
         if message.has_media_objects || input[:media_comment_id]
           InstStatsd::Statsd.increment("inbox.message.sent.media.react")
+        end
+        if message[:attachment_ids].present?
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
         end
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.react")

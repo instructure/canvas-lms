@@ -58,6 +58,9 @@ class Mutations::AddConversationMessage < Mutations::BaseMutation
     if input[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
       InstStatsd::Statsd.increment("inbox.message.sent.media.react")
     end
+    if !message[:message].nil? && message[:message][:attachment_ids].present?
+      InstStatsd::Statsd.increment("inbox.message.sent.attachment.react")
+    end
     { conversation_message: message[:message] }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, "not found"
