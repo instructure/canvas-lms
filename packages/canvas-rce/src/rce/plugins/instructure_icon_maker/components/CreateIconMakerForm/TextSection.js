@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React from 'react'
 
 import {Flex} from '@instructure/ui-flex'
 import {TextInput} from '@instructure/ui-text-input'
@@ -26,6 +26,7 @@ import {ColorInput} from '../../../shared/ColorInput'
 import formatMessage from '../../../../../format-message'
 import {Group} from './Group'
 import {MAX_TOTAL_TEXT_CHARS} from '../../svg/constants'
+import useDebouncedValue from '../../utils/useDebouncedValue'
 
 const TEXT_SIZES = ['small', 'medium', 'large', 'x-large']
 const TEXT_POSITIONS = ['middle', 'bottom-third', 'below']
@@ -47,17 +48,14 @@ const processText = (oldValue, newValue) => {
 }
 
 export const TextSection = ({settings, onChange}) => {
-  const [text, setText] = useState(settings.text)
-
-  useEffect(() => {
-    if (settings.text !== text) {
-      setText(processText(settings.text))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.text])
+  const [text, setText] = useDebouncedValue(
+    settings.text || '',
+    value => onChange({text: value}),
+    value => processText(text, value)
+  )
 
   return (
-    <Group as="section" defaultExpanded summary={formatMessage('Text')}>
+    <Group as="section" defaultExpanded={true} summary={formatMessage('Text')}>
       <Flex
         as="section"
         justifyItems="space-between"
@@ -68,13 +66,7 @@ export const TextSection = ({settings, onChange}) => {
           <TextInput
             id="icon-text"
             renderLabel={formatMessage('Text')}
-            onChange={(e, value) => {
-              const processedText = processText(text, value)
-              if (processedText !== text) {
-                setText(processedText)
-                onChange({text: processedText})
-              }
-            }}
+            onChange={setText}
             value={text}
             messages={[
               {
@@ -108,7 +100,7 @@ export const TextSection = ({settings, onChange}) => {
             name="icon-text-color"
             onChange={textColor => onChange({textColor})}
             popoverMountNode={getTextSection}
-            requireColor
+            requireColor={true}
           />
         </Flex.Item>
 

@@ -16,40 +16,48 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useCallback, useEffect} from 'react'
 import {debounce} from '@instructure/debounce'
 
-export default function useDebouncedValue(currentValue, onChange) {
+export default function useDebouncedValue(currentValue, onChange, processValueCallback) {
   const [immediateValue, setImmediateValue] = useState(currentValue)
 
-  // The hook may have initially been called with currentValue
-  // being set to an empty value.
-  //
-  // If so we need to make sure to re-set the immediate value
-  // once a truthy value is given
-  if (!immediateValue && !!currentValue) {
-    setImmediateValue(currentValue)
-  }
+  // Only invokes onChange on the trailing edge of the timeout
+  const debouncedOnChangeCallback = useCallback(
+    debounce(val => onChange(val), 500, {trailing: true}),
+    []
+  )
+
+  useEffect(() => {
+    let newValue = currentValue
+    if (processValueCallback) {
+      newValue = processValueCallback(immediateValue, newValue)
+    }
+
+    // If so we need to make sure to re-set the immediate value
+    // once a truthy value is given
+    if (newValue !== immediateValue) {
+      setImmediateValue(newValue)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentValue])
+
+  useEffect(() => {
+    // Debounce the call to set reducer's state
+    debouncedOnChangeCallback(immediateValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [immediateValue])
 
   const handleValueChange = event => {
-    const {value} = event.target
+    let {value} = event.target
+
+    if (processValueCallback) {
+      value = processValueCallback(value)
+    }
 
     // Immediately set local state for low-latency feedback
     setImmediateValue(value)
-
-    if (!value) {
-      // The user may have done ctrl+a, backspace.
-      // Clear the value immediately to allow this
-      // action to clear the input
-      onChange(value)
-    } else {
-      // Debounce the call to set state that may cause many
-      // re-renders down the component tree
-      debounce(val => {
-        onChange(val)
-      }, 500)(value)
-    }
   }
 
-  return [immediateValue, handleValueChange, setImmediateValue]
+  return [immediateValue, handleValueChange]
 }
