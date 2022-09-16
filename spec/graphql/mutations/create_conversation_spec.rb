@@ -146,6 +146,32 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "yo"
   end
 
+  it "creates a conversation with an attachment" do
+    new_user = User.create
+    attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
+    enrollment = @course.enroll_student(new_user)
+    enrollment.workflow_state = "active"
+    enrollment.save
+    @student.media_objects.where(media_id: "m-whatever", media_type: "video/mp4").first_or_create!
+    result = run_mutation(
+      recipients: [new_user.id.to_s],
+      body: "yo",
+      context_code: @course.asset_string,
+      media_comment_id: "m-whatever",
+      media_comment_type: "video",
+      attachment_ids: [attachment.id]
+    )
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.react")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.react")
+    expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.react", 1)
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.media.react")
+    expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.react")
+    expect(result.dig("data", "createConversation", "errors")).to be_nil
+    expect(
+      result.dig("data", "createConversation", "conversations", 0, "conversation", "conversationMessagesConnection", "nodes", 0, "body")
+    ).to eq "yo"
+  end
+
   it "does not allow creating conversations without context without read_roster permission (the normal case)" do
     new_user = User.create
     enrollment = @course.enroll_student(new_user)
