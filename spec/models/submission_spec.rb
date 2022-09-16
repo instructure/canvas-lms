@@ -7155,11 +7155,17 @@ describe Submission do
       let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
 
       before do
-        @assignment.update!(peer_reviews: true)
+        @assignment.update!(submission_types: "online_text_entry", peer_reviews: true)
       end
 
-      it "returns true for peer reviewer of student under view" do
+      it "returns false for peer reviewer of student under view that has not submitted" do
         AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: @submission, user: @student)
+        expect(@submission.can_view_details?(reviewer)).to be false
+      end
+
+      it "returns true for peer reviewer of student under view that has submitted" do
+        AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: @submission, user: @student)
+        @assignment.submit_homework(reviewer, body: "hi")
         expect(@submission.can_view_details?(reviewer)).to be true
       end
 

@@ -511,7 +511,7 @@ class Submission < ActiveRecord::Base
     end
     can :read_grade
 
-    given { |user| peer_reviewer?(user) }
+    given { |user| peer_reviewer?(user) && !!assignment&.submitted?(user) }
     can :read and can :comment and can :make_group_comment
 
     given { |user, session| can_view_plagiarism_report("turnitin", user, session) }
