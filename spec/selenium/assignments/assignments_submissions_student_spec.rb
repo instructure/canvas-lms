@@ -330,7 +330,7 @@ describe "submissions" do
 
     it "does not allow peer reviewers to see turnitin scores/reports", priority: "1" do
       @student1 = @user
-      @assignment.submission_types = "online_upload"
+      @assignment.submission_types = "online_upload,online_text_entry"
       @assignment.turnitin_enabled = true
       @assignment.save!
       _filename, fullpath, _data = get_file("testfile1.txt")
@@ -367,7 +367,7 @@ describe "submissions" do
       }
       @submission.turnitin_data_changed!
       @submission.save!
-
+      @assignment.submit_homework(@student2, body: "hello")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student1.id}"
       in_frame("preview_frame") do
         expect(f("body")).not_to contain_css(".turnitin_score_container")
