@@ -21,9 +21,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
 
@@ -93,17 +93,19 @@ export default class ExpandableLockOptions extends React.Component {
     const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
-        <Button variant="icon" onClick={this.toggle}>
-          <Text size="medium">
-            <Icon />
-          </Text>
-          <ScreenReaderContent>
-            {`${itemTypeLabelPlurals[this.props.objectType]},
+        <IconButton
+          withBorder={false}
+          withBackground={false}
+          screenReaderLabel={`${itemTypeLabelPlurals[this.props.objectType]},
             ${this.state.open ? I18n.t('Expanded') : I18n.t('Collapsed')},
             ${formatLockObject(this.state.locks) ? I18n.t('Locked') : I18n.t('Unlocked')},
             ${formatLockObject(this.state.locks)}`}
-          </ScreenReaderContent>
-        </Button>
+          renderIcon={
+            <Text size="medium">
+              <Icon />
+            </Text>
+          }
+        />
       </div>
     )
   }
