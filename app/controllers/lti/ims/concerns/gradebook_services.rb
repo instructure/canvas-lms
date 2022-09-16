@@ -23,6 +23,7 @@ module Lti::IMS::Concerns
     include AdvantageServices
 
     included do
+      before_action :verify_course_not_concluded
       before_action :verify_line_item_client_id_connection, only: %i[show update destroy]
 
       def line_item
@@ -30,7 +31,11 @@ module Lti::IMS::Concerns
       end
 
       def context
-        @_context ||= Course.not_completed.find(params[:course_id])
+        @_context ||= if Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
+                        Course.find(params[:course_id])
+                      else
+                        Course.not_completed.find(params[:course_id])
+                      end
       end
 
       def user
@@ -53,6 +58,16 @@ module Lti::IMS::Concerns
 
       def pagination_args
         params[:limit] ? { per_page: params[:limit] } : {}
+      end
+
+      def verify_course_not_concluded
+        return unless Account.site_admin.feature_enabled?(:ags_improved_course_concluded_response_codes)
+
+        # If context is nil, the verify_context will handle rendering a 404.
+        if context&.concluded?
+          render_error("This course has concluded. AGS requests will no longer be accepted for this course.",
+                       :unprocessable_entity)
+        end
       end
 
       def verify_user_in_context
