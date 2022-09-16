@@ -1,5 +1,5 @@
-Introduction
-====================
+# Introduction
+
 External tools can be associated with Canvas assignments so that students are
 able to experience an integrated offering of the tool. Tools can also leverage
 LTI services to return submissions and/or scores back to the Canvas gradebook.
@@ -32,18 +32,18 @@ LTI Advantage: Assignment and Grading Services
 LTI 1.3 tools can be configured to have access to the
 <a href="https://www.imsglobal.org/spec/lti-ags/v2p0/" target="_blank">
 Assignment and Grading Services</a> (AGS). Assignment and Grading Services
-are a powerful way for tools  to interact with the LMS gradebook to save
+are a powerful way for tools to interact with the LMS gradebook to save
 time for instructors and students.
 
 Some examples of use cases that are uniquely solvable using AGS that were not
 resolvable by the LTI 1.1 Outcomes Service include:
 
 - External tools can return scores for assignments without the need of students
-ever accessing the tool.
+  ever accessing the tool.
 - Using the Line Items service tools can create columns to store grades in
-the gradebook without the need for instructors to manually create them using
-<a href="file.assignment_selection_placement.html" target="_blank">deep linking
-and the assignment_selection placement</a>.
+  the gradebook without the need for instructors to manually create them using
+  <a href="file.assignment_selection_placement.html" target="_blank">deep linking
+  and the assignment_selection placement</a>.
 - Previously returned scores can be cleared out.
 
 In addition to permitting these use cases, many more use cases are described in
@@ -63,7 +63,6 @@ AGS documentation</a>.
 For example, the following JSON would create an LTI 1.3 tool that has access to
 read and write scores, check for existing scores, and manage line items (ex.
 assignments) that are associated with the tool:
-
 
 ```
 {
@@ -108,7 +107,6 @@ assignments) that are associated with the tool:
 }
 ```
 
-
 NOTE: Using AGS does not require configuration of any specific placements, so
 the placement(s) here could be any placement(s).
 
@@ -137,6 +135,29 @@ As long as you as a tool provider keep requests more-or-less sequential, and pay
 to the request throttling headers as detailed in the above doc, even this elevated level
 of requests per token should not be limited.
 
+##Common Error Codes
+Below are some common error codes that you might encounter while using the Assignment
+and Grade Services API. Each code also comes with some advice for fixing your issue.
+
+| Code | Associated Message | Resolution | Notes |
+| ---- | ------------------ | ---------- | ----- |
+| 400 | \<parameter\> is missing | Ensure you're passing all required parameters |
+| 400 | Provided timestamp of \<timestamp\> not a valid timestamp | Ensure you're passing a correctly formatted, valid timestamp |
+| 400 | Provided timestamp of \<timestamp\> before last updated timestamp of \<timestamp\> | Ensure the timestamp you're passing isn't before when the result was last updated |
+| 400 | Provided submitted_at timestamp of \<timestamp\> in the future | Ensure the provided timestamp isn't too far in the future |
+| 401 | Invalid Developer Key | Ensure your credentials point to the correct developer key and that the key is on |
+| 401 | Access Token not linked to a Tool associated with this Context | Ensure that your tool is installed and available in the specified context |
+| 404 | The specified resource does not exist. | Verify that the course, resource link, line item, or any other such resource that you're specifying exists |
+| 404 | Context not found | Ensure that the context you're specifying actually exists. |
+| 412 | Tool does not have permission to view line_item | Ensure the specified line item is associated with your tool |
+| 412 | The specified LTI link ID is not associated with the line item | Ensure the resourceLinkId you're passing is associated with this line item |
+| 422 | This course has concluded. AGS requests will no longer be accepted for this course. | Reopen the specified course or stop sending requests for this course | Only returned if the ags_improved_course_concluded_response_codes feature flag is enabled |
+| 422 | User not found in course or is not a student | Ensure the user you're specifying exists or is a student |
+| 422 | ScoreMaximum must be greater than or equal to 0 | Ensure you're passing a valid value for ScoreMaximum |
+| 422 | ScoreMaximum not supplied when ScoreGiven present | Ensure you're providing a ScoreMaximum in any request with a ScoreGiven |
+| 422 | Content items must be provided with submission type 'online_upload' | Ensure you specify the correct submission type when providing submission files |
+| 422 | The maximum number of allowed attempts has been reached for this submission | Add additional attempts or stop sending submission requests for the specified student |
+
 ##Extensions
 Canvas has extended several AGS endpoints to support deeper grading
 integrations. Here, we will focus on these extensions and describe how tools can
@@ -161,7 +182,6 @@ an external tool to submission data back to the Canvas Gradebook. This data is
 then exposed in the Submission Details and Speedgrader Views so that both
 students and teachers can see what was submitted to the external tool without
 leaving Canvas. Support for basic urls, text, and LTI links are supported.
-
 
 <a name="outcomes_service"></a>
 LTI 1.1 Grade Passback Tools
@@ -323,7 +343,7 @@ If the external tool wants to supply this value, it can augment the POX sent
 with the grading value. <a href="http://www.imsglobal.org/LTI/v1p1/ltiIMGv1p1.html#_Toc319560473">LTI replaceResult POX</a>
 
 Simply add a node called `resultTotalScore` instead of `resultScore`. If both are
-sent, then `resultScore` will be ignored. The `textString` value  should be
+sent, then `resultScore` will be ignored. The `textString` value should be
 an Integer or Float value.
 
 ```xml
@@ -414,7 +434,6 @@ string must be an <a href="https://tools.ietf.org/html/rfc3339">iso8601 formatte
 If included, then it will override any existing submitted_at value on the submission even when
 result score or result total score are not present.
 
-
 ```xml
 <?xml version = "1.0" encoding = "UTF-8"?>
 <imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
@@ -454,7 +473,7 @@ If an external tool wants to honor/preserve any grading done in Canvas by a huma
 prioritize non-tool grade tag.
 
 Simply add a node called `prioritizeNonToolGrade` to the `submissionDetails` node. The tag expects no data, just its
-presence is all that is required for Canvas.  If included, any grading done by something other than an LTI tool will
+presence is all that is required for Canvas. If included, any grading done by something other than an LTI tool will
 be preserved.
 
 ```xml
@@ -494,7 +513,7 @@ If an external tool wants to tell canvas that grading isn't final and additional
 can augment the POX sent with the needs additional review grade tag.
 
 Simply add a node called `needsAdditionalReview` to the `submissionDetails` node. The tag expects no data, just its
-presence is all that is required for Canvas.  If included, the Canvas gradebook will signal to the teacher additional
+presence is all that is required for Canvas. If included, the Canvas gradebook will signal to the teacher additional
 grading action is needed.
 
 ```xml
