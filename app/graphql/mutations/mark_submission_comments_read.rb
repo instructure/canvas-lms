@@ -29,7 +29,7 @@ class Mutations::MarkSubmissionCommentsRead < Mutations::BaseMutation
 
   def resolve(input:)
     submission = Submission.find(input[:submission_id])
-    verify_authorized_action!(submission, :comment)
+    verify_authorized_action!(submission, :read_comments)
 
     input_sc_ids = submission.submission_comments
                              .where(id: input[:submission_comment_ids]).limit(SUBMISSION_COMMENT_LIMIT).pluck(:id)
