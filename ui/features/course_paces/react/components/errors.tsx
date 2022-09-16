@@ -65,12 +65,7 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
               <div ref={result.focusRef} tabIndex={-1}>
                 {msg}
               </div>
-              <Button
-                variant="primary"
-                display="block"
-                margin="x-small 0 0"
-                onClick={syncUnpublishedChanges}
-              >
+              <Button color="primary" margin="x-small 0 0" onClick={syncUnpublishedChanges}>
                 {I18n.t('Retry')}
               </Button>
             </>
