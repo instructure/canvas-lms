@@ -454,7 +454,7 @@ class Submission < ActiveRecord::Base
         user.id == user_id &&
         assignment.published?
     end
-    can :read and can :comment and can :make_group_comment and can :submit and can :mark_item_read
+    can :read and can :comment and can :make_group_comment and can :submit and can :mark_item_read and can :read_comments
 
     # see user_can_read_grade? before editing :read_grade permissions
     given do |user|
@@ -2628,7 +2628,8 @@ class Submission < ActiveRecord::Base
     end
 
     return state if state.present?
-    return "read" if assignment.deleted? || assignment.muted? || !user_id
+
+    return "read" if assignment.deleted? || !posted? || !user_id
     return "unread" if grade || score
 
     has_comments = if visible_submission_comments.loaded?

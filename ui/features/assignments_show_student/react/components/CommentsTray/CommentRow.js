@@ -15,19 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react'
 import {Text} from '@instructure/ui-text'
-
 import {Badge} from '@instructure/ui-badge'
 import {Avatar} from '@instructure/ui-avatar'
-import {Button} from '@instructure/ui-buttons'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
 import {getIconByType} from '@canvas/mime/react/mimeClassIconHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import {MediaPlayer} from '@instructure/ui-media-player'
-
 import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('assignments_2')

@@ -96,4 +96,22 @@ describe Mutations::MarkSubmissionCommentsRead do
     expect(@student_comment.read?(@teacher)).to eq true
     expect(student_comment2.read?(@teacher)).to eq true
   end
+
+  describe "observer context" do
+    it "will mark a comment as read for observers" do
+      observer = @course.enroll_user(User.create!, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id).user
+      result = run_mutation({ submission_comment_ids: [@teacher_comment.id.to_s] }, observer)
+
+      expect(
+        result.dig(:data, :markSubmissionCommentsRead, :submissionComments).count
+      ).to eq 1
+      expect(
+        result.dig(:data, :markSubmissionCommentsRead, :submissionComments)[0][:_id].to_i
+      ).to eq @teacher_comment.id
+      expect(ViewedSubmissionComment.count).to eq 1
+      expect(ViewedSubmissionComment.last.user).to eq observer
+      expect(ViewedSubmissionComment.last.submission_comment_id).to eq @teacher_comment.id
+      expect(@teacher_comment.read?(observer)).to eq true
+    end
+  end
 end

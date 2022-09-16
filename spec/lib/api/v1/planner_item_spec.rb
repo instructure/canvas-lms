@@ -458,7 +458,7 @@ describe Api::V1::PlannerItem do
       graded_submission(@quiz, @student)
       graded_submission_model(assignment: @assignment, user: @student).update(score: 5)
       graded_submission_model(assignment: @topic.assignment, user: @student).update(score: 5)
-      Assignment.active.update_all(muted: false)
+      Assignment.active.each(&:post_submissions)
       expect(api.planner_item_json(@quiz.reload, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@assignment.reload, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@topic.reload, @student, session)[:new_activity]).to be true
@@ -469,7 +469,7 @@ describe Api::V1::PlannerItem do
       submission_model(assignment: @quiz.assignment, user: @student).add_comment(author: @teacher, comment: "hi")
       submission_model(assignment: @assignment, user: @student).add_comment(author: @teacher, comment: "hi")
       submission_model(assignment: @topic.assignment, user: @student).add_comment(author: @teacher, comment: "hi")
-      Assignment.active.update_all(muted: false)
+      Assignment.active.each(&:post_submissions)
       expect(api.planner_item_json(@quiz.reload, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@assignment.reload, @student, session)[:new_activity]).to be true
       expect(api.planner_item_json(@topic.reload, @student, session)[:new_activity]).to be true
