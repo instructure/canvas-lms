@@ -415,7 +415,7 @@ module AccountReports
       end
     end
 
-    def write_outcomes_report(headers, scope)
+    def write_outcomes_report(headers, scope, empty_scope_message = "No outcomes found")
       header_keys = headers.keys
       header_names = headers.values
       host = root_account.domain
@@ -434,7 +434,9 @@ module AccountReports
           add_outcomes_data(row)
           csv << header_keys.map { |h| row[h] }
         end
-        csv << ["No outcomes found"] if total == 0
+        unless empty_scope_message.blank?
+          csv << [empty_scope_message] if total == 0
+        end
       end
     end
 
