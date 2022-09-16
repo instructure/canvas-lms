@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import registerEditToolbar, {shouldShowEditButton} from '../registerEditToolbar'
+import registerEditToolbar, {
+  shouldShowEditButton,
+  EDIT_ALT_TEXT_BUTTON_ID
+} from '../registerEditToolbar'
 import {BUTTON_ID, TOOLBAR_ID} from '../svg/constants'
 
 let editor, onAction
@@ -26,6 +29,7 @@ beforeEach(() => {
     ui: {
       registry: {
         addButton: jest.fn(),
+        addAltTextButton: jest.fn(),
         addContextToolbar: jest.fn()
       }
     }
@@ -43,14 +47,23 @@ describe('registerEditToolbar()', () => {
   it('adds the edit button', () => {
     expect(editor.ui.registry.addButton).toHaveBeenCalledWith(BUTTON_ID, {
       onAction,
-      text: 'Edit',
+      text: 'Edit Icon',
       tooltip: 'Edit Existing Icon Maker Icon'
     })
   })
 
+  it('adds the icon options button', () => {
+    expect(editor.ui.registry.addButton).toHaveBeenCalledWith(
+      EDIT_ALT_TEXT_BUTTON_ID,
+      expect.objectContaining({
+        text: 'Icon Options'
+      })
+    )
+  })
+
   it('adds the context toolbar with the button', () => {
     expect(editor.ui.registry.addContextToolbar).toHaveBeenCalledWith(TOOLBAR_ID, {
-      items: BUTTON_ID,
+      items: `${BUTTON_ID} ${EDIT_ALT_TEXT_BUTTON_ID}`,
       position: 'node',
       scope: 'node',
       predicate: expect.any(Function)

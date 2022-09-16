@@ -36,10 +36,16 @@ function getSizeOptions($sizeSelect) {
 export default class ImageOptionsTrayDriver {
   static find() {
     const $tray = queryByLabelText(document.body, 'Image Options Tray')
-    if ($tray == null) {
-      return null
+    if ($tray !== null) {
+      return new ImageOptionsTrayDriver($tray)
     }
-    return new ImageOptionsTrayDriver($tray)
+
+    const $trayForIcons = queryByLabelText(document.body, 'Icon Options Tray')
+    if ($trayForIcons !== null) {
+      return new ImageOptionsTrayDriver($trayForIcons)
+    }
+
+    return null
   }
 
   constructor($element) {

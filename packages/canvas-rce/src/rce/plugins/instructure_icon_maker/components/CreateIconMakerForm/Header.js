@@ -30,7 +30,7 @@ import {IconQuestionLine} from '@instructure/ui-icons'
 import {decode} from '../../svg/utils'
 import useDebouncedValue from '../../utils/useDebouncedValue'
 
-export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
+export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) => {
   const originalName = settings.originalName
 
   const [name, setName] = useDebouncedValue(settings.name, n => onChange({name: n}))
@@ -82,25 +82,29 @@ export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
           }}
         />
       </Flex.Item>
-      <Flex.Item padding="small">
-        <TextArea
-          id="icon-alt-text"
-          height="4rem"
-          disabled={settings.isDecorative}
-          label={textAreaLabel}
-          onChange={setAlt}
-          placeholder={formatMessage('(Describe the icon)')}
-          resize="vertical"
-          value={alt}
-        />
-      </Flex.Item>
-      <Flex.Item padding="small">
-        <Checkbox
-          checked={settings.isDecorative}
-          label={formatMessage('Decorative Icon')}
-          onChange={() => onChange({isDecorative: !settings.isDecorative})}
-        />
-      </Flex.Item>
+      {!editing && (
+        <>
+          <Flex.Item padding="small">
+            <TextArea
+              id="icon-alt-text"
+              height="4rem"
+              disabled={settings.isDecorative}
+              label={textAreaLabel}
+              onChange={setAlt}
+              placeholder={formatMessage('(Describe the icon)')}
+              resize="vertical"
+              value={alt}
+            />
+          </Flex.Item>
+          <Flex.Item padding="small">
+            <Checkbox
+              checked={settings.isDecorative}
+              label={formatMessage('Decorative Icon')}
+              onChange={() => onChange({isDecorative: !settings.isDecorative})}
+            />
+          </Flex.Item>
+        </>
+      )}
     </Flex>
   )
 }
