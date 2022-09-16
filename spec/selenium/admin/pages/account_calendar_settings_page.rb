@@ -26,12 +26,12 @@ module AccountCalendarSettingsPage
     ".account_calendars"
   end
 
-  def account_checkboxes_selector(account_folder_name, number_of_subitems)
-    "[aria-label = '#{account_folder_name} (#{number_of_subitems})'] [data-testid = 'flex-calendar-item'] label"
+  def account_checkboxes_selector(account_id)
+    "[data-testid='toggle-group-#{account_id}'] label"
   end
 
-  def account_folder_selector(account_name, number_of_subitems)
-    "[aria-label = '#{account_name} (#{number_of_subitems})'] button"
+  def account_folder_selector(account_id)
+    "[data-testid='toggle-group-#{account_id}'] > span:first-child button"
   end
 
   def apply_changes_button_selector
@@ -67,12 +67,12 @@ module AccountCalendarSettingsPage
     f(account_calendar_navigation_selector)
   end
 
-  def account_checkboxes(account_folder_name, number_of_subitems)
-    ff(account_checkboxes_selector(account_folder_name, number_of_subitems))
+  def account_checkboxes(account_id)
+    ff(account_checkboxes_selector(account_id))
   end
 
-  def account_folder(account_name, number_of_items)
-    f(account_folder_selector(account_name, number_of_items))
+  def account_folder(account_id)
+    f(account_folder_selector(account_id))
   end
 
   def apply_changes_button
@@ -117,8 +117,8 @@ module AccountCalendarSettingsPage
     checkbox_element.click
   end
 
-  def click_account_folder(account_name, number_of_subfolders)
-    account_folder(account_name, number_of_subfolders).click
+  def click_account_folder(account_id)
+    account_folder(account_id).click
   end
 
   def click_apply_changes_button

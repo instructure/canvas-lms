@@ -18,20 +18,8 @@
 
 import {ReactElement} from 'react'
 
-export type CollectionChild = {
-  id: number
-  name: string
-  visible: boolean
-}
-
 export type Collection = {
-  [id: number]: {
-    id: number
-    name: string
-    collections: number[]
-    children: CollectionChild[]
-    renderBeforeItems?: ReactElement
-  }
+  [id: number]: Account
 }
 
 export type AccountData = {
@@ -46,9 +34,11 @@ export type AccountData = {
 export type Account = {
   id: number
   name: string
+  heading: string | undefined
   parent_account_id: number | null
-  visible: boolean
   sub_account_count: number
+  children: any[]
+  visible: boolean
 }
 
 export type VisibilityChange = {
