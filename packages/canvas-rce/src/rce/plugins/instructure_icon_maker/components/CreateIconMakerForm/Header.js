@@ -33,26 +33,12 @@ import useDebouncedValue from '../../utils/useDebouncedValue'
 export const Header = ({settings, onChange, allowNameChange, nameRef}) => {
   const originalName = settings.originalName
 
-  const [name, setName, setImmediateName] = useDebouncedValue(settings.name, n =>
-    onChange({name: n})
-  )
+  const [name, setName] = useDebouncedValue(settings.name, n => onChange({name: n}))
   const [alt, setAlt] = useDebouncedValue(settings.alt, a => onChange({alt: a}))
 
   useEffect(() => {
     if (!allowNameChange) onChange({name: originalName})
   }, [allowNameChange, onChange, originalName])
-
-  useEffect(() => {
-    // The "immediate" bit of name state may have been initialized to an
-    // empty value if the app has not yet fetched the file's name from the
-    // API (on icon edit).
-    //
-    // If that's the case, we need to update the "immediate" piece of name
-    // state to present the file name.
-    if (!name && !!settings.name) {
-      setImmediateName(settings.name)
-    }
-  }, [name, setImmediateName, settings.name])
 
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
