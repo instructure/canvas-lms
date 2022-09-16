@@ -26,53 +26,40 @@ export const castIdsToInt = (accounts: AccountData[]): Account[] =>
   accounts.map(account => ({
     ...account,
     id: parseInt(account.id, 10),
+    children: [],
+    heading: '',
     parent_account_id:
       account.parent_account_id != null ? parseInt(account.parent_account_id, 10) : null
   }))
 
 export const addAccountsToTree = (
   accountData: AccountData[],
-  collections: Collection,
-  originAccountId: number
+  collections: Collection
 ): Collection => {
   const accounts = castIdsToInt(accountData)
-  const newCollections = {...collections}
+  const allAccounts = {...collections}
 
-  // Add any new accounts with sub-accounts to collections and to parent's collections array
-  // Also add self as the first item in the children array
   accounts.forEach(account => {
-    if (
-      !newCollections.hasOwnProperty(account.id) &&
-      (account.sub_account_count > 0 || account.id === originAccountId)
-    ) {
-      newCollections[account.id] = {
-        id: account.id,
-        name: I18n.t('%{accountName} (%{accountCount})', {
+    if (allAccounts.hasOwnProperty(account.id)) {
+      return
+    }
+
+    allAccounts[account.id] = {
+      ...account,
+      ...{
+        heading: I18n.t('%{accountName} (%{accountCount})', {
           accountName: account.name,
           accountCount: account.sub_account_count + 1 // to include parent account in the count
-        }),
-        collections: [],
-        children: [{id: account.id, name: account.name, visible: account.visible}]
-      }
-      if (account.id !== originAccountId) {
-        newCollections[account.parent_account_id!].collections.push(account.id)
+        })
       }
     }
-  })
 
-  // Add any new accounts without sub-accounts to parent's children
-  accounts.forEach(account => {
-    if (
-      account.sub_account_count === 0 &&
-      account.id !== originAccountId &&
-      !newCollections[account.parent_account_id!].children.some(({id}) => id === account.id)
-    ) {
-      newCollections[account.parent_account_id!].children = [
-        ...newCollections[account.parent_account_id!].children,
-        {id: account.id, name: account.name, visible: account.visible}
-      ]
+    if (account.parent_account_id && account.parent_account_id != account.id) {
+      allAccounts[account.parent_account_id].children.push(account.id)
     }
+
+    account.children.push(account.id)
   })
 
-  return newCollections
+  return allAccounts
 }

@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 import {AccountCalendarSettings} from '../AccountCalendarSettings'
-import {RESPONSE_ACCOUNT_1} from '../../__tests__/fixtures'
+import {RESPONSE_ACCOUNT_1} from './fixtures'
 
 jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
@@ -77,17 +77,13 @@ describe('AccountCalendarSettings', () => {
   })
 
   it('renders account tree when no filters are applied', async () => {
-    const {findByText, getByLabelText} = render(<AccountCalendarSettings {...defaultProps} />)
+    const {findByText, getByTestId} = render(<AccountCalendarSettings {...defaultProps} />)
     await findByText('University (25)')
-    expect(
-      getByLabelText(
-        'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
-      )
-    ).toBeInTheDocument()
+    expect(getByTestId('account-tree')).toBeInTheDocument()
   })
 
   it('renders account list when filters are applied', async () => {
-    const {findByText, getByLabelText, getByPlaceholderText} = render(
+    const {findByText, queryByTestId, getByPlaceholderText} = render(
       <AccountCalendarSettings {...defaultProps} />
     )
     await findByText('University (25)')
@@ -105,10 +101,6 @@ describe('AccountCalendarSettings', () => {
     const search = getByPlaceholderText('Search Calendars')
     fireEvent.change(search, {target: {value: 'elemen'}})
     expect(await findByText('West Elementary School')).toBeInTheDocument()
-    expect(
-      getByLabelText(
-        'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
-      )
-    ).not.toBeVisible()
+    expect(queryByTestId('account-tree')).not.toBeVisible()
   })
 })
