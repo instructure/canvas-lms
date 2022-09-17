@@ -25,6 +25,7 @@
    show_grading = !@assignment || !%w{online_quiz not_graded}.include?(@assignment.submission_types)
    rubric_association = assessment.rubric_association if assessment&.active_rubric_association?
    anonymize_student ||= false
+   outcome_friendly_descriptions = rubric.outcome_friendly_descriptions.to_a if rubric
 %>
 <% cache(['rubric_render4',
          (rubric.try(:cache_key) || 'no_rubric'),
@@ -152,7 +153,8 @@
   <% if rubric && rubric.criteria %>
     <% rubric.criteria_object.each do |criterion| %>
       <% rating = assessment.ratings.find{|r| r[:criterion_id] == criterion.id} rescue nil %>
-      <%= render :partial => "shared/rubric_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :rubric => rubric, :rubric_association => rubric_association, :edit_view => edit_view} %>
+      <% friendly_description = outcome_friendly_descriptions.detect {|x| x["learning_outcome_id"] == criterion[:learning_outcome_id]}.description rescue '' %>
+      <%= render :partial => "shared/rubric_criterion", :object => criterion, :locals => {:assessing => assessing, :assessment_rating => rating, :rubric => rubric, :rubric_association => rubric_association, :edit_view => edit_view, :friendly_description => friendly_description} %>
     <% end %>
   <% end %>
   <%= render :partial => "shared/rubric_criterion", :object => nil %>
