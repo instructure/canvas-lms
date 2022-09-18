@@ -23,7 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {roleIsCourseBaseRole} from '@canvas/permissions/util'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
 import {FormField} from '@instructure/ui-form-field'
@@ -112,15 +112,15 @@ export default class AddTray extends Component {
   renderTrayHeader = () => (
     <Flex alignItems="center" margin="small">
       <Flex.Item>
-        <Button
+        <IconButton
           id="close-add-role-tray-button"
-          variant="icon"
           size="small"
           onClick={this.hideTray}
           elementRef={c => (this.closeButton = c)}
+          screenReaderLabel={I18n.t('Close')}
         >
-          <IconXSolid title={I18n.t('Close')} />
-        </Button>
+          <IconXSolid />
+        </IconButton>
       </Flex.Item>
       <Flex.Item>
         <View as="div" margin="0 0 0 small">
@@ -135,7 +135,7 @@ export default class AddTray extends Component {
   renderSelectRoleName = () => (
     <View display="block" margin="medium 0">
       <TextInput
-        isRequired
+        isRequired={true}
         onChange={this.onChangeRoleName}
         id="add_role_input"
         value={this.state.selectedRoleName}
