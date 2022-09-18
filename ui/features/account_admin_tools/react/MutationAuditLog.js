@@ -23,6 +23,7 @@ import {Button} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import {Heading} from '@instructure/ui-heading'
+import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -59,7 +60,7 @@ const AuditLogForm = ({onSubmit}) => {
           onChange={e => {
             setAssetString(e.target.value)
           }}
-          isRequired
+          isRequired={true}
         />
 
         <div style={{marginTop: '1.5em'}} />
@@ -73,7 +74,7 @@ const AuditLogForm = ({onSubmit}) => {
                 formatDate={formatDate}
                 selectedDate={startDate}
                 placement="top center"
-                withRunningValue
+                withRunningValue={true}
               />
             </Grid.Col>
             <Grid.Col>
@@ -83,7 +84,7 @@ const AuditLogForm = ({onSubmit}) => {
                 formatDate={formatDate}
                 selectedDate={endDate}
                 placement="top center"
-                withRunningValue
+                withRunningValue={true}
               />
             </Grid.Col>
             <Grid.Col vAlign="middle">
@@ -167,9 +168,9 @@ const LogEntry = ({logEntry}) => {
           <User user={logEntry.user} realUser={logEntry.realUser} />
         </Table.Cell>
         <Table.Cell>
-          <Button variant="link" onClick={() => setShowingParams(!showingParams)}>
+          <Link as="button" isWithinText={false} onClick={() => setShowingParams(!showingParams)}>
             {showingParams ? I18n.t('Hide params') : I18n.t('Show params')}
-          </Button>
+          </Link>
         </Table.Cell>
       </Table.Row>
       {showingParams ? (
