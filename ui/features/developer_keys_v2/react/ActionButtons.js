@@ -20,9 +20,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {IconEditLine, IconEyeLine, IconOffLine, IconTrashLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('react_developer_keys')
@@ -43,7 +42,7 @@ class DeveloperKeyActionButtons extends React.Component {
   deleteLinkHandler = event => {
     const {dispatch, deleteDeveloperKey, developerKey, onDelete} = this.props
     event.preventDefault()
-    const confirmResult = confirm(this.confirmationMessage(developerKey))
+    const confirmResult = window.confirm(this.confirmationMessage(developerKey))
     if (confirmResult) {
       onDelete(developerKey.id)
       dispatch(deleteDeveloperKey(developerKey))
@@ -93,24 +92,32 @@ class DeveloperKeyActionButtons extends React.Component {
     if (visible) {
       return (
         <Tooltip renderTip={I18n.t('Make key invisible')}>
-          <Button variant="icon" margin="0" size="small" onClick={this.makeInvisibleLinkHandler}>
-            <ScreenReaderContent>
-              {I18n.t('Make key %{developerName} invisible', {developerName})}
-            </ScreenReaderContent>
+          <IconButton
+            withBackground={false}
+            withBorder={false}
+            margin="0"
+            size="small"
+            onClick={this.makeInvisibleLinkHandler}
+            screenReaderLabel={I18n.t('Make key %{developerName} invisible', {developerName})}
+          >
             <IconEyeLine />
-          </Button>
+          </IconButton>
         </Tooltip>
       )
     }
 
     return (
       <Tooltip renderTip={I18n.t('Make key visible')}>
-        <Button variant="icon" margin="0" size="small" onClick={this.makeVisibleLinkHandler}>
-          <ScreenReaderContent>
-            {I18n.t('Make key %{developerName} visible', {developerName})}
-          </ScreenReaderContent>
+        <IconButton
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Make key %{developerName} visible', {developerName})}
+          margin="0"
+          size="small"
+          onClick={this.makeVisibleLinkHandler}
+        >
           <IconOffLine />
-        </Button>
+        </IconButton>
       </Tooltip>
     )
   }
@@ -120,12 +127,16 @@ class DeveloperKeyActionButtons extends React.Component {
 
     return (
       <Tooltip renderTip={I18n.t('Edit this key')}>
-        <Button variant="icon" margin="0" size="small" onClick={this.editLinkHandler}>
-          <ScreenReaderContent>
-            {I18n.t('Edit key %{developerName}', {developerName})}
-          </ScreenReaderContent>
+        <IconButton
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Edit key %{developerName}', {developerName})}
+          margin="0"
+          size="small"
+          onClick={this.editLinkHandler}
+        >
           <IconEditLine />
-        </Button>
+        </IconButton>
       </Tooltip>
     )
   }
@@ -138,18 +149,17 @@ class DeveloperKeyActionButtons extends React.Component {
         {this.renderEditButton()}
         {this.renderVisibilityIcon()}
         <Tooltip renderTip={I18n.t('Delete this key')}>
-          <Button
-            variant="icon"
+          <IconButton
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={I18n.t('Delete key %{developerName}', {developerName})}
             margin="0"
             size="small"
             onClick={this.deleteLinkHandler}
             elementRef={this.refDeleteLink}
           >
-            <ScreenReaderContent>
-              {I18n.t('Delete key %{developerName}', {developerName})}
-            </ScreenReaderContent>
             <IconTrashLine />
-          </Button>
+          </IconButton>
         </Tooltip>
       </div>
     )
