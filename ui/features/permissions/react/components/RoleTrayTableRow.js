@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
@@ -65,7 +65,7 @@ export default function RoleTrayTableRow({
         permissionLabel={permissionLabel}
         roleId={role.id}
         roleLabel={role.label}
-        inTray
+        inTray={true}
       />
     )
   }
@@ -76,9 +76,14 @@ export default function RoleTrayTableRow({
         <Flex.Item>
           {expandable && (
             <span className="ic-permissions_role_tray_table_role_expandable">
-              <Button variant="icon" size="small">
-                <IconArrowOpenStartSolid title={I18n.t('Expand permission')} />
-              </Button>
+              <IconButton
+                withBorder={false}
+                withBackground={false}
+                size="small"
+                screenReaderLabel={I18n.t('Expand permission')}
+              >
+                <IconArrowOpenStartSolid />
+              </IconButton>
             </span>
           )}
 

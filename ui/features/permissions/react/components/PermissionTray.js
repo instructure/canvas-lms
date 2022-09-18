@@ -72,7 +72,7 @@ function PermissionDetailToggles({tab, permissionName}) {
   if (error) {
     return (
       <View margin="small" as="div">
-        <Text color="warning">{error}</Text>
+        <Text color="alert">{error}</Text>
       </View>
     )
   }
