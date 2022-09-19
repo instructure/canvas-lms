@@ -134,15 +134,112 @@ describe BigBlueButtonConference do
     end
 
     it "sends record flag if record user_setting is set" do
-      expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "true"))
+      allow(@bbb).to receive(:send_request)
       @bbb.initiate_conference
+      expect(@bbb).to have_received(:send_request).with(:create, hash_including(record: true))
     end
 
     it "does not send record flag if record user setting is unset" do
+      allow(@bbb).to receive(:send_request)
       @bbb.user_settings = { record: false }
       @bbb.save!
-      expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
       @bbb.initiate_conference
+      expect(@bbb).to have_received(:send_request).with(:create, hash_including(record: false))
+    end
+
+    it "initiates with the correct default values" do
+      allow(@bbb).to receive(:send_request)
+
+      # these are the defaults defined in the BigBlueButtonConference model
+      @bbb.user_settings = {
+        record: false,
+        scheduled_date: false,
+        create_time: false,
+        share_webcam: true,
+        share_microphone: true,
+        send_public_chat: true,
+        send_private_chat: true,
+        enable_waiting_room: false,
+        share_other_webcams: true
+      }
+
+      @bbb.save!
+      @bbb.initiate_conference
+      expect(@bbb).to have_received(:send_request).with(:create, hash_including(record: false))
+      expect(@bbb).to have_received(:send_request).with(:create, hash_excluding(
+                                                                   {
+                                                                     lockSettingsDisableCam: :any,
+                                                                     lockSettingsDisableMic: :any,
+                                                                     lockSettingsDisablePrivateChat: :any,
+                                                                     lockSettingsDisablePublicChat: :any,
+                                                                     webcamsOnlyForModerator: :any,
+                                                                     guestPolicy: :any
+                                                                   }
+                                                                 ))
+    end
+
+    context "when :bbb_modal_update is ON" do
+      before :once do
+        Account.site_admin.enable_feature! :bbb_modal_update
+      end
+
+      it "send the correct bbb_modal_update default params" do
+        allow(@bbb).to receive(:send_request)
+
+        # these are the defaults defined in the BigBlueButtonConference model
+        @bbb.user_settings = {
+          record: false,
+          scheduled_date: false,
+          create_time: false,
+          share_webcam: true,
+          share_microphone: true,
+          send_public_chat: true,
+          send_private_chat: true,
+          enable_waiting_room: false,
+          share_other_webcams: true
+        }
+
+        @bbb.save!
+        @bbb.initiate_conference
+        expect(@bbb).to have_received(:send_request).with(:create, hash_including(
+                                                                     record: false,
+                                                                     lockSettingsDisableCam: false,
+                                                                     lockSettingsDisableMic: false,
+                                                                     lockSettingsDisablePrivateChat: false,
+                                                                     lockSettingsDisablePublicChat: false,
+                                                                     webcamsOnlyForModerator: false,
+                                                                     guestPolicy: "ALWAYS_ACCEPT"
+                                                                   ))
+      end
+
+      it "send the correct bbb_modal_update supplied params" do
+        allow(@bbb).to receive(:send_request)
+
+        # these are the defaults defined in the BigBlueButtonConference model
+        @bbb.user_settings = {
+          record: true,
+          scheduled_date: false,
+          create_time: false,
+          share_webcam: false,
+          share_microphone: false,
+          send_public_chat: false,
+          send_private_chat: false,
+          enable_waiting_room: true,
+          share_other_webcams: false
+        }
+
+        @bbb.save!
+        @bbb.initiate_conference
+        expect(@bbb).to have_received(:send_request).with(:create, hash_including(
+                                                                     record: true,
+                                                                     lockSettingsDisableCam: true,
+                                                                     lockSettingsDisableMic: true,
+                                                                     lockSettingsDisablePrivateChat: true,
+                                                                     lockSettingsDisablePublicChat: true,
+                                                                     webcamsOnlyForModerator: true,
+                                                                     guestPolicy: "ASK_MODERATOR"
+                                                                   ))
+      end
     end
 
     it "properly serializes a response with no recordings" do
@@ -330,7 +427,7 @@ describe BigBlueButtonConference do
       bbb.user = user_factory
       bbb.context = course_factory
       bbb.save!
-      expect(bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
+      expect(bbb).to receive(:send_request).with(:create, hash_including(record: false))
       bbb.initiate_conference
       expect(bbb.user_settings[:record]).to be_falsey
     end
