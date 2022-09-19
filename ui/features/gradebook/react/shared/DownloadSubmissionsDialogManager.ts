@@ -19,13 +19,25 @@
 import INST from 'browser-sniffer'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import type {Assignment} from '../../../../api.d'
 
 class DownloadSubmissionsDialogManager {
-  constructor(assignment, downloadUrlTemplate, submissionsDownloading) {
+  assignment: Assignment
+
+  downloadUrl: string
+
+  validSubmissionTypes = ['online_upload', 'online_text_entry', 'online_url']
+
+  submissionsDownloading: (assignmentId: string) => void
+
+  constructor(
+    assignment: Assignment,
+    downloadUrlTemplate,
+    submissionsDownloading: (assignmentId: string) => void
+  ) {
     this.assignment = assignment
     this.downloadUrl = $.replaceTags(downloadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
-    this.validSubmissionTypes = ['online_upload', 'online_text_entry', 'online_url']
     this.submissionsDownloading = submissionsDownloading
   }
 

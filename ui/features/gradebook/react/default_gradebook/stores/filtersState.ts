@@ -238,8 +238,8 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     const filters = filterPreset.filters.filter(isFilterNotEmpty)
     if (!filters.length) return
     const originalFilters = get().filterPresets
-    const stagedFilter = {
-      id: uuid.v4(),
+    const stagedFilter: FilterPreset = {
+      id: uuid.v4() as string,
       name: filterPreset.name,
       filters,
       created_at: new Date().toISOString(),

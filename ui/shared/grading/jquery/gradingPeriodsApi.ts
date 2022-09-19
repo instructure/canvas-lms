@@ -20,7 +20,7 @@ import _ from 'underscore'
 import axios from '@canvas/axios'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
 
-const batchUpdateUrl = id => $.replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
+const batchUpdateUrl = (id: string) => $.replaceTags(ENV.GRADING_PERIODS_UPDATE_URL, 'set_id', id)
 
 const serializePeriods = periods => {
   const serialized = _.map(periods, period => ({
@@ -48,7 +48,7 @@ export default {
     }))
   },
 
-  batchUpdate(setId, periods) {
+  batchUpdate(setId: string, periods) {
     return new Promise((resolve, reject) =>
       axios
         .patch(batchUpdateUrl(setId), serializePeriods(periods))

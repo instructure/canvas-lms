@@ -17,8 +17,9 @@
  */
 
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
+import type Gradebook from '../../../gradebook'
 
-function isTrayOpen(gradebook, student, assignment) {
+function isTrayOpen(gradebook: Gradebook, student, assignment) {
   const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()
   return open && studentId === student.id && assignmentId === assignment.id
 }
@@ -39,7 +40,9 @@ function similarityInfoToShow(submission) {
 }
 
 export default class AssignmentRowCellPropFactory {
-  constructor(gradebook) {
+  gradebook: Gradebook
+
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
