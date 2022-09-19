@@ -23,15 +23,14 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter} from '../gradebook.d'
 import type {
   AssignmentGroup,
-  GradingPeriod,
   Module,
   Section,
   StudentGroup,
-  StudentGroupCategory,
-  StudentGroupCategoryMap
+  StudentGroupCategory
 } from '../../../../../api.d'
 import natcompare from '@canvas/util/natcompare'
 
@@ -63,11 +62,11 @@ const filterTypeLabels = {
 export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
   filter: Filter
-  gradingPeriods: GradingPeriod[]
+  gradingPeriods: CamelizedGradingPeriod[]
   modules: Module[]
   onChange: any
   sections: Section[]
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 type MenuItem = [id: string, name: string]

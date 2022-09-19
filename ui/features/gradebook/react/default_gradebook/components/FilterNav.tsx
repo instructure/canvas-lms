@@ -23,14 +23,9 @@ import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterDrilldownData} from '../gradebook.d'
-import type {
-  AssignmentGroup,
-  GradingPeriod,
-  Module,
-  Section,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
@@ -46,8 +41,8 @@ export type FilterNavProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  gradingPeriods: GradingPeriod[]
-  studentGroupCategories: StudentGroupCategoryMap
+  gradingPeriods: CamelizedGradingPeriod[]
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterNav({

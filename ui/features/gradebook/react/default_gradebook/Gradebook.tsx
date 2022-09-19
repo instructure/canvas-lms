@@ -1747,8 +1747,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     })
   }
 
-  initPostGradesLtis = () => {
-    return (this.postGradesLtis = this.options.post_grades_ltis.map(lti => {
+  initPostGradesLtis = (): void => {
+    this.postGradesLtis = this.options.post_grades_ltis.map(lti => {
       return {
         id: lti.id,
         name: lti.name,
@@ -1767,7 +1767,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
           )
         }
       }
-    }))
+    })
   }
 
   updatePostGradesFeatureButton = () => {
@@ -3511,18 +3511,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         userId: studentId
       }),
       requireStudentGroupForSpeedGrader: this.requireStudentGroupForSpeedGrader(assignment),
-      selectNextAssignment: () => {
-        return this.loadTrayAssignment('next')
-      },
-      selectPreviousAssignment: () => {
-        return this.loadTrayAssignment('previous')
-      },
-      selectNextStudent: () => {
-        return this.loadTrayStudent('next')
-      },
-      selectPreviousStudent: () => {
-        return this.loadTrayStudent('previous')
-      },
+      selectNextAssignment: () => this.loadTrayAssignment('next'),
+      selectPreviousAssignment: () => this.loadTrayAssignment('previous'),
+      selectNextStudent: () => this.loadTrayStudent('next'),
+      selectPreviousStudent: () => this.loadTrayStudent('previous'),
       showSimilarityScore: this.options.show_similarity_score,
       speedGraderEnabled: this.options.speed_grader_enabled,
       student: {
@@ -3716,9 +3708,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   getSubmissionCommentsLoaded = () => this.gridDisplaySettings.submissionTray.commentsLoaded
 
-  initShowUnpublishedAssignments = (showUnpublishedAssignments = 'true') => {
-    return (this.gridDisplaySettings.showUnpublishedAssignments =
-      showUnpublishedAssignments === 'true')
+  initShowUnpublishedAssignments = (showUnpublishedAssignments = 'true'): void => {
+    this.gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments === 'true'
   }
 
   toggleUnpublishedAssignments = () => {
@@ -3817,7 +3808,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return loadStates.gradingPeriod[gradingPeriodId]
   }
 
-  setAssignmentsLoaded = (gradingPeriodIds: string[]) => {
+  setAssignmentsLoaded = (gradingPeriodIds?: string[]) => {
     const {assignmentsLoaded} = this.contentLoadStates
     if (!gradingPeriodIds) {
       assignmentsLoaded.all = true
@@ -3920,12 +3911,18 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.actionStates.pendingGradeInfo
   }
 
-  getPendingGradeInfo = submission => {
+  getPendingGradeInfo = ({
+    assignmentId,
+    userId
+  }: {
+    assignmentId: string
+    userId: string
+  }): PendingGradeInfo | null => {
     if (!this.actionStates) throw new Error('actionStates missing')
     return (
-      this.actionStates.pendingGradeInfo.find(function (info) {
-        return info.userId === submission.userId && info.assignmentId === submission.assignmentId
-      }) || null
+      this.actionStates.pendingGradeInfo.find(
+        info => info.userId === userId && info.assignmentId === assignmentId
+      ) || null
     )
   }
 

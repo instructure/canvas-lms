@@ -38,12 +38,13 @@ import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
-
+import type {PendingGradeInfo, SerializedComment, LatePolicyCamelized} from '../gradebook.d'
 import {Link} from '@instructure/ui-link'
+import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
 
 const I18n = useI18nScope('gradebook')
 
-function renderAvatar(name, avatarUrl) {
+function renderAvatar(name: string, avatarUrl: string) {
   return (
     <div id="SubmissionTray__Avatar">
       <Avatar name={name} src={avatarUrl} size="auto" data-fs-exclude={true} />
@@ -219,7 +220,7 @@ export default class SubmissionTray extends React.Component {
     const buttonProps = {
       disabled: speedGraderProps.requireStudentGroup,
       href: speedGraderProps.speedGraderUrl,
-      variant: 'link'
+      variant: 'link' // TODO: replace since this is deprecated with InstUI 8
     }
     if (speedGraderProps.anonymizeStudents) {
       buttonProps.onClick = e => {
