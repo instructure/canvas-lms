@@ -351,7 +351,6 @@ CanvasRails::Application.routes.draw do
       get :finished
       collection do
         get :retrieve
-        get :homework_submissions
       end
     end
 
