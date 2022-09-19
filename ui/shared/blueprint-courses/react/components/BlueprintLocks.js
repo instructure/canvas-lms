@@ -24,18 +24,18 @@ import {IconBlueprintLockSolid, IconBlueprintSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('blueprint_coursesBlueprintLocks')
 
-export const IconLock = () => (
+export const IconLock = ({'data-testid': testid}) => (
   <Tooltip placement="start" color="primary" renderTip={I18n.t('Locked')}>
-    <span>
+    <span data-testid={testid}>
       <IconBlueprintLockSolid />
       <ScreenReaderContent>{I18n.t('Locked')}</ScreenReaderContent>
     </span>
   </Tooltip>
 )
 
-export const IconUnlock = () => (
+export const IconUnlock = ({'data-testid': testid}) => (
   <Tooltip placement="start" color="primary" renderTip={I18n.t('Unlocked')}>
-    <span>
+    <span data-testid={testid}>
       <IconBlueprintSolid />
       <ScreenReaderContent>{I18n.t('Unlocked')}</ScreenReaderContent>
     </span>
