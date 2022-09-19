@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import {ApplyTheme} from '@instructure/ui-themeable'
 import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -31,7 +31,6 @@ import {IconSpeedGraderLine} from '@instructure/ui-icons'
 import Carousel from './Carousel'
 import GradeInput from './GradeInput'
 import LatePolicyGrade from './LatePolicyGrade'
-import CommentPropTypes from '../propTypes/CommentPropTypes'
 import SimilarityScore from './SimilarityScore'
 import SubmissionCommentListItem from './SubmissionCommentListItem'
 import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
@@ -39,8 +38,9 @@ import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
 import type {PendingGradeInfo, SerializedComment, LatePolicyCamelized} from '../gradebook.d'
-import {Link} from '@instructure/ui-link'
 import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
+
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('gradebook')
 
@@ -52,7 +52,7 @@ function renderAvatar(name: string, avatarUrl: string) {
   )
 }
 
-function renderTraySubHeading(headingText) {
+function renderTraySubHeading(headingText: string) {
   return (
     <Heading level="h4" as="h2" margin="auto auto small">
       <Text weight="bold">{headingText}</Text>
@@ -60,98 +60,69 @@ function renderTraySubHeading(headingText) {
   )
 }
 
-export default class SubmissionTray extends React.Component {
+export type SubmissionTrayProps = {
+  assignment: CamelizedAssignment
+  currentUserId: string
+  editedCommentId: string | null
+  gradingDisabled: boolean
+  pendingGradeInfo: null | PendingGradeInfo
+  isFirstAssignment: boolean
+  isLastAssignment: boolean
+  colors: {
+    late: string
+    missing: string
+    excused: string
+    extended: string
+  }
+  student: {
+    id: string
+    avatarUrl?: string
+    gradesUrl: string
+    isConcluded: boolean
+    name: string
+  }
+  submission: CamelizedSubmission
+  courseId: string
+  speedGraderEnabled: boolean
+  submissionUpdating: boolean
+  submissionCommentsLoaded: boolean
+  processing: boolean
+  isInOtherGradingPeriod: boolean
+  isInClosedGradingPeriod: boolean
+  isInNoGradingPeriod: boolean
+  isNotCountedForScore: boolean
+  enterGradesAs: 'points' | 'percent' | 'passFail' | 'gradingScheme'
+  isOpen: boolean
+  isFirstStudent: boolean
+  isLastStudent: boolean
+  latePolicy: LatePolicyCamelized
+  locale: string
+  editSubmissionComment: (commentId: string | null) => void
+  onClose: () => void
+  requireStudentGroupForSpeedGrader: boolean
+  gradingScheme: Array<Array<number>>
+  onGradeSubmission: (grade: string, excused: boolean) => void
+  onRequestClose: () => void
+  selectNextAssignment: () => void
+  selectPreviousAssignment: () => void
+  selectNextStudent: () => void
+  selectPreviousStudent: () => void
+  updateSubmission: (submission: any) => void
+  updateSubmissionComment: (commentId: string, comment: string) => void
+  createSubmissionComment: (comment: string) => void
+  deleteSubmissionComment: (commentId: string) => void
+  setProcessing: (processing: boolean) => void
+  onAnonymousSpeedGraderClick: (speedGraderUrl: string) => void
+  submissionComments: SerializedComment[]
+  showSimilarityScore: boolean
+}
+
+export default class SubmissionTray extends React.Component<SubmissionTrayProps> {
   static defaultProps = {
-    contentRef: undefined,
     gradingDisabled: false,
     latePolicy: {lateSubmissionInterval: 'day'},
     submission: {drop: false},
     pendingGradeInfo: null
-  }
-
-  static propTypes = {
-    assignment: shape({
-      name: string.isRequired,
-      htmlUrl: string.isRequired,
-      muted: bool.isRequired,
-      postManually: bool.isRequired,
-      published: bool.isRequired,
-      anonymizeStudents: bool.isRequired,
-      moderatedGrading: bool.isRequired
-    }).isRequired,
-    contentRef: func,
-    currentUserId: string.isRequired,
-    editedCommentId: string,
-    editSubmissionComment: func.isRequired,
-    enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
-    gradingScheme: arrayOf(Array).isRequired,
-    gradingDisabled: bool,
-    isOpen: bool.isRequired,
-    colors: shape({
-      late: string.isRequired,
-      missing: string.isRequired,
-      excused: string.isRequired,
-      extended: string.isRequired
-    }).isRequired,
-    onClose: func.isRequired,
-    onGradeSubmission: func.isRequired,
-    onRequestClose: func.isRequired,
-    pendingGradeInfo: shape({
-      excused: bool.isRequired,
-      grade: string,
-      valid: bool.isRequired
-    }),
-    requireStudentGroupForSpeedGrader: bool.isRequired,
-    student: shape({
-      id: string.isRequired,
-      avatarUrl: string,
-      gradesUrl: string.isRequired,
-      isConcluded: bool.isRequired,
-      name: string.isRequired
-    }).isRequired,
-    submission: shape({
-      drop: bool,
-      excused: bool.isRequired,
-      grade: string,
-      gradedAt: string.isRequired,
-      late: bool.isRequired,
-      missing: bool.isRequired,
-      extended: bool.isRequired,
-      pointsDeducted: number,
-      postedAt: string.isRequired,
-      secondsLate: number.isRequired,
-      assignmentId: string.isRequired,
-      hasPostableComments: bool.isRequired
-    }),
-    isFirstAssignment: bool.isRequired,
-    isLastAssignment: bool.isRequired,
-    selectNextAssignment: func.isRequired,
-    selectPreviousAssignment: func.isRequired,
-    isFirstStudent: bool.isRequired,
-    isLastStudent: bool.isRequired,
-    selectNextStudent: func.isRequired,
-    selectPreviousStudent: func.isRequired,
-    courseId: string.isRequired,
-    speedGraderEnabled: bool.isRequired,
-    submissionUpdating: bool.isRequired,
-    updateSubmission: func.isRequired,
-    updateSubmissionComment: func.isRequired,
-    locale: string.isRequired,
-    latePolicy: shape({
-      lateSubmissionInterval: string
-    }).isRequired,
-    submissionComments: arrayOf(shape(CommentPropTypes).isRequired).isRequired,
-    submissionCommentsLoaded: bool.isRequired,
-    createSubmissionComment: func.isRequired,
-    deleteSubmissionComment: func.isRequired,
-    processing: bool.isRequired,
-    setProcessing: func.isRequired,
-    isInOtherGradingPeriod: bool.isRequired,
-    isInClosedGradingPeriod: bool.isRequired,
-    isInNoGradingPeriod: bool.isRequired,
-    isNotCountedForScore: bool.isRequired,
-    onAnonymousSpeedGraderClick: func.isRequired,
-    showSimilarityScore: bool.isRequired
   }
 
   cancelCommenting = () => {
@@ -184,7 +155,8 @@ export default class SubmissionTray extends React.Component {
     ))
   }
 
-  renderSubmissionComments() {
+  renderSubmissionComments(_props) {
+    // TODO: Remove _props? It is not used.
     const {anonymizeStudents, moderatedGrading, muted} = this.props.assignment
     if (anonymizeStudents || (moderatedGrading && muted)) {
       return
@@ -217,7 +189,12 @@ export default class SubmissionTray extends React.Component {
   }
 
   renderSpeedGraderLink(speedGraderProps) {
-    const buttonProps = {
+    const buttonProps: {
+      disabled?: boolean
+      href: string
+      variant: 'link'
+      onClick?: (event: React.MouseEvent) => void
+    } = {
       disabled: speedGraderProps.requireStudentGroup,
       href: speedGraderProps.speedGraderUrl,
       variant: 'link' // TODO: replace since this is deprecated with InstUI 8
@@ -310,7 +287,7 @@ export default class SubmissionTray extends React.Component {
       carouselContainerStyleOverride = 'small 0 0 0'
     }
 
-    let speedGraderProps = null
+    let speedGraderProps = {}
     if (this.props.speedGraderEnabled) {
       speedGraderProps = {
         anonymizeStudents: this.props.assignment.anonymizeStudents,
@@ -349,13 +326,11 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextStudent}
                 rightArrowDescription={I18n.t('Next student')}
               >
-                <Link
-                  href={this.props.student.gradesUrl}
-                  isWithinText={false}
-                  theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-                >
-                  {name}
-                </Link>
+                <ApplyTheme theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}>
+                  <Link href={this.props.student.gradesUrl} isWithinText={false}>
+                    {name}
+                  </Link>
+                </ApplyTheme>
               </Carousel>
 
               <View as="div" margin="small 0" className="hr" />
@@ -370,13 +345,11 @@ export default class SubmissionTray extends React.Component {
                 onRightArrowClick={this.props.selectNextAssignment}
                 rightArrowDescription={I18n.t('Next assignment')}
               >
-                <Link
-                  href={this.props.assignment.htmlUrl}
-                  isWithinText={false}
-                  theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-                >
-                  {this.props.assignment.name}
-                </Link>
+                <ApplyTheme theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}>
+                  <Link href={this.props.assignment.htmlUrl} isWithinText={false}>
+                    {this.props.assignment.name}
+                  </Link>
+                </ApplyTheme>
               </Carousel>
 
               {this.props.speedGraderEnabled && this.renderSpeedGraderLink(speedGraderProps)}
@@ -384,7 +357,7 @@ export default class SubmissionTray extends React.Component {
               <View as="div" margin="small 0" className="hr" />
             </View>
 
-            <View as="div" style={{overflowY: 'auto', flex: '1 1 auto'}}>
+            <div style={{overflowY: 'auto', flex: '1 1 auto'}}>
               {this.props.showSimilarityScore && this.renderSimilarityScore()}
 
               <SubmissionStatus
@@ -421,25 +394,29 @@ export default class SubmissionTray extends React.Component {
 
               <View as="div" margin="small 0" className="hr" />
 
-              <View as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
-                <SubmissionTrayRadioInputGroup
-                  assignment={this.props.assignment}
-                  colors={this.props.colors}
-                  disabled={this.props.gradingDisabled}
-                  locale={this.props.locale}
-                  latePolicy={this.props.latePolicy}
-                  submission={this.props.submission}
-                  submissionUpdating={this.props.submissionUpdating}
-                  updateSubmission={this.props.updateSubmission}
-                />
+              <View as="div" margin="0 0 small 0">
+                <div id="SubmissionTray__RadioInputGroup">
+                  <SubmissionTrayRadioInputGroup
+                    assignment={this.props.assignment}
+                    colors={this.props.colors}
+                    disabled={this.props.gradingDisabled}
+                    locale={this.props.locale}
+                    latePolicy={this.props.latePolicy}
+                    submission={this.props.submission}
+                    submissionUpdating={this.props.submissionUpdating}
+                    updateSubmission={this.props.updateSubmission}
+                  />
+                </div>
               </View>
 
               <View as="div" margin="small 0" className="hr" />
 
-              <View as="div" id="SubmissionTray__Comments" padding="xx-small">
-                {this.renderSubmissionComments(submissionCommentsProps)}
+              <View as="div" padding="xx-small">
+                <div id="SubmissionTray__Comments">
+                  {this.renderSubmissionComments(submissionCommentsProps)}
+                </div>
               </View>
-            </View>
+            </div>
           </div>
         </div>
       </Tray>

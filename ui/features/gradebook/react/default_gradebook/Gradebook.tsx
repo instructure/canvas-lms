@@ -29,6 +29,7 @@ import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from './PerformanceControls'
 import type {ActionMenuProps} from './components/ActionMenu'
+import type {SubmissionTrayProps} from './components/SubmissionTray'
 import type {
   Assignment,
   AssignmentGroup,
@@ -3434,9 +3435,9 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.updateRowAndRenderSubmissionTray(studentId)
   }
 
-  getSubmissionTrayProps = (student: null | Student = null) => {
+  getSubmissionTrayProps = (student: null | Student = null): SubmissionTrayProps => {
     if (!this.gradebookGrid?.gridSupport) throw new Error('grid is not initialized')
-    const {open, studentId, assignmentId, comments, editedCommentId} = this.getSubmissionTrayState()
+    const {open, studentId, assignmentId, editedCommentId} = this.getSubmissionTrayState()
     if (!studentId) {
       throw new Error('studentId missing')
     }
@@ -3480,7 +3481,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return {
       assignment: camelize(assignment),
       colors: this.state.gridColors,
-      comments,
       courseId: this.options.context_id,
       currentUserId: this.options.currentUserId,
       enterGradesAs: this.getEnterGradesAsSetting(assignmentId),
@@ -3504,7 +3504,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         assignment.omit_from_final_grade ||
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
-      key: 'grade_details_tray',
       latePolicy: this.courseContent.latePolicy,
       locale: this.options.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
