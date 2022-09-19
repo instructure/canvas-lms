@@ -39,7 +39,9 @@ import {scoreToGrade} from '@canvas/grading/GradingSchemeHelper'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import StatusPill from '@canvas/grading-status-pill'
 import SelectMenuGroup from '../react/SelectMenuGroup'
+import SubmissionCommentsTray from '../react/SubmissionCommentsTray'
 import {scoreToPercentage} from '@canvas/grading/GradeCalculationHelper'
+import useStore from '../react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
@@ -62,7 +64,10 @@ const GradeSummary = {
     const defaultNumericalValue = typeof numericalDefault === 'number' ? numericalDefault : null
     const defaultFormattedValue = typeof formattedDefault === 'string' ? formattedDefault : '-'
     let numericalValue = numberHelper.parse(text)
-    numericalValue = isNaN(numericalValue) ? defaultNumericalValue : numericalValue
+    numericalValue =
+      numericalValue === undefined || Number.isNaN(numericalValue)
+        ? defaultNumericalValue
+        : numericalValue
     return {
       numericalValue,
       formattedValue: GradeFormatHelper.formatGrade(numericalValue, {
@@ -73,7 +78,8 @@ const GradeSummary = {
 
   getOriginalScore($assignment) {
     let numericalValue = parseFloat($assignment.find('.original_points').text())
-    numericalValue = isNaN(numericalValue) ? null : numericalValue
+    numericalValue =
+      numericalValue === undefined || Number.isNaN(numericalValue) ? null : numericalValue
     return {
       numericalValue,
       formattedValue: $assignment.find('.original_score').text(),
@@ -324,7 +330,7 @@ function calculateGrades() {
 }
 
 function canBeConvertedToGrade(score, possible) {
-  return possible > 0 && !isNaN(score)
+  return possible > 0 && score !== undefined && !Number.isNaN(score)
 }
 
 function calculatePercentGrade(score, possible) {
@@ -592,6 +598,50 @@ function renderSelectMenuGroup() {
   )
 }
 
+function handleSubmissionsCommentTray(assignmentId) {
+  const {submissionTrayAssignmentId, submissionTrayOpen} = useStore.getState()
+
+  if (submissionTrayAssignmentId === assignmentId && submissionTrayOpen) {
+    useStore.setState({submissionTrayOpen: false, submissionTrayAssignmentId: undefined})
+  } else {
+    const {attempts, assignmentUrl} = getSubmissionCommentsTrayProps(assignmentId)
+    useStore.setState({
+      submissionCommentsTray: {attempts},
+      submissionTrayOpen: true,
+      submissionTrayAssignmentId: assignmentId,
+      submissionTrayAssignmentUrl: assignmentUrl,
+    })
+  }
+}
+
+function getSubmissionCommentsTrayProps(assignmentId) {
+  const matchingSubmission = ENV.submissions.find(x => x.assignment_id === assignmentId)
+  const {submission_comments, assignment_url: assignmentUrl} = matchingSubmission
+  const attempts = submission_comments.reduce((attemptsMessages, comment) => {
+    const currentAttempt = comment.attempt ?? 1
+
+    if (attemptsMessages[currentAttempt]) {
+      attemptsMessages[currentAttempt].push(comment)
+    } else {
+      attemptsMessages[currentAttempt] = [comment]
+    }
+
+    return attemptsMessages
+  }, {})
+  return {
+    attempts,
+    assignmentUrl,
+  }
+}
+
+function renderSubmissionCommentsTray() {
+  ReactDOM.unmountComponentAtNode(document.getElementById('GradeSummarySubmissionCommentsTray'))
+  ReactDOM.render(
+    <SubmissionCommentsTray />,
+    document.getElementById('GradeSummarySubmissionCommentsTray')
+  )
+}
+
 function setup() {
   $(document).ready(function () {
     GradeSummary.updateStudentGrades()
@@ -638,6 +688,11 @@ function setup() {
           $.ajaxJSON(mark_comments_read_url, 'PUT', {}, () => {})
           $unreadIcon.remove()
         }
+
+        const assignmentIdPrefix = 'assignment_comment_'
+        const eventId = event.currentTarget.id
+        const assignmentId = eventId.substring(assignmentIdPrefix.length)
+        handleSubmissionsCommentTray(assignmentId)
       })
 
       $('.toggle_rubric_assessments_link').on('click', function (event) {
@@ -788,6 +843,9 @@ export default _.extend(GradeSummary, {
   formatPercentGrade,
   getSelectMenuGroupProps,
   renderSelectMenuGroup,
+  getSubmissionCommentsTrayProps,
+  handleSubmissionsCommentTray,
+  renderSubmissionCommentsTray,
   updateScoreForAssignment,
   updateStudentGrades,
 })

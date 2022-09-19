@@ -25,6 +25,7 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
 import GradeSummary from 'ui/features/grade_summary/jquery/index'
 import {createCourseGradesWithGradingPeriods} from '../gradebook/GradeCalculatorSpecHelper'
+import useStore from 'ui/features/grade_summary/react/stores'
 
 const I18n = useI18nScope('gradingGradeSummary')
 
@@ -182,6 +183,7 @@ function setPageHtmlFixture() {
       <input type="text" id="grade_entry" style="display: none;" />
       <a id="revert_score_template" class="revert_score_link" >Revert Score</i></a>
       <a href="/assignments/{{ assignment_id }}" class="update_submission_url">&nbsp;</a>
+      <div id="GradeSummarySelectMenuGroup"></div>
     </div>
   `)
 }
@@ -1512,6 +1514,155 @@ QUnit.module('GradeSummary', () => {
       ]
 
       deepEqual(GradeSummary.getSelectMenuGroupProps().students, ENV.students)
+    })
+  })
+
+  QUnit.module('SubmissionCommentsTray', hooks => {
+    hooks.beforeEach(() => {
+      ENV.submissions = [
+        {
+          assignment_id: '22',
+          submission_comments: [
+            {
+              id: '2',
+              attempt: null,
+              author_name: 'test user',
+              created_at: '2022-09-27T16:34:17Z',
+              edited_at: '2022-09-27T19:32:02Z',
+              comment: 'Lorem ipsum dolor sit amet',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+            {
+              id: '3',
+              attempt: null,
+              author_name: 'test user',
+              created_at: '2022-09-27T19:32:17Z',
+              edited_at: null,
+              comment: 'this is a test comment 2',
+              display_updated_at: 'Sep 27 at 1:32pm',
+            },
+          ],
+          excused: false,
+          score: 10,
+          workflow_state: 'graded',
+        },
+        {
+          assignment_id: '17',
+          submission_comments: [
+            {
+              id: '1',
+              attempt: 4,
+              author_name: 'test user 2',
+              created_at: '2022-09-27T16:34:00Z',
+              edited_at: null,
+              comment: 'This is another test comment',
+              display_updated_at: 'Sep 27 at 10:34am',
+            },
+          ],
+          excused: false,
+          score: 19,
+          workflow_state: 'graded',
+          assignment_url: 'assignment.url',
+        },
+      ]
+    })
+    hooks.afterEach(() => {
+      commonTeardown()
+    })
+    const expectedCommentTrayProps = {
+      attempts: {
+        4: [
+          {
+            id: '1',
+            attempt: 4,
+            author_name: 'test user 2',
+            created_at: '2022-09-27T16:34:00Z',
+            edited_at: null,
+            comment: 'This is another test comment',
+            display_updated_at: 'Sep 27 at 10:34am',
+          },
+        ],
+      },
+      assignmentUrl: 'assignment.url',
+    }
+    QUnit.module('getSubmissionCommentsTrayProps', () => {
+      test('gets props getSubmissionCommentsTrayProps for correct assignmentId', () => {
+        const commentTrayProps = GradeSummary.getSubmissionCommentsTrayProps('17')
+        deepEqual(commentTrayProps, expectedCommentTrayProps)
+      })
+    })
+    QUnit.module('handleSubmissionsCommentTray', () => {
+      test('should open tray with no prior assignmentId', () => {
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should open tray with different prior assignmentId', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '22',
+          submissionTrayOpen: false,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should close tray if same assignmentId and trey is open', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '17',
+          submissionTrayOpen: true,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const expectedState = {
+          submissionTrayOpen: false,
+          submissionTrayAssignmentId: undefined,
+        }
+        deepEqual(value, expectedState)
+      })
+      test('should keep tray open and switch assignmentId for different assignment and tray open', () => {
+        sandbox.stub(useStore, 'getState').returns({
+          submissionTrayAssignmentId: '22',
+          submissionTrayOpen: true,
+          submissionTrayAssignmentUrl: 'testUr',
+        })
+        sandbox.spy(useStore, 'setState')
+        GradeSummary.handleSubmissionsCommentTray('17')
+
+        equal(useStore.setState.callCount, 1)
+        const [value] = useStore.setState.getCall(0).args
+        const {attempts} = expectedCommentTrayProps
+        const expectedState = {
+          submissionCommentsTray: {attempts},
+          submissionTrayOpen: true,
+          submissionTrayAssignmentId: '17',
+          submissionTrayAssignmentUrl: 'assignment.url',
+        }
+        deepEqual(value, expectedState)
+      })
     })
   })
 })

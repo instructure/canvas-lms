@@ -341,6 +341,9 @@ export type SubmissionComment = {
   created_at: string
   comment: string
   edited_at: null | string
+  updated_at: string
+  display_updated_at?: string
+  is_read?: boolean
   author?: {
     id: string
     display_name: string
@@ -370,6 +373,12 @@ export type GradingPeriod = {
   start_date: string
   title: string
   weight: null | number
+}
+
+export type SubmissionAttemptsComments = {
+  attempts: {
+    [key: string]: SubmissionComment[]
+  }
 }
 
 export type GradingPeriodSet = {

@@ -338,12 +338,16 @@
             <% end %>
           </a>
           <a href="#"
+            id="assignment_comment_<%= assignment.id %>"
             class="toggle_comments_link tooltip"
             aria-label="<%= t('Read comments') %>"
+
             aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
             <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
               aria-expanded="false"
-              aria-controls="comments_thread_<%= assignment.id %>"
+              <% if !@visibility_feedback_enabled %>
+                aria-controls="comments_thread_<%= assignment.id %>"
+              <% end %>
               role="button"
             <% else %>
               aria-hidden='true'
@@ -651,6 +655,7 @@
       </tr>
     <% end %>
   </table>
+  <div id="GradeSummarySubmissionCommentsTray"></div>
   </div>
   <% if @presenter.hidden_submissions_for_published_assignments? %>
     <small><i class="icon-off" role="presentation"></i><%= t("Your instructor has not posted the grade. While your instructor has not posted the grade, grade and comment information is unavailable.") %></small>
