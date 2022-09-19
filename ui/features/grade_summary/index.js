@@ -80,6 +80,7 @@ GradebookSummaryRouter.prototype.routes = {
 let router
 $(() => {
   GradeSummary.renderSelectMenuGroup()
+  GradeSummary.renderSubmissionCommentsTray()
 
   router = new GradebookSummaryRouter()
   Backbone.history.start()

@@ -117,6 +117,26 @@ class GradebooksController < ApplicationController
                     })
       end
 
+      if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+        json[:submission_comments] = submission.visible_submission_comments.map do |comment|
+          {
+            id: comment.id,
+            attempt: comment.attempt,
+            author: {
+              id: comment.author_id,
+              display_name: comment.author_name
+            },
+            created_at: comment.created_at,
+            edited_at: comment.edited_at,
+            updated_at: comment.updated_at,
+            comment: comment.comment,
+            display_updated_at: datetime_string(comment.updated_at),
+            is_read: comment.read?(@current_user)
+          }
+        end.as_json
+        json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)
+      end
+
       json
     end
 
