@@ -16,8 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+
 export default class SisOverridesLoader {
-  constructor({dispatch, gradebook}) {
+  _gradebook: Gradebook
+
+  _dispatch: RequestDispatch
+
+  constructor({dispatch, gradebook}: {dispatch: RequestDispatch; gradebook: Gradebook}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
   }
@@ -38,6 +45,7 @@ export default class SisOverridesLoader {
       override_assignment_dates: false
     }
 
+    // eslint-disable-next-line promise/catch-or-return
     this._dispatch.getDepaginated(url, params).then(data => {
       this._gradebook.addOverridesToPostGradesStore(data)
     })
