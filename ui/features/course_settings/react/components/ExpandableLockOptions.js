@@ -135,7 +135,11 @@ export default class ExpandableLockOptions extends React.Component {
       (isLocked, lockProp) => isLocked || this.state.locks[lockProp],
       false
     )
-    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
+    const Icon = hasLocks ? (
+      <IconLock data-testid="lock-icon" />
+    ) : (
+      <IconUnlock data-testid="unlock-icon" />
+    )
     return <div className="bcs_tab-icon">{Icon}</div>
   }
 
@@ -145,7 +149,7 @@ export default class ExpandableLockOptions extends React.Component {
       'bcs_sub-menu-viewable': this.state.open
     })
     return (
-      <div className={viewableClasses}>
+      <div className={viewableClasses} data-testid="sub-list">
         <LockCheckList
           formName={`[blueprint_restrictions_by_object_type][${this.props.objectType}]`}
           locks={this.state.locks}
@@ -159,7 +163,7 @@ export default class ExpandableLockOptions extends React.Component {
   render() {
     return (
       <div className="bcs__object-tab">
-        <div onClick={this.toggle}>
+        <div onClick={this.toggle} data-testid="toggle">
           <Grid>
             <Grid.Row>
               <Grid.Col width={4}>{this.renderTitle()}</Grid.Col>
