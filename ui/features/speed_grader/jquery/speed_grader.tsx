@@ -72,7 +72,6 @@ import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from 'round'
 import _ from 'underscore'
 import INST from 'browser-sniffer'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import natcompare from '@canvas/util/natcompare'
 import qs from 'qs'

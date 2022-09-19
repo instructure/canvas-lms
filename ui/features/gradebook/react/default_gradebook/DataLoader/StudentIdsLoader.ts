@@ -17,9 +17,15 @@
  */
 
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
 
 export default class StudentIdsLoader {
-  constructor({dispatch, gradebook}) {
+  _gradebook: Gradebook
+
+  _dispatch: RequestDispatch
+
+  constructor({dispatch, gradebook}: {dispatch: RequestDispatch; gradebook: Gradebook}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
   }
@@ -42,7 +48,7 @@ export default class StudentIdsLoader {
       promise = this._dispatch.getJSON(url)
     }
 
-    return promise.then(data => {
+    return promise.then((data: {user_ids: Array<string>}) => {
       this._gradebook.updateStudentIds(data.user_ids)
     })
   }
