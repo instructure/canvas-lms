@@ -171,7 +171,7 @@ export type Assignment = {
   max_name_length: number
   moderated_grading: boolean
   module_ids: string[]
-  module_positions: string[]
+  module_positions: number[]
   muted: boolean
   name: string
   omit_from_final_grade: boolean
@@ -244,15 +244,32 @@ export type ModuleMap = {
 }
 
 export type Section = {
+  course_id: string
+  created_at: string
+  end_at: null | string
   id: string
+  integration_id: null | string
   name: string
+  name: string
+  nonxlist_course_id: null | string
+  restrict_enrollments_to_section_dates: null | boolean
+  sis_course_id: null | string
+  sis_import_id: null | string
+  sis_section_id: null | string
+  start_at: null | string
 }
 
 export type SectionMap = {
   [id: string]: Section
 }
 
-export type GradingType = 'points' | 'percent' | 'letter_grade' | 'gpa_scale' | 'pass_fail'
+export type GradingType =
+  | 'points'
+  | 'percent'
+  | 'letter_grade'
+  | 'gpa_scale'
+  | 'pass_fail'
+  | 'not_graded'
 
 export type SubmissionType =
   | null
@@ -295,6 +312,7 @@ export type Submission = {
   grading_period_id: string
   gradingType: GradingType
   has_postable_comments: boolean
+  has_originality_report: boolean
   hidden: boolean
   id: string
   late_policy_status: null | string
@@ -318,6 +336,19 @@ export type UserSubmissionGroup = {
   submissions: Submission[]
 }
 
+export type SubmissionComment = {
+  id: string
+  created_at: string
+  comment: string
+  edited_at: null | string
+  author?: {
+    id: string
+    display_name: string
+    avatar_image_url: string
+    html_url: string
+  }
+}
+
 export type SubmissionCommentData = {
   group_comment: 1 | 0
   text_comment: string
@@ -325,15 +356,32 @@ export type SubmissionCommentData = {
 }
 
 export type GradingPeriod = {
+  close_date: string
+  end_date: string
   id: string
+  is_closed: boolean
+  is_last: boolean
+  permission: {
+    read: boolean
+    update: boolean
+    create: boolean
+    delete: boolean
+  }
+  start_date: string
   title: string
-  startDate: Date
-  endDate: Date
-  isClosed: boolean
+  weight: null | number
 }
 
 export type GradingPeriodSet = {
-  gradingPeriods: GradingPeriod[]
-  displayTotalsForAllGradingPeriods: boolean
+  account_id: string
+  course_id: null | string
+  created_at: string
+  display_totals_for_all_grading_periods: boolean
+  grading_periods: GradingPeriod[]
+  id: string
+  root_account_id: string
+  title: string
+  updated_at: string
   weighted: boolean
+  workflow_state: WorkflowState
 }
