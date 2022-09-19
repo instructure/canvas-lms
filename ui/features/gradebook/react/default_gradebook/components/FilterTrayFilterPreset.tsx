@@ -27,14 +27,9 @@ import {Flex} from '@instructure/ui-flex'
 import FilterComponent from './FilterTrayFilter'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
-import type {PartialFilterPreset, FilterPreset, Filter, FilterType} from '../gradebook.d'
-import type {
-  AssignmentGroup,
-  GradingPeriod,
-  Module,
-  Section,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
+import type {Filter, FilterPreset, FilterType, PartialFilterPreset} from '../gradebook.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 import {isFilterNotEmpty} from '../Gradebook.utils'
 
 const I18n = useI18nScope('gradebook')
@@ -45,7 +40,7 @@ export type FilterTrayPresetProps = {
   applyFilters: (filters: PartialFilterPreset['filters']) => void
   assignmentGroups: AssignmentGroup[]
   filterPreset: PartialFilterPreset | FilterPreset
-  gradingPeriods: GradingPeriod[]
+  gradingPeriods: CamelizedGradingPeriod[]
   isActive: boolean
   modules: Module[]
   onChange?: (filter: PartialFilterPreset) => void
@@ -55,7 +50,7 @@ export type FilterTrayPresetProps = {
   onToggle: (boolean) => void
   isExpanded: boolean
   sections: Section[]
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterTrayPreset({

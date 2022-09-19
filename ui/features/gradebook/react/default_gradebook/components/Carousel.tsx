@@ -17,30 +17,45 @@
  */
 
 import React, {Component} from 'react'
-import {bool, func, node, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconArrowOpenStartLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 
-export default class Carousel extends Component {
-  componentDidUpdate(prevProps) {
+type CarouselProps = {
+  disabled: boolean
+  displayLeftArrow: boolean
+  displayRightArrow: boolean
+  id: string
+  leftArrowDescription: string
+  onLeftArrowClick: () => void
+  onRightArrowClick: () => void
+  rightArrowDescription: string
+  children: JSX.Element
+}
+
+export default class Carousel extends Component<CarouselProps> {
+  leftArrow: HTMLElement | null = null
+
+  rightArrow: HTMLElement | null = null
+
+  componentDidUpdate(prevProps: CarouselProps) {
     const selectedLast = prevProps.displayRightArrow && !this.props.displayRightArrow
     const selectedFirst = prevProps.displayLeftArrow && !this.props.displayLeftArrow
 
     if (selectedFirst) {
-      this.rightArrow.focus()
+      this.rightArrow?.focus()
     } else if (selectedLast) {
-      this.leftArrow.focus()
+      this.leftArrow?.focus()
     }
   }
 
   handleLeftArrowClick = () => {
     this.props.onLeftArrowClick()
-    this.leftArrow.focus()
+    this.leftArrow?.focus()
   }
 
   handleRightArrowClick = () => {
     this.props.onRightArrowClick()
-    this.rightArrow.focus()
+    this.rightArrow?.focus()
   }
 
   render() {
@@ -90,16 +105,4 @@ export default class Carousel extends Component {
 
 Carousel.defaultProps = {
   id: null
-}
-
-Carousel.propTypes = {
-  id: string,
-  children: node.isRequired,
-  disabled: bool.isRequired,
-  displayLeftArrow: bool.isRequired,
-  displayRightArrow: bool.isRequired,
-  onLeftArrowClick: func.isRequired,
-  onRightArrowClick: func.isRequired,
-  leftArrowDescription: string.isRequired,
-  rightArrowDescription: string.isRequired
 }

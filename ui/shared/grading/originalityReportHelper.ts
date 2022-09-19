@@ -18,11 +18,15 @@
 
 import type {SubmissionOriginalityData, OriginalityData} from '@canvas/grading/grading.d'
 
-export function originalityReportSubmissionKey(submission) {
+export function originalityReportSubmissionKey(submission: {
+  id: string
+  submitted_at: null | string | Date
+  submittedAt?: null | string | Date
+}): string {
   try {
     const submittedAtDate = new Date(submission.submitted_at || submission.submittedAt)
     const submittedAtString = `${submittedAtDate.toISOString().split('.')[0]}Z`
-    return (submittedAtString && `submission_${submission.id}_${submittedAtString}`) || ''
+    return submittedAtString ? `submission_${submission.id}_${submittedAtString}` : ''
   } catch (_error) {
     return ''
   }
@@ -35,7 +39,8 @@ export function getOriginalityData(
     originalityData: {
       [key: string]: SubmissionOriginalityData
     }
-    attachments
+    attachments: any
+    submitted_at: string
   },
   index: number
 ): false | OriginalityData {
