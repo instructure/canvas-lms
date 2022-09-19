@@ -17,6 +17,7 @@
  */
 
 import type {GradebookStudent} from './gradebook.d'
+import type {SubmissionComment} from '@canvas/grading.grading.d'
 import type {StatusColors} from './constants/colors'
 
 type GridColumn = {
@@ -60,7 +61,7 @@ export type FilterColumnsOptions = {
   assignmentGroupId: null | string
   contextModuleId: null | string
   gradingPeriodId: null | string
-  submissions: null | string // 'has-ungraded-submissions' | 'has-submissions'
+  submissions: null | 'has-ungraded-submissions' | 'has-submissions'
   startDate: null | string
   endDate: null | string
 }
@@ -71,7 +72,7 @@ export type GridDisplaySettings = {
   filterColumnsBy: FilterColumnsOptions
   filterRowsBy: {sectionId: string | null; studentGroupId: string | null}
   hideTotal: boolean
-  selectedPrimaryInfo: string
+  selectedPrimaryInfo: 'last_first' | 'first_last'
   selectedSecondaryInfo: string
   selectedViewOptionsFilters: string[]
   showEnrollments: {concluded: boolean; inactive: boolean}
@@ -84,7 +85,7 @@ export type GridDisplaySettings = {
     open: boolean
     studentId: string
     assignmentId: string
-    comments: any[]
+    comments: SubmissionComment[]
     commentsLoaded: boolean
     commentsUpdating: boolean
     editedCommentId: string | null

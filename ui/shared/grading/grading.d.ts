@@ -20,6 +20,7 @@ import type {
   Enrollment,
   GradingType,
   Override,
+  Submission,
   SubmissionType,
   UserDueDateMap,
   WorkflowState
@@ -73,7 +74,7 @@ export type CamelizedStudent = {
 }
 
 // TODO: remove the need for this
-export type CamelizedAssignment = {
+export type SubmissionComment = {
   allowedAttempts: number
   anonymizeStudents: boolean
   anonymousGrading: boolean
@@ -146,4 +147,77 @@ export type CamelizedSubmission = {
   url: null | string
   userId: string
   workflowState: WorkflowState
+}
+
+export type CamelizedGradingPeriod = {
+  id: string
+  title: string
+  startDate: Date
+  endDate: Date
+  isClosed: boolean
+}
+
+export type CamelizedGradingPeriodSet = {
+  id: string
+  gradingPeriods: CamelizedGradingPeriod[]
+  displayTotalsForAllGradingPeriods: boolean
+  weighted: boolean
+  title: string
+  enrollmentTermIDs?: string[]
+  createdAt: Date
+}
+
+export type CamelizedAssignment = {
+  allowedAttempts: number
+  anonymizeStudents: boolean
+  gradingType: GradingType
+  courseId: string
+  dueAt: string | null
+  htmlUrl: string
+  id: string
+  moderatedGrading: boolean
+  muted: boolean
+  name: string
+  postManually: boolean
+  published: boolean
+  submissionTypes: string
+}
+
+export type PlagiarismData = {
+  status: string
+  similarity_score: number
+}
+
+export type SimilarityEntry = {
+  id: string
+  data: PlagiarismData
+}
+
+export type SubmissionWithOriginalityReport = Submission & {
+  attachments: Array<{
+    id: string
+    attachment: {
+      id: string
+    }
+  }>
+  has_originality_report: boolean
+  turnitin_data?: {
+    [key: string]: PlagiarismData
+  }
+  vericite_data?: {provider: 'vericite'} & {
+    [key: string]: PlagiarismData
+  }
+}
+
+export type PlagiarismDataMap = {
+  [key: string]: PlagiarismData
+}
+
+export type SimilarityType = 'vericite' | 'turnitin' | 'originality_report'
+
+export type CamelizedSubmissionWithOriginalityReport = CamelizedSubmission & {
+  attachments: Array<{id: string}>
+  hasOriginalityReport: boolean
+  turnitinData?: PlagiarismDataMap
+  vericiteData?: {provider: 'vericite'} & PlagiarismDataMap
 }
