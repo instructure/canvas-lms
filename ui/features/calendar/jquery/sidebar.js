@@ -107,7 +107,7 @@ class VisibleContextManager {
     this.notify()
 
     return $.ajaxJSON('/api/v1/calendar_events/save_selected_contexts', 'POST', {
-      selected_contexts: this.contexts
+      selected_contexts: this.contexts.length > 0 ? this.contexts : '[]'
     })
   }
 
