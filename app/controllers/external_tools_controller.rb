@@ -138,13 +138,6 @@ class ExternalToolsController < ApplicationController
     end
   end
 
-  def homework_submissions
-    @tools = Lti::ContextToolFinder.all_tools_for(@context, user: @current_user, type: :has_homework_submission)
-    respond_to do |format|
-      format.json { render json: external_tools_json(@tools, @context, @current_user, session) }
-    end
-  end
-
   def finished
     @headers = false
   end
