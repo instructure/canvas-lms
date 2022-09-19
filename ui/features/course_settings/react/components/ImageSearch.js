@@ -27,12 +27,12 @@ import SVGWrapper from '@canvas/svg-wrapper'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
-import {Button} from '@instructure/ui-buttons'
 import {IconSearchLine, IconArrowOpenEndLine, IconArrowOpenStartLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('image_search')
 
@@ -177,20 +177,20 @@ export default class ImageSearch extends React.Component {
       <Flex as="div" width="100%" justifyItems="space-between" margin="small 0 small">
         <Flex.Item>
           {this.state.prevUrl && (
-            <Button
-              variant="link"
+            <Link
+              as="button"
               elementRef={e => (this._imageSearchControlPrev = e)}
               onClick={this.loadPreviousPage}
               renderIcon={IconArrowOpenStartLine}
             >
               {I18n.t('Previous Page')}
-            </Button>
+            </Link>
           )}
         </Flex.Item>
         <Flex.Item>
           {this.state.nextUrl && (
-            <Button
-              variant="link"
+            <Link
+              as="button"
               elementRef={e => (this._imageSearchControlNext = e)}
               onClick={this.loadNextPage}
               iconPlacement="end"
@@ -199,7 +199,7 @@ export default class ImageSearch extends React.Component {
               <View padding="0 0 0 x-small">
                 <IconArrowOpenEndLine />
               </View>
-            </Button>
+            </Link>
           )}
         </Flex.Item>
       </Flex>
