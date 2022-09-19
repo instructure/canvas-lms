@@ -120,7 +120,9 @@ namespace :i18n do
   task generate: [:extract]
 
   desc "generate JavaScript translation files"
-  task generate_js: [:i18n_environment, :extract_js] do
+  task generate_js: [:i18n_environment] do
+    Rake::Task["i18n:extract_js"].invoke unless ENV["I18N_JS_PRECOMPILED"] == "1"
+
     generator = I18nTasks::GenerateJs.new(
       index: JSON.parse(File.read(js_index_file))
     )
