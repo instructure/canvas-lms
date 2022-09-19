@@ -2858,43 +2858,48 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     if (!(selectedViewOptionsFilters.length > 0)) {
       selectedViewOptionsFilters.push('')
     }
-    const data = {
-      gradebook_settings: {
-        enter_grades_as: this.gridDisplaySettings.enterGradesAs,
-        filter_columns_by: {
-          assignment_group_id: this.gridDisplaySettings.filterColumnsBy.assignmentGroupId,
-          context_module_id: this.gridDisplaySettings.filterColumnsBy.contextModuleId,
-          grading_period_id: this.gridDisplaySettings.filterColumnsBy.gradingPeriodId,
-          submissions: this.gridDisplaySettings.filterColumnsBy.submissions,
-          start_date: this.gridDisplaySettings.filterColumnsBy.startDate,
-          end_date: this.gridDisplaySettings.filterColumnsBy.endDate
-        },
-        filter_rows_by: {
-          section_id: this.gridDisplaySettings.filterRowsBy.sectionId,
-          student_group_id: this.gridDisplaySettings.filterRowsBy.studentGroupId
-        },
-        hide_assignment_group_totals: hideAssignmentGroupTotals ? 'true' : 'false',
-        hide_total: hideTotal ? 'true' : 'false',
-        selected_view_options_filters: selectedViewOptionsFilters,
-        show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
-        show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
-        show_unpublished_assignments: showUnpublishedAssignments ? 'true' : 'false',
-        show_separate_first_last_names: showSeparateFirstLastNames ? 'true' : 'false',
-        student_column_display_as: studentColumnDisplayAs,
-        student_column_secondary_info: studentColumnSecondaryInfo,
-        sort_rows_by_column_id: sortRowsBy.columnId,
-        sort_rows_by_setting_key: sortRowsBy.settingKey,
-        sort_rows_by_direction: sortRowsBy.direction,
-        view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
-        colors
-      }
+    const gradebook_settings: GradebookSettings = {
+      enter_grades_as: this.gridDisplaySettings.enterGradesAs,
+      filter_columns_by: {
+        assignment_group_id: this.gridDisplaySettings.filterColumnsBy.assignmentGroupId,
+        context_module_id: this.gridDisplaySettings.filterColumnsBy.contextModuleId,
+        grading_period_id: this.gridDisplaySettings.filterColumnsBy.gradingPeriodId,
+        submissions: this.gridDisplaySettings.filterColumnsBy.submissions,
+        start_date: this.gridDisplaySettings.filterColumnsBy.startDate,
+        end_date: this.gridDisplaySettings.filterColumnsBy.endDate
+      },
+      filter_rows_by: {
+        section_id: this.gridDisplaySettings.filterRowsBy.sectionId,
+        student_group_id: this.gridDisplaySettings.filterRowsBy.studentGroupId
+      },
+      hide_assignment_group_totals: hideAssignmentGroupTotals ? 'true' : 'false',
+      hide_total: hideTotal ? 'true' : 'false',
+      selected_view_options_filters: selectedViewOptionsFilters,
+      show_concluded_enrollments: showConcludedEnrollments ? 'true' : 'false',
+      show_inactive_enrollments: showInactiveEnrollments ? 'true' : 'false',
+      show_unpublished_assignments: showUnpublishedAssignments ? 'true' : 'false',
+      show_separate_first_last_names: showSeparateFirstLastNames ? 'true' : 'false',
+      student_column_display_as: studentColumnDisplayAs,
+      student_column_secondary_info: studentColumnSecondaryInfo,
+      sort_rows_by_column_id: sortRowsBy.columnId,
+      sort_rows_by_setting_key: sortRowsBy.settingKey,
+      sort_rows_by_direction: sortRowsBy.direction,
+      view_ungraded_as_zero: viewUngradedAsZero ? 'true' : 'false',
+      colors
     }
-
     if (this.options.enhanced_gradebook_filters) {
-      return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
+      return GradebookApi.saveUserSettings(this.options.context_id, gradebook_settings)
     } else {
       return new Promise((resolve, reject) => {
-        $.ajaxJSON(this.options.settings_update_url, 'PUT', data, resolve, reject)
+        $.ajaxJSON(
+          this.options.settings_update_url,
+          'PUT',
+          {
+            gradebook_settings
+          },
+          resolve,
+          reject
+        )
       })
     }
   }
