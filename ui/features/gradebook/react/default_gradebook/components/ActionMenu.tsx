@@ -55,7 +55,7 @@ export type ActionMenuProps = {
   }
   attachment?: {
     id: string
-    downloadUrl: string
+    downloadUrl: string | null
     updatedAt: string
     createdAt: string
   }

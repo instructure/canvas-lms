@@ -21,15 +21,16 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {underscore} from 'convert-case'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 import {serializeFilter} from '../Gradebook.utils'
+import type {GradebookSettings, ColumnOrderSettings, FilterPreset} from '../gradebook.d'
 
 const I18n = useI18nScope('gradebookGradebookApi')
 
-function applyScoreToUngradedSubmissions(courseId, params) {
+function applyScoreToUngradedSubmissions(courseId: string, params) {
   const url = `/api/v1/courses/${courseId}/apply_score_to_ungraded_submissions`
   return axios.put(url, underscore(params))
 }
 
-function createTeacherNotesColumn(courseId) {
+function createTeacherNotesColumn(courseId: string) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
   const data = {
     column: {
@@ -41,12 +42,18 @@ function createTeacherNotesColumn(courseId) {
   return axios.post(url, data)
 }
 
-function updateTeacherNotesColumn(courseId, columnId, attr) {
+function updateTeacherNotesColumn(courseId: string, columnId: string, attr) {
   const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}`
   return axios.put(url, {column: attr})
 }
 
-function updateSubmission(courseId, assignmentId, userId, submission, enterGradesAs) {
+function updateSubmission(
+  courseId: string,
+  assignmentId: string,
+  userId: string,
+  submission,
+  enterGradesAs?: string
+) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${userId}`
   return axios.put(url, {
     submission: underscore(submission),
@@ -55,17 +62,17 @@ function updateSubmission(courseId, assignmentId, userId, submission, enterGrade
   })
 }
 
-function saveUserSettings(courseId, gradebook_settings) {
+function saveUserSettings(courseId: string, gradebook_settings: GradebookSettings) {
   const url = `/api/v1/courses/${courseId}/gradebook_settings`
   return axios.put(url, {gradebook_settings})
 }
 
-function updateColumnOrder(courseId, columnOrder) {
+function updateColumnOrder(courseId: string, columnOrder: ColumnOrderSettings) {
   const url = `/courses/${courseId}/gradebook/save_gradebook_column_order`
   return axios.post(url, {column_order: columnOrder})
 }
 
-function createGradebookFilterPreset(courseId, filter) {
+function createGradebookFilterPreset(courseId: string, filter: FilterPreset) {
   const {name, payload} = serializeFilter(filter)
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters`,
@@ -74,14 +81,14 @@ function createGradebookFilterPreset(courseId, filter) {
   })
 }
 
-function deleteGradebookFilterPreset(courseId, filterId) {
+function deleteGradebookFilterPreset(courseId: string, filterId: string) {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filterId}`,
     method: 'DELETE'
   })
 }
 
-function updateGradebookFilterPreset(courseId, filter) {
+function updateGradebookFilterPreset(courseId: string, filter: FilterPreset) {
   const {name, payload} = serializeFilter(filter)
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filter.id}`,

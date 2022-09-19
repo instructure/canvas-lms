@@ -27,14 +27,9 @@ import FilterTrayPreset from './FilterTrayFilterPreset'
 import useStore from '../stores/index'
 
 import {doFiltersMatch} from '../Gradebook.utils'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
-import type {
-  Module,
-  AssignmentGroup,
-  Section,
-  GradingPeriod,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 
 const {Item: FlexItem} = Flex as any
 
@@ -47,8 +42,8 @@ export type FilterTrayProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  gradingPeriods: GradingPeriod[]
-  studentGroupCategories: StudentGroupCategoryMap
+  gradingPeriods: CamelizedGradingPeriod[]
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterTray({

@@ -25,6 +25,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import {Text} from '@instructure/ui-text'
 import {statuses} from '../constants/statuses'
 import StatusColorListItem from './StatusColorListItem'
+import type {StatusColors} from '../constants/colors'
 
 const I18n = useI18nScope('gradebook')
 
@@ -37,7 +38,7 @@ type Props = {
     dropped: string
     resubmitted: string
   }
-  afterUpdateStatusColors: (colors: any) => void
+  afterUpdateStatusColors: (colors: StatusColors, successFn: any, errorFn: any) => Promise<any>
 }
 
 type State = {

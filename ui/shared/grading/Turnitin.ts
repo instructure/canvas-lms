@@ -19,25 +19,9 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {max, invert} from 'underscore'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
-import type {Submission} from '../../api.d'
+import type {PlagiarismData, SubmissionWithOriginalityReport} from '@canvas/grading/grading.d'
 
 const I18n = useI18nScope('turnitin')
-
-type PlagiarismData = {
-  state: string
-  similarity_score: number
-}
-
-type SubmissionWithOriginalityReport = Submission & {
-  attachments: Array<{id: string}>
-  has_originality_report: boolean
-  turnitin_data?: {
-    [key: string]: PlagiarismData
-  }
-  vericite_data?: {provider: 'vericite'} & {
-    [key: string]: PlagiarismData
-  }
-}
 
 export const extractDataTurnitin = function (submission: SubmissionWithOriginalityReport) {
   let attachment, i, item, len, plagData, ref, turnitin
