@@ -164,6 +164,7 @@
 class OutcomesApiController < ApplicationController
   include Api::V1::Outcome
   include Outcomes::Enrollments
+  include CanvasOutcomesHelper
 
   before_action :require_user
   before_action :get_outcome, except: :outcome_alignments
@@ -302,6 +303,30 @@ class OutcomesApiController < ApplicationController
     end
   end
 
+  def find_outcomes_service_assignment_alignments(course)
+    outcomes = ContentTag.active.where(context: context).learning_outcome_links.pluck(:content_id)
+    assignments = Assignment.active.where(context: context).type_quiz_lti
+    os_results = get_outcome_alignments(context, outcomes.join(","), { includes: "alignments", list_groups: false })
+
+    os_assignment_alignments = []
+    os_results&.each do |r|
+      next if r[:alignments].nil?
+
+      r[:alignments].each do |a|
+        next if a[:associated_asset_id].nil?
+
+        os_assignment_alignments.push({
+                                        learning_outcome_id: r[:external_id],
+                                        title: assignments.find(a[:associated_asset_id]).title,
+                                        assignment_id: a[:associated_asset_id],
+                                        submission_types: assignments.find(a[:associated_asset_id]).submission_types,
+                                        url: "#{polymorphic_url([course, :assignments])}/#{a[:associated_asset_id]}"
+                                      })
+      end
+    end
+    os_assignment_alignments
+  end
+
   # @API Get aligned assignments for an outcome in a course for a particular student
   #
   # @argument course_id [Integer]
@@ -365,7 +390,11 @@ class OutcomesApiController < ApplicationController
           }
         end
       end.flatten
-      alignments.concat(quiz_alignments, magic_marker_alignments)
+
+      # find_outcomes_service_assignment_alignments
+      # Returns outcome service aligned assignments for a given course
+      # if the outcome_service_results_to_canvas FF is enabled
+      alignments.concat(quiz_alignments, magic_marker_alignments, find_outcomes_service_assignment_alignments(course))
 
       render json: alignments
     else

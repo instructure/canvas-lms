@@ -976,6 +976,64 @@ describe "Outcomes API", type: :request do
                         format: "json")
         expect(json["message"]).to eq("student_id is required")
       end
+
+      describe "#find_outcomes_service_assignment_alignments" do
+        def mock_os_alignment_results(course, outcome, quiz_assignment)
+          {
+            learning_outcome_id: outcome.id,
+            title: Assignment.find(quiz_assignment.id).title,
+            assignment_id: quiz_assignment.id,
+            submission_types: Assignment.find(quiz_assignment.id).submission_types,
+            url: "#{polymorphic_url([course, :assignments])}/#{quiz_assignment.id}"
+          }
+        end
+
+        it "returns empty array for alignments when FF is disabled" do
+          @course.disable_feature!(:outcome_service_results_to_canvas)
+          expect_any_instance_of(OutcomesApiController).to receive(:find_outcomes_service_assignment_alignments).with(any_args).and_return([])
+          json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                          controller: "outcomes_api",
+                          action: "outcome_alignments",
+                          course_id: @course.id.to_s,
+                          student_id: @student.id.to_s,
+                          format: "json")
+          expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+        end
+
+        context "outcome_service_results_to_canvas FF is enabled" do
+          before do
+            @course.enable_feature!(:outcome_service_results_to_canvas)
+          end
+
+          it "returns empty array when results are not found in OS" do
+            @course.enable_feature!(:outcome_service_results_to_canvas)
+            expect_any_instance_of(OutcomesApiController).to receive(:find_outcomes_service_assignment_alignments).with(any_args).and_return([])
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                            controller: "outcomes_api",
+                            action: "outcome_alignments",
+                            course_id: @course.id.to_s,
+                            student_id: @student.id.to_s,
+                            format: "json")
+            expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id].sort)
+          end
+
+          it "returns array of assignments when results are found in OS" do
+            @course.enable_feature!(:outcome_service_results_to_canvas)
+            new_quiz = @course.assignments.create!(title: "New Quiz", submission_types: "external_tool")
+
+            expect_any_instance_of(OutcomesApiController).to receive(:find_outcomes_service_assignment_alignments).with(any_args).and_return(
+              [mock_os_alignment_results(@course, @outcome, new_quiz)]
+            )
+            json = api_call(:get, "/api/v1/courses/#{@course.id}/outcome_alignments?student_id=#{@student.id}",
+                            controller: "outcomes_api",
+                            action: "outcome_alignments",
+                            course_id: @course.id.to_s,
+                            student_id: @student.id.to_s,
+                            format: "json")
+            expect(json.filter_map { |j| j["assignment_id"] }.sort).to eq([@assignment1.id, @assignment2.id, @quiz.assignment_id, new_quiz.id].sort)
+          end
+        end
+      end
     end
 
     describe "update" do
