@@ -288,7 +288,7 @@ pipeline {
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath('ruby-runner')
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath('yarn-runner')
     WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath('webpack-builder')
-    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath('webpack-cache')
+    WEBPACK_ASSETS_PREFIX = configuration.buildRegistryPath('webpack-assets')
 
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
@@ -298,7 +298,7 @@ pipeline {
     DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    WEBPACK_CACHE_IMAGE = "$WEBPACK_CACHE_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    WEBPACK_ASSETS_IMAGE = "$WEBPACK_ASSETS_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"

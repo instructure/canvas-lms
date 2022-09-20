@@ -13,5 +13,5 @@ RUN COMPILE_ASSETS_API_DOCS=0 \
     CRYSTALBALL_MAP="$CRYSTALBALL_MAP" \
     bundle exec rails canvas:compile_assets
 
-FROM local/ruby-runner AS webpack-cache
+FROM local/ruby-runner AS webpack-assets
 COPY --chown=docker:docker --from=webpack-runner /usr/src/app/public ${APP_HOME}/public
