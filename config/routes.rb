@@ -2409,6 +2409,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/course_pacing/new", action: :new
       get "courses/:course_id/course_pacing/:id", action: :api_show
       put "courses/:course_id/course_pacing/:id", action: :update
+      delete "courses/:course_id/course_pacing/:id", action: :destroy
       post "courses/:course_id/course_pacing/:id/publish", action: :publish
       post "courses/:course_id/course_pacing/compress_dates", action: :compress_dates
     end

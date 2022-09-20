@@ -24,7 +24,7 @@ class CoursePacesController < ApplicationController
   before_action :load_calendar_event_blackout_dates, only: %i[index]
   before_action :require_feature_flag
   before_action :authorize_action
-  before_action :load_course_pace, only: %i[api_show publish update]
+  before_action :load_course_pace, only: %i[api_show publish update destroy]
 
   include Api::V1::Course
   include Api::V1::Progress
@@ -183,6 +183,19 @@ class CoursePacesController < ApplicationController
     render json: compressed_dates.to_json
   end
 
+  def destroy
+    return not_found unless Account.site_admin.feature_enabled?(:course_paces_redesign)
+
+    if @course_pace.primary? && @course_pace.published?
+      return render json: { success: false, errors: t("You cannot delete the default course pace.") }, status: :unprocessable_entity
+    end
+
+    was_published = @course_pace.published?
+    @course_pace.destroy
+    @course_pace.republish_paces_for_affected_enrollments if was_published
+    render json: { course_pace: CoursePacePresenter.new(@course_pace).as_json }
+  end
+
   private
 
   def authorize_action
@@ -198,6 +211,7 @@ class CoursePacesController < ApplicationController
         update: [:manage_course_content_edit],
         compress_dates: [:manage_course_content_edit],
         master_course_info: [:manage_course_content_edit],
+        destroy: [:manage_course_content_delete]
       }
     )
   end
