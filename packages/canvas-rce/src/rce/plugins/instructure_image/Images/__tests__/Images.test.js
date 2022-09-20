@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, getByText} from '@testing-library/react'
 
 import {buildImage} from '../../../../../rcs/fake'
 import Images from '..'
@@ -148,6 +148,20 @@ describe('RCE "Images" Plugin > Images', () => {
     })
   })
 
+  describe('after inital load resolves with no images', () => {
+    beforeEach(() => {
+      renderComponent()
+      props.images[props.contextType].isLoading = true
+      renderComponent()
+      props.images[props.contextType].isLoading = false
+    })
+
+    it('displays No Results message', () => {
+      renderComponent()
+      expect(getByText(component.container, 'No results.')).toBeInTheDocument()
+      expect(getImages()).toHaveLength(0)
+    })
+  })
   describe('after updating to load additional images', () => {
     beforeEach(() => {
       // Initial render

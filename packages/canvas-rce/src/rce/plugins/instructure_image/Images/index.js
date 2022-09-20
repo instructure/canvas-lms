@@ -32,6 +32,13 @@ import {
 import ImageList from '../ImageList'
 import formatMessage from '../../../../format-message'
 
+function hasFiles(images) {
+  return images.files.length > 0
+}
+
+function isEmpty(images) {
+  return !hasFiles(images) && !images.hasMore && !images.isLoading
+}
 export default function Images(props) {
   const {fetchInitialImages, fetchNextImages, contextType, sortBy, searchString, isIconMaker} =
     props
@@ -81,6 +88,12 @@ export default function Images(props) {
       {error && (
         <View as="div" role="alert" margin="medium">
           <Text color="danger">{formatMessage('Loading failed.')}</Text>
+        </View>
+      )}
+
+      {isEmpty(images) && (
+        <View as="div" padding="medium">
+          {formatMessage('No results.')}
         </View>
       )}
     </View>
