@@ -71,3 +71,4 @@ class Quizzes::QuizSubmissionFilesController < ApplicationController
   end
 
 end
+git
