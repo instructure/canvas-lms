@@ -128,7 +128,7 @@ def premergeCacheImage() {
       'RAILS_LOAD_ALL_LOCALES=0',
       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+      "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
     ]) {
       slackSendCacheBuild {
@@ -146,7 +146,7 @@ def premergeCacheImage() {
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
       """, label: 'upload cache images')
     }
   }
@@ -169,7 +169,7 @@ def patchsetImage(asyncStepsStr = '') {
         "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
         "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
         "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-        "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+        "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       ]) {
         try {
@@ -200,7 +200,7 @@ def patchsetImage(asyncStepsStr = '') {
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $YARN_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
       ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
     """, label: 'upload cache images')
   }
 }

@@ -28,5 +28,5 @@ wait
 # because it is unlikely that another build that runs on the node will need it, saving
 # disk space. The dependency image(s) will not be cleared however, so tag them to avoid
 # future builds on this node from downloading the layers again.
-WEBPACK_CACHE_SELECTED_TAG=$(docker image inspect -f "{{.Config.Labels.WEBPACK_CACHE_SELECTED_TAG}}" $PATCHSET_TAG)
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SELECTED_TAG
+WEBPACK_ASSETS_SELECTED_TAG=$(docker image inspect -f "{{.Config.Labels.WEBPACK_ASSETS_SELECTED_TAG}}" $PATCHSET_TAG)
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_ASSETS_SELECTED_TAG
