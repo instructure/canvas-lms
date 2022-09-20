@@ -13,11 +13,11 @@ of caching.
     - This image contains ruby-runner and yarn packages without postinstall executed
 - Canvas Packages (webpack-builder)
     - This image contains yarn-runner and built packages from the packages/ directory
-- Webpack Built Assets (webpack-cache)
+- Webpack Built Assets (webpack-assets)
     - This image contains the fully built webpack assets in public/. It does not contain
   yarn-runner or webpack-builder.
 - Patchset
-    - This image contains webpack-cache and the rest of the application files for
+    - This image contains webpack-assets and the rest of the application files for
   running tests under. It is the primary image used by the rspec / selenium jobs.
 
 # Docker Build Tags
@@ -28,7 +28,7 @@ Each image is built through docker-build.sh, and is tagged with the following fo
 starlord.inscloudgate.net/jenkins/canvas-lms-[image type]:[image scope]-[salt]-[cache id]
 ```
 
-- image type = one of ruby-runner, yarn-runner, webpack-builder, webpack-cache
+- image type = one of ruby-runner, yarn-runner, webpack-builder, webpack-assets
 - image scope = one of master, [patchset number]
 - salt = unique value that changes if the image labels need to change
 - cache id = hash of all relevant files for that image
@@ -45,7 +45,7 @@ Examples:
 - `starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-postgres-12-ruby-2.6`
 - `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:20.255220.11-postgres-12-ruby-2.6`
 - `starlord.inscloudgate.net/jenkins/canvas-lms-yarn-runner:master-39e953ae-9414c88300488700236b8f34cd228fe0`
-- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-cache:master-39e953ae-642ae86a8baf46e598852d6adbdf4766`
+- `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-assets:master-39e953ae-642ae86a8baf46e598852d6adbdf4766`
 - `starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:master-39e953ae-cad9edddd890801ee5cb811267c7299c`
 - `starlord.inscloudgate.net/jenkins/canvas-lms-ruby-runner:master-39e953ae-f98271e7f6a8da245c645b3087238be7`
 
@@ -58,7 +58,7 @@ in `docker-build.sh`.
 1. Jenkins starts to build a patchset with changes.
 2. It computes the hash of all relevant dependencies for the above images, which is the cache id above.
 3. It attempts to pull the images in the following order, ordered by least build time required.
-    1. webpack-cache:master, webpack-cache:[patchset number]
+    1. webpack-assets:master, webpack-assets:[patchset number]
         * The most ideal cached image for ruby-only changes, requires only copying in the changed application files.
     2. webpack-builder:master, webpack-builder:[patchset number]
         * The most ideal cached image for webpack-related changes
@@ -87,7 +87,7 @@ docker image inspect starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-p
 {
     "RUBY_RUNNER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-ruby-runner:master-c480fc86-a30b30a43fb95f996d13db8d5236c772",
     "WEBPACK_BUILDER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-webpack-builder:master-c480fc86-350f70e66da25a6e27dd0851be751e15",
-    "WEBPACK_CACHE_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-webpack-cache:master-c480fc86-dccd0b970e09db19fd839da2cb9150e0",
+    "WEBPACK_ASSETS_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-webpack-assets:master-c480fc86-dccd0b970e09db19fd839da2cb9150e0",
     "YARN_RUNNER_SELECTED_TAG": "starlord.inscloudgate.net/jenkins/canvas-lms-yarn-runner:master-c480fc86-217b3c20e3a7d4a66de8fc4e10871a48",
     "maintainer": "Instructure"
 }

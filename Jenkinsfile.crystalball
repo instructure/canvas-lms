@@ -127,7 +127,7 @@ pipeline {
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath('ruby-runner')
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath('yarn-runner')
     WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath('webpack-builder')
-    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath('webpack-cache')
+    WEBPACK_ASSETS_PREFIX = configuration.buildRegistryPath('webpack-assets')
 
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
 
