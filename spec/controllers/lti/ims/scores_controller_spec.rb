@@ -551,7 +551,7 @@ module Lti::IMS
                 end
 
                 before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
                 end
 
                 it "sets submitted_at correctly" do
@@ -590,7 +590,7 @@ module Lti::IMS
 
               context "with FF off" do
                 before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
                 end
 
                 it "ignores submitted_at" do
@@ -655,7 +655,7 @@ module Lti::IMS
 
               shared_examples_for "no updates are made with FF on" do
                 before do
-                  Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                  Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
                 end
 
                 it "does not update submission" do
@@ -680,7 +680,7 @@ module Lti::IMS
 
               shared_examples_for "updates are made with FF off" do
                 before do
-                  Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                  Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
                 end
 
                 it "updates submission" do
@@ -755,7 +755,7 @@ module Lti::IMS
               context "when file upload url times out" do
                 context "and FF is on" do
                   before do
-                    Account.root_accounts.first.enable_feature! :ags_scores_file_error_improvements
+                    Account.root_accounts.first.enable_feature! :ags_scores_multiple_files
                   end
 
                   context "and InstFS responds with a 502" do
@@ -789,7 +789,7 @@ module Lti::IMS
 
                 context "and FF is off" do
                   before do
-                    Account.root_accounts.first.disable_feature! :ags_scores_file_error_improvements
+                    Account.root_accounts.first.disable_feature! :ags_scores_multiple_files
                   end
 
                   context "and InstFS responds with a 502" do
