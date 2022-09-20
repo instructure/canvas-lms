@@ -1,4 +1,4 @@
-FROM local/webpack-cache
+FROM local/webpack-assets
 
 ARG COMPILE_ADDITIONAL_ASSETS=0
 
