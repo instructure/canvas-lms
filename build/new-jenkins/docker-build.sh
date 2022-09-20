@@ -46,6 +46,7 @@ source ./build/new-jenkins/docker-build-helpers.sh
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack-dependencies" --target cache-helper-collect-webpack-dependencies "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-js" --target cache-helper-collect-js "$WORKSPACE"
 
@@ -53,6 +54,7 @@ RUBY_CACHE_MD5=$(docker run local/cache-helper-collect-gems sh -c "find /tmp/dst
 YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 WEBPACK_ASSETS_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
+WEBPACK_ASSETS_DEPENDENCIES_MD5=$(docker run local/cache-helper-collect-webpack-dependencies sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 
 BASE_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins | md5sum)
 RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.ruby-runner | md5sum)
@@ -99,6 +101,7 @@ WEBPACK_ASSETS_PARTS=(
   "${WEBPACK_ASSETS_BUILD_ARGS[@]}"
   $WEBPACK_ASSETS_DOCKERFILE_MD5
   $WEBPACK_ASSETS_MD5
+  $WEBPACK_ASSETS_DEPENDENCIES_MD5
 )
 
 declare -A BASE_RUNNER_TAGS; compute_tags "BASE_RUNNER_TAGS" $BASE_RUNNER_PREFIX ${BASE_RUNNER_PARTS[@]}
