@@ -29,11 +29,11 @@ export function Embed({onSubmit, onDismiss}) {
 
   return (
     <Modal
-      data-mce-component
+      data-mce-component={true}
       label={formatMessage('Embed')}
       size="medium"
       onDismiss={onDismiss}
-      open
+      open={true}
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
@@ -63,7 +63,7 @@ export function Embed({onSubmit, onDismiss}) {
             onSubmit(embedCode)
             onDismiss()
           }}
-          variant="primary"
+          color="primary"
           type="submit"
           disabled={!embedCode}
         >
