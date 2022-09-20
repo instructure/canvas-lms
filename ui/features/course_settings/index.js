@@ -45,7 +45,7 @@ const Integrations = React.lazy(() => import('@canvas/integrations/react/courses
 const Loading = () => <Spinner size="x-small" renderTitle={I18n.t('Loading')} />
 const Error = () => (
   <div className="bcs_check-box">
-    <Text color="warning">{I18n.t('Unable to load this control')}</Text>
+    <Text color="danger">{I18n.t('Unable to load this control')}</Text>
   </div>
 )
 
@@ -84,7 +84,10 @@ ready(() => {
   const navView = new NavigationView({el: $('#tab-navigation')})
 
   if (document.getElementById('tab-features')) {
-    ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
+    ReactDOM.render(
+      <FeatureFlags disableDefaults={true} />,
+      document.getElementById('tab-features')
+    )
   }
 
   $(() => navView.render())
@@ -105,7 +108,7 @@ ready(() => {
         store={configureStore(initialState)}
         courseId={ENV.COURSE_ID}
         setting="banner_image"
-        wide
+        wide={true}
       />,
       bannerImageContainer
     )
