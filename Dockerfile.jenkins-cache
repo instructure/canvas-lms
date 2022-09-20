@@ -48,31 +48,19 @@ RUN --mount=target=/tmp/src \
     \
     /tmp/dst
 
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack-dependencies
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   shopt -s globstar && \
   tar -cf - \
-    --exclude='**/__mocks__' \
-    --exclude='**/__tests__' \
-    app/stylesheets \
     bin \
     config/environments \
-    config/locales \
-    gems/**/config/locales \
     # This is intentionally only a single-level directory - and really should be cut down more later.
     gems/*/lib \
-    gems/plugins/**/app/coffeescripts \
-    gems/plugins/**/app/jsx \
-    gems/plugins/**/app/stylesheets \
-    gems/plugins/**/app/views/jst \
-    gems/plugins/**/public \
     lib/canvas/cdn \
     lib/rake \
     lib/tasks \
-    public \
-    ui \
     ui-build \
     \
     config/application.rb \
@@ -97,6 +85,27 @@ RUN --mount=target=/tmp/src \
     Rakefile \
     gulpfile.js \
     webpack.config.js \
+    \
+  | tar -xf - -C /tmp/dst
+
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  shopt -s globstar && \
+  tar -cf - \
+    --exclude='**/__mocks__' \
+    --exclude='**/__tests__' \
+    app/stylesheets \
+    config/locales \
+    gems/**/config/locales \
+    gems/plugins/**/app/coffeescripts \
+    gems/plugins/**/app/jsx \
+    gems/plugins/**/app/stylesheets \
+    gems/plugins/**/app/views/jst \
+    gems/plugins/**/public \
+    public \
+    ui \
     \
   | tar -xf - -C /tmp/dst
 
