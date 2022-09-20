@@ -46,7 +46,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import formatMessage from '../format-message'
 import {Alert} from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
@@ -158,9 +158,9 @@ export default class FlashAlert extends React.Component {
         details = (
           <span>
             <PresentationContent>
-              <Button variant="link" onClick={this.showDetails}>
+              <Link as="button" onClick={this.showDetails}>
                 {formatMessage('Details')}
-              </Button>
+              </Link>
             </PresentationContent>
             <ScreenReaderContent>{this.renderDetailMessage()}</ScreenReaderContent>
           </span>
@@ -169,7 +169,7 @@ export default class FlashAlert extends React.Component {
     }
 
     return (
-      <Transition transitionOnMount in={this.state.isOpen} type="fade">
+      <Transition transitionOnMount={true} in={this.state.isOpen} type="fade">
         <Alert
           variant={this.props.variant}
           renderCloseButtonLabel={formatMessage('Close')}

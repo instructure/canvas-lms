@@ -192,7 +192,7 @@ export default function ImageOptionsTray(props) {
               padding="small medium"
               textAlign="end"
             >
-              <Button disabled={saveDisabled} onClick={handleSave} variant="primary">
+              <Button disabled={saveDisabled} onClick={handleSave} color="primary">
                 {formatMessage('Done')}
               </Button>
             </Flex.Item>

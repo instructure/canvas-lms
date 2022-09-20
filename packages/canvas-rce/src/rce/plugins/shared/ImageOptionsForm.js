@@ -17,8 +17,7 @@
  */
 
 import React from 'react'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
@@ -70,9 +69,13 @@ const ImageOptionsForm = ({
             </View>
           }
         >
-          <Button renderIcon={IconQuestionLine} size="small" variant="icon">
-            <ScreenReaderContent>{tooltipText}</ScreenReaderContent>
-          </Button>
+          <IconButton
+            renderIcon={IconQuestionLine}
+            size="small"
+            withBackground={false}
+            withBorder={false}
+            screenReaderLabel={tooltipText}
+          />
         </Tooltip>
       </Flex.Item>
     </Flex>

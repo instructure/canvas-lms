@@ -296,7 +296,7 @@ const UploadFileModal = React.forwardRef(
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-          <Button variant="primary" type="submit" disabled={submitDisabled}>
+          <Button color="primary" type="submit" disabled={submitDisabled}>
             {formatMessage('Submit')}
           </Button>
         </Modal.Footer>

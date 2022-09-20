@@ -108,7 +108,7 @@ export default function AudioOptionsTray({
                   padding="small medium"
                   textAlign="end"
                 >
-                  <Button onClick={e => handleSave(e, contentProps)} variant="primary">
+                  <Button onClick={e => handleSave(e, contentProps)} color="primary">
                     {formatMessage('Done')}
                   </Button>
                 </Flex.Item>

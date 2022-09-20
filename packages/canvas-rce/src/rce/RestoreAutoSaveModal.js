@@ -37,11 +37,11 @@ export default function RestoreAutoSaveModal(props) {
   return (
     <Modal
       data-testid="RCE_RestoreAutoSaveModal"
-      data-mce-component
+      data-mce-component={true}
       label={formatMessage('Restore auto-save?')}
       open={props.open}
       shouldCloseOnDocumentClick={false}
-      shouldReturnFocus
+      shouldReturnFocus={true}
       size="medium"
       onDismiss={props.onNo}
     >
@@ -83,7 +83,7 @@ export default function RestoreAutoSaveModal(props) {
           {formatMessage('No')}
         </Button>
         &nbsp;
-        <Button variant="primary" onClick={props.onYes}>
+        <Button color="primary" onClick={props.onYes}>
           {formatMessage('Yes')}
         </Button>
       </Modal.Footer>
