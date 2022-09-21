@@ -52,6 +52,7 @@ class CoursePace < ActiveRecord::Base
   scope :not_deleted, -> { where.not(workflow_state: "deleted") }
   scope :unpublished, -> { where(workflow_state: "unpublished") }
   scope :published, -> { where(workflow_state: "active").where.not(published_at: nil) }
+  scope :section_paces, -> { where.not(course_section_id: nil) }
 
   workflow do
     state :unpublished
