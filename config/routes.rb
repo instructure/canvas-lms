@@ -2439,6 +2439,14 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/eportfolios", action: :moderate_all
       put "eportfolios/:eportfolio_id/restore", action: :restore
     end
+
+    scope(controller: :section_paces_api) do
+      get "courses/:course_id/section_paces", action: :index, as: :section_paces
+      get "courses/:course_id/sections/:course_section_id/pace", action: :show, as: :section_pace
+      post "courses/:course_id/sections/:course_section_id/paces", action: :create, as: :new_section_pace
+      patch "courses/:course_id/sections/:course_section_id/pace", action: :update, as: :patch_section_pace
+      delete "courses/:course_id/sections/:course_section_id/pace", action: :delete, as: :delete_section_pace
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
