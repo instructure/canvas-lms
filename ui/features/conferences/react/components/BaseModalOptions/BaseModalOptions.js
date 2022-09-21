@@ -113,7 +113,7 @@ const BaseModalOptions = props => {
             <ConferenceAddressBook
               data-testId="conference-address-book"
               selectedIds={props.selectedAttendees}
-              userList={props.availableAttendeesList}
+              menuItemList={props.availableAttendeesList}
               onChange={userList => {
                 props.onAttendeesChange(userList.map(u => u.id))
               }}
