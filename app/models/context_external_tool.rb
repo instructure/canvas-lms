@@ -136,7 +136,7 @@ class ContextExternalTool < ActiveRecord::Base
       ) do
         # let them see admin level tools if there are any courses they can manage
         if root_account.grants_any_right?(user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS) ||
-           GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false, root_account.id).exists? }
+           GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(root_account_id: root_account).exists? }
           "admins"
         else
           "members"

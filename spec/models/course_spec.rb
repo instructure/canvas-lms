@@ -4989,10 +4989,10 @@ describe Course do
       user = account_admin_user(account: sub_account)
       course = Course.create!(account: sub_sub_account)
 
-      expect(Course.manageable_by_user(user.id, false).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
 
       user.account_users.first.destroy!
-      expect(Course.manageable_by_user(user.id, false)).to_not be_exists
+      expect(Course.manageable_by_user(user.id)).to_not be_exists
     end
 
     it "includes courses the user is actively enrolled in as a teacher" do
@@ -5002,7 +5002,7 @@ describe Course do
       e = course.teacher_enrollments.first
       e.accept
 
-      expect(Course.manageable_by_user(user.id, false).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
     end
 
     it "includes courses the user is actively enrolled in as a ta" do
@@ -5012,7 +5012,7 @@ describe Course do
       e = course.ta_enrollments.first
       e.accept
 
-      expect(Course.manageable_by_user(user.id, false).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
     end
 
     it "includes courses the user is actively enrolled in as a designer" do
@@ -5020,7 +5020,7 @@ describe Course do
       user = user_with_pseudonym
       course.enroll_designer(user).accept
 
-      expect(Course.manageable_by_user(user.id, false).map(&:id)).to be_include(course.id)
+      expect(Course.manageable_by_user(user.id).map(&:id)).to be_include(course.id)
     end
 
     it "does not include courses the user is enrolled in when the enrollment is non-active" do
@@ -5030,10 +5030,10 @@ describe Course do
       e = course.teacher_enrollments.first
 
       # it's only invited at this point
-      expect(Course.manageable_by_user(user.id, false)).to be_empty
+      expect(Course.manageable_by_user(user.id)).to be_empty
 
       e.destroy
-      expect(Course.manageable_by_user(user.id, false)).to be_empty
+      expect(Course.manageable_by_user(user.id)).to be_empty
     end
 
     it "does not include deleted courses the user was enrolled in" do
@@ -5044,7 +5044,7 @@ describe Course do
       e.accept
 
       course.destroy
-      expect(Course.manageable_by_user(user.id, false)).to be_empty
+      expect(Course.manageable_by_user(user.id)).to be_empty
     end
   end
 
