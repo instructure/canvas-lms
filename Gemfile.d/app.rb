@@ -169,3 +169,4 @@ gem 'canvas_shim', :path => 'vendor/canvas_shim'
 gem 'bootsnap', require: false
 gem 'jquery-rails'
 gem 'rails-ujs'
+gem 'launchdarkly-server-sdk'

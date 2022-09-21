@@ -1899,7 +1899,12 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
-    super
+    show_feature = Rails.configuration.launch_darkly_client.variation("canvas-lms-double-render-fix", @current_user, false)
+    if show_feature
+      super if !performed?
+    else
+      super
+    end
   end
 
   # flash is normally only preserved for one redirect; make sure we carry
