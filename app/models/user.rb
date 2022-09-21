@@ -2586,11 +2586,11 @@ class User < ActiveRecord::Base
   end
 
   def manageable_courses(include_concluded = false)
-    Course.manageable_by_user(id, include_concluded)
+    Course.manageable_by_user(id, include_concluded).not_deleted
   end
 
   def manageable_courses_by_query(query = "", include_concluded = false)
-    manageable_courses(include_concluded).name_like(query).limit(50)
+    manageable_courses(include_concluded).not_deleted.name_like(query).limit(50)
   end
 
   def last_completed_module
