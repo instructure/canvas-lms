@@ -270,6 +270,7 @@ const ConferencesRouter = Backbone.Router.extend({
         <VideoConferenceModal
           open={true}
           isEditing={true}
+          hasBegun={!!attributes.started_at}
           type={attributes.conference_type}
           name={attributes.title}
           duration={!attributes.duration ? 0 : attributes.duration}

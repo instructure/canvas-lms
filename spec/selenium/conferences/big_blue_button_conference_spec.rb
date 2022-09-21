@@ -146,6 +146,29 @@ describe "BigBlueButton conferences" do
       expect(ce.web_conference_id).to eq wc.id
       expect(ce.start_at).to eq wc.start_at
     end
+
+    it "disables unchangeable properties when conference has begun" do
+      conf = create_big_blue_button_conference
+      conf.start_at = 2.hours.ago
+      conf.started_at = 1.hour.ago
+      conf.end_at = 1.day.from_now
+      conf.save!
+
+      get conferences_index_page
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+      expect(f("span[data-testid='duration-input'] input")).to be_disabled
+      expect(f("input[value='no_time_limit']")).to be_disabled
+      expect(f("input[value='enable_waiting_room']")).to be_disabled
+      expect(f("input[value='add_to_calendar']")).to be_disabled
+      expect(fj("span[data-testid='plain-text-dates']:contains('Start at:')")).to be_present
+      expect(fj("span[data-testid='plain-text-dates']:contains('End at:')")).to be_present
+      expect(f("body")).not_to contain_jqcss("input[label='Start Date']")
+      expect(f("body")).not_to contain_jqcss("input[label='End Date']")
+      f("div#tab-attendees").click
+      lock_options = ff("input[name='attendees_options']")
+      expect(lock_options).to all(be_disabled)
+    end
   end
 
   context "when bbb_modal_update is OFF" do

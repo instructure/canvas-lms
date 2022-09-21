@@ -184,6 +184,7 @@ export const VideoConferenceModal = ({
           setTab={setTab}
           nameValidationMessages={nameValidationMessages}
           descriptionValidationMessages={descriptionValidationMessages}
+          hasBegun={props.hasBegun}
         />
       )
     }
@@ -206,6 +207,7 @@ export const VideoConferenceModal = ({
         selectedAttendees={selectedAttendees}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
+        hasBegun={props.hasBegun}
       />
     )
   }
@@ -303,6 +305,7 @@ VideoConferenceModal.propTypes = {
   onDismiss: PropTypes.func,
   onSubmit: PropTypes.func,
   isEditing: PropTypes.bool,
+  hasBegun: PropTypes.bool,
   name: PropTypes.string,
   duration: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.string),

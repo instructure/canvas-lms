@@ -49,6 +49,19 @@ describe "Web conferences" do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
 
+    it "disables unchangeable properties when conference has begun" do
+      conf = create_wimba_conference
+      conf.started_at = 1.hour.ago
+      conf.end_at = 1.day.from_now
+      conf.save!
+
+      get conferences_index_page
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+      expect(f("span[data-testid='duration-input'] input")).to be_disabled
+      expect(f("input[value='no_time_limit']")).to be_disabled
+    end
+
     it "validates name length" do
       initial_conference_count = WebConference.count
       get conferences_index_page
