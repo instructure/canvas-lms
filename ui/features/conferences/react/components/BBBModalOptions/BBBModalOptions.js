@@ -123,7 +123,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                 value="enable_waiting_room"
                 disabled={props.hasBegun}
               />
-              {!contextIsGroup && (
+              {!contextIsGroup && ENV.can_manage_calendar && (
                 <Checkbox
                   label={I18n.t('Add to Calendar')}
                   value="add_to_calendar"

@@ -126,6 +126,14 @@ describe "BigBlueButton conferences" do
       expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
     end
 
+    it "does not show add to calendar option to users without :manage_calendar permissions" do
+      user_session(@student)
+      get conferences_index_page
+      f("button[title='New Conference']").click
+      expect(f("input[placeholder='Conference Name']")).to be_present
+      expect(f("body")).not_to contain_jqcss("input[value='add_to_calendar']")
+    end
+
     it "has a working add to calendar option on create" do
       get conferences_index_page
       f("button[title='New Conference']").click
