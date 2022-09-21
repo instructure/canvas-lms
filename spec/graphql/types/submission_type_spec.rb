@@ -552,6 +552,9 @@ describe Types::SubmissionType do
 
       @submission.turnitin_data[@submission.asset_string] = @tii_data
       @submission.turnitin_data[:last_processed_attempt] = 1
+      @submission.turnitin_data[:status] = "pending"
+      @submission.turnitin_data[:student_error] = "The product for this account has expired. Please contact your sales agent to renew the product"
+      @submission.turnitin_data[:assignment_error] = "The product for this account has expired. Please contact your sales agent to renew the product"
       @submission.save!
     end
 
