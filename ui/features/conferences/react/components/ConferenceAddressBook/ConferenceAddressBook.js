@@ -24,24 +24,24 @@ import {Tag} from '@instructure/ui-tag'
 
 const I18n = useI18nScope('video_conference')
 
-export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
+export const ConferenceAddressBook = ({menuItemList, onChange, selectedIds}) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [highlightUser, setHighlightUser] = useState(null)
+  const [highlightMenuItem, setHighlightMenuItem] = useState(null)
   const [inputValue, setInputValue] = useState('')
-  const [selectedUsers, setSelectedUsers] = useState([])
+  const [selectedMenuItems, setSelectedMenuItems] = useState([])
   const [announcement, setAnnouncement] = useState('')
 
   // Initial setup of selectd Ids
   useEffect(() => {
-    const initialSelectedUsers = userList.filter(u => selectedIds?.includes(u.id))
-    if (initialSelectedUsers !== selectedUsers) {
-      setSelectedUsers(initialSelectedUsers)
+    const initialSelectedMenuItems = menuItemList.filter(u => selectedIds?.includes(u.id))
+    if (initialSelectedMenuItems !== selectedMenuItems) {
+      setSelectedMenuItems(initialSelectedMenuItems)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedIds, userList])
+  }, [selectedIds, menuItemList])
 
   const handleBlur = () => {
-    setHighlightUser(null)
+    setHighlightMenuItem(null)
   }
 
   const handleInputChange = e => {
@@ -53,65 +53,65 @@ export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
 
   const handleHighlight = (e, {id}) => {
     if (id) {
-      const user = userList.find(u => u.id === id)
-      setHighlightUser(user)
-      setAnnouncement(user.displayName)
+      const menuItem = menuItemList.find(u => u.id === id)
+      setHighlightMenuItem(menuItem)
+      setAnnouncement(menuItem.displayName)
     }
   }
 
-  const filteredUsers = useMemo(() => {
-    let newUserList = userList.filter(u => u.displayName.includes(inputValue))
-    newUserList = newUserList.filter(u => !selectedUsers.includes(u))
+  const filteredMenuItems = useMemo(() => {
+    let newMenuItemList = menuItemList.filter(u => u.displayName.includes(inputValue))
+    newMenuItemList = newMenuItemList.filter(u => !selectedMenuItems.includes(u))
 
-    const getOptionsChangedMessage = newUsers => {
+    const getOptionsChangedMessage = newMenuItems => {
       let message =
-        newUsers.length !== userList.length
-          ? `${newUsers.length} options available.` // options changed, announce new total
+        newMenuItems.length !== menuItemList.length
+          ? `${newMenuItems.length} options available.` // options changed, announce new total
           : null // options haven't changed, don't announce
-      if (message && newUsers.length > 0) {
+      if (message && newMenuItems.length > 0) {
         // options still available
-        if (highlightUser !== newUsers[0]) {
+        if (highlightMenuItem !== newMenuItems[0]) {
           // highlighted option hasn't been announced
-          message = `${highlightUser?.displayName}. ${message}`
+          message = `${highlightMenuItem?.displayName}. ${message}`
         }
       }
       return message
     }
 
     if (inputValue.length) {
-      const newAnnouncement = getOptionsChangedMessage(newUserList)
+      const newAnnouncement = getOptionsChangedMessage(newMenuItemList)
       setAnnouncement(newAnnouncement)
     }
 
-    return newUserList
+    return newMenuItemList
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputValue, userList, selectedUsers.length])
+  }, [inputValue, menuItemList, selectedMenuItems.length])
 
-  const removeSelectedUser = user => {
-    const newSelectedUsers = selectedUsers
-    const removalIndex = newSelectedUsers.indexOf(user)
+  const removeSelectedItem = menuItem => {
+    const newSelectedMenuItems = selectedMenuItems
+    const removalIndex = newSelectedMenuItems.indexOf(menuItem)
     if (removalIndex > -1) {
-      newSelectedUsers.splice(removalIndex, 1)
+      newSelectedMenuItems.splice(removalIndex, 1)
     }
-    setSelectedUsers([...newSelectedUsers])
-    onChange([...newSelectedUsers])
+    setSelectedMenuItems([...newSelectedMenuItems])
+    onChange([...newSelectedMenuItems])
   }
 
-  const addSelectedUser = (event, {id}) => {
-    const user = userList.find(u => u.id === id)
+  const addSelectedItem = (event, {id}) => {
+    const menuItem = menuItemList.find(u => u.id === id)
 
-    // Exit if selected user already selected
-    if (selectedUsers.includes(user)) {
+    // Exit if selected menu item is already selected
+    if (selectedMenuItems.includes(menuItem)) {
       setIsOpen(false)
       setInputValue('')
       return
     }
 
-    const newSelectedUsers = selectedUsers
-    newSelectedUsers.push(user)
-    setAnnouncement(`${user.displayName} selected. List collapsed.`)
-    setSelectedUsers([...newSelectedUsers])
-    onChange([...newSelectedUsers])
+    const newSelectedItems = selectedMenuItems
+    newSelectedItems.push(menuItem)
+    setAnnouncement(`${menuItem.displayName} selected. List collapsed.`)
+    setSelectedMenuItems([...newSelectedItems])
+    onChange([...newSelectedItems])
     setInputValue('')
     setIsOpen(false)
   }
@@ -119,8 +119,8 @@ export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
   const handleKeyDown = e => {
     // Delete last tag when input is empty
     if (e.keyCode === 8) {
-      if (inputValue === '' && selectedUsers?.length > 0) {
-        removeSelectedUser(selectedUsers[selectedUsers?.length - 1])
+      if (inputValue === '' && selectedMenuItems?.length > 0) {
+        removeSelectedItem(selectedMenuItems[selectedMenuItems?.length - 1])
       }
     }
   }
@@ -140,20 +140,20 @@ export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
         onRequestShowOptions={() => setIsOpen(true)}
         onRequestHideOptions={() => setIsOpen(false)}
         onRequestHighlightOption={handleHighlight}
-        onRequestSelectOption={addSelectedUser}
+        onRequestSelectOption={addSelectedItem}
         onKeyDown={handleKeyDown}
         renderBeforeInput={
-          selectedUsers.length > 0 ? (
+          selectedMenuItems.length > 0 ? (
             <ConferenceAddressBookTags
-              selectedUsers={selectedUsers}
-              onDismiss={removeSelectedUser}
+              selectedMenuItems={selectedMenuItems}
+              onDismiss={removeSelectedItem}
             />
           ) : null
         }
       >
-        {filteredUsers?.map(u => {
+        {filteredMenuItems?.map(u => {
           return (
-            <Select.Option id={u.id} key={u.id} isHighlighted={u.id === highlightUser?.id}>
+            <Select.Option id={u.id} key={u.id} isHighlighted={u.id === highlightMenuItem?.id}>
               {u.displayName}
             </Select.Option>
           )
@@ -162,7 +162,7 @@ export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
       <Alert
         liveRegion={() => document.getElementById('flash-messages')}
         liveRegionPoliteness="assertive"
-        screenReaderOnly
+        screenReaderOnly={true}
       >
         {announcement}
       </Alert>
@@ -171,7 +171,7 @@ export const ConferenceAddressBook = ({userList, onChange, selectedIds}) => {
 }
 
 ConferenceAddressBook.propTypes = {
-  userList: PropTypes.array,
+  menuItemList: PropTypes.array,
   selectedIds: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func
 }
@@ -180,24 +180,24 @@ ConferenceAddressBook.defaultProps = {
   onChange: () => {}
 }
 
-const ConferenceAddressBookTags = ({selectedUsers, onDismiss}) => {
-  return selectedUsers.map((user, index) => (
+const ConferenceAddressBookTags = ({selectedMenuItems, onDismiss}) => {
+  return selectedMenuItems.map((menuItem, index) => (
     <Tag
       data-testId="address-tag"
-      dismissable
-      key={user.id}
-      title={`Remove ${user.displayName}`}
-      text={user.displayName}
+      dismissable={true}
+      key={menuItem.id}
+      title={`Remove ${menuItem.displayName}`}
+      text={menuItem.displayName}
       margin={index > 0 ? 'xxx-small 0 xxx-small xx-small' : 'xxx-small 0'}
       onClick={() => {
-        onDismiss(user)
+        onDismiss(menuItem)
       }}
     />
   ))
 }
 
 ConferenceAddressBookTags.propTypes = {
-  selectedUsers: PropTypes.arrayOf(PropTypes.object),
+  selectedMenuItems: PropTypes.arrayOf(PropTypes.object),
   onDismiss: PropTypes.func
 }
 
