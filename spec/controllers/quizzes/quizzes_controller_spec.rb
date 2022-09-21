@@ -396,6 +396,18 @@ describe Quizzes::QuizzesController do
               expect(assignment_options[:can_unpublish]).to eq false
             end
           end
+
+          it "includes blueprint restriction_data" do
+            @course.master_course_templates.for_full_course.first_or_create
+            account_admin_user(account: @course.root_account)
+            user_session(@admin)
+            get "index", params: { course_id: @course.id }
+
+            controller.js_env[:QUIZZES][:assignment].select { |a| a[:quiz_type] == "quizzes.next" }
+                      .each do |assignment|
+                        expect(assignment["is_master_course_master_content"]).to eq true
+                      end
+          end
         end
       end
 

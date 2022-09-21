@@ -722,3 +722,29 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
     equal(json.quizzesRespondusEnabled, true)
   })
 })
+
+QUnit.module('Blueprint Icon/Button', hooks => {
+  test('renders unlocked', () => {
+    const quiz = createQuiz({
+      id: 1,
+      title: 'Foo',
+      is_master_course_master_content: true,
+      restricted_by_master_course: false,
+      can_update: true
+    })
+    const view = createView(quiz, {canManage: true})
+    equal(view.$('.lock-icon.btn-unlocked i.icon-blueprint').length, 1)
+  })
+
+  test('renders locked', () => {
+    const quiz = createQuiz({
+      id: 1,
+      title: 'Foo',
+      is_master_course_master_content: true,
+      restricted_by_master_course: true,
+      can_update: true
+    })
+    const view = createView(quiz, {canManage: true})
+    equal(view.$('.lock-icon.lock-icon-locked i.icon-blueprint-lock').length, 1)
+  })
+})

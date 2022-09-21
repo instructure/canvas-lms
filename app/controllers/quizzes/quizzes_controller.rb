@@ -93,8 +93,12 @@ class Quizzes::QuizzesController < ApplicationController
 
       practice_quizzes   = scoped_quizzes_index.select { |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
       surveys            = scoped_quizzes_index.select { |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
+      if scoped_new_quizzes_index.any? && @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+        mc_status = setup_master_course_restrictions(scoped_new_quizzes_index, @context)
+      end
       serializer_options = [@context, @current_user, session, {
         permissions: quiz_options,
+        master_course_status: mc_status,
         skip_date_overrides: true,
         skip_lock_tests: true
       }]
