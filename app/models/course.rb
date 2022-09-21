@@ -848,45 +848,37 @@ class Course < ActiveRecord::Base
   scope :active, -> { where.not(workflow_state: "deleted") }
   scope :least_recently_updated, ->(limit) { order(:updated_at).limit(limit) }
 
-  scope :manageable_by_user, lambda { |user_id, include_completed_enrollments, root_account_id = nil|
+  scope :manageable_by_user, lambda { |*args|
+    # args[0] should be user_id, args[1], if true, will include completed
     # enrollments as well as active enrollments
-    workflow_states = sanitize_sql((include_completed_enrollments ? ["'active'", "'completed'"] : ["'active'"]).join(", "))
+    user_id = args[0]
+    workflow_states = (args[1].present? ? ["'active'", "'completed'"] : ["'active'"]).join(", ")
     admin_completed_sql = ""
     enrollment_completed_sql = ""
 
-    unless include_completed_enrollments
-      admin_completed_sql = sanitize_sql(["
+    if args[1].blank?
+      admin_completed_sql = sanitize_sql(["INNER JOIN #{Course.quoted_table_name} AS courses ON courses.id = caa.course_id
         INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
         WHERE courses.workflow_state<>'completed' AND
           ((et.end_at IS NULL OR et.end_at >= :end) OR
           (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
-      enrollment_completed_sql = sanitize_sql(["
-        INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
+      enrollment_completed_sql = sanitize_sql(["INNER JOIN #{EnrollmentTerm.quoted_table_name} AS et ON et.id = courses.enrollment_term_id
         WHERE courses.workflow_state<>'completed' AND
           ((et.end_at IS NULL OR et.end_at >= :end) OR
           (courses.restrict_enrollments_to_course_dates = true AND courses.conclude_at >= :end))", end: Time.now.utc])
     end
 
-    where("exists (
-          SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
-            INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
-            INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i} AND au.workflow_state = 'active'
-            #{admin_completed_sql}
-            #{sanitize_sql(admin_completed_sql == "" ? "WHERE" : "AND")}
-              caa.course_id = courses.id AND
-              courses.workflow_state<>'deleted'
-              #{root_account_id ? sanitize_sql(["AND courses.root_account_id = :root_account_id", { root_account_id: root_account_id }]) : ""}
-        ) or exists (
-          SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name} c
-            INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
-              AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
-            INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id AND es.state IN (#{workflow_states})
-              #{enrollment_completed_sql}
-              #{sanitize_sql(enrollment_completed_sql == "" ? "WHERE" : "AND")}
-              course_id = courses.id AND
-              courses.workflow_state<>'deleted'
-              #{root_account_id ? sanitize_sql(["AND courses.root_account_id = :root_account_id", { root_account_id: root_account_id }]) : ""}
-        )")
+    distinct.joins("INNER JOIN (
+         SELECT caa.course_id, au.user_id FROM #{CourseAccountAssociation.quoted_table_name} AS caa
+         INNER JOIN #{Account.quoted_table_name} AS a ON a.id = caa.account_id AND a.workflow_state = 'active'
+         INNER JOIN #{AccountUser.quoted_table_name} AS au ON au.account_id = a.id AND au.user_id = #{user_id.to_i} AND au.workflow_state = 'active'
+         #{admin_completed_sql}
+       UNION SELECT courses.id AS course_id, e.user_id FROM #{Course.quoted_table_name}
+         INNER JOIN #{Enrollment.quoted_table_name} AS e ON e.course_id = courses.id AND e.user_id = #{user_id.to_i}
+           AND e.workflow_state IN(#{workflow_states}) AND e.type IN ('TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment')
+         INNER JOIN #{EnrollmentState.quoted_table_name} AS es ON es.enrollment_id = e.id AND es.state IN (#{workflow_states})
+         #{enrollment_completed_sql}) AS course_users
+       ON course_users.course_id = courses.id")
   }
 
   scope :not_deleted, -> { where("workflow_state<>'deleted'") }
