@@ -21,14 +21,14 @@ import {fireEvent, render} from '@testing-library/react'
 import {ConferenceAddressBook} from '../ConferenceAddressBook'
 
 describe('ConferenceAddressBook', () => {
-  const userList = [
+  const menuItemList = [
     {displayName: 'Allison', id: '7'},
     {displayName: 'Caleb', id: '3'},
     {displayName: 'Chawn', id: '2'}
   ]
 
   const setup = (props = {}) => {
-    return render(<ConferenceAddressBook userList={userList} {...props} />)
+    return render(<ConferenceAddressBook menuItemList={menuItemList} {...props} />)
   }
 
   it('should render', () => {
