@@ -17,12 +17,19 @@
  */
 
 import natcompare from '@canvas/util/natcompare'
+import NumberCompare from '../../util/NumberCompare'
+import type {GridColumn} from './grid.d'
+import type {Student} from '../../../../api.d'
 
-export function isDefaultSortOrder(sortOrder) {
+export function isDefaultSortOrder(sortOrder: string) {
   return !['due_date', 'name', 'points', 'module_position', 'custom'].includes(sortOrder)
 }
 
-export function localeSort(a, b, {asc = true, nullsLast = false} = {}) {
+export function localeSort(
+  a: null | string,
+  b: null | string,
+  {asc = true, nullsLast = false} = {}
+): number {
   if (nullsLast) {
     if (a != null && b == null) {
       return -1
@@ -37,8 +44,17 @@ export function localeSort(a, b, {asc = true, nullsLast = false} = {}) {
   return natcompare.strings(a || '', b || '')
 }
 
-export function wrapColumnSortFn(wrappedFn, direction = 'ascending') {
-  return function (a, b) {
+export function wrapColumnSortFn(
+  wrappedFn: (
+    a: Pick<GridColumn, 'id' | 'type' | 'object'>,
+    b: Pick<GridColumn, 'id' | 'type' | 'object'>
+  ) => number,
+  direction = 'ascending'
+) {
+  return function (
+    a: Pick<GridColumn, 'id' | 'type' | 'object'>,
+    b: Pick<GridColumn, 'id' | 'type' | 'object'>
+  ): number {
     if (b.type === 'total_grade_override') {
       return -1
     }
@@ -58,7 +74,7 @@ export function wrapColumnSortFn(wrappedFn, direction = 'ascending') {
       return 1
     }
     if (a.type === 'assignment_group' && b.type === 'assignment_group') {
-      return a.object.position - b.object.position
+      return (a.object?.position || 0) - (b.object?.position || 0)
     }
     if (direction === 'descending') {
       ;[a, b] = [b, a]
@@ -67,15 +83,92 @@ export function wrapColumnSortFn(wrappedFn, direction = 'ascending') {
   }
 }
 
-export function compareAssignmentPointsPossible(a, b) {
-  return a.object.points_possible - b.object.points_possible
+export function compareAssignmentPointsPossible(
+  a: Pick<GridColumn, 'object'>,
+  b: Pick<GridColumn, 'object'>
+): number {
+  return (a.object?.points_possible || 0) - (b.object?.points_possible || 0)
 }
 
-export function compareAssignmentPositions(a, b) {
+export function compareAssignmentPositions(
+  a: Pick<GridColumn, 'object'>,
+  b: Pick<GridColumn, 'object'>
+): number {
   const diffOfAssignmentGroupPosition =
-    a.object.assignment_group.position - b.object.assignment_group.position
-  const diffOfAssignmentPosition = a.object.position - b.object.position
+    (a.object?.assignment_group?.position || 0) - (b.object?.assignment_group?.position || 0)
+  const diffOfAssignmentPosition = (a.object?.position || 0) - (b.object?.position || 0)
   // order first by assignment_group position and then by assignment position
   // will work when there are less than 1000000 assignments in an assignment_group
   return diffOfAssignmentGroupPosition * 1000000 + diffOfAssignmentPosition
+}
+
+export function idSort(a: {id: string}, b: {id: string}, {asc = true}): number {
+  return NumberCompare(Number(a.id), Number(b.id), {
+    descending: !asc
+  })
+}
+
+export function secondaryAndTertiarySort(
+  a: Pick<Student, 'id' | 'sortable_name'>,
+  b: Pick<Student, 'id' | 'sortable_name'>,
+  {asc = true}
+) {
+  let result
+  result = localeSort(a.sortable_name, b.sortable_name, {asc})
+  if (result === 0) {
+    result = idSort(a, b, {asc})
+  }
+  return result
+}
+
+export function compareAssignmentNames(
+  a: Pick<GridColumn, 'object'>,
+  b: Pick<GridColumn, 'object'>
+): number {
+  return localeSort(a.object?.name || '', b.object?.name || '')
+}
+
+export function makeCompareAssignmentCustomOrderFn(sortOrder: {customOrder?: string[]}) {
+  let assignmentId: string
+  let indexCounter: number
+  let len: number
+  let j: number
+  const sortMap = {}
+  indexCounter = 0
+  const ref1 = sortOrder.customOrder || []
+  for (j = 0, len = ref1.length; j < len; j++) {
+    assignmentId = ref1[j]
+    sortMap[String(assignmentId)] = indexCounter
+    indexCounter += 1
+  }
+  return (a: Pick<GridColumn, 'id' | 'object'>, b: Pick<GridColumn, 'id' | 'object'>): number => {
+    let aIndex, bIndex
+    // The second lookup for each index is to maintain backwards
+    // compatibility with old gradebook sorting on load which only
+    // considered assignment ids.
+    aIndex = sortMap[a?.id || '']
+    if (a.object != null) {
+      if (aIndex == null) {
+        aIndex = sortMap[String(a.object.id)]
+      }
+    }
+    bIndex = sortMap[b?.id || '']
+    if (b.object != null) {
+      if (bIndex == null) {
+        bIndex = sortMap[String(b.object.id)]
+      }
+    }
+    if (aIndex != null && bIndex != null) {
+      return aIndex - bIndex
+      // if there's a new assignment or assignment group and its
+      // order has not been stored, it should come at the end
+    } else if (aIndex != null && bIndex == null) {
+      return -1
+    } else if (bIndex != null) {
+      return 1
+    } else {
+      const fn = wrapColumnSortFn(compareAssignmentPositions)
+      return fn(a, b)
+    }
+  }
 }

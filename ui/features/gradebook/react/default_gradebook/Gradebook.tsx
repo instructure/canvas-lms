@@ -82,7 +82,6 @@ import type {
 import type GradebookGridType from './GradebookGrid/index'
 import type {StatusColors} from './constants/colors'
 
-import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 // @ts-ignore
 import KeyboardNavDialog from '@canvas/keyboard-nav-dialog'
 // @ts-ignore
@@ -138,7 +137,6 @@ import DownloadSubmissionsDialogManager from '../shared/DownloadSubmissionsDialo
 import ReuploadSubmissionsDialogManager from '../shared/ReuploadSubmissionsDialogManager'
 import GradebookKeyboardNav from '../../jquery/GradebookKeyboardNav'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
-import getTextWidth from '../shared/helpers/TextMeasure'
 import * as GradeInputHelper from '@canvas/grading/GradeInputHelper'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
@@ -161,6 +159,10 @@ import 'jqueryui/position'
 import '@canvas/util/jquery/fixDialogButtons'
 
 import {
+  assignmentSearchMatcher,
+  buildCustomColumn,
+  buildAssignmentGroupColumnFn,
+  buildStudentColumn,
   compareAssignmentDueDates,
   confirmViewUngradedAsZero,
   doesSubmissionNeedGrading,
@@ -183,13 +185,18 @@ import {
   isAdmin,
   onGridKeyDown,
   renderComponent,
-  sectionList
+  sectionList,
+  testWidth
 } from './Gradebook.utils'
 import {
+  compareAssignmentNames,
   compareAssignmentPointsPossible,
   compareAssignmentPositions,
+  idSort,
   isDefaultSortOrder,
+  makeCompareAssignmentCustomOrderFn,
   localeSort,
+  secondaryAndTertiarySort,
   wrapColumnSortFn
 } from './Gradebook.sorting'
 
@@ -208,13 +215,6 @@ const GradebookGrid = React.lazy(() => import('./components/GradebookGrid'))
 
 const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
-const HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
-const testWidth = function (text: string, minWidth: number, maxWidth: number) {
-  const padding = HEADER_START_AND_END_WIDTHS_IN_PIXELS * 2
-  const textWidth = getTextWidth(text) || 0
-  const width = Math.max(textWidth + padding, minWidth)
-  return Math.min(width, maxWidth)
-}
 const anonymousSpeedGraderAlertMountPoint = function () {
   return document.querySelector("[data-component='AnonymousSpeedGraderAlert']")
 }
@@ -661,7 +661,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   gotCustomColumns = (columns: CustomColumn[]) => {
     this.gradebookContent.customColumns = columns
     columns.forEach(column => {
-      const customColumn = this.buildCustomColumn(column)
+      const customColumn = buildCustomColumn(column)
       this.gridData.columns.definitions[customColumn.id] = customColumn
     })
     this.setCustomColumnsLoaded(true)
@@ -1008,7 +1008,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.saveColumnOrder()
   }
 
-  arrangeColumnsBy = (newSortOrder, isFirstArrangement: boolean) => {
+  arrangeColumnsBy = (newSortOrder: ColumnOrderSettings, isFirstArrangement: boolean) => {
     if (!isFirstArrangement) {
       this.setColumnOrder(newSortOrder)
       this.saveColumnOrder()
@@ -1032,11 +1032,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       case 'module_position':
         return wrapColumnSortFn(this.compareAssignmentModulePositions, sortOrder.direction)
       case 'name':
-        return wrapColumnSortFn(this.compareAssignmentNames, sortOrder.direction)
+        return wrapColumnSortFn(compareAssignmentNames, sortOrder.direction)
       case 'points':
         return wrapColumnSortFn(compareAssignmentPointsPossible, sortOrder.direction)
       case 'custom':
-        return this.makeCompareAssignmentCustomOrderFn(sortOrder)
+        return makeCompareAssignmentCustomOrderFn(sortOrder)
       default:
         return wrapColumnSortFn(compareAssignmentPositions, sortOrder.direction)
     }
@@ -1066,49 +1066,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       return -1
     } else {
       return compareAssignmentPositions(a, b)
-    }
-  }
-
-  compareAssignmentNames = (a, b) => localeSort(a.object.name, b.object.name)
-
-  makeCompareAssignmentCustomOrderFn = sortOrder => {
-    let assignmentId, indexCounter, j, len
-    const sortMap = {}
-    indexCounter = 0
-    const ref1 = sortOrder.customOrder
-    for (j = 0, len = ref1.length; j < len; j++) {
-      assignmentId = ref1[j]
-      sortMap[String(assignmentId)] = indexCounter
-      indexCounter += 1
-    }
-    return (a, b) => {
-      let aIndex, bIndex
-      // The second lookup for each index is to maintain backwards
-      // compatibility with old gradebook sorting on load which only
-      // considered assignment ids.
-      aIndex = sortMap[a.id]
-      if (a.object != null) {
-        if (aIndex == null) {
-          aIndex = sortMap[String(a.object.id)]
-        }
-      }
-      bIndex = sortMap[b.id]
-      if (b.object != null) {
-        if (bIndex == null) {
-          bIndex = sortMap[String(b.object.id)]
-        }
-      }
-      if (aIndex != null && bIndex != null) {
-        return aIndex - bIndex
-        // if there's a new assignment or assignment group and its
-        // order has not been stored, it should come at the end
-      } else if (aIndex != null && bIndex == null) {
-        return -1
-      } else if (bIndex != null) {
-        return 1
-      } else {
-        return wrapColumnSortFn(compareAssignmentPositions)(a, b)
-      }
     }
   }
 
@@ -2214,7 +2171,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       const columns = this.gridData.columns.scrollable.map(
         columnId => this.gridData.columns.definitions[columnId]
       )
-      columns.sort(this.makeColumnSortFn(newSortOrder))
+      const fn = this.makeColumnSortFn(newSortOrder)
+      columns.sort(fn)
       this.gridData.columns.scrollable = columns.map(column => column.id)
     })
   }
@@ -2284,7 +2242,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     } else {
       promise = GradebookApi.createTeacherNotesColumn(this.options.context_id).then(response => {
         this.gradebookContent.customColumns.push(response.data)
-        const teacherNotesColumn = this.buildCustomColumn(response.data)
+        const teacherNotesColumn = buildCustomColumn(response.data)
         this.gridData.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
       })
     }
@@ -2374,12 +2332,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return !!sisId && sisId.toLowerCase() === term
   }
 
-  assignmentSearchMatcher = (option, searchTerm: string) => {
-    const term = searchTerm?.toLowerCase() || ''
-    const assignmentName = option.label?.toLowerCase() || ''
-    return assignmentName.includes(term)
-  }
-
   renderStudentSearchFilter = (students: Student[]) => {
     const props = {
       id: 'student-names-filter',
@@ -2401,7 +2353,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       id: 'assignments-filter',
       disabled: assignments.length === 0 || !this._gridHasRendered(),
       label: I18n.t('Assignment Names'),
-      customMatcher: this.assignmentSearchMatcher,
+      customMatcher: assignmentSearchMatcher,
       onChange: this.onFilterToAssignments,
       options: assignments.map((assignment: Assignment) => ({
         id: assignment.id,
@@ -2483,45 +2435,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   // # Grid Column Definitions
 
-  // Student Columns
-  buildStudentColumn = (
-    columnId: string,
-    gradebookColumnSizeSetting: string,
-    defaultWidth: number
-  ) => {
-    const studentColumnWidth = gradebookColumnSizeSetting
-      ? parseInt(gradebookColumnSizeSetting, 10)
-      : defaultWidth
-    return {
-      id: columnId,
-      type: columnId,
-      width: studentColumnWidth,
-      cssClass: 'meta-cell primary-column student',
-      headerCssClass: 'primary-column student',
-      resizable: true
-    }
-  }
-
-  // Custom Column
-  buildCustomColumn = (customColumn: CustomColumn) => {
-    const columnId = getCustomColumnId(customColumn.id)
-    return {
-      id: columnId,
-      type: 'custom_column',
-      field: `custom_col_${customColumn.id}`,
-      width: 100,
-      cssClass: `meta-cell custom_column ${columnId}`,
-      headerCssClass: `custom_column ${columnId}`,
-      resizable: true,
-      editor: LongTextEditor,
-      customColumnId: customColumn.id,
-      autoEdit: false,
-      maxLength: 255
-    }
-  }
-
   // Assignment Column
-  buildAssignmentColumn = (assignment: Assignment) => {
+  buildAssignmentColumn = (assignment: Assignment): GridColumn => {
     let assignmentWidth
     const shrinkForOutOfText =
       assignment && assignment.grading_type === 'points' && assignment.points_possible != null
@@ -2537,9 +2452,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       id: columnId,
       field: fieldName,
       object: assignment,
-      getGridSupport: () => {
-        return this.gradebookGrid?.gridSupport
-      },
+      getGridSupport: () => this.gradebookGrid?.gridSupport,
       propFactory: new AssignmentRowCellPropFactory(this),
       minWidth: columnWidths.assignment.min,
       maxWidth: columnWidths.assignment.max,
@@ -2555,34 +2468,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       columnDef.headerCssClass += ' minimized'
     }
     return columnDef
-  }
-
-  buildAssignmentGroupColumn = (assignmentGroup: AssignmentGroup) => {
-    let width
-    const columnId = getAssignmentGroupColumnId(assignmentGroup.id)
-    const fieldName = `assignment_group_${assignmentGroup.id}`
-    if (this.gradebookColumnSizeSettings && this.gradebookColumnSizeSettings[fieldName]) {
-      width = parseInt(this.gradebookColumnSizeSettings[fieldName], 10)
-    } else {
-      width = testWidth(
-        assignmentGroup.name,
-        columnWidths.assignmentGroup.min,
-        columnWidths.assignmentGroup.default_max
-      )
-    }
-    return {
-      id: columnId,
-      field: fieldName,
-      toolTip: assignmentGroup.name,
-      object: assignmentGroup,
-      minWidth: columnWidths.assignmentGroup.min,
-      maxWidth: columnWidths.assignmentGroup.max,
-      width,
-      cssClass: `meta-cell assignment-group-cell ${columnId}`,
-      headerCssClass: `assignment_group ${columnId}`,
-      type: 'assignment_group',
-      assignmentGroupId: assignmentGroup.id
-    }
   }
 
   buildTotalGradeColumn = () => {
@@ -2637,21 +2522,21 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   initGrid = () => {
     let assignmentGroup, assignmentGroupColumn, id
     this.updateFilteredContentInfo()
-    const studentColumn = this.buildStudentColumn(
+    const studentColumn = buildStudentColumn(
       'student',
       this.gradebookColumnSizeSettings?.student,
       150
     )
     this.gridData.columns.definitions[studentColumn.id] = studentColumn
     this.gridData.columns.frozen.push(studentColumn.id)
-    const studentColumnLastName = this.buildStudentColumn(
+    const studentColumnLastName = buildStudentColumn(
       'student_lastname',
       this.gradebookColumnSizeSettings?.student_lastname,
       155
     )
     this.gridData.columns.definitions[studentColumnLastName.id] = studentColumnLastName
     this.gridData.columns.frozen.push(studentColumnLastName.id)
-    const studentColumnFirstName = this.buildStudentColumn(
+    const studentColumnFirstName = buildStudentColumn(
       'student_firstname',
       this.gradebookColumnSizeSettings?.student_firstname,
       155
@@ -2660,9 +2545,12 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.gridData.columns.frozen.push(studentColumnFirstName.id)
 
     const ref2 = this.assignmentGroups
+    const buildAssignmentGroupColumn = buildAssignmentGroupColumnFn(
+      this.gradebookColumnSizeSettings
+    )
     for (id in ref2) {
       assignmentGroup = ref2[id]
-      assignmentGroupColumn = this.buildAssignmentGroupColumn(assignmentGroup)
+      assignmentGroupColumn = buildAssignmentGroupColumn(assignmentGroup)
       this.gridData.columns.definitions[assignmentGroupColumn.id] = assignmentGroupColumn
     }
     const totalGradeColumn = this.buildTotalGradeColumn()
@@ -2927,22 +2815,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return this.gradebookGrid?.invalidate()
   }
 
-  idSort(a, b, {asc = true}) {
-    return NumberCompare(Number(a.id), Number(b.id), {
-      descending: !asc
-    })
-  }
-
-  secondaryAndTertiarySort = (a, b, {asc = true}) => {
-    let result
-    result = localeSort(a.sortable_name, b.sortable_name, {asc})
-    if (result === 0) {
-      result = this.idSort(a, b, {asc})
-    }
-    return result
-  }
-
-  gradeSort = (a, b, field: string, asc: boolean) => {
+  gradeSort = (a, b, field: string, asc: boolean): number => {
     let result
     const scoreForSorting = student => {
       const grade = getStudentGradeForColumn(student, field)
@@ -2963,7 +2836,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       descending: !asc
     })
     if (result === 0) {
-      result = this.secondaryAndTertiarySort(a, b, {asc})
+      result = secondaryAndTertiarySort(a, b, {asc})
     }
     return result
   }
@@ -2982,7 +2855,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       if (rowA < rowB) {
         return 1
       }
-      return this.secondaryAndTertiarySort(a, b, {asc})
+      return secondaryAndTertiarySort(a, b, {asc})
     })
   }
 
@@ -3003,7 +2876,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         nullsLast: true
       })
       if (result === 0) {
-        result = this.idSort(a, b, {asc})
+        result = idSort(a, b, {asc})
       }
       return result
     })
@@ -3015,7 +2888,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       const asc = direction === 'ascending'
       result = localeSort(a[columnId], b[columnId], {asc})
       if (result === 0) {
-        result = this.secondaryAndTertiarySort(a, b, {asc})
+        result = secondaryAndTertiarySort(a, b, {asc})
       }
       return result
     })
@@ -3946,7 +3819,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // Grid Display Settings Access Methods
   // Kept only for tests
   // TODO: Remove when moving tests to Jest
-  setFilterColumnsBySetting = (filterKey: ColumnFilterKey, value: null | string) => {
+  setFilterColumnsBySetting = (
+    filterKey: ColumnFilterKey,
+    value: null | 'has-ungraded-submissions' | 'has-submissions'
+  ) => {
     this.gridDisplaySettings.filterColumnsBy[filterKey] = value
   }
 
@@ -4359,7 +4235,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     return GradebookApi.createTeacherNotesColumn(this.options.context_id)
       .then(response => {
         this.gradebookContent.customColumns.push(response.data)
-        const teacherNotesColumn = this.buildCustomColumn(response.data)
+        const teacherNotesColumn = buildCustomColumn(response.data)
         this.gridData.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
         this.showNotesColumn()
         this.setTeacherNotesColumnUpdating(false)

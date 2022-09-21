@@ -17,6 +17,7 @@
  */
 
 import {
+  assignmentSearchMatcher,
   confirmViewUngradedAsZero,
   doesSubmissionNeedGrading,
   doFiltersMatch,
@@ -51,6 +52,7 @@ const unsubmittedSubmission: Submission = {
   gradingType: 'points',
   grading_period_id: '2',
   has_postable_comments: false,
+  has_originality_report: false,
   hidden: false,
   id: '160',
   late: false,
@@ -300,8 +302,11 @@ describe('getDefaultSettingKeyForColumnType', () => {
 
 describe('sectionList', () => {
   const sections = {
-    2: {id: '2', name: 'Hello &lt;script>while(1);&lt;/script> world!'},
-    1: {id: '1', name: 'Section 1'}
+    2: {
+      id: '2',
+      name: 'Hello &lt;script>while(1);&lt;/script> world!'
+    },
+    1: {id: '1', name: 'Section 1', course_id: '1'}
   }
 
   it('sorts by id', () => {
@@ -345,7 +350,8 @@ describe('findConditionValuesOfType', () => {
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
         {id: '4', type: 'module', value: '3', created_at: ''}
       ],
-      created_at: '2019-01-01T00:00:00Z'
+      created_at: '2019-01-01T00:00:00Z',
+      updated_at: '2019-01-01T00:00:00Z'
     },
     {
       id: '2',
@@ -355,7 +361,8 @@ describe('findConditionValuesOfType', () => {
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
       ],
-      created_at: '2019-01-01T00:00:01Z'
+      created_at: '2019-01-01T00:00:01Z',
+      updated_at: '2019-01-01T00:00:00Z'
     }
   ]
 
@@ -379,7 +386,8 @@ describe('doFiltersMatch', () => {
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
         {id: '4', type: 'module', value: '3', created_at: ''}
       ],
-      created_at: '2019-01-01T00:00:00Z'
+      created_at: '2019-01-01T00:00:00Z',
+      updated_at: '2019-01-01T00:00:00Z'
     },
     {
       id: '2',
@@ -389,7 +397,8 @@ describe('doFiltersMatch', () => {
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
       ],
-      created_at: '2019-01-01T00:00:01Z'
+      created_at: '2019-01-01T00:00:01Z',
+      updated_at: '2019-01-01T00:00:00Z'
     },
     {
       id: '3',
@@ -399,7 +408,8 @@ describe('doFiltersMatch', () => {
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
         {id: '3', type: 'module', value: '6', created_at: ''}
       ],
-      created_at: '2019-01-01T00:00:01Z'
+      created_at: '2019-01-01T00:00:01Z',
+      updated_at: '2019-01-01T00:00:00Z'
     }
   ]
 
@@ -427,5 +437,22 @@ describe('doesSubmissionNeedGrading', () => {
 
   it('none-zero graded submission does not needs grading', () => {
     expect(doesSubmissionNeedGrading(gradedSubmission)).toStrictEqual(false)
+  })
+})
+
+describe('assignmentSearchMatcher', () => {
+  it('returns true if the search term is a substring of the assignment name (case insensitive)', () => {
+    const option = {id: '122', label: 'Science Lab II'}
+    expect(assignmentSearchMatcher(option, 'lab')).toStrictEqual(true)
+  })
+
+  test('returns false if the search term is not a substring of the assignment name', () => {
+    const option = {id: '122', label: 'Science Lab II'}
+    expect(assignmentSearchMatcher(option, 'Lib')).toStrictEqual(false)
+  })
+
+  test('does not treat the search term as a regular expression', () => {
+    const option = {id: '122', label: 'Science Lab II'}
+    expect(assignmentSearchMatcher(option, 'Science.*II')).toStrictEqual(false)
   })
 })

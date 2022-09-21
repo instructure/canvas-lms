@@ -18,22 +18,25 @@
 
 import {createGradebook} from './GradebookSpecHelper'
 import {
-  compareAssignmentPositions,
+  compareAssignmentNames,
   compareAssignmentPointsPossible,
-  wrapColumnSortFn,
+  compareAssignmentPositions,
   isDefaultSortOrder,
-  localeSort
+  localeSort,
+  makeCompareAssignmentCustomOrderFn,
+  wrapColumnSortFn
 } from '../Gradebook.sorting'
 
 const assignments = [
   {
     id: '1',
     object: {
-      due_at: 1,
+      id: '1',
+      due_at: '2022-10-01T05:59:59Z',
       name: 'Abc',
       position: 4,
       points_possible: 1,
-      module_ids: [1],
+      module_ids: ['1'],
       module_positions: [1],
       assignment_group: {position: 5}
     }
@@ -41,11 +44,12 @@ const assignments = [
   {
     id: '2',
     object: {
-      due_at: 2,
+      id: '2',
+      due_at: '2022-10-01T06:59:59Z',
       name: 'Bcd',
       position: 3,
       points_possible: 2,
-      module_ids: [2],
+      module_ids: ['2'],
       module_positions: [2],
       assignment_group: {position: 6}
     }
@@ -67,12 +71,12 @@ describe('makeColumnSortFn', () => {
     })
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.assignment_group.position).toBe(5)
-    expect(results[1].object.assignment_group.position).toBe(6)
+    expect(results[0].object?.assignment_group?.position).toBe(5)
+    expect(results[1].object?.assignment_group?.position).toBe(6)
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.assignment_group.position).toBe(5)
-    expect(results[1].object.assignment_group.position).toBe(6)
+    expect(results[0].object?.assignment_group?.position).toBe(5)
+    expect(results[1].object?.assignment_group?.position).toBe(6)
   })
 
   // since "alpha" isn't a type, sorts by assignment position (default)
@@ -100,12 +104,12 @@ describe('makeColumnSortFn', () => {
     })
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.name).toBe('Abc')
-    expect(results[1].object.name).toBe('Bcd')
+    expect(results[0].object?.name).toBe('Abc')
+    expect(results[1].object?.name).toBe('Bcd')
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.name).toBe('Abc')
-    expect(results[1].object.name).toBe('Bcd')
+    expect(results[0].object?.name).toBe('Abc')
+    expect(results[1].object?.name).toBe('Bcd')
   })
 
   it('returns wrapped sort function for name, descending', () => {
@@ -116,12 +120,12 @@ describe('makeColumnSortFn', () => {
     })
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.name).toBe('Bcd')
-    expect(results[1].object.name).toBe('Abc')
+    expect(results[0].object?.name).toBe('Bcd')
+    expect(results[1].object?.name).toBe('Abc')
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.name).toBe('Bcd')
-    expect(results[1].object.name).toBe('Abc')
+    expect(results[0].object?.name).toBe('Bcd')
+    expect(results[1].object?.name).toBe('Abc')
   })
 
   it('returns wrapped sort function for due_date, ascending', () => {
@@ -129,12 +133,12 @@ describe('makeColumnSortFn', () => {
     const sortFn = gradebook.makeColumnSortFn({sortType: 'due_date', direction: 'ascending'})
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.due_at).toBe(1)
-    expect(results[1].object.due_at).toBe(2)
+    expect(results[0].object?.due_at).toBe('2022-10-01T05:59:59Z')
+    expect(results[1].object?.due_at).toBe('2022-10-01T06:59:59Z')
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.due_at).toBe(1)
-    expect(results[1].object.due_at).toBe(2)
+    expect(results[0].object?.due_at).toBe('2022-10-01T05:59:59Z')
+    expect(results[1].object?.due_at).toBe('2022-10-01T06:59:59Z')
   })
 
   it('returns wrapped sort function for due_date, descending', () => {
@@ -142,12 +146,12 @@ describe('makeColumnSortFn', () => {
     const sortFn = gradebook.makeColumnSortFn({sortType: 'due_date', direction: 'descending'})
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.due_at).toBe(2)
-    expect(results[1].object.due_at).toBe(1)
+    expect(results[0].object?.due_at).toBe('2022-10-01T06:59:59Z')
+    expect(results[1].object?.due_at).toBe('2022-10-01T05:59:59Z')
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.due_at).toBe(2)
-    expect(results[1].object.due_at).toBe(1)
+    expect(results[0].object?.due_at).toBe('2022-10-01T06:59:59Z')
+    expect(results[1].object?.due_at).toBe('2022-10-01T05:59:59Z')
   })
 
   it('returns wrapped sort function for points, ascending', () => {
@@ -155,12 +159,12 @@ describe('makeColumnSortFn', () => {
     const sortFn = gradebook.makeColumnSortFn({sortType: 'points', direction: 'ascending'})
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.points_possible).toBe(1)
-    expect(results[1].object.points_possible).toBe(2)
+    expect(results[0].object?.points_possible).toBe(1)
+    expect(results[1].object?.points_possible).toBe(2)
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.points_possible).toBe(1)
-    expect(results[1].object.points_possible).toBe(2)
+    expect(results[0].object?.points_possible).toBe(1)
+    expect(results[1].object?.points_possible).toBe(2)
   })
 
   it('returns wrapped sort function for points, descending', () => {
@@ -168,12 +172,12 @@ describe('makeColumnSortFn', () => {
     const sortFn = gradebook.makeColumnSortFn({sortType: 'points', direction: 'descending'})
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.points_possible).toBe(2)
-    expect(results[1].object.points_possible).toBe(1)
+    expect(results[0].object?.points_possible).toBe(2)
+    expect(results[1].object?.points_possible).toBe(1)
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.points_possible).toBe(2)
-    expect(results[1].object.points_possible).toBe(1)
+    expect(results[0].object?.points_possible).toBe(2)
+    expect(results[1].object?.points_possible).toBe(1)
   })
 
   it('returns wrapped sort function for module_position, ascending', () => {
@@ -182,12 +186,12 @@ describe('makeColumnSortFn', () => {
     const sortFn = gradebook.makeColumnSortFn({sortType: 'module_position', direction: 'ascending'})
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.module_positions[0]).toBe(1)
-    expect(results[1].object.module_positions[0]).toBe(2)
+    expect(results[0].object?.module_positions?.[0]).toBe(1)
+    expect(results[1].object?.module_positions?.[0]).toBe(2)
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.module_positions[0]).toBe(1)
-    expect(results[1].object.module_positions[0]).toBe(2)
+    expect(results[0].object?.module_positions?.[0]).toBe(1)
+    expect(results[1].object?.module_positions?.[0]).toBe(2)
   })
 
   it('returns wrapped sort function for module_position, descending', () => {
@@ -199,20 +203,19 @@ describe('makeColumnSortFn', () => {
     })
 
     let results = [...assignments].sort(sortFn)
-    expect(results[0].object.module_positions[0]).toBe(2)
-    expect(results[1].object.module_positions[0]).toBe(1)
+    expect(results[0].object?.module_positions?.[0]).toBe(2)
+    expect(results[1].object?.module_positions?.[0]).toBe(1)
 
     results = [...assignmentsReversed].sort(sortFn)
-    expect(results[0].object.module_positions[0]).toBe(2)
-    expect(results[1].object.module_positions[0]).toBe(1)
+    expect(results[0].object?.module_positions?.[0]).toBe(2)
+    expect(results[1].object?.module_positions?.[0]).toBe(1)
   })
 })
 
 describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
   it('returns position difference if both are defined in the index', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
-    const gradeBook = createGradebook()
-    const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
+    const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
     const a = {id: 'foo'}
     const b = {id: 'bar'}
@@ -221,8 +224,7 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
 
   it('returns -1 if the first arg is in the order and the second one is not', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
-    const gradeBook = createGradebook()
-    const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
+    const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
     const a = {id: 'foo'}
     const b = {id: 'NO'}
@@ -231,8 +233,7 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
 
   it('returns 1 if the second arg is in the order and the first one is not', () => {
     const sortOrder = {customOrder: ['foo', 'bar']}
-    const gradeBook = createGradebook()
-    const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
+    const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
     const a = {id: 'NO'}
     const b = {id: 'bar'}
@@ -241,11 +242,10 @@ describe('Gradebook#makeCompareAssignmentCustomOrderFn', () => {
 
   it('falls back to object id for the indexes if field is not in the map', () => {
     const sortOrder = {customOrder: ['5', '11']}
-    const gradeBook = createGradebook()
-    const sortFn = gradeBook.makeCompareAssignmentCustomOrderFn(sortOrder)
+    const sortFn = makeCompareAssignmentCustomOrderFn(sortOrder)
 
-    const a = {id: 'NO', object: {id: 5}}
-    const b = {id: 'NOPE', object: {id: 11}}
+    const a = {id: 'NO', object: {id: '5', position: 1}}
+    const b = {id: 'NOPE', object: {id: '11', position: 2}}
     expect(sortFn(a, b)).toBe(-1)
   })
 })
@@ -283,50 +283,50 @@ describe('compareAssignmentPointsPossible', () => {
 
   it('sorts by points_possible', () => {
     let results = [...assignments].sort(compareAssignmentPointsPossible)
-    expect(results[0].object.points_possible).toBe(1)
-    expect(results[1].object.points_possible).toBe(2)
+    expect(results[0].object?.points_possible).toBe(1)
+    expect(results[1].object?.points_possible).toBe(2)
 
     results = [...assignmentsReversed].sort(compareAssignmentPointsPossible)
-    expect(results[0].object.points_possible).toBe(1)
-    expect(results[1].object.points_possible).toBe(2)
+    expect(results[0].object?.points_possible).toBe(1)
+    expect(results[1].object?.points_possible).toBe(2)
   })
 })
 
 describe('wrapColumnSortFn', () => {
   it('returns -1 if second argument is of type total_grade', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({}, {type: 'total_grade'})).toBe(-1)
+    expect(sortFn({id: '1'}, {id: '2', type: 'total_grade'})).toBe(-1)
   })
 
   it('returns 1 if first argument is of type total_grade', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({type: 'total_grade'}, {})).toBe(1)
+    expect(sortFn({id: '1', type: 'total_grade'}, {id: '2'})).toBe(1)
   })
 
   it('returns 1 if first argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({type: 'total_grade_override'}, {})).toBe(1)
+    expect(sortFn({id: '1', type: 'total_grade_override'}, {id: '2'})).toBe(1)
   })
 
   it('returns -1 if second argument is of type total_grade_override', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({}, {type: 'total_grade_override'})).toBe(-1)
+    expect(sortFn({id: '1'}, {id: '2', type: 'total_grade_override'})).toBe(-1)
   })
 
   it('returns -1 if second argument is an assignment_group and the first is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({}, {type: 'assignment_group'})).toBe(-1)
+    expect(sortFn({id: '1'}, {id: '2', type: 'assignment_group'})).toBe(-1)
   })
 
   it('returns 1 if first arg is an assignment_group and second arg is not', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    expect(sortFn({type: 'assignment_group'}, {})).toBe(1)
+    expect(sortFn({id: '1', type: 'assignment_group'}, {id: '2'})).toBe(1)
   })
 
   it('returns difference in object.positions if both args are assignement_groups', () => {
     const sortFn = wrapColumnSortFn(jest.fn())
-    const a = {type: 'assignment_group', object: {position: 10}}
-    const b = {type: 'assignment_group', object: {position: 5}}
+    const a = {id: '1', type: 'assignment_group', object: {position: 10}}
+    const b = {id: '2', type: 'assignment_group', object: {position: 5}}
 
     expect(sortFn(a, b)).toBe(5)
   })
@@ -334,15 +334,15 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function when either column is not total_grade nor assignment_group', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn)
-    sortFn({}, {})
+    sortFn({id: '1'}, {id: '2'})
     expect(wrappedFn).toHaveBeenCalled()
   })
 
   it('calls wrapped function with arguments in given order when no direction is given', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn)
-    const first = {field: 1}
-    const second = {field: 2}
+    const first = {id: '1', field: '1'}
+    const second = {id: '2', field: '2'}
     const expectedArgs = [first, second]
 
     sortFn(first, second)
@@ -354,8 +354,8 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function with arguments in given order when direction is ascending', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn, 'ascending')
-    const first = {field: 1}
-    const second = {field: 2}
+    const first = {id: '1', field: '1'}
+    const second = {id: '2', field: '2'}
     const expectedArgs = [first, second]
 
     sortFn(first, second)
@@ -367,8 +367,8 @@ describe('wrapColumnSortFn', () => {
   it('calls wrapped function with arguments in reverse order when direction is descending', () => {
     const wrappedFn = jest.fn()
     const sortFn = wrapColumnSortFn(wrappedFn, 'descending')
-    const first = {field: 1}
-    const second = {field: 2}
+    const first = {id: '1', field: '1'}
+    const second = {id: '2', field: '2'}
     const expectedArgs = [second, first]
 
     sortFn(first, second)
@@ -432,5 +432,39 @@ describe('localeSort', () => {
 
   it('returns -1 if nullsLast is true and only second item is null', function () {
     expect(localeSort('fred', null, {nullsLast: true})).toStrictEqual(-1)
+  })
+})
+
+describe('compareAssignmentNames', () => {
+  const firstRecord = {
+    object: {name: 'alpha'}
+  }
+  const secondRecord = {
+    object: {name: 'omega'}
+  }
+  const thirdRecord = {
+    object: {name: 'Alpha'}
+  }
+  const fourthRecord = {
+    object: {name: 'Omega'}
+  }
+  it('returns -1 if the name field comes first alphabetically in the first record', function () {
+    expect(compareAssignmentNames(firstRecord, secondRecord)).toStrictEqual(-1)
+  })
+
+  it('returns 0 if the name field is the same in both records', function () {
+    expect(compareAssignmentNames(firstRecord, firstRecord)).toStrictEqual(0)
+  })
+
+  it('returns 1 if the name field comes later alphabetically in the first record', function () {
+    expect(compareAssignmentNames(secondRecord, firstRecord)).toStrictEqual(1)
+  })
+
+  it('comparison is case-sensitive between alpha and Alpha', function () {
+    expect(compareAssignmentNames(thirdRecord, firstRecord)).toStrictEqual(1)
+  })
+
+  it('comparison does not group uppercase letters together', function () {
+    expect(compareAssignmentNames(fourthRecord, secondRecord)).toStrictEqual(1)
   })
 })
