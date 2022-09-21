@@ -25,7 +25,7 @@ import {View} from '@instructure/ui-view'
 
 const I18n = useI18nScope('video_conference')
 
-const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType}) => {
+const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEditing}) => {
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [selectedOptionId, setSelectedOptionId] = useState(conferenceTypes[0].type)
   const [inputValue, setInputValue] = useState(conferenceTypes[0].name)
@@ -77,6 +77,7 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType}) => {
         onRequestHideOptions={handleHideOptions}
         onRequestHighlightOption={handleHighlightOption}
         onRequestSelectOption={handleSelectOption}
+        disabled={isEditing}
       >
         {conferenceTypes.map(option => {
           return (
@@ -97,7 +98,8 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType}) => {
 
 VideoConferenceTypeSelect.prototype = {
   conferenceTypes: arrayOf(PropTypes.object),
-  onSetConferenceType: PropTypes.func
+  onSetConferenceType: PropTypes.func,
+  isEditing: PropTypes.bool
 }
 
 export default VideoConferenceTypeSelect
