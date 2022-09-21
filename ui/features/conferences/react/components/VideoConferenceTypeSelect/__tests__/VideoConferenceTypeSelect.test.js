@@ -47,6 +47,7 @@ describe('VideoConferenceTypeSelect', () => {
       <VideoConferenceTypeSelect
         conferenceTypes={conferenceTypeOptions}
         onSetConferenceType={setConferenceType}
+        isEditing={false}
       />
     )
   }
@@ -54,5 +55,28 @@ describe('VideoConferenceTypeSelect', () => {
   it('renders conference type select', () => {
     const container = setup()
     expect(container.findByTestId('conference-type-select')).toBeTruthy()
+  })
+
+  it('keeps type select enabled when isEditing is falsey', () => {
+    const {container} = render(
+      <VideoConferenceTypeSelect
+        conferenceTypes={conferenceTypeOptions}
+        onSetConferenceType={setConferenceType}
+        isEditing={false}
+      />
+    )
+    expect(container.querySelector('input')).not.toBeDisabled()
+  })
+
+  it('disables type select when isEditing is truthy', () => {
+    const {container} = render(
+      <VideoConferenceTypeSelect
+        conferenceTypes={conferenceTypeOptions}
+        onSetConferenceType={setConferenceType}
+        isEditing={true}
+      />
+    )
+
+    expect(container.querySelector('input')).toBeDisabled()
   })
 })
