@@ -426,21 +426,25 @@ describe Assignment do
 
       it "returns false when the student is not assigned" do
         @assignment.update!(only_visible_to_overrides: true)
-        expect(@assignment.submitted?(@initial_student)).to be false
+        expect(@assignment.submitted?(user: @initial_student)).to be false
+        expect(@assignment.submitted?(submission: @assignment.submission_for_student(@initial_student))).to be false
       end
 
       it "returns false when the student is assigned, but hasn't submitted" do
-        expect(@assignment.submitted?(@initial_student)).to be false
+        expect(@assignment.submitted?(user: @initial_student)).to be false
+        expect(@assignment.submitted?(submission: @assignment.submission_for_student(@initial_student))).to be false
       end
 
       it "returns true when the student is assigned and hasn't submitted, but the assignment is non-digital" do
         @assignment.update!(submission_types: "on_paper")
-        expect(@assignment.submitted?(@initial_student)).to be true
+        expect(@assignment.submitted?(user: @initial_student)).to be true
+        expect(@assignment.submitted?(submission: @assignment.submission_for_student(@initial_student))).to be true
       end
 
       it "returns true when the student has submitted" do
         @assignment.submit_homework(@initial_student, body: "hi")
-        expect(@assignment.submitted?(@initial_student)).to be true
+        expect(@assignment.submitted?(user: @initial_student)).to be true
+        expect(@assignment.submitted?(submission: @assignment.submission_for_student(@initial_student))).to be true
       end
     end
 

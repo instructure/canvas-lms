@@ -29,7 +29,7 @@ type StudentPeerUrlQueryParams = {
 
 type AssignmentPeerReview = Pick<
   Assignment,
-  'id' | 'anonymous_peer_reviews' | 'assessment_requests'
+  'id' | 'course_id' | 'anonymous_peer_reviews' | 'assessment_requests'
 >
 
 export type StudentViewPeerReviewsProps = {
@@ -66,13 +66,13 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
     : assessment.user_name
 
   const studentPeerReviewUrl = () => {
-    const {anonymous_peer_reviews, id} = assignment
+    const {anonymous_peer_reviews, course_id, id} = assignment
     const {anonymous_id, user_id} = assessment
 
     const queryParams: StudentPeerUrlQueryParams = anonymous_peer_reviews
       ? {anonymous_asset_id: anonymous_id}
       : {reviewee_id: user_id}
-    return `assignments/${id}?${new URLSearchParams(queryParams)}`
+    return `/courses/${course_id}/assignments/${id}?${new URLSearchParams(queryParams)}`
   }
 
   return (

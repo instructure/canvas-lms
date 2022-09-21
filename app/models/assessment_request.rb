@@ -136,7 +136,8 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def available?
-    asset&.submitted_at.present? && assessor_asset&.submitted_at.present?
+    assignment = (assessor_asset || asset).assignment
+    assignment&.submitted?(submission: asset) && assignment.submitted?(submission: assessor_asset)
   end
 
   on_create_send_to_streams do

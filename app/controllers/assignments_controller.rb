@@ -135,7 +135,7 @@ class AssignmentsController < ApplicationController
                  end
 
     peer_review_mode_enabled = @context.feature_enabled?(:peer_reviews_for_a2) && (params[:reviewee_id].present? || params[:anonymous_asset_id].present?)
-    peer_review_available = submission.present? && submission.submitted? && current_user_submission.present? && current_user_submission.submitted?
+    peer_review_available = submission.present? && @assignment.submitted?(submission: submission) && current_user_submission.present? && @assignment.submitted?(submission: current_user_submission)
 
     js_env({
              peer_review_mode_enabled: submission.present? && peer_review_mode_enabled,

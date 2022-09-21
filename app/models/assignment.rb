@@ -1741,8 +1741,8 @@ class Assignment < ActiveRecord::Base
     end
   end
 
-  def submitted?(user)
-    submission = submissions.find_by(user: user)
+  def submitted?(user: nil, submission: nil)
+    submission = submissions.find_by(user: user) if submission.nil? && user.present?
     submission.present? && (non_digital_submission? || submission.has_submission?)
   end
 
