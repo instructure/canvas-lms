@@ -1,56 +1,44 @@
 # syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
 
-FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-gems
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-gems
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
-  cp --parents -rf \
+  shopt -s globstar && \
+  tar -cf - \
+    --exclude='vendor/qti_migration_tool' \
     config/canvas_rails_switcher.rb \
     Gemfile \
     Gemfile.d \
+    gems/**/Gemfile \
+    gems/**/*.gemspec \
+    gems/**/gem_version.rb \
+    gems/**/version.rb \
+    gems/plugins/**/Gemfile.d \
+    engines/**/Gemfile \
+    engines/**/*.gemspec \
+    engines/**/version.rb \
+    vendor \
     \
-    /tmp/dst && \
-  find gems \( \
-    -name "Gemfile" -o \
-    -name "*.gemspec" -o \
-    -name "gem_version.rb" -o \
-    -name "version.rb" \
-  \) -exec cp --parents -rf {} /tmp/dst \; && \
-  find gems/plugins \( \
-    -name "Gemfile.d" \
-  \) -exec cp --parents -rf {} /tmp/dst \; && \
-  find engines \( \
-    -name "Gemfile" -o \
-    -name "*.gemspec" -o \
-    -name "gem_version.rb" -o \
-    -name "version.rb" \
-  \) -exec cp --parents -rf {} /tmp/dst \; && \
-  find vendor -type d \( \
-    -not -name "qti_migration_tool" \
-    -maxdepth 1 \
-    -mindepth 1 \
-  \) -exec cp --parents -rf {} /tmp/dst \;
+    | tar -xf - -C /tmp/dst
 
-FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-yarn
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-yarn
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
-  cp --parents -rf \
+  shopt -s globstar && \
+  tar -cf - \
     script/fix_inst_esm.js \
     package.json \
     yarn.lock \
+    gems/plugins/**/package.json \
+    ui/engine/**/package.json \
+    ui/shared/**/package.json \
+    packages/**/package.json \
     \
-    /tmp/dst && \
-  find \
-    gems/plugins/* \
-    ui/engine \
-    ui/shared/* \
-    packages/* \
-    \
-    -name 'package.json' \
-    -exec cp --parents {} /tmp/dst \;
+    | tar -xf - -C /tmp/dst
 
-FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-packages
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-packages
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
@@ -60,36 +48,26 @@ RUN --mount=target=/tmp/src \
     \
     /tmp/dst
 
-FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-webpack
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
-  find gems -type d \
-    -not -path "gems" \
-    -not -path "gems/plugins" \
-    -maxdepth 2 \
-    -path "gems/*/lib" \
-    -exec cp -rf --parents {} /tmp/dst \; && \
-  find gems \( \
-    -path "*/config/locales" \
-  \) -exec cp -rf --parents {} /tmp/dst \; && \
-  find gems/plugins \( \
-    -path "*/app/coffeescripts" -o \
-    -path "*/app/jsx" -o \
-    -path "*/app/stylesheets" -o \
-    -path "*/app/views/jst" -o \
-    -path "*/public" -o \
-  \) -exec cp -rf --parents {} /tmp/dst \; && \
-  find gems/config_file \
-    -not -path "gems/config_file" \
-    -not -path "gems/config_file/spec" \
-    -not -path "gems/config_file/spec/*" \
-    -exec cp -rf --parents {} /tmp/dst \; && \
-  cp --parents -rf \
+  shopt -s globstar && \
+  tar -cf - \
+    --exclude='**/__mocks__' \
+    --exclude='**/__tests__' \
     app/stylesheets \
     bin \
     config/environments \
     config/locales \
+    gems/**/config/locales \
+    # This is intentionally only a single-level directory - and really should be cut down more later.
+    gems/*/lib \
+    gems/plugins/**/app/coffeescripts \
+    gems/plugins/**/app/jsx \
+    gems/plugins/**/app/stylesheets \
+    gems/plugins/**/app/views/jst \
+    gems/plugins/**/public \
     lib/canvas/cdn \
     lib/rake \
     lib/tasks \
@@ -120,26 +98,22 @@ RUN --mount=target=/tmp/src \
     gulpfile.js \
     webpack.config.js \
     \
-    /tmp/dst && \
-  find /tmp/dst/ui /tmp/dst/gems/plugins \
-    -regex ".*__mocks__\|.*__tests__" -prune \
-    -exec rm -rf {} \;
+  | tar -xf - -C /tmp/dst
 
-FROM starlord.inscloudgate.net/jenkins/busybox AS cache-helper-collect-js
+FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-js
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
-  find gems/plugins \( \
-    -path "*/app/coffeescripts" -o \
-    -path "*/app/jsx" -o \
-    -path "*/app/stylesheets" -o \
-    -path "*/public" -o \
-    -path "*/spec_canvas/coffeescripts" -o \
-  \) -exec cp -rf --parents {} /tmp/dst \; && \
-  cp --parents -rf \
+  shopt -s globstar && \
+  tar -cf - \
     app/stylesheets \
     config/brandable_css.yml \
     config/browsers.yml \
+    gems/plugins/**/app/coffeescripts \
+    gems/plugins/**/app/jsx \
+    gems/plugins/**/app/stylesheets \
+    gems/plugins/**/public \
+    gems/plugins/**/spec_canvas/coffeescripts \
     jest \
     packages \
     public \
@@ -155,7 +129,7 @@ RUN --mount=target=/tmp/src \
     tsconfig.json \
     yarn.lock \
     \
-    /tmp/dst
+    | tar -xf - -C /tmp/dst
 
 FROM local/cache-helper-collect-js AS cache-helper-collect-js-graphql
 RUN --mount=target=/tmp/src \
