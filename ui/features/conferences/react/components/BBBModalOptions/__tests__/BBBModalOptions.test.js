@@ -168,8 +168,9 @@ describe('BBBModalOptions', () => {
     expect(container.queryByText('Add to Calendar')).not.toBeInTheDocument()
   })
 
-  it('shows add to calendar when context', () => {
+  it('shows add to calendar when context and can_manage_calendar', () => {
     window.ENV.context_asset_string = 'course_1'
+    window.ENV.can_manage_calendar = true
     const customProps = defaultProps
     const container = setup({...customProps})
     expect(container.queryByText('Add to Calendar')).toBeInTheDocument()
