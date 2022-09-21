@@ -256,6 +256,7 @@ export const VideoConferenceModal = ({
         <VideoConferenceTypeSelect
           conferenceTypes={window.ENV.conference_type_details}
           onSetConferenceType={type => setConferenceType(type)}
+          isEditing={isEditing}
         />
         {renderModalOptions()}
       </Modal.Body>
