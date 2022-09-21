@@ -26,7 +26,11 @@ module Api::V1::QuizzesNext::Quiz
     options[:description_formatter] = description_formatter(context, user, preloaded_attachments)
 
     quizzes.map do |quiz|
-      quiz_json(quiz, context, user, session, options, klass(quiz))
+      hash = quiz_json(quiz, context, user, session, options, klass(quiz))
+      if options[:master_course_status]
+        hash.merge!(quiz.master_course_api_restriction_data(options[:master_course_status]))
+      end
+      hash
     end
   end
 

@@ -86,6 +86,7 @@ export default class ItemView extends Backbone.View {
     this.publishIconView = false
     this.lockIconView = false
     this.sisButtonView = false
+    const content_type = this.model.get('quiz_type') === 'quizzes.next' ? 'assignment' : 'quiz'
 
     if (this.canManage()) {
       this.publishIconView = new PublishIconView({
@@ -100,7 +101,7 @@ export default class ItemView extends Backbone.View {
         lockedText: I18n.t('%{name} is locked. Click to unlock', {name: this.model.get('title')}),
         course_id: ENV.COURSE_ID,
         content_id: this.model.get('id'),
-        content_type: 'quiz',
+        content_type,
       })
       if (
         this.model.postToSISEnabled() &&
