@@ -26,6 +26,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
       assignment: {
         id: '1',
         anonymous_peer_reviews: true,
+        course_id: '1',
         assessment_requests: [
           {
             anonymous_id: 'anonymous1',
@@ -54,10 +55,10 @@ describe('StudentViewPeerReviews Component Tests', () => {
     const firstLink = container.querySelectorAll('a.item_link')[0]
     const secondLink = container.querySelectorAll('a.item_link')[1]
     expect(firstLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?anonymous_asset_id=anonymous1'
+      '/courses/1/assignments/1?anonymous_asset_id=anonymous1'
     )
     expect(secondLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?anonymous_asset_id=anonymous2'
+      '/courses/1/assignments/1?anonymous_asset_id=anonymous2'
     )
   })
 
@@ -66,6 +67,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
       assignment: {
         id: '1',
         anonymous_peer_reviews: false,
+        course_id: '1',
         assessment_requests: [
           {
             anonymous_id: 'anonymous1',
@@ -100,13 +102,13 @@ describe('StudentViewPeerReviews Component Tests', () => {
     const secondLink = container.querySelectorAll('a.item_link')[1]
     const thirdLink = container.querySelectorAll('a.item_link')[2]
     expect(firstLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?reviewee_id=user1'
+      '/courses/1/assignments/1?reviewee_id=user1'
     )
     expect(secondLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?reviewee_id=user2'
+      '/courses/1/assignments/1?reviewee_id=user2'
     )
     expect(thirdLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?reviewee_id=user3'
+      '/courses/1/assignments/1?reviewee_id=user3'
     )
   })
 
@@ -115,6 +117,7 @@ describe('StudentViewPeerReviews Component Tests', () => {
       assignment: {
         id: '1',
         anonymous_peer_reviews: false,
+        course_id: '1',
         assessment_requests: [
           {
             anonymous_id: 'anonymous1',
@@ -140,10 +143,10 @@ describe('StudentViewPeerReviews Component Tests', () => {
     const firstLink = container.querySelectorAll('a.item_link')[0]
     const secondLink = container.querySelectorAll('a.item_link')[1]
     expect(firstLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?reviewee_id=user1'
+      '/courses/1/assignments/1?reviewee_id=user1'
     )
     expect(secondLink.attributes.getNamedItem('href')?.value).toEqual(
-      'assignments/1?reviewee_id=user2'
+      '/courses/1/assignments/1?reviewee_id=user2'
     )
   })
 })

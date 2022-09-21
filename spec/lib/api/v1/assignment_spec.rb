@@ -190,6 +190,7 @@ describe "Api::V1::Assignment" do
         expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
         expect(assessment_request["user_id"]).to eq @assessment_request.user.id
         expect(assessment_request["user_name"]).to eq @assessment_request.user.name
+        expect(assessment_request["available"]).to eq @assessment_request.available?
       end
 
       it "includes workflow_state, anonymous_id when anonymous_peer_reviews is true" do
@@ -198,6 +199,7 @@ describe "Api::V1::Assignment" do
         assessment_request = json["assessment_requests"][0]
         expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
         expect(assessment_request["anonymous_id"]).to eq @assessment_request.asset.anonymous_id
+        expect(assessment_request["available"]).to eq @assessment_request.available?
       end
     end
 
