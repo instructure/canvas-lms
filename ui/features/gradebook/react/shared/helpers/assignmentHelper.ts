@@ -16,8 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type {Assignment} from '../../../../../api.d'
+
 const assignmentHelper = {
-  compareByDueDate(a, b) {
+  compareByDueDate(a: Pick<Assignment, 'due_at' | 'name'>, b: Pick<Assignment, 'due_at' | 'name'>) {
     let aDate = a.due_at == null ? null : new Date(a.due_at)
     let bDate = b.due_at == null ? null : new Date(b.due_at)
     const aDateIsNull = aDate === null

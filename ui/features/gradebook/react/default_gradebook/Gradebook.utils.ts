@@ -19,11 +19,16 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
+import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
+import filterTypes from './constants/filterTypes'
 import type {
+  CustomColumn,
+  ColumnSizeSettings,
   Filter,
   FilterType,
   FilterPreset,
@@ -38,13 +43,13 @@ import type {
   GradingPeriod,
   Module,
   Section,
-  SectionMap,
   StudentGroup,
   StudentGroupCategory,
   StudentMap,
   Submission
 } from '../../../../api.d'
-import filterTypes from './constants/filterTypes'
+import type {GridColumn} from './grid'
+import {columnWidths} from './initialState'
 
 const I18n = useI18nScope('gradebook')
 
@@ -185,8 +190,8 @@ export function getDefaultSettingKeyForColumnType(columnType: string) {
   return 'sortable_name'
 }
 
-export function sectionList(sections: SectionMap) {
-  const x: Section[] = _.values(sections)
+export function sectionList(sections: {[id: string]: Pick<Section, 'name' | 'id'>}) {
+  const x: Pick<Section, 'name' | 'id'>[] = _.values(sections)
   return x
     .sort((a, b) => a.id.localeCompare(b.id))
     .map(section => {
@@ -343,4 +348,88 @@ export function doesSubmissionNeedGrading(s: Submission) {
   if (!s.grade_matches_current_submission) return true
 
   return typeof s.score !== 'number'
+}
+
+export function assignmentSearchMatcher(
+  option: {
+    label: string
+  },
+  searchTerm: string
+): boolean {
+  const term = searchTerm?.toLowerCase() || ''
+  const assignmentName = option.label?.toLowerCase() || ''
+  return assignmentName.includes(term)
+}
+
+export function buildStudentColumn(
+  columnId: string,
+  gradebookColumnSizeSetting: string,
+  defaultWidth: number
+): GridColumn {
+  const studentColumnWidth = gradebookColumnSizeSetting
+    ? parseInt(gradebookColumnSizeSetting, 10)
+    : defaultWidth
+  return {
+    id: columnId,
+    type: columnId,
+    width: studentColumnWidth,
+    cssClass: 'meta-cell primary-column student',
+    headerCssClass: 'primary-column student',
+    resizable: true
+  }
+}
+
+export function buildCustomColumn(customColumn: CustomColumn): GridColumn {
+  const columnId = getCustomColumnId(customColumn.id)
+  return {
+    id: columnId,
+    type: 'custom_column',
+    field: `custom_col_${customColumn.id}`,
+    width: 100,
+    cssClass: `meta-cell custom_column ${columnId}`,
+    headerCssClass: `custom_column ${columnId}`,
+    resizable: true,
+    editor: LongTextEditor,
+    customColumnId: customColumn.id,
+    autoEdit: false,
+    maxLength: 255
+  }
+}
+
+export const buildAssignmentGroupColumnFn =
+  (gradebookColumnSizeSettings: ColumnSizeSettings) =>
+  (assignmentGroup: Pick<AssignmentGroup, 'id' | 'name'>): GridColumn => {
+    let width
+    const columnId = getAssignmentGroupColumnId(assignmentGroup.id)
+    const fieldName = `assignment_group_${assignmentGroup.id}`
+    if (gradebookColumnSizeSettings && gradebookColumnSizeSettings[fieldName]) {
+      width = parseInt(gradebookColumnSizeSettings[fieldName], 10)
+    } else {
+      width = testWidth(
+        assignmentGroup.name,
+        columnWidths.assignmentGroup.min,
+        columnWidths.assignmentGroup.default_max
+      )
+    }
+    return {
+      id: columnId,
+      field: fieldName,
+      toolTip: assignmentGroup.name,
+      object: assignmentGroup,
+      minWidth: columnWidths.assignmentGroup.min,
+      maxWidth: columnWidths.assignmentGroup.max,
+      width,
+      cssClass: `meta-cell assignment-group-cell ${columnId}`,
+      headerCssClass: `assignment_group ${columnId}`,
+      type: 'assignment_group',
+      assignmentGroupId: assignmentGroup.id
+    }
+  }
+
+const HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
+export function testWidth(text: string, minWidth: number, maxWidth: number) {
+  const padding = HEADER_START_AND_END_WIDTHS_IN_PIXELS * 2
+  const textWidth = getTextWidth(text) || 0
+  const width = Math.max(textWidth + padding, minWidth)
+  return Math.min(width, maxWidth)
 }

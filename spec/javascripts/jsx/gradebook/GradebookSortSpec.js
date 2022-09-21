@@ -891,47 +891,6 @@ test('returns false if sorting by custom and there is a custom column order stor
   strictEqual(this.gradebook.isInvalidSort(), false)
 })
 
-QUnit.module('Gradebook#compareAssignmentNames', {
-  getRecord(name) {
-    return {
-      object: {
-        name
-      }
-    }
-  },
-
-  setup() {
-    this.gradebook = createGradebook()
-
-    this.firstRecord = this.getRecord('alpha')
-    this.secondRecord = this.getRecord('omega')
-  }
-})
-
-test('returns -1 if the name field comes first alphabetically in the first record', function () {
-  strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.secondRecord), -1)
-})
-
-test('returns 0 if the name field is the same in both records', function () {
-  strictEqual(this.gradebook.compareAssignmentNames(this.firstRecord, this.firstRecord), 0)
-})
-
-test('returns 1 if the name field comes later alphabetically in the first record', function () {
-  strictEqual(this.gradebook.compareAssignmentNames(this.secondRecord, this.firstRecord), 1)
-})
-
-test('comparison is case-sensitive between alpha and Alpha', function () {
-  const thirdRecord = this.getRecord('Alpha')
-
-  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.firstRecord), 1)
-})
-
-test('comparison does not group uppercase letters together', function () {
-  const thirdRecord = this.getRecord('Omega')
-
-  strictEqual(this.gradebook.compareAssignmentNames(thirdRecord, this.secondRecord), 1)
-})
-
 QUnit.module('Gradebook#compareAssignmentModulePositions - when both records have module info', {
   createRecord(moduleId, positionInModule) {
     return {

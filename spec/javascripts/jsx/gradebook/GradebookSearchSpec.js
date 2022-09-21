@@ -78,27 +78,6 @@ QUnit.module('Gradebook', suiteHooks => {
     })
   })
 
-  QUnit.module('Gradebook#assignmentSearchMatcher', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-    })
-
-    test('returns true if the search term is a substring of the assignment name (case insensitive)', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      ok(gradebook.assignmentSearchMatcher(option, 'lab'))
-    })
-
-    test('returns false if the search term is not a substring of the assignment name', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      notOk(gradebook.assignmentSearchMatcher(option, 'Lib'))
-    })
-
-    test('does not treat the search term as a regular expression', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      notOk(gradebook.assignmentSearchMatcher(option, 'Science.*II'))
-    })
-  })
-
   QUnit.module('#_updateEssentialDataLoaded()', () => {
     function createInitializedGradebook(options) {
       gradebook = createGradebook(options)
