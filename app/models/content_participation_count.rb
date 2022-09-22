@@ -46,18 +46,26 @@ class ContentParticipationCount < ActiveRecord::Base
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
 
-        # if the participant was just created, the count will already be correct
-        if opts[:offset].present? && !participant.new_record?
-          current_unread_count = participant.unread_count(refresh: false)
-          unless current_unread_count == 0 && opts[:offset] == -1
-            participant.unread_count = current_unread_count + opts[:offset]
-          end
-        end
+        set_unread_count(participant, opts)
+
         participant.save if participant.new_record? || participant.changed?
       end
     end
     participant
   end
+
+  def self.set_unread_count(participant, opts = {})
+    offset = opts.delete(:offset)
+    unread_count = opts.delete(:unread_count)
+
+    # allow setting the unread_count and when not present increment|decrement using an offset
+    unless unread_count.is_a?(Integer)
+      unread_count = participant.unread_count(refresh: false) + offset.to_i
+    end
+
+    participant.unread_count = unread_count > 0 ? unread_count : 0
+  end
+  private_class_method :set_unread_count
 
   def self.unread_count_for(type, context, user)
     return 0 unless user.present? && context.present?
@@ -100,17 +108,22 @@ class ContentParticipationCount < ActiveRecord::Base
                                        SQL
         (subs_with_grades + subs_with_comments).uniq
       end
-      already_read_count = if potential_ids.any?
-                             ContentParticipation.where(
-                               content_type: "Submission",
-                               content_id: potential_ids,
-                               user_id: user,
-                               workflow_state: "read"
-                             ).count
-                           else
-                             0
-                           end
-      potential_ids.size - already_read_count
+      potential_ids.size - already_read_count(potential_ids, user)
+    end
+  end
+
+  def self.already_read_count(ids = [], user)
+    return 0 if ids.empty?
+
+    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+      ContentParticipation.already_read_count(ids, user)
+    else
+      ContentParticipation.where(
+        content_type: "Submission",
+        content_id: ids,
+        user_id: user,
+        workflow_state: "read"
+      ).count
     end
   end
 
