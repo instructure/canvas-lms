@@ -412,7 +412,10 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
-                    .execute { setupStage() }
+                    .execute {
+                      buildDockerImageStage.preloadCacheImagesAsync()
+                      setupStage()
+                    }
 
                   extendedStage('Rebase')
                     .hooks(buildSummaryReportHooks.call())
