@@ -5348,7 +5348,7 @@ nn:
   clark_county_gradebook_c5ea74bb: "Clark County vurderingsoversikt"
   classic_quizzes_dee3c7b7: "Orinære quizar"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Ordinære quizar for tidsstyrte quizar utan innlevering"
-  classic_quizzes_with_new_rce_audio_video_may_not_h_6d31e78c: "Ordinære quizar med ny RCE audio/video kan ha verte flytta ufullstendig; Desse må byggast på ny."
+  classic_quizzes_with_new_rce_audio_video_may_not_h_6d31e78c: "Ordinære quizar med ny RCE audio/video har kanskje ikkje blitt fullstendig flytta; Desse må byggast på ny."
   classic_view_33f29576: "Ordinær visning"
   clear_2084585f: Fjern
   clear_all_da755751: "Fjern alt"
@@ -7935,7 +7935,7 @@ nn:
   courses_account_settings_79e2f748: "Emne - kontoinnstillingar"
   courses_add_20891f99: "Emne - legg til"
   courses_add_edit_delete_aa2b55d3: "Emner - legg til / endre / slett"
-  courses_can_only_be_created_at_the_course_level_if_192bb838: "Emner kan berre opprettast på emnenivå dersom dette er tillatt av Canvas administrator. Dersom det er tillatt, kan emner opprettast frå dashbordet."
+  courses_can_only_be_created_at_the_course_level_if_192bb838: "Emner kan berre opprettast på emnenivå dersom dette er tillatt av ein Canvas administrator. Dersom det er tillatt, kan emner opprettast frå dashbordet."
   courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "Emner kan ikkje opprettast på site_admin kontoen"
   courses_change_visibility_9150ff1b: "Emne - endre synlegheit"
   courses_conclude_7bf4ce68: "Emne - fullfør"
@@ -8197,7 +8197,7 @@ nn:
   d2l_file_description: "D2L-eksport i ZIP-format"
   d2l_name: D2L-konverteringsprogram
   d_b59e2d8d: d
-  daily_notifications_will_be_delivered_around_day_t_a2b49202: "Daglege varslingar blir levert rundt %{day_time}. Ukentlege varslingar blir levert på %{weekday} mellom %{start_time} og %{end_time}."
+  daily_notifications_will_be_delivered_around_day_t_a2b49202: "Daglege varslingar blir levert rundt %{day_time}. Vekevarslingar blir levert på %{weekday} mellom %{start_time} og %{end_time}."
   daily_summary_cf43f37c: "Dagleg samandrag"
   danish_c18cdac8: Dansk
   dark_skin_tone_6c9e7c7c: "Mørk hudfarge"
@@ -10305,7 +10305,7 @@ nn:
   failed_to_import_some_lti_resource_links_ab124c3f: "Import av nokre LTI ressurslenker mislukkast"
   failed_to_invalidate_portal_path_5bc31b91: "Ugyldiggjering av portal path vart mislukka"
   failed_to_laod_more_submissions_990aacee: "Kunne ikkje laste fleire innleveringar"
-  failed_to_load_announcements_429c16fc: "Lasting av kunngjeringar mislukkast. "
+  failed_to_load_announcements_429c16fc: "Lasting av kunngjeringar feila. "
   failed_to_load_apps_db37e651: "Lasting av apper feila. "
   failed_to_load_assignments_in_important_dates_ce3b4227: "Lasting av oppgåver i viktige datoar mislukkast"
   failed_to_load_conversation_messages_9b4546fc: "Lasting av samtalemeldingar feila."
@@ -12113,7 +12113,7 @@ nn:
   groups_navigation_menu_76b5acc6: "Meny for gruppenavigasjon"
   groups_tray_ef3e2649: Gruppemeny
   groups_view_all_student_groups_39bd1b85: "Grupper - vis alle studentgrupper"
-  grouptitle_was_moved_to_newgrouptitle_efabcda2: "\"%{groupTitle}\" flytta til \"%{newGroupTitle}\"."
+  grouptitle_was_moved_to_newgrouptitle_efabcda2: "\"%{groupTitle}\" vart flytta til \"%{newGroupTitle}\"."
   grouptitle_was_successfully_updated_658f725e: "\"%{groupTitle}\" oppdatert."
   groupweight_of_total_9579ae8c: "%{groupWeight}% av totalen"
   guatemala_502_ae25c68f: "Guatemala (+502)"
@@ -12432,7 +12432,7 @@ nn:
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Eg godtek *vilkår for bruk* og **retningslinjer for personvern**."
   i_agree_to_the_tool_s_270301a5: "Eg godtar verktøyet sitt/sine"
   i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: "Eg samtykker til *sluttbrukarlisensen*."
-  i_agree_to_the_tool_s_end_user_license_agreement_c77fa44d: "Eg samtykkjer til verktøyets *Lisensavtale til sluttbrukar*"
+  i_agree_to_the_tool_s_end_user_license_agreement_c77fa44d: "Eg samtykkjer til verktøyets *Lisensavtale for sluttbrukar*"
   i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Eg får ikkje gjort noko før eg får svar frå deg"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Eg har løyve til å bruke denne fila"
