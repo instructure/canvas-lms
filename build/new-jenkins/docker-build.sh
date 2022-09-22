@@ -61,6 +61,7 @@ RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.ruby-runner | md5sum)
 YARN_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.yarn-runner | md5sum)
 WEBPACK_BUILDER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-builder | md5sum)
 WEBPACK_ASSETS_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-assets | md5sum)
+WEBPACK_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-runner | md5sum)
 
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
 
@@ -71,7 +72,7 @@ BASE_RUNNER_BUILD_ARGS=(
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
 )
-WEBPACK_ASSETS_BUILD_ARGS=(
+WEBPACK_RUNNER_BUILD_ARGS=(
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY"
   --build-arg RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES"
   --build-arg CRYSTALBALL_MAP="$CRYSTALBALL_MAP"
@@ -96,12 +97,16 @@ WEBPACK_BUILDER_PARTS=(
   $WEBPACK_BUILDER_DOCKERFILE_MD5
   $PACKAGES_CACHE_MD5
 )
-WEBPACK_ASSETS_PARTS=(
+WEBPACK_RUNNER_PARTS=(
   "${WEBPACK_BUILDER_PARTS[@]}"
-  "${WEBPACK_ASSETS_BUILD_ARGS[@]}"
-  $WEBPACK_ASSETS_DOCKERFILE_MD5
+  "${WEBPACK_RUNNER_BUILD_ARGS[@]}"
+  $WEBPACK_RUNNER_DOCKERFILE_MD5
   $WEBPACK_ASSETS_MD5
   $WEBPACK_ASSETS_DEPENDENCIES_MD5
+)
+WEBPACK_ASSETS_PARTS=(
+  "${WEBPACK_RUNNER_PARTS[@]}"
+  $WEBPACK_ASSETS_DOCKERFILE_MD5
 )
 
 declare -A BASE_RUNNER_TAGS; compute_tags "BASE_RUNNER_TAGS" $BASE_RUNNER_PREFIX ${BASE_RUNNER_PARTS[@]}
@@ -190,16 +195,16 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-}
 
-  # Using a multi-stage build is safe for the below image because
-  # there is no expectation that we will need to use docker's
-  # built-in caching.
   docker build \
-    "${WEBPACK_ASSETS_BUILD_ARGS[@]}" \
+    "${WEBPACK_RUNNER_BUILD_ARGS[@]}" \
+    --tag local/webpack-runner \
+    - < Dockerfile.jenkins.webpack-runner
+
+  docker build \
     --label "RUBY_RUNNER_SELECTED_TAG=$RUBY_RUNNER_SELECTED_TAG" \
     --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
     --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
     --tag "${WEBPACK_ASSETS_TAGS[SAVE_TAG]}" \
-    --target webpack-assets \
     - < Dockerfile.jenkins.webpack-assets
 
   WEBPACK_ASSETS_SELECTED_TAG=${WEBPACK_ASSETS_TAGS[SAVE_TAG]}
