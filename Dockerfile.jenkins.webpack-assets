@@ -1,4 +1,5 @@
 FROM local/webpack-builder AS webpack-runner
+COPY --chown=docker:docker --from=local/cache-helper-collect-webpack-dependencies /tmp/dst ${APP_HOME}
 COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
 
 ARG JS_BUILD_NO_UGLIFY=0
