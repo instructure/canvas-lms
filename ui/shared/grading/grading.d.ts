@@ -88,7 +88,6 @@ export type SubmissionComment = {
   gradesPublished: boolean
   gradingStandardId: string | null
   gradingType: GradingType
-  hasDownloadedSubmissions: boolean
   hidden: boolean
   htmlUrl: string
   id: string

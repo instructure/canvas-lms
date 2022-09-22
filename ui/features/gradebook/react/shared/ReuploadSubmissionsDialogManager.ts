@@ -21,17 +21,34 @@ import re_upload_submissions_form from '@canvas/grading/jst/re_upload_submission
 import {setupSubmitHandler} from '@canvas/assignments/jquery/reuploadSubmissionsHelper'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_helpers'
+import type {Assignment} from '../../../../api.d'
 
 class ReuploadSubmissionsDialogManager {
-  constructor(assignment, reuploadUrlTemplate, userAssetString) {
+  reuploadUrl: string
+
+  userAssetString: string
+
+  assignment: Assignment
+
+  downloadedSubmissionsMap: {
+    [assignmentId: string]: boolean
+  }
+
+  constructor(
+    assignment: Assignment,
+    reuploadUrlTemplate,
+    userAssetString: string,
+    downloadedSubmissionsMap
+  ) {
     this.assignment = assignment
+    this.downloadedSubmissionsMap = downloadedSubmissionsMap
     this.reuploadUrl = $.replaceTags(reuploadUrlTemplate, 'assignment_id', assignment.id)
     this.showDialog = this.showDialog.bind(this)
     this.userAssetString = userAssetString
   }
 
   isDialogEnabled() {
-    return this.assignment.hasDownloadedSubmissions
+    return this.downloadedSubmissionsMap[this.assignment.id]
   }
 
   getReuploadForm(cb) {
