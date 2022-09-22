@@ -16,6 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+def getFuzzyTagSuffix() {
+  return "fuzzy-${env.IMAGE_CACHE_MERGE_SCOPE}"
+}
+
 def getRailsLoadAllLocales() {
   return configuration.isChangeMerged() ? 1 : (configuration.getBoolean('rails-load-all-locales', 'false') ? 1 : 0)
 }
@@ -115,6 +119,17 @@ def lintersImage() {
   }
 }
 
+def preloadCacheImagesAsync() {
+  // Start loading webpack-assets immediately in case this build will re-use it.
+  libraryScript.load('bash/docker-with-flakey-network-protection.sh', '/tmp/docker-with-flakey-network-protection.sh')
+
+  sh """#!/bin/bash
+    /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/bash &
+    /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental &
+    /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()} &
+  """
+}
+
 def premergeCacheImage() {
   credentials.withStarlordCredentials {
     withEnv([
@@ -128,6 +143,7 @@ def premergeCacheImage() {
       'RAILS_LOAD_ALL_LOCALES=0',
       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+      "WEBPACK_ASSETS_FUZZY_TAG=${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}",
       "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
     ]) {
