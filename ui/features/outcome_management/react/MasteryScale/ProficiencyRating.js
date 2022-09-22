@@ -100,10 +100,18 @@ class ProficiencyRating extends React.Component {
   handleFocus = () => {
     if (this.props.canManage) {
       if (this.props.focusField === 'trash') {
-        setTimeout(
-          () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
-          700
-        )
+        /*  changing settimeout to 1ms to move the focus action out of the execution queue 
+            and add it back at after the queue is empty which gives enough time for 
+            the modal to be dismissed
+            reference: http://latentflip.com/loupe/
+        */
+        setTimeout(() => {
+          /* checking if the user has not changed the focus manually 
+             (the default focus for some browsers is the body and 
+             for others is null, so i am adding both to the if ) */
+          if (!document.activeElement || document.activeElement === document.body)
+            this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()
+        }, 1)
       } else if (this.props.focusField === 'description') {
         this.descriptionInput.focus()
       } else if (this.props.focusField === 'points') {
