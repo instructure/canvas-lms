@@ -349,6 +349,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   dataLoader: DataLoader
 
+  downloadedSubmissionsMap: {
+    [assignmentId: string]: boolean
+  } = {}
+
   gridData: GridData = {
     columns: {
       definitions: {},
@@ -1222,7 +1226,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   handleSubmissionsDownloading = (assignmentId: string) => {
     // TODO: Use separate object to track which submissions are downloaded
     // Don't mutate assignment objects
-    this.getAssignment(assignmentId).hasDownloadedSubmissions = true
+    this.downloadedSubmissionsMap[assignmentId] = true
     return this.gradebookGrid?.gridSupport?.columns.updateColumnHeaders([
       getAssignmentColumnId(assignmentId)
     ])
@@ -4191,7 +4195,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const manager = new ReuploadSubmissionsDialogManager(
       assignment,
       this.options.re_upload_submissions_url,
-      this.options.user_asset_string
+      this.options.user_asset_string,
+      this.downloadedSubmissionsMap
     )
     return {
       hidden: !manager.isDialogEnabled(),
