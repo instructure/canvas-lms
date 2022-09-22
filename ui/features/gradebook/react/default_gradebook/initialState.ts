@@ -22,6 +22,7 @@ import type {
   ContentLoadStates,
   CourseContent,
   GradebookOptions,
+  GradebookSettings,
   InitialActionStates
 } from './gradebook.d'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
@@ -33,7 +34,10 @@ export function getInitialGradebookContent(options) {
   }
 }
 
-export function getInitialGridDisplaySettings(settings, colors): GridDisplaySettings {
+export function getInitialGridDisplaySettings(
+  settings: GradebookSettings,
+  colors
+): GridDisplaySettings {
   const selectedPrimaryInfo = studentRowHeaderConstants.primaryInfoKeys.includes(
     settings.student_column_display_as
   )

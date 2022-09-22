@@ -19,17 +19,27 @@
 import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
-
 import AsyncComponents from '../default_gradebook/AsyncComponents'
+import type {Assignment} from '../../../../api.d'
 
 const I18n = useI18nScope('gradebooksharedSetDefaultGradeDialogManager')
 
 class SetDefaultGradeDialogManager {
+  assignment: Assignment
+
+  isAdmin: boolean
+
+  contextId: string
+
+  submissionsLoaded: boolean
+
+  selectedSection: string | null
+
   constructor(
-    assignment,
+    assignment: Assignment,
     students,
-    contextId,
-    selectedSection,
+    contextId: string,
+    selectedSection: string | null,
     isAdmin = false,
     submissionsLoaded = false
   ) {

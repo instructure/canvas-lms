@@ -147,9 +147,8 @@ export default function FilterTray({
 
         <View as="div" margin="medium 0 0 0">
           {filterPresets.map(filterPreset => (
-            <View as="div" margin="0 0 small 0">
+            <View as="div" margin="0 0 small 0" key={filterPreset.id}>
               <FilterTrayPreset
-                key={filterPreset.id}
                 applyFilters={applyFilters}
                 assignmentGroups={assignmentGroups}
                 filterPreset={filterPreset}

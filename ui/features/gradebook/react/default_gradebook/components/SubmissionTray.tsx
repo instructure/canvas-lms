@@ -37,7 +37,12 @@ import SubmissionCommentCreateForm from './SubmissionCommentCreateForm'
 import SubmissionStatus from './SubmissionStatus'
 import SubmissionTrayRadioInputGroup from './SubmissionTrayRadioInputGroup'
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
-import type {PendingGradeInfo, SerializedComment, LatePolicyCamelized} from '../gradebook.d'
+import type {
+  GradingStandard,
+  LatePolicyCamelized,
+  PendingGradeInfo,
+  SerializedComment
+} from '../gradebook.d'
 import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
 
 import {Link} from '@instructure/ui-link'
@@ -100,7 +105,7 @@ export type SubmissionTrayProps = {
   editSubmissionComment: (commentId: string | null) => void
   onClose: () => void
   requireStudentGroupForSpeedGrader: boolean
-  gradingScheme: Array<Array<number>>
+  gradingScheme: null | GradingStandard[]
   onGradeSubmission: (grade: string, excused: boolean) => void
   onRequestClose: () => void
   selectNextAssignment: () => void

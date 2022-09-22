@@ -33,8 +33,6 @@ import type {
   SubmissionType,
   WorkflowState
 } from '../api.d'
-import type {RequestDispatch} from '@canvas/network'
-import type PerformanceControls from './PerformanceControls'
 
 export type CourseSettingsType = {
   filter_speed_grader_by_student_group: boolean
@@ -42,7 +40,7 @@ export type CourseSettingsType = {
 }
 
 export type GradebookSettings = {
-  enter_grades_as: string
+  enter_grades_as: any
   filter_columns_by: {
     assignment_group_id: string | null
     grading_period_id: string | null
@@ -56,7 +54,6 @@ export type GradebookSettings = {
     student_group_id: string | null
   }
   hide_assignment_group_totals: 'false' | 'true'
-  hide_assignment_group_totals: string
   hide_total: 'false' | 'true'
   selected_view_options_filters: string[]
   show_concluded_enrollments: 'false' | 'true'
@@ -69,7 +66,7 @@ export type GradebookSettings = {
   student_column_display_as: 'last_first' | 'first_last'
   student_column_secondary_info: string
   view_ungraded_as_zero: 'false' | 'true'
-  colors: StatusColors
+  colors?: StatusColors
 }
 
 export type PerformanceControlValues = {
@@ -89,7 +86,6 @@ export type GradebookOptions = {
   allow_apply_score_to_ungraded: boolean
   allow_separate_first_last_names: boolean
   allow_view_ungraded_as_zero: boolean
-  applyScoreToUngradedModalNode: HTMLElement
   attachment_url: null | string
   attachment: null | AttachmentData
   change_gradebook_version_url: string
@@ -104,20 +100,14 @@ export type GradebookOptions = {
   course_settings: CourseSettingsType
   course_url: string
   current_grading_period_id: string
-  currentUserId: string
   custom_column_datum_url: string
-  customColumns: CustomColumn[]
-  default_grading_standard: [string, number][]
-  dispatch: RequestDispatch
+  default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean
   enrollments_url: string
   enrollments_with_concluded_url: string
   export_gradebook_csv_url: string
-  filterNavNode: HTMLElement
   final_grade_override_enabled: boolean
-  flashAlerts: FlashAlertType[]
-  flashMessageContainer: HTMLElement
   grade_calc_ignore_unposted_anonymous_enabled: boolean
   grade_calc_ignore_unposted_anonymous_enabled: boolean
   gradebook_column_order_settings_url: string
@@ -128,28 +118,17 @@ export type GradebookOptions = {
   gradebook_import_url: string
   gradebook_is_editable: boolean
   gradebook_score_to_ungraded_progress: null | ProgressData
-  gradebookGridNode: HTMLElement
-  gradebookMenuNode: HTMLElement
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
   grading_schemes: GradingScheme[]
   grading_standard: boolean
-  gradingPeriodsFilterContainer: HTMLElement
-  gridColorNode: HTMLElement
   group_weighting_scheme: null | string
   has_modules: boolean
-  hideGrid: boolean
-  isCustomColumnsLoading: boolean
-  late_policy: LatePolicy
-  isFiltersLoading: boolean
-  isModulesLoading: boolean
-  locale: string
+  late_policy: LatePolicy | null
   login_handle_name: null | string
-  modules: Module[]
   message_attachment_upload_folder_id: string
   new_gradebook_development_enabled: boolean
   outcome_gradebook_enabled: boolean
-  performanceControls: PerformanceControls
   performance_controls: PerformanceControlValues
   post_grades_feature: boolean
   post_grades_ltis: Lti[]
@@ -162,9 +141,6 @@ export type GradebookOptions = {
   setting_update_url: string
   settings_update_url: string
   settings: GradebookSettings
-  settingsModalButtonContainer: HTMLElement
-  show_concluded_enrollments: string
-  show_inactive_enrollments: string
   show_message_students_with_observers_dialog: boolean
   show_message_students_with_observers_dialog: boolean
   show_similarity_score: boolean
@@ -185,12 +161,14 @@ export type GradebookOptions = {
     title: string
   }
   version: null | string
-  viewOptionsMenuNode: HTMLElement
 }
+
+export type GradingStandard = [string, number]
 
 export type GradingScheme = {
   id?: string
-  data: any
+  title?: string
+  data: GradingStandard[]
 }
 
 export type LatePolicy = {
@@ -211,7 +189,7 @@ export type GradingPeriodAssignmentMap = {
 
 export type CourseContent = {
   contextModules: Module[]
-  courseGradingScheme: GradingScheme | null
+  courseGradingScheme: {data: boolean} | null
   defaultGradingScheme: GradingScheme | null
   gradingSchemes: GradingScheme[]
   gradingPeriodAssignments: GradingPeriodAssignmentMap

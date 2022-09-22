@@ -148,12 +148,12 @@ export default class GradebookSettingsModal extends React.Component {
 
   onFetchLatePolicyFailure = () => {
     const message = I18n.t('An error occurred while loading late policies')
-    showFlashAlert({message, type: 'error'})
+    showFlashAlert({message, type: 'error', err: null})
   }
 
   onSaveLatePolicyFailure = () => {
     const message = I18n.t('An error occurred while updating late policies')
-    showFlashAlert({message, type: 'error'})
+    showFlashAlert({message, type: 'error', err: null})
     return Promise.reject(new Error(message))
   }
 
