@@ -26,7 +26,7 @@ const primaryInfoLabels = {
 }
 
 const primaryInfoKeys = ['first_last', 'last_first']
-const defaultPrimaryInfo = 'first_last'
+const defaultPrimaryInfo: 'last_first' | 'first_last' = 'first_last'
 
 const secondaryInfoLabels = {
   group: I18n.t('Group'),

@@ -32,10 +32,10 @@ const gradingTypeDefaultOptionMap = {
   points: 'points'
 }
 
-export function defaultOptionForGradingType(gradingType) {
+export function defaultOptionForGradingType(gradingType: string) {
   return gradingTypeDefaultOptionMap[gradingType] || null
 }
 
-export function optionsForGradingType(gradingType) {
+export function optionsForGradingType(gradingType: string) {
   return gradingTypeOptionMap[gradingType] || []
 }

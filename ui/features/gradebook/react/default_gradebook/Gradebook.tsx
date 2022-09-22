@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import type JQuery from 'jquery'
 import _ from 'underscore'
 import {intersection} from 'lodash'
 import tz from '@canvas/timezone'
@@ -223,7 +224,7 @@ export function Portal({node, children}) {
   return ReactDOM.createPortal(children, node)
 }
 
-type GradebookProps = {
+export type GradebookProps = {
   appliedFilters: Filter[]
   applyScoreToUngradedModalNode: HTMLElement
   colors: StatusColors
@@ -237,10 +238,11 @@ type GradebookProps = {
   gradebookMenuNode: HTMLElement
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
-  hideGrid?: false
+  hideGrid?: boolean
   isCustomColumnsLoading: boolean
   isFiltersLoading: boolean
   isModulesLoading: boolean
+  locale: string
   modules: Module[]
   performanceControls: PerformanceControls
   settingsModalButtonContainer: HTMLElement
@@ -279,7 +281,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   effectiveDueDates: AssignmentUserDueDateMap = {}
 
-  $grid: any
+  $grid?: JQuery<HTMLElement>
 
   postGradesLtis: {id: string; name: string; onSelect: () => void}[] = []
 
@@ -1438,7 +1440,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   // $("<div class='slick-header-columns' style='width:10000px; left:-1000px' />")
   // if a course has a ton of assignments then it will not be wide enough to
   // contain them all
-  fixMaxHeaderWidth = () => this.$grid.find('.slick-header-columns').width(1000000)
+  fixMaxHeaderWidth = () => this.$grid?.find('.slick-header-columns').width(1000000)
 
   // SlickGrid doesn't have a blur event for the grid, so this mimics it in
   // conjunction with a click listener on <body />. When we 'blur' the grid
@@ -2670,12 +2672,10 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       })
     })
     this.$grid = $('#gradebook_grid').fillWindowWithMe({
-      onResize: () => {
-        return this.gradebookGrid?.grid.resizeCanvas()
-      }
+      onResize: () => this.gradebookGrid?.grid.resizeCanvas()
     })
     if (this.options.gradebook_is_editable) {
-      this.$grid.addClass('editable')
+      this.$grid?.addClass('editable')
     }
     this.fixMaxHeaderWidth()
     this.keyboardNav?.init()

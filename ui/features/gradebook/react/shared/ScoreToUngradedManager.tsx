@@ -100,7 +100,7 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId, options) {
+  startProcess(courseId: string, options) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }
