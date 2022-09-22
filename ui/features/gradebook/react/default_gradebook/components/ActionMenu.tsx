@@ -31,7 +31,7 @@ import '@canvas/rails-flash-notifications'
 
 const I18n = useI18nScope('gradebookActionMenu')
 
-const {Item: MenuItem, Menu: MenuSeparator} = Menu as any
+const {Item: MenuItem, Separator: MenuItemSeparator} = Menu as any
 
 export type ActionMenuProps = {
   gradingPeriodId: string | null
@@ -225,7 +225,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     }
 
     if (tools.length) {
-      tools.push(<MenuSeparator key="postGradesSeparator" />)
+      tools.push(<MenuItemSeparator key="postGradesSeparator" />)
     }
 
     return tools
@@ -272,7 +272,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
       </MenuItem>
     )
 
-    return [<MenuSeparator key="previousExportSeparator" />, previousMenu]
+    return [<MenuItemSeparator key="previousExportSeparator" />, previousMenu]
   }
 
   renderPublishGradesToSis() {
