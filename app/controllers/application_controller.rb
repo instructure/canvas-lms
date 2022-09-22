@@ -1051,8 +1051,9 @@ class ApplicationController < ActionController::Base
   def get_context(include_deleted: false)
     GuardRail.activate(:secondary) do
       unless @context
-        if params[:course_id]
-          @context = api_find(Course.active, params[:course_id])
+        if params[:course_id] || (request.url.include?("/graphql") && params[:operationName] == "CreateSubmission")
+
+          @context = params[:course_id] ? api_find(Course.active, params[:course_id]) : pull_context_course
           @context.root_account = @domain_root_account if @context.root_account_id == @domain_root_account.id # no sense in refetching it
           params[:context_id] = params[:course_id]
           params[:context_type] = "Course"
@@ -3096,6 +3097,11 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :k5_user?
+
+  def pull_context_course
+    assignment_id = params[:variables][:assignmentLid]
+    ::Assignment.active.find(assignment_id).course
+  end
 
   def react_discussions_post_enabled_for_preferences_use?
     if @context.instance_of?(UserProfile) && Account.default.feature_enabled?(:react_discussions_post)
