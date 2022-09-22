@@ -160,7 +160,6 @@ export const K5Dashboard = ({
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities,
-  observerPickerEnabled,
 }) => {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -225,19 +224,15 @@ export const K5Dashboard = ({
 
   const handleChangeObservedUser = id => {
     if (id !== observedUserId) {
-      if (observerPickerEnabled) {
-        fetchShowK5Dashboard(id)
-          .then(isK5User => {
-            if (isK5User) {
-              updateDashboardForObserverCallback(id)
-            } else {
-              window.location.reload()
-            }
-          })
-          .catch(err => showFlashError(I18n.t('Unable to switch students'))(err))
-      } else {
-        updateDashboardForObserverCallback(id)
-      }
+      fetchShowK5Dashboard(id)
+        .then(isK5User => {
+          if (isK5User) {
+            updateDashboardForObserverCallback(id)
+          } else {
+            window.location.reload()
+          }
+        })
+        .catch(err => showFlashError(I18n.t('Unable to switch students'))(err))
     }
   }
 
@@ -487,7 +482,6 @@ K5Dashboard.propTypes = {
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired,
-  observerPickerEnabled: PropTypes.bool.isRequired,
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))

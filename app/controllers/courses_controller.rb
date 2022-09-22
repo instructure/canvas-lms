@@ -2141,7 +2141,7 @@ class CoursesController < ApplicationController
       end
 
       if @context && @current_user
-        if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+        if Setting.get("assignments_2_observer_view", "false") == "true"
           observed_users(@current_user, session, @context.id) # sets @selected_observed_user
           context_enrollment_scope = @context.enrollments.where(user_id: @current_user)
           if observee_selected?

@@ -270,7 +270,7 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true"
+          if Setting.get("assignments_2_observer_view", "false") == "true"
             js_env({ OBSERVER_OPTIONS: {
                      OBSERVED_USERS_LIST: observed_users(@current_user, session, @context.id),
                      CAN_ADD_OBSERVEE: @current_user

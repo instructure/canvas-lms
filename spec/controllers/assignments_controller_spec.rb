@@ -1170,17 +1170,11 @@ describe AssignmentsController do
             expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
           end
 
-          context "when observer_picker is enabled" do
-            before :once do
-              Account.site_admin.enable_feature!(:observer_picker)
-            end
-
-            it "sets js_env variables" do
-              get :show, params: { course_id: @course.id, id: @assignment.id }
-              expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
-              expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
-              expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
-            end
+          it "sets js_env variables" do
+            get :show, params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+            expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+            expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
           end
         end
       end

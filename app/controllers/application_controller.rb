@@ -317,7 +317,7 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = %i[
-    featured_help_links observer_picker
+    featured_help_links
     lti_platform_storage scale_equation_images new_equation_editor buttons_and_icons_cropper course_paces_for_sections
     calendar_series account_level_blackout_dates account_calendar_events rce_ux_improvements render_both_to_do_lists
     course_paces_redesign
@@ -3041,7 +3041,7 @@ class ApplicationController < ActionController::Base
         # If course_ids isn't passed, check all their (non-observer and unlinked observer) enrollments and account_users
         # i.e., ignore observer enrollments with a linked student - the observer picker filters out these courses
         enrolled_courses_scope = user.enrollments.shard(Shard.current).new_or_active_by_date
-        enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type.or(enrolled_courses_scope.of_observer_type.where(associated_user_id: nil)) if Account.site_admin.feature_enabled?(:observer_picker)
+        enrolled_courses_scope = enrolled_courses_scope.not_of_observer_type.or(enrolled_courses_scope.of_observer_type.where(associated_user_id: nil))
         enrolled_course_ids = enrolled_courses_scope.select(:course_id)
         enrolled_account_ids = Course.where(id: enrolled_course_ids).distinct.pluck(:account_id)
         break true if (enrolled_account_ids & k5_account_ids).any?
@@ -3065,7 +3065,6 @@ class ApplicationController < ActionController::Base
 
   def currently_observing?
     @current_user.roles(@domain_root_account).include?("observer") &&
-      Account.site_admin.feature_enabled?(:observer_picker) &&
       @selected_observed_user.present? &&
       @selected_observed_user != @current_user
   end
@@ -3092,7 +3091,7 @@ class ApplicationController < ActionController::Base
       end
 
       # This key is also invalidated when the k5 setting is toggled at the account level or when enrollments change
-      Rails.cache.fetch_with_batched_keys(["k5_user3", course_ids, Account.site_admin.feature_enabled?(:observer_picker)].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
+      Rails.cache.fetch_with_batched_keys(["k5_user3", course_ids].cache_key, batch_object: user, batched_keys: %i[k5_user enrollments account_users], expires_in: 12.hours) do
         uncached_k5_user?(user, course_ids: course_ids)
       end
     end

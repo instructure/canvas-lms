@@ -252,7 +252,7 @@ describe('K5Dashboard Parent Support', () => {
       reloadMock.mockClear()
     })
 
-    it('reloads the page if observer_picker is on', async () => {
+    it('reloads the page when a student is selected in the students picker', async () => {
       const {findByRole, getByText} = render(
         <K5Dashboard
           {...defaultProps}
@@ -268,28 +268,6 @@ describe('K5Dashboard Parent Support', () => {
       await waitFor(() => expect(reloadMock).toHaveBeenCalled())
     })
 
-    it('does not reload the page if observer_picker is off', async () => {
-      moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
-        status: 200,
-        response: MOCK_CARDS_2,
-      })
-
-      const {findByRole, getByText, findByText} = render(
-        <K5Dashboard
-          {...defaultProps}
-          currentUserRoles={['user', 'observer', 'teacher']}
-          observedUsersList={MOCK_OBSERVED_USERS_LIST}
-          canAddObservee={true}
-          plannerEnabled={true}
-          observerPickerEnabled={false}
-        />
-      )
-      const select = await findByRole('combobox', {name: 'Select a student to view'})
-      act(() => select.click())
-      act(() => getByText('Student 2').click())
-      expect(await findByText('Economics 203')).toBeInTheDocument()
-      expect(reloadMock).not.toHaveBeenCalled()
-    })
   })
 
   describe('grades tab', () => {
