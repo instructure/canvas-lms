@@ -138,7 +138,7 @@
             <% end %>
           <% end %>
           <% if (@context&.is_a?(Course) || @context&.is_a?(Assignment)) && @context_enrollment&.observer? %>
-            <% if Account.site_admin.feature_enabled?(:observer_picker) && Setting.get("assignments_2_observer_view", "false") == "true" %>
+            <% if Setting.get("assignments_2_observer_view", "false") == "true" %>
               <div id='observer-picker-mountpoint' style="margin: 3px;"></div>
             <% end %>
           <% end %>

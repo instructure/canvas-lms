@@ -31,9 +31,6 @@ jest.useFakeTimers()
 const defaultEnv = {
   current_user: {id: '1'},
   current_user_roles: ['user', 'student', 'observer'],
-  FEATURES: {
-    observer_picker: true,
-  },
   OBSERVED_USERS_LIST: [
     {id: '2', name: 'Student 2', avatar_url: undefined},
     {id: '3', name: 'Student 3', avatar_url: undefined},

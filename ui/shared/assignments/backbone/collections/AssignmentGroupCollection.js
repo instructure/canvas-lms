@@ -55,13 +55,8 @@ export default class AssignmentGroupCollection extends PaginatedCollection {
   }
 
   getObservedUserId() {
-    if (ENV.FEATURES?.observer_picker) {
-      // if enabled, use new observed user selection
-      return savedObservedId(ENV.current_user?.id)
-    } else if (ENV.observed_student_ids?.length === 1) {
-      // otherwise fall back to old behavior
-      return ENV.observed_student_ids[0]
-    }
+    if (savedObservedId(ENV.current_user?.id)) return savedObservedId(ENV.current_user?.id)
+    if (ENV.observed_student_ids?.length === 1) return ENV.observed_student_ids[0]
   }
 
   getGrades() {

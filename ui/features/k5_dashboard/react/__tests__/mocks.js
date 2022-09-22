@@ -230,5 +230,4 @@ export const defaultK5DashboardProps = {
   canAddObservee: false,
   observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
   openTodosInNewTab: true,
-  observerPickerEnabled: true,
 }

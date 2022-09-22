@@ -190,8 +190,6 @@ describe "observer k5 dashboard" do
     end
 
     it "switches to the classic dashboard when selecting a non-k5 student" do
-      Account.site_admin.enable_feature!(:observer_picker)
-
       @course2 = course_factory(active_all: true)
       @student2 = user_factory(active_all: true, name: "Classic Student")
       @course2.enroll_student(@student2)

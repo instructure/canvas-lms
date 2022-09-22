@@ -399,10 +399,7 @@ export function reloadPlannerForObserver(newObserveeId) {
   const observeeId =
     !newObserveeId || newObserveeId === store.getState().currentUser.id ? null : newObserveeId
 
-  if (
-    observeeId !== store.getState().selectedObservee &&
-    (store.getState().weeklyDashboard || ENV.FEATURES.observer_picker)
-  ) {
+  if (observeeId !== store.getState().selectedObservee) {
     store.dispatch(reloadWithObservee(observeeId))
   }
 }

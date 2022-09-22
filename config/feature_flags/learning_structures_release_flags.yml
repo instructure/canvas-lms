@@ -86,17 +86,6 @@ submission_feedback_indicators:
   description: |-
     Adds visual indicators to the submission details page to tell students that unread
     document annotations or rubric comments exist
-observer_picker:
-  applies_to: SiteAdmin
-  state: hidden
-  display_name: Filter observer dashboard by student
-  description: |-
-    When enabled, this flag shows a student picker for observers on the dashboard.
-  environments:
-    ci:
-      state: allowed_on
-    development:
-      state: allowed_on
 calendar_series:
   applies_to: SiteAdmin
   state: hidden

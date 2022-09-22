@@ -334,7 +334,6 @@ QUnit.module('Dashboard Header', hooks => {
 
   QUnit.module('with observer', hooks2 => {
     hooks2.beforeEach(() => {
-      ENV.FEATURES = {observer_picker: true}
       ENV.current_user_roles = ['user', 'observer']
       ENV.OBSERVED_USERS_LIST = [
         {id: '17', name: 'bob', avatar_url: undefined},

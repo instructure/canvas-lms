@@ -436,8 +436,7 @@ class User < ActiveRecord::Base
                     .merge(enrollment_scope.except(:joins))
                     .where(enrollments: { associated_user_id: associated_user.id })
     else
-      enrollments_association = Account.site_admin.feature_enabled?(:observer_picker) ? :enrollments_excluding_linked_observers : :non_observer_enrollments
-      join = associated_user == self ? enrollments_association : :all_enrollments
+      join = associated_user == self ? :enrollments_excluding_linked_observers : :all_enrollments
       scope = Course.active.joins(join).merge(enrollment_scope.except(:joins)).distinct
     end
 

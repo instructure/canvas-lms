@@ -1559,9 +1559,8 @@ describe CoursesController do
         @student1 = @student
       end
 
-      context "with 'Assignments 2 Observer View' and the 'Observer Picker' enabled" do
+      context "with 'Assignments 2 Observer View'" do
         before do
-          Account.site_admin.enable_feature!(:observer_picker)
           Setting.set("assignments_2_observer_view", "true")
         end
 
@@ -1623,7 +1622,7 @@ describe CoursesController do
         end
       end
 
-      context "without 'Assignments 2 Observer View' or the 'Observer Picker' enabled" do
+      context "without 'Assignments 2 Observer View'" do
         it "redirects to the xlisted course" do
           user_session(@student1)
           @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
@@ -2013,9 +2012,8 @@ describe CoursesController do
         expect(enrollment.associated_user_id).to eq @student.id
       end
 
-      context "when observer_picker and a2 observer view is enabled" do
+      context "when a2 observer view is enabled" do
         before do
-          Account.site_admin.enable_feature!(:observer_picker)
           Setting.set("assignments_2_observer_view", "true")
         end
 
