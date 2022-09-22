@@ -82,6 +82,35 @@ describe GraphQLController do
       expect(JSON.parse(response.body)["data"]).to be_blank
     end
 
+    it "logs a page view for CreateSubmission" do
+      Setting.set("enable_page_views", "db")
+      @course = course_factory(name: "course", active_course: true)
+
+      @assignment = @course.assignments.create!(
+        name: "assignment",
+        due_at: 5.days.ago,
+        points_possible: 10,
+        submission_types: "online_text_entry"
+      )
+
+      test_query = <<~GQL
+        mutation {
+          CreateSubmission(input: {assignmentId: $assignmentLid, submissionType: $type, body: $body})
+      GQL
+
+      test_variables = {
+        assignmentLid: @assignment.id,
+        body: "<p>test</p>",
+        type: "online_text_entry"
+      }
+      # need this for the page view to be assigned a proper request_id
+      RequestContext::Generator.new(->(_env) { [200, {}, []] }).call({})
+
+      expect { post :execute, params: { query: test_query, operationName: "CreateSubmission", variables: test_variables }, format: :json }.to change { PageView.count }.by(1)
+
+      expect(PageView.last.participated).to be(true)
+    end
+
     context "datadog metrics" do
       before { allow(InstStatsd::Statsd).to receive(:increment).and_call_original }
 
