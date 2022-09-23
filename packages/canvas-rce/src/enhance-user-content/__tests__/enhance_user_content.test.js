@@ -17,7 +17,6 @@
  */
 
 import {enhanceUserContent} from '../enhance_user_content'
-import stubEnv from '@canvas/stub-env'
 
 jest.useFakeTimers()
 
@@ -122,10 +121,15 @@ describe('enhanceUserContent()', () => {
   })
 
   describe('ENV.SKIP_ENHANCING_USER_CONTENT', () => {
-    const env = stubEnv({})
+    beforeAll(() => {
+      window.ENV = {}
+    })
+    afterAll(() => {
+      window.ENV = {}
+    })
 
     it('does not enhance user content if true', () => {
-      env.SKIP_ENHANCING_USER_CONTENT = true
+      window.ENV.SKIP_ENHANCING_USER_CONTENT = true
       subject(`<div class="user_content"><a href="https://instructure.com/">external</a></div>`)
       enhanceUserContent()
       expect(document.querySelector('img.external_link_icon')).not.toBeInTheDocument()
@@ -134,7 +138,7 @@ describe('enhanceUserContent()', () => {
 
   describe('enhanceUserContent:media', () => {
     beforeAll(() => {
-      window.INST.kalturaSettings = {}
+      window.INST = {kalturaSettings: {}}
     })
     describe('links to youtube videos', () => {
       it('youtube preview gets alt text from link data-preview-alt', () => {

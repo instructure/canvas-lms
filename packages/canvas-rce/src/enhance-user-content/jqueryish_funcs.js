@@ -84,7 +84,7 @@ export function capitalize(word) {
 // so something useful anyway.
 /* eslint-disable no-undef */
 export function setData(elem, key, value) {
-  if ($) {
+  if (typeof $ !== 'undefined') {
     $(elem).data(key, value)
   } else {
     if (!elem.data) elem.data = {}
@@ -93,10 +93,13 @@ export function setData(elem, key, value) {
 }
 
 export function getData(elem, key) {
-  if ($) {
+  if (typeof $ !== 'undefined') {
     return $(elem).data(key)
   }
-  return elem.data?.[key]
+  if (elem.data && key in elem.data) {
+    return elem.data[key]
+  }
+  return elem.getAttribute(`data-${key}`)
 }
 /* eslint-enable no-undef */
 

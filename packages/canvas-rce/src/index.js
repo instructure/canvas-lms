@@ -23,6 +23,8 @@ import getTranslations from './getTranslations'
 import defaultTinymceConfig from './defaultTinymceConfig'
 import {setLocale} from './canvasFileBrowser/natcompare'
 
+export * from './enhance-user-content/index'
+
 export const defaultConfiguration = defaultTinymceConfig
 
 export function renderIntoDiv(editorEl, props, cb) {

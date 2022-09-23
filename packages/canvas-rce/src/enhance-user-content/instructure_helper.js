@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import htmlEscape from 'escape-html'
+import formatMessage from '../format-message'
+import {showFlashAlert} from '../canvasFileBrowser/FlashAlert'
 import {isPreviewable, loadDocPreview, showLoadingImage, removeLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
-
-const I18n = useI18nScope('instructure_js')
 
 const youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
 export function youTubeID(path) {
@@ -157,9 +155,7 @@ export function showFilePreviewInline(event) {
         $minimizeLink.setAttribute('href', '#')
         $minimizeLink.setAttribute('style', 'font-size: 0.8em;')
         $minimizeLink.setAttribute('class', 'hide_file_preview_link')
-        $minimizeLink.innerHTML = htmlEscape(
-          I18n.t('links.minimize_file_preview', 'Minimize File Preview')
-        )
+        $minimizeLink.innerHTML = htmlEscape(formatMessage('Minimize File Preview'))
         $minimizeLink.addEventListener('click', event2 => {
           event2.preventDefault()
           resetInlinePreview($link, $div)
@@ -174,7 +170,7 @@ export function showFilePreviewInline(event) {
     })
     .catch(ex => {
       showFlashAlert({
-        message: I18n.t('Failed getting file contents'),
+        message: formatMessage('Failed getting file contents'),
         type: 'error',
       })
       // eslint-disable-next-line no-console
