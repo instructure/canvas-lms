@@ -15,7 +15,7 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// This can be used to network with other containers or the host.
-	"forwardPorts": [3000, 5432],
+	"forwardPorts": [3000, 5432, 6379],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	"postCreateCommand": "./build/finalize-app-setup.sh",

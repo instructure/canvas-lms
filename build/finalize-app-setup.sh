@@ -5,6 +5,8 @@ set -e
 cp config/database.yml.codespaces config/database.yml &&
 cp config/security.yml.example config/security.yml &&
 cp config/domain.yml.example config/domain.yml &&
+cp config/cache_store.yml.example config/cache_store.yml && # edit
+cp .devcontainer/redis.yml.example config/redis.yml && 
 bundle install &&
 yarn install &&
 CANVAS_LMS_STATS_COLLECTION=opt_out \
