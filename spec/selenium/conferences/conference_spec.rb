@@ -83,6 +83,28 @@ describe "Web conferences" do
       wait_for_ajaximations
       expect(WebConference.count).to be > initial_conference_count
     end
+
+    it "validates duration length" do
+      initial_conference_count = WebConference.count
+      get conferences_index_page
+      stub_request(:get, /wimba\.instructure\.com/)
+      number_larger_than_8_digits = 999_999_990
+      f("button[title='New Conference']").click
+      f("span[data-testid='duration-input'] input").clear
+      f("span[data-testid='duration-input'] input").send_keys number_larger_than_8_digits
+      # f("input[placeholder='Conference Name']").send_keys "a" # 256th char
+      expect(fj("span:contains('Duration must be less than 99,999,999 minutes')")).to be_present
+      expect(f("button[data-testid='submit-button']")).not_to be_enabled
+
+      # bring it back down to 255 chars
+      f("span[data-testid='duration-input'] input").send_keys :backspace
+      expect(f("body")).not_to contain_jqcss("span:contains('Duration must be less than 99,999,999 minutes')")
+      expect(f("button[data-testid='submit-button']")).to be_enabled
+
+      f("button[data-testid='submit-button']").click
+      wait_for_ajaximations
+      expect(WebConference.count).to be > initial_conference_count
+    end
   end
 
   context "when bbb_modal_update is OFF", ignore_js_errors: true do
