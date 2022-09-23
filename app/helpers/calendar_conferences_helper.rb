@@ -40,7 +40,7 @@ module CalendarConferencesHelper
   def find_or_initialize_conference(context, conference_params, override_params = {})
     return nil if conference_params.blank?
 
-    valid_params = conference_params.merge(override_params).slice(:title, :description, :conference_type, :lti_settings, :user_settings)
+    valid_params = conference_params.merge(override_params).slice(:title, :description, :conference_type, :lti_settings, :user_settings, :start_at, :end_at)
 
     if conference_params[:id]
       WebConference.find(conference_params[:id]).tap do |conf|
