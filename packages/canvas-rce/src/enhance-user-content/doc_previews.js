@@ -18,13 +18,10 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import formatMessage from '../format-message'
 import {Spinner} from '@instructure/ui-spinner'
-import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
-import sanitizeUrl from 'sanitize-url'
+import htmlEscape from 'escape-html'
 import {capitalize, getData, setData} from './jqueryish_funcs'
-
-const I18n = useI18nScope('instructure_js')
 
 // first element in array is if scribd can handle it, second is if google can
 export const previewableMimeTypes = {
@@ -94,7 +91,7 @@ export function showLoadingImage($link) {
     )
     $link.appendChild($imageHolder)
   }
-  ReactDOM.render(<Spinner size="x-small" title={I18n.t('Loading')} />, $imageHolder)
+  ReactDOM.render(<Spinner size="x-small" title={formatMessage('Loading')} />, $imageHolder)
   return $link
 }
 
@@ -234,8 +231,7 @@ export function loadDocPreview($container, options) {
       $container.html(
         '<p>' +
           htmlEscape(
-            I18n.t(
-              'errors.document_preview_processing',
+            formatMessage(
               'The document preview is currently being processed. Please try again later.'
             )
           ) +
@@ -244,14 +240,28 @@ export function loadDocPreview($container, options) {
     } else {
       $container.html(
         '<p>' +
-          htmlEscape(
-            I18n.t(
-              'errors.cannot_view_document_in_canvas',
-              'This document cannot be displayed within Canvas.'
-            )
-          ) +
+          htmlEscape(formatMessage('This document cannot be displayed within Canvas.')) +
           '</p>'
       )
     }
+  }
+}
+
+/**
+ * Replaces bad urls with harmless urls in cases where bad urls might cause harm
+ * @param {string} url
+ */
+export function sanitizeUrl(url) {
+  const defaultUrl = 'about:blank'
+  try {
+    const parsedUrl = new URL(url, window.location.origin)
+    // eslint-disable-next-line no-script-url
+    if (parsedUrl.protocol === 'javascript:') {
+      return defaultUrl
+    }
+    return url
+  } catch (e) {
+    // URL() throws TypeError if url is not a valid URL
+    return defaultUrl
   }
 }

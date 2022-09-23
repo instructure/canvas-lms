@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <title>enhanceUserContent TestCafe page</title>
+  </head>
+  <body>
+    <div id="enhance_me">
+      <div class="user_content">
+        <p>
+          external link:
+          <a class="inline_disabled" href="https://instructure.com/" target="_blank" rel="noopener">
+            instructure is external
+          </a>
+        </p>
+        <p>
+          inline preview:
+          <a
+            class="instructure_file_link instructure_scribd_file"
+            href="http://localhost:3000/courses/1/files/13?wrap=1"
+            target="_blank"
+            rel="noopener"
+            data-canvas-previewable="true"
+            data-api-endpoint="http://localhost:3000/api/v1/courses/1/files/13"
+            data-api-returntype="File"
+            >wrappedOpts.pdf</a
+          >
+        </p>
+        <p>
+          auto inline:
+          <a
+            class="instructure_file_link instructure_scribd_file auto_open"
+            href="http://localhost:3000/courses/1/files/13?wrap=1"
+            target="_blank"
+            rel="noopener"
+            data-canvas-previewable="true"
+            data-api-endpoint="http://localhost:3000/api/v1/courses/1/files/13"
+            data-api-returntype="File"
+            >wrappedOpts.pdf</a
+          >
+        </p>
+        <p>
+          in overlay:
+          <a
+            class="instructure_file_link instructure_scribd_file inline_disabled"
+            href="http://localhost:3000/courses/1/files/13?wrap=1"
+            target="_blank"
+            rel="noopener"
+            data-canvas-previewable="true"
+            data-api-endpoint="http://localhost:3000/api/v1/courses/1/files/13"
+            data-api-returntype="File"
+            >wrappedOpts.pdf</a
+          >
+        </p>
+      </div>
+    </div>
+    <script src="build/testcafe.js"></script>
+  </body>
+</html>

@@ -19,14 +19,12 @@
 import ReactDOM from 'react-dom'
 import React from 'react'
 import {Link} from '@instructure/ui-link'
-import htmlEscape from 'html-escape'
+import htmlEscape from 'escape-html'
 import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
-import {useScope as useI18nScope} from '@canvas/i18n'
+import formatMessage from '../format-message'
 import {closest, siblings, show, hide, insertAfter, getData, setData} from './jqueryish_funcs'
 import {youTubeID, isExternalLink, getTld, showFilePreview} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
-
-const I18n = useI18nScope('instructure_js')
 
 // we're doing this so we can use the svg in the img src attribute
 // rather than just inlining the svg. This simplified keeping the
@@ -52,7 +50,7 @@ function makeDownloadButton(download_url, filename) {
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(I18n.t('Download %{filename}', {filename}))
+  srspan.innerHTML = htmlEscape(formatMessage('Download {filename}', {filename}))
   a.appendChild(srspan)
 
   return a
@@ -74,7 +72,7 @@ function makeExternalLinkIcon(forLink) {
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
-  srspan.innerHTML = htmlEscape(I18n.t('Links to an external site.'))
+  srspan.innerHTML = htmlEscape(formatMessage('Links to an external site.'))
   span.appendChild(srspan)
   return span
 }
@@ -113,7 +111,7 @@ function handleYoutubeLink($link) {
           style='font-size: 0.8em;'
           class='hide_youtube_embed_link'
         >
-          ${htmlEscape(I18n.t('links.minimize_youtube_video', 'Minimize Video'))}
+          ${htmlEscape(formatMessage('Minimize Video'))}
         </a>
       `
       $video.querySelectorAll('.hide_youtube_embed_link').forEach($elem => {
@@ -173,7 +171,7 @@ function handleAnchorsWithImage() {
 }
 
 export function enhanceUserContent(container, customEnhanceFunc) {
-  if (ENV.SKIP_ENHANCING_USER_CONTENT) {
+  if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
     return
   }
 
@@ -192,7 +190,7 @@ export function enhanceUserContent(container, customEnhanceFunc) {
       // and canvas adds hidden=1 to the URL.
       // we also need to strip the alt text
       if (/hidden=1$/.test(img.getAttribute('src'))) {
-        img.setAttribute('alt', I18n.t('This image is currently unavailable'))
+        img.setAttribute('alt', formatMessage('This image is currently unavailable'))
       }
     })
     setData(unenhanced_elem, 'unenhanced_content_html', unenhanced_elem.innerHTML)

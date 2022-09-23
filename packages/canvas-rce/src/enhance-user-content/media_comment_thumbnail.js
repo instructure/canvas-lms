@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useScope as useI18nScope} from '@canvas/i18n'
+import formatMessage from '../format-message'
 import {closest} from './jqueryish_funcs'
-import htmlEscape from 'html-escape'
-import deparam from 'deparam'
-
-const I18n = useI18nScope('mediaCommentThumbnail')
+import htmlEscape from 'escape-html'
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
   normal: {width: 140, height: 100},
@@ -43,7 +40,10 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
     console.error(error)
   }
 
-  if (url && deparam(url.search).no_preview) return
+  if (url) {
+    const urlParams = new URLSearchParams(url.search)
+    if (urlParams.has('no_preview') && urlParams.get('no_preview') !== 'false') return
+  }
 
   const dimensions = MEDIA_COMMENT_THUMBNAIL_SIZES[size] || MEDIA_COMMENT_THUMBNAIL_SIZES.normal
   const id =
@@ -57,12 +57,12 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
   let altText
 
   if (authorName && createdAt) {
-    altText = I18n.t('Play media comment by %{name} from %{createdAt}.', {
+    altText = formatMessage('Play media comment by {name} from {createdAt}.', {
       name: authorName,
       createdAt,
     })
   } else {
-    altText = I18n.t('Play media comment.')
+    altText = formatMessage('Play media comment.')
   }
 
   if (id) {
