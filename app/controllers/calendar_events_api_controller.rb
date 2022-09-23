@@ -1222,10 +1222,15 @@ class CalendarEventsApiController < ApplicationController
   # @API Save enabled account calendars
   #
   #  Creates and updates the enabled_account_calendars and mark_feature_as_seen user preferences
-  #  @argument mark_feature_as_seen [Optional, Boolean]
-  #    Flag to mark account calendars feature as seen
-  #  @argument enabled_account_calendars[] [Optional, Array]
-  #    An array of account Ids to remember in the calendars list of the user
+  #
+  # @argument mark_feature_as_seen [Optional, Boolean]
+  #   Flag to mark account calendars feature as seen
+  #
+  # @argument enabled_account_calendars[] [Optional, Array]
+  #   An array of account Ids to remember in the calendars list of the user
+  #
+  # @example_request
+  #
   #   curl 'https://<canvas>/api/v1/calendar_events/save_enabled_account_calendars' \
   #        -X POST \
   #        -F 'mark_feature_as_seen=true' \
