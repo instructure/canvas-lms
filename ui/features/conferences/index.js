@@ -225,7 +225,12 @@ const ConferencesRouter = Backbone.Router.extend({
     conference =
       this.currentConferences.get(conference) || this.concludedConferences.get(conference)
     if (!conference) return
-
+    if (!conference.get('permissions').update) {
+      // reached when a user without edit permissions navigates
+      // to a specific conference's url directly
+      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      return
+    }
     if (ENV.bbb_modal_update) {
       const {attributes} = conference
       const options = []
@@ -380,13 +385,8 @@ const ConferencesRouter = Backbone.Router.extend({
         document.getElementById('react-conference-modal-container')
       )
     } else {
-      if (conference.get('permissions').update) {
-        this.editConferenceId = conference.get('id')
-        this.editView.show(conference, {isEditing: true})
-      }
-      // reached when a user without edit permissions navigates
-      // to a specific conference's url directly
-      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      this.editConferenceId = conference.get('id')
+      this.editView.show(conference, {isEditing: true})
     }
   },
 
