@@ -43,7 +43,10 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 import CommentsTray from './CommentsTray/index'
-import {getOriginalityData} from '@canvas/grading/originalityReportHelper'
+import {
+  getOriginalityData,
+  isOriginalityReportVisible,
+} from '@canvas/grading/originalityReportHelper'
 
 const I18n = useI18nScope('assignments_2_student_header')
 
@@ -338,6 +341,11 @@ class Header extends React.Component {
                       this.props.submission.attachments.length === 1) &&
                     this.props.submission.originalityData &&
                     this.props.assignment.env.originalityReportsForA2Enabled &&
+                    isOriginalityReportVisible(
+                      this.props.assignment.originalityReportVisibility,
+                      this.props.assignment.dueAt,
+                      this.props.submission.gradingStatus
+                    ) &&
                     getOriginalityData(this.props.submission, 0) && (
                       <Flex.Item>
                         <OriginalityReport

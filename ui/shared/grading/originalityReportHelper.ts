@@ -32,6 +32,31 @@ export function originalityReportSubmissionKey(submission: {
   }
 }
 
+export function isOriginalityReportVisible(
+  originalityReportVisibility: string | null,
+  dueAt: string | null,
+  gradingStatus: string | null
+): boolean {
+  switch (originalityReportVisibility) {
+    case 'immediate':
+      return true
+    case 'never':
+      return false
+    case 'after_grading':
+      if (gradingStatus && ['graded', 'excused'].includes(gradingStatus)) {
+        return true
+      }
+      return false
+    case 'after_due_date':
+      if (!dueAt || new Date(dueAt) < new Date()) {
+        return true
+      }
+      return false
+    default:
+      return true
+  }
+}
+
 export function getOriginalityData(
   submission: {
     _id: string
