@@ -116,7 +116,7 @@ describe "calendar2" do
     end
 
     context "Add other calendars modal" do
-      it "adds an account calendar to the list of other calendars and shows its events" do
+      it "adds an account calendar to the list of other calendars and shows its calendar events" do
         account_admin_user(account: @subaccount1)
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
@@ -130,6 +130,25 @@ describe "calendar2" do
         expect(other_calendars_container).to be_displayed
         expect(account_calendar.first.text).to eq @subaccount1.name
         assert_title(event_title, false)
+      end
+
+      it "removes an account calendar from the list of other calendars and removes its calendar events" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        event_title = "event of #{@subaccount1.name}"
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+        get "/calendar2"
+        # Confirm the account calendar is active
+        account_calendar = other_calendars_context_labels
+        expect(account_calendar.first.text).to eq @subaccount1.name
+        assert_title(event_title, false)
+        # Removing the account calendar
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_save_btn
+        wait_for_ajaximations
+        expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+        expect(calendar_body).not_to contain_css(calendar_event_selector)
       end
 
       it "keeps added account calendars as selected context after refreshing the page" do

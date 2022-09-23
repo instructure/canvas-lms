@@ -266,13 +266,24 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
       const newAddedCalendars = newOtherCalendars.filter(newAC => {
         return !otherCalendars.some(oldAC => newAC.id === oldAC.id)
       })
+      const removedCalendars = otherCalendars.filter(oldAC =>{
+        return !newOtherCalendars.some(newAC => oldAC.id === newAC.id)
+      })
+
+      // make sure the removed contexts aren't active before syncing the calendar
+      removedCalendars.forEach(removedCalendar => {
+        if (visibleContexts.contexts.includes(removedCalendar.asset_string)) {
+          visibleContexts.toggle(removedCalendar.asset_string)
+        }
+      })
       otherCalendars = newOtherCalendars
       const contextAccountCodes = otherCalendars.map(nOC => nOC.asset_string)
       syncOtherCalendars(otherCalendars, visibleContexts.notify)
       visibleContexts.overrideEnabledAccounts(contextAccountCodes)
       onContextsChange(otherCalendars)
+      // make sure the calendar is synced and ready to enable the new contexts
       newAddedCalendars.forEach(newCalendar => {
-        if (!visibleContexts.contexts.includes(newCalendar)) {
+        if (!visibleContexts.contexts.includes(newCalendar.asset_string)) {
           visibleContexts.toggle(newCalendar.asset_string)
         }
       })
