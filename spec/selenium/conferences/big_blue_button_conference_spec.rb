@@ -291,7 +291,23 @@ describe "BigBlueButton conferences" do
       end
     end
 
-    context "when a conference is open" do
+    context "when a conference is open", ignore_js_errors: true do
+      it "displays start and end dates by description" do
+        conf = create_big_blue_button_conference
+
+        # far in the future, will need to be changed after these dates
+        conf.start_at = Date.parse("2999-07-01")
+        conf.end_at = Date.parse("2999-07-02")
+        conf.description = "this is the description"
+        conf.save!
+
+        get conferences_index_page
+        expect(fj("div:contains('Jul 1, 2999')")).to be_present
+        expect(fj("div:contains('to')")).to be_present
+        expect(fj("div:contains('Jul 2, 2999')")).to be_present
+        expect(fj("div:contains('#{conf.description}')")).to be_present
+      end
+
       context "and the conference has no recordings" do
         before(:once) do
           stub_request(:get, /getRecordings/)
