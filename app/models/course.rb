@@ -3150,9 +3150,8 @@ class Course < ActiveRecord::Base
   end
 
   def external_tool_tabs(opts, user)
-    tools = context_external_tools.active.having_setting("course_navigation")
-    tools += ContextExternalTool.shard(shard).active.having_setting("course_navigation").where(context_type: "Account", context_id: account_chain_ids).to_a
-    tools = tools.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
+    tools = Lti::ContextToolFinder.new(self, type: :course_navigation)
+                                  .all_tools_scope_union.to_unsorted_array.select { |t| t.permission_given?(:course_navigation, user, self) && t.feature_flag_enabled?(self) }
     Lti::ExternalToolTab.new(self, :course_navigation, tools, opts[:language]).tabs
   end
 

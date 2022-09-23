@@ -239,7 +239,7 @@ class ContextExternalTool < ActiveRecord::Base
 
     def all_global_navigation_tools(root_account)
       RequestCache.cache("global_navigation_tools", root_account) do # prevent re-querying
-        root_account.context_external_tools.active.having_setting(:global_navigation).to_a
+        Lti::ContextToolFinder.new(root_account, type: :global_navigation).all_tools_scope_union.to_unsorted_array
       end
     end
 
