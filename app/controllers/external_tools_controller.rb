@@ -1213,7 +1213,8 @@ class ExternalToolsController < ApplicationController
       favorite_ids << @tool.global_id
       favorite_ids.uniq!
       if favorite_ids.length > 2
-        valid_ids = Lti::ContextToolFinder.all_tools_for(@context, placements: [:editor_button]).pluck(:id).map { |id| Shard.global_id_for(id) }
+        valid_ids = Lti::ContextToolFinder.new(@context, placements: [:editor_button]).all_tools_scope_union.pluck(:id)
+        valid_ids.map! { |id| Shard.global_id_for(id) }
         favorite_ids &= valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
       end
       if favorite_ids.length > 2

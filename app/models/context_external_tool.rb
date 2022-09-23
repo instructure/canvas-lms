@@ -861,7 +861,12 @@ class ContextExternalTool < ActiveRecord::Base
     return true if url.present? && duplicate_tool.present?
 
     # If tool with same domain is found in the context
-    Lti::ContextToolFinder.all_tools_for(context).where.not(id: id).where(domain: domain).present? && domain.present?
+    if domain.present?
+      same_domain_diff_id = ContextExternalTool.where.not(id: id).where(domain: domain)
+      Lti::ContextToolFinder.all_tools_scope_union(context, base_scope: same_domain_diff_id).exists?
+    else
+      false
+    end
   end
 
   def check_for_duplication(verify_uniqueness)

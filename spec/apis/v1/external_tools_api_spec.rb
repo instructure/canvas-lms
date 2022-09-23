@@ -402,16 +402,30 @@ describe ExternalToolsController, type: :request do
         expect(json["message"]).to eq "Cannot have more than 2 favorited tools"
       end
 
-      it "handles adding a favorite after a previous tool is deleted" do
-        tool2 = create_editor_tool(Account.default)
-        tool3 = create_editor_tool(Account.default)
-        Account.default.tap do |ra|
-          ra.settings[:rce_favorite_tool_ids] = { value: [tool2.global_id, tool3.global_id] }
-          ra.save!
+      describe "handling deleted tools" do
+        before do
+          @tool2 = create_editor_tool(Account.default)
+          @tool3 = create_editor_tool(Account.default)
+          Account.default.tap do |ra|
+            ra.settings[:rce_favorite_tool_ids] = { value: [@tool2.global_id, @tool3.global_id] }
+            ra.save!
+          end
         end
-        tool3.destroy
 
-        add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+        it "handles adding a favorite after a previous tool is deleted" do
+          @tool3.destroy
+          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+        end
+
+        it "uses Lti::ContextToolFinder to return tools and can handle global ids" do
+          scope_union_double = instance_double(Lti::ScopeUnion)
+          expect(Lti::ContextToolFinder).to receive(:new).and_return(
+            instance_double(Lti::ContextToolFinder, all_tools_scope_union: scope_union_double)
+          )
+          expect(scope_union_double).to receive(:pluck).with(:id).and_return([@tool2.global_id])
+
+          add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+        end
       end
 
       it "adds to existing favorites configured with old column if not specified on account" do
