@@ -53,6 +53,7 @@ export const Assignment = {
       }
       name
       nonDigitalSubmission
+      originalityReportVisibility
       pointsPossible
       submissionTypes
       unlockAt
@@ -80,6 +81,7 @@ export const Assignment = {
     modules: arrayOf(Module.shape),
     name: string.isRequired,
     nonDigitalSubmission: bool.isRequired,
+    originalityReportVisibility: string,
     pointsPossible: number.isRequired,
     submissionTypes: arrayOf(string.isRequired),
     unlockAt: string,
@@ -116,6 +118,7 @@ export const DefaultMocks = {
     expectsSubmission: true,
     gradingType: 'points',
     nonDigitalSubmission: false,
+    originalityReportVisibility: null,
     pointsPossible: 10,
     rubric: null,
     submissionsConnection: {
