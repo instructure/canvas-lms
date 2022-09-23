@@ -100,6 +100,20 @@ describe Lti::ContextToolFinder do
         end
       end
     end
+
+    it "applies the base_scope" do
+      tools = [
+        create_tool(@root_account, "hello", domain: "google.com"),
+        create_tool(@account, "bye", domain: "google.com"),
+        create_tool(@course, "hello", domain: "google.com"),
+        create_tool(course_model, "hello", url: "http://www.google.com"),
+      ]
+      scope_union = described_class.all_tools_scope_union(
+        tools[2].course,
+        base_scope: ContextExternalTool.where(name: "hello")
+      )
+      expect(scope_union.to_unsorted_array).to contain_exactly(tools[0], tools[2])
+    end
   end
 
   describe "all_tools_sorted_array" do

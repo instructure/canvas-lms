@@ -38,5 +38,25 @@ module Lti
     def to_unsorted_array
       scopes.flat_map(&:to_a)
     end
+
+    # Looks at each shard in order. (In ContextToolFinder, the first shard is
+    # the one the context is on, rather than a federated parent shard)
+    def take
+      scopes.each do |scope|
+        taken = scope.take
+        return taken if taken
+      end
+      nil
+    end
+
+    def pluck(*args)
+      scopes.inject([]) { |agg, scope| agg.concat(scope.pluck(*args)) }
+    end
+
+    def each(&blk)
+      scopes.each do |scope|
+        scope.each(&blk)
+      end
+    end
   end
 end

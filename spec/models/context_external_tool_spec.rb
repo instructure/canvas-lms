@@ -456,6 +456,37 @@ describe ContextExternalTool do
         let(:context) { course_model }
       end
     end
+
+    context "called from another shard" do
+      specs_require_sharding
+
+      it_behaves_like "detects duplication in contexts" do
+        # Some of the specs would fail if ContextToolFinder doesn't translate IDs correctly,
+        # so that tests that.
+        subject do
+          second_tool
+          @shard2.activate { second_tool.duplicated_in_context? }
+        end
+
+        let(:context) { course_model }
+      end
+    end
+
+    it "uses Lti::ContextToolFinder" do
+      course = course_model
+      tool = ContextExternalTool.create!(
+        context: course,
+        name: "first tool",
+        consumer_key: "key",
+        shared_secret: "secret",
+        domain: "www.tool.com"
+      )
+
+      expect(Lti::ContextToolFinder).to receive(:all_tools_scope_union)
+        .with(course, base_scope: anything)
+        .and_return(Lti::ScopeUnion.new([ContextExternalTool.all]))
+      expect(tool.duplicated_in_context?).to eq(true)
+    end
   end
 
   describe "#calculate_identity_hash" do
