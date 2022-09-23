@@ -25,6 +25,27 @@ export function originalityReportSubmissionKey(submission) {
   }
 }
 
+export function isOriginalityReportVisible(originalityReportVisibility, dueAt, gradingStatus) {
+  switch (originalityReportVisibility) {
+    case 'immediate':
+      return true
+    case 'never':
+      return false
+    case 'after_grading':
+      if (gradingStatus && ['graded', 'excused'].includes(gradingStatus)) {
+        return true
+      }
+      return false
+    case 'after_due_date':
+      if (!dueAt || new Date(dueAt) < new Date()) {
+        return true
+      }
+      return false
+    default:
+      return true
+  }
+}
+
 export function getOriginalityData(submission, index) {
   let data = null
   if (submission.submissionType === 'online_text_entry') {

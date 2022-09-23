@@ -46,6 +46,7 @@ import {uploadFile} from '@canvas/upload-file'
 import {useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 import theme from '@instructure/canvas-theme'
+import {isOriginalityReportVisible} from '@canvas/grading/originalityReportHelper'
 
 const I18n = useI18nScope('assignments_2_attempt_tab')
 
@@ -339,7 +340,13 @@ export default class AttemptTab extends Component {
       <LazyLoad errorCategory="Assignments 2 FilePreview on AttemptTab">
         <FilePreview
           submission={this.props.submission}
-          originalityReportsForA2={this.props.originalityReportsForA2}
+          isOriginalityReportVisible={
+            isOriginalityReportVisible(
+              this.props.assignment.originalityReportVisibility,
+              this.props.assignment.dueAt,
+              this.props.submission.gradingStatus
+            ) && this.props.originalityReportsForA2
+          }
         />
       </LazyLoad>
     ) : (
