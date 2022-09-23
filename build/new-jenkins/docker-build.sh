@@ -36,25 +36,17 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2022-09-20.1"
+export CACHE_VERSION="2022-09-23.1"
+export DOCKER_BUILDKIT=1
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/bash
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/core:focal
 
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack-dependencies" --target cache-helper-collect-webpack-dependencies "$WORKSPACE"
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
-DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-js" --target cache-helper-collect-js "$WORKSPACE"
+docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper" "$WORKSPACE"
 
-RUBY_CACHE_MD5=$(docker run local/cache-helper-collect-gems sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
-YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
-PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
-WEBPACK_ASSETS_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
-WEBPACK_ASSETS_DEPENDENCIES_MD5=$(docker run local/cache-helper-collect-webpack-dependencies sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
+source <(docker run local/cache-helper cat /tmp/dst/environment.sh)
 
 BASE_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins | md5sum)
 RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.ruby-runner | md5sum)
@@ -85,24 +77,24 @@ BASE_RUNNER_PARTS=(
 RUBY_RUNNER_PARTS=(
   "${BASE_RUNNER_PARTS[@]}"
   $RUBY_RUNNER_DOCKERFILE_MD5
-  $RUBY_CACHE_MD5
+  $RUBY_RUNNER_MD5
 )
 YARN_RUNNER_PARTS=(
   "${RUBY_RUNNER_PARTS[@]}"
   $YARN_RUNNER_DOCKERFILE_MD5
-  $YARN_CACHE_MD5
+  $YARN_RUNNER_MD5
 )
 WEBPACK_BUILDER_PARTS=(
   "${YARN_RUNNER_PARTS[@]}"
   $WEBPACK_BUILDER_DOCKERFILE_MD5
-  $PACKAGES_CACHE_MD5
+  $WEBPACK_BUILDER_MD5
 )
 WEBPACK_RUNNER_PARTS=(
   "${WEBPACK_BUILDER_PARTS[@]}"
   "${WEBPACK_RUNNER_BUILD_ARGS[@]}"
   $WEBPACK_RUNNER_DOCKERFILE_MD5
-  $WEBPACK_ASSETS_MD5
-  $WEBPACK_ASSETS_DEPENDENCIES_MD5
+  $WEBPACK_RUNNER_MD5
+  $WEBPACK_RUNNER_DEPENDENCIES_MD5
 )
 WEBPACK_ASSETS_PARTS=(
   "${WEBPACK_RUNNER_PARTS[@]}"

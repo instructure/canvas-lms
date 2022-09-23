@@ -1,11 +1,12 @@
 # syntax = starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
 
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-gems
+FROM starlord.inscloudgate.net/jenkins/core:focal
+SHELL ["/usr/bin/bash", "-c"]
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   shopt -s globstar && \
-  tar -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     --exclude='vendor/qti_migration_tool' \
     config/canvas_rails_switcher.rb \
     Gemfile \
@@ -20,14 +21,9 @@ RUN --mount=target=/tmp/src \
     engines/**/version.rb \
     vendor \
     \
-    | tar -xf - -C /tmp/dst
-
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-yarn
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src \
-  mkdir -p /tmp/dst && \
-  shopt -s globstar && \
-  tar -cf - \
+    | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     script/fix_inst_esm.js \
     package.json \
     yarn.lock \
@@ -36,24 +32,15 @@ RUN --mount=target=/tmp/src \
     ui/shared/**/package.json \
     packages/**/package.json \
     \
-    | tar -xf - -C /tmp/dst
-
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-packages
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src \
-  mkdir -p /tmp/dst && \
-  cp --parents -rf \
+    | tee /tmp/dst/yarn-runner.tar | md5sum > /tmp/dst/yarn-runner.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     ui/engine \
     packages \
     \
-    /tmp/dst
-
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack-dependencies
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src \
-  mkdir -p /tmp/dst && \
-  shopt -s globstar && \
-  tar -cf - \
+    | tee /tmp/dst/webpack-builder.tar | md5sum > /tmp/dst/webpack-builder.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     bin \
     config/environments \
     # This is intentionally only a single-level directory - and really should be cut down more later.
@@ -86,14 +73,9 @@ RUN --mount=target=/tmp/src \
     gulpfile.js \
     webpack.config.js \
     \
-  | tar -xf - -C /tmp/dst
-
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-webpack
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src \
-  mkdir -p /tmp/dst && \
-  shopt -s globstar && \
-  tar -cf - \
+    | tee /tmp/dst/webpack-runner-dependencies.tar | md5sum > /tmp/dst/webpack-runner-dependencies.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     --exclude='**/__mocks__' \
     --exclude='**/__tests__' \
     app/stylesheets \
@@ -107,14 +89,9 @@ RUN --mount=target=/tmp/src \
     public \
     ui \
     \
-  | tar -xf - -C /tmp/dst
-
-FROM starlord.inscloudgate.net/jenkins/bash AS cache-helper-collect-js
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src \
-  mkdir -p /tmp/dst && \
-  shopt -s globstar && \
-  tar -cf - \
+    | tee /tmp/dst/webpack-runner.tar | md5sum > /tmp/dst/webpack-runner.tar.md5 && \
+  \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     app/stylesheets \
     config/brandable_css.yml \
     config/browsers.yml \
@@ -138,8 +115,10 @@ RUN --mount=target=/tmp/src \
     tsconfig.json \
     yarn.lock \
     \
-    | tar -xf - -C /tmp/dst
-
-FROM local/cache-helper-collect-js AS cache-helper-collect-js-graphql
-RUN --mount=target=/tmp/src \
-  cp /tmp/src/schema.graphql /tmp/dst/schema.graphql
+    | tee /tmp/dst/js.tar | md5sum > /tmp/dst/js.tar.md5 && \
+  touch /tmp/dst/environment.sh && \
+  echo "RUBY_RUNNER_MD5=$(cat /tmp/dst/ruby-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
+  echo "YARN_RUNNER_MD5=$(cat /tmp/dst/yarn-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
+  echo "WEBPACK_BUILDER_MD5=$(cat /tmp/dst/webpack-builder.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
+  echo "WEBPACK_RUNNER_MD5=$(cat /tmp/dst/webpack-runner.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh && \
+  echo "WEBPACK_RUNNER_DEPENDENCIES_MD5=$(cat /tmp/dst/webpack-runner-dependencies.tar.md5 | cut -d' ' -f1)" >> /tmp/dst/environment.sh

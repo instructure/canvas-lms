@@ -14,11 +14,10 @@ mkdir -p tmp
 docker cp $(docker ps -qa -f name=general-build-container):/usr/src/app/schema.graphql tmp/schema.graphql
 
 DOCKER_BUILDKIT=1 docker build \
-  --file Dockerfile.jenkins-cache \
+  --file Dockerfile.jenkins.js \
   --label "PATCHSET_TAG=$PATCHSET_TAG" \
   --label "WEBPACK_BUILDER_IMAGE=$WEBPACK_BUILDER_IMAGE" \
   --tag "$1" \
-  --target cache-helper-collect-js-graphql \
   "$WORKSPACE/tmp"
 
 add_log "built $1"
