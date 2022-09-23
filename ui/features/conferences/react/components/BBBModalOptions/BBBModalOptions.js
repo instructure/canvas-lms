@@ -93,6 +93,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                 }}
                 interaction={noTimeLimit || props.hasBegun ? 'disabled' : 'enabled'}
                 isRequired={!noTimeLimit}
+                messages={props.durationValidationMessages}
               />
             </span>
           </Flex.Item>
@@ -341,7 +342,8 @@ BBBModalOptions.propTypes = {
   setTab: PropTypes.func,
   nameValidationMessages: PropTypes.array,
   descriptionValidationMessages: PropTypes.array,
-  hasBegun: PropTypes.bool
+  hasBegun: PropTypes.bool,
+  durationValidationMessages: PropTypes.array
 }
 
 export default BBBModalOptions
