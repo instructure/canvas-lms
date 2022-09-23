@@ -83,6 +83,7 @@ export const VideoConferenceModal = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const [nameValidationMessages, setNameValidationMessages] = useState([])
+  const [durationValidationMessages, setDurationValidationMessages] = useState([])
   const [descriptionValidationMessages, setDescriptionValidationMessages] = useState([])
   const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
   const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
@@ -103,6 +104,20 @@ export const VideoConferenceModal = ({
     } else {
       setNameValidationMessages([])
       setName(nameToBeValidated)
+    }
+  }
+
+  const setAndValidateDuration = durationToBeValidated => {
+    if (durationToBeValidated.toString().length > 8) {
+      if (durationValidationMessages.length === 0) {
+        setDuration(durationToBeValidated)
+      }
+      setDurationValidationMessages([
+        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'}
+      ])
+    } else {
+      setDurationValidationMessages([])
+      setDuration(durationToBeValidated)
     }
   }
 
@@ -159,7 +174,8 @@ export const VideoConferenceModal = ({
           name={name}
           onSetName={setAndValidateName}
           duration={duration}
-          onSetDuration={setDuration}
+          onSetDuration={setAndValidateDuration}
+          durationValidationMessages={durationValidationMessages}
           options={options}
           onSetOptions={setOptions}
           description={description}
@@ -194,7 +210,8 @@ export const VideoConferenceModal = ({
         name={name}
         onSetName={setAndValidateName}
         duration={duration}
-        onSetDuration={setDuration}
+        onSetDuration={setAndValidateDuration}
+        durationValidationMessages={durationValidationMessages}
         options={options}
         onSetOptions={setOptions}
         description={description}
@@ -279,7 +296,8 @@ export const VideoConferenceModal = ({
             isLoading ||
             nameValidationMessages.length > 0 ||
             calendarValidationMessages.length > 0 ||
-            descriptionValidationMessages > 0
+            descriptionValidationMessages.length > 0 ||
+            durationValidationMessages.length > 0
           }
         >
           {isLoading ? (

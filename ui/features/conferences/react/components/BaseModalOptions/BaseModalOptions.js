@@ -70,6 +70,7 @@ const BaseModalOptions = props => {
               }}
               interaction={noTimeLimit || props.hasBegun ? 'disabled' : 'enabled'}
               isRequired={!noTimeLimit}
+              messages={props.durationValidationMessages}
             />
           </span>
         </Flex.Item>
@@ -153,7 +154,8 @@ BaseModalOptions.propTypes = {
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
   nameValidationMessages: PropTypes.array,
   descriptionValidationMessages: PropTypes.array,
-  hasBegun: PropTypes.bool
+  hasBegun: PropTypes.bool,
+  durationValidationMessages: PropTypes.array
 }
 
 export default BaseModalOptions
