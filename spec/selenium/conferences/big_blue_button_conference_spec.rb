@@ -177,6 +177,71 @@ describe "BigBlueButton conferences" do
       lock_options = ff("input[name='attendees_options']")
       expect(lock_options).to all(be_disabled)
     end
+
+    it "sets start and end date on WebConference when created and edited from the calendar" do
+      get "/calendar"
+
+      # Create calendar event with conference
+      f("a#create_new_event_link").click
+      f("input[placeholder='Input Event Title...']").send_keys "BBB Conference from Calendar"
+
+      f("input[data-testid='event-form-start-time']").click
+      f("input[data-testid='event-form-start-time']").send_keys(:arrow_down)
+      f("input[data-testid='event-form-start-time']").send_keys(:enter)
+
+      f("input[data-testid='event-form-end-time']").click
+      5.times { f("input[data-testid='event-form-end-time']").send_keys(:arrow_down) }
+      f("input[data-testid='event-form-end-time']").send_keys(:enter)
+
+      f("input[data-testid='edit-calendar-event-form-context']").click
+      f("input[data-testid='edit-calendar-event-form-context']").send_keys(:arrow_down)
+      f("input[data-testid='edit-calendar-event-form-context']").send_keys(:enter)
+
+      fj('button:contains("Add BigBlueButton")').click
+      wait_for_ajaximations
+
+      f("button[type=submit]").click
+
+      ce = CalendarEvent.last
+      wc = WebConference.last
+
+      wc_before_start_at = wc.start_at
+      wc_before_end_at = wc.end_at
+
+      # Make sure values are correctly and as expected
+      expect(ce.web_conference_id).to eq wc.id
+      expect(wc.title).to eq "BBB Conference from Calendar"
+      expect(ce.start_at).to eq wc.start_at
+      expect(ce.end_at).to eq wc.end_at
+
+      # Edit calendar event
+      fj("a:contains('BBB Conference from Calendar')").click
+      fj('button:contains("Edit")').click
+
+      f("input[data-testid='event-form-start-time']").click
+      5.times { f("input[data-testid='event-form-start-time']").send_keys(:arrow_down) }
+      f("input[data-testid='event-form-start-time']").send_keys(:enter)
+
+      f("input[data-testid='event-form-end-time']").click
+      10.times { f("input[data-testid='event-form-end-time']").send_keys(:arrow_down) }
+      f("input[data-testid='event-form-end-time']").send_keys(:enter)
+
+      f("button[type=submit]").click
+      wait_for_ajaximations
+
+      ce.reload
+      wc.reload
+
+      wc_after_start_at = wc.start_at
+      wc_after_end_at = wc.end_at
+
+      # Make sure edited values are correctly and as expected
+      expect(ce.start_at).to eq wc.start_at
+      expect(ce.end_at).to eq wc.end_at
+
+      expect(wc_before_start_at).to be < wc_after_start_at
+      expect(wc_before_end_at).to be < wc_after_end_at
+    end
   end
 
   context "when bbb_modal_update is OFF" do

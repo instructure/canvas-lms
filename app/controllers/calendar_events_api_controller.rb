@@ -531,7 +531,12 @@ class CalendarEventsApiController < ApplicationController
       params_for_create[:description] = process_incoming_html_content(params_for_create[:description])
     end
     if params_for_create.key?(:web_conference)
-      params_for_create[:web_conference] = find_or_initialize_conference(@context, params_for_create[:web_conference])
+      web_conference_params = params_for_create[:web_conference]
+      unless web_conference_params.empty?
+        web_conference_params[:start_at] = params_for_create[:start_at]
+        web_conference_params[:end_at] = params_for_create[:end_at]
+      end
+      params_for_create[:web_conference] = find_or_initialize_conference(@context, web_conference_params)
     end
 
     @event = @context.calendar_events.build(params_for_create)
@@ -756,7 +761,12 @@ class CalendarEventsApiController < ApplicationController
         params_for_update[:description] = process_incoming_html_content(params_for_update[:description])
       end
       if params_for_update.key?(:web_conference)
-        web_conference = find_or_initialize_conference(@event.context, params_for_update[:web_conference])
+        web_conference_params = params_for_update[:web_conference]
+        unless web_conference_params.empty?
+          web_conference_params[:start_at] = params_for_update[:start_at]
+          web_conference_params[:end_at] = params_for_update[:end_at]
+        end
+        web_conference = find_or_initialize_conference(@event.context, web_conference_params)
         return unless authorize_user_for_conference(@current_user, web_conference)
 
         params_for_update[:web_conference] = web_conference
