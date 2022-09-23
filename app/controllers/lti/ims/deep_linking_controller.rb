@@ -29,6 +29,7 @@ module Lti
 
       before_action :require_context
       before_action :validate_jwt
+      before_action :validate_return_url_data
       before_action :require_context_update_rights
       before_action :require_tool
 
@@ -68,7 +69,7 @@ module Lti
 
           item_for_assignment = lti_resource_links.first
           if allow_line_items? && item_for_assignment.key?(:lineItem) && validate_line_item!(item_for_assignment)
-            create_update_assignment!(item_for_assignment, params[:assignment_id])
+            create_update_assignment!(item_for_assignment, return_url_parameters[:assignment_id])
           end
 
           render_content_items(items: [item_for_assignment])
@@ -111,7 +112,7 @@ module Lti
         context_module = if create_new_module?
                            @context.context_modules.create!(name: I18n.t("New Content From App"), workflow_state: "unpublished")
                          else
-                           @context.context_modules.not_deleted.find(params[:context_module_id])
+                           @context.context_modules.not_deleted.find(return_url_parameters[:context_module_id])
                          end
 
         lti_resource_links.each do |content_item|
@@ -134,13 +135,13 @@ module Lti
       private
 
       def for_placement?(placement)
-        params[:placement]&.to_sym == placement
+        return_url_parameters[:placement]&.to_sym == placement
       end
 
       def render_content_items(items: content_items, reload_page: true)
         js_env({
                  deep_link_response: {
-                   placement: params[:placement],
+                   placement: return_url_parameters[:placement],
                    content_items: items,
                    msg: messaging_value("msg"),
                    log: messaging_value("log"),

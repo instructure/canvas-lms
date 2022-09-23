@@ -23,6 +23,18 @@ module Lti::IMS::Concerns
 
     CLAIM_PREFIX = "https://purl.imsglobal.org/spec/lti-dl/claim/"
 
+    def return_url_parameters
+      @return_url_parameters ||= return_url_data.data
+    end
+
+    def return_url_data
+      @return_url_data ||= Lti::DeepLinkingData.from_jwt(params[:data])
+    end
+
+    def validate_return_url_data
+      return render_error({ errors: return_url_data.errors }) unless return_url_data.valid?
+    end
+
     def validate_jwt
       render_error(deep_linking_jwt.errors) and return unless deep_linking_jwt.valid?
     end
