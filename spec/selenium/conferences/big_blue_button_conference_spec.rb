@@ -61,6 +61,27 @@ describe "BigBlueButton conferences" do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
 
+    context "when a conference exists" do
+      before do
+        @conf = create_big_blue_button_conference
+        @conf.add_invitee(@ta)
+        @conf.add_invitee(@student)
+        @conf.save!
+      end
+
+      it "opens edit form when conference id is in url for teachers" do
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(fj("span:contains('Edit')")).to be_present
+      end
+
+      it "does not open edit form when conference id is in url for students" do
+        user_session @student
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(f("button[title='New Conference']")).to be_present
+        expect(f("body")).not_to contain_jqcss("span:contains('Edit')")
+      end
+    end
+
     it "validates name length" do
       initial_conference_count = WebConference.count
       get conferences_index_page
@@ -249,8 +270,25 @@ describe "BigBlueButton conferences" do
       Account.site_admin.disable_feature! :bbb_modal_update
     end
 
-    before do
-      get conferences_index_page
+    context "on a conference that exists" do
+      before do
+        @conf = create_big_blue_button_conference
+        @conf.add_invitee(@ta)
+        @conf.add_invitee(@student)
+        @conf.save!
+      end
+
+      it "opens edit form when conference id is in url for teachers" do
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(fj("span:contains('Edit')")).to be_present
+      end
+
+      it "does not open edit form when conference id is in url for students" do
+        user_session @student
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(f("button[title='New Conference']")).to be_present
+        expect(f("body")).not_to contain_jqcss("span:contains('Edit')")
+      end
     end
 
     context "when a conference is open" do
@@ -263,6 +301,7 @@ describe "BigBlueButton conferences" do
         end
 
         it "does not include list with recordings", priority: "2" do
+          get conferences_index_page
           verify_conference_does_not_include_recordings
         end
       end
@@ -276,6 +315,7 @@ describe "BigBlueButton conferences" do
         end
 
         it "includes list with recordings", priority: "2" do
+          get conferences_index_page
           verify_conference_includes_recordings
         end
       end
@@ -292,6 +332,7 @@ describe "BigBlueButton conferences" do
         end
 
         it "removes recording from the list", priority: "2" do
+          get conferences_index_page
           show_recordings_in_first_conference_in_list
           delete_first_recording_in_first_conference_in_list
           verify_conference_does_not_include_recordings
