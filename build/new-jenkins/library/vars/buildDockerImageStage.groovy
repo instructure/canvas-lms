@@ -124,7 +124,6 @@ def preloadCacheImagesAsync() {
   libraryScript.load('bash/docker-with-flakey-network-protection.sh', '/tmp/docker-with-flakey-network-protection.sh')
 
   sh """#!/bin/bash
-    /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/bash &
     /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental &
     /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()} &
   """
