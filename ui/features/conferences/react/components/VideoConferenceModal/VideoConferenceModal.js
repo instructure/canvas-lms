@@ -49,7 +49,7 @@ export const VideoConferenceModal = ({
     'share_other_webcams',
     'share_microphone',
     'send_public_chat',
-    'send_private_chat'
+    'send_private_chat',
   ]
 
   const [tab, setTab] = useState(SETTINGS_TAB)
@@ -99,7 +99,7 @@ export const VideoConferenceModal = ({
   const setAndValidateName = nameToBeValidated => {
     if (nameToBeValidated.length > 255) {
       setNameValidationMessages([
-        {text: I18n.t('Name must be less than 255 characters'), type: 'error'}
+        {text: I18n.t('Name must be less than 255 characters'), type: 'error'},
       ])
     } else {
       setNameValidationMessages([])
@@ -124,7 +124,7 @@ export const VideoConferenceModal = ({
   const setAndValidateDescription = descriptionToBeValidated => {
     if (descriptionToBeValidated.length > 2500) {
       setDescriptionValidationMessages([
-        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'}
+        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'},
       ])
     } else {
       setDescriptionValidationMessages([])
@@ -147,7 +147,7 @@ export const VideoConferenceModal = ({
   useEffect(() => {
     if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
       setCalendarValidationMessages([
-        {text: I18n.t('End at must be later than Start at'), type: 'error'}
+        {text: I18n.t('End at must be later than Start at'), type: 'error'},
       ])
     } else {
       setCalendarValidationMessages([])
@@ -188,6 +188,7 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
+          savedAttendees={props.savedAttendees}
           showCalendar={showCalendarOptions}
           setAddToCalendar={setAddToCalendar}
           addToCalendar={addToCalendar}
@@ -201,6 +202,7 @@ export const VideoConferenceModal = ({
           nameValidationMessages={nameValidationMessages}
           descriptionValidationMessages={descriptionValidationMessages}
           hasBegun={props.hasBegun}
+          isEditing={isEditing}
         />
       )
     }
@@ -222,9 +224,11 @@ export const VideoConferenceModal = ({
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
+        savedAttendees={props.savedAttendees}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
         hasBegun={props.hasBegun}
+        isEditing={isEditing}
       />
     )
   }
@@ -256,7 +260,7 @@ export const VideoConferenceModal = ({
           attendeesOptions,
           selectedAttendees,
           startCalendarDate,
-          endCalendarDate
+          endCalendarDate,
         })
 
         if (!submitted) {
@@ -333,12 +337,13 @@ VideoConferenceModal.propTypes = {
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   startCalendarDate: PropTypes.string,
-  endCalendarDate: PropTypes.string
+  endCalendarDate: PropTypes.string,
 }
 
 VideoConferenceModal.defaultProps = {
-  isEditing: false
+  isEditing: false,
 }
 
 export default VideoConferenceModal
