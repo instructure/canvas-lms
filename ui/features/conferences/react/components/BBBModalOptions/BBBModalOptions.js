@@ -264,10 +264,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
               <ConferenceAddressBook
                 data-testId="conference-address-book"
                 selectedIds={props.selectedAttendees}
+                savedAttendees={props.savedAttendees}
                 menuItemList={props.availableAttendeesList}
                 onChange={userList => {
                   props.onAttendeesChange(userList.map(u => u.id))
                 }}
+                isEditing={props.isEditing}
               />
             </Flex.Item>
           )}
@@ -330,6 +332,7 @@ BBBModalOptions.propTypes = {
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   showCalendar: PropTypes.bool,
   setAddToCalendar: PropTypes.func,
   addToCalendar: PropTypes.bool,
@@ -343,7 +346,8 @@ BBBModalOptions.propTypes = {
   nameValidationMessages: PropTypes.array,
   descriptionValidationMessages: PropTypes.array,
   hasBegun: PropTypes.bool,
-  durationValidationMessages: PropTypes.array
+  durationValidationMessages: PropTypes.array,
+  isEditing: PropTypes.bool
 }
 
 export default BBBModalOptions

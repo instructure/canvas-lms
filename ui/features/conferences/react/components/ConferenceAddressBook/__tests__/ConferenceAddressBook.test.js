@@ -24,7 +24,7 @@ describe('ConferenceAddressBook', () => {
   const menuItemList = [
     {displayName: 'Allison', id: '7'},
     {displayName: 'Caleb', id: '3'},
-    {displayName: 'Chawn', id: '2'}
+    {displayName: 'Chawn', id: '2'},
   ]
 
   const setup = (props = {}) => {
@@ -70,6 +70,30 @@ describe('ConferenceAddressBook', () => {
 
   it('should remove selected user when backspace is pressed and input is empty', () => {
     const container = setup()
+    const input = container.getByTestId('address-input')
+    input.click()
+    const item = container.getByText('Allison')
+    item.click()
+    fireEvent.keyDown(input, {keyCode: '8'})
+    const tag = container.queryByTestId('address-tag')
+    expect(tag).toBeFalsy()
+  })
+
+  it('should not remove saved users when isEditing', () => {
+    const container = setup({isEditing: true, savedAttendees: ['7']})
+    const input = container.getByTestId('address-input')
+    input.click()
+    const item = container.getByText('Allison')
+    item.click()
+    fireEvent.keyDown(input, {keyCode: '8'})
+    const tag = container.queryByTestId('address-tag')
+    expect(tag).toBeTruthy()
+    tag.click()
+    expect(tag).toBeTruthy()
+  })
+
+  it('should remove unsaved users when isEditing', () => {
+    const container = setup({isEditing: true, savedAttendees: ['25']})
     const input = container.getByTestId('address-input')
     input.click()
     const item = container.getByText('Allison')
