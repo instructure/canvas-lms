@@ -183,6 +183,7 @@ cy:
     uploading: "Wrthi’n llwytho i fyny..."
   _2d4c0d31: …
   _5a374287: "..."
+  __376f89ea: "--"
   _at_the_bottom__4360f2b4: "-- Ar y gwaelod --"
   _b4455c8b: "%"
   _count_points_23dc93e0: 
@@ -264,6 +265,8 @@ cy:
         common_core_guid: "GUID Common Core (dewisol)"
         partner_id: "ID y Partner"
         partner_key: "Allwedd Partner"
+  academic_engagement_capella_74946a80: "Ymgysylltiad Academaidd (Capella)"
+  academic_engagement_strayer_8c7832b9: "Ymgysylltiad Academaidd (Strayer)"
   acalanes_union_high_grade_report_ae9bce11: "Adroddiad Graddau Acalanes Union High"
   accept_2fdd362e: Derbyn
   accept_course_invitation_b4c04fbb: "Derbyn gwahoddiad cwrs"
@@ -2033,6 +2036,7 @@ cy:
   all_comments_are_sent_to_the_whole_group_778126f3: "Mae’r holl sylwadau’n cael eu hanfon at y grŵp cyfan."
   all_configured_apps_a14eef0a: "Pob Ap wedi’i Ffurfweddu"
   all_configured_apps_or_course_apps_only_1ccda005: "pob ap wedi’i ffurfweddu neu apiau cyrsiau’n unig"
+  all_course_members_must_be_invited_to_calendar_eve_73984f29: "Rhaid i bob aelod o’r cwrs gael eu gwahodd i ddigwyddiadau calendr."
   all_courses_80701c6f: "Pob Cwrs."
   all_courses_a7dbb853: "Pob Cwrs"
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: "Mae’n rhaid i bob maes dyddiad fod yn bresennol a chael ei fformatio’n gywir"
@@ -2150,6 +2154,7 @@ cy:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "Gadael i’r adnodd hwn gael mynediad at y Gwasanaeth Darparu Rôl ac Enwau IMS"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: "Yn caniatáu cyfeiriadau e-bost heb eu cadarnhau wrth ychwanegu defnyddwyr"
   allow_users_to_comment_45b8f753: "Gadael i ddefnyddwyr wneud sylwadau"
+  allow_users_to_submit_an_additional_email_at_regis_75b54a9d: "Yn gadael i ddefnyddwyr gyflwyno e-bost ychwanegol wrth gofrestru."
   allowed_attempts_4e229caa: "Ymgeisiau a ganiateir"
   allowed_domains_ee7868c8: "Parthau wedi’u caniatáu"
   allowed_for_subaccounts_courses_default_off_da598c11: "Wedi’i ganiatáu ar gyfer is-gyfrifon/cyrsiau, wedi diffodd yn ddiofyn"
@@ -3236,6 +3241,7 @@ cy:
   apply_conditions_9e941010: "Defnyddio amodau"
   apply_date_range_selection_cc4351ed: "Rhoi’r ystod dyddiadau a ddewiswyd ar waith"
   apply_filter_7e4f6113: "Rhowch yr hidlydd ar waith"
+  apply_filters_e98823c0: "Rhowch Hidlyddion ar waith"
   apply_filters_note_clicking_this_button_will_cause_753f04: "Rhowch hidlyddion ar waith. Nodyn: wrth glicio’r botwm hwn, bydd y dudalen yn ail-lwytho."
   apply_missing_status_cd98e1d3: "Gosod statws coll"
   apply_score_1edd7cda: "Gosod Sgôr"
@@ -3403,6 +3409,7 @@ cy:
     default_imported_title: "Cwestiynau wedi’u Mewngludo"
     default_title: "Dim Enw - %{course}"
     default_unfiled_title: "Cwestiynau Heb eu Ffeilio"
+  assessment_question_bank_4c6026e: "Banc Cwestiynau Asesu"
   assessment_question_id_4eacadb3: "id cwestiwn yr asesiad"
   assessment_title_7ab69b66: "teitl yr asesiad"
   assessment_type_81a73b9c: "math o asesiad"
@@ -3576,6 +3583,7 @@ cy:
   assignment_has_been_graded_for_name_4384f9b: "%{assignment} wedi’i raddio ar gyfer %{name}."
   assignment_id_96baa1b7: "id yr aseiniad"
   assignment_id_b040cee0: "Id yr Aseiniad"
+  assignment_ids_param_is_invalid_7dc5c327: "Mae paramedr %{assignment_ids} yn annilys"
   assignment_is_incomplete_ff55e07c: "%{assignment} heb ei gwblhau"
   assignment_is_reassigned_dd6b6ef2: "Aseiniad wedi’i ailneilltuo."
   assignment_is_reassigned_ebb31807: "%{assignment} wedi’i ailneilltuo"
@@ -4259,6 +4267,7 @@ cy:
     two: Ymgais
   attempts_allowed_8441aadf: "Nifer y ceisiadau a ganiateir"
   attendance_ca433183: Presenoldeb
+  attendee_sync_in_progress_cd882292: " Wrthi’n cysoni mynychwyr... "
   attendees_eb402bac: Mynychwyr
   attendees_failed_to_sync_725c8137: " Mynychwyr wedi methu Cysoni."
   attendees_synced_ee5edd00: " Wedi cysoni Mynychwyr!"
@@ -4798,6 +4807,7 @@ cy:
   c4e_analytics_66e0fc46: "Dadansoddi C4E"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Wedi llwyddo i glirio'r storfa"
+  cache_site_admin_access_tokens_c2cdf974: "Tocynnau mynediad gweinyddwr safle storfa"
   calculated_by_4ac40468: "Cyfrifwyd gan: "
   calculated_by_baa3c8f3: "Cyfrifwyd gan:"
   calculation_d82f6181: Cyfrifo
@@ -5434,6 +5444,7 @@ cy:
   chat_2153c6b7: Sgwrs
   chcp_student_activity_report_5611dd39: "Adroddiad Gweithgarwch Myfyrwyr CHCP"
   check_back_later_c4234dbc: "Dewch yn ôl rywbryd eto"
+  check_back_later_to_view_feedback_b937200a: "Dewch yn ôl rywbryd eto i weld adborth."
   check_permissions_when_masquerading_as_course_admi_ded7106c: "Gwirio hawliau wrth Ffugio bod yn Weinyddwr Cwrs"
   check_services_to_enable_8877c451: "Gwirio Gwasanaethau i alluogi"
   check_submission_file_type_b3dbf3fd: "Gwirio Mathau o Ffeil Gyflwyno"
@@ -5499,6 +5510,7 @@ cy:
   classic_view_33f29576: "Gwedd Glasurol"
   clear_2084585f: Clirio
   clear_all_da755751: "Clirio’r cyfan"
+  clear_all_filters_9c7e870: "Clirio Pob Hidlydd"
   clear_course_selection_b0762ae2: "Clirio Dewis Cwrs"
   clear_job_selection_6ad1ff95: "Clirio dewis tasg"
   clear_search_900e9c97: "Clirio chwilio"
@@ -5823,6 +5835,7 @@ cy:
         wrong_account: "Cafodd y gwahoddiad ar gyfer %{course} ei anfon at **%{invited_user}** ond, ar hyn o bryd, rydych chi wedi mewngofnodi fel **%{current_user}**"
       labels: 
         password: Cyfrinair
+        personal_email: "E-bost Personol (dewisol)"
         subscribe_to_emails: "Rydw i’n dymuno cael gwybodaeth, newyddion ac awgrymiadau gan Instructure"
         time_zone: "Cylchfa Amser"
         unique_id: Mewngofnodi
@@ -6037,6 +6050,8 @@ cy:
       members: Aelodau
       name: Enw
       options: Opsiynau
+    errors: 
+      create_failed: "Wedi methu creu cynhadledd"
     general_error: "Gwall wrth ymuno â’r gynhadledd"
     general_error_with_message: "Gwall wrth ymuno â'r gynhadledd. Neges: '%{message}'"
     inactive_error: "Dydy’r gynhadledd honno ddim ar waith ar hyn o bryd"
@@ -6920,6 +6935,10 @@ cy:
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "Does dim modd tracio neilltuo myfyrwyr i grwpiau, ond mae’n dal i ddigwydd! Gwirio’r canlyniad eich hun yn nes ymlaen. (%{errorMessage})"
   couldn_t_update_standards_for_authority_auth_81206187: "Doedd dim modd diweddaru safonau ar gyfer awdurdod %{auth}"
   count_40eced3b: Nifer
+  count_account_calendars_found_b1eed2e3: 
+    one: "1 calendr cyfrif wedi’i ganfod."
+    other: "%{count} calendr cyfrif wedi’u canfod"
+    zero: "Heb ddod o hyd i galendrau cyfrif cyfatebol"
   count_account_calendars_selected_578d6db8: 
     one: "1 Calendr Cyfrif wedi’i ddewis"
     other: "%{count} Calendr Cyfrif wedi’u dewis"
@@ -7019,6 +7038,10 @@ cy:
     one: "anwybyddwyd (1) ffeil"
     other: "anwybyddwyd (%{count}) ffeil"
     two: "anwybyddwyd (%{count}) ffeil"
+  count_filters_aa5172fc: 
+    one: "1 Hidlydd"
+    other: "{{count}} Hidlydd"
+    zero: "Dim Hidlyddion"
   count_grouptitle_outcomes_4ddea09: 
     many: "%{count} \"%{groupTitle}\" Deilliant"
     one: "1 \"%{groupTitle}\" Deilliant"
@@ -8185,12 +8208,14 @@ cy:
   create_file_71aa1922: "[ Creu Ffeil ]"
   create_file_s_188549e6: "[ Creu Ffeiliau ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Creu Ffeiliau ar ôl Llwytho i Fyny/Recordio Cyfryngau RCE"
+  create_filter_preset_d6f28bc4: "Creu Hidlydd wedi’i osod ymlaen llaw"
   create_group_set_7fe1cd53: "Creu Set Grwpiau"
   create_groups_later_6ce36058: "Creu grwpiau yn nes ymlaen"
   create_groups_now_d59bf70b: "Creu grwpiau nawr"
   create_interactive_course_content_76665336: "Creu cynnwys cwrs rhyngweithiol"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Creu tanysgrifiadau digwyddiadau byw ar ToolProxy"
   create_lookup_7ceb6d90: "Creu Chwilio am Barth"
+  create_manage_filter_presets_18404c3a: "Creu a rheoli Hidlyddion wedi’u gosod ymlaen llaw"
   create_new_attempt_19c96c03: "Creu Cais Newydd"
   create_new_course_e3ef9cd0: "Creu cwrs newydd"
   create_new_discussions_6ab69da2: "Creu trafodaethau newydd"
@@ -8226,6 +8251,7 @@ cy:
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
       Yn creu gwrthrychau ffeil (wedi’u cuddio rhag myfyrwyr i ddechrau os mewn cwrs) ar ôl i
       gyfryngau gael eu llwytho i fyny neu eu recordio drwy RCE.
+  creating_88cc5158: "Wrthi’n Creu"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Ar hyn o bryd, nid yw creu grŵp yn cael ei drin yn y llif aseiniadau newydd. Mynd i'r hen dudalen aseiniadau?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Os byddwch chi’n creu proses allgludo cyflwyniad, gallwch lwytho ffeil zip i lawr o’r holl aseiniadau rydych wedi’u cyflwyno yn eich cyrsiau presennol a’ch cyrsiau blaenorol. Fe allai fod yn ffeil fawr, felly mae’n bosib y bydd hyn yn cymryd ychydig bach o amser. Gallwch adael y dudalen a dod yn ôl rywbryd eto."
   creating_conference_95b59116: "Wrthi’n creu cynhadledd"
@@ -8667,6 +8693,7 @@ cy:
   default_skin_tone_f378d31c: "Lliw Croen Diofyn"
   default_template_f2a759ed: "Templed Diofyn"
   default_templates_are_used_as_starting_points_for__f06f9e33: "Mae templedi diofyn yn cael eu defnyddio fel man cychwyn ar gyfer themâu newydd, a does dim modd eu dileu."
+  default_to_new_quizzes_dac795a9: "Cwisiau Newydd yn Ddiofyn"
   default_view_for_dashboard_ea91b60f: "Gwedd Ddiofyn ar gyfer y Dangosfwrdd"
   define_general_settings_for_locked_objects_in_this_20da2981: "Diffiniwch y gosodiadau cyffredinol ar gyfer gwrthrychau sydd wedi’u cloi yn y cwrs hwn. "
   define_settings_by_type_for_locked_objects_in_this_676197bf: "Diffiniwch y gosodiadau yn ôl math ar gyfer gwrthrychau sydd wedi’u cloi yn y cwrs hwn. "
@@ -8725,6 +8752,7 @@ cy:
   delete_pages_ab60f58: "Dileu tudalennau"
   delete_prerequisite_5e97bdf4: "Dileu rhagofyniad"
   delete_prerequisite_title_19741947: "Dileu rhagofyniad %{title}"
+  delete_preset_d7fda473: "Dileu wedi’i osod ymlaen llaw"
   delete_proficiency_rating_5436ee08: "Dileu sgôr medrusrwydd"
   delete_proficiency_rating_position_46e205f7: "Dileu sgôr medrusrwydd %{position}"
   delete_quiz_142b8099: "Dileu Cwis"
@@ -8871,6 +8899,7 @@ cy:
   description_61f4296: "* Disgrifiad"
   description_for_mastery_level_position_description_cc17114b: "Disgrifiad ar gyfer lefel meistroli %{position} %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Disgrifiad ar gyfer sgôr medruswydd %{position} %{description}"
+  description_must_be_less_than_2500_characters_1ee7c522: "Rhaid i ddisgrifiad fod yn llai na 2500 nod"
   descriptivename_was_changed_from_formattedoldvalue_47623537: "Newidiwyd %{descriptiveName} o %{formattedOldValue} i %{formattedNewValue}."
   descriptivename_was_set_to_formattednewvalue_cd78b357: "Gosodwyd %{descriptiveName} i %{formattedNewValue}."
   descriptivename_was_turned_off_38771a19: "Wedi diffodd %{descriptiveName}."
@@ -8973,6 +9002,7 @@ cy:
     save_settings: "Cadw Gosodiadau"
     saving: "Wrthi’n cadw..."
   did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: "Oeddech chi’n gwybod eich bod chi nawr yn gallu creu hidlyddion manwl a’u cadw i’w defnyddio yn y dyfodol?"
+  did_you_know_you_can_now_create_filter_presets_and_f0bc546e: "Oeddech chi’n gwybod eich bod chi nawr yn gallu creu hidlyddion wedi’u gosod ymlaen llaw a’u cadw i’w defnyddio yn y dyfodol?"
   did_you_mean_id_241c900c: "Oeddech chi’n golygu? *%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: "Wnaethoch chi ddod o hyd i beth roeddech chi’n chwilio amdano? Daliwch ati!"
   different_course_b875770e: "cwrs gwahanol"
@@ -9885,6 +9915,7 @@ cy:
   encourage_student_discourse_7836b9f7: "Annog trafodaethau myfyrwyr"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedid wedi’i Amgryptio ar gyfer Deilliannau Sylfaenol"
   end_78c581cd: Gorffen
+  end_at_must_be_later_than_start_at_3b673851: "Rhaid i’r Diwedd fod yn ddiweddarach na’r Dechrau"
   end_course_set_up_tutorial_dialog_5b812ec6: "Cau blwch deialog y Tiwtorial Creu Cwrs"
   end_course_set_up_tutorial_f358b85d: "Dod â’r Tiwtorial Creu Cwrs i ben"
   end_date_cannot_be_before_start_date_eb62ed6d: "Does dim modd i’r dyddiad gorffen fod cyn y dyddiad dechrau"
@@ -9955,6 +9986,7 @@ cy:
     teacher_assistant: "Cynorthwyydd Dysgu"
   enrollment_count_8a289702: "Nifer yr Ymrestriadau"
   enrollment_count_report_685807b6: "Adroddiad Nifer yr Ymrestriadau"
+  enrollment_details_11f9a7d5: "Manylion Ymrestru"
   enrollment_role_f5d985a7: "Rôl Ymrestru"
   enrollment_roles_b9cffda7: "Rolau Ymrestru"
   enrollment_state_7a9c55e2: "cyflwr ymrestru"
@@ -11030,6 +11062,7 @@ cy:
   filter_messages_by_course_21a53fc4: "Hidlo negeseuon yn ôl cwrs"
   filter_observer_dashboard_by_student_5705ff33: "Hidlo dangosfwrdd arsyllwr yn ôl myfyriwr"
   filter_outcomes_e91aa331: "Hidlo Deillianau"
+  filter_preset_name_9ce8f057: "Enw hidlydd wedi’i osod yn barod"
   filter_recent_user_accesses_by_term_30812659: "Hidlo mynediad diweddar gan fyfyrwyr yn ôl tymor."
   filter_replies_by_unread_342e8e90: "Hidlo atebion yn ôl y rhai sydd heb eu darllen"
   filter_roles_12cf2271: "Hidlo Rolau"
@@ -11238,6 +11271,7 @@ cy:
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "Rhoi’r un radd i bob myfyriwr ar gyfer *%{assignment.name}* drwy roi a chyflwyno gwerth gradd sy’n is na’r canlynol:"
   give_all_students_the_same_percent_grade_for_assig_6a008004: "Rhoi’r un radd *canran* i bob myfyriwr ar gyfer **%{assignment.name}** drwy roi a chyflwyno gwerth gradd sy’n is na'r canlynol:"
   give_this_filter_a_name_36b4b03a: "Rhowch enw i'r hidlydd hwn"
+  give_your_filter_preset_a_name_11144c73: "Rhowch enw i'r hidlydd wedi’i osod yn barod"
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: "Wedi rhoi’r gorau i geisio nôl ffynonellau cyfryngau Mae’n debyg y bydd y mater hwn yn datrys ei hun yn y pen draw."
   global_announcements_a78912c8: "Cyhoeddiadau Cyffredinol"
   global_announcements_add_edit_delete_843ca4d2: "Cyhoeddiadau Cyffredinol  - ychwanegu / golygu / dileu"
@@ -13325,6 +13359,7 @@ cy:
   invitation_options_69813f8: "Opsiynau Gwahoddiad"
   invite_5b1fcbcd: Gwahodd
   invite_all_course_members_a0a13bc6: "Gwahodd holl aelodau’r cwrs"
+  invite_all_group_members_3182f61a: "Gwahodd holl aelodau’r grŵp"
   invite_students_a4873a50: "Gwahodd Myfyrwyr"
   ip_filter_is_not_valid_152a46d8: "Dydy’r hidlydd IP ddim yn ddilys."
   ireland_353_3cd32cc0: "Iwerddon (+353)"
@@ -13839,6 +13874,7 @@ cy:
       4xx_feedback: "Cliciwch yma i ddweud wrthym am beth roeddech chi’n chwilio."
       feedback: "Cliciwch yma i ddweud wrthym beth ddigwyddodd"
   links_14b70841: Dolenni
+  links_to_an_external_site_de74145d: "Dolenni at safle allanol."
   links_to_other_courses_in_this_resource_may_not_be_d9f2779: "Mae’n bosib na fydd dolenni i gyrsiau eraill yn yr adnodd hwn ar gael i fyfyrwyr y cwrs hwn:"
   listWithOthers: 
     other: 
@@ -16313,6 +16349,7 @@ cy:
   mobile_homescreen_icon_f85d6b63: "Eicon Sgrin Hafan Symudol"
   modal_dialog_add_to_course_aec33759: "Dialog Is-ffenestr: Ychwanegu at gwrs"
   modal_dialog_header_source_16ec3ac1: "Dialog is-ffenestr: %{header} %{source}"
+  modal_dialog_start_end_date_674315cc: "Deialog yr Is-ffenestr: Dyddiad Cychwyn a Gorffen"
   model_is_already_located_in_newgroup_e5cea361: "%{model} wedi'i leoli’n barod yn %{newGroup}"
   modelsOutcome: 
     criteria: 
@@ -16626,6 +16663,7 @@ cy:
   name_mark_as_read_cc9e5fd6: "%{name} marcio eu bod wedi’u darllen"
   name_mark_as_unread_abd650da: "%{name} marcio eu bod heb eu darllen"
   name_missing_f4f3eb9e: "Enw ar goll"
+  name_must_be_less_than_255_characters_37a49ba: "Rhaid i enw fod yn llai na 255 nod"
   name_name_913c785b: "enw: %{name}"
   name_only_5f56718e: "Enw yn unig"
   name_options_bc5c95ce: "%{name} Opsiynau"
@@ -16741,6 +16779,7 @@ cy:
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Mudo New Quizzes wedi’i alluogi yn ddiofyn"
   new_quizzes_migration_required_7854aa1a: "Angen mudo New Quizzes"
   new_quizzes_on_the_quizzes_page_b21f338d: "New Quizzes ar y dudalen Gwisiau"
+  new_quizzes_site_admin_service_user_a331233a: "Defnyddiwr Gwasanaeth Gweinyddu Safle Cwisiau Newydd"
   new_quizzes_submission_274b5c57: "Cyflwyniad Cwisiau Newydd"
   new_quizzes_submission_history_d81b477b: "Hanes cyflwyno New Quizzes"
   new_quizzes_support_for_modules_7b81eee9: "Modiwlau’n gallu delio â New Quizzes"
@@ -17413,6 +17452,7 @@ cy:
   october_6b2bf82: Hydref
   of_students_5d1af0d2: "# myfyrwyr"
   of_times_1018baab: "# o weithiau"
+  of_total_c02b5afe: "o %{total}"
   off_5385ef3f: Diffodd
   off_for_key_keyname_24b0f366: "I ffwrdd ar gyfer allwedd: %{keyName}"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "Diffodd - Ni fydd y polisi yn berthnasol ar gyfer yr is-gyfrif hwn"
@@ -17947,6 +17987,7 @@ cy:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_632472b7: "Cyd-fyfyriwr:"
+  peer_review_74f26a13: "Adolygiad gan Gyd-fyfyrwyr"
   peer_review_assignment_7d314c59: "Aseiniad wedi'i Adolygu gan Gyd-fyfyrwyr"
   peer_review_due_dueattext_20987412: "Adolygiad gan Gyd-fyfyriwr ar gyfer %{dueAtText}"
   peer_review_due_eb63af38: "Adolygiad gan Gyd-fyfyriwr ar gyfer"
@@ -18976,6 +19017,7 @@ cy:
     you_have_no_services: "Dim gwasanaethau wedi'u cofrestru, gallwch chi ychwanegu rhai ar y dudalen *gosodiadau*."
   profile_6bd2baed: Proffil
   profile_photo_save_failed_too_many_times_e1ebda5: "Mae’r broses o gadw llun proffil wedi methu ormod o weithiau"
+  profile_pictures_15953851: "Lluniau Proffil"
   profile_tray_bcec5044: "Ardal proffiliau"
   profiles: 
     gravatar_view: 
@@ -20787,6 +20829,7 @@ cy:
   remove_missing_status_when_graded_d0755cc7: "Tynnu statws coll pan fo wedi ei raddio"
   remove_name_624e06be: "Tynnu %{name}"
   remove_name_as_an_admin_c296cf49: "Tynnu %{name} fel gweinyddwr"
+  remove_name_calendar_bdc329d9: "Tynnu %{name} Calendr"
   remove_null_values_from_live_event_payloads_3c826f: "Tynnu gwerthoedd nwl o brif lwythi digwyddiadau byw"
   remove_observers_from_courses_703edc34: "Tynnu Arsyllwyr o gyrsiau"
   remove_outcome_20e16da7: "Tynnu Deilliant?"
@@ -21291,6 +21334,7 @@ cy:
   save_changes_698abe77: "Cadw Newidiadau"
   save_customizations_dde779d8: "Cadw Addasiadau"
   save_failed_463cb2a8: "Wedi methu cadw."
+  save_filter_preset_37f32c02: "Cadw Hidlydd wedi’i osod ymlaen llaw"
   save_grading_period_daaaddea: "Cadw Cyfnod Graddio"
   save_grading_period_set_e029fa88: "Cadw set o gyfnodau graddio"
   save_key_b4dede06: "Cadw Allwedd"
@@ -21310,6 +21354,7 @@ cy:
   saved_3cd67a7c: "Wedi Cadw"
   saved_comments_2f6ba95: "Sylwadau sydd wedi’u cadw"
   saved_discussion_settings_successfully_ebd46a57: "Wedi llwyddo i gadw gosodiadau trafodaeth"
+  saved_filter_presets_81b7a73d: "Cadw Hidlyddion wedi’u gosod ymlaen llaw"
   saving_2521e616: "Wrthi’n cadw"
   saving_assignment_dates_progress_9856153d: "Cadw cynnydd dyddiadau aseiniad"
   saving_assignment_dates_progress_percent_a5ea89a1: "Cadw cynnydd dyddiadau aseiniad: %{percent}%"
@@ -22684,6 +22729,11 @@ cy:
   showing_all_announcements_36ff0cec: "Wrthi’n dangos pob cyhoeddiad"
   showing_all_discussions_7e09f4b7: "Wrthi’n dangos pob trafodaeth"
   showing_all_sets_of_grading_periods_6c160874: "Wrthi’n dangos pob set o gyfnodau graddio."
+  showing_count_account_calendars_e8266ae6: 
+    many: "Dangos %{count} calendr cyfrif"
+    one: "Dangos 1 calendr cyfrif"
+    other: "Dangos %{count} calendr cyfrif"
+    two: "Dangos %{count} calendr cyfrif"
   showing_count_outcomes_for_grouptitle_32d7988b: 
     many: "Dangos %{count} deilliant ar gyfer %{groupTitle}."
     one: "Dangos %{count} deilliant ar gyfer %{groupTitle}."
@@ -22698,6 +22748,7 @@ cy:
   similarity_detection_platform_9e424d70: "Platfform Canfod Tebygrwydd"
   similarity_score_more_information_b7010a87: "Sgôr tebygrwydd - mwy o wybodaeth"
   similarity_score_see_detailed_report_a113dac0: "Sgôr Tebygrwydd - Gweld adroddiad manwl"
+  similarity_score_state_7e3364ac: "Sgôr tebygrwydd -- %{state}"
   similarityscore_similarity_score_52236e85: "Sgôr tebygrwydd o %{similarityScore}%"
   simple_tls_45df2648: "TLS Syml"
   singapore_65_b4927585: "Singapôr (+65)"
@@ -23025,6 +23076,8 @@ cy:
   start_date_to_1e6e6bbe: "Dyddiad Dechrau I:"
   start_date_value_817cab96: "Dyddiad Dechrau %{value}"
   start_dates_8f1c22a8: "Dyddiadau Dechrau:"
+  start_end_date_4a7a56da: "Dyddiad Cychwyn a Gorffen"
+  start_end_dates_aaa00ecf: "Dyddiadau Cychwyn a Gorffen"
   start_entry_4b491f60: "Dechrau Cofnod"
   start_link_validation_dc0ac99c: "Dechrau dilysu dolen"
   start_over_f7552aa9: "Dechrau eto"
@@ -23324,6 +23377,7 @@ cy:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Sylw ar Gyflwyniad: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Sylwadau ar Gyflwyniad"
   submission_comments_b6d65841: "Sylwadau ar y cyflwyniad"
+  submission_completed_ba0e552e: "Cyflwyniad wedi’i Gwblhau"
   submission_data_88085815: "Data Cyflwyno"
   submission_date_8f659c0c: "Dyddiad Cyflwyno"
   submission_date_a7920dac: "dyddiad cyflwyno"
@@ -23518,6 +23572,7 @@ cy:
   subscribed_fe74d22a: "Wedi tanysgrifio"
   subtitle_ee60ca78: Is-deitl
   subtitles_could_not_be_imported_from_file_5de6da0b: "Doedd dim modd mewngludo isdeitlau o %{file}"
+  success_a5aeb7: "WEDI LLWYDDO!"
   success_file_uploaded_8174e93f: "Wedi llwyddo: Ffeil wedi’i llwytho i fyny"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Wedi llwyddo! Mae modd i’r myfyrwyr weld y graddau ar gyfer yr aseiniad hwn nawr."
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Wedi llwyddo! Mae graddau wedi’u cuddio ar gyfer %{assignmentName}."
@@ -24228,6 +24283,7 @@ cy:
   there_was_an_error_creating_a_new_filter_e93bb765: "Gwall wrth greu hidlydd newydd."
   there_was_an_error_deleting_name_aa3050e5: "Gwall wrth ddileu “%{name}”"
   there_was_an_error_fetching_course_statistics_96e9dbad: "Gwall wrth nôl manylion cwrs"
+  there_was_an_error_fetching_custom_columns_542014ef: "Gwall wrth nôl colofnau personol"
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Gwall wrth nôl data ar gyfer y Llyfr Graddau"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Gwall wrth nôl hidlyddion llyfr graddau."
   there_was_an_error_fetching_modules_8ee451bb: "Gwall wrth nôl modiwlau."
@@ -24627,6 +24683,13 @@ cy:
   this_topic_is_closed_for_comments_5bacad6: "Mae’r pwnc hwn wedi’i gau ar gyfer sylwadau"
   this_topic_is_used_for_grading_efc6ca89: "Mae’r pwnc hwn yn cael ei ddefnyddio ar gyfer graddio"
   this_topic_will_be_available_delayedpostat_6b47c4c3: "Bydd y pwnc hwn ar gael ar %{delayedPostAt}."
+  this_update_offers_enhanced_feature_functionality__c3c4ea51: |-
+      Mae’r diweddariad hwn yn cynnig swyddogaethau nodwedd uwch ar gyfer Cynadleddau 
+      Big Blue Button. Bydd defnyddwyr yn gallu galluogi 
+      yr Ystafell Aros yng ngosodiadau eu cynhadledd, byddan nhw’n gallu 
+      ychwanegu cynhadledd wedi’i drefnu o du mewn i galendr, 
+      a byddan nhw’n gallu diweddaru/cysoni mynychwyr wrth i fynychwyr newydd gael eu 
+      hychwanegu neu eu tynnu.
   this_update_will_allow_more_options_for_bbb_confer_3d7d1d08: "Bydd y diweddariad hwn yn caniatáu rhagor o opsiynau ar gyfer cynadleddau BBB."
   this_user_has_been_deleted_77e6c04b: "Mae'r defnyddiwr hwn wedi’i ddileu"
   this_user_has_been_deleted_8caa45be: "Mae'r defnyddiwr hwn wedi cael ei ddileu."
@@ -25487,6 +25550,7 @@ cy:
   toggle_alignment_details_for_title_944f605: "Toglo manylion cysoni ar gyfer %{title}"
   toggle_course_card_color_overlays_b5b8137a: "Toglo gorchuddion lliw ar gyfer cerdyn cwrs"
   toggle_editing_answer_text_as_html_9a93fe6: "Toglo’r nodwedd golygu testun ateb fel HTML"
+  toggle_filterpresetname_f8ae0191: "Toglo %{filterPresetName}"
   toggle_module_visibility_781a2f6c: "toglo opsiynau gweld modiwl"
   toggle_name_c0ab332b: "Toglo %{name}"
   toggle_option_cfd8b95a: "Toglo Opsiwn"
@@ -25654,6 +25718,7 @@ cy:
   type_folder_115f3b07: "math: ffolder"
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "Dydy '%{type}' ddim yn fath dilys o ddelwedd (ceisiwch ddefnyddio jpg, png, neu gif)"
   type_message_here_e15e30a7: "Teipiwch neges yma..."
+  type_name_has_no_next_in_strand_ace3cfdb: "Does gan %{type} \"%{name}\" ddim next_in_strand"
   type_of_change_1cb24a0e: "Math o Newid"
   type_of_item_8a37f69d: "Math o Eitem"
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: "Teipiwch neu defnyddiwch fysellau saeth i grwydro. Nifer o ddewisiadau wedi’u caniatáu."
@@ -26038,6 +26103,7 @@ cy:
             Gorfod cwblhau rhagofynion cyn symud i’r modiwl neu’r eitem
             modiwl nesaf, neu gloi modiwl cyfan tan ddyddiad penodol.
   use_new_folder_tree_in_files_bc0ea09f: "Defnyddio’r goeden ffolderi newydd yn yr adran Ffeiliau"
+  use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: "Defnyddio Cwisiau Newydd fel y peiriant cwisiau diofyn. Yn tynnu’r gallu i grey cwisiau clasurol."
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: "Defnyddio golygydd cynnwys cyfoethog newydd gyda bar ochr gwell yn ymddangos ym mhobman"
   use_pairing_code_for_parent_sign_up_10b091f8: "Defnyddiwch god paru er mwyn i rieni gofrestru"
   use_parent_account_setting_f25a721f: "Defnyddiwch osodiadau cyfrif rhiant"
@@ -26801,7 +26867,11 @@ cy:
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Wrth greu ateb, bydd gennych chi’r opsiwn o ddangos eich enw a’ch llun proffil i aelodau eraill y cwrs neu aros yn anhysbys."
   when_disabled_students_can_still_send_individual_m_3bf396f2: "Pan fydd wedi cael ei analluogi, bydd myfyrwyr yn dal i allu anfon negeseuon unigol at athrawon cyrsiau, cynorthwywyr dysgu cyrsiau, a myfyrwyr sy’n rhan o’r un grwpiau ar lefel y cyfrif."
   when_disabled_students_can_still_send_individual_m_567a911c: "Pan fydd wedi cael ei analluogi, bydd myfyrwyr yn dal i allu anfon negeseuon unigol at athrawon cyrsiau, cynorthwywyr dysgu cyrsiau, a myfyrwyr sy’n rhan o’r un grwpiau ar lefel y cyfrif."
+  when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "Pan fo wedi’i alluogi, bydd darlleniadau AccessToken yn cael eu storio (gan ddefnyddio MultiCache) wrth ofyn am awdurdodiad."
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: "Pan fo wedi’i alluogi mae’n dibrisio’r Gwasanaeth Negeseuon Byr (SMS)"
+  when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
+      Pan fo wedi’i alluogi, bydd darpariaethau Cwisiau Newydd yn defnyddio’r Gweinyddwr Safle penodol
+      Defnyddiwr Gwasanaeth a DeveloperKey i greu tocyn adnewyddu a mynediad
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       Pan fo wedi’i alluogi, mae’r fflag hon yn dangos nifer y geiriau yn speed grader ar
       gyfer cyflwyniadau testun.
@@ -27230,6 +27300,7 @@ cy:
     one: "Mae gennych chi 1 calendr ar ôl"
     other: "Mae gennych chi %{count} calendr ar ôl"
     two: "Mae gennych chi %{count} calendr ar ôl"
+  you_have_count_peer_reviews_to_complete_52e065e: "Mae gennych chi %{count} Adolygiad gan Gyd-fyfyrwyr i’w cwblhau"
   you_have_count_submissions_to_grade_6c5b511a: "Mae gennych chi %{count} cyflwyniad i'w graddio"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: "Rydych chi wedi creu sylw sydd heb gael ei bostio. Ydych chi eisiau parhau a chadw’r sylw hwn fel drafft? (Gallwch chi bostio sylwadau drafft ar unrhyw adeg.)"
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: "Rydych chi wedi rhoi gradd annilys ar gyfer y myfyriwr hwn. Mae angen i chi wneud yn siŵr bod y math o radd a’r gwerth yn gywir, a rhoi cynnig arall arni."
@@ -27421,6 +27492,7 @@ cy:
   your_submission_has_not_been_graded_yet_d6963e53: "Dydy’ch cyflwyniad ddim wedi cael ei raddio eto"
   your_time_for_this_quiz_has_been_reduced_394652e9: "Mae’ch amser ar gyfer y cwis hwn wedi cael ei leihau."
   your_webcam_may_already_be_in_use_6cd64c25: "Efallai bod eich gwe-gamera yn cael ei ddefnyddio’n barod."
+  your_work_has_been_submitted_519058f8: "Mae’ch gwaith wedi’i gyflwyno."
   yyyy_mm_dd_hh_mm_a01b6081: "BBBB-MM-DD aa:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A
