@@ -206,9 +206,11 @@ const ConferencesRouter = Backbone.Router.extend({
               const response = await fetch(`/${context}/${contextId}/conferences`, requestOptions)
 
               if (response.status === 200) {
+                $.flashMessage(I18n.t('Conference Saved'))
                 window.location.href = window.location.href.split('#')[0]
                 return true
               } else {
+                $.flashError(I18n.t('There was an error upon saving your conference'))
                 return false
               }
             }}
@@ -376,9 +378,11 @@ const ConferencesRouter = Backbone.Router.extend({
             )
 
             if (response.status === 200) {
+              $.flashMessage(I18n.t('Conference Saved'))
               window.location.href = window.location.href.split('#')[0]
               return true
             } else {
+              $.flashError(I18n.t('There was an error upon saving your conference'))
               return false
             }
           }}
