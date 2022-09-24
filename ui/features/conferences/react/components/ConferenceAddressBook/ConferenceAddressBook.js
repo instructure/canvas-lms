@@ -24,7 +24,13 @@ import {Tag} from '@instructure/ui-tag'
 
 const I18n = useI18nScope('video_conference')
 
-export const ConferenceAddressBook = ({menuItemList, onChange, selectedIds}) => {
+export const ConferenceAddressBook = ({
+  menuItemList,
+  onChange,
+  selectedIds,
+  isEditing,
+  savedAttendees,
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [highlightMenuItem, setHighlightMenuItem] = useState(null)
   const [inputValue, setInputValue] = useState('')
@@ -88,6 +94,11 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedIds}) => 
   }, [inputValue, menuItemList, selectedMenuItems.length])
 
   const removeSelectedItem = menuItem => {
+    if (isEditing) {
+      if (savedAttendees?.includes(menuItem.id))
+        // terminate if menu item has been saved
+        return
+    }
     const newSelectedMenuItems = selectedMenuItems
     const removalIndex = newSelectedMenuItems.indexOf(menuItem)
     if (removalIndex > -1) {
@@ -173,13 +184,14 @@ export const ConferenceAddressBook = ({menuItemList, onChange, selectedIds}) => 
 ConferenceAddressBook.propTypes = {
   menuItemList: PropTypes.array,
   selectedIds: PropTypes.arrayOf(PropTypes.string),
-  onChange: PropTypes.func
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
+  onChange: PropTypes.func,
+  isEditing: PropTypes.bool,
 }
 
 ConferenceAddressBook.defaultProps = {
-  onChange: () => {}
+  onChange: () => {},
 }
-
 const ConferenceAddressBookTags = ({selectedMenuItems, onDismiss}) => {
   return selectedMenuItems.map((menuItem, index) => (
     <Tag
@@ -198,7 +210,7 @@ const ConferenceAddressBookTags = ({selectedMenuItems, onDismiss}) => {
 
 ConferenceAddressBookTags.propTypes = {
   selectedMenuItems: PropTypes.arrayOf(PropTypes.object),
-  onDismiss: PropTypes.func
+  onDismiss: PropTypes.func,
 }
 
 export default ConferenceAddressBook
