@@ -125,3 +125,13 @@ course_paces_redesign:
   display_name: 'Course Pacing Redesign'
   description: Enable the redesigned course pacing user experience.
   applies_to: SiteAdmin
+deprecate_faculty_journal:
+  state: hidden
+  display_name: 'Faculty Journal Deprecation'
+  description: Enable the deprecation of the faculty journal functionality.
+  applies_to: SiteAdmin
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
