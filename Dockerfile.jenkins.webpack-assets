@@ -1,2 +1,2 @@
 FROM local/ruby-runner
-COPY --chown=docker:docker --from=local/webpack-runner /usr/src/app/public ${APP_HOME}/public
+COPY --from=local/webpack-runner /usr/src/app/public ${APP_HOME}/public

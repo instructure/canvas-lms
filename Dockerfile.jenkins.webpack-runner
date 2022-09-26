@@ -1,6 +1,8 @@
 FROM local/webpack-builder
-COPY --chown=docker:docker --from=local/cache-helper-collect-webpack-dependencies /tmp/dst ${APP_HOME}
-COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
+
+RUN --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
+  tar --no-same-owner -xf /cache-helper/webpack-runner-dependencies.tar -C ${APP_HOME} && \
+  tar --no-same-owner -xf /cache-helper/webpack-runner.tar -C ${APP_HOME}
 
 ARG JS_BUILD_NO_UGLIFY=0
 ARG RAILS_LOAD_ALL_LOCALES=0
