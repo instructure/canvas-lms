@@ -82,6 +82,52 @@ describe "BigBlueButton conferences" do
       end
     end
 
+    context "attendee selection" do
+      before do
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student)
+
+        @group_category = @course.group_categories.create!(name: "Group Category")
+        @group = @course.groups.create!(group_category: @group_category, name: "Group 1")
+        @group.add_user(@student, "accepted")
+      end
+
+      context "on create" do
+        it "successfully invites a section to the conference" do
+          get "/courses/#{@course.id}/conferences"
+          new_conference_button.click
+          wait_for_ajaximations
+          f("div#tab-attendees").click
+          fj("label:contains('Invite all course members')").click
+          f("[data-testid='address-input']").click
+          f("[data-testid='section-#{@section.id}']").click
+          expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
+
+          wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+          new_conference = WebConference.last
+          expect(@section.participants.count).to eq new_conference.users.count
+        end
+
+        it "successfully invites a group to the conference" do
+          get "/courses/#{@course.id}/conferences"
+          # Since the teacher isn't a participating user, we have to add 1 to this count
+          group_participant_and_group_tag_count = @group.participating_users_in_context.count + 1
+
+          new_conference_button.click
+          wait_for_ajaximations
+          f("div#tab-attendees").click
+          fj("label:contains('Invite all course members')").click
+          f("[data-testid='address-input']").click
+          f("[data-testid='group-#{@group.id}']").click
+          expect(group_participant_and_group_tag_count).to eq ff("[data-testid='address-tag']").count
+
+          wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+          new_conference = WebConference.last
+          expect(group_participant_and_group_tag_count).to eq new_conference.users.count
+        end
+      end
+    end
+
     it "validates name length" do
       initial_conference_count = WebConference.count
       get conferences_index_page

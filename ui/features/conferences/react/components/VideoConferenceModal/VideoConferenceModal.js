@@ -189,7 +189,6 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
-          savedAttendees={props.savedAttendees}
           showCalendar={showCalendarOptions}
           setAddToCalendar={setAddToCalendar}
           addToCalendar={addToCalendar}
@@ -225,7 +224,6 @@ export const VideoConferenceModal = ({
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
-        savedAttendees={props.savedAttendees}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
         hasBegun={props.hasBegun}
@@ -337,8 +335,7 @@ VideoConferenceModal.propTypes = {
   attendeesOptions: PropTypes.arrayOf(PropTypes.string),
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
-  savedAttendees: PropTypes.arrayOf(PropTypes.string),
+  selectedAttendees: PropTypes.arrayOf(PropTypes.object),
   startCalendarDate: PropTypes.string,
   endCalendarDate: PropTypes.string,
 }

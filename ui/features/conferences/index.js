@@ -117,14 +117,35 @@ const ConferencesRouter = Backbone.Router.extend({
           return {
             displayName: name,
             id,
+            type: 'user',
+            assetCode: `user-${id}`,
           }
         })
 
+        const availableSectionsList = ENV.sections.map(({id, name}) => {
+          return {
+            displayName: name,
+            id,
+            type: 'section',
+            assetCode: `section-${id}`,
+          }
+        })
+
+        const availableGroupsList = ENV.groups.map(({id, name}) => {
+          return {
+            displayName: name,
+            id,
+            type: 'group',
+            assetCode: `group-${id}`,
+          }
+        })
+
+        const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
         ReactDOM.render(
           <VideoConferenceModal
             open={true}
             isEditing={false}
-            availableAttendeesList={availableAttendeesList}
+            availableAttendeesList={menuData}
             onDismiss={() => {
               window.location.hash = ''
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
@@ -174,8 +195,14 @@ const ConferencesRouter = Backbone.Router.extend({
                   payload[`user[${userId}]`] = 1
                 })
               } else {
-                data.selectedAttendees.forEach(userId => {
-                  payload[`user[${userId}]`] = 1
+                data.selectedAttendees.forEach(menuItem => {
+                  if (menuItem.type === 'group') {
+                    payload[`group[${menuItem.id}]`] = 1
+                  } else if (menuItem.type === 'section') {
+                    payload[`section[${menuItem.id}]`] = 1
+                  } else {
+                    payload[`user[${menuItem.id}]`] = 1
+                  }
                 })
               }
 
@@ -242,9 +269,30 @@ const ConferencesRouter = Backbone.Router.extend({
         return {
           displayName: name,
           id,
+          type: 'user',
+          assetCode: `user-${id}`,
         }
       })
 
+      const availableSectionsList = ENV.sections.map(({id, name}) => {
+        return {
+          displayName: name,
+          id,
+          type: 'section',
+          assetCode: `section-${id}`,
+        }
+      })
+
+      const availableGroupsList = ENV.groups.map(({id, name}) => {
+        return {
+          displayName: name,
+          id,
+          type: 'group',
+          assetCode: `group-${id}`,
+        }
+      })
+
+      const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
       if (attributes.long_running === 1) {
         options.push('no_time_limit')
       }
@@ -285,9 +333,10 @@ const ConferencesRouter = Backbone.Router.extend({
           description={attributes.description}
           invitationOptions={invitationOptions}
           attendeesOptions={attendeesOptions}
-          availableAttendeesList={availableAttendeesList}
-          selectedAttendees={attributes.user_ids}
-          savedAttendees={attributes.user_ids}
+          availableAttendeesList={menuData}
+          selectedAttendees={attributes.user_ids.map(u => {
+            return {assetCode: `user-${u}`, id: u}
+          })}
           startCalendarDate={attributes.start_at}
           endCalendarDate={attributes.end_at}
           onDismiss={() => {
@@ -340,8 +389,14 @@ const ConferencesRouter = Backbone.Router.extend({
                 payload[`user[${userId}]`] = 1
               })
             } else {
-              data.selectedAttendees.forEach(userId => {
-                payload[`user[${userId}]`] = 1
+              data.selectedAttendees.forEach(menuItem => {
+                if (menuItem.type === 'group') {
+                  payload[`group[${menuItem.id}]`] = 1
+                } else if (menuItem.type === 'section') {
+                  payload[`section[${menuItem.id}]`] = 1
+                } else {
+                  payload[`user[${menuItem.id}]`] = 1
+                }
               })
             }
 
