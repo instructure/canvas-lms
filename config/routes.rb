@@ -2440,7 +2440,7 @@ CanvasRails::Application.routes.draw do
       put "eportfolios/:eportfolio_id/restore", action: :restore
     end
 
-    scope(controller: :section_paces_api) do
+    scope(controller: "course_pacing/section_paces_api") do
       get "courses/:course_id/section_paces", action: :index, as: :section_paces
       get "courses/:course_id/sections/:course_section_id/pace", action: :show, as: :section_pace
       post "courses/:course_id/sections/:course_section_id/paces", action: :create, as: :new_section_pace
