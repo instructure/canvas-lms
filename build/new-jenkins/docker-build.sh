@@ -39,6 +39,10 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 export CACHE_VERSION="2022-09-26.1"
 export DOCKER_BUILDKIT=1
 
+if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then
+  export USE_BUILD_CACHE=1
+fi
+
 source ./build/new-jenkins/docker-build-helpers.sh
 
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental
@@ -53,6 +57,7 @@ RUBY_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.ruby-runner | md5sum)
 YARN_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.yarn-runner | md5sum)
 WEBPACK_BUILDER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-builder | md5sum)
 WEBPACK_ASSETS_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-assets | md5sum)
+WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
 WEBPACK_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-runner | md5sum)
 
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
@@ -110,6 +115,14 @@ WEBPACK_ASSETS_CACHE_ID_PARTS=(
   $WEBPACK_ASSETS_DOCKERFILE_MD5
 )
 WEBPACK_ASSETS_CACHE_ID=$(compute_hash ${WEBPACK_ASSETS_CACHE_ID_PARTS[@]})
+
+WEBPACK_CACHE_ID_PARTS=(
+  "${WEBPACK_BUILDER_PARTS[@]}"
+  $WEBPACK_RUNNER_DEPENDENCIES_MD5
+  $WEBPACK_RUNNER_DOCKERFILE_MD5
+  $WEBPACK_CACHE_DOCKERFILE_MD5
+)
+WEBPACK_CACHE_ID=$(compute_hash ${WEBPACK_CACHE_ID_PARTS[@]})
 
 declare -A BASE_RUNNER_TAGS; compute_tags "BASE_RUNNER_TAGS" $BASE_RUNNER_PREFIX ${BASE_RUNNER_PARTS[@]}
 declare -A RUBY_RUNNER_TAGS; compute_tags "RUBY_RUNNER_TAGS" $RUBY_RUNNER_PREFIX ${RUBY_RUNNER_PARTS[@]}
@@ -184,6 +197,7 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     add_log "built ${WEBPACK_BUILDER_SELECTED_TAG}"
 
     tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
+    tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
   else
     RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
     YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
@@ -196,23 +210,31 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_SELECTED_TAG
     tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
 
-    (
-      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_ASSETS_FUZZY_TAG
+    [[ ! -z "${WEBPACK_ASSETS_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+      $WEBPACK_ASSETS_FUZZY_TAG \
+      "WEBPACK_ASSETS_CACHE_ID" \
+      $WEBPACK_ASSETS_CACHE_ID \
+      local/webpack-assets-previous \
+    || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
 
-      if ! image_label_eq $WEBPACK_ASSETS_FUZZY_TAG "WEBPACK_ASSETS_CACHE_ID" $WEBPACK_ASSETS_CACHE_ID; then
-        exit 1
-      fi
-
-      tag_many $WEBPACK_ASSETS_FUZZY_TAG local/webpack-assets-previous
-    ) || (
-      tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
-    )
+    [[ ! -z "${WEBPACK_CACHE_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+      $WEBPACK_CACHE_FUZZY_TAG \
+      "WEBPACK_CACHE_ID" \
+      $WEBPACK_CACHE_ID \
+      local/webpack-cache-previous \
+    && export USE_BUILD_CACHE=1 \
+    || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
   fi
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-}
 
+  # *_BUILD_CACHE are special variables and do not need to be included in the image cache hash
+  # because it shouldn't produce any compiled asset changes
   docker build \
     "${WEBPACK_RUNNER_BUILD_ARGS[@]}" \
+    --build-arg USE_BUILD_CACHE="${USE_BUILD_CACHE-0}" \
+    --build-arg WRITE_BUILD_CACHE="${WRITE_BUILD_CACHE-0}" \
+    --no-cache \
     --tag local/webpack-runner \
     - < Dockerfile.jenkins.webpack-runner
 
@@ -221,8 +243,20 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     --label "WEBPACK_ASSETS_CACHE_ID=$WEBPACK_ASSETS_CACHE_ID" \
     --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
     --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
+    --no-cache \
     --tag "${WEBPACK_ASSETS_TAGS[SAVE_TAG]}" \
     - < Dockerfile.jenkins.webpack-assets
+
+  if [[ "$WRITE_BUILD_CACHE" == "1" ]]; then
+    docker build \
+      --label "RUBY_RUNNER_SELECTED_TAG=$RUBY_RUNNER_SELECTED_TAG" \
+      --label "WEBPACK_CACHE_ID=$WEBPACK_CACHE_ID" \
+      --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
+      --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
+      --no-cache \
+      --tag "${WEBPACK_CACHE_FUZZY_TAG-}" \
+      - < Dockerfile.jenkins.webpack-cache
+  fi
 
   WEBPACK_ASSETS_SELECTED_TAG=${WEBPACK_ASSETS_TAGS[SAVE_TAG]}
 

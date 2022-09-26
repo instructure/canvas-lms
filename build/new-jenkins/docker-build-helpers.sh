@@ -59,6 +59,21 @@ function image_label_eq {
   return 0
 }
 
+function load_image_if_label_eq  {
+  local imageName=$1; shift
+  local labelName=$1; shift
+  local expectedValue=$1; shift
+  local outputImageName=$1; shift
+
+  ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $imageName
+
+  if ! image_label_eq $imageName $labelName $expectedValue; then
+    return 1
+  fi
+
+  tag_many $imageName $outputImageName
+}
+
 function pull_first_tag {
   local -n selectedTag=$1; shift
   local loadTags=$@
