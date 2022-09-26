@@ -137,9 +137,9 @@ module Types
       course.resolved_outcome_calculation_method
     end
 
-    field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: false
+    field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: true
     def outcome_alignment_stats
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(course)
+      Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
     end
 
     field :sections_connection, SectionType.connection_type, null: true

@@ -21,13 +21,9 @@
 class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
   include OutcomesFeaturesHelper
 
-  VALID_CONTEXT_TYPES = ["Course", "Account"].freeze
-
-  def initialize(context_id, context_type)
+  def initialize(context)
     super()
-    @context_id = context_id
-    @context_type = context_type
-    @context = VALID_CONTEXT_TYPES.include?(context_type) ? context_type.constantize.active.find_by(id: context_id) : nil
+    @context = context
   end
 
   def perform(outcomes)
