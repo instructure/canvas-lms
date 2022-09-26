@@ -113,7 +113,7 @@ export const VideoConferenceModal = ({
         setDuration(durationToBeValidated)
       }
       setDurationValidationMessages([
-        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'}
+        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'},
       ])
     } else {
       setDurationValidationMessages([])
@@ -147,7 +147,8 @@ export const VideoConferenceModal = ({
   useEffect(() => {
     if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
       setCalendarValidationMessages([
-        {text: I18n.t('End at must be later than Start at'), type: 'error'},
+        [{text: I18n.t('Start Date/Time must be before the End Date/Time'), type: 'error'}],
+        [{text: I18n.t('End Date/Time must be later than Start Date/Time'), type: 'error'}],
       ])
     } else {
       setCalendarValidationMessages([])
