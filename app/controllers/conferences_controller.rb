@@ -320,6 +320,7 @@ class ConferencesController < ApplicationController
       group_user_ids_map: @group_user_ids_map,
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
+      can_manage_calendar: @context.grants_right?(@current_user, session, :manage_calendar),
       render_alternatives: @render_alternatives,
       bbb_modal_update: Account.site_admin.feature_enabled?(:bbb_modal_update),
       bbb_recording_enabled: bbb_config ? bbb_config[:recording_enabled] : false,

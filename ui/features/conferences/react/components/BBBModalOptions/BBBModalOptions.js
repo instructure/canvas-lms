@@ -33,6 +33,7 @@ import {DateTimeInput} from '@instructure/ui-forms'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
 import {View} from '@instructure/ui-view'
+import DateHelper from '@canvas/datetime/dateHelper'
 
 const I18n = useI18nScope('video_conference')
 
@@ -90,8 +91,9 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
 
                   props.onSetDuration(props.duration - 1)
                 }}
-                interaction={noTimeLimit ? 'disabled' : 'enabled'}
+                interaction={noTimeLimit || props.hasBegun ? 'disabled' : 'enabled'}
                 isRequired={!noTimeLimit}
+                messages={props.durationValidationMessages}
               />
             </span>
           </Flex.Item>
@@ -115,9 +117,14 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                 onChange={event => {
                   setNoTimeLimit(event.target.checked)
                 }}
+                disabled={props.hasBegun}
               />
-              <Checkbox label={I18n.t('Enable waiting room')} value="enable_waiting_room" />
-              {!contextIsGroup && (
+              <Checkbox
+                label={I18n.t('Enable waiting room')}
+                value="enable_waiting_room"
+                disabled={props.hasBegun}
+              />
+              {!contextIsGroup && ENV.can_manage_calendar && (
                 <Checkbox
                   label={I18n.t('Add to Calendar')}
                   value="add_to_calendar"
@@ -128,11 +135,28 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                       props.onSetInvitationOptions(['invite_all'])
                     }
                   }}
+                  disabled={props.hasBegun}
                 />
               )}
             </CheckboxGroup>
           </Flex.Item>
-          {props.showCalendar && (
+          {props.startDate && props.hasBegun && (
+            <Flex.Item padding="small" data-testid="plain-text-dates">
+              <div>
+                <span>{`${I18n.t('Start at: ')} ${DateHelper.formatDatetimeForDisplay(
+                  props.startDate
+                )}`}</span>
+              </div>
+              {props.endDate && (
+                <div>
+                  <span>{`${I18n.t('End at: ')} ${DateHelper.formatDatetimeForDisplay(
+                    props.endDate
+                  )}`}</span>
+                </div>
+              )}
+            </Flex.Item>
+          )}
+          {props.showCalendar && !props.hasBegun && (
             <Flex.Item>
               <Flex>
                 <Flex.Item padding="small" align="start">
@@ -240,10 +264,12 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
               <ConferenceAddressBook
                 data-testId="conference-address-book"
                 selectedIds={props.selectedAttendees}
-                userList={props.availableAttendeesList}
+                savedAttendees={props.savedAttendees}
+                menuItemList={props.availableAttendeesList}
                 onChange={userList => {
                   props.onAttendeesChange(userList.map(u => u.id))
                 }}
+                isEditing={props.isEditing}
               />
             </Flex.Item>
           )}
@@ -256,11 +282,31 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
               defaultValue={props.attendeesOptions}
               description={I18n.t('Allow Attendees To...')}
             >
-              <Checkbox label={I18n.t('Share webcam')} value="share_webcam" />
-              <Checkbox label={I18n.t('See other viewers webcams')} value="share_other_webcams" />
-              <Checkbox label={I18n.t('Share microphone')} value="share_microphone" />
-              <Checkbox label={I18n.t('Send public chat messages')} value="send_public_chat" />
-              <Checkbox label={I18n.t('Send private chat messages')} value="send_private_chat" />
+              <Checkbox
+                label={I18n.t('Share webcam')}
+                value="share_webcam"
+                disabled={props.hasBegun}
+              />
+              <Checkbox
+                label={I18n.t('See other viewers webcams')}
+                value="share_other_webcams"
+                disabled={props.hasBegun}
+              />
+              <Checkbox
+                label={I18n.t('Share microphone')}
+                value="share_microphone"
+                disabled={props.hasBegun}
+              />
+              <Checkbox
+                label={I18n.t('Send public chat messages')}
+                value="send_public_chat"
+                disabled={props.hasBegun}
+              />
+              <Checkbox
+                label={I18n.t('Send private chat messages')}
+                value="send_private_chat"
+                disabled={props.hasBegun}
+              />
             </CheckboxGroup>
           </Flex.Item>
         </Flex>
@@ -286,6 +332,7 @@ BBBModalOptions.propTypes = {
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   showCalendar: PropTypes.bool,
   setAddToCalendar: PropTypes.func,
   addToCalendar: PropTypes.bool,
@@ -297,7 +344,10 @@ BBBModalOptions.propTypes = {
   tab: PropTypes.string,
   setTab: PropTypes.func,
   nameValidationMessages: PropTypes.array,
-  descriptionValidationMessages: PropTypes.array
+  descriptionValidationMessages: PropTypes.array,
+  hasBegun: PropTypes.bool,
+  durationValidationMessages: PropTypes.array,
+  isEditing: PropTypes.bool
 }
 
 export default BBBModalOptions

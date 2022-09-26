@@ -68,8 +68,9 @@ const BaseModalOptions = props => {
 
                 props.onSetDuration(props.duration - 1)
               }}
-              interaction={noTimeLimit ? 'disabled' : 'enabled'}
+              interaction={noTimeLimit || props.hasBegun ? 'disabled' : 'enabled'}
               isRequired={!noTimeLimit}
+              messages={props.durationValidationMessages}
             />
           </span>
         </Flex.Item>
@@ -88,6 +89,7 @@ const BaseModalOptions = props => {
               onChange={event => {
                 setNoTimeLimit(event.target.checked)
               }}
+              disabled={props.hasBegun}
             />
           </CheckboxGroup>
         </Flex.Item>
@@ -110,12 +112,14 @@ const BaseModalOptions = props => {
         {props.showAddressBook && (
           <Flex.Item padding="medium">
             <ConferenceAddressBook
-              data-testId="conference-address-book"
+              data-testid="conference-address-book"
               selectedIds={props.selectedAttendees}
-              userList={props.availableAttendeesList}
+              savedAttendees={props.savedAttendees}
+              menuItemList={props.availableAttendeesList}
               onChange={userList => {
                 props.onAttendeesChange(userList.map(u => u.id))
               }}
+              isEditing={props.isEditing}
             />
           </Flex.Item>
         )}
@@ -150,8 +154,12 @@ BaseModalOptions.propTypes = {
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   nameValidationMessages: PropTypes.array,
-  descriptionValidationMessages: PropTypes.array
+  descriptionValidationMessages: PropTypes.array,
+  hasBegun: PropTypes.bool,
+  durationValidationMessages: PropTypes.array,
+  isEditing: PropTypes.bool,
 }
 
 export default BaseModalOptions

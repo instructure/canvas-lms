@@ -49,7 +49,7 @@ export const VideoConferenceModal = ({
     'share_other_webcams',
     'share_microphone',
     'send_public_chat',
-    'send_private_chat'
+    'send_private_chat',
   ]
 
   const [tab, setTab] = useState(SETTINGS_TAB)
@@ -83,6 +83,7 @@ export const VideoConferenceModal = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const [nameValidationMessages, setNameValidationMessages] = useState([])
+  const [durationValidationMessages, setDurationValidationMessages] = useState([])
   const [descriptionValidationMessages, setDescriptionValidationMessages] = useState([])
   const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
   const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
@@ -98,7 +99,7 @@ export const VideoConferenceModal = ({
   const setAndValidateName = nameToBeValidated => {
     if (nameToBeValidated.length > 255) {
       setNameValidationMessages([
-        {text: I18n.t('Name must be less than 255 characters'), type: 'error'}
+        {text: I18n.t('Name must be less than 255 characters'), type: 'error'},
       ])
     } else {
       setNameValidationMessages([])
@@ -106,10 +107,24 @@ export const VideoConferenceModal = ({
     }
   }
 
+  const setAndValidateDuration = durationToBeValidated => {
+    if (durationToBeValidated.toString().length > 8) {
+      if (durationValidationMessages.length === 0) {
+        setDuration(durationToBeValidated)
+      }
+      setDurationValidationMessages([
+        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'}
+      ])
+    } else {
+      setDurationValidationMessages([])
+      setDuration(durationToBeValidated)
+    }
+  }
+
   const setAndValidateDescription = descriptionToBeValidated => {
     if (descriptionToBeValidated.length > 2500) {
       setDescriptionValidationMessages([
-        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'}
+        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'},
       ])
     } else {
       setDescriptionValidationMessages([])
@@ -132,7 +147,7 @@ export const VideoConferenceModal = ({
   useEffect(() => {
     if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
       setCalendarValidationMessages([
-        {text: I18n.t('End at must be later than Start at'), type: 'error'}
+        {text: I18n.t('End at must be later than Start at'), type: 'error'},
       ])
     } else {
       setCalendarValidationMessages([])
@@ -159,7 +174,8 @@ export const VideoConferenceModal = ({
           name={name}
           onSetName={setAndValidateName}
           duration={duration}
-          onSetDuration={setDuration}
+          onSetDuration={setAndValidateDuration}
+          durationValidationMessages={durationValidationMessages}
           options={options}
           onSetOptions={setOptions}
           description={description}
@@ -172,6 +188,7 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
+          savedAttendees={props.savedAttendees}
           showCalendar={showCalendarOptions}
           setAddToCalendar={setAddToCalendar}
           addToCalendar={addToCalendar}
@@ -184,6 +201,8 @@ export const VideoConferenceModal = ({
           setTab={setTab}
           nameValidationMessages={nameValidationMessages}
           descriptionValidationMessages={descriptionValidationMessages}
+          hasBegun={props.hasBegun}
+          isEditing={isEditing}
         />
       )
     }
@@ -193,7 +212,8 @@ export const VideoConferenceModal = ({
         name={name}
         onSetName={setAndValidateName}
         duration={duration}
-        onSetDuration={setDuration}
+        onSetDuration={setAndValidateDuration}
+        durationValidationMessages={durationValidationMessages}
         options={options}
         onSetOptions={setOptions}
         description={description}
@@ -204,8 +224,11 @@ export const VideoConferenceModal = ({
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
+        savedAttendees={props.savedAttendees}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
+        hasBegun={props.hasBegun}
+        isEditing={isEditing}
       />
     )
   }
@@ -237,7 +260,7 @@ export const VideoConferenceModal = ({
           attendeesOptions,
           selectedAttendees,
           startCalendarDate,
-          endCalendarDate
+          endCalendarDate,
         })
 
         if (!submitted) {
@@ -256,6 +279,7 @@ export const VideoConferenceModal = ({
         <VideoConferenceTypeSelect
           conferenceTypes={window.ENV.conference_type_details}
           onSetConferenceType={type => setConferenceType(type)}
+          isEditing={isEditing}
         />
         {renderModalOptions()}
       </Modal.Body>
@@ -276,7 +300,8 @@ export const VideoConferenceModal = ({
             isLoading ||
             nameValidationMessages.length > 0 ||
             calendarValidationMessages.length > 0 ||
-            descriptionValidationMessages > 0
+            descriptionValidationMessages.length > 0 ||
+            durationValidationMessages.length > 0
           }
         >
           {isLoading ? (
@@ -302,6 +327,7 @@ VideoConferenceModal.propTypes = {
   onDismiss: PropTypes.func,
   onSubmit: PropTypes.func,
   isEditing: PropTypes.bool,
+  hasBegun: PropTypes.bool,
   name: PropTypes.string,
   duration: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.string),
@@ -311,12 +337,13 @@ VideoConferenceModal.propTypes = {
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   startCalendarDate: PropTypes.string,
-  endCalendarDate: PropTypes.string
+  endCalendarDate: PropTypes.string,
 }
 
 VideoConferenceModal.defaultProps = {
-  isEditing: false
+  isEditing: false,
 }
 
 export default VideoConferenceModal

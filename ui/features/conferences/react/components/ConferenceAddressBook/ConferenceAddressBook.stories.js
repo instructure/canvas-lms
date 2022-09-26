@@ -20,7 +20,7 @@ import React from 'react'
 
 import {ConferenceAddressBook} from './ConferenceAddressBook'
 
-const userList = [
+const menuItemList = [
   {displayName: 'Allison Pitler', id: '7'},
   {displayName: 'Caleb Guanzon', id: '3'},
   {displayName: 'Chawn Neal', id: '2'},
@@ -38,7 +38,7 @@ export default {
   argTypes: {}
 }
 
-const Template = args => <ConferenceAddressBook userList={userList} {...args} />
+const Template = args => <ConferenceAddressBook menuItemList={menuItemList} {...args} />
 
 export const Default = Template.bind({})
 Default.args = {}

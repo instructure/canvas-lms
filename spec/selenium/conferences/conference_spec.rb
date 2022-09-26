@@ -49,6 +49,19 @@ describe "Web conferences" do
       Account.site_admin.enable_feature! :bbb_modal_update
     end
 
+    it "disables unchangeable properties when conference has begun" do
+      conf = create_wimba_conference
+      conf.started_at = 1.hour.ago
+      conf.end_at = 1.day.from_now
+      conf.save!
+
+      get conferences_index_page
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+      expect(f("span[data-testid='duration-input'] input")).to be_disabled
+      expect(f("input[value='no_time_limit']")).to be_disabled
+    end
+
     it "validates name length" do
       initial_conference_count = WebConference.count
       get conferences_index_page
@@ -64,6 +77,28 @@ describe "Web conferences" do
       # bring it back down to 255 chars
       f("input[placeholder='Conference Name']").send_keys :backspace
       expect(f("body")).not_to contain_jqcss("span:contains('Name must be less than 255 characters')")
+      expect(f("button[data-testid='submit-button']")).to be_enabled
+
+      f("button[data-testid='submit-button']").click
+      wait_for_ajaximations
+      expect(WebConference.count).to be > initial_conference_count
+    end
+
+    it "validates duration length" do
+      initial_conference_count = WebConference.count
+      get conferences_index_page
+      stub_request(:get, /wimba\.instructure\.com/)
+      number_larger_than_8_digits = 999_999_990
+      f("button[title='New Conference']").click
+      f("span[data-testid='duration-input'] input").clear
+      f("span[data-testid='duration-input'] input").send_keys number_larger_than_8_digits
+      # f("input[placeholder='Conference Name']").send_keys "a" # 256th char
+      expect(fj("span:contains('Duration must be less than 99,999,999 minutes')")).to be_present
+      expect(f("button[data-testid='submit-button']")).not_to be_enabled
+
+      # bring it back down to 255 chars
+      f("span[data-testid='duration-input'] input").send_keys :backspace
+      expect(f("body")).not_to contain_jqcss("span:contains('Duration must be less than 99,999,999 minutes')")
       expect(f("button[data-testid='submit-button']")).to be_enabled
 
       f("button[data-testid='submit-button']").click

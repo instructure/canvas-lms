@@ -53,7 +53,7 @@ if (ENV.can_create_conferences) {
 const ConferencesRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'conference_:id': 'edit'
+    'conference_:id': 'edit',
   },
 
   editView: null,
@@ -77,7 +77,7 @@ const ConferencesRouter = Backbone.Router.extend({
       itemView: ConferenceView,
       collection: this.currentConferences,
       emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
-      listClassName: 'ig-list'
+      listClassName: 'ig-list',
     }))
     view.render()
 
@@ -87,7 +87,7 @@ const ConferencesRouter = Backbone.Router.extend({
       itemView: ConcludedConferenceView,
       collection: this.concludedConferences,
       emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences'),
-      listClassName: 'ig-list'
+      listClassName: 'ig-list',
     })
     view.render()
 
@@ -116,7 +116,7 @@ const ConferencesRouter = Backbone.Router.extend({
         const availableAttendeesList = ENV.users.map(({id, name}) => {
           return {
             displayName: name,
-            id
+            id,
           }
         })
 
@@ -167,7 +167,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 'observers[remove]': remove_observers,
                 'web_conference[start_at]': start_at,
                 'web_conference[end_at]': end_at,
-                'web_conference[calendar_event]': calendar_event
+                'web_conference[calendar_event]': calendar_event,
               }
               if (inviteAll) {
                 ENV.users.forEach(userId => {
@@ -184,7 +184,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 'share_microphone',
                 'share_other_webcams',
                 'send_public_chat',
-                'send_private_chat'
+                'send_private_chat',
               ].forEach(option => {
                 payload[`web_conference[user_settings][${option}]`] =
                   data.attendeesOptions.includes(option) ? 1 : 0
@@ -195,8 +195,8 @@ const ConferencesRouter = Backbone.Router.extend({
                 method: 'POST',
                 body: new URLSearchParams(payload),
                 headers: {
-                  'X-CSRF-Token': getCookie('_csrf_token')
-                }
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                },
               }
 
               if (!context) {
@@ -206,9 +206,11 @@ const ConferencesRouter = Backbone.Router.extend({
               const response = await fetch(`/${context}/${contextId}/conferences`, requestOptions)
 
               if (response.status === 200) {
+                $.flashMessage(I18n.t('Conference Saved'))
                 window.location.href = window.location.href.split('#')[0]
                 return true
               } else {
+                $.flashError(I18n.t('There was an error upon saving your conference'))
                 return false
               }
             }}
@@ -225,7 +227,12 @@ const ConferencesRouter = Backbone.Router.extend({
     conference =
       this.currentConferences.get(conference) || this.concludedConferences.get(conference)
     if (!conference) return
-
+    if (!conference.get('permissions').update) {
+      // reached when a user without edit permissions navigates
+      // to a specific conference's url directly
+      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      return
+    }
     if (ENV.bbb_modal_update) {
       const {attributes} = conference
       const options = []
@@ -234,7 +241,7 @@ const ConferencesRouter = Backbone.Router.extend({
       const availableAttendeesList = ENV.users.map(({id, name}) => {
         return {
           displayName: name,
-          id
+          id,
         }
       })
 
@@ -259,7 +266,7 @@ const ConferencesRouter = Backbone.Router.extend({
         'share_other_webcams',
         'share_microphone',
         'send_public_chat',
-        'send_private_chat'
+        'send_private_chat',
       ].forEach(option => {
         if (attributes.user_settings[option]) {
           attendeesOptions.push(option)
@@ -270,6 +277,7 @@ const ConferencesRouter = Backbone.Router.extend({
         <VideoConferenceModal
           open={true}
           isEditing={true}
+          hasBegun={!!attributes.started_at}
           type={attributes.conference_type}
           name={attributes.title}
           duration={!attributes.duration ? 0 : attributes.duration}
@@ -279,6 +287,7 @@ const ConferencesRouter = Backbone.Router.extend({
           attendeesOptions={attendeesOptions}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={attributes.user_ids}
+          savedAttendees={attributes.user_ids}
           startCalendarDate={attributes.start_at}
           endCalendarDate={attributes.end_at}
           onDismiss={() => {
@@ -323,7 +332,7 @@ const ConferencesRouter = Backbone.Router.extend({
               'observers[remove]': remove_observers,
               'web_conference[start_at]': start_at,
               'web_conference[end_at]': end_at,
-              'web_conference[calendar_event]': calendar_event
+              'web_conference[calendar_event]': calendar_event,
             }
 
             if (inviteAll) {
@@ -341,7 +350,7 @@ const ConferencesRouter = Backbone.Router.extend({
               'share_other_webcams',
               'share_microphone',
               'send_public_chat',
-              'send_private_chat'
+              'send_private_chat',
             ].forEach(option => {
               payload[`web_conference[user_settings][${option}]`] = data.attendeesOptions.includes(
                 option
@@ -355,8 +364,8 @@ const ConferencesRouter = Backbone.Router.extend({
               method: 'POST',
               body: new URLSearchParams(payload),
               headers: {
-                'X-CSRF-Token': getCookie('_csrf_token')
-              }
+                'X-CSRF-Token': getCookie('_csrf_token'),
+              },
             }
 
             if (!context) {
@@ -369,9 +378,11 @@ const ConferencesRouter = Backbone.Router.extend({
             )
 
             if (response.status === 200) {
+              $.flashMessage(I18n.t('Conference Saved'))
               window.location.href = window.location.href.split('#')[0]
               return true
             } else {
+              $.flashError(I18n.t('There was an error upon saving your conference'))
               return false
             }
           }}
@@ -379,20 +390,15 @@ const ConferencesRouter = Backbone.Router.extend({
         document.getElementById('react-conference-modal-container')
       )
     } else {
-      if (conference.get('permissions').update) {
-        this.editConferenceId = conference.get('id')
-        this.editView.show(conference, {isEditing: true})
-      }
-      // reached when a user without edit permissions navigates
-      // to a specific conference's url directly
-      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      this.editConferenceId = conference.get('id')
+      this.editView.show(conference, {isEditing: true})
     }
   },
 
   close(conference) {
     this.currentConferences.remove(conference)
     this.concludedConferences.unshift(conference)
-  }
+  },
 })
 
 ready(() => {
