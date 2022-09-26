@@ -157,7 +157,7 @@ class RailsFlashNotificationsHelper {
       $(this.screenreader_holder).attr('aria-live', 'assertive')
       $(this.screenreader_holder).attr('aria-relevant', 'additions')
       $(this.screenreader_holder).attr('class', 'screenreader-only')
-      $(this.screenreader_holder).attr('aria-atomic', '')
+      $(this.screenreader_holder).attr('aria-atomic', true)
     }
   }
 
