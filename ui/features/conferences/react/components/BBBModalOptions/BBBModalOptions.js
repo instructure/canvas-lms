@@ -41,7 +41,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
   const [noTimeLimit, setNoTimeLimit] = useState(props.options.includes('no_time_limit')) // match options.no_time_limit default
 
   const contextIsGroup = ENV.context_asset_string?.split('_')[0] === 'group'
-  const inviteAllMemberstext = contextIsGroup
+  const inviteAllMembersText = contextIsGroup
     ? I18n.t('Invite all group members')
     : I18n.t('Invite all course members')
 
@@ -249,7 +249,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                 </View>
               }
             >
-              <Checkbox label={inviteAllMemberstext} value="invite_all" disabled={addToCalendar} />
+              <Checkbox label={inviteAllMembersText} value="invite_all" disabled={addToCalendar} />
               {!contextIsGroup && (
                 <Checkbox
                   label={I18n.t('Remove all course observer members')}
@@ -263,11 +263,10 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
             <Flex.Item padding="small">
               <ConferenceAddressBook
                 data-testId="conference-address-book"
-                selectedIds={props.selectedAttendees}
-                savedAttendees={props.savedAttendees}
+                selectedItems={props.selectedAttendees}
                 menuItemList={props.availableAttendeesList}
-                onChange={userList => {
-                  props.onAttendeesChange(userList.map(u => u.id))
+                onChange={menuItemList => {
+                  props.onAttendeesChange(menuItemList)
                 }}
                 isEditing={props.isEditing}
               />
@@ -335,8 +334,7 @@ BBBModalOptions.propTypes = {
   showAddressBook: PropTypes.bool,
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
-  savedAttendees: PropTypes.arrayOf(PropTypes.string),
+  selectedAttendees: PropTypes.arrayOf(PropTypes.object),
   showCalendar: PropTypes.bool,
   setAddToCalendar: PropTypes.func,
   addToCalendar: PropTypes.bool,
