@@ -738,6 +738,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
 
   def locked_for?(user, opts={})
+    return { asset_string: asset_string, missing_permission: nil } unless user
     ::Rails.cache.fetch(locked_cache_key(user), :expires_in => 1.minute) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
       return false if user_submission && user_submission.manually_unlocked
