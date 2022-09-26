@@ -170,6 +170,7 @@ def premergeCacheImage() {
 def patchsetImage(asyncStepsStr = '') {
   credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+    def webpackAssetsFuzzyTag = configuration.isChangeMerged() ? "" : "${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}"
 
     slackSendCacheBuild {
       withEnv([
@@ -184,6 +185,7 @@ def patchsetImage(asyncStepsStr = '') {
         "RAILS_LOAD_ALL_LOCALES=${getRailsLoadAllLocales()}",
         "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
         "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
+        "WEBPACK_ASSETS_FUZZY_TAG=${webpackAssetsFuzzyTag}",
         "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       ]) {

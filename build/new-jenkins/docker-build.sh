@@ -36,7 +36,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2022-09-23.1"
+export CACHE_VERSION="2022-09-26.1"
 export DOCKER_BUILDKIT=1
 
 source ./build/new-jenkins/docker-build-helpers.sh
@@ -100,6 +100,16 @@ WEBPACK_ASSETS_PARTS=(
   "${WEBPACK_RUNNER_PARTS[@]}"
   $WEBPACK_ASSETS_DOCKERFILE_MD5
 )
+
+# If any of these SHAs change - we don't want to use the previously cached webpack assets to prevent the
+# cache from using stale dependencies.
+WEBPACK_ASSETS_CACHE_ID_PARTS=(
+  "${WEBPACK_BUILDER_PARTS[@]}"
+  $WEBPACK_RUNNER_DEPENDENCIES_MD5
+  $WEBPACK_RUNNER_DOCKERFILE_MD5
+  $WEBPACK_ASSETS_DOCKERFILE_MD5
+)
+WEBPACK_ASSETS_CACHE_ID=$(compute_hash ${WEBPACK_ASSETS_CACHE_ID_PARTS[@]})
 
 declare -A BASE_RUNNER_TAGS; compute_tags "BASE_RUNNER_TAGS" $BASE_RUNNER_PREFIX ${BASE_RUNNER_PARTS[@]}
 declare -A RUBY_RUNNER_TAGS; compute_tags "RUBY_RUNNER_TAGS" $RUBY_RUNNER_PREFIX ${RUBY_RUNNER_PARTS[@]}
@@ -172,6 +182,8 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
 
     add_log "built ${WEBPACK_BUILDER_SELECTED_TAG}"
+
+    tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
   else
     RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
     YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
@@ -183,6 +195,18 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
 
     ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_SELECTED_TAG
     tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
+
+    (
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_ASSETS_FUZZY_TAG
+
+      if ! image_label_eq $WEBPACK_ASSETS_FUZZY_TAG "WEBPACK_ASSETS_CACHE_ID" $WEBPACK_ASSETS_CACHE_ID; then
+        exit 1
+      fi
+
+      tag_many $WEBPACK_ASSETS_FUZZY_TAG local/webpack-assets-previous
+    ) || (
+      tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
+    )
   fi
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-}
@@ -194,6 +218,7 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
 
   docker build \
     --label "RUBY_RUNNER_SELECTED_TAG=$RUBY_RUNNER_SELECTED_TAG" \
+    --label "WEBPACK_ASSETS_CACHE_ID=$WEBPACK_ASSETS_CACHE_ID" \
     --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
     --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
     --tag "${WEBPACK_ASSETS_TAGS[SAVE_TAG]}" \
