@@ -277,10 +277,7 @@ module Lti
                        lambda {
                          return "" if @request.nil?
 
-                         Services::RichContent.env_for(user: @current_user,
-                                                       domain: @request.host_with_port,
-                                                       real_user: @controller.logged_in_user,
-                                                       context: @context)[:JWT]
+                         @controller.rce_js_env_base[:JWT]
                        },
                        INTERNAL_TOOL_GUARD,
                        default_name: "com_instructure_rcs_service_jwt"
