@@ -177,7 +177,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                         {I18n.t('Start Date for Conference')}
                       </ScreenReaderContent>
                     }
-                    messages={props.calendarValidationMessages}
+                    messages={props.calendarValidationMessages[0]}
                   />
                 </Flex.Item>
                 <Flex.Item padding="small" align="start">
@@ -196,7 +196,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                     description={
                       <ScreenReaderContent>{I18n.t('End Date for Conference')}</ScreenReaderContent>
                     }
-                    messages={props.calendarValidationMessages}
+                    messages={props.calendarValidationMessages[1]}
                   />
                 </Flex.Item>
               </Flex>
@@ -315,6 +315,10 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
   )
 }
 
+BBBModalOptions.defaultProps = {
+  calendarValidationMessages: [],
+}
+
 BBBModalOptions.propTypes = {
   name: PropTypes.string,
   onSetName: PropTypes.func,
@@ -347,7 +351,7 @@ BBBModalOptions.propTypes = {
   descriptionValidationMessages: PropTypes.array,
   hasBegun: PropTypes.bool,
   durationValidationMessages: PropTypes.array,
-  isEditing: PropTypes.bool
+  isEditing: PropTypes.bool,
 }
 
 export default BBBModalOptions
