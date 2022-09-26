@@ -66,20 +66,10 @@ describe Loaders::OutcomeAlignmentLoader do
     [base_url, "modules", alignment[:module_id]].join("/") if alignment[:module_id]
   end
 
-  it "resolves to nil if context id is invalid" do
+  it "resolves to nil if context is invalid" do
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
-        "999999", "Course"
-      ).load(@outcome).then do |alignment|
-        expect(alignment).to be_nil
-      end
-    end
-  end
-
-  it "resolves to nil if context type is invalid" do
-    GraphQL::Batch.batch do
-      Loaders::OutcomeAlignmentLoader.for(
-        @course.id, "InvalidContextType"
+        nil
       ).load(@outcome).then do |alignment|
         expect(alignment).to be_nil
       end
@@ -91,7 +81,7 @@ describe Loaders::OutcomeAlignmentLoader do
 
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
-        @course.id, "Course"
+        @course
       ).load(@outcome).then do |alignment|
         expect(alignment).to be_nil
       end
@@ -101,7 +91,7 @@ describe Loaders::OutcomeAlignmentLoader do
   it "resolves to correct number of alignments" do
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
-        @course.id, "Course"
+        @course
       ).load(@outcome).then do |alignments|
         expect(alignments.is_a?(Array)).to be_truthy
         expect(alignments.length).to eq 6
@@ -112,7 +102,7 @@ describe Loaders::OutcomeAlignmentLoader do
   it "resolves outcome alignments to assignment, rubric, quiz, discussion and quiz with question bank" do
     GraphQL::Batch.batch do
       Loaders::OutcomeAlignmentLoader.for(
-        @course.id, "Course"
+        @course
       ).load(@outcome).then do |alignments|
         alignments.each do |alignment|
           if alignment[:content_type] == "Assignment"
@@ -178,7 +168,7 @@ describe Loaders::OutcomeAlignmentLoader do
     it "resolves outcome alignment to assignment with null values for module id, module name and module workflow_state" do
       GraphQL::Batch.batch do
         Loaders::OutcomeAlignmentLoader.for(
-          @course.id, "Course"
+          @course
         ).load(@outcome).then do |alignments|
           alignments.each do |alignment|
             next unless alignment[:content_type] == "Assignment" && alignment[:title] == @assignment.title
@@ -210,7 +200,7 @@ describe Loaders::OutcomeAlignmentLoader do
     it "displays only once the outcome alignment to the quiz" do
       GraphQL::Batch.batch do
         Loaders::OutcomeAlignmentLoader.for(
-          @course.id, "Course"
+          @course
         ).load(@outcome).then do |alignments|
           expect(alignments.is_a?(Array)).to be_truthy
           expect(alignments.length).to eq 6

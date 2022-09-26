@@ -185,14 +185,35 @@ describe Types::CourseType do
     end
   end
 
-  describe "outcomeAlignmentStats" do
-    it "resolves to outcome alignment stats" do
+  context "outcomeAlignmentStats" do
+    before do
       account_admin_user
       outcome_alignment_stats_model
+      course_with_student(course: @course)
       @course.account.enable_feature!(:outcome_alignment_summary)
-      course_type = GraphQLTypeTester.new(@course, { current_user: @admin })
-      expect(course_type.resolve("outcomeAlignmentStats { totalOutcomes }")).to eq 2
-      expect(course_type.resolve("outcomeAlignmentStats { alignedOutcomes }")).to eq 1
+    end
+
+    context "for users with Admin role" do
+      it "resolves outcome alignment stats" do
+        course_type = GraphQLTypeTester.new(@course, { current_user: @admin })
+        expect(course_type.resolve("outcomeAlignmentStats { totalOutcomes }")).to eq 2
+        expect(course_type.resolve("outcomeAlignmentStats { alignedOutcomes }")).to eq 1
+      end
+    end
+
+    context "for users with Teacher role" do
+      it "resolves outcome alignment stats" do
+        course_type = GraphQLTypeTester.new(@course, { current_user: @teacher })
+        expect(course_type.resolve("outcomeAlignmentStats { totalOutcomes }")).to eq 2
+        expect(course_type.resolve("outcomeAlignmentStats { alignedOutcomes }")).to eq 1
+      end
+    end
+
+    context "for users with Student role" do
+      it "does not resolve outcome alignment stats" do
+        course_type = GraphQLTypeTester.new(@course, { current_user: @student })
+        expect(course_type.resolve("outcomeAlignmentStats { totalOutcomes }")).to be_nil
+      end
     end
   end
 
