@@ -126,6 +126,7 @@ def preloadCacheImagesAsync() {
   sh """#!/bin/bash
     /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental &
     /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()} &
+    /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_CACHE_PREFIX}:${getFuzzyTagSuffix()} &
   """
 }
 
@@ -144,7 +145,10 @@ def premergeCacheImage() {
       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
       "WEBPACK_ASSETS_FUZZY_TAG=${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}",
       "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
+      "WEBPACK_CACHE_FUZZY_TAG=${env.WEBPACK_CACHE_PREFIX}:${getFuzzyTagSuffix()}",
       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+      "READ_BUILD_CACHE=0",
+      "WRITE_BUILD_CACHE=1",
     ]) {
       slackSendCacheBuild {
         try {
@@ -162,6 +166,7 @@ def premergeCacheImage() {
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $RUBY_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $BASE_RUNNER_PREFIX || true
         ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_ASSETS_PREFIX
+        ./build/new-jenkins/docker-with-flakey-network-protection.sh push -a $WEBPACK_CACHE_PREFIX || true
       """, label: 'upload cache images')
     }
   }
@@ -170,7 +175,9 @@ def premergeCacheImage() {
 def patchsetImage(asyncStepsStr = '') {
   credentials.withStarlordCredentials {
     def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+    def readBuildCache = configuration.isChangeMerged() ? 0 : 1
     def webpackAssetsFuzzyTag = configuration.isChangeMerged() ? "" : "${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}"
+    def webpackCacheFuzzyTag = configuration.isChangeMerged() ? "" : "${env.WEBPACK_CACHE_PREFIX}:${getFuzzyTagSuffix()}"
 
     slackSendCacheBuild {
       withEnv([
@@ -187,7 +194,10 @@ def patchsetImage(asyncStepsStr = '') {
         "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
         "WEBPACK_ASSETS_FUZZY_TAG=${webpackAssetsFuzzyTag}",
         "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
+        "WEBPACK_CACHE_FUZZY_TAG=${webpackCacheFuzzyTag}",
         "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
+        "READ_BUILD_CACHE=${readBuildCache}",
+        "WRITE_BUILD_CACHE=0",
       ]) {
         try {
           sh """#!/bin/bash
