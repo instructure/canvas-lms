@@ -49,7 +49,7 @@ def getDockerWorkDir() {
     return "/usr/src/app/vendor/${env.GERRIT_PROJECT}"
   }
 
-  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+  return env.GERRIT_PROJECT == 'canvas-lms' ? '/usr/src/app/' : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}/"
 }
 
 def getLocalWorkDir() {
@@ -412,7 +412,10 @@ pipeline {
                     .hooks(buildSummaryReportHooks.call())
                     .obeysAllowStages(false)
                     .timeout(2)
-                    .execute { setupStage() }
+                    .execute {
+                      buildDockerImageStage.preloadCacheImagesAsync()
+                      setupStage()
+                    }
 
                   extendedStage('Rebase')
                     .hooks(buildSummaryReportHooks.call())

@@ -7790,7 +7790,7 @@ nn:
       turnitin: "desse kommentarane blir viste til studentar når dei leverer inn ei Turnitin-aktivert oppgåve"
       view_grading_scheme: "vis oppsett for karaktersetjing"
       wiki_editing_roles: "kan opprette, endre namn på og redigere wiki-sider i kurset, som standard"
-      wiki_editing_roles_change_existing: "Kan endre sider redigerbare frå \"%{current_setting}\" til \"%{new_setting}\"."
+      wiki_editing_roles_change_existing: "Kan endre sider som er redigerbare av \"%{current_setting}\" til \"%{new_setting}\"."
     settings_sidebar: 
       buttons: 
         reset: "Tilbakestill emneinnhald"
@@ -10280,6 +10280,7 @@ nn:
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Kan ikkje laste emneklassar. Last sida på nytt og prøv igjen."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Kan ikkje laste Sync History-komponenten. Er internettkoplinga OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Kan ikkje laste Unsynced Changes-komponenten. Er internettkoplinga OK?"
+  failed_pairing_student_c9f0863b: "Kobling med student feila"
   failed_please_report_the_following_error_code_to_y_42248d60: "Mislukkast, rapporter følgande feilkode til systemansvarleg: Feilrapport: %{error};"
   failed_publishing_pace_40f87d0e: "Publisering av tempo mislukkast"
   failed_retrieving_media_sources_32aed288: "Kan ikkje hente mediakjelder."
@@ -12663,7 +12664,7 @@ nn:
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Forbetra støtte for nye quizar med modular, inkludert oppretting av nye quizar frå modular"
   improved_outcomes_management_4692f886: "Forbetra administrering av læringsmål"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbetra visuell påminning til faglærar om å publisere emne"
-  improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Forbetringar for å betre brukaropplevinga innan vurderingsoversikt for meistringsbasert læring"
+  improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Forbetringar er gjort for å betre brukaropplevinga innan vurderingsoversikt for meistringsbasert læring"
   in_a_few_seconds_538ddff3: "om ei kort stund"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "i %{asset_link} klikkar studentane på %{bad_link}, som går til ei side i emnet ditt som ikkje eksisterar. "
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald i eit anna emne."
@@ -12887,9 +12888,9 @@ nn:
   instructure_report_bundle_course_usage_report_6bb7075d: "Instructure rapport for emnebruk for rapporteringspakke"
   insufficient_permission_1d6a17a6: "Utilstrekkeleg løyve"
   insufficient_permission_1f8f1b3e: "Utilstrekkeleg løyve"
-  insufficient_permissions_2b3269d: "Utilstrekkeleg løyve"
-  insufficient_permissions_842fa94a: "Utilstrekkeleg løyve"
-  insufficient_permissions_fc65d8e7: "Utilstrekkeleg løyve"
+  insufficient_permissions_2b3269d: "Utilstrekkelege løyver"
+  insufficient_permissions_842fa94a: "Utilstrekkelege løyver"
+  insufficient_permissions_fc65d8e7: "Utilstrekkelege løyver"
   integration_error_44a52be4: Integrasjonsfeil
   integration_id_8a20b328: Integrasjons-ID
   integration_id_a6977535: "Integrasjons-ID:"
@@ -12930,35 +12931,35 @@ nn:
   invalid_grade_passback_setting_a1d209d1: "Ugyldig grade_passback_setting"
   invalid_hexcode_9124519f: "Ugyldig heksadesimal kode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ugyldig hex-kode. Oppgi ei hex-kode slik at du kan bruke eigendefinert farge."
-  invalid_hexcode_provided_522ba223: "Ugyldeg hex-kode"
-  invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Ugyldeg Microsoft sync tenant. Bekreft tenanten din."
-  invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Ugyldeg eller manglande \"login attributt\"-konfigurasjon i kontoen"
+  invalid_hexcode_provided_522ba223: "Ugyldig hex-kode"
+  invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Ugyldig Microsoft sync tenant. Bekreft tenanten din."
+  invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Ugyldig eller manglande \"login attributt\"-konfigurasjon i kontoen"
   invalid_or_missing_session_for_oauth_3ce4b605: "Ugyldig eller manglande arbeidsøkt for oauth"
-  invalid_pairing_code_dde8d40a: "ugyldeg paringskode."
+  invalid_pairing_code_dde8d40a: "ugyldig paringskode."
   invalid_points_8e929c3f: "Ugyldige poeng"
   invalid_points_possible: "Verdien av moglege poeng for denne oppgåva må vere null eller høgare."
   invalid_recipient_name_56b22b86: "Ugyldig namn på mottakar."
   invalid_recipients_5fd7c594: "Ugyldige mottakarar"
   invalid_redirect_url_6444a1b0: "Ugyldig omdirigerings-url"
   invalid_request_sftp_name_is_invalid_please_reach__91bc0955: |-
-      Ugyldeg førespurnad. SFTP namn er ugyldeg.
+      Ugyldig førespurnad. SFTP namn er ugyldig.
       Ta kontakt på #canvas-sre i Slack.
   invalid_restrictions_316cd740: "Ugyldig restriksjon"
   invalid_score_3d247da7: "Ugyldig resultat"
   invalid_sftp_username_we_were_unable_to_determin_t_9d769a7e: |-
-      Ugyldeg sftp brukarnamn. Me kunne ikkje bestemme brukarnamnet sidan domenet ikkje sluttar med .instructure.
+      Ugyldig sftp brukarnamn. Me kunne ikkje fastslå brukarnamnet sidan domenet ikkje sluttar med .instructure.
       Ta kontakt på #canvas-sre i Slack.
   invalid_sis_sync_status_b68db497: "Ugyldig SIS-synkroniseringsstatus"
   invalid_state_parameter_7a5aa108: "Ugyldig tilstandsparameter"
-  invalid_submission_file_type_cda6742a: "Ugyldeg filtype på innlevering"
-  invalid_targetcontexttype_53b96e87: "Ugyldeg targetContextType"
+  invalid_submission_file_type_cda6742a: "Ugyldig filtype på innlevering"
+  invalid_targetcontexttype_53b96e87: "Ugyldig targetContextType"
   invalid_timestamp_timestamp_in_future_5bc855d7: "Ugyldig tidspunkt - tidspunkt er i framtida"
   invalid_timestamp_timestamp_not_parseable_dae79e92: "Ugyldig tidsmerking - tidsmerke lar seg ikkje parse"
   invalid_url_in_xml: "Ugyldig URL i xml. Må unngå bruk av ampersand (&-teiknet)."
   invalid_username_or_password_b60aa240: "Ugyldig brukarnamn eller passord"
   invalid_username_or_password_trouble_logging_in_ch_7699399c: "Ugyldig brukarnamn eller passord. Problem med innlogging? *Sjå vår Login FAQs*."
   invalid_utf_8_13c76a6: "Ugyldig UTF-8"
-  invalid_value_a1b45937: "Ugyldeg verdi"
+  invalid_value_a1b45937: "Ugyldig verdi"
   invalid_value_for_name_i_4a7c601a: "Ugyldig verdi for %{name}:%{i}"
   invalid_xml_configuration_9c3f6bcf: "Ugyldig XML-konfigurasjon"
   invalid_xml_syntax: "Ugyldig xml-syntaks"
@@ -13163,8 +13164,8 @@ nn:
   last_reply_lastreplyatdisplaytext_f3d8ee3a: "Siste svar %{lastReplyAtDisplayText}"
   last_submission_activity_64ada9d0: "Siste innleveringsaktivitet"
   last_sync_5aac1ff1: "Siste synkronisering:"
-  last_synced_datetime_1c3e0295: "Siste synkronisering: %{datetime}"
-  last_synced_right_now_f6c2ab00: "Siste synkronisering: Nå"
+  last_synced_datetime_1c3e0295: "Sist synkronisert: %{datetime}"
+  last_synced_right_now_f6c2ab00: "Sist synkronisert: No"
   last_updated_timestamp_1822e508: "Sist oppdatert %{timestamp}"
   last_used_f9457313: "Sist brukt:"
   last_user_access_title: "Siste brukartilgang"
@@ -13192,7 +13193,7 @@ nn:
   late_policy_minus_count_points_1a945541: 
     one: "For sein-retningslinjer: minus 1 poeng"
     other: "For sein-retningslinjer: minus %{count} poeng"
-  late_submission_deduction_5d7fa3cb: "Reduksjon for sein innlevering"
+  late_submission_deduction_5d7fa3cb: "Frådrag for sein innlevering"
   late_submission_deduction_interval_b9fca334: "Intervall for utrekning av for sein innlevering"
   late_submission_deduction_must_be_between_0_and_10_9cde872d: "Utrekning av for sein innlevering må vere mellom 0 og 100"
   late_submission_deduction_must_be_numeric_5b3f468e: "Utrekninga av for sein innlevering må vere numerisk"
@@ -13801,7 +13802,7 @@ nn:
       lock_avatar: "Om du låser dette bildet er det godkjent og hindrar at brukaren oppdaterer det.  Vil du halde fram?"
   manage_b88f7150: Rediger
   manage_comment_library_48f2d123: "Administrer bibliotek av kommentarar"
-  manage_course_files_57e07038: "Administrer emnefilar"
+  manage_course_files_57e07038: "Administrer emnefiler"
   manage_course_sections_f482d1b3: "Administrer emneseksjonar"
   manage_course_templates_66c00052: "Administrer emnemalar"
   manage_courses_abe8335f: "Administrer emne"
@@ -13855,7 +13856,7 @@ nn:
   mark_as_done_6fa48d2f: "Merk som fullført"
   mark_as_done_779556d7: "merk som fullført"
   mark_as_important_date_533718de: "Merk som viktig dato"
-  mark_as_important_date_and_show_on_homeroom_sideba_1bc818ad: "Merk som viktig dato og vis på heimesidas sidemeny"
+  mark_as_important_date_and_show_on_homeroom_sideba_1bc818ad: "Merk som viktig dato og vis på heimesida si sidemeny"
   mark_as_read_47ec83dd: "Merk som lesen"
   mark_as_read_e7de2ce3: "Merk som lesen"
   mark_as_safe_c01fea35: "Marker som trygt"
@@ -14032,7 +14033,7 @@ nn:
   message_body_1f782712: Meldingsinnhald
   message_body_is_required_105d5986: "Meldingstekst påkrevd"
   message_for_name_648f5765: "Melding til %{name}"
-  message_form_9658d1ef: "Melding frå"
+  message_form_9658d1ef: Meldingsskjema
   message_groups_who_1ba736f: "Send melding til grupper som..."
   message_name_3b100614: "Melding %{name}"
   message_not_included_login_to_view_the_message_bd7a0627: "Meldingsinnhaldet er ikkje inkludert, logg inn for å sjå meldinga"
@@ -14060,7 +14061,7 @@ nn:
   message_students_who_b9f2bf20: "Send melding til studentar som..."
   message_text_5f692459: Meldingstekst
   message_this_student_6d14043d: "Send melding til denne studenten"
-  message_to_name_sent_f67d0cc3: "Melding til %{name}sent."
+  message_to_name_sent_f67d0cc3: "Melding til %{name}sendt."
   message_type_480e7b89: Meldingstype
   message_will_be_sent_to_all_the_teachers_and_teach_1b8d17c1: "Sender melding til alle faglærarane og undervisingsassistentane på emnet."
   messageableuser_library_767eed20: "Liste over brukarar du kan senda melding til"
@@ -24288,7 +24289,9 @@ nn:
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
   to_publish_unpublish_module_content_course_content_efc294d4: "For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på"
+  to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "For å svare i ein diskusjon må \"Diskusjonar - kommenter\" òg vere slått på."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "For å gjenopprette eit sletta emne, må 'Emne - omgjer sletting' og 'Emneinnhald - vis' begge vere slått på."
+  to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "For å gjenopprette eit sletta emne, må 'Administrer Emne - slett' og 'Emneinnhald - vis' begge vere slått på."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "For å hindre studentar i å opprette grupper, fjern merke frå avhakingsboksen 'La studentar organisere eigne grupper' i emneinnstillingar."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "For å avgrense tilgangen til brukarar frå eit spesifikt Clever-district, legg inn kvart distrikt sine Clever-ID-ar her. Det er eit krav for at Clever Instant Login kan fungere i eit multi-tenar-miljø. "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "For å hindre brukartilgong til spesifikke Google Apps-domene, list domena her."
@@ -24296,21 +24299,27 @@ nn:
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "For å avgrense tilgangen til berre Azure Active Directory-brukarar, registrer tenaren her. "
   to_search_and_view_notifications_for_a_user_users__becfb733: "For å søke og sjå varsel for ein brukar må 'Brukarar - vis liste' òg vere slått på."
   to_search_and_view_notifications_for_a_user_users__fab7293a: "For å søke gjennom og vise varslingar for ein brukar må «Brukarar - vis liste» også være aktivert."
+  to_search_by_assignment_id_only_grades_view_all_gr_6c58d9bb: "For å kunne søke etter kun oppgåveID så må \"Vurdering - sjå alle vurderingar\" òg vere slått på."
+  to_search_by_course_id_or_assignment_id_grades_edi_ac2c7b94: "For å kunne søke etter emneID eller oppgåveID så må \"Vurderingar - rediger\" òg vere slått på "
   to_search_by_grader_or_student_id_users_view_list__66bf658d: |-
       For å søke etter vurderarar eller student-ID, må 'Brukarar - vis liste' òg vere slått på.
       For å søke etter emne-ID eller oppgåve-ID, må 'Vurderingar - endre' òg vere slått på.
       For å søke kun etter oppgåve-ID, må 'Vurderingar - vis alle vurderingar' òg vere slått på.
+  to_search_by_grader_or_student_id_users_view_must__4639a825: "For å kunne søke etter sensor eller studentID må \"Brukarar - sjå\" òg vere slått på "
   to_search_by_grader_or_student_id_users_view_must__524aa668: "For å søke etter vurderar eller student-ID må «Brukarar - vis» også være aktivert. For å søke etter emne-ID eller oppgåve-ID må 'Vurderingar - rediger' også være aktivert. For å søke kun etter oppgåve-ID må «Vurderingar - vis alle vurderingar» også være aktivert."
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på.
       For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på.
+  to_search_for_a_course_in_the_restore_courses_tab__93dffdd5: "For å søke etter eit emne i Gjenopprett Emne -valet så må \"Emne Innhald - sjå\" og vere slått på"
   to_search_for_a_course_in_the_restore_courses_tab__a903343: "For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på. For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på. "
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "For å søke etter vurderingsloggar, må 'Vurderingar - vis endringsloggar' òg vere slått på."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "For å søke i vurderingsloggane, må 'Vurderingar - vis endringsloggar' òg vere slått på."
+  to_see_the_analytics_link_in_the_user_sidebar_from_6a8b20d9: "For å kunne sjå Analyticslenka i sidemenyen frå Personsida så må \"Profilar\" vere slått av for din konto."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "For å sjå sjekklista for emneoppsett på forsida til emnet, må 'Administrer ( legg til / endre / slett ) emne' òg vere slått på. "
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "For å sjå valet for sjekklista for emneetablering på emnets heimeside må «Administrer, legg til, rediger, slett emner» også være aktivert."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "For å sende ei melding til ein individuell brukar må 'Samtaler - send meldingar til individulle emnemedlem' òg vere slått på."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "For å dele ein diskusjon til Commons må 'Emneinnhald - legg til / endre / slett' òg vere slått på."
+  to_share_a_discussion_to_commons_courses_manage_mu_addad8ba: "For å dele ein diskusjon til Commons, må 'Emne - administrer' óg vere slått på."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "For å dele ein diskusjon til Commons, må 'Diskusjonar - vis' óg vere slått på."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "For å dele ein diskusjon til Commons, må 'Diskusjonar - vis' òg vere slått på."
   to_upload_some_submissions_for_this_assignment_cli_22368328: "For å laste opp innleveringar for denne oppgåva, klikk på \"Tilbake til oppgåve\"-knappen over."

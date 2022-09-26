@@ -98,6 +98,5 @@ docker image inspect starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-p
 Q: I added a new file dependency to `bundle exec rake canvas:compile_assets` or similar task, and
    the build is throwing an error because it can't find it. How do I fix it?
 
-A: The cache images used for the computation are built in `Dockerfile.jenkins-cache`. You'll
-   probably need to add it to the target `cache-helper-collect-webpack`. Please take care to
-   add as few files as possible to these images.
+A: The cache images used for the computation are built in `Dockerfile.jenkins-cache`. Please take
+   care to add as few files as possible to each tarball.

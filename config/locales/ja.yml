@@ -173,6 +173,7 @@ ja:
     uploading: 更新中...
   _2d4c0d31: …
   _5a374287: "..."
+  __376f89ea: "--"
   _at_the_bottom__4360f2b4: "-- 下へ --"
   _at_the_bottom__d2cf682a: "-- 下へ --"
   _b4455c8b: "%"
@@ -266,6 +267,8 @@ ja:
         common_core_guid: "共通コア GUID (オプション)"
         partner_id: "パートナー ID"
         partner_key: パートナーキー
+  academic_engagement_capella_74946a80: "アカデミックな予定 (Capella)"
+  academic_engagement_strayer_8c7832b9: "アカデミックな予定 (Strayer)"
   acalanes_union_high_grade_report_ae9bce11: "Acalanes Union ハイスクール評定表"
   accept_2fdd362e: 受諾
   accept_course_invitation_b4c04fbb: コースへの招待を受け入れる
@@ -2271,6 +2274,7 @@ ja:
   all_comments_are_sent_to_the_whole_group_778126f3: すべてのコメントはグループ全体に送信されます。
   all_configured_apps_a14eef0a: すべての設定済みのアプリ
   all_configured_apps_or_course_apps_only_1ccda005: 設定されたすべてのアプリ、またはコースアプリのみ
+  all_course_members_must_be_invited_to_calendar_eve_73984f29: すべてのコースメンバーがカレンダーのイベントに招待される必要があります。
   all_courses_80701c6f: すべてのコース。
   all_courses_a7dbb853: すべてのコース
   all_dates_fields_must_be_present_and_formatted_cor_3a0fe925: すべての日付け欄は現在の日付けで、正しいフォーマットである必要があります
@@ -2392,6 +2396,7 @@ ja:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "このツールで IMS の名前とロールのプロビジョニングサービスにアクセスできるようにする"
   allow_unconfirmed_e_mail_addresses_when_adding_use_47b7d5a2: ユーザーを追加するときに未確認の電子メールアドレスを許可する
   allow_users_to_comment_45b8f753: ユーザーにコメントを許可する
+  allow_users_to_submit_an_additional_email_at_regis_75b54a9d: 登録時にユーザが追加のEメールを送信できるようにします。
   allowed_attempts_4e229caa: 許可されている試行回数
   allowed_domains_ee7868c8: 許可されているドメイン
   allowed_for_subaccounts_courses_default_off_da598c11: "サブアカウント / コース対して許可、デフォルトはオフ"
@@ -3486,6 +3491,7 @@ ja:
   apply_conditions_9e941010: 適用条件
   apply_date_range_selection_cc4351ed: 日付範囲選択を適用する
   apply_filter_7e4f6113: フィルターを適用する
+  apply_filters_e98823c0: フィルターを適用する
   apply_filters_note_clicking_this_button_will_cause_753f04: フィルターを適用する。注：このボタンをクリックすると、ページが再読み込みされます。
   apply_missing_status_cd98e1d3: 不足しているステータスの適用
   apply_score_1edd7cda: スコアの適用
@@ -3643,6 +3649,7 @@ ja:
     default_imported_title: インポートされた問題
     default_title: "名称なし - %{course}"
     default_unfiled_title: 未整理の問題
+  assessment_question_bank_4c6026e: アセスメントの質問バンク
   assessment_question_id_4eacadb3: "アセスメントの質問 ID"
   assessment_title_7ab69b66: アセスメントのタイトル
   assessment_type_81a73b9c: "アセスメント タイプ"
@@ -3819,6 +3826,7 @@ ja:
   assignment_has_been_graded_for_name_4384f9b: "%{assignment}は %{name}と採点されました。"
   assignment_id_96baa1b7: "課題 ID"
   assignment_id_b040cee0: "課題 ID"
+  assignment_ids_param_is_invalid_7dc5c327: "%{assignment_ids}パラメータが無効"
   assignment_is_incomplete_ff55e07c: "%{assignment}は未完了"
   assignment_is_reassigned_dd6b6ef2: 課題が再割り当てされます。
   assignment_is_reassigned_ebb31807: "%{assignment}は再割り当て"
@@ -4644,6 +4652,7 @@ ja:
     titles: 
       attendance_help: 出欠についてのヘルプ
   attendance_ca433183: 出席状況
+  attendee_sync_in_progress_cd882292: " 受講者同期中... "
   attendees_eb402bac: 出席者
   attendees_failed_to_sync_725c8137: " 出席者の同期に失敗しました。"
   attendees_synced_ee5edd00: " 受講者が同期されました"
@@ -5229,6 +5238,7 @@ ja:
   c_modal_form: 
     close: 閉じる
   cache_cleared_successfully_9ab84d5a: キャッシュの消去に成功しました
+  cache_site_admin_access_tokens_c2cdf974: キャッシュサイト管理者アクセストークン
   calculated_by_4ac40468: "計算者： "
   calculated_by_baa3c8f3: 計算者：
   calculation_d82f6181: 計算
@@ -5941,6 +5951,7 @@ ja:
   chcp_student_activity_report_5611dd39: "CHCP 受講者アクティビティレポート"
   check_back_in_a_little_while_17756399: 後でもう一度チェックしてください。
   check_back_later_c4234dbc: 後で戻って確認
+  check_back_later_to_view_feedback_b937200a: フィードバックを表示するには、後でチェックし直してください。
   check_permissions_when_masquerading_as_course_admi_ded7106c: コース管理者マスカレード時の権限の確認
   check_services_to_enable_8877c451: 有効にするサービスを確認してください
   check_submission_file_type_b3dbf3fd: 提出ファイルのタイプをチェックする
@@ -6007,6 +6018,7 @@ ja:
   classic_view_33f29576: クラシックビュー
   clear_2084585f: クリア
   clear_all_da755751: すべてクリア
+  clear_all_filters_9c7e870: すべてのフィルターをクリア
   clear_course_selection_b0762ae2: コース選択をクリア
   clear_job_selection_6ad1ff95: 選択したジョブをクリアする
   clear_search_900e9c97: 検索をクリアする
@@ -6367,6 +6379,7 @@ ja:
         wrong_account: "%{course} への招待が **%{invited_user}** に送信されましたが、現在 **%{current_user}** でログインしています。"
       labels: 
         password: パスワード
+        personal_email: 個人メール（オプション）
         subscribe_to_emails: "Instructure から、情報、ニュース、ヒントを受け取ることを希望します。"
         time_zone: "タイム ゾーン"
         unique_id: "電子メール アドレス"
@@ -6590,6 +6603,8 @@ ja:
       members: メンバー
       name: 名前
       options: オプション
+    errors: 
+      create_failed: 会議の作成に失敗しました
     general_error: 会議に参加する際にエラーが発生しました
     general_error_with_message: "会議に参加する際にエラーが発生しました。メッセージ: '%{message}'"
     inactive_error: その会議は現在アクティブになっていません
@@ -7602,6 +7617,10 @@ ja:
   couldn_t_track_assigning_students_to_groups_but_it_b6510770: "受講者のグループへの割り当てを追跡できませんでしたが、まだ起こっています！後ほど手動で結果を確認してください。(%{errorMessage})"
   couldn_t_update_standards_for_authority_auth_81206187: "受講生を権限 %{auth} に更新できませんでした。"
   count_40eced3b: 数
+  count_account_calendars_found_b1eed2e3: 
+    one: 1つのアカウントカレンダーが見つかりました。
+    other: "%{count}つのアカウントカレンダーが見つかりました。"
+    zero: 該当するアカウントカレンダーが見つかりません。
   count_account_calendars_selected_578d6db8: 
     one: 1つのアカウントカレンダーの表示/非表示
     other: "%{count}つのアカウントカレンダーが選択されています"
@@ -7677,6 +7696,10 @@ ja:
   count_files_were_ignored_2f9c054a: 
     one: "(%{count}) のファイルが無視されました"
     other: "(%{count}) のファイルが無視されました"
+  count_filters_aa5172fc: 
+    one: 1つのフィルター
+    other: "{{count}} つのフィルター"
+    zero: フィルターがありません
   count_grouptitle_outcomes_4ddea09: 
     one: "%{count} 件の「%{groupTitle}」結果"
     other: "%{count} 件の「%{groupTitle}」結果"
@@ -8937,6 +8960,7 @@ ja:
   create_file_71aa1922: "[ ファイルを作成 ]"
   create_file_s_188549e6: "[ ファイルを作成 ]"
   create_files_after_rce_media_upload_recording_77d75a96: RCEメディアのアップロード/記録後にファイルを作成する
+  create_filter_preset_d6f28bc4: フィルタープリセットを作成する
   create_group_set_7fe1cd53: "グループ セットの作成"
   create_groups_later_6ce36058: グループを後で作成する
   create_groups_now_d59bf70b: 今すぐグループを作成する
@@ -8945,6 +8969,7 @@ ja:
     there_was_an_error: "「%{title}」の保存中にエラーが発生しました。もう一度やり直してください。"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: ToolProxyでライブイベントサブスクリプションを作成する
   create_lookup_7ceb6d90: ルックアップの作成
+  create_manage_filter_presets_18404c3a: フィルタープリセットを作成・管理する
   create_module_item: 
     assignment_name: 課題名
   create_module_item_quiz: 
@@ -8994,6 +9019,7 @@ ja:
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
       メディアがRCE経由でアップロードまたは記録された後に、
       ファイルオブジェクト（コース内の場合は最初は受講生に非表示）を作成します。
+  creating_88cc5158: 作成中
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: 新しい課題フローでは、グループ作成はまだ処理されていません。レガシー作成課題ページに移動しますか？
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 提出のエクスポートを作成すると、すべての現在と過去のコースにおける課題提出のzipファイルをダウンロードすることができます。これは大きなファイルになる可能性があるので、時間がかかる可能性があります。そのページから移動し、後で戻ってくることができます。
   creating_conference_95b59116: 会議を作成中
@@ -9417,6 +9443,7 @@ ja:
   default_template_f2a759ed: デフォルトのテンプレート
   default_templates_are_used_as_starting_points_for__f06f9e33: デフォルトのテンプレートは、新しいテーマの開始地点として利用され、消去することはできません。
   default_to_modules_for_the_course_home_page_d6a951a7: コースホームページのモジュールwoデフォルトに
+  default_to_new_quizzes_dac795a9: 新しい小テストへデフォルト
   default_view_for_dashboard_ea91b60f: ダッシュボードのデフォルトビュー
   define_general_settings_for_locked_objects_in_this_20da2981: このコースでロックされたオブジェクトの一般的な設定を定義します。
   define_settings_by_type_for_locked_objects_in_this_676197bf: このコースでロックされたオブジェクトの種類によって、設定を定義します。
@@ -9478,6 +9505,7 @@ ja:
   delete_pages_ab60f58: ページを削除
   delete_prerequisite_5e97bdf4: 前提条件を削除
   delete_prerequisite_title_19741947: "前提条件%{title}を削除"
+  delete_preset_d7fda473: プリセットを削除する
   delete_proficiency_rating_5436ee08: 熟達度評価を削除する
   delete_proficiency_rating_position_46e205f7: "熟達度評価を削除 %{position}"
   delete_quiz_142b8099: 小テストの削除
@@ -9630,6 +9658,7 @@ ja:
   description_61f4296: "* 説明"
   description_for_mastery_level_position_description_cc17114b: "達成レベル%{position}の説明:%{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "熟達度の説明%{position}：%{description}"
+  description_must_be_less_than_2500_characters_1ee7c522: 説明は2500文字未満でなければなりません
   descriptivename_was_changed_from_formattedoldvalue_47623537: "%{descriptiveName}が%{formattedOldValue}から%{formattedNewValue}に変更されました。"
   descriptivename_was_set_to_formattednewvalue_cd78b357: "%{descriptiveName}が%{formattedNewValue}に送信されました。"
   descriptivename_was_turned_off_38771a19: "%{descriptiveName}のシャッフルがオフになりました。"
@@ -9741,6 +9770,7 @@ ja:
     save_settings: 設定の保存
     saving: 保存しています...
   did_you_know_you_can_now_create_detailed_filters_a_c6b8756c: 詳細なフィルターを作成し、保存しておくことができるようになったことをご存知でしたか？
+  did_you_know_you_can_now_create_filter_presets_and_f0bc546e: フィルタープリセットを作成し、将来使用するために保存できることをご存じですか？
   did_you_mean_id_241c900c: "もしかして、こちらのことですか?*%{id}*"
   didn_t_find_what_you_are_looking_for_keep_trying_ee5b508c: お探しのものが見つかりませんでしたか？試し続けてみてください！
   different_course_b875770e: 異なるコース
@@ -10748,6 +10778,7 @@ ja:
   encourage_student_discourse_7836b9f7: 受講者同士の会話を促す
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "基本的なアウトカム用の暗号化された Sourcedids"
   end_78c581cd: 終了
+  end_at_must_be_later_than_start_at_3b673851: 終了時間は開始時間より後でなければなりません
   end_course_set_up_tutorial_dialog_5b812ec6: コース設定のチュートリアルダイアログ終了
   end_course_set_up_tutorial_f358b85d: コースのセットアップチュートリアル終了
   end_date_cannot_be_before_start_date_eb62ed6d: 終了日は、開始日の前にすることはできません
@@ -10819,6 +10850,7 @@ ja:
     teacher_assistant: TA
   enrollment_count_8a289702: 登録数
   enrollment_count_report_685807b6: 登録数レポート
+  enrollment_details_11f9a7d5: 登録の詳細
   enrollment_role_f5d985a7: 登録ロール
   enrollment_roles_b9cffda7: 登録ロール
   enrollment_state_7a9c55e2: 登録状況
@@ -12028,6 +12060,7 @@ ja:
   filter_messages_by_course_21a53fc4: コースでメッセージをフィルタ
   filter_observer_dashboard_by_student_5705ff33: オブザーバーダッシュボードを受講者でフィルタリング
   filter_outcomes_e91aa331: アウトカムのフィルタリング
+  filter_preset_name_9ce8f057: フィルタープリセット名
   filter_recent_user_accesses_by_term_30812659: 最近のユーザアクセスを期間ごとにフィルタリング
   filter_replies_by_unread_342e8e90: 未読の返信のみを表示
   filter_replies_by_unread_caf870ea: 未読の返信のみを表示
@@ -12242,6 +12275,7 @@ ja:
   give_all_students_the_same_grade_for_assignment_na_e44fcc7e: "以下のグレードの値を入力して提出することによって、すべての生徒に*%{assignment.name}*への同じグレードを与えます："
   give_all_students_the_same_percent_grade_for_assig_6a008004: "以下のグレードの値を入力して提出することによって、すべての生徒に同じ*パーセント*のグレードを**%{assignment.name}**に対して与えます："
   give_this_filter_a_name_36b4b03a: フィルターに名前を付ける
+  give_your_filter_preset_a_name_11144c73: フィルタープリセットに名前を付ける
   giving_up_on_retrieving_media_sources_this_issue_w_ad49b0d3: メディアソースの取得をあきらめる。この問題はおそらく、最終的には解決します。
   global_announcements_a78912c8: "グローバル アナウンスメント"
   global_announcements_add_edit_delete_843ca4d2: "グローバルアナウンス - 追加/編集/削除"
@@ -14879,6 +14913,7 @@ ja:
   invitation_options_69813f8: 招待オプション
   invite_5b1fcbcd: 招待
   invite_all_course_members_a0a13bc6: コースメンバーを全員招待する
+  invite_all_group_members_3182f61a: グループメンバーを全員招待する
   invite_students_a4873a50: 新入生を招待する
   ip_filter_is_not_valid_152a46d8: "IP フィルタは無効です。"
   ireland_353_3cd32cc0: "アイルランド (+353)"
@@ -15418,6 +15453,7 @@ ja:
       feedback: ここをクリックして、問題を報告
     show_me_where: どこに表示するか
   links_14b70841: リンク
+  links_to_an_external_site_de74145d: 外部サイトにリンクしています。
   links_to_other_courses_in_this_resource_may_not_be_d9f2779: このコースの受講者がこのリソース内の他のコースへのリンクにアクセスできない場合があります。
   listWithOthers: 
     other: 
@@ -18083,6 +18119,7 @@ ja:
   modal_dialog_add_people_bc1c6e14: "モーダルダイアログ:メンバーの追加"
   modal_dialog_add_to_course_aec33759: "モーダルダイアログ:コースに追加"
   modal_dialog_header_source_16ec3ac1: "モーダルダイアログ%{header} %{source}"
+  modal_dialog_start_end_date_674315cc: モーダルダイアログ：開始日と終了日
   model_is_already_located_in_newgroup_e5cea361: "%{model} はすでに %{newGroup} 内にあります"
   modelsOutcome: 
     criteria: 
@@ -18537,6 +18574,7 @@ ja:
   name_mark_as_read_cc9e5fd6: "%{name} 赤でマークする"
   name_mark_as_unread_abd650da: "%{name} 未読としてマークする"
   name_missing_f4f3eb9e: 名前がありません
+  name_must_be_less_than_255_characters_37a49ba: 名前は255文字未満でなければなりません
   name_name_913c785b: "名前:%{name}"
   name_only_5f56718e: 名前のみ
   name_options_bc5c95ce: "%{name} オプション"
@@ -18660,6 +18698,7 @@ ja:
   new_quizzes_migration_enabled_by_default_5f9bcc81: デフォルトで有効になっている新しい小テストの移行
   new_quizzes_migration_required_7854aa1a: 新しい小テストの移行が必要です
   new_quizzes_on_the_quizzes_page_b21f338d: 小テストページの新しい小テスト
+  new_quizzes_site_admin_service_user_a331233a: "新規小テスト サイト管理者サービスユーザー"
   new_quizzes_submission_274b5c57: 新規小テスト提出
   new_quizzes_submission_history_d81b477b: 新小テスト提出履歴
   new_quizzes_support_for_modules_7b81eee9: モジュールの新しい小テストサポート
@@ -19374,6 +19413,7 @@ ja:
   october_6b2bf82: 10月
   of_students_5d1af0d2: 受講者数
   of_times_1018baab: "#回"
+  of_total_c02b5afe: "/%{total}"
   off_5385ef3f: オフ
   off_for_key_keyname_24b0f366: "キーがオフ：%{keyName}"
   off_policy_will_not_apply_to_this_sub_account_8b12386b: "オフ - このサブアカウントにはポリシーは適用されません"
@@ -19940,6 +19980,7 @@ ja:
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_632472b7: ピア：
+  peer_review_74f26a13: "ピア レビュー"
   peer_review_assignment_7d314c59: ピアレビュー課題
   peer_review_due_dueattext_20987412: "ピア評価期限%{dueAtText}"
   peer_review_due_eb63af38: ピア評価期限
@@ -21077,6 +21118,7 @@ ja:
     you_have_no_services: "*設定*ページに追加できる登録済みのサービスはありません。"
   profile_6bd2baed: プロフィール
   profile_photo_save_failed_too_many_times_e1ebda5: プロフィール写真の保存に失敗した回数が多すぎます
+  profile_pictures_15953851: プロフィール画像
   profile_tray_bcec5044: プロファイルトレイ
   profiles: 
     avatar_dialog: 
@@ -23099,6 +23141,7 @@ ja:
   remove_missing_status_when_graded_d0755cc7: 採点時に不足しているステータスを削除する
   remove_name_624e06be: "%{name}を削除する"
   remove_name_as_an_admin_c296cf49: "%{name}管理者として削除"
+  remove_name_calendar_bdc329d9: "%{name}カレンダーを削除する"
   remove_null_values_from_live_event_payloads_3c826f: ライブイベントペイロードからゼロ値を削除する
   remove_observers_from_courses_703edc34: オブザーバーをコースから削除
   remove_outcome_20e16da7: 結果を削除しますか？
@@ -23625,6 +23668,7 @@ ja:
   save_changes_698abe77: 変更内容の保存
   save_customizations_dde779d8: カスタマイズを保存
   save_failed_463cb2a8: 保存に失敗しました。
+  save_filter_preset_37f32c02: フィルタープリセットを保存する
   save_grading_period_daaaddea: 採点期間を保存する
   save_grading_period_set_e029fa88: 採点期間のセットを保存する
   save_key_b4dede06: 鍵の保存
@@ -23645,6 +23689,7 @@ ja:
   saved_3cd67a7c: 保存済み
   saved_comments_2f6ba95: 保存されたコメント
   saved_discussion_settings_successfully_ebd46a57: 保存したディスカッション設定を正常に完了しました
+  saved_filter_presets_81b7a73d: 保存されたフィルタープリセット
   saving_2521e616: 保存
   saving_assignment_dates_progress_9856153d: 課題の日付の進行を保存する
   saving_assignment_dates_progress_percent_a5ea89a1: "課題の日付の進行を保存する：%{percent}%"
@@ -25210,6 +25255,9 @@ ja:
   showing_all_announcements_36ff0cec: すべてのアナウンスを表示
   showing_all_discussions_7e09f4b7: すべてのディスカッションを表示
   showing_all_sets_of_grading_periods_6c160874: すべての採点期間のセットを表示。
+  showing_count_account_calendars_e8266ae6: 
+    one: "%{count}つのアカウントのカレンダーを表示しています。"
+    other: "%{count}つのアカウントのカレンダーを表示しています。"
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "%{count}の%{groupTitle}の結果を表示中。"
     other: "%{count}の%{groupTitle}のアウトカムを表示中。"
@@ -25222,6 +25270,7 @@ ja:
   similarity_detection_platform_9e424d70: 類似性検知プラットフォーム
   similarity_score_more_information_b7010a87: "類似スコア -- 詳細"
   similarity_score_see_detailed_report_a113dac0: "類似スコア - 詳細レポートを参照"
+  similarity_score_state_7e3364ac: "類似性スコア-- %{state}"
   similarityscore_similarity_score_52236e85: "%{similarityScore}% 類似スコア"
   simple_tls_45df2648: "簡易 TLS"
   singapore_65_b4927585: "シンガポール (+65)"
@@ -25590,6 +25639,8 @@ ja:
   start_date_to_1e6e6bbe: "（）までの開始日:"
   start_date_value_817cab96: "開始日%{value}"
   start_dates_8f1c22a8: 開始日：
+  start_end_date_4a7a56da: 開始日と終了日
+  start_end_dates_aaa00ecf: 開始日と終了日
   start_entry_4b491f60: エントリを開始する
   start_from_a_template_380d4e8: テンプレートから開始
   start_from_a_template_theme_6c6e3dab: テンプレートテーマから開始
@@ -25890,6 +25941,7 @@ ja:
   submission_comment_user_name_assignment_title_cour_d88ba875: "提出コメント：%{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: 提出コメント
   submission_comments_b6d65841: 提出コメント
+  submission_completed_ba0e552e: 提出完了
   submission_data_88085815: 提出データ
   submission_date_8f659c0c: 提出日
   submission_date_a7920dac: 提出日
@@ -26104,6 +26156,7 @@ ja:
   subscribed_fe74d22a: 購読済み
   subtitle_ee60ca78: サブタイトル
   subtitles_could_not_be_imported_from_file_5de6da0b: "%{file}から字幕をインポートできませんでした"
+  success_a5aeb7: 成功！
   success_all_users_on_this_domain_will_now_see_this_4681b85d: 成功しました！このドメイン上のすべてのユーザーは、このブランディングを見ることができるようになりました。
   success_file_uploaded_8174e93f: 成功：ファイルをアップロードしました
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: 成功です！この課題の成績は受講生に表示されるようになりました。
@@ -26832,6 +26885,7 @@ ja:
   there_was_an_error_creating_a_new_filter_e93bb765: 新しいフィルターの作成中にエラーが発生しました。
   there_was_an_error_deleting_name_aa3050e5: "\"%{name}\"を削除中にエラーが発生しました。"
   there_was_an_error_fetching_course_statistics_96e9dbad: コース統計を取得中にエラーが発生しました
+  there_was_an_error_fetching_custom_columns_542014ef: カスタムカラムの取得中にエラーが発生しました。
   there_was_an_error_fetching_data_for_gradebook_174e82f9: 評定表のデータを取得中にエラーが発生しました
   there_was_an_error_fetching_gradebook_filters_3b4607ac: 評定表フィルターを取得中にエラーが発生しました。
   there_was_an_error_fetching_modules_8ee451bb: モジュールを取得中にエラーが発生しました。
@@ -27250,6 +27304,13 @@ ja:
   this_topic_is_closed_for_comments_5bacad6: このトピックへのコメントは締め切られています
   this_topic_is_used_for_grading_efc6ca89: このトピックは採点に使用されます。
   this_topic_will_be_available_delayedpostat_6b47c4c3: "トピックは%{delayedPostAt}に利用可能になります。"
+  this_update_offers_enhanced_feature_functionality__c3c4ea51: |-
+      このアップデートでは、
+      Big Blue Button 会議の機能が強化されました。ユーザーは、会議の設定で
+      待合室を有効にすることができるようになり、会議内から予定されている会議をカレンダーに
+      追加できるようになり、
+      新しい参加者の
+      追加や削除に伴って会議の参加者を更新・同期できるようになります。
   this_update_will_allow_more_options_for_bbb_confer_3d7d1d08: "このアップデートにより、BBB 会議でより多くのオプションが使用できるようになります。"
   this_user_has_been_deleted_77e6c04b: このユーザーは削除されました
   this_user_has_been_deleted_8caa45be: このユーザーは削除されました。
@@ -28111,6 +28172,7 @@ ja:
   toggle_course_card_color_overlays_b5b8137a: トグルコースカードカラーオーバーレイ
   toggle_dashcard_view_or_recent_activity_stream_1de257: トグルダッシュカードビュー、または最近のアクティビティーストリーム
   toggle_editing_answer_text_as_html_9a93fe6: "回答テキストを HTML として編集するかどうか"
+  toggle_filterpresetname_f8ae0191: "トグル%{filterPresetName}"
   toggle_module_visibility_781a2f6c: モジュール可視性を切り替える
   toggle_name_c0ab332b: "トグル%{name}"
   toggle_option_cfd8b95a: トグルオプション
@@ -28285,6 +28347,7 @@ ja:
   type_folder_115f3b07: タイプ、フォルダー
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}'は有効な画像形式ではありません(jpg、 png、またはgifをお試しください)"
   type_message_here_e15e30a7: ここにメッセージを入力してください...
+  type_name_has_no_next_in_strand_ace3cfdb: "%{type} \"%{name}\" には next_in_strand がありません"
   type_of_change_1cb24a0e: 変更の種類
   type_of_item_8a37f69d: アイテムの種類
   type_or_use_arrow_keys_to_navigate_multiple_select_ec56e29c: 入力するか、矢印キーを使用してナビゲートします。複数回答可。
@@ -28698,6 +28761,7 @@ ja:
             特定の日付までモジュール全体をブロックします。
   use_new_folder_tree_in_files_bc0ea09f: ファイル中の新しいフォルダツリーを使う
   use_new_folder_tree_in_files_eb5a451b: ファイル中の新しいフォルダツリーを使う
+  use_new_quizzes_as_the_default_quizzing_engine_rem_73020960: デフォルトの小テストエンジンとして「新しい小テスト」を使用します。クラシックな小テストを作成する機能を削除します。
   use_new_rich_content_editor_with_enhanced_sidebar__8e0bfedd: 拡張されたサイドバーで新しいリッチコンテンツエディタをどこでも使用する
   use_pairing_code_for_parent_sign_up_10b091f8: 親のサインアップにペアリングコードを使用する
   use_parent_account_setting_f25a721f: ペアレントアカウントの設定を使用する
@@ -29519,8 +29583,12 @@ ja:
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: 返信を作成する際、あなたは自分の名前およびプロフィール写真を他のコースメンバーに表示するか、匿名のままにするかを選択することができます。
   when_disabled_students_can_still_send_individual_m_3bf396f2: 無効にしても、受講者はコース講師、コースTA、同じアカウントレベルのグループに所属する受講者に個別のメッセージを送信できます。
   when_disabled_students_can_still_send_individual_m_567a911c: 無効にしても、受講者はコース講師、コースTA、同じアカウントレベルのグループに所属する受講者に個別のメッセージを送信できます。
+  when_enabled_accesstoken_reads_will_be_cached_usin_917f3375: "有効にすると、AccessTokenリクエスト認証時に読み込みがキャッシュされます (MultiCacheを使用して)。"
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "有効化した場合、グローバル JavaScript と CSS ファイルは、 *%{t_theme_editor}*にアップロードすることができます。"
   when_enabled_it_deprecates_the_short_message_servi_18c6ee3f: 有効にすると、ショートメッセージサービス（SMS）が廃止されます。
+  when_enabled_new_quizzes_provisions_will_use_the_d_f18d3c15: |-
+      有効にすると、「新しい小テスト」の規定は、専用のサイト管理者
+      サービスユーザー使用し、DeveloperKeyアクセストークンとリフレッシュトークンを生成するようになります。
   when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
       有効にすると、このフラグはテキスト
       ベースの送信のスピードグレーダーに単語数を表示します。
@@ -29949,6 +30017,7 @@ ja:
   you_have_count_calendars_left_f0cbcac4: 
     one: "予定表が%{count}残っています"
     other: "カレンダーが%{count}残っています"
+  you_have_count_peer_reviews_to_complete_52e065e: "%{count}つのピアレビューを完了する必要があります。"
   you_have_count_submissions_to_grade_6c5b511a: "採点する提出が %{count} あります"
   you_have_created_a_comment_that_has_not_been_poste_cd1d3a06: まだ投稿されていないコメントを作成しました。このコメントを下書きとして保存しますか？(下書きコメントはいつでも投稿できます)。
   you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: この受講者に無効な評定を入力しました。値と採点タイプを確認して、もう一度やり直してください。
@@ -30152,6 +30221,7 @@ ja:
   your_submission_has_not_been_graded_yet_d6963e53: 提出物はまだ採点されていません
   your_time_for_this_quiz_has_been_reduced_394652e9: この小テストの回答時間が少なくなっています。
   your_webcam_may_already_be_in_use_6cd64c25: あなたのウェブカメラは既に使用中かもしれません。
+  your_work_has_been_submitted_519058f8: あなたの課題が提出されました。
   yyyy_mm_dd_hh_mm_a01b6081: "YYYY-MM-DD hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z-A
