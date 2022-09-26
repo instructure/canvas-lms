@@ -59,6 +59,10 @@ module Auditors::ActiveRecord
       end
     end
 
+    def self.prune
+      process(prune: true)
+    end
+
     def self.retention_months
       Setting.get("auditor_partitions_keep_months", 14).to_i
     end
