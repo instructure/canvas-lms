@@ -1,8 +1,11 @@
 FROM local/webpack-builder
 
-RUN --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
+RUN \
+  --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
+  --mount=type=bind,from=local/webpack-assets-previous,target=/mount/webpack-assets-previous \
   tar --no-same-owner -xf /cache-helper/webpack-runner-dependencies.tar -C ${APP_HOME} && \
-  tar --no-same-owner -xf /cache-helper/webpack-runner.tar -C ${APP_HOME}
+  tar --no-same-owner -xf /cache-helper/webpack-runner.tar -C ${APP_HOME} && \
+  { { cd /mount/webpack-assets-previous/usr/src/app && cp --parents -rf public/dist/brandable_css ${APP_HOME}; } || true; }
 
 ARG JS_BUILD_NO_UGLIFY=0
 ARG RAILS_LOAD_ALL_LOCALES=0
