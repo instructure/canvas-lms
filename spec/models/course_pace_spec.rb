@@ -70,6 +70,10 @@ describe CoursePace do
     it "has a working section_paces scope" do
       expect(@course.course_paces.section_paces).to match_array([@section_plan])
     end
+
+    it "has a working student_enrollment_paces scope" do
+      expect(@course.course_paces.student_enrollment_paces).to match_array([@student_plan])
+    end
   end
 
   context "course_pace_context" do

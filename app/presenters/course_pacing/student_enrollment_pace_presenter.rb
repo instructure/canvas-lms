@@ -17,25 +17,29 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
+class CoursePacing::StudentEnrollmentPacePresenter < CoursePacing::PacePresenterInterface
+  attr_reader :student_enrollment
+
+  def initialize(student_enrollment_pace, student_enrollment = nil)
+    super(student_enrollment_pace)
+    @student_enrollment = student_enrollment || @pace.user.enrollments.find_by(course_id: @pace.course)
+  end
+
+  def as_json
+    default_json.merge({
+                         student: {
+                           name: student_enrollment.user.name,
+                         }
+                       })
+  end
+
   private
 
-  def pacing_service
-    CoursePacing::SectionPaceService
+  def context_id
+    @student_enrollment.id
   end
 
-  def pacing_presenter
-    CoursePacing::SectionPacePresenter
-  end
-
-  attr_reader :course
-
-  def context
-    @section
-  end
-
-  def load_contexts
-    @course = api_find(Course.active, params[:course_id])
-    @section = api_find(@course.active_course_sections, params[:course_section_id]) if params[:course_section_id]
+  def context_type
+    "StudentEnrollment"
   end
 end

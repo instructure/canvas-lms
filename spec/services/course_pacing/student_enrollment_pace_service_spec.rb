@@ -17,25 +17,26 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe CoursePacing::SectionPaceService do
+describe CoursePacing::StudentEnrollmentPaceService do
   let(:course) { course_model }
-  let(:section) { add_section("Section One", course: course) }
-  let(:section_two) { add_section("Section Two", course: course) }
-  let!(:section_pace) { section_pace_model(section: section) }
+  let(:student) { user_model }
+  let(:student_enrollment) { course.enroll_student(student, enrollment_state: "active") }
+  let(:extra_enrollment) { course.enroll_student(user_model, enrollment_state: "active") }
+  let!(:pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
 
   before { course_pace_model(course: course) }
 
   describe ".paces_in_course" do
     it "returns the paces for the provided course" do
       expect(
-        CoursePacing::SectionPaceService.paces_in_course(course)
-      ).to match_array [section_pace]
+        CoursePacing::StudentEnrollmentPaceService.paces_in_course(course)
+      ).to match_array [pace]
     end
 
     it "does not include deleted paces" do
-      section_pace.destroy!
+      pace.destroy!
       expect(
-        CoursePacing::SectionPaceService.paces_in_course(course)
+        CoursePacing::StudentEnrollmentPaceService.paces_in_course(course)
       ).to match_array []
     end
   end
@@ -43,13 +44,13 @@ describe CoursePacing::SectionPaceService do
   describe ".pace_in_context" do
     it "returns the matching pace" do
       expect(
-        CoursePacing::SectionPaceService.pace_in_context(section)
-      ).to eq section_pace
+        CoursePacing::StudentEnrollmentPaceService.pace_in_context(student_enrollment)
+      ).to eq pace
     end
 
     it "raises RecordNotFound when the pace is not found" do
       expect do
-        CoursePacing::SectionPaceService.pace_in_context(section_two)
+        CoursePacing::StudentEnrollmentPaceService.pace_in_context(extra_enrollment)
       end.to raise_error ActiveRecord::RecordNotFound
     end
   end
@@ -57,18 +58,16 @@ describe CoursePacing::SectionPaceService do
   describe ".create_in_context" do
     context "when the context already has a pace" do
       it "returns the pace" do
-        expect(CoursePacing::SectionPaceService.create_in_context(section)).to eq section_pace
+        expect(CoursePacing::StudentEnrollmentPaceService.create_in_context(student_enrollment)).to eq pace
       end
     end
 
     context "when the context does not have a pace" do
-      let(:new_section) { add_section("New Section", course: course) }
-
       it "creates a pace in the context" do
         expect do
-          CoursePacing::SectionPaceService.create_in_context(new_section)
+          CoursePacing::StudentEnrollmentPaceService.create_in_context(extra_enrollment)
         end.to change {
-          new_section.course_paces.count
+          extra_enrollment.course_paces.count
         }.by 1
       end
     end
@@ -81,19 +80,19 @@ describe CoursePacing::SectionPaceService do
       it "returns the updated pace" do
         expect do
           expect(
-            CoursePacing::SectionPaceService.update_pace(section_pace, update_params)
-          ).to eq section_pace
+            CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
+          ).to eq pace
         end.to change {
-          section_pace.exclude_weekends
+          pace.exclude_weekends
         }.to false
       end
     end
 
     context "the update failed" do
       it "returns false" do
-        allow(section_pace).to receive(:update).and_return false
+        allow(pace).to receive(:update).and_return false
         expect(
-          CoursePacing::SectionPaceService.update_pace(section_pace, update_params)
+          CoursePacing::StudentEnrollmentPaceService.update_pace(pace, update_params)
         ).to eq false
       end
     end
@@ -102,15 +101,15 @@ describe CoursePacing::SectionPaceService do
   describe ".delete_in_context" do
     it "deletes the matching pace" do
       expect do
-        CoursePacing::SectionPaceService.delete_in_context(section)
+        CoursePacing::StudentEnrollmentPaceService.delete_in_context(student_enrollment)
       end.to change {
-        section.course_paces.not_deleted.count
+        student_enrollment.course_paces.not_deleted.count
       }.by(-1)
     end
 
     it "raises RecordNotFound when the pace is not found" do
       expect do
-        CoursePacing::SectionPaceService.delete_in_context(section_two)
+        CoursePacing::StudentEnrollmentPaceService.delete_in_context(extra_enrollment)
       end.to raise_error ActiveRecord::RecordNotFound
     end
   end

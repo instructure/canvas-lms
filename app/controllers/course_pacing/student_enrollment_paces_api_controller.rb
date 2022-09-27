@@ -17,25 +17,27 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
+class CoursePacing::StudentEnrollmentPacesApiController < CoursePacing::PacesApiController
   private
 
   def pacing_service
-    CoursePacing::SectionPaceService
+    CoursePacing::StudentEnrollmentPaceService
   end
 
   def pacing_presenter
-    CoursePacing::SectionPacePresenter
+    CoursePacing::StudentEnrollmentPacePresenter
   end
 
   attr_reader :course
 
   def context
-    @section
+    @student_enrollment
   end
 
   def load_contexts
     @course = api_find(Course.active, params[:course_id])
-    @section = api_find(@course.active_course_sections, params[:course_section_id]) if params[:course_section_id]
+    if params[:student_enrollment_id]
+      @student_enrollment = @course.student_enrollments.find(params[:student_enrollment_id])
+    end
   end
 end
