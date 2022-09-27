@@ -27,7 +27,7 @@ beforeEach(() => {
     refreshToken: callback => {
       callback('freshJWT')
     },
-    alertFunc: jest.fn()
+    alertFunc: jest.fn(),
   })
 
   apiSource.fetchPage = jest.fn()
@@ -44,9 +44,9 @@ describe('fetchImages()', () => {
   const standardProps = {
     contextType: 'course',
     images: {
-      course: {}
+      course: {},
     },
-    sortBy: 'date'
+    sortBy: 'date',
   }
 
   const subject = () => apiSource.fetchImages(props)
@@ -59,7 +59,7 @@ describe('fetchImages()', () => {
   describe('with "category" set', () => {
     props = {
       category: 'uncategorized',
-      ...standardProps
+      ...standardProps,
     }
   })
 
@@ -83,9 +83,26 @@ describe('fetchFilesForFolder()', () => {
     fetchMock.mock('/api/files', '{"files": []}')
   })
 
-  it('includes the "uncategorized" category in the request', async () => {
+  it('fetches folder files without query params if none supplied in props', async () => {
+    apiProps = {...apiProps}
     await subject()
-    expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files?&category=uncategorized', 'theJWT')
+    expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files', 'theJWT')
+  })
+
+  it('fetches folder files using the per_page query param', async () => {
+    apiProps = {...apiProps, perPage: 5}
+    await subject()
+    expect(apiSource.fetchPage).toHaveBeenCalledWith('/api/files?per_page=5', 'theJWT')
+  })
+
+  it('fetches folder files using the encoded searchString query param', async () => {
+    apiProps = {...apiProps, perPage: 5, searchString: 'an awesome file'}
+    const encodedSearchString = encodeURIComponent(apiProps.searchString)
+    await subject()
+    expect(apiSource.fetchPage).toHaveBeenCalledWith(
+      `/api/files?per_page=5&search_term=${encodedSearchString}`,
+      'theJWT'
+    )
   })
 })
 
@@ -102,9 +119,9 @@ describe('fetchMedia', () => {
       media: {course: {}},
       sortBy: {
         sort: 'name',
-        dir: 'asc'
+        dir: 'asc',
       },
-      contextId: 1
+      contextId: 1,
     }
 
     apiSource.apiFetch = jest.fn()
@@ -133,8 +150,8 @@ describe('saveClosedCaptions()', () => {
       {
         language: {selectedOptionId: 'en'},
         file: new Blob(['file contents'], {type: 'text/plain'}),
-        isNew: true
-      }
+        isNew: true,
+      },
     ]
     maxBytes = undefined
   })
@@ -148,7 +165,7 @@ describe('saveClosedCaptions()', () => {
       await subject()
       expect(apiSource.alertFunc).toHaveBeenCalledWith({
         text: 'Closed caption file must be less than 0.005 kb',
-        variant: 'error'
+        variant: 'error',
       })
     })
   })
