@@ -10603,7 +10603,7 @@ describe Assignment do
 
         it "sets post_to_sis to false if at least one section has a due date in the closed grading period" do
           course_section = course.course_sections.create!(name: "section")
-          course.enroll_student(User.create!, active_all: true, section: course_section)
+          course.enroll_student(User.create!, enrollment_state: "active", section: course_section)
           assignment.update!(due_at: 1.week.after(newly_closed_grading_period.end_date))
           assignment.assignment_overrides.create!(
             due_at: 10.minutes.before(newly_closed_grading_period.end_date),

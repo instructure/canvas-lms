@@ -2787,16 +2787,18 @@ class Course < ActiveRecord::Base
                           :course_section_id,
                           :limit_privileges_to_course_section,
                           :type,
-                          :associated_user_id
+                          :associated_user_id,
+                          :workflow_state
                         )
 
-      enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id|
+      enrollment_rows.map do |section_id, limit_privileges, type, associated_user_id, workflow_state|
         {
           course_section_id: section_id,
           limit_privileges_to_course_section: limit_privileges,
           type: type,
           associated_user_id: associated_user_id,
-          admin: ADMIN_TYPES.include?(type)
+          admin: ADMIN_TYPES.include?(type),
+          workflow_state: workflow_state
         }
       end
     end
