@@ -29,8 +29,10 @@ import {actions} from './actions/ui'
 import Body from './components/body'
 import Footer from './components/footer'
 import Header from './components/header/header'
+import PaceModal from './components/pace_modal'
+import PacePicker from './components/header/pace_picker'
 import {ResponsiveSizes, StoreState} from './types'
-import {getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
+import {getLoadingMessage, getShowLoadingOverlay, getShowPaceModal} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getSummarizedChanges} from './reducers/course_paces'
@@ -39,17 +41,21 @@ import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
 import Errors from './components/errors'
 
+const {Item: FlexItem} = Flex as any
+
 const I18n = useI18nScope('course_paces_app')
 
 interface StoreProps {
   readonly loadingMessage: string
   readonly showLoadingOverlay: boolean
+  readonly modalOpen: boolean
   readonly unpublishedChanges: SummarizedChange[]
 }
 
 interface DispatchProps {
   readonly pollForPublishStatus: typeof coursePaceActions.pollForPublishStatus
   readonly setResponsiveSize: typeof actions.setResponsiveSize
+  readonly hidePaceModal: typeof actions.hidePaceModal
 }
 
 type ComponentProps = StoreProps & DispatchProps
@@ -62,6 +68,8 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   loadingMessage,
   setResponsiveSize,
   showLoadingOverlay,
+  hidePaceModal,
+  modalOpen,
   responsiveSize,
   pollForPublishStatus,
   unpublishedChanges,
@@ -79,6 +87,61 @@ export const App: React.FC<ResponsiveComponentProps> = ({
     setResponsiveSize(responsiveSize)
   }, [responsiveSize, setResponsiveSize])
 
+  const handleModalClose = () => {
+    hidePaceModal()
+  }
+
+  const renderApp = () => {
+    if (window.ENV.FEATURES.course_paces_redesign) {
+      return (
+        <>
+          <Flex as="section" alignItems="end" wrap="wrap">
+            <FlexItem margin="0 0 small">
+              <PacePicker />
+            </FlexItem>
+          </Flex>
+          <PaceModal
+            isOpen={modalOpen}
+            isBlueprintLocked={isBlueprintLocked}
+            changes={unpublishedChanges}
+            responsiveSize={responsiveSize}
+            onClose={() => handleModalClose()}
+            handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+          />
+        </>
+      )
+    } else {
+      return (
+        <>
+          <View>
+            <Errors />
+            <Header
+              isBlueprintLocked={isBlueprintLocked}
+              setIsBlueprintLocked={setIsBlueprintLocked}
+              handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+            />
+          </View>
+          <Body blueprintLocked={isBlueprintLocked} />
+          <Footer blueprintLocked={isBlueprintLocked} />
+          <Tray
+            label={I18n.t('Unpublished Changes tray')}
+            open={trayOpen}
+            onDismiss={() => setTrayOpen(false)}
+            placement={responsiveSize === 'small' ? 'bottom' : 'end'}
+            shouldContainFocus={true}
+            shouldReturnFocus={true}
+            shouldCloseOnDocumentClick={true}
+          >
+            <UnpublishedChangesTrayContents
+              handleTrayDismiss={() => setTrayOpen(false)}
+              changes={unpublishedChanges}
+            />
+          </Tray>
+        </>
+      )
+    }
+  }
+
   return (
     <View>
       <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
@@ -87,30 +150,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
         </Mask>
       </Overlay>
       <Flex as="div" direction="column" margin="small">
-        <View>
-          <Errors />
-          <Header
-            isBlueprintLocked={isBlueprintLocked}
-            setIsBlueprintLocked={setIsBlueprintLocked}
-            handleDrawerToggle={() => setTrayOpen(!trayOpen)}
-          />
-        </View>
-        <Body blueprintLocked={isBlueprintLocked} />
-        <Footer blueprintLocked={isBlueprintLocked} />
-        <Tray
-          label={I18n.t('Unpublished Changes tray')}
-          open={trayOpen}
-          onDismiss={() => setTrayOpen(false)}
-          placement={responsiveSize === 'small' ? 'bottom' : 'end'}
-          shouldContainFocus={true}
-          shouldReturnFocus={true}
-          shouldCloseOnDocumentClick={true}
-        >
-          <UnpublishedChangesTrayContents
-            handleTrayDismiss={() => setTrayOpen(false)}
-            changes={unpublishedChanges}
-          />
-        </Tray>
+        {renderApp()}
       </Flex>
     </View>
   )
@@ -135,6 +175,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     loadingMessage: getLoadingMessage(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
+    modalOpen: getShowPaceModal(state),
     unpublishedChanges: getSummarizedChanges(state),
   }
 }
@@ -142,4 +183,5 @@ const mapStateToProps = (state: StoreState): StoreProps => {
 export default connect(mapStateToProps, {
   pollForPublishStatus: coursePaceActions.pollForPublishStatus,
   setResponsiveSize: actions.setResponsiveSize,
+  hidePaceModal: actions.hidePaceModal,
 })(ResponsiveApp)

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {act, render, within} from '@testing-library/react'
+import {renderConnected} from '../../__tests__/utils'
 
 import {Footer} from '../footer'
 
@@ -121,5 +122,33 @@ describe('Footer', () => {
       pubButton.click()
     })
     expect(document.activeElement).toBe(pubButton)
+  })
+
+  describe('with course paces redesign', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_redesign = true
+    })
+
+    it('renders Create Pace for new paces', () => {
+      const {getByRole} = renderConnected(<Footer {...defaultProps} newPace={true} />)
+
+      const publishButton = getByRole('button', {name: 'Create Pace'})
+      expect(publishButton).toBeInTheDocument()
+      act(() => publishButton.click())
+      expect(syncUnpublishedChanges).toHaveBeenCalled()
+    })
+    it('renders Apply Changes for updating paces', () => {
+      const {getByRole} = renderConnected(<Footer {...defaultProps} />)
+
+      const publishButton = getByRole('button', {name: 'Apply Changes'})
+      expect(publishButton).toBeInTheDocument()
+      act(() => publishButton.click())
+      expect(syncUnpublishedChanges).toHaveBeenCalled()
+    })
+    it('renders the unpublished changes indicator', () => {
+      const {getByText} = renderConnected(<Footer {...defaultProps} />)
+      expect(getByText('All changes published')).toBeInTheDocument()
+    })
   })
 })

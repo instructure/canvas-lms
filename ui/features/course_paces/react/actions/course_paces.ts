@@ -209,6 +209,7 @@ const thunkActions = {
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(uiActions.hideLoadingOverlay())
+          dispatch(uiActions.showPaceModal(coursePace))
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())

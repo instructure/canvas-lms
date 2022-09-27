@@ -38,6 +38,8 @@ export enum Constants {
   SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
+  SHOW_PACE_MODAL = 'UI/SHOW_PACE_MODAL',
+  HIDE_PACE_MODAL = 'UI/HIDE_PACE_MODAL',
   START_SYNCING = 'UI/START_SYNCING',
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
 }
@@ -52,6 +54,8 @@ export const regularActions = {
   clearCategoryError: (category: string) => createAction(Constants.CLEAR_CATEGORY_ERROR, category),
   showLoadingOverlay: (message: string) => createAction(Constants.SHOW_LOADING_OVERLAY, message),
   hideLoadingOverlay: () => createAction(Constants.HIDE_LOADING_OVERLAY),
+  showPaceModal: (pace: CoursePace) => createAction(Constants.SHOW_PACE_MODAL, pace),
+  hidePaceModal: () => createAction(Constants.HIDE_PACE_MODAL),
   setSelectedPaceContext: (
     contextType: PaceContextTypes,
     contextId: string,
