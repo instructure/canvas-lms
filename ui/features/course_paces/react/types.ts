@@ -109,6 +109,7 @@ export interface CoursePace {
   readonly published_at?: string
   readonly compressed_due_dates: CoursePaceItemDueDates | undefined
   readonly updated_at: string
+  readonly name?: string
 }
 
 export interface Progress {
@@ -145,6 +146,7 @@ export interface UIState {
   readonly loadingMessage: string
   readonly responsiveSize: ResponsiveSizes
   readonly showLoadingOverlay: boolean
+  readonly showPaceModal: boolean
   readonly showProjections: boolean
   readonly editingBlackoutDates: boolean
 }

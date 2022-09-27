@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
 
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {IconSettingsLine} from '@instructure/ui-icons'
 import {uid} from '@instructure/uid'
 import {Menu} from '@instructure/ui-menu'
@@ -115,6 +115,50 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     return error
   }
 
+  menuButton = () => {
+    if (window.ENV.FEATURES.course_paces_redesign) {
+      return (
+        <Button margin={this.props.margin} renderIcon={IconSettingsLine}>
+          {I18n.t('Settings')}
+        </Button>
+      )
+    } else {
+      return (
+        <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
+          <IconSettingsLine />
+        </IconButton>
+      )
+    }
+  }
+
+  renderManageBlackoutDates = () => {
+    if (
+      !window.ENV.FEATURES.course_paces_redesign ||
+      this.props.coursePace.context_type === 'Course'
+    ) {
+      return (
+        <MenuItem
+          type="button"
+          onSelect={() => {
+            this.setState({showSettingsPopover: false})
+            this.showBlackoutDatesModal()
+          }}
+          disabled={this.props.isSyncing}
+        >
+          {I18n.t('Manage Blackout Dates')}
+        </MenuItem>
+      )
+    }
+  }
+
+  menuPlacement = () => {
+    if (window.ENV.FEATURES.course_paces_redesign) {
+      return 'bottom end'
+    } else {
+      return 'bottom start'
+    }
+  }
+
   /* Renderers */
 
   render() {
@@ -135,12 +179,8 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             onCancel={this.closeBlackoutDatesModal}
           />
           <Menu
-            trigger={
-              <IconButton screenReaderLabel={I18n.t('Modify Settings')} margin={this.props.margin}>
-                <IconSettingsLine />
-              </IconButton>
-            }
-            placement="bottom start"
+            trigger={this.menuButton()}
+            placement={this.menuPlacement()}
             show={this.state.showSettingsPopover}
             onToggle={newState =>
               this.setState({
@@ -160,16 +200,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             >
               {I18n.t('Skip Weekends')}
             </MenuItem>
-            <MenuItem
-              type="button"
-              onSelect={() => {
-                this.setState({showSettingsPopover: false})
-                this.showBlackoutDatesModal()
-              }}
-              disabled={this.props.isSyncing}
-            >
-              {I18n.t('Manage Blackout Dates')}
-            </MenuItem>
+            {this.renderManageBlackoutDates()}
           </Menu>
         </Tooltip>
       </div>

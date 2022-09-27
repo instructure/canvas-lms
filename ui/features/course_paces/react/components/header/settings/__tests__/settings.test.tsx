@@ -19,7 +19,7 @@
 import React from 'react'
 import {act, screen} from '@testing-library/react'
 
-import {BLACKOUT_DATES, COURSE, PRIMARY_PACE} from '../../../../__tests__/fixtures'
+import {BLACKOUT_DATES, COURSE, PRIMARY_PACE, SECTION_PACE} from '../../../../__tests__/fixtures'
 import {renderConnected} from '../../../../__tests__/utils'
 
 import {Settings} from '../settings'
@@ -115,5 +115,36 @@ describe('Settings', () => {
     expect(screen.queryByRole('heading', {name: 'Blackout Dates'})).not.toBeInTheDocument()
     expect(screen.queryByRole('menuitemcheckbox', {name: 'Skip Weekends'})).not.toBeInTheDocument()
     expect(updateBlackoutDates).toHaveBeenCalledWith(defaultProps.blackoutDates)
+  })
+
+  describe('with course paces redesign', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_redesign = true
+    })
+
+    it('renders a button with settings text', () => {
+      const {getByRole} = renderConnected(<Settings {...defaultProps} />)
+      const settingsButton = getByRole('button', {name: 'Settings'})
+      expect(settingsButton).toBeInTheDocument()
+    })
+    it('renders manage blackout dates for course paces', () => {
+      const {getByRole} = renderConnected(<Settings {...defaultProps} />)
+      const settingsButton = getByRole('button', {name: 'Settings'})
+      act(() => settingsButton.click())
+
+      expect(screen.getByRole('menuitem', {name: 'Manage Blackout Dates'})).toBeInTheDocument()
+      expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
+    })
+    it('does not render manage blackout dates for non-course paces', () => {
+      const {getByRole} = renderConnected(<Settings {...defaultProps} coursePace={SECTION_PACE} />)
+      const settingsButton = getByRole('button', {name: 'Settings'})
+      act(() => settingsButton.click())
+
+      expect(
+        screen.queryByRole('menuitem', {name: 'Manage Blackout Dates'})
+      ).not.toBeInTheDocument()
+      expect(screen.getByRole('menuitemcheckbox', {name: 'Skip Weekends'})).toBeInTheDocument()
+    })
   })
 })

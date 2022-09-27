@@ -36,6 +36,7 @@ import {
   isStudentPace,
 } from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
+import UnpublishedChangesIndicator from './unpublished_changes_indicator'
 
 const I18n = useI18nScope('course_paces_footer')
 
@@ -59,6 +60,8 @@ interface DispatchProps {
 
 interface PassedProps {
   readonly blueprintLocked: boolean
+  readonly handleCancel: () => void
+  readonly handleDrawerToggle?: () => void
 }
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
@@ -69,6 +72,7 @@ export const Footer: React.FC<ComponentProps> = ({
   blackoutDatesSyncing,
   isSyncing,
   syncUnpublishedChanges,
+  handleCancel,
   onResetPace,
   showLoadingOverlay,
   studentPace,
@@ -76,6 +80,7 @@ export const Footer: React.FC<ComponentProps> = ({
   newPace,
   unpublishedChanges,
   blueprintLocked,
+  handleDrawerToggle,
 }) => {
   const handlePublish = useCallback(() => {
     syncUnpublishedChanges()
@@ -89,6 +94,22 @@ export const Footer: React.FC<ComponentProps> = ({
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
+  if (window.ENV.FEATURES.course_paces_redesign) {
+    if (newPace) {
+      publishLabel = I18n.t('Create Pace')
+    } else {
+      publishLabel = I18n.t('Apply Changes')
+    }
+  }
+
+  const handleCancelClick = () => {
+    if (window.ENV.FEATURES.course_paces_redesign) {
+      handleCancel()
+    } else {
+      cancelDisabled || onResetPace()
+    }
+  }
+
   if (pacePublishing || isSyncing) {
     publishLabel = (
       <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
@@ -120,15 +141,14 @@ export const Footer: React.FC<ComponentProps> = ({
   }
   return (
     <Flex as="section" justifyItems="end">
+      {window.ENV.FEATURES.course_paces_redesign && !studentPace && (
+        <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
+      )}
       <Tooltip
         renderTip={cancelDisabled && cancelTip}
         on={cancelDisabled ? ['hover', 'focus'] : []}
       >
-        <Button
-          color="secondary"
-          margin="0 small 0"
-          onClick={() => cancelDisabled || onResetPace()}
-        >
+        <Button color="secondary" margin="0 small 0" onClick={handleCancelClick}>
           {I18n.t('Cancel')}
         </Button>
       </Tooltip>
