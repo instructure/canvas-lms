@@ -3659,6 +3659,69 @@ describe Submission do
       @submission.mark_read(@user)
       expect(@submission.read?(@user)).to be_truthy
     end
+
+    context "when feedback visibility ff on" do
+      before do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+        @student = @user
+        @assignment.submit_homework(@student)
+        @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
+      end
+
+      it "is unread after submission is graded by teacher" do
+        expect(@submission.read?(@student)).to be_falsey
+      end
+
+      it "is unread after submission is graded and commented on by teacher" do
+        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+
+        expect(@submission.read?(@student)).to be_falsey
+      end
+
+      it "is unread after grade is read and teacher posts a comment" do
+        @submission.mark_item_read(@student, "grade")
+        @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
+
+        expect(@submission.reload.read?(@student)).to be_falsey
+      end
+
+      it "is read after grade is read and student posts a comment" do
+        @submission.mark_item_read(@student, "grade")
+        @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
+
+        expect(@submission.reload.read?(@student)).to be_truthy
+      end
+
+      it "is unread after student and teacher post a comment" do
+        @assignment.update_submission(@student, { commenter: @student, comment: "good!" })
+        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+
+        expect(@submission.read?(@student)).to be_falsey
+      end
+
+      it "is unread if there is any unread rubric" do
+        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+
+        expect(@submission.read?(@student)).to be_falsey
+      end
+
+      it "is read if grade and rubric are read" do
+        ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
+
+        @submission.mark_item_read(@student, "grade")
+        @submission.mark_item_read(@student, "rubric")
+
+        expect(@submission.read?(@student)).to be_truthy
+      end
+
+      it "changes the state from read to unread" do
+        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+
+        @submission.mark_item_unread(@student, "comment")
+
+        expect(@submission.unread?(@student)).to be_truthy
+      end
+    end
   end
 
   describe "mute" do

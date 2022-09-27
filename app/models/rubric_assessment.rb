@@ -149,15 +149,25 @@ class RubricAssessment < ActiveRecord::Base
     return unless data_changed? && data.present?
 
     if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
-      if data.any? { |rating| rating.is_a?(Hash) && (rating[:comments].present? || rating[:points].present?) }
-        user.mark_rubric_assessments_unread!(artifact)
+      if any_comments_or_points?
+        ContentParticipation.participate(content: artifact, user: user, content_item: "rubric")
       end
-    elsif data.any? { |rating| rating.is_a?(Hash) && rating[:comments].present? }
+    elsif any_comments?
       user.mark_rubric_assessments_unread!(artifact)
     end
 
     true
   end
+
+  def any_comments_or_points?
+    data.any? { |rating| rating.is_a?(Hash) && (rating[:comments].present? || rating[:points].present?) }
+  end
+  private :any_comments_or_points?
+
+  def any_comments?
+    data.any? { |rating| rating.is_a?(Hash) && rating[:comments].present? }
+  end
+  private :any_comments?
 
   def update_assessment_requests
     requests = assessment_requests
