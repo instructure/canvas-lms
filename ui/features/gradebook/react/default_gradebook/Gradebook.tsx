@@ -232,6 +232,7 @@ export type GradebookProps = {
   colors: StatusColors
   customColumns: CustomColumn[]
   dispatch: RequestDispatch
+  fetchStudentIds: () => Promise<string[]>
   filterNavNode: HTMLElement
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
@@ -244,10 +245,12 @@ export type GradebookProps = {
   isCustomColumnsLoading: boolean
   isFiltersLoading: boolean
   isModulesLoading: boolean
+  isStudentIdsLoading: boolean
   locale: string
   modules: Module[]
   performanceControls: PerformanceControls
   settingsModalButtonContainer: HTMLElement
+  studentIds: string[]
   viewOptionsMenuNode: HTMLElement
 }
 
@@ -438,6 +441,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       gradebook: this,
       dispatch: props.dispatch,
       performanceControls: props.performanceControls,
+      fetchStudentIds: props.fetchStudentIds,
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)
@@ -638,7 +642,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   }
 
   // dependencies - gridReady
-  setAssignmentVisibility = studentIds => {
+  setAssignmentVisibility = (studentIds: string[]) => {
     let a, assignmentId, hiddenStudentIds, j, k, len, len1, student, studentId
     const studentsWithHiddenAssignments: string[] = []
     const ref1 = this.assignments
@@ -4583,6 +4587,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
     // Here we keep track of data loading states
     //   and filter changes until we use hooks
+
+    // studentIds
+    if (
+      prevProps.isStudentIdsLoading !== this.props.isStudentIdsLoading &&
+      !this.props.isStudentIdsLoading
+    ) {
+      this.updateStudentIds(this.props.studentIds)
+    }
 
     // modules
     if (

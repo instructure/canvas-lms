@@ -49,6 +49,10 @@ export default function GradebookData(props) {
   const isCustomColumnsLoading = useStore(state => state.isCustomColumnsLoading)
   const fetchCustomColumns = useStore(state => state.fetchCustomColumns)
 
+  const studentIds = useStore(state => state.studentIds, shallow)
+  const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
+  const fetchStudentIds = useStore(state => state.fetchStudentIds)
+
   // Initial state
   // We might be able to do this in gradebook/index.tsx instead
   useEffect(() => {
@@ -92,14 +96,17 @@ export default function GradebookData(props) {
   return (
     <Gradebook
       {...props}
+      appliedFilters={appliedFilters}
+      customColumns={customColumns}
+      fetchStudentIds={fetchStudentIds}
       flashAlerts={flashMessages}
       hideGrid={false}
-      appliedFilters={appliedFilters}
+      isCustomColumnsLoading={isCustomColumnsLoading}
       isFiltersLoading={isFiltersLoading}
       isModulesLoading={isModulesLoading}
+      isStudentIdsLoading={isStudentIdsLoading}
       modules={modules}
-      customColumns={customColumns}
-      isCustomColumnsLoading={isCustomColumnsLoading}
+      studentIds={studentIds}
       // when the rest of DataLoader is moved we can remove these
       performanceControls={performanceControls.current}
       dispatch={dispatch.current}
