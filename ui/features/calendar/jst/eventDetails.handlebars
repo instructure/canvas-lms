@@ -21,7 +21,12 @@
       {{#if contextInfo}}
         <tr>
           <th scope="row">{{#t "calendar"}}Calendar{{/t}}</th>
-          <td><a href="{{contextInfo.url}}">{{contextInfo.name}}</a>
+          <td>
+            {{#if contextInfo.can_view_context}}
+              <a href="{{contextInfo.url}}">{{contextInfo.name}}</a>
+            {{else}}
+              {{contextInfo.name}}
+            {{/if}}
             {{#if actualContextInfo}}
               <br><span class="event-details-actual-context">{{actualContextInfo.name}}</span>
             {{/if}}

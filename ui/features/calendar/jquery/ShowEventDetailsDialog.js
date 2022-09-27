@@ -395,7 +395,7 @@ export default class ShowEventDetailsDialog {
       this.event.object.reserve_comments != null
         ? this.event.object.reserve_comments
         : (this.event.object.reserve_comments = this.event.object.comments)
-    params.showEventLink = params.fullDetailsURL()
+    params.showEventLink = params.contextInfo.can_view_context ? params.fullDetailsURL() : null
     if (!params.showEventLink) {
       params.showEventLink = params.isAppointmentGroupEvent()
     }

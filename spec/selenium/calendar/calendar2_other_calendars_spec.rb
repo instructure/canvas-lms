@@ -60,7 +60,7 @@ describe "calendar2" do
 
       expect(sidebar).to contain_css(".new-feature-pill")
       open_other_calendars_modal
-      wait_for_ajaximations
+      wait_for_ajax_requests
       modal_cancel_btn.click
       driver.navigate.refresh
       expect(sidebar).not_to contain_css(".new-feature-pill")
@@ -234,6 +234,33 @@ describe "calendar2" do
           search_account("non")
           expect(modal_empty_state).to be_displayed
         end
+      end
+    end
+
+    context "does not show links to unauthorized pages" do
+      it "does not display the link to the event details page if the user is not authorized" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        make_event(context: @subaccount1, start: 0.days.from_now, title: "account event")
+        get "/calendar2"
+
+        # event title is displayed but not as a link
+        fj(calendar_event_selector).click
+        expect(event_popover).to be_displayed
+        expect(event_popover_title).to be_displayed
+        expect(event_popover_title.text).to eq "account event"
+        expect(event_popover_title).not_to contain_css(event_link_selector)
+      end
+
+      it "does not display the link to the calendar context if the user is not authorized" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        make_event(context: @subaccount1, start: 0.days.from_now, title: "account event")
+        get "/calendar2"
+
+        # event context is displayed but not as a link
+        fj(calendar_event_selector).click
+        expect(event_popover).to be_displayed
+        expect(event_popover_content).to be_displayed
+        expect(event_popover_content).not_to contain_css("a")
       end
     end
   end

@@ -89,6 +89,22 @@ module CalendarOtherCalendarsPage
     "#{account_calendars_list_selector} > li"
   end
 
+  def event_popover_header_selector
+    ".event-details-header"
+  end
+
+  def event_popover_content_selector
+    ".event-details-content"
+  end
+
+  def event_popover_selector
+    ".event-details"
+  end
+
+  def event_link_selector
+    ".view_event_link"
+  end
+
   #------------------------- Elements ---------------------------
   def open_other_calendars_modal_btn
     f(open_other_calendars_modal_btn_selector)
@@ -152,6 +168,18 @@ module CalendarOtherCalendarsPage
 
   def account_calendar_list_items
     ffj(account_calendar_list_items_selector)
+  end
+
+  def event_popover_title
+    f(event_popover_header_selector)
+  end
+
+  def event_popover_content
+    f(event_popover_content_selector)
+  end
+
+  def event_popover
+    f(event_popover_selector)
   end
 
   #----------------------- Actions/Methods ----------------------
