@@ -25,7 +25,7 @@ function transformRubricCriterionData(criterion) {
   const {_id, outcome, ...criterionCopy} = {
     ...criterion,
     id: criterion._id,
-    learning_outcome_id: criterion.outcome?._id
+    learning_outcome_id: criterion.outcome?._id,
   }
 
   if (criterionCopy.ratings) {
@@ -46,7 +46,7 @@ function transformRubricRatingData(rating) {
     ...rating,
     id: rating._id,
     criterion_id: rating.criterion?._id || null,
-    learning_outcome_id: rating.outcome?._id || null
+    learning_outcome_id: rating.outcome?._id || null,
   }
 
   return ratingCopy

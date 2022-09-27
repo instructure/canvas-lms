@@ -29,7 +29,7 @@ import {
   getGradeAsPercent,
   getStudentGradeForColumn,
   onGridKeyDown,
-  sectionList
+  sectionList,
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
 import {createGradebook} from './GradebookSpecHelper'
@@ -68,13 +68,13 @@ const unsubmittedSubmission: Submission = {
   submitted_at: new Date(),
   url: null,
   user_id: '28',
-  workflow_state: 'unsubmitted'
+  workflow_state: 'unsubmitted',
 }
 
 const ungradedSubmission: Submission = {
   ...unsubmittedSubmission,
   attempt: 1,
-  workflow_state: 'submitted'
+  workflow_state: 'submitted',
 }
 
 const zeroGradedSubmission: Submission = {
@@ -86,7 +86,7 @@ const zeroGradedSubmission: Submission = {
   grade_matches_current_submission: true,
   rawGrade: '0',
   score: 0,
-  workflow_state: 'graded'
+  workflow_state: 'graded',
 }
 
 const gradedSubmission: Submission = {
@@ -98,7 +98,7 @@ const gradedSubmission: Submission = {
   grade_matches_current_submission: true,
   rawGrade: '5',
   score: 5,
-  workflow_state: 'graded'
+  workflow_state: 'graded',
 }
 
 describe('getGradeAsPercent', () => {
@@ -145,12 +145,12 @@ describe('onGridKeyDown', () => {
   beforeEach(() => {
     columns = [
       {id: 'student', type: 'student'},
-      {id: 'assignment_2301', type: 'assignment'}
+      {id: 'assignment_2301', type: 'assignment'},
     ]
     grid = {
       getColumns() {
         return columns
-      }
+      },
     }
   })
 
@@ -285,7 +285,7 @@ describe('getDefaultSettingKeyForColumnType', () => {
     const gradebook = createGradebook()
     gradebook.gridData.rows = [
       {id: '3', sortable_name: 'Z Lastington', someProperty: false},
-      {id: '4', sortable_name: 'A Firstington', someProperty: true}
+      {id: '4', sortable_name: 'A Firstington', someProperty: true},
     ]
 
     const value = 0
@@ -304,9 +304,9 @@ describe('sectionList', () => {
   const sections = {
     2: {
       id: '2',
-      name: 'Hello &lt;script>while(1);&lt;/script> world!'
+      name: 'Hello &lt;script>while(1);&lt;/script> world!',
     },
-    1: {id: '1', name: 'Section 1', course_id: '1'}
+    1: {id: '1', name: 'Section 1', course_id: '1'},
   }
 
   it('sorts by id', () => {
@@ -348,10 +348,10 @@ describe('findConditionValuesOfType', () => {
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
-        {id: '4', type: 'module', value: '3', created_at: ''}
+        {id: '4', type: 'module', value: '3', created_at: ''},
       ],
       created_at: '2019-01-01T00:00:00Z',
-      updated_at: '2019-01-01T00:00:00Z'
+      updated_at: '2019-01-01T00:00:00Z',
     },
     {
       id: '2',
@@ -359,11 +359,11 @@ describe('findConditionValuesOfType', () => {
       filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
-        {id: '3', type: 'module', value: '6', created_at: ''}
+        {id: '3', type: 'module', value: '6', created_at: ''},
       ],
       created_at: '2019-01-01T00:00:01Z',
-      updated_at: '2019-01-01T00:00:00Z'
-    }
+      updated_at: '2019-01-01T00:00:00Z',
+    },
   ]
 
   it('returns module condition values', () => {
@@ -384,10 +384,10 @@ describe('doFiltersMatch', () => {
         {id: '1', type: 'module', value: '1', created_at: ''},
         {id: '2', type: 'assignment-group', value: '2', created_at: ''},
         {id: '3', type: 'assignment-group', value: '7', created_at: ''},
-        {id: '4', type: 'module', value: '3', created_at: ''}
+        {id: '4', type: 'module', value: '3', created_at: ''},
       ],
       created_at: '2019-01-01T00:00:00Z',
-      updated_at: '2019-01-01T00:00:00Z'
+      updated_at: '2019-01-01T00:00:00Z',
     },
     {
       id: '2',
@@ -395,10 +395,10 @@ describe('doFiltersMatch', () => {
       filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
-        {id: '3', type: 'module', value: '6', created_at: ''}
+        {id: '3', type: 'module', value: '6', created_at: ''},
       ],
       created_at: '2019-01-01T00:00:01Z',
-      updated_at: '2019-01-01T00:00:00Z'
+      updated_at: '2019-01-01T00:00:00Z',
     },
     {
       id: '3',
@@ -406,11 +406,11 @@ describe('doFiltersMatch', () => {
       filters: [
         {id: '1', type: 'module', value: '4', created_at: ''},
         {id: '2', type: 'assignment-group', value: '5', created_at: ''},
-        {id: '3', type: 'module', value: '6', created_at: ''}
+        {id: '3', type: 'module', value: '6', created_at: ''},
       ],
       created_at: '2019-01-01T00:00:01Z',
-      updated_at: '2019-01-01T00:00:00Z'
-    }
+      updated_at: '2019-01-01T00:00:00Z',
+    },
   ]
 
   it('returns false if filter conditions are different', () => {

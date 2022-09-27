@@ -27,14 +27,11 @@ QUnit.module('GradeFormatHelper#formatGrade', {
     this.translateString = I18n.t
     sandbox.stub(numberHelper, 'validate').callsFake(val => !isNaN(parseFloat(val)))
     sandbox.stub(I18n.constructor.prototype, 't').callsFake(this.translateString)
-  }
+  },
 })
 
 test('uses I18n#n to format numerical integer grades', () => {
-  sandbox
-    .stub(I18n.constructor.prototype, 'n')
-    .withArgs(1000)
-    .returns('* 1,000')
+  sandbox.stub(I18n.constructor.prototype, 'n').withArgs(1000).returns('* 1,000')
   equal(GradeFormatHelper.formatGrade(1000), '* 1,000')
   equal(I18n.n.callCount, 1)
 })
@@ -44,17 +41,14 @@ test('uses formatPointsOutOf to format points grade type', () => {
     GradeFormatHelper.formatGrade('4', {
       gradingType: 'points',
       pointsPossible: '7',
-      formatType: 'points_out_of_fraction'
+      formatType: 'points_out_of_fraction',
     }),
     '4/7'
   )
 })
 
 test('uses I18n#n to format numerical decimal grades', () => {
-  sandbox
-    .stub(I18n.constructor.prototype, 'n')
-    .withArgs(123.45)
-    .returns('* 123.45')
+  sandbox.stub(I18n.constructor.prototype, 'n').withArgs(123.45).returns('* 123.45')
   equal(GradeFormatHelper.formatGrade(123.45), '* 123.45')
   equal(I18n.n.callCount, 1)
 })
@@ -179,10 +173,7 @@ test('optionally rounds to a given precision', () => {
 })
 
 test('optionally parses grades as non-localized', () => {
-  sandbox
-    .stub(numberHelper, 'parse')
-    .withArgs('32.459')
-    .returns(32459)
+  sandbox.stub(numberHelper, 'parse').withArgs('32.459').returns(32459)
   const formatted = GradeFormatHelper.formatGrade('32.459', {delocalize: false})
 
   strictEqual(numberHelper.parse.callCount, 0)
@@ -419,7 +410,7 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
     hooks.beforeEach(() => {
       options = {
         pointsPossible: 10,
-        version: 'final'
+        version: 'final',
       }
       submission = {
         enteredGrade: '7.8',
@@ -427,7 +418,7 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
         excused: false,
         grade: '6.8',
         gradingType: 'points',
-        score: 6.8
+        score: 6.8,
       }
     })
 
@@ -583,7 +574,13 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
     QUnit.module('when formatting as "gradingScheme"', contextHooks => {
       contextHooks.beforeEach(() => {
         options.formatType = 'gradingScheme'
-        options.gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]]
+        options.gradingScheme = [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['C', 0.7],
+          ['D', 0.6],
+          ['F', 0.5],
+        ]
       })
 
       test('returns the matching scheme grade for the "final" score', () => {
@@ -591,7 +588,10 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
       })
 
       test('avoids floating point calculation issues when computing the percent', () => {
-        options.gradingScheme = [['A', 0.94665], ['F', 0]]
+        options.gradingScheme = [
+          ['A', 0.94665],
+          ['F', 0],
+        ]
         submission.score = 946.65
         options.pointsPossible = 1000
         const floatingPointResult = (946.65 / 1000) * 100
@@ -631,7 +631,13 @@ QUnit.module('GradeFormatHelper', suiteHooks => {
       contextHooks => {
         contextHooks.beforeEach(() => {
           options.formatType = 'gradingScheme'
-          options.gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]]
+          options.gradingScheme = [
+            ['A', 0.9],
+            ['B', 0.8],
+            ['C', 0.7],
+            ['D', 0.6],
+            ['F', 0.5],
+          ]
           options.pointsPossible = 0
         })
 

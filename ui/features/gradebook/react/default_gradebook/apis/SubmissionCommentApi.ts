@@ -26,7 +26,7 @@ function deserializeComment(comment: SubmissionComment): SerializedComment {
     id: comment.id,
     createdAt: timezone.parse(comment.created_at),
     comment: comment.comment,
-    editedAt: comment.edited_at && timezone.parse(comment.edited_at)
+    editedAt: comment.edited_at && timezone.parse(comment.edited_at),
   }
 
   if (!comment.author) {
@@ -38,7 +38,7 @@ function deserializeComment(comment: SubmissionComment): SerializedComment {
     authorId: comment.author.id,
     author: comment.author.display_name,
     authorAvatarUrl: comment.author.avatar_image_url,
-    authorUrl: comment.author.html_url
+    authorUrl: comment.author.html_url,
   }
 }
 
@@ -84,5 +84,5 @@ export default {
   createSubmissionComment,
   deleteSubmissionComment,
   getSubmissionComments,
-  updateSubmissionComment
+  updateSubmissionComment,
 }

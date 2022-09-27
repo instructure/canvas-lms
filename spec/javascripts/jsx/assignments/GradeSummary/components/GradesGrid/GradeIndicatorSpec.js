@@ -37,8 +37,8 @@ QUnit.module('GradeSummary GradeIndicator', suiteHooks => {
         id: '4601',
         score: 10,
         selected: false,
-        studentId: '1111'
-      }
+        studentId: '1111',
+      },
     }
   })
 

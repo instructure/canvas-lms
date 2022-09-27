@@ -35,20 +35,20 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
         ['B', 0.8],
         ['C', 0.7],
         ['D', 0.6],
-        ['<b>F</b>', 0.0]
-      ]
+        ['<b>F</b>', 0.0],
+      ],
     })
     finalGradeOverrides = {
       1101: {
         courseGrade: {
-          percentage: 90.0
+          percentage: 90.0,
         },
         gradingPeriodGrades: {
           1501: {
-            percentage: 80.0
-          }
-        }
-      }
+            percentage: 80.0,
+          },
+        },
+      },
     }
     sinon.stub(gradebook, 'isFilteringColumnsByGradingPeriod').returns(false)
     gradebook.gradingPeriodId = '1501'

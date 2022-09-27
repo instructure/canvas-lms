@@ -53,15 +53,15 @@ export function setCoursePostPolicy({courseId, postManually}) {
       mutation: SET_COURSE_POST_POLICY_MUTATION,
       variables: {
         courseId,
-        postManually
-      }
+        postManually,
+      },
     })
     .then(response => {
       const queryResponse = response && response.data && response.data.setCoursePostPolicy
       if (queryResponse) {
         if (queryResponse.postPolicy) {
           return {
-            postManually: queryResponse.postPolicy.postManually
+            postManually: queryResponse.postPolicy.postManually,
           }
         } else if (queryResponse.errors && queryResponse.errors.length > 0) {
           throw new Error(queryResponse.errors[0].message)
@@ -76,7 +76,7 @@ export function getAssignmentPostPolicies({courseId}) {
   return createClient()
     .query({
       query: COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-      variables: {courseId}
+      variables: {courseId},
     })
     .then(response => {
       const queryResponse = response && response.data && response.data.course

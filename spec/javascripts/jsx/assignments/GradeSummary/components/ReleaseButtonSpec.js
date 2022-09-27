@@ -23,7 +23,7 @@ import {
   FAILURE,
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
-  STARTED
+  STARTED,
 } from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
 import ReleaseButton from 'ui/features/assignment_grade_summary/react/components/ReleaseButton'
 
@@ -35,7 +35,7 @@ QUnit.module('GradeSummary ReleaseButton', suiteHooks => {
     props = {
       gradesReleased: false,
       onClick: sinon.spy(),
-      releaseGradesStatus: null
+      releaseGradesStatus: null,
     }
   })
 

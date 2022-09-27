@@ -39,10 +39,10 @@ export default class SisOverridesLoader {
         'description',
         'in_closed_grading_period',
         'needs_grading_count',
-        'rubric'
+        'rubric',
       ],
       include: ['assignments', 'grades_published', 'overrides'],
-      override_assignment_dates: false
+      override_assignment_dates: false,
     }
 
     // eslint-disable-next-line promise/catch-or-return

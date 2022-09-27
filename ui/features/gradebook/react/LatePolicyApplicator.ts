@@ -83,7 +83,7 @@ function latePenalty(submission: Submission, assignment, latePolicy) {
     lateSubmissionDeductionEnabled,
     lateSubmissionMinimumPercent,
     lateSubmissionMinimumPercentEnabled,
-    lateSubmissionInterval
+    lateSubmissionInterval,
   } = latePolicy
 
   if (submission.points_deducted !== null && !lateSubmissionDeductionEnabled) {
@@ -144,7 +144,7 @@ const LatePolicyApplicator = {
     }
 
     return changed
-  }
+  },
 }
 
 export default LatePolicyApplicator

@@ -27,21 +27,21 @@ QUnit.module('EffectiveDueDates', () => {
         101: {
           due_at: '2015-05-04T12:00:00Z',
           grading_period_id: '701',
-          in_closed_grading_period: true
+          in_closed_grading_period: true,
         },
         102: {
           due_at: '2015-05-05T12:00:00Z',
           grading_period_id: '701',
-          in_closed_grading_period: true
-        }
+          in_closed_grading_period: true,
+        },
       },
       202: {
         101: {
           due_at: '2015-06-04T12:00:00Z',
           grading_period_id: '702',
-          in_closed_grading_period: false
-        }
-      }
+          in_closed_grading_period: false,
+        },
+      },
     }
 
     test('returns a map with effective due dates keyed to assignment ids', () => {
@@ -50,7 +50,7 @@ QUnit.module('EffectiveDueDates', () => {
       deepEqual(_.keys(scopedDueDates[201]).sort(), [
         'due_at',
         'grading_period_id',
-        'in_closed_grading_period'
+        'in_closed_grading_period',
       ])
     })
 
@@ -83,26 +83,26 @@ QUnit.module('EffectiveDueDates', () => {
           1101: {
             due_at: '2015-02-02T12:00:00Z',
             grading_period_id: '1401',
-            in_closed_grading_period: true
+            in_closed_grading_period: true,
           },
           1103: {
             due_at: '2015-02-02T12:00:00Z',
             grading_period_id: '1401',
-            in_closed_grading_period: true
-          }
+            in_closed_grading_period: true,
+          },
         },
         2303: {
           1101: {
             due_at: '2015-04-02T12:00:00Z',
             grading_period_id: '1402',
-            in_closed_grading_period: false
-          }
-        }
+            in_closed_grading_period: false,
+          },
+        },
       }
       submissions = [
         {assignment_id: '2301', user_id: '1101', cached_due_date: '2015-02-01T12:00:00Z'},
         {assignment_id: '2302', user_id: '1101', cached_due_date: '2015-04-01T12:00:00Z'},
-        {assignment_id: '2302', user_id: '1102', cached_due_date: '2015-04-02T12:00:00Z'}
+        {assignment_id: '2302', user_id: '1102', cached_due_date: '2015-04-02T12:00:00Z'},
       ]
     })
 
@@ -112,22 +112,22 @@ QUnit.module('EffectiveDueDates', () => {
         closeDate: timezone.parse('2015-07-08T12:00:00Z'),
         endDate: timezone.parse('2015-07-01T12:00:00Z'),
         isClosed: false,
-        startDate: timezone.parse('2015-05-01T12:00:00Z')
+        startDate: timezone.parse('2015-05-01T12:00:00Z'),
       },
       {
         id: '1401',
         closeDate: timezone.parse('2015-03-08T12:00:00Z'),
         endDate: timezone.parse('2015-03-01T12:00:00Z'),
         isClosed: true,
-        startDate: timezone.parse('2015-01-01T12:00:00Z')
+        startDate: timezone.parse('2015-01-01T12:00:00Z'),
       },
       {
         id: '1402',
         closeDate: timezone.parse('2015-05-08T12:00:00Z'),
         endDate: timezone.parse('2015-05-01T12:00:00Z'),
         isClosed: false,
-        startDate: timezone.parse('2015-03-01T12:00:00Z')
-      }
+        startDate: timezone.parse('2015-03-01T12:00:00Z'),
+      },
     ]
 
     test('sets the due_at for each effective due date', () => {

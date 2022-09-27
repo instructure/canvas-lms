@@ -36,12 +36,12 @@ QUnit.module('Gradebook > Individual Gradebook > Components > GradebookSelector'
     props = {
       courseUrl: 'https://localhost/courses/1201',
       learningMasteryEnabled: false,
-      navigate: sinon.stub()
+      navigate: sinon.stub(),
     }
 
     tabsProps = {
       onTab1Click: sinon.stub(),
-      onTab2Click: sinon.stub()
+      onTab2Click: sinon.stub(),
     }
 
     component = null

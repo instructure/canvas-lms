@@ -33,12 +33,12 @@ import ready from '@instructure/ready'
 import {
   addDeepLinkingListener,
   handleDeepLinking,
-  reloadPage
+  reloadPage,
 } from '@canvas/deep-linking/DeepLinking'
 
 const course = new Course({
   id: encodeURIComponent(splitAssetString(ENV.context_asset_string)[1]),
-  apply_assignment_group_weights: ENV.apply_assignment_group_weights
+  apply_assignment_group_weights: ENV.apply_assignment_group_weights,
 })
 course.url = ENV.URLS.course_url
 
@@ -46,7 +46,7 @@ const userIsAdmin = _.includes(ENV.current_user_roles, 'admin')
 
 const assignmentGroups = new AssignmentGroupCollection([], {
   course,
-  courseSubmissionsURL: ENV.URLS.course_student_submissions_url
+  courseSubmissionsURL: ENV.URLS.course_student_submissions_url,
 })
 
 const assignmentGroupsView = new AssignmentGroupListView({
@@ -54,7 +54,7 @@ const assignmentGroupsView = new AssignmentGroupListView({
   sortURL: ENV.URLS.sort_url,
   assignment_sort_base_url: ENV.URLS.assignment_sort_base_url,
   course,
-  userIsAdmin
+  userIsAdmin,
 })
 
 let assignmentSettingsView = false
@@ -67,26 +67,26 @@ if (ENV.PERMISSIONS.manage_assignments) {
     model: course,
     assignmentGroups,
     weightsView: AssignmentGroupWeightsView,
-    userIsAdmin
+    userIsAdmin,
   })
 
   assignmentSyncSettingsView = new AssignmentSyncSettingsView({
     collection: assignmentGroups,
     model: course,
-    sisName: ENV.SIS_NAME
+    sisName: ENV.SIS_NAME,
   })
 }
 if (ENV.PERMISSIONS.manage_assignments_add) {
   createGroupView = new CreateGroupView({
     assignmentGroups,
     course,
-    userIsAdmin
+    userIsAdmin,
   })
 }
 if (!ENV.PERMISSIONS.manage_assignments && !ENV.PERMISSIONS.manage_assignments_add) {
   showByView = new ToggleShowByView({
     course,
-    assignmentGroups
+    assignmentGroups,
   })
 }
 
@@ -101,7 +101,7 @@ ready(() => {
     assignmentSyncSettingsView,
     createGroupView,
     showByView,
-    collection: assignmentGroups
+    collection: assignmentGroups,
   })
 
   app.render()

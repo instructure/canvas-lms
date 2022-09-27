@@ -70,7 +70,7 @@ export default class Columns {
 
     return {
       frozen: columns.slice(0, frozenCount),
-      scrollable: columns.slice(frozenCount)
+      scrollable: columns.slice(frozenCount),
     }
   }
 

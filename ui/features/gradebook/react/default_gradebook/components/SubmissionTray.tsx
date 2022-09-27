@@ -41,7 +41,7 @@ import type {
   GradingStandard,
   LatePolicyCamelized,
   PendingGradeInfo,
-  SerializedComment
+  SerializedComment,
 } from '../gradebook.d'
 import {CamelizedAssignment, CamelizedSubmission} from '@canvas/grading/grading'
 
@@ -127,7 +127,7 @@ export default class SubmissionTray extends React.Component<SubmissionTrayProps>
     gradingDisabled: false,
     latePolicy: {lateSubmissionInterval: 'day'},
     submission: {drop: false},
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   cancelCommenting = () => {
@@ -202,7 +202,7 @@ export default class SubmissionTray extends React.Component<SubmissionTrayProps>
     } = {
       disabled: speedGraderProps.requireStudentGroup,
       href: speedGraderProps.speedGraderUrl,
-      variant: 'link' // TODO: replace since this is deprecated with InstUI 8
+      variant: 'link', // TODO: replace since this is deprecated with InstUI 8
     }
     if (speedGraderProps.anonymizeStudents) {
       buttonProps.onClick = e => {
@@ -246,7 +246,7 @@ export default class SubmissionTray extends React.Component<SubmissionTrayProps>
 
     const {
       id: entryId,
-      data: {similarity_score, status}
+      data: {similarity_score, status},
     } = similarityInfo.entries[0]
     const reportType = similarityInfo.type
     const assignmentPath = `/courses/${assignment.courseId}/assignments/${assignment.id}`
@@ -279,7 +279,7 @@ export default class SubmissionTray extends React.Component<SubmissionTrayProps>
       deleteSubmissionComment: this.props.deleteSubmissionComment,
       createSubmissionComment: this.props.createSubmissionComment,
       processing: this.props.processing,
-      setProcessing: this.props.setProcessing
+      setProcessing: this.props.setProcessing,
     }
     const trayIsBusy =
       this.props.processing || this.props.submissionUpdating || !this.props.submissionCommentsLoaded
@@ -297,7 +297,7 @@ export default class SubmissionTray extends React.Component<SubmissionTrayProps>
       speedGraderProps = {
         anonymizeStudents: this.props.assignment.anonymizeStudents,
         requireStudentGroup: this.props.requireStudentGroupForSpeedGrader,
-        speedGraderUrl
+        speedGraderUrl,
       }
     }
 

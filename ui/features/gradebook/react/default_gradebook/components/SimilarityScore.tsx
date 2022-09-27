@@ -34,7 +34,7 @@ export default class SimilarityScore extends PureComponent {
     hasAdditionalData: bool,
     reportUrl: string,
     similarityScore: number,
-    status: string.isRequired
+    status: string.isRequired,
   }
 
   render() {

@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/GradebookApi'
 import {waitFor} from '../support/Waiters'
@@ -49,8 +49,8 @@ QUnit.module('Gradebook#renderSubmissionTray', {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     })
     this.gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     this.gradebook.students = {
@@ -63,29 +63,29 @@ QUnit.module('Gradebook#renderSubmissionTray', {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
         enrollments: [
           {
             grades: {
-              html_url: 'http://gradesUrl/'
-            }
-          }
+              html_url: 'http://gradesUrl/',
+            },
+          },
         ],
-        isConcluded: false
-      }
+        isConcluded: false,
+      },
     }
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit() {},
-        focus() {}
+        focus() {},
       },
       state: {
-        getActiveLocation: () => ({region: 'body', cell: 0, row: 0})
+        getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
       },
       grid: {
-        getColumns: () => []
-      }
+        getColumns: () => [],
+      },
     }
   },
 
@@ -94,7 +94,7 @@ QUnit.module('Gradebook#renderSubmissionTray', {
     ReactDOM.unmountComponentAtNode(node)
     $fixtures.innerHTML = ''
     moxios.uninstall()
-  }
+  },
 })
 
 test('shows a submission tray on the page when rendering an open tray', async function () {
@@ -134,8 +134,8 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
     this.gradebook = createGradebook()
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
-        commitCurrentEdit() {}
-      }
+        commitCurrentEdit() {},
+      },
     }
     this.gradebook.students = {1101: {id: '1101'}}
     this.promise = {
@@ -147,7 +147,7 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
       catch(catchFn) {
         this.catchFn = catchFn
         return this
-      }
+      },
     }
     this.submission = {assignmentId: '2301', latePolicyStatus: 'none', userId: '1101'}
     this.gradebook.updateSubmission({
@@ -157,12 +157,12 @@ QUnit.module('Gradebook#updateSubmissionAndRenderSubmissionTray', {
       excused: false,
       grade: 'B',
       score: 8.5,
-      user_id: '1101'
+      user_id: '1101',
     })
 
     sandbox.stub(GradebookApi, 'updateSubmission').returns(this.promise)
     this.gradebook.setSubmissionTrayState(true, '1101', '2301')
-  }
+  },
 })
 
 test('stores the pending grade info before sending the request', function () {
@@ -272,7 +272,7 @@ QUnit.module('Gradebook#updateRowAndRenderSubmissionTray', {
     this.gradebook = createGradebook()
     sandbox.stub(this.gradebook, 'updateRowCellsForStudentIds')
     sandbox.stub(this.gradebook, 'renderSubmissionTray')
-  }
+  },
 })
 
 test('unloads comments for the submission', function () {
@@ -301,7 +301,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     ['B', 0.8],
     ['C', 0.7],
     ['D', 0.6],
-    ['E', 0.5]
+    ['E', 0.5],
   ]
   let gradebook
 
@@ -310,7 +310,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
     moxios.stubRequest(url, {status: 200, response: {submission_comments: []}})
     setFixtureHtml($fixtures)
     gradebook = createGradebook({
-      default_grading_standard: defaultGradingScheme
+      default_grading_standard: defaultGradingScheme,
     })
     gradebook.setAssignmentGroups({9000: {group_weight: 100}})
     gradebook.setAssignments({
@@ -327,8 +327,8 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     })
     gradebook.students = {
       1101: {
@@ -339,30 +339,30 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
         enrollments: [
           {
             grades: {
-              html_url: 'http://gradesUrl/'
-            }
-          }
+              html_url: 'http://gradesUrl/',
+            },
+          },
         ],
-        isConcluded: false
-      }
+        isConcluded: false,
+      },
     }
     gradebook.initSubmissionStateMap()
     gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit() {},
-        focus() {}
+        focus() {},
       },
       state: {
-        getActiveLocation: () => ({region: 'body', cell: 0, row: 0})
+        getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
       },
       grid: {
-        getColumns: () => []
-      }
+        getColumns: () => [],
+      },
     }
   })
 
@@ -616,7 +616,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
       excused: false,
       grade: null,
       score: null,
-      valid: true
+      valid: true,
     }
     const submission = {assignmentId: '2301', userId: '1101'}
 
@@ -633,7 +633,7 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
       excused: false,
       grade: null,
       score: null,
-      valid: true
+      valid: true,
     }
     const submission = {assignmentId: '2302', userId: '1101'}
 
@@ -650,19 +650,19 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
         {
           groups: [
             {id: '1', name: 'First Group Set 1'},
-            {id: '2', name: 'First Group Set 2'}
+            {id: '2', name: 'First Group Set 2'},
           ],
           id: '1',
-          name: 'First Group Set'
+          name: 'First Group Set',
         },
         {
           groups: [
             {id: '3', name: 'Second Group Set 1'},
-            {id: '4', name: 'Second Group Set 2'}
+            {id: '4', name: 'Second Group Set 2'},
           ],
           id: '2',
-          name: 'Second Group Set'
-        }
+          name: 'Second Group Set',
+        },
       ]
 
       gradebook.setStudentGroups(studentGroups)
@@ -738,8 +738,8 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     })
     gradebook.setAssignmentGroups({9000: {group_weight: 100}})
 
@@ -752,10 +752,10 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
         enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
-        isConcluded: false
+        isConcluded: false,
       },
       1101: {
         id: '1101',
@@ -765,10 +765,10 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
         enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
-        isConcluded: false
+        isConcluded: false,
       },
       1102: {
         id: '1100',
@@ -778,24 +778,24 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
         enrollments: [{grades: {html_url: 'http://gradesUrl/'}}],
-        isConcluded: false
-      }
+        isConcluded: false,
+      },
     }
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]))
     gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit() {},
-        focus() {}
+        focus() {},
       },
       state: {
-        getActiveLocation: () => ({region: 'body', cell: 0, row: 0})
+        getActiveLocation: () => ({region: 'body', cell: 0, row: 0}),
       },
       grid: {
-        getColumns: () => []
-      }
+        getColumns: () => [],
+      },
     }
     clock = sinon.useFakeTimers()
   })
@@ -814,7 +814,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 0
+      row: 0,
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
@@ -830,7 +830,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 0
+      row: 0,
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
@@ -846,7 +846,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 2
+      row: 2,
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
@@ -862,7 +862,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 2
+      row: 2,
     })
     gradebook.setSubmissionTrayState(true, '1101', '2301')
     gradebook.renderSubmissionTray(gradebook.student('1101'))
@@ -878,7 +878,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 1
+      row: 1,
     })
     sinon.stub(gradebook, 'loadTrayStudent')
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false)
@@ -899,7 +899,7 @@ QUnit.module('Gradebook#renderSubmissionTray - Student Carousel', hooks => {
     gradebook.gradebookGrid.gridSupport.state.getActiveLocation = () => ({
       region: 'body',
       cell: 0,
-      row: 1
+      row: 1,
     })
     sinon.stub(gradebook, 'loadTrayStudent')
     sinon.stub(gradebook, 'getCommentsUpdating').returns(false)
@@ -945,11 +945,11 @@ QUnit.module('Gradebook#toggleSubmissionTrayOpen', {
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit() {},
-        focus() {}
-      }
+        focus() {},
+      },
     }
     sandbox.stub(this.gradebook, 'updateRowAndRenderSubmissionTray')
-  }
+  },
 })
 
 test('sets the tray state to open if it was closed', function () {
@@ -981,18 +981,18 @@ QUnit.module('Gradebook#closeSubmissionTray', {
     this.gradebook.gradebookGrid.grid = {
       getActiveCell() {
         return {row: 0}
-      }
+      },
     }
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit() {},
         focus() {},
-        beginEdit() {}
-      }
+        beginEdit() {},
+      },
     }
     this.gradebook.setSubmissionTrayState(true, '1101', '2')
     sandbox.stub(this.gradebook, 'updateRowAndRenderSubmissionTray')
-  }
+  },
 })
 
 test('sets the state of the tray to closed', function () {
@@ -1023,10 +1023,10 @@ QUnit.module('Gradebook#setSubmissionTrayState', {
     this.gradebook.gradebookGrid.gridSupport = {
       helper: {
         commitCurrentEdit: sinon.stub(),
-        focus: sinon.stub()
-      }
+        focus: sinon.stub(),
+      },
     }
-  }
+  },
 })
 
 test('sets the state of the submission tray', function () {
@@ -1038,7 +1038,7 @@ test('sets the state of the submission tray', function () {
     commentsLoaded: false,
     comments: [],
     commentsUpdating: false,
-    editedCommentId: null
+    editedCommentId: null,
   }
 
   deepEqual(this.gradebook.gridDisplaySettings.submissionTray, expected)
@@ -1057,7 +1057,7 @@ test('does not put cell in view mode when tray is closed', function () {
 QUnit.module('Gradebook#getSubmissionTrayState', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('returns the state of the submission tray', function () {
@@ -1068,7 +1068,7 @@ test('returns the state of the submission tray', function () {
     commentsLoaded: false,
     comments: [],
     commentsUpdating: false,
-    editedCommentId: null
+    editedCommentId: null,
   }
 
   deepEqual(this.gradebook.getSubmissionTrayState(), expected)
@@ -1085,7 +1085,7 @@ test('returns the state of the submission tray when accessed directly', function
     commentsLoaded: false,
     comments: [],
     commentsUpdating: false,
-    editedCommentId: null
+    editedCommentId: null,
   }
 
   deepEqual(this.gradebook.getSubmissionTrayState(), expected)

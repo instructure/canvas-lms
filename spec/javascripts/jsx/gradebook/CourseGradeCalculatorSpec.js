@@ -50,7 +50,7 @@ QUnit.module('CourseGradeCalculator.calculate with no submissions and no assignm
   setup() {
     submissions = []
     assignmentGroups = [{id: 301, rules: {}, group_weight: 100, assignments: []}]
-  }
+  },
 })
 
 test('includes assignment group grades', () => {
@@ -102,20 +102,20 @@ QUnit.module('CourseGradeCalculator.calculate with some assignments and submissi
       {assignment_id: 202, score: 42},
       {assignment_id: 203, score: 14},
       {assignment_id: 204, score: 3},
-      {assignment_id: 205, score: null}
+      {assignment_id: 205, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
       {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroups = [
       {id: 301, rules: {}, group_weight: 50, assignments: assignments.slice(0, 2)},
-      {id: 302, rules: {}, group_weight: 50, assignments: assignments.slice(2, 5)}
+      {id: 302, rules: {}, group_weight: 50, assignments: assignments.slice(2, 5)},
     ]
-  }
+  },
 })
 
 test('avoids floating point errors in current and final score when assignment groups are weighted', () => {
@@ -123,21 +123,21 @@ test('avoids floating point errors in current and final score when assignment gr
     {assignment_id: 201, score: 194.5},
     {assignment_id: 202, score: 100.0},
     {assignment_id: 203, score: 94.5},
-    {assignment_id: 204, score: 89.5}
+    {assignment_id: 204, score: 89.5},
   ]
 
   assignments = [
     {id: 201, points_possible: 200, anonymize_students: false},
     {id: 202, points_possible: 100, anonymize_students: false},
     {id: 203, points_possible: 100, anonymize_students: false},
-    {id: 204, points_possible: 100, anonymize_students: false}
+    {id: 204, points_possible: 100, anonymize_students: false},
   ]
 
   assignmentGroups = [
     {id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1)},
     {id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2)},
     {id: 303, rules: {}, group_weight: 50, assignments: assignments.slice(2, 3)},
-    {id: 304, rules: {}, group_weight: 30, assignments: assignments.slice(3, 4)}
+    {id: 304, rules: {}, group_weight: 30, assignments: assignments.slice(3, 4)},
   ]
 
   // 9.725 + 10 + 47.25 + 26.85 === 93.82499999999999
@@ -149,17 +149,17 @@ test('avoids floating point errors in current and final score when assignment gr
 test('avoids floating point errors in current and final score when assignment groups are not weighted', () => {
   submissions = [
     {assignment_id: 201, score: 110.1},
-    {assignment_id: 202, score: 170.7}
+    {assignment_id: 202, score: 170.7},
   ]
 
   assignments = [
     {id: 201, points_possible: 120},
-    {id: 202, points_possible: 180}
+    {id: 202, points_possible: 180},
   ]
 
   assignmentGroups = [
     {id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1)},
-    {id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2)}
+    {id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2)},
   ]
 
   // 110.1 + 170.7 === 280.79999999999995
@@ -171,17 +171,17 @@ test('avoids floating point errors in current and final score when assignment gr
 test('avoids floating point errors in points possible when assignment groups are not weighted', () => {
   submissions = [
     {assignment_id: 201, score: 100},
-    {assignment_id: 202, score: 150}
+    {assignment_id: 202, score: 150},
   ]
 
   assignments = [
     {id: 201, points_possible: 110.1},
-    {id: 202, points_possible: 170.7}
+    {id: 202, points_possible: 170.7},
   ]
 
   assignmentGroups = [
     {id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1)},
-    {id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2)}
+    {id: 302, rules: {}, group_weight: 10, assignments: assignments.slice(1, 2)},
   ]
 
   // 110.1 + 170.7 === 280.79999999999995
@@ -193,15 +193,15 @@ test('avoids floating point errors in points possible when assignment groups are
 test('avoids floating point errors in assignment group weights', () => {
   submissions = [
     {assignment_id: 201, score: 124.46},
-    {assignment_id: 202, score: 144.53}
+    {assignment_id: 202, score: 144.53},
   ]
   assignments = [
     {id: 201, points_possible: 148},
-    {id: 202, points_possible: 148}
+    {id: 202, points_possible: 148},
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
-    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)}
+    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)},
   ]
 
   //   124.46 / 148 * 0.5 (weight)
@@ -215,15 +215,15 @@ test('avoids floating point errors in assignment group weights', () => {
 test('avoids floating point errors when up-scaling assignment group weights', () => {
   submissions = [
     {assignment_id: 201, score: 81.01},
-    {assignment_id: 202, score: 96.08}
+    {assignment_id: 202, score: 96.08},
   ]
   assignments = [
     {id: 201, points_possible: 100},
-    {id: 202, points_possible: 100}
+    {id: 202, points_possible: 100},
   ]
   assignmentGroups = [
     {id: 301, group_weight: 40, rules: {}, assignments: assignments.slice(0, 1)},
-    {id: 302, group_weight: 40, rules: {}, assignments: assignments.slice(1, 2)}
+    {id: 302, group_weight: 40, rules: {}, assignments: assignments.slice(1, 2)},
   ]
 
   //   81.01 / 100 * 0.4 (weight)
@@ -380,19 +380,19 @@ QUnit.module('CourseGradeCalculator.calculate with zero-point assignments', {
       {assignment_id: 201, score: 10},
       {assignment_id: 202, score: 5},
       {assignment_id: 203, score: 20},
-      {assignment_id: 204, score: 0}
+      {assignment_id: 204, score: 0},
     ]
     assignments = [
       {id: 201, points_possible: 0, omit_from_final_grade: false},
       {id: 202, points_possible: 0, omit_from_final_grade: false},
       {id: 203, points_possible: 0, omit_from_final_grade: false},
-      {id: 204, points_possible: 0, omit_from_final_grade: false}
+      {id: 204, points_possible: 0, omit_from_final_grade: false},
     ]
     assignmentGroups = [
       {id: 301, rules: {}, group_weight: 50, assignments: assignments.slice(0, 2)},
-      {id: 302, rules: {}, group_weight: 50, assignments: assignments.slice(2, 4)}
+      {id: 302, rules: {}, group_weight: 50, assignments: assignments.slice(2, 4)},
     ]
-  }
+  },
 })
 
 test('includes all assignment group grades regardless of points possible', () => {
@@ -436,15 +436,15 @@ QUnit.module('CourseGradeCalculator.calculate with only ungraded submissions', {
     submissions = [
       {assignment_id: 201, score: null},
       {assignment_id: 202, score: null},
-      {assignment_id: 203, score: null}
+      {assignment_id: 203, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 5, omit_from_final_grade: false},
       {id: 202, points_possible: 10, omit_from_final_grade: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false}
+      {id: 203, points_possible: 20, omit_from_final_grade: false},
     ]
     assignmentGroups = [{id: 301, group_weight: 100, rules: {}, assignments}]
-  }
+  },
 })
 
 test('includes all assignment group grades regardless of submissions graded', () => {
@@ -496,31 +496,31 @@ QUnit.module('CourseGradeCalculator.calculate with unweighted grading periods', 
       {assignment_id: 201, score: 10},
       {assignment_id: 202, score: 5},
       {assignment_id: 203, score: 12},
-      {assignment_id: 204, score: 16}
+      {assignment_id: 204, score: 16},
     ]
     assignments = [
       {id: 201, points_possible: 10, omit_from_final_grade: false},
       {id: 202, points_possible: 10, omit_from_final_grade: false},
       {id: 203, points_possible: 20, omit_from_final_grade: false},
-      {id: 204, points_possible: 40, omit_from_final_grade: false}
+      {id: 204, points_possible: 40, omit_from_final_grade: false},
     ]
     assignmentGroups = [
       {id: 301, group_weight: 60, rules: {}, assignments: assignments.slice(0, 2)},
       {id: 302, group_weight: 20, rules: {}, assignments: assignments.slice(2, 3)},
-      {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)}
+      {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)},
     ]
     gradingPeriods = [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ]
     gradingPeriodSet = {gradingPeriods, weighted: false}
     effectiveDueDates = {
       201: {grading_period_id: '701'},
       202: {grading_period_id: '701'},
       203: {grading_period_id: '702'},
-      204: {grading_period_id: '702'}
+      204: {grading_period_id: '702'},
     }
-  }
+  },
 })
 
 test('includes assignment group grades', () => {
@@ -761,31 +761,31 @@ QUnit.module('CourseGradeCalculator.calculate with weighted grading periods', {
       {assignment_id: 201, score: 10},
       {assignment_id: 202, score: 5},
       {assignment_id: 203, score: 12},
-      {assignment_id: 204, score: 16}
+      {assignment_id: 204, score: 16},
     ]
     assignments = [
       {id: 201, points_possible: 10, omit_from_final_grade: false},
       {id: 202, points_possible: 10, omit_from_final_grade: false},
       {id: 203, points_possible: 20, omit_from_final_grade: false},
-      {id: 204, points_possible: 40, omit_from_final_grade: false}
+      {id: 204, points_possible: 40, omit_from_final_grade: false},
     ]
     assignmentGroups = [
       {id: 301, group_weight: 60, rules: {}, assignments: assignments.slice(0, 2)},
       {id: 302, group_weight: 20, rules: {}, assignments: assignments.slice(2, 3)},
-      {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)}
+      {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)},
     ]
     gradingPeriods = [
       {id: '701', weight: 50},
-      {id: '702', weight: 50}
+      {id: '702', weight: 50},
     ]
     gradingPeriodSet = {gradingPeriods, weighted: true}
     effectiveDueDates = {
       201: {grading_period_id: '701'},
       202: {grading_period_id: '701'},
       203: {grading_period_id: '702'},
-      204: {grading_period_id: '702'}
+      204: {grading_period_id: '702'},
     }
-  }
+  },
 })
 
 test('includes grading period attributes in gradingPeriods', () => {
@@ -1116,23 +1116,23 @@ test('uses a score unit of "percentage" for grading period grades when weighting
 test('avoids floating point errors in current and final score', () => {
   submissions = [
     {assignment_id: 201, score: 45.9},
-    {assignment_id: 202, score: 38.25}
+    {assignment_id: 202, score: 38.25},
   ]
   assignments = [
     {id: 201, points_possible: 60},
-    {id: 202, points_possible: 40}
+    {id: 202, points_possible: 40},
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
-    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)}
+    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)},
   ]
   effectiveDueDates = {
     201: {grading_period_id: '701'},
-    202: {grading_period_id: '702'}
+    202: {grading_period_id: '702'},
   }
   gradingPeriods = [
     {id: '701', weight: 40},
-    {id: '702', weight: 50}
+    {id: '702', weight: 50},
   ]
   gradingPeriodSet = {gradingPeriods, weighted: true}
 
@@ -1158,28 +1158,28 @@ QUnit.module(
       submissions = [
         {assignment_id: 201, score: 10},
         {assignment_id: 202, score: 5},
-        {assignment_id: 203, score: 3}
+        {assignment_id: 203, score: 3},
       ]
       assignments = [
         {id: 201, points_possible: 10, omit_from_final_grade: false},
         {id: 202, points_possible: 10, omit_from_final_grade: false},
-        {id: 203, points_possible: 10, omit_from_final_grade: false}
+        {id: 203, points_possible: 10, omit_from_final_grade: false},
       ]
       assignmentGroups = [
         {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
-        {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)}
+        {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)},
       ]
       gradingPeriods = [
         {id: '701', weight: 50},
-        {id: '702', weight: 50}
+        {id: '702', weight: 50},
       ]
       gradingPeriodSet = {gradingPeriods, weighted: true}
       effectiveDueDates = {
         201: {grading_period_id: '701'}, // in first assignment group and first grading period
         202: {grading_period_id: '702'}, // in first assignment group and second grading period
-        203: {grading_period_id: '702'}
+        203: {grading_period_id: '702'},
       }
-    }
+    },
   }
 )
 
@@ -1283,16 +1283,16 @@ test('avoids floating point errors in assignment group scores', () => {
   submissions = [
     {assignment_id: 201, score: 110.1},
     {assignment_id: 202, score: 170.7},
-    {assignment_id: 203, score: 103.3}
+    {assignment_id: 203, score: 103.3},
   ]
   assignments = [
     {id: 201, points_possible: 120},
     {id: 202, points_possible: 190},
-    {id: 203, points_possible: 120}
+    {id: 203, points_possible: 120},
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
-    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)}
+    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)},
   ]
 
   // 110.1 + 170.7 === 280.79999999999995
@@ -1307,16 +1307,16 @@ test('avoids floating point errors in assignment group points possible', () => {
   submissions = [
     {assignment_id: 201, score: 100},
     {assignment_id: 202, score: 100},
-    {assignment_id: 203, score: 90}
+    {assignment_id: 203, score: 90},
   ]
   assignments = [
     {id: 201, points_possible: 110.1},
     {id: 202, points_possible: 170.7},
-    {id: 203, points_possible: 103.3}
+    {id: 203, points_possible: 103.3},
   ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
-    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)}
+    {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)},
   ]
 
   // 110.1 + 170.7 === 280.79999999999995

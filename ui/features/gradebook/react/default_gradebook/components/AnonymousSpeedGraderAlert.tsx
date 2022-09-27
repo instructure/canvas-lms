@@ -31,7 +31,7 @@ const I18n = useI18nScope('gradebook')
 class AnonymousSpeedGraderAlert extends React.Component {
   static propTypes = {
     speedGraderUrl: string.isRequired,
-    onClose: func.isRequired
+    onClose: func.isRequired,
   }
 
   constructor(props) {

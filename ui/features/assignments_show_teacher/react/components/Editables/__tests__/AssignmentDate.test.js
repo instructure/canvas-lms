@@ -90,7 +90,7 @@ describe('AssignmentDate', () => {
       mode: 'edit',
       onValidate: () => true,
       invalidMessage,
-      value
+      value,
     })
 
     const dateDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LL')
@@ -117,7 +117,7 @@ describe('AssignmentDate', () => {
       mode: 'edit',
       onValidate: validator,
       invalidMessage,
-      value
+      value,
     })
 
     const dateDisplay = DateTime.toLocaleString(value, locale, timeZone, 'LL')

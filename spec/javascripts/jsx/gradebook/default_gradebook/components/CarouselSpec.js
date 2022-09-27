@@ -29,7 +29,7 @@ function mountComponent(props) {
     leftArrowDescription: 'Previous',
     onLeftArrowClick() {},
     onRightArrowClick() {},
-    rightArrowDescription: 'Next'
+    rightArrowDescription: 'Next',
   }
 
   const tbody = document.createElement('div')
@@ -43,7 +43,7 @@ QUnit.module('Carousel', {
   teardown() {
     this.wrapper.detach()
     document.getElementById('carousel-tbody').remove()
-  }
+  },
 })
 
 test('renders children', function () {

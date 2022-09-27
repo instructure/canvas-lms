@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import AssignmentGroupColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/AssignmentGroupColumnHeaderRenderer'
 import {getAssignmentGroupColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
@@ -41,7 +41,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -65,15 +65,15 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeaderRenderer', suiteHooks => 
         omit_from_final_grade: false,
         only_visible_to_overrides: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     ]
 
     assignmentGroup = {
       id: '2201',
       position: 1,
       name: 'Assignments',
-      assignments
+      assignments,
     }
     gradebook.gotAllAssignmentGroups([assignmentGroup])
     column = {id: getAssignmentGroupColumnId('2201'), assignmentGroupId: '2201'}

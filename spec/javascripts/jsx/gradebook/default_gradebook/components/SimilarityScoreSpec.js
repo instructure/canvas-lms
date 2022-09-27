@@ -36,7 +36,7 @@ QUnit.module('SimilarityScore', moduleHooks => {
       hasAdditionalData: false,
       reportUrl: '/my_superlative_report',
       similarityScore: 60,
-      status: 'scored'
+      status: 'scored',
     }
 
     ReactDOM.render(<SimilarityScore {...defaultProps} {...props} />, $container)

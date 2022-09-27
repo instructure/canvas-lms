@@ -54,7 +54,7 @@ export default function FilterTray({
   modules,
   gradingPeriods,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterTrayProps) {
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
   const updateFilterPreset = useStore(state => state.updateFilterPreset)
@@ -100,7 +100,7 @@ export default function FilterTray({
                 alt={I18n.t('Friendly panda')}
                 style={{
                   width: '100px',
-                  height: '128px'
+                  height: '128px',
                 }}
               />
             </FlexItem>
@@ -127,7 +127,7 @@ export default function FilterTray({
               name: '',
               filters: appliedFilters,
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
             }}
             isActive={true}
             gradingPeriods={gradingPeriods}

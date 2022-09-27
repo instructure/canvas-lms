@@ -80,7 +80,7 @@ function failADate(whichDate) {
   const editButtonLabel = {
     dueAt: 'Edit Due',
     unlockAt: 'Edit Available',
-    lockAt: 'Edit Until'
+    lockAt: 'Edit Until',
   }
   const errMessages = {}
 
@@ -89,7 +89,7 @@ function failADate(whichDate) {
     const override = mockOverride({
       dueAt: '2018-12-25T23:59:59-05:00',
       unlockAt: '2018-12-23T00:00:00-05:00',
-      lockAt: '2018-12-29T23:59:00-05:00'
+      lockAt: '2018-12-29T23:59:00-05:00',
     })
 
     // validate + invalidMessage mock the real deal

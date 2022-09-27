@@ -28,10 +28,10 @@ QUnit.module('GradebookGrid Columns', suiteHooks => {
         columns: {
           definitions: {},
           frozen: ['student', 'custom_col_2401'],
-          scrollable: ['assignment_2301', 'total_grade', 'total_grade_override']
+          scrollable: ['assignment_2301', 'total_grade', 'total_grade_override'],
         },
-        rows: []
-      }
+        rows: [],
+      },
     }
   })
 

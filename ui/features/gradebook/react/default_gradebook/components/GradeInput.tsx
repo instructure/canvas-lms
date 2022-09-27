@@ -48,7 +48,7 @@ function normalizeSubmissionGrade(props) {
     formatType,
     gradingScheme,
     pointsPossible: assignment.pointsPossible,
-    version: 'entered'
+    version: 'entered',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
@@ -72,7 +72,7 @@ function assignmentLabel(assignment, formatType) {
     case 'points': {
       const points = I18n.n(assignment.pointsPossible, {
         strip_insignificant_zeros: true,
-        precision: 2
+        precision: 2,
       })
       return I18n.t('Grade out of %{points}', {points})
     }
@@ -80,7 +80,7 @@ function assignmentLabel(assignment, formatType) {
       const percentage = I18n.n(100, {
         percentage: true,
         precision: 2,
-        strip_insignificant_zeros: true
+        strip_insignificant_zeros: true,
       })
       return I18n.t('Grade out of %{percentage}', {percentage})
     }
@@ -111,7 +111,7 @@ function stateFromProps(props) {
 
   return {
     formattedGrade: normalizedGrade,
-    grade: normalizedGrade
+    grade: normalizedGrade,
   }
 }
 
@@ -125,9 +125,9 @@ export default class GradeInput extends Component {
         'not_graded',
         'pass_fail',
         'points',
-        'percent'
+        'percent',
       ]).isRequired,
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     disabled: bool,
     enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
@@ -136,15 +136,15 @@ export default class GradeInput extends Component {
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
-      valid: bool.isRequired
+      valid: bool.isRequired,
     }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
       excused: bool.isRequired,
-      id: string
+      id: string,
     }).isRequired,
-    submissionUpdating: bool
+    submissionUpdating: bool,
   }
 
   static defaultProps = {
@@ -152,7 +152,7 @@ export default class GradeInput extends Component {
     gradingScheme: null,
     onSubmissionUpdate() {},
     pendingGradeInfo: null,
-    submissionUpdating: false
+    submissionUpdating: false,
   }
 
   constructor(props) {
@@ -184,7 +184,7 @@ export default class GradeInput extends Component {
           formattedGrade: GradeFormatHelper.isExcused(enteredGrade)
             ? GradeFormatHelper.excused()
             : enteredGrade,
-          grade: enteredGrade
+          grade: enteredGrade,
         }
       },
 
@@ -199,7 +199,7 @@ export default class GradeInput extends Component {
   handleTextChange(event) {
     this.setState({
       formattedGrade: event.target.value,
-      grade: event.target.value
+      grade: event.target.value,
     })
   }
 
@@ -211,7 +211,7 @@ export default class GradeInput extends Component {
     const gradeInfo = parseTextValue(this.state.grade, {
       enterGradesAs: this.props.enterGradesAs,
       gradingScheme: this.props.gradingScheme,
-      pointsPossible: this.props.assignment.pointsPossible
+      pointsPossible: this.props.assignment.pointsPossible,
     })
 
     this.props.onSubmissionUpdate(this.props.submission, gradeInfo)
@@ -238,13 +238,13 @@ export default class GradeInput extends Component {
         excused: true,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
     } else {
       currentGradeInfo = parseTextValue(this.state.grade, {
         enterGradesAs: this.props.enterGradesAs,
         gradingScheme: this.props.gradingScheme,
-        pointsPossible: this.props.assignment.pointsPossible
+        pointsPossible: this.props.assignment.pointsPossible,
       })
     }
 

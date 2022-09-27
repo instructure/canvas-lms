@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import StudentColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeader'
 import StudentColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentColumnHeaderRenderer'
@@ -39,7 +39,7 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -51,7 +51,7 @@ QUnit.module('GradebookGrid StudentLastNameColumnHeaderRenderer', suiteHooks => 
 
     gradebook = createGradebook({
       login_handle_name: 'a_jones',
-      sis_name: 'Example SIS'
+      sis_name: 'Example SIS',
     })
     sinon
       .stub(gradebook, 'saveSettings')
@@ -102,7 +102,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -114,7 +114,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
 
     gradebook = createGradebook({
       login_handle_name: 'a_jones',
-      sis_name: 'Example SIS'
+      sis_name: 'Example SIS',
     })
     sinon
       .stub(gradebook, 'saveSettings')
@@ -237,7 +237,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
     test('sets sectionsEnabled to true when sections are in use', () => {
       gradebook.gotSections([
         {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
+        {id: '2002', name: 'Sophomores'},
       ])
       render()
       strictEqual(component.props.sectionsEnabled, true)
@@ -253,11 +253,11 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         {
           groups: [
             {id: '1', name: 'Default Group 1'},
-            {id: '2', name: 'Default Group 2'}
+            {id: '2', name: 'Default Group 2'},
           ],
           id: '1',
-          name: 'Default Group'
-        }
+          name: 'Default Group',
+        },
       ])
       render()
       strictEqual(component.props.studentGroupsEnabled, true)
@@ -324,7 +324,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -336,7 +336,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'sis_user_id'
+        settingKey: 'sis_user_id',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -348,7 +348,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'integration_id'
+        settingKey: 'integration_id',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -360,7 +360,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'login_id'
+        settingKey: 'login_id',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -372,7 +372,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -384,7 +384,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'descending',
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -396,7 +396,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'ascending',
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -408,7 +408,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
       const expectedSetting = {
         columnId: 'student',
         direction: 'descending',
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       }
       deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
     })
@@ -421,7 +421,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         const expectedSetting = {
           columnId: 'student',
           direction: 'ascending',
-          settingKey: 'sortable_name'
+          settingKey: 'sortable_name',
         }
         deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
       })
@@ -433,7 +433,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         const expectedSetting = {
           columnId: 'student',
           direction: 'descending',
-          settingKey: 'sortable_name'
+          settingKey: 'sortable_name',
         }
         deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
       })
@@ -447,7 +447,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         const expectedSetting = {
           columnId: 'student',
           direction: 'ascending',
-          settingKey: 'integration_id'
+          settingKey: 'integration_id',
         }
         deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
       })
@@ -459,7 +459,7 @@ QUnit.module('GradebookGrid StudentColumnHeaderRenderer', suiteHooks => {
         const expectedSetting = {
           columnId: 'student',
           direction: 'descending',
-          settingKey: 'integration_id'
+          settingKey: 'integration_id',
         }
         deepEqual(gradebook.getSortRowsBySetting(), expectedSetting)
       })

@@ -44,7 +44,7 @@ function getProps(column, gradebook, options) {
 
     assignmentGroup: {
       groupWeight: assignmentGroup.group_weight,
-      name: assignmentGroup.name
+      name: assignmentGroup.name,
     },
 
     onApplyScoreToUngraded,
@@ -66,12 +66,12 @@ function getProps(column, gradebook, options) {
       onSortByGradeDescending: () => {
         gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
-    weightedGroups: gradebook.weightedGroups()
+    weightedGroups: gradebook.weightedGroups(),
   }
 }
 

@@ -20,7 +20,7 @@ import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
@@ -38,14 +38,14 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
     contextModules = [
       {id: '2601', position: 3, name: 'Final Module'},
       {id: '2602', position: 2, name: 'Second Module'},
-      {id: '2603', position: 1, name: 'First Module'}
+      {id: '2603', position: 1, name: 'First Module'},
     ]
   }
 
   function createCustomColumns() {
     customColumns = [
       {id: '2401', teacher_notes: true, title: 'Notes'},
-      {id: '2402', teacher_notes: false, title: 'Other Notes'}
+      {id: '2402', teacher_notes: false, title: 'Other Notes'},
     ]
   }
 
@@ -66,7 +66,7 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
           points_possible: null,
           position: 1,
           published: true,
-          submission_types: ['online_text_entry']
+          submission_types: ['online_text_entry'],
         },
         {
           id: '2303',
@@ -82,8 +82,8 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
           points_possible: 15,
           position: 2,
           published: true,
-          submission_types: ['online_text_entry']
-        }
+          submission_types: ['online_text_entry'],
+        },
       ],
 
       quizzes: [
@@ -101,7 +101,7 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
           points_possible: 10,
           position: 1,
           published: true,
-          submission_types: ['online_quiz']
+          submission_types: ['online_quiz'],
         },
         {
           id: '2304',
@@ -117,16 +117,16 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
           points_possible: 20,
           position: 2,
           published: true,
-          submission_types: ['online_quiz']
-        }
-      ]
+          submission_types: ['online_quiz'],
+        },
+      ],
     }
   }
 
   function createAssignmentGroups() {
     assignmentGroups = [
       {id: '2201', position: 2, name: 'Homework', assignments: assignments.homework},
-      {id: '2202', position: 1, name: 'Quizzes', assignments: assignments.quizzes}
+      {id: '2202', position: 1, name: 'Quizzes', assignments: assignments.quizzes},
     ]
   }
 
@@ -171,7 +171,7 @@ QUnit.module('Gradebook Grid Column Widths', suiteHooks => {
     setFixtureHtml($fixture)
 
     fakeENV.setup({
-      current_user_id: '1101'
+      current_user_id: '1101',
     })
 
     createAssignments()

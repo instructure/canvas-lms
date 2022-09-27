@@ -39,18 +39,18 @@ export default class AssignmentName extends React.Component {
     onChangeMode: func.isRequired,
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      isValid: props.onValidate('name', props.name)
+      isValid: props.onValidate('name', props.name),
     }
   }
 
@@ -66,7 +66,7 @@ export default class AssignmentName extends React.Component {
         showFlashAlert({
           message: this.props.invalidMessage('name') || I18n.t('Error'),
           type: 'error',
-          srOnly: true
+          srOnly: true,
         })
       }
       this.props.onChange(name)

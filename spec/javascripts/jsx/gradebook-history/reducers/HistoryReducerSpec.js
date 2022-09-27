@@ -23,7 +23,7 @@ import {
   FETCH_HISTORY_FAILURE,
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
-  FETCH_HISTORY_NEXT_PAGE_FAILURE
+  FETCH_HISTORY_NEXT_PAGE_FAILURE,
 } from 'ui/features/gradebook_history/react/actions/HistoryActions.js'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
 import reducer from 'ui/features/gradebook_history/react/reducers/HistoryReducer.js'
@@ -33,7 +33,7 @@ QUnit.module('HistoryReducer')
 const defaultState = () => ({
   loading: false,
   items: [],
-  fetchHistoryStatus: 'success'
+  fetchHistoryStatus: 'success',
 })
 
 const defaultPayload = () => ({
@@ -43,17 +43,17 @@ const defaultPayload = () => ({
         anonymousGrading: false,
         gradingType: 'points',
         muted: false,
-        name: 'Rustic Rubber Car'
+        name: 'Rustic Rubber Car',
       },
       grader: 'Ms. Casey',
       gradeAfter: '25',
       gradeBefore: '20',
       pointsPossibleBefore: '20',
       pointsPossibleAfter: '25',
-      student: 'Norman Osborne'
-    }
+      student: 'Norman Osborne',
+    },
   ],
-  link: parseLinkHeader(Fixtures.historyResponse().headers.link)
+  link: parseLinkHeader(Fixtures.historyResponse().headers.link),
 })
 
 test('returns the current state by default', () => {
@@ -64,13 +64,13 @@ test('returns the current state by default', () => {
 test('should handle FETCH_HISTORY_START', () => {
   const initialState = {
     ...defaultState(),
-    nextPage: null
+    nextPage: null,
   }
   const newState = {
     ...initialState,
     loading: true,
     items: null,
-    fetchHistoryStatus: 'started'
+    fetchHistoryStatus: 'started',
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_START}), newState)
 })
@@ -79,14 +79,14 @@ test('handles FETCH_HISTORY_SUCCESS', () => {
   const payload = defaultPayload()
   const initialState = {
     ...defaultState(),
-    fetchHistoryStatus: 'started'
+    fetchHistoryStatus: 'started',
   }
   const newState = {
     ...initialState,
     loading: false,
     nextPage: payload.link,
     items: payload.items,
-    fetchHistoryStatus: 'success'
+    fetchHistoryStatus: 'success',
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_SUCCESS, payload}), newState)
 })
@@ -94,13 +94,13 @@ test('handles FETCH_HISTORY_SUCCESS', () => {
 test('handles FETCH_HISTORY_FAILURE', () => {
   const initialState = {
     ...defaultState(),
-    fetchHistoryStatus: 'started'
+    fetchHistoryStatus: 'started',
   }
   const newState = {
     ...initialState,
     loading: false,
     nextPage: null,
-    fetchHistoryStatus: 'failure'
+    fetchHistoryStatus: 'failure',
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_FAILURE}), newState)
 })
@@ -111,7 +111,7 @@ test('handles FETCH_HISTORY_NEXT_PAGE_START', () => {
     ...initialState,
     fetchNextPageStatus: 'started',
     loading: true,
-    nextPage: null
+    nextPage: null,
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_START}), newState)
 })
@@ -128,16 +128,16 @@ test('handles FETCH_HISTORY_NEXT_PAGE_SUCCESS', () => {
         gradeBefore: '25',
         pointsPossibleBefore: '20',
         pointsPossibleAfter: '25',
-        student: 'Norman Osborne'
-      }
-    ]
+        student: 'Norman Osborne',
+      },
+    ],
   }
   const newState = {
     ...initialState,
     fetchNextPageStatus: 'success',
     items: initialState.items.concat(payload.items),
     loading: false,
-    nextPage: payload.link
+    nextPage: payload.link,
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_SUCCESS, payload}), newState)
 })
@@ -148,7 +148,7 @@ test('handles FETCH_HISTORY_NEXT_PAGE_FAILURE', () => {
     ...initialState,
     fetchNextPageStatus: 'failure',
     loading: false,
-    nextPage: null
+    nextPage: null,
   }
   deepEqual(reducer(initialState, {type: FETCH_HISTORY_NEXT_PAGE_FAILURE}), newState)
 })

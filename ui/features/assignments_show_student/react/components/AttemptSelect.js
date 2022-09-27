@@ -76,5 +76,5 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
 AttemptSelect.propTypes = {
   allSubmissions: PropTypes.arrayOf(Submission.shape).isRequired,
   onChangeSubmission: PropTypes.func.isRequired,
-  submission: Submission.shape.isRequired
+  submission: Submission.shape.isRequired,
 }

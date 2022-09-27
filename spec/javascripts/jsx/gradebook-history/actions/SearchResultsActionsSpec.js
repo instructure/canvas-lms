@@ -30,10 +30,10 @@ QUnit.module('SearchResultsActionsSpec getHistoryNextPage', {
       .returns(Promise.resolve(this.response))
 
     this.dispatchSpy = sandbox.spy(GradebookHistoryStore, 'dispatch')
-  }
+  },
 })
 
-test('dispatches fetchHistoryNextPageStart', function() {
+test('dispatches fetchHistoryNextPageStart', function () {
   const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageStart')
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))
   return promise.then(() => {
@@ -41,7 +41,7 @@ test('dispatches fetchHistoryNextPageStart', function() {
   })
 })
 
-test('dispatches fetchHistoryNextPageSuccess with response data and headers on success', function() {
+test('dispatches fetchHistoryNextPageSuccess with response data and headers on success', function () {
   const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageSuccess')
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))
   return promise.then(() => {
@@ -51,7 +51,7 @@ test('dispatches fetchHistoryNextPageSuccess with response data and headers on s
   })
 })
 
-test('dispatches fetchHistoryNextPageFailure on failure', function() {
+test('dispatches fetchHistoryNextPageFailure on failure', function () {
   this.getNextPageStub.returns(Promise.reject(new Error('FAIL')))
   const fetchSpy = sandbox.spy(HistoryActions, 'fetchHistoryNextPageFailure')
   const promise = this.dispatchSpy(SearchResultsActions.getHistoryNextPage('http://example.com'))

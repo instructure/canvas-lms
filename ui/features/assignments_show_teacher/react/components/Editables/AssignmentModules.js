@@ -38,7 +38,7 @@ const AssignmentModulesPropTypes = {
   onAddModule: func, // .isRequired TODO when support +Module,
   moduleList: arrayOf(ModuleShape),
   selectedModules: arrayOf(ModuleShape),
-  readOnly: bool
+  readOnly: bool,
 }
 
 // eslint doesn't deal with the prop types being defined this way
@@ -46,19 +46,19 @@ const AssignmentModulesPropTypes = {
 const AssignmentModulesDefaultProps = {
   moduleList: [],
   selectedModules: [],
-  readOnly: true
+  readOnly: true,
 }
 /* eslint-enable react/default-props-match-prop-types */
 
 class AssignmentModulesUI extends React.Component {
   static propTypes = {
     ...AssignmentModulesPropTypes,
-    isLoading: bool
+    isLoading: bool,
   }
 
   static defaultProps = {
     ...AssignmentModulesDefaultProps,
-    isLoading: false
+    isLoading: false,
   }
 
   modulePlaceholder = I18n.t('No Module Assigned')
@@ -66,7 +66,7 @@ class AssignmentModulesUI extends React.Component {
   handleModulesChange = selection => {
     const selectedModules = selection.map(s => ({
       lid: s.value,
-      name: s.label
+      name: s.label,
     }))
     this.props.onChange(selectedModules)
   }
@@ -181,7 +181,7 @@ const AssignmentModules = function (props) {
 
 AssignmentModules.propTypes = {
   ...AssignmentModulesPropTypes,
-  courseId: string.isRequired
+  courseId: string.isRequired,
 }
 
 AssignmentModules.defaultProps = AssignmentModulesDefaultProps
@@ -192,7 +192,7 @@ function depaginate(fetchMore, data) {
   if (data.course.modulesConnection.pageInfo.hasNextPage) {
     fetchMore({
       variables: {cursor: data.course.modulesConnection.pageInfo.endCursor},
-      updateQuery: mergeThePage
+      updateQuery: mergeThePage,
     })
     isLoading = true
   }

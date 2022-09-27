@@ -34,18 +34,18 @@ export default class Override extends React.Component {
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
     index: number.isRequired, // offset of this override in the assignment
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      expanded: false
+      expanded: false,
     }
   }
 

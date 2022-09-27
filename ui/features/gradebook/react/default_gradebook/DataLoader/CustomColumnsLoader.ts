@@ -39,7 +39,7 @@ export default class CustomColumnsLoader {
 
     const params = {
       include_hidden: true,
-      per_page: this._performanceControls.customColumnsPerPage
+      per_page: this._performanceControls.customColumnsPerPage,
     }
 
     return this._dispatch.getDepaginated(url, params).then(customColumns => {

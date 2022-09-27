@@ -35,7 +35,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape,
     open: bool.isRequired,
-    onClose: func.isRequired
+    onClose: func.isRequired,
   }
 
   constructor(...args) {
@@ -46,7 +46,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
       pointsThreshold: null,
       subject: '',
       body: '',
-      selectedStudents: []
+      selectedStudents: [],
     }
   }
 
@@ -58,7 +58,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
   messageStudentsWhoButtonProps = () => [
     {
       children: I18n.t('Cancel'),
-      onClick: this.props.onClose
+      onClick: this.props.onClose,
     },
     {
       children: I18n.t('Send'),
@@ -67,8 +67,8 @@ export default class MessageStudentsWhoDialog extends React.Component {
       disabled:
         this.state.subject.length === 0 ||
         this.state.body.length === 0 ||
-        this.state.selectedStudents.length === 0
-    }
+        this.state.selectedStudents.length === 0,
+    },
   ]
 
   findStudentsWith(submissionSelector) {
@@ -95,18 +95,18 @@ export default class MessageStudentsWhoDialog extends React.Component {
   handleNotSubmitted() {
     this.setState({
       subject: I18n.t('No submission for %{assignmentTitle}', {
-        assignmentTitle: this.props.assignment.name
+        assignmentTitle: this.props.assignment.name,
       }),
-      selectedStudents: this.findStudentsWith(submission => !hasSubmitted(submission))
+      selectedStudents: this.findStudentsWith(submission => !hasSubmitted(submission)),
     })
   }
 
   handleNotGraded() {
     this.setState({
       subject: I18n.t('No grade for %{assignmentTitle}', {
-        assignmentTitle: this.props.assignment.name
+        assignmentTitle: this.props.assignment.name,
       }),
-      selectedStudents: this.findStudentsWith(submission => submission.score == null)
+      selectedStudents: this.findStudentsWith(submission => submission.score == null),
     })
   }
 
@@ -114,11 +114,11 @@ export default class MessageStudentsWhoDialog extends React.Component {
     this.setState(state => ({
       subject: I18n.t('Scored less than %{score} on %{assignmentTitle}', {
         score: state.pointsThreshold ? state.pointsThreshold.toString() : 0,
-        assignmentTitle: this.props.assignment.name
+        assignmentTitle: this.props.assignment.name,
       }),
       selectedStudents: this.findStudentsWith(
         submission => submission.score != null && submission.score < state.pointsThreshold
-      )
+      ),
     }))
   }
 
@@ -126,11 +126,11 @@ export default class MessageStudentsWhoDialog extends React.Component {
     this.setState(state => ({
       subject: I18n.t('Scored more than %{score} on %{assignmentTitle}', {
         score: state.pointsThreshold ? state.pointsThreshold.toString() : 0,
-        assignmentTitle: this.props.assignment.name
+        assignmentTitle: this.props.assignment.name,
       }),
       selectedStudents: this.findStudentsWith(
         submission => submission.score != null && submission.score > state.pointsThreshold
-      )
+      ),
     }))
   }
 
@@ -157,7 +157,7 @@ export default class MessageStudentsWhoDialog extends React.Component {
       recipientLids: this.state.selectedStudents,
       subject: this.state.subject,
       body: this.state.body,
-      contextCode: `course_${this.props.assignment.course.lid}`
+      contextCode: `course_${this.props.assignment.course.lid}`,
     })
       .then(() => {
         showFlashAlert({message: I18n.t('Messages sent'), type: 'success'})

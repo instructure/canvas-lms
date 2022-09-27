@@ -25,13 +25,13 @@ const defaultStudents = [
   {id: '1', group_ids: ['1'], sections: ['1']},
   {id: '2', group_ids: ['2'], sections: ['1']},
   {id: '3', group_ids: ['2'], sections: ['2']},
-  {id: '4', group_ids: ['3'], sections: ['3']}
+  {id: '4', group_ids: ['3'], sections: ['3']},
 ]
 
 function createOverride({type, id, dueAt} = {}) {
   const override = {
     assignment_id: '1',
-    due_at: dueAt
+    due_at: dueAt,
   }
 
   if (type === 'student') {
@@ -52,14 +52,14 @@ QUnit.module(
       this.dates = {
         june: new Date('2009-06-03T02:57:42.000Z'),
         august: new Date('2009-08-03T02:57:42.000Z'),
-        october: new Date('2009-10-03T02:57:42.000Z')
+        october: new Date('2009-10-03T02:57:42.000Z'),
       }
 
       this.assignment = {due_at: null, only_visible_to_overrides: true}
       this.overrides = [
         createOverride({type: 'student', id: '1', dueAt: this.dates.june}),
         createOverride({type: 'section', id: '1', dueAt: this.dates.august}),
-        createOverride({type: 'group', id: '1', dueAt: this.dates.october})
+        createOverride({type: 'group', id: '1', dueAt: this.dates.october}),
       ]
 
       this.dueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(
@@ -67,7 +67,7 @@ QUnit.module(
         this.overrides,
         defaultStudents
       )
-    }
+    },
   }
 )
 
@@ -87,7 +87,7 @@ QUnit.module(
     setup() {
       this.dates = {
         june: new Date('2009-06-03T02:57:42.000Z'),
-        may: new Date('2009-05-03T02:57:42.000Z')
+        may: new Date('2009-05-03T02:57:42.000Z'),
       }
 
       this.assignment = {due_at: this.dates.may, only_visible_to_overrides: false}
@@ -98,7 +98,7 @@ QUnit.module(
         this.overrides,
         defaultStudents
       )
-    }
+    },
   }
 )
 
@@ -117,10 +117,10 @@ QUnit.module(
     setup() {
       this.assignment = {
         due_at: new Date('2009-05-03T02:57:42.000Z'),
-        only_visible_to_overrides: false
+        only_visible_to_overrides: false,
       }
       this.overrides = []
-    }
+    },
   }
 )
 
@@ -164,7 +164,7 @@ QUnit.module('AssignmentOverrideHelper#setStudentDisplayNames', () => {
   test('includes secondary info for students with matching names', () => {
     const students = [
       {name: 'John Doe', sis_user_id: '555'},
-      {name: 'John Doe', sis_user_id: '999'}
+      {name: 'John Doe', sis_user_id: '999'},
     ]
 
     AssignmentOverrideHelper.setStudentDisplayNames(students)
@@ -174,7 +174,7 @@ QUnit.module('AssignmentOverrideHelper#setStudentDisplayNames', () => {
   test('does not include secondary info for students without matching names', () => {
     const students = [
       {name: 'Johnny Doe', sis_user_id: '555'},
-      {name: 'John Doe', sis_user_id: '999'}
+      {name: 'John Doe', sis_user_id: '999'},
     ]
 
     AssignmentOverrideHelper.setStudentDisplayNames(students)
@@ -184,7 +184,7 @@ QUnit.module('AssignmentOverrideHelper#setStudentDisplayNames', () => {
   test('ignores punctuation, capitalization, and leading/trailing spaces when considering matches', () => {
     const students = [
       {name: ' j#ohn D&o!E', sis_user_id: '555'},
-      {name: 'John Doe ', sis_user_id: '999'}
+      {name: 'John Doe ', sis_user_id: '999'},
     ]
 
     AssignmentOverrideHelper.setStudentDisplayNames(students)
@@ -196,7 +196,7 @@ QUnit.module('AssignmentOverrideHelper#setStudentDisplayNames', () => {
       {name: 'John Doe', sis_user_id: '555', email: 'john555@example.com', login_id: 'john555'},
       {name: 'John Doe', sis_user_id: null, email: 'john999@example.com', login_id: 'john999'},
       {name: 'John Doe', sis_user_id: null, email: null, login_id: 'john222'},
-      {name: 'John Doe', sis_user_id: null, email: null, login_id: null}
+      {name: 'John Doe', sis_user_id: null, email: null, login_id: null},
     ]
 
     AssignmentOverrideHelper.setStudentDisplayNames(students)
@@ -204,7 +204,7 @@ QUnit.module('AssignmentOverrideHelper#setStudentDisplayNames', () => {
       'John Doe (555)',
       'John Doe (john999@example.com)',
       'John Doe (john222)',
-      'John Doe'
+      'John Doe',
     ])
   })
 })

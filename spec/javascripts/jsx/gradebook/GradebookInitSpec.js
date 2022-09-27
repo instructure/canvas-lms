@@ -19,7 +19,7 @@
 import _ from 'underscore'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -30,7 +30,7 @@ test('correctly loads initial colors', () => {
   const color = '#F3EFEA'
   equal(
     createGradebook({
-      colors: {late: color}
+      colors: {late: color},
     }).options.colors.late,
     color
   )
@@ -42,10 +42,10 @@ test('normalizes the grading period set from the env', () => {
       id: '1501',
       grading_periods: [
         {id: '701', weight: 50},
-        {id: '702', weight: 50}
+        {id: '702', weight: 50},
       ],
-      weighted: true
-    }
+      weighted: true,
+    },
   }
   const gradingPeriodSet = createGradebook(options).gradingPeriodSet
   deepEqual(gradingPeriodSet.id, '1501')
@@ -70,7 +70,7 @@ QUnit.module('Gradebook#initialize', () => {
 
     test('stores the late policy with camelized keys, if one exists', () => {
       const gradebook = createInitializedGradebook({
-        late_policy: {late_submission_interval: 'hour'}
+        late_policy: {late_submission_interval: 'hour'},
       })
       deepEqual(gradebook.courseContent.latePolicy, {lateSubmissionInterval: 'hour'})
     })
@@ -85,7 +85,7 @@ QUnit.module('Gradebook#initialize', () => {
 QUnit.module('Gradebook React Header Component References', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('#setHeaderComponentRef stores a reference by a column id', function () {
@@ -119,7 +119,7 @@ test('sets grading period set to null when not defined in the env', () => {
 test('when sections are loaded and there is no secondary info configured, set it to "section"', () => {
   const sections = [
     {id: 1, name: 'Section 1'},
-    {id: 2, name: 'Section 2'}
+    {id: 2, name: 'Section 2'},
   ]
   const gradebook = createGradebook({sections})
 
@@ -143,10 +143,10 @@ test('when zero sections are loaded and there is no secondary info configured, s
 test('when sections are loaded and there is secondary info configured, do not change it', () => {
   const sections = [
     {id: 1, name: 'Section 1'},
-    {id: 2, name: 'Section 2'}
+    {id: 2, name: 'Section 2'},
   ]
   const settings = {
-    student_column_secondary_info: 'login_id'
+    student_column_secondary_info: 'login_id',
   }
   const gradebook = createGradebook({sections, settings})
 
@@ -156,7 +156,7 @@ test('when sections are loaded and there is secondary info configured, do not ch
 test('when one section is loaded and there is secondary info configured, do not change it', () => {
   const sections = [{id: 1, name: 'Section 1'}]
   const settings = {
-    student_column_secondary_info: 'login_id'
+    student_column_secondary_info: 'login_id',
   }
   const gradebook = createGradebook({sections, settings})
 
@@ -166,7 +166,7 @@ test('when one section is loaded and there is secondary info configured, do not 
 test('when zero sections are loaded and there is secondary info configured, do not change it', () => {
   const sections = []
   const settings = {
-    student_column_secondary_info: 'login_id'
+    student_column_secondary_info: 'login_id',
   }
   const gradebook = createGradebook({sections, settings})
 
@@ -175,7 +175,7 @@ test('when zero sections are loaded and there is secondary info configured, do n
 
 test('sets the submission state map .hasGradingPeriods to true when a grading period set exists', () => {
   const gradebook = createGradebook({
-    grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]}
+    grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]},
   })
   strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true)
 })
@@ -185,8 +185,8 @@ test('sets the submission state map .selectedGradingPeriodID to the current grad
     id: '1501',
     grading_periods: [
       {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
-      {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
-    ]
+      {id: '702', title: 'Grading Period 2', startDate: new Date(2)},
+    ],
   }
   const gradebook = createGradebook({current_grading_period_id: '701', grading_period_set})
   strictEqual(gradebook.submissionStateMap.selectedGradingPeriodID, '701')

@@ -117,7 +117,7 @@ const ProcessGradebookUpload = {
         data.push({
           column_id: Number.parseInt(column.column_id, 10),
           user_id: studentId,
-          content: column.new_content
+          content: column.new_content,
         })
       })
     })
@@ -155,7 +155,7 @@ const ProcessGradebookUpload = {
     return Object.entries(scoresByGradingPeriod).map(([gradingPeriodId, scores]) => {
       const submittableScores = scores.map(score => ({
         override_score: score.new_score,
-        student_id: score.student_id
+        student_id: score.student_id,
       }))
       return this.createOverrideScoreRequest(gradingPeriodId, submittableScores)
     })
@@ -194,9 +194,9 @@ const ProcessGradebookUpload = {
         assignment: {
           name: assignment.title,
           points_possible: assignment.points_possible,
-          published: true
+          published: true,
         },
-        calculate_grades: false
+        calculate_grades: false,
       }),
       null,
       null,
@@ -260,7 +260,7 @@ const ProcessGradebookUpload = {
       gradeData[assignmentId][studentId] = {excuse: true}
     } else {
       gradeData[assignmentId][studentId] = {
-        posted_grade: submission.grade
+        posted_grade: submission.grade,
       }
     }
   },
@@ -279,7 +279,7 @@ const ProcessGradebookUpload = {
   goToGradebook() {
     $('#gradebook_grid_form').text(I18n.t('Done.'))
     window.location = ENV.gradebook_path
-  }
+  },
 }
 
 export default ProcessGradebookUpload

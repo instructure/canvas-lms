@@ -18,7 +18,7 @@
 
 import FakeServer, {
   formBodyFromRequest,
-  pathFromRequest
+  pathFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
@@ -28,7 +28,7 @@ QUnit.module('Gradebook', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     gradebookOptions = {
-      settings_update_url: '/api/v1/courses/1201/settings'
+      settings_update_url: '/api/v1/courses/1201/settings',
     }
   })
 
@@ -85,7 +85,7 @@ QUnit.module('Gradebook', suiteHooks => {
         excused: '#FEF7E5',
         late: '#E5F3FC',
         missing: '#FFE8E5',
-        resubmitted: '#E5F7E5'
+        resubmitted: '#E5F7E5',
       })
 
       test('can be set using an argument', async () => {

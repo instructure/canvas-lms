@@ -39,7 +39,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
     this.show = this.show.bind(this)
 
     this.state = {
-      open: false
+      open: false,
     }
 
     this.handlePostPolicyChanged = this.handlePostPolicyChanged.bind(this)
@@ -55,7 +55,7 @@ export default class AssignmentPostingPolicyTray extends PureComponent {
       ...context,
       open: true,
       requestInProgress: false,
-      selectedPostManually: context.assignment.postManually
+      selectedPostManually: context.assignment.postManually,
     })
   }
 

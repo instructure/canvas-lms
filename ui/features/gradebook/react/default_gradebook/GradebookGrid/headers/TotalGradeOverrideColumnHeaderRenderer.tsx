@@ -25,7 +25,7 @@ import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
 
 function getProps(options) {
   return {
-    ref: options.ref
+    ref: options.ref,
   }
 }
 

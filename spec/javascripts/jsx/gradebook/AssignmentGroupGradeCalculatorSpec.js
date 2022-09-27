@@ -28,7 +28,7 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with no submissions and n
   setup() {
     submissions = []
     assignmentGroup = {id: 301, rules: {}, assignments: [], group_weight: 100}
-  }
+  },
 })
 
 test('returns a current and final score of 0', () => {
@@ -61,17 +61,17 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with some assignments and
       {assignment_id: 202, score: 42},
       {assignment_id: 203, score: 14},
       {assignment_id: 204, score: 3},
-      {assignment_id: 205, score: null}
+      {assignment_id: 205, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
       {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
-  }
+  },
 })
 
 test('adds all scores for current and final grades', () => {
@@ -199,14 +199,14 @@ QUnit.module(
     setup() {
       submissions = [
         {assignment_id: 201, score: 10},
-        {assignment_id: 202, score: 10}
+        {assignment_id: 202, score: 10},
       ]
       assignments = [
         {id: 201, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-        {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
-    }
+    },
   }
 )
 
@@ -221,12 +221,12 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
     submissions = [
       {assignment_id: 201, score: 31},
       {assignment_id: 202, score: 17},
-      {assignment_id: 203, score: 6}
+      {assignment_id: 203, score: 6},
     ]
     assignments = [
       {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: '2201', rules: {drop_lowest: 1}, assignments}
   })
@@ -309,13 +309,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
       submissions = [
         {assignment_id: '2302', score: 2, excused: false, workflow_state: 'graded'},
         {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
-        {assignment_id: '2301', score: 2, excused: false, workflow_state: 'graded'}
+        {assignment_id: '2301', score: 2, excused: false, workflow_state: 'graded'},
       ]
 
       assignmentGroup.assignments = [
         {id: '2302', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
         {id: '2303', points_possible: 50, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
       ]
 
       // drop 2/10, keep 10/50, keep 2/10 = 12/60 = 50.0%
@@ -340,13 +340,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
         assignmentGroup.assignments = [
           {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
           {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
         ]
 
         submissions = [
           {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
           {assignment_id: '2302', score: 5, excused: false, workflow_state: 'graded'},
-          {assignment_id: '2301', score: 15, excused: false, workflow_state: 'graded'}
+          {assignment_id: '2301', score: 15, excused: false, workflow_state: 'graded'},
         ]
       })
 
@@ -366,13 +366,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule (set t
         assignmentGroup.assignments = [
           {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
           {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
         ]
 
         submissions = [
           {assignment_id: '2302', score: 10, excused: false, workflow_state: 'graded'},
           {assignment_id: '2301', score: 10, excused: false, workflow_state: 'graded'},
-          {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'}
+          {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
         ]
       })
 
@@ -396,17 +396,17 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_lowest" rule', {
       {assignment_id: 202, score: 42},
       {assignment_id: 203, score: 14},
       {assignment_id: 204, score: 3},
-      {assignment_id: 205, score: null}
+      {assignment_id: 205, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
       {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {drop_lowest: 2}, assignments}
-  }
+  },
 })
 
 test('drops multiple submissions to maximize overall percentage grade', () => {
@@ -485,12 +485,12 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
     submissions = [
       {assignment_id: 201, score: 31},
       {assignment_id: 202, score: 17},
-      {assignment_id: 203, score: 6}
+      {assignment_id: 203, score: 6},
     ]
     assignments = [
       {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {drop_highest: 1}, assignments}
   })
@@ -555,13 +555,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
       submissions = [
         {assignment_id: '2302', score: 2, excused: false, workflow_state: 'graded'},
         {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
-        {assignment_id: '2301', score: 2, excused: false, workflow_state: 'graded'}
+        {assignment_id: '2301', score: 2, excused: false, workflow_state: 'graded'},
       ]
 
       assignmentGroup.assignments = [
         {id: '2302', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
         {id: '2303', points_possible: 50, omit_from_final_grade: false, anonymize_students: false},
-        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {id: '2301', points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
       ]
 
       // drop 2/10, keep 10/50, keep 2/10 = 12/60 = 50.0%
@@ -586,13 +586,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
         assignmentGroup.assignments = [
           {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
           {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
         ]
 
         submissions = [
           {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
           {assignment_id: '2302', score: 15, excused: false, workflow_state: 'graded'},
-          {assignment_id: '2301', score: 5, excused: false, workflow_state: 'graded'}
+          {assignment_id: '2301', score: 5, excused: false, workflow_state: 'graded'},
         ]
       })
 
@@ -612,13 +612,13 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule (set 
         assignmentGroup.assignments = [
           {id: '2302', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
           {id: '2303', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+          {id: '2301', points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
         ]
 
         submissions = [
           {assignment_id: '2302', score: 10, excused: false, workflow_state: 'graded'},
           {assignment_id: '2303', score: 10, excused: false, workflow_state: 'graded'},
-          {assignment_id: '2301', score: 10, excused: false, workflow_state: 'graded'}
+          {assignment_id: '2301', score: 10, excused: false, workflow_state: 'graded'},
         ]
       })
 
@@ -642,17 +642,17 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "drop_highest" rule', {
       {assignment_id: 202, score: 42},
       {assignment_id: 203, score: 14},
       {assignment_id: 204, score: 30},
-      {assignment_id: 205, score: null}
+      {assignment_id: 205, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
       {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {drop_highest: 2}, assignments}
-  }
+  },
 })
 
 test('drops multiple submissions to minimize overall percentage grade', () => {
@@ -738,17 +738,17 @@ QUnit.module(
         {assignment_id: 202, score: 42},
         {assignment_id: 203, score: 14},
         {assignment_id: 204, score: 3},
-        {assignment_id: 205, score: null}
+        {assignment_id: 205, score: null},
       ]
       assignments = [
         {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
         {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
         {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
         {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
-        {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
+        {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false},
       ]
       assignmentGroup = {id: 301, rules: {drop_lowest: 1, drop_highest: 1}, assignments}
-    }
+    },
   }
 )
 
@@ -816,16 +816,16 @@ QUnit.module(
         {assignment_id: 201, score: 9},
         {assignment_id: 202, score: 9},
         {assignment_id: 203, score: 9},
-        {assignment_id: 204, score: 9}
+        {assignment_id: 204, score: 9},
       ]
       assignments = [
         {id: 201, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
         {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
         {id: 203, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-        {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+        {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
-    }
+    },
   }
 )
 
@@ -883,16 +883,16 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only unpointed assig
       {assignment_id: 201, score: 10},
       {assignment_id: 202, score: 5},
       {assignment_id: 203, score: 20},
-      {assignment_id: 204, score: 0}
+      {assignment_id: 204, score: 0},
     ]
     assignments = [
       {id: 201, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 0, omit_from_final_grade: false, anonymize_students: false}
+      {id: 204, points_possible: 0, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
-  }
+  },
 })
 
 test('drops the submission with the lowest score when drop_lowest is 1', () => {
@@ -923,15 +923,15 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate with only ungraded submis
     submissions = [
       {assignment_id: 201, score: null},
       {assignment_id: 202, score: null},
-      {assignment_id: 203, score: null}
+      {assignment_id: 203, score: null},
     ]
     assignments = [
       {id: 201, points_possible: 5, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
-      {id: 203, points_possible: 20, omit_from_final_grade: false, anonymize_students: false}
+      {id: 203, points_possible: 20, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {}, assignments}
-  }
+  },
 })
 
 test('sets current score as 0', () => {
@@ -957,16 +957,16 @@ QUnit.module('AssignmentGroupGradeCalculator.calculate "never_drop" rule', {
       {assignment_id: 201, score: 31},
       {assignment_id: 202, score: 19},
       {assignment_id: 203, score: 12},
-      {assignment_id: 204, score: 6}
+      {assignment_id: 204, score: 6},
     ]
     assignments = [
       {id: 201, points_possible: 40, omit_from_final_grade: false, anonymize_students: false},
       {id: 202, points_possible: 24, omit_from_final_grade: false, anonymize_students: false},
       {id: 203, points_possible: 16, omit_from_final_grade: false, anonymize_students: false},
-      {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false}
+      {id: 204, points_possible: 10, omit_from_final_grade: false, anonymize_students: false},
     ]
     assignmentGroup = {id: 301, rules: {never_drop: [204]}, assignments}
-  }
+  },
 })
 
 test('prevents submissions from being dropped for low scores', () => {
@@ -1091,39 +1091,39 @@ QUnit.module('AssignmentGroupGradeCalculator', () => {
     hooks.beforeEach(() => {
       submissions = [
         {id: 101, assignment_id: 201, score: 100},
-        {id: 102, assignment_id: 202, score: null}
+        {id: 102, assignment_id: 202, score: null},
       ]
       assignments = [
         {id: 201, points_possible: 100, workflow_state: 'published'},
-        {id: 202, points_possible: 100, workflow_state: 'unpublished'}
+        {id: 202, points_possible: 100, workflow_state: 'unpublished'},
       ]
       assignmentGroup = {id: 301, rules: {}, assignments}
     })
 
     test('does not include unpublished assignments in points possible for final score', () => {
       const {
-        final: {possible: finalPossible}
+        final: {possible: finalPossible},
       } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
       strictEqual(finalPossible, 100)
     })
 
     test('does not include unpublished assignments in points possible for current score', () => {
       const {
-        current: {possible: currentPossible}
+        current: {possible: currentPossible},
       } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
       strictEqual(currentPossible, 100)
     })
 
     test('does not include unpublished assignment in submission_count for final score', () => {
       const {
-        final: {submission_count: finalSubmissionCount}
+        final: {submission_count: finalSubmissionCount},
       } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
       strictEqual(finalSubmissionCount, 1)
     })
 
     test('does not include unpublished assignment in submission_count for current score', () => {
       const {
-        current: {submission_count: currentSubmissionCount}
+        current: {submission_count: currentSubmissionCount},
       } = AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup, true)
       strictEqual(currentSubmissionCount, 1)
     })

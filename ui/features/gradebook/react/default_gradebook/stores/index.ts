@@ -27,7 +27,7 @@ import type {FlashMessage} from '../gradebook.d'
 const defaultPerformanceControls = new PerformanceControls()
 
 const defaultDispatch = new RequestDispatch({
-  activeRequestLimit: defaultPerformanceControls.activeRequestLimit
+  activeRequestLimit: defaultPerformanceControls.activeRequestLimit,
 })
 
 type State = {
@@ -52,7 +52,7 @@ const store = create<GradebookStore>((set, get) => ({
 
   ...modules(set, get),
 
-  ...customColumns(set, get)
+  ...customColumns(set, get),
 }))
 
 export default store

@@ -272,7 +272,7 @@ const assignmentUtils = {
             '). '
           msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
           $.flashError(msg)
-        }
+        },
       })
       // if there is a naming conflict on the assignment that has an override with a date
       // that was just set AND the naming conflict is fixed we must also update the assignment
@@ -281,8 +281,8 @@ const assignmentUtils = {
       data = {
         assignment: {
           name: assignment.name,
-          due_at: assignment.due_at
-        }
+          due_at: assignment.due_at,
+        },
       }
       $.ajax(url, {
         type: 'PUT',
@@ -292,7 +292,7 @@ const assignmentUtils = {
           let msg = 'An error occurred saving assignment (' + assignment.id + '). '
           msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
           $.flashError(msg)
-        }
+        },
       })
     } else {
       // allows the validation process to determine when it has been updated and can display the correct page
@@ -301,8 +301,8 @@ const assignmentUtils = {
       var data = {
         assignment: {
           name: assignment.name,
-          due_at: assignment.due_at
-        }
+          due_at: assignment.due_at,
+        },
       }
       $.ajax(url, {
         type: 'PUT',
@@ -312,7 +312,7 @@ const assignmentUtils = {
           let msg = 'An error occurred saving assignment (' + assignment.id + '). '
           msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
           $.flashError(msg)
-        }
+        },
       })
     }
   },
@@ -339,9 +339,9 @@ const assignmentUtils = {
           'An error occurred posting grades for (' + selected.type + ' : ' + selected.id + '). '
         msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
         $.flashError(msg)
-      }
+      },
     })
-  }
+  },
 }
 
 export default assignmentUtils

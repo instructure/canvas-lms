@@ -21,7 +21,7 @@ import {fireEvent, waitFor} from '@testing-library/react'
 import {
   SAVE_ASSIGNMENT,
   COURSE_MODULES_QUERY_LOCAL,
-  COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
+  COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
 } from './assignmentData'
 
 // because our version of jsdom doesn't support elt.closest('a') yet. Should soon.
@@ -63,21 +63,21 @@ export function initialTeacherViewGQLMocks(courseId) {
     {
       request: {
         query: COURSE_MODULES_QUERY_LOCAL,
-        variables: {courseId}
+        variables: {courseId},
       },
       result: {
-        data: {}
-      }
+        data: {},
+      },
     },
     {
       request: {
         query: COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
-        variables: {courseId}
+        variables: {courseId},
       },
       result: {
-        data: {}
-      }
-    }
+        data: {},
+      },
+    },
   ]
 }
 
@@ -87,8 +87,8 @@ export function saveAssignmentResult(assignment, updates, response, errorMessage
       query: SAVE_ASSIGNMENT,
       variables: {
         id: assignment.lid,
-        ...updates
-      }
+        ...updates,
+      },
     },
     result: {
       data: {
@@ -106,11 +106,11 @@ export function saveAssignmentResult(assignment, updates, response, errorMessage
             pointsPossible: assignment.pointsPossible,
             state: assignment.state,
             assignmentOverrides: assignment.assignmentOverrides,
-            ...response
-          }
-        }
-      }
-    }
+            ...response,
+          },
+        },
+      },
+    },
   }
   if (errorMessage !== undefined) {
     result.error = new Error(errorMessage)
@@ -123,13 +123,13 @@ export function mockCourse(overrides) {
     lid: 'course-lid',
     assignmentGroupsConnection: {
       pageInfo: mockPageInfo(),
-      nodes: []
+      nodes: [],
     },
     modulesConnection: {
       pageInfo: mockPageInfo(),
-      nodes: []
+      nodes: [],
     },
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -139,7 +139,7 @@ export function mockPageInfo(overrides) {
     endCursor: 'endCursor',
     hasNextPage: false,
     hasPreviousPage: false,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -161,11 +161,11 @@ export function mockAssignment(overrides) {
     course: mockCourse(),
     modules: [
       {lid: '1', name: 'module 1'},
-      {lid: '2', name: 'module 2'}
+      {lid: '2', name: 'module 2'},
     ],
     assignmentGroup: {lid: '1', name: 'assignment group'},
     lockInfo: {
-      isLocked: false
+      isLocked: false,
     },
     submissionTypes: ['online_text_entry'],
     allowedExtensions: [],
@@ -174,13 +174,13 @@ export function mockAssignment(overrides) {
     onlyVisibleToOverrides: false,
     assignmentOverrides: {
       pageInfo: mockPageInfo(),
-      nodes: []
+      nodes: [],
     },
     submissions: {
       pageInfo: mockPageInfo(),
-      nodes: []
+      nodes: [],
     },
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -197,13 +197,13 @@ export function mockOverride(overrides = {}) {
     set: {
       __typename: 'Section',
       lid: '10',
-      sectionName: 'Section A'
+      sectionName: 'Section A',
     },
     // copied from assignment
     allowedAttempts: null,
     submissionTypes: [],
     allowedExtensions: [],
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -232,12 +232,12 @@ export function mockSubmission(overrides) {
         {
           attempt: 1,
           submittedAt: '2019-01-17T12:21:42Z',
-          score: 4
-        }
-      ]
+          score: 4,
+        },
+      ],
     },
     submissionDraft: null,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -251,7 +251,7 @@ export function mockUser(overrides) {
     sortableName: 'User, Juan',
     email: 'juan_user1@example.com',
     avatarUrl: 'http://host.test',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -264,7 +264,7 @@ export function itBehavesLikeADialog({
   // other functions will be wrapped in a wait* method and should not be async
   getOpenDialogElt,
   confirmDialogOpen,
-  getCancelDialogElt
+  getCancelDialogElt,
 }) {
   // skipped because the close tests regularly timeout in jenkins
   describe('behaves like a dialog', () => {

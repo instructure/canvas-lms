@@ -79,7 +79,7 @@ describe('GridColor', () => {
       '.slick-cell.editable .gradebook-cell.dropped { background-color: white; }',
       `.even .gradebook-cell.excused { background-color: ${defaultColors.yellow}; }`,
       `.odd .gradebook-cell.excused { background-color: ${darken(defaultColors.yellow, 5)}; }`,
-      '.slick-cell.editable .gradebook-cell.excused { background-color: white; }'
+      '.slick-cell.editable .gradebook-cell.excused { background-color: white; }',
     ].join('')
     expect(node.innerHTML).toContain(styleText)
   })

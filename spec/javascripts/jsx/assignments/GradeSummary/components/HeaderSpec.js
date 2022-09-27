@@ -40,19 +40,19 @@ QUnit.module('GradeSummary Header', suiteHooks => {
     clock = sinon.useFakeTimers()
     students = [
       {id: '1', displayName: 'Adam Jones'},
-      {id: '2', displayName: 'Larry Brown'}
+      {id: '2', displayName: 'Larry Brown'},
     ]
     grades = [
       {grade: '4', graderId: '1103', id: '34', score: 4, selected: true, studentId: '1'},
       {grade: '6', graderId: '1102', id: '35', score: 8, selected: false, studentId: '1'},
       {grade: '8', graderId: '1103', id: '36', score: 3, selected: true, studentId: '2'},
-      {grade: '10', graderId: '1102', id: '37', score: 9, selected: false, studentId: '2'}
+      {grade: '10', graderId: '1102', id: '37', score: 9, selected: false, studentId: '2'},
     ]
     fakeENV.setup({
       GRADERS: [
         {grader_name: 'Charlie Xi', id: '4502', user_id: '1103', grader_selectable: true},
-        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false}
-      ]
+        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false},
+      ],
     })
     storeEnv = {
       assignment: {
@@ -60,16 +60,16 @@ QUnit.module('GradeSummary Header', suiteHooks => {
         gradesPublished: false,
         id: '2301',
         muted: true,
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       currentUser: {
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {grader_name: 'Charlie Xi', id: '4502', user_id: '1103', grader_selectable: true},
-        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false}
-      ]
+        {grader_name: 'Betty Ford', id: '4501', user_id: '1102', grader_selectable: false},
+      ],
     }
   })
 

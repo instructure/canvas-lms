@@ -45,5 +45,5 @@ export default function LockedAssignment({assignment}) {
 }
 
 LockedAssignment.propTypes = {
-  assignment: Assignment.shape
+  assignment: Assignment.shape,
 }

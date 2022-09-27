@@ -61,7 +61,7 @@ QUnit.module('GradeCalculationHelper', () => {
     })
   })
 
-  QUnit.module('.sumBy()', (hooks) => {
+  QUnit.module('.sumBy()', hooks => {
     let collection
 
     hooks.beforeEach(() => {
@@ -110,7 +110,7 @@ QUnit.module('GradeCalculationHelper', () => {
     })
 
     test('avoids floating point calculation issues', () => {
-      collection = [7, 6.1, 7, 6.9, 6.27].map((price) => ({price}))
+      collection = [7, 6.1, 7, 6.9, 6.27].map(price => ({price}))
       // 7 + 6.1 + 7 + 6.9 + 6.27 === 33.269999999999996
       strictEqual(sumBy(collection, 'price'), 33.27)
     })

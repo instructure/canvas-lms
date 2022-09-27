@@ -34,10 +34,10 @@ Details.propTypes = {
   onChangeAssignment: func.isRequired,
   onValidate: func.isRequired,
   invalidMessage: func.isRequired,
-  readOnly: bool
+  readOnly: bool,
 }
 Details.defaultProps = {
-  readOnly: false
+  readOnly: false,
 }
 
 export default function Details(props) {

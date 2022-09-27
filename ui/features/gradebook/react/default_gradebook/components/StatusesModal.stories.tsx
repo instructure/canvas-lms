@@ -29,10 +29,10 @@ export default {
       excused: '#E5F7E5',
       late: '#F3EFEA',
       missing: '#FEF7E5',
-      resubmitted: '#E5F7F6'
+      resubmitted: '#E5F7F6',
     },
-    afterUpdateStatusColors: () => {}
-  }
+    afterUpdateStatusColors: () => {},
+  },
 }
 
 function openStatusesModalRef(modal) {

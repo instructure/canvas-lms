@@ -60,7 +60,7 @@ describe('StudentFooter', () => {
       {key: 'item1', element: <div data-testid="child-item">item 1</div>},
       {key: 'item2', element: <div data-testid="child-item">item 2</div>},
       {key: 'item3', element: <div data-testid="child-item">item 3</div>},
-      {key: 'item4', element: <div data-testid="child-item">item 4</div>}
+      {key: 'item4', element: <div data-testid="child-item">item 4</div>},
     ]
 
     previousModule = null
@@ -71,7 +71,7 @@ describe('StudentFooter', () => {
       'item 1',
       'item 2',
       'item 3',
-      'item 4'
+      'item 4',
     ])
   })
 

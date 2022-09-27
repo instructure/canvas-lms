@@ -24,20 +24,20 @@ export default {
   component: LatePolicyGrade,
   args: {
     assignment: {
-      pointsPossible: 100
+      pointsPossible: 100,
     },
     enterGradesAs: 'points',
     gradingScheme: [
       ['A', 90],
       ['B', 80],
-      ['C', 70]
+      ['C', 70],
     ],
     submission: {
       grade: 'B',
       score: 85,
-      pointsDeducted: 10
-    }
-  }
+      pointsDeducted: 10,
+    },
+  },
 }
 
 const Template = args => <LatePolicyGrade {...args} />

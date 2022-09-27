@@ -34,7 +34,7 @@ const I18n = useI18nScope('assignments_2')
 const ENROLLMENT_STRINGS = {
   StudentEnrollment: I18n.t('Student'),
   TeacherEnrollment: I18n.t('Teacher'),
-  TaEnrollment: I18n.t('TA')
+  TaEnrollment: I18n.t('TA'),
 }
 
 function formatAssessor(assessor) {
@@ -104,5 +104,5 @@ RubricTab.propTypes = {
   proficiencyRatings: arrayOf(ProficiencyRating.shape),
   rubric: Rubric.shape,
   rubricAssociation: RubricAssociation.shape,
-  peerReviewModeEnabled: bool
+  peerReviewModeEnabled: bool,
 }

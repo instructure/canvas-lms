@@ -19,7 +19,7 @@
 import {arrayOf, shape} from 'prop-types'
 import {
   Assignment,
-  AssignmentSubmissionsConnection
+  AssignmentSubmissionsConnection,
 } from '@canvas/assignments/graphql/student/Assignment'
 import React from 'react'
 import StudentContent from './StudentContent'
@@ -43,7 +43,7 @@ function makeDummyNextSubmission(submission) {
     submissionDraft: submission.submissionDraft,
     submissionStatus: 'unsubmitted',
     submittedAt: null,
-    unreadCommentCount: 0
+    unreadCommentCount: 0,
   }
 }
 
@@ -77,27 +77,27 @@ class ViewManager extends React.Component {
   static propTypes = {
     initialQueryData: shape({
       ...Assignment.shape.propTypes,
-      ...AssignmentSubmissionsConnection.shape.propTypes
+      ...AssignmentSubmissionsConnection.shape.propTypes,
     }),
     // eslint-disable-next-line react/no-unused-prop-types
     submissionHistoriesQueryData: shape({
       submissionHistoriesConnection: shape({
-        nodes: arrayOf(Submission.shape)
-      })
-    })
+        nodes: arrayOf(Submission.shape),
+      }),
+    }),
   }
 
   state = {
     displayedAttempt: null,
     dummyNextSubmission: null,
-    submissions: []
+    submissions: [],
   }
 
   static getDerivedStateFromProps(props, state) {
     const prevState = state
     const nextState = {
       ...prevState,
-      submissions: getAllSubmissions(props)
+      submissions: getAllSubmissions(props),
     }
 
     // Case where there are no submissions (user not logged in on public course)
@@ -208,7 +208,7 @@ class ViewManager extends React.Component {
         const dummyNextSubmission = makeDummyNextSubmission(this.getLatestSubmission(opts))
         return {
           dummyNextSubmission,
-          displayedAttempt: dummyNextSubmission.attempt
+          displayedAttempt: dummyNextSubmission.attempt,
         }
       },
       () => {
@@ -232,7 +232,7 @@ class ViewManager extends React.Component {
 
       return {
         displayedAttempt: submissions[submissions.length - 1].attempt,
-        dummyNextSubmission: null
+        dummyNextSubmission: null,
       }
     })
   }
@@ -257,7 +257,7 @@ class ViewManager extends React.Component {
           showDraftAction: () => {
             this.onChangeSubmission(this.getLatestSubmission().attempt)
           },
-          startNewAttemptAction: this.onStartNewAttempt
+          startNewAttemptAction: this.onStartNewAttempt,
         }}
       >
         <StudentContent

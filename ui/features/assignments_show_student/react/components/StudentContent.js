@@ -86,7 +86,7 @@ function SubmissionlessFooter({onMarkAsDoneError}) {
           onError={onMarkAsDoneError}
         />
       ),
-      key: 'mark-as-done'
+      key: 'mark-as-done',
     })
   }
 
@@ -104,7 +104,7 @@ function renderAttemptsAndAvailability({assignment, submission}) {
             {
               zero: 'Unlimited Attempts Allowed',
               one: '1 Attempt Allowed',
-              other: '%{count} Attempts Allowed'
+              other: '%{count} Attempts Allowed',
             },
             {count: totalAllowedAttempts({assignment, submission}) || 0}
           )}
@@ -179,7 +179,7 @@ function StudentContent(props) {
     const setUpImmersiveReader = async () => {
       const mountPoints = [
         document.getElementById('immersive_reader_mount_point'),
-        document.getElementById('immersive_reader_mobile_mount_point')
+        document.getElementById('immersive_reader_mobile_mount_point'),
       ].filter(element => element != null)
 
       if (mountPoints.length === 0) {
@@ -192,7 +192,7 @@ function StudentContent(props) {
             ImmersiveReader.initializeReaderButton(mountPoint, {
               content: () =>
                 description || I18n.t('No additional details were added for this assignment.'),
-              title: name
+              title: name,
             })
           })
         })
@@ -225,11 +225,11 @@ StudentContent.propTypes = {
   assignment: Assignment.shape,
   onChangeSubmission: PropTypes.func.isRequired,
   submission: Submission.shape,
-  reviewerSubmission: Submission.shape
+  reviewerSubmission: Submission.shape,
 }
 
 StudentContent.defaultProps = {
-  reviewerSubmission: null
+  reviewerSubmission: null,
 }
 
 export default StudentContent

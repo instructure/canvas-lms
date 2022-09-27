@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import StudentFirstNameColumnHeader from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentFirstNameColumnHeader'
 import StudentFirstNameColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/StudentFirstNameColumnHeaderRenderer'
@@ -39,7 +39,7 @@ QUnit.module('GradebookGrid StudentFirstNameColumnHeaderRenderer', suiteHooks =>
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -51,7 +51,7 @@ QUnit.module('GradebookGrid StudentFirstNameColumnHeaderRenderer', suiteHooks =>
 
     gradebook = createGradebook({
       login_handle_name: 'a_jones',
-      sis_name: 'Example SIS'
+      sis_name: 'Example SIS',
     })
     sinon.stub(gradebook, 'saveSettings')
     renderer = new StudentFirstNameColumnHeaderRenderer(gradebook)
@@ -64,7 +64,10 @@ QUnit.module('GradebookGrid StudentFirstNameColumnHeaderRenderer', suiteHooks =>
   QUnit.module('#render()', () => {
     test('renders the StudentFirstNameColumnHeader to the given container node', () => {
       render()
-      ok($container.innerText.includes('Student First Name'), 'the "Student First Name" header is rendered')
+      ok(
+        $container.innerText.includes('Student First Name'),
+        'the "Student First Name" header is rendered'
+      )
     })
 
     test('calls the "ref" callback option with the component reference', () => {

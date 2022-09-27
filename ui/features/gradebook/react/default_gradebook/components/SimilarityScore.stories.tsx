@@ -25,8 +25,8 @@ export default {
   args: {
     hasAdditionalData: true,
     reportUrl: 'http://url.com',
-    similarityScore: 50
-  }
+    similarityScore: 50,
+  },
 }
 
 const Template = args => <SimilarityScore {...args} />
@@ -35,9 +35,9 @@ export const Error = Template.bind({})
 export const Pending = Template.bind({})
 
 Error.args = {
-  status: 'error'
+  status: 'error',
 }
 
 Pending.args = {
-  status: 'pending'
+  status: 'pending',
 }

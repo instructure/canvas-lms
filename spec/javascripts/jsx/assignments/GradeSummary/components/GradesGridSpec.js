@@ -32,16 +32,16 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
       anonymousStudents: false,
       assignment: {
         courseId: '1201',
-        id: '2301'
+        id: '2301',
       },
       disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
+        {graderId: '1102', graderName: 'Mr. Keating'},
       ],
       grades: {
         1111: {
@@ -51,7 +51,7 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
             id: '4601',
             score: 10,
             selected: false,
-            studentId: '1111'
+            studentId: '1111',
           },
           1102: {
             grade: 'B',
@@ -59,8 +59,8 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
             id: '4602',
             score: 8.9,
             selected: false,
-            studentId: '1111'
-          }
+            studentId: '1111',
+          },
         },
         1112: {
           1102: {
@@ -69,8 +69,8 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
             id: '4603',
             score: 7.8,
             selected: false,
-            studentId: '1112'
-          }
+            studentId: '1112',
+          },
         },
         1113: {
           1101: {
@@ -79,9 +79,9 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
             id: '4604',
             score: 10,
             selected: false,
-            studentId: '1113'
-          }
-        }
+            studentId: '1113',
+          },
+        },
       },
       onGradeSelect() {},
       selectProvisionalGradeStatuses: {},
@@ -89,8 +89,8 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
         {id: '1111', displayName: 'Adam Jones'},
         {id: '1112', displayName: 'Betty Ford'},
         {id: '1113', displayName: 'Charlie Xi'},
-        {id: '1114', displayName: 'Dana Smith'}
-      ]
+        {id: '1114', displayName: 'Dana Smith'},
+      ],
     }
   })
 
@@ -179,7 +179,10 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     mountComponent()
     const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
     const expectedUrls = props.students.map(student => speedGraderUrlFor(student.id))
-    deepEqual(links.map(link => link.prop('href')), expectedUrls)
+    deepEqual(
+      links.map(link => link.prop('href')),
+      expectedUrls
+    )
   })
 
   test('enumerates students for names when students are anonymous', () => {
@@ -195,7 +198,10 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
     mountComponent()
     const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
     const expectedUrls = props.students.map(student => speedGraderUrlFor(student.id, true))
-    deepEqual(links.map(link => link.prop('href')), expectedUrls)
+    deepEqual(
+      links.map(link => link.prop('href')),
+      expectedUrls
+    )
   })
 
   test('sorts students by id when students are anonymous', () => {
@@ -203,14 +209,17 @@ QUnit.module('GradeSummary GradesGrid', suiteHooks => {
       {id: 'fp312', displayName: 'Adam Jones'},
       {id: 'BB811', displayName: 'Betty Ford'},
       {id: 'x9X23', displayName: 'Charlie Xi'},
-      {id: 'G234a', displayName: 'Dana Smith'}
+      {id: 'G234a', displayName: 'Dana Smith'},
     ]
     props.anonymousStudents = true
     mountComponent()
     const links = wrapper.find('th.GradesGrid__BodyRowHeader a')
     const sortedStudentIds = ['BB811', 'G234a', 'fp312', 'x9X23']
     const expectedUrls = sortedStudentIds.map(id => speedGraderUrlFor(id, true))
-    deepEqual(links.map(link => link.prop('href')), expectedUrls)
+    deepEqual(
+      links.map(link => link.prop('href')),
+      expectedUrls
+    )
   })
 
   test('enumerates additional students for names as they are added', () => {

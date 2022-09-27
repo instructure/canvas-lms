@@ -31,7 +31,7 @@ function defaultProps(props = {}) {
     colorPickerContentRef() {},
     colorPickerAfterClose() {},
     afterSetColor() {},
-    ...props
+    ...props,
   }
 }
 
@@ -43,7 +43,7 @@ QUnit.module('StatusColorListItem', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('color is passed to ColorPicker', function () {

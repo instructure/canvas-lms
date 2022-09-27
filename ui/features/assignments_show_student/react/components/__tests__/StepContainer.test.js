@@ -70,10 +70,10 @@ describe('the assignment is unavailable', () => {
     const props = await mockAssignmentAndSubmission({
       Submission: {
         submissionDraft: {
-          meetsAssignmentCriteria: true
-        }
+          meetsAssignmentCriteria: true,
+        },
       },
-      LockInfo: {isLocked: true}
+      LockInfo: {isLocked: true},
     })
     const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
     verifySteps(
@@ -119,7 +119,7 @@ describe('the assignment is available', () => {
 describe('the assignment is uploaded', () => {
   it('will render the uploaded state tracker with all appropriate steps', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
     const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('uploaded-step-container'), uploadedSteps, getByText)
@@ -127,7 +127,7 @@ describe('the assignment is uploaded', () => {
 
   it('will render the uploaded state tracker if an assignment is not submitted', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
     const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('uploaded-step-container')).toBeInTheDocument()

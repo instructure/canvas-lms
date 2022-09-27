@@ -27,17 +27,17 @@ import type {PerformanceControlValues} from './gradebook.d'
 const DEFAULTS = {
   activeRequestLimit: 12,
   apiMaxPerPage: 100,
-  submissionsChunkSize: 10
+  submissionsChunkSize: 10,
 }
 
 const MINIMUMS = {
   activeRequestLimit: 1,
-  perPage: 1
+  perPage: 1,
 }
 
 const MAXIMUMS = {
   activeRequestLimit: 100,
-  apiMaxPerPage: 500
+  apiMaxPerPage: 500,
 }
 
 function integerBetween(value, min: number, max: number, defaultValue: number) {

@@ -45,7 +45,7 @@ export default function CommentRow(props) {
         src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
         label: track.locale,
         type: track.kind,
-        language: track.locale
+        language: track.locale,
       }
     })
   }
@@ -98,5 +98,5 @@ export default function CommentRow(props) {
 }
 
 CommentRow.propTypes = {
-  comment: SubmissionComment.shape.isRequired
+  comment: SubmissionComment.shape.isRequired,
 }

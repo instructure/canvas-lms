@@ -29,12 +29,12 @@ export default class TextGradeInput extends PureComponent {
     gradeInfo: gradeInfo.isRequired,
     label: element.isRequired,
     messages: messages.isRequired,
-    pendingGradeInfo: gradeInfo
+    pendingGradeInfo: gradeInfo,
   }
 
   static defaultProps = {
     disabled: false,
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {
@@ -48,7 +48,7 @@ export default class TextGradeInput extends PureComponent {
 
     this.state = {
       gradeInfo: effectiveGradeInfo,
-      inputValue: gradeEntry.formatGradeInfoForInput(effectiveGradeInfo)
+      inputValue: gradeEntry.formatGradeInfoForInput(effectiveGradeInfo),
     }
   }
 
@@ -58,7 +58,7 @@ export default class TextGradeInput extends PureComponent {
 
       this.setState({
         gradeInfo: nextInfo,
-        inputValue: nextProps.gradeEntry.formatGradeInfoForInput(nextInfo)
+        inputValue: nextProps.gradeEntry.formatGradeInfoForInput(nextInfo),
       })
     }
   }
@@ -79,7 +79,7 @@ export default class TextGradeInput extends PureComponent {
   handleTextChange(event) {
     this.setState({
       gradeInfo: this.props.gradeEntry.parseValue(event.target.value),
-      inputValue: event.target.value
+      inputValue: event.target.value,
     })
   }
 

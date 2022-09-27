@@ -19,7 +19,7 @@
 import fakeENV from 'helpers/fakeENV'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import SlickGridSpecHelper from './GradebookGrid/GridSupport/SlickGridSpecHelper'
 
@@ -36,9 +36,14 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
   function createGradebookWithAllFilters(options = {}) {
     gradebook = createGradebook({
       settings: {
-        selected_view_options_filters: ['assignmentGroups', 'modules', 'gradingPeriods', 'sections']
+        selected_view_options_filters: [
+          'assignmentGroups',
+          'modules',
+          'gradingPeriods',
+          'sections',
+        ],
       },
-      ...options
+      ...options,
     })
     sinon
       .stub(gradebook, 'saveSettings')
@@ -49,14 +54,14 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
     contextModules = [
       {id: '2601', position: 3, name: 'Final Module'},
       {id: '2602', position: 2, name: 'Second Module'},
-      {id: '2603', position: 1, name: 'First Module'}
+      {id: '2603', position: 1, name: 'First Module'},
     ]
   }
 
   function createCustomColumns() {
     customColumns = [
       {id: '2401', teacher_notes: true, title: 'Notes'},
-      {id: '2402', teacher_notes: false, title: 'Other Notes'}
+      {id: '2402', teacher_notes: false, title: 'Other Notes'},
     ]
   }
 
@@ -77,7 +82,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
           points_possible: null,
           position: 1,
           published: true,
-          submission_types: ['online_text_entry']
+          submission_types: ['online_text_entry'],
         },
         {
           id: '2303',
@@ -93,8 +98,8 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
           points_possible: 15,
           position: 2,
           published: true,
-          submission_types: ['online_text_entry']
-        }
+          submission_types: ['online_text_entry'],
+        },
       ],
 
       quizzes: [
@@ -112,7 +117,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
           points_possible: 10,
           position: 1,
           published: true,
-          submission_types: ['online_quiz']
+          submission_types: ['online_quiz'],
         },
         {
           id: '2304',
@@ -128,16 +133,16 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
           points_possible: 20,
           position: 2,
           published: true,
-          submission_types: ['online_quiz']
-        }
-      ]
+          submission_types: ['online_quiz'],
+        },
+      ],
     }
   }
 
   function createAssignmentGroups() {
     assignmentGroups = [
       {id: '2201', position: 2, name: 'Homework', assignments: assignments.homework},
-      {id: '2202', position: 1, name: 'Quizzes', assignments: assignments.quizzes}
+      {id: '2202', position: 1, name: 'Quizzes', assignments: assignments.quizzes},
     ]
   }
 
@@ -181,7 +186,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
     setFixtureHtml($fixture)
 
     fakeENV.setup({
-      current_user_id: '1101'
+      current_user_id: '1101',
     })
 
     createAssignments()
@@ -217,7 +222,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -230,7 +235,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2302',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -246,7 +251,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -260,7 +265,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2302',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -276,7 +281,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       setShowUnpublishedAssignments(true)
       addData()
@@ -297,7 +302,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       setShowUnpublishedAssignments(true)
       addData()
@@ -311,7 +316,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_group_2201',
         'assignment_2301',
         'assignment_group_2202',
-        'assignment_2302'
+        'assignment_2302',
       ]
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
@@ -338,7 +343,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -351,7 +356,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -367,7 +372,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
       'assignment_2302',
       'assignment_group_2201',
       'assignment_group_2202',
-      'total_grade'
+      'total_grade',
     ]
     deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
   })
@@ -387,7 +392,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -400,7 +405,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -415,7 +420,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -428,7 +433,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -444,7 +449,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)
@@ -457,7 +462,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_group_2201',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
@@ -473,7 +478,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)
@@ -491,9 +496,9 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
           display_totals_for_all_grading_periods: true,
           grading_periods: [
             {id: '1401', title: 'GP1'},
-            {id: '1402', title: 'GP2'}
-          ]
-        }
+            {id: '1402', title: 'GP2'},
+          ],
+        },
       })
     })
 
@@ -507,7 +512,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -521,7 +526,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -536,7 +541,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -549,7 +554,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -562,7 +567,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2301',
         'assignment_2302',
         'assignment_2303',
-        'assignment_2304'
+        'assignment_2304',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -575,7 +580,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2301',
         'assignment_2302',
         'assignment_2303',
-        'assignment_2304'
+        'assignment_2304',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -591,7 +596,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)
@@ -604,7 +609,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_group_2201',
         'assignment_2303',
         'assignment_group_2202',
-        'assignment_2302'
+        'assignment_2302',
       ]
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
@@ -620,7 +625,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)
@@ -645,7 +650,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -658,7 +663,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -673,7 +678,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2304',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -685,7 +690,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2302',
         'assignment_group_2201',
         'assignment_group_2202',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gridSpecHelper.listScrollableColumnIds().sort(), expectedColumns)
     })
@@ -701,7 +706,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)
@@ -714,7 +719,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_group_2201',
         'assignment_2301',
         'assignment_2303',
-        'assignment_group_2202'
+        'assignment_group_2202',
       ]
       deepEqual(gridSpecHelper.listColumnIds(), expectedColumns)
     })
@@ -730,7 +735,7 @@ QUnit.module('Gradebook Grid Column Filtering', suiteHooks => {
         'assignment_2303',
         'assignment_group_2202',
         'assignment_2302',
-        'assignment_2304'
+        'assignment_2304',
       ]
       addData()
       gridSpecHelper.updateColumnOrder(customOrder)

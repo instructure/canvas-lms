@@ -34,27 +34,27 @@ const I18n = useI18nScope('gradebook')
 const themeOverrides = {
   [Button.theme]: {
     iconPadding: '0 3px',
-    smallHeight: '23px'
+    smallHeight: '23px',
   },
   [TextInput.theme]: {
-    smallHeight: '27px'
-  }
+    smallHeight: '27px',
+  },
 }
 
 export default class AssignmentRowCell extends Component {
   static propTypes = {
     assignment: shape({
       id: string.isRequired,
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     editorOptions: shape({
       column: shape({
-        assignmentId: string.isRequired
+        assignmentId: string.isRequired,
       }).isRequired,
       grid: shape({}).isRequired,
       item: shape({
-        id: string.isRequired
-      }).isRequired
+        id: string.isRequired,
+      }).isRequired,
     }).isRequired,
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
     gradingScheme: instanceOf(Array).isRequired,
@@ -65,7 +65,7 @@ export default class AssignmentRowCell extends Component {
       excused: bool.isRequired,
       grade: string,
       score: number,
-      valid: bool.isRequired
+      valid: bool.isRequired,
     }),
     submission: shape({
       assignmentId: string.isRequired,
@@ -75,15 +75,15 @@ export default class AssignmentRowCell extends Component {
       id: string,
       similarityInfo: shape({
         similarityScore: number,
-        status: string.isRequired
+        status: string.isRequired,
       }),
-      userId: string.isRequired
+      userId: string.isRequired,
     }).isRequired,
-    submissionIsUpdating: bool.isRequired
+    submissionIsUpdating: bool.isRequired,
   }
 
   static defaultProps = {
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {

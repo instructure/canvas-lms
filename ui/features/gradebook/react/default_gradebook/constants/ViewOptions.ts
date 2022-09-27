@@ -25,9 +25,9 @@ export const filterLabels = {
   gradingPeriods: I18n.t('Grading Periods'),
   modules: I18n.t('Modules'),
   sections: I18n.t('Sections'),
-  studentGroups: I18n.t('Student Groups')
+  studentGroups: I18n.t('Student Groups'),
 }
 
 export default {
-  filterLabels
+  filterLabels,
 }

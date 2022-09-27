@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import HideAssignmentGradesTray from '@canvas/hide-assignment-grades-tray'
@@ -105,26 +105,26 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         omit_from_final_grade: false,
         points_possible: 10,
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       }
       submission = {
         assignment_id: '2301',
         has_postable_comments: true,
         posted_at: new Date().toISOString(),
         score: 1.0,
-        workflow_state: 'graded'
+        workflow_state: 'graded',
       }
       const student = {
         name: 'John Doe',
         assignment_2301: submission,
-        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
+        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}],
       }
 
       gradebook.setAssignments({2301: assignment})
       gradebook.gotChunkOfStudents([student])
       gradebook.setSections([
         {id: '2001', name: 'Hogwarts'},
-        {id: '2002', name: 'Freshmen'}
+        {id: '2002', name: 'Freshmen'},
       ])
 
       sandbox
@@ -179,7 +179,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const [{sections}] = HideAssignmentGradesTray.prototype.show.lastCall.args
       deepEqual(sections, [
         {id: '2001', name: 'Hogwarts'},
-        {id: '2002', name: 'Freshmen'}
+        {id: '2002', name: 'Freshmen'},
       ])
     })
 
@@ -191,8 +191,8 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
           hasPostableComments: true,
           postedAt: submission.posted_at,
           score: '1',
-          workflowState: 'graded'
-        }
+          workflowState: 'graded',
+        },
       ])
     })
 
@@ -213,12 +213,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
           name: 'John Doe',
           assignment_2301: {assignment_id: '2301', user_id: '1101'},
           enrollments: [{type: 'StudentEnrollment'}],
-          id: '1101'
+          id: '1101',
         }
         postedOrHiddenInfo = {
           assignmentId: '2301',
           postedAt: null,
-          userIds: ['1101']
+          userIds: ['1101'],
         }
 
         gradebook.gotChunkOfStudents([student])
@@ -281,26 +281,26 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         course_id: '1201',
         grades_published: true,
         id: '2301',
-        name: 'Math 1.1'
+        name: 'Math 1.1',
       }
       submission = {
         assignment_id: '2301',
         has_postable_comments: true,
         posted_at: new Date().toISOString(),
         score: 1.0,
-        workflow_state: 'graded'
+        workflow_state: 'graded',
       }
       const student = {
         name: 'John Doe',
         assignment_2301: submission,
-        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}]
+        enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}],
       }
 
       gradebook.setAssignments({2301: assignment})
       gradebook.gotChunkOfStudents([student])
       gradebook.setSections([
         {id: '2001', name: 'Hogwarts'},
-        {id: '2002', name: 'Freshmen'}
+        {id: '2002', name: 'Freshmen'},
       ])
 
       sandbox
@@ -355,7 +355,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
       const [{sections}] = PostAssignmentGradesTray.prototype.show.lastCall.args
       deepEqual(sections, [
         {id: '2001', name: 'Hogwarts'},
-        {id: '2002', name: 'Freshmen'}
+        {id: '2002', name: 'Freshmen'},
       ])
     })
 
@@ -367,8 +367,8 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
           hasPostableComments: true,
           postedAt: submission.posted_at,
           score: '1',
-          workflowState: 'graded'
-        }
+          workflowState: 'graded',
+        },
       ])
     })
 
@@ -400,12 +400,12 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
           name: 'John Doe',
           assignment_2301: {assignment_id: '2301', user_id: '1101'},
           enrollments: [{type: 'StudentEnrollment'}],
-          id: '1101'
+          id: '1101',
         }
         postedOrHiddenInfo = {
           assignmentId: '2301',
           postedAt: new Date(),
-          userIds: ['1101']
+          userIds: ['1101'],
         }
 
         gradebook.gotChunkOfStudents([student])
@@ -474,7 +474,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         points_possible: 10,
         post_manually: true,
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       }
       gradebook.setAssignments({2301: assignment})
 
@@ -628,7 +628,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         points_possible: 10,
         post_manually: false,
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       }
 
       const assignment2 = {
@@ -644,7 +644,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
         points_possible: 10,
         post_manually: false,
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       }
 
       gradebook.setAssignments({2301: assignment1, 2302: assignment2})
@@ -653,7 +653,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     test('updates the post_manually values for assignments given in assignmentPostPoliciesById', () => {
       const assignmentPostPoliciesById = {
         2301: {postManually: true},
-        2302: {postManually: true}
+        2302: {postManually: true},
       }
 
       postPolicies.setAssignmentPostPolicies({assignmentPostPoliciesById})

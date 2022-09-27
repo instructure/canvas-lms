@@ -43,7 +43,7 @@ function labelForGradeInfo(gradeInfo) {
   return (
     {
       complete: I18n.t('Complete'),
-      incomplete: I18n.t('Incomplete')
+      incomplete: I18n.t('Incomplete'),
     }[gradeInfo.grade] || I18n.t('Ungraded')
   )
 }
@@ -64,7 +64,7 @@ export default function CompleteIncompleteGradeInput(props) {
     return (
       {
         complete: 'complete',
-        incomplete: 'incomplete'
+        incomplete: 'incomplete',
       }[optionId] || null
     )
   }
@@ -77,7 +77,7 @@ export default function CompleteIncompleteGradeInput(props) {
   }
 
   const selectProps = {
-    inputValue: anonymizeStudents ? '' : labelForGradeInfo(gradeInfo)
+    inputValue: anonymizeStudents ? '' : labelForGradeInfo(gradeInfo),
   }
 
   function isItemDisabled(optionId) {
@@ -96,7 +96,7 @@ export default function CompleteIncompleteGradeInput(props) {
     options = [
       {id: 'ungraded', label: I18n.t('Ungraded')},
       {id: 'complete', label: I18n.t('Complete')},
-      {id: 'incomplete', label: I18n.t('Incomplete')}
+      {id: 'incomplete', label: I18n.t('Incomplete')},
     ]
   }
 
@@ -131,9 +131,9 @@ CompleteIncompleteGradeInput.propTypes = {
   gradeInfo: shape({
     excused: bool.isRequired,
     grade: string,
-    valid: bool.isRequired
+    valid: bool.isRequired,
   }).isRequired,
   isBusy: bool.isRequired,
   isDisabled: bool.isRequired,
-  onChange: func.isRequired
+  onChange: func.isRequired,
 }

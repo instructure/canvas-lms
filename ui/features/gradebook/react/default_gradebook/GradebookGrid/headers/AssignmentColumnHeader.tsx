@@ -36,7 +36,7 @@ import {Text} from '@instructure/ui-text'
 import type {
   CamelizedAssignment,
   CamelizedSubmission,
-  PartialStudent
+  PartialStudent,
 } from '@canvas/grading/grading.d'
 
 const {Separator: MenuSeparator, Item: MenuItem, Group: MenuGroup} = Menu as any
@@ -144,11 +144,11 @@ export default class AssignmentColumnHeader extends ColumnHeader<
   enterGradesAsMenuContent: HTMLElement | null = null
 
   static propTypes = {
-    ...ColumnHeader.propTypes
+    ...ColumnHeader.propTypes,
   }
 
   static defaultProps = {
-    ...ColumnHeader.defaultProps
+    ...ColumnHeader.defaultProps,
   }
 
   bindAssignmentLink = ref => {
@@ -238,7 +238,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
 
     const options = {
       assignment: this.props.assignment,
-      students: this.activeStudentDetails()
+      students: this.activeStudentDetails(),
     }
 
     if (this.props.showMessageStudentsWithObserversDialog) {
@@ -257,7 +257,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
           },
           onSend: this.handleSendMessageStudentsWho,
           messageAttachmentUploadFolderId: this.props.messageAttachmentUploadFolderId,
-          userId: this.props.userId
+          userId: this.props.userId,
         }
 
         ReactDOM.render(
@@ -290,7 +290,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
         redoRequest,
         score,
         sortableName: student.sortableName,
-        submittedAt
+        submittedAt,
       }
     })
   }

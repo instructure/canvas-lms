@@ -39,16 +39,16 @@ export default class Toolbox extends React.Component {
     invalidMessage: func.isRequired,
     onSetWorkstate: func.isRequired,
     onDelete: func,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
     onDelete: () => {},
-    readOnly: false
+    readOnly: false,
   }
 
   state = {
-    pointsMode: 'view'
+    pointsMode: 'view',
   }
 
   // TODO: publish => save all pending edits, including state

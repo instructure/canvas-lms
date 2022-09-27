@@ -37,7 +37,7 @@ export default class EditableHeading extends React.Component {
     editButtonPlacement: oneOf(['start', 'end']), // is the edit button before or after the text?
     level: oneOf(['h1', 'h2', 'h3', 'h4', 'h5']),
     readOnly: bool,
-    required: bool
+    required: bool,
   }
 
   static defaultProps = {
@@ -45,14 +45,14 @@ export default class EditableHeading extends React.Component {
     level: 'h2', // to match instui Heading default
     placeholder: '',
     readOnly: false,
-    required: false
+    required: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      initialValue: props.value
+      initialValue: props.value,
     }
 
     this._inputRef = null
@@ -63,7 +63,7 @@ export default class EditableHeading extends React.Component {
   static getDerivedStateFromProps(props, _state) {
     if (props.mode === 'view') {
       return {
-        initialValue: props.value
+        initialValue: props.value,
       }
     }
     return null
@@ -163,7 +163,7 @@ export default class EditableHeading extends React.Component {
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     // move it a bit so it doesn't move on edit
     const sty = {
-      margin: '-3px 0 0 -3px'
+      margin: '-3px 0 0 -3px',
     }
 
     return (
@@ -232,7 +232,7 @@ export default class EditableHeading extends React.Component {
             position: 'absolute',
             display: 'inline-block',
             top: '-1000px',
-            fontSize: this.getFontSize()
+            fontSize: this.getFontSize(),
           }}
           ref={this.getHiddenTextRef}
         >

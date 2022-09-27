@@ -25,17 +25,17 @@ const I18n = useI18nScope('OriginalityReportVisibilityPicker')
 export default class OriginalityReportVisibilityPicker extends React.Component {
   static propTypes = {
     isEnabled: PropTypes.bool.isRequired,
-    selectedOption: PropTypes.string
+    selectedOption: PropTypes.string,
   }
 
   static defaultProps = {
-    selectedOption: null
+    selectedOption: null,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      selectedOption: props.selectedOption
+      selectedOption: props.selectedOption,
     }
   }
 

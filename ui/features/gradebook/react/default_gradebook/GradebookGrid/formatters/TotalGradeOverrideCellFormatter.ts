@@ -47,7 +47,7 @@ function render(formattedGrade, gradeInfo) {
 export default class TotalGradeOverrideCellFormatter {
   constructor(gradebook) {
     const gradeEntry = new GradeOverrideEntry({
-      gradingScheme: gradebook.getCourseGradingScheme()
+      gradingScheme: gradebook.getCourseGradingScheme(),
     })
 
     this.options = {
@@ -63,7 +63,7 @@ export default class TotalGradeOverrideCellFormatter {
 
       formatGradeInfo(gradeInfo) {
         return gradeEntry.formatGradeInfoForDisplay(gradeInfo)
-      }
+      },
     }
 
     this.render = this.render.bind(this)

@@ -34,9 +34,9 @@ QUnit.module('GradePostingPolicyTabPanel', moduleHooks => {
       onChange: postPoliciesOnChangeStub,
       settings: {
         postManually: false,
-        ...settings
+        ...settings,
       },
-      ...props
+      ...props,
     }
     ReactDOM.render(<GradePostingPolicyTabPanel {...componentProps} />, $container)
     return $container.children[0]

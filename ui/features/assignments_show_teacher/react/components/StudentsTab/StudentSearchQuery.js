@@ -30,7 +30,7 @@ const I18n = useI18nScope('assignments_2')
 
 StudentSearchQuery.propTypes = {
   children: func,
-  variables: StudentSearchQueryShape
+  variables: StudentSearchQueryShape,
 }
 
 export default function StudentSearchQuery({variables, children}) {

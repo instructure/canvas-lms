@@ -82,7 +82,7 @@ class StatusColorListItem extends React.Component<Props, State> {
       colorPickerOnToggle,
       colorPickerButtonRef,
       colorPickerContentRef,
-      colorPickerAfterClose
+      colorPickerAfterClose,
     } = this.props
 
     return (

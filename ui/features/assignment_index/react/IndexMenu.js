@@ -40,7 +40,7 @@ export default class IndexMenu extends React.Component {
     sisName: PropTypes.string.isRequired,
     postToSisDefault: PropTypes.bool.isRequired,
     hasAssignments: PropTypes.bool.isRequired,
-    assignmentGroupsCollection: PropTypes.object
+    assignmentGroupsCollection: PropTypes.object,
   }
 
   state = this.props.store.getState()
@@ -59,7 +59,7 @@ export default class IndexMenu extends React.Component {
       this.props.contextType,
       's/',
       this.props.contextId,
-      '/lti_apps/launch_definitions?placements[]=course_assignments_menu'
+      '/lti_apps/launch_definitions?placements[]=course_assignments_menu',
     ].join('')
 
     this.props.store.dispatch(Actions.apiGetLaunches(null, toolsUrl))
@@ -165,8 +165,8 @@ export default class IndexMenu extends React.Component {
     const groupData = [
       {
         course_id: this.props.contextId,
-        type: 'assignment_group'
-      }
+        type: 'assignment_group',
+      },
     ]
     ReactDOM.render(
       <ContentTypeExternalToolTray

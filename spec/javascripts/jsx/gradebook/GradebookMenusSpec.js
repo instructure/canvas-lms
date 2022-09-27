@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -69,14 +69,14 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
 
   test('allowShowSeparateFirstLastNames is true when options.allow_separate_first_last_names is true', () => {
     const {allowShowSeparateFirstLastNames} = createGradebook({
-      allow_separate_first_last_names: true
+      allow_separate_first_last_names: true,
     }).getViewOptionsMenuProps()
     strictEqual(allowShowSeparateFirstLastNames, true)
   })
 
   test('allowShowSeparateFirstLastNames is false when options.allow_separate_first_last_names is false', () => {
     const {allowShowSeparateFirstLastNames} = createGradebook({
-      allow_separate_first_last_names: false
+      allow_separate_first_last_names: false,
     }).getViewOptionsMenuProps()
     strictEqual(allowShowSeparateFirstLastNames, false)
   })
@@ -106,14 +106,14 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
 
   test('allowViewUngradedAsZero is true when allow_view_ungraded_as_zero is true', () => {
     const {allowViewUngradedAsZero} = createGradebook({
-      allow_view_ungraded_as_zero: true
+      allow_view_ungraded_as_zero: true,
     }).getViewOptionsMenuProps()
     strictEqual(allowViewUngradedAsZero, true)
   })
 
   test('allowViewUngradedAsZero is false when allow_view_ungraded_as_zero is false', () => {
     const {allowViewUngradedAsZero} = createGradebook({
-      allow_view_ungraded_as_zero: false
+      allow_view_ungraded_as_zero: false,
     }).getViewOptionsMenuProps()
     strictEqual(allowViewUngradedAsZero, false)
   })
@@ -154,7 +154,7 @@ QUnit.module('Menus', {
       context_allows_gradebook_uploads: true,
       export_gradebook_csv_url: 'http://someUrl',
       gradebook_import_url: 'http://someUrl',
-      navigate() {}
+      navigate() {},
     })
     this.gradebook.postGradesLtis = []
     this.gradebook.postGradesStore = {}
@@ -162,7 +162,7 @@ QUnit.module('Menus', {
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('ViewOptionsMenu is rendered on renderViewOptionsMenu', function () {
@@ -179,7 +179,7 @@ test('ActionMenu is rendered on renderActionMenu when enhanced_gradebook_filters
     export_gradebook_csv_url: 'http://someUrl',
     gradebook_import_url: 'http://someUrl',
     enhanced_gradebook_filters: true,
-    navigate() {}
+    navigate() {},
   })
   this.gradebook.renderActionMenu()
   const importButtonText = document

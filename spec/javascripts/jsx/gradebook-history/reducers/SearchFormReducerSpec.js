@@ -26,7 +26,7 @@ import {
   FETCH_RECORDS_FAILURE,
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
-  FETCH_RECORDS_NEXT_PAGE_FAILURE
+  FETCH_RECORDS_NEXT_PAGE_FAILURE,
 } from 'ui/features/gradebook_history/react/actions/SearchFormActions.js'
 
 const defaultState = () => ({
@@ -34,19 +34,19 @@ const defaultState = () => ({
     assignments: {
       fetchStatus: null,
       items: [],
-      nextPage: null
+      nextPage: null,
     },
     graders: {
       fetchStatus: null,
       items: [],
-      nextPage: null
+      nextPage: null,
     },
     students: {
       fetchStatus: null,
       items: [],
-      nextPage: null
-    }
-  }
+      nextPage: null,
+    },
+  },
 })
 
 QUnit.module('SearchFormReducer')
@@ -64,9 +64,9 @@ test('handles FETCH_RECORDS_START for given record type', () => {
       ...defaults.records,
       assignments: {
         ...defaults.records.assignments,
-        fetchStatus: null
-      }
-    }
+        fetchStatus: null,
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -74,15 +74,15 @@ test('handles FETCH_RECORDS_START for given record type', () => {
       ...initialState.records,
       assignments: {
         ...initialState.records.assignments,
-        fetchStatus: 'started'
-      }
-    }
+        fetchStatus: 'started',
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_START,
     payload: {
-      recordType: 'assignments'
-    }
+      recordType: 'assignments',
+    },
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -92,8 +92,7 @@ test('handles FETCH_RECORDS_SUCCESS on success for given record type', () => {
   const payload = {
     recordType: 'graders',
     data: Fixtures.userArray(),
-    link:
-      '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
   }
   const initialState = defaultState()
   const newState = {
@@ -103,13 +102,13 @@ test('handles FETCH_RECORDS_SUCCESS on success for given record type', () => {
       graders: {
         fetchStatus: 'success',
         items: payload.data,
-        nextPage: parseLinkHeader(payload.link).next
-      }
-    }
+        nextPage: parseLinkHeader(payload.link).next,
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_SUCCESS,
-    payload
+    payload,
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -124,9 +123,9 @@ test('handles FETCH_RECORDS_FAILURE on failure for given record type', () => {
       students: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -135,13 +134,13 @@ test('handles FETCH_RECORDS_FAILURE on failure for given record type', () => {
       students: {
         fetchStatus: 'failure',
         items: [],
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_FAILURE,
-    payload: {recordType: 'students'}
+    payload: {recordType: 'students'},
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -156,9 +155,9 @@ test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', () 
       students: {
         fetchStatus: null,
         items: Fixtures.userArray(),
-        nextPage: 'https://example.com'
-      }
-    }
+        nextPage: 'https://example.com',
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -167,13 +166,13 @@ test('handles FETCH_RECORDS_NEXT_PAGE_START on start for given record type', () 
       students: {
         ...initialState.records.students,
         fetchStatus: 'started',
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_START,
-    payload: {recordType: 'students'}
+    payload: {recordType: 'students'},
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -184,8 +183,7 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', () => {
   const payload = {
     recordType: 'graders',
     data: Fixtures.userArray(),
-    link:
-      '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"'
+    link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
   }
   const initialState = {
     ...defaults,
@@ -194,9 +192,9 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', () => {
       graders: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -206,13 +204,13 @@ test('handles FETCH_RECORDS_NEXT_PAGE_SUCCESS for given record type', () => {
         ...initialState.records.graders,
         fetchStatus: 'success',
         items: initialState.records.graders.items.concat(payload.data),
-        nextPage: parseLinkHeader(payload.link).next
-      }
-    }
+        nextPage: parseLinkHeader(payload.link).next,
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_SUCCESS,
-    payload
+    payload,
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -227,9 +225,9 @@ test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', () => {
       students: {
         fetchStatus: 'started',
         items: Fixtures.userArray(),
-        nextPage: 'https://example.com'
-      }
-    }
+        nextPage: 'https://example.com',
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -238,13 +236,13 @@ test('handles FETCH_RECORDS_NEXT_PAGE_FAILURE for given record type', () => {
       students: {
         ...initialState.records.students,
         fetchStatus: 'failure',
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const action = {
     type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
-    payload: {recordType: 'students'}
+    payload: {recordType: 'students'},
   }
 
   deepEqual(reducer(initialState, action), newState)
@@ -259,9 +257,9 @@ test('handles CLEAR_RECORDS for given record type', () => {
       students: {
         fetchStatus: 'success',
         items: Fixtures.userArray(),
-        nextPage: 'https://example.com'
-      }
-    }
+        nextPage: 'https://example.com',
+      },
+    },
   }
   const newState = {
     ...initialState,
@@ -270,13 +268,13 @@ test('handles CLEAR_RECORDS for given record type', () => {
       students: {
         fetchStatus: null,
         items: [],
-        nextPage: null
-      }
-    }
+        nextPage: null,
+      },
+    },
   }
   const action = {
     type: CLEAR_RECORDS,
-    payload: {recordType: 'students'}
+    payload: {recordType: 'students'},
   }
 
   deepEqual(reducer(initialState, action), newState)

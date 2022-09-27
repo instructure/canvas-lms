@@ -37,7 +37,7 @@ export default class OverrideSummary extends React.Component {
   static contextType = TeacherViewContext
 
   static propTypes = {
-    override: OverrideShape
+    override: OverrideShape,
   }
 
   renderTitle(override) {
@@ -102,7 +102,7 @@ export default class OverrideSummary extends React.Component {
         <Responsive
           match="media"
           query={{
-            largerScreen: {minWidth: '36rem'}
+            largerScreen: {minWidth: '36rem'},
           }}
         >
           {(props, matches) => {

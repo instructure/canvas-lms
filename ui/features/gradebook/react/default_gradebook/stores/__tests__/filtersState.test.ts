@@ -31,11 +31,11 @@ const mockResponse: GradebookFilterApiResponse[] = [
       user_id: '1',
       name: 'filter 1',
       payload: {
-        conditions: []
+        conditions: [],
       },
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
-    }
+      updated_at: '2020-01-01T00:00:00Z',
+    },
   },
   {
     gradebook_filter: {
@@ -44,12 +44,12 @@ const mockResponse: GradebookFilterApiResponse[] = [
       user_id: '1',
       name: 'filter 2',
       payload: {
-        conditions: []
+        conditions: [],
       },
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
-    }
-  }
+      updated_at: '2020-01-01T00:00:00Z',
+    },
+  },
 ]
 
 describe('filtersState', () => {
@@ -70,8 +70,8 @@ describe('filtersState', () => {
         id: '321',
         name: 'filter 1',
         filters: [],
-        created_at: '2020-01-01T00:00:00Z'
-      }
+        created_at: '2020-01-01T00:00:00Z',
+      },
     ])
   })
 
@@ -82,9 +82,9 @@ describe('filtersState', () => {
           id: '123',
           type: 'student-group',
           value: '1',
-          created_at: '2022-01-01T00:00:00Z'
-        }
-      ]
+          created_at: '2022-01-01T00:00:00Z',
+        },
+      ],
     })
     const newFilter: PartialFilterPreset = {
       name: 'new filter',
@@ -93,11 +93,11 @@ describe('filtersState', () => {
           id: '234',
           type: 'student-group',
           value: '2',
-          created_at: '2022-01-01T00:00:00Z'
-        }
+          created_at: '2022-01-01T00:00:00Z',
+        },
       ],
       created_at: '2022-01-01T00:00:00Z',
-      updated_at: '2022-01-01T00:00:00Z'
+      updated_at: '2022-01-01T00:00:00Z',
     }
     const url = `/api/v1/courses/${courseId}/gradebook_filters`
     fetchMock.post(url, mockResponse[0])
@@ -110,8 +110,8 @@ describe('filtersState', () => {
         name: 'filter 1',
         filters: [],
         created_at: '2020-01-01T00:00:00Z',
-        updated_at: '2020-01-01T00:00:00Z'
-      }
+        updated_at: '2020-01-01T00:00:00Z',
+      },
     ])
   })
 
@@ -123,23 +123,23 @@ describe('filtersState', () => {
           name: 'filter 1',
           filters: [],
           created_at: '2020-01-01T00:00:00Z',
-          updated_at: '2020-01-01T00:00:00Z'
-        }
-      ]
+          updated_at: '2020-01-01T00:00:00Z',
+        },
+      ],
     })
     const url = `/api/v1/courses/${courseId}/gradebook_filters/321`
     fetchMock.put(url, {
       gradebook_filter: {
         ...mockResponse[0].gradebook_filter,
-        name: 'filter 1 (renamed)'
-      }
+        name: 'filter 1 (renamed)',
+      },
     })
     await store.getState().updateFilterPreset({
       id: '321',
       name: 'filter 1 (renamed)',
       filters: [],
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
+      updated_at: '2020-01-01T00:00:00Z',
     })
     expect(fetchMock.called(url, 'PUT')).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([
@@ -147,8 +147,8 @@ describe('filtersState', () => {
         id: '321',
         name: 'filter 1 (renamed)',
         filters: [],
-        created_at: '2020-01-01T00:00:00Z'
-      }
+        created_at: '2020-01-01T00:00:00Z',
+      },
     ])
   })
 
@@ -160,9 +160,9 @@ describe('filtersState', () => {
           name: 'filter 1',
           filters: [],
           created_at: '2020-01-01T00:00:00Z',
-          updated_at: '2020-01-01T00:00:00Z'
-        }
-      ]
+          updated_at: '2020-01-01T00:00:00Z',
+        },
+      ],
     })
     const url = `/api/v1/courses/${courseId}/gradebook_filters/321`
     fetchMock.delete(url, mockResponse[0])
@@ -171,7 +171,7 @@ describe('filtersState', () => {
       name: 'filter 1 (renamed)',
       filters: [],
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
+      updated_at: '2020-01-01T00:00:00Z',
     })
     expect(fetchMock.called(url, 'DELETE')).toBe(true)
     expect(store.getState().filterPresets).toMatchObject([])
@@ -182,7 +182,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -190,7 +190,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
@@ -201,7 +201,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: '1',
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -209,7 +209,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -217,8 +217,8 @@ describe('filtersState', () => {
       {
         id: expect.any(String),
         type: 'section',
-        value: '1'
-      }
+        value: '1',
+      },
     ])
   })
 
@@ -227,7 +227,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: '1'
+      student_group_id: '1',
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -235,7 +235,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -243,8 +243,8 @@ describe('filtersState', () => {
       {
         id: expect.any(String),
         type: 'student-group',
-        value: '1'
-      }
+        value: '1',
+      },
     ])
   })
 
@@ -253,7 +253,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: '1',
@@ -261,7 +261,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -269,8 +269,8 @@ describe('filtersState', () => {
       {
         id: expect.any(String),
         type: 'assignment-group',
-        value: '1'
-      }
+        value: '1',
+      },
     ])
   })
 
@@ -279,7 +279,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -287,7 +287,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: 'has-submissions',
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -295,8 +295,8 @@ describe('filtersState', () => {
       {
         id: expect.any(String),
         type: 'submissions',
-        value: 'has-submissions'
-      }
+        value: 'has-submissions',
+      },
     ])
   })
 
@@ -305,7 +305,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: '0',
@@ -313,7 +313,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
@@ -324,7 +324,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -332,7 +332,7 @@ describe('filtersState', () => {
       grading_period_id: '1',
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).not.toBeNull()
@@ -340,8 +340,8 @@ describe('filtersState', () => {
       {
         id: expect.any(String),
         type: 'grading-period',
-        value: '1'
-      }
+        value: '1',
+      },
     ])
   })
 
@@ -350,7 +350,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -358,15 +358,15 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters).toMatchObject([
       {
         id: expect.any(String),
         type: 'module',
-        value: '1'
-      }
+        value: '1',
+      },
     ])
   })
 
@@ -375,7 +375,7 @@ describe('filtersState', () => {
     fetchMock.post(url, mockResponse[0])
     const initialRowFilterSettings: InitialRowFilterSettings = {
       section_id: null,
-      student_group_id: null
+      student_group_id: null,
     }
     const initialColumnFilterSettings: InitialColumnFilterSettings = {
       assignment_group_id: null,
@@ -383,7 +383,7 @@ describe('filtersState', () => {
       grading_period_id: null,
       submissions: null,
       start_date: null,
-      end_date: null
+      end_date: null,
     }
     store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
@@ -397,43 +397,43 @@ describe('filtersState', () => {
           name: 'filter 1',
           filters: [],
           created_at: '2020-01-01T00:00:00Z',
-          updated_at: '2020-01-01T00:00:00Z'
+          updated_at: '2020-01-01T00:00:00Z',
         },
         {
           id: '432',
           name: 'filter 2',
           filters: [],
           created_at: '2020-01-02T00:00:00Z',
-          updated_at: '2020-01-02T00:00:00Z'
-        }
-      ]
+          updated_at: '2020-01-02T00:00:00Z',
+        },
+      ],
     })
 
     fetchMock
       .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/321`, mockResponse[0])
       .putOnce(`/api/v1/courses/${courseId}/gradebook_filters/432`, mockResponse[1], {
-        overwriteRoutes: false
+        overwriteRoutes: false,
       })
     await store.getState().updateFilterPreset({
       id: '321',
       name: 'filter 1',
       filters: [],
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
+      updated_at: '2020-01-01T00:00:00Z',
     })
     expect(store.getState().filterPresets[1]).toMatchObject({
       id: '321',
       name: 'filter 1',
       filters: [],
       created_at: '2020-01-01T00:00:00Z',
-      updated_at: '2020-01-01T00:00:00Z'
+      updated_at: '2020-01-01T00:00:00Z',
     })
     expect(store.getState().filterPresets[0]).toMatchObject({
       id: '432',
       name: 'filter 2',
       filters: [],
       created_at: '2020-01-02T00:00:00Z',
-      updated_at: '2020-01-02T00:00:00Z'
+      updated_at: '2020-01-02T00:00:00Z',
     })
   })
 })

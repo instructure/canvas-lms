@@ -26,26 +26,26 @@ export default {
     columnSort: {
       currentValue: {
         criterion: 'name',
-        direction: 'ascending'
+        direction: 'ascending',
       },
       modulesEnabled: true,
-      onChange: () => {}
+      onChange: () => {},
     },
     hideAssignmentGroupTotals: {
       checked: false,
-      onChange: () => {}
+      onChange: () => {},
     },
     hideTotal: {
       checked: false,
-      onChange: () => {}
+      onChange: () => {},
     },
     showNotes: {
       checked: true,
-      onChange: () => {}
+      onChange: () => {},
     },
     showUnpublishedAssignments: {
       checked: true,
-      onChange: () => {}
+      onChange: () => {},
     },
     statusColors: {
       currentValues: {
@@ -53,21 +53,21 @@ export default {
         excused: '#E5F7E5',
         late: '#F3EFEA',
         missing: '#FEF7E5',
-        resubmitted: '#E5F7F6'
+        resubmitted: '#E5F7F6',
       },
-      onChange: () => {}
+      onChange: () => {},
     },
     viewUngradedAsZero: {
       allowed: true,
       checked: true,
-      onChange: () => {}
+      onChange: () => {},
     },
     showSeparateFirstLastNames: {
       allowed: true,
       checked: false,
-      onChange: () => {}
-    }
-  }
+      onChange: () => {},
+    },
+  },
 }
 
 const Template = args => <ViewOptionsTabPanel {...args} />

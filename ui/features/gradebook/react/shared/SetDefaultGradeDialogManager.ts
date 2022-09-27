@@ -58,7 +58,7 @@ class SetDefaultGradeDialogManager {
       assignment: this.assignment,
       students: this.students,
       context_id: this.contextId,
-      selected_section: this.selectedSection
+      selected_section: this.selectedSection,
     }
   }
 

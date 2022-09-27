@@ -89,5 +89,5 @@ SubmissionCompletedModal.propTypes = {
   count: number.isRequired,
   onRedirect: func.isRequired,
   onClose: func.isRequired,
-  open: bool.isRequired
+  open: bool.isRequired,
 }

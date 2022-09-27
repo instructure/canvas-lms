@@ -44,7 +44,7 @@ export default (
     const url = `/api/v1/courses/${courseId}/custom_gradebook_columns`
     const params = {
       include_hidden: true,
-      per_page: get().performanceControls.customColumnsPerPage
+      per_page: get().performanceControls.customColumnsPerPage,
     }
     return dispatch
       .getDepaginated(url, params)
@@ -59,10 +59,10 @@ export default (
             {
               key: 'custom-columns-loading-error',
               message: I18n.t('There was an error fetching custom columns.'),
-              variant: 'error'
-            }
-          ])
+              variant: 'error',
+            },
+          ]),
         })
       })
-  }
+  },
 })

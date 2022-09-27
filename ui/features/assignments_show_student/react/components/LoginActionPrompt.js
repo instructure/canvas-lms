@@ -102,11 +102,11 @@ function LoginActionPrompt(props) {
 
 LoginActionPrompt.propTypes = {
   nonAcceptedEnrollment: bool,
-  enrollmentState: string
+  enrollmentState: string,
 }
 
 LoginActionPrompt.defaultProps = {
-  enrollmentState: null
+  enrollmentState: null,
 }
 
 export default LoginActionPrompt

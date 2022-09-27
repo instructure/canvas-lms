@@ -24,7 +24,7 @@ import {
   isDefaultSortOrder,
   localeSort,
   makeCompareAssignmentCustomOrderFn,
-  wrapColumnSortFn
+  wrapColumnSortFn,
 } from '../Gradebook.sorting'
 
 const assignments = [
@@ -38,8 +38,8 @@ const assignments = [
       points_possible: 1,
       module_ids: ['1'],
       module_positions: [1],
-      assignment_group: {position: 5}
-    }
+      assignment_group: {position: 5},
+    },
   },
   {
     id: '2',
@@ -51,15 +51,15 @@ const assignments = [
       points_possible: 2,
       module_ids: ['2'],
       module_positions: [2],
-      assignment_group: {position: 6}
-    }
-  }
+      assignment_group: {position: 6},
+    },
+  },
 ]
 const assignmentsReversed = [...assignments].reverse()
 
 const contextModules = [
   {id: '1', name: 'Module 1', position: 1},
-  {id: '2', name: 'Module 2', position: 2}
+  {id: '2', name: 'Module 2', position: 2},
 ]
 
 describe('makeColumnSortFn', () => {
@@ -67,7 +67,7 @@ describe('makeColumnSortFn', () => {
     const gradebook = createGradebook()
     const sortFn = gradebook.makeColumnSortFn({
       sortType: '__default__',
-      direction: 'ascending'
+      direction: 'ascending',
     })
 
     let results = [...assignments].sort(sortFn)
@@ -84,7 +84,7 @@ describe('makeColumnSortFn', () => {
     const gradebook = createGradebook()
     const sortFn = gradebook.makeColumnSortFn({
       sortType: 'alpha',
-      direction: 'descending'
+      direction: 'descending',
     })
 
     let results = [...assignments].sort(sortFn)
@@ -100,7 +100,7 @@ describe('makeColumnSortFn', () => {
     const gradebook = createGradebook()
     const sortFn = gradebook.makeColumnSortFn({
       sortType: 'name',
-      direction: 'ascending'
+      direction: 'ascending',
     })
 
     let results = [...assignments].sort(sortFn)
@@ -116,7 +116,7 @@ describe('makeColumnSortFn', () => {
     const gradebook = createGradebook()
     const sortFn = gradebook.makeColumnSortFn({
       sortType: 'name',
-      direction: 'descending'
+      direction: 'descending',
     })
 
     let results = [...assignments].sort(sortFn)
@@ -199,7 +199,7 @@ describe('makeColumnSortFn', () => {
     gradebook.setContextModules(contextModules)
     const sortFn = gradebook.makeColumnSortFn({
       sortType: 'module_position',
-      direction: 'descending'
+      direction: 'descending',
     })
 
     let results = [...assignments].sort(sortFn)
@@ -383,7 +383,7 @@ describe('getDefaultSettingKeyForColumnType', () => {
     const gradebook = createGradebook()
     gradebook.gridData.rows = [
       {id: '3', sortable_name: 'Z Lastington', someProperty: false},
-      {id: '4', sortable_name: 'A Firstington', someProperty: true}
+      {id: '4', sortable_name: 'A Firstington', someProperty: true},
     ]
 
     const value = 0
@@ -437,16 +437,16 @@ describe('localeSort', () => {
 
 describe('compareAssignmentNames', () => {
   const firstRecord = {
-    object: {name: 'alpha'}
+    object: {name: 'alpha'},
   }
   const secondRecord = {
-    object: {name: 'omega'}
+    object: {name: 'omega'},
   }
   const thirdRecord = {
-    object: {name: 'Alpha'}
+    object: {name: 'Alpha'},
   }
   const fourthRecord = {
-    object: {name: 'Omega'}
+    object: {name: 'Omega'},
   }
   it('returns -1 if the name field comes first alphabetically in the first record', function () {
     expect(compareAssignmentNames(firstRecord, secondRecord)).toStrictEqual(-1)

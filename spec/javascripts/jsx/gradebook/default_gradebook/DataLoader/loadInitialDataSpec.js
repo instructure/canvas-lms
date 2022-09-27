@@ -32,7 +32,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
     gradingPeriodAssignments: '/courses/1201/gradebook/grading_period_assignments',
     students: '/api/v1/courses/1201/users',
     submissions: '/api/v1/courses/1201/students/submissions',
-    userIds: '/courses/1201/gradebook/user_ids'
+    userIds: '/courses/1201/gradebook/user_ids',
   }
 
   let dataLoader
@@ -54,7 +54,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       },
 
       {
@@ -69,15 +69,15 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     ]
 
     exampleData = {
       assignmentGroups: [
         {id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1)},
         {id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2)},
-        {id: '2203', position: 3, name: 'Extra Credit', assignments: []}
+        {id: '2203', position: 3, name: 'Extra Credit', assignments: []},
       ],
       assignments,
 
@@ -88,9 +88,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       finalGradeOverrides: {
         1101: {
           courseGrade: {
-            percentage: 91.23
-          }
-        }
+            percentage: 91.23,
+          },
+        },
       },
 
       gradingPeriodAssignments: {1401: ['2301']},
@@ -104,9 +104,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1101'},
-              type: 'StudentEnrollment'
-            }
-          ]
+              type: 'StudentEnrollment',
+            },
+          ],
         },
 
         {
@@ -116,9 +116,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1102'},
-              type: 'StudentEnrollment'
-            }
-          ]
+              type: 'StudentEnrollment',
+            },
+          ],
         },
 
         {
@@ -128,10 +128,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1103'},
-              type: 'StudentEnrollment'
-            }
-          ]
-        }
+              type: 'StudentEnrollment',
+            },
+          ],
+        },
       ],
 
       submissions: [
@@ -141,7 +141,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-10-15T12:00:00Z',
           id: '2501',
           score: 10,
-          user_id: '1101'
+          user_id: '1101',
         },
 
         {
@@ -150,7 +150,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-12-15T12:00:00Z',
           id: '2502',
           score: 9,
-          user_id: '1101'
+          user_id: '1101',
         },
 
         {
@@ -159,9 +159,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-10-16T12:00:00Z',
           id: '2503',
           score: 10,
-          user_id: '1102'
-        }
-      ]
+          user_id: '1102',
+        },
+      ],
     }
   })
 
@@ -172,17 +172,17 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
 
       server.for(urls.assignmentGroups).respond([
         {status: 200, body: exampleData.assignmentGroups.slice(0, 2)},
-        {status: 200, body: exampleData.assignmentGroups.slice(2, 3)}
+        {status: 200, body: exampleData.assignmentGroups.slice(2, 3)},
       ])
 
       server.for(urls.contextModules).respond([
         {status: 200, body: exampleData.contextModules.slice(0, 2)},
-        {status: 200, body: exampleData.contextModules.slice(2, 3)}
+        {status: 200, body: exampleData.contextModules.slice(2, 3)},
       ])
 
       server.for(urls.gradingPeriodAssignments).respond({
         status: 200,
-        body: {grading_period_assignments: exampleData.gradingPeriodAssignments}
+        body: {grading_period_assignments: exampleData.gradingPeriodAssignments},
       })
 
       server
@@ -201,7 +201,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
 
       server.for(urls.customColumns).respond([
         {status: 200, body: exampleData.customColumns.slice(0, 2)},
-        {status: 200, body: exampleData.customColumns.slice(2, 3)}
+        {status: 200, body: exampleData.customColumns.slice(2, 3)},
       ])
 
       server
@@ -223,7 +223,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
 
         course_settings: {
           allow_final_grade_override: true,
-          filter_speed_grader_by_student_group: false
+          filter_speed_grader_by_student_group: false,
         },
 
         final_grade_override_enabled: true,
@@ -231,13 +231,13 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           id: '1501',
           grading_periods: [
             {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
-            {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
-          ]
+            {id: '702', title: 'Grading Period 2', startDate: new Date(2)},
+          ],
         },
 
         performance_controls: {
-          students_chunk_size: 2 // students per page
-        }
+          students_chunk_size: 2, // students per page
+        },
       })
 
       sinon.stub(gradebook.finalGradeOverrides, 'setGrades')

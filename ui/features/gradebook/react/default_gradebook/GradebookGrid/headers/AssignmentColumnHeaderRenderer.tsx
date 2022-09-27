@@ -41,7 +41,7 @@ function getSubmission(student: Student, assignmentId: string) {
       postedAt: null,
       score: null,
       submittedAt: null,
-      workflowState: null
+      workflowState: null,
     }
   }
 
@@ -54,7 +54,7 @@ function getSubmission(student: Student, assignmentId: string) {
     postedAt: submission.posted_at,
     score: submission.score,
     submittedAt: submission.submitted_at,
-    workflowState: submission.workflow_state
+    workflowState: submission.workflow_state,
   }
 }
 
@@ -80,7 +80,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
     isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
     name: student.name,
     sortableName: student.sortable_name,
-    submission: getSubmission(student, assignmentId)
+    submission: getSubmission(student, assignmentId),
   })
 
   // Menu options for posting and hiding grades should always take into account
@@ -119,7 +119,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       pointsPossible: assignment.points_possible,
       postManually: assignment.post_manually,
       published: assignment.published,
-      submissionTypes: assignment.submission_types
+      submissionTypes: assignment.submission_types,
     },
 
     curveGradesAction: gradebook.getCurveGradesAction(assignmentId),
@@ -133,7 +133,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       selected: gradebook.getEnterGradesAsSetting(assignmentId),
       showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes(
         'gradingScheme'
-      )
+      ),
     },
     getCurrentlyShownStudents,
 
@@ -151,7 +151,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showHideAssignmentGradesTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
     postGradesAction: {
@@ -162,7 +162,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
     removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
@@ -174,7 +174,7 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showAssignmentPostingPolicyTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
     showMessageStudentsWithObserversDialog:
@@ -200,14 +200,14 @@ function getProps(column: Column, gradebook: Gradebook, options): AssignmentColu
       onSortByUnposted: () => {
         gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,
 
-    onSendMessageStudentsWho: (args: SendMessageArgs) => gradebook.sendMessageStudentsWho(args)
+    onSendMessageStudentsWho: (args: SendMessageArgs) => gradebook.sendMessageStudentsWho(args),
   }
 }
 

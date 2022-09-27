@@ -38,9 +38,9 @@ QUnit.module('AssignmentConfigurationsTools', {
           similarity_detection: {
             message_type: 'basic-lti-launch-request',
             url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
-            title: 'similarity_detection Text'
-          }
-        }
+            title: 'similarity_detection Text',
+          },
+        },
       },
       {
         definition_type: 'ContextExternalTool',
@@ -52,9 +52,9 @@ QUnit.module('AssignmentConfigurationsTools', {
           similarity_detection: {
             message_type: 'basic-lti-launch-request',
             url: 'http://my-lti.docker/course-navigation',
-            title: 'My LTI'
-          }
-        }
+            title: 'My LTI',
+          },
+        },
       },
       {
         definition_type: 'ContextExternalTool',
@@ -67,9 +67,9 @@ QUnit.module('AssignmentConfigurationsTools', {
           similarity_detection: {
             message_type: 'basic-lti-launch-request',
             url: 'https://www.edu-apps.org/redirect',
-            title: 'Redirect Tool'
-          }
-        }
+            title: 'Redirect Tool',
+          },
+        },
       },
       {
         definition_type: 'Lti::MessageHandler',
@@ -81,9 +81,9 @@ QUnit.module('AssignmentConfigurationsTools', {
           similarity_detection: {
             message_type: 'basic-lti-launch-request',
             url: 'http://localhost:3000/messages/blti',
-            title: 'Lti2Example'
-          }
-        }
+            title: 'Lti2Example',
+          },
+        },
       },
       {
         definition_type: 'ContextExternalTool',
@@ -96,17 +96,17 @@ QUnit.module('AssignmentConfigurationsTools', {
           similarity_detection: {
             message_type: 'basic-lti-launch-request',
             url: 'https://www.edu-apps.org/redirect',
-            title: 'Redirect Tool'
-          }
-        }
-      }
+            title: 'Redirect Tool',
+          },
+        },
+      },
     ]
     sandbox.stub($, 'ajax').returns({status: 200, data: toolDefinitions})
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']
   },
   teardown() {
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test('it renders', () => {

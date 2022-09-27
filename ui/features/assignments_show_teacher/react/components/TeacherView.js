@@ -55,11 +55,11 @@ export default class TeacherView extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape,
     messageAttachmentUploadFolderId: string,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: window.location.hash.indexOf('readOnly') >= 0
+    readOnly: window.location.hash.indexOf('readOnly') >= 0,
   }
 
   constructor(props) {
@@ -73,14 +73,14 @@ export default class TeacherView extends React.Component {
       isDirty: false, // has the user changed anything?
       isSaving: false, // is save assignment in-flight?
       isUnpublishing: false, // is saving just the unpublished state in-flight?
-      invalids: {} // keys are the  paths to invalid fields
+      invalids: {}, // keys are the  paths to invalid fields
     }
 
     // TODO: reevaluate if the context is still needed. <FriendlyDateTime> pulls the data
     // directly from ENV, so unless its replacement is different, this might be unnecessary.
     this.contextValue = {
       locale: (window.ENV && window.ENV.MOMENT_LOCALE) || TeacherViewContextDefaults.locale,
-      timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone
+      timeZone: (window.ENV && window.ENV.TIMEZONE) || TeacherViewContextDefaults.timeZone,
     }
 
     this.fieldValidator = new AssignmentFieldValidator()
@@ -127,7 +127,7 @@ export default class TeacherView extends React.Component {
       this.setState({
         workingAssignment: updatedAssignment,
         isDirty: true,
-        invalids: updatedInvalids
+        invalids: updatedInvalids,
       })
     }
   }
@@ -173,8 +173,8 @@ export default class TeacherView extends React.Component {
     deleteAssignment({
       variables: {
         id: this.props.assignment.lid,
-        state: 'deleted'
-      }
+        state: 'deleted',
+      },
     })
   }
 
@@ -189,7 +189,7 @@ export default class TeacherView extends React.Component {
     showFlashAlert({
       message: I18n.t('Unable to delete assignment'),
       err: new Error(apolloErrors),
-      type: 'error'
+      type: 'error',
     })
     this.setState({confirmDelete: false, deletingNow: false})
   }
@@ -201,7 +201,7 @@ export default class TeacherView extends React.Component {
       return {
         workingAssignment: this.props.assignment,
         isDirty: false,
-        invalids: this.fieldValidator.invalidFields()
+        invalids: this.fieldValidator.invalidFields(),
       }
     })
   }
@@ -212,7 +212,7 @@ export default class TeacherView extends React.Component {
         (state, props) => {
           return {
             isSaving: true,
-            isTogglingWorkstate: state.workingAssignment.state !== props.assignment.state
+            isTogglingWorkstate: state.workingAssignment.state !== props.assignment.state,
           }
         },
         () => {
@@ -235,16 +235,16 @@ export default class TeacherView extends React.Component {
                 sectionId: o.set.__typename === 'Section' ? o.set.lid : undefined,
                 groupId: o.set.__typename === 'Group' ? o.set.lid : undefined,
                 studentIds:
-                  o.set.__typename === 'AdhocStudents' ? o.set.students.map(s => s.lid) : undefined
-              }))
-            }
+                  o.set.__typename === 'AdhocStudents' ? o.set.students.map(s => s.lid) : undefined,
+              })),
+            },
           })
         }
       )
     } else {
       showFlashAlert({
         message: I18n.t('You cannot save while there are errors'),
-        type: 'info'
+        type: 'info',
       })
     }
   }
@@ -256,7 +256,7 @@ export default class TeacherView extends React.Component {
       isSaving: false,
       isUnpublishing: false,
       isDirty: state.isUnpublishing ? state.isDirty : false,
-      isTogglingWorkstate: false
+      isTogglingWorkstate: false,
     }))
   }
 
@@ -265,7 +265,7 @@ export default class TeacherView extends React.Component {
     showFlashAlert({
       message: I18n.t('An error occured saving the assignment'),
       err: new Error(apolloErrors),
-      type: 'error'
+      type: 'error',
     })
 
     this.setState((state, _props) => {
@@ -280,7 +280,7 @@ export default class TeacherView extends React.Component {
       return {
         isSaving: false,
         isTogglingWorkstate: false,
-        workingAssignment
+        workingAssignment,
       }
     })
   }
@@ -294,7 +294,7 @@ export default class TeacherView extends React.Component {
     } else {
       showFlashAlert({
         message: I18n.t('You cannot publish this assignment while there are errors'),
-        type: 'info'
+        type: 'info',
       })
     }
   }
@@ -303,14 +303,14 @@ export default class TeacherView extends React.Component {
     {
       children: I18n.t('Cancel'),
       onClick: this.handleCancelDelete,
-      'data-testid': 'delete-dialog-cancel-button'
+      'data-testid': 'delete-dialog-cancel-button',
     },
     {
       children: I18n.t('Delete'),
       variant: 'danger',
       onClick: () => this.handleReallyDelete(deleteAssignment),
-      'data-testid': 'delete-dialog-confirm-button'
-    }
+      'data-testid': 'delete-dialog-confirm-button',
+    },
   ]
 
   renderDeleteDialogBody = () => (
@@ -327,7 +327,7 @@ export default class TeacherView extends React.Component {
           workingAssignment: updatedAssignment,
           isSaving: true,
           isDirty: true,
-          isTogglingWorkstate: true
+          isTogglingWorkstate: true,
         },
         () => {
           if (newState === 'unpublished') {
@@ -336,8 +336,8 @@ export default class TeacherView extends React.Component {
               saveAssignment({
                 variables: {
                   id: this.state.workingAssignment.lid,
-                  state: this.state.workingAssignment.state
-                }
+                  state: this.state.workingAssignment.state,
+                },
               })
             })
           } else {
@@ -349,7 +349,7 @@ export default class TeacherView extends React.Component {
     } else {
       showFlashAlert({
         message: I18n.t('You cannot publish this assignment while there are errors'),
-        type: 'info'
+        type: 'info',
       })
     }
   }

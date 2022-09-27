@@ -44,10 +44,10 @@ const recordShape = shape({
   items: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ),
-  nextPage: string.isRequired
+  nextPage: string.isRequired,
 })
 
 const formatDate = date => tz.format(date, 'date.formats.medium_with_weekday')
@@ -61,7 +61,7 @@ class SearchFormComponent extends Component {
     getGradebookHistory: func.isRequired,
     clearSearchOptions: func.isRequired,
     getSearchOptions: func.isRequired,
-    getSearchOptionsNextPage: func.isRequired
+    getSearchOptionsNextPage: func.isRequired,
   }
 
   constructor(props) {
@@ -73,13 +73,13 @@ class SearchFormComponent extends Component {
         student: '',
         from: {value: ''},
         to: {value: ''},
-        showFinalGradeOverridesOnly: false
+        showFinalGradeOverridesOnly: false,
       },
       messages: {
         assignments: I18n.t('Type a few letters to start searching'),
         graders: I18n.t('Type a few letters to start searching'),
-        students: I18n.t('Type a few letters to start searching')
-      }
+        students: I18n.t('Type a few letters to start searching'),
+      },
     }
     this.debouncedGetSearchOptions = debounce(props.getSearchOptions, DEBOUNCE_DELAY)
   }
@@ -97,24 +97,24 @@ class SearchFormComponent extends Component {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
-          assignments: I18n.t('No artifacts with that name found')
-        }
+          assignments: I18n.t('No artifacts with that name found'),
+        },
       }))
     }
     if (graders.fetchStatus === 'success' && !graders.items.length) {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
-          graders: I18n.t('No graders with that name found')
-        }
+          graders: I18n.t('No graders with that name found'),
+        },
       }))
     }
     if (students.fetchStatus === 'success' && !students.items.length) {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
-          students: I18n.t('No students with that name found')
-        }
+          students: I18n.t('No students with that name found'),
+        },
       }))
     }
     if (assignments.nextPage) {
@@ -134,8 +134,8 @@ class SearchFormComponent extends Component {
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from: {value}
-      }
+        from: {value},
+      },
     }))
   }
 
@@ -145,8 +145,8 @@ class SearchFormComponent extends Component {
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to: {value}
-      }
+        to: {value},
+      },
     }))
   }
 
@@ -156,7 +156,7 @@ class SearchFormComponent extends Component {
     this.setState(prevState => {
       const selected = {
         ...prevState.selected,
-        assignment: selectedOption || ''
+        assignment: selectedOption || '',
       }
 
       // If we selected an assignment, uncheck the "show final grade overrides
@@ -175,8 +175,8 @@ class SearchFormComponent extends Component {
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        grader: selected || ''
-      }
+        grader: selected || '',
+      },
     }))
   }
 
@@ -186,8 +186,8 @@ class SearchFormComponent extends Component {
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        student: selected || ''
-      }
+        student: selected || '',
+      },
     }))
   }
 
@@ -209,8 +209,8 @@ class SearchFormComponent extends Component {
       return [
         {
           type: 'error',
-          text: I18n.t("'From' date must be before 'To' date")
-        }
+          text: I18n.t("'From' date must be before 'To' date"),
+        },
       ]
     }
 
@@ -223,8 +223,8 @@ class SearchFormComponent extends Component {
       messages: {
         assignments: emptyMessage,
         graders: emptyMessage,
-        students: emptyMessage
-      }
+        students: emptyMessage,
+      },
     })
   }
 
@@ -252,8 +252,8 @@ class SearchFormComponent extends Component {
       selected: {
         ...prevState.selected,
         assignment: enabled ? '' : prevState.selected.assignment,
-        showFinalGradeOverridesOnly: enabled
-      }
+        showFinalGradeOverridesOnly: enabled,
+      },
     }))
   }
 
@@ -407,18 +407,18 @@ const mapStateToProps = state => ({
   assignments: {
     fetchStatus: state.searchForm.records.assignments.fetchStatus || '',
     items: state.searchForm.records.assignments.items || [],
-    nextPage: state.searchForm.records.assignments.nextPage || ''
+    nextPage: state.searchForm.records.assignments.nextPage || '',
   },
   graders: {
     fetchStatus: state.searchForm.records.graders.fetchStatus || '',
     items: state.searchForm.records.graders.items || [],
-    nextPage: state.searchForm.records.graders.nextPage || ''
+    nextPage: state.searchForm.records.graders.nextPage || '',
   },
   students: {
     fetchStatus: state.searchForm.records.students.fetchStatus || '',
     items: state.searchForm.records.students.items || [],
-    nextPage: state.searchForm.records.students.nextPage || ''
-  }
+    nextPage: state.searchForm.records.students.nextPage || '',
+  },
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -433,7 +433,7 @@ const mapDispatchToProps = dispatch => ({
   },
   clearSearchOptions: recordType => {
     dispatch(SearchFormActions.clearSearchOptions(recordType))
-  }
+  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchFormComponent)

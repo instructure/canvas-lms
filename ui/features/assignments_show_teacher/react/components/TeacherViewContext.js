@@ -21,7 +21,7 @@ import {DateTime} from '@instructure/ui-i18n'
 
 export const TeacherViewContextDefaults = {
   locale: window.navigator.language,
-  timeZone: DateTime.browserTimeZone()
+  timeZone: DateTime.browserTimeZone(),
 }
 
 const TeacherViewContext = React.createContext(TeacherViewContextDefaults)

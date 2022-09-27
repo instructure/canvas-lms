@@ -53,7 +53,7 @@ const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
 
 GradebookHistoryApp.propTypes = {
   courseUrl: string,
-  learningMasteryEnabled: bool
+  learningMasteryEnabled: bool,
 }
 
 export default GradebookHistoryApp

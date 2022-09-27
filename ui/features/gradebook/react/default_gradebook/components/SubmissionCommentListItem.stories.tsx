@@ -34,8 +34,8 @@ export default {
     setProcessing: () => {},
     authorUrl: '',
     author: 'John Doe',
-    comment: 'commenting...'
-  }
+    comment: 'commenting...',
+  },
 }
 
 const Template = args => <SubmissionCommentListItem {...args} />

@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Context Modules', suiteHooks => {
@@ -43,7 +43,7 @@ QUnit.module('Gradebook > Context Modules', suiteHooks => {
 
       contextModules = [
         {id: '2601', name: 'Algebra', position: 1},
-        {id: '2602', name: 'English', position: 2}
+        {id: '2602', name: 'English', position: 2},
       ]
     })
 

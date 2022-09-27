@@ -67,7 +67,7 @@ class ReuploadSubmissionsDialogManager {
         if (typeof cb === 'function') {
           cb()
         }
-      }
+      },
     })
 
     setupSubmitHandler(this.userAssetString)

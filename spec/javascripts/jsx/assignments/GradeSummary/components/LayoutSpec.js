@@ -38,29 +38,29 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
         gradesPublished: false,
         id: '2301',
         muted: true,
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       currentUser: {
         canViewStudentIdentities: true,
         graderId: 'admin',
-        id: '1100'
+        id: '1100',
       },
       finalGrader: {
         canViewStudentIdentities: true,
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
-      ]
+        {graderId: '1102', graderName: 'Mr. Keating'},
+      ],
     }
 
     fakeENV.setup({
       GRADERS: [
         {grader_name: 'Miss Frizzle', id: '4502', user_id: '1101', grader_selectable: true},
-        {grader_name: 'Mr. Keating', id: '4503', user_id: '1102', grader_selectable: true}
-      ]
+        {grader_name: 'Mr. Keating', id: '4503', user_id: '1102', grader_selectable: true},
+      ],
     })
 
     sinon
@@ -109,7 +109,7 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
     hooks.beforeEach(() => {
       students = [
         {id: '1111', displayName: 'Adam Jones'},
-        {id: '1112', displayName: 'Betty Ford'}
+        {id: '1112', displayName: 'Betty Ford'},
       ]
     })
 
@@ -135,11 +135,11 @@ QUnit.module('GradeSummary Layout', suiteHooks => {
       mountComponent()
       const students = [
         {id: '1111', displayName: 'Adam Jones'},
-        {id: '1112', displayName: 'Betty Ford'}
+        {id: '1112', displayName: 'Betty Ford'},
       ]
       store.dispatch(StudentActions.addStudents(students))
       grades = [
-        {grade: 'A', graderId: '1101', id: '1101', score: 10, selected: false, studentId: '1111'}
+        {grade: 'A', graderId: '1101', id: '1101', score: 10, selected: false, studentId: '1111'},
       ]
       store.dispatch(GradeActions.addProvisionalGrades(grades))
       wrapper.update()

@@ -39,8 +39,8 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
 
     gridSupport = {
       events: {
-        onKeyDown: new GridEvent()
-      }
+        onKeyDown: new GridEvent(),
+      },
     }
 
     const assignment = {grading_type: 'points', id: '2301', points_possible: 10}
@@ -54,7 +54,7 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
       entered_score: 7.8,
       excused: false,
       id: '2501',
-      user_id: '1101'
+      user_id: '1101',
     })
 
     sinon.stub(gradebook, 'isGradeEditable').withArgs('1101', '2301').returns(true)
@@ -68,22 +68,22 @@ QUnit.module('GradebookGrid AssignmentCellEditor', suiteHooks => {
           return gridSupport
         },
         object: assignment,
-        propFactory: new AssignmentRowCellPropFactory(gradebook)
+        propFactory: new AssignmentRowCellPropFactory(gradebook),
       },
       grid: {
         onKeyDown: {
           subscribe() {},
-          unsubscribe() {}
-        }
+          unsubscribe() {},
+        },
       },
       item: {
         // student row object
         id: '1101',
         assignment_2301: {
           // submission
-          user_id: '1101'
-        }
-      }
+          user_id: '1101',
+        },
+      },
     }
   })
 

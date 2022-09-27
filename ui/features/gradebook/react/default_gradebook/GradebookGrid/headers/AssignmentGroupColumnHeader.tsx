@@ -40,7 +40,7 @@ function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGro
       const weight = I18n.n(weightValue, {
         precision: 2,
         percentage: true,
-        strip_insignificant_zeros: true
+        strip_insignificant_zeros: true,
       })
 
       if (viewUngradedAsZero) {
@@ -83,10 +83,10 @@ function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGro
 AssignmentGroupDetail.propTypes = {
   assignmentGroup: shape({
     name: string.isRequired,
-    groupWeight: number
+    groupWeight: number,
   }).isRequired,
   viewUngradedAsZero: bool.isRequired,
-  weightedGroups: bool.isRequired
+  weightedGroups: bool.isRequired,
 }
 
 function renderTrigger(assignmentGroup, ref) {
@@ -117,7 +117,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
   static propTypes = {
     assignmentGroup: shape({
       name: string.isRequired,
-      groupWeight: number
+      groupWeight: number,
     }).isRequired,
     sortBySetting: shape({
       direction: string.isRequired,
@@ -125,18 +125,18 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader<Props, Sta
       isSortColumn: bool.isRequired,
       onSortByGradeAscending: func.isRequired,
       onSortByGradeDescending: func.isRequired,
-      settingKey: string.isRequired
+      settingKey: string.isRequired,
     }).isRequired,
     onApplyScoreToUngraded: func,
     viewUngradedAsZero: bool.isRequired,
     weightedGroups: bool.isRequired,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     isRunningScoreToUngraded: bool,
-    ...ColumnHeader.propTypes
+    ...ColumnHeader.propTypes,
   }
 
   static defaultProps = {
-    ...ColumnHeader.defaultProps
+    ...ColumnHeader.defaultProps,
   }
 
   render() {

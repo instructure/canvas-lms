@@ -36,7 +36,7 @@ BulkDateInput.propTypes = {
   defaultTime: string,
   interaction: string,
   messages: arrayOf(shape({type: string, text: string})),
-  width: string
+  width: string,
 }
 
 BulkDateInput.defaultProps = {
@@ -44,7 +44,7 @@ BulkDateInput.defaultProps = {
   fancyMidnight: false,
   defaultTime: null,
   interaction: 'enabled',
-  width: '100%'
+  width: '100%',
 }
 
 function BulkDateInput({
@@ -59,7 +59,7 @@ function BulkDateInput({
   fancyMidnight,
   defaultTime,
   interaction,
-  width
+  width,
 }) {
   // do this here so tests can modify ENV.TIMEZONE
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
@@ -86,7 +86,7 @@ function BulkDateInput({
             selectedMoment.hour(),
             selectedMoment.minute(),
             selectedMoment.second(),
-            selectedMoment.millisecond()
+            selectedMoment.millisecond(),
           ]
           newMoment.hour(h)
           newMoment.minute(m)

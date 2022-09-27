@@ -104,7 +104,7 @@ export function compareAssignmentPositions(
 
 export function idSort(a: {id: string}, b: {id: string}, {asc = true}): number {
   return NumberCompare(Number(a.id), Number(b.id), {
-    descending: !asc
+    descending: !asc,
   })
 }
 

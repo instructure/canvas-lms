@@ -36,7 +36,7 @@ afterEach(() => {
 
 it('renders the title', async () => {
   const assignment = await mockAssignment({
-    Assignment: {name: 'Egypt Economy Research'}
+    Assignment: {name: 'Egypt Economy Research'},
   })
   const {getByText} = render(<AssignmentDetails assignment={assignment} />)
   expect(getByText('Egypt Economy Research')).toBeInTheDocument()
@@ -44,7 +44,7 @@ it('renders the title', async () => {
 
 it('renders the due date if dueAt is set', async () => {
   const assignment = await mockAssignment({
-    Assignment: {dueAt: '2016-07-11T18:00:00-01:00'}
+    Assignment: {dueAt: '2016-07-11T18:00:00-01:00'},
   })
 
   const {queryAllByText} = render(<AssignmentDetails assignment={assignment} />)

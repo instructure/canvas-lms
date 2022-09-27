@@ -68,11 +68,11 @@ TrayContent.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
-  isPeerReviewEnabled: bool
+  isPeerReviewEnabled: bool,
 }
 
 TrayContent.defaultProps = {
-  isPeerReviewEnabled: false
+  isPeerReviewEnabled: false,
 }
 
 export default function CommentsTray(props) {
@@ -133,9 +133,9 @@ CommentsTray.propTypes = {
   reviewerSubmission: Submission.shape,
   closeTray: func.isRequired,
   open: bool.isRequired,
-  isPeerReviewEnabled: bool
+  isPeerReviewEnabled: bool,
 }
 
 CommentsTray.defaultProps = {
-  isPeerReviewEnabled: false
+  isPeerReviewEnabled: false,
 }

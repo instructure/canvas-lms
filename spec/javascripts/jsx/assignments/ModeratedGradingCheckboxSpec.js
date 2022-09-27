@@ -30,7 +30,7 @@ QUnit.module('ModeratedGradingCheckbox', hooks => {
       gradedSubmissionsExist: false,
       isGroupAssignment: false,
       isPeerReviewAssignment: false,
-      onChange: () => {}
+      onChange: () => {},
     }
   })
 

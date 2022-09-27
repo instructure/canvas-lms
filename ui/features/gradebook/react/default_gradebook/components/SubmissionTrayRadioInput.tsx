@@ -25,7 +25,7 @@ import TimeLateInput from '@canvas/grading/TimeLateInput'
 function styles({color, showNumberInput}) {
   return {
     backgroundColor: color,
-    height: showNumberInput ? '5rem' : '2rem'
+    height: showNumberInput ? '5rem' : '2rem',
   }
 }
 
@@ -51,14 +51,14 @@ export default class SubmissionTrayRadioInput extends React.Component<Props> {
   radioInputClasses: string
 
   static defaultProps = {
-    color: 'transparent'
+    color: 'transparent',
   }
 
   constructor(props) {
     super(props)
 
     this.radioInputClasses = classnames('SubmissionTray__RadioInput', {
-      'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent'
+      'SubmissionTray__RadioInput-WithBackground': props.color !== 'transparent',
     })
   }
 

@@ -53,15 +53,15 @@ const submissionsParams = {
     'submitted_at',
     'url',
     'user_id',
-    'workflow_state'
-  ]
+    'workflow_state',
+  ],
 }
 
 function flashStudentLoadError(): void {
   showFlashAlert({
     message: I18n.t('There was a problem loading students.'),
     type: 'error',
-    err: null
+    err: null,
   })
 }
 
@@ -69,7 +69,7 @@ function flashSubmissionLoadError(): void {
   showFlashAlert({
     message: I18n.t('There was a problem loading submissions.'),
     type: 'error',
-    err: null
+    err: null,
   })
 }
 
@@ -88,7 +88,7 @@ function getStudentsChunk(
     enrollment_type: ['student', 'student_view'],
     include: ['avatar_url', 'enrollments', 'group_ids', 'last_name', 'first_name'],
     per_page: studentIds.length,
-    user_ids: studentIds
+    user_ids: studentIds,
   }
 
   return options.dispatch.getJSON(url, params)
@@ -159,7 +159,7 @@ function getContentForStudentIdChunk(
   return {
     allEnqueued,
     studentRequest: studentRequest.catch(flashStudentLoadError), // ignore failed student requests
-    submissionRequests
+    submissionRequests,
   }
 }
 
@@ -173,7 +173,7 @@ export default class StudentContentDataLoader {
   constructor({
     dispatch,
     gradebook,
-    performanceControls
+    performanceControls,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
@@ -198,7 +198,7 @@ export default class StudentContentDataLoader {
       dispatch: this._dispatch,
       gradebook,
       submissionsChunkSize: this._performanceControls.submissionsChunkSize,
-      submissionsPerPage: this._performanceControls.submissionsPerPage
+      submissionsPerPage: this._performanceControls.submissionsPerPage,
     }
 
     const studentRequests: Promise<void>[] = []

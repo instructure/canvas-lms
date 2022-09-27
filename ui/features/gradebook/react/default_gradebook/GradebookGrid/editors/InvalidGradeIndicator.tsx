@@ -41,5 +41,5 @@ export default function InvalidGradeIndicator(props) {
 }
 
 InvalidGradeIndicator.propTypes = {
-  elementRef: func.isRequired
+  elementRef: func.isRequired,
 }

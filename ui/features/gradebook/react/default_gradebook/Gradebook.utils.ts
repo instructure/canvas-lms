@@ -35,7 +35,7 @@ import type {
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
   PartialFilterPreset,
-  SubmissionFilterValue
+  SubmissionFilterValue,
 } from './gradebook.d'
 import type {
   Assignment,
@@ -46,7 +46,7 @@ import type {
   StudentGroup,
   StudentGroupCategory,
   StudentMap,
-  Submission
+  Submission,
 } from '../../../../api.d'
 import type {GridColumn} from './grid'
 import {columnWidths} from './initialState'
@@ -88,13 +88,13 @@ export function getAssignmentGroupPointsPossible(assignmentGroup) {
 export function getCourseFeaturesFromOptions(options) {
   return {
     finalGradeOverrideEnabled: options.final_grade_override_enabled,
-    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero
+    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero,
   }
 }
 
 export function getCourseFromOptions(options) {
   return {
-    id: options.context_id
+    id: options.context_id,
   }
 }
 
@@ -151,7 +151,7 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
       ),
       confirmText: I18n.t('OK'),
       label: I18n.t('View Ungraded as Zero'),
-      confirmColor: undefined
+      confirmColor: undefined,
     })
 
   // If the setting was already enabled, no need to show the confirmation
@@ -240,14 +240,14 @@ export const deserializeFilter = (json: GradebookFilterApiResponse): FilterPrese
       id: c.id,
       type: c.type,
       value: c.value,
-      created_at: String(c.created_at)
+      created_at: String(c.created_at),
     }))
   return {
     id: filterPreset.id,
     name: String(filterPreset.name),
     filters,
     created_at: String(filterPreset.created_at),
-    updated_at: String(filterPreset.updated_at)
+    updated_at: String(filterPreset.updated_at),
   }
 }
 
@@ -255,8 +255,8 @@ export const serializeFilter = (filterPreset: PartialFilterPreset): GradebookFil
   return {
     name: filterPreset.name,
     payload: {
-      conditions: filterPreset.filters
-    }
+      conditions: filterPreset.filters,
+    },
   }
 }
 
@@ -301,7 +301,7 @@ export const getLabelForFilter = (
     const options: any = {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
     }
     if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
     const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
@@ -310,7 +310,7 @@ export const getLabelForFilter = (
     const options: any = {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
     }
     if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
     const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
@@ -375,7 +375,7 @@ export function buildStudentColumn(
     width: studentColumnWidth,
     cssClass: 'meta-cell primary-column student',
     headerCssClass: 'primary-column student',
-    resizable: true
+    resizable: true,
   }
 }
 
@@ -392,7 +392,7 @@ export function buildCustomColumn(customColumn: CustomColumn): GridColumn {
     editor: LongTextEditor,
     customColumnId: customColumn.id,
     autoEdit: false,
-    maxLength: 255
+    maxLength: 255,
   }
 }
 
@@ -422,7 +422,7 @@ export const buildAssignmentGroupColumnFn =
       cssClass: `meta-cell assignment-group-cell ${columnId}`,
       headerCssClass: `assignment_group ${columnId}`,
       type: 'assignment_group',
-      assignmentGroupId: assignmentGroup.id
+      assignmentGroupId: assignmentGroup.id,
     }
   }
 

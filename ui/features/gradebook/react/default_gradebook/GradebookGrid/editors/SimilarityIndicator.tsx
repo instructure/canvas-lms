@@ -55,6 +55,6 @@ SimilarityIndicator.propTypes = {
   elementRef: func.isRequired,
   similarityInfo: shape({
     similarityScore: number,
-    status: oneOf(['error', 'pending', 'scored']).isRequired
-  }).isRequired
+    status: oneOf(['error', 'pending', 'scored']).isRequired,
+  }).isRequired,
 }

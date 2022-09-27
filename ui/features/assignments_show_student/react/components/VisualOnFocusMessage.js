@@ -38,5 +38,5 @@ export default function VisualOnFocusMessage({message}) {
 }
 
 VisualOnFocusMessage.propTypes = {
-  message: PropTypes.string
+  message: PropTypes.string,
 }

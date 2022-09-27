@@ -23,7 +23,7 @@ QUnit.module('ReuploadSubmissionsDialogManager#constructor')
 test('constructs reupload url from given assignment data and url template', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
     'user_22',
@@ -37,7 +37,7 @@ QUnit.module('ReuploadSubmissionsDialogManager#isDialogEnabled')
 
 test('returns true when assignment submssions have been downloaded', () => {
   const manager = new ReuploadSubmissionsDialogManager({id: '123'}, 'the_url', 'user_22', {
-    123: true
+    123: true,
   })
 
   strictEqual(manager.isDialogEnabled(), true)
@@ -45,7 +45,7 @@ test('returns true when assignment submssions have been downloaded', () => {
 
 test('returns false when assignment submssions have not been downloaded', () => {
   const manager = new ReuploadSubmissionsDialogManager({id: '123'}, 'the_url', 'user_22', {
-    123: false
+    123: false,
   })
 
   strictEqual(manager.isDialogEnabled(), false)
@@ -56,7 +56,7 @@ QUnit.module('ReuploadSubmissionsDialogManager#showDialog')
 test('sets form action to reupload url', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
     'user_22',
@@ -73,7 +73,7 @@ test('sets form action to reupload url', () => {
 test('opens dialog', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
     'user_22',

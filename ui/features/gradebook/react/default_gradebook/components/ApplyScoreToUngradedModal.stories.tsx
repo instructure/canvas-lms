@@ -24,12 +24,12 @@ export default {
   component: ApplyScoreToUngradedModal,
   args: {
     assignmentGroup: null,
-    open: true
+    open: true,
   },
   argTypes: {
     onApply: {action: 'HI GUYS'},
-    onClose: {action: 'HHHD'}
-  }
+    onClose: {action: 'HHHD'},
+  },
 }
 
 const Template = args => <ApplyScoreToUngradedModal {...args} />
@@ -42,6 +42,6 @@ SpecificAssignmentGroup.args = {
   ...AllAssignments.args,
   assignmentGroup: {
     id: '100',
-    name: 'My Assignment Group'
-  }
+    name: 'My Assignment Group',
+  },
 }

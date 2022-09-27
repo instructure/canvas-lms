@@ -82,7 +82,7 @@ describe.skip('EditableDateTime', () => {
       mode: 'edit',
       onChangeMode,
       onChange,
-      value
+      value,
     })
 
     const datestr = DateTime.toLocaleString(value, locale, timeZone, 'LL')

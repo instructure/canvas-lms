@@ -31,13 +31,13 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       catch(catchFn) {
         this.catchFn = catchFn
         return this
-      }
+      },
     }
     sandbox.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise)
     this.gradebook = createGradebook({context_id: '1201'})
     this.gradebook.gradebookContent.customColumns = [
       {id: '2401', teacher_notes: true, hidden: true, title: 'Notes'},
-      {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'}
+      {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'},
     ]
     this.gradebook.gradebookGrid.grid = {
       getColumns() {
@@ -45,17 +45,17 @@ QUnit.module('Gradebook#setTeacherNotesHidden - showing teacher notes', {
       },
       getOptions() {
         return {
-          numberOfColumnsToFreeze: 0
+          numberOfColumnsToFreeze: 0,
         }
       },
       invalidate() {},
       setColumns() {},
-      setNumberOfColumnsToFreeze() {}
+      setNumberOfColumnsToFreeze() {},
     }
     sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
     sandbox.stub(this.gradebook, 'reorderCustomColumns')
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
-  }
+  },
 })
 
 test('sets teacherNotesUpdating to true before sending the api request', function () {
@@ -83,7 +83,7 @@ test('shows the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(this.gradebook.getTeacherNotesColumn().hidden, true)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
 })
@@ -92,7 +92,7 @@ test('reorders custom columns after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   equal(this.gradebook.reorderCustomColumns.callCount, 0)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.reorderCustomColumns.callCount, 1)
 })
@@ -100,7 +100,7 @@ test('reorders custom columns after request resolves', function () {
 test('reorders custom columns using the column ids', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   const [columnIds] = this.gradebook.reorderCustomColumns.getCall(0).args
   deepEqual(columnIds, ['2401', '2402'])
@@ -109,7 +109,7 @@ test('reorders custom columns using the column ids', function () {
 test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
@@ -117,7 +117,7 @@ test('sets teacherNotesUpdating to false after request resolves', function () {
 test('re-renders the view options menu after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(false)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
@@ -152,12 +152,12 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
       catch(catchFn) {
         this.catchFn = catchFn
         return this
-      }
+      },
     }
     sandbox.stub(GradebookApi, 'updateTeacherNotesColumn').returns(this.promise)
     this.gradebook = createGradebook({
       context_id: '1201',
-      teacher_notes: {id: '2401', teacher_notes: true, hidden: false}
+      teacher_notes: {id: '2401', teacher_notes: true, hidden: false},
     })
     this.gradebook.gradebookGrid.grid = {
       getColumns() {
@@ -165,15 +165,15 @@ QUnit.module('Gradebook#setTeacherNotesHidden - hiding teacher notes', {
       },
       getOptions() {
         return {
-          numberOfColumnsToFreeze: 0
+          numberOfColumnsToFreeze: 0,
         }
       },
       invalidate() {},
       setColumns() {},
-      setNumberOfColumnsToFreeze() {}
+      setNumberOfColumnsToFreeze() {},
     }
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
-  }
+  },
 })
 
 test('sets teacherNotesUpdating to true before sending the api request', function () {
@@ -201,7 +201,7 @@ test('hides the notes column after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true},
   })
   equal(this.gradebook.getTeacherNotesColumn().hidden, true)
 })
@@ -209,7 +209,7 @@ test('hides the notes column after request resolves', function () {
 test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
@@ -217,7 +217,7 @@ test('sets teacherNotesUpdating to false after request resolves', function () {
 test('re-renders the view options menu after request resolves', function () {
   this.gradebook.setTeacherNotesHidden(true)
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: true},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
@@ -248,12 +248,12 @@ QUnit.module('Gradebook#showNotesColumn', {
       title: 'Notes',
       position: 1,
       teacher_notes: true,
-      hidden: true
+      hidden: true,
     }
     this.gradebook = createGradebook({teacher_notes: teacherNotes})
     sandbox.stub(this.gradebook.dataLoader, 'loadCustomColumnData')
     sandbox.stub(this.gradebook, 'toggleNotesColumn')
-  }
+  },
 })
 
 test('loads the notes if they have not yet been loaded', function () {
@@ -373,13 +373,13 @@ QUnit.module('Gradebook#createTeacherNotes', {
       catch(catchFn) {
         this.catchFn = catchFn
         return this
-      }
+      },
     }
     sandbox.stub(GradebookApi, 'createTeacherNotesColumn').returns(this.promise)
     this.gradebook = createGradebook({context_id: '1201'})
     sandbox.stub(this.gradebook, 'showNotesColumn')
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
-  }
+  },
 })
 
 test('sets teacherNotesUpdating to true before sending the api request', function () {
@@ -418,7 +418,7 @@ test('updates custom columns with response data after request resolves', functio
 test('shows the notes column after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.getTeacherNotesColumn().hidden, false)
 })
@@ -426,7 +426,7 @@ test('shows the notes column after request resolves', function () {
 test('sets teacherNotesUpdating to false after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })
@@ -434,7 +434,7 @@ test('sets teacherNotesUpdating to false after request resolves', function () {
 test('re-renders the view options menu after request resolves', function () {
   this.gradebook.createTeacherNotes()
   this.promise.thenFn({
-    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false}
+    data: {id: '2401', title: 'Notes', position: 1, teacher_notes: true, hidden: false},
   })
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, false)
 })

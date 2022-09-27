@@ -20,7 +20,7 @@ import ReactDOM from 'react-dom'
 import AnonymousSpeedGraderAlert from 'ui/features/gradebook/react/default_gradebook/components/AnonymousSpeedGraderAlert'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -30,7 +30,7 @@ QUnit.module('Gradebook#renderAnonymousSpeedGraderAlert', hooks => {
   const onClose = () => {}
   const alertProps = {
     speedGraderUrl: 'http://test.url:3000',
-    onClose
+    onClose,
   }
 
   function anonymousSpeedGraderAlertProps() {

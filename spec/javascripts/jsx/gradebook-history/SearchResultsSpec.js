@@ -30,7 +30,7 @@ function defaultHistoryItems() {
         anonymousGrading: false,
         gradingType: 'points',
         muted: false,
-        name: 'Rustic Rubber Duck'
+        name: 'Rustic Rubber Duck',
       },
       date: 'May 30, 2017',
       displayAsPoints: true,
@@ -43,8 +43,8 @@ function defaultHistoryItems() {
       pointsPossibleAfter: '25',
       pointsPossibleCurrent: '30',
       student: 'Norval Abbott',
-      time: '11:16pm'
-    }
+      time: '11:16pm',
+    },
   ]
 }
 
@@ -55,7 +55,7 @@ function defaultProps() {
     historyItems: defaultHistoryItems(),
     getNextPage() {},
     nextPage: 'example.com',
-    requestingResults: false
+    requestingResults: false,
   }
 }
 
@@ -70,7 +70,7 @@ QUnit.module('SearchResults', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('does not show a Table/Spinner if no historyItems passed', () => {
@@ -96,7 +96,7 @@ test('Table has column headers in correct order', () => {
     'Artifact',
     'Before',
     'After',
-    'Current'
+    'Current',
   ]
   const wrapper = mount(<SearchResultsComponent {...defaultProps()} />)
   const headers = wrapper
@@ -164,7 +164,7 @@ test('loads next page on scroll if possible', () => {
   const props = {
     ...defaultProps(),
     nextPage: 'example.com',
-    getNextPage: sinon.stub()
+    getNextPage: sinon.stub(),
   }
   const wrapper = mount(<SearchResultsComponent {...props} />)
   window.innerHeight = document.body.clientHeight - 1
@@ -180,7 +180,7 @@ test('loads next page if available on window resize that causes window to not ha
     ...defaultProps(),
     historyItems,
     nextPage: 'example.com',
-    getNextPage: sinon.stub()
+    getNextPage: sinon.stub(),
   }
   const wrapper = mount(<SearchResultsComponent {...props} />)
   window.innerHeight = document.body.clientHeight

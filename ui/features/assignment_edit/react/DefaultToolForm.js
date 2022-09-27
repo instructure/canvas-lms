@@ -124,12 +124,12 @@ DefaultToolForm.propTypes = {
   toolName: PropTypes.string.isRequired,
   previouslySelected: PropTypes.bool.isRequired,
   toolButtonText: PropTypes.string,
-  toolInfoMessage: PropTypes.string
+  toolInfoMessage: PropTypes.string,
 }
 
 DefaultToolForm.defaultProps = {
   toolButtonText: I18n.t('Add Content'),
-  toolInfoMessage: I18n.t('Click the button above to add content')
+  toolInfoMessage: I18n.t('Click the button above to add content'),
 }
 
 export default DefaultToolForm

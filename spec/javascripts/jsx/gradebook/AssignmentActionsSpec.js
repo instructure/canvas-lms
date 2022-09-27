@@ -24,23 +24,23 @@ QUnit.module('Gradebook Assignment Actions', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     gradebook = createGradebook({
-      download_assignment_submissions_url: 'http://example.com/submissions'
+      download_assignment_submissions_url: 'http://example.com/submissions',
     })
 
     assignments = [
       {
         id: '2301',
-        submission_types: ['online_text_entry']
+        submission_types: ['online_text_entry'],
       },
       {
         id: '2302',
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     ]
 
     gradebook.gotAllAssignmentGroups([
       {id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1)},
-      {id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2)}
+      {id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2)},
     ])
   })
 

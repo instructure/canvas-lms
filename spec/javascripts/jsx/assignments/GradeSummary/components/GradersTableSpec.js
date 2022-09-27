@@ -38,18 +38,18 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         gradesPublished: false,
         id: '2301',
         muted: true,
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       currentUser: {
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'},
         {graderId: '1103', graderName: 'Mrs. Krabappel'},
-        {graderId: '1104', graderName: 'Mr. Feeny'}
-      ]
+        {graderId: '1104', graderName: 'Mr. Feeny'},
+      ],
     }
 
     provisionalGrades = [
@@ -59,7 +59,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         id: '4601',
         score: 9.5,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       },
       {
         grade: 'B',
@@ -67,7 +67,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         id: '4602',
         score: 8.4,
         selected: false,
-        studentId: '1112'
+        studentId: '1112',
       },
       {
         grade: 'C',
@@ -75,7 +75,7 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         id: '4603',
         score: 7.6,
         selected: false,
-        studentId: '1113'
+        studentId: '1113',
       },
       {
         grade: 'B+',
@@ -83,8 +83,8 @@ QUnit.module('GradeSummary GradersTable', suiteHooks => {
         id: '4604',
         score: 8.9,
         selected: false,
-        studentId: '1114'
-      }
+        studentId: '1114',
+      },
     ]
   })
 

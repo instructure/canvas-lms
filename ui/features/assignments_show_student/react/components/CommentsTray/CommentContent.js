@@ -29,7 +29,7 @@ import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
   SUBMISSION_COMMENT_QUERY,
-  SUBMISSION_HISTORIES_QUERY
+  SUBMISSION_HISTORIES_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionComment} from '@canvas/assignments/graphql/student/SubmissionComment'
 import SVGWithTextPlaceholder from '../../SVGWithTextPlaceholder'
@@ -60,8 +60,8 @@ export default function CommentContent(props) {
           query: SUBMISSION_COMMENT_QUERY,
           variables: {
             submissionId: props.submission.id,
-            submissionAttempt: props.submission.attempt
-          }
+            submissionAttempt: props.submission.attempt,
+          },
         }
 
         const {submissionComments} = JSON.parse(
@@ -75,7 +75,7 @@ export default function CommentContent(props) {
 
         cache.writeQuery({
           ...commentQueryVariables,
-          data: {submissionComments}
+          data: {submissionComments},
         })
 
         // Now update the unreadCommentCount. We have to handle the current
@@ -85,7 +85,7 @@ export default function CommentContent(props) {
           id: props.submission.id,
           fragment: Submission.fragment,
           fragmentName: 'Submission',
-          variables: {submissionID: props.submission.id}
+          variables: {submissionID: props.submission.id},
         }
         const cachedCurrentSubmission = cache.readFragment(submissionQueryVariables)
 
@@ -97,7 +97,7 @@ export default function CommentContent(props) {
         } else {
           const cachedHistories = cache.readQuery({
             query: SUBMISSION_HISTORIES_QUERY,
-            variables: {submissionID: props.submission.id}
+            variables: {submissionID: props.submission.id},
           })
 
           const histories = JSON.parse(JSON.stringify(cachedHistories))
@@ -113,10 +113,10 @@ export default function CommentContent(props) {
           cache.writeQuery({
             query: SUBMISSION_HISTORIES_QUERY,
             variables: {submissionID: props.submission.id},
-            data: histories
+            data: histories,
           })
         }
-      }
+      },
     }
   )
 
@@ -189,9 +189,9 @@ CommentContent.propTypes = {
   comments: arrayOf(SubmissionComment.shape).isRequired,
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
-  isPeerReviewEnabled: bool
+  isPeerReviewEnabled: bool,
 }
 
 CommentContent.defaultProps = {
-  isPeerReviewEnabled: false
+  isPeerReviewEnabled: false,
 }

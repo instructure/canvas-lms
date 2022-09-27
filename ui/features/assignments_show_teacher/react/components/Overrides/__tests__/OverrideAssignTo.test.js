@@ -25,28 +25,31 @@ const assignToSection = {
   set: {
     __typename: 'Section',
     lid: '17',
-    sectionName: 'Section 8'
-  }
+    sectionName: 'Section 8',
+  },
 }
 const assignToGroup = {
   set: {
     __typename: 'Group',
     lid: '68',
-    groupName: 'Yo La Tengo'
-  }
+    groupName: 'Yo La Tengo',
+  },
 }
 const assignToGroupWithNoName = {
   set: {
     __typename: 'Group',
     lid: '68',
-    groupName: null
-  }
+    groupName: null,
+  },
 }
 const assignToStudents = {
   set: {
     __typename: 'AdhocStudents',
-    students: [{lid: '2', studentName: 'Dweezil Zappa'}, {lid: '3', studentName: 'Moon Zappa'}]
-  }
+    students: [
+      {lid: '2', studentName: 'Dweezil Zappa'},
+      {lid: '3', studentName: 'Moon Zappa'},
+    ],
+  },
 }
 
 it('renders an empty OverrideAssignTo summary', () => {

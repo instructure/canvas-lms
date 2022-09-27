@@ -36,8 +36,8 @@ class SubmissionHistoriesQuery extends React.Component {
   static propTypes = {
     initialQueryData: shape({
       ...Assignment.shape.propTypes,
-      ...Submission.shape.propTypes
-    })
+      ...Submission.shape.propTypes,
+    }),
   }
 
   render() {

@@ -22,7 +22,7 @@ const I18n = useI18nScope('gradebook')
 
 const primaryInfoLabels = {
   first_last: I18n.t('First, Last Name'),
-  last_first: I18n.t('Last, First Name')
+  last_first: I18n.t('Last, First Name'),
 }
 
 const primaryInfoKeys = ['first_last', 'last_first']
@@ -34,7 +34,7 @@ const secondaryInfoLabels = {
   sis_id: I18n.t('SIS ID'),
   integration_id: I18n.t('Integration ID'),
   login_id: I18n.t('Login ID'),
-  none: I18n.t('None')
+  none: I18n.t('None'),
 }
 
 const secondaryInfoKeys = ['section', 'sis_id', 'integration_id', 'login_id', 'group', 'none']
@@ -43,7 +43,7 @@ const sectionSecondaryInfo = 'section'
 
 const enrollmentFilterLabels = {
   inactive: I18n.t('Inactive enrollments'),
-  concluded: I18n.t('Concluded enrollments')
+  concluded: I18n.t('Concluded enrollments'),
 }
 
 const enrollmentFilterKeys = ['inactive', 'concluded']
@@ -57,5 +57,5 @@ export default {
   defaultSecondaryInfo,
   sectionSecondaryInfo,
   enrollmentFilterKeys,
-  enrollmentFilterLabels
+  enrollmentFilterLabels,
 }

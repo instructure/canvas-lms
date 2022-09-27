@@ -30,7 +30,7 @@ export default function ExternalToolOptions({
   activeSubmissionType,
   externalTools,
   updateActiveSubmissionType,
-  selectedExternalTool
+  selectedExternalTool,
 }) {
   if (externalTools.length === 0) {
     return null
@@ -97,9 +97,9 @@ ExternalToolOptions.propTypes = {
   activeSubmissionType: string,
   externalTools: arrayOf(ExternalTool.shape).isRequired,
   updateActiveSubmissionType: func,
-  selectedExternalTool: ExternalTool.shape
+  selectedExternalTool: ExternalTool.shape,
 }
 
 ExternalToolOptions.defaultProps = {
-  updateActiveSubmissionType: () => {}
+  updateActiveSubmissionType: () => {},
 }

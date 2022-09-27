@@ -24,7 +24,7 @@ import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/
 QUnit.module('#updateSubmissionComments', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('calls renderSubmissionTray', function () {
@@ -86,7 +86,7 @@ QUnit.module('#apiCreateSubmissionComment', hooks => {
     student = {
       enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
       id: '1101',
-      name: 'Adam Jones'
+      name: 'Adam Jones',
     }
     gradebook.setAssignments({2301: assignment})
     gradebook.gotChunkOfStudents([student])
@@ -208,7 +208,7 @@ QUnit.module('#apiUpdateSubmissionComment', hooks => {
     gradebook = createGradebook()
     gradebook.setSubmissionComments([
       {id: '23', createdAt: '2015-10-04T22:09:27Z', editedAt: null, comment: 'a comment'},
-      {id: '25', createdAt: '2015-10-05T22:09:27Z', editedAt: null, comment: 'another comment'}
+      {id: '25', createdAt: '2015-10-05T22:09:27Z', editedAt: null, comment: 'another comment'},
     ])
   })
 
@@ -226,9 +226,9 @@ QUnit.module('#apiUpdateSubmissionComment', hooks => {
           id: '23',
           created_at: '2015-10-04T22:09:27Z',
           comment,
-          edited_at: editedTimestamp
-        }
-      }
+          edited_at: editedTimestamp,
+        },
+      },
     })
   }
 
@@ -311,7 +311,7 @@ QUnit.module('#apiDeleteSubmissionComment', {
   teardown() {
     FlashAlert.destroyContainer()
     moxios.uninstall()
-  }
+  },
 })
 
 test('calls the success function on a successful call', function () {
@@ -374,13 +374,13 @@ QUnit.module('#removeSubmissionComment', {
         author: {
           display_name: 'foo',
           avatar_image_url: '//avatar_image_url/',
-          html_url: '//html_url/'
+          html_url: '//html_url/',
         },
         created_at: new Date('2017-09-15'),
-        comment: 'a comment'
-      }
+        comment: 'a comment',
+      },
     ]
-  }
+  },
 })
 
 test('removes matching comment id', function () {
@@ -431,7 +431,7 @@ QUnit.module('#setEditedCommentId', () => {
 QUnit.module('#getSubmissionComments', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('is empty', function () {
@@ -447,7 +447,7 @@ test('gets comments', function () {
 QUnit.module('#setSubmissionComments', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('sets comments on gridDisplaySettings.submissionTray', function () {

@@ -29,7 +29,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       assignment: {
         anonymizeStudents: false,
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -44,8 +44,8 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
         missing: false,
         postedAt: null,
         secondsLate: 0,
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 
@@ -207,7 +207,7 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
     props = {
       assignment: {
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -221,8 +221,8 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
         missing: false,
         secondsLate: 0,
         assignmentId: '1',
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 
@@ -266,7 +266,7 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
     props = {
       assignment: {
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -280,8 +280,8 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
         missing: false,
         secondsLate: 0,
         assignmentId: '1',
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 
@@ -325,7 +325,7 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
     props = {
       assignment: {
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -339,8 +339,8 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
         missing: false,
         secondsLate: 0,
         assignmentId: '1',
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 
@@ -384,7 +384,7 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
     props = {
       assignment: {
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -398,8 +398,8 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
         missing: false,
         secondsLate: 0,
         assignmentId: '1',
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 
@@ -443,7 +443,7 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
     props = {
       assignment: {
         postManually: false,
-        published: true
+        published: true,
       },
       isConcluded: false,
       isInOtherGradingPeriod: false,
@@ -457,8 +457,8 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
         missing: false,
         secondsLate: 0,
         assignmentId: '1',
-        workflowState: 'unsubmitted'
-      }
+        workflowState: 'unsubmitted',
+      },
     }
   })
 

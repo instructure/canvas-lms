@@ -34,16 +34,16 @@ async function mockSubmissionCommentQuery() {
   const overrides = {
     Node: {__typename: 'Submission'},
     SubmissionCommentConnection: {
-      nodes: [{}]
-    }
+      nodes: [{}],
+    },
   }
   const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
   return {
     request: {
       query: SUBMISSION_COMMENT_QUERY,
-      variables
+      variables,
     },
-    result
+    result,
   }
 }
 
@@ -52,9 +52,9 @@ async function mockCreateSubmissionComment(variables = {}) {
   return {
     request: {
       query: CREATE_SUBMISSION_COMMENT,
-      variables
+      variables,
     },
-    result
+    result,
   }
 }
 
@@ -66,7 +66,7 @@ function mockContext(children) {
     <AlertManagerContext.Provider
       value={{
         setOnFailure: mockedSetOnFailure,
-        setOnSuccess: mockedSetOnSuccess
+        setOnSuccess: mockedSetOnSuccess,
       }}
     >
       {children}
@@ -88,8 +88,8 @@ describe('CommentTextArea', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
-        files
-      }
+        files,
+      },
     })
   }
 
@@ -102,7 +102,7 @@ describe('CommentTextArea', () => {
       mediaObject = {
         id: 1,
         name: 'Never Gonna Give You Up',
-        type: 'video/mp4'
+        type: 'video/mp4',
       }
     })
 
@@ -178,7 +178,7 @@ describe('CommentTextArea', () => {
       new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
-      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
     ]
 
     uploadFiles(fileInput, files)
@@ -199,7 +199,7 @@ describe('CommentTextArea', () => {
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image4.png', {type: 'image/png'}),
-      new File(['foo'], 'awesome-test-image5.png', {type: 'image/png'})
+      new File(['foo'], 'awesome-test-image5.png', {type: 'image/png'}),
     ]
 
     uploadFiles(fileInput, files.slice(0, 1))
@@ -224,7 +224,7 @@ describe('CommentTextArea', () => {
       new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
-      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
     ]
 
     uploadFiles(fileInput, files)
@@ -273,7 +273,7 @@ describe('CommentTextArea', () => {
     const files = [
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
-      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
     ]
 
     uploadFiles(fileInput, files)
@@ -299,7 +299,7 @@ describe('CommentTextArea', () => {
     const files = [
       new File(['foo'], 'awesome-test-image1.png', {type: 'image/png'}),
       new File(['foo'], 'awesome-test-image2.png', {type: 'image/png'}),
-      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'})
+      new File(['foo'], 'awesome-test-image3.png', {type: 'image/png'}),
     ]
 
     uploadFiles(fileInput, files)
@@ -324,7 +324,7 @@ describe('CommentTextArea', () => {
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
       {id: '1', name: 'awesome-test-image1.png'},
       {id: '2', name: 'awesome-test-image2.png'},
-      {id: '3', name: 'awesome-test-image3.png'}
+      {id: '3', name: 'awesome-test-image3.png'},
     ]
 
     const variables = {
@@ -332,11 +332,11 @@ describe('CommentTextArea', () => {
       id: '1',
       comment: 'lion',
       fileIds: ['1', '2', '3'],
-      mediaObjectId: null
+      mediaObjectId: null,
     }
     const mocks = await Promise.all([
       mockSubmissionCommentQuery(),
-      mockCreateSubmissionComment(variables)
+      mockCreateSubmissionComment(variables),
     ])
     const props = await mockAssignmentAndSubmission()
     const {container, findByPlaceholderText, findByText} = render(
@@ -372,13 +372,13 @@ describe('CommentTextArea', () => {
     uploadFileModule.submissionCommentAttachmentsUpload = () => [
       {id: '1', name: 'awesome-test-image1.png'},
       {id: '2', name: 'awesome-test-image2.png'},
-      {id: '3', name: 'awesome-test-image3.png'}
+      {id: '3', name: 'awesome-test-image3.png'},
     ]
 
     const variables = {submissionAttempt: 0, id: '1', comment: '', fileIds: ['1', '2', '3']}
     const mocks = await Promise.all([
       mockSubmissionCommentQuery(),
-      mockCreateSubmissionComment(variables)
+      mockCreateSubmissionComment(variables),
     ])
     const props = await mockAssignmentAndSubmission()
     const {getByPlaceholderText, getByText, queryAllByText} = render(
@@ -408,7 +408,7 @@ describe('CommentTextArea', () => {
     const variables = {submissionAttempt: 0, id: '1', comment: 'lion', fileIds: ['1', '2', '3']}
     const mocks = await Promise.all([
       mockSubmissionCommentQuery(),
-      mockCreateSubmissionComment(variables)
+      mockCreateSubmissionComment(variables),
     ])
     const props = await mockAssignmentAndSubmission()
     const {container, getByPlaceholderText, getByText, queryAllByText} = render(

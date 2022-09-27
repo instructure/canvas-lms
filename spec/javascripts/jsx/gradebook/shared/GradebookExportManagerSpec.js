@@ -26,7 +26,7 @@ const monitoringBase = GradebookExportManager.DEFAULT_MONITORING_BASE_URL
 const attachmentBase = `${GradebookExportManager.DEFAULT_ATTACHMENT_BASE_URL}/${currentUserId}/files`
 const workingExport = {
   progressId: 'progressId',
-  attachmentId: 'attachmentId'
+  attachmentId: 'attachmentId',
 }
 
 QUnit.module('GradebookExportManager - constructor', {
@@ -36,7 +36,7 @@ QUnit.module('GradebookExportManager - constructor', {
 
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 test('sets the polling interval with a sensible default', () => {
@@ -54,7 +54,7 @@ test('sets the existing export if it is not already completed or failed', () => 
     const existingExport = {
       progressId: workingExport.progressId,
       attachmentId: workingExport.attachmentId,
-      workflowState
+      workflowState,
     }
 
     const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport)
@@ -65,7 +65,7 @@ test('sets the existing export if it is not already completed or failed', () => 
     const existingExport = {
       progressId: workingExport.progressId,
       attachmentId: workingExport.attachmentId,
-      workflowState
+      workflowState,
     }
 
     const manager = new GradebookExportManager(exportingUrl, currentUserId, existingExport)
@@ -85,7 +85,7 @@ QUnit.module('GradebookExportManager - monitoringUrl', {
     moxios.uninstall()
 
     this.subject = undefined
-  }
+  },
 })
 
 test('returns an appropriate url if all relevant pieces are present', function () {
@@ -115,7 +115,7 @@ QUnit.module('GradebookExportManager - attachmentUrl', {
     moxios.uninstall()
 
     this.subject = undefined
-  }
+  },
 })
 
 test('returns an appropriate url if all relevant pieces are present', function () {
@@ -140,13 +140,13 @@ QUnit.module('GradebookExportManager - startExport', {
 
     const expectedExportFromServer = {
       progress_id: 'newProgressId',
-      attachment_id: 'newAttachmentId'
+      attachment_id: 'newAttachmentId',
     }
 
     // Initial request to start the export
     moxios.stubRequest(new RegExp(exportingUrl), {
       status: 200,
-      responseText: expectedExportFromServer
+      responseText: expectedExportFromServer,
     })
   },
 
@@ -155,7 +155,7 @@ QUnit.module('GradebookExportManager - startExport', {
 
     this.subject.clearMonitor()
     this.subject = undefined
-  }
+  },
 })
 
 test('sets show_student_first_last_name setting if requested', function () {
@@ -254,7 +254,7 @@ test('returns a rejected promise if the manager already has an export going', fu
 test('sets a new existing export and returns a fulfilled promise', function () {
   const expectedExport = {
     progressId: 'newProgressId',
-    attachmentId: 'newAttachmentId'
+    attachmentId: 'newAttachmentId',
   }
 
   this.subject = new GradebookExportManager(exportingUrl, currentUserId)
@@ -300,8 +300,8 @@ test('starts polling for progress and returns a rejected promise on progress fai
     status: 200,
     responseText: {
       workflow_state: 'failed',
-      message: 'Arbitrary failure'
-    }
+      message: 'Arbitrary failure',
+    },
   })
 
   return this.subject
@@ -325,8 +325,8 @@ test('starts polling for progress and returns a rejected promise on unknown prog
     status: 200,
     responseText: {
       workflow_state: 'discombobulated',
-      message: 'Pattern buffer degradation'
-    }
+      message: 'Pattern buffer degradation',
+    },
   })
 
   return this.subject
@@ -350,16 +350,16 @@ test('starts polling for progress and returns a fulfilled promise on progress co
   moxios.stubRequest(expectedMonitoringUrl, {
     status: 200,
     responseText: {
-      workflow_state: 'completed'
-    }
+      workflow_state: 'completed',
+    },
   })
 
   moxios.stubRequest(expectedAttachmentUrl, {
     status: 200,
     responseText: {
       url: 'http://completedAttachmentUrl',
-      updated_at: '2009-01-20T17:00:00Z'
-    }
+      updated_at: '2009-01-20T17:00:00Z',
+    },
   })
 
   return this.subject
@@ -374,7 +374,7 @@ test('starts polling for progress and returns a fulfilled promise on progress co
 
       const expectedResolution = {
         attachmentUrl: 'http://completedAttachmentUrl',
-        updatedAt: '2009-01-20T17:00:00Z'
+        updatedAt: '2009-01-20T17:00:00Z',
       }
       deepEqual(resolution, expectedResolution)
     })

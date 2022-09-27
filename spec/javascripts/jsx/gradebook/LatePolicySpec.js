@@ -22,7 +22,7 @@ import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicat
 QUnit.module('Gradebook#setLatePolicy', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('sets the late policy state', function () {
@@ -38,8 +38,8 @@ QUnit.module('Gradebook#applyLatePolicy', {
     this.gradebook.gradingPeriodSet = {
       gradingPeriods: [
         {id: 100, isClosed: true},
-        {id: 101, isClosed: false}
-      ]
+        {id: 101, isClosed: false},
+      ],
     }
     this.latePolicyApplicator = sandbox
       .stub(LatePolicyApplicator, 'processSubmission')
@@ -48,46 +48,46 @@ QUnit.module('Gradebook#applyLatePolicy', {
     this.submission1 = {
       user_id: 10,
       assignment_id: 'assignment_1',
-      grading_period_id: null
+      grading_period_id: null,
     }
 
     this.submission2 = {
       user_id: 10,
       assignment_id: 'assignment_2',
-      grading_period_id: 100
+      grading_period_id: 100,
     }
 
     this.submission3 = {
       user_id: 11,
       assignment_id: 'assignment_2',
-      grading_period_id: 101
+      grading_period_id: 101,
     }
 
     this.submission4 = {
       user_id: 12,
       assignment_id: 'assignment_1',
-      grading_period_id: null
+      grading_period_id: null,
     }
 
     this.gradebook.assignments = {
       assignment_1: 'assignment1value',
-      assignment_2: 'assignment2value'
+      assignment_2: 'assignment2value',
     }
     this.gradebook.students = {
       10: {
         assignment_1: this.submission1,
-        assignment_2: this.submission2
+        assignment_2: this.submission2,
       },
       11: {
-        assignment_2: this.submission3
+        assignment_2: this.submission3,
       },
       12: {
         assignment_1: this.submission4,
-        isConcluded: true
-      }
+        isConcluded: true,
+      },
     }
     this.gradebook.courseContent.latePolicy = 'latepolicy'
-  }
+  },
 })
 
 test('does not affect submissions in closed grading periods', function () {

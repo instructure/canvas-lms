@@ -39,23 +39,23 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
           {
             groups: [
               {id: '2103', name: 'Group B1'},
-              {id: '2104', name: 'Group B2'}
+              {id: '2104', name: 'Group B2'},
             ],
             id: '2152',
-            name: 'Group Set B'
+            name: 'Group Set B',
           },
           {
             groups: [
               {id: '2101', name: 'Group A2'},
-              {id: '2102', name: 'Group A1'}
+              {id: '2102', name: 'Group A1'},
             ],
             id: '2151',
-            name: 'Group Set A'
-          }
+            name: 'Group Set A',
+          },
         ],
 
         onSelect: sinon.stub(),
-        selectedStudentGroupId: '0'
+        selectedStudentGroupId: '0',
       }
 
       component = null

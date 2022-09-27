@@ -47,5 +47,5 @@ export default function DateLocked(props) {
 
 DateLocked.propTypes = {
   date: string.isRequired,
-  type: oneOf(['assignment', 'quiz', 'topic', 'file', 'page'])
+  type: oneOf(['assignment', 'quiz', 'topic', 'file', 'page']),
 }

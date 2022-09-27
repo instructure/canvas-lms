@@ -31,7 +31,7 @@ import type {
   StudentGroupCategory,
   StudentMap,
   SubmissionType,
-  WorkflowState
+  WorkflowState,
 } from '../api.d'
 
 export type CourseSettingsType = {

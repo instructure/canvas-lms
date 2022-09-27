@@ -32,18 +32,18 @@ export default class AssignmentDescription extends React.Component {
   static propTypes = {
     text: string,
     onChange: func.isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultPropTypes = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      mode: 'view'
+      mode: 'view',
     }
   }
 

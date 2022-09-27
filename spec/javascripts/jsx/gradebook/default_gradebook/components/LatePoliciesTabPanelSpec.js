@@ -44,13 +44,13 @@ QUnit.module(
       props = {
         latePolicy: {
           changes: {},
-          validationErrors: {}
+          validationErrors: {},
           // by default there is no data key, it gets added after first render
         },
         changeLatePolicy,
         locale: 'en',
         gradebookIsEditable: true,
-        showAlert: false
+        showAlert: false,
       }
       changeLatePolicySpy = sinon.spy(props, 'changeLatePolicy')
     })
@@ -85,8 +85,8 @@ QUnit.module(
         ...componentProps,
         latePolicy: {
           ...componentProps.latePolicy,
-          data: DEFAULT_LATE_POLICY_DATA
-        }
+          data: DEFAULT_LATE_POLICY_DATA,
+        },
       }
       mountComponent(props)
     }
@@ -147,7 +147,7 @@ QUnit.module(
         test("the 'Automatically apply grade for missing submissions' checkbox displays what's passed in via props", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
-            missingSubmissionDeductionEnabled: true
+            missingSubmissionDeductionEnabled: true,
           }
           mountComponent(props)
           const checkbox = getAutomaticallyApplyGradeForMissingSubmissionsCheckbox()
@@ -157,7 +157,7 @@ QUnit.module(
         test("the 'Grade percentage for missing submissions' displays what's passed in via props, adjusted for display", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
-            missingSubmissionDeduction: 42
+            missingSubmissionDeduction: 42,
           }
           mountComponent(props)
           const input = getGradePercentageForMissingSubmissionsInput()
@@ -241,7 +241,7 @@ QUnit.module(
         test("the 'Automatically apply grade for missing submissions' checkbox displays what's passed in via props", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
-            lateSubmissionDeductionEnabled: true
+            lateSubmissionDeductionEnabled: true,
           }
           mountComponent(props)
           const checkbox = getAutomaticallyApplyDeductionToLateSubmissionsCheckbox()
@@ -251,7 +251,7 @@ QUnit.module(
         test("the 'Late submission deduction percent' input displays what's passed in via props", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
-            lateSubmissionDeduction: 43
+            lateSubmissionDeduction: 43,
           }
           mountComponent(props)
           const input = getLateSubmissionDeductionPercentInput()
@@ -261,7 +261,7 @@ QUnit.module(
         test("the 'Lowest Possible Grade Percent' input displays what's passed in via props", () => {
           props.latePolicy.data = {
             ...DEFAULT_LATE_POLICY_DATA,
-            lateSubmissionMinimumPercent: 44
+            lateSubmissionMinimumPercent: 44,
           }
           mountComponent(props)
           const input = getLowestPossibleGradePercentInput()
@@ -478,21 +478,21 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       changeLatePolicy() {},
       gradebookIsEditable: true,
       locale: 'en',
-      showAlert: false
+      showAlert: false,
     }
     props = {
       latePolicy: {
         changes: {},
         validationErrors: {},
         data: latePolicyData,
-        ...latePolicyProps
+        ...latePolicyProps,
       },
       ...defaults,
-      ...otherProps
+      ...otherProps,
     }
     changeLatePolicySpy = sinon.spy(props, 'changeLatePolicy')
     return mount(<LatePoliciesTabPanel {...props} />, {
-      attachTo: document.getElementById('fixtures')
+      attachTo: document.getElementById('fixtures'),
     })
   }
 
@@ -503,7 +503,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     lateSubmissionDeduction: 0,
     lateSubmissionInterval: 'day',
     lateSubmissionMinimumPercentEnabled: false,
-    lateSubmissionMinimumPercent: 0
+    lateSubmissionMinimumPercent: 0,
   }
   let changeLatePolicySpy
   let props
@@ -578,7 +578,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: spinner', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('shows a spinner if no data is present', function () {
@@ -594,7 +594,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: validations', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('shows a message if missing deduction validation errors are passed', function () {
@@ -610,7 +610,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: missing submission deduction checkbox', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('calls the changeLatePolicy function when the missing submission deduction checkbox is changed', function () {
@@ -636,7 +636,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: missing submission deduction input', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('missing submission input has label describing it', function () {
@@ -726,11 +726,11 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   test('calls the changeLatePolicy function without a validationError for missing submission deduction if a valid input is entered after an invalid input is entered', function () {
     this.wrapper = mountComponent({
       changes: {
-        missingSubmissionDeduction: 0
+        missingSubmissionDeduction: 0,
       },
       validationErrors: {
-        missingSubmissionDeduction: 'Missing submission grade must be between 0 and 100'
-      }
+        missingSubmissionDeduction: 'Missing submission grade must be between 0 and 100',
+      },
     })
     missingDeductionInput(this.wrapper).simulate('blur')
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -744,7 +744,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: late submission deduction checkbox', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('calls the changeLatePolicy function when the late submission deduction checkbox is changed', function () {
@@ -772,7 +772,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     const data = {
       ...latePolicyData,
       lateSubmissionMinimumPercent: 1,
-      lateSubmissionDeductionEnabled: false
+      lateSubmissionDeductionEnabled: false,
     }
     this.wrapper = mountComponent({data})
     lateDeductionCheckbox(this.wrapper).simulate('change', {target: {checked: true}})
@@ -799,7 +799,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   QUnit.module('LatePoliciesTabPanel: late submission deduction input', {
     teardown() {
       this.wrapper.unmount()
-    }
+    },
   })
 
   test('disables the late deduction input if the late deduction checkbox is unchecked', function () {
@@ -875,11 +875,11 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
   test('calls the changeLatePolicy function without a validationError for late submission deduction if a valid input is entered after an invalid input is entered', function () {
     this.wrapper = mountComponent({
       changes: {
-        lateSubmissionDeduction: 100
+        lateSubmissionDeduction: 100,
       },
       validationErrors: {
-        lateSubmissionDeduction: 'Late submission deduction must be between 0 and 100'
-      }
+        lateSubmissionDeduction: 'Late submission deduction must be between 0 and 100',
+      },
     })
     lateDeductionInput(this.wrapper).simulate('blur')
     strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')
@@ -919,8 +919,8 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       changeLateDeductionIntervalSelect(wrapper, 'hour')
       const {
         firstCall: {
-          args: [{changes}]
-        }
+          args: [{changes}],
+        },
       } = changeLatePolicySpy
       deepEqual(changes, {lateSubmissionInterval: 'hour'})
     })
@@ -931,8 +931,8 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       changeLateDeductionIntervalSelect(wrapper, 'day')
       const {
         secondCall: {
-          args: [{changes}]
-        }
+          args: [{changes}],
+        },
       } = changeLatePolicySpy
       deepEqual(changes, {})
     })
@@ -949,7 +949,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       const data = {
         ...latePolicyData,
         lateSubmissionMinimumPercent: 60,
-        lateSubmissionMinimumPercentEnabled: true
+        lateSubmissionMinimumPercentEnabled: true,
       }
       wrapper = mountComponent({data})
       lateSubmissionMinimumPercentInput(wrapper).simulate('change', {target: {value: '22'}})
@@ -965,14 +965,14 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       const data = {
         ...latePolicyData,
         lateSubmissionMinimumPercent: 60,
-        lateSubmissionMinimumPercentEnabled: true
+        lateSubmissionMinimumPercentEnabled: true,
       }
       wrapper = mountComponent({data})
       const input = lateSubmissionMinimumPercentInput(wrapper)
       input.simulate('change', {target: {value: '22'}})
 
       const newProps = {
-        ...wrapper.props()
+        ...wrapper.props(),
       }
       newProps.latePolicy.changes = {lateSubmissionMinimumPercent: 22}
       wrapper.setProps(newProps)
@@ -987,7 +987,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       input.simulate('change', {target: {value: '60'}})
 
       const evenNewerProps = {
-        ...wrapper.props()
+        ...wrapper.props(),
       }
       evenNewerProps.latePolicy.changes = {lateSubmissionMinimumPercent: 60}
       wrapper.setProps(evenNewerProps)
@@ -1005,7 +1005,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
 
       const {changes} = changeLatePolicySpy.firstCall.args[0]
       const newProps = {
-        ...wrapper.props()
+        ...wrapper.props(),
       }
       newProps.latePolicy.changes = {...newProps.latePolicy.changes, ...changes}
       wrapper.setProps(newProps)
@@ -1022,14 +1022,14 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       const data = {
         ...latePolicyData,
         lateSubmissionMinimumPercent: 60,
-        lateSubmissionMinimumPercentEnabled: true
+        lateSubmissionMinimumPercentEnabled: true,
       }
       wrapper = mountComponent({data})
       const input = lateSubmissionMinimumPercentInput(wrapper)
       input.simulate('change', {target: {value: '0'}})
       const {changes} = changeLatePolicySpy.firstCall.args[0]
       const newProps = {
-        ...wrapper.props()
+        ...wrapper.props(),
       }
       newProps.latePolicy.changes = {...newProps.latePolicy.changes, ...changes}
       wrapper.setProps(newProps)
@@ -1054,7 +1054,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
       deepEqual(changeLatePolicySpy.firstCall.args[0].validationErrors, {}, 'no validation errors')
 
       const newProps = {
-        ...wrapper.props()
+        ...wrapper.props(),
       }
       newProps.latePolicy.changes = {lateSubmissionMinimumPercent: NaN}
       wrapper.setProps(newProps)
@@ -1075,7 +1075,7 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
 
     test('does not allow entering negative numbers for late submission minimum percent', () => {
       wrapper = mountComponent({
-        changes: {lateSubmissionMinimumPercentInput: -0.1}
+        changes: {lateSubmissionMinimumPercentInput: -0.1},
       })
       const input = lateSubmissionMinimumPercentInput(wrapper)
       input.simulate('blur')
@@ -1085,11 +1085,11 @@ QUnit.module('Gradebook > Default Gradebook > LatePoliciesTabPanel > with enzyme
     test('calls the changeLatePolicy function without a validationError for late submission minimum percent if a valid input is entered after an invalid input is entered', () => {
       wrapper = mountComponent({
         changes: {
-          lateSubmissionMinimumPercent: 100
+          lateSubmissionMinimumPercent: 100,
         },
         validationErrors: {
-          lateSubmissionMinimumPercent: 'Lowest possible grade must be between 0 and 100'
-        }
+          lateSubmissionMinimumPercent: 'Lowest possible grade must be between 0 and 100',
+        },
       })
       lateSubmissionMinimumPercentInput(wrapper).simulate('blur')
       strictEqual(changeLatePolicySpy.callCount, 1, 'calls changeLatePolicy')

@@ -45,7 +45,7 @@ export default function FilterNavDateModal({
   endDate,
   isOpen,
   onCloseDateModal,
-  onSelectDates
+  onSelectDates,
 }) {
   const [startDateValue, setStartDateValue] = useResetState(startDate)
   const [endDateValue, setEndDateValue] = useResetState(endDate)

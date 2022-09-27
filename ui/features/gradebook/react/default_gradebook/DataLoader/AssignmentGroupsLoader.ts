@@ -35,7 +35,7 @@ export default class AssignmentGroupsLoader {
     dispatch,
     gradebook,
     performanceControls,
-    requestCharacterLimit
+    requestCharacterLimit,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
@@ -55,7 +55,7 @@ export default class AssignmentGroupsLoader {
       'assignment_visibility',
       'assignments',
       'grades_published',
-      'post_manually'
+      'post_manually',
     ]
 
     if (this._gradebook.options.has_modules) {
@@ -70,11 +70,11 @@ export default class AssignmentGroupsLoader {
         'description',
         'in_closed_grading_period',
         'needs_grading_count',
-        'rubric'
+        'rubric',
       ],
       include: includes,
       override_assignment_dates: false,
-      per_page: this._performanceControls.assignmentGroupsPerPage
+      per_page: this._performanceControls.assignmentGroupsPerPage,
     }
 
     const periodId = this._gradingPeriodId()
@@ -155,8 +155,8 @@ export default class AssignmentGroupsLoader {
       selected: selectedIds,
       rest: {
         ids: [...new Set(restIds)],
-        gradingPeriodIds: Object.keys(gpAssignments).filter(gpId => gpId !== selectedPeriodId)
-      }
+        gradingPeriodIds: Object.keys(gpAssignments).filter(gpId => gpId !== selectedPeriodId),
+      },
     }
   }
 

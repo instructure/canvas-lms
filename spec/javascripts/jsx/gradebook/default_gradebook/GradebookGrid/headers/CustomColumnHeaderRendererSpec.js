@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import CustomColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/CustomColumnHeaderRenderer'
 import {getCustomColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
@@ -42,7 +42,7 @@ QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -55,7 +55,7 @@ QUnit.module('GradebookGrid CustomColumnHeaderRenderer', suiteHooks => {
     gradebook = createGradebook()
     gradebook.gotCustomColumns([
       {id: '2401', teacher_notes: true, title: 'Notes'},
-      {id: '2402', teacher_notes: false, title: 'Other Notes'}
+      {id: '2402', teacher_notes: false, title: 'Other Notes'},
     ])
     column = {id: getCustomColumnId('2401'), customColumnId: '2401'}
     renderer = new CustomColumnHeaderRenderer(gradebook)

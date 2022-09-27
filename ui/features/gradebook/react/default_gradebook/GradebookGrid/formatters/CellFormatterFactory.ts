@@ -47,7 +47,7 @@ class CellFormatterFactory {
       student_lastname: new StudentLastNameCellFormatter(gradebook),
       student_firstname: new StudentFirstNameCellFormatter(gradebook),
       total_grade: new TotalGradeCellFormatter(gradebook),
-      total_grade_override: new TotalGradeOverrideCellFormatter(gradebook)
+      total_grade_override: new TotalGradeOverrideCellFormatter(gradebook),
     }
   }
 

@@ -27,7 +27,7 @@ import {
   IconAssignmentLine,
   IconGroupLine,
   IconQuizLine,
-  IconPeerReviewLine
+  IconPeerReviewLine,
 } from '@instructure/ui-icons'
 
 import SelectableText from './SelectableText'
@@ -38,7 +38,7 @@ const assignment_type = {value: 'assignment', label: I18n.t('Assignment'), icon:
 const peer_review_type = {
   value: 'peer-review',
   label: I18n.t('Peer Review Assignment'),
-  icon: IconPeerReviewLine
+  icon: IconPeerReviewLine,
 }
 const group_type = {value: 'group', label: I18n.t('Group Assignment'), icon: IconGroupLine}
 const quiz_type = {value: 'quiz', label: I18n.t('Quiz'), icon: IconQuizLine}
@@ -51,11 +51,11 @@ export default class AssignmentType extends React.Component {
     onChange: func.isRequired,
     onChangeMode: func.isRequired,
     selectedAssignmentType: string,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {

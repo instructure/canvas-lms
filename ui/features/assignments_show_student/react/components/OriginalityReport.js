@@ -40,5 +40,5 @@ export default function OriginalityReport({originalityData}) {
 }
 
 OriginalityReport.propTypes = {
-  originalityData: TurnitinData.shape.isRequired
+  originalityData: TurnitinData.shape.isRequired,
 }

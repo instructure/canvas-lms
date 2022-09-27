@@ -24,8 +24,8 @@ export default {
   component: SimilarityIcon,
   args: {
     similarityScore: 80,
-    status: 'pending'
-  }
+    status: 'pending',
+  },
 }
 
 const Template = args => <SimilarityIcon {...args} />
@@ -38,23 +38,23 @@ export const Error = Template.bind({})
 
 VerySimilar.args = {
   similarityScore: 80,
-  status: 'scored'
+  status: 'scored',
 }
 
 KindaSimilar.args = {
   similarityScore: 50,
-  status: 'scored'
+  status: 'scored',
 }
 
 Original.args = {
   similarityScore: 10,
-  status: 'scored'
+  status: 'scored',
 }
 
 Pending.args = {
-  status: 'pending'
+  status: 'pending',
 }
 
 Error.args = {
-  status: 'error'
+  status: 'error',
 }

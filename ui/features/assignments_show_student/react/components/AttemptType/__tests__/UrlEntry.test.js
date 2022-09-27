@@ -35,24 +35,24 @@ async function createGraphqlMocks(overrides = {}) {
     {
       request: {
         query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
+        variables: {courseID: '1'},
       },
-      result: externalToolsResult
+      result: externalToolsResult,
     },
     {
       request: {
         query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
+        variables: {courseID: '1'},
       },
-      result: externalToolsResult
+      result: externalToolsResult,
     },
     {
       request: {
         query: USER_GROUPS_QUERY,
-        variables: {userID: '1'}
+        variables: {userID: '1'},
       },
-      result: userGroupsResult
-    }
+      result: userGroupsResult,
+    },
   ]
 }
 
@@ -62,7 +62,7 @@ async function makeProps(overrides) {
     ...assignmentAndSubmission,
     createSubmissionDraft: jest.fn().mockResolvedValue({}),
     updateEditingDraft: jest.fn(),
-    focusOnInit: false
+    focusOnInit: false,
   }
   return props
 }
@@ -77,14 +77,14 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: false,
-            url: null
-          }
-        }
+            url: null,
+          },
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -104,14 +104,14 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: false,
-            url: null
-          }
-        }
+            url: null,
+          },
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -133,15 +133,15 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: false,
-            url: null
-          }
-        }
+            url: null,
+          },
+        },
       })
       props.focusOnInit = true
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -161,14 +161,14 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: false,
-            url: null
-          }
-        }
+            url: null,
+          },
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -188,14 +188,14 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: false,
-            url: 'not a valid url'
-          }
-        }
+            url: 'not a valid url',
+          },
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByText} = render(
@@ -215,14 +215,14 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: true,
-            url: 'http://www.valid.com'
-          }
-        }
+            url: 'http://www.valid.com',
+          },
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -242,15 +242,15 @@ describe('UrlEntry', () => {
             attachments: () => [],
             body: null,
             meetsUrlCriteria: true,
-            url: 'http://www.reddit.com'
-          }
-        }
+            url: 'http://www.reddit.com',
+          },
+        },
       })
       window.open = jest.fn()
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(
@@ -271,8 +271,8 @@ describe('UrlEntry', () => {
         Submission: {
           attachment: {_id: '1'},
           state: 'submitted',
-          url: 'http://www.google.com'
-        }
+          url: 'http://www.google.com',
+        },
       })
       const {getByText} = render(<UrlEntry {...props} />)
 
@@ -287,8 +287,8 @@ describe('UrlEntry', () => {
           attachment: {_id: '1'},
           state: 'graded',
           attempt: 1,
-          url: 'http://www.google.com'
-        }
+          url: 'http://www.google.com',
+        },
       })
       const {getByText} = render(<UrlEntry {...props} />)
 
@@ -299,13 +299,13 @@ describe('UrlEntry', () => {
       const props = await makeProps({
         Submission: {
           state: 'graded',
-          attempt: 0
-        }
+          attempt: 0,
+        },
       })
       const overrides = {
         ExternalToolConnection: {
-          nodes: [{}]
-        }
+          nodes: [{}],
+        },
       }
       const mocks = await createGraphqlMocks(overrides)
       const {getByTestId} = render(

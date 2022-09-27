@@ -35,11 +35,11 @@ export default class OverrideDates extends React.Component {
     dueAt: string,
     unlockAt: string,
     lockAt: string,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
@@ -49,7 +49,7 @@ export default class OverrideDates extends React.Component {
     this.state = {
       dueMode: mode,
       unlockMode: mode,
-      lockMode: mode
+      lockMode: mode,
     }
   }
 

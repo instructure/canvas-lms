@@ -121,7 +121,7 @@ class GradebookExportManager {
               .then(attachmentResponse => {
                 const resolution = {
                   attachmentUrl: attachmentResponse.data.url,
-                  updatedAt: attachmentResponse.data.updated_at
+                  updatedAt: attachmentResponse.data.updated_at,
                 }
 
                 this.export = undefined
@@ -160,7 +160,7 @@ class GradebookExportManager {
       show_student_first_last_name: showStudentFirstLastName,
       current_view: currentView,
       assignment_order: undefined,
-      student_order: undefined
+      student_order: undefined,
     }
 
     const assignmentOrder = getAssignmentOrder()
@@ -176,7 +176,7 @@ class GradebookExportManager {
     return axios.post(this.exportingUrl, params).then(response => {
       this.export = {
         progressId: response.data.progress_id,
-        attachmentId: response.data.attachment_id
+        attachmentId: response.data.attachment_id,
       }
 
       return new Promise<{

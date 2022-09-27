@@ -26,19 +26,19 @@ import StudentsSearcher from '../StudentsSearcher'
 function mockRequest({users = [mockUser()], variables = {}}) {
   const submissions = users.map(user => mockSubmission({user}))
   const assignment = mockAssignment({
-    submissions: {nodes: submissions}
+    submissions: {nodes: submissions},
   })
   return {
     request: {
       query: STUDENT_SEARCH_QUERY,
       variables: {
         assignmentId: assignment.lid,
-        ...variables
-      }
+        ...variables,
+      },
     },
     result: {
-      data: {assignment}
-    }
+      data: {assignment},
+    },
   }
 }
 
@@ -116,12 +116,12 @@ describe('StudentsSearcher', () => {
       {},
       {
         users: [mockUser({shortName: 'searched user'})],
-        variables: {orderBy: [{field: 'username', direction: 'ascending'}]}
+        variables: {orderBy: [{field: 'username', direction: 'ascending'}]},
       },
       {
         users: [mockUser({shortName: 'reverse searched user'})],
-        variables: {orderBy: [{field: 'username', direction: 'descending'}]}
-      }
+        variables: {orderBy: [{field: 'username', direction: 'descending'}]},
+      },
     ])
     jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Name'), 'button'))
@@ -138,8 +138,8 @@ describe('StudentsSearcher', () => {
       {},
       {
         users: [mockUser({shortName: 'searched user'})],
-        variables: {orderBy: [{field: 'score', direction: 'ascending'}]}
-      }
+        variables: {orderBy: [{field: 'score', direction: 'ascending'}]},
+      },
     ])
     jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Score'), 'button'))
@@ -152,8 +152,8 @@ describe('StudentsSearcher', () => {
       {},
       {
         users: [mockUser({shortName: 'searched user'})],
-        variables: {orderBy: [{field: 'submitted_at', direction: 'ascending'}]}
-      }
+        variables: {orderBy: [{field: 'submitted_at', direction: 'ascending'}]},
+      },
     ])
     jest.runOnlyPendingTimers()
     fireEvent.click(closest(getByText('Submission Date'), 'button'))
@@ -187,7 +187,7 @@ describe('StudentsSearcher', () => {
   it('runs the userSearch query with a delay', () => {
     const {getByText, queryByText, getByLabelText} = renderStudentsSearcher([
       {},
-      {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}}
+      {users: [mockUser({shortName: 'searched user'})], variables: {userSearch: 'search'}},
     ])
     jest.runOnlyPendingTimers()
     const searchInput = getByLabelText('Search by student name')

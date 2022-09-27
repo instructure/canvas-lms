@@ -32,7 +32,7 @@ jest.mock('../../apis/ContextModuleApi')
 
 jest.mock('../../../../../shared/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn()
+    initializeReaderButton: jest.fn(),
   }
 })
 
@@ -53,7 +53,7 @@ describe('Assignment Student Content View', () => {
 
   it('renders the student header if the assignment is locked', async () => {
     const props = await mockAssignmentAndSubmission({
-      LockInfo: {isLocked: true}
+      LockInfo: {isLocked: true},
     })
     const {getByTestId} = render(<StudentContent {...props} />)
     expect(getByTestId('assignment-student-header')).toBeInTheDocument()
@@ -81,9 +81,9 @@ describe('Assignment Student Content View', () => {
       props = await mockAssignmentAndSubmission({
         Assignment: {
           ...AssignmentMocks.onPaper,
-          name: 'this is my assignment'
+          name: 'this is my assignment',
         },
-        Submission: {}
+        Submission: {},
       })
     })
 
@@ -113,7 +113,7 @@ describe('Assignment Student Content View', () => {
       window.ENV.CONTEXT_MODULE_ITEM = {
         done: false,
         id: '123',
-        module_id: '456'
+        module_id: '456',
       }
 
       const {getByRole} = render(
@@ -142,7 +142,7 @@ describe('Assignment Student Content View', () => {
         assignmentLid: '1',
         courseID: '1',
         submissionAttempt: 0,
-        submissionID: '1'
+        submissionID: '1',
       }
       const overrides = {
         Account: {outcomeProficiency: {proficiencyRatingsConnection: null}},
@@ -151,18 +151,18 @@ describe('Assignment Student Content View', () => {
         Node: {__typename: 'Assignment'},
         Rubric: {
           criteria: [],
-          title: 'Some On-paper Rubric'
-        }
+          title: 'Some On-paper Rubric',
+        },
       }
       const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
       const mocks = [
         {
           request: {
             query: RUBRIC_QUERY,
-            variables
+            variables,
           },
-          result
-        }
+          result,
+        },
       ]
 
       const {findByText} = render(
@@ -185,7 +185,7 @@ describe('Assignment Student Content View', () => {
       it('renders next and previous module links if they exist for the assignment', async () => {
         ContextModuleApi.getContextModuleData.mockResolvedValue({
           next: {url: '/next', tooltipText: {string: 'Next'}},
-          previous: {url: '/previous', tooltipText: {string: 'Previous'}}
+          previous: {url: '/previous', tooltipText: {string: 'Previous'}},
         })
 
         const {getByTestId} = render(
@@ -221,17 +221,17 @@ describe('Assignment Student Content View', () => {
       const variables = {submissionAttempt: 0, submissionId: '1'}
       const overrides = {
         Node: {__typename: 'Submission'},
-        SubmissionCommentConnection: {nodes: []}
+        SubmissionCommentConnection: {nodes: []},
       }
       const result = await mockQuery(SUBMISSION_COMMENT_QUERY, overrides, variables)
       const mocks = [
         {
           request: {
             query: SUBMISSION_COMMENT_QUERY,
-            variables
+            variables,
           },
-          result
-        }
+          result,
+        },
       ]
       return mocks
     }
@@ -306,7 +306,7 @@ describe('Assignment Student Content View', () => {
   describe('number of attempts', () => {
     it('renders the number of attempts with one attempt', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 1}
+        Assignment: {allowedAttempts: 1},
       })
 
       const {getByText} = render(
@@ -319,7 +319,7 @@ describe('Assignment Student Content View', () => {
 
     it('renders the number of attempts with unlimited attempts', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: null}
+        Assignment: {allowedAttempts: null},
       })
       const {getByText} = render(
         <MockedProvider>
@@ -331,7 +331,7 @@ describe('Assignment Student Content View', () => {
 
     it('renders the number of attempts with multiple attempts', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3}
+        Assignment: {allowedAttempts: 3},
       })
       const {getByText} = render(
         <MockedProvider>
@@ -343,7 +343,7 @@ describe('Assignment Student Content View', () => {
 
     it('does not render the number of attempts if the assignment does not involve digital submissions', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {...AssignmentMocks.onPaper}
+        Assignment: {...AssignmentMocks.onPaper},
       })
 
       const {queryByText} = render(
@@ -356,7 +356,7 @@ describe('Assignment Student Content View', () => {
 
     it('does not render the number of attempts if peer review mode is enabled', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {allowedAttempts: 3}
+        Assignment: {allowedAttempts: 3},
       })
       props.assignment.env.peerReviewModeEnabled = true
       props.assignment.env.peerReviewAvailable = true
@@ -366,9 +366,9 @@ describe('Assignment Student Content View', () => {
           {
             anonymousUser: null,
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned'
-          }
-        ]
+            workflowState: 'assigned',
+          },
+        ],
       }
       const {queryByText} = render(
         <MockedProvider>
@@ -381,7 +381,7 @@ describe('Assignment Student Content View', () => {
     it('takes into account extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},
-        Submission: {extraAttempts: 2}
+        Submission: {extraAttempts: 2},
       })
       const {getByText} = render(
         <MockedProvider>
@@ -394,7 +394,7 @@ describe('Assignment Student Content View', () => {
     it('treats a null value for extraAttempts as zero', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 3},
-        Submission: {extraAttempts: null}
+        Submission: {extraAttempts: null},
       })
       const {getByText} = render(
         <MockedProvider>
@@ -410,8 +410,8 @@ describe('Assignment Student Content View', () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {
           unlockAt: '2016-07-11T18:00:00-01:00',
-          lockAt: '2016-11-11T18:00:00-01:00'
-        }
+          lockAt: '2016-11-11T18:00:00-01:00',
+        },
       })
       const {getAllByText} = render(
         <MockedProvider>
@@ -449,9 +449,9 @@ describe('Assignment Student Content View', () => {
           {
             anonymousUser: null,
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned'
-          }
-        ]
+            workflowState: 'assigned',
+          },
+        ],
       }
       const {getByText} = render(
         <MockedProvider>
@@ -502,8 +502,8 @@ describe('Assignment Student Content View', () => {
       props = await mockAssignmentAndSubmission({
         Assignment: {
           description: 'description',
-          name: 'name'
-        }
+          name: 'name',
+        },
       })
     })
 
@@ -526,7 +526,7 @@ describe('Assignment Student Content View', () => {
       await waitFor(() => {
         expect(initializeReaderButton).toHaveBeenCalledWith(element, {
           content: expect.anything(Function),
-          title: 'name'
+          title: 'name',
         })
 
         expect(initializeReaderButton.mock.calls[0][1].content()).toEqual('description')
@@ -547,7 +547,7 @@ describe('Assignment Student Content View', () => {
       await waitFor(() => {
         expect(initializeReaderButton).toHaveBeenCalledWith(element, {
           content: expect.anything(Function),
-          title: 'name'
+          title: 'name',
         })
 
         expect(initializeReaderButton.mock.calls[0][1].content()).toEqual('description')

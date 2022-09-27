@@ -26,22 +26,22 @@ const props: FilterNavProps = {
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
-    {id: '3', name: 'Module 3', position: 3}
+    {id: '3', name: 'Module 3', position: 3},
   ],
   assignmentGroups: [
     {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
     {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
-    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []}
+    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []},
   ],
   sections: [
     {id: '7', name: 'Section 7'},
     {id: '8', name: 'Section 8'},
-    {id: '9', name: 'Section 9'}
+    {id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
     {id: '1', title: 'Grading Period 1', startDate: 1},
     {id: '2', title: 'Grading Period 2', startDate: 2},
-    {id: '3', title: 'Grading Period 3', startDate: 3}
+    {id: '3', title: 'Grading Period 3', startDate: 3},
   ],
   studentGroupCategories: {
     1: {
@@ -49,10 +49,10 @@ const props: FilterNavProps = {
       name: 'Student Group Category 1',
       groups: [
         {id: '1', name: 'Student Group 1'},
-        {id: '2', name: 'Student Group 2'}
-      ]
-    }
-  }
+        {id: '2', name: 'Student Group 2'},
+      ],
+    },
+  },
 }
 
 const appliedFilters: Filter[] = [
@@ -60,25 +60,25 @@ const appliedFilters: Filter[] = [
     id: '2',
     type: 'start-date',
     value: '2022-08-02T06:00:00.000Z',
-    created_at: '2022-02-05T10:18:34-07:00'
+    created_at: '2022-02-05T10:18:34-07:00',
   },
   {
     id: '3',
     type: 'end-date',
     value: '2022-08-04T06:00:00.000Z',
-    created_at: '2022-02-05T10:18:34-07:00'
-  }
+    created_at: '2022-02-05T10:18:34-07:00',
+  },
 ]
 
 export default {
   title: 'Examples/Evaluate/Gradebook/FilterNav',
   component: FilterNav,
-  args: props
+  args: props,
 }
 
 const Wrapper = (args: FilterNavProps) => {
   store.setState({
-    appliedFilters
+    appliedFilters,
   })
 
   return (

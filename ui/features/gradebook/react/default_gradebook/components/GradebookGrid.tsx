@@ -37,7 +37,7 @@ export default function GradebookGridComponent({
   gridData,
   gradebookGridNode,
   gradebookIsEditable,
-  onLoad
+  onLoad,
 }: Props) {
   useEffect(() => {
     const formatterFactory = new CellFormatterFactory(gradebook)
@@ -48,7 +48,7 @@ export default function GradebookGridComponent({
       data: gridData,
       editable: gradebookIsEditable,
       formatterFactory,
-      columnHeaderRenderer
+      columnHeaderRenderer,
     }
     const gradebookGrid = new GradebookGrid(options)
     onLoad(gradebookGrid)

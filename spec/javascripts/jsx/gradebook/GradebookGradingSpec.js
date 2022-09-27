@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import CourseGradeCalculator from '@canvas/grading/CourseGradeCalculator'
@@ -37,7 +37,7 @@ QUnit.module('setupGrading', {
     this.students = [{id: '1101'}, {id: '1102'}]
     sandbox.stub(this.gradebook, 'setAssignmentVisibility')
     sandbox.stub(this.gradebook, 'invalidateRowsForStudentIds')
-  }
+  },
 })
 
 test('sets assignment visibility for the given students', function () {
@@ -106,7 +106,7 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
     ['B', 0.8],
     ['C', 0.7],
     ['D', 0.6],
-    ['E', 0.5]
+    ['E', 0.5],
   ]
   const gradingScheme = {
     id: '2801',
@@ -115,9 +115,9 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
       ['🙂', 0.8],
       ['😐', 0.7],
       ['😢', 0.6],
-      ['💩', 0]
+      ['💩', 0],
     ],
-    title: 'Emoji Grades'
+    title: 'Emoji Grades',
   }
 
   let gradebook
@@ -127,7 +127,7 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
       default_grading_standard: defaultGradingScheme,
       grading_schemes: [gradingScheme],
       grading_standard: gradingScheme.data,
-      ...options
+      ...options,
     })
     gradebook.setAssignments({
       2301: {
@@ -135,15 +135,15 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
         grading_type: 'points',
         id: '2301',
         name: 'Math Assignment',
-        published: true
+        published: true,
       },
       2302: {
         grading_standard_id: null,
         grading_type: 'points',
         id: '2302',
         name: 'English Assignment',
-        published: false
-      }
+        published: false,
+      },
     })
   }
 
@@ -208,7 +208,7 @@ QUnit.module('Gradebook Grading Schemes', suiteHooks => {
 QUnit.module('Gradebook#weightedGrades', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('returns true when group_weighting_scheme is "percent"', function () {
@@ -238,7 +238,7 @@ test('returns false when group_weighting_scheme is not "percent" and gradingPeri
 QUnit.module('Gradebook#weightedGroups', {
   setup() {
     this.gradebook = createGradebook()
-  }
+  },
 })
 
 test('returns true when group_weighting_scheme is "percent"', function () {
@@ -256,30 +256,30 @@ test('returns false when group_weighting_scheme is not "percent"', function () {
 QUnit.module('Gradebook#calculateStudentGrade', {
   createGradebook(options = {}) {
     const gradebook = createGradebook({
-      group_weighting_scheme: 'points'
+      group_weighting_scheme: 'points',
     })
     const assignments = [{id: '201', points_possible: 10, omit_from_final_grade: false}]
     Object.assign(gradebook, {
       assignmentGroups: [{id: '301', group_weight: 60, rules: {}, assignments}],
       gradingPeriods: [
         {id: '701', weight: 50},
-        {id: '702', weight: 50}
+        {id: '702', weight: 50},
       ],
       gradingPeriodSet: {
         id: '1501',
         gradingPeriods: [
           {id: '701', weight: 50},
-          {id: '702', weight: 50}
+          {id: '702', weight: 50},
         ],
-        weighted: true
+        weighted: true,
       },
       effectiveDueDates: {
         201: {
-          101: {grading_period_id: '701'}
-        }
+          101: {grading_period_id: '701'},
+        },
       },
       submissionsForStudent: () => this.submissions,
-      ...options
+      ...options,
     })
     gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
     return gradebook
@@ -288,7 +288,7 @@ QUnit.module('Gradebook#calculateStudentGrade', {
   setup() {
     this.exampleGrades = createGrades()
     this.submissions = [{assignment_id: 201, score: 10}]
-  }
+  },
 })
 
 test('calculates grades using properties from the gradebook', function () {
@@ -297,7 +297,7 @@ test('calculates grades using properties from the gradebook', function () {
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   })
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], this.submissions)
@@ -312,25 +312,25 @@ test('scopes effective due dates to the user', function () {
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   })
   const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
   deepEqual(dueDates, {
     201: {
-      grading_period_id: '701'
-    }
+      grading_period_id: '701',
+    },
   })
 })
 
 test('calculates grades without grading period data when grading period set is null', function () {
   const gradebook = this.createGradebook({
-    gradingPeriodSet: null
+    gradingPeriodSet: null,
   })
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   })
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], this.submissions)
@@ -342,13 +342,13 @@ test('calculates grades without grading period data when grading period set is n
 
 test('calculates grades without grading period data when effective due dates are not defined', function () {
   const gradebook = this.createGradebook({
-    effectiveDueDates: null
+    effectiveDueDates: null,
   })
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(createGrades())
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   })
   const args = CourseGradeCalculator.calculate.getCall(0).args
   equal(args[0], this.submissions)
@@ -364,7 +364,7 @@ test('stores the current grade on the student if not viewing ungraded as zero', 
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.current)
@@ -378,7 +378,7 @@ test('stores the final grade on the student if viewing ungraded as zero', functi
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.final)
@@ -392,7 +392,7 @@ test('stores the current grade from the selected grading period if not viewing u
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
@@ -408,7 +408,7 @@ test('stores the final grade from the selected grading period if viewing ungrade
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
@@ -421,7 +421,7 @@ test('does not repeat the calculation if cached and preferCachedGrades is true',
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
 
   gradebook.calculateStudentGrade(student)
@@ -437,7 +437,7 @@ test('does perform the calculation if preferCachedGrades is true and no cached v
   const student = {
     id: '101',
     loaded: true,
-    initialized: true
+    initialized: true,
   }
 
   gradebook.calculateStudentGrade(student, true)
@@ -450,7 +450,7 @@ test('does not calculate when the student is not loaded', function () {
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: false,
-    initialized: true
+    initialized: true,
   })
   notOk(CourseGradeCalculator.calculate.called)
 })
@@ -461,7 +461,7 @@ test('does not calculate when the student is not initialized', function () {
   gradebook.calculateStudentGrade({
     id: '101',
     loaded: true,
-    initialized: false
+    initialized: false,
   })
   notOk(CourseGradeCalculator.calculate.called)
 })
@@ -496,7 +496,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
 
   test('does not render the modal if the mount point is not present', () => {
     gradebook = createGradebook({
-      allow_apply_score_to_ungraded: true
+      allow_apply_score_to_ungraded: true,
     })
     gradebook.onApplyScoreToUngradedRequested()
     ok(ReactDOM.render.notCalled)
@@ -504,7 +504,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
 
   test('does not render the modal if the allow_apply_score_to_ungraded option is false', () => {
     gradebook = createGradebook({
-      applyScoreToUngradedModalNode: mountPoint
+      applyScoreToUngradedModalNode: mountPoint,
     })
     gradebook.onApplyScoreToUngradedRequested()
     ok(ReactDOM.render.notCalled)
@@ -513,7 +513,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
   test('renders the modal when the mount point is present and allow_apply_score_to_ungraded is true', () => {
     gradebook = createGradebook({
       allow_apply_score_to_ungraded: true,
-      applyScoreToUngradedModalNode: mountPoint
+      applyScoreToUngradedModalNode: mountPoint,
     })
     gradebook.onApplyScoreToUngradedRequested()
 
@@ -524,7 +524,7 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
   test('passes the supplied assignmentGroup to the render if present', () => {
     gradebook = createGradebook({
       allow_apply_score_to_ungraded: true,
-      applyScoreToUngradedModalNode: mountPoint
+      applyScoreToUngradedModalNode: mountPoint,
     })
 
     gradebook.onApplyScoreToUngradedRequested({id: '100', name: 'group'})
@@ -541,13 +541,13 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
   hooks.beforeEach(() => {
     gradebook = createGradebook({
       allow_apply_score_to_ungraded: true,
-      context_id: '1234'
+      context_id: '1234',
     })
 
     gradebook.gridData.rows = [
       {id: '3', sortable_name: 'Z'},
       {id: '4', sortable_name: 'A'},
-      {id: '1', sortable_name: 'C'}
+      {id: '1', sortable_name: 'C'},
     ]
 
     gradebook.gridData.columns.scrollable = [
@@ -556,13 +556,13 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
       'assignment_2',
       'assignment_group_1',
       'assignment_7',
-      'total_grade'
+      'total_grade',
     ]
 
     const assignments = [
       {id: '3', assignment_group_id: '10'},
       {id: '2', assignment_group_id: '10'},
-      {id: '7'}
+      {id: '7'},
     ]
     gradebook.gotAllAssignmentGroups([{id: '10', position: 1, name: 'Assignments', assignments}])
 
@@ -602,7 +602,7 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
       assignmentGroupId: '10',
       onlyPastDue: true,
       markAsMissing: true,
-      value: 40.0
+      value: 40.0,
     })
 
     const passedArgs = startProcessStub.firstCall.args[1]
@@ -617,7 +617,7 @@ QUnit.module('Gradebook#executeApplyScoreToUngraded', hooks => {
     await gradebook.executeApplyScoreToUngraded({
       onlyPastDue: true,
       markAsMissing: true,
-      value: 40.0
+      value: 40.0,
     })
 
     const passedArgs = startProcessStub.firstCall.args[1]
@@ -756,7 +756,7 @@ QUnit.module('Gradebook Grading', () => {
       deepEqual(gradebook.getPendingGradeInfo(submission), {
         ...pendingGradeInfo,
         assignmentId: '2301',
-        userId: '1101'
+        userId: '1101',
       })
     })
 
@@ -824,7 +824,7 @@ QUnit.module('Gradebook Grading', () => {
       deepEqual(gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1102'}), {
         ...pendingGradeInfo,
         assignmentId: '2301',
-        userId: '1102'
+        userId: '1102',
       })
     })
 
@@ -834,7 +834,7 @@ QUnit.module('Gradebook Grading', () => {
       deepEqual(gradebook.getPendingGradeInfo({assignmentId: '2302', userId: '1101'}), {
         ...pendingGradeInfo,
         assignmentId: '2302',
-        userId: '1101'
+        userId: '1101',
       })
     })
   })
@@ -888,7 +888,7 @@ QUnit.module('Gradebook Grading', () => {
         ['B', 0.8],
         ['C', 0.7],
         ['D', 0.6],
-        ['E', 0.5]
+        ['E', 0.5],
       ]
       gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
       gradebook.setAssignments({
@@ -897,15 +897,15 @@ QUnit.module('Gradebook Grading', () => {
           id: '2301',
           name: 'Math Assignment',
           points_possible: 10,
-          published: true
+          published: true,
         },
         2302: {
           grading_type: 'letter_grade',
           id: '2302',
           name: 'English Assignment',
           points_possible: 5,
-          published: false
-        }
+          published: false,
+        },
       })
       submission = {
         assignmentId: '2301',
@@ -913,11 +913,11 @@ QUnit.module('Gradebook Grading', () => {
         enteredGrade: 'B',
         excused: false,
         id: '2501',
-        userId: '1101'
+        userId: '1101',
       }
       gradeInfo = {enteredAs: 'points', excused: false, grade: 'A', score: 10, valid: true}
       response = {
-        data: {score: 10}
+        data: {score: 10},
       }
       sinon.stub(gradebook, 'apiUpdateSubmission').callsFake(() => {
         apiPromise = Promise.resolve(response)
@@ -1008,7 +1008,7 @@ QUnit.module('Gradebook Grading', () => {
         excused: false,
         grade: 'complete',
         score: 10,
-        valid: true
+        valid: true,
       }
       gradebook.gradeSubmission(submission, gradeInfo)
       return apiPromise.then(() => {
@@ -1067,7 +1067,7 @@ QUnit.module('Gradebook Grading', () => {
           excused: false,
           grade: 'invalid',
           score: null,
-          valid: false
+          valid: false,
         }
         gradebook.addPendingGradeInfo(submission, invalidGradeInfo)
         Object.assign(gradeInfo, {enteredAs: 'points', grade: 'B', score: 9})
@@ -1118,7 +1118,7 @@ QUnit.module('Gradebook Grading', () => {
           excused: false,
           grade: 'invalid',
           score: null,
-          valid: false
+          valid: false,
         }
         // return to ensure that any changes cause the hook to wait for the
         // potential promise from the api
@@ -1134,7 +1134,7 @@ QUnit.module('Gradebook Grading', () => {
         deepEqual(gradebook.getPendingGradeInfo({assignmentId: '2301', userId: '1101'}), {
           ...gradeInfo,
           assignmentId: '2301',
-          userId: '1101'
+          userId: '1101',
         })
       })
 
@@ -1191,11 +1191,11 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
     gradebook = createGradebook({
       grid: {
         getColumns: () => [],
-        updateCell: sinon.stub()
+        updateCell: sinon.stub(),
       },
       settings: {
-        allow_view_ungraded_as_zero: 'true'
-      }
+        allow_view_ungraded_as_zero: 'true',
+      },
     })
 
     sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
@@ -1236,14 +1236,14 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
     gradebook.toggleViewUngradedAsZero()
 
     deepEqual(gradebook.saveSettings.firstCall.args[0], {
-      viewUngradedAsZero: true
+      viewUngradedAsZero: true,
     })
   })
 
   test('calls calculateStudentGrade once for each student', () => {
     const allStudents = [
       {id: '1101', assignment_201: {}, assignment_202: {}},
-      {id: '1102', assignment_201: {}}
+      {id: '1102', assignment_201: {}},
     ]
     sandbox.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents)
 
@@ -1257,7 +1257,7 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   test('calls updateAllTotalColumns', () => {
     gradebook.students = {
       1101: {id: '1101', assignment_201: {}, assignment_202: {}},
-      1102: {id: '1102', assignment_201: {}}
+      1102: {id: '1102', assignment_201: {}},
     }
 
     sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
@@ -1279,13 +1279,13 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
   hooks.beforeEach(() => {
     gradebook = createGradebook({
       context_id: '1234',
-      show_message_students_with_observers_dialog: true
+      show_message_students_with_observers_dialog: true,
     })
 
     gradebook.gridData.rows = [
       {id: '3', sortable_name: 'Z'},
       {id: '4', sortable_name: 'A'},
-      {id: '1', sortable_name: 'C'}
+      {id: '1', sortable_name: 'C'},
     ]
 
     gradebook.gridData.columns.scrollable = [
@@ -1294,13 +1294,13 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
       'assignment_2',
       'assignment_group_1',
       'assignment_7',
-      'total_grade'
+      'total_grade',
     ]
 
     const assignments = [
       {id: '3', assignment_group_id: '10'},
       {id: '2', assignment_group_id: '10'},
-      {id: '7'}
+      {id: '7'},
     ]
     gradebook.gotAllAssignmentGroups([{id: '10', position: 1, name: 'Assignments', assignments}])
 
@@ -1320,7 +1320,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
-      body
+      body,
     })
 
     strictEqual(apiRequestStub.callCount, 1)
@@ -1330,7 +1330,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
-      body
+      body,
     })
 
     strictEqual(apiRequestStub.firstCall.args[0], recipientsIds)
@@ -1340,7 +1340,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
-      body
+      body,
     })
 
     strictEqual(apiRequestStub.firstCall.args[1], subject)
@@ -1350,7 +1350,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
-      body
+      body,
     })
 
     strictEqual(apiRequestStub.firstCall.args[2], body)
@@ -1362,7 +1362,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
       body,
       mediaFile,
       recipientsIds,
-      subject
+      subject,
     })
 
     deepEqual(apiRequestStub.firstCall.args[4], mediaFile)
@@ -1374,7 +1374,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
       attachmentIds,
       body,
       recipientsIds,
-      subject
+      subject,
     })
 
     deepEqual(apiRequestStub.firstCall.args[5], attachmentIds)
@@ -1385,7 +1385,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
     await gradebook.sendMessageStudentsWho({
       recipientsIds,
       subject,
-      body
+      body,
     })
     strictEqual(FlashAlert.showFlashSuccess.firstCall.args[0], message)
   })
@@ -1397,7 +1397,7 @@ QUnit.module('Gradebook#sendMessageStudentsWho', hooks => {
       await gradebook.sendMessageStudentsWho({
         recipientsIds,
         subject,
-        body
+        body,
       })
     } catch (_error) {
       errorThrown = true

@@ -32,14 +32,14 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     const assignment = {
       anonymizeStudents: false,
       gradingType: 'percent',
-      pointsPossible: 10
+      pointsPossible: 10,
     }
 
     const submission = {
       enteredGrade: '78%',
       enteredScore: 7.8,
       excused: false,
-      id: '2501'
+      id: '2501',
     }
 
     const gradingScheme = [
@@ -47,7 +47,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       ['B', 0.8],
       ['C', 0.7],
       ['D', 0.6],
-      ['F', 0]
+      ['F', 0],
     ]
 
     props = {
@@ -57,7 +57,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       gradingScheme,
       onSubmissionUpdate: sinon.stub(),
       pendingGradeInfo: null,
-      submission
+      submission,
     }
 
     $container = document.body.appendChild(document.createElement('div'))

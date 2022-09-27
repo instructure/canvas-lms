@@ -70,22 +70,22 @@ export default class ToggleShowByView extends Backbone.View {
     const overdue_group = new AssignmentGroup({
       id: 'overdue',
       name: I18n.t('overdue_assignments', 'Overdue Assignments'),
-      assignments: overdue
+      assignments: overdue,
     })
     const upcoming_group = new AssignmentGroup({
       id: 'upcoming',
       name: I18n.t('upcoming_assignments', 'Upcoming Assignments'),
-      assignments: upcoming
+      assignments: upcoming,
     })
     const undated_group = new AssignmentGroup({
       id: 'undated',
       name: I18n.t('undated_assignments', 'Undated Assignments'),
-      assignments: undated
+      assignments: undated,
     })
     const past_group = new AssignmentGroup({
       id: 'past',
       name: I18n.t('past_assignments', 'Past Assignments'),
-      assignments: past
+      assignments: past,
     })
 
     const sorted_groups = this._sortGroups(overdue_group, upcoming_group, undated_group, past_group)
@@ -166,7 +166,7 @@ export default class ToggleShowByView extends Backbone.View {
       this.course.get('id'),
       'user',
       ENV.current_user_id,
-      'assignments_show_by_date'
+      'assignments_show_by_date',
     ]
   }
 

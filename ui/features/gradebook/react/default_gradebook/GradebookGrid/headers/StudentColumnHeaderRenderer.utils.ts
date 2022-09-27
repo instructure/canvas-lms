@@ -75,8 +75,8 @@ export function getProps(gradebook: Gradebook, options: {ref: any}, columnHeader
       onSortBySortableNameDescending: () => {
         gradebook.setSortRowsBySetting(columnId, 'sortable_name', 'descending')
       },
-      settingKey
+      settingKey,
     },
-    studentGroupsEnabled: gradebook.studentGroupsEnabled
+    studentGroupsEnabled: gradebook.studentGroupsEnabled,
   }
 }
