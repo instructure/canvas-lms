@@ -460,7 +460,7 @@ describe Submission do
     it "gets initialized during submission creation" do
       # create an invited user, so that the submission is not automatically
       # created by the DueDateCacher
-      student_in_course
+      student_in_course(active_all: true)
       @assignment.update_attribute(:due_at, Time.zone.now - 1.day)
 
       override = @assignment.assignment_overrides.build

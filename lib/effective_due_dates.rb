@@ -150,6 +150,14 @@ class EffectiveDueDates
     end
   end
 
+  def active_in_section_sql
+    if Account.site_admin.feature_enabled?(:deprioritize_section_overrides_for_nonactive_enrollments)
+      "e.workflow_state = 'active'"
+    else
+      "TRUE"
+    end
+  end
+
   # This beauty of a method brings together assignment overrides,
   # due dates, grading periods, course/group enrollments, etc
   # to calculate each student's effective due date and whether or
@@ -220,6 +228,7 @@ class EffectiveDueDates
           override_adhoc_students AS (
             SELECT
               os.user_id AS student_id,
+              TRUE as active_in_section,
               o.assignment_id,
               o.id AS override_id,
               date_trunc('minute', o.due_at) AS trunc_due_at,
@@ -240,6 +249,7 @@ class EffectiveDueDates
           override_groups_students AS (
             SELECT
               gm.user_id AS student_id,
+              TRUE as active_in_section,
               o.assignment_id,
               o.id AS override_id,
               date_trunc('minute', o.due_at) AS trunc_due_at,
@@ -262,6 +272,7 @@ class EffectiveDueDates
           override_sections_students AS (
             SELECT
               e.user_id AS student_id,
+              #{active_in_section_sql} AS active_in_section,
               o.assignment_id,
               o.id AS override_id,
               date_trunc('minute', o.due_at) AS trunc_due_at,
@@ -286,6 +297,7 @@ class EffectiveDueDates
           override_everyonelse_students AS (
             SELECT
               e.user_id AS student_id,
+              TRUE as active_in_section,
               a.id as assignment_id,
               NULL::integer AS override_id,
               date_trunc('minute', a.due_at) AS trunc_due_at,
@@ -319,7 +331,7 @@ class EffectiveDueDates
             SELECT DISTINCT ON (student_id, assignment_id)
               *
             FROM override_all_students
-            ORDER BY student_id ASC, assignment_id ASC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
+            ORDER BY student_id ASC, assignment_id ASC, active_in_section DESC, due_at_overridden DESC, priority ASC, due_at DESC NULLS FIRST
           ),
 
           /* now find all grading periods, including both

@@ -38,7 +38,7 @@ module AssignmentOverrideApplicator
 
     overrides = overrides_for_assignment_and_user(assignment_or_quiz, user)
 
-    result_assignment_or_quiz = assignment_with_overrides(assignment_or_quiz, overrides)
+    result_assignment_or_quiz = assignment_with_overrides(assignment_or_quiz, overrides, user)
     result_assignment_or_quiz.overridden_for_user = user
 
     # students get the last overridden date that applies to them, but teachers
@@ -242,11 +242,17 @@ module AssignmentOverrideApplicator
         end.pluck(:course_section_id).uniq
     end
 
-    if assignment_or_quiz.assignment_overrides.loaded?
-      assignment_or_quiz.assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
-    else
-      assignment_or_quiz.assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
+    overrides = if assignment_or_quiz.assignment_overrides.loaded?
+                  assignment_or_quiz.assignment_overrides.select { |o| o.set_type == "CourseSection" && section_ids.include?(o.set_id) }
+                else
+                  assignment_or_quiz.assignment_overrides.where(set_type: "CourseSection", set_id: section_ids)
+                end
+
+    if Account.site_admin.feature_enabled?(:deprioritize_section_overrides_for_nonactive_enrollments)
+      AssignmentOverride.preload_for_nonactive_enrollment(overrides, context, user)
     end
+
+    overrides
   end
 
   def self.current_override_version(assignment_or_quiz, all_overrides)
@@ -306,13 +312,13 @@ module AssignmentOverrideApplicator
   # apply the overrides calculated by collapsed_overrides to a clone of the
   # assignment or quiz which can then be used in place of the original object.
   # the clone is marked readonly to prevent saving
-  def self.assignment_with_overrides(assignment_or_quiz, overrides)
+  def self.assignment_with_overrides(assignment_or_quiz, overrides, user = nil)
     unoverridden_assignment_or_quiz = assignment_or_quiz.without_overrides
 
     setup_overridden_clone(unoverridden_assignment_or_quiz,
                            overrides) do |cloned_assignment_or_quiz|
       if overrides&.any?
-        collapsed_overrides(unoverridden_assignment_or_quiz, overrides).each do |field, value|
+        collapsed_overrides(unoverridden_assignment_or_quiz, overrides, user).each do |field, value|
           # for any times in the value set, bring them back from raw UTC into the
           # current Time.zone before placing them in the assignment
           value = value.in_time_zone if value.respond_to?(:in_time_zone) && !value.is_a?(Date)
@@ -333,13 +339,13 @@ module AssignmentOverrideApplicator
     assignment_with_overrides(quiz, overrides)
   end
 
-  # given an assignment or quiz (of specific version) and an ordered list of overrides
-  # (see overrides_for_assignment_and_user), return a hash of values for each
-  # overrideable field. for caching, the same set of overrides should produce
-  # the same collapsed assignment or quiz, regardless of the user that ended up at that
-  # set of overrides.
-  def self.collapsed_overrides(assignment_or_quiz, overrides)
-    cache_key = ["collapsed_overrides", assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)].cache_key
+  # given an assignment or quiz (of specific version), an ordered list of overrides
+  # (see overrides_for_assignment_and_user), and an optional user, return a hash of
+  # values for each overrideable field.
+  def self.collapsed_overrides(assignment_or_quiz, overrides, user = nil)
+    cache_key_contents = ["collapsed_overrides", assignment_or_quiz.cache_key(:availability), version_for_cache(assignment_or_quiz), overrides_hash(overrides)]
+    cache_key_contents << user.cache_key(:enrollments) if user.present?
+    cache_key = cache_key_contents.cache_key
     RequestCache.cache("collapsed_overrides", cache_key) do
       Rails.cache.fetch(cache_key) do
         overridden_data = {}
@@ -367,17 +373,59 @@ module AssignmentOverrideApplicator
 
   # perform overrides of specific fields
   def self.override_for_due_at(assignment_or_quiz, overrides)
-    applicable_overrides = overrides.select(&:due_at_overridden)
-    if applicable_overrides.empty?
-      assignment_or_quiz
-    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
-      adhoc_override
-    elsif (override = applicable_overrides.detect { |o| o.due_at.nil? })
-      override
+    due_at_overrides = overrides.select(&:due_at_overridden)
+    select_override_by_attribute(assignment_or_quiz, due_at_overrides, :due_at, :max)
+  end
+
+  def self.override_for_unlock_at(assignment_or_quiz, overrides)
+    unlock_at_overrides = overrides.select(&:unlock_at_overridden)
+    # CNVS-24849 if the override has been locked it's unlock_at no longer applies
+    unlock_at_overrides.reject!(&:availability_expired?)
+    select_override_by_attribute(assignment_or_quiz, unlock_at_overrides, :unlock_at, :min)
+  end
+  private_class_method :override_for_unlock_at
+
+  def self.override_for_lock_at(assignment_or_quiz, overrides)
+    lock_at_overrides = overrides.select(&:lock_at_overridden)
+    select_override_by_attribute(assignment_or_quiz, lock_at_overrides, :lock_at, :max)
+  end
+  private_class_method :override_for_lock_at
+
+  # Is there an active* override that applies to the user?
+  #   Yes -> use it.
+  #   No -> Does the assignment have an "everyone" date?
+  #     Yes -> use it.
+  #     No -> Is there an "inactive" override that applies?
+  #       Yes -> use it.
+  #       No -> the assigment is not assigned to the student.
+  #
+  # * Individual and Group overrides are always considered "active".
+  #   A Section override that applies to an enrollment that has a state that is not "active" is
+  #   considered an "inactive override" for that enrollment's user.
+  def self.select_override_by_attribute(assignment_or_quiz, overrides, attribute, comparison)
+    nonactive_overrides, applicable_overrides = overrides.partition(&:for_nonactive_enrollment?)
+    if applicable_overrides.any?
+      select_override(applicable_overrides, attribute, comparison)
+    elsif assignment_or_quiz.only_visible_to_overrides && nonactive_overrides.any?
+      select_override(nonactive_overrides, attribute, comparison)
     else
-      applicable_overrides.max_by(&:due_at)
+      assignment_or_quiz
     end
   end
+  private_class_method :select_override_by_attribute
+
+  def self.select_override(overrides, attribute, comparison)
+    if (adhoc_override = overrides.detect(&:adhoc?))
+      adhoc_override
+    elsif (override = overrides.detect { |o| o.public_send(attribute).nil? })
+      override
+    elsif comparison == :max
+      overrides.max_by(&attribute)
+    else
+      overrides.min_by(&attribute)
+    end
+  end
+  private_class_method :select_override
 
   def self.overridden_due_at(assignment_or_quiz, overrides)
     override_for_due_at(assignment_or_quiz, overrides).due_at
@@ -392,33 +440,11 @@ module AssignmentOverrideApplicator
   end
 
   def self.overridden_unlock_at(assignment_or_quiz, overrides)
-    applicable_overrides = overrides.select(&:unlock_at_overridden)
-
-    # CNVS-24849 if the override has been locked it's unlock_at no longer applies
-    applicable_overrides.reject!(&:availability_expired?)
-
-    if applicable_overrides.empty?
-      assignment_or_quiz.unlock_at
-    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
-      adhoc_override.unlock_at
-    elsif applicable_overrides.any? { |o| o.unlock_at.nil? }
-      nil
-    else
-      applicable_overrides.min_by(&:unlock_at).unlock_at
-    end
+    override_for_unlock_at(assignment_or_quiz, overrides).unlock_at
   end
 
   def self.overridden_lock_at(assignment_or_quiz, overrides)
-    applicable_overrides = overrides.select(&:lock_at_overridden)
-    if applicable_overrides.empty?
-      assignment_or_quiz.lock_at
-    elsif (adhoc_override = applicable_overrides.detect(&:adhoc?))
-      adhoc_override.lock_at
-    elsif applicable_overrides.detect { |o| o.lock_at.nil? }
-      nil
-    else
-      applicable_overrides.max_by(&:lock_at).lock_at
-    end
+    override_for_lock_at(assignment_or_quiz, overrides).lock_at
   end
 
   def self.should_preload_override_students?(assignments, user, endpoint_key)
