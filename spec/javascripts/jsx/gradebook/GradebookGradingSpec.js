@@ -494,14 +494,6 @@ QUnit.module('Gradebook#onApplyScoreToUngradedRequested', hooks => {
     mountPoint.remove()
   })
 
-  test('does not render the modal if the mount point is not present', () => {
-    gradebook = createGradebook({
-      allow_apply_score_to_ungraded: true,
-    })
-    gradebook.onApplyScoreToUngradedRequested()
-    ok(ReactDOM.render.notCalled)
-  })
-
   test('does not render the modal if the allow_apply_score_to_ungraded option is false', () => {
     gradebook = createGradebook({
       applyScoreToUngradedModalNode: mountPoint,

@@ -35,6 +35,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
   let exampleData
   let gradebook
   let server
+  let returnStudentIds = []
 
   suiteHooks.beforeEach(() => {
     exampleData = {
@@ -172,6 +173,8 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
         performance_controls: {
           students_chunk_size: 2, // students per page
         },
+
+        fetchStudentIds: () => Promise.resolve(returnStudentIds),
       })
 
       sinon.stub(gradebook.finalGradeOverrides, 'setGrades')
@@ -186,6 +189,8 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       sinon.stub(gradebook, 'gotCustomColumns')
       sinon.stub(gradebook, 'gotChunkOfStudents')
       sinon.stub(gradebook, 'gotSubmissionsChunk')
+
+      returnStudentIds = []
     })
 
     hooks.afterEach(() => {
@@ -237,12 +242,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       await reloadData()
     })
 
-    test('loads student ids', async () => {
-      sinon.spy(dataLoader.studentIdsLoader, 'loadStudentIds')
-      await reloadData()
-      strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
-    })
-
     test('does not load grading period assignments', async () => {
       sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
       await reloadData()
@@ -265,6 +264,8 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
     })
 
     test('excludes students already loaded when loading student content', async () => {
+      returnStudentIds = ['1102']
+
       // This will not be sufficient when interruptable reloads are implemented
       gradebook.updateStudentIds(['1101', '1103'])
       sinon.spy(dataLoader.studentContentDataLoader, 'load')

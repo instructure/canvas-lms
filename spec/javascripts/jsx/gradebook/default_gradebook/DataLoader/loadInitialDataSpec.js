@@ -267,12 +267,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     }
 
-    test('loads student ids', async () => {
-      sinon.spy(dataLoader.studentIdsLoader, 'loadStudentIds')
-      await loadInitialData()
-      strictEqual(dataLoader.studentIdsLoader.loadStudentIds.callCount, 1)
-    })
-
     test('loads grading period assignments when the course uses a grading period set', async () => {
       sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
       await loadInitialData()
@@ -304,24 +298,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       strictEqual(dataLoader.studentContentDataLoader.load.callCount, 1)
     })
 
-    test('includes all loaded student ids when loading student content', async () => {
-      sinon.spy(dataLoader.studentContentDataLoader, 'load')
-      await loadInitialData()
-      const [studentIds] = dataLoader.studentContentDataLoader.load.lastCall.args
-      deepEqual(studentIds, exampleData.studentIds)
-    })
-
     test('loads custom column data', async () => {
       sinon.spy(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData')
       await loadInitialData()
       strictEqual(dataLoader.customColumnsDataLoader.loadCustomColumnsData.callCount, 1)
-    })
-
-    test('loads custom column data after students finish loading', async () => {
-      sinon.stub(dataLoader.customColumnsDataLoader, 'loadCustomColumnsData').callsFake(() => {
-        strictEqual(gradebook.updateStudentsLoaded.withArgs(true).callCount, 1)
-      })
-      await loadInitialData()
     })
 
     test('loads custom column data after submissions finish loading', async () => {

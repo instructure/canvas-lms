@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Gradebook, {GradebookProps} from '../Gradebook'
+import Gradebook from '../Gradebook'
+import type {GradebookProps} from '../Gradebook'
 import GradebookGrid from '../GradebookGrid/index'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
@@ -78,6 +79,7 @@ export const defaultGradebookEnv = {
   locale: 'en',
   new_gradebook_development_enabled: true,
   outcome_gradebook_enabled: false,
+  performanceControls: new PerformanceControls(),
   post_grades_ltis: [],
   publish_to_sis_enabled: false,
   sections: [],
@@ -92,21 +94,33 @@ export const defaultGradebookEnv = {
 
 export const defaultGradebookProps: GradebookProps = {
   appliedFilters: [],
-  hideGrid: true,
-  isFiltersLoading: false,
-  onFiltersChange: () => {},
+  applyScoreToUngradedModalNode: document.createElement('div'),
+  customColumns: [],
+  dispatch: new RequestDispatch(),
+  fetchStudentIds: () => Promise.resolve([]),
+  filterNavNode: document.createElement('div'),
   flashAlerts: [],
+  flashMessageContainer: document.createElement('div'),
+  gradebookEnv: defaultGradebookEnv,
+  gradebookGridNode: document.createElement('div'),
+  gradebookMenuNode: document.createElement('div'),
+  gradingPeriodAssignments: {},
+  gradingPeriodsFilterContainer: document.createElement('div'),
+  gridColorNode: document.createElement('div'),
+  hideGrid: true,
+  isCustomColumnsLoading: false,
+  isFiltersLoading: false,
+  isGradingPeriodAssignmentsLoading: false,
+  isModulesLoading: false,
+  isStudentIdsLoading: false,
+  locale: 'en',
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Another Module', position: 2},
     {id: '3', name: 'Module 2', position: 3},
   ],
-  isModulesLoading: false,
-  flashMessageContainer: document.createElement('div'),
-  gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
-  gridColorNode: document.createElement('div'),
-  filterNavNode: document.createElement('div'),
+  studentIds: [],
   viewOptionsMenuNode: document.createElement('div'),
   gradingPeriodsFilterContainer: document.createElement('div'),
   gradebookEnv: defaultGradebookEnv,

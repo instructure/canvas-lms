@@ -23,7 +23,6 @@ import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
-import StudentIdsLoader from './StudentIdsLoader'
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
@@ -41,18 +40,21 @@ export default class DataLoader {
 
   studentContentDataLoader: StudentContentDataLoader
 
-  studentIdsLoader: StudentIdsLoader
+  fetchStudentIds: () => Promise<string[]>
 
   constructor({
     dispatch,
     gradebook,
     performanceControls,
+    fetchStudentIds,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
     performanceControls: PerformanceControls
+    fetchStudentIds: () => Promise<string[]>
   }) {
     this._gradebook = gradebook
+    this.fetchStudentIds = fetchStudentIds
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
@@ -65,7 +67,6 @@ export default class DataLoader {
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
-    this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
   loadInitialData() {
@@ -135,7 +136,7 @@ export default class DataLoader {
     const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
 
     // Begin loading Student IDs before any other data.
-    const gotStudentIds: Promise<void> = dataLoader.studentIdsLoader.loadStudentIds()
+    const gotStudentIds: Promise<string[]> = this.fetchStudentIds()
 
     let gotGradingPeriodAssignments
     if (options.getGradingPeriodAssignments) {
@@ -154,9 +155,8 @@ export default class DataLoader {
       }
     }
 
-    await gotStudentIds
+    const studentIds = await gotStudentIds
 
-    const studentIds = gradebook.courseContent.students.listStudentIds()
     const studentIdsToLoad = difference(studentIds, loadedStudentIds)
 
     await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
