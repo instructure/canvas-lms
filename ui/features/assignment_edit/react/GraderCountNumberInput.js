@@ -31,7 +31,7 @@ function availableGradersText(availableGradersCount) {
   }
 
   return I18n.t('There are currently %{availableGradersCount} available graders', {
-    availableGradersCount
+    availableGradersCount,
   })
 }
 
@@ -39,18 +39,18 @@ export default class GraderCountNumberInput extends React.Component {
   static propTypes = {
     currentGraderCount: number,
     locale: string.isRequired,
-    availableGradersCount: number.isRequired
+    availableGradersCount: number.isRequired,
   }
 
   static defaultProps = {
-    currentGraderCount: null
+    currentGraderCount: null,
   }
 
   state = {
     graderCount:
       this.props.currentGraderCount ||
       Math.min(this.props.availableGradersCount, DEFAULT_GRADER_COUNT),
-    messages: []
+    messages: [],
   }
 
   generateMessages(newValue, eventType) {

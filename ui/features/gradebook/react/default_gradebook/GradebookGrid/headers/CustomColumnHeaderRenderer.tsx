@@ -37,7 +37,7 @@ function getProps(
 
   return {
     ref: options.ref,
-    title: customColumn.teacher_notes ? I18n.t('Notes') : customColumn.title
+    title: customColumn.teacher_notes ? I18n.t('Notes') : customColumn.title,
   }
 }
 

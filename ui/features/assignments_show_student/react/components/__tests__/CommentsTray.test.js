@@ -29,15 +29,15 @@ async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}
     {DateTime: '2010-10-16T23:59:59-06:00'},
     {Node: {__typename: 'Submission'}},
     {SubmissionCommentConnection: {nodes: []}},
-    overrides
+    overrides,
   ]
   const result = await mockQuery(SUBMISSION_COMMENT_QUERY, allOverrides, variables)
   return {
     request: {
       query: SUBMISSION_COMMENT_QUERY,
-      variables
+      variables,
     },
-    result
+    result,
   }
 }
 

@@ -31,8 +31,8 @@ const I18n = useI18nScope('gradebook')
 const themeOverrides = {
   [Button.theme]: {
     iconPadding: '0 3px',
-    smallHeight: '23px'
-  }
+    smallHeight: '23px',
+  },
 }
 
 function formatGrade(submission, assignment, gradingScheme, enterGradesAs) {
@@ -41,7 +41,7 @@ function formatGrade(submission, assignment, gradingScheme, enterGradesAs) {
     formatType: enterGradesAs,
     gradingScheme,
     pointsPossible: assignment.pointsPossible,
-    version: 'final'
+    version: 'final',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
@@ -77,14 +77,14 @@ export default class ReadOnlyCell extends Component {
   static propTypes = {
     assignment: shape({
       id: string.isRequired,
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
     gradeIsVisible: bool.isRequired,
     gradingScheme: instanceOf(Array).isRequired,
     onToggleSubmissionTrayOpen: func.isRequired,
     student: shape({
-      id: string.isRequired
+      id: string.isRequired,
     }).isRequired,
     submission: shape({
       assignmentId: string.isRequired,
@@ -92,8 +92,8 @@ export default class ReadOnlyCell extends Component {
       grade: string,
       id: string,
       rawGrade: string,
-      score: number
-    }).isRequired
+      score: number,
+    }).isRequired,
   }
 
   constructor(props) {

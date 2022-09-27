@@ -39,7 +39,7 @@ QUnit.module('SubmissionCommentListItem', {
       deleteSubmissionComment() {},
       updateSubmissionComment() {},
       processing: false,
-      setProcessing() {}
+      setProcessing() {},
     }
   },
   mountComponent(props) {
@@ -47,7 +47,7 @@ QUnit.module('SubmissionCommentListItem', {
   },
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('it has an Avatar', function () {
@@ -153,7 +153,7 @@ test('the comment timestamp excludes the year if it matches the current year', f
 test('uses the edited_at for the timestamp, if one exists', function () {
   this.wrapper = this.mountComponent({
     createdAt: new Date('Jan 8, 2003'),
-    editedAt: new Date('Feb 12, 2003')
+    editedAt: new Date('Feb 12, 2003'),
   })
 
   const dateText = this.wrapper.find('Text').at(0).text()
@@ -163,7 +163,7 @@ test('uses the edited_at for the timestamp, if one exists', function () {
 test("starts with the text '(Edited)' if the comment has an edited_at", function () {
   this.wrapper = this.mountComponent({
     createdAt: new Date('Jan 8, 2003'),
-    editedAt: new Date('Feb 12, 2003')
+    editedAt: new Date('Feb 12, 2003'),
   })
 
   const dateText = this.wrapper.find('Text').at(0).text()
@@ -201,7 +201,7 @@ QUnit.module('SubmissionCommentListItem#deleteSubmissionComment', {
       deleteSubmissionComment() {},
       updateSubmissionComment() {},
       processing: false,
-      setProcessing() {}
+      setProcessing() {},
     }
   },
   mountComponent(props) {
@@ -210,7 +210,7 @@ QUnit.module('SubmissionCommentListItem#deleteSubmissionComment', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('clicking the trash icon calls deleteSubmissionComment', function () {

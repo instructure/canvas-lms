@@ -36,10 +36,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         disabled: false,
         gradingPeriods: [
           {id: '1501', title: 'Q1'},
-          {id: '1502', title: 'Q2'}
+          {id: '1502', title: 'Q2'},
         ],
         onSelect: sinon.stub(),
-        selectedGradingPeriodId: '0'
+        selectedGradingPeriodId: '0',
       }
 
       component = null

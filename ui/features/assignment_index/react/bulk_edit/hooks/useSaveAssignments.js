@@ -62,7 +62,7 @@ export default function useSaveAssignments(courseId) {
         const {json} = await doFetchApi({
           path: `/api/v1/courses/${courseId}/assignments/bulk_update`,
           method: 'PUT',
-          body: editedAssignments
+          body: editedAssignments,
         })
         setProgressUrl(json.url)
       } catch (err) {
@@ -86,6 +86,6 @@ export default function useSaveAssignments(courseId) {
     startingSaveError,
     setStartingSaveError,
     progressUrl,
-    setProgressUrl
+    setProgressUrl,
   }
 }

@@ -37,7 +37,7 @@ import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
-  SelectStrings
+  SelectStrings,
 } from '@canvas/upload-media-translations'
 import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
@@ -63,13 +63,13 @@ class MediaAttempt extends React.Component {
     focusOnInit: bool.isRequired,
     submission: Submission.shape.isRequired,
     updateUploadingFiles: func.isRequired,
-    uploadingFiles: bool.isRequired
+    uploadingFiles: bool.isRequired,
   }
 
   state = {
     mediaModalOpen: false,
     iframeURL: '',
-    mediaModalTabs: {record: false, upload: false}
+    mediaModalTabs: {record: false, upload: false},
   }
 
   componentDidMount() {
@@ -96,8 +96,8 @@ class MediaAttempt extends React.Component {
           id: this.props.submission.id,
           activeSubmissionType: 'media_recording',
           attempt: this.props.submission.attempt || 1,
-          mediaId: data.mediaObject.media_object.media_id
-        }
+          mediaId: data.mediaObject.media_object.media_id,
+        },
       })
     }
   }
@@ -112,8 +112,8 @@ class MediaAttempt extends React.Component {
       variables: {
         id: this.props.submission.id,
         activeSubmissionType: 'media_recording',
-        attempt: this.props.submission.attempt || 1
-      }
+        attempt: this.props.submission.attempt || 1,
+      },
     })
     this.setState({iframeURL: ''})
   }
@@ -129,7 +129,7 @@ class MediaAttempt extends React.Component {
       src: `/media_objects/${mediaObject._id}/media_tracks/${track._id}`,
       label: track.locale,
       type: track.kind,
-      language: track.locale
+      language: track.locale,
     }))
     const shouldRenderWithIframeURL = mediaObject.mediaSources.length === 0 && this.state.iframeURL
     const autoCCTrack = getAutoTrack(mediaObject.mediaTracks)
@@ -142,7 +142,7 @@ class MediaAttempt extends React.Component {
                 position: 'relative',
                 width: '100%',
                 height: '0',
-                paddingBottom: '56.25%' // 16:9 aspect ratio
+                paddingBottom: '56.25%', // 16:9 aspect ratio
               }}
             >
               <iframe
@@ -152,7 +152,7 @@ class MediaAttempt extends React.Component {
                   position: 'absolute',
                   border: 'none',
                   minWidth: '100%',
-                  minHeight: '100%'
+                  minHeight: '100%',
                 }}
               />
             </div>
@@ -208,7 +208,7 @@ class MediaAttempt extends React.Component {
           onDismiss={this.onDismiss}
           rcsConfig={{
             contextId: this.props.assignment.env.courseId,
-            contextType: 'course'
+            contextType: 'course',
           }}
           open={this.state.mediaModalOpen}
           tabs={this.state.mediaModalTabs}
@@ -253,7 +253,7 @@ class MediaAttempt extends React.Component {
                         onClick={() =>
                           this.setState({
                             mediaModalTabs: {record: true, upload: false},
-                            mediaModalOpen: true
+                            mediaModalOpen: true,
                           })
                         }
                       >
@@ -274,7 +274,7 @@ class MediaAttempt extends React.Component {
                       style={{
                         backgroundColor: theme.variables.colors.backgroundDark,
                         height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em'
+                        width: desktop ? '1px' : '9em',
                       }}
                     />
                   </Flex.Item>
@@ -286,7 +286,7 @@ class MediaAttempt extends React.Component {
                       style={{
                         backgroundColor: theme.variables.colors.backgroundDark,
                         height: desktop ? '9em' : '1px',
-                        width: desktop ? '1px' : '9em'
+                        width: desktop ? '1px' : '9em',
                       }}
                     />
                   </Flex.Item>
@@ -323,7 +323,7 @@ class MediaAttempt extends React.Component {
                         onClick={() =>
                           this.setState({
                             mediaModalTabs: {record: false, upload: true},
-                            mediaModalOpen: true
+                            mediaModalOpen: true,
                           })
                         }
                       >

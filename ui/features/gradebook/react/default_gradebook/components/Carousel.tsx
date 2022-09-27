@@ -104,5 +104,5 @@ export default class Carousel extends Component<CarouselProps> {
 }
 
 Carousel.defaultProps = {
-  id: null
+  id: null,
 }

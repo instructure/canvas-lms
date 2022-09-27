@@ -27,7 +27,7 @@ const I18n = useI18nScope('assignments_2')
 TeacherFooter.propTypes = {
   onCancel: func.isRequired,
   onSave: func.isRequired,
-  onPublish: func.isRequired
+  onPublish: func.isRequired,
 }
 export default function TeacherFooter(props) {
   let padding
@@ -46,7 +46,7 @@ export default function TeacherFooter(props) {
     backgroundColor: theme.variables.colors.white,
     borderColor: theme.variables.colors.borderMedium,
     paddingRight: padding,
-    paddingLeft: padding
+    paddingLeft: padding,
   }
 
   return (

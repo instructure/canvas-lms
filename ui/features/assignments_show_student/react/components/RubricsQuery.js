@@ -35,8 +35,8 @@ export default function RubricsQuery(props) {
       assignmentLid: props.assignment._id,
       submissionID: props.submission.id,
       courseID: props.assignment.env.courseId,
-      submissionAttempt: props.submission.attempt
-    }
+      submissionAttempt: props.submission.attempt,
+    },
   })
 
   if (loading) {
@@ -71,5 +71,5 @@ export default function RubricsQuery(props) {
 
 RubricsQuery.propTypes = {
   assignment: Assignment.shape,
-  submission: Submission.shape
+  submission: Submission.shape,
 }

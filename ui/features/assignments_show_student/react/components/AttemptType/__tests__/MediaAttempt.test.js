@@ -34,10 +34,10 @@ const submissionDraftOverrides = {
       mediaObject: {
         _id: 'm-123456',
         id: '1',
-        title: 'dope video'
-      }
-    }
-  }
+        title: 'dope video',
+      },
+    },
+  },
 }
 
 const makeProps = async overrides => {
@@ -47,7 +47,7 @@ const makeProps = async overrides => {
     createSubmissionDraft: jest.fn(),
     updateUploadingFiles: jest.fn(),
     uploadingFiles: false,
-    focusOnInit: false
+    focusOnInit: false,
   }
 }
 
@@ -111,8 +111,8 @@ describe('MediaAttempt', () => {
         variables: {
           id: '1',
           activeSubmissionType: 'media_recording',
-          attempt: 1
-        }
+          attempt: 1,
+        },
       })
     })
   })
@@ -125,10 +125,10 @@ describe('MediaAttempt', () => {
           mediaObject: {
             _id: 'm-123456',
             id: '1',
-            title: 'dope_vid.mov'
+            title: 'dope_vid.mov',
           },
-          state: 'submitted'
-        }
+          state: 'submitted',
+        },
       })
       const {getByTestId, queryByTestId} = render(
         <MediaAttempt {...props} uploadingFiles={false} />
@@ -149,24 +149,24 @@ describe('MediaAttempt', () => {
                 _id: 3,
                 locale: 'fr',
                 type: 'captions',
-                language: 'fr'
+                language: 'fr',
               },
               {
                 _id: 1,
                 locale: 'en',
                 type: 'captions',
-                language: 'en'
+                language: 'en',
               },
               {
                 _id: 2,
                 locale: 'es',
                 type: 'captions',
-                language: 'es'
-              }
-            ]
+                language: 'es',
+              },
+            ],
           },
-          state: 'submitted'
-        }
+          state: 'submitted',
+        },
       })
       global.ENV = {auto_show_cc: true}
       const wrapper = mount(<MediaAttempt {...props} uploadingFiles={false} />)
@@ -180,8 +180,8 @@ describe('MediaAttempt', () => {
       const props = await makeProps({
         Submission: {
           mediaObject: null,
-          state: 'graded'
-        }
+          state: 'graded',
+        },
       })
       render(<MediaAttempt {...props} uploadingFiles={false} />)
       // doesn't render anything, so nothing to check for

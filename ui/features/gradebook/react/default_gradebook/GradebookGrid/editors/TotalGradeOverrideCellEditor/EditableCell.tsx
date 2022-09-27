@@ -30,12 +30,12 @@ export default class EditableCell extends CellEditorComponent {
     gradeInfo,
     gradeIsUpdating: bool.isRequired,
     onGradeUpdate: func.isRequired,
-    pendingGradeInfo: gradeInfo
+    pendingGradeInfo: gradeInfo,
   }
 
   static defaultProps = {
     gradeInfo: null,
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   componentDidMount() {

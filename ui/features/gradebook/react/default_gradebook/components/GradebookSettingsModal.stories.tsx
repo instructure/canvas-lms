@@ -24,10 +24,10 @@ export default {
   component: GradebookSettingsModal,
   args: {
     courseSettings: {
-      allowFinalGradeOverride: true
+      allowFinalGradeOverride: true,
     },
     courseFeatures: {
-      finalGradeOverrideEnabled: true
+      finalGradeOverrideEnabled: true,
     },
     courseId: '',
     locale: '',
@@ -39,10 +39,10 @@ export default {
     onViewOptionsUpdated: () => {},
     postPolicies: {
       coursePostPolicy: {
-        postManually: true
+        postManually: true,
       },
       setAssignmentPostPolicies: true,
-      setCoursePostPolicy: true
+      setCoursePostPolicy: true,
     },
     // The component uses a function prop to retrieve the viewOptions data
     // dynamically, but we specify the data itself here so it can be
@@ -50,7 +50,7 @@ export default {
     viewOptions: {
       columnSortSettings: {
         criterion: 'name',
-        direction: 'ascending'
+        direction: 'ascending',
       },
       hideTotal: true,
       showNotes: true,
@@ -62,11 +62,11 @@ export default {
         excused: '#E5F7E5',
         late: '#F3EFEA',
         missing: '#FEF7E5',
-        resubmitted: '#E5F7F6'
+        resubmitted: '#E5F7F6',
       },
-      viewUngradedAsZero: true
-    }
-  }
+      viewUngradedAsZero: true,
+    },
+  },
 }
 
 function openGradebookSettingsModalRef(modal) {

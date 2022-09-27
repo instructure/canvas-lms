@@ -40,7 +40,7 @@ const colHeaders = [
   I18n.t('Artifact'),
   I18n.t('Before'),
   I18n.t('After'),
-  I18n.t('Current')
+  I18n.t('Current'),
 ]
 
 const nearPageBottom = () =>
@@ -55,7 +55,7 @@ class SearchResultsComponent extends Component {
       shape({
         assignment: shape({
           name: string.isRequired,
-          muted: bool.isRequired
+          muted: bool.isRequired,
         }),
         date: string.isRequired,
         displayAsPoints: bool.isRequired,
@@ -68,11 +68,11 @@ class SearchResultsComponent extends Component {
         pointsPossibleAfter: string.isRequired,
         pointsPossibleBefore: string.isRequired,
         pointsPossibleCurrent: string.isRequired,
-        student: string.isRequired
+        student: string.isRequired,
       })
     ).isRequired,
     nextPage: string.isRequired,
-    requestingResults: bool.isRequired
+    requestingResults: bool.isRequired,
   }
 
   componentDidMount() {
@@ -178,13 +178,13 @@ const mapStateToProps = state => ({
   fetchHistoryStatus: state.history.fetchHistoryStatus || '',
   historyItems: state.history.items || [],
   nextPage: state.history.nextPage || '',
-  requestingResults: state.history.loading || false
+  requestingResults: state.history.loading || false,
 })
 
 const mapDispatchToProps = dispatch => ({
   getNextPage: url => {
     dispatch(getHistoryNextPage(url))
-  }
+  },
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchResultsComponent)

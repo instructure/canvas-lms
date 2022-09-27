@@ -26,14 +26,14 @@ QUnit.module('GradebookGrid CellStyles', () => {
   QUnit.module('.classNamesForAssignmentCell', hooks => {
     hooks.beforeEach(() => {
       assignment = {
-        submissionTypes: ['online_text_entry']
+        submissionTypes: ['online_text_entry'],
       }
       submissionData = {
         dropped: false,
         excused: false,
         late: false,
         missing: false,
-        resubmitted: false
+        resubmitted: false,
       }
     })
 

@@ -30,19 +30,19 @@ QUnit.module('LatePolicyGrade', suiteHooks => {
   function mountComponent(props = {}) {
     const defaultProps = {
       assignment: {
-        pointsPossible: 100
+        pointsPossible: 100,
       },
       submission: {
         score: 70,
         grade: '70%',
-        pointsDeducted: 3
+        pointsDeducted: 3,
       },
       enterGradesAs: 'percent',
       gradingScheme: [
         ['A', 90],
         ['B', 80],
-        ['C', 70]
-      ]
+        ['C', 70],
+      ],
     }
     wrapper = mount(<LatePolicyGrade {...defaultProps} {...props} />)
   }

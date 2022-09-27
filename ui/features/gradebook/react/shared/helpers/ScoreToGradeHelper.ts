@@ -61,5 +61,5 @@ export default {
       default:
         return score
     }
-  }
+  },
 }

@@ -28,27 +28,27 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     const assignment = {
-      pointsPossible: 10
+      pointsPossible: 10,
     }
     const submission = {
       enteredGrade: null,
       enteredScore: null,
       excused: false,
-      id: '2501'
+      id: '2501',
     }
     const gradingScheme = [
       ['A', 0.9],
       ['B', 0.8],
       ['C', 0.7],
       ['D', 0.6],
-      ['F', 0]
+      ['F', 0],
     ]
     props = {
       assignment,
       enterGradesAs: 'points',
       disabled: false,
       gradingScheme,
-      submission
+      submission,
     }
 
     $container = document.createElement('div')
@@ -259,7 +259,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
     test('displays "Excused" as the input value when the updated submission is excused', () => {
       mountComponent()
       wrapper.setProps({
-        submission: {...props.submission, excused: true, enteredScore: null, enteredGrade: null}
+        submission: {...props.submission, excused: true, enteredScore: null, enteredGrade: null},
       })
       strictEqual(getTextInputValue(), 'Excused')
     })
@@ -377,7 +377,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput', suiteHooks => {
           excused: false,
           grade: 'B',
           score: 8.6,
-          valid: true
+          valid: true,
         }
         mountComponent()
       })

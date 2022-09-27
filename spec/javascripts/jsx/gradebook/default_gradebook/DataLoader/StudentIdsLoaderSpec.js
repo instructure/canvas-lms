@@ -34,7 +34,7 @@ QUnit.module('Gradebook > DataLoader > StudentIdsLoader', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     exampleData = {
-      studentIds: ['1101', '1102', '1103']
+      studentIds: ['1101', '1102', '1103'],
     }
   })
 
@@ -44,7 +44,7 @@ QUnit.module('Gradebook > DataLoader > StudentIdsLoader', suiteHooks => {
       dispatch = new RequestDispatch()
 
       gradebook = createGradebook({
-        context_id: '1201'
+        context_id: '1201',
       })
 
       dataLoader = new StudentIdsLoader({dispatch, gradebook})

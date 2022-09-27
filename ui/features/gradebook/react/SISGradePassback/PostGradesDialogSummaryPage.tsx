@@ -29,7 +29,7 @@ export default function PostGradesDialogSummaryPage(props) {
           {I18n.t(
             {
               one: 'You are ready to sync 1 assignment.',
-              other: 'You are ready to sync %{count} assignments.'
+              other: 'You are ready to sync %{count} assignments.',
             },
             {count: props.postCount}
           )}
@@ -43,7 +43,7 @@ export default function PostGradesDialogSummaryPage(props) {
               'assignments_to_grade',
               {
                 one: '1 assignment has ungraded submissions',
-                other: '%{count} assignments have ungraded submissions'
+                other: '%{count} assignments have ungraded submissions',
               },
               {count: props.needsGradingCount}
             )}

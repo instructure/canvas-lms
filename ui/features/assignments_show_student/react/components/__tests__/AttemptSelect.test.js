@@ -29,7 +29,7 @@ function mockContext(children) {
   return (
     <AlertManagerContext.Provider
       value={{
-        setOnSuccess: mockedSetOnSuccess
+        setOnSuccess: mockedSetOnSuccess,
       }}
     >
       {children}
@@ -43,7 +43,7 @@ async function createProps({attempt}) {
   return {
     submission,
     allSubmissions: [submission, submission2],
-    onChangeSubmission: mockedOnChangeSubmission
+    onChangeSubmission: mockedOnChangeSubmission,
   }
 }
 
@@ -64,7 +64,7 @@ describe('Attempt', () => {
     const props = {
       submission,
       allSubmissions: [submission],
-      onChangeSubmission: mockedOnChangeSubmission
+      onChangeSubmission: mockedOnChangeSubmission,
     }
     const {getByDisplayValue} = render(mockContext(<AttemptSelect {...props} />))
     expect(getByDisplayValue('Attempt 1')).toBeInTheDocument()
@@ -76,7 +76,7 @@ describe('Attempt', () => {
     const props = {
       submission: submission2,
       allSubmissions: [submission, submission2],
-      onChangeSubmission: mockedOnChangeSubmission
+      onChangeSubmission: mockedOnChangeSubmission,
     }
     const {getAllByText, getByTestId} = render(mockContext(<AttemptSelect {...props} />))
     const select = getByTestId('attemptSelect')

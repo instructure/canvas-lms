@@ -46,7 +46,7 @@ export default class DataLoader {
   constructor({
     dispatch,
     gradebook,
-    performanceControls
+    performanceControls,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
@@ -58,7 +58,7 @@ export default class DataLoader {
       requestCharacterLimit: 8000, // apache limit
       dispatch,
       gradebook,
-      performanceControls
+      performanceControls,
     }
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
@@ -76,7 +76,7 @@ export default class DataLoader {
       gradebook,
       getAssignmentGroups: true,
       getModules: gradebook.options.has_modules,
-      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
+      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
     })
   }
 
@@ -90,19 +90,19 @@ export default class DataLoader {
 
   reloadStudentDataForEnrollmentFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: true
+      getGradingPeriodAssignments: true,
     })
   }
 
   reloadStudentDataForSectionFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: false
+      getGradingPeriodAssignments: false,
     })
   }
 
   reloadStudentDataForStudentGroupFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: false
+      getGradingPeriodAssignments: false,
     })
   }
 
@@ -118,7 +118,7 @@ export default class DataLoader {
       dataLoader: this,
       gradebook,
       getGradingPeriodAssignments:
-        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null
+        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
     })
   }
 

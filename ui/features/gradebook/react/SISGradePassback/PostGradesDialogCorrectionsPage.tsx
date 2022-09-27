@@ -106,7 +106,7 @@ class PostGradesDialogCorrectionsPage extends React.Component {
                 {
                   zero: 'No Assignments with Errors, Click Continue',
                   one: '1 Assignment with Errors',
-                  other: '%{count} Assignments with Errors'
+                  other: '%{count} Assignments with Errors',
                 },
                 {count: errorCount}
               )}

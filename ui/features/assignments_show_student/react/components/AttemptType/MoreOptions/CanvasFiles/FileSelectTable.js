@@ -43,7 +43,7 @@ const tableColumnWidths = {
   dateModifiedWidth: '110px',
   modifiedByWidth: '110px',
   fileSizeWidth: '80px',
-  publishedWidth: '80px'
+  publishedWidth: '80px',
 }
 
 const FileSelectTable = props => {
@@ -51,7 +51,7 @@ const FileSelectTable = props => {
     <>
       <ScreenReaderContent>
         {I18n.t('File select, %{filename} folder contents', {
-          filename: props.folders[props.selectedFolderID].name
+          filename: props.folders[props.selectedFolderID].name,
         })}
       </ScreenReaderContent>
       <TableHeader columnWidths={tableColumnWidths} />
@@ -83,7 +83,7 @@ FileSelectTable.propTypes = {
   files: object,
   handleCanvasFileSelect: func,
   handleFolderSelect: func,
-  selectedFolderID: string
+  selectedFolderID: string,
 }
 
 export default FileSelectTable

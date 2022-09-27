@@ -43,18 +43,18 @@ export default class ModeratedGradingFormFieldGroup extends React.Component {
     availableGradersCount: number.isRequired,
     moderatedGradingEnabled: bool.isRequired,
     onGraderCommentsVisibleToGradersChange: func.isRequired,
-    onModeratedGradingChange: func.isRequired
+    onModeratedGradingChange: func.isRequired,
   }
 
   static defaultProps = {
     currentGraderCount: null,
-    finalGraderID: null
+    finalGraderID: null,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      moderatedGradingChecked: props.moderatedGradingEnabled
+      moderatedGradingChecked: props.moderatedGradingEnabled,
     }
   }
 

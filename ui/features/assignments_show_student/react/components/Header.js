@@ -53,12 +53,12 @@ class Header extends React.Component {
     assignment: Assignment.shape,
     onChangeSubmission: func,
     submission: Submission.shape,
-    reviewerSubmission: Submission.shape
+    reviewerSubmission: Submission.shape,
   }
 
   static defaultProps = {
     onChangeSubmission: () => {},
-    reviewerSubmission: null
+    reviewerSubmission: null,
   }
 
   isPeerReviewModeEnabled = () => {
@@ -70,7 +70,7 @@ class Header extends React.Component {
       !!this.props.submission?.unreadCommentCount ||
       (!!this.isPeerReviewModeEnabled() &&
         this.props.assignment.env.peerReviewAvailable &&
-        !this.props.assignment.rubric)
+        !this.props.assignment.rubric),
   }
 
   isSubmissionLate = () => {
@@ -156,7 +156,7 @@ class Header extends React.Component {
       defaultValue: I18n.t('N/A'),
       formatType: 'points_out_of_fraction',
       gradingType: assignment.gradingType,
-      pointsPossible: assignment.pointsPossible
+      pointsPossible: assignment.pointsPossible,
     })
 
     const textProps =

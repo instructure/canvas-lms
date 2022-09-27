@@ -41,7 +41,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
 
       assignmentGroup: {
         groupWeight: 35.5,
-        name: 'Homework'
+        name: 'Homework',
       },
 
       onMenuDismiss() {},
@@ -56,13 +56,13 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
         isSortColumn: true,
         onSortByGradeAscending() {},
         onSortByGradeDescending() {},
-        settingKey: 'grade'
+        settingKey: 'grade',
       },
 
       isRunningScoreToUngraded: false,
 
       viewUngradedAsZero: false,
-      weightedGroups: true
+      weightedGroups: true,
     }
   })
 

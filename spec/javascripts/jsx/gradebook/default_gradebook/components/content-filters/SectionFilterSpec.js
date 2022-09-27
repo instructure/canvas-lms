@@ -34,9 +34,12 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
 
       props = {
         disabled: false,
-        sections: [{id: '2002', name: 'Section 2'}, {id: '2001', name: 'Section 1'}],
+        sections: [
+          {id: '2002', name: 'Section 2'},
+          {id: '2001', name: 'Section 1'},
+        ],
         onSelect: sinon.stub(),
-        selectedSectionId: '0'
+        selectedSectionId: '0',
       }
 
       component = null

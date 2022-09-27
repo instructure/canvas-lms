@@ -33,22 +33,22 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
       grades = {
         1101: {
           courseGrade: {
-            percentage: 90.12
+            percentage: 90.12,
           },
           gradingPeriodGrades: {
             1502: {
-              percentage: 81.23
-            }
-          }
+              percentage: 81.23,
+            },
+          },
         },
 
         1102: {
           gradingPeriodGrades: {
             1501: {
-              percentage: 81.23
-            }
-          }
-        }
+              percentage: 81.23,
+            },
+          },
+        },
       }
 
       datastore.setGrades(grades)
@@ -91,17 +91,17 @@ describe('Gradebook FinalGradeOverrideDatastore', () => {
       grades = {
         1101: {
           courseGrade: {
-            percentage: 90.12
-          }
+            percentage: 90.12,
+          },
         },
 
         1102: {
           gradingPeriodGrades: {
             1501: {
-              percentage: 81.23
-            }
-          }
-        }
+              percentage: 81.23,
+            },
+          },
+        },
       }
 
       datastore.setGrades(grades)

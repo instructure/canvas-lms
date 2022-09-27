@@ -66,7 +66,7 @@ const assignmentHelper = {
 
   gradeByGroup(assignment) {
     return !!assignment.group_category_id && !assignment.grade_group_students_individually
-  }
+  },
 }
 
 export default assignmentHelper

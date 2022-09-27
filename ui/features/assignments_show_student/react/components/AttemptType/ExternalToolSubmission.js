@@ -98,8 +98,8 @@ function ExternalToolDraftView({createSubmissionDraft, onFileUploadRequested, su
             externalToolId: tool._id,
             id: submission.id,
             ltiLaunchUrl: contentItem.url,
-            resourceLinkLookupUuid: contentItem.lookup_uuid
-          }
+            resourceLinkLookupUuid: contentItem.lookup_uuid,
+          },
         })
       }
     }
@@ -156,12 +156,12 @@ ExternalToolSubmission.propTypes = {
   submission: shape({
     attempt: number,
     id: string,
-    url: string
+    url: string,
   }).isRequired,
-  tool: ExternalToolModel.shape
+  tool: ExternalToolModel.shape,
 }
 
 ExternalToolSubmission.defaultProps = {
   createSubmissionDraft: () => {},
-  onFileUploadRequested: () => {}
+  onFileUploadRequested: () => {},
 }

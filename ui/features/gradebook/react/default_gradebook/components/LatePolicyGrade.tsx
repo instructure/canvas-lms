@@ -30,7 +30,7 @@ export default function LatePolicyGrade(props) {
     formatType: props.enterGradesAs,
     pointsPossible: props.assignment.pointsPossible,
     gradingScheme: props.gradingScheme,
-    version: 'final'
+    version: 'final',
   }
   const finalGrade = GradeFormatHelper.formatSubmissionGrade(props.submission, formatOptions)
 
@@ -66,13 +66,13 @@ export default function LatePolicyGrade(props) {
 
 LatePolicyGrade.propTypes = {
   assignment: shape({
-    pointsPossible: number
+    pointsPossible: number,
   }).isRequired,
   enterGradesAs: oneOf(['points', 'percent', 'passFail', 'gradingScheme']).isRequired,
   gradingScheme: arrayOf(Array).isRequired,
   submission: shape({
     grade: string,
     score: number,
-    pointsDeducted: number
-  }).isRequired
+    pointsDeducted: number,
+  }).isRequired,
 }

@@ -34,8 +34,8 @@ const defaultProps: FilterNavFilterProps = {
     id: '123',
     type: 'submissions',
     value: 'has-ungraded-submissions',
-    created_at: '2021-11-02T20:56:23.616Z'
-  }
+    created_at: '2021-11-02T20:56:23.616Z',
+  },
 }
 
 const dateTests = (testType: string) => {
@@ -45,11 +45,11 @@ const dateTests = (testType: string) => {
       id: '456',
       createdAt: '2021-11-02T20:56:23.616Z',
       type: testType,
-      value: undefined
+      value: undefined,
     }
     props = {
       ...defaultProps,
-      filter
+      filter,
     }
     onChange = jest.fn()
     onDelete = jest.fn()
@@ -79,7 +79,7 @@ const dateTests = (testType: string) => {
     )
     const dateComponent = getByTestId('date-input')
     fireEvent.change(dateComponent, {
-      target: {value: 'Fri Dec 04 2021 02:00:00 GMT-0500 (Colombia Standard Time)'}
+      target: {value: 'Fri Dec 04 2021 02:00:00 GMT-0500 (Colombia Standard Time)'},
     })
     fireEvent.blur(dateComponent)
     expect(onChange).toHaveBeenCalled()
@@ -101,11 +101,11 @@ describe('FilterNavFilter', () => {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'submissions',
-        value: undefined
+        value: undefined,
       }
       props = {
         ...defaultProps,
-        filter
+        filter,
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -137,7 +137,7 @@ describe('FilterNavFilter', () => {
       expect(onChange).toHaveBeenLastCalledWith(
         expect.objectContaining({
           type: 'submissions',
-          value: 'has-ungraded-submissions'
+          value: 'has-ungraded-submissions',
         })
       )
     })
@@ -150,15 +150,15 @@ describe('FilterNavFilter', () => {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'section',
-        value: '1'
+        value: '1',
       }
       props = {
         ...defaultProps,
         filter,
         sections: [
           {id: '1', name: 'Section 1'},
-          {id: '2', name: 'Section 2'}
-        ]
+          {id: '2', name: 'Section 2'},
+        ],
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -183,7 +183,7 @@ describe('FilterNavFilter', () => {
         expect.objectContaining({
           id: '456',
           type: 'section',
-          value: '1'
+          value: '1',
         })
       )
     })
@@ -196,7 +196,7 @@ describe('FilterNavFilter', () => {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'grading-period',
-        value: '1'
+        value: '1',
       }
       props = {
         ...defaultProps,
@@ -204,8 +204,8 @@ describe('FilterNavFilter', () => {
         gradingPeriods: [
           {id: '1', title: 'Grading Period 1', startDate: 1},
           {id: '2', title: 'Grading Period 2', startDate: 2},
-          {id: '3', title: 'Grading Period 3', startDate: 3}
-        ]
+          {id: '3', title: 'Grading Period 3', startDate: 3},
+        ],
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -230,7 +230,7 @@ describe('FilterNavFilter', () => {
         expect.objectContaining({
           id: '456',
           type: 'grading-period',
-          value: '1'
+          value: '1',
         })
       )
     })
@@ -243,7 +243,7 @@ describe('FilterNavFilter', () => {
         id: '456',
         createdAt: '2021-11-02T20:56:23.616Z',
         type: 'student-group',
-        value: '1'
+        value: '1',
       }
       props = {
         ...defaultProps,
@@ -254,18 +254,18 @@ describe('FilterNavFilter', () => {
             name: 'Student Group Category 1',
             groups: [
               {id: '1', name: 'Student Group 1'},
-              {id: '2', name: 'Student Group 2'}
-            ]
+              {id: '2', name: 'Student Group 2'},
+            ],
           },
           '2': {
             id: '1',
             name: 'Student Group Category 2',
             groups: [
               {id: '3', name: 'Student Group 3'},
-              {id: '4', name: 'Student Group 4'}
-            ]
-          }
-        }
+              {id: '4', name: 'Student Group 4'},
+            ],
+          },
+        },
       }
       onChange = jest.fn()
       onDelete = jest.fn()
@@ -290,7 +290,7 @@ describe('FilterNavFilter', () => {
         expect.objectContaining({
           id: '456',
           type: 'student-group',
-          value: '1'
+          value: '1',
         })
       )
     })

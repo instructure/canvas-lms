@@ -1,36 +1,34 @@
-<form id="assignment_turnitin_settings">
-  <div class="control-group">
-    <div class="controls">
-      <label for="settings_originality_report_visibility"
-      class="control-label">
-        {{#t "vericite_settings.originality_report_visibility"}}
+<form id='assignment_turnitin_settings'>
+  <div class='control-group'>
+    <div class='controls'>
+      <label for='settings_originality_report_visibility' class='control-label'>
+        {{#t 'vericite_settings.originality_report_visibility'}}
           Students Can See the Originality Report
         {{/t}}
       </label>
-      <br/>
-      <select id="settings_originality_report_visibility" style="min-width: 18em;"
-        name="originality_report_visibility">
-        <option value="immediate"
-        {{selectedIf originalityReportVisibility "immediate"}} >
-          {{#t "vericite_settings.originality_report_visible_immediately"}}
+      <br />
+      <select
+        id='settings_originality_report_visibility'
+        style='min-width: 18em;'
+        name='originality_report_visibility'
+      >
+        <option value='immediate' {{selectedIf originalityReportVisibility 'immediate'}}>
+          {{#t 'vericite_settings.originality_report_visible_immediately'}}
             Immediately
           {{/t}}
         </option>
-        <option value="after_grading"
-        {{selectedIf originalityReportVisibility "after_grading"}} >
-          {{#t "vericite_settings.originality_report_visible_after_grading"}}
+        <option value='after_grading' {{selectedIf originalityReportVisibility 'after_grading'}}>
+          {{#t 'vericite_settings.originality_report_visible_after_grading'}}
             After the assignment is graded
           {{/t}}
         </option>
-        <option value="after_due_date"
-        {{selectedIf originalityReportVisibility "after_due_date"}} >
-          {{#t "vericite_settings.originality_report_visible_after_due_date"}}
+        <option value='after_due_date' {{selectedIf originalityReportVisibility 'after_due_date'}}>
+          {{#t 'vericite_settings.originality_report_visible_after_due_date'}}
             After the Due Date
           {{/t}}
         </option>
-        <option value="never"
-        {{selectedIf originalityReportVisibility "never"}} >
-          {{#t "vericite_settings.originality_report_never"}}
+        <option value='never' {{selectedIf originalityReportVisibility 'never'}}>
+          {{#t 'vericite_settings.originality_report_never'}}
             Never
           {{/t}}
         </option>
@@ -39,28 +37,27 @@
   </div>
 
   <fieldset>
-    <div class="control-group">
-      <div class="controls">
-        <label class="checkbox" for="exclude_quoted">
-          {{checkbox "exclude_quoted" checked=excludeQuoted}}
+    <div class='control-group'>
+      <div class='controls'>
+        <label class='checkbox' for='exclude_quoted'>
+          {{checkbox 'exclude_quoted' checked=excludeQuoted}}
           Exclude Quoted Material
         </label>
-        <label class="checkbox" for="exclude_self_plag">
-          {{checkbox "exclude_self_plag" checked=excludeSelfPlag}}
+        <label class='checkbox' for='exclude_self_plag'>
+          {{checkbox 'exclude_self_plag' checked=excludeSelfPlag}}
           Exclude Self Plagiarism
         </label>
-        <label class="checkbox" for="store_in_index">
-          {{checkbox "store_in_index" checked=storeInIndex}}
+        <label class='checkbox' for='store_in_index'>
+          {{checkbox 'store_in_index' checked=storeInIndex}}
           Store submissions in Institutional Index
         </label>
       </div>
     </div>
   </fieldset>
 
-
-  <div class="button-container">
-    <button type="submit" class="btn btn-primary">
-      {{#t "buttons.update_settings"}}
+  <div class='button-container'>
+    <button type='submit' class='btn btn-primary'>
+      {{#t 'buttons.update_settings'}}
         Update Settings
       {{/t}}
     </button>

@@ -19,7 +19,7 @@
 import AssignmentRowCellPropFactory from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/editors/AssignmentCellEditor/AssignmentRowCellPropFactory'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
@@ -42,13 +42,13 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
       gradebook.gradebookGrid.gridSupport = {
         helper: {
           commitCurrentEdit() {},
-          focus() {}
-        }
+          focus() {},
+        },
       }
 
       gradebook.students['1101'] = {id: '1101', isConcluded: false}
       gradebook.setAssignments({
-        2301: {grading_type: 'points', id: '2301', points_possible: 10}
+        2301: {grading_type: 'points', id: '2301', points_possible: 10},
       })
       gradebook.updateSubmission({
         assignment_id: '2301',
@@ -58,14 +58,14 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
         grade: '6.8',
         id: '2501',
         score: 6.8,
-        user_id: '1101'
+        user_id: '1101',
       })
 
       editorOptions = {
         column: {
-          assignmentId: '2301'
+          assignmentId: '2301',
         },
-        item: {id: '1101'}
+        item: {id: '1101'},
       }
 
       sinon.stub(gradebook, 'updateRowAndRenderSubmissionTray') // no rendering needed for these tests
@@ -117,9 +117,9 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
           ['🙂', 0.8],
           ['😐', 0.7],
           ['😢', 0.6],
-          ['💩', 0]
+          ['💩', 0],
         ],
-        title: 'Emoji Grades'
+        title: 'Emoji Grades',
       }
       gradebook.getAssignment('2301').grading_standard_id = '2801'
       gradebook.courseContent.gradingSchemes = [gradingScheme]
@@ -177,13 +177,13 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
         excused: false,
         grade: 'A',
         score: 10,
-        valid: true
+        valid: true,
       }
       gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       deepEqual(getProps().pendingGradeInfo, {
         ...pendingGradeInfo,
         assignmentId: '2301',
-        userId: '1101'
+        userId: '1101',
       })
     })
 
@@ -266,9 +266,9 @@ QUnit.module('GradebookGrid AssignmentRowCellPropFactory', () => {
             score: 6.8,
             submission_type: 'online_text_entry',
             turnitin_data: {
-              submission_2501: {status: 'scored', similarity_score: 75}
+              submission_2501: {status: 'scored', similarity_score: 75},
             },
-            user_id: '1101'
+            user_id: '1101',
           }
 
           sinon.stub(gradebook, 'getSubmission').returns(submission)

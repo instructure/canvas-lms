@@ -55,7 +55,7 @@ function availableStepContainer(props) {
 
 availableStepContainer.propTypes = {
   assignment: Assignment.shape,
-  isCollapsed: bool
+  isCollapsed: bool,
 }
 
 function unavailableStepContainer(props) {
@@ -73,7 +73,7 @@ function unavailableStepContainer(props) {
 }
 
 unavailableStepContainer.propTypes = {
-  isCollapsed: bool
+  isCollapsed: bool,
 }
 
 function uploadedStepContainer(props) {
@@ -97,7 +97,7 @@ function uploadedStepContainer(props) {
 
 uploadedStepContainer.propTypes = {
   assignment: Assignment.shape,
-  isCollapsed: bool
+  isCollapsed: bool,
 }
 
 function submittedStepContainer(props) {
@@ -119,7 +119,7 @@ function submittedStepContainer(props) {
 submittedStepContainer.propTypes = {
   assignment: Assignment.shape,
   isCollapsed: bool,
-  submission: Submission.shape
+  submission: Submission.shape,
 }
 
 function gradedStepContainer(props) {
@@ -162,12 +162,12 @@ export default function StepContainer({assignment, submission, isCollapsed, forc
 gradedStepContainer.propTypes = {
   assignment: Assignment.shape,
   isCollapsed: bool,
-  submission: Submission.shape
+  submission: Submission.shape,
 }
 
 StepContainer.propTypes = {
   assignment: Assignment.shape,
   forceLockStatus: bool,
   isCollapsed: bool,
-  submission: Submission.shape
+  submission: Submission.shape,
 }

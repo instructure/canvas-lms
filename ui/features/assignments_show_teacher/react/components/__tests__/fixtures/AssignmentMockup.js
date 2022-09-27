@@ -21,7 +21,7 @@ import {
   mockAssignment,
   mockUser,
   mockSubmission,
-  mockOverride
+  mockOverride,
 } from '../../../test-utils'
 
 // unpublished, graded, no-submission, due for everyone, no due date
@@ -32,7 +32,7 @@ export function noSubEveryoneAssignment(overrides) {
     lockAt: null,
     state: 'unpublished',
     submissionTypes: ['none'],
-    ...overrides
+    ...overrides,
   })
   return noSubEveryoneAssign
 }
@@ -45,7 +45,7 @@ export function paperEveryoneAssignment(overrides) {
     lockAt: null,
     state: 'unpublished',
     submissionTypes: ['on_paper'],
-    ...overrides
+    ...overrides,
   })
   return paperEveryoneAssign
 }
@@ -56,7 +56,7 @@ export function gradedEveryoneAssignment(overrides) {
     dueAt: '2019-02-23T23:59:59-07:00',
     unlockAt: null,
     lockAt: null,
-    ...overrides
+    ...overrides,
   })
   return gradedEveryoneAssign
 }
@@ -67,7 +67,7 @@ export function gradedAnySubAssignment(overrides) {
     unlockAt: null,
     lockAt: null,
     submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],
-    ...overrides
+    ...overrides,
   })
   return gradedAnySubAssign
 }
@@ -96,8 +96,8 @@ export function partialSubAssignment(overrides) {
             name: 'First Student',
             shortName: 'FirstS1',
             sortableName: 'Student, First',
-            email: 'first_student1@example.com'
-          })
+            email: 'first_student1@example.com',
+          }),
         }),
         mockSubmission({
           gid: '2sub',
@@ -114,12 +114,12 @@ export function partialSubAssignment(overrides) {
             name: 'Second Student',
             shortName: 'SecondS12',
             sortableName: 'Student, Second',
-            email: 'second_student2@example.com'
-          })
-        })
-      ]
+            email: 'second_student2@example.com',
+          }),
+        }),
+      ],
     },
-    ...overrides
+    ...overrides,
   })
   return partialSubAssign
 }
@@ -141,12 +141,12 @@ export function sectionAssignment(overrides) {
           set: {
             lid: '2',
             name: 'CourseSection1',
-            __typename: 'Section'
-          }
-        })
-      ]
+            __typename: 'Section',
+          },
+        }),
+      ],
     },
-    ...overrides
+    ...overrides,
   })
   return sectionAssign
 }
@@ -160,7 +160,7 @@ export function gradedGroupAssignment(overrides) {
     allowedExtensions: ['pdf'],
     submissionTypes: ['online_upload'],
     course: mockCourse(),
-    ...overrides
+    ...overrides,
   })
   return gradedGroupAssign
 }
@@ -181,8 +181,8 @@ export function groupAssignment(overrides) {
           set: {
             lid: '1',
             name: 'GrpSet1 1',
-            __typename: 'Group'
-          }
+            __typename: 'Group',
+          },
         }),
         mockOverride({
           title: 'Override_2',
@@ -194,10 +194,10 @@ export function groupAssignment(overrides) {
           set: {
             lid: '2',
             name: 'GrpSet1 2',
-            __typename: 'Group'
-          }
-        })
-      ]
+            __typename: 'Group',
+          },
+        }),
+      ],
     },
     needsGradingCount: 2,
     submissions: {
@@ -216,8 +216,8 @@ export function groupAssignment(overrides) {
             name: 'First Student',
             shortName: 'FirstS1',
             sortableName: 'Student, First',
-            email: 'first_student1@example.com'
-          })
+            email: 'first_student1@example.com',
+          }),
         }),
         mockSubmission({
           gid: '2',
@@ -233,8 +233,8 @@ export function groupAssignment(overrides) {
             name: 'Second Student',
             shortName: 'SecondS2',
             sortableName: 'Student, Second',
-            email: 'second_student2@example.com'
-          })
+            email: 'second_student2@example.com',
+          }),
         }),
         mockSubmission({
           gid: '3',
@@ -250,8 +250,8 @@ export function groupAssignment(overrides) {
             name: 'Third Student',
             shortName: 'ThirdS3',
             sortableName: 'Student, Third',
-            email: 'third_student3@example.com'
-          })
+            email: 'third_student3@example.com',
+          }),
         }),
         mockSubmission({
           gid: '4',
@@ -267,13 +267,13 @@ export function groupAssignment(overrides) {
             name: 'Fourth Student',
             shortName: 'FourthS4',
             sortableName: 'Student, Fourth',
-            email: 'fourth_student4@example.com'
-          })
-        })
-      ]
+            email: 'fourth_student4@example.com',
+          }),
+        }),
+      ],
     },
     course: mockCourse(),
-    ...overrides
+    ...overrides,
   })
   return groupAssign
 }
@@ -298,7 +298,7 @@ export function groupIndividualSubAssignment(overrides) {
           lid: '1',
           lockAt: null,
           unlockAt: null,
-          set: {__typename: 'Group', lid: '1', name: 'GPSET1_1'}
+          set: {__typename: 'Group', lid: '1', name: 'GPSET1_1'},
         }),
         mockOverride({
           title: 'Group Individual Override_2',
@@ -307,9 +307,9 @@ export function groupIndividualSubAssignment(overrides) {
           lid: '2',
           lockAt: null,
           unlockAt: null,
-          set: {__typename: 'Group', lid: '2', name: 'GPSET2_2'}
-        })
-      ]
+          set: {__typename: 'Group', lid: '2', name: 'GPSET2_2'},
+        }),
+      ],
     },
     needsGradingCount: 2,
     submissions: {
@@ -330,8 +330,8 @@ export function groupIndividualSubAssignment(overrides) {
             lid: '1',
             name: 'S1 Student One',
             shortName: 'S1 Student One',
-            sortableName: 'One, S1 Student'
-          })
+            sortableName: 'One, S1 Student',
+          }),
         }),
         mockSubmission({
           gid: '2',
@@ -349,8 +349,8 @@ export function groupIndividualSubAssignment(overrides) {
             lid: '2',
             name: 'S2 Student Two',
             shortName: 'S2 Student Two',
-            sortableName: 'Two, S2 Student'
-          })
+            sortableName: 'Two, S2 Student',
+          }),
         }),
         mockSubmission({
           gid: '3',
@@ -368,8 +368,8 @@ export function groupIndividualSubAssignment(overrides) {
             lid: '3',
             name: 'S3 Student Three',
             shortName: 'S3 Student Three',
-            sortableName: 'Three, S3 Student'
-          })
+            sortableName: 'Three, S3 Student',
+          }),
         }),
         mockSubmission({
           gid: '4',
@@ -387,13 +387,13 @@ export function groupIndividualSubAssignment(overrides) {
             lid: '4',
             name: 'S4 Student Four',
             shortName: 'S4 Student Four',
-            sortableName: 'Four, S4 Student'
-          })
-        })
-      ]
+            sortableName: 'Four, S4 Student',
+          }),
+        }),
+      ],
     },
     course: mockCourse(),
-    ...overrides
+    ...overrides,
   })
   return groupIndividualSubAssign
 }
@@ -415,8 +415,8 @@ export function variedSubmissionTypes() {
         name: 'First Student',
         shortName: 'FirstS1',
         sortableName: 'Student, First',
-        email: 'first_student1@example.com'
-      })
+        email: 'first_student1@example.com',
+      }),
     }),
     mockSubmission({
       gid: '2sub',
@@ -433,8 +433,8 @@ export function variedSubmissionTypes() {
         name: 'Second Student',
         shortName: 'SecondS12',
         sortableName: 'Student, Second',
-        email: 'second_student2@example.com'
-      })
+        email: 'second_student2@example.com',
+      }),
     }),
     mockSubmission({
       gid: '3sub',
@@ -451,8 +451,8 @@ export function variedSubmissionTypes() {
         name: 'Third Student',
         shortName: 'ThirdS3',
         sortableName: 'Student, Third',
-        email: 'third_student3@example.com'
-      })
+        email: 'third_student3@example.com',
+      }),
     }),
     mockSubmission({
       gid: '4sub',
@@ -469,8 +469,8 @@ export function variedSubmissionTypes() {
         name: 'Fourth Student',
         shortName: 'FourthS4',
         sortableName: 'Student, Fourth',
-        email: 'fourth_student4@example.com'
-      })
+        email: 'fourth_student4@example.com',
+      }),
     }),
     mockSubmission({
       gid: '5sub',
@@ -487,8 +487,8 @@ export function variedSubmissionTypes() {
         name: 'Fifth Student',
         shortName: 'FifthS5',
         sortableName: 'Student, Fifth',
-        email: 'fifth_student5@example.com'
-      })
+        email: 'fifth_student5@example.com',
+      }),
     }),
     mockSubmission({
       gid: '6sub',
@@ -505,9 +505,9 @@ export function variedSubmissionTypes() {
         name: 'Sixth Student',
         shortName: 'SixthS6',
         sortableName: 'Student, Sixth',
-        email: 'sixth_student6@example.com'
-      })
-    })
+        email: 'sixth_student6@example.com',
+      }),
+    }),
   ]
   return submissions
 }

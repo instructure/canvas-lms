@@ -32,7 +32,7 @@ function normalizeStudentGroupSets(studentGroupSets) {
   return studentGroupSets.map(category => ({
     children: [...category.groups].sort(natcompare.byKey('name')),
     id: category.id,
-    name: category.name
+    name: category.name,
   }))
 }
 
@@ -59,18 +59,18 @@ StudentGroupFilter.propTypes = {
       children: arrayOf(
         shape({
           id: string.isRequired,
-          name: string.isRequired
+          name: string.isRequired,
         })
       ),
 
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
 
-  selectedStudentGroupId: string
+  selectedStudentGroupId: string,
 }
 
 StudentGroupFilter.defaultProps = {
-  selectedStudentGroupId: null
+  selectedStudentGroupId: null,
 }

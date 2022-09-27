@@ -23,10 +23,10 @@ export const AllDates = shape({
   base: bool,
   due_at: string, // iso8601 strings or null
   lock_at: string,
-  unlock_at: string
+  unlock_at: string,
 })
 
 export const AssignmentShape = shape({
   id: string.isRequired,
-  all_dates: arrayOf(AllDates)
+  all_dates: arrayOf(AllDates),
 })

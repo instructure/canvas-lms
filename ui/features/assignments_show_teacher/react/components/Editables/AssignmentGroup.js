@@ -27,7 +27,7 @@ import SelectableText from './SelectableText'
 import {
   AssignmentGroupShape,
   COURSE_ASSIGNMENT_GROUPS_QUERY,
-  COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL
+  COURSE_ASSIGNMENT_GROUPS_QUERY_LOCAL,
 } from '../../assignmentData'
 
 const I18n = useI18nScope('assignments_2')
@@ -39,13 +39,13 @@ const AssignmentGroupPropTypes = {
   onAddAssignmentGroup: func, // .isRequired  TODO: when support + New Assignment Group
   assignmentGroupList: arrayOf(AssignmentGroupShape),
   selectedAssignmentGroup: AssignmentGroupShape,
-  readOnly: bool
+  readOnly: bool,
 }
 // eslint doesn't deal with the prop types being defined this way
 /* eslint-disable react/default-props-match-prop-types */
 const AssignmentGroupDefaultProps = {
   assignmentGroupList: [],
-  readOnly: false
+  readOnly: false,
 }
 /* eslint-enable react/default-props-match-prop-types */
 const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')
@@ -53,12 +53,12 @@ const assignmentGroupPlaceholder = I18n.t('No Assignment Group Assigned')
 class AssignmentGroupUI extends React.Component {
   static propTypes = {
     ...AssignmentGroupPropTypes,
-    isLoading: bool
+    isLoading: bool,
   }
 
   static defaultProps = {
     ...AssignmentGroupDefaultProps,
-    isLoading: false
+    isLoading: false,
   }
 
   handleGroupChange = selection => {
@@ -92,7 +92,7 @@ class AssignmentGroupUI extends React.Component {
     } else if (this.props.selectedAssignmentGroup) {
       opts.push({
         label: this.props.selectedAssignmentGroup.name,
-        value: this.props.selectedAssignmentGroup.lid
+        value: this.props.selectedAssignmentGroup.lid,
       })
     }
     return opts
@@ -168,7 +168,7 @@ const AssignmentGroup = function (props) {
 }
 AssignmentGroup.propTypes = {
   ...AssignmentGroupPropTypes,
-  courseId: string
+  courseId: string,
 }
 AssignmentGroup.defaultProps = AssignmentGroupDefaultProps
 
@@ -179,7 +179,7 @@ function depaginate(fetchMore, data) {
   if (data.course.assignmentGroupsConnection.pageInfo.hasNextPage) {
     fetchMore({
       variables: {cursor: data.course.assignmentGroupsConnection.pageInfo.endCursor},
-      updateQuery: mergeThePage
+      updateQuery: mergeThePage,
     })
     isLoading = true
   }

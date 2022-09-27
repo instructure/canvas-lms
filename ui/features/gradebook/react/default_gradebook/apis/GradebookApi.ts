@@ -36,8 +36,8 @@ function createTeacherNotesColumn(courseId: string) {
     column: {
       position: 1,
       teacher_notes: true,
-      title: I18n.t('Notes')
-    }
+      title: I18n.t('Notes'),
+    },
   }
   return axios.post(url, data)
 }
@@ -58,7 +58,7 @@ function updateSubmission(
   return axios.put(url, {
     submission: underscore(submission),
     include: ['visibility'],
-    prefer_points_over_scheme: enterGradesAs === 'points'
+    prefer_points_over_scheme: enterGradesAs === 'points',
   })
 }
 
@@ -77,14 +77,14 @@ function createGradebookFilterPreset(courseId: string, filter: FilterPreset) {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters`,
     method: 'POST',
-    body: {gradebook_filter: {name, payload}}
+    body: {gradebook_filter: {name, payload}},
   })
 }
 
 function deleteGradebookFilterPreset(courseId: string, filterId: string) {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filterId}`,
-    method: 'DELETE'
+    method: 'DELETE',
   })
 }
 
@@ -93,7 +93,7 @@ function updateGradebookFilterPreset(courseId: string, filter: FilterPreset) {
   return doFetchApi({
     path: `/api/v1/courses/${courseId}/gradebook_filters/${filter.id}`,
     method: 'PUT',
-    body: {gradebook_filter: {name, payload}}
+    body: {gradebook_filter: {name, payload}},
   })
 }
 
@@ -106,5 +106,5 @@ export default {
   updateColumnOrder,
   updateGradebookFilterPreset,
   updateSubmission,
-  updateTeacherNotesColumn
+  updateTeacherNotesColumn,
 }

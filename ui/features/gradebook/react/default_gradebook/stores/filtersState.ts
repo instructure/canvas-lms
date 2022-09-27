@@ -25,7 +25,7 @@ import {
   compareFilterSetByUpdatedDate,
   deserializeFilter,
   doFiltersMatch,
-  isFilterNotEmpty
+  isFilterNotEmpty,
 } from '../Gradebook.utils'
 import GradebookApi from '../apis/GradebookApi'
 import type {GradebookStore} from './index'
@@ -91,7 +91,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     set({
       appliedFilters: [...get().appliedFilters.filter(f => f.type !== filter.type)].concat(
         existingFilter ? [] : [filter]
-      )
+      ),
     })
   },
 
@@ -106,7 +106,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialRowFilterSettings.section_id,
         type: 'section',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -115,7 +115,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,
         type: 'student-group',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -127,7 +127,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.assignment_group_id,
         type: 'assignment-group',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -140,7 +140,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.submissions || undefined,
         type: 'submissions',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -152,7 +152,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.context_module_id,
         type: 'module',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -161,7 +161,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.start_date,
         type: 'start-date',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -170,7 +170,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.end_date,
         type: 'end-date',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -182,7 +182,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,
         type: 'grading-period',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       })
     }
 
@@ -192,7 +192,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
 
     set({
       appliedFilters: filters,
-      stagedFilters: !savedFilterAlreadyMatches ? filters : []
+      stagedFilters: !savedFilterAlreadyMatches ? filters : [],
     })
   },
 
@@ -203,7 +203,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       .then(response => {
         set({
           filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
-          isFiltersLoading: false
+          isFiltersLoading: false,
         })
       })
       .catch(() => {
@@ -214,9 +214,9 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
             {
               key: 'filter-presets-loading-error',
               message: I18n.t('There was an error fetching gradebook filters.'),
-              variant: 'error'
-            }
-          ])
+              variant: 'error',
+            },
+          ]),
         })
       })
   },
@@ -230,7 +230,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       stagedFilters: newStagedFilters,
       appliedFilters: isFilterApplied
         ? newStagedFilters.filter(isFilterNotEmpty)
-        : get().appliedFilters
+        : get().appliedFilters,
     })
   },
 
@@ -243,13 +243,13 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       name: filterPreset.name,
       filters,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     }
 
     // optimistic update
     set({
       filterPresets: get().filterPresets.concat([stagedFilter]).sort(compareFilterSetByUpdatedDate),
-      stagedFilters: []
+      stagedFilters: [],
     })
 
     return GradebookApi.createGradebookFilterPreset(get().courseId, stagedFilter)
@@ -257,7 +257,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         const newFilter = deserializeFilter(response.json)
         set({
           stagedFilters: [],
-          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate)
+          filterPresets: originalFilters.concat([newFilter]).sort(compareFilterSetByUpdatedDate),
         })
       })
       .catch(() => {
@@ -267,9 +267,9 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
             {
               key: `filter-presets-create-error-${Date.now()}`,
               message: I18n.t('There was an error creating a new filter.'),
-              variant: 'error'
-            }
-          ])
+              variant: 'error',
+            },
+          ]),
         })
       })
   },
@@ -284,7 +284,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // optimistic update
     set({
       filterPresets: otherFilters.concat([filterPreset]).sort(compareFilterSetByUpdatedDate),
-      appliedFilters: isFilterApplied ? filterPreset.filters : appliedFilters
+      appliedFilters: isFilterApplied ? filterPreset.filters : appliedFilters,
     })
 
     try {
@@ -295,7 +295,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           .filterPresets.filter(f => f.id !== filterPreset.id)
           .concat([updatedFilter])
           .sort(compareFilterSetByUpdatedDate),
-        appliedFilters: isFilterApplied ? updatedFilter.filters : appliedFilters
+        appliedFilters: isFilterApplied ? updatedFilter.filters : appliedFilters,
       })
     } catch (err) {
       // rewind
@@ -305,7 +305,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
             .filterPresets.filter(f => f.id !== filterPreset.id)
             .concat([originalFilter])
             .sort(compareFilterSetByUpdatedDate),
-          appliedFilters
+          appliedFilters,
         })
       }
 
@@ -314,9 +314,9 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           {
             key: `filter-presets-create-error-${Date.now()}`,
             message: I18n.t('There was an error updating a filter.'),
-            variant: 'error'
-          }
-        ])
+            variant: 'error',
+          },
+        ]),
       })
     }
   },
@@ -328,7 +328,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     // Optimistic update
     set({
       filterPresets: get().filterPresets.filter(f => f.id !== filterPreset.id),
-      appliedFilters: isFilterApplied ? [] : appliedFilters
+      appliedFilters: isFilterApplied ? [] : appliedFilters,
     })
 
     return GradebookApi.deleteGradebookFilterPreset(get().courseId, filterPreset.id).catch(() => {
@@ -338,7 +338,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         set({
           filterPresets: get()
             .filterPresets.concat([filterPreset])
-            .sort(compareFilterSetByUpdatedDate)
+            .sort(compareFilterSetByUpdatedDate),
         })
       }
 
@@ -347,11 +347,11 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           {
             key: `filter-presets-delete-error-${filterPreset.id}-${Date.now()}`,
             message: I18n.t('There was an error deleting "%{name}".', {name: filterPreset.name}),
-            variant: 'error'
-          }
+            variant: 'error',
+          },
         ]),
-        appliedFilters
+        appliedFilters,
       })
     })
-  }
+  },
 })

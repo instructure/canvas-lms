@@ -32,7 +32,7 @@ function getProps(gradebook: Gradebook, options) {
     removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     onHeaderKeyDown: event => {
       gradebook.handleHeaderKeyDown(event, columnId)
-    }
+    },
   }
 }
 

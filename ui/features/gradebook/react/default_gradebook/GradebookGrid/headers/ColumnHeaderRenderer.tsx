@@ -56,7 +56,7 @@ export default class ColumnHeaderRenderer {
       ),
       student_firstname: new StudentFirstNameColumnHeaderRenderer(gradebook),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
-      total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook)
+      total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook),
     }
   }
 
@@ -65,7 +65,7 @@ export default class ColumnHeaderRenderer {
       const options = {
         ref: header => {
           this.gradebook.setHeaderComponentRef(column.id, header)
-        }
+        },
       }
       // The container to render into needs to be slick-column-name because
       // overwriting slick-column-name can cause slick-resizable-handle to be

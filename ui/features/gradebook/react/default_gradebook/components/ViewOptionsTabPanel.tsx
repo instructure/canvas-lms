@@ -39,7 +39,7 @@ function buildAssignmentSortOptions(includeModules) {
     {criterion: 'due_date', direction: 'ascending', label: I18n.t('Due Date - Oldest to Newest')},
     {criterion: 'due_date', direction: 'descending', label: I18n.t('Due Date - Newest to Oldest')},
     {criterion: 'points', direction: 'ascending', label: I18n.t('Points - Lowest to Highest')},
-    {criterion: 'points', direction: 'descending', label: I18n.t('Points - Highest to Lowest')}
+    {criterion: 'points', direction: 'descending', label: I18n.t('Points - Highest to Lowest')},
   ]
 
   if (includeModules) {
@@ -47,19 +47,19 @@ function buildAssignmentSortOptions(includeModules) {
       {
         criterion: 'module_position',
         direction: 'ascending',
-        label: I18n.t('Module - First to Last')
+        label: I18n.t('Module - First to Last'),
       },
       {
         criterion: 'module_position',
         direction: 'descending',
-        label: I18n.t('Module - Last to First')
+        label: I18n.t('Module - Last to First'),
       }
     )
   }
 
   return options.map(option => ({
     ...option,
-    value: `${option.criterion}-${option.direction}`
+    value: `${option.criterion}-${option.direction}`,
   }))
 }
 
@@ -83,7 +83,7 @@ export default function ViewOptionsTabPanel({
   showUnpublishedAssignments,
   showSeparateFirstLastNames,
   statusColors,
-  viewUngradedAsZero
+  viewUngradedAsZero,
 }) {
   const sortOptions = buildAssignmentSortOptions(columnSort.modulesEnabled)
   const selectedSortKey =
@@ -161,39 +161,39 @@ ViewOptionsTabPanel.propTypes = {
   columnSort: shape({
     currentValue: shape({
       criterion: string.isRequired,
-      direction: string.isRequired
+      direction: string.isRequired,
     }),
     modulesEnabled: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   hideAssignmentGroupTotals: shape({
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   hideTotal: shape({
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   showNotes: shape({
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   showUnpublishedAssignments: shape({
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   showSeparateFirstLastNames: shape({
     allowed: bool.isRequired,
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   statusColors: shape({
     currentValues: objectOf(string).isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }).isRequired,
   viewUngradedAsZero: shape({
     allowed: bool.isRequired,
     checked: bool.isRequired,
-    onChange: func.isRequired
-  }).isRequired
+    onChange: func.isRequired,
+  }).isRequired,
 }

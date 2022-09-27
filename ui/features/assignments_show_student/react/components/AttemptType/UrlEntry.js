@@ -39,7 +39,7 @@ import {TextInput} from '@instructure/ui-text-input'
 const I18n = useI18nScope('assignments_2_url_entry')
 
 const ERROR_MESSAGE = [
-  {text: I18n.t('Please enter a valid url (e.g. http://example.com)'), type: 'error'}
+  {text: I18n.t('Please enter a valid url (e.g. http://example.com)'), type: 'error'},
 ]
 
 class UrlEntry extends React.Component {
@@ -47,7 +47,7 @@ class UrlEntry extends React.Component {
     messages: [],
     typingTimeout: 0,
     url: '',
-    valid: false
+    valid: false,
   }
 
   _urlInputRef = createRef()
@@ -79,7 +79,7 @@ class UrlEntry extends React.Component {
     this.setState({
       messages: valid ? [] : ERROR_MESSAGE,
       url,
-      valid
+      valid,
     })
   }
 
@@ -137,7 +137,7 @@ class UrlEntry extends React.Component {
         await this.createSubmissionDraft(url)
         this.props.updateEditingDraft(false)
       }, 1000), // set a timeout of 1 second
-      url
+      url,
     })
   }
 
@@ -147,8 +147,8 @@ class UrlEntry extends React.Component {
         id: this.props.submission.id,
         activeSubmissionType: 'online_url',
         attempt: this.props.submission.attempt || 1,
-        url
-      }
+        url,
+      },
     })
   }
 
@@ -156,7 +156,7 @@ class UrlEntry extends React.Component {
     const inputStyle = {
       maxWidth: '700px',
       marginLeft: 'auto',
-      marginRight: 'auto'
+      marginRight: 'auto',
     }
 
     return (
@@ -255,7 +255,7 @@ UrlEntry.propTypes = {
   createSubmissionDraft: func,
   focusOnInit: bool.isRequired,
   submission: Submission.shape,
-  updateEditingDraft: func
+  updateEditingDraft: func,
 }
 
 UrlEntry.contextType = AlertManagerContext

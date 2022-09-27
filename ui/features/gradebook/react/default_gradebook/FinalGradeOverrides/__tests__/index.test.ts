@@ -34,28 +34,28 @@ describe('Gradebook FinalGradeOverrides', () => {
     const students = {
       1101: {
         enrollments: [{id: '2901', type: 'StudentEnrollment'}],
-        id: '1101'
-      }
+        id: '1101',
+      },
     }
 
     // `gradebook` is a double because CoffeeScript and AMD cannot be imported
     // into Jest specs
     gradebook = {
       course: {
-        id: '1201'
+        id: '1201',
       },
 
       gradingPeriodId: '1501',
 
       gradebookGrid: {
-        updateRowCell: sinon.stub()
+        updateRowCell: sinon.stub(),
       },
 
       isFilteringColumnsByGradingPeriod: sinon.stub().returns(false),
 
       student(id) {
         return students[id]
-      }
+      },
     }
     finalGradeOverrides = new FinalGradeOverrides(gradebook)
   })
@@ -65,19 +65,19 @@ describe('Gradebook FinalGradeOverrides', () => {
       grades = {
         1101: {
           courseGrade: {
-            percentage: 88.1
+            percentage: 88.1,
           },
 
           gradingPeriodGrades: {
             1501: {
-              percentage: 91.1
+              percentage: 91.1,
             },
 
             1502: {
-              percentage: 77.6
-            }
-          }
-        }
+              percentage: 77.6,
+            },
+          },
+        },
       }
     })
 
@@ -115,14 +115,14 @@ describe('Gradebook FinalGradeOverrides', () => {
       grades = {
         1101: {
           courseGrade: {
-            percentage: 88.1
-          }
+            percentage: 88.1,
+          },
         },
         1102: {
           courseGrade: {
-            percentage: 91.1
-          }
-        }
+            percentage: 91.1,
+          },
+        },
       }
     })
 
@@ -242,7 +242,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       beforeEach(() => {
         gradeInfo = new GradeOverrideInfo({
           grade: new GradeOverride({percentage: 90.0}),
-          valid: true
+          valid: true,
         })
       })
 
@@ -284,7 +284,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       beforeEach(() => {
         gradeInfo = new GradeOverrideInfo({
           grade: new GradeOverride({percentage: 90.0}),
-          valid: true
+          valid: true,
         })
         // Use a separate instance to mimic a new instance from the API call.
         gradeFromApi = new GradeOverride({percentage: 90.0})
@@ -378,7 +378,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       beforeEach(async () => {
         gradeInfo = new GradeOverrideInfo({
           grade: new GradeOverride({percentage: 90.0}),
-          valid: true
+          valid: true,
         })
 
         FinalGradeOverrideApi.updateFinalGradeOverride.returns(
@@ -408,7 +408,7 @@ describe('Gradebook FinalGradeOverrides', () => {
       beforeEach(() => {
         gradeInfo = new GradeOverrideInfo({
           enteredValue: 'invalid',
-          valid: false
+          valid: false,
         })
 
         finalGradeOverrides.updateGrade('1101', gradeInfo)
@@ -434,14 +434,14 @@ describe('Gradebook FinalGradeOverrides', () => {
       grades = {
         1101: {
           courseGrade: {
-            percentage: 88.1
-          }
+            percentage: 88.1,
+          },
         },
         1102: {
           courseGrade: {
-            percentage: 91.1
-          }
-        }
+            percentage: 91.1,
+          },
+        },
       }
 
       sinon

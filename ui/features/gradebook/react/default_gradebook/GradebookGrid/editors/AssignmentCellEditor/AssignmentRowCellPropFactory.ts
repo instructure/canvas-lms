@@ -32,7 +32,7 @@ function similarityInfoToShow(submission) {
 
     return {
       similarityScore: similarity_score,
-      status
+      status,
     }
   }
 
@@ -66,7 +66,7 @@ export default class AssignmentRowCellPropFactory {
       rawGrade: submission.rawGrade,
       score: submission.score,
       similarityInfo,
-      userId: student.id
+      userId: student.id,
     }
 
     const pendingGradeInfo = this.gradebook.getPendingGradeInfo(cleanSubmission)
@@ -74,7 +74,7 @@ export default class AssignmentRowCellPropFactory {
     return {
       assignment: {
         id: assignment.id,
-        pointsPossible: assignment.points_possible
+        pointsPossible: assignment.points_possible,
       },
 
       enterGradesAs: this.gradebook.getEnterGradesAsSetting(assignment.id),
@@ -91,7 +91,7 @@ export default class AssignmentRowCellPropFactory {
       pendingGradeInfo,
       student,
       submission: cleanSubmission,
-      submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid
+      submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid,
     }
   }
 }

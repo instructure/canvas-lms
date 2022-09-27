@@ -40,8 +40,8 @@ const EXTRA_ZEROS_MAP = {
     '01.000',
     '1.000',
     '1.00',
-    '1.0'
-  ]
+    '1.0',
+  ],
 }
 const MAX_OUTLIER_VALUES = [
   '100.001',
@@ -51,7 +51,7 @@ const MAX_OUTLIER_VALUES = [
   '500',
   '1000000',
   '1e10',
-  Number.MAX_SAFE_INTEGER.toString()
+  Number.MAX_SAFE_INTEGER.toString(),
 ]
 const MIN_OUTLIER_VALUES = [
   '-0.001',
@@ -61,7 +61,7 @@ const MIN_OUTLIER_VALUES = [
   '-500',
   '-1000000',
   '-1e10',
-  Number.MIN_SAFE_INTEGER.toString()
+  Number.MIN_SAFE_INTEGER.toString(),
 ]
 
 /*
@@ -198,12 +198,12 @@ QUnit.module(
       props = {
         latePolicy: {
           changes: {},
-          validationErrors: {}
+          validationErrors: {},
           // by default there is no data key, it gets added after first render
         },
         changeLatePolicy,
         locale: 'en',
-        showAlert: false
+        showAlert: false,
       }
     })
 
@@ -229,8 +229,8 @@ QUnit.module(
         ...componentProps,
         latePolicy: {
           ...componentProps.latePolicy,
-          data: DEFAULT_LATE_POLICY_DATA
-        }
+          data: DEFAULT_LATE_POLICY_DATA,
+        },
       }
       mountComponent(props)
     }

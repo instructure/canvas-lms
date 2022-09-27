@@ -22,7 +22,7 @@ import {
   getSecondaryDisplayInfo,
   getEnrollmentLabel,
   getOptions,
-  renderCell
+  renderCell,
 } from './StudentCellFormatter.utils'
 
 const I18n = useI18nScope('gradebook')
@@ -45,7 +45,7 @@ export default class StudentLastNameCellFormatter {
       enrollmentLabel: getEnrollmentLabel(student),
       secondaryInfo: getSecondaryDisplayInfo(student, secondaryInfo, this.options),
       studentId: student.id,
-      url: `${student.enrollments[0].grades.html_url}#tab-assignments`
+      url: `${student.enrollments[0].grades.html_url}#tab-assignments`,
     }
 
     return renderCell(options)

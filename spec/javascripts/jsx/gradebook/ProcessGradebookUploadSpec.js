@@ -47,13 +47,13 @@ const submissionNew2Change = {
   assignment_id: -1,
   grade: '20',
   original_grade: '25',
-  type: 'assignment'
+  type: 'assignment',
 }
 const submissionNew2Excused = {
   assignment_id: -1,
   grade: 'EX',
   original_grade: '20',
-  type: 'assignment'
+  type: 'assignment',
 }
 
 const submissionIgnored = {assignment_id: -2, grade: '25', original_grade: '25', type: 'assignment'}
@@ -137,7 +137,7 @@ QUnit.module('ProcessGradebookUpload.createIndividualAssignment', {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
@@ -148,7 +148,7 @@ QUnit.module('ProcessGradebookUpload.createIndividualAssignment', {
     xhr.restore()
 
     fakeENV.teardown()
-  }
+  },
 })
 
 test('properly creates a new assignment', () => {
@@ -167,7 +167,7 @@ QUnit.module('ProcessGradebookUpload.createAssignments', {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
@@ -177,7 +177,7 @@ QUnit.module('ProcessGradebookUpload.createAssignments', {
   teardown() {
     xhr.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('sends no data to server and returns an empty array if given no assignments', () => {
@@ -190,7 +190,7 @@ test('sends no data to server and returns an empty array if given no assignments
 
 test('properly filters and creates multiple assignments', () => {
   const gradebook = {
-    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2]
+    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
   }
   ProcessGradebookUpload.createAssignments(gradebook)
 
@@ -211,7 +211,7 @@ test('properly filters and creates multiple assignments', () => {
 
 test('sends calculate_grades: false as an argument when creating assignments', () => {
   const gradebook = {
-    assignments: [newAssignment1]
+    assignments: [newAssignment1],
   }
   ProcessGradebookUpload.createAssignments(gradebook)
 
@@ -351,8 +351,8 @@ test('properly populates grade data for a student', () => {
       submissionOld1Change,
       submissionOld2Excused,
       submissionNew1Excused,
-      submissionNew2Change
-    ]
+      submissionNew2Change,
+    ],
   }
   const gradeData = {}
   const assignmentMap = mapAssignments()
@@ -378,19 +378,19 @@ QUnit.module('ProcessGradebookUpload.populateGradeData')
 test('properly populates grade data', () => {
   const student1 = {
     previous_id: 1,
-    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change],
   }
   const student2 = {
     previous_id: 2,
-    submissions: [submissionOld2Excused, submissionNew1Change, submissionNew2Excused]
+    submissions: [submissionOld2Excused, submissionNew1Change, submissionNew2Excused],
   }
   const student3 = {
     previous_id: 3,
-    submissions: [submissionOld1Excused, submissionOld2Change, submissionNew2Change]
+    submissions: [submissionOld1Excused, submissionOld2Change, submissionNew2Change],
   }
   const gradebook = {
     students: [student1, student2, student3],
-    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2]
+    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
   }
   const responses = [[createAssignmentResponse1], [createAssignmentResponse2]]
   const gradeData = ProcessGradebookUpload.populateGradeData(gradebook, responses)
@@ -426,7 +426,7 @@ QUnit.module('ProcessGradebookUpload.submitGradeData', {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
@@ -437,23 +437,23 @@ QUnit.module('ProcessGradebookUpload.submitGradeData', {
     xhr.restore()
 
     fakeENV.teardown()
-  }
+  },
 })
 
 test('properly submits grade data', () => {
   const gradeData = {
     1: {
       1: {posted_grade: '20'},
-      2: {excuse: true}
+      2: {excuse: true},
     },
     2: {
       1: {posted_grade: '25'},
-      2: {posted_grade: '15'}
+      2: {posted_grade: '15'},
     },
     3: {
       1: {excuse: true},
-      2: {excuse: true}
-    }
+      2: {excuse: true},
+    },
   }
   ProcessGradebookUpload.submitGradeData(gradeData)
 
@@ -476,7 +476,7 @@ QUnit.module('ProcessGradebookUpload.upload', {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
@@ -497,7 +497,7 @@ QUnit.module('ProcessGradebookUpload.upload', {
     clock.restore()
 
     fakeENV.teardown()
-  }
+  },
 })
 
 test('sends no data to server if given null', () => {
@@ -818,19 +818,19 @@ test('handles multiple students changing multiple new assignments', () => {
 test('handles multiple students changing multiple new and existing assignments', () => {
   const student1 = {
     previous_id: 1,
-    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change],
   }
   const student2 = {
     previous_id: 2,
-    submissions: [submissionOld2Excused, submissionNew1Change, submissionNew2Excused]
+    submissions: [submissionOld2Excused, submissionNew1Change, submissionNew2Excused],
   }
   const student3 = {
     previous_id: 3,
-    submissions: [submissionOld1Excused, submissionOld2Change, submissionNew2Change]
+    submissions: [submissionOld1Excused, submissionOld2Change, submissionNew2Change],
   }
   const gradebook = {
     students: [student1, student2, student3],
-    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2]
+    assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -898,12 +898,12 @@ test('calls uploadCustomColumnData if custom_columns is non-empty', () => {
 
   const student1 = {
     previous_id: 1,
-    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change],
   }
   const gradebook = {
     students: [student1],
     assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
-    custom_columns: [customColumn1]
+    custom_columns: [customColumn1],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -917,12 +917,12 @@ test('does not call uploadCustomColumnData if custom_columns is empty', () => {
 
   const student1 = {
     previous_id: 1,
-    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change]
+    submissions: [submissionOld1Change, submissionNew1Excused, submissionNew2Change],
   }
   const gradebook = {
     students: [student1],
     assignments: [oldAssignment1, oldAssignment2, newAssignment1, newAssignment2],
-    custom_columns: []
+    custom_columns: [],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -941,12 +941,12 @@ test('creates requests for override score changes if an update URL is set', () =
         override_scores: [
           {
             current_score: '75',
-            new_score: '80'
-          }
+            new_score: '80',
+          },
         ],
-        submissions: []
-      }
-    ]
+        submissions: [],
+      },
+    ],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -963,12 +963,12 @@ test('ignores override score changes if no update URL is set', () => {
         override_scores: [
           {
             current_score: '75',
-            new_score: '80'
-          }
+            new_score: '80',
+          },
         ],
-        submissions: []
-      }
-    ]
+        submissions: [],
+      },
+    ],
   }
   delete ENV.bulk_update_override_scores_path
   ProcessGradebookUpload.upload(gradebook)
@@ -982,20 +982,20 @@ test('shows an alert if any bulk data is being uploaded', () => {
       {
         title: 'a new assignment',
         id: -1,
-        points_possible: 10
+        points_possible: 10,
       },
       {
         title: 'an even newer assignment',
         id: -2,
-        points_possible: 20
-      }
+        points_possible: 20,
+      },
     ],
     students: [
       {
         id: '1',
-        submissions: [{assignment_id: -1, grade: '10', original_grade: '9'}]
-      }
-    ]
+        submissions: [{assignment_id: -1, grade: '10', original_grade: '9'}],
+      },
+    ],
   }
 
   ProcessGradebookUpload.upload(gradebook)
@@ -1021,20 +1021,20 @@ test('does not show an alert if the only changes involve creating new assignment
       {
         title: 'a new assignment',
         id: -1,
-        points_possible: 10
+        points_possible: 10,
       },
       {
         title: 'an even newer assignment',
         id: -2,
-        points_possible: 20
-      }
+        points_possible: 20,
+      },
     ],
     students: [
       {
         id: '1',
-        submissions: []
-      }
-    ]
+        submissions: [],
+      },
+    ],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -1048,9 +1048,9 @@ test('does not redirect to gradebook until all requests have completed', () => {
       {
         id: 1,
         submissions: [submissionOld1Change, submissionNew1Change],
-        override_scores: [{current_score: '70', new_score: '75'}]
-      }
-    ]
+        override_scores: [{current_score: '70', new_score: '75'}],
+      },
+    ],
   }
   ProcessGradebookUpload.upload(gradebook)
 
@@ -1091,13 +1091,13 @@ test('correctly parses data for one student', () => {
     10: [
       {
         new_content: 'first content',
-        column_id: 1
+        column_id: 1,
       },
       {
         new_content: 'second content',
-        column_id: 3
-      }
-    ]
+        column_id: 3,
+      },
+    ],
   }
 
   const data = ProcessGradebookUpload.parseCustomColumnData(customColumnData)
@@ -1115,15 +1115,15 @@ test('correctly parses data for multiple students', () => {
     10: [
       {
         new_content: 'first content',
-        column_id: 1
-      }
+        column_id: 1,
+      },
     ],
     1: [
       {
         new_content: 'second content',
-        column_id: 2
-      }
-    ]
+        column_id: 2,
+      },
+    ],
   }
 
   const data = ProcessGradebookUpload.parseCustomColumnData(customColumnData)
@@ -1142,7 +1142,7 @@ QUnit.module('ProcessGradebookUpload.submitCustomColumnData', {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
@@ -1161,7 +1161,7 @@ QUnit.module('ProcessGradebookUpload.submitCustomColumnData', {
     clock.restore()
 
     fakeENV.teardown()
-  }
+  },
 })
 
 test('correctly submits custom column data', () => {
@@ -1169,13 +1169,13 @@ test('correctly submits custom column data', () => {
     {
       column_id: 1,
       user_id: 2,
-      content: 'test content'
+      content: 'test content',
     },
     {
       column_id: 3,
       user_id: 4,
-      content: 'test content 2'
-    }
+      content: 'test content 2',
+    },
   ]
 
   ProcessGradebookUpload.submitCustomColumnData(gradeData)
@@ -1199,9 +1199,9 @@ QUnit.module('ProcessGradebookUpload.createOverrideUpdateRequests', hooks => {
     override_scores: [
       {
         current_score: '80',
-        new_score: '90'
-      }
-    ]
+        new_score: '90',
+      },
+    ],
   }
   const studentWithGradingPeriodUpdate = {
     id: '2',
@@ -1209,9 +1209,9 @@ QUnit.module('ProcessGradebookUpload.createOverrideUpdateRequests', hooks => {
       {
         current_score: '80',
         grading_period_id: '1',
-        new_score: '90'
-      }
-    ]
+        new_score: '90',
+      },
+    ],
   }
   const studentWithMultipleUpdates = {
     id: '3',
@@ -1219,42 +1219,42 @@ QUnit.module('ProcessGradebookUpload.createOverrideUpdateRequests', hooks => {
       {
         current_score: '80',
         grading_period_id: '1',
-        new_score: '90'
+        new_score: '90',
       },
       {
         current_score: '80',
         grading_period_id: '2',
-        new_score: '90'
+        new_score: '90',
       },
       {
         current_score: '40',
-        new_score: '50'
-      }
-    ]
+        new_score: '50',
+      },
+    ],
   }
   const studentWithNoActualChanges = {
     id: '999',
     override_scores: [
       {
         current_score: '80',
-        new_score: '80'
+        new_score: '80',
       },
       {
         current_score: '70',
         grading_period_id: '1',
-        new_score: '70.0'
+        new_score: '70.0',
       },
       {
         current_score: '',
         grading_period_id: '2',
-        new_score: null
+        new_score: null,
       },
       {
         current_score: 'null',
         grading_period_id: '3',
-        new_score: null
-      }
-    ]
+        new_score: null,
+      },
+    ],
   }
 
   let gradebook
@@ -1263,14 +1263,14 @@ QUnit.module('ProcessGradebookUpload.createOverrideUpdateRequests', hooks => {
     xhr = sinon.useFakeXMLHttpRequest()
     requests = []
 
-    xhr.onCreate = function(request) {
+    xhr.onCreate = function (request) {
       requests.push(request)
     }
 
     fakeENV.setup({bulk_update_override_scores_path: '/bulk_update_override_scores_path'})
 
     gradebook = {
-      students: []
+      students: [],
     }
   })
 

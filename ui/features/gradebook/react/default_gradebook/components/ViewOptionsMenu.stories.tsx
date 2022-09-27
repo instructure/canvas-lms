@@ -36,25 +36,25 @@ export default {
       onSortByPointsAscending: () => {},
       onSortByPointsDescending: () => {},
       onSortByModuleAscending: () => {},
-      onSortByModuleDescending: () => {}
+      onSortByModuleDescending: () => {},
     },
     filterSettings: {
       available: ['modules', 'assignmentGroups'],
       onSelect: () => {},
-      selected: ['modules']
+      selected: ['modules'],
     },
     teacherNotes: {
       disabled: false,
       onSelect: () => {},
-      selected: true
+      selected: true,
     },
     onSelectShowStatusesModal: () => {},
     showUnpublishedAssignments: true,
     onSelectShowUnpublishedAssignments: () => {},
     onSelectViewUngradedAsZero: () => {},
     viewUngradedAsZero: true,
-    allowViewUngradedAsZero: true
-  }
+    allowViewUngradedAsZero: true,
+  },
 }
 
 const Template = args => <ViewOptionsMenu {...args} />

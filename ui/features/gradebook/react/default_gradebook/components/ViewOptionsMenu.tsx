@@ -94,17 +94,17 @@ class ViewOptionsMenu extends React.Component<Props> {
       onSortByPointsAscending: func.isRequired,
       onSortByPointsDescending: func.isRequired,
       onSortByModuleAscending: func.isRequired,
-      onSortByModuleDescending: func.isRequired
+      onSortByModuleDescending: func.isRequired,
     }).isRequired,
     filterSettings: shape({
       available: arrayOf(string).isRequired,
       onSelect: func.isRequired,
-      selected: arrayOf(string).isRequired
+      selected: arrayOf(string).isRequired,
     }),
     teacherNotes: shape({
       disabled: bool.isRequired,
       onSelect: func.isRequired,
-      selected: bool.isRequired
+      selected: bool.isRequired,
     }).isRequired,
     onSelectShowStatusesModal: func.isRequired,
     showUnpublishedAssignments: bool.isRequired,
@@ -114,7 +114,7 @@ class ViewOptionsMenu extends React.Component<Props> {
     onSelectShowSeparateFirstLastNames: func.isRequired,
     onSelectViewUngradedAsZero: func.isRequired,
     viewUngradedAsZero: bool.isRequired,
-    allowViewUngradedAsZero: bool.isRequired
+    allowViewUngradedAsZero: bool.isRequired,
   }
 
   onFilterSelect = (_event, filters) => {

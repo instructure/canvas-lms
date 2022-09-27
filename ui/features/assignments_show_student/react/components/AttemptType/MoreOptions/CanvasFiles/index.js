@@ -38,7 +38,7 @@ class CanvasFiles extends React.Component {
     loadedFiles: {},
     error: null,
     pendingAPIRequests: 0,
-    selectedFolderID: '0'
+    selectedFolderID: '0',
   }
 
   FILE_TYPE = 'files'
@@ -155,7 +155,7 @@ class CanvasFiles extends React.Component {
     return {
       ...folder,
       subFolderIDs: [],
-      subFileIDs: []
+      subFileIDs: [],
     }
   }
 
@@ -174,7 +174,7 @@ class CanvasFiles extends React.Component {
             parent.subFolderIDs.push(folder.id)
             loadedFolders[folder.parent_folder_id] = {
               ...loadedFolders[folder.parent_folder_id],
-              ...parent
+              ...parent,
             }
           }
 
@@ -288,9 +288,9 @@ CanvasFiles.propTypes = {
   userGroups: arrayOf(
     shape({
       _id: string,
-      name: string
+      name: string,
     })
-  )
+  ),
 }
 
 export default CanvasFiles

@@ -55,7 +55,7 @@ export default {
       const possibleStores = {
         memory: {},
         sessionStorage,
-        localStorage
+        localStorage,
       }
       this.store = possibleStores[store]
     },
@@ -121,6 +121,6 @@ export default {
     // given a key, remove its contents from the cache
     remove(...key) {
       delete this.store[this.toKey(key)]
-    }
-  }
+    },
+  },
 }

@@ -24,10 +24,10 @@ export default {
   component: AdvancedTabPanel,
   args: {
     courseSettings: {
-      allowFinalGradeOverride: true
+      allowFinalGradeOverride: true,
     },
-    onCourseSettingsChange: () => {}
-  }
+    onCourseSettingsChange: () => {},
+  },
 }
 
 const Template = args => <AdvancedTabPanel {...args} />

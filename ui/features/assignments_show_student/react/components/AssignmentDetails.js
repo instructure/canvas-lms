@@ -56,5 +56,5 @@ export default function AssignmentDetails({assignment}) {
 }
 
 AssignmentDetails.propTypes = {
-  assignment: Assignment.shape
+  assignment: Assignment.shape,
 }

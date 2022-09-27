@@ -38,22 +38,22 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
     exampleData = {
       customColumns: [
         {id: '2401', teacher_notes: true, hidden: true, title: 'Notes'},
-        {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'}
+        {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'},
       ],
 
       customColumnData: {
         2401: [
           {content: '', custom_gradebook_column_id: '2401', id: '2801', user_id: '1101'},
           {content: '', custom_gradebook_column_id: '2401', id: '2802', user_id: '1102'},
-          {content: '', custom_gradebook_column_id: '2401', id: '2803', user_id: '1103'}
+          {content: '', custom_gradebook_column_id: '2401', id: '2803', user_id: '1103'},
         ],
 
         2402: [
           {content: '', custom_gradebook_column_id: '2402', id: '2804', user_id: '1102'},
           {content: '', custom_gradebook_column_id: '2402', id: '2805', user_id: '1101'},
-          {content: '', custom_gradebook_column_id: '2402', id: '2806', user_id: '1103'}
-        ]
-      }
+          {content: '', custom_gradebook_column_id: '2402', id: '2806', user_id: '1103'},
+        ],
+      },
     }
   })
 
@@ -64,7 +64,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
       performanceControls = new PerformanceControls()
 
       gradebook = createGradebook({
-        context_id: '1201'
+        context_id: '1201',
       })
       gradebook.gotCustomColumns(exampleData.customColumns)
 
@@ -209,7 +209,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
         const columnData = calls.map(call => call.args[1])
         deepEqual(columnData, [
           exampleData.customColumnData[2401].slice(0, 1),
-          exampleData.customColumnData[2402].slice(0, 1)
+          exampleData.customColumnData[2402].slice(0, 1),
         ])
       })
 
@@ -282,7 +282,7 @@ QUnit.module('Gradebook > DataLoader > CustomColumnsDataLoader', suiteHooks => {
           exampleData.customColumnData[2401].slice(1, 2),
           exampleData.customColumnData[2401].slice(2, 3),
           exampleData.customColumnData[2402].slice(1, 2),
-          exampleData.customColumnData[2402].slice(2, 3)
+          exampleData.customColumnData[2402].slice(2, 3),
         ])
       })
     })

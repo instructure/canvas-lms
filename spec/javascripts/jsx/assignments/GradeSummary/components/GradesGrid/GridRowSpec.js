@@ -32,11 +32,11 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
       disabledCustomGrade: false,
       finalGrader: {
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
+        {graderId: '1102', graderName: 'Mr. Keating'},
       ],
       grades: {
         1101: {
@@ -45,7 +45,7 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
           id: '4601',
           score: 10,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         },
         1102: {
           grade: 'B',
@@ -53,19 +53,19 @@ QUnit.module('GradeSummary GridRow', suiteHooks => {
           id: '4602',
           score: 8.9,
           selected: false,
-          studentId: '1111'
-        }
+          studentId: '1111',
+        },
       },
       onGradeSelect() {},
       row: {
         speedGraderUrl: speedGraderUrl('1201', '2301', {
           anonymousStudents: false,
-          studentId: '1111'
+          studentId: '1111',
         }),
         studentId: '1111',
-        studentName: 'Adam Jones'
+        studentName: 'Adam Jones',
       },
-      selectProvisionalGradeStatus: STARTED
+      selectProvisionalGradeStatus: STARTED,
     }
   })
 

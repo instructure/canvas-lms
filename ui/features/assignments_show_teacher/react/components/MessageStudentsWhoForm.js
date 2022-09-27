@@ -52,7 +52,7 @@ export default class MessageStudentsWhoForm extends React.Component {
     onPointsThresholdChange: func,
     onSubjectChange: func,
     onBodyChange: func,
-    onSelectedStudentsChange: func
+    onSelectedStudentsChange: func,
   }
 
   static defaultProps = {
@@ -64,7 +64,7 @@ export default class MessageStudentsWhoForm extends React.Component {
     onPointsThresholdChange: () => {},
     onSubjectChange: () => {},
     onBodyChange: () => {},
-    onSelectedStudentsChange: () => {}
+    onSelectedStudentsChange: () => {},
   }
 
   getAllStudents() {
@@ -131,7 +131,7 @@ export default class MessageStudentsWhoForm extends React.Component {
       {key: 'not-submitted', value: 'not-submitted', label: I18n.t("Haven't submitted yet")},
       {key: 'not-graded', value: 'not-graded', label: I18n.t("Haven't been graded")},
       {key: 'less-than', value: 'less-than', label: I18n.t('Scored less than')},
-      {key: 'more-than', value: 'more-than', label: I18n.t('Scored more than')}
+      {key: 'more-than', value: 'more-than', label: I18n.t('Scored more than')},
     ]
     // not-submitted is only available if the assignment has an online submission
     if (!hasSubmission(this.props.assignment)) options.shift()

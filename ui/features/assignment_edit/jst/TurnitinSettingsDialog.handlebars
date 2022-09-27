@@ -1,36 +1,30 @@
-<form id="assignment_turnitin_settings">
-  <div class="control-group">
-    <div class="controls">
-      <label for="settings_originality_report_visibility"
-      class="control-label">
-        {{#t "turnitin_settings.originality_report_visibility"}}
+<form id='assignment_turnitin_settings'>
+  <div class='control-group'>
+    <div class='controls'>
+      <label for='settings_originality_report_visibility' class='control-label'>
+        {{#t 'turnitin_settings.originality_report_visibility'}}
           Students Can See the Originality Report
         {{/t}}
       </label>
-      <br/>
-      <select id="settings_originality_report_visibility"
-        name="originality_report_visibility">
-        <option value="immediate"
-        {{selectedIf originalityReportVisibility "immediate"}} >
-          {{#t "turnitin_settings.originality_report_visible_immediately"}}
+      <br />
+      <select id='settings_originality_report_visibility' name='originality_report_visibility'>
+        <option value='immediate' {{selectedIf originalityReportVisibility 'immediate'}}>
+          {{#t 'turnitin_settings.originality_report_visible_immediately'}}
             Immediately
           {{/t}}
         </option>
-        <option value="after_grading"
-        {{selectedIf originalityReportVisibility "after_grading"}} >
-          {{#t "turnitin_settings.originality_report_visible_after_grading"}}
+        <option value='after_grading' {{selectedIf originalityReportVisibility 'after_grading'}}>
+          {{#t 'turnitin_settings.originality_report_visible_after_grading'}}
             After the assignment is graded
           {{/t}}
         </option>
-        <option value="after_due_date"
-        {{selectedIf originalityReportVisibility "after_due_date"}} >
-          {{#t "turnitin_settings.originality_report_visible_after_due_date"}}
+        <option value='after_due_date' {{selectedIf originalityReportVisibility 'after_due_date'}}>
+          {{#t 'turnitin_settings.originality_report_visible_after_due_date'}}
             After the Due Date
           {{/t}}
         </option>
-        <option value="never"
-        {{selectedIf originalityReportVisibility "never"}} >
-          {{#t "turnitin_settings.originality_report_never"}}
+        <option value='never' {{selectedIf originalityReportVisibility 'never'}}>
+          {{#t 'turnitin_settings.originality_report_never'}}
             Never
           {{/t}}
         </option>
@@ -40,33 +34,33 @@
 
   <fieldset>
     <h5>
-      {{#t "turnitin_settings.labels.compare_against"}}
+      {{#t 'turnitin_settings.labels.compare_against'}}
         Compare Against
       {{/t}}
     </h5>
-    <div class="control-group">
-      <div class="controls">
-        <label class="checkbox" for="s_paper_check">
-          {{checkbox "s_paper_check" checked=sPaperCheck}}
-          {{#t "turnitin_settings.labels.student_paper_check"}}
+    <div class='control-group'>
+      <div class='controls'>
+        <label class='checkbox' for='s_paper_check'>
+          {{checkbox 's_paper_check' checked=sPaperCheck}}
+          {{#t 'turnitin_settings.labels.student_paper_check'}}
             Other Student Papers
           {{/t}}
         </label>
       </div>
 
-      <div class="controls">
-        <label class="checkbox" for="internet_check">
-          {{checkbox "internet_check" checked=internetCheck}}
-          {{#t "turnitin_settings.labels.internet_check"}}
+      <div class='controls'>
+        <label class='checkbox' for='internet_check'>
+          {{checkbox 'internet_check' checked=internetCheck}}
+          {{#t 'turnitin_settings.labels.internet_check'}}
             Internet Database
           {{/t}}
         </label>
       </div>
 
-      <div class="controls">
-        <label class="checkbox" for="journal_check">
-          {{checkbox "journal_check" checked=journalCheck}}
-          {{#t "turnitin_settings.labels.journal_check"}}
+      <div class='controls'>
+        <label class='checkbox' for='journal_check'>
+          {{checkbox 'journal_check' checked=journalCheck}}
+          {{#t 'turnitin_settings.labels.journal_check'}}
             Journals, Periodicals, and Publications
           {{/t}}
         </label>
@@ -76,58 +70,68 @@
 
   <fieldset>
     <h5>
-      {{#t "turnitin_settings.labels.do_not_consider"}}
+      {{#t 'turnitin_settings.labels.do_not_consider'}}
         Do Not Consider
       {{/t}}
     </h5>
-    <div class="control-group">
-      <div class="controls">
-        <label class="checkbox" for="exclude_biblio">
-          {{checkbox "exclude_biblio" checked=excludeBiblio}}
-          {{#t "turnitin_settings.labels.exclude_biblio"}}
+    <div class='control-group'>
+      <div class='controls'>
+        <label class='checkbox' for='exclude_biblio'>
+          {{checkbox 'exclude_biblio' checked=excludeBiblio}}
+          {{#t 'turnitin_settings.labels.exclude_biblio'}}
             Bibliographic Material
           {{/t}}
         </label>
       </div>
-      <div class="controls">
-        <label class="checkbox" for="exclude_quoted">
-          {{checkbox "exclude_quoted" checked=excludeQuoted}}
-          {{#t "turnitin_settings.labels.exclude_quoted"}}
+      <div class='controls'>
+        <label class='checkbox' for='exclude_quoted'>
+          {{checkbox 'exclude_quoted' checked=excludeQuoted}}
+          {{#t 'turnitin_settings.labels.exclude_quoted'}}
             Quoted Material
           {{/t}}
         </label>
       </div>
 
-      <div class="controls">
-        <label class="checkbox" for="exclude_small_matches">
-          {{checkbox "exclude_small_matches" checked=excludesSmallMatches}}
-          {{#t "assignments.turnitin_settings.labels.exclude_small_matches"}}
+      <div class='controls'>
+        <label class='checkbox' for='exclude_small_matches'>
+          {{checkbox 'exclude_small_matches' checked=excludesSmallMatches}}
+          {{#t 'assignments.turnitin_settings.labels.exclude_small_matches'}}
             Small Matches
           {{/t}}
         </label>
-        <div class="controls js-exclude-small-matches-options"
-          style="{{hiddenUnless excludesSmallMatches}}">
+        <div
+          class='controls js-exclude-small-matches-options'
+          style='{{hiddenUnless excludesSmallMatches}}'
+        >
 
-          <label class="control-label radio" style="display: block;">
-            <input id="exclude_small_matches_type_r1"
-              name="exclude_small_matches_type"
-              type="radio"
-              {{checkedIf excludeSmallMatchesType "words"}}
-              value="words"/>
-              {{#t "turnitin_settings.settings_exclude_fewer_than_count"}}
-                Fewer than {{{wordsInput}}} words
-              {{/t}}
+          <label class='control-label radio' style='display: block;'>
+            <input
+              id='exclude_small_matches_type_r1'
+              name='exclude_small_matches_type'
+              type='radio'
+              {{checkedIf excludeSmallMatchesType 'words'}}
+              value='words'
+            />
+            {{#t 'turnitin_settings.settings_exclude_fewer_than_count'}}
+              Fewer than
+              {{{wordsInput}}}
+              words
+            {{/t}}
           </label>
 
-          <label class="control-label radio">
-            <input id="exclude_small_matches_type_r2"
-              type="radio"
-              name="exclude_small_matches_type"
-              {{checkedIf excludeSmallMatchesType "percent"}}
-              value="percent"/>
-              {{#t "turnitin_settings.settings_exclude_less_than_percent"}}
-                Less than {{{percentInput}}} of the document
-              {{/t}}
+          <label class='control-label radio'>
+            <input
+              id='exclude_small_matches_type_r2'
+              type='radio'
+              name='exclude_small_matches_type'
+              {{checkedIf excludeSmallMatchesType 'percent'}}
+              value='percent'
+            />
+            {{#t 'turnitin_settings.settings_exclude_less_than_percent'}}
+              Less than
+              {{{percentInput}}}
+              of the document
+            {{/t}}
           </label>
         </div>
       </div>
@@ -136,15 +140,15 @@
 
   <fieldset>
     <h5>
-      {{#t "turnitin_settings.labels.turnitin_repository"}}
+      {{#t 'turnitin_settings.labels.turnitin_repository'}}
         Turnitin Repository
       {{/t}}
     </h5>
-    <div class="control-group">
-      <div class="controls">
-        <label class="checkbox" for="submit_papers_to">
-          {{checkbox "submit_papers_to" checked=submitPapersTo}}
-          {{#t "turnitin_settings.labels.submit_papers_to"}}
+    <div class='control-group'>
+      <div class='controls'>
+        <label class='checkbox' for='submit_papers_to'>
+          {{checkbox 'submit_papers_to' checked=submitPapersTo}}
+          {{#t 'turnitin_settings.labels.submit_papers_to'}}
             Include in Repository
           {{/t}}
         </label>
@@ -152,9 +156,9 @@
     </div>
   </fieldset>
 
-  <div class="button-container">
-    <button type="submit" class="btn btn-primary">
-      {{#t "buttons.update_settings"}}
+  <div class='button-container'>
+    <button type='submit' class='btn btn-primary'>
+      {{#t 'buttons.update_settings'}}
         Update Settings
       {{/t}}
     </button>

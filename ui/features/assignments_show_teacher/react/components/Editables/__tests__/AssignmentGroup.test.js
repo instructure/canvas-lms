@@ -32,7 +32,7 @@ function makeGroupList() {
   return [
     {lid: '1', name: 'Group 1'},
     {lid: '2', name: 'Group 2'},
-    {lid: '3', name: 'Group 3'}
+    {lid: '3', name: 'Group 3'},
   ]
 }
 

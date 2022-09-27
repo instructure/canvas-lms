@@ -67,7 +67,7 @@ export default class GradebookGrid {
       headerHeight: 38,
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
       rowHeight: 35,
-      syncColumnCellResize: true
+      syncColumnCellResize: true,
     }
 
     const columns = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable].map(
@@ -79,7 +79,7 @@ export default class GradebookGrid {
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
       columnHeaderRenderer: this.options.columnHeaderRenderer,
-      rows: this.gridData.rows
+      rows: this.gridData.rows,
     }
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions)
 

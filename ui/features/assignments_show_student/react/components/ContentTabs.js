@@ -38,7 +38,7 @@ const RubricTab = lazy(() =>
 
 ContentTabs.propTypes = {
   assignment: Assignment.shape,
-  submission: Submission.shape
+  submission: Submission.shape,
 }
 
 function LoggedInContentTabs(props) {

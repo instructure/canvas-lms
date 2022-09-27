@@ -19,7 +19,7 @@
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Submissions', suiteHooks => {
@@ -121,13 +121,13 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {
           enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
           id: '1101',
-          name: 'Adam Jones'
+          name: 'Adam Jones',
         },
         {
           enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
           id: '1102',
-          name: 'Betty Ford'
-        }
+          name: 'Betty Ford',
+        },
       ]
 
       gradebook.gotChunkOfStudents(students)
@@ -142,7 +142,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
               cached_due_date: '2015-10-15T12:00:00Z',
               id: '2501',
               score: 10,
-              user_id: '1101'
+              user_id: '1101',
             },
 
             {
@@ -151,11 +151,11 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
               cached_due_date: '2015-12-15T12:00:00Z',
               id: '2502',
               score: 9,
-              user_id: '1101'
-            }
+              user_id: '1101',
+            },
           ],
 
-          user_id: '1101'
+          user_id: '1101',
         },
 
         {
@@ -166,16 +166,16 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
               cached_due_date: '2015-10-16T12:00:00Z',
               id: '2503',
               score: 10,
-              user_id: '1102'
-            }
+              user_id: '1102',
+            },
           ],
 
-          user_id: '1102'
-        }
+          user_id: '1102',
+        },
       ]
 
       gradebook.setAssignmentGroups({
-        2201: {group_weight: 100}
+        2201: {group_weight: 100},
       })
 
       gradebook.setAssignments({
@@ -183,15 +183,15 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
           assignment_group_id: '2201',
           id: '2301',
           name: 'Math Assignment',
-          published: true
+          published: true,
         },
 
         2302: {
           assignment_group_id: '2201',
           id: '2302',
           name: 'English Assignment',
-          published: false
-        }
+          published: false,
+        },
       })
     })
 
@@ -280,7 +280,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
             id: '1501',
             start_date: '2015-09-01T12:00:00Z',
             title: 'Q1',
-            weight: null
+            weight: null,
           },
 
           {
@@ -289,13 +289,13 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
             id: '1502',
             start_date: '2015-11-01T12:00:00Z',
             title: 'Q2',
-            weight: null
-          }
+            weight: null,
+          },
         ],
 
         id: '1401',
         title: 'Fall 2015',
-        weighted: false
+        weighted: false,
       }
 
       studentSubmissions = [
@@ -307,7 +307,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
               cached_due_date: '2015-10-15T12:00:00Z',
               id: '2501',
               score: 10,
-              user_id: '1101'
+              user_id: '1101',
             },
 
             {
@@ -316,12 +316,12 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
               cached_due_date: '2015-12-15T12:00:00Z',
               id: '2502',
               score: 9,
-              user_id: '1101'
-            }
+              user_id: '1101',
+            },
           ],
 
-          user_id: '1101'
-        }
+          user_id: '1101',
+        },
       ]
     })
 
@@ -330,15 +330,15 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {
           enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
           id: '1101',
-          name: 'Adam Jones'
-        }
+          name: 'Adam Jones',
+        },
       ]
 
       gradebook = createGradebook(gradebookOptions)
       gradebook.gotChunkOfStudents(students)
 
       gradebook.setAssignmentGroups({
-        2201: {group_weight: 100}
+        2201: {group_weight: 100},
       })
 
       gradebook.setAssignments({
@@ -346,15 +346,15 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
           assignment_group_id: '2201',
           id: '2301',
           name: 'Math Assignment',
-          published: true
+          published: true,
         },
 
         2302: {
           assignment_group_id: '2201',
           id: '2302',
           name: 'English Assignment',
-          published: false
-        }
+          published: false,
+        },
       })
 
       gradebook.gotSubmissionsChunk(studentSubmissions)
@@ -416,14 +416,14 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         grading_type: 'percent',
         id: '2301',
         name: 'Math Assignment',
-        published: true
+        published: true,
       }
 
       submission = {
         assignment_id: '2301',
         grade: '123.45',
         submitted_at: '2015-05-04T12:00:00Z',
-        user_id: '1101'
+        user_id: '1101',
       }
     })
 
@@ -518,7 +518,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {id: 'assignment_2302', type: 'assignment'},
         {id: 'assignment_group_2201', type: 'assignment_group'},
         {id: 'assignment_group_2202', type: 'assignment_group'},
-        {id: 'total_grade', type: 'total_grade'}
+        {id: 'total_grade', type: 'total_grade'},
       ]
 
       const studentData = [
@@ -527,11 +527,11 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1101'},
-              type: 'StudentEnrollment'
-            }
+              type: 'StudentEnrollment',
+            },
           ],
           id: '1101',
-          name: 'Adam Jones'
+          name: 'Adam Jones',
         },
 
         {
@@ -539,12 +539,12 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1102'},
-              type: 'StudentEnrollment'
-            }
+              type: 'StudentEnrollment',
+            },
           ],
           id: '1102',
-          name: 'Betty Ford'
-        }
+          name: 'Betty Ford',
+        },
       ]
 
       gradebook = createGradebook()
@@ -558,18 +558,18 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         {
           assignment_visibility: null,
           id: '2301',
-          only_visible_to_overrides: false
+          only_visible_to_overrides: false,
         },
         {
           assignment_visibility: null,
           id: '2302',
-          only_visible_to_overrides: false
-        }
+          only_visible_to_overrides: false,
+        },
       ]
 
       gradebook.gotAllAssignmentGroups([
         {id: '2201', position: 1, name: 'Assignments', assignments: [assignments[0]]},
-        {id: '2202', position: 2, name: 'Homework', assignments: [assignments[1]]}
+        {id: '2202', position: 2, name: 'Homework', assignments: [assignments[1]]},
       ])
 
       sinon.stub(gradebook, 'updateRowCellsForStudentIds')
@@ -580,21 +580,21 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         getColumns() {
           return columns
         },
-        updateCell: sinon.stub()
+        updateCell: sinon.stub(),
       }
 
       gradebook.gradebookGrid.gridSupport = {
         columns: {
-          updateColumnHeaders: sinon.stub()
+          updateColumnHeaders: sinon.stub(),
         },
-        destroy() {}
+        destroy() {},
       }
     })
 
     test('updates row cells', () => {
       const submissions = [
         {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
-        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true}
+        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       strictEqual(gradebook.updateRowCellsForStudentIds.callCount, 1)
@@ -604,7 +604,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       const submissions = [
         {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
         {assignment_id: '2302', user_id: '1101', score: 9, assignment_visible: true},
-        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true}
+        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       const [studentIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
@@ -615,7 +615,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       const submissions = [
         {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
         {assignment_id: '2301', user_id: '1103', score: 9, assignment_visible: true},
-        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true}
+        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       const [studentIds] = gradebook.updateRowCellsForStudentIds.lastCall.args
@@ -624,7 +624,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
 
     test('updates column headers', () => {
       const submissions = [
-        {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true}
+        {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       strictEqual(gradebook.gradebookGrid.gridSupport.columns.updateColumnHeaders.callCount, 1)
@@ -634,7 +634,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
       const submissions = [
         {assignment_id: '2301', user_id: '1101', score: 10, assignment_visible: true},
         {assignment_id: '2302', user_id: '1101', score: 9, assignment_visible: true},
-        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true}
+        {assignment_id: '2301', user_id: '1102', score: 8, assignment_visible: true},
       ]
       gradebook.updateSubmissionsFromExternal(submissions)
       const [columnIds] =

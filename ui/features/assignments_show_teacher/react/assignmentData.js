@@ -32,13 +32,13 @@ export const EnvShape = shape({
       // manage_assignments_edit and manage_assignments_delete as separate
       // permissions. If this ends up needing to be used in the future,
       // consider whether those might be more appropriate.
-      manage_assignments: bool.isRequired
+      manage_assignments: bool.isRequired,
     }).isRequired,
     assignment: shape({
       update: bool.isRequired,
-      submit: bool.isRequired
-    }).isRequired
-  }).isRequired
+      submit: bool.isRequired,
+    }).isRequired,
+  }).isRequired,
 })
 
 const userFields = gql`
@@ -358,21 +358,21 @@ export const SAVE_ASSIGNMENT = gql`
 `
 
 export const CourseShape = shape({
-  lid: string.isRequired
+  lid: string.isRequired,
 })
 
 export const ModuleShape = shape({
   lid: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 
 export const AssignmentGroupShape = shape({
   lid: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 
 export const LockInfoShape = shape({
-  isLocked: bool.isRequired
+  isLocked: bool.isRequired,
 })
 
 // TODO: is this the final shape?
@@ -390,8 +390,8 @@ export const OverrideShape = shape({
   set: shape({
     lid: string,
     name: string,
-    __typename: oneOf(['Section', 'Group', 'AdhocStudents'])
-  })
+    __typename: oneOf(['Section', 'Group', 'AdhocStudents']),
+  }),
 })
 
 export const UserShape = shape({
@@ -401,17 +401,17 @@ export const UserShape = shape({
   shortName: string,
   sortableName: string,
   avatarUrl: string,
-  email: string
+  email: string,
 })
 
 export const SubmissionHistoryShape = shape({
   attempt: number,
   score: number,
-  submittedAt: string
+  submittedAt: string,
 })
 
 export const SubmissionDraftShape = shape({
-  submissionAttempt: string
+  submissionAttempt: string,
 })
 
 export const SubmissionShape = shape({
@@ -428,9 +428,9 @@ export const SubmissionShape = shape({
   submittedAt: string, // datetime
   user: UserShape,
   submissionHistoriesConnection: shape({
-    nodes: arrayOf(SubmissionHistoryShape)
+    nodes: arrayOf(SubmissionHistoryShape),
   }),
-  submissionDraft: SubmissionDraftShape
+  submissionDraft: SubmissionDraftShape,
 })
 
 export const TeacherAssignmentShape = shape({
@@ -450,11 +450,11 @@ export const TeacherAssignmentShape = shape({
   allowedExtensions: arrayOf(string).isRequired,
   allowedAttempts: number,
   assignmentOverrides: shape({
-    nodes: arrayOf(OverrideShape)
+    nodes: arrayOf(OverrideShape),
   }).isRequired,
   submissions: shape({
-    nodes: arrayOf(SubmissionShape)
-  }).isRequired
+    nodes: arrayOf(SubmissionShape),
+  }).isRequired,
 })
 
 export const StudentSearchQueryShape = shape({
@@ -463,9 +463,9 @@ export const StudentSearchQueryShape = shape({
   orderBy: arrayOf(
     shape({
       field: string,
-      direction: oneOf(['ascending', 'descending'])
+      direction: oneOf(['ascending', 'descending']),
     })
-  )
+  ),
 })
 
 // custom proptype validator

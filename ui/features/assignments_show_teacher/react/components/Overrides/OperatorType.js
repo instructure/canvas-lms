@@ -28,11 +28,11 @@ const I18n = useI18nScope('assignments_2')
 
 export default class OperatorType extends React.Component {
   static propTypes = {
-    value: string.isRequired
+    value: string.isRequired,
   }
 
   static defaultProps = {
-    value: 'or'
+    value: 'or',
   }
 
   render() {

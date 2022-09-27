@@ -25,8 +25,8 @@ export default {
   args: {
     id: '',
     disabled: false,
-    onChange: () => {}
-  }
+    onChange: () => {},
+  },
 }
 
 const Template = args => <MultiSelectSearchInput {...args} />
@@ -39,10 +39,10 @@ Assignment.args = {
     {id: '2', text: 'Potions'},
     {id: '3', text: 'Witchcraft'},
     {id: '4', text: 'Wizardry'},
-    {id: '5', text: 'Quidditch'}
+    {id: '5', text: 'Quidditch'},
   ],
   placeholder: 'Search Assignments',
-  label: 'Assignment Names'
+  label: 'Assignment Names',
 }
 
 Student.args = {
@@ -51,8 +51,8 @@ Student.args = {
     {id: '2', text: 'Vincent Crabbe'},
     {id: '3', text: 'Ariana Dumbledore'},
     {id: '4', text: 'Aberforth Dumbledore'},
-    {id: '5', text: 'Xenophilius Lovegood'}
+    {id: '5', text: 'Xenophilius Lovegood'},
   ],
   placeholder: 'Search Students',
-  label: 'Student Names'
+  label: 'Student Names',
 }

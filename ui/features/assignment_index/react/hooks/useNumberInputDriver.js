@@ -22,7 +22,7 @@ import {useState, useCallback} from 'react'
 export default function useNumberInputDriver({
   initialNumberValue, // may be null to indicate the initial text value should be blank
   minNumberValue = 1, // may be null to indicate no minimum value
-  maxNumberValue = null
+  maxNumberValue = null,
 }) {
   // numberValue may be null to indicate the input is not a valid number
   const [numberValue, setNumberValue] = useState(initialNumberValue)
@@ -117,6 +117,6 @@ export default function useNumberInputDriver({
   // [{state values}, {props for number input}]
   return [
     {numberValue, setNumberValue, inputValue, setInputValue},
-    {value: inputValue, onChange, onIncrement, onDecrement}
+    {value: inputValue, onChange, onIncrement, onDecrement},
   ]
 }

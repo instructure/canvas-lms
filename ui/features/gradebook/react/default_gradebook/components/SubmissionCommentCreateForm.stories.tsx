@@ -23,8 +23,8 @@ export default {
   title: 'Examples/Evaluate/Gradebook/SubmissionCommentCreateForm',
   component: SubmissionCommentCreateForm,
   args: {
-    createSubmissionComment: () => {}
-  }
+    createSubmissionComment: () => {},
+  },
 }
 
 const Template = args => <SubmissionCommentCreateForm {...args} />

@@ -21,7 +21,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {
   getFinalGradeOverrides,
-  updateFinalGradeOverride
+  updateFinalGradeOverride,
 } from '@canvas/grading/FinalGradeOverrideApi'
 import FinalGradeOverrideDatastore from './FinalGradeOverrideDatastore'
 
@@ -79,13 +79,13 @@ export default class FinalGradeOverrides {
 
           showFlashAlert({
             message: I18n.t('Grade saved.'),
-            type: 'success'
+            type: 'success',
           })
         })
         .catch((/* error */) => {
           showFlashAlert({
             message: I18n.t('There was a problem saving the grade.'),
-            type: 'error'
+            type: 'error',
           })
         })
     } else {
@@ -93,7 +93,7 @@ export default class FinalGradeOverrides {
         message: I18n.t(
           'You have entered an invalid grade for this student. Check the value and the grading type and try again.'
         ),
-        type: 'error'
+        type: 'error',
       })
     }
   }

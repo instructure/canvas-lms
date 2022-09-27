@@ -58,14 +58,14 @@ function bound(decimal) {
 
 const errorMessages = {
   missingSubmissionDeduction: {
-    notNumeric: I18n.t('Missing submission grade must be numeric')
+    notNumeric: I18n.t('Missing submission grade must be numeric'),
   },
   lateSubmissionDeduction: {
-    notNumeric: I18n.t('Late submission deduction must be numeric')
+    notNumeric: I18n.t('Late submission deduction must be numeric'),
   },
   lateSubmissionMinimumPercent: {
-    notNumeric: I18n.t('Lowest possible grade must be numeric')
-  }
+    notNumeric: I18n.t('Lowest possible grade must be numeric'),
+  },
 }
 
 function validationErrorMessage(input, validationType) {
@@ -95,7 +95,7 @@ const numberInputWillUpdateMap = {
   },
   lateSubmissionMinimumPercent(decimal) {
     return decimal
-  }
+  },
 }
 
 class LatePoliciesTabPanel extends React.Component {
@@ -107,12 +107,12 @@ class LatePoliciesTabPanel extends React.Component {
         lateSubmissionDeductionEnabled: bool,
         lateSubmissionDeduction: number,
         lateSubmissionInterval: string,
-        lateSubmissionMinimumPercent: number
+        lateSubmissionMinimumPercent: number,
       }).isRequired,
       validationErrors: shape({
         missingSubmissionDeduction: string,
         lateSubmissionDeduction: string,
-        lateSubmissionMinimumPercent: string
+        lateSubmissionMinimumPercent: string,
       }).isRequired,
       data: shape({
         missingSubmissionDeductionEnabled: bool,
@@ -121,24 +121,24 @@ class LatePoliciesTabPanel extends React.Component {
         lateSubmissionDeduction: number,
         lateSubmissionInterval: string,
         lateSubmissionMinimumPercentEnabled: bool,
-        lateSubmissionMinimumPercent: number
-      })
+        lateSubmissionMinimumPercent: number,
+      }),
     }).isRequired,
     changeLatePolicy: func.isRequired,
     gradebookIsEditable: bool.isRequired,
     locale: string.isRequired,
-    showAlert: bool.isRequired
+    showAlert: bool.isRequired,
   }
 
   state = {
-    showAlert: this.props.showAlert
+    showAlert: this.props.showAlert,
   }
 
   missingPolicyMessages = messages.bind(this, ['missingSubmissionDeduction'])
 
   latePolicyMessages = messages.bind(this, [
     'lateSubmissionDeduction',
-    'lateSubmissionMinimumPercent'
+    'lateSubmissionMinimumPercent',
   ])
 
   componentDidUpdate(_prevProps, prevState) {
@@ -177,7 +177,7 @@ class LatePoliciesTabPanel extends React.Component {
     }
     this.props.changeLatePolicy({
       ...this.props.latePolicy,
-      changes: this.calculateChanges(updates)
+      changes: this.calculateChanges(updates),
     })
   }
 
@@ -201,7 +201,7 @@ class LatePoliciesTabPanel extends React.Component {
       }
       const updates = {
         changes: this.calculateChanges(changesData),
-        validationErrors: {...this.props.latePolicy.validationErrors}
+        validationErrors: {...this.props.latePolicy.validationErrors},
       }
       delete updates.validationErrors[name]
       this.props.changeLatePolicy({...this.props.latePolicy, ...updates})

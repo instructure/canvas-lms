@@ -37,6 +37,6 @@ export default function useAllowedAttemptsState(props) {
     limited,
     attempts,
     onLimitedChange,
-    onAttemptsChange
+    onAttemptsChange,
   }
 }

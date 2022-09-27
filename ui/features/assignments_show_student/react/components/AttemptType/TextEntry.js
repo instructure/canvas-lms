@@ -35,7 +35,7 @@ export default class TextEntry extends React.Component {
     focusOnInit: bool.isRequired,
     onContentsChanged: func,
     submission: Submission.shape,
-    readOnly: bool
+    readOnly: bool,
   }
 
   _isMounted = false
@@ -180,8 +180,8 @@ export default class TextEntry extends React.Component {
         id: this.props.submission.id,
         activeSubmissionType: 'online_text_entry',
         attempt: attempt || 1,
-        body: rceText
-      }
+        body: rceText,
+      },
     })
   }
 
@@ -190,7 +190,7 @@ export default class TextEntry extends React.Component {
       <div
         data-testid="read-only-content"
         dangerouslySetInnerHTML={{
-          __html: apiUserContent.convert(this.props.submission.body)
+          __html: apiUserContent.convert(this.props.submission.body),
         }}
       />
     )
@@ -207,7 +207,7 @@ export default class TextEntry extends React.Component {
           autosave={false}
           defaultContent={this.getDraftBody()}
           editorOptions={{
-            focus: false
+            focus: false,
           }}
           height={300}
           readOnly={context.isObserver}

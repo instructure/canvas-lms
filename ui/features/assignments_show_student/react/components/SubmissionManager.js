@@ -24,14 +24,14 @@ import Confetti from '@canvas/confetti/react/Confetti'
 import {
   CREATE_SUBMISSION,
   CREATE_SUBMISSION_DRAFT,
-  DELETE_SUBMISSION_DRAFT
+  DELETE_SUBMISSION_DRAFT,
 } from '@canvas/assignments/graphql/student/Mutations'
 import {Flex} from '@instructure/ui-flex'
 import {
   friendlyTypeName,
   isSubmitted,
   multipleTypesDrafted,
-  totalAllowedAttempts
+  totalAllowedAttempts,
 } from '../helpers/SubmissionHelpers'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconCheckSolid, IconEndSolid, IconRefreshSolid} from '@instructure/ui-icons'
@@ -46,7 +46,7 @@ import StudentFooter from './StudentFooter'
 import SubmissionCompletedModal from './SubmissionCompletedModal'
 import {
   STUDENT_VIEW_QUERY,
-  SUBMISSION_HISTORIES_QUERY
+  SUBMISSION_HISTORIES_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
@@ -60,18 +60,18 @@ function DraftStatus({status}) {
     saving: {
       color: 'success',
       icon: <IconRefreshSolid color="success" />,
-      text: I18n.t('Saving Draft')
+      text: I18n.t('Saving Draft'),
     },
     saved: {
       color: 'success',
       icon: <IconCheckSolid color="success" />,
-      text: I18n.t('Draft Saved')
+      text: I18n.t('Draft Saved'),
     },
     error: {
       color: 'danger',
       icon: <IconEndSolid color="error" />,
-      text: I18n.t('Error Saving Draft')
-    }
+      text: I18n.t('Error Saving Draft'),
+    },
   }
 
   const config = statusConfigs[status]
@@ -92,7 +92,7 @@ function DraftStatus({status}) {
 }
 
 DraftStatus.propTypes = {
-  status: PropTypes.oneOf(['saving', 'saved', 'error'])
+  status: PropTypes.oneOf(['saving', 'saved', 'error']),
 }
 
 function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}) {
@@ -112,7 +112,7 @@ function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}
         handleCacheUpdate(cache)
       }
     },
-    variables: {submissionId}
+    variables: {submissionId},
   })
 
   const handleCancelDraft = async () => {
@@ -129,7 +129,7 @@ function CancelAttemptButton({handleCacheUpdate, onError, onSuccess, submission}
       ),
       confirmColor: 'danger',
       confirmText: I18n.t('Delete Work'),
-      label: I18n.t('Delete your work?')
+      label: I18n.t('Delete your work?'),
     })
 
     if (confirmed) {
@@ -152,13 +152,13 @@ CancelAttemptButton.propTypes = {
   handleCacheUpdate: PropTypes.func.isRequired,
   onError: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  submission: PropTypes.object.isRequired
+  submission: PropTypes.object.isRequired,
 }
 
 export default class SubmissionManager extends Component {
   static propTypes = {
     assignment: Assignment.shape,
-    submission: Submission.shape
+    submission: Submission.shape,
   }
 
   state = {
@@ -169,12 +169,12 @@ export default class SubmissionManager extends Component {
     showConfetti: false,
     submittingAssignment: false,
     uploadingFiles: false,
-    submissionCompletedModalOpen: false
+    submissionCompletedModalOpen: false,
   }
 
   componentDidMount() {
     this.setState({
-      activeSubmissionType: this.getActiveSubmissionTypeFromProps()
+      activeSubmissionType: this.getActiveSubmissionTypeFromProps(),
     })
   }
 
@@ -231,8 +231,8 @@ export default class SubmissionManager extends Component {
           query: STUDENT_VIEW_QUERY,
           variables: {
             assignmentLid: this.props.assignment._id,
-            submissionID: this.props.submission.id
-          }
+            submissionID: this.props.submission.id,
+          },
         })
       )
     )
@@ -242,9 +242,9 @@ export default class SubmissionManager extends Component {
       query: STUDENT_VIEW_QUERY,
       variables: {
         assignmentLid: this.props.assignment._id,
-        submissionID: this.props.submission.id
+        submissionID: this.props.submission.id,
       },
-      data: {assignment, submission}
+      data: {assignment, submission},
     })
   }
 
@@ -253,8 +253,8 @@ export default class SubmissionManager extends Component {
       variables: {
         assignmentLid: this.props.assignment._id,
         submissionID: this.props.submission.id,
-        ...submitVars
-      }
+        ...submitVars,
+      },
     })
   }
 
@@ -270,7 +270,7 @@ export default class SubmissionManager extends Component {
           await this.submitToGraphql(submitMutation, {
             resourceLinkLookupUuid: this.props.submission.submissionDraft.resourceLinkLookupUuid,
             url: this.props.submission.submissionDraft.ltiLaunchUrl,
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
@@ -278,7 +278,7 @@ export default class SubmissionManager extends Component {
         if (this.props.submission.submissionDraft.mediaObject?._id) {
           await this.submitToGraphql(submitMutation, {
             mediaId: this.props.submission.submissionDraft.mediaObject._id,
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
@@ -289,7 +289,7 @@ export default class SubmissionManager extends Component {
         ) {
           await this.submitToGraphql(submitMutation, {
             fileIds: this.props.submission.submissionDraft.attachments.map(file => file._id),
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
@@ -300,7 +300,7 @@ export default class SubmissionManager extends Component {
         ) {
           await this.submitToGraphql(submitMutation, {
             body: this.props.submission.submissionDraft.body,
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
@@ -308,14 +308,14 @@ export default class SubmissionManager extends Component {
         if (this.props.submission.submissionDraft.url) {
           await this.submitToGraphql(submitMutation, {
             url: this.props.submission.submissionDraft.url,
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
       case 'student_annotation':
         if (this.props.submission.submissionDraft) {
           await this.submitToGraphql(submitMutation, {
-            type: this.state.activeSubmissionType
+            type: this.state.activeSubmissionType,
           })
         }
         break
@@ -385,7 +385,7 @@ export default class SubmissionManager extends Component {
           {submissionType: friendlyTypeName(this.state.activeSubmissionType)}
         ),
         confirmText: I18n.t('Okay'),
-        label: I18n.t('Confirm Submission')
+        label: I18n.t('Confirm Submission'),
       })
 
       if (!confirmed) {
@@ -484,7 +484,7 @@ export default class SubmissionManager extends Component {
         comments={pledgeSettings.COMMENTS}
         onChange={() => {
           this.setState(oldState => ({
-            similarityPledgeChecked: !oldState.similarityPledgeChecked
+            similarityPledgeChecked: !oldState.similarityPledgeChecked,
           }))
         }}
         pledgeText={pledgeSettings.PLEDGE_TEXT}
@@ -501,7 +501,7 @@ export default class SubmissionManager extends Component {
           this.props.submission.state === 'unsubmitted' &&
           this.state.activeSubmissionType === 'online_text_entry' &&
           this.state.draftStatus != null,
-        render: _context => <DraftStatus status={this.state.draftStatus} />
+        render: _context => <DraftStatus status={this.state.draftStatus} />,
       },
       {
         key: 'cancel-draft',
@@ -520,7 +520,7 @@ export default class SubmissionManager extends Component {
               submission={context.latestSubmission}
             />
           )
-        }
+        },
       },
       {
         key: 'back-to-draft',
@@ -538,7 +538,7 @@ export default class SubmissionManager extends Component {
               {I18n.t('Back to Attempt %{attempt}', {attempt})}
             </Button>
           )
-        }
+        },
       },
       {
         key: 'new-attempt',
@@ -553,18 +553,18 @@ export default class SubmissionManager extends Component {
               {I18n.t('Try Again')}
             </Button>
           )
-        }
+        },
       },
       {
         key: 'mark-as-done',
         shouldRender: _context => window.ENV.CONTEXT_MODULE_ITEM != null,
-        render: _context => this.renderMarkAsDoneButton()
+        render: _context => this.renderMarkAsDoneButton(),
       },
       {
         key: 'submit',
         shouldRender: context => this.shouldRenderSubmit(context),
-        render: _context => this.renderSubmitButton()
-      }
+        render: _context => this.renderSubmitButton(),
+      },
     ]
   }
 
@@ -573,7 +573,7 @@ export default class SubmissionManager extends Component {
       .filter(button => button.shouldRender(context))
       .map(button => ({
         element: button.render(context),
-        key: button.key
+        key: button.key,
       }))
 
     return (
@@ -623,7 +623,7 @@ export default class SubmissionManager extends Component {
         // displayed submission when a new submission is created and the current
         // submission gets transitioned over to a submission history.
         refetchQueries={() => [
-          {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}}
+          {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}},
         ]}
       >
         {submitMutation => (

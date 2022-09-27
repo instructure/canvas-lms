@@ -22,7 +22,7 @@ import {
   FETCH_HISTORY_FAILURE,
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
-  FETCH_HISTORY_NEXT_PAGE_FAILURE
+  FETCH_HISTORY_NEXT_PAGE_FAILURE,
 } from '../actions/HistoryActions'
 
 function history(state = {}, {type, payload}) {
@@ -33,7 +33,7 @@ function history(state = {}, {type, payload}) {
         loading: true,
         items: null,
         nextPage: null,
-        fetchHistoryStatus: 'started'
+        fetchHistoryStatus: 'started',
       }
     }
     case FETCH_HISTORY_SUCCESS: {
@@ -42,7 +42,7 @@ function history(state = {}, {type, payload}) {
         loading: false,
         nextPage: payload.link,
         items: payload.items,
-        fetchHistoryStatus: 'success'
+        fetchHistoryStatus: 'success',
       }
     }
     case FETCH_HISTORY_FAILURE: {
@@ -50,7 +50,7 @@ function history(state = {}, {type, payload}) {
         ...state,
         loading: false,
         nextPage: null,
-        fetchHistoryStatus: 'failure'
+        fetchHistoryStatus: 'failure',
       }
     }
     case FETCH_HISTORY_NEXT_PAGE_START: {
@@ -58,7 +58,7 @@ function history(state = {}, {type, payload}) {
         ...state,
         loading: true,
         nextPage: null,
-        fetchNextPageStatus: 'started'
+        fetchNextPageStatus: 'started',
       }
     }
     case FETCH_HISTORY_NEXT_PAGE_SUCCESS: {
@@ -67,7 +67,7 @@ function history(state = {}, {type, payload}) {
         items: state.items.concat(payload.items),
         loading: false,
         nextPage: payload.link,
-        fetchNextPageStatus: 'success'
+        fetchNextPageStatus: 'success',
       }
     }
     case FETCH_HISTORY_NEXT_PAGE_FAILURE: {
@@ -75,7 +75,7 @@ function history(state = {}, {type, payload}) {
         ...state,
         loading: false,
         nextPage: null,
-        fetchNextPageStatus: 'failure'
+        fetchNextPageStatus: 'failure',
       }
     }
     default: {

@@ -32,7 +32,7 @@ function renderConfirmDialog(overrideProps = {}) {
     buttons: () => [{children: 'a button', 'data-testid': 'the-button'}],
     closeLabel: 'close the dialog',
     spinnerLabel: 'doing the thing',
-    ...overrideProps
+    ...overrideProps,
   }
   return render(<ConfirmDialog {...props} />)
 }
@@ -54,8 +54,8 @@ it('creates buttons and passes through button properties', () => {
   const {getByTestId} = renderConfirmDialog({
     buttons: () => [
       {children: 'click me', onClick: clicked, 'data-testid': 'test-button'},
-      {children: 'other button', disabled: true, 'data-testid': 'disabled-button'}
-    ]
+      {children: 'other button', disabled: true, 'data-testid': 'disabled-button'},
+    ],
   })
   fireEvent.click(getByTestId('test-button'))
   expect(clicked).toHaveBeenCalled()

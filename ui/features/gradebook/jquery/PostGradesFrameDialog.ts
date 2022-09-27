@@ -39,7 +39,7 @@ export default class PostGradesFrameDialog {
     // init dialog
     this.$dialog = $(
       postGradesFrameDialog({
-        allowances: iframeAllowances()
+        allowances: iframeAllowances(),
       })
     )
 
@@ -51,7 +51,7 @@ export default class PostGradesFrameDialog {
       resizable: false,
       width: 800,
       height: 600,
-      dialogClass: 'post-grades-frame-dialog'
+      dialogClass: 'post-grades-frame-dialog',
     })
 
     // list for focus/blur events

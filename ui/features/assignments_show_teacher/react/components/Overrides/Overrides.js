@@ -31,11 +31,11 @@ export default class Overrides extends React.Component {
     onChangeAssignment: func.isRequired,
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   handleChangeOverride = (overrideIndex, path, value) => {
@@ -82,7 +82,7 @@ export default class Overrides extends React.Component {
             ...override,
             submissionTypes: assignment.submissionTypes,
             allowedExtensions: assignment.allowedExtensions,
-            allowedAttempts: assignment.allowedAttempts
+            allowedAttempts: assignment.allowedAttempts,
           }}
           index={index}
           onChangeOverride={this.handleChangeOverride}

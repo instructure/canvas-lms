@@ -30,7 +30,7 @@ const possibleStates = {
   inProgress: {
     value: 1,
     title: <Text transform="uppercase">{I18n.t('In Progress')}</Text>,
-    subtitle: I18n.t('Next Up: Submit Assignment')
+    subtitle: I18n.t('Next Up: Submit Assignment'),
   },
   submitted: {
     value: 2,
@@ -48,7 +48,7 @@ const possibleStates = {
         />
       )
     },
-    subtitle: I18n.t('Next Up: Review Feedback')
+    subtitle: I18n.t('Next Up: Review Feedback'),
   },
   completed: {
     value: 3,
@@ -72,8 +72,8 @@ const possibleStates = {
           showTime
         />
       )
-    }
-  }
+    },
+  },
 }
 
 function currentWorkflowState({submission}) {
@@ -137,5 +137,5 @@ export default function SubmissionWorkflowTracker({submission}) {
 }
 
 SubmissionWorkflowTracker.propTypes = {
-  submission: Submission.shape.isRequired
+  submission: Submission.shape.isRequired,
 }

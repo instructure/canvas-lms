@@ -18,13 +18,13 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import qs from 'qs'
 import _ from 'underscore'
 import {
   getAssignmentColumnId,
-  getAssignmentGroupColumnId
+  getAssignmentGroupColumnId,
 } from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 const $fixtures = document.getElementById('fixtures')
@@ -100,7 +100,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       createWithSettings({
         direction: 'descending',
         freezeTotalGrade: 'false',
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       equal(gradebook.getColumnOrder().direction, 'descending')
     })
@@ -109,7 +109,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       createWithSettings({
         direction: 'descending',
         freezeTotalGrade: 'false',
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       equal(gradebook.getColumnOrder().sortType, 'due_date')
     })
@@ -118,7 +118,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       createWithSettings({
         direction: 'descending',
         freezeTotalGrade: 'true',
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       strictEqual(gradebook.getColumnOrder().freezeTotalGrade, true)
     })
@@ -127,7 +127,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       createWithSettings({
         direction: 'descending',
         freezeTotalGrade: 'false',
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
     })
@@ -135,7 +135,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
     test('does not freeze the total grade column when the setting is not set', () => {
       createWithSettings({
         direction: 'descending',
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       strictEqual(gradebook.getColumnOrder().freezeTotalGrade, false)
     })
@@ -196,7 +196,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
     test('does not update "customOrder" when "sortType" is not included', () => {
       gradebook.setColumnOrder({
         customOrder: ['assignment_2301', 'total_grade'],
-        sortType: undefined
+        sortType: undefined,
       })
       strictEqual(typeof gradebook.getColumnOrder().customOrder, 'undefined')
     })
@@ -206,7 +206,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       gradebook.setColumnOrder({customOrder: originalOrder, sortType: 'custom'})
       gradebook.setColumnOrder({
         customOrder: ['total_grade', 'assignment_2301'],
-        sortType: 'due_date'
+        sortType: 'due_date',
       })
       equal(gradebook.getColumnOrder().customOrder, originalOrder)
     })
@@ -335,7 +335,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         {id: 'assignment_2301'},
         {id: 'assignment_2302'},
         {id: 'assignment_group_2201'},
-        {id: 'total_grade'}
+        {id: 'total_grade'},
       ]
       columns.forEach(column => {
         gradebook.gridData.columns.definitions[column.id] = column
@@ -358,7 +358,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
         'assignment_2301',
         'assignment_2302',
         'assignment_group_2201',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(gradebook.getColumnOrder().customOrder, expectedOrder)
     })
@@ -386,7 +386,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
       server.respondWith('POST', options.gradebook_column_order_settings_url, [
         200,
         {'Content-Type': 'application/json'},
-        '{}'
+        '{}',
       ])
       gradebook = createGradebook(options)
       gradebook.setColumnOrder({freezeTotalGrade: false})
@@ -460,7 +460,7 @@ QUnit.module('Gradebook Column Order', suiteHooks => {
     test('saves custom column order when using a custom order', () => {
       gradebook.setColumnOrder({
         customOrder: ['assignment_2301', 'total_grade'],
-        sortType: 'custom'
+        sortType: 'custom',
       })
       gradebook.moveTotalGradeColumnToEnd()
       strictEqual(gradebook.saveColumnOrder.callCount, 0)
@@ -505,7 +505,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
     this.studentColumnHeader = {
       focusAtEnd: sinon.spy(),
       focusAtStart: sinon.spy(),
-      handleKeyDown: sinon.stub()
+      handleKeyDown: sinon.stub(),
     }
 
     this.gradebook = createGradebook()
@@ -528,7 +528,7 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
   QUnit.module('onActiveLocationChanged', {
     setup() {
       this.$studentGradesLink = $fixtures.querySelector('.student-grades-link')
-    }
+    },
   })
 
   test('sets focus on the student grades link when a "student" body cell becomes active', function () {
@@ -716,11 +716,11 @@ QUnit.module('Gradebook Grid Events', function (suiteHooks) {
         {id: 'assignment_2302', type: 'assignment'},
         {id: 'assignment_group_2201', type: 'assignment_group'},
         {id: 'assignment_group_2202', type: 'assignment_group'},
-        {id: 'total_grade', type: 'total_grade'}
+        {id: 'total_grade', type: 'total_grade'},
       ]
       columns = {
         frozen: allColumns.slice(0, 3),
-        scrollable: allColumns.slice(3)
+        scrollable: allColumns.slice(3),
       }
 
       gradebook.gridData.columns.definitions = allColumns.reduce(
@@ -779,12 +779,12 @@ QUnit.module('Gradebook Grid Events (2)', () => {
       gradebook.initSubmissionStateMap()
       gradebook.gradebookContent.customColumns = [
         {id: '1', teacher_notes: false, hidden: false, title: 'Read Only', read_only: true},
-        {id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false}
+        {id: '2', teacher_notes: false, hidden: false, title: 'Not Read Only', read_only: false},
       ]
       gradebook.students = {1101: {id: '1101', isConcluded: false}}
       eventObject = {
         column: {assignmentId: '2301', type: 'assignment'},
-        item: {id: '1101'}
+        item: {id: '1101'},
       }
       sinon.stub(gradebook.submissionStateMap, 'getSubmissionState').returns({locked: false})
     })
@@ -818,7 +818,7 @@ QUnit.module('Gradebook Grid Events (2)', () => {
       columns = [
         {id: 'student', width: 120},
         {id: 'assignment_2301', width: 140},
-        {id: 'total_grade', width: 100}
+        {id: 'total_grade', width: 100},
       ]
       sinon.stub(gradebook, 'saveColumnWidthPreference')
     })
@@ -853,20 +853,20 @@ QUnit.module('Gradebook#updateColumnHeaders', {
       {type: 'assignment_group', assignmentGroupId: '2201'},
       {type: 'assignment', assignmentId: '2301'},
       {type: 'custom_column', customColumnId: '2401'},
-      {type: 'total_grade'}
+      {type: 'total_grade'},
     ]
     this.gradebook = createGradebook()
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: sinon.stub()
-      }
+        updateColumnHeaders: sinon.stub(),
+      },
     }
     this.gradebook.gradebookGrid.grid = {
       getColumns() {
         return columns
-      }
+      },
     }
-  }
+  },
 })
 
 test('uses Grid Support to update the column headers', function () {
@@ -886,7 +886,7 @@ QUnit.module('Gradebook#invalidateRowsForStudentIds', {
     this.gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}]
     sandbox.stub(this.gradebook.gradebookGrid, 'invalidateRow')
     sandbox.stub(this.gradebook.gradebookGrid, 'render')
-  }
+  },
 })
 
 test('invalidates each student row', function () {
@@ -986,14 +986,14 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets selectedPrimaryInfo based on the settings passed in', () => {
     const settings = {student_column_display_as: 'last_first'}
     const {
-      gridDisplaySettings: {selectedPrimaryInfo}
+      gridDisplaySettings: {selectedPrimaryInfo},
     } = createGradebook({settings})
     strictEqual(selectedPrimaryInfo, settings.student_column_display_as)
   })
 
   test('sets selectedPrimaryInfo to default if no settings passed in', () => {
     const {
-      gridDisplaySettings: {selectedPrimaryInfo}
+      gridDisplaySettings: {selectedPrimaryInfo},
     } = createGradebook()
     strictEqual(selectedPrimaryInfo, 'first_last')
   })
@@ -1001,7 +1001,7 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets selectedPrimaryInfo to default if unknown settings passed in', () => {
     const settings = {student_column_display_as: 'gary_42'}
     const {
-      gridDisplaySettings: {selectedPrimaryInfo}
+      gridDisplaySettings: {selectedPrimaryInfo},
     } = createGradebook({settings})
     strictEqual(selectedPrimaryInfo, 'first_last')
   })
@@ -1009,14 +1009,14 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets selectedSecondaryInfo based on the settings passed in', () => {
     const settings = {student_column_secondary_info: 'login_id'}
     const {
-      gridDisplaySettings: {selectedSecondaryInfo}
+      gridDisplaySettings: {selectedSecondaryInfo},
     } = createGradebook({settings})
     strictEqual(selectedSecondaryInfo, settings.student_column_secondary_info)
   })
 
   test('sets selectedSecondaryInfo to default if no settings passed in', () => {
     const {
-      gridDisplaySettings: {selectedSecondaryInfo}
+      gridDisplaySettings: {selectedSecondaryInfo},
     } = createGradebook()
     strictEqual(selectedSecondaryInfo, 'none')
   })
@@ -1025,8 +1025,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
     const settings = {sort_rows_by_column_id: 'assignment_1'}
     const {
       gridDisplaySettings: {
-        sortRowsBy: {columnId}
-      }
+        sortRowsBy: {columnId},
+      },
     } = createGradebook({settings})
     strictEqual(columnId, settings.sort_rows_by_column_id)
   })
@@ -1034,8 +1034,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets sortRowsBy > columnId to default if no settings passed in', () => {
     const {
       gridDisplaySettings: {
-        sortRowsBy: {columnId}
-      }
+        sortRowsBy: {columnId},
+      },
     } = createGradebook()
     strictEqual(columnId, 'student')
   })
@@ -1044,8 +1044,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
     const settings = {sort_rows_by_setting_key: 'grade'}
     const {
       gridDisplaySettings: {
-        sortRowsBy: {settingKey}
-      }
+        sortRowsBy: {settingKey},
+      },
     } = createGradebook({settings})
     strictEqual(settingKey, settings.sort_rows_by_setting_key)
   })
@@ -1053,8 +1053,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets sortRowsBy > settingKey to default if no settings passed in', () => {
     const {
       gridDisplaySettings: {
-        sortRowsBy: {settingKey}
-      }
+        sortRowsBy: {settingKey},
+      },
     } = createGradebook()
     strictEqual(settingKey, 'sortable_name')
   })
@@ -1063,8 +1063,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
     const settings = {sort_rows_by_direction: 'descending'}
     const {
       gridDisplaySettings: {
-        sortRowsBy: {direction}
-      }
+        sortRowsBy: {direction},
+      },
     } = createGradebook({settings})
     strictEqual(direction, settings.sort_rows_by_direction)
   })
@@ -1072,8 +1072,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets sortRowsBy > Direction to default if no settings passed in', () => {
     const {
       gridDisplaySettings: {
-        sortRowsBy: {direction}
-      }
+        sortRowsBy: {direction},
+      },
     } = createGradebook()
     strictEqual(direction, 'ascending')
   })
@@ -1081,8 +1081,8 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets showEnrollments.concluded to a default value', () => {
     const {
       gridDisplaySettings: {
-        showEnrollments: {concluded}
-      }
+        showEnrollments: {concluded},
+      },
     } = createGradebook()
     strictEqual(concluded, false)
   })
@@ -1090,15 +1090,15 @@ QUnit.module('Gradebook#getInitialGridDisplaySettings', () => {
   test('sets showEnrollments.inactive to a default value', () => {
     const {
       gridDisplaySettings: {
-        showEnrollments: {inactive}
-      }
+        showEnrollments: {inactive},
+      },
     } = createGradebook()
     strictEqual(inactive, false)
   })
 
   test('sets showUnpublishedAssignment to a default value', () => {
     const {
-      gridDisplaySettings: {showUnpublishedAssignments}
+      gridDisplaySettings: {showUnpublishedAssignments},
     } = createGradebook()
     strictEqual(showUnpublishedAssignments, true)
   })
@@ -1109,12 +1109,12 @@ QUnit.module('Gradebook#setSelectedSecondaryInfo', {
     this.gradebook = createGradebook()
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: sinon.stub()
-      }
+        updateColumnHeaders: sinon.stub(),
+      },
     }
     sandbox.stub(this.gradebook, 'saveSettings')
     sandbox.stub(this.gradebook, 'buildRows')
-  }
+  },
 })
 
 test('updates the selectedSecondaryInfo in the grid display settings', function () {
@@ -1165,10 +1165,10 @@ QUnit.module('Gradebook#onGridBlur', {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
+          seconds_late: 0,
         },
-        enrollment_state: ['active']
-      }
+        enrollment_state: ['active'],
+      },
     ]
     this.gradebook.gotChunkOfStudents(students)
     this.gradebook.initGrid()
@@ -1185,8 +1185,8 @@ QUnit.module('Gradebook#onGridBlur', {
         muted: false,
         omit_from_final_grade: false,
         published: true,
-        submission_types: ['online_text_entry']
-      }
+        submission_types: ['online_text_entry'],
+      },
     })
     this.gradebook.assignmentGroups = {9000: {group_weight: 100}}
 
@@ -1203,7 +1203,7 @@ QUnit.module('Gradebook#onGridBlur', {
   teardown() {
     this.gradebook.destroy()
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('closes grid details tray when open', function () {
@@ -1246,7 +1246,7 @@ QUnit.module('Gradebook#setVisibleGridColumns()', hooks => {
     server.respondWith('POST', options.gradebook_column_order_settings_url, [
       200,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
 
     setFixtureHtml($fixtures)
@@ -1267,38 +1267,38 @@ QUnit.module('Gradebook#setVisibleGridColumns()', hooks => {
             id: '2301',
             name: 'Math Assignment',
             points_possible: 10,
-            published: true
+            published: true,
           },
           {
             assignment_group_id: '2201',
             id: '2302',
             name: 'English Assignment',
             points_possible: 10,
-            published: false
-          }
+            published: false,
+          },
         ],
         group_weight: 40,
         id: '2201',
-        name: 'Assignments'
-      }
+        name: 'Assignments',
+      },
     ])
 
     const students = [
       {
         id: '1101',
         name: 'Adam Jones',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
       },
       {
         id: '1102',
         name: 'Betty Ford',
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
       },
       {
         id: '1199',
         name: 'Test Student',
-        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.url/'}}]
-      }
+        enrollments: [{type: 'StudentViewEnrollment', grades: {html_url: 'http://example.url/'}}],
+      },
     ]
     gradebook.courseContent.students.setStudentIds(['1101', '1102', '1199'])
     gradebook.buildRows()
@@ -1424,7 +1424,7 @@ QUnit.module('Gradebook#setSortRowsBySetting', {
     sandbox.stub(this.gradebook, 'sortGridRows')
 
     this.gradebook.setSortRowsBySetting('assignment_1', 'grade', 'descending')
-  }
+  },
 })
 
 test('updates the sort column in the grid display settings', function () {
@@ -1452,12 +1452,12 @@ QUnit.module('Gradebook#setSelectedPrimaryInfo', {
     this.gradebook = createGradebook()
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: sinon.stub()
-      }
+        updateColumnHeaders: sinon.stub(),
+      },
     }
     sandbox.stub(this.gradebook, 'saveSettings')
     sandbox.stub(this.gradebook, 'buildRows')
-  }
+  },
 })
 
 test('updates the selectedPrimaryInfo in the grid display settings', function () {
@@ -1502,7 +1502,7 @@ QUnit.module('Gradebook#arrangeColumnsBy', hooks => {
     server.respondWith('POST', options.gradebook_column_order_settings_url, [
       200,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
     gradebook = createGradebook(options)
     gradebook.makeColumnSortFn = () => () => 1
@@ -1512,12 +1512,12 @@ QUnit.module('Gradebook#arrangeColumnsBy', hooks => {
       },
       getOptions() {
         return {
-          numberOfColumnsToFreeze: 0
+          numberOfColumnsToFreeze: 0,
         }
       },
       invalidate() {},
       setColumns() {},
-      setNumberOfColumnsToFreeze() {}
+      setNumberOfColumnsToFreeze() {},
     }
   })
 
@@ -1630,7 +1630,7 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     server.respondWith('POST', options.settings_update_url, [
       200,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
 
     const gradebook = createGradebook({options})
@@ -1649,7 +1649,7 @@ QUnit.module('Gradebook#toggleUnpublishedAssignments', () => {
     server.respondWith('POST', options.settings_update_url, [
       401,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
 
     const gradebook = createGradebook({options})
@@ -1683,7 +1683,7 @@ QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
       {id: 'student', type: 'student'},
       {id: 'assignment_232', type: 'assignment'},
       {id: 'total_grade', type: 'total_grade'},
-      {id: 'assignment_group_12', type: 'assignment'}
+      {id: 'assignment_group_12', type: 'assignment'},
     ]
     gradebook = createGradebook()
     gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}]
@@ -1693,7 +1693,7 @@ QUnit.module('Gradebook#updateTotalGradeColumn', hooks => {
       updateCell: sinon.stub(),
       getColumns() {
         return columns
-      }
+      },
     }
   })
 
@@ -1752,7 +1752,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
   const sortByStudentNameSettings = {
     columnId: 'student',
     settingKey: 'sortable_name',
-    direction: 'ascending'
+    direction: 'ascending',
   }
 
   hooks.beforeEach(() => {
@@ -1761,7 +1761,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
     server.respondWith('POST', options.settings_update_url, [
       200,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
     gradebook = createGradebook(options)
     columnId = getAssignmentColumnId('2301')
@@ -1790,7 +1790,7 @@ QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
     gradebook.handleSubmissionPostedChange({
       id: '2301',
       anonymize_students: true,
-      assignment_group_id: groupId
+      assignment_group_id: groupId,
     })
     deepEqual(gradebook.getSortRowsBySetting(), sortByStudentNameSettings)
   })
@@ -1821,7 +1821,7 @@ QUnit.module('Gradebook#updateStudentRow', {
     this.gradebook = createGradebook()
     this.gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}, {id: '1103'}]
     sandbox.stub(this.gradebook.gradebookGrid, 'invalidateRow')
-  }
+  },
 })
 
 test('updates the associated row with the given student', function () {
@@ -1861,7 +1861,7 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
       {id: 'student', type: 'student'},
       {id: 'assignment_232', type: 'assignment'},
       {id: 'total_grade', type: 'total_grade'},
-      {id: 'assignment_group_12', type: 'assignment'}
+      {id: 'assignment_group_12', type: 'assignment'},
     ]
     this.gradebook = createGradebook()
     this.gradebook.gridData.rows = [{id: '1101'}, {id: '1102'}]
@@ -1869,9 +1869,9 @@ QUnit.module('Gradebook#updateRowCellsForStudentIds', {
       updateCell: sinon.stub(),
       getColumns() {
         return columns
-      }
+      },
     }
-  }
+  },
 })
 
 test('updates cells for each column', function () {

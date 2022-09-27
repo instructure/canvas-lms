@@ -59,13 +59,13 @@ export default class ConfirmDialog extends React.Component {
     modalProps: shape({
       // by default Modal.propTypes.label "isRequired" but ours is not because we fall back to this.props.heading
       ...Modal.propTypes,
-      label: string
+      label: string,
     }),
 
     closeLabel: string,
 
     // invoked when the close button is clicked
-    onDismiss: func
+    onDismiss: func,
   }
 
   static defaultProps = {
@@ -77,7 +77,7 @@ export default class ConfirmDialog extends React.Component {
     modalProps: {},
     closeLabel: I18n.t('close'),
     spinnerLabel: I18n.t('working...'),
-    onDismiss: () => {}
+    onDismiss: () => {},
   }
 
   closeButtonRef(elt) {
@@ -100,7 +100,7 @@ export default class ConfirmDialog extends React.Component {
     const defaultProps = {
       key: index,
       disabled: this.props.disabled,
-      margin: '0 x-small 0 0'
+      margin: '0 x-small 0 0',
     }
     const props = {...defaultProps, ...buttonProps}
     return <Button {...props} />

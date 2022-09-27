@@ -20,7 +20,7 @@ import axios from '@canvas/axios'
 
 const userMetaTypes = {
   graders: ['teacher', 'ta'],
-  students: ['student', 'student_view']
+  students: ['student', 'student_view'],
 }
 
 function getUsersByName(courseId, userType, searchTerm, enrollmentStates = []) {
@@ -33,8 +33,8 @@ function getUsersByName(courseId, userType, searchTerm, enrollmentStates = []) {
     params: {
       search_term: searchTerm,
       enrollment_type: userMetaTypes[userType],
-      enrollment_state: enrollmentStates
-    }
+      enrollment_state: enrollmentStates,
+    },
   }
 
   const url = encodeURI(`/api/v1/courses/${courseId}/users`)
@@ -48,5 +48,5 @@ function getUsersNextPage(url) {
 
 export default {
   getUsersByName,
-  getUsersNextPage
+  getUsersNextPage,
 }

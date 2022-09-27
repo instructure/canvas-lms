@@ -36,10 +36,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         disabled: false,
         modules: [
           {id: '2002', name: 'Module 2'},
-          {id: '2001', name: 'Module 1'}
+          {id: '2001', name: 'Module 1'},
         ],
         onSelect: sinon.stub(),
-        selectedModuleId: '0'
+        selectedModuleId: '0',
       }
 
       component = null

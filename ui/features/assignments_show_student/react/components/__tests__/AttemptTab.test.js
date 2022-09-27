@@ -34,10 +34,10 @@ const defaultMocks = (result = {data: {}}) => [
   {
     request: {
       query: EXTERNAL_TOOLS_QUERY,
-      variables: {courseID: '1'}
+      variables: {courseID: '1'},
     },
-    result
-  }
+    result,
+  },
 ]
 
 describe('ContentTabs', () => {
@@ -69,7 +69,7 @@ describe('ContentTabs', () => {
   describe('the assignment is locked aka passed the until date', () => {
     it('renders the availability dates if the assignment was not submitted', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {lockInfo: {isLocked: true}}
+        Assignment: {lockInfo: {isLocked: true}},
       })
       const {findByText} = render(
         <MockedProvider>
@@ -85,8 +85,8 @@ describe('ContentTabs', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {
           ...SubmissionMocks.submitted,
-          attachments: [{displayName: 'test.jpg'}]
-        }
+          attachments: [{displayName: 'test.jpg'}],
+        },
       })
       const {findByTestId} = render(
         <MockedProvider>
@@ -101,8 +101,8 @@ describe('ContentTabs', () => {
         Assignment: {lockInfo: {isLocked: true}},
         Submission: {
           ...SubmissionMocks.late,
-          attachments: [{displayName: 'test.jpg'}]
-        }
+          attachments: [{displayName: 'test.jpg'}],
+        },
       })
       const {findByTestId} = render(
         <MockedProvider>
@@ -115,7 +115,7 @@ describe('ContentTabs', () => {
     it('renders the availability dates if the assignment was not submitted and marked missing', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {lockInfo: {isLocked: true}},
-        Submission: {...SubmissionMocks.missing}
+        Submission: {...SubmissionMocks.missing},
       })
       const {findByText} = render(
         <MockedProvider>
@@ -129,7 +129,7 @@ describe('ContentTabs', () => {
     it('renders the availability dates if the assignment was not submitted and marked excused', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {lockInfo: {isLocked: true}},
-        Submission: {...SubmissionMocks.excused}
+        Submission: {...SubmissionMocks.excused},
       })
       const {findByText} = render(
         <MockedProvider>
@@ -144,7 +144,7 @@ describe('ContentTabs', () => {
   describe('the submission type is online_upload', () => {
     it('renders the file upload tab when the submission is unsubmitted', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_upload']}
+        Assignment: {submissionTypes: ['online_upload']},
       })
 
       const {getByTestId} = render(
@@ -160,8 +160,8 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_upload']},
         Submission: {
           ...SubmissionMocks.submitted,
-          attachments: [{}]
-        }
+          attachments: [{}],
+        },
       })
 
       const {findByTestId} = render(<AttemptTab {...props} focusAttemptOnInit={false} />)
@@ -179,9 +179,9 @@ describe('ContentTabs', () => {
         const props = await mockAssignmentAndSubmission({
           Submission: {
             submissionDraft: {
-              attachments: [{displayName: 'test.jpg'}]
-            }
-          }
+              attachments: [{displayName: 'test.jpg'}],
+            },
+          },
         })
 
         const {getAllByText} = render(
@@ -197,11 +197,11 @@ describe('ContentTabs', () => {
   describe('the submission type is student_annotation', () => {
     it('renders the canvadocs iframe', async () => {
       const assignmentAndSubmission = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['student_annotation']}
+        Assignment: {submissionTypes: ['student_annotation']},
       })
       const props = {
         ...assignmentAndSubmission,
-        createSubmissionDraft: jest.fn().mockResolvedValue({})
+        createSubmissionDraft: jest.fn().mockResolvedValue({}),
       }
 
       const {getByTestId} = render(
@@ -231,7 +231,7 @@ describe('ContentTabs', () => {
     describe('uploading a text draft', () => {
       it('renders the text entry tab', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry']}
+          Assignment: {submissionTypes: ['online_text_entry']},
         })
 
         const {findByTestId} = await renderAttemptTab(props)
@@ -249,8 +249,8 @@ describe('ContentTabs', () => {
           const props = await mockAssignmentAndSubmission({
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
-              state: 'submitted'
-            }
+              state: 'submitted',
+            },
           })
 
           const {findByTestId} = await renderAttemptTab(props)
@@ -262,8 +262,8 @@ describe('ContentTabs', () => {
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
               state: 'graded',
-              attempt: 0
-            }
+              attempt: 0,
+            },
           })
 
           const {queryByTestId} = await renderAttemptTab(props)
@@ -275,8 +275,8 @@ describe('ContentTabs', () => {
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
               state: 'graded',
-              attempt: 1
-            }
+              attempt: 1,
+            },
           })
 
           const {findByTestId} = await renderAttemptTab(props)
@@ -287,8 +287,8 @@ describe('ContentTabs', () => {
           const props = await mockAssignmentAndSubmission({
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
-              state: 'unsubmitted'
-            }
+              state: 'unsubmitted',
+            },
           })
 
           const {findByTestId} = render(
@@ -304,8 +304,8 @@ describe('ContentTabs', () => {
           const props = await mockAssignmentAndSubmission({
             Assignment: {submissionTypes: ['online_text_entry']},
             Submission: {
-              state: 'unsubmitted'
-            }
+              state: 'unsubmitted',
+            },
           })
 
           const {queryByTestId} = await renderAttemptTab(props)
@@ -319,7 +319,7 @@ describe('ContentTabs', () => {
     describe('when no submission type is selected', () => {
       it('renders the submission type selector if the submission can be modified', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
         const {getByTestId} = render(
           <MockedProvider mocks={defaultMocks()}>
@@ -332,7 +332,7 @@ describe('ContentTabs', () => {
 
       it('shows buttons for the available submission types', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
 
         const {getAllByRole} = render(
@@ -349,7 +349,7 @@ describe('ContentTabs', () => {
 
       it('shows disabled buttons for the available submission types for observers', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
         const {getAllByRole} = render(
           <MockedProvider mocks={defaultMocks()}>
@@ -369,7 +369,7 @@ describe('ContentTabs', () => {
 
       it('displays "Available submission types" for observers', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
         const {getByText} = render(
           <MockedProvider mocks={defaultMocks()}>
@@ -386,7 +386,7 @@ describe('ContentTabs', () => {
 
       it('displays "Choose a submission type" for students', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
         const {getByText} = render(
           <MockedProvider mocks={defaultMocks()}>
@@ -401,7 +401,7 @@ describe('ContentTabs', () => {
 
       it('does not render the submission type selector if the submission cannot be modified', async () => {
         const props = await mockAssignmentAndSubmission({
-          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+          Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         })
         const {queryByTestId} = render(
           <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
@@ -416,7 +416,7 @@ describe('ContentTabs', () => {
     it('updates the active type after selecting a type', async () => {
       const mockedUpdateActiveSubmissionType = jest.fn()
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
       })
       const {getByRole} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -438,7 +438,7 @@ describe('ContentTabs', () => {
 
     it('renders the active submission type if available', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_url']}
+        Assignment: {submissionTypes: ['online_url']},
       })
       const {findByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -453,8 +453,8 @@ describe('ContentTabs', () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         Submission: {
-          state: 'submitted'
-        }
+          state: 'submitted',
+        },
       })
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -470,8 +470,8 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         Submission: {
           state: 'graded',
-          attempt: 1
-        }
+          attempt: 1,
+        },
       })
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -487,8 +487,8 @@ describe('ContentTabs', () => {
         Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
         Submission: {
           state: 'graded',
-          attempt: 0
-        }
+          attempt: 0,
+        },
       })
       const {queryByTestId} = render(
         <MockedProvider mocks={defaultMocks()}>
@@ -501,7 +501,7 @@ describe('ContentTabs', () => {
 
     it('does not render the selector if the context indicates the submission cannot be modified', async () => {
       const props = await mockAssignmentAndSubmission({
-        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']}
+        Assignment: {submissionTypes: ['online_text_entry', 'online_upload']},
       })
 
       const {queryByTestId} = render(
@@ -523,13 +523,13 @@ describe('ContentTabs', () => {
           gradeGroupStudentsIndividually: false,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
 
       const {getByText} = render(
@@ -546,11 +546,11 @@ describe('ContentTabs', () => {
     it('does not show a reminder for a non-group assignment', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
 
       const {queryByText} = render(
@@ -570,13 +570,13 @@ describe('ContentTabs', () => {
           gradeGroupStudentsIndividually: true,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
 
       const {queryByText} = render(
@@ -596,13 +596,13 @@ describe('ContentTabs', () => {
           gradeGroupStudentsIndividually: true,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.submitted
-        }
+          ...SubmissionMocks.submitted,
+        },
       })
 
       const {queryByText} = render(
@@ -620,13 +620,13 @@ describe('ContentTabs', () => {
           gradeGroupStudentsIndividually: false,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
 
       const {queryByText} = render(
@@ -663,7 +663,7 @@ describe('ContentTabs', () => {
     async function generatePropsWithAttempt(attempt) {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt}
+        Submission: {attempt},
       })
       props.focusAttemptOnInit = true
       props.updateUploadingFiles = jest.fn()
@@ -685,7 +685,7 @@ describe('ContentTabs', () => {
 
       await submitFiles(container, [
         new File(['foo'], 'file1.pdf', {type: 'application/pdf'}),
-        new File(['foo2'], 'file2.pdf', {type: 'application/pdf'})
+        new File(['foo2'], 'file2.pdf', {type: 'application/pdf'}),
       ])
 
       const {calls} = uploadFileModule.uploadFile.mock
@@ -693,12 +693,12 @@ describe('ContentTabs', () => {
       expect(calls[0][1]).toEqual({
         content_type: 'application/pdf',
         name: 'file1.pdf',
-        submit_assignment: true
+        submit_assignment: true,
       })
       expect(calls[1][1]).toEqual({
         content_type: 'application/pdf',
         name: 'file2.pdf',
-        submit_assignment: true
+        submit_assignment: true,
       })
     })
 
@@ -717,7 +717,7 @@ describe('ContentTabs', () => {
     it('calls uploadFile with the URL pointing to the groups api endpoint', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {submissionTypes: ['online_upload']},
-        Submission: {attempt: 2}
+        Submission: {attempt: 2},
       })
       props.focusAttemptOnInit = true
       props.updateUploadingFiles = jest.fn()
@@ -746,8 +746,8 @@ describe('ContentTabs', () => {
             id: '1',
             activeSubmissionType: 'online_upload',
             attempt: 2,
-            fileIds: ['1']
-          }
+            fileIds: ['1'],
+          },
         })
       })
     })
@@ -764,8 +764,8 @@ describe('ContentTabs', () => {
             id: '1',
             activeSubmissionType: 'online_upload',
             attempt: 1,
-            fileIds: ['1']
-          }
+            fileIds: ['1'],
+          },
         })
       })
     })
@@ -788,7 +788,7 @@ describe('ContentTabs', () => {
       const {container, findAllByRole} = renderWithProps(props)
       await submitFiles(container, [
         new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
-        new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
+        new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'}),
       ])
 
       progressHandlers[0]({loaded: 10, total: 100})
@@ -820,8 +820,8 @@ describe('ContentTabs', () => {
         new MessageEvent('message', {
           data: {
             subject: 'LtiDeepLinkingResponse',
-            content_items: [contentItem]
-          }
+            content_items: [contentItem],
+          },
         })
       )
     }
@@ -875,7 +875,7 @@ describe('ContentTabs', () => {
       fireEventWithContentItem({
         url: 'http://localhost/some-lti-file',
         text: 'x.pdf',
-        mediaType: 'plain/txt'
+        mediaType: 'plain/txt',
       })
 
       progressHandlers[0]({loaded: 10, total: 100})
@@ -887,7 +887,7 @@ describe('ContentTabs', () => {
         url: 'http://localhost/some-lti-file',
         name: 'x.pdf',
         content_type: 'plain/txt',
-        submit_assignment: true
+        submit_assignment: true,
       })
     })
   })

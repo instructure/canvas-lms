@@ -38,16 +38,16 @@ const I18n = useI18nScope('assignments_bulk_edit')
 const DATE_INPUT_META = {
   due_at: {
     label: I18n.t('Due At'),
-    fancyMidnight: true
+    fancyMidnight: true,
   },
   unlock_at: {
     label: I18n.t('Available From'),
-    fancyMidnight: false
+    fancyMidnight: false,
   },
   lock_at: {
     label: I18n.t('Available Until'),
-    fancyMidnight: true
-  }
+    fancyMidnight: true,
+  },
 }
 
 BulkEditTable.propTypes = {
@@ -69,7 +69,7 @@ BulkEditTable.propTypes = {
 
   setAssignmentSelected: func.isRequired, // (assignmentId, selected) => {}
 
-  defaultDueTime: string // e.g. "16:00:00"
+  defaultDueTime: string, // e.g. "16:00:00"
 }
 
 export default function BulkEditTable({
@@ -78,7 +78,7 @@ export default function BulkEditTable({
   setAssignmentSelected,
   selectAllAssignments,
   clearOverrideEdits,
-  defaultDueTime
+  defaultDueTime,
 }) {
   const CHECKBOX_COLUMN_WIDTH_REMS = 2
   const DATE_COLUMN_WIDTH_REMS = 17
@@ -311,10 +311,10 @@ export default function BulkEditTable({
             {
               position: 'absolute',
               top: '8px',
-              left: '13px'
+              left: '13px',
             },
             <ScreenReaderContent>{I18n.t('Select all assignments')}</ScreenReaderContent>,
-            <ScreenReaderContent>{I18n.t('Selected')}</ScreenReaderContent>
+            <ScreenReaderContent>{I18n.t('Selected')}</ScreenReaderContent>,
           ]
 
     return (
@@ -366,8 +366,8 @@ export default function BulkEditTable({
           small: {
             maxWidth: `${
               5 * DATE_COLUMN_WIDTH_REMS + ACTION_COLUMN_WIDTH_REMS + NOTE_COLUMN_WIDTH_REMS
-            }rem`
-          }
+            }rem`,
+          },
         }}
         render={renderTable}
       />

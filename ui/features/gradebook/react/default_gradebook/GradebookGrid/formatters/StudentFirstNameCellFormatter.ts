@@ -25,7 +25,7 @@ const I18n = useI18nScope('gradebook')
 export default class StudentFirstNameCellFormatter {
   constructor(gradebook) {
     this.options = {
-      courseId: gradebook.options.context_id
+      courseId: gradebook.options.context_id,
     }
   }
 
@@ -39,7 +39,7 @@ export default class StudentFirstNameCellFormatter {
       displayName: student.first_name || I18n.t('<No first name>'),
       enrollmentLabel: getEnrollmentLabel(student),
       studentId: student.id,
-      url: `${student.enrollments[0].grades.html_url}#tab-assignments`
+      url: `${student.enrollments[0].grades.html_url}#tab-assignments`,
     }
 
     return renderCell(options)

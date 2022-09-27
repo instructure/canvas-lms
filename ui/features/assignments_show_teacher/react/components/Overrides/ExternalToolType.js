@@ -33,11 +33,11 @@ export default class ExternalToolType extends React.Component {
     icon: element.isRequired,
     name: string.isRequired,
     value: string.isRequired,
-    onDelete: func
+    onDelete: func,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   onDelete = () => {

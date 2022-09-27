@@ -29,18 +29,18 @@ function defaultProps() {
     assignments: {
       fetchStatus: 'started',
       items: [],
-      nextPage: ''
+      nextPage: '',
     },
     graders: {
       fetchStatus: 'started',
       items: [],
-      nextPage: ''
+      nextPage: '',
     },
     students: {
       fetchStatus: 'started',
       items: [],
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   }
 }
 
@@ -95,7 +95,9 @@ describe('GradebookHistory::SearchFormComponent', () => {
         const input = container.querySelector(`input#${field}`)
         fireEvent.click(input)
         fireEvent.input(input, {target: {id: field, value: 'onetwo'}})
-        act(() => { jest.advanceTimersByTime(500) }) // wait for debounce
+        act(() => {
+          jest.advanceTimersByTime(500)
+        }) // wait for debounce
         expect(getSearchOptions).toHaveBeenCalledWith(field, 'onetwo')
       })
     })
@@ -110,8 +112,8 @@ describe('GradebookHistory::SearchFormComponent', () => {
           [field]: {
             fetchStatus: 'success',
             items: [{id: '1', name: `One of the ${field}`}],
-            nextPage: ''
-          }
+            nextPage: '',
+          },
         })
         const input = container.querySelector(`input#${field}`)
         fireEvent.click(input)
@@ -128,7 +130,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
         const displayField = field === 'assignments' ? 'artifacts' : field
         const {rerender, container, getByText} = mountSubject()
         const results = {
-          [field]: {fetchStatus: 'success', items: [], nextPage: ''}
+          [field]: {fetchStatus: 'success', items: [], nextPage: ''},
         }
         rerender(<Subject {...defaultProps()} {...results} />)
         const input = container.querySelector(`input#${field}`)
@@ -149,7 +151,7 @@ describe('GradebookHistory::SearchFormComponent', () => {
         students={{
           fetchStatus: 'success',
           items: [],
-          nextPage: 'https://nextpage.example.com'
+          nextPage: 'https://nextpage.example.com',
         }}
       />
     )

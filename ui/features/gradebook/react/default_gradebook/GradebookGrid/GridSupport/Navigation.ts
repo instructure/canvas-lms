@@ -204,7 +204,7 @@ export default class Navigation {
         // Left Arrow within the body: Activate the previous cell.
         this.gridSupport.state.setActiveLocation('body', {
           row: location.row,
-          cell: location.cell - 1
+          cell: location.cell - 1,
         })
         this.trigger('onNavigateLeft', event)
 
@@ -219,7 +219,7 @@ export default class Navigation {
       if (!isLastCellInRow(location, this.grid)) {
         this.gridSupport.state.setActiveLocation('body', {
           row: location.row,
-          cell: location.cell + 1
+          cell: location.cell + 1,
         })
         this.trigger('onNavigateRight', event)
 
@@ -237,7 +237,7 @@ export default class Navigation {
         // Up Arrow in a row below the top row: activate the cell above this one
         this.gridSupport.state.setActiveLocation('body', {
           row: location.row - 1,
-          cell: location.cell
+          cell: location.cell,
         })
       }
 
@@ -252,7 +252,7 @@ export default class Navigation {
         // Down Arrow in a row above the bottom row: activate the cell below
         this.gridSupport.state.setActiveLocation('body', {
           row: location.row + 1,
-          cell: location.cell
+          cell: location.cell,
         })
         this.trigger('onNavigateDown', event)
       } else if (!isLastCellInRow(location, this.grid)) {

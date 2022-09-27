@@ -45,7 +45,7 @@ QUnit.module('Gradebook > DataLoader > SisOverridesLoader', () => {
           muted: false,
           omit_from_final_grade: false,
           published: true,
-          submission_types: ['online_text_entry']
+          submission_types: ['online_text_entry'],
         },
 
         {
@@ -60,23 +60,23 @@ QUnit.module('Gradebook > DataLoader > SisOverridesLoader', () => {
           muted: false,
           omit_from_final_grade: false,
           published: true,
-          submission_types: ['online_text_entry']
-        }
+          submission_types: ['online_text_entry'],
+        },
       ]
 
       exampleData = {
         assignmentGroups: [
           {id: '2201', position: 1, name: 'Assignments', assignments: assignments.slice(0, 1)},
           {id: '2202', position: 2, name: 'Homework', assignments: assignments.slice(1, 2)},
-          {id: '2203', position: 3, name: 'Extra Credit', assignments: []}
-        ]
+          {id: '2203', position: 3, name: 'Extra Credit', assignments: []},
+        ],
       }
 
       network = new NetworkFake()
       dispatch = new RequestDispatch()
 
       gradebook = createGradebook({
-        context_id: '1201'
+        context_id: '1201',
       })
 
       sinon.stub(gradebook, 'addOverridesToPostGradesStore')

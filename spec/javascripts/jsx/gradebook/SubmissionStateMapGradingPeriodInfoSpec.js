@@ -21,7 +21,7 @@ import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 const student = {
   id: '1',
   group_ids: ['1'],
-  sections: ['1']
+  sections: ['1'],
 }
 
 function createMap(opts = {}) {
@@ -29,7 +29,7 @@ function createMap(opts = {}) {
     hasGradingPeriods: false,
     selectedGradingPeriodID: '0',
     isAdmin: false,
-    ...opts
+    ...opts,
   }
 
   return new SubmissionStateMap(params)
@@ -58,13 +58,13 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
     test('returns undefined if submission has no grading period', () => {
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
       submissionStateMap = createAndSetupMap(assignment, options)
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inNoGradingPeriod, undefined)
@@ -74,13 +74,13 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
         grading_period_id: 1,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
       submissionStateMap = createAndSetupMap(assignment, options)
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inNoGradingPeriod, undefined)
@@ -91,7 +91,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
     hooks.beforeEach(() => {
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
     })
 
@@ -100,7 +100,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, undefined)
@@ -112,7 +112,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, undefined)
@@ -124,7 +124,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, undefined)
@@ -134,7 +134,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
   QUnit.module('inClosedGradingPeriod', hooks => {
     hooks.beforeEach(() => {
       assignment.effectiveDueDates[student.id] = {
-        due_at: dueDate
+        due_at: dueDate,
       }
     })
 
@@ -144,7 +144,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inClosedGradingPeriod, undefined)
@@ -156,7 +156,7 @@ QUnit.module('SubmissionStateMap without grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inClosedGradingPeriod, undefined)
@@ -179,13 +179,13 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
     test('returns true if submission has no grading period', () => {
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
       submissionStateMap = createAndSetupMap(assignment, options)
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inNoGradingPeriod, true)
@@ -195,13 +195,13 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
         grading_period_id: 1,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
       submissionStateMap = createAndSetupMap(assignment, options)
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inNoGradingPeriod, false)
@@ -213,7 +213,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
       options = {hasGradingPeriods: true, selectedGradingPeriodID: '2'}
       assignment.effectiveDueDates[student.id] = {
         due_at: dueDate,
-        in_closed_grading_period: false
+        in_closed_grading_period: false,
       }
     })
 
@@ -222,7 +222,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, false)
@@ -234,7 +234,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, true)
@@ -246,7 +246,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inOtherGradingPeriod, false)
@@ -257,7 +257,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
     hooks.beforeEach(() => {
       options = {hasGradingPeriods: true, selectedGradingPeriodID: '2'}
       assignment.effectiveDueDates[student.id] = {
-        due_at: dueDate
+        due_at: dueDate,
       }
     })
 
@@ -267,7 +267,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inClosedGradingPeriod, true)
@@ -279,7 +279,7 @@ QUnit.module('SubmissionStateMap with grading periods', suiteHooks => {
 
       const state = submissionStateMap.getSubmissionState({
         user_id: student.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
 
       strictEqual(state.inClosedGradingPeriod, false)

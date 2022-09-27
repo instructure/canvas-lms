@@ -36,7 +36,7 @@ const SearchFormActions = {
   fetchRecordsStart(recordType) {
     return {
       type: FETCH_RECORDS_START,
-      payload: {recordType}
+      payload: {recordType},
     }
   },
 
@@ -46,22 +46,22 @@ const SearchFormActions = {
       payload: {
         data,
         link: headers.link,
-        recordType
-      }
+        recordType,
+      },
     }
   },
 
   fetchRecordsFailure(recordType) {
     return {
       type: FETCH_RECORDS_FAILURE,
-      payload: {recordType}
+      payload: {recordType},
     }
   },
 
   fetchRecordsNextPageStart(recordType) {
     return {
       type: FETCH_RECORDS_NEXT_PAGE_START,
-      payload: {recordType}
+      payload: {recordType},
     }
   },
 
@@ -71,20 +71,20 @@ const SearchFormActions = {
       payload: {
         data,
         link: headers.link,
-        recordType
-      }
+        recordType,
+      },
     }
   },
 
   fetchRecordsNextPageFailure(recordType) {
     return {
       type: FETCH_RECORDS_NEXT_PAGE_FAILURE,
-      payload: {recordType}
+      payload: {recordType},
     }
   },
 
   getGradebookHistory(input) {
-    return function(dispatch) {
+    return function (dispatch) {
       dispatch(HistoryActions.fetchHistoryStart())
       return HistoryApi.getGradebookHistory(courseId, input)
         .then(response => {
@@ -99,12 +99,12 @@ const SearchFormActions = {
   clearSearchOptions(recordType) {
     return {
       type: CLEAR_RECORDS,
-      payload: {recordType}
+      payload: {recordType},
     }
   },
 
   getSearchOptions(recordType, searchTerm) {
-    return function(dispatch) {
+    return function (dispatch) {
       dispatch(SearchFormActions.fetchRecordsStart(recordType))
 
       const enrollmentStates = environment.courseIsConcluded() ? ['completed'] : []
@@ -124,7 +124,7 @@ const SearchFormActions = {
   },
 
   getSearchOptionsNextPage(recordType, url) {
-    return function(dispatch) {
+    return function (dispatch) {
       dispatch(SearchFormActions.fetchRecordsNextPageStart(recordType))
 
       const request =
@@ -140,7 +140,7 @@ const SearchFormActions = {
           dispatch(SearchFormActions.fetchRecordsNextPageFailure(recordType))
         })
     }
-  }
+  },
 }
 
 export default SearchFormActions
@@ -152,5 +152,5 @@ export {
   FETCH_RECORDS_FAILURE,
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
-  FETCH_RECORDS_NEXT_PAGE_FAILURE
+  FETCH_RECORDS_NEXT_PAGE_FAILURE,
 }

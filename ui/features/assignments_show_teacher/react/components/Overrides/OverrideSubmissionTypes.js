@@ -39,7 +39,7 @@ import {
   IconIntegrationsLine,
   IconImageLine,
   IconLinkLine,
-  IconUnpublishedLine
+  IconUnpublishedLine,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('assignments_2')
@@ -51,12 +51,12 @@ export default class OverrideSubmissionTypes extends React.Component {
     override: OverrideShape,
     onChangeOverride: requiredIfDetail,
     readOnly: bool,
-    variant: oneOf(['summary', 'detail'])
+    variant: oneOf(['summary', 'detail']),
   }
 
   static defaultProps = {
     readOnly: false,
-    variant: 'summary'
+    variant: 'summary',
   }
 
   static docTypeOptions = [
@@ -67,7 +67,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     {key: 'ppt', display: I18n.t('PPT')},
     {key: 'txt', display: I18n.t('TXT')},
     {key: 'xls', display: I18n.t('XLS')},
-    {key: 'rtf', display: I18n.t('RTF')}
+    {key: 'rtf', display: I18n.t('RTF')},
   ]
 
   static imageTypeOptions = [
@@ -79,7 +79,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     {key: 'gif', display: I18n.t('GIF')},
     {key: 'psd', display: I18n.t('PSD')},
     {key: 'svg', display: I18n.t('SVG')},
-    {key: 'eps', display: I18n.t('EPS')}
+    {key: 'eps', display: I18n.t('EPS')},
   ]
 
   static mediaTypeOptions = [
@@ -90,20 +90,20 @@ export default class OverrideSubmissionTypes extends React.Component {
     {key: 'mp4', display: I18n.t('MP4')},
     {key: 'mp3', display: I18n.t('MP3')},
     {key: 'mov', display: I18n.t('MOV')},
-    {key: 'arc', display: I18n.t('ARC')}
+    {key: 'arc', display: I18n.t('ARC')},
   ]
 
   static nonCanvasOptions = [
     {key: 'in_class', display: I18n.t('In Class')},
     {key: 'on_paper', display: I18n.t('On Paper')},
-    {key: 'none', display: I18n.t('No Submission')}
+    {key: 'none', display: I18n.t('No Submission')},
   ]
 
   static appType = {
     name: I18n.t('App'),
     icon: IconIntegrationsLine,
     value: 'external_tool',
-    slotType: ExternalToolType
+    slotType: ExternalToolType,
   }
 
   static fileType = {
@@ -111,7 +111,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     icon: IconDocumentLine,
     value: 'online_upload',
     options: OverrideSubmissionTypes.docTypeOptions,
-    slotType: FileType
+    slotType: FileType,
   }
 
   static imageType = {
@@ -119,7 +119,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     icon: IconImageLine,
     value: 'image',
     options: OverrideSubmissionTypes.imageTypeOptions,
-    slotType: FileType
+    slotType: FileType,
   }
 
   static mediaType = {
@@ -127,7 +127,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     icon: IconAttachMediaLine,
     value: 'media_recording',
     options: OverrideSubmissionTypes.mediaTypeOptions,
-    slotType: FileType
+    slotType: FileType,
   }
 
   static nonCanvasType = {
@@ -135,21 +135,21 @@ export default class OverrideSubmissionTypes extends React.Component {
     icon: IconUnpublishedLine,
     value: 'non_canvas',
     options: OverrideSubmissionTypes.nonCanvasOptions,
-    slotType: NonCanvasType
+    slotType: NonCanvasType,
   }
 
   static textType = {
     name: I18n.t('Text Entry'),
     icon: IconDocumentLine,
     value: 'online_text_entry',
-    slotType: SimpleType
+    slotType: SimpleType,
   }
 
   static urlType = {
     name: I18n.t('URL'),
     icon: IconLinkLine,
     value: 'online_url',
-    slotType: SimpleType
+    slotType: SimpleType,
   }
 
   static submissionTypes = [
@@ -159,7 +159,7 @@ export default class OverrideSubmissionTypes extends React.Component {
     OverrideSubmissionTypes.mediaType,
     OverrideSubmissionTypes.nonCanvasType,
     OverrideSubmissionTypes.textType,
-    OverrideSubmissionTypes.urlType
+    OverrideSubmissionTypes.urlType,
   ]
 
   onSelectSubmissionType = (_event, value) => {

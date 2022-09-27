@@ -137,7 +137,7 @@ class StatusesModal extends React.Component<Props, State> {
     const {
       props: {onClose},
       bindDoneButton,
-      bindContentRef
+      bindContentRef,
     } = this
 
     return (

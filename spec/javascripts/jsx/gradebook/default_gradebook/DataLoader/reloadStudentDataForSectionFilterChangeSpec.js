@@ -28,7 +28,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
     customColumnData: columnId => `/api/v1/courses/1201/custom_gradebook_columns/${columnId}/data`,
     students: '/api/v1/courses/1201/users',
     submissions: '/api/v1/courses/1201/students/submissions',
-    userIds: '/courses/1201/gradebook/user_ids'
+    userIds: '/courses/1201/gradebook/user_ids',
   }
 
   let dataLoader
@@ -43,9 +43,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       finalGradeOverrides: {
         1101: {
           courseGrade: {
-            percentage: 91.23
-          }
-        }
+            percentage: 91.23,
+          },
+        },
       },
 
       studentIds: ['1101', '1102', '1103'],
@@ -58,9 +58,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1101'},
-              type: 'StudentEnrollment'
-            }
-          ]
+              type: 'StudentEnrollment',
+            },
+          ],
         },
 
         {
@@ -70,9 +70,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1102'},
-              type: 'StudentEnrollment'
-            }
-          ]
+              type: 'StudentEnrollment',
+            },
+          ],
         },
 
         {
@@ -82,10 +82,10 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
             {
               enrollment_state: 'active',
               grades: {html_url: 'http://canvas/courses/1201/users/1103'},
-              type: 'StudentEnrollment'
-            }
-          ]
-        }
+              type: 'StudentEnrollment',
+            },
+          ],
+        },
       ],
 
       submissions: [
@@ -95,7 +95,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-10-15T12:00:00Z',
           id: '2501',
           score: 10,
-          user_id: '1101'
+          user_id: '1101',
         },
 
         {
@@ -104,7 +104,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-12-15T12:00:00Z',
           id: '2502',
           score: 9,
-          user_id: '1101'
+          user_id: '1101',
         },
 
         {
@@ -113,9 +113,9 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           cached_due_date: '2015-10-16T12:00:00Z',
           id: '2503',
           score: 10,
-          user_id: '1102'
-        }
-      ]
+          user_id: '1102',
+        },
+      ],
     }
   })
 
@@ -157,7 +157,7 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
 
         course_settings: {
           allow_final_grade_override: true,
-          filter_speed_grader_by_student_group: false
+          filter_speed_grader_by_student_group: false,
         },
 
         final_grade_override_enabled: true,
@@ -165,13 +165,13 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
           id: '1501',
           grading_periods: [
             {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
-            {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
-          ]
+            {id: '702', title: 'Grading Period 2', startDate: new Date(2)},
+          ],
         },
 
         performance_controls: {
-          students_chunk_size: 2 // students per page
-        }
+          students_chunk_size: 2, // students per page
+        },
       })
 
       sinon.stub(gradebook.finalGradeOverrides, 'setGrades')

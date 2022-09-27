@@ -86,12 +86,12 @@ SubmissionTypeButton.propTypes = {
   displayName: string.isRequired,
   icon: oneOfType([func, string]).isRequired,
   onSelected: func,
-  selected: bool
+  selected: bool,
 }
 
 SubmissionTypeButton.defaultProps = {
   onSelected: () => {},
-  selected: false
+  selected: false,
 }
 
 const MoreOptionsButton = ({selected}) => (

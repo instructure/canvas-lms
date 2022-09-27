@@ -33,14 +33,14 @@ export default function AccessibleTipContent(props) {
         grade: GradeFormatHelper.formatGrade(originalGrade, {
           gradingType,
           pointsPossible,
-          formatType: 'points_out_of_fraction'
-        })
+          formatType: 'points_out_of_fraction',
+        }),
       })}
       {I18n.t(
         {
           one: 'Late Penalty: minus 1 Point',
           other: 'Late Penalty: minus %{count} Points',
-          zero: 'Late Penalty: None'
+          zero: 'Late Penalty: None',
         },
         {count: pointsDeducted || 0}
       )}
@@ -48,8 +48,8 @@ export default function AccessibleTipContent(props) {
         grade: GradeFormatHelper.formatGrade(grade, {
           gradingType,
           pointsPossible,
-          formatType: 'points_out_of_fraction'
-        })
+          formatType: 'points_out_of_fraction',
+        }),
       })}
     </ScreenReaderContent>
   )
@@ -61,5 +61,5 @@ AccessibleTipContent.propTypes = {
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   pointsDeducted: PropTypes.number.isRequired,
-  pointsPossible: PropTypes.number.isRequired
+  pointsPossible: PropTypes.number.isRequired,
 }

@@ -153,5 +153,5 @@ Layout.propTypes = {
   onDismiss: func.isRequired,
   onPostPolicyChanged: func.isRequired,
   onSave: func.isRequired,
-  selectedPostManually: bool.isRequired
+  selectedPostManually: bool.isRequired,
 }

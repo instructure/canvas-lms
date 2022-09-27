@@ -36,10 +36,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         disabled: false,
         assignmentGroups: [
           {id: '2201', name: 'In-Class'},
-          {id: '2202', name: 'Homework'}
+          {id: '2202', name: 'Homework'},
         ],
         onSelect: sinon.stub(),
-        selectedAssignmentGroupId: '0'
+        selectedAssignmentGroupId: '0',
       }
 
       component = null

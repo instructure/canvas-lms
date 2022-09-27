@@ -42,7 +42,7 @@ export default class ReactCellEditor {
       ...this.options.column.propFactory.getProps(this.options),
       ref: ref => {
         this.component = ref
-      }
+      },
     }
 
     /*

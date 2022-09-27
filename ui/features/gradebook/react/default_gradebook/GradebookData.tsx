@@ -30,7 +30,7 @@ export default function GradebookData(props) {
   )
   const dispatch = useRef(
     new RequestDispatch({
-      activeRequestLimit: performanceControls.current.activeRequestLimit
+      activeRequestLimit: performanceControls.current.activeRequestLimit,
     })
   )
   const courseId = props.gradebookEnv.context_id
@@ -55,7 +55,7 @@ export default function GradebookData(props) {
     useStore.setState({
       courseId,
       dispatch: dispatch.current,
-      performanceControls: performanceControls.current
+      performanceControls: performanceControls.current,
     })
   }, [courseId, props.gradebookEnv.enhanced_gradebook_filters])
 
@@ -86,7 +86,7 @@ export default function GradebookData(props) {
     props.gradebookEnv.has_modules,
     initializeStagedFilter,
     props.gradebookEnv.settings.filter_rows_by,
-    props.gradebookEnv.settings.filter_columns_by
+    props.gradebookEnv.settings.filter_columns_by,
   ])
 
   return (

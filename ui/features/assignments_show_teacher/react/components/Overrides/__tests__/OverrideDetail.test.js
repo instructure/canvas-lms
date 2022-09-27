@@ -36,7 +36,7 @@ function renderOD(override, props = {}) {
 describe('OverrideDetail', () => {
   it('renders readonly override details', () => {
     const override = mockOverride({
-      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload'],
     })
 
     const {getByText, getAllByText, getByTestId} = renderOD(override, {readOnly: true})
@@ -57,7 +57,7 @@ describe('OverrideDetail', () => {
 
   it('renders editable override details', () => {
     const override = mockOverride({
-      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload']
+      submissionTypes: ['online_text_entry', 'online_url', 'media_recording', 'online_upload'],
     })
 
     const {getByText, getAllByText, getByTestId} = renderOD(override)

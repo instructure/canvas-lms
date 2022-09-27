@@ -28,7 +28,7 @@ const PostGradesStore = state => {
       _.each(assignments, a => (a.please_ignore = false))
       this.setState({
         assignments,
-        pleaseShowNeedsGradingPage: false
+        pleaseShowNeedsGradingPage: false,
       })
     },
 
@@ -161,13 +161,13 @@ const PostGradesStore = state => {
         selected = {
           type: 'section',
           id: section_id,
-          sis_id: this.getSISSectionId(section_id)
+          sis_id: this.getSISSectionId(section_id),
         }
       } else {
         selected = {
           type: 'course',
           id: state.course.id,
-          sis_id: state.course.sis_id
+          sis_id: state.course.sis_id,
         }
       }
 
@@ -215,7 +215,7 @@ const PostGradesStore = state => {
         this.updateAssignment(assignment_id, {
           due_at: date,
           please_ignore: false,
-          hadOriginalErrors: true
+          hadOriginalErrors: true,
         })
       }
     },
@@ -252,7 +252,7 @@ const PostGradesStore = state => {
           return 'corrections'
         }
       }
-    }
+    },
   })
 
   return store

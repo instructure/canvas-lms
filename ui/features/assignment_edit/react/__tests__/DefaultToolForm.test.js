@@ -27,9 +27,9 @@ const newProps = (overrides = {}) => ({
     toolUrl: 'https://www.default-tool.com/blti',
     courseId: 1,
     toolName: 'Awesome Tool',
-    previouslySelected: false
+    previouslySelected: false,
   },
-  ...overrides
+  ...overrides,
 })
 
 beforeEach(() => {
@@ -51,10 +51,7 @@ describe('DefaultToolForm', () => {
   it('launches the tool when the button is clicked', () => {
     SelectContentDialog.Events.onContextExternalToolSelect = jest.fn()
     wrapper = mount(<DefaultToolForm {...newProps()} />)
-    wrapper
-      .find('#default-tool-launch-button')
-      .first()
-      .simulate('click')
+    wrapper.find('#default-tool-launch-button').first().simulate('click')
     expect(SelectContentDialog.Events.onContextExternalToolSelect).toHaveBeenCalled()
     SelectContentDialog.Events.onContextExternalToolSelect.mockRestore()
   })
@@ -81,11 +78,11 @@ describe('DefaultToolForm', () => {
           {
             placements: [
               {
-                url: 'foo'
-              }
-            ]
-          }
-        ]
+                url: 'foo',
+              },
+            ],
+          },
+        ],
       })
     })
 

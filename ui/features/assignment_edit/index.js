@@ -59,22 +59,22 @@ ready(() => {
   const assignmentGroupSelector = new AssignmentGroupSelector({
     parentModel: assignment,
     assignmentGroups:
-      (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || []
+      (typeof ENV !== 'undefined' && ENV !== null ? ENV.ASSIGNMENT_GROUPS : undefined) || [],
   })
   const gradingTypeSelector = new GradingTypeSelector({
     parentModel: assignment,
     preventNotGraded: assignment.submissionTypesFrozen(),
     lockedItems,
-    canEditGrades: ENV.PERMISSIONS.can_edit_grades
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades,
   })
   const groupCategorySelector = new GroupCategorySelector({
     parentModel: assignment,
     groupCategories:
       (typeof ENV !== 'undefined' && ENV !== null ? ENV.GROUP_CATEGORIES : undefined) || [],
-    inClosedGradingPeriod: assignment.inClosedGradingPeriod()
+    inClosedGradingPeriod: assignment.inClosedGradingPeriod(),
   })
   const peerReviewsSelector = new PeerReviewsSelector({
-    parentModel: assignment
+    parentModel: assignment,
   })
 
   const editView = new EditView({
@@ -93,11 +93,11 @@ ready(() => {
         availabilityDatesReadonly: !!lockedItems.availability_dates,
         inPacedCourse: assignment.inPacedCourse(),
         isModuleItem: ENV.IS_MODULE_ITEM,
-        courseId: assignment.courseID()
-      })
+        courseId: assignment.courseID(),
+      }),
     },
     lockedItems: assignment.id ? lockedItems : {}, // if no id, creating a new assignment
-    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist()
+    canEditGrades: ENV.PERMISSIONS.can_edit_grades || !assignment.gradedSubmissionsExist(),
   })
 
   const editHeaderView = new EditHeaderView({
@@ -105,8 +105,8 @@ ready(() => {
     model: assignment,
     userIsAdmin,
     views: {
-      edit_assignment_form: editView
-    }
+      edit_assignment_form: editView,
+    },
   })
   editHeaderView.render()
 })

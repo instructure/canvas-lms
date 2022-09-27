@@ -23,12 +23,18 @@ QUnit.module('Gradebook Sections', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     gradebook = createGradebook()
-    gradebook.setSections([{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}])
+    gradebook.setSections([
+      {id: '2001', name: 'Freshmen'},
+      {id: '2002', name: 'Sophomores'},
+    ])
   })
 
   QUnit.module('#getSections()', () => {
     test('returns the sections', () => {
-      const sections = [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}]
+      const sections = [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'},
+      ]
       deepEqual(gradebook.getSections(), sections)
     })
   })

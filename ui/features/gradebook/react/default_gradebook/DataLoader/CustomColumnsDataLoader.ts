@@ -30,7 +30,7 @@ export default class CustomColumnsDataLoader {
   constructor({
     dispatch,
     gradebook,
-    performanceControls
+    performanceControls,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
@@ -57,7 +57,7 @@ export default class CustomColumnsDataLoader {
     const url = `/api/v1/courses/${courseId}/custom_gradebook_columns/${columnId}/data`
     const params = {
       include_hidden: true,
-      per_page: this._performanceControls.customColumnDataPerPage
+      per_page: this._performanceControls.customColumnDataPerPage,
     }
 
     const perPageCallback = customColumnData => {

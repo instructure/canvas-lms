@@ -48,7 +48,7 @@ export default class CommentTextArea extends Component {
   static propTypes = {
     assignment: Assignment.shape,
     submission: Submission.shape,
-    reviewerSubmission: Submission.shape
+    reviewerSubmission: Submission.shape,
   }
 
   state = {
@@ -57,7 +57,7 @@ export default class CommentTextArea extends Component {
     hasError: false,
     mediaModalOpen: false,
     mediaObject: null,
-    uploadingComments: false
+    uploadingComments: false,
   }
 
   queryVariables() {
@@ -65,8 +65,8 @@ export default class CommentTextArea extends Component {
       query: SUBMISSION_COMMENT_QUERY,
       variables: {
         submissionId: this.props.submission.id,
-        submissionAttempt: this.props.submission.attempt
-      }
+        submissionAttempt: this.props.submission.attempt,
+      },
     }
   }
 
@@ -83,13 +83,13 @@ export default class CommentTextArea extends Component {
           author: {
             avatarUrl: this.props.assignment.env.currentUser.avatar_image_url,
             shortName: this.props.assignment.env.currentUser.display_name,
-            __typename: 'User'
+            __typename: 'User',
           },
           mediaObject: null, // When we handle upload of media comments we will handle this
-          __typename: 'SubmissionComment'
+          __typename: 'SubmissionComment',
         },
-        __typename: 'CreateSubmissionCommentPayload'
-      }
+        __typename: 'CreateSubmissionCommentPayload',
+      },
     }
   }
 
@@ -101,11 +101,11 @@ export default class CommentTextArea extends Component {
     const {submissionComments} = JSON.parse(JSON.stringify(cache.readQuery(this.queryVariables())))
     submissionComments.commentsConnection.nodes =
       submissionComments.commentsConnection.nodes.concat([
-        result.data.createSubmissionComment.submissionComment
+        result.data.createSubmissionComment.submissionComment,
       ])
     cache.writeQuery({
       ...this.queryVariables(),
-      data: {submissionComments}
+      data: {submissionComments},
     })
   }
 
@@ -136,7 +136,7 @@ export default class CommentTextArea extends Component {
       this.setState(prevState => ({
         mediaModalOpen: false,
         mediaObject,
-        currentFiles: [...prevState.currentFiles, mediaObject]
+        currentFiles: [...prevState.currentFiles, mediaObject],
       }))
     }
   }
@@ -144,7 +144,7 @@ export default class CommentTextArea extends Component {
   onSendComment = createSubmissionComment => {
     this.setState({hasError: false, uploadingComments: true}, async () => {
       const mediaObject = this.state.mediaObject || {
-        media_object: {media_id: null, media_type: null}
+        media_object: {media_id: null, media_type: null},
       }
       let attachmentIds = []
       const filesWithoutMediaObject = this.state.currentFiles.filter(
@@ -174,8 +174,8 @@ export default class CommentTextArea extends Component {
           fileIds: attachmentIds,
           mediaObjectId: mediaObject.media_object.media_id,
           mediaObjectType: mediaObject.media_object.media_type,
-          reviewerSubmissionId: this.props.reviewerSubmission?.id
-        }
+          reviewerSubmissionId: this.props.reviewerSubmission?.id,
+        },
       })
 
       this.setState(
@@ -183,7 +183,7 @@ export default class CommentTextArea extends Component {
           commentText: '',
           mediaObject: null,
           currentFiles: [],
-          uploadingComments: false
+          uploadingComments: false,
         },
         () => {
           if (this._commentTextBox) {
@@ -222,7 +222,7 @@ export default class CommentTextArea extends Component {
 
     this.setState(
       prevState => ({
-        currentFiles: prevState.currentFiles.filter((_, i) => i !== fileIndex)
+        currentFiles: prevState.currentFiles.filter((_, i) => i !== fileIndex),
       }),
       () => {
         if (this.state.currentFiles.length === 0) {
@@ -306,7 +306,7 @@ export default class CommentTextArea extends Component {
                     multiple
                     onChange={this.onFileSelected}
                     style={{
-                      display: 'none'
+                      display: 'none',
                     }}
                     type="file"
                   />
@@ -348,7 +348,7 @@ export default class CommentTextArea extends Component {
                     open={this.state.mediaModalOpen}
                     rcsConfig={{
                       contextId: this.props.assignment.env.courseId,
-                      contextType: 'course'
+                      contextType: 'course',
                     }}
                     tabs={{embed: false, record: true, upload: true}}
                     uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}

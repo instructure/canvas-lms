@@ -51,7 +51,7 @@ QUnit.module('SubmissionCommentUpdateForm', hooks => {
       id: '23',
       updateSubmissionComment() {},
       processing: false,
-      setProcessing() {}
+      setProcessing() {},
     }
   })
 
@@ -211,7 +211,7 @@ QUnit.module('SubmissionCommentUpdateForm', hooks => {
     props.updateSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     const event = {
-      preventDefault: sinon.stub()
+      preventDefault: sinon.stub(),
     }
     wrapper.find('textarea').simulate('change', {target: {value: 'A changed comment'}})
     submitButton().simulate('click', event)

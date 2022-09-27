@@ -43,18 +43,18 @@ export default class AssignmentDate extends React.Component {
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
     value: string,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      isValid: props.onValidate(props.value)
+      isValid: props.onValidate(props.value),
     }
     this.id = uid() // FormField reqires an id
   }
@@ -71,7 +71,7 @@ export default class AssignmentDate extends React.Component {
         showFlashAlert({
           message: this.props.invalidMessage() || fallbackErrorMessage,
           type: 'error',
-          srOnly: true
+          srOnly: true,
         })
       }
       this.props.onChange(value)
@@ -85,7 +85,7 @@ export default class AssignmentDate extends React.Component {
     showFlashAlert({
       message,
       type: 'error',
-      srOnly: true
+      srOnly: true,
     })
     return message
   }

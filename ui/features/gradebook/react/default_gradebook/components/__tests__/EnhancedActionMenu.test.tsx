@@ -24,7 +24,7 @@ import React from 'react'
 
 const defaultResult = {
   attachmentUrl: 'http://attachmentUrl',
-  updatedAt: '2009-01-20T17:00:00Z'
+  updatedAt: '2009-01-20T17:00:00Z',
 }
 
 const getPromise = (type, object = defaultResult) => {
@@ -48,37 +48,37 @@ const workingMenuProps = () => ({
     {
       id: '1',
       name: 'Pinnacle',
-      onSelect() {}
-    }
+      onSelect() {},
+    },
   ],
 
   postGradesFeature: {
     enabled: false,
     label: '',
     store: {},
-    returnFocusTo: {focus() {}}
+    returnFocusTo: {focus() {}},
   },
 
   publishGradesToSis: {
-    isEnabled: false
+    isEnabled: false,
   },
 
   gradingPeriodId: '1234',
 
-  showStudentFirstLastName: true
+  showStudentFirstLastName: true,
 })
 
 const previousExportProps = () => ({
   lastExport: {
     progressId: '9000',
-    workflowState: 'completed'
+    workflowState: 'completed',
   },
   attachment: {
     id: '691',
     downloadUrl: 'http://downloadUrl',
     updatedAt: '2009-01-20T17:00:00Z',
-    createdAt: '2009-01-20T17:00:00Z'
-  }
+    createdAt: '2009-01-20T17:00:00Z',
+  },
 })
 
 describe('EnhancedActionMenu', () => {
@@ -105,12 +105,12 @@ describe('EnhancedActionMenu', () => {
 
   beforeEach(() => {
     props = {
-      ...workingMenuProps()
+      ...workingMenuProps(),
     }
 
     delete window.location
     window.location = {
-      href: ''
+      href: '',
     }
   })
 
@@ -122,7 +122,7 @@ describe('EnhancedActionMenu', () => {
     beforeEach(() => {
       props = {
         ...workingMenuProps(),
-        ...previousExportProps()
+        ...previousExportProps(),
       }
     })
 
@@ -136,7 +136,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Export')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Export Current Gradebook View'
+        name: 'Export Current Gradebook View',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -145,7 +145,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Export')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Export Entire Gradebook'
+        name: 'Export Entire Gradebook',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -154,7 +154,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Export')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Previous Export (Jan 20, 2009 at 5pm)'
+        name: 'Previous Export (Jan 20, 2009 at 5pm)',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -162,7 +162,7 @@ describe('EnhancedActionMenu', () => {
     it('updates the Previous Export date when export success', async () => {
       const exportResult = getPromise('resolved', {
         ...defaultResult,
-        updatedAt: '2021-05-12T13:00:00Z'
+        updatedAt: '2021-05-12T13:00:00Z',
       })
       const startExport = jest.spyOn(GradebookExportManager.prototype, 'startExport')
       startExport.mockReturnValue(exportResult)
@@ -173,7 +173,7 @@ describe('EnhancedActionMenu', () => {
         clickOnDropdown('Export')
       })
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Previous Export (May 12, 2021 at 1pm)'
+        name: 'Previous Export (May 12, 2021 at 1pm)',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -183,7 +183,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Export')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Previous Export (Jan 20, 2009 at 5pm)'
+        name: 'Previous Export (Jan 20, 2009 at 5pm)',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -192,7 +192,7 @@ describe('EnhancedActionMenu', () => {
       component = renderComponent(props)
       clickOnDropdown('Sync')
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Sync to Pinnacle'
+        name: 'Sync to Pinnacle',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -228,7 +228,7 @@ describe('EnhancedActionMenu', () => {
     let startExport
     beforeEach(() => {
       props = {
-        ...workingMenuProps()
+        ...workingMenuProps(),
       }
       startExport = jest.spyOn(GradebookExportManager.prototype, 'startExport')
       component = renderComponent(props)
@@ -396,7 +396,7 @@ describe('EnhancedActionMenu', () => {
     it('disables interaction with "Import" button when gradebook is not editable and context allows gradebook uploads', async () => {
       props = {
         ...workingMenuProps(),
-        gradebookIsEditable: false
+        gradebookIsEditable: false,
       }
       component = renderComponent(props)
       const specificMenuItem = document.querySelector('[data-menu-id="import"]').closest('button')
@@ -406,7 +406,7 @@ describe('EnhancedActionMenu', () => {
     it('disables interaction with "Import" when gradebook is editable but context does not allow gradebook uploads', async () => {
       props = {
         ...workingMenuProps(),
-        contextAllowsGradebookUploads: false
+        contextAllowsGradebookUploads: false,
       }
       component = renderComponent(props)
       const specificMenuItem = document.querySelector('[data-menu-id="import"]').closest('button')
@@ -423,7 +423,7 @@ describe('EnhancedActionMenu', () => {
 
     it('draws with "Sync to" label', async () => {
       const specificMenuItem = component.getByRole('menuitem', {
-        name: 'Sync to Pinnacle'
+        name: 'Sync to Pinnacle',
       })
       expect(specificMenuItem).toBeInTheDocument()
     })
@@ -470,8 +470,8 @@ describe('EnhancedActionMenu', () => {
       props = {
         ...props,
         publishGradesToSis: {
-          isEnabled: true
-        }
+          isEnabled: true,
+        },
       }
       component = renderComponent(props)
       clickOnDropdown('Sync')
@@ -484,8 +484,8 @@ describe('EnhancedActionMenu', () => {
         ...props,
         publishGradesToSis: {
           isEnabled: true,
-          publishToSisUrl: 'http://example.com'
-        }
+          publishToSisUrl: 'http://example.com',
+        },
       }
       component = renderComponent(props)
       clickOnDropdown('Sync')
@@ -498,8 +498,8 @@ describe('EnhancedActionMenu', () => {
         ...workingMenuProps(),
         publishGradesToSis: {
           isEnabled: true,
-          publishToSisUrl: 'http://example.com'
-        }
+          publishToSisUrl: 'http://example.com',
+        },
       }
       component = renderComponent(props)
       clickOnDropdown('Sync')

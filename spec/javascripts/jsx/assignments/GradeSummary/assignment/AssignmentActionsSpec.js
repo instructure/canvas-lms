@@ -30,9 +30,9 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
         gradesPublished: false,
         id: '2301',
         muted: true,
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
-      graders: [{graderId: '1101'}, {graderId: '1102'}]
+      graders: [{graderId: '1101'}, {graderId: '1102'}],
     })
   })
 
@@ -58,7 +58,7 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
 
         catch(callback) {
           rejectPromise = callback
-        }
+        },
       }
 
       sinon.stub(AssignmentApi, 'releaseGrades').callsFake((courseId, assignmentId) => {
@@ -136,7 +136,7 @@ QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
 
         catch(callback) {
           rejectPromise = callback
-        }
+        },
       }
 
       sinon.stub(AssignmentApi, 'unmuteAssignment').callsFake((courseId, assignmentId) => {

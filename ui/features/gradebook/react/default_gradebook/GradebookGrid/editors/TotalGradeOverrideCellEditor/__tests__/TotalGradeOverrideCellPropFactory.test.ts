@@ -37,10 +37,10 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
           ['B', 0.8],
           ['C', 0.7],
           ['D', 0.6],
-          ['F', 0.5]
+          ['F', 0.5],
         ],
         id: '2801',
-        title: 'Default Grading Scheme'
+        title: 'Default Grading Scheme',
       }
 
       // `gradebook` is a double because CoffeeScript and AMD cannot be imported
@@ -51,27 +51,27 @@ describe('GradebookGrid TotalGradeOverrideCellPropFactory', () => {
         },
 
         gradebookGrid: {
-          updateRowCell: sinon.stub()
+          updateRowCell: sinon.stub(),
         },
 
         isFilteringColumnsByGradingPeriod: sinon.stub().returns(false),
 
         studentCanReceiveGradeOverride(id) {
           return {1101: true, 1102: false}[id]
-        }
+        },
       }
 
       gradebook.finalGradeOverrides = new FinalGradeOverrides(gradebook)
       gradebook.finalGradeOverrides.setGrades({
         1101: {
           courseGrade: {
-            percentage: 88.1
-          }
-        }
+            percentage: 88.1,
+          },
+        },
       })
 
       editorOptions = {
-        item: {id: '1101'}
+        item: {id: '1101'},
       }
     })
 

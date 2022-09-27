@@ -25,7 +25,7 @@ const I18n = useI18nScope('gradebook')
 export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   static propTypes = {
     ...SubmissionCommentForm.propTypes,
-    createSubmissionComment: func.isRequired
+    createSubmissionComment: func.isRequired,
   }
 
   handleCancel(event) {
@@ -40,7 +40,7 @@ export default class SubmissionCommentCreateForm extends SubmissionCommentForm {
   buttonLabels() {
     return {
       cancelButtonLabel: I18n.t('Cancel Submitting Comment'),
-      submitButtonLabel: I18n.t('Submit Comment')
+      submitButtonLabel: I18n.t('Submit Comment'),
     }
   }
 

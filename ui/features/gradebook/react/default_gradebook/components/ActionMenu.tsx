@@ -81,8 +81,8 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     attachment: undefined,
     postGradesLtis: [],
     publishGradesToSis: {
-      publishToSisUrl: undefined
-    }
+      publishToSisUrl: undefined,
+    },
   }
 
   static gotoUrl(url) {
@@ -96,7 +96,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
 
     this.state = {
       exportInProgress: false,
-      previousExport: null
+      previousExport: null,
     }
     this.launchPostGrades = this.launchPostGrades.bind(this)
   }
@@ -122,7 +122,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     return {
       progressId: this.props.lastExport.progressId,
       attachmentId: this.props.attachment.id,
-      workflowState: this.props.lastExport.workflowState
+      workflowState: this.props.lastExport.workflowState,
     }
   }
 
@@ -150,7 +150,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
 
         const previousExport = {
           label: `${I18n.t('New Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-          attachmentUrl
+          attachmentUrl,
         }
 
         this.setState({previousExport})
@@ -204,7 +204,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
 
     return {
       label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(createdAt)})`,
-      attachmentUrl: attachment.downloadUrl
+      attachmentUrl: attachment.downloadUrl,
     }
   }
 
@@ -298,7 +298,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
       weight: 'normal',
       style: 'normal',
       size: 'medium',
-      color: 'primary'
+      color: 'primary',
     }
     const publishGradesToSis = this.renderPublishGradesToSis()
 

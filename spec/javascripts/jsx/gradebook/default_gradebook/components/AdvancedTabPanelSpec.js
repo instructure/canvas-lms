@@ -30,10 +30,10 @@ QUnit.module('GradebookSettingsModal AdvancedTabPanel', suiteHooks => {
 
     props = {
       courseSettings: {
-        allowFinalGradeOverride: false
+        allowFinalGradeOverride: false,
       },
 
-      onCourseSettingsChange: sinon.spy()
+      onCourseSettingsChange: sinon.spy(),
     }
   })
 

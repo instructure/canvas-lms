@@ -23,7 +23,7 @@ import {
   IconMiniArrowDownSolid,
   IconGradebookExportLine,
   IconGradebookImportLine,
-  IconSisSyncedLine
+  IconSisSyncedLine,
 } from '@instructure/ui-icons'
 import {Button} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -99,7 +99,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
     return {
       progressId: props.lastExport.progressId,
       attachmentId: props.attachment.id,
-      workflowState: props.lastExport.workflowState
+      workflowState: props.lastExport.workflowState,
     }
   }
 
@@ -127,7 +127,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
 
         const previousExportValue = {
           label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-          attachmentUrl
+          attachmentUrl,
         }
 
         setPreviousExportState(previousExportValue)
@@ -221,7 +221,7 @@ export default function EnhancedActionMenu(props: EnhancedActionMenuProps) {
 
     return {
       label: `${I18n.t('Previous Export')} (${DateHelper.formatDatetimeForDisplay(createdAt)})`,
-      attachmentUrl: attachment.downloadUrl
+      attachmentUrl: attachment.downloadUrl,
     }
   }
 
@@ -356,37 +356,37 @@ EnhancedActionMenu.propTypes = {
 
   lastExport: shape({
     progressId: string.isRequired,
-    workflowState: string.isRequired
+    workflowState: string.isRequired,
   }),
 
   attachment: shape({
     id: string.isRequired,
     downloadUrl: string.isRequired,
     updatedAt: string.isRequired,
-    createdAt: string.isRequired
+    createdAt: string.isRequired,
   }),
 
   postGradesLtis: arrayOf(
     shape({
       id: string.isRequired,
       name: string.isRequired,
-      onSelect: func.isRequired
+      onSelect: func.isRequired,
     })
   ),
 
   postGradesFeature: shape({
     enabled: bool.isRequired,
     store: object.isRequired,
-    returnFocusTo: object
+    returnFocusTo: object,
   }).isRequired,
 
   publishGradesToSis: shape({
     isEnabled: bool.isRequired,
-    publishToSisUrl: string
+    publishToSisUrl: string,
   }),
 
   gradingPeriodId: string.isRequired,
-  showStudentFirstLastName: bool
+  showStudentFirstLastName: bool,
 }
 
 EnhancedActionMenu.defaultProps = {
@@ -394,7 +394,7 @@ EnhancedActionMenu.defaultProps = {
   attachment: undefined,
   postGradesLtis: [],
   publishGradesToSis: {
-    publishToSisUrl: undefined
+    publishToSisUrl: undefined,
   },
-  showStudentFirstLastName: false
+  showStudentFirstLastName: false,
 }

@@ -25,13 +25,13 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
   static propTypes = {
     addGradebookElement: func,
     removeGradebookElement: func,
-    onHeaderKeyDown: func
+    onHeaderKeyDown: func,
   }
 
   static defaultProps = {
     addGradebookElement() {},
     removeGradebookElement() {},
-    onHeaderKeyDown() {}
+    onHeaderKeyDown() {},
   }
 
   constructor(props) {
@@ -44,7 +44,7 @@ export default class ColumnHeader<Props, State> extends React.Component<Props, S
     this.state = {
       hasFocus: false, // eslint-disable-line react/no-unused-state
       menuShown: false,
-      skipFocusOnClose: false
+      skipFocusOnClose: false,
     }
   }
 

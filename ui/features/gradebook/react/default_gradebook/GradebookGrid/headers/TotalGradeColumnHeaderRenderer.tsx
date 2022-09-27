@@ -52,7 +52,7 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
       currentDisplay: gradebook.options.show_total_grade_as_points ? 'points' : 'percentage',
       disabled: !gradebook.contentLoadStates.submissionsLoaded,
       hidden: gradebook.weightedGrades(),
-      onSelect: gradebook.togglePointsOrPercentTotals
+      onSelect: gradebook.togglePointsOrPercentTotals,
     },
 
     onHeaderKeyDown: event => {
@@ -66,7 +66,7 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
       isInBack,
       isInFront,
       onMoveToBack: gradebook.moveTotalGradeColumnToEnd,
-      onMoveToFront: gradebook.freezeTotalGradeColumn
+      onMoveToFront: gradebook.freezeTotalGradeColumn,
     },
 
     onApplyScoreToUngraded,
@@ -82,12 +82,12 @@ function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, optio
       onSortByGradeDescending: () => {
         gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
-    weightedGroups: gradebook.weightedGroups()
+    weightedGroups: gradebook.weightedGroups(),
   }
 }
 

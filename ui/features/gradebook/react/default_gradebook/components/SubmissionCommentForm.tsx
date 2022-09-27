@@ -31,11 +31,11 @@ export default class SubmissionCommentForm extends React.Component {
     cancelCommenting: func.isRequired,
     comment: string,
     processing: bool.isRequired,
-    setProcessing: func.isRequired
+    setProcessing: func.isRequired,
   }
 
   static defaultProps = {
-    comment: ''
+    comment: '',
   }
 
   constructor(props) {
@@ -46,7 +46,7 @@ export default class SubmissionCommentForm extends React.Component {
       'handleCommentChange',
       'handlePublishComment',
       'insertEmoji',
-      'focusTextarea'
+      'focusTextarea',
     ]
     methodsToBind.forEach(method => {
       this[method] = this[method].bind(this)
@@ -124,7 +124,7 @@ export default class SubmissionCommentForm extends React.Component {
               marginTop: '0rem',
               border: 'none',
               padding: '0rem',
-              background: 'transparent'
+              background: 'transparent',
             }}
           >
             <Button

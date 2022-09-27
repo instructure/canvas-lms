@@ -162,7 +162,7 @@ export default class AssignmentFieldValidator {
     name: this.isNameValid,
     dueAt: this.isDueAtValid,
     unlockAt: this.isUnlockAtValid,
-    lockAt: this.isLockAtValid
+    lockAt: this.isLockAtValid,
   }
 
   invalidFields = () => this.messages

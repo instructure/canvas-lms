@@ -79,20 +79,20 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
       // sort callbacks with additional sort options disabled
       onSortBySortableNameAscending: func.isRequired,
       onSortBySortableNameDescending: func.isRequired,
-      settingKey: string.isRequired
+      settingKey: string.isRequired,
     }).isRequired,
     selectedEnrollmentFilters: arrayOf(oneOf(studentRowHeaderConstants.enrollmentFilterKeys))
       .isRequired,
     onToggleEnrollmentFilter: func.isRequired,
     disabled: Menu.propTypes.disabled.isRequired,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
-    ...ColumnHeader.propTypes
+    ...ColumnHeader.propTypes,
   }
 
   static defaultProps = {
     loginHandleName: null,
     sisName: null,
-    ...ColumnHeader.defaultProps
+    ...ColumnHeader.defaultProps,
   }
 
   getColumnHeaderName() {
@@ -179,8 +179,8 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
         onSortByLoginId,
         onSortInAscendingOrder,
         onSortInDescendingOrder,
-        settingKey
-      }
+        settingKey,
+      },
     } = this.props
     const selectedSortSetting = isSortColumn && settingKey
     const selectedSortDirection = isSortColumn && direction

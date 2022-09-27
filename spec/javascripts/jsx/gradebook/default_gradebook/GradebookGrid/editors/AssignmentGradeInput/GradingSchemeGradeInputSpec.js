@@ -32,13 +32,13 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
 
   suiteHooks.beforeEach(() => {
     const assignment = {
-      pointsPossible: 10
+      pointsPossible: 10,
     }
     const submission = {
       enteredGrade: null,
       enteredScore: null,
       excused: false,
-      id: '2501'
+      id: '2501',
     }
     const gradingScheme = [
       ['A+', 0.97],
@@ -53,7 +53,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
       ['D+', 0.67],
       ['D', 0.63],
       ['D-', 0.6],
-      ['F', 0]
+      ['F', 0],
     ]
 
     props = {
@@ -70,7 +70,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
       onMenuShow() {
         resolveOpen()
       },
-      submission
+      submission,
     }
 
     $menuContent = null
@@ -170,7 +170,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
     test('displays "Excused" as the input value when the updated submission is excused', () => {
       mountComponent()
       wrapper.setProps({
-        submission: {...props.submission, excused: true, enteredScore: null, enteredGrade: null}
+        submission: {...props.submission, excused: true, enteredScore: null, enteredGrade: null},
       })
       equal(getTextInputValue(), 'Excused')
     })
@@ -215,7 +215,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
         props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
         mountComponent()
         wrapper.setProps({
-          submission: {...props.submission, enteredGrade: null, enteredScore: null}
+          submission: {...props.submission, enteredGrade: null, enteredScore: null},
         })
       })
 
@@ -310,7 +310,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
         props.submission = {...props.submission, enteredGrade: 'C', enteredScore: 7.6}
         mountComponent()
         wrapper.setProps({
-          submission: {...props.submission, enteredGrade: null, enteredScore: null, excused: true}
+          submission: {...props.submission, enteredGrade: null, enteredScore: null, excused: true},
         })
       })
 
@@ -338,7 +338,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
           excused: false,
           grade: 'B',
           score: 8.6,
-          valid: true
+          valid: true,
         }
         mountComponent()
       })
@@ -369,8 +369,8 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
             excused: false,
             grade: 'B',
             score: 8.6,
-            valid: true
-          }
+            valid: true,
+          },
         })
       })
 
@@ -398,7 +398,7 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
           excused: false,
           grade: 'B',
           score: 8.6,
-          valid: true
+          valid: true,
         }
         mountComponent()
         wrapper.setProps({
@@ -407,8 +407,8 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
             excused: false,
             grade: 'A',
             score: 9.3,
-            valid: true
-          }
+            valid: true,
+          },
         })
       })
 
@@ -436,12 +436,12 @@ QUnit.module('GradebookGrid AssignmentGradeInput using GradingSchemeGradeInput',
           excused: false,
           grade: 'B',
           score: 8.6,
-          valid: true
+          valid: true,
         }
         mountComponent()
         wrapper.setProps({
           pendingGradeInfo: null,
-          submission: {...props.submission, enteredGrade: 'B', enteredScore: 8.6}
+          submission: {...props.submission, enteredGrade: 'B', enteredScore: 8.6},
         })
       })
 

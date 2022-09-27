@@ -26,7 +26,7 @@ QUnit.module('DownloadSubmissionsDialogManager#constructor')
 test('constructs download url from given assignment data and url template', () => {
   const manager = new DownloadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url'
   )
@@ -40,7 +40,7 @@ test('returns true when submssion type includes online_upload and there is a sub
   const manager = new DownloadSubmissionsDialogManager(
     {
       submission_types: ['online_upload'],
-      has_submitted_submissions: true
+      has_submitted_submissions: true,
     },
     'the_url'
   )
@@ -51,7 +51,7 @@ test('returns true when submssion type includes online_text_entry and there is a
   const manager = new DownloadSubmissionsDialogManager(
     {
       submission_types: ['online_text_entry'],
-      has_submitted_submissions: true
+      has_submitted_submissions: true,
     },
     'the_url'
   )
@@ -62,7 +62,7 @@ test('returns true when submssion type includes online_url and there is a submit
   const manager = new DownloadSubmissionsDialogManager(
     {
       submission_types: ['online_url'],
-      has_submitted_submissions: true
+      has_submitted_submissions: true,
     },
     'the_url'
   )
@@ -73,7 +73,7 @@ test('returns false when submssion type does not include a valid submission type
   const manager = new DownloadSubmissionsDialogManager(
     {
       submission_types: ['foo'],
-      has_submitted_submissions: true
+      has_submitted_submissions: true,
     },
     'the_url'
   )
@@ -84,7 +84,7 @@ test('returns false when submssion type does includes a valid submission type an
   const manager = new DownloadSubmissionsDialogManager(
     {
       submission_types: ['online_url'],
-      has_submitted_submissions: false
+      has_submitted_submissions: false,
     },
     '/foo/bar'
   )
@@ -100,7 +100,7 @@ test('calls submissions downloading callback and opens downloadSubmissions dialo
     {
       id: 'the_id',
       submission_types: ['online_upload'],
-      has_submitted_submissions: true
+      has_submitted_submissions: true,
     },
     'the_{{ assignment_id }}_url',
     submissionsDownloading

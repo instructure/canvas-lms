@@ -31,7 +31,7 @@ import {
   fetchLatePolicy,
   createLatePolicy,
   updateCourseSettings,
-  updateLatePolicy
+  updateLatePolicy,
 } from '../apis/GradebookSettingsModalApi'
 import {getAssignmentPostPolicies, setCoursePostPolicy} from '../PostPolicies/PostPolicyApi'
 import LatePoliciesTabPanel from './LatePoliciesTabPanel'
@@ -99,11 +99,11 @@ export default class GradebookSettingsModal extends React.Component {
     allowShowSeparateFirstLastNames: bool,
     anonymousAssignmentsPresent: bool,
     courseFeatures: shape({
-      finalGradeOverrideEnabled: bool.isRequired
+      finalGradeOverrideEnabled: bool.isRequired,
     }).isRequired,
     courseId: string.isRequired,
     courseSettings: shape({
-      allowFinalGradeOverride: bool.isRequired
+      allowFinalGradeOverride: bool.isRequired,
     }).isRequired,
     locale: string.isRequired,
     onClose: func.isRequired,
@@ -116,30 +116,31 @@ export default class GradebookSettingsModal extends React.Component {
     onViewOptionsUpdated: func.isRequired,
     postPolicies: shape({
       coursePostPolicy: shape({
-        postManually: bool.isRequired
+        postManually: bool.isRequired,
       }),
       setAssignmentPostPolicies: func.isRequired,
-      setCoursePostPolicy: func.isRequired
-    })
+      setCoursePostPolicy: func.isRequired,
+    }),
   }
 
   static defaultProps = {
-    onEntered() {}
+    onEntered() {},
   }
 
   state = {
     courseSettings: {
-      allowFinalGradeOverride: this.props.courseSettings.allowFinalGradeOverride
+      allowFinalGradeOverride: this.props.courseSettings.allowFinalGradeOverride,
     },
     isOpen: false,
     latePolicy: {changes: {}, validationErrors: {}},
     coursePostPolicy: {
-      postManually: this.props.postPolicies && this.props.postPolicies.coursePostPolicy.postManually
+      postManually:
+        this.props.postPolicies && this.props.postPolicies.coursePostPolicy.postManually,
     },
     processingRequests: false,
     selectedTab: 'tab-panel-late',
     viewOptions: this.props.loadCurrentViewOptions?.(),
-    viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
+    viewOptionsLastSaved: this.props.loadCurrentViewOptions?.(),
   }
 
   onFetchLatePolicySuccess = ({data}) => {
@@ -171,7 +172,7 @@ export default class GradebookSettingsModal extends React.Component {
       .then(() =>
         this.props.onLatePolicyUpdate({
           ...this.state.latePolicy.data,
-          ...this.state.latePolicy.changes
+          ...this.state.latePolicy.changes,
         })
       )
       .catch(this.onSaveLatePolicyFailure)
@@ -187,7 +188,7 @@ export default class GradebookSettingsModal extends React.Component {
   savePostPolicy = () =>
     setCoursePostPolicy({
       courseId: this.props.courseId,
-      postManually: this.state.coursePostPolicy.postManually
+      postManually: this.state.coursePostPolicy.postManually,
     })
       .then(_response => getAssignmentPostPolicies({courseId: this.props.courseId}))
       .then(response => {
@@ -269,7 +270,7 @@ export default class GradebookSettingsModal extends React.Component {
       // instead of on close, because doing the latter causes the reverted
       // settings to be briefly visible.
       viewOptions: this.props.loadCurrentViewOptions?.(),
-      viewOptionsLastSaved: this.props.loadCurrentViewOptions?.()
+      viewOptionsLastSaved: this.props.loadCurrentViewOptions?.(),
     }))
   }
 
@@ -383,44 +384,44 @@ export default class GradebookSettingsModal extends React.Component {
                       modulesEnabled: this.props.allowSortingByModules,
                       onChange: ({criterion, direction}) => {
                         this.setViewOption('columnSortSettings', {criterion, direction})
-                      }
+                      },
                     }}
                     statusColors={{
                       currentValues: this.state.viewOptions.statusColors,
                       onChange: colors => {
                         this.setViewOption('statusColors', colors)
-                      }
+                      },
                     }}
                     showNotes={{
                       checked: this.state.viewOptions.showNotes,
                       onChange: value => {
                         this.setViewOption('showNotes', value)
-                      }
+                      },
                     }}
                     showUnpublishedAssignments={{
                       checked: this.state.viewOptions.showUnpublishedAssignments,
                       onChange: value => {
                         this.setViewOption('showUnpublishedAssignments', value)
-                      }
+                      },
                     }}
                     showSeparateFirstLastNames={{
                       allowed: this.props.allowShowSeparateFirstLastNames,
                       checked: this.state.viewOptions.showSeparateFirstLastNames,
                       onChange: value => {
                         this.setViewOption('showSeparateFirstLastNames', value)
-                      }
+                      },
                     }}
                     hideAssignmentGroupTotals={{
                       checked: this.state.viewOptions.hideAssignmentGroupTotals,
                       onChange: value => {
                         this.setViewOption('hideAssignmentGroupTotals', value)
-                      }
+                      },
                     }}
                     hideTotal={{
                       checked: this.state.viewOptions.hideTotal,
                       onChange: value => {
                         this.setViewOption('hideTotal', value)
-                      }
+                      },
                     }}
                     viewUngradedAsZero={{
                       allowed: this.props.allowViewUngradedAsZero,
@@ -430,9 +431,9 @@ export default class GradebookSettingsModal extends React.Component {
                           currentValue: this.state.viewOptions.viewUngradedAsZero,
                           onAccepted: () => {
                             this.setViewOption('viewUngradedAsZero', newValue)
-                          }
+                          },
                         })
-                      }
+                      },
                     }}
                   />
                 </Tabs.Panel>

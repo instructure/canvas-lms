@@ -41,8 +41,8 @@ describe('assignments 2 teacher view toolbox', () => {
     const assignment = mockAssignment({
       needsGradingCount: 1,
       submissions: {
-        nodes: [mockSubmission({submittedAt: null}), mockSubmission()]
-      }
+        nodes: [mockSubmission({submittedAt: null}), mockSubmission()],
+      },
     })
 
     const {getByLabelText, getByTestId} = renderToolbox(assignment)

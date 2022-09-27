@@ -24,8 +24,8 @@ export default {
   component: AnonymousSpeedGraderAlert,
   args: {
     speedGraderUrl: '',
-    onClose: () => {}
-  }
+    onClose: () => {},
+  },
 }
 
 function openAnonymousSpeedGraderAlertRef(alert) {

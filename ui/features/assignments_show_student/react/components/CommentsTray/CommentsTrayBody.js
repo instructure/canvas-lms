@@ -43,11 +43,11 @@ export default function CommentsTrayBody(props) {
 
   const queryVariables = {
     submissionId: props.submission.id,
-    submissionAttempt: props.submission.attempt
+    submissionAttempt: props.submission.attempt,
   }
 
   const {loading, error, data, fetchMore} = useQuery(SUBMISSION_COMMENT_QUERY, {
-    variables: queryVariables
+    variables: queryVariables,
   })
 
   const loadMoreComments = async () => {
@@ -55,7 +55,7 @@ export default function CommentsTrayBody(props) {
     await fetchMore({
       variables: {
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
-        ...queryVariables
+        ...queryVariables,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         const newNodes = fetchMoreResult.submissionComments.commentsConnection.nodes
@@ -67,7 +67,7 @@ export default function CommentsTrayBody(props) {
           results.submissionComments.commentsConnection.nodes.push(...newNodes)
         }
         return results
-      }
+      },
     })
     setIsFetchingMoreComments(false)
   }
@@ -161,9 +161,9 @@ CommentsTrayBody.propTypes = {
   assignment: Assignment.shape.isRequired,
   submission: Submission.shape.isRequired,
   reviewerSubmission: Submission.shape,
-  isPeerReviewEnabled: bool
+  isPeerReviewEnabled: bool,
 }
 
 CommentsTrayBody.defaultProps = {
-  isPeerReviewEnabled: false
+  isPeerReviewEnabled: false,
 }

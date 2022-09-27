@@ -48,13 +48,13 @@ AssignmentGroupFilter.propTypes = {
   assignmentGroups: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
 
-  selectedAssignmentGroupId: string
+  selectedAssignmentGroupId: string,
 }
 
 AssignmentGroupFilter.defaultProps = {
-  selectedAssignmentGroupId: null
+  selectedAssignmentGroupId: null,
 }

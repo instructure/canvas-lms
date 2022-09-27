@@ -20,7 +20,7 @@ import {shape, string} from 'prop-types'
 
 const SubmitOptionShape = shape({
   key: string.isRequired,
-  display: string.isRequired
+  display: string.isRequired,
 })
 
 export default SubmitOptionShape

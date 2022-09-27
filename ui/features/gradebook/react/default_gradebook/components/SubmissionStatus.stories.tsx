@@ -26,7 +26,7 @@ export default {
     assignment: {
       anonymizeStudents: false,
       postManually: false,
-      published: true
+      published: true,
     },
     isConcluded: false,
     isInClosedGradingPeriod: false,
@@ -39,9 +39,9 @@ export default {
       hasPostableComments: false,
       postedAt: Date.now,
       score: 10,
-      workflowState: 'graded'
-    }
-  }
+      workflowState: 'graded',
+    },
+  },
 }
 
 const Template = args => <SubmissionStatus {...args} />
@@ -60,14 +60,14 @@ export const NotCountedForScore = Template.bind({})
 Excused.args = {
   submission: {
     excused: true,
-    postedAt: Date.now
-  }
+    postedAt: Date.now,
+  },
 }
 
 Dropped.args = {
   submission: {
-    drop: true
-  }
+    drop: true,
+  },
 }
 
 Hidden.args = {
@@ -75,32 +75,32 @@ Hidden.args = {
     hasPostableComments: false,
     postedAt: false,
     score: 10,
-    workflowState: 'graded'
-  }
+    workflowState: 'graded',
+  },
 }
 
 Unpublished.args = {
   assignment: {
-    published: false
-  }
+    published: false,
+  },
 }
 
 Concluded.args = {
-  isConcluded: true
+  isConcluded: true,
 }
 
 ClosedGradingPeriod.args = {
-  isInClosedGradingPeriod: true
+  isInClosedGradingPeriod: true,
 }
 
 NoGradingPeriod.args = {
-  isInNoGradingPeriod: true
+  isInNoGradingPeriod: true,
 }
 
 OtherGradingPeriod.args = {
-  isInOtherGradingPeriod: true
+  isInOtherGradingPeriod: true,
 }
 
 NotCountedForScore.args = {
-  isNotCountedForScore: true
+  isNotCountedForScore: true,
 }

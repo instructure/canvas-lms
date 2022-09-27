@@ -30,7 +30,7 @@ QUnit.module('PostPolicyApi', () => {
         {
           request: {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
-            variables: {courseId: VALID_COURSE_ID, postManually: true}
+            variables: {courseId: VALID_COURSE_ID, postManually: true},
           },
 
           result: {
@@ -40,17 +40,17 @@ QUnit.module('PostPolicyApi', () => {
                 errors: [],
                 postPolicy: {
                   postManually: true,
-                  __typename: 'PostPolicy'
-                }
-              }
-            }
-          }
+                  __typename: 'PostPolicy',
+                },
+              },
+            },
+          },
         },
 
         {
           request: {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
-            variables: {courseId: ERROR_COURSE_ID, postManually: true}
+            variables: {courseId: ERROR_COURSE_ID, postManually: true},
           },
 
           result: {
@@ -59,24 +59,24 @@ QUnit.module('PostPolicyApi', () => {
                 __typename: 'SetCoursePostPolicy',
                 errors: [
                   {__typename: 'Error', attribute: 'badness', message: 'oh no'},
-                  {__typename: 'Error', attribute: 'more badness', message: 'oh nooooo'}
+                  {__typename: 'Error', attribute: 'more badness', message: 'oh nooooo'},
                 ],
-                postPolicy: null
-              }
-            }
-          }
+                postPolicy: null,
+              },
+            },
+          },
         },
 
         {
           request: {
             query: PostPolicyApi.SET_COURSE_POST_POLICY_MUTATION,
-            variables: {courseId: BAD_RESPONSE_COURSE_ID, postManually: true}
+            variables: {courseId: BAD_RESPONSE_COURSE_ID, postManually: true},
           },
 
           result: {
-            data: {}
-          }
-        }
+            data: {},
+          },
+        },
       ])
     })
 
@@ -87,7 +87,7 @@ QUnit.module('PostPolicyApi', () => {
     test('returns the postManually value if the response includes a postPolicy object', async () => {
       const result = await PostPolicyApi.setCoursePostPolicy({
         courseId: VALID_COURSE_ID,
-        postManually: true
+        postManually: true,
       })
       strictEqual(result.postManually, true)
     })
@@ -95,7 +95,7 @@ QUnit.module('PostPolicyApi', () => {
     test('returns the first error if the response includes errors', async () => {
       PostPolicyApi.setCoursePostPolicy({
         courseId: ERROR_COURSE_ID,
-        postManually: true
+        postManually: true,
       }).catch(error => {
         strictEqual(error.message, 'oh no')
       })
@@ -104,7 +104,7 @@ QUnit.module('PostPolicyApi', () => {
     test('returns an error if the response provides neither a postPolicy object nor an error', async () => {
       PostPolicyApi.setCoursePostPolicy({
         courseId: BAD_RESPONSE_COURSE_ID,
-        postManually: true
+        postManually: true,
       }).catch(error => {
         strictEqual(error.message, 'no postPolicy or error provided in response')
       })
@@ -121,7 +121,7 @@ QUnit.module('PostPolicyApi', () => {
         {
           request: {
             query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-            variables: {courseId: VALID_COURSE_ID}
+            variables: {courseId: VALID_COURSE_ID},
           },
 
           result: {
@@ -136,28 +136,28 @@ QUnit.module('PostPolicyApi', () => {
                       _id: '1234',
                       postPolicy: {
                         __typename: 'PostPolicy',
-                        postManually: true
-                      }
+                        postManually: true,
+                      },
                     },
                     {
                       __typename: 'Assignment',
                       _id: '4567',
                       postPolicy: {
                         __typename: 'PostPolicy',
-                        postManually: false
-                      }
-                    }
-                  ]
+                        postManually: false,
+                      },
+                    },
+                  ],
                 },
-                errors: []
-              }
-            }
-          }
+                errors: [],
+              },
+            },
+          },
         },
         {
           request: {
             query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-            variables: {courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID}
+            variables: {courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID},
           },
 
           result: {
@@ -170,27 +170,27 @@ QUnit.module('PostPolicyApi', () => {
                     {
                       __typename: 'Assignment',
                       _id: '1234',
-                      postPolicy: null
-                    }
-                  ]
+                      postPolicy: null,
+                    },
+                  ],
                 },
-                errors: []
-              }
-            }
-          }
+                errors: [],
+              },
+            },
+          },
         },
         {
           request: {
             query: PostPolicyApi.COURSE_ASSIGNMENT_POST_POLICIES_QUERY,
-            variables: {courseId: NO_COURSE_IN_RESPONSE_COURSE_ID}
+            variables: {courseId: NO_COURSE_IN_RESPONSE_COURSE_ID},
           },
 
           result: {
             data: {
-              course: null
-            }
-          }
-        }
+              course: null,
+            },
+          },
+        },
       ])
     })
 
@@ -202,13 +202,13 @@ QUnit.module('PostPolicyApi', () => {
       const result = await PostPolicyApi.getAssignmentPostPolicies({courseId: VALID_COURSE_ID})
       deepEqual(result.assignmentPostPoliciesById, {
         1234: {postManually: true},
-        4567: {postManually: false}
+        4567: {postManually: false},
       })
     })
 
     test('returns an error if no course object is found in the response', async () => {
       PostPolicyApi.getAssignmentPostPolicies({
-        courseId: NO_COURSE_IN_RESPONSE_COURSE_ID
+        courseId: NO_COURSE_IN_RESPONSE_COURSE_ID,
       }).catch(error => {
         strictEqual(error.message, 'no course provided in response')
       })
@@ -216,7 +216,7 @@ QUnit.module('PostPolicyApi', () => {
 
     test('omits assignments returned with a null post policy from the results', async () => {
       const result = await PostPolicyApi.getAssignmentPostPolicies({
-        courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID
+        courseId: NULL_ASSIGNMENT_POLICY_COURSE_ID,
       })
       deepEqual(result.assignmentPostPoliciesById, {})
     })

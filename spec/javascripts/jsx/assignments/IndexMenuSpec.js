@@ -30,7 +30,7 @@ const generateProps = (overrides, initialState = {}) => {
   const state = {
     externalTools: [],
     selectedTool: null,
-    ...initialState
+    ...initialState,
   }
   return {
     store: createFakeStore(state),
@@ -43,7 +43,7 @@ const generateProps = (overrides, initialState = {}) => {
     sisName: 'PowerSchool',
     postToSisDefault: ENV.POST_TO_SIS_DEFAULT,
     hasAssignments: ENV.HAS_ASSIGNMENTS,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -54,7 +54,7 @@ const context = {}
 const beforeEach = () => {
   context.sinon = sinon.createSandbox()
   context.sinon.stub(Actions, 'apiGetLaunches').returns({
-    type: 'STUB_API_GET_TOOLS'
+    type: 'STUB_API_GET_TOOLS',
   })
 }
 
@@ -145,8 +145,8 @@ testCase('renders iframe when there is a selectedTool in state', () => {
         modalIsOpen: true,
         selectedTool: {
           placements: {course_assignments_menu: {title: 'foo'}},
-          definition_id: 100
-        }
+          definition_id: 100,
+        },
       }
     )
   )
@@ -209,12 +209,12 @@ testCase('renders a dropdown menu with one option when sync to sis conditions ar
 testCase('reloads the page when receiving a deep linking message', async () => {
   ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'https://www.test.com'
   ENV.FEATURES = {
-    lti_multiple_assignment_deep_linking: true
+    lti_multiple_assignment_deep_linking: true,
   }
   const message = overrides => ({
     origin: 'https://www.test.com',
     data: {subject: 'LtiDeepLinkingResponse'},
-    ...overrides
+    ...overrides,
   })
   const initialState = {modalIsOpen: true}
   const component = renderComponent(generateProps({}, initialState))

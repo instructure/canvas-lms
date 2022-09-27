@@ -33,7 +33,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
     gradebook.gridData.columns.scrollable = ['total_grade']
     gradebook.gridData.columns.definitions = {
       student: {id: 'student'},
-      total_grade: {id: 'total_grade'}
+      total_grade: {id: 'total_grade'},
     }
 
     gradebookGrid = new GradebookGrid({
@@ -41,7 +41,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
       activeBorderColor: '#FFFFFF',
       data: gradebook.gridData,
       editable: true,
-      gradebook
+      gradebook,
     })
   })
 
@@ -64,7 +64,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
         {id: 'assignment_2301'},
         {id: 'assignment_2302'},
         {id: 'assignment_group_2201'},
-        {id: 'total_grade'}
+        {id: 'total_grade'},
       ]
       columns.forEach(column => {
         gradebook.gridData.columns.definitions[column.id] = column
@@ -87,7 +87,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
         'assignment_2301',
         'assignment_2302',
         'assignment_group_2201',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(columnIds, expected)
     })
@@ -107,7 +107,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
         {id: 'assignment_2301'},
         {id: 'assignment_2302'},
         {id: 'assignment_group_2201'},
-        {id: 'total_grade'}
+        {id: 'total_grade'},
       ]
       columns.forEach(column => {
         gradebook.gridData.columns.definitions[column.id] = column
@@ -130,7 +130,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
         'assignment_2301',
         'assignment_2302',
         'assignment_group_2201',
-        'total_grade'
+        'total_grade',
       ]
       deepEqual(columnIds, expected)
     })
@@ -156,7 +156,7 @@ QUnit.module('GradebookGrid', suiteHooks => {
         {id: 'assignment_2301'},
         {id: 'assignment_2302'},
         {id: 'assignment_group_2201'},
-        {id: 'total_grade'}
+        {id: 'total_grade'},
       ]
       columns.forEach(column => {
         gradebook.gridData.columns.definitions[column.id] = column

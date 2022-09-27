@@ -39,8 +39,8 @@ export default class GradePostingPolicyTabPanel extends Component {
     gradebookIsEditable: bool.isRequired,
     onChange: func.isRequired,
     settings: shape({
-      postManually: bool.isRequired
-    }).isRequired
+      postManually: bool.isRequired,
+    }).isRequired,
   }
 
   constructor(props) {
@@ -55,7 +55,7 @@ export default class GradePostingPolicyTabPanel extends Component {
         message: I18n.t(
           'Anonymous assignments are hidden by default and will need to be posted manually even if the course setting is set to Automatic.'
         ),
-        type: 'warning'
+        type: 'warning',
       })
     }
 

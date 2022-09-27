@@ -58,7 +58,7 @@ function formatGrade(submissionData, assignment, options) {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
     pointsPossible: assignment.points_possible,
-    version: 'final'
+    version: 'final',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submissionData, formatOptions)
@@ -142,7 +142,7 @@ export default class AssignmentCellFormatter {
       },
       showUpdatedSimilarityScore() {
         return gradebook.options.show_similarity_score
-      }
+      },
     }
   }
 
@@ -165,7 +165,7 @@ export default class AssignmentCellFormatter {
     const assignmentData = {
       id: assignment.id,
       pointsPossible: assignment.points_possible,
-      submissionTypes: assignment.submission_types
+      submissionTypes: assignment.submission_types,
     }
 
     const submissionData = {
@@ -176,12 +176,12 @@ export default class AssignmentCellFormatter {
       late: submission.late,
       missing: submission.missing,
       resubmitted: submission.grade_matches_current_submission === false,
-      score: submission.score
+      score: submission.score,
     }
 
     const pendingGradeInfo = this.options.getPendingGradeInfo({
       assignmentId: assignment.id,
-      userId: student.id
+      userId: student.id,
     })
     if (pendingGradeInfo) {
       submissionData.grade = pendingGradeInfo.grade
@@ -197,7 +197,7 @@ export default class AssignmentCellFormatter {
       disabled: student.isConcluded || submissionState.locked,
       hidden: submissionState.hideGrade,
       invalid: !!pendingGradeInfo && !pendingGradeInfo.valid,
-      showUnpostedIndicator
+      showUnpostedIndicator,
     }
 
     if (this.options.showUpdatedSimilarityScore()) {

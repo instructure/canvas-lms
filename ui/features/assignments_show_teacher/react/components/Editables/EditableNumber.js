@@ -42,7 +42,7 @@ export default class EditableNumber extends React.Component {
     onInput: func, // called as the user types.
     inline: bool,
     required: bool,
-    size: oneOf(['medium', 'large'])
+    size: oneOf(['medium', 'large']),
   }
 
   static defaultProps = {
@@ -51,7 +51,7 @@ export default class EditableNumber extends React.Component {
     readOnly: false,
     required: false,
     size: 'medium',
-    onInputChange: () => {}
+    onInputChange: () => {},
   }
 
   constructor(props) {
@@ -59,7 +59,7 @@ export default class EditableNumber extends React.Component {
 
     const strValue = `${props.value}`
     this.state = {
-      initialValue: strValue
+      initialValue: strValue,
     }
 
     this._inputRef = null
@@ -71,7 +71,7 @@ export default class EditableNumber extends React.Component {
   static getDerivedStateFromProps(props, _state) {
     if (props.mode === 'view') {
       return {
-        initialValue: props.value
+        initialValue: props.value,
       }
     }
     return null
@@ -243,7 +243,7 @@ export default class EditableNumber extends React.Component {
             position: 'absolute',
             display: 'inline-block',
             top: '-1000px',
-            fontSize: this.getFontSize()
+            fontSize: this.getFontSize(),
           }}
           ref={this.getHiddenTextRef}
         >

@@ -46,8 +46,8 @@ describe('when a submission is graded', () => {
       const submission = await mockSubmission({
         Submission: {
           ...SubmissionMocks.graded,
-          attempt: 0
-        }
+          attempt: 0,
+        },
       })
 
       const {queryByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
@@ -57,7 +57,7 @@ describe('when a submission is graded', () => {
 
   it('renders as "Submitted" when the grade is not visible', async () => {
     const submission = await mockSubmission({
-      Submission: {...SubmissionMocks.graded, gradeHidden: true}
+      Submission: {...SubmissionMocks.graded, gradeHidden: true},
     })
 
     const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)
@@ -82,7 +82,7 @@ it('renders the time submitted when the student has submitted', async () => {
 
 it('renders as "In Progress" when the student has not yet submitted', async () => {
   const submission = await mockSubmission({
-    Submission: {...SubmissionMocks.onlineUploadReadyToSubmit}
+    Submission: {...SubmissionMocks.onlineUploadReadyToSubmit},
   })
 
   const {getByTestId} = render(<SubmissionWorkflowTracker submission={submission} />)

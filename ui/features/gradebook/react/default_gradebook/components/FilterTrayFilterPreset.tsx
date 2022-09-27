@@ -66,7 +66,7 @@ export default function FilterTrayPreset({
   onToggle,
   isExpanded,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterTrayPresetProps) {
   const [name, setName] = useState(filterPreset.name)
   const [filterPresetWasChanged, setFilterPresetWasChanged] = useState(false)
@@ -100,7 +100,7 @@ export default function FilterTrayPreset({
       onCreate({
         ...filterPreset,
         name,
-        filters: stagedFilters.filter(isFilterNotEmpty)
+        filters: stagedFilters.filter(isFilterNotEmpty),
       })
       setName('')
       setStagedFilters(filterPreset.filters)
@@ -113,7 +113,7 @@ export default function FilterTrayPreset({
       const updatedFilter = {
         ...filterPreset,
         name,
-        filters: stagedFilters.filter(isFilterNotEmpty)
+        filters: stagedFilters.filter(isFilterNotEmpty),
       } as FilterPreset
       onUpdate(updatedFilter)
       setFilterPresetWasChanged(false)
@@ -128,7 +128,7 @@ export default function FilterTrayPreset({
       id: uuid.v4(),
       type,
       value: undefined,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     }
 
   const sectionFilter = sections.length > 0 ? ensureFilter(stagedFilters, 'section') : undefined
@@ -158,7 +158,7 @@ export default function FilterTrayPreset({
 
   const filtersAlwaysShownChunks = [
     [gradingPeriodFilter, submissionFilter],
-    [startDateFilter, endDateFilter]
+    [startDateFilter, endDateFilter],
   ]
 
   const isSaveButtonEnabled =
@@ -169,7 +169,7 @@ export default function FilterTrayPreset({
   return (
     <ToggleGroup
       toggleLabel={I18n.t('Toggle %{filterPresetName}', {
-        filterPresetName: filterPreset.name || I18n.t('Create Filter Preset')
+        filterPresetName: filterPreset.name || I18n.t('Create Filter Preset'),
       })}
       onToggle={(_event: React.MouseEvent, expanded: boolean) => {
         onToggle(expanded)
@@ -190,10 +190,10 @@ export default function FilterTrayPreset({
                     {
                       zero: 'No Filters',
                       one: '1 Filter',
-                      other: '{{count}} Filters'
+                      other: '{{count}} Filters',
                     },
                     {
-                      count: stagedFilters.filter(isFilterNotEmpty).length
+                      count: stagedFilters.filter(isFilterNotEmpty).length,
                     }
                   )}
                 </Text>

@@ -26,8 +26,8 @@ function getAssignmentsByName(courseId, searchTerm) {
 
   const params = {
     params: {
-      search_term: searchTerm
-    }
+      search_term: searchTerm,
+    },
   }
 
   const url = encodeURI(`/api/v1/courses/${courseId}/assignments`)
@@ -41,5 +41,5 @@ function getAssignmentsNextPage(url) {
 
 export default {
   getAssignmentsByName,
-  getAssignmentsNextPage
+  getAssignmentsNextPage,
 }

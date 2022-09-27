@@ -31,7 +31,7 @@ export default class TotalGradeOverrideCellPropFactory {
     const pendingGradeInfo = finalGradeOverrides.getPendingGradeInfoForUser(userId)
 
     const gradeEntry = new GradeOverrideEntry({
-      gradingScheme: this._gradebook.getCourseGradingScheme()
+      gradingScheme: this._gradebook.getCourseGradingScheme(),
     })
 
     return {
@@ -44,7 +44,7 @@ export default class TotalGradeOverrideCellPropFactory {
       },
 
       pendingGradeInfo,
-      studentIsGradeable: this._gradebook.studentCanReceiveGradeOverride(userId)
+      studentIsGradeable: this._gradebook.studentCanReceiveGradeOverride(userId),
     }
   }
 }

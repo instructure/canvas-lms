@@ -39,16 +39,16 @@ QUnit.module('GradebookGrid GradeInput', suiteHooks => {
           ['B', 0.8],
           ['C', 0.7],
           ['D', 0.6],
-          ['F', 0]
-        ]
-      }
+          ['F', 0],
+        ],
+      },
     })
 
     props = {
       disabled: false,
       gradeEntry,
       gradeInfo: gradeEntry.gradeInfoFromGrade(null),
-      pendingGradeInfo: null
+      pendingGradeInfo: null,
     }
   })
 

@@ -23,14 +23,14 @@ import type {
   CourseContent,
   GradebookOptions,
   GradebookSettings,
-  InitialActionStates
+  InitialActionStates,
 } from './gradebook.d'
 import type {GridDisplaySettings, FilterColumnsOptions} from './grid.d'
 import {camelize} from 'convert-case'
 
 export function getInitialGradebookContent(options) {
   return {
-    customColumns: options.teacher_notes ? [options.teacher_notes] : []
+    customColumns: options.teacher_notes ? [options.teacher_notes] : [],
   }
 }
 
@@ -53,14 +53,14 @@ export function getInitialGridDisplaySettings(
     gradingPeriodId: null,
     submissions: null,
     startDate: null,
-    endDate: null
+    endDate: null,
   }
   if (settings.filter_columns_by != null) {
     Object.assign(filterColumnsBy, camelize(settings.filter_columns_by))
   }
   const filterRowsBy = {
     sectionId: null,
-    studentGroupId: null
+    studentGroupId: null,
   }
   if (settings.filter_rows_by != null) {
     Object.assign(filterRowsBy, camelize(settings.filter_rows_by))
@@ -77,12 +77,12 @@ export function getInitialGridDisplaySettings(
     selectedViewOptionsFilters: settings.selected_view_options_filters || [],
     showEnrollments: {
       concluded: false,
-      inactive: false
+      inactive: false,
     },
     sortRowsBy: {
       columnId: sortRowsByColumnId, // the column controlling the sort
       settingKey: sortRowsBySettingKey, // the key describing the sort criteria
-      direction: sortRowsByDirection // the direction of the sort
+      direction: sortRowsByDirection, // the direction of the sort
     },
     submissionTray: {
       open: false,
@@ -91,11 +91,11 @@ export function getInitialGridDisplaySettings(
       comments: [],
       commentsLoaded: false,
       commentsUpdating: false,
-      editedCommentId: null
+      editedCommentId: null,
     },
     showUnpublishedAssignments: settings.show_unpublished_assignments === 'true',
     showSeparateFirstLastNames: settings.show_separate_first_last_names === 'true',
-    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true'
+    viewUngradedAsZero: settings.view_ungraded_as_zero === 'true',
   }
 }
 
@@ -110,19 +110,19 @@ export function getInitialContentLoadStates(options): ContentLoadStates {
     studentIdsLoaded: false,
     studentsLoaded: false,
     submissionsLoaded: false,
-    teacherNotesColumnUpdating: false
+    teacherNotesColumnUpdating: false,
   }
 }
 
 export function getInitialCourseContent(options: GradebookOptions): CourseContent {
   const courseGradingScheme = options.grading_standard
     ? {
-        data: options.grading_standard
+        data: options.grading_standard,
       }
     : null
   const defaultGradingScheme = options.default_grading_standard
     ? {
-        data: options.default_grading_standard
+        data: options.default_grading_standard,
       }
     : null
   return {
@@ -134,13 +134,13 @@ export function getInitialCourseContent(options: GradebookOptions): CourseConten
     assignmentStudentVisibility: {},
     latePolicy: options.late_policy ? camelize(options.late_policy) : undefined,
     students: new StudentDatastore({}, {}),
-    modulesById: {}
+    modulesById: {},
   }
 }
 
 export function getInitialActionStates(): InitialActionStates {
   return {
-    pendingGradeInfo: []
+    pendingGradeInfo: [],
   }
 }
 
@@ -148,19 +148,19 @@ export const columnWidths = {
   assignment: {
     min: 10,
     default_max: 200,
-    max: 400
+    max: 400,
   },
   assignmentGroup: {
     min: 35,
     default_max: 200,
-    max: 400
+    max: 400,
   },
   total: {
     min: 95,
-    max: 400
+    max: 400,
   },
   total_grade_override: {
     min: 95,
-    max: 400
-  }
+    max: 400,
+  },
 }

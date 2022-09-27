@@ -35,7 +35,7 @@ class AssignmentConfigurationTools extends React.Component {
     secureParams: PropTypes.string.isRequired,
     selectedTool: PropTypes.number,
     selectedToolType: PropTypes.string,
-    visibilitySetting: PropTypes.string
+    visibilitySetting: PropTypes.string,
   }
 
   state = {
@@ -46,7 +46,7 @@ class AssignmentConfigurationTools extends React.Component {
     beforeExternalContentAlertClass: 'screenreader-only',
     afterExternalContentAlertClass: 'screenreader-only',
     iframeStyle: {},
-    visibilityEnabled: !!this.props.selectedTool
+    visibilityEnabled: !!this.props.selectedTool,
   }
 
   componentWillMount() {
@@ -65,7 +65,7 @@ class AssignmentConfigurationTools extends React.Component {
     const self = this
     const toolsUrl = this.getDefinitionsUrl()
     const data = {
-      'placements[]': 'similarity_detection'
+      'placements[]': 'similarity_detection',
     }
 
     $.ajax({
@@ -89,12 +89,12 @@ class AssignmentConfigurationTools extends React.Component {
         this.setState({
           tools: data,
           toolType: this.props.selectedToolType || '',
-          toolLaunchUrl: prevToolLaunch || 'about:blank'
+          toolLaunchUrl: prevToolLaunch || 'about:blank',
         })
       }, self),
       error(xhr) {
         $.flashError(I18n.t('Error retrieving similarity detection tools'))
-      }
+      },
     })
   }
 
@@ -122,7 +122,7 @@ class AssignmentConfigurationTools extends React.Component {
     const selectBox = this.similarityDetectionTool
     this.setState({
       toolLaunchUrl: selectBox[selectBox.selectedIndex].getAttribute('data-launch'),
-      toolType: selectBox[selectBox.selectedIndex].getAttribute('data-type') || ''
+      toolType: selectBox[selectBox.selectedIndex].getAttribute('data-type') || '',
     })
   }
 
@@ -131,7 +131,7 @@ class AssignmentConfigurationTools extends React.Component {
     this.setState(
       {
         selectedToolValue: event.target.value,
-        visibilityEnabled: event.target.value.toLowerCase().indexOf('none') === -1
+        visibilityEnabled: event.target.value.toLowerCase().indexOf('none') === -1,
       },
       () => this.setToolLaunchUrl()
     )
@@ -139,7 +139,7 @@ class AssignmentConfigurationTools extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -151,7 +151,7 @@ class AssignmentConfigurationTools extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -286,7 +286,7 @@ const attach = function (
 
 const ConfigurationTools = {
   configTools: AssignmentConfigurationTools,
-  attach
+  attach,
 }
 
 export default ConfigurationTools

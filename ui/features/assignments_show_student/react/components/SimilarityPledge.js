@@ -30,7 +30,7 @@ function eulaHTML(eulaUrl) {
 
   // xsslint safeString.identifier encodedUrl
   return I18n.t("I agree to the tool's *End-User License Agreement*", {
-    wrappers: [`<a target="_blank" href="${encodedUrl}">$1</a>`]
+    wrappers: [`<a target="_blank" href="${encodedUrl}">$1</a>`],
   })
 }
 
@@ -75,5 +75,5 @@ SimilarityPledge.propTypes = {
   checked: PropTypes.bool.isRequired,
   comments: PropTypes.string,
   onChange: PropTypes.func.isRequired,
-  pledgeText: PropTypes.string
+  pledgeText: PropTypes.string,
 }

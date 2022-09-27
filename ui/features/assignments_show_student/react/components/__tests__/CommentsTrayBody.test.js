@@ -36,15 +36,15 @@ async function mockSubmissionCommentQuery(overrides = {}, variableOverrides = {}
     {DateTime: '2010-10-16T23:59:59-06:00'},
     {Node: {__typename: 'Submission'}},
     {SubmissionCommentConnection: {nodes: []}},
-    overrides
+    overrides,
   ]
   const result = await mockQuery(SUBMISSION_COMMENT_QUERY, allOverrides, variables)
   return {
     request: {
       query: SUBMISSION_COMMENT_QUERY,
-      variables
+      variables,
     },
-    result
+    result,
   }
 }
 
@@ -55,20 +55,20 @@ async function mockCreateSubmissionComment() {
     comment: 'lion',
     fileIds: [],
     mediaObjectId: null,
-    mediaObjectType: null
+    mediaObjectType: null,
   }
   const overrides = {
     DateTime: '2010-11-16T23:59:59-06:00',
     User: {shortName: 'sent user'},
-    SubmissionComment: {comment: 'test reply comment'}
+    SubmissionComment: {comment: 'test reply comment'},
   }
   const result = await mockQuery(CREATE_SUBMISSION_COMMENT, overrides, variables)
   return {
     request: {
       query: CREATE_SUBMISSION_COMMENT,
-      variables
+      variables,
     },
-    result
+    result,
   }
 }
 
@@ -86,7 +86,7 @@ function mockContext(children) {
     <AlertManagerContext.Provider
       value={{
         setOnFailure: mockedSetOnFailure,
-        setOnSuccess: mockedSetOnSuccess
+        setOnSuccess: mockedSetOnSuccess,
       }}
     >
       {children}
@@ -114,12 +114,12 @@ describe('CommentsTrayBody', () => {
       jest.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1}
+        Submission: {unreadCommentCount: 1},
       })
       const overrides = {
         SubmissionCommentConnection: {
-          nodes: [{read: false}]
-        }
+          nodes: [{read: false}],
+        },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
@@ -137,7 +137,7 @@ describe('CommentsTrayBody', () => {
       act(() => jest.runAllTimers())
       await waitFor(() =>
         expect(mockMutation).toHaveBeenCalledWith({
-          variables: {commentIds: ['1'], submissionId: '1'}
+          variables: {commentIds: ['1'], submissionId: '1'},
         })
       )
     })
@@ -146,12 +146,12 @@ describe('CommentsTrayBody', () => {
       jest.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1}
+        Submission: {unreadCommentCount: 1},
       })
       const overrides = {
         SubmissionCommentConnection: {
-          nodes: [{read: false}]
-        }
+          nodes: [{read: false}],
+        },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
@@ -176,12 +176,12 @@ describe('CommentsTrayBody', () => {
       jest.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1}
+        Submission: {unreadCommentCount: 1},
       })
       const overrides = {
         SubmissionCommentConnection: {
-          nodes: [{read: false}]
-        }
+          nodes: [{read: false}],
+        },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
@@ -206,12 +206,12 @@ describe('CommentsTrayBody', () => {
       jest.useFakeTimers()
 
       const props = await mockAssignmentAndSubmission({
-        Submission: {unreadCommentCount: 1}
+        Submission: {unreadCommentCount: 1},
       })
       const overrides = {
         SubmissionCommentConnection: {
-          nodes: [{read: false}]
-        }
+          nodes: [{read: false}],
+        },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
 
@@ -241,13 +241,13 @@ describe('CommentsTrayBody', () => {
           gradeGroupStudentsIndividually: false,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
       const {queryByText} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
@@ -268,13 +268,13 @@ describe('CommentsTrayBody', () => {
           gradeGroupStudentsIndividually: true,
           groupSet: {
             _id: '1',
-            name: 'sample-group-set'
+            name: 'sample-group-set',
           },
-          submissionTypes: ['online_text_entry', 'online_upload']
+          submissionTypes: ['online_text_entry', 'online_upload'],
         },
         Submission: {
-          ...SubmissionMocks.onlineUploadReadyToSubmit
-        }
+          ...SubmissionMocks.onlineUploadReadyToSubmit,
+        },
       })
       const {queryByText} = render(
         <StudentViewContext.Provider value={{allowChangesToSubmission: true, isObserver: false}}>
@@ -338,8 +338,8 @@ describe('CommentsTrayBody', () => {
     it('renders a message (no image) if there are comments', async () => {
       const overrides = {
         SubmissionCommentConnection: {
-          nodes: [{_id: '1'}, {_id: '2'}]
-        }
+          nodes: [{_id: '1'}, {_id: '2'}],
+        },
       }
       const mocks = [await mockSubmissionCommentQuery(overrides)]
       const props = await mockAssignmentAndSubmission()
@@ -396,9 +396,9 @@ describe('CommentsTrayBody', () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
-          hasPreviousPage: true
-        }
-      }
+          hasPreviousPage: true,
+        },
+      },
     }
 
     const mocks = [await mockSubmissionCommentQuery(overrides)]
@@ -417,9 +417,9 @@ describe('CommentsTrayBody', () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
-          hasPreviousPage: false
-        }
-      }
+          hasPreviousPage: false,
+        },
+      },
     }
 
     const mocks = [await mockSubmissionCommentQuery(overrides)]
@@ -438,14 +438,14 @@ describe('CommentsTrayBody', () => {
     const overrides = {
       SubmissionCommentConnection: {
         pageInfo: {
-          hasPreviousPage: true
-        }
-      }
+          hasPreviousPage: true,
+        },
+      },
     }
 
     const mocks = [
       await mockSubmissionCommentQuery(overrides),
-      await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'})
+      await mockSubmissionCommentQuery(overrides, {cursor: 'Hello World'}),
     ]
     const props = await mockAssignmentAndSubmission()
 
@@ -608,8 +608,8 @@ describe('CommentsTrayBody', () => {
   it('renders comment rows when provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {
-        nodes: [{_id: '1'}, {_id: '2'}]
-      }
+        nodes: [{_id: '1'}, {_id: '2'}],
+      },
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -623,7 +623,7 @@ describe('CommentsTrayBody', () => {
   it('renders shortname when shortname is provided', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
-      User: {shortName: 'bob builder'}
+      User: {shortName: 'bob builder'},
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -634,7 +634,7 @@ describe('CommentsTrayBody', () => {
 
   it('renders Anonymous when author is not provided', async () => {
     const overrides = {
-      SubmissionCommentConnection: {nodes: [{author: null}]}
+      SubmissionCommentConnection: {nodes: [{author: null}]},
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -648,7 +648,7 @@ describe('CommentsTrayBody', () => {
   it('displays a single attachment', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
-      File: {url: 'test-url.com', displayName: 'Test Display Name'}
+      File: {url: 'test-url.com', displayName: 'Test Display Name'},
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -667,11 +667,11 @@ describe('CommentsTrayBody', () => {
           {
             attachments: [
               {url: 'attachment1.com', displayName: 'attachment1'},
-              {url: 'attachment2.com', displayName: 'attachment2'}
-            ]
-          }
-        ]
-      }
+              {url: 'attachment2.com', displayName: 'attachment2'},
+            ],
+          },
+        ],
+      },
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -689,7 +689,7 @@ describe('CommentsTrayBody', () => {
 
   it('does not display attachments if there are none', async () => {
     const overrides = {
-      SubmissionCommentConnection: {nodes: [{attachments: []}]}
+      SubmissionCommentConnection: {nodes: [{attachments: []}]},
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -706,9 +706,9 @@ describe('CommentsTrayBody', () => {
         nodes: [
           {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
           {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-          {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'}
-        ]
-      }
+          {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+        ],
+      },
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -730,7 +730,7 @@ describe('CommentsTrayBody', () => {
   it('includes an icon on an attachment', async () => {
     const overrides = {
       SubmissionCommentConnection: {nodes: [{}]},
-      File: {url: 'test-url.com', displayName: 'Test Display Name', mimeClass: 'pdf'}
+      File: {url: 'test-url.com', displayName: 'Test Display Name', mimeClass: 'pdf'},
     }
     const comments = await mockComments(overrides)
     const props = await mockAssignmentAndSubmission()
@@ -751,9 +751,9 @@ describe('CommentsTrayBody', () => {
           nodes: [
             {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
             {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'}
-          ]
-        }
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+          ],
+        },
       }
       const comments = await mockComments(overrides)
       const props = await mockAssignmentAndSubmission()
@@ -771,9 +771,9 @@ describe('CommentsTrayBody', () => {
           nodes: [
             {_id: '3', updatedAt: '2019-03-01T14:32:37-07:00', comment: 'first comment'},
             {_id: '1', updatedAt: '2019-03-03T14:32:37-07:00', comment: 'last comment'},
-            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'}
-          ]
-        }
+            {_id: '2', updatedAt: '2019-03-02T14:32:37-07:00', comment: 'middle comment'},
+          ],
+        },
       }
       const comments = await mockComments(overrides)
       const props = await mockAssignmentAndSubmission()

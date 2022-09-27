@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import StudentLastNameCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/StudentLastNameCellFormatter'
 
@@ -40,26 +40,26 @@ QUnit.module('GradebookGrid StudentLastNameCellFormatter', hooks => {
       {id: '2001', name: 'Freshmen'},
       {id: '2002', name: 'Sophomores'},
       {id: '2003', name: 'Juniors'},
-      {id: '2004', name: 'Seniors'}
+      {id: '2004', name: 'Seniors'},
     ])
 
     gradebook.setStudentGroups([
       {
         groups: [
           {id: '1', name: 'First Category 1'},
-          {id: '2', name: 'First Category 2'}
+          {id: '2', name: 'First Category 2'},
         ],
         id: '1',
-        name: 'First Category'
+        name: 'First Category',
       },
       {
         groups: [
           {id: '3', name: 'Second Category 1'},
-          {id: '4', name: 'Second Category 2'}
+          {id: '4', name: 'Second Category 2'},
         ],
         id: '2',
-        name: 'Second Category'
-      }
+        name: 'Second Category',
+      },
     ])
 
     student = {
@@ -75,7 +75,7 @@ QUnit.module('GradebookGrid StudentLastNameCellFormatter', hooks => {
       sections: ['2001', '2003', '2004'],
       sis_user_id: 'sis_student_1101',
       integration_id: 'integration_id_1101',
-      sortable_name: 'Jones, Adam'
+      sortable_name: 'Jones, Adam',
     }
   })
 
@@ -183,13 +183,13 @@ QUnit.module('GradebookGrid StudentLastNameCellFormatter', hooks => {
         {
           groups: [{id: '1', name: '&lt;span&gt;First Category 1&lt;/span&gt;'}],
           id: '1',
-          name: 'First Category'
+          name: 'First Category',
         },
         {
           groups: [{id: '4', name: 'Second Category 2'}],
           id: '1',
-          name: 'Second Category'
-        }
+          name: 'Second Category',
+        },
       ])
 
       gradebook.setSelectedSecondaryInfo('group')

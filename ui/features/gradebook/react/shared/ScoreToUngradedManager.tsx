@@ -109,7 +109,7 @@ class ScoreToUngradedManager {
       .then(response => {
         this.process = {
           progressId: response.data.id,
-          workflowState: response.data.workflow_state
+          workflowState: response.data.workflow_state,
         }
 
         return new Promise(this.monitorProcess.bind(this))
