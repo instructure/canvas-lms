@@ -143,9 +143,24 @@ export const VideoConferenceModal = ({
     addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
   }, [addToCalendar])
 
+  const normalizeDate = calendarString => {
+    if (!calendarString) {
+      return null
+    }
+    const date = new Date(calendarString)
+    if (!Number.isNaN(date) && date instanceof Date) {
+      return date.toISOString()
+    } else {
+      return calendarString
+    }
+  }
+
   // Validate Calendar EndAt > StartAt
   useEffect(() => {
-    if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
+    const endDate = normalizeDate(endCalendarDate)
+    const startDate = normalizeDate(startCalendarDate)
+
+    if ((addToCalendar && !(endDate > startDate)) || !endDate || !startDate) {
       setCalendarValidationMessages([
         [{text: I18n.t('Start Date/Time must be before the End Date/Time'), type: 'error'}],
         [{text: I18n.t('End Date/Time must be later than Start Date/Time'), type: 'error'}],
