@@ -17,13 +17,13 @@
  */
 
 import React from 'react'
-
+import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import Images from '../../instructure_image/Images'
 import {useStoreProps} from '../../shared/StoreContext'
 import {ICON_MAKER_ICONS} from '../svg/constants'
 
-const SavedIconMakerList = ({onImageEmbed}) => {
+const SavedIconMakerList = ({sortBy, searchString, onImageEmbed}) => {
   const storeProps = useStoreProps()
   const {files, bookmark, isLoading, hasMore} = storeProps.images[storeProps.contextType]
 
@@ -38,18 +38,34 @@ const SavedIconMakerList = ({onImageEmbed}) => {
             files,
             bookmark,
             hasMore,
-            isLoading
-          }
+            isLoading,
+          },
         }}
-        sortBy={{
-          sort: 'date_added',
-          order: 'desc'
-        }}
+        sortBy={sortBy}
+        searchString={searchString}
         onImageEmbed={onImageEmbed}
         isIconMaker={true}
       />
     </View>
   )
+}
+
+SavedIconMakerList.propTypes = {
+  sortBy: PropTypes.shape({
+    sort: PropTypes.oneOf(['date_added', 'alphabetical']).isRequired,
+    order: PropTypes.oneOf(['asc', 'desc']).isRequired,
+  }),
+  searchString: PropTypes.string,
+  onImageEmbed: PropTypes.func,
+}
+
+SavedIconMakerList.defaultProps = {
+  sortBy: {
+    sort: 'date_added',
+    order: 'desc',
+  },
+  searchString: '',
+  onImageEmbed: () => {},
 }
 
 export default SavedIconMakerList
