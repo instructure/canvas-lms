@@ -20,9 +20,7 @@ import 'isomorphic-fetch'
 import {parse} from 'url'
 import {saveClosedCaptions, CONSTANTS} from '@instructure/canvas-media'
 import {downloadToWrap, fixupFileUrl} from '../common/fileUrl'
-import formatMessage from '../format-message'
 import alertHandler from '../rce/alertHandler'
-import {DEFAULT_FILE_CATEGORY} from '../sidebar/containers/sidebarHandlers'
 import buildError from './buildError'
 
 export function headerFor(jwt) {
@@ -65,7 +63,7 @@ function normalizeFileData(file) {
     display_name: file.name,
     ...file,
     // wrap the url
-    href: downloadToWrap(file.href || file.url)
+    href: downloadToWrap(file.href || file.url),
   }
 }
 
@@ -108,7 +106,7 @@ class RceApiSource {
       bookmark: this.uriFor(endpoint, props),
       isLoading: false,
       hasMore: true,
-      searchString: props.searchString
+      searchString: props.searchString,
     }
   }
 
@@ -116,7 +114,7 @@ class RceApiSource {
     return {
       uploading: false,
       folders: {},
-      formExpanded: false
+      formExpanded: false,
     }
   }
 
@@ -130,9 +128,9 @@ class RceApiSource {
         files: [],
         bookmark: null,
         isLoading: false,
-        hasMore: true
+        hasMore: true,
       },
-      searchString: ''
+      searchString: '',
     }
   }
 
@@ -144,7 +142,7 @@ class RceApiSource {
     return {
       searchResults: [],
       searching: false,
-      formExpanded: false
+      formExpanded: false,
     }
   }
 
@@ -172,7 +170,7 @@ class RceApiSource {
     return this.apiFetch(uri, headerFor(this.jwt)).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f))
+        files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f)),
       }
     })
   }
@@ -187,7 +185,7 @@ class RceApiSource {
     return this.fetchPage(uri).then(({bookmark, files}) => {
       return {
         bookmark,
-        files: files.map(normalizeFileData)
+        files: files.map(normalizeFileData),
       }
     })
   }
@@ -215,7 +213,7 @@ class RceApiSource {
           : 'video',
       context_code: mediaObject.contextCode,
       title: mediaObject.title,
-      user_entered_title: mediaObject.userTitle
+      user_entered_title: mediaObject.userTitle,
     }
 
     return this.apiPost(this.baseUri('media_objects'), headerFor(this.jwt), body)
@@ -237,7 +235,7 @@ class RceApiSource {
       subtitles,
       {
         origin: originFromHost(apiProps.host),
-        headers: headerFor(apiProps.jwt)
+        headers: headerFor(apiProps.jwt),
       },
       maxBytes || CONSTANTS.CC_FILE_MAX_BYTES
     ).catch(e => {
@@ -251,7 +249,7 @@ class RceApiSource {
   fetchClosedCaptions(_mediaId) {
     return Promise.resolve([
       {locale: 'af', content: '1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n'},
-      {locale: 'es', content: '1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n'}
+      {locale: 'es', content: '1\r\n00:00:00,000 --> 00:00:01,251\r\nThis is the content\r\n'},
     ])
   }
 
@@ -268,10 +266,13 @@ class RceApiSource {
 
     if (!bookmark) {
       const perPageQuery = props.perPage ? `per_page=${props.perPage}` : ''
-      const categoryQuery = `category=${DEFAULT_FILE_CATEGORY}`
-      uri = `${props.filesUrl}?${perPageQuery}&${categoryQuery}${getSearchParam(
-        props.searchString
-      )}`
+      const searchParam = getSearchParam(props.searchString)
+
+      uri = `${props.filesUrl}`
+      uri += perPageQuery ? `?${perPageQuery}` : ''
+      if (searchParam) {
+        uri += perPageQuery ? `${searchParam}` : `?${searchParam}`
+      }
 
       if (props.sortBy) {
         uri += `${getSortParams(props.sortBy.sort, props.sortBy.order)}`
@@ -291,7 +292,7 @@ class RceApiSource {
       contextId,
       contextType,
       host: this.host,
-      jwt: this.jwt
+      jwt: this.jwt,
     })
     return this.fetchPage(uri)
   }
@@ -319,7 +320,7 @@ class RceApiSource {
       return {
         bookmark,
         files: files.map(f => fixupFileUrl(props.contextType, props.contextId, f)),
-        searchString: props.searchString
+        searchString: props.searchString,
       }
     })
   }
@@ -333,7 +334,7 @@ class RceApiSource {
       file: fileProps,
       no_redirect: true,
       onDuplicate: apiProps.onDuplicate,
-      category: apiProps.category
+      category: apiProps.category,
     }
 
     return this.apiPost(uri, headers, body)
@@ -433,7 +434,7 @@ class RceApiSource {
 
     const uri = this.addParamsIfPresent(`${base}/${id}`, {
       replacement_chain_context_type,
-      replacement_chain_context_id
+      replacement_chain_context_id,
     })
 
     return this.apiFetch(uri, headers).then(normalizeFileData)
@@ -497,7 +498,7 @@ class RceApiSource {
     headers = {...headers, 'Content-Type': 'application/json'}
     const fetchOptions = {
       method,
-      headers
+      headers,
     }
     if (body) {
       fetchOptions.body = JSON.stringify(body)

@@ -30,7 +30,7 @@ module Api::V1::Folders
   def folder_json(folder, user, session, opts = {})
     can_view_hidden_files = opts.key?(:can_view_hidden_files) ? opts[:can_view_hidden_files] : folder.grants_right?(user, :update)
     json = api_json(folder, user, session,
-                    only: %w[id name full_name position parent_folder_id context_type context_id unlock_at lock_at created_at updated_at])
+                    only: %w[id name full_name position parent_folder_id context_type context_id unlock_at lock_at created_at updated_at category])
     if folder
       if opts[:master_course_restricted_folder_ids]&.include?(folder.id)
         json["is_master_course_child_content"] = true

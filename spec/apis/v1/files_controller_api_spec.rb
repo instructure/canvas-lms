@@ -839,6 +839,12 @@ describe "Files API", type: :request do
       it { is_expected.not_to include uncategorized }
     end
 
+    it "returns file category with the response" do
+      json = api_call(:get, @files_path, @files_path_options, {})
+      res = json.map { |f| f["category"] }
+      expect(res).to eq %w[uncategorized uncategorized uncategorized]
+    end
+
     describe "sort" do
       it "lists files in alphabetical order" do
         json = api_call(:get, @files_path, @files_path_options, {})

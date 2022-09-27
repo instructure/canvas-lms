@@ -30,7 +30,7 @@ describe('sources/api', () => {
     contextType: 'group',
     contextId: 123,
     sortBy: {sort: 'date_added', dir: 'desc'},
-    searchString: ''
+    searchString: '',
   }
   let apiSource
   let alertFuncSpy
@@ -42,7 +42,7 @@ describe('sources/api', () => {
       refreshToken: callback => {
         callback('freshJWT')
       },
-      alertFunc: alertFuncSpy
+      alertFunc: alertFuncSpy,
     })
     fetchMock.mock('/api/session', '{}')
   })
@@ -135,7 +135,7 @@ describe('sources/api', () => {
         contextType: 'course',
         contextId: '17',
         sortBy: {sort: 'alphabetical', dir: 'asc'},
-        searchString: 'hello world'
+        searchString: 'hello world',
       }
     })
 
@@ -214,8 +214,8 @@ describe('sources/api', () => {
           bookmark: 'newBookmark',
           links: [
             {href: 'link1', title: 'Link 1'},
-            {href: 'link2', title: 'Link 2'}
-          ]
+            {href: 'link2', title: 'Link 2'},
+          ],
         })
       })
     })
@@ -289,7 +289,7 @@ describe('sources/api', () => {
     it('makes a request to the folders api with the given host and ID', () => {
       subject()
       sinon.assert.calledWith(apiSource.apiFetch, 'about://canvas.rce/api/folders/2', {
-        Authorization: 'Bearer theJWT'
+        Authorization: 'Bearer theJWT',
       })
     })
 
@@ -307,13 +307,9 @@ describe('sources/api', () => {
 
       it('makes a request to the files api with given host and folder ID', () => {
         subject()
-        sinon.assert.calledWith(
-          apiSource.apiFetch,
-          'https://canvas.rce/api/files/2?&category=uncategorized',
-          {
-            Authorization: 'Bearer theJWT'
-          }
-        )
+        sinon.assert.calledWith(apiSource.apiFetch, 'https://canvas.rce/api/files/2', {
+          Authorization: 'Bearer theJWT',
+        })
       })
 
       describe('with perPage set', () => {
@@ -325,9 +321,9 @@ describe('sources/api', () => {
           subject()
           sinon.assert.calledWith(
             apiSource.apiFetch,
-            'https://canvas.rce/api/files/2?per_page=50&category=uncategorized',
+            'https://canvas.rce/api/files/2?per_page=50',
             {
-              Authorization: 'Bearer theJWT'
+              Authorization: 'Bearer theJWT',
             }
           )
         })
@@ -340,7 +336,7 @@ describe('sources/api', () => {
       it('makes a request to the bookmark', () => {
         subject()
         sinon.assert.calledWith(apiSource.apiFetch, bookmark, {
-          Authorization: 'Bearer theJWT'
+          Authorization: 'Bearer theJWT',
         })
       })
     })
@@ -413,7 +409,7 @@ describe('sources/api', () => {
       return apiSource
         .fetchIconMakerFolder({
           contextType: 'course',
-          contextId: '22'
+          contextId: '22',
         })
         .then(() => {
           sinon.assert.calledWith(
@@ -439,7 +435,7 @@ describe('sources/api', () => {
       return apiSource
         .fetchMediaFolder({
           contextType: 'course',
-          contextId: '22'
+          contextId: '22',
         })
         .then(() => {
           sinon.assert.calledWith(
@@ -522,7 +518,7 @@ describe('sources/api', () => {
         .then(() => {
           sinon.assert.calledWith(alertFuncSpy, {
             text: 'Something went wrong uploading, check your connection and try again.',
-            variant: 'error'
+            variant: 'error',
           })
         })
         .catch(() => {
@@ -552,7 +548,7 @@ describe('sources/api', () => {
             .then(() => {
               sinon.assert.calledWith(alertFuncSpy, {
                 text: 'File storage quota exceeded',
-                variant: 'error'
+                variant: 'error',
               })
             })
             .catch(e => {})
@@ -569,7 +565,7 @@ describe('sources/api', () => {
       uploadUrl = 'upload-url'
       preflightProps = {
         upload_params: {},
-        upload_url: uploadUrl
+        upload_url: uploadUrl,
       }
       file = {url: 'file-url'}
       fetchMock.mock(uploadUrl, file)
@@ -586,7 +582,7 @@ describe('sources/api', () => {
         .then(() => {
           sinon.assert.calledWith(alertFuncSpy, {
             text: 'Something went wrong uploading, check your connection and try again.',
-            variant: 'error'
+            variant: 'error',
           })
         })
         .catch(() => {})
@@ -646,7 +642,7 @@ describe('sources/api', () => {
         const fileId = '123'
         const response = {
           location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
-          uuid: 'xyzzy'
+          uuid: 'xyzzy',
         }
         fetchMock.mock(preflightProps.upload_url, response)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
@@ -661,7 +657,7 @@ describe('sources/api', () => {
         const fileId = '1023~789'
         const response = {
           location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
-          uuid: 'xyzzy'
+          uuid: 'xyzzy',
         }
         fetchMock.mock(preflightProps.upload_url, response)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
@@ -676,15 +672,15 @@ describe('sources/api', () => {
   describe('api mapping', () => {
     const body = {
       bookmark: 'mo.images',
-      files: [{href: '/some/where', uuid: 'xyzzy'}]
+      files: [{href: '/some/where', uuid: 'xyzzy'}],
     }
     props.images = {
       group: {
         isLoading: false,
         hasMore: true,
         bookmark: null,
-        files: []
-      }
+        files: [],
+      },
     }
     props.searchString = 'panda'
 
@@ -702,7 +698,7 @@ describe('sources/api', () => {
         assert.deepStrictEqual(page, {
           bookmark: 'mo.images',
           files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
-          searchString: 'panda'
+          searchString: 'panda',
         })
         fetchMock.restore()
       })
@@ -716,7 +712,7 @@ describe('sources/api', () => {
         assert.deepEqual(page, {
           bookmark: 'mo.images',
           files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
-          searchString: 'panda'
+          searchString: 'panda',
         })
         fetchMock.restore()
       })
@@ -753,7 +749,7 @@ describe('sources/api', () => {
         const postBody = JSON.parse(fetchMock.lastOptions(uri).body)
         assert.deepEqual(postBody, {
           fileId,
-          usageRight: usageRights.usageRight
+          usageRight: usageRights.usageRight,
         })
       })
     })
@@ -863,7 +859,7 @@ describe('sources/api', () => {
   describe('headerFor', () => {
     it('returns an authorization header', () => {
       assert.deepStrictEqual(headerFor('the_jwt'), {
-        Authorization: 'Bearer the_jwt'
+        Authorization: 'Bearer the_jwt',
       })
     })
   })
@@ -880,8 +876,8 @@ describe('sources/api', () => {
     it('uses the windowOverride protocol if present', () => {
       const win = {
         location: {
-          protocol: 'https:'
-        }
+          protocol: 'https:',
+        },
       }
       assert.strictEqual(
         originFromHost('http://host:port', win),
