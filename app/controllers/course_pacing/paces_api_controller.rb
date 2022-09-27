@@ -93,7 +93,7 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def authorize_action
-    raise NotImplementedError
+    authorized_action(course, @current_user, :manage_content)
   end
 
   def load_contexts

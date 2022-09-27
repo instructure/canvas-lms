@@ -17,25 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::SectionPacesApiController < CoursePacing::PacesApiController
-  private
-
-  def pacing_service
-    CoursePacing::SectionPaceService
+class CoursePacing::StudentEnrollmentPaceService < CoursePacing::PaceServiceInterface
+  def self.paces_in_course(course)
+    course.course_paces.not_deleted.student_enrollment_paces.preload(:user)
   end
 
-  def pacing_presenter
-    CoursePacing::SectionPacePresenter
+  def self.pace_in_context(student_enrollment)
+    paces_in_course(course_for(student_enrollment)).find_by!(user_id: student_enrollment.user_id)
   end
 
-  attr_reader :course
-
-  def context
-    @section
+  def self.create_params(student_enrollment)
+    super.merge({ user_id: student_enrollment.user_id })
   end
 
-  def load_contexts
-    @course = api_find(Course.active, params[:course_id])
-    @section = api_find(@course.active_course_sections, params[:course_section_id]) if params[:course_section_id]
+  def self.course_for(student_enrollment)
+    student_enrollment.course
   end
 end
