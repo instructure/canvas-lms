@@ -20,7 +20,7 @@
 class CoursePacing::PacesApiController < ApplicationController
   before_action :load_contexts
   before_action :require_feature_flag
-  # TODO: permissions
+  before_action :authorize_action
 
   def index
     render json: {
@@ -89,6 +89,10 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def context
+    raise NotImplementedError
+  end
+
+  def authorize_action
     raise NotImplementedError
   end
 

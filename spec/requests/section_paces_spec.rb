@@ -27,11 +27,19 @@ describe "Section Paces API" do
   let(:section) { add_section("Section One", course: course) }
   let(:section_two) { add_section("Section Two", course: course) }
   let(:section_three) { add_section("Section Three", course: course) }
+  let(:unrelated_section) { add_section("Section Three", course: course_factory) }
 
   before do
     Account.site_admin.enable_feature!(:course_paces_redesign)
     2.times { multiple_student_enrollment(user_model, section_two, course: course) }
+    course.enroll_student(@user = user_factory, enrollment_state: "active")
     user_session(teacher)
+  end
+
+  def assert_grant_check
+    user_session(@user)
+    yield
+    expect(response.status).to eq 401
   end
 
   describe "index" do
@@ -75,6 +83,15 @@ describe "Section Paces API" do
       get api_v1_section_pace_path(course.id, section_two), params: { format: :json }
       expect(response.status).to eq 404
     end
+
+    it "returns a 404 if the section and course are unrelated" do
+      get api_v1_section_pace_path(course.id, unrelated_section.id), params: { format: :json }
+      expect(response.status).to eq 404
+    end
+
+    it "returns a 401 if the user lacks permission" do
+      assert_grant_check { get api_v1_section_pace_path(course.id, section.id), params: { format: :json } }
+    end
   end
 
   describe "create" do
@@ -87,6 +104,15 @@ describe "Section Paces API" do
       expect(response.status).to eq 201
       json = JSON.parse(response.body)
       expect(json["pace"]["section"]["name"]).to eq section.name
+    end
+
+    it "returns a 404 if the section and course are unrelated" do
+      post api_v1_new_section_pace_path(course, unrelated_section), params: { format: :json }
+      expect(response.status).to eq 404
+    end
+
+    it "returns a 401 if the user lacks permission" do
+      assert_grant_check { post api_v1_new_section_pace_path(course, section), params: { format: :json } }
     end
 
     context "when the section already has a pace" do
@@ -122,6 +148,15 @@ describe "Section Paces API" do
       expect(response.status).to eq 200
     end
 
+    it "returns a 401 if the user lacks permission" do
+      assert_grant_check { patch api_v1_patch_section_pace_path(course, section), params: { format: :json, pace: {} } }
+    end
+
+    it "returns a 404 if the section and course are unrelated" do
+      patch api_v1_patch_section_pace_path(course, unrelated_section), params: { format: :json, pace: {} }
+      expect(response.status).to eq 404
+    end
+
     it "handles invalid update parameters" do
       allow_any_instance_of(CoursePace).to receive(:update).and_return(false)
       patch api_v1_patch_section_pace_path(course, section), params: {
@@ -144,6 +179,15 @@ describe "Section Paces API" do
         pace.reload.workflow_state
       }.from("active").to("deleted")
       expect(response.status).to eq 204
+    end
+
+    it "returns a 401 if the user lacks permission" do
+      assert_grant_check { delete api_v1_delete_section_pace_path(course, section), params: { format: :json } }
+    end
+
+    it "returns a 404 if the section and course are unrelated" do
+      delete api_v1_delete_section_pace_path(course, unrelated_section), params: { format: :json }
+      expect(response.status).to eq 404
     end
 
     it "returns 404 if the section does not have a pace" do
