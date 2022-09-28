@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, screen} from '@testing-library/react'
+import {render, screen, fireEvent} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {Footer} from '../Footer'
 
@@ -29,7 +29,8 @@ describe('<Footer />', () => {
       onCancel: jest.fn(),
       onSubmit: jest.fn(),
       onReplace: jest.fn(),
-      editing: false
+      editing: false,
+      isModified: false,
     }
   })
 
@@ -50,7 +51,7 @@ describe('<Footer />', () => {
   })
 
   it('renders the footer disabled', () => {
-    render(<Footer {...defaults} disabled />)
+    render(<Footer {...defaults} disabled={true} />)
     const cancelButton = screen.getByRole('button', {name: /cancel/i})
     const applyButton = screen.getByRole('button', {name: /apply/i})
     expect(cancelButton).toBeDisabled()
@@ -74,12 +75,36 @@ describe('<Footer />', () => {
       expect(await findByText('Save')).toBeInTheDocument()
     })
 
+    it('Disable the "save" button when the user has not made changes', async () => {
+      const {findByText} = subject()
+      const saveButton = await findByText('Save')
+
+      expect(saveButton.closest('button')).toHaveAttribute('disabled')
+    })
+
+    it('renders Tooltip when hover the "save" button', async () => {
+      const {findByText} = subject()
+      const saveButton = await findByText('Save')
+      fireEvent.mouseOver(saveButton)
+
+      expect(await findByText('No changes to save.')).toBeInTheDocument()
+    })
+
     it('does not render the "apply" button', async () => {
       const {queryByText} = subject()
       expect(await queryByText('Apply')).not.toBeInTheDocument()
     })
 
+    it('Enable the "save" button when the user has made changes', async () => {
+      defaults.isModified = true
+      const {findByText} = subject()
+      const saveButton = await findByText('Save')
+
+      expect(saveButton.closest('button')).not.toBeDisabled()
+    })
+
     it('calls "onSubmit" when "Save" is pressed"', async () => {
+      defaults.isModified = true
       const {findByText} = subject()
       userEvent.click(await findByText('Save'))
       expect(defaults.onSubmit).toHaveBeenCalled()
