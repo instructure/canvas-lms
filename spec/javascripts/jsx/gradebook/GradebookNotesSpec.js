@@ -293,14 +293,14 @@ test('disabled defaults to true', () => {
 
 test('disabled is false when the grid is ready', () => {
   const gradebook = createGradebook()
-  sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(gradebook.gridReady, 'state').get(() => 'resolved')
   const props = gradebook.getTeacherNotesViewOptionsMenuProps()
   equal(props.disabled, false)
 })
 
 test('disabled is true if the teacher notes column is updating', () => {
   const gradebook = createGradebook()
-  sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(gradebook.gridReady, 'state').get(() => 'resolved')
   gradebook.setTeacherNotesColumnUpdating(true)
   const props = gradebook.getTeacherNotesViewOptionsMenuProps()
   equal(props.disabled, true)
@@ -308,7 +308,7 @@ test('disabled is true if the teacher notes column is updating', () => {
 
 test('disabled is false if the teacher notes column is not updating', () => {
   const gradebook = createGradebook()
-  sinon.stub(gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(gradebook.gridReady, 'state').get(() => 'resolved')
   gradebook.setTeacherNotesColumnUpdating(false)
   const props = gradebook.getTeacherNotesViewOptionsMenuProps()
   equal(props.disabled, false)

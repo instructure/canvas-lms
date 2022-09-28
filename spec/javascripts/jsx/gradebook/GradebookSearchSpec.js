@@ -169,28 +169,28 @@ test('renders Assignment Names label', function () {
 })
 
 test('enables the input if there is at least one assignment to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
   const assignmentSearchInput = document.getElementById('assignments-filter')
   notOk(assignmentSearchInput.disabled)
 })
 
 test('disables the input if the grid has not yet rendered', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'pending')
   this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
   const assignmentSearchInput = document.getElementById('assignments-filter')
   ok(assignmentSearchInput.disabled)
 })
 
 test('disables the input if there are no assignments to filter by', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   this.gradebook.renderAssignmentSearchFilter([])
   const assignmentSearchInput = document.getElementById('assignments-filter')
   ok(assignmentSearchInput.disabled)
 })
 
 test('displays a select menu option for each assignment', function () {
-  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  sinon.stub(this.gradebook.gridReady, 'state').get(() => 'resolved')
   const assignment = {id: '1', name: 'An assignment'}
   this.gradebook.renderAssignmentSearchFilter([assignment])
   const assignmentSearchInput = document.getElementById('assignments-filter')

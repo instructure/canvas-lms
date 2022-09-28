@@ -16,20 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function deferPromise() {
-  const deferred = {
-    state: 'pending'
+type Deferred<T> = {
+  state: 'pending' | 'resolved' | 'rejected'
+  promise: Promise<T | undefined>
+  resolve: (value?: T | undefined) => void
+  reject: (error?: Error) => void
+}
+
+export default function deferPromise<T>(): Deferred<T> {
+  const deferred: Deferred<T> = {
+    state: 'pending',
+    resolve: () => {},
+    reject: () => {},
+    promise: new Promise(() => {}),
   }
 
   deferred.promise = new Promise((resolve, reject) => {
-    deferred.resolve = value => {
+    deferred.resolve = (value?) => {
       if (deferred.state === 'pending') {
         deferred.state = 'resolved'
         resolve(value)
       }
     }
 
-    deferred.reject = error => {
+    deferred.reject = (error?: Error) => {
       if (deferred.state === 'pending') {
         deferred.state = 'rejected'
         reject(error)
