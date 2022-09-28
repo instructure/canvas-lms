@@ -304,6 +304,15 @@ class GradeSummaryPresenter
                                end
   end
 
+  def unread_submission_items
+    @unread_submission_items ||= if student_is_user?
+                                   participations = submissions.map(&:content_participations).flatten
+                                   ContentParticipation.items_by_submission(participations, "unread")
+                                 else
+                                   {}
+                                 end
+  end
+
   def no_calculations?
     @groups_assignments.empty? && @periods_assignments.empty?
   end

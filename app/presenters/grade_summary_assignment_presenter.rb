@@ -53,6 +53,10 @@ class GradeSummaryAssignmentPresenter
     (submission.present? ? @summary.unread_submission_ids.include?(submission.id) : false)
   end
 
+  def item_unread?(item)
+    submission.present? && !!@summary.unread_submission_items[submission.id]&.include?(item)
+  end
+
   def hide_grade_from_student?
     submission.blank? || submission.hide_grade_from_student?
   end

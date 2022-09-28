@@ -419,6 +419,37 @@ describe ContentParticipation do
     end
   end
 
+  describe "unread_items_by_submission" do
+    before do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      temp_assignment = @assignment
+      @assignment2 = assignment_model(course: @course)
+      @content2 = @assignment2.submit_homework(@student)
+      @assignment = temp_assignment
+
+      @assignment.grade_student(@student, grade: 1, grader: @teacher)
+      @assignment2.grade_student(@student, grade: 1, grader: @teacher)
+      @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+    end
+
+    it "returns unread content items grouped by submission" do
+      expected = {
+        @content.id => ["grade", "comment"],
+        @content2.id => ["grade"]
+      }
+
+      participations = [@content.content_participations, @content2.content_participations].flatten
+      unread_items = ContentParticipation.items_by_submission(participations, "unread")
+
+      aggregate_failures do
+        expect(unread_items).to have_key(@content.id)
+        expect(unread_items).to have_key(@content2.id)
+        expect(unread_items[@content.id]).to match_array(expected[@content.id])
+        expect(unread_items[@content2.id]).to match_array(expected[@content2.id])
+      end
+    end
+  end
+
   describe "create" do
     it "sets the root_account_id from the submissions assignment" do
       participant = ContentParticipation.create_or_update({

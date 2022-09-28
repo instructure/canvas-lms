@@ -437,8 +437,7 @@ class SubmissionComment < ActiveRecord::Base
 
     self.class.connection.after_transaction_commit do
       submission.user.clear_cache_key(:submissions)
-
-      ContentParticipation.participate(content: submission, user: recipient, content_item: "comment")
+      submission.mark_item_unread("comment")
     end
   end
 

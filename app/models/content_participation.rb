@@ -46,6 +46,11 @@ class ContentParticipation < ActiveRecord::Base
     user = opts.delete(:user)
     return nil unless user && content
 
+    if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+      workflow_state = opts.fetch(:workflow_state, "unread")
+      return participate(content: content, user: user, workflow_state: workflow_state)
+    end
+
     participant = nil
     unique_constraint_retry do
       participant = content.content_participations.where(user_id: user).first
@@ -176,6 +181,17 @@ class ContentParticipation < ActiveRecord::Base
     return "unread" if states.any?("unread")
 
     "read"
+  end
+
+  def self.items_by_submission(participations, workflow_state)
+    unread_items = {}
+
+    participations.each do |cp|
+      unread_items[cp.content_id] ||= []
+      unread_items[cp.content_id] << cp.content_item if cp.workflow_state == workflow_state
+    end
+
+    unread_items
   end
 
   def self.already_read_count(ids = [], user)

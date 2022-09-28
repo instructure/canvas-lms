@@ -150,7 +150,7 @@ class RubricAssessment < ActiveRecord::Base
 
     if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
       if any_comments_or_points?
-        ContentParticipation.participate(content: artifact, user: user, content_item: "rubric")
+        artifact.mark_item_unread("rubric")
       end
     elsif any_comments?
       user.mark_rubric_assessments_unread!(artifact)
