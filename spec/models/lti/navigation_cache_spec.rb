@@ -24,7 +24,7 @@ module Lti
   describe NavigationCache do
     subject { NavigationCache.new(account) }
 
-    let(:account) { double }
+    let(:account) { account_model }
 
     describe "#cache_key" do
       it "creates a new cache key" do
