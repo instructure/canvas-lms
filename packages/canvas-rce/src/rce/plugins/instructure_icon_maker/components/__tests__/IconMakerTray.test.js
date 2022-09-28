@@ -53,7 +53,7 @@ const setIconColor = hex => {
 describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   const defaults = {
     onUnmount: jest.fn(),
-    editing: false
+    editing: false,
   }
 
   let rcs
@@ -67,7 +67,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   beforeAll(() => {
     rcs = {
       getFile: jest.fn(() => Promise.resolve({name: 'Test Icon.svg'})),
-      canvasUrl: 'https://domain.from.env'
+      canvasUrl: 'https://domain.from.env',
     }
 
     RceApiSource.mockImplementation(() => rcs)
@@ -102,9 +102,14 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     await waitFor(() => expect(onUnmount).toHaveBeenCalled())
   })
 
-  it('does not close the tray when the user has unsaved changes', () => {
-    const onUnmount = jest.fn()
-    renderComponent({...defaults, onUnmount})
+  it('does not call confirm when there are no changes', () => {
+    renderComponent(defaults)
+    userEvent.click(screen.getByText(/close/i))
+    expect(window.confirm).not.toHaveBeenCalled()
+  })
+
+  it('calls confirm when the user has unsaved changes', () => {
+    renderComponent(defaults)
     // edit the icon before clicking on close
     setIconColor('#000000')
     userEvent.click(screen.getByText(/close/i))
@@ -389,7 +394,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
       await waitFor(() => expect(button).toBeDisabled())
       await waitFor(() => expect(defaults.onUnmount).toHaveBeenCalled(), {
-        timeout: 3000
+        timeout: 3000,
       })
     })
 
@@ -455,7 +460,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
           rcsConfig={{
             contextType: 'course',
             contextId: 2,
-            canvasUrl: 'https://canvas.instructure.com'
+            canvasUrl: 'https://canvas.instructure.com',
           }}
         />
       )
@@ -476,7 +481,7 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#E71F63",
             "textPosition":"below"
-          }`
+          }`,
       })
     })
 
@@ -487,6 +492,19 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
 
     it('renders the edit view', () => {
       expect(subject().getByRole('heading', {name: /edit icon/i})).toBeInTheDocument()
+    })
+
+    it('does not call confirm when there are no changes', () => {
+      subject()
+      userEvent.click(screen.getByText(/close/i))
+      expect(window.confirm).not.toHaveBeenCalled()
+    })
+
+    it('calls confirm when the user has unsaved changes', async () => {
+      await subject().findByTestId('icon-maker-color-input-icon-color')
+      setIconColor('#000000')
+      userEvent.click(screen.getByText(/close/i))
+      expect(window.confirm).toHaveBeenCalled()
     })
 
     it('inserts a placeholder when an icon is saved', async () => {

@@ -206,7 +206,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
     settings.text,
     settings.encodedImage,
     settings.outlineColor,
-    settings.outlineSize
+    settings.outlineSize,
   ])
 
   const handleSubmit = ({replaceFile = false}) => {
@@ -224,10 +224,10 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       .startIconMakerUpload(
         {
           name: `${settings.name || formatMessage('untitled')}.svg`,
-          domElement: svg
+          domElement: svg,
         },
         {
-          onDuplicate: replaceFile && 'overwrite'
+          onDuplicate: replaceFile && 'overwrite',
         }
       )
       .then(writeIconToRCE)
@@ -248,7 +248,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       // passing along a string here. Using the style attribute
       // with all caps makes React ignore this fact
       STYLE: externalStyle,
-      width: externalWidth
+      width: externalWidth,
     }
 
     // Mark the image as an icon maker icon.
@@ -269,12 +269,12 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       imageName: '',
       icon: '',
       iconFillColor: '#000000',
-      cropperSettings: null
+      cropperSettings: editing ? {shape: settings.shape} : null,
     }
   }
 
   const replaceInitialSettings = () => {
-    const name = editing ? settings.name : ''
+    const name = editing ? settings.name : undefined
     const textPosition = editing ? settings.textPosition : defaultState.textPosition
     const imageSettings =
       settings.imageSettings && !!settings.imageSettings.mode
@@ -294,7 +294,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
       textColor: settings.textColor,
       textBackgroundColor: settings.textBackgroundColor,
       textPosition,
-      imageSettings
+      imageSettings,
     })
   }
 
@@ -330,10 +330,10 @@ IconMakerTray.propTypes = {
   editor: PropTypes.object.isRequired,
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
-  rcsConfig: PropTypes.object.isRequired
+  rcsConfig: PropTypes.object.isRequired,
 }
 
 IconMakerTray.defaultProps = {
   onUnmount: () => {},
-  editing: false
+  editing: false,
 }
