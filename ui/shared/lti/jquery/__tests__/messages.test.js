@@ -21,19 +21,19 @@ import $ from '@canvas/rails-flash-notifications'
 
 const requestFullWindowLaunchMessage = {
   subject: 'requestFullWindowLaunch',
-  data: 'http://localhost/test'
+  data: 'http://localhost/test',
 }
 
 const reactDevToolsBridge = {
   data: 'http://localhost/test',
-  source: 'react-devtools-bridge'
+  source: 'react-devtools-bridge',
 }
 
 function postMessageEvent(data, origin, source) {
   return {
     data,
     origin,
-    source: source || {postMessage: jest.fn()}
+    source: source || {postMessage: jest.fn()},
   }
 }
 
@@ -149,6 +149,12 @@ describe('ltiMessageHander', () => {
         const event = postMessageEvent({subject: 'lti.fetchWindowSize'})
         await ltiMessageHandler(event)
         expect(event.source.postMessage).toHaveBeenCalled()
+      })
+
+      it('should not respond to response messages', async () => {
+        const event = postMessageEvent({subject: 'notSupported.response'})
+        await ltiMessageHandler(event)
+        expect(event.source.postMessage).not.toHaveBeenCalled()
       })
     })
   })
