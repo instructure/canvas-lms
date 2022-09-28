@@ -31,6 +31,8 @@ const I18n = useI18nScope('AlignmentSummary')
 
 const AlignmentStatItem = ({type, count, percent, average}) => {
   const {isMobileView} = useCanvasContext()
+  const statPercentage = I18n.toPercentage((percent * 100).toFixed(), {precision: 0})
+  const statAverage = I18n.n(average.toFixed(1), {precision: 1})
   let statName, statDescription, statType
   if (type === 'outcome') {
     statName = I18n.t(
@@ -123,7 +125,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
                 weight="bold"
                 data-testid="outcome-alignment-stat-percent"
               >
-                {`${(percent * 100).toFixed()}%`}
+                {statPercentage}
               </Text>
               <View padding="0 small 0 xx-small">
                 <Text
@@ -140,7 +142,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
                 weight="bold"
                 data-testid="outcome-alignment-stat-average"
               >
-                {average.toFixed(1)}
+                {statAverage}
               </Text>
               <View padding="0 small 0 xx-small">
                 <Text
