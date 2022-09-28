@@ -158,7 +158,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
           )}
           {props.showCalendar && !props.hasBegun && (
             <Flex.Item>
-              <Flex>
+              <Flex wrap="wrap">
                 <Flex.Item padding="small" align="start">
                   <DateTimeInput
                     data-testId="start-date-input"
@@ -180,7 +180,7 @@ const BBBModalOptions = ({addToCalendar, setAddToCalendar, ...props}) => {
                     messages={props.calendarValidationMessages[0]}
                   />
                 </Flex.Item>
-                <Flex.Item padding="small" align="start">
+                <Flex.Item padding="small none small small" align="start">
                   <DateTimeInput
                     data-testId="end-date-input"
                     onChange={(e, newValue) => {
