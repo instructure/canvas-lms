@@ -232,6 +232,7 @@ export type GradebookProps = {
   colors: StatusColors
   customColumns: CustomColumn[]
   dispatch: RequestDispatch
+  fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   fetchStudentIds: () => Promise<string[]>
   filterNavNode: HTMLElement
   flashAlerts: FlashAlertType[]
@@ -239,11 +240,13 @@ export type GradebookProps = {
   gradebookEnv: any
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
+  gradingPeriodAssignments: GradingPeriodAssignmentMap
   gradingPeriodsFilterContainer: HTMLElement
   gridColorNode: HTMLElement
   hideGrid?: boolean
   isCustomColumnsLoading: boolean
   isFiltersLoading: boolean
+  isGradingPeriodAssignmentsLoading: boolean
   isModulesLoading: boolean
   isStudentIdsLoading: boolean
   locale: string
@@ -442,6 +445,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       dispatch: props.dispatch,
       performanceControls: props.performanceControls,
       fetchStudentIds: props.fetchStudentIds,
+      fetchGradingPeriodAssignments: props.fetchGradingPeriodAssignments,
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)
@@ -1984,8 +1988,8 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         this.setState({
           exportState: {
             completion: val,
-            filename: name
-          }
+            filename: name,
+          },
         }),
       setExportManager: (manager?: GradebookExportManager) =>
         this.setState({exportManager: manager}),
@@ -4594,6 +4598,15 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       !this.props.isStudentIdsLoading
     ) {
       this.updateStudentIds(this.props.studentIds)
+    }
+
+    // grading period assignments
+    if (
+      prevProps.isGradingPeriodAssignmentsLoading !==
+        this.props.isGradingPeriodAssignmentsLoading &&
+      !this.props.isGradingPeriodAssignmentsLoading
+    ) {
+      this.updateGradingPeriodAssignments(this.props.gradingPeriodAssignments)
     }
 
     // modules

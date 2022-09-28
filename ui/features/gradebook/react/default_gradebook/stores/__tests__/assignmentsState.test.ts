@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,45 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {createGradebook} from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
-import GradingPeriodAssignmentsLoader from 'ui/features/gradebook/react/default_gradebook/DataLoader/GradingPeriodAssignmentsLoader'
 import {NetworkFake} from '@canvas/network/NetworkFake/index'
-import {RequestDispatch} from '@canvas/network'
+import store from '../index'
 
-QUnit.module('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', suiteHooks => {
+describe('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', () => {
   const url = '/courses/1201/gradebook/grading_period_assignments'
 
-  let dataLoader
-  let dispatch
   let exampleData
-  let gradebook
   let network
 
-  suiteHooks.beforeEach(() => {
+  beforeEach(() => {
     exampleData = {
       gradingPeriodAssignments: {1401: ['2301']},
     }
   })
 
-  QUnit.module('#loadGradingPeriodAssignments()', hooks => {
-    hooks.beforeEach(() => {
+  describe('#loadGradingPeriodAssignments()', () => {
+    beforeEach(() => {
       network = new NetworkFake()
-      dispatch = new RequestDispatch()
-
-      gradebook = createGradebook({
-        context_id: '1201',
-      })
-      sinon.stub(gradebook, 'updateGradingPeriodAssignments')
-
-      dataLoader = new GradingPeriodAssignmentsLoader({dispatch, gradebook})
     })
 
-    hooks.afterEach(() => {
+    afterEach(() => {
       network.restore()
     })
 
     function loadGradingPeriodAssignments() {
-      dataLoader.loadGradingPeriodAssignments()
+      store.getState().fetchGradingPeriodAssignments()
       return network.allRequestsReady()
     }
 
@@ -73,22 +60,16 @@ QUnit.module('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', suiteHoo
     test('sends the request using the given course id', async () => {
       await loadGradingPeriodAssignments()
       const requests = getRequests()
-      strictEqual(requests.length, 1)
-    })
-
-    test('updates the grading period assignments in the gradebook', async () => {
-      const loaded = await loadGradingPeriodAssignments()
-      resolveRequest()
-      await loaded
-      strictEqual(gradebook.updateGradingPeriodAssignments.callCount, 1)
+      expect(requests.length).toStrictEqual(1)
     })
 
     test('includes the loaded grading period assignments when updating the gradebook', async () => {
       const loaded = await loadGradingPeriodAssignments()
       resolveRequest()
       await loaded
-      const [gradingPeriodAssignments] = gradebook.updateGradingPeriodAssignments.lastCall.args
-      deepEqual(gradingPeriodAssignments, exampleData.gradingPeriodAssignments)
+      expect(store.getState().gradingPeriodAssignments).toStrictEqual(
+        exampleData.gradingPeriodAssignments
+      )
     })
   })
 })

@@ -97,6 +97,7 @@ export const defaultGradebookProps: GradebookProps = {
   applyScoreToUngradedModalNode: document.createElement('div'),
   customColumns: [],
   dispatch: new RequestDispatch(),
+  fetchGradingPeriodAssignments: () => Promise.resolve({}),
   fetchStudentIds: () => Promise.resolve([]),
   filterNavNode: document.createElement('div'),
   flashAlerts: [],
