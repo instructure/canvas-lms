@@ -24237,21 +24237,34 @@ nn:
       For å endre brukardetaljar, modifisere innloggingsdetaljar eller endre brukarpassord, må 'Brukarar - administrere innloggingsdeltajar' òg vere slått på.
       For å sjå sidevisingar for ein brukar, må 'Statistikk - vis' òg vere slått på.
       For å opptre som andre brukarar, må 'Brukarar - opptre som' òg vere slått på.
+  to_end_a_long_running_conference_the_course_conten_63e3f993: "For å avslutte ein langvarig konferanse må løyve for Emne Innhald vere slått på  "
   to_f0e90538: "Til: "
+  to_fully_manage_course_level_question_banks_assign_3e5eb580: "For å administrere spørsmålsbankar på emnenivå må løyve for Oppgåver og Quizar - administrere/endre også vere slått på"
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "For å generere ein paringskode frå sida brukardetaljar, må løyva 'Brukarar - legg til / fjern studentar i emne' òg vere slått på."
+  to_generate_a_pairing_code_from_a_student_s_user_d_b3256aa0: "For å generere ein paringskode frå sida brukardetaljar, må løyve for \"Brukarar - tillat administrative handlingar\" òg vere slått på."
+  to_generate_a_pairing_code_from_a_student_s_user_s_5dcba185: "For å generere ein paringskode frå sida brukardetaljar, må løyve for \"Brukarar - opptre som\" òg vere slått på."
   to_generate_a_pairing_code_from_a_student_s_user_s_e36358b3: |-
       For å generere ein paringskode frå brukarinnstillingane til ein student, må løyvet 'Brukarar - opptre som' òg vere slått på.
       For å generere ein paringskode frå brukardetaljane til ein student, må løyvet 'Brukarar - legg til / fjern studentar frå emne' òg vere slått på.
+  to_generate_a_pairing_code_on_behalf_of_a_student__3caa504b: "For å generere ein paringskode på vegne av ein student som så skal dele denne med ein observatør så må løyve for \"Brukarar - generer paringskode for studentar\" vere slått på"
+  to_generate_grade_change_logs_in_admin_tools_grade_cbcab1c9: "For å generere vurderingsloggar i Admin Verktøy må 'Vurderingar - vis endringsloggar' òg vere slått på."
+  to_generate_login_logout_activity_in_admin_tools_u_603c40a0: "For å generere innlogging/utlogging i Admin Verktøy må \"Brukarar - administrer innloggingsdetaljar\" eller \"Statistikk - sjå\" vere slått på."
   to_generate_login_logout_activity_in_admin_tools_u_c5712e03: "For å generere inn- og utloggingsaktivitet i administrasjonsverktøy, må 'Brukarar - administrer innloggingsdetaljar' eller 'Statistikk - vis' òg vere slått på. For å generere vurderingsendringsloggar i administrasjonsverktøy, må 'Vurderingar - vis endringsloggar' òg vere slått på."
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "For å importere oppgåver og quizar gjennom emneimportfunksjonen, må 'Emneinnhald - legg til / endre / slett' vere slått på."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "For å importere filer ved å bruke emneimportvertøyet må 'Emneinnhald - legg til / endre / slett' òg vere slått på."
+  to_import_files_using_the_course_import_tool_cours_eb0ce4e1: "For å importere filar ved å bruke emneimportvertøyet må \"Emne filar - legg til\" og  'Emneinnhald - legg til / endre / slett' vere slått på."
   to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "For å importere læringsmål, må 'Læringsmål - import' òg vere slått på."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "For å importere SIS-data må 'SIS-data - import' òg vere slått på."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "For å importere SIS-data må 'SIS-data - import' òg vere slått på."
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "For å bli med i Canvas' nettsamfunn må du fyrst ha ein Canvas brukar."
+  to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "For å lære meir om Canvas for grunnskolen sjå *vår dokumentasjon*"
+  to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "For å kunne knytte ein observatør til ein student må løyve \"Meldingar - send til enkeltmedlemmar\" vere slått på."
+  to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "For å kunne knytte ein observatør til ein student må \"Brukarar - administrer innloggingsdetaljar\" og \"Meldingar - send til enkeltmedlemmar\" vere slått på."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "Om du vil lenke emneobservatøren *%{name}* til ein student, kan du skrive og finne studenten sitt namn nedanfor og deretter klikke på Oppdater."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "For å logge på Canvas brukaren din medan du er på farten, skann denne QR-koden frå ein Canvas mobilapp."
+  to_manage_associated_courses_courses_view_list_and_26f4c15c: "For å kunne administrere tilknytta emner må dei to løyva \"Emner - sjå liste\" og \"Emner - legg til\" vere slått på "
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "For å administrere innstillingar for blueprint-emne i emneinnstillingar må 'Emne - legg til / endre / slett' òg vere slått på."
+  to_manage_course_announcements_discussions_moderat_5f02f46e: "For å kunne administrere kunngjeringar på emne så må løyve \"Diskusjonar - moderer\" vere slått på"
   to_manage_course_content_course_content_add_edit_d_94caa77f: "For å redigere emneinnhald, må 'Emneinnhald - legg til / rediger / slett' være slått på."
   to_manage_discussions_discussions_moderate_must_al_51d7646f: |-
       For å administrere diskusjonar, må 'Diskusjonar - moderer' òg vere slått på.
