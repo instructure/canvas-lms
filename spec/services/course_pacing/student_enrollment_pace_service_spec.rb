@@ -23,8 +23,7 @@ describe CoursePacing::StudentEnrollmentPaceService do
   let(:student_enrollment) { course.enroll_student(student, enrollment_state: "active") }
   let(:extra_enrollment) { course.enroll_student(user_model, enrollment_state: "active") }
   let!(:pace) { student_enrollment_pace_model(student_enrollment: student_enrollment) }
-
-  before { course_pace_model(course: course) }
+  let!(:course_pace) { course_pace_model(course: course) }
 
   describe ".paces_in_course" do
     it "returns the paces for the provided course" do
@@ -52,6 +51,53 @@ describe CoursePacing::StudentEnrollmentPaceService do
       expect do
         CoursePacing::StudentEnrollmentPaceService.pace_in_context(extra_enrollment)
       end.to raise_error ActiveRecord::RecordNotFound
+    end
+  end
+
+  describe ".template_pace_for" do
+    context "the enrollment is within a section" do
+      let(:section) { add_section("Section One", course: course) }
+      let(:student_enrollment) { multiple_student_enrollment(student, section, course: course) }
+
+      context "when the section has a pace" do
+        let!(:section_pace) { section_pace_model(section: section) }
+
+        it "returns the section pace" do
+          expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq section_pace
+        end
+      end
+
+      context "when the section does not have a pace" do
+        context "when the course has a pace" do
+          it "returns the course pace" do
+            expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq course_pace
+          end
+        end
+
+        context "when the course does not have a pace" do
+          before { course_pace.destroy! }
+
+          it "returns nil" do
+            expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq nil
+          end
+        end
+      end
+    end
+
+    context "when the enrollment is not within a section" do
+      context "when the course has a pace" do
+        it "returns the course pace" do
+          expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq course_pace
+        end
+      end
+
+      context "when the course does not have a pace" do
+        before { course_pace.destroy! }
+
+        it "returns nil" do
+          expect(CoursePacing::StudentEnrollmentPaceService.template_pace_for(student_enrollment)).to eq nil
+        end
+      end
     end
   end
 

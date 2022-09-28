@@ -22,8 +22,7 @@ describe CoursePacing::SectionPaceService do
   let(:section) { add_section("Section One", course: course) }
   let(:section_two) { add_section("Section Two", course: course) }
   let!(:section_pace) { section_pace_model(section: section) }
-
-  before { course_pace_model(course: course) }
+  let!(:course_pace) { course_pace_model(course: course) }
 
   describe ".paces_in_course" do
     it "returns the paces for the provided course" do
@@ -51,6 +50,22 @@ describe CoursePacing::SectionPaceService do
       expect do
         CoursePacing::SectionPaceService.pace_in_context(section_two)
       end.to raise_error ActiveRecord::RecordNotFound
+    end
+  end
+
+  describe ".template_pace_for" do
+    context "when the course does not have a pace" do
+      before { section.course.course_paces.primary.destroy_all }
+
+      it "returns nil" do
+        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to eq nil
+      end
+    end
+
+    context "when the course has a pace" do
+      it "returns the course pace" do
+        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to eq course_pace
+      end
     end
   end
 

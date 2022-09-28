@@ -69,19 +69,31 @@ describe "Section Paces API" do
   end
 
   describe "show" do
-    let!(:section_pace) { section_pace_model(section: section) }
-    let(:course_pace) { course_pace_model(course: course) }
-
     it "returns the pace for the requested section" do
-      get api_v1_section_pace_path(course.id, section.id), params: { format: :json }
+      section_pace = section_pace_model(section: section)
+      get api_v1_section_pace_path(course, section), params: { format: :json }
       expect(response.status).to eq 200
       json = JSON.parse(response.body)
       expect(json["pace"]["id"]).to eq section_pace.id
     end
 
-    it "returns a 404 if the section does not have a pace" do
-      get api_v1_section_pace_path(course.id, section_two), params: { format: :json }
-      expect(response.status).to eq 404
+    context "the section does not have a pace, but the course does" do
+      before { course_pace_model(course: course, workflow_state: "published") }
+
+      it "falls back to the course pace" do
+        get api_v1_section_pace_path(course, section), params: { format: :json }
+        expect(response.status).to eq 200
+        json = JSON.parse(response.body)
+        expect(json["pace"]["id"]).to eq nil
+        expect(json["pace"]["workflow_state"]).to eq "unpublished"
+      end
+    end
+
+    context "the section and course do not have paces" do
+      it "returns a 404" do
+        get api_v1_section_pace_path(course, section), params: { format: :json }
+        expect(response.status).to eq 404
+      end
     end
 
     it "returns a 404 if the section and course are unrelated" do

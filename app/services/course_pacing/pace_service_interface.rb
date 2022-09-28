@@ -22,7 +22,18 @@ class CoursePacing::PaceServiceInterface
     raise NotImplementedError
   end
 
+  def self.pace_for(context)
+    pace_in_context(context)
+  rescue ActiveRecord::RecordNotFound
+    template = template_pace_for(context) || raise(ActiveRecord::RecordNotFound)
+    template.duplicate(create_params(context))
+  end
+
   def self.pace_in_context(context)
+    raise NotImplementedError
+  end
+
+  def self.template_pace_for(context)
     raise NotImplementedError
   end
 
