@@ -456,6 +456,10 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
+  def has_calendar_event
+    calendar_event.nil? ? 0 : 1
+  end
+
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
@@ -536,7 +540,7 @@ class WebConference < ActiveRecord::Base
     url = options.delete(:url)
     join_url = options.delete(:join_url)
     options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code start_at end_at])
-    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings long_running user_settings recordings]))
+    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings has_calendar_event long_running user_settings recordings]))
     result["url"] = url
     result["join_url"] = join_url
     result

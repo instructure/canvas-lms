@@ -330,6 +330,24 @@ describe "BigBlueButton conferences" do
       expect(wc_before_start_at).to be < wc_after_start_at
       expect(wc_before_end_at).to be < wc_after_end_at
     end
+
+    it "do not check Add to Calendar when the conference without calendar starts" do
+      get "/courses/#{@course.id}/conferences"
+      new_conference_button.click
+      wait_for_ajaximations
+
+      wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+
+      f("a.start-button").click
+      wait_for_ajaximations
+
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+
+      expect(f("input[value='add_to_calendar']").attribute("checked")).to be_falsey
+      new_conference = WebConference.last
+      expect(new_conference.has_calendar_event).to eq 0
+    end
   end
 
   context "when bbb_modal_update is OFF" do

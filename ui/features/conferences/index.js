@@ -305,7 +305,7 @@ const ConferencesRouter = Backbone.Router.extend({
         options.push('enable_waiting_room')
       }
 
-      if (attributes.start_at && attributes.end_at) {
+      if (attributes.has_calendar_event && attributes.start_at && attributes.end_at) {
         options.push('add_to_calendar')
       }
 
