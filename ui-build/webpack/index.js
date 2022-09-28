@@ -46,14 +46,39 @@ const skipSourcemaps = Boolean(
   process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY === '1'
 )
 
+// These flags are used by the build system to enable caching - it assumes that the cache is only reused
+// when no build dependencies are changing.
+const useBuildCache = process.env.USE_BUILD_CACHE === '1'
+const writeBuildCache = process.env.WRITE_BUILD_CACHE === '1'
+
 const createBundleAnalyzerPlugin = (...args) => {
   const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer')
   return new BundleAnalyzerPlugin(...args)
 }
 
+const readOnlyCachePlugin = () => {
+  return function apply(compiler) {
+    compiler.cache.hooks.store.intercept({
+      register: (tapInfo) => ({ ...tapInfo, fn: () => {} }),
+    })
+  }
+}
+
 module.exports = {
   mode: process.env.NODE_ENV,
   target: ['web', 'es2021'],
+  cache: useBuildCache ? {
+    type: 'filesystem',
+    allowCollectingMemory: false,
+    buildDependencies: { config: [] },
+    compression: 'gzip',
+  } : false,
+  snapshot: useBuildCache ? {
+    buildDependencies: { hash: true, timestamp: false },
+    module: { hash: true, timestamp: false },
+    resolve: { hash: true, timestamp: false },
+    resolveBuildDependencies: { hash: true, timestamp: false }
+  } : {},
   performance: skipSourcemaps
     ? false
     : {
@@ -398,8 +423,11 @@ module.exports = {
       // runtime error in case we didn't cover them all, or provide a sink like
       // this, which i'm gonna go with for now:
       process: { env: {} },
-    })
+    }),
   ]
+    .concat(
+      writeBuildCache ? [] : readOnlyCachePlugin()
+    )
     .concat(
       // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
       process.env.WEBPACK_PEDANTIC !== '0'

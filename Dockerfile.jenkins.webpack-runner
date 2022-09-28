@@ -3,12 +3,16 @@ FROM local/webpack-builder
 RUN \
   --mount=type=bind,from=local/cache-helper,source=/tmp/dst,target=/cache-helper \
   --mount=type=bind,from=local/webpack-assets-previous,target=/mount/webpack-assets-previous \
+  --mount=type=bind,from=local/webpack-cache-previous,target=/mount/webpack-cache-previous \
   tar --no-same-owner -xf /cache-helper/webpack-runner-dependencies.tar -C ${APP_HOME} && \
   tar --no-same-owner -xf /cache-helper/webpack-runner.tar -C ${APP_HOME} && \
-  { { cd /mount/webpack-assets-previous/usr/src/app && cp --parents -rf public/dist/brandable_css ${APP_HOME}; } || true; }
+  { { cd /mount/webpack-assets-previous/usr/src/app && cp --parents -rf public/dist/brandable_css ${APP_HOME}; } || true; } && \
+  { { cd /mount/webpack-cache-previous && cp --parents -rf node_modules/.cache ${APP_HOME}; } || true; }
 
 ARG JS_BUILD_NO_UGLIFY=0
 ARG RAILS_LOAD_ALL_LOCALES=0
+ARG USE_BUILD_CACHE=0
+ARG WRITE_BUILD_CACHE=0
 ARG CRYSTALBALL_MAP=0
 RUN COMPILE_ASSETS_API_DOCS=0 \
     COMPILE_ASSETS_BRAND_CONFIGS=0 \
@@ -16,5 +20,7 @@ RUN COMPILE_ASSETS_API_DOCS=0 \
     COMPILE_ASSETS_STYLEGUIDE=0 \
     JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
     RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES" \
+    USE_BUILD_CACHE="$USE_BUILD_CACHE" \
+    WRITE_BUILD_CACHE="$WRITE_BUILD_CACHE" \
     CRYSTALBALL_MAP="$CRYSTALBALL_MAP" \
     bundle exec rails canvas:compile_assets
