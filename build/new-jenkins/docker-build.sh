@@ -226,7 +226,7 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
   fi
 
-  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-}
+  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-} ${WEBPACK_BUILDER_FUZZY_TAG-}
 
   # *_BUILD_CACHE are special variables and do not need to be included in the image cache hash
   # because it shouldn't produce any compiled asset changes
