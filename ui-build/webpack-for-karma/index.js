@@ -68,6 +68,7 @@ module.exports = {
           path.join(canvasDir, 'packages/jquery-popover'),
           path.join(canvasDir, 'packages/jquery-selectmenu'),
           path.join(canvasDir, 'packages/mathml'),
+          path.join(canvasDir, 'packages/defer-promise'),
           path.join(canvasDir, 'packages/persistent-array'),
           path.join(canvasDir, 'packages/slickgrid'),
           path.join(canvasDir, 'packages/with-breakpoints'),
