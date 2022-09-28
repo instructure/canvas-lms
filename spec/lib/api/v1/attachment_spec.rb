@@ -278,6 +278,26 @@ describe Api::V1::Attachment do
         allow(InstFS).to receive(:enabled?).and_return(true)
       end
 
+      it "sends the precreated_attachment_id as a string" do
+        student = course_with_user("StudentEnrollment", course: context, active_all: true).user
+        user_session(student)
+        additional_opts = {
+          precreate_attachment: true
+        }
+        expect(InstFS).to receive(:upload_preflight_json)
+          .with hash_including(
+            {
+              additional_capture_params: include(
+                {
+                  precreated_attachment_id: String
+                }
+              )
+            }
+          )
+
+        api_attachment_preflight(context, request, opts.merge(additional_opts))
+      end
+
       context "with the category param set" do
         subject { Attachment.find_by(display_name: params[:name]) }
 
