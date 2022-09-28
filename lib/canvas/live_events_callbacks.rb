@@ -202,6 +202,10 @@ module Canvas::LiveEventsCallbacks
       if %w[restrictions use_default_restrictions].any? { |f| changes[f] } && obj.quiz_lti_content?
         Canvas::LiveEvents.blueprint_restrictions_updated(obj)
       end
+    when MasterCourses::ChildSubscription
+      if changes["workflow_state"] && obj.workflow_state == "active"
+        Canvas::LiveEvents.blueprint_subscription_created(obj)
+      end
     end
   end
 
@@ -213,6 +217,8 @@ module Canvas::LiveEventsCallbacks
       end
     when WikiPage
       Canvas::LiveEvents.wiki_page_deleted(obj)
+    when MasterCourses::ChildSubscription
+      Canvas::LiveEvents.blueprint_subscription_deleted(obj)
     end
   end
 
