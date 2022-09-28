@@ -63,6 +63,8 @@ const buildResponseMessages = ({targetWindow, origin, subject, message_id}) => {
     sendError(UNSUPPORTED_SUBJECT_ERROR_CODE)
   }
 
+  const isResponse = message => !!message.data?.subject?.endsWith('.response')
+
   return {
     sendResponse,
     sendSuccess,
@@ -70,7 +72,8 @@ const buildResponseMessages = ({targetWindow, origin, subject, message_id}) => {
     sendGenericError,
     sendBadRequestError,
     sendWrongOriginError,
-    sendUnsupportedSubjectError
+    sendUnsupportedSubjectError,
+    isResponse,
   }
 }
 
