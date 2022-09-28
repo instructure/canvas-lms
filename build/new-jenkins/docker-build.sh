@@ -210,17 +210,17 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
   fi
 
-  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-} ${WEBPACK_BUILDER_FUZZY_TAG-}
+  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-} ${WEBPACK_BUILDER_FUZZY_SAVE_TAG-}
 
-  [[ ! -z "${WEBPACK_ASSETS_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
-    $WEBPACK_ASSETS_FUZZY_TAG \
+  [[ ! -z "${WEBPACK_ASSETS_FUZZY_LOAD_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+    $WEBPACK_ASSETS_FUZZY_LOAD_TAG \
     "WEBPACK_ASSETS_CACHE_ID" \
     $WEBPACK_ASSETS_CACHE_ID \
     local/webpack-assets-previous \
   || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
 
-  [[ ! -z "${WEBPACK_CACHE_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
-    $WEBPACK_CACHE_FUZZY_TAG \
+  [[ ! -z "${WEBPACK_CACHE_FUZZY_LOAD_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+    $WEBPACK_CACHE_FUZZY_LOAD_TAG \
     "WEBPACK_CACHE_ID" \
     $WEBPACK_CACHE_ID \
     local/webpack-cache-previous \
@@ -253,7 +253,7 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
       --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
       --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
       --no-cache \
-      --tag "${WEBPACK_CACHE_FUZZY_TAG-}" \
+      --tag "${WEBPACK_CACHE_FUZZY_SAVE_TAG-}" \
       - < Dockerfile.jenkins.webpack-cache
   fi
 
@@ -273,7 +273,7 @@ else
   [ ! -z "${CACHE_UNIQUE_SCOPE-}" ] && tag_remote_async "WEBPACK_ASSETS_TAG_REMOTE_UNIQUE_PID" $WEBPACK_ASSETS_SELECTED_TAG ${WEBPACK_ASSETS_TAGS[UNIQUE_TAG]}
 fi
 
-tag_many $WEBPACK_ASSETS_SELECTED_TAG local/webpack-assets ${WEBPACK_ASSETS_TAGS[SAVE_TAG]} ${WEBPACK_ASSETS_TAGS[UNIQUE_TAG]-} ${WEBPACK_ASSETS_FUZZY_TAG-}
+tag_many $WEBPACK_ASSETS_SELECTED_TAG local/webpack-assets ${WEBPACK_ASSETS_TAGS[SAVE_TAG]} ${WEBPACK_ASSETS_TAGS[UNIQUE_TAG]-} ${WEBPACK_ASSETS_FUZZY_SAVE_TAG-}
 
 # Build Final Image
 if [ -n "${1:-}" ]; then
