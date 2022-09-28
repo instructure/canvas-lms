@@ -125,7 +125,10 @@ def preloadCacheImagesAsync() {
 
   sh """#!/bin/bash
     /tmp/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental &
-    /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()} &
+    {
+      /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}
+      /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_BUILDER_PREFIX}:${getFuzzyTagSuffix()}
+    } &
     /tmp/docker-with-flakey-network-protection.sh pull ${env.WEBPACK_CACHE_PREFIX}:${getFuzzyTagSuffix()} &
   """
 }
@@ -145,6 +148,7 @@ def premergeCacheImage() {
       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
       "WEBPACK_ASSETS_FUZZY_TAG=${env.WEBPACK_ASSETS_PREFIX}:${getFuzzyTagSuffix()}",
       "WEBPACK_ASSETS_PREFIX=${env.WEBPACK_ASSETS_PREFIX}",
+      "WEBPACK_BUILDER_FUZZY_TAG=${env.WEBPACK_BUILDER_PREFIX}:${getFuzzyTagSuffix()}",
       "WEBPACK_CACHE_FUZZY_TAG=${env.WEBPACK_CACHE_PREFIX}:${getFuzzyTagSuffix()}",
       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
       "READ_BUILD_CACHE=0",
