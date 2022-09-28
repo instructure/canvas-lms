@@ -53,6 +53,12 @@ export default function GradebookData(props) {
   const isStudentIdsLoading = useStore(state => state.isStudentIdsLoading)
   const fetchStudentIds = useStore(state => state.fetchStudentIds)
 
+  const gradingPeriodAssignments = useStore(state => state.gradingPeriodAssignments)
+  const isGradingPeriodAssignmentsLoading = useStore(
+    state => state.isGradingPeriodAssignmentsLoading
+  )
+  const fetchGradingPeriodAssignments = useStore(state => state.fetchGradingPeriodAssignments)
+
   // Initial state
   // We might be able to do this in gradebook/index.tsx instead
   useEffect(() => {
@@ -98,11 +104,14 @@ export default function GradebookData(props) {
       {...props}
       appliedFilters={appliedFilters}
       customColumns={customColumns}
+      fetchGradingPeriodAssignments={fetchGradingPeriodAssignments}
       fetchStudentIds={fetchStudentIds}
       flashAlerts={flashMessages}
+      gradingPeriodAssignments={gradingPeriodAssignments}
       hideGrid={false}
       isCustomColumnsLoading={isCustomColumnsLoading}
       isFiltersLoading={isFiltersLoading}
+      isGradingPeriodAssignmentsLoading={isGradingPeriodAssignmentsLoading}
       isModulesLoading={isModulesLoading}
       isStudentIdsLoading={isStudentIdsLoading}
       modules={modules}

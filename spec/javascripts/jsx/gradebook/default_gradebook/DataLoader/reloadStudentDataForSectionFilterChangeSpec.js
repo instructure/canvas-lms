@@ -242,15 +242,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       await reloadData()
     })
 
-    test('does not load grading period assignments', async () => {
-      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
-      await reloadData()
-      strictEqual(
-        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
-        0
-      )
-    })
-
     test('does not load assignment groups', async () => {
       sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
       await reloadData()

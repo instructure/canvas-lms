@@ -267,25 +267,6 @@ QUnit.module('Gradebook > DataLoader', suiteHooks => {
       )
     }
 
-    test('loads grading period assignments when the course uses a grading period set', async () => {
-      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
-      await loadInitialData()
-      strictEqual(
-        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
-        1
-      )
-    })
-
-    test('does not load grading period assignments when the course does not use a grading period set', async () => {
-      gradebook.gradingPeriodSet = null
-      sinon.spy(dataLoader.gradingPeriodAssignmentsLoader, 'loadGradingPeriodAssignments')
-      await loadInitialData()
-      strictEqual(
-        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments.callCount,
-        0
-      )
-    })
-
     test('loads assignment groups', async () => {
       sinon.spy(dataLoader.assignmentGroupsLoader, 'loadAssignmentGroups')
       await loadInitialData()

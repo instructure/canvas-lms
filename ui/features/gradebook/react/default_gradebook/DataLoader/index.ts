@@ -20,12 +20,12 @@ import {difference} from 'lodash'
 
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
-import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
+import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 
 export default class DataLoader {
   _gradebook: Gradebook
@@ -34,27 +34,30 @@ export default class DataLoader {
 
   customColumnsDataLoader: CustomColumnsDataLoader
 
-  gradingPeriodAssignmentsLoader: GradingPeriodAssignmentsLoader
-
   sisOverridesLoader: SisOverridesLoader
 
   studentContentDataLoader: StudentContentDataLoader
 
   fetchStudentIds: () => Promise<string[]>
 
+  fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
+
   constructor({
     dispatch,
     gradebook,
     performanceControls,
     fetchStudentIds,
+    fetchGradingPeriodAssignments,
   }: {
     dispatch: RequestDispatch
     gradebook: Gradebook
     performanceControls: PerformanceControls
     fetchStudentIds: () => Promise<string[]>
+    fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
   }) {
     this._gradebook = gradebook
     this.fetchStudentIds = fetchStudentIds
+    this.fetchGradingPeriodAssignments = fetchGradingPeriodAssignments
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
@@ -64,7 +67,6 @@ export default class DataLoader {
     }
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
-    this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
   }
@@ -138,11 +140,8 @@ export default class DataLoader {
     // Begin loading Student IDs before any other data.
     const gotStudentIds: Promise<string[]> = this.fetchStudentIds()
 
-    let gotGradingPeriodAssignments
-    if (options.getGradingPeriodAssignments) {
-      gotGradingPeriodAssignments =
-        dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
-    }
+    const gotGradingPeriodAssignments: null | Promise<GradingPeriodAssignmentMap> =
+      options.getGradingPeriodAssignments ? this.fetchGradingPeriodAssignments() : null
 
     if (options.getAssignmentGroups) {
       if (gotGradingPeriodAssignments && gradebook.gradingPeriodId !== '0') {
