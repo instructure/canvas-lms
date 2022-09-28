@@ -349,7 +349,7 @@ module Api::V1::Attachment
 
       if opts[:precreate_attachment]
         @attachment = create_new_attachment(context, params, current_user, opts, folder)
-        additional_capture_params[:precreated_attachment_id] = @attachment.global_id
+        additional_capture_params[:precreated_attachment_id] = @attachment.global_id.to_s
       end
 
       json = InstFS.upload_preflight_json(
