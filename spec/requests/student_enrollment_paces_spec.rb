@@ -72,9 +72,61 @@ describe "Student Enrollment Paces API" do
       expect(json["pace"]["id"]).to eq student_pace.id
     end
 
-    it "returns a 404 if the student enrollment does not have a pace" do
-      get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
-      expect(response.status).to eq 404
+    context "the student enrollment belongs to a section" do
+      let(:section) { add_section("Section One", course: course) }
+      let(:student_enrollment) { multiple_student_enrollment(student, section, course: course) }
+
+      context "the section has a pace" do
+        before { section_pace_model(section: section, workflow_state: "published") }
+
+        it "falls back to the section pace" do
+          get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["workflow_state"]).to eq "unpublished"
+        end
+      end
+
+      context "the section does not have a pace, but the course does" do
+        before { course_pace_model(course: course, workflow_state: "published") }
+
+        it "falls back to the course pace" do
+          get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["workflow_state"]).to eq "unpublished"
+        end
+      end
+
+      context "neither the section nor the course have a pace" do
+        it "returns a 404" do
+          get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
+          expect(response.status).to eq 404
+        end
+      end
+    end
+
+    context "the student enrollment does not belong to a section" do
+      context "the course has a pace" do
+        before { course_pace_model(course: course, workflow_state: "published") }
+
+        it "falls back to the course pace" do
+          get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace"]["id"]).to eq nil
+          expect(json["pace"]["workflow_state"]).to eq "unpublished"
+        end
+      end
+
+      context "the course does not have a pace" do
+        it "returns a 404" do
+          get api_v1_student_enrollment_pace_path(course.id, student_enrollment.id), params: { format: :json }
+          expect(response.status).to eq 404
+        end
+      end
     end
 
     it "returns a 401 if the user lacks permissions" do

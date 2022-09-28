@@ -26,6 +26,18 @@ class CoursePacing::StudentEnrollmentPaceService < CoursePacing::PaceServiceInte
     paces_in_course(course_for(student_enrollment)).find_by!(user_id: student_enrollment.user_id)
   end
 
+  def self.template_pace_for(student_enrollment)
+    if student_enrollment.course_section_id.nil?
+      course_for(student_enrollment).course_paces.primary.take
+    else
+      begin
+        CoursePacing::SectionPaceService.pace_in_context(student_enrollment.course_section)
+      rescue ActiveRecord::RecordNotFound
+        CoursePacing::SectionPaceService.template_pace_for(student_enrollment.course_section)
+      end
+    end
+  end
+
   def self.create_params(student_enrollment)
     super.merge({ user_id: student_enrollment.user_id })
   end

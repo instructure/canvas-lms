@@ -26,6 +26,40 @@ describe CoursePacing::PaceServiceInterface do
     end
   end
 
+  describe ".pace_for" do
+    context "when there is an existing pace within the context" do
+      before { allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_return("foobar") }
+
+      it "returns the pace in the context" do
+        expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq "foobar"
+      end
+    end
+
+    context "when there is no existing pace within the context" do
+      before do
+        allow(CoursePacing::PaceServiceInterface).to receive(:pace_in_context).and_raise(ActiveRecord::RecordNotFound)
+        allow(CoursePacing::PaceServiceInterface).to receive(:template_pace_for).and_return(nil)
+      end
+
+      it "raises a RecordNotFound error" do
+        expect do
+          CoursePacing::PaceServiceInterface.pace_for(double)
+        end.to raise_error ActiveRecord::RecordNotFound
+      end
+
+      context "when there is an existing template to fall back to" do
+        let(:template) { double }
+
+        before { allow(CoursePacing::PaceServiceInterface).to receive(:template_pace_for).and_return(template) }
+
+        it "duplicates the template within the context" do
+          expect(template).to receive(:duplicate)
+          CoursePacing::PaceServiceInterface.pace_for(double)
+        end
+      end
+    end
+  end
+
   describe ".pace_in_context" do
     it "requires implementation" do
       expect do
