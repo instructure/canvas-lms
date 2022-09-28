@@ -33,6 +33,10 @@ module Messages
       end
     end
 
+    def self.prune
+      process(prune: true)
+    end
+
     def self.log(*args)
       logger&.info(*args)
     end

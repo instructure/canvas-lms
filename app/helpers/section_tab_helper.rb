@@ -118,6 +118,9 @@ module SectionTabHelper
             !WebConference.config(context: @context)
           elsif quiz_lti_tab?(tab)
             !new_quizzes_navigation_placements_enabled?(context)
+          elsif tab_is?(tab, "TAB_PEOPLE")
+            # can't manage people in template courses
+            context.is_a?(Course) && context.template?
           end
         end
       end

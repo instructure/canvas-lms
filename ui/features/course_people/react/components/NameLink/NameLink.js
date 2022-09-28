@@ -21,8 +21,7 @@ import {arrayOf, shape, string} from 'prop-types'
 import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import '@canvas/context-cards/react/StudentContextCardTrigger'
-
-const STUDENT_ENROLLMENT = 'StudentEnrollment'
+import {STUDENT_ENROLLMENT} from '../../../util/constants'
 
 const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
   const formatPronouns = pronounString => {
@@ -43,7 +42,7 @@ const NameLink = ({studentId, htmlUrl, name, pronouns, enrollments}) => {
       data-course_id={ENV.course.id}
     >
       <Link isWithinText={false} href={htmlUrl} margin="0 x-small 0 0">
-        {name}
+        <Text wrap="break-word">{name}</Text>
         {formatPronouns(pronouns)}
       </Link>
     </span>

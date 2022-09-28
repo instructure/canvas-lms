@@ -579,6 +579,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           {
             grade: 70,
             score: 7,
+            graded_at: '2016-07-11T19:22:14Z',
             user_id: '4',
             assignment_id: '1',
             anonymous_id: 'i9Z1a'
@@ -586,6 +587,7 @@ QUnit.module('SpeedGrader', rootHooks => {
           {
             grade: 10,
             score: 1,
+            graded_at: '2016-07-10T19:22:14Z',
             user_id: '5',
             assignment_id: '1',
             anonymous_id: 't4N2y'
@@ -596,7 +598,16 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.jsonReady()
       originalStudent = SpeedGrader.EG.currentStudent
       SpeedGrader.EG.currentStudent = window.jsonData.studentMap[4]
-      sinon.stub($, 'getJSON').yields({user_id: '4', score: 2, grade: '20'})
+      const getJSONStub = sinon.stub($, 'getJSON')
+      getJSONStub
+        .onFirstCall()
+        .yields({user_id: '4', score: 2, grade: '20', graded_at: '2016-07-11T19:22:14Z'})
+      getJSONStub
+        .onSecondCall()
+        .yields({user_id: '4', score: 10, grade: '100', graded_at: '2016-07-12T19:22:14Z'})
+      getJSONStub
+        .onThirdCall()
+        .yields({user_id: '4', score: 5, grade: '50', graded_at: '2016-07-13T19:22:14Z'})
       sinon.stub(SpeedGrader.EG, 'updateSelectMenuStatus')
       sinon.stub(SpeedGrader.EG, 'showGrade')
     })
@@ -616,13 +627,30 @@ QUnit.module('SpeedGrader', rootHooks => {
       strictEqual(request.args[1]['include[]'], 'submission_history')
     })
 
+    test('can be configured to keep polling until a condition is met', () => {
+      const retry = (sub, originalSub, _numRequests) =>
+        Date.parse(sub.graded_at) <= Date.parse(originalSub.graded_at)
+
+      SpeedGrader.EG.refreshGrades(null, retry)
+      strictEqual($.getJSON.callCount, 2)
+      strictEqual(SpeedGrader.EG.currentStudent.submission.grade, '100')
+    })
+
+    test('can be configured to keep polling until a certain number of requests are made', () => {
+      const retry = (_sub, _originalSub, numRequests) => numRequests <= 1
+
+      SpeedGrader.EG.refreshGrades(null, retry)
+      strictEqual($.getJSON.callCount, 2)
+      strictEqual(SpeedGrader.EG.currentStudent.submission.grade, '100')
+    })
+
     test('updates the submission for the requested student', () => {
       SpeedGrader.EG.refreshGrades()
       strictEqual(SpeedGrader.EG.currentStudent.submission.grade, '20')
     })
 
     test('updates the submission_state for the requested student', () => {
-      $.getJSON.yields({user_id: '4', workflow_state: 'unsubmitted'})
+      $.getJSON.onFirstCall().yields({user_id: '4', workflow_state: 'unsubmitted'})
       SpeedGrader.EG.refreshGrades()
       strictEqual(SpeedGrader.EG.currentStudent.submission_state, 'not_submitted')
     })

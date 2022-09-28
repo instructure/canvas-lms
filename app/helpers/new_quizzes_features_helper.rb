@@ -39,6 +39,10 @@ module NewQuizzesFeaturesHelper
     Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks) && context.feature_enabled?(:quizzes_next)
   end
 
+  def new_quizzes_by_default?
+    @context.feature_enabled?(:quizzes_next) && @context.feature_enabled?(:new_quizzes_by_default)
+  end
+
   module_function
 
   def new_quizzes_enabled?(context = @context)

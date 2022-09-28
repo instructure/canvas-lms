@@ -214,6 +214,7 @@ const OutcomeManagementPanel = ({
   const onSuccessGroupRemove = () => {
     selectParentGroupInLhs()
     removeGroup(selectedGroupId)
+    setParentsToUnload(getOutcomeGroupAncestorsWithSelf(collections, selectedParentGroupId))
     clearSelectedOutcomes()
   }
 

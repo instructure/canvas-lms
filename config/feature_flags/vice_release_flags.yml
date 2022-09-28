@@ -67,7 +67,12 @@ bbb_modal_update:
   state: hidden
   display_name: BBB Modal Update
   description: |-
-    This update will allow more options for BBB conferences
+    This update offers enhanced feature functionality for 
+    Big Blue Button Conferences. Users will now be able to enable 
+    the Waiting Room in their conference settings, they'll be able 
+    to add a scheduled conference to their calendar from within a conference, 
+    and they'll be able to update/sync conference attendees as new attendees are 
+    added or removed.
   applies_to: SiteAdmin
 
 react_inbox:

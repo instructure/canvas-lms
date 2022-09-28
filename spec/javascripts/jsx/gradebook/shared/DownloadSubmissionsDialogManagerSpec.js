@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import DownloadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/DownloadSubmissionsDialogManager.js'
+import DownloadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/DownloadSubmissionsDialogManager'
 
 import INST from 'browser-sniffer'
 import 'ui/features/submission_download/jquery/index.js'

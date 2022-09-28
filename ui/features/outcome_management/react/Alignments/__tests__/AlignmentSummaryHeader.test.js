@@ -31,6 +31,7 @@ describe('AlignmentSummaryHeader', () => {
     totalAlignments: 200,
     totalArtifacts: 75,
     alignedArtifacts: 60,
+    artifactAlignments: 225,
     searchString: 'search value',
     updateSearchHandler: updateSearchHandlerMock,
     clearSearchHandler: clearSearchHandlerMock,
@@ -134,9 +135,7 @@ describe('AlignmentSummaryHeader', () => {
   })
 
   it('calculates properly average alignments per artifact', () => {
-    const {getAllByTestId} = render(
-      <AlignmentSummaryHeader {...defaultProps({totalArtifacts: 50, totalAlignments: 150})} />
-    )
+    const {getAllByTestId} = render(<AlignmentSummaryHeader {...defaultProps()} />)
     const {getByText} = within(getAllByTestId('outcome-alignment-stat-item')[1])
     expect(getByText(/3.0/)).toBeInTheDocument()
   })

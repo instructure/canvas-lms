@@ -32,6 +32,22 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     options[:consul_event] = consul_event
   end
 
+  def delete_matched(matcher, options = nil)
+    # do it locally
+    super
+
+    options = merged_options(options)
+    # then if so configured, trigger consul
+    if options[:consul_event]
+      pattern = namespace_key(matcher, options)
+      datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
+      datacenters.each do |dc|
+        # Diplomat is silly and doesn't use kwargs for some reason
+        Diplomat::Event.fire(options[:consul_event], "DELETE_MATCHED|#{pattern}", nil, nil, nil, dc)
+      end
+    end
+  end
+
   def clear
     # do it locally
     super
@@ -72,6 +88,7 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     if options[:consul_event]
       datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
       datacenters.each do |dc|
+        # TODO: after the new version of consume_consul_events is deployed everywhere, replace key with "DELETE|#{key}"
         Diplomat::Event.fire(options[:consul_event], key, nil, nil, nil, dc)
       end
       # no idea if we actually cleared anything

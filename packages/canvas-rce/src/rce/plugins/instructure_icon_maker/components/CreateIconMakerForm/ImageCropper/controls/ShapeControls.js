@@ -17,10 +17,10 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import formatMessage from '../../../../../../../format-message'
 import {SimpleSelect} from '@instructure/ui-simple-select'
-import PropTypes from 'prop-types'
 import {ZoomControls} from './ZoomControls'
 import {Shape} from '../../../../svg/shape'
 
@@ -39,11 +39,12 @@ export const ShapeControls = ({shape, onChange}) => {
   return (
     <Flex.Item margin="0 medium 0 0">
       <SimpleSelect
-        isInline
+        isInline={true}
         assistiveText={formatMessage('Select crop shape')}
         value={shape}
         onChange={(event, {id}) => onChange(id)}
         renderLabel={null}
+        data-testid="shape-select-dropdown"
       >
         {SHAPE_OPTIONS.map(option => (
           <SimpleSelect.Option key={option.id} id={option.id} value={option.id}>

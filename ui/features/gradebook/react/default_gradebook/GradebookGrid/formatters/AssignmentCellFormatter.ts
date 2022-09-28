@@ -171,7 +171,7 @@ export default class AssignmentCellFormatter {
     const submissionData = {
       dropped: submission.drop,
       excused: submission.excused,
-      extended: submission.late_policy_status == 'extended',
+      extended: submission.late_policy_status === 'extended',
       grade: assignment.grading_type === 'pass_fail' ? submission.rawGrade : submission.grade,
       late: submission.late,
       missing: submission.missing,

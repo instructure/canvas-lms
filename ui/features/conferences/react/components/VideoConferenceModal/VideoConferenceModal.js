@@ -25,6 +25,8 @@ import {Button, CloseButton} from '@instructure/ui-buttons'
 import VideoConferenceTypeSelect from '../VideoConferenceTypeSelect/VideoConferenceTypeSelect'
 import BBBModalOptions from '../BBBModalOptions/BBBModalOptions'
 import BaseModalOptions from '../BaseModalOptions/BaseModalOptions'
+import {SETTINGS_TAB, ATTENDEES_TAB} from '../../../util/constants'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('video_conference')
 
@@ -36,7 +38,7 @@ export const VideoConferenceModal = ({
   onSubmit,
   ...props
 }) => {
-  const OPTIONS_DEFAULT = ['enable_waiting_room']
+  const OPTIONS_DEFAULT = []
 
   if (ENV.bbb_recording_enabled) {
     OPTIONS_DEFAULT.push('recording_enabled')
@@ -47,9 +49,10 @@ export const VideoConferenceModal = ({
     'share_other_webcams',
     'share_microphone',
     'send_public_chat',
-    'send_private_chat'
+    'send_private_chat',
   ]
 
+  const [tab, setTab] = useState(SETTINGS_TAB)
   const defaultName = ENV.context_name ? `${ENV.context_name} Conference` : 'Conference'
   const [name, setName] = useState(isEditing ? props.name : defaultName)
   const [conferenceType, setConferenceType] = useState(
@@ -57,6 +60,7 @@ export const VideoConferenceModal = ({
   )
   const [duration, setDuration] = useState(isEditing ? props.duration : 60)
   const [options, setOptions] = useState(isEditing ? props.options : OPTIONS_DEFAULT)
+
   const [description, setDescription] = useState(isEditing ? props.description : '')
   const [invitationOptions, setInvitationOptions] = useState(
     isEditing ? props.invitationOptions : INVITATION_OPTIONS_DEFAULT
@@ -76,6 +80,57 @@ export const VideoConferenceModal = ({
   )
 
   const [showCalendarOptions, setShowCalendarOptions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [nameValidationMessages, setNameValidationMessages] = useState([])
+  const [durationValidationMessages, setDurationValidationMessages] = useState([])
+  const [descriptionValidationMessages, setDescriptionValidationMessages] = useState([])
+  const [calendarValidationMessages, setCalendarValidationMessages] = useState([])
+  const [addToCalendar, setAddToCalendar] = useState(options.includes('add_to_calendar'))
+
+  const onStartDateChange = newValue => {
+    setStartCalendarDate(newValue)
+  }
+
+  const onEndDateChange = newValue => {
+    setEndCalendarDate(newValue)
+  }
+
+  const setAndValidateName = nameToBeValidated => {
+    if (nameToBeValidated.length > 255) {
+      setNameValidationMessages([
+        {text: I18n.t('Name must be less than 255 characters'), type: 'error'},
+      ])
+    } else {
+      setNameValidationMessages([])
+      setName(nameToBeValidated)
+    }
+  }
+
+  const setAndValidateDuration = durationToBeValidated => {
+    if (durationToBeValidated.toString().length > 8) {
+      if (durationValidationMessages.length === 0) {
+        setDuration(durationToBeValidated)
+      }
+      setDurationValidationMessages([
+        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'}
+      ])
+    } else {
+      setDurationValidationMessages([])
+      setDuration(durationToBeValidated)
+    }
+  }
+
+  const setAndValidateDescription = descriptionToBeValidated => {
+    if (descriptionToBeValidated.length > 2500) {
+      setDescriptionValidationMessages([
+        {text: I18n.t('Description must be less than 2500 characters'), type: 'error'},
+      ])
+    } else {
+      setDescriptionValidationMessages([])
+      setDescription(descriptionToBeValidated)
+    }
+  }
 
   // Detect initial state for address book display
   useEffect(() => {
@@ -85,9 +140,19 @@ export const VideoConferenceModal = ({
 
   // Detect initial state for calender picker display
   useEffect(() => {
-    const addToCalendar = options.includes('add_to_calendar')
     addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
-  }, [options])
+  }, [addToCalendar])
+
+  // Validate Calendar EndAt > StartAt
+  useEffect(() => {
+    if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
+      setCalendarValidationMessages([
+        {text: I18n.t('End at must be later than Start at'), type: 'error'},
+      ])
+    } else {
+      setCalendarValidationMessages([])
+    }
+  }, [addToCalendar, startCalendarDate, endCalendarDate])
 
   const renderCloseButton = () => {
     return (
@@ -107,13 +172,14 @@ export const VideoConferenceModal = ({
       return (
         <BBBModalOptions
           name={name}
-          onSetName={setName}
+          onSetName={setAndValidateName}
           duration={duration}
-          onSetDuration={setDuration}
+          onSetDuration={setAndValidateDuration}
+          durationValidationMessages={durationValidationMessages}
           options={options}
           onSetOptions={setOptions}
           description={description}
-          onSetDescription={setDescription}
+          onSetDescription={setAndValidateDescription}
           invitationOptions={invitationOptions}
           onSetInvitationOptions={setInvitationOptions}
           attendeesOptions={attendeesOptions}
@@ -122,11 +188,21 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
+          savedAttendees={props.savedAttendees}
           showCalendar={showCalendarOptions}
+          setAddToCalendar={setAddToCalendar}
+          addToCalendar={addToCalendar}
           startDate={startCalendarDate}
           endDate={endCalendarDate}
-          onStartDateChange={setStartCalendarDate}
-          onEndDateChange={setEndCalendarDate}
+          onStartDateChange={onStartDateChange}
+          onEndDateChange={onEndDateChange}
+          calendarValidationMessages={calendarValidationMessages}
+          tab={tab}
+          setTab={setTab}
+          nameValidationMessages={nameValidationMessages}
+          descriptionValidationMessages={descriptionValidationMessages}
+          hasBegun={props.hasBegun}
+          isEditing={isEditing}
         />
       )
     }
@@ -134,19 +210,25 @@ export const VideoConferenceModal = ({
     return (
       <BaseModalOptions
         name={name}
-        onSetName={setName}
+        onSetName={setAndValidateName}
         duration={duration}
-        onSetDuration={setDuration}
+        onSetDuration={setAndValidateDuration}
+        durationValidationMessages={durationValidationMessages}
         options={options}
         onSetOptions={setOptions}
         description={description}
-        onSetDescription={setDescription}
+        onSetDescription={setAndValidateDescription}
         invitationOptions={invitationOptions}
         onSetInvitationOptions={setInvitationOptions}
         showAddressBook={showAddressBook}
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
+        savedAttendees={props.savedAttendees}
+        nameValidationMessages={nameValidationMessages}
+        descriptionValidationMessages={descriptionValidationMessages}
+        hasBegun={props.hasBegun}
+        isEditing={isEditing}
       />
     )
   }
@@ -156,9 +238,19 @@ export const VideoConferenceModal = ({
       as="form"
       open={open}
       onDismiss={onDismiss}
-      onSubmit={e => {
+      onSubmit={async e => {
         e.preventDefault()
-        onSubmit(e, {
+        if (tab === ATTENDEES_TAB) {
+          setTab(SETTINGS_TAB)
+          setTimeout(() => {
+            document.querySelector('button[type=submit]').click()
+          }, 200)
+          return
+        }
+
+        setIsLoading(true)
+
+        const submitted = await onSubmit(e, {
           name,
           conferenceType,
           duration,
@@ -168,12 +260,16 @@ export const VideoConferenceModal = ({
           attendeesOptions,
           selectedAttendees,
           startCalendarDate,
-          endCalendarDate
+          endCalendarDate,
         })
+
+        if (!submitted) {
+          setIsLoading(false)
+        }
       }}
       size="auto"
       label={header}
-      shouldCloseOnDocumentClick={true}
+      shouldCloseOnDocumentClick={false}
     >
       <Modal.Header>
         {renderCloseButton()}
@@ -183,15 +279,43 @@ export const VideoConferenceModal = ({
         <VideoConferenceTypeSelect
           conferenceTypes={window.ENV.conference_type_details}
           onSetConferenceType={type => setConferenceType(type)}
+          isEditing={isEditing}
         />
         {renderModalOptions()}
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onDismiss} margin="0 x-small 0 0" data-testid="cancel-button">
+        <Button
+          disabled={isLoading}
+          onClick={onDismiss}
+          margin="0 x-small 0 0"
+          data-testid="cancel-button"
+        >
           {I18n.t('Cancel')}
         </Button>
-        <Button color="primary" type="submit" data-testid="submit-button">
-          {isEditing ? I18n.t('Save') : I18n.t('Create')}
+        <Button
+          color="primary"
+          type="submit"
+          data-testid="submit-button"
+          disabled={
+            isLoading ||
+            nameValidationMessages.length > 0 ||
+            calendarValidationMessages.length > 0 ||
+            descriptionValidationMessages.length > 0 ||
+            durationValidationMessages.length > 0
+          }
+        >
+          {isLoading ? (
+            <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
+              <Spinner
+                renderTitle={isEditing ? I18n.t('Saving') : I18n.t('Creating')}
+                size="x-small"
+              />
+            </div>
+          ) : isEditing ? (
+            I18n.t('Save')
+          ) : (
+            I18n.t('Create')
+          )}
         </Button>
       </Modal.Footer>
     </Modal>
@@ -203,6 +327,7 @@ VideoConferenceModal.propTypes = {
   onDismiss: PropTypes.func,
   onSubmit: PropTypes.func,
   isEditing: PropTypes.bool,
+  hasBegun: PropTypes.bool,
   name: PropTypes.string,
   duration: PropTypes.number,
   options: PropTypes.arrayOf(PropTypes.string),
@@ -212,12 +337,13 @@ VideoConferenceModal.propTypes = {
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
+  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   startCalendarDate: PropTypes.string,
-  endCalendarDate: PropTypes.string
+  endCalendarDate: PropTypes.string,
 }
 
 VideoConferenceModal.defaultProps = {
-  isEditing: false
+  isEditing: false,
 }
 
 export default VideoConferenceModal

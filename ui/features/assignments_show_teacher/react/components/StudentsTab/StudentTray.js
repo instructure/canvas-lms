@@ -23,7 +23,7 @@ import {bool, func} from 'prop-types'
 import {TeacherAssignmentShape, UserShape} from '../../assignmentData'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
-import {Button, CloseButton, IconButton} from '@instructure/ui-buttons'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {Heading} from '@instructure/ui-heading'
@@ -157,25 +157,38 @@ export default class StudentTray extends React.Component {
         <Heading level="h4" as="h3" margin="medium auto auto auto">
           {I18n.t('Actions')}
         </Heading>
-        <View display="block" margin="x-small none">
-          <Button
-            variant="link"
+        <View display="block" margin="x-small none" padding="small">
+          <Link
+            as="button"
             renderIcon={IconEmailLine}
             elementRef={b => (this.messageStudentsButton = b)}
             onClick={this.handleMessageButtonClick}
-            theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
+            isWithinText={false}
+            theme={{
+              iconSize: '1.25rem',
+              mediumPaddingHorizontal: '0',
+              mediumHeight: '1',
+              iconPlusTextMargin: '.5rem'
+            }}
           >
             {I18n.t('Message Student')}
-          </Button>
+          </Link>
+          <Link
+            as="button"
+            renderIcon={IconUploadLine}
+            onClick={this.handleSubmitForStudent}
+            isWithinText={false}
+            margin="small auto auto auto"
+            theme={{
+              iconSize: '1.25rem',
+              mediumPaddingHorizontal: '0',
+              mediumHeight: '1.5rem',
+              iconPlusTextMargin: '.5rem'
+            }}
+          >
+            {I18n.t('Submit for Student')}
+          </Link>
         </View>
-        <Button
-          variant="link"
-          renderIcon={IconUploadLine}
-          onClick={this.handleSubmitForStudent}
-          theme={{mediumPaddingHorizontal: '0', mediumHeight: '1.5rem'}}
-        >
-          {I18n.t('Submit for Student')}
-        </Button>
       </>
     )
   }

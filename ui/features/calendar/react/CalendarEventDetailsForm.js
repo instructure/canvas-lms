@@ -366,7 +366,6 @@ const CalendarEventDetailsForm = ({
               messages={startMessages}
               format="LT"
               timezone={timezone}
-              step={5}
             />
           </Flex.Item>
           <Flex.Item padding="none none none small" shouldShrink={true}>
@@ -381,7 +380,6 @@ const CalendarEventDetailsForm = ({
               messages={endMessages}
               format="LT"
               timezone={timezone}
-              step={5}
             />
           </Flex.Item>
         </Flex>

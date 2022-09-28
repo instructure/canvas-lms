@@ -39,7 +39,7 @@ function CopyToClipboardTruncatedValue({value, onClick}) {
   return (
     <div className="copy-button-container">
       <Flex>
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <Tooltip renderTip={value}>
             <Link onClick={() => onClick(value)}>
               <TruncateText>{value}</TruncateText>

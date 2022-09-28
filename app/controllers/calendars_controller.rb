@@ -26,8 +26,10 @@ class CalendarsController < ApplicationController
 
   def show
     get_context
-    @account_calendar_events_enabled = Account.site_admin.feature_enabled?(:account_calendar_events)
-    get_all_pertinent_contexts(include_groups: true, include_accounts: @account_calendar_events_enabled, favorites_first: true, cross_shard: true)
+    active_account_calendars = @current_user.associated_accounts.active.where(account_calendar_visible: true)
+    account_calendar_events_enabled = Account.site_admin.feature_enabled?(:account_calendar_events)
+    @show_account_calendars = !active_account_calendars.empty? && account_calendar_events_enabled
+    get_all_pertinent_contexts(include_groups: true, include_accounts: @show_account_calendars, favorites_first: true, cross_shard: true)
     @manage_contexts = @contexts.select do |c|
       c.grants_right?(@current_user, session, :manage_calendar)
     end.map(&:asset_string)
@@ -53,12 +55,8 @@ class CalendarsController < ApplicationController
         if ag.grants_right? @current_user, session, :create
           ag_permission = { all_sections: true }
         else
-          section_ids = if Account.site_admin.feature_enabled?(:section_level_calendar_permissions)
-                          all_course_sections = CourseSection.find(context.section_visibilities_for(@current_user).pluck(:course_section_id).map { |cs_id| Shard.global_id_for(cs_id, context.shard) })
-                          all_course_sections.select { |cs| cs.grants_right?(@current_user, session, :manage_calendar) }.pluck(:id)
-                        else
-                          context.section_visibilities_for(@current_user).pluck(:course_section_id)
-                        end
+          all_course_sections = CourseSection.find(context.section_visibilities_for(@current_user).pluck(:course_section_id).map { |cs_id| Shard.global_id_for(cs_id, context.shard) })
+          section_ids = all_course_sections.select { |cs| cs.grants_right?(@current_user, session, :manage_calendar) }.pluck(:id)
           ag_permission = { all_sections: false, section_ids: section_ids } if section_ids.any?
         end
       end

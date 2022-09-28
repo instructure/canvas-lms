@@ -100,7 +100,8 @@ export default class Calendar {
     this.agenda = new AgendaView({
       el: $('.agenda-wrapper'),
       dataSource: this.dataSource,
-      calendar: this
+      calendar: this,
+      contextObjects: this.contexts
     })
 
     const fullCalendarParams = this.initializeFullCalendarParams()
@@ -1101,13 +1102,13 @@ export default class Calendar {
     return this.schedulerNavigator.hide()
   }
 
-  syncNewContexts = (additionalContexts) => {
+  syncNewContexts = additionalContexts => {
     if (additionalContexts?.length > 0) {
-      additionalContexts.forEach((additionalContext) => {
+      additionalContexts.forEach(additionalContext => {
         const context = this.contexts.find(c => c.asset_string === additionalContext.asset_string)
         if (!context) {
           this.contexts.push(additionalContext)
-          this.contextCodes.push(additionalContext.asset_string);
+          this.contextCodes.push(additionalContext.asset_string)
         }
       })
       this.colorizeContexts()

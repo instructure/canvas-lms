@@ -470,13 +470,22 @@ describe AssignmentGroupsController do
         @student1 = student_in_course(course: @course, active_enrollment: true).user
         @student2 = student_in_course(course: @course, active_enrollment: true).user
 
-        @assignment = @course.assignments.create!(name: "Assignment 1", peer_reviews: true)
+        @assignment = @course.assignments.create!(name: "Assignment 1", peer_reviews: true, submission_types: "online_text_entry")
 
         @assessment_request = AssessmentRequest.create!(
-          asset: @assignment.submission_for_student(@student2),
+          asset: @assignment.submit_homework(@student2, body: "hi"),
           user: @student2,
           assessor: @student1,
-          assessor_asset: @assignment.submission_for_student(@student1)
+          assessor_asset: @assignment.submit_homework(@student1, body: "hi")
+        )
+
+        @assignment2 = @course.assignments.create!(name: "Assignment 2", peer_reviews: true, submission_types: "online_text_entry")
+
+        AssessmentRequest.create!(
+          asset: @assignment2.submission_for_student(@student2),
+          user: @student2,
+          assessor: @student1,
+          assessor_asset: @assignment2.submission_for_student(@student1)
         )
       end
 
@@ -544,6 +553,7 @@ describe AssignmentGroupsController do
           assessment_request = json[0]["assignments"][0]["assessment_requests"][0]
           expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
           expect(assessment_request["anonymous_id"]).to eq @assessment_request.asset.anonymous_id
+          expect(assessment_request["available"]).to eq true
         end
 
         it "includes workflow_state, user_id, user_name when the assignment has anonymous_peer_reviews disabled" do
@@ -553,6 +563,14 @@ describe AssignmentGroupsController do
           expect(assessment_request["workflow_state"]).to eq @assessment_request.workflow_state
           expect(assessment_request["user_id"]).to eq @assessment_request.user.id
           expect(assessment_request["user_name"]).to eq @assessment_request.user.name
+          expect(assessment_request["available"]).to eq true
+        end
+
+        it "has available set correctly if both asset and assessor_asset have submitted_at" do
+          assessment_request0 = json[0]["assignments"][0]["assessment_requests"][0]
+          assessment_request1 = json[0]["assignments"][1]["assessment_requests"][0]
+          expect(assessment_request0["available"]).to eq true
+          expect(assessment_request1["available"]).to eq false
         end
       end
     end

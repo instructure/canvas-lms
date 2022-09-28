@@ -118,40 +118,22 @@ describe "Final Grade Override" do
       user_session(@teacher)
       Gradebook.visit(@course)
       Gradebook::Cells.edit_override(@students.first, 90.0)
+      GradeBookHistory.visit(@course)
+      wait_for_ajaximations
     end
 
-    context "when final_grade_override_in_gradebook_history flag is enabled" do
-      before do
-        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
-        GradeBookHistory.visit(@course)
-        wait_for_ajaximations
-      end
-
-      it "displays checkbox to show final grade overrides only when final_grade_override_in_gradebook_history flag enabled" do
-        expect(GradeBookHistory.final_grade_override_checkbox).to be_displayed
-      end
-
-      it "displays final grade override grade changes when final_grade_override_in_gradebook_history flag is enabled" do
-        expect(GradeBookHistory).to be_contains_final_grade_override_entries
-      end
-
-      it "displays final grade override grade changes only when filter is applied" do
-        GradeBookHistory.search_final_grade_override_only
-
-        expect(GradeBookHistory).to be_contains_only_final_grade_override_entries
-      end
+    it "displays checkbox to show final grade overrides" do
+      expect(GradeBookHistory.final_grade_override_checkbox).to be_displayed
     end
 
-    context "when final_grade_override_in_gradebook_history flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:final_grade_override_in_gradebook_history)
-        GradeBookHistory.visit(@course)
-        wait_for_ajaximations
-      end
+    it "displays final grade override grade changes" do
+      expect(GradeBookHistory).to be_contains_final_grade_override_entries
+    end
 
-      it "does not display final grade override grade changes when final_grade_override_in_gradebook_history flag is disabled" do
-        expect(GradeBookHistory).not_to be_contains_final_grade_override_entries
-      end
+    it "displays final grade override grade changes only when filter is applied" do
+      GradeBookHistory.search_final_grade_override_only
+
+      expect(GradeBookHistory).to be_contains_only_final_grade_override_entries
     end
   end
 end

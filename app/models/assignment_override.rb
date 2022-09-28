@@ -378,6 +378,7 @@ class AssignmentOverride < ActiveRecord::Base
   def notify_change?
     assignment&.context&.available? &&
       assignment.published? &&
+      !assignment.context.concluded? &&
       assignment.created_at < 3.hours.ago &&
       !deleted? &&
       (saved_change_to_workflow_state? ||

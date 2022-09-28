@@ -523,8 +523,6 @@ class UsersController < ApplicationController
     js_env({ K5_USER: k5_user && !k5_disabled }, true)
 
     # things needed on both k5 and classic dashboards
-    create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
-    create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
     js_env({
              PREFERENCES: {
                dashboard_view: @current_user.dashboard_view(@domain_root_account),
@@ -536,8 +534,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
              ALLOW_ELEMENTARY_DASHBOARD: k5_disabled && k5_user,
              CREATE_COURSES_PERMISSIONS: {
-               PERMISSION: create_permission_root_account || create_permission_mcc_account,
-               RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+               PERMISSION: ccr = @current_user.create_courses_right(@current_user.sub_account_for_course_creation(@domain_root_account)),
+               RESTRICT_TO_MCC_ACCOUNT: ccr && !@domain_root_account.grants_any_right?(@current_user, session, :manage_courses, :create_courses)
              },
              OBSERVED_USERS_LIST: observed_users_list,
              CAN_ADD_OBSERVEE: @current_user
@@ -1324,6 +1322,11 @@ class UsersController < ApplicationController
 
       @group_memberships = @user.cached_current_group_memberships_by_date
 
+      # restrict group memberships view for other users
+      if @user != @current_user
+        @group_memberships = @group_memberships.select { |m| m.grants_right?(@current_user, session, :read) }
+      end
+
       # course_section and enrollment term will only be used if the enrollment dates haven't been cached yet;
       # maybe should just look at the first enrollment and check if it's cached to decide if we should include
       # them here
@@ -1333,7 +1336,7 @@ class UsersController < ApplicationController
                           .eager_load(:course)
                           .preload(:associated_user, :course_section, :enrollment_state, course: { enrollment_term: :enrollment_dates_overrides }).to_a
 
-      # restrict view for other users
+      # restrict course enrollments view for other users
       if @user != @current_user
         @enrollments = @enrollments.select { |e| e.grants_right?(@current_user, session, :read) }
       end
@@ -1412,6 +1415,7 @@ class UsersController < ApplicationController
   end
 
   def external_tool
+    timing_start = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     @tool = ContextExternalTool.find_for(params[:id], @domain_root_account, :user_navigation)
     @opaque_id = @tool.opaque_identifier_for(@current_user, context: @domain_root_account)
     @resource_type = "user_navigation"
@@ -1457,6 +1461,8 @@ class UsersController < ApplicationController
     set_active_tab @tool.asset_string
     add_crumb(@current_user.short_name, user_profile_path(@current_user))
     render Lti::AppUtil.display_template
+    timing_end = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    InstStatsd::Statsd.timing("lti.user_external_tool.request_time", timing_end - timing_start, tags: { lti_version: @tool.lti_version })
   end
 
   def new

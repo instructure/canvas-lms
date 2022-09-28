@@ -55,7 +55,7 @@ export const AccountCalendarItem: React.FC<ComponentProps> = ({
 }) => (
   <ApplyTheme theme={accountListTheme}>
     <View as="div" padding={padding} borderWidth={`${showTopSeparator ? 'small' : '0'} 0 0 0`}>
-      <Flex as="div" alignItems="center">
+      <Flex data-testid="flex-calendar-item" as="div" alignItems="center">
         <FlexItem>
           <Checkbox
             label={
@@ -63,7 +63,7 @@ export const AccountCalendarItem: React.FC<ComponentProps> = ({
                 {I18n.t('Show account calendar for %{name}', {name: item.name})}
               </ScreenReaderContent>
             }
-            inline
+            inline={true}
             checked={
               visibilityChanges.find(change => change.id === item.id)
                 ? visibilityChanges.find(change => change.id === item.id)!.visible
@@ -76,7 +76,7 @@ export const AccountCalendarItem: React.FC<ComponentProps> = ({
           <IconCalendarMonthLine width={CALENDAR_ICON_SIZE} height={CALENDAR_ICON_SIZE} />
         </FlexItem>
         <FlexItem>
-          <Text>{item.name}</Text>
+          <Text data-testid="account-calendar-name">{item.name}</Text>
         </FlexItem>
       </Flex>
     </View>

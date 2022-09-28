@@ -53,7 +53,7 @@ if (ENV.can_create_conferences) {
 const ConferencesRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'conference_:id': 'edit'
+    'conference_:id': 'edit',
   },
 
   editView: null,
@@ -77,7 +77,7 @@ const ConferencesRouter = Backbone.Router.extend({
       itemView: ConferenceView,
       collection: this.currentConferences,
       emptyMessage: I18n.t('no_new_conferences', 'There are no new conferences'),
-      listClassName: 'ig-list'
+      listClassName: 'ig-list',
     }))
     view.render()
 
@@ -87,7 +87,7 @@ const ConferencesRouter = Backbone.Router.extend({
       itemView: ConcludedConferenceView,
       collection: this.concludedConferences,
       emptyMessage: I18n.t('no_concluded_conferences', 'There are no concluded conferences'),
-      listClassName: 'ig-list'
+      listClassName: 'ig-list',
     })
     view.render()
 
@@ -111,12 +111,12 @@ const ConferencesRouter = Backbone.Router.extend({
     conference.once('startSync', () => this.currentConferences.unshift(conference))
     if (conference.get('permissions').create) {
       if (ENV.bbb_modal_update) {
-        const {attributes} = conference // || ENV.default_conference
+        const {attributes} = conference
 
         const availableAttendeesList = ENV.users.map(({id, name}) => {
           return {
             displayName: name,
-            id
+            id,
           }
         })
 
@@ -129,7 +129,7 @@ const ConferencesRouter = Backbone.Router.extend({
               window.location.hash = ''
               ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
             }}
-            onSubmit={(e, data) => {
+            onSubmit={async (e, data) => {
               const context =
                 attributes.context_type === 'Course'
                   ? 'courses'
@@ -142,6 +142,12 @@ const ConferencesRouter = Backbone.Router.extend({
               const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
               const duration = noTimeLimit ? '' : data.duration
               const record = data.options.includes('recording_enabled') ? 1 : 0
+              const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
+              const start_at = calendar_event ? data.startCalendarDate : null
+              const end_at = calendar_event ? data.endCalendarDate : null
+
+              const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
               const payload = {
                 _method: 'POST',
                 title: data.name,
@@ -158,7 +164,10 @@ const ConferencesRouter = Backbone.Router.extend({
                 description: data.description,
                 'web_conference[description]': data.description,
                 'user[all]': inviteAll,
-                'observers[remove]': 0
+                'observers[remove]': remove_observers,
+                'web_conference[start_at]': start_at,
+                'web_conference[end_at]': end_at,
+                'web_conference[calendar_event]': calendar_event,
               }
               if (inviteAll) {
                 ENV.users.forEach(userId => {
@@ -175,7 +184,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 'share_microphone',
                 'share_other_webcams',
                 'send_public_chat',
-                'send_private_chat'
+                'send_private_chat',
               ].forEach(option => {
                 payload[`web_conference[user_settings][${option}]`] =
                   data.attendeesOptions.includes(option) ? 1 : 0
@@ -186,22 +195,24 @@ const ConferencesRouter = Backbone.Router.extend({
                 method: 'POST',
                 body: new URLSearchParams(payload),
                 headers: {
-                  'X-CSRF-Token': getCookie('_csrf_token')
-                }
+                  'X-CSRF-Token': getCookie('_csrf_token'),
+                },
               }
 
               if (!context) {
-                return
+                return false
               }
 
-              fetch(`/${context}/${contextId}/conferences`, requestOptions)
-                .then(() => {
-                  // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                  window.location.href = window.location.href.split('#')[0]
-                })
-                .catch(err => {
-                  throw err
-                })
+              const response = await fetch(`/${context}/${contextId}/conferences`, requestOptions)
+
+              if (response.status === 200) {
+                $.flashMessage(I18n.t('Conference Saved'))
+                window.location.href = window.location.href.split('#')[0]
+                return true
+              } else {
+                $.flashError(I18n.t('There was an error upon saving your conference'))
+                return false
+              }
             }}
           />,
           document.getElementById('react-conference-modal-container')
@@ -216,7 +227,12 @@ const ConferencesRouter = Backbone.Router.extend({
     conference =
       this.currentConferences.get(conference) || this.concludedConferences.get(conference)
     if (!conference) return
-
+    if (!conference.get('permissions').update) {
+      // reached when a user without edit permissions navigates
+      // to a specific conference's url directly
+      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      return
+    }
     if (ENV.bbb_modal_update) {
       const {attributes} = conference
       const options = []
@@ -225,7 +241,7 @@ const ConferencesRouter = Backbone.Router.extend({
       const availableAttendeesList = ENV.users.map(({id, name}) => {
         return {
           displayName: name,
-          id
+          id,
         }
       })
 
@@ -241,14 +257,16 @@ const ConferencesRouter = Backbone.Router.extend({
         options.push('enable_waiting_room')
       }
 
-      // TBD Add to Calendar
+      if (attributes.start_at && attributes.end_at) {
+        options.push('add_to_calendar')
+      }
 
       ;[
         'share_webcam',
         'share_other_webcams',
         'share_microphone',
         'send_public_chat',
-        'send_private_chat'
+        'send_private_chat',
       ].forEach(option => {
         if (attributes.user_settings[option]) {
           attendeesOptions.push(option)
@@ -259,6 +277,7 @@ const ConferencesRouter = Backbone.Router.extend({
         <VideoConferenceModal
           open={true}
           isEditing={true}
+          hasBegun={!!attributes.started_at}
           type={attributes.conference_type}
           name={attributes.title}
           duration={!attributes.duration ? 0 : attributes.duration}
@@ -268,11 +287,14 @@ const ConferencesRouter = Backbone.Router.extend({
           attendeesOptions={attendeesOptions}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={attributes.user_ids}
+          savedAttendees={attributes.user_ids}
+          startCalendarDate={attributes.start_at}
+          endCalendarDate={attributes.end_at}
           onDismiss={() => {
             window.location.hash = ''
             ReactDOM.render(<span />, document.getElementById('react-conference-modal-container'))
           }}
-          onSubmit={(e, data) => {
+          onSubmit={async (e, data) => {
             const context =
               attributes.context_type === 'Course'
                 ? 'courses'
@@ -286,6 +308,11 @@ const ConferencesRouter = Backbone.Router.extend({
             const duration = noTimeLimit ? '' : data.duration
             const record = data.options.includes('recording_enabled') ? 1 : 0
             const enableWaitingRoom = data.options.includes('enable_waiting_room') ? 1 : 0
+            const calendar_event = data.options.includes('add_to_calendar') ? 1 : 0
+            const start_at = calendar_event ? data.startCalendarDate : null
+            const end_at = calendar_event ? data.endCalendarDate : null
+            const remove_observers = data.invitationOptions.includes('remove_observers') ? 1 : 0
+
             const payload = {
               _method: 'PUT',
               title: data.name,
@@ -302,7 +329,10 @@ const ConferencesRouter = Backbone.Router.extend({
               description: data.description,
               'web_conference[description]': data.description,
               'user[all]': inviteAll,
-              'observers[remove]': 0
+              'observers[remove]': remove_observers,
+              'web_conference[start_at]': start_at,
+              'web_conference[end_at]': end_at,
+              'web_conference[calendar_event]': calendar_event,
             }
 
             if (inviteAll) {
@@ -320,7 +350,7 @@ const ConferencesRouter = Backbone.Router.extend({
               'share_other_webcams',
               'share_microphone',
               'send_public_chat',
-              'send_private_chat'
+              'send_private_chat',
             ].forEach(option => {
               payload[`web_conference[user_settings][${option}]`] = data.attendeesOptions.includes(
                 option
@@ -334,41 +364,41 @@ const ConferencesRouter = Backbone.Router.extend({
               method: 'POST',
               body: new URLSearchParams(payload),
               headers: {
-                'X-CSRF-Token': getCookie('_csrf_token')
-              }
+                'X-CSRF-Token': getCookie('_csrf_token'),
+              },
             }
 
             if (!context) {
-              return
+              return false
             }
 
-            fetch(`/${context}/${contextId}/conferences/${conferenceId}`, requestOptions)
-              .then(() => {
-                // Remove the `conference_N` since it will cause the modal to reopen on the reload.
-                window.location.href = window.location.href.split('#')[0]
-              })
-              .catch(err => {
-                throw err
-              })
+            const response = await fetch(
+              `/${context}/${contextId}/conferences/${conferenceId}`,
+              requestOptions
+            )
+
+            if (response.status === 200) {
+              $.flashMessage(I18n.t('Conference Saved'))
+              window.location.href = window.location.href.split('#')[0]
+              return true
+            } else {
+              $.flashError(I18n.t('There was an error upon saving your conference'))
+              return false
+            }
           }}
         />,
         document.getElementById('react-conference-modal-container')
       )
     } else {
-      if (conference.get('permissions').update) {
-        this.editConferenceId = conference.get('id')
-        this.editView.show(conference, {isEditing: true})
-      }
-      // reached when a user without edit permissions navigates
-      // to a specific conference's url directly
-      $(`#conf_${conference.get('id')}`)[0].scrollIntoView()
+      this.editConferenceId = conference.get('id')
+      this.editView.show(conference, {isEditing: true})
     }
   },
 
   close(conference) {
     this.currentConferences.remove(conference)
     this.concludedConferences.unshift(conference)
-  }
+  },
 })
 
 ready(() => {

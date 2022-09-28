@@ -54,6 +54,19 @@ describe('<Preview />', () => {
         >
           <g
             fill="none"
+          >
+            <clippath
+              id="clip-path-for-embed"
+            >
+              <path
+                d="M109 8L210 214H8L109 8Z"
+              />
+            </clippath>
+            <path
+              d="M109 8L210 214H8L109 8Z"
+            />
+          </g>
+          <g
             stroke="#0f0"
             stroke-width="4"
           >

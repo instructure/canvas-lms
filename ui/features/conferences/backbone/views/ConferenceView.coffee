@@ -21,6 +21,10 @@ import {View} from '@canvas/backbone'
 import template from '../../jst/newConference.handlebars'
 import '@canvas/rails-flash-notifications'
 import authenticity_token from '@canvas/authenticity-token'
+import { Spinner } from '@instructure/ui-spinner'
+import { Text } from '@instructure/ui-text'
+import ReactDOM from 'react-dom'
+import React from 'react'
 
 import '@canvas/forms/jquery/jquery.instructure_forms' # formSubmit
 
@@ -51,14 +55,23 @@ export default class ConferenceView extends View
     atag = e.target
     form = atag.parentElement.querySelector('form')
     conference_name = form.querySelector("[name='web_conference[title]']").value || ''
+    spinner = React.createElement(Spinner, {renderTitle:"Loading", size:"x-small"})
+    spinnerText = React.createElement(Text, {size: "small"}, I18n.t(' Attendee sync in progress... '))
+    spinnerDomEl = @el.querySelector('.conference-loading-indicator')
+    ReactDOM.render([spinner, spinnerText], spinnerDomEl)
+    @el.querySelector('.conference-loading-indicator').style.display = "block"
     @$(form).formSubmit(
       object_name: 'web_conference'
       success: (data) =>
         @model.set(data)
         @model.trigger('sync')
+        @el.querySelector('.conference-loading-indicator').style.display = "none"
+        ReactDOM.unmountComponentAtNode(spinnerDomEl)
         $.flashMessage(conference_name + I18n.t(" Attendees Synced!"))
       error: =>
         @show(@model)
+        @el.querySelector('.conference-loading-indicator').style.display = "none"
+        ReactDOM.unmountComponentAtNode(spinnerDomEl)
         $.flashError(conference_name + I18n.t(" Attendees Failed to Sync."))
     )
     @$(form).submit()

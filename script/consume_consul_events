@@ -23,6 +23,8 @@ require "base64"
 require "json"
 require "redis"
 
+SCAN_BATCH_SIZE = 1000
+
 # this purposely has no config so that it can spin up quickly;
 # just copy this script elsewhere and modify if you have a
 # non-default configuration
@@ -40,7 +42,20 @@ data.each do |event|
     cache.flushdb
     # Readd this event so that it doesn't get forgotten about in the future
     cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+  elsif key.start_with?("DELETE_MATCHED|")
+    pattern = key.split("|", 2)[1]
+    # Adapted from rails redis_cache_store.rb
+    cursor = "0"
+    loop do
+      cursor, keys = cache.scan(cursor, match: pattern, count: SCAN_BATCH_SIZE)
+      cache.del(*keys) unless keys.empty?
+      break if cursor == "0"
+    end
+  elsif key.start_with?("DELETE|")
+    target = key.split("|", 2)[1]
+    cache.del(target)
   else
+    # deprecated
     cache.del(key)
   end
 end

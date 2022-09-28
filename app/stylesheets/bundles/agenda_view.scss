@@ -350,38 +350,6 @@ span.agendaView--no-assignments {
   text-transform: uppercase;
 }
 
-#other-calendar-actions-row {
-  line-height: 1;
-  .element_toggler {
-    float: direction(left);
-    margin-top: 1rem !important;
-  }
-  div.manage-accounts-wrapper{
-    float: direction(right);
-    display: flex;
-    max-width: 25rem;
-    .new-feature-pill{
-      max-width: 12rem;
-      margin-top: 1rem !important;
-      float: direction(left);
-      color: var(--ic-brand-primary);
-      border-radius: 0.5rem;
-      border: 1px solid var(--ic-brand-primary);
-      font-size:0.8rem;
-      text-transform: uppercase;
-      padding: 0.1rem 0.25rem;
-    }
-    .manage-accounts-btn{
-      float: direction(right);
-      text-decoration: none;
-      cursor: pointer;
-      text-align: center;
-      font-size: 1.5rem;
-      font-weight: 400;
-    }
-  }
-}
-
 #undated-events {
   display: none;
   .event {

@@ -104,6 +104,8 @@ module AccountReports
 
     # returns rows for each assessed outcome result (or question result)
     def outcome_results
+      # TODO: - Add this 3rd parameter as part of OUT-5167 and update write_outcomes_report to merge the two result sets
+      # write_outcomes_report(self.class.outcome_result_headers, outcome_results_scope, outcomes_new_quiz_scope)
       write_outcomes_report(self.class.outcome_result_headers, outcome_results_scope)
     end
 
@@ -188,26 +190,124 @@ module AccountReports
       add_term_scope(students, "c")
     end
 
-    def outcomes_lmgb_results
-      id = account.root_account.id
-      courses = Course.where(root_account_id: id).filter { |c| c.feature_enabled?(:outcome_service_results_to_canvas) }
-      return if courses.empty?
+    def outcomes_new_quiz_scope
+      students = account.learning_outcome_links.active
+                        .select(<<~SQL.squish)
+                          distinct on (#{outcome_order}, p.id, s.id, a.id)
+                          u.sortable_name                             AS "student name",
+                          u.uuid                                      AS "student uuid",
+                          p.user_id                                   AS "student id",
+                          p.sis_user_id                               AS "student sis id",
+                          a.id                                        AS "assignment id",
+                          a.title                                     AS "assessment title",
+                          a.id                                        AS "assessment id",
+                          learning_outcomes.short_description         AS "learning outcome name",
+                          learning_outcomes.id                        AS "learning outcome id",
+                          learning_outcomes.display_name              AS "learning outcome friendly name",
+                          learning_outcomes.data                      AS "learning outcome data",
+                          c.name                                      AS "course name",
+                          c.id                                        AS "course id",
+                          c.sis_source_id                             AS "course sis id",
+                          'quiz'                                      AS "assessment type",
+                          s.name                                      AS "section name",
+                          s.id                                        AS "section id",
+                          s.sis_source_id                             AS "section sis id",
+                          e.workflow_state                            AS "enrollment state",
+                          acct.id                                     AS "account id",
+                          acct.name                                   AS "account name"
+                        SQL
+                        .joins(<<~SQL.squish)
+                          INNER JOIN #{LearningOutcome.quoted_table_name} ON learning_outcomes.id = content_tags.content_id
+                            AND content_tags.content_type = 'LearningOutcome'
+                          INNER JOIN #{ContentTag.quoted_table_name} cct ON cct.content_id = content_tags.content_id AND cct.context_type = 'Course'
+                          INNER JOIN #{Course.quoted_table_name} c ON cct.context_id = c.id
+                          INNER JOIN #{Account.quoted_table_name} acct ON acct.id = c.account_id
+                          INNER JOIN #{Enrollment.quoted_table_name} e ON e.type = 'StudentEnrollment' AND e.root_account_id = #{account.root_account.id}
+                            AND e.course_id = c.id #{@include_deleted ? "" : "AND e.workflow_state <> 'deleted'"}
+                          INNER JOIN #{User.quoted_table_name} u ON u.id = e.user_id
+                          INNER JOIN #{Pseudonym.quoted_table_name} p on p.user_id = u.id
+                          INNER JOIN #{CourseSection.quoted_table_name} s ON e.course_section_id = s.id
+                          LEFT OUTER JOIN #{Assignment.quoted_table_name} a ON (a.context_id = c.id AND a.context_type = 'Course' AND a.submission_types = 'external_tool')
+                        SQL
 
-      results = courses.map do |c|
-        assignments = Assignment.where(root_account_id: id, context: c).type_quiz_lti.pluck(:id)
-        assignment_ids = assignments.join(",")
-
-        users = Enrollment.where(type: "StudentEnrollment", root_account_id: id, course: c)
-                          .joins(:user)
-                          .pluck("users.uuid")
-        uuids = users.join(",")
-
-        outcomes = ContentTag.active.where(root_account_id: id, context: c).learning_outcome_links.pluck(:content_id)
-        outcome_ids = outcomes.join(",")
-
-        [c.id, get_lmgb_results(c, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)]
+      unless @include_deleted
+        students = students.where("p.workflow_state<>'deleted' AND c.workflow_state IN ('available', 'completed')")
       end
-      results.to_h
+
+      students = join_course_sub_account_scope(account, students, "c")
+      students = add_term_scope(students, "c")
+      students.order(outcome_order)
+
+      # We need to call the outcomes service once per course to get the authoritative results for each student. This
+      # takes the results from the query above and transform it to a hash of course => (assignments, outcomes, students)
+      # This hash will be used to call outcome service and the results from outcome service will be joined with the
+      # results from the query.
+      courses = {}
+      students.each do |s|
+        c_id = s["course id"]
+        if courses.key?(c_id)
+          course_map = courses[c_id]
+          course_map[:assignment_ids].add(s["assignment id"])
+          course_map[:outcome_ids].add(s["learning outcome id"])
+          course_map[:uuids].add(s["student uuid"])
+        else
+          courses[c_id] = { course_id: c_id, assignment_ids: Set[s["assignment id"]], outcome_ids: Set[s["learning outcome id"]], uuids: Set[s["student uuid"]] }
+        end
+      end
+
+      student_results = {}
+      courses.each_value do |c|
+        # There is no need to check if the feature flag :outcome_service_results_to_canvas is enabled for the
+        # course because get_lmgb_results will return nil if it is not enabled
+        course = Course.find(c[:course_id])
+        assignment_ids = c[:assignment_ids].to_a.join(",")
+        outcome_ids = c[:outcome_ids].to_a.join(",")
+        uuids = c[:uuids].to_a.join(",")
+        os_results = get_lmgb_results(course, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+        next if os_results.nil?
+
+        os_results.each do |r|
+          composite_key = "#{c[:course_id]}_#{r["associated_asset_id"]}_#{r["external_outcome_id"]}_#{r["user_uuid"]}"
+          if student_results.key?(composite_key)
+            # This should not happen, but if it does we take the result that was submitted last.
+            current_result = student_results[composite_key]
+            if r["submitted_at"] > current_result["submitted_at"]
+              student_results[composite_key] = r
+            end
+          else
+            student_results[composite_key] = r
+          end
+        end
+      end
+
+      # TODO: - We are not .where("ct.workflow_state <> 'deleted' AND r.workflow_state <> 'deleted' AND r.artifact_type <> 'Submission'")
+      #        - The artifact type is 'quizzes.quiz'
+      # If there is not an entry in student_results, the student hasn't taken teh quiz yet and does not need to
+      # be in the report.
+      students.filter_map do |s|
+        composite_key = "#{s["course id"]}_#{s["assignment id"]}_#{s["learning outcome id"]}_#{s["student uuid"]}"
+        student_results.key?(composite_key) ? combine_result(s, student_results[composite_key]) : nil
+      end
+    end
+
+    # TODO: - This method will be fully implemented as part of OUT-5167
+    def combine_result(student, authoritative_results)
+      student.attributes.merge(
+        {
+          "assessment title" => "",
+          "assessment id" => authoritative_results["submitted_at"], # TODO: Should this be question id or quiz id?
+          "submission date" => authoritative_results["submitted_at"],
+          "submission score" => "",
+          "assessment question" => "",
+          "assessment question id" => "",
+          "learning outcome points possible" => authoritative_results["points_possible"],
+          "learning outcome mastered" => authoritative_results["mastery"],
+          "attempt" => "", # TODO: do we need the most recent attempt.
+          "learning outcome points hidden" => nil, # TODO: hide_points is a column on AR, but not populated
+          "outcome score" => authoritative_results["points"], # TODO: is this the same as qr.score or r.score?
+          "total percent outcome score" => authoritative_results["percent_score"]
+        }
+      )
     end
 
     def outcome_results_scope

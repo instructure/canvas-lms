@@ -508,13 +508,11 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
-          create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
-          create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
-                     PERMISSION: create_permission_root_account || create_permission_mcc_account,
-                     RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
-                   }
+                     PERMISSION: ccr = @current_user.create_courses_right(@current_user.sub_account_for_course_creation(@domain_root_account)),
+                     RESTRICT_TO_MCC_ACCOUNT: ccr && !@domain_root_account.grants_any_right?(@current_user, session, :manage_courses, :create_courses)
+                   },
                  })
 
           set_k5_mode(require_k5_theme: true)
@@ -824,7 +822,7 @@ class CoursesController < ApplicationController
   #
   # @returns Course
   def create
-    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
+    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @current_user.sub_account_for_course_creation(@domain_root_account)
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
       params_for_create = course_params
@@ -3488,6 +3486,10 @@ class CoursesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
     assignment_ids = effective_due_dates_params[:assignment_ids]
+    unless validate_assignment_ids(assignment_ids)
+      return render json: { errors: t("%{assignment_ids} param is invalid", assignment_ids: "assignment_ids") }, status: :unprocessable_entity
+    end
+
     due_dates = if assignment_ids.present?
                   EffectiveDueDates.for_course(@context, assignment_ids)
                 else
@@ -3962,6 +3964,10 @@ class CoursesController < ApplicationController
   helper_method :visible_self_enrollment_option
 
   private
+
+  def validate_assignment_ids(assignment_ids)
+    assignment_ids.nil? || assignment_ids.all?(/\A\d+\z/)
+  end
 
   def observee_selected?
     @selected_observed_user.present? && @selected_observed_user != @current_user

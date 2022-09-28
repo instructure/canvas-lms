@@ -56,6 +56,69 @@ describe Outcomes::ResultAnalytics do
     end
   end
 
+  describe "#find_outcome_service_outcome_results" do
+    before(:once) do
+      course_with_student
+
+      names = %w[Gamma Alpha Beta]
+      @students = create_users(Array.new(3) { |i| { name: "User #{i + 1}", sortable_name: "#{names[i]}, User" } }, return_type: :record)
+
+      course_with_user("StudentEnrollment", course: @course, user: @students[0])
+      course_with_user("StudentEnrollment", course: @course, user: @students[1])
+      course_with_user("StudentEnrollment", course: @course, user: @students[2])
+
+      course_with_teacher(course: @course)
+      @outcomes = [outcome_model(context: @course, short_description: "Course outcome 1"), outcome_model(context: @course, short_description: "Course outcome 2")]
+      @assignment = assignment_model
+      @alignment = @outcome.align(@assignment, @course)
+    end
+
+    it "calls get_lmgb_results" do
+      quiz = new_quizzes_assignment(course: @course, title: "new quiz")
+      outcome_ids = @outcomes.pluck(:id).join(",")
+      uuids = "#{@students[0].uuid},#{@students[1].uuid},#{@students[2].uuid}"
+      expect(ra).to receive(:get_lmgb_results).with(@course, quiz.id.to_s, "canvas.assignment.quizzes", outcome_ids, uuids).and_return(nil)
+
+      ra.send(:find_outcomes_service_outcome_results, { context: @course, users: @students, outcomes: @outcomes })
+    end
+
+    describe "#handle_outcome_service_results" do
+      it "logs warning and returns nil if results are nil" do
+        allow(Rails.logger).to receive(:warn)
+        expect(Rails.logger).to receive(:warn).with(
+          "No Outcome Service outcome results found for context: #{@course.uuid}"
+        ).once
+        results = ra.handle_outcome_service_results(nil, @course)
+        expect(results).to eq nil
+      end
+
+      it "logs warning and returns nil if results are empty" do
+        allow(Rails.logger).to receive(:warn)
+        expect(Rails.logger).to receive(:warn).with(
+          "No Outcome Service outcome results found for context: #{@course.uuid}"
+        ).once
+        results = ra.handle_outcome_service_results({}, @course)
+        expect(results).to eq nil
+      end
+
+      it "calls resolve_outcome_results" do
+        os_results = [
+          {
+            user_uuid: "someguid",
+            percent_score: 1.0,
+            points: 3.0,
+            points_possible: 3.0,
+            external_outcome_id: 123,
+            submitted_at: Time.now.utc,
+            attempts: {}
+          }
+        ]
+        expect(ra).to receive(:resolve_outcome_results).with(os_results)
+        ra.send(:handle_outcome_service_results, os_results, @course)
+      end
+    end
+  end
+
   describe "#find_outcome_results" do
     before(:once) do
       course_with_student

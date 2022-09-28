@@ -34,6 +34,7 @@ declare global {
     confirmDelete: any
     fillWindowWithMe: (options?: {onResize: () => void}) => void
     fixDialogButtons: () => void
+    keycodes: any
     live: any
     mediaComment: any
     showIf: (boolean) => void

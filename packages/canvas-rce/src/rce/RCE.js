@@ -25,7 +25,6 @@ import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import wrapInitCb from './wrapInitCb'
 import tinyRCE from './tinyRCE'
-import defaultTinymceConfig from '../defaultTinymceConfig'
 import getTranslations from '../getTranslations'
 import '@instructure/canvas-theme'
 
@@ -98,11 +97,12 @@ const RCE = forwardRef(function RCE(props, rceRef) {
       trayProps: rcsProps,
       use_rce_icon_maker,
       features,
-      editorOptions: Object.assign(editorOptions, {
-        selector: `#${textareaId}`,
+      editorOptions: {
+        ...editorOptions,
+        selector: editorOptions.selector || `#${textareaId}`,
         height,
         language: editorLanguage(props.language)
-      })
+      }
     }
     wrapInitCb(mirroredAttrs, iProps.editorOptions)
 
@@ -197,7 +197,7 @@ RCE.propTypes = {
   // configurable default timeout value for flash alerts
   flashAlertTimeout: number,
   // user's timezone
-  timezone: string.isRequired,
+  timezone: string,
   // event handlers
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
@@ -208,7 +208,7 @@ RCE.propTypes = {
 RCE.defaultProps = {
   autosave: {enabled: false, maxAge: 3600000},
   defaultContent: '',
-  editorOptions: {...defaultTinymceConfig},
+  editorOptions: {},
   renderKBShortcutModal: true,
   highContrastCSS: [],
   instRecordDisabled: false,

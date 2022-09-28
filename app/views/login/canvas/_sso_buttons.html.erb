@@ -21,8 +21,9 @@
     <ul class="ic-Login__sso-list">
       <% aacs.each do |aac| %>
         <% only_one = aacs.size < 2 %>
+        <% only_one_of_type = aacs.select { |a| a.auth_type == aac.auth_type }.size < 2 %>
         <li class="ic-Login__sso-list__item">
-          <a href="/login/<%= aac.auth_type %>"
+          <a href="/login/<%= aac.auth_type %><%= only_one_of_type ? '' : "/#{aac.id}" %>"
              class="Button Button--primary <%= only_one ? 'ic-Login__sso-button--has-text ' : '' %>ic-Login__sso-button ic-Login__sso-button--<%= aac.auth_type %>">
               <%= render partial: "shared/auth_type_icon",
                          locals: {

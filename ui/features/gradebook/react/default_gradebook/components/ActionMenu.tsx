@@ -34,7 +34,7 @@ const I18n = useI18nScope('gradebookActionMenu')
 const {Item: MenuItem, Menu: MenuSeparator} = Menu as any
 
 export type ActionMenuProps = {
-  gradingPeriodId: string
+  gradingPeriodId: string | null
   gradebookIsEditable: boolean
   contextAllowsGradebookUploads: boolean
   getAssignmentOrder: any

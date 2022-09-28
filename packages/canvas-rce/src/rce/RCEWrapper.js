@@ -37,6 +37,7 @@ import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
 import {getCanvasUrl} from './getCanvasUrl'
 import RCEGlobals from './RCEGlobals'
+import defaultTinymceConfig from '../defaultTinymceConfig'
 
 import indicate from '../common/indicate'
 import bridge from '../bridge'
@@ -273,7 +274,7 @@ class RCEWrapper extends React.Component {
     use_rce_icon_maker: PropTypes.bool,
     features: PropTypes.objectOf(PropTypes.bool),
     flashAlertTimeout: PropTypes.number,
-    timezone: PropTypes.string.isRequired
+    timezone: PropTypes.string
   }
 
   static defaultProps = {
@@ -283,7 +284,8 @@ class RCEWrapper extends React.Component {
     highContrastCSS: [],
     ltiTools: [],
     maxInitRenderedRCEs: -1,
-    features: {}
+    features: {},
+    timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone
   }
 
   static skinCssInjected = false
@@ -375,8 +377,11 @@ class RCEWrapper extends React.Component {
   }
 
   getRequiredFeatureStatuses() {
-    const {new_equation_editor, new_math_equation_handling, rce_ux_improvements} =
-      this.props.features
+    const {
+      new_equation_editor = false,
+      new_math_equation_handling = false,
+      rce_ux_improvements = false
+    } = this.props.features
     return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
   }
 
@@ -1466,6 +1471,7 @@ class RCEWrapper extends React.Component {
       : undefined
 
     const wrappedOpts = {
+      ...defaultTinymceConfig,
       ...options,
 
       readonly: this.props.readOnly,
@@ -1812,7 +1818,6 @@ class RCEWrapper extends React.Component {
         <div
           ref={this._editorPlaceholderRef}
           style={{
-            width: `${this.props.editorOptions.width}px`,
             height: `${this.props.editorOptions.height}px`,
             border: '1px solid grey'
           }}

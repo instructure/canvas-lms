@@ -42,7 +42,6 @@ module PactConfig
 
   # Add new Live Events consumers to this module
   module LiveEventConsumers
-    CATALOG = "Catalog"
     OUTCOMES = "Outcomes"
   end
 

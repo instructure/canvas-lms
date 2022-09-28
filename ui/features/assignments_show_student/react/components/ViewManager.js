@@ -143,6 +143,10 @@ class ViewManager extends React.Component {
     return assignmentCopy
   }
 
+  getReviewerSubmission = () => {
+    return this.props.initialQueryData.reviewerSubmission
+  }
+
   getPageInfo = (opts = {}) => {
     const props = opts.props || this.props
     if (!props.submissionHistoriesQueryData) {
@@ -236,6 +240,7 @@ class ViewManager extends React.Component {
   render() {
     const assignment = this.getAssignment()
     const submission = this.getDisplayedSubmission()
+    const reviewerSubmission = this.getReviewerSubmission()
 
     return (
       <StudentViewContext.Provider
@@ -258,6 +263,7 @@ class ViewManager extends React.Component {
         <StudentContent
           assignment={assignment}
           submission={submission}
+          reviewerSubmission={reviewerSubmission}
           allSubmissions={this.state.submissions}
           onChangeSubmission={this.onChangeSubmission}
         />

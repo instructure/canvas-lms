@@ -225,10 +225,15 @@ module CanvasRails
 
       private
 
-      def normalize_key(key, options)
-        if options[:unprefixed_key]
+      def namespace_key(key, options)
+        # Purge all rails versions at once if deleting based on a pattern
+        if caller_locations(1, 1).first.base_label == "delete_matched"
+          return "rails??:#{super}"
+        end
+
+        if options&.[](:unprefixed_key)
           super
-        elsif options[:explicit_version]
+        elsif options&.[](:explicit_version)
           "rails#{options[:explicit_version]}:#{super}"
         else
           "rails#{Rails::VERSION::MAJOR}#{Rails::VERSION::MINOR}:#{super}"

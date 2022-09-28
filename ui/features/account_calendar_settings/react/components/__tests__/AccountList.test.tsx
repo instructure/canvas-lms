@@ -23,6 +23,13 @@ import fetchMock from 'fetch-mock'
 import {AccountList} from '../AccountList'
 import {FilterType} from '../FilterControls'
 import {RESPONSE_ACCOUNT_3, RESPONSE_ACCOUNT_4} from '../../__tests__/fixtures'
+import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
+
+jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
+  return {
+    alertForMatchingAccounts: jest.fn()
+  }
+})
 
 const defaultProps = {
   originAccountId: 1,
@@ -39,6 +46,7 @@ const accountListUrl = (searchTerm = '', filter = '') =>
 
 beforeEach(() => {
   fetchMock.get(accountListUrl(), [])
+  jest.clearAllMocks()
 })
 
 afterEach(() => {
@@ -102,5 +110,12 @@ describe('AccountList', () => {
     expect(onAccountToggled).not.toHaveBeenCalled()
     act(() => cpmsCheckbox.click())
     expect(onAccountToggled).toHaveBeenCalledWith(4, false)
+  })
+
+  it('announces search results for screen readers', async () => {
+    fetchMock.get(accountListUrl('elemen'), RESPONSE_ACCOUNT_4)
+    const {findByText} = render(<AccountList {...defaultProps} />)
+    await findByText('CPMS')
+    expect(alertForMatchingAccounts).toHaveBeenCalledWith(2, false)
   })
 })

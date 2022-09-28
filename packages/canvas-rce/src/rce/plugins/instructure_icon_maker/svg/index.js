@@ -36,21 +36,33 @@ export function buildSvg(settings, options = {}) {
     mainContainer.appendChild(metadata)
   }
 
-  const g = buildGroup(settings) // The shape group. Sets the controls the fill color
+  const fillGroup = buildGroup(settings, {fill: true}) // The shape with the fill color
+  const borderGroup = buildGroup(settings) // The shape with the outline and image
   const clipPath = buildClipPath(settings) // A clip path used to crop the image
   const shape = buildShape(settings) // The actual path of the shape being built
   const image = buildImage(settings) // The embedded image. Cropped by clipPath
 
-  clipPath.appendChild(shape)
-  g.appendChild(clipPath)
-  g.appendChild(shape.cloneNode(true))
-
   // Don't append an image if none has been selected
+  // Also add image here so it sits beneath the outline,
+  // which is added below to the borderGroup
   if (image) {
-    g.appendChild(image)
+    borderGroup.appendChild(image)
   }
 
-  shapeWrapper.appendChild(g)
+  clipPath.appendChild(shape)
+
+  // These are required to make the group have the right shape
+  fillGroup.appendChild(clipPath)
+  fillGroup.appendChild(shape.cloneNode(true))
+
+  // These are required to make the group have the right shape
+  borderGroup.appendChild(clipPath.cloneNode(true))
+  borderGroup.appendChild(shape.cloneNode(true))
+
+  // Add fill group before the main group so the fill
+  // sits behind the image and outline
+  shapeWrapper.appendChild(fillGroup)
+  shapeWrapper.appendChild(borderGroup)
   mainContainer.appendChild(shapeWrapper)
 
   const textBackground = buildTextBackground(settings)
@@ -95,10 +107,11 @@ export function buildSvgContainer(settings, options) {
   return createSvgElement('svg', attributes)
 }
 
-export function buildGroup({color, outlineColor, outlineSize}) {
-  const fill = color || 'none'
-  const g = createSvgElement('g', {fill})
-  if (outlineColor) {
+export function buildGroup({color, outlineColor, outlineSize}, options = {}) {
+  const g = createSvgElement('g')
+  if (options.fill) {
+    g.setAttribute('fill', color || 'none')
+  } else if (outlineColor) {
     g.setAttribute('stroke', outlineColor)
     g.setAttribute('stroke-width', STROKE_WIDTH[outlineSize])
   }

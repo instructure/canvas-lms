@@ -458,9 +458,7 @@ describe DiscussionTopicsController, type: :request do
     end
 
     context "student permissions" do
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:react_discussions_post).and_return(true)
-      end
+      before { Account.site_admin.enable_feature!(:react_discussions_post) }
 
       it "unable to create an anonymous topic if course setting is turned off" do
         @user = @student
@@ -585,7 +583,8 @@ describe DiscussionTopicsController, type: :request do
                             "modified_at" => @attachment.modified_at.as_json,
                             "thumbnail_url" => nil,
                             "mime_class" => @attachment.mime_class,
-                            "media_entry_id" => @attachment.media_entry_id }],
+                            "media_entry_id" => @attachment.media_entry_id,
+                            "category" => "uncategorized" }],
         "discussion_type" => "side_comment",
         "locked" => false,
         "can_lock" => true,
@@ -1824,7 +1823,8 @@ describe DiscussionTopicsController, type: :request do
            "thumbnail_url" => nil,
            "modified_at" => attachment.modified_at.as_json,
            "mime_class" => attachment.mime_class,
-           "media_entry_id" => attachment.media_entry_id }],
+           "media_entry_id" => attachment.media_entry_id,
+           "category" => "uncategorized" }],
       "posted_at" => gtopic.posted_at.as_json,
       "root_topic_id" => nil,
       "topic_children" => [],
@@ -2938,7 +2938,8 @@ describe DiscussionTopicsController, type: :request do
         "thumbnail_url" => nil,
         "modified_at" => @attachment.modified_at.as_json,
         "mime_class" => @attachment.mime_class,
-        "media_entry_id" => @attachment.media_entry_id
+        "media_entry_id" => @attachment.media_entry_id,
+        "category" => "uncategorized"
       }
 
       v0 = json["view"][0]

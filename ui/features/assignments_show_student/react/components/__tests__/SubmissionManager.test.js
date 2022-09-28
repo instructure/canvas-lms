@@ -265,9 +265,7 @@ describe('SubmissionManager', () => {
           const submitButton = getByTestId('submit-button')
           fireEvent.click(submitButton)
         })
-        await waitFor(() =>
-          expect(getByTestId('submit-button')).not.toBeDisabled()
-        )
+        await waitFor(() => expect(getByTestId('submit-button')).not.toBeDisabled())
         if (inDocument) {
           expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
         } else {
@@ -291,6 +289,175 @@ describe('SubmissionManager', () => {
     enabled: true,
     dueDate: Date.now() - 100000,
     inDocument: false
+  })
+
+  describe('Submission completed modal after clicking the "Submit Assignment" button', () => {
+    const {assign} = window.location
+    let props, createSubmissionResult, submissionHistoriesResult, mocks, oldEnv
+    const variables = {
+      assignmentLid: '1',
+      submissionID: '1',
+      type: 'online_upload',
+      fileIds: ['1']
+    }
+
+    beforeEach(async () => {
+      oldEnv = window.ENV
+      window.ENV = {
+        ASSIGNMENT_ID: '1',
+        COURSE_ID: '1'
+      }
+      delete window.location
+      window.location = {assign: jest.fn(), origin: 'http://localhost'}
+
+      createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
+      submissionHistoriesResult = await mockQuery(
+        SUBMISSION_HISTORIES_QUERY,
+        {Node: {__typename: 'Submission'}},
+        {submissionID: '1'}
+      )
+      mocks = [
+        {
+          request: {query: CREATE_SUBMISSION, variables},
+          result: createSubmissionResult
+        },
+        {
+          request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
+          result: submissionHistoriesResult
+        }
+      ]
+      props = await mockAssignmentAndSubmission({
+        Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      })
+      props.submission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymousUser: null,
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned'
+          },
+          {
+            anonymousUser: null,
+            anonymousId: 'baT9cx',
+            workflowState: 'assigned'
+          }
+        ]
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = oldEnv
+      window.location.assign = assign
+    })
+
+    it('is present when there are assigned assessments', async () => {
+      const {getByText, getByRole} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
+
+      const peerReviewButton = getByRole('button', {name: 'Peer Review'})
+      expect(peerReviewButton).toBeInTheDocument()
+    })
+
+    it('is not present when there are no assigned assessments', async () => {
+      props.submission.assignedAssessments = []
+
+      const {getByText, queryByRole} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
+
+      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      expect(peerReviewButton).not.toBeInTheDocument()
+    })
+
+    it('redirects to the corresponding url when the anonymous peer reviews option is disabled and the "Peer Review" button is clicked', async () => {
+      props.submission = {
+        ...props.submission,
+        assignedAssessments: [
+          {
+            anonymizedUser: {_id: '1'},
+            anonymousId: 'xaU9cd',
+            workflowState: 'assigned'
+          },
+          {
+            anonymizedUser: {_id: '2'},
+            anonymousId: 'baT9cx',
+            workflowState: 'assigned'
+          }
+        ]
+      }
+
+      const {getByText, queryByRole} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
+
+      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      fireEvent.click(peerReviewButton)
+
+      const firstAssessment = props.submission.assignedAssessments[0]
+      expect(window.location.assign).toHaveBeenCalledWith(
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?reviewee_id=${firstAssessment.anonymizedUser._id}`
+      )
+    })
+
+    it('redirects to the corresponding url when the anonymous peer reviews option is enabled and the "Peer Review" button is clicked', async () => {
+      const {getByText, queryByRole} = render(
+        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+          <MockedProvider mocks={mocks}>
+            <SubmissionManager {...props} />
+          </MockedProvider>
+        </AlertManagerContext.Provider>
+      )
+
+      const submitButton = getByText('Submit Assignment')
+      fireEvent.click(submitButton)
+
+      await act(async () => {
+        jest.runOnlyPendingTimers()
+      })
+
+      const peerReviewButton = queryByRole('button', {name: 'Peer Review'})
+      fireEvent.click(peerReviewButton)
+
+      const firstAssessment = props.submission.assignedAssessments[0]
+      expect(window.location.assign).toHaveBeenCalledWith(
+        `/courses/${ENV.COURSE_ID}/assignments/${ENV.ASSIGNMENT_ID}?anonymous_asset_id=${firstAssessment.anonymousId}`
+      )
+    })
   })
 
   it('disables the submit button after it is pressed', async () => {
@@ -463,7 +630,9 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await act(async () => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
 
@@ -495,7 +664,9 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await act(async () => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(getByTestId('set-module-item-completion-button')).toHaveTextContent('Done')
       })
 
@@ -527,7 +698,9 @@ describe('SubmissionManager', () => {
           fireEvent.click(markAsDoneButton)
         })
 
-        await act(async () => { jest.runOnlyPendingTimers() })
+        await act(async () => {
+          jest.runOnlyPendingTimers()
+        })
         expect(markAsDoneButton).toHaveTextContent('Mark as done')
       })
     })
@@ -1132,8 +1305,12 @@ describe('SubmissionManager', () => {
 
         await waitFor(() => expect(ContextModuleApi.getContextModuleData).toHaveBeenCalled())
         const footer = getByTestId('student-footer')
-        expect(within(footer).getByTestId('previous-assignment-btn', {name: /Previous/})).toBeInTheDocument()
-        expect(within(footer).getByTestId('next-assignment-btn', {name: /Next/})).toBeInTheDocument()
+        expect(
+          within(footer).getByTestId('previous-assignment-btn', {name: /Previous/})
+        ).toBeInTheDocument()
+        expect(
+          within(footer).getByTestId('next-assignment-btn', {name: /Next/})
+        ).toBeInTheDocument()
       })
 
       it('does not render module buttons if no next/previous modules exist for the assignment', async () => {

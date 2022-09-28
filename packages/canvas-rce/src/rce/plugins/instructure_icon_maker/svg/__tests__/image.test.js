@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {transformForShape} from '../image'
+import {transformForShape, buildImage} from '../image'
 import {Shape} from '../shape'
-import {Size} from '../constants'
+import {Size, DEFAULT_SETTINGS} from '../constants'
 
 describe('transformShape()', () => {
   let shape, size
@@ -629,6 +629,73 @@ describe('transformShape()', () => {
 
       it('sets the translation in the Y direction', () => {
         expect(subject().translateY).toEqual(-55)
+      })
+    })
+  })
+})
+
+describe('buildImage', () => {
+  describe('when there is no encoded image', () => {
+    it('returns undefined', () => {
+      expect(buildImage(DEFAULT_SETTINGS)).toBe(undefined)
+    })
+  })
+
+  describe('when there is an encoded image', () => {
+    const baseSettings = {
+      ...DEFAULT_SETTINGS,
+      width: 1,
+      height: 2,
+      x: 3,
+      y: 4,
+      transform: 'translate(5, 6)'
+    }
+
+    describe('when the encoded image type is a stock image', () => {
+      it('uses the icon settings to set the image attributes', () => {
+        const settings = {
+          ...baseSettings,
+          encodedImage: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
+          encodedImageType: 'SingleColor'
+        }
+        expect(buildImage(settings)).toMatchInlineSnapshot(`
+          <g
+            clip-path="url(#clip-path-for-embed)"
+          >
+            <image
+              height="2"
+              href="data:image/svg+xml;base64,PHN2Zaaaaaaaaa"
+              transform="translate(5, 6)"
+              width="1"
+              x="3"
+              y="4"
+            />
+          </g>
+        `)
+      })
+    })
+
+    describe('when the encoded image type is not a stock image', () => {
+      it('uses image attributes computed from the square size', () => {
+        const settings = {
+          ...baseSettings,
+          encodedImage: 'data:image/svg+xml;base64,PHN2Zbbbbbbbbb',
+          encodedImageType: 'Course'
+        }
+        expect(buildImage(settings)).toMatchInlineSnapshot(`
+          <g
+            clip-path="url(#clip-path-for-embed)"
+          >
+            <image
+              height="114"
+              href="data:image/svg+xml;base64,PHN2Zbbbbbbbbb"
+              transform="translate(-57, -57)"
+              width="114"
+              x="50%"
+              y="50%"
+            />
+          </g>
+        `)
       })
     })
   })

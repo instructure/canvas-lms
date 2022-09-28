@@ -17,7 +17,6 @@
  */
 
 import {getDirection} from '@canvas/i18n/rtlHelper'
-import defaultTinymceConfig from '@instructure/canvas-rce/es/defaultTinymceConfig'
 
 export default class EditorConfig {
   /**
@@ -31,8 +30,6 @@ export default class EditorConfig {
    *  @param {INST} inst a config hash defined in public/javascripts/INST.js,
    *    provides feature information like whether notorious is enabled for
    *    their account.  Generally you can just pass it in after requiring it.
-   *  @param {int} width The width of the viewport the editor is in, this is
-   *    useful for deciding how many buttons to show per toolbar line
    *  @param {string} domId the "id" attribute of the element that's going
    *    to be transformed with a tinymce editor
    *
@@ -40,11 +37,10 @@ export default class EditorConfig {
    *  @constructor
    *  @return {EditorConfig}
    */
-  constructor(tinymce, inst, width, domId) {
+  constructor(tinymce, inst, domId) {
     this.baseURL = tinymce.baseURL
     this.extraButtons = inst.editorButtons
     this.instConfig = inst
-    this.viewportWidth = width
     this.idAttribute = domId
   }
 
@@ -63,8 +59,6 @@ export default class EditorConfig {
    */
   defaultConfig() {
     return {
-      ...defaultTinymceConfig,
-
       body_class:
         window.ENV.FEATURES?.canvas_k6_theme ||
         window.ENV.K5_SUBJECT_COURSE ||
@@ -79,14 +73,6 @@ export default class EditorConfig {
       plugins: ['instructure_equation'],
 
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
-
-      style_formats: [
-        {title: 'Heading 2', format: 'h2'},
-        {title: 'Heading 3', format: 'h3'},
-        {title: 'Heading 4', format: 'h4'},
-        {title: 'Heading 5', format: 'h5'},
-        {title: 'Heading 6', format: 'h6'}
-      ],
 
       init_instance_callback: ed => {
         $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef

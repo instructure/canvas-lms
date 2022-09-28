@@ -31,7 +31,6 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
   let gradebook
   let network
   let performanceControls
-  let loadAssignmentsByGradingPeriod
   let requestCharacterLimit
 
   suiteHooks.beforeEach(() => {
@@ -83,7 +82,6 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
       performanceControls = new PerformanceControls()
-      loadAssignmentsByGradingPeriod = true
       requestCharacterLimit = 8000
 
       gradebook = createGradebook({
@@ -101,7 +99,6 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         dispatch,
         gradebook,
         performanceControls,
-        loadAssignmentsByGradingPeriod,
         requestCharacterLimit
       })
 
@@ -179,14 +176,6 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
 
       test('makes one request if a grading period is selected that has no assignments in it', async () => {
         gradebook.gradingPeriodId = '68'
-        loadAssignmentGroups()
-        await network.allRequestsReady()
-        const requests = getRequests()
-        strictEqual(requests.length, 1)
-      })
-
-      test('makes one request if a grading period is selected and release flag is disabled', async () => {
-        loadAssignmentsByGradingPeriod = false
         loadAssignmentGroups()
         await network.allRequestsReady()
         const requests = getRequests()

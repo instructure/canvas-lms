@@ -386,7 +386,7 @@ export default class StudentColumnHeader extends ColumnHeader<Props, State> {
 
                     <MenuSeparator />
 
-                    <MenuGroup label={I18n.t('Show')} allowMultiple>
+                    <MenuGroup label={I18n.t('Show')} allowMultiple={true}>
                       <MenuItem
                         key="inactive"
                         selected={this.props.selectedEnrollmentFilters.includes('inactive')}

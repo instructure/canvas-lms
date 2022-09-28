@@ -9487,6 +9487,27 @@ describe Assignment do
     end
   end
 
+  describe "allowed attempts when updating submission types" do
+    before(:once) do
+      @assignment = @course.assignments.create!(submission_types: "online_text_entry", allowed_attempts: 3)
+    end
+
+    it "sets allowed_attempts to nil when the submission type is updated to no submission" do
+      @assignment.update!(submission_types: "none")
+      expect(@assignment.allowed_attempts).to eq(nil)
+    end
+
+    it "sets allowed_attempts is set to nil when the submission type is updated to a on paper submission" do
+      @assignment.update!(submission_types: "on_paper")
+      expect(@assignment.allowed_attempts).to eq(nil)
+    end
+
+    it "does not change allowed_attempts when the updated submission type allows for multiple submission attempts" do
+      @assignment.update!(submission_types: "external_tool")
+      expect(@assignment.allowed_attempts).to eq 3
+    end
+  end
+
   describe "after create callbacks" do
     subject(:event) { AnonymousOrModerationEvent.where(assignment: assignment).last }
 
