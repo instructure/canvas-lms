@@ -109,17 +109,19 @@ WEBPACK_ASSETS_PARTS=(
 # If any of these SHAs change - we don't want to use the previously cached webpack assets to prevent the
 # cache from using stale dependencies.
 WEBPACK_ASSETS_CACHE_ID_PARTS=(
-  "${WEBPACK_BUILDER_PARTS[@]}"
+  "${YARN_RUNNER_PARTS[@]}"
   $WEBPACK_RUNNER_DEPENDENCIES_MD5
   $WEBPACK_RUNNER_DOCKERFILE_MD5
+  $WEBPACK_BUILDER_DOCKERFILE_MD5
   $WEBPACK_ASSETS_DOCKERFILE_MD5
 )
 WEBPACK_ASSETS_CACHE_ID=$(compute_hash ${WEBPACK_ASSETS_CACHE_ID_PARTS[@]})
 
 WEBPACK_CACHE_ID_PARTS=(
-  "${WEBPACK_BUILDER_PARTS[@]}"
+  "${YARN_RUNNER_PARTS[@]}"
   $WEBPACK_RUNNER_DEPENDENCIES_MD5
   $WEBPACK_RUNNER_DOCKERFILE_MD5
+  $WEBPACK_BUILDER_DOCKERFILE_MD5
   $WEBPACK_CACHE_DOCKERFILE_MD5
 )
 WEBPACK_CACHE_ID=$(compute_hash ${WEBPACK_CACHE_ID_PARTS[@]})
@@ -195,9 +197,6 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
 
     add_log "built ${WEBPACK_BUILDER_SELECTED_TAG}"
-
-    tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
-    tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
   else
     RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
     YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
@@ -209,24 +208,24 @@ if [ -z "${WEBPACK_ASSETS_SELECTED_TAG}" ]; then
 
     ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_SELECTED_TAG
     tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
-
-    [[ ! -z "${WEBPACK_ASSETS_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
-      $WEBPACK_ASSETS_FUZZY_TAG \
-      "WEBPACK_ASSETS_CACHE_ID" \
-      $WEBPACK_ASSETS_CACHE_ID \
-      local/webpack-assets-previous \
-    || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
-
-    [[ ! -z "${WEBPACK_CACHE_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
-      $WEBPACK_CACHE_FUZZY_TAG \
-      "WEBPACK_CACHE_ID" \
-      $WEBPACK_CACHE_ID \
-      local/webpack-cache-previous \
-    && export USE_BUILD_CACHE=1 \
-    || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
   fi
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-} ${WEBPACK_BUILDER_FUZZY_TAG-}
+
+  [[ ! -z "${WEBPACK_ASSETS_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+    $WEBPACK_ASSETS_FUZZY_TAG \
+    "WEBPACK_ASSETS_CACHE_ID" \
+    $WEBPACK_ASSETS_CACHE_ID \
+    local/webpack-assets-previous \
+  || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-assets-previous
+
+  [[ ! -z "${WEBPACK_CACHE_FUZZY_TAG-}" && "$READ_BUILD_CACHE" == "1" ]] && load_image_if_label_eq \
+    $WEBPACK_CACHE_FUZZY_TAG \
+    "WEBPACK_CACHE_ID" \
+    $WEBPACK_CACHE_ID \
+    local/webpack-cache-previous \
+  && export USE_BUILD_CACHE=1 \
+  || tag_many starlord.inscloudgate.net/jenkins/core:focal local/webpack-cache-previous
 
   # *_BUILD_CACHE are special variables and do not need to be included in the image cache hash
   # because it shouldn't produce any compiled asset changes
