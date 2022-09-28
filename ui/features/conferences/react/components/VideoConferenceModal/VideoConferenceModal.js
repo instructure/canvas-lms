@@ -281,7 +281,7 @@ export const VideoConferenceModal = ({
           setIsLoading(false)
         }
       }}
-      size="auto"
+      size="large"
       label={header}
       shouldCloseOnDocumentClick={false}
     >
