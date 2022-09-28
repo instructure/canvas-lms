@@ -216,7 +216,8 @@ class SubmissionsApiController < ApplicationController
                                              document_annotations_read_state
                                              mark_document_annotations_read
                                              rubric_assessments_read_state
-                                             mark_rubric_assessments_read]
+                                             mark_rubric_assessments_read
+                                             mark_submission_item_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -566,8 +567,8 @@ class SubmissionsApiController < ApplicationController
         result << hash
       end
     else
-      order_by = params[:order] == "graded_at" ? "graded_at" : :id
-      order_direction = params[:order_direction] == "descending" ? "desc nulls last" : "asc"
+      order_by = (params[:order] == "graded_at") ? "graded_at" : :id
+      order_direction = (params[:order_direction] == "descending") ? "desc nulls last" : "asc"
       order = "#{order_by} #{order_direction}"
       submissions = @context.submissions.except(:order).where(user_id: student_ids).order(order)
       submissions = submissions.where(assignment_id: assignments)
@@ -1314,6 +1315,27 @@ class SubmissionsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def mark_submission_unread
     change_topic_read_state("unread")
+  end
+
+  # @API Mark submission item as read
+  #
+  # No request fields are necessary.
+  #
+  # A submission item can be "grade", "comment" or "rubric"
+  #
+  # On success, the response will be 204 No Content with an empty body.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/read/<item>.json' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  #
+  def mark_submission_item_read
+    if authorized_action(@submission, @current_user, :mark_item_read)
+      render_state_change_result @submission.mark_item_read(params[:item])
+    end
   end
 
   # @API Get rubric assessments read state

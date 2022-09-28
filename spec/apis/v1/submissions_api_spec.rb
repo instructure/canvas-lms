@@ -5018,6 +5018,44 @@ describe "Submissions API", type: :request do
     expect(@submission.reload.read?(@teacher)).to be_falsey
   end
 
+  context "with feedback visibility on" do
+    before :once do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      course_with_student_and_submitted_homework
+    end
+
+    let(:content_item) { "comment" }
+    let(:endpoint) { "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/read/#{content_item}" }
+    let(:params) do
+      { course_id: @course.id.to_s, assignment_id: @assignment.id.to_s, user_id: @student.id.to_s, item: content_item,
+        action: "mark_submission_item_read", controller: "submissions_api", format: "json" }
+    end
+
+    it "mark comments as read" do
+      @submission.add_comment(author: @teacher, comment: "teacher")
+      @user = @student
+      raw_api_call(:put, endpoint, params)
+      expect(@submission.reload.read_item?(@student, "comment")).to be_truthy
+    end
+
+    context "when passing an invalid content item" do
+      let(:content_item) { "_invalid_" }
+
+      it "returns status 422 and does not mark as read" do
+        api_call_as_user(@student, :put, endpoint, params, {}, {}, { expected_status: 422 })
+        expect(@submission.reload.read?(@student)).to be_truthy
+      end
+    end
+
+    context "when current user is not the student" do
+      it "doesn't allow you to mark someone else's submission item read" do
+        @submission.add_comment(author: @teacher, comment: "teacher")
+        api_call_as_user(@teacher, :put, endpoint, params, {}, {}, { expected_status: 401 })
+        expect(@submission.reload.unread_item?(@student, "comment")).to be_truthy
+      end
+    end
+  end
+
   context "document annotation read state" do
     before :once do
       course_with_student_and_submitted_homework

@@ -325,4 +325,36 @@ describe GradeSummaryAssignmentPresenter do
       end
     end
   end
+
+  describe "#item_unread?" do
+    before do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      @presenter = GradeSummaryPresenter.new(@course, @student, @student.id)
+      @test_presenter = GradeSummaryAssignmentPresenter.new(@presenter, @student, @assignment, @submission)
+    end
+
+    it "is true if participation item is unread" do
+      @assignment.grade_student(@student, grader: @teacher, score: 5)
+      expect(@test_presenter.item_unread?("grade")).to be_truthy
+    end
+
+    it "is false if participation item is read" do
+      @assignment.grade_student(@student, grader: @teacher, score: 5)
+      @submission.mark_item_read("grade")
+
+      expect(@test_presenter.item_unread?("grade")).to be_falsey
+    end
+
+    it "is false if there is no participation" do
+      allow(@presenter).to receive(:unread_submission_items).and_return({ @submission.id => [] })
+
+      expect(@test_presenter.item_unread?("comment")).to be_falsey
+    end
+
+    it "is false if there is no submission" do
+      allow(@presenter).to receive(:unread_submission_items).and_return({})
+
+      expect(@test_presenter.item_unread?("comment")).to be_falsey
+    end
+  end
 end
