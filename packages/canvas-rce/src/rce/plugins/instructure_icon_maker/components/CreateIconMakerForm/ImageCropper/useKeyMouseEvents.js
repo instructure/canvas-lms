@@ -18,14 +18,13 @@
 
 import {useEffect, useState, useRef, useCallback} from 'react'
 import {debounce} from '@instructure/debounce'
-import round from '../../../utils/round'
-import {KEY_EVENT_DELAY, KEY_EVENT_STEP} from './constants'
+import {KEY_EVENT_DELAY, KEY_EVENT_ACCELERATION} from './constants'
 import {actions} from '../../../reducers/imageCropper'
 
 const EVENT_EXCEPTION_ELEMENT_IDS = [
   'imageCropperHeader',
   'imageCropperFooter',
-  'imageCropperControls'
+  'imageCropperControls',
 ]
 
 function useKeysEvents(
@@ -41,7 +40,7 @@ function useKeysEvents(
 ) {
   // Refs that manage the keydown acceleration
   const direction = useRef(0)
-  const elapsedTime = useRef(0)
+  const initialTime = useRef(null)
 
   const onKeyDownCallback = event => {
     // 37 = Left, 38 = Up, 39 = Right, 40 = Down
@@ -49,37 +48,45 @@ function useKeysEvents(
     if (![37, 38, 39, 40].includes(keyCode)) {
       return
     }
+    event.preventDefault()
 
-    elapsedTime.current += 1
+    let elapsedTime
 
-    let increment = 1
-    if (keyCode === direction.current) {
-      increment = Math.floor(elapsedTime.current / KEY_EVENT_STEP) + 1
-    } else {
+    if (keyCode !== direction.current) {
+      elapsedTime = 0
+      initialTime.current = new Date()
       direction.current = keyCode
       dispatch({type: actions.UPDATE_SETTINGS, payload: {direction: keyCode}})
-      elapsedTime.current = 0
+    } else {
+      const currentTime = new Date()
+      elapsedTime = (currentTime - initialTime.current) / 1000
     }
 
-    event.preventDefault()
+    const translationDiff = Math.floor(KEY_EVENT_ACCELERATION * elapsedTime ** 2) || 1
+
     if ([37, 39].includes(keyCode)) {
-      const signedIncrement = keyCode === 37 ? -increment : increment
-      const newTranslateX = round(tempTranslateXRef.current + signedIncrement)
+      const sign = keyCode === 37 ? -1 : 1
+      const newTranslateX = tempTranslateXRef.current + sign * translationDiff
       setTempTranslateX(newTranslateX)
     }
 
     if ([38, 40].includes(keyCode)) {
-      const signedIncrement = keyCode === 38 ? -increment : increment
-      const newTranslateY = round(tempTranslateYRef.current + signedIncrement)
+      const sign = keyCode === 38 ? -1 : 1
+      const newTranslateY = tempTranslateYRef.current + sign * translationDiff
       setTempTranslateY(newTranslateY)
     }
   }
 
   const stopMovementCallback = useCallback(
-    debounce(() => {
-      direction.current = elapsedTime.current = 0
-      setIsMoving(false)
-    }, KEY_EVENT_DELAY),
+    debounce(
+      () => {
+        direction.current = 0
+        initialTime.current = null
+        setIsMoving(false)
+      },
+      KEY_EVENT_DELAY,
+      {trailing: true}
+    ),
     []
   )
 
@@ -164,7 +171,7 @@ function useMouseEvents(
   return e => startedMovingCallback(e.target, e.clientX, e.clientY)
 }
 
-export function useKeyMouseEvents(translateX, translateY, dispatch, imgRef) {
+export function useKeyMouseEvents(translateX, translateY, dispatch) {
   const [tempTranslateX, _setTempTranslateX] = useState(translateX)
   const [tempTranslateY, _setTempTranslateY] = useState(translateY)
   const [isMoving, setIsMoving] = useState(false)
