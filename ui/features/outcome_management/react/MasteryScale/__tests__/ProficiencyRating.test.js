@@ -42,7 +42,7 @@ describe('ProficiencyRating', () => {
     onPointsChange: onPointsChangeMock,
     points: '10.0',
     position: 1,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -118,7 +118,7 @@ describe('ProficiencyRating', () => {
         <ProficiencyRating
           {...defaultProps({
             mastery: true,
-            canManage: true
+            canManage: true,
           })}
         />
       )
@@ -168,7 +168,7 @@ describe('ProficiencyRating', () => {
         <ProficiencyRating
           {...defaultProps({
             disableDelete: true,
-            canManage: true
+            canManage: true,
           })}
         />
       )

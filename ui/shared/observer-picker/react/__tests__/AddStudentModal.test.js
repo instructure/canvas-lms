@@ -27,7 +27,7 @@ const defaultProps = {
   open: true,
   currentUserId: '1',
   handleClose: () => {},
-  onStudentPaired: () => {}
+  onStudentPaired: () => {},
 }
 
 describe('Add Student Modal', () => {

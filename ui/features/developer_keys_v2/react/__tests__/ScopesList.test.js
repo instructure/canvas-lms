@@ -25,93 +25,93 @@ const scopes = {
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth1: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oaut2: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth3: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth4: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth5: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth6: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth7: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth8: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth9: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   oauth10: [
     {
       resource: 'oauth',
       verb: 'GET',
-      scope: '/auth/userinfo'
-    }
+      scope: '/auth/userinfo',
+    },
   ],
   account_domain_lookups: [
     {
       resource: 'account_domain_lookups',
       verb: 'GET',
       path: '/api/v1/accounts/search',
-      scope: 'url:GET|/api/v1/accounts/search'
+      scope: 'url:GET|/api/v1/accounts/search',
     },
     {
       resource: 'account_domain_lookups',
       verb: 'POST',
       path: '/api/v1/account_domain_lookups',
-      scope: 'url:POST|/api/v1/account_domain_lookups'
-    }
-  ]
+      scope: 'url:POST|/api/v1/account_domain_lookups',
+    },
+  ],
 }
 
 const props = {
@@ -122,26 +122,26 @@ const props = {
       {
         resource: 'oauth',
         verb: 'GET',
-        scope: '/auth/userinfo'
-      }
+        scope: '/auth/userinfo',
+      },
     ],
     account_domain_lookups: [
       {
         resource: 'account_domain_lookups',
         verb: 'GET',
         path: '/api/v1/accounts/search',
-        scope: 'url:GET|/api/v1/accounts/search'
+        scope: 'url:GET|/api/v1/accounts/search',
       },
       {
         resource: 'account_domain_lookups',
         verb: 'POST',
         path: '/api/v1/account_domain_lookups',
-        scope: 'url:POST|/api/v1/account_domain_lookups'
-      }
-    ]
+        scope: 'url:POST|/api/v1/account_domain_lookups',
+      },
+    ],
   },
   filter: '',
-  actions: {listDeveloperKeyScopesSet: () => {}}
+  actions: {listDeveloperKeyScopesSet: () => {}},
 }
 
 it('renders each group', () => {
@@ -180,8 +180,8 @@ describe('handleReadOnlySelected', () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props} />)
     const fakeEvent = {
       currentTarget: {
-        checked: true
-      }
+        checked: true,
+      },
     }
 
     wrapper.instance().handleReadOnlySelected(fakeEvent)
@@ -195,13 +195,13 @@ describe('handleReadOnlySelected', () => {
     const wrapper = mount(<DeveloperKeyScopesList {...props} />)
     const fakeSelectEvent = {
       currentTarget: {
-        checked: true
-      }
+        checked: true,
+      },
     }
     const fakeDeselectEvent = {
       currentTarget: {
-        checked: false
-      }
+        checked: false,
+      },
     }
 
     wrapper.instance().handleReadOnlySelected(fakeSelectEvent)
@@ -277,7 +277,7 @@ describe('setSelectedScopes', () => {
         .setSelectedScopes([
           'url:POST|/api/v1/account_domain_lookups',
           '/auth/userinfo',
-          'url:GET|/api/v1/accounts/search'
+          'url:GET|/api/v1/accounts/search',
         ])
       const state = wrapper.instance().state
       expect(state.readOnlySelected).toEqual(false)

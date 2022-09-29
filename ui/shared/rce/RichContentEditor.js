@@ -235,7 +235,7 @@ const RichContentEditor = {
 
   freshNode,
   ensureID,
-  node2jquery
+  node2jquery,
 }
 
 // while the internals work with jquery, let's not

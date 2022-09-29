@@ -21,7 +21,7 @@ import ContentItemProcessor from '../ContentItemProcessor'
 
 const oldEnv = window.ENV
 const env = {
-  DEEP_LINKING_LOGGING: 'true'
+  DEEP_LINKING_LOGGING: 'true',
 }
 
 beforeEach(() => {
@@ -41,7 +41,7 @@ describe('message claims', () => {
 
   const messages = {
     msg: 'Message',
-    errormsg: 'Error message'
+    errormsg: 'Error message',
   }
 
   beforeEach(() => {
@@ -73,7 +73,7 @@ describe('log claims', () => {
 
   const logs = {
     log: 'Log',
-    errorlog: 'Error log'
+    errorlog: 'Error log',
   }
 
   beforeEach(() => {

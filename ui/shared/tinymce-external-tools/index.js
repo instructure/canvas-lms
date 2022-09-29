@@ -29,7 +29,7 @@ const I18n = useI18nScope('ExternalToolsPlugin')
 const TRANSLATIONS = {
   get more_external_tools() {
     return htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
-  }
+  },
 }
 
 const ExternalToolsPlugin = {
@@ -40,7 +40,7 @@ const ExternalToolsPlugin = {
 
     let dialog = {
       // if somehow open gets called early, keep trying until it is ready
-      open: (...args) => setTimeout(() => dialog.open(...args), 50)
+      open: (...args) => setTimeout(() => dialog.open(...args), 50),
     }
     import('./react/components/ExternalToolDialog').then(({default: ExternalToolDialog}) => {
       const dialogContainer = document.createElement('div')
@@ -74,7 +74,7 @@ const ExternalToolsPlugin = {
       buildMRUMenuButton(ed, ltiButtons)
       buildMenubarItem(ed, ltiButtons)
     }
-  }
+  },
 }
 
 function registerToolIcon(ed, button) {
@@ -111,7 +111,7 @@ function buildMenubarItem(ed, ltiButtons) {
     ed.ui.registry.addNestedMenuItem('lti_tools_menuitem', {
       text: I18n.t('Apps'),
       icon: 'lti',
-      getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons)
+      getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons),
     })
   }
 }
@@ -126,7 +126,7 @@ function buildFavoriteToolsButtons(ed, ltiButtons) {
       onAction: button.onAction,
       tooltip: button.title,
       icon: button.icon,
-      title: button.title
+      title: button.title,
     })
   })
 }
@@ -142,7 +142,7 @@ function buildMRUMenuButton(ed, ltiButtons) {
     },
     onSetup(_api) {
       ExternalToolsHelper.showHideButtons(ed)
-    }
+    },
   })
 }
 
@@ -160,7 +160,7 @@ function getLtiMRUItems(ed, ltiButtons) {
             type: 'menuitem',
             text: b.title,
             icon: b.icon,
-            onAction: b.onAction
+            onAction: b.onAction,
           }
         }
         mruMenuItems.push(b.menuItem)
@@ -177,7 +177,7 @@ function getLtiMRUItems(ed, ltiButtons) {
       onAction: () => {
         const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
         document.dispatchEvent(ev)
-      }
+      },
     })
   }
   return mruMenuItems

@@ -17,7 +17,7 @@
 
 import $ from 'jquery'
 
-export default $.fn.toggleAccessibly = function(visible) {
+export default $.fn.toggleAccessibly = function (visible) {
   if (visible) {
     this.show()
     this.attr('aria-expanded', 'true')

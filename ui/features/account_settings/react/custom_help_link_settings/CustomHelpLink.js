@@ -32,14 +32,14 @@ export default class CustomHelpLink extends React.Component {
     onMoveUp: PropTypes.func,
     onMoveDown: PropTypes.func,
     onEdit: PropTypes.func,
-    onRemove: PropTypes.func
+    onRemove: PropTypes.func,
   }
 
   static defaultProps = {
     onMoveUp: () => {},
     onMoveDown: () => {},
     onEdit: () => {},
-    onRemove: () => {}
+    onRemove: () => {},
   }
 
   focus = action => {

@@ -23,7 +23,7 @@ import VideoConferenceTypeSelect from './VideoConferenceTypeSelect'
 export default {
   title: 'Examples/Conferences/VideoConferenceTypeSelect',
   component: VideoConferenceTypeSelect,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => (
@@ -42,7 +42,7 @@ Default.args = {
       settings: [],
       free_trial: false,
       lti_settings: null,
-      contexts: null
+      contexts: null,
     },
     {
       name: 'BigBlueButton',
@@ -50,8 +50,8 @@ Default.args = {
       settings: [],
       free_trial: false,
       lti_settings: null,
-      contexts: null
-    }
+      contexts: null,
+    },
   ],
-  onSetConferenceType: () => {}
+  onSetConferenceType: () => {},
 }

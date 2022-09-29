@@ -57,9 +57,9 @@ describe('Confetti', () => {
         props: [
           'square',
           expect.objectContaining({
-            size: 40
-          })
-        ]
+            size: 40,
+          }),
+        ],
       })
     )
   })
@@ -69,7 +69,7 @@ describe('Confetti', () => {
     beforeEach(() => {
       env = window.ENV
       window.ENV = {
-        confetti_branding_enabled: true
+        confetti_branding_enabled: true,
       }
     })
 
@@ -82,14 +82,14 @@ describe('Confetti', () => {
           ...window.ENV,
           active_brand_config: {
             variables: {
-              'ic-brand-primary': '#000000'
-            }
-          }
+              'ic-brand-primary': '#000000',
+            },
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator).toHaveBeenCalledWith(
           expect.objectContaining({
-            colors: [[0, 0, 0]]
+            colors: [[0, 0, 0]],
           })
         )
       })
@@ -99,14 +99,14 @@ describe('Confetti', () => {
           ...window.ENV,
           active_brand_config: {
             variables: {
-              'ic-brand-global-nav-bgd': '#ffffff'
-            }
-          }
+              'ic-brand-global-nav-bgd': '#ffffff',
+            },
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator).toHaveBeenCalledWith(
           expect.objectContaining({
-            colors: [[255, 255, 255]]
+            colors: [[255, 255, 255]],
           })
         )
       })
@@ -117,17 +117,17 @@ describe('Confetti', () => {
           active_brand_config: {
             variables: {
               'ic-brand-primary': '#000000',
-              'ic-brand-global-nav-bgd': '#ffffff'
-            }
-          }
+              'ic-brand-global-nav-bgd': '#ffffff',
+            },
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator).toHaveBeenCalledWith(
           expect.objectContaining({
             colors: [
               [0, 0, 0],
-              [255, 255, 255]
-            ]
+              [255, 255, 255],
+            ],
           })
         )
       })
@@ -136,8 +136,8 @@ describe('Confetti', () => {
         window.ENV = {
           ...window.ENV,
           active_brand_config: {
-            variables: {}
-          }
+            variables: {},
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator.mock.calls[0][0]).not.toHaveProperty('colors')
@@ -150,9 +150,9 @@ describe('Confetti', () => {
             active_brand_config: {
               variables: {
                 'ic-brand-primary': '#000000',
-                'ic-brand-global-nav-bgd': '#ffffff'
-              }
-            }
+                'ic-brand-global-nav-bgd': '#ffffff',
+              },
+            },
           }
 
           render(<Confetti />)
@@ -167,14 +167,14 @@ describe('Confetti', () => {
           ...window.ENV,
           active_brand_config: {
             variables: {
-              'ic-brand-header-image': '/public/images/canvas-logo.svg'
-            }
-          }
+              'ic-brand-header-image': '/public/images/canvas-logo.svg',
+            },
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator).toHaveBeenCalledWith(
           expect.objectContaining({
-            props: expect.arrayContaining([expect.objectContaining({key: 'logo'})])
+            props: expect.arrayContaining([expect.objectContaining({key: 'logo'})]),
           })
         )
       })
@@ -183,13 +183,13 @@ describe('Confetti', () => {
         window.ENV = {
           ...window.ENV,
           active_brand_config: {
-            variables: {}
-          }
+            variables: {},
+          },
         }
         render(<Confetti />)
         expect(ConfettiGenerator).toHaveBeenCalledWith(
           expect.objectContaining({
-            props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})])
+            props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})]),
           })
         )
       })
@@ -200,15 +200,15 @@ describe('Confetti', () => {
             confetti_branding_enabled: false,
             active_brand_config: {
               variables: {
-                'ic-brand-header-image': '/public/images/canvas-logo.svg'
-              }
-            }
+                'ic-brand-header-image': '/public/images/canvas-logo.svg',
+              },
+            },
           }
 
           render(<Confetti />)
           expect(ConfettiGenerator).toHaveBeenCalledWith(
             expect.objectContaining({
-              props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})])
+              props: expect.not.arrayContaining([expect.objectContaining({key: 'logo'})]),
             })
           )
         })
@@ -222,7 +222,7 @@ describe('Confetti', () => {
       jest.advanceTimersByTime(2500)
       expect(showFlashAlert).toHaveBeenCalledWith({
         message: 'Great work! From the Canvas developers',
-        srOnly: true
+        srOnly: true,
       })
     })
   })
@@ -248,7 +248,7 @@ describe('Confetti', () => {
     beforeEach(() => {
       env = window.ENV
       window.ENV = {
-        disable_celebrations: true
+        disable_celebrations: true,
       }
     })
 

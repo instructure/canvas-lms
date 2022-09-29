@@ -41,7 +41,7 @@ export default class TimeBlockSelector extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     timeData: PropTypes.arrayOf(PropTypes.object),
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }
 
   constructor(props) {
@@ -50,11 +50,11 @@ export default class TimeBlockSelector extends React.Component {
       timeBlockRows: [
         {
           slotEventId: uniqueId(),
-          timeData: {}
-        }
+          timeData: {},
+        },
       ],
       slotValue: '30',
-      slotMessage: null
+      slotMessage: null,
     }
   }
 
@@ -76,7 +76,7 @@ export default class TimeBlockSelector extends React.Component {
   deleteRow = slotEventId => {
     const newRows = this.state.timeBlockRows.filter(e => e.slotEventId !== slotEventId)
     this.setState({
-      timeBlockRows: newRows
+      timeBlockRows: newRows,
     })
   }
 
@@ -84,26 +84,26 @@ export default class TimeBlockSelector extends React.Component {
     const newRows = [
       {
         slotEventId: uniqueId(),
-        timeData
-      }
+        timeData,
+      },
     ]
     this.setState({
-      timeBlockRows: this.state.timeBlockRows.concat(newRows)
+      timeBlockRows: this.state.timeBlockRows.concat(newRows),
     })
   }
 
   addRowsFromBlocks = timeBlocks => {
     const newRows = timeBlocks.map(tb => ({
       slotEventId: uniqueId(),
-      timeData: tb
+      timeData: tb,
     }))
     // Make sure a new blank row is there as well.
     newRows.push({
       slotEventId: uniqueId(),
-      timeData: {}
+      timeData: {},
     })
     this.setState({
-      timeBlockRows: newRows
+      timeBlockRows: newRows,
     })
   }
 
@@ -125,7 +125,7 @@ export default class TimeBlockSelector extends React.Component {
     const newBlocks = timeManager.blocks.map(block => ({
       date: this.formatDate(block.start),
       startTime: this.formatDate(block.start),
-      endTime: this.formatDate(block.end)
+      endTime: this.formatDate(block.end),
     }))
     this.addRowsFromBlocks(newBlocks)
   }
@@ -135,7 +135,7 @@ export default class TimeBlockSelector extends React.Component {
     const rowToUpdate = newRows.find(r => r.slotEventId === timeslotId)
     rowToUpdate.timeData = data
     this.setState({
-      timeBlockRows: newRows
+      timeBlockRows: newRows,
     })
   }
 
@@ -160,7 +160,7 @@ export default class TimeBlockSelector extends React.Component {
       }
       return {
         slotValue: val + 1,
-        slotMessage: null
+        slotMessage: null,
       }
     })
   }
@@ -174,7 +174,7 @@ export default class TimeBlockSelector extends React.Component {
       }
       return {
         slotValue: val > 1 ? val - 1 : val,
-        slotMessage: null
+        slotMessage: null,
       }
     })
   }
@@ -184,7 +184,7 @@ export default class TimeBlockSelector extends React.Component {
       <div className="TimeBlockSelector">
         <div className="TimeBlockSelector__Rows">
           {this.props.timeData.map(timeBlock => (
-            <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly />
+            <TimeBlockSelectRow {...timeBlock} key={timeBlock.slotEventId} readOnly={true} />
           ))}
           {this.state.timeBlockRows.map(timeBlock => (
             <TimeBlockSelectRow

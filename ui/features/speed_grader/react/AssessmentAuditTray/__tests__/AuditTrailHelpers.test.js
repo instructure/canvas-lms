@@ -24,7 +24,7 @@ import {
   IconQuestionLine,
   IconStandardsLine,
   IconTrashLine,
-  IconUnmutedLine
+  IconUnmutedLine,
 } from '@instructure/ui-icons'
 
 import * as AuditTrailHelpers from '../AuditTrailHelpers'

@@ -29,7 +29,7 @@ const SearchHelpers = {
 
   substringMatchRegex(string) {
     return new RegExp(rEscape(string), 'i')
-  }
+  },
 }
 
 export default SearchHelpers

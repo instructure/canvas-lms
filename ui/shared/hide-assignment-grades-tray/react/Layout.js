@@ -45,7 +45,7 @@ export default function Layout({
   sections,
   sectionSelectionChanged,
   selectedSectionIds,
-  unhiddenCount
+  unhiddenCount,
 }) {
   const hasSections = sections.length > 0
 
@@ -119,9 +119,9 @@ export default function Layout({
 Layout.propTypes = {
   assignment: shape({
     anonymousGrading: bool.isRequired,
-    gradesPublished: bool.isRequired
+    gradesPublished: bool.isRequired,
   }).isRequired,
   containerName: string,
   sections: arrayOf(any).isRequired,
-  ...FormContent.propTypes
+  ...FormContent.propTypes,
 }

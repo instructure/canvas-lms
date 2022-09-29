@@ -54,18 +54,18 @@ export class Whitelist extends Component {
       account: arrayOf(string),
       effective: arrayOf(string),
       inherited: arrayOf(string),
-      tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string})))
+      tools: objectOf(arrayOf(shape({id: string, name: string, account_id: string}))),
     }).isRequired,
-    maxDomains: number.isRequired
+    maxDomains: number.isRequired,
   }
 
   static defaultProps = {
-    inherited: false
+    inherited: false,
   }
 
   state = {
     addDomainInputValue: '',
-    errors: []
+    errors: [],
   }
 
   deleteButtons = []
@@ -88,11 +88,11 @@ export class Whitelist extends Component {
       this.setState(curState => {
         this.props.addDomain(this.props.context, this.props.contextId, curState.addDomainInputValue)
         this.props.copyInheritedIfNeeded(this.props.context, this.props.contextId, {
-          add: curState.addDomainInputValue
+          add: curState.addDomainInputValue,
         })
         return {
           errors: [],
-          addDomainInputValue: ''
+          addDomainInputValue: '',
         }
       })
     } else {
@@ -100,9 +100,9 @@ export class Whitelist extends Component {
         errors: [
           {
             text: I18n.t('Invalid domain'),
-            type: 'error'
-          }
-        ]
+            type: 'error',
+          },
+        ],
       })
     }
   }
@@ -150,7 +150,7 @@ export class Whitelist extends Component {
                   ? I18n.t('Domains')
                   : I18n.t('Domains (%{count}/%{max})', {
                       count: this.props.whitelistedDomains.account.length,
-                      max: this.props.maxDomains
+                      max: this.props.maxDomains,
                     })}
               </Heading>
             </Flex.Item>
@@ -298,7 +298,7 @@ function mapStateToProps(state, ownProps) {
 const mapDispatchToProps = {
   addDomain,
   removeDomain,
-  copyInheritedIfNeeded
+  copyInheritedIfNeeded,
 }
 
 export const ConnectedWhitelist = connect(mapStateToProps, mapDispatchToProps)(Whitelist)

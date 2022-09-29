@@ -53,11 +53,11 @@ export const Conversation = {
     canReply: bool,
     isPrivate: bool,
     conversationMessagesConnection: shape({
-      nodes: arrayOf(ConversationMessage.shape)
+      nodes: arrayOf(ConversationMessage.shape),
     }),
     conversationParticipantsConnection: shape({
-      nodes: arrayOf(ConversationParticipant.shape)
-    })
+      nodes: arrayOf(ConversationParticipant.shape),
+    }),
   }),
 
   mock: ({
@@ -80,8 +80,8 @@ export const Conversation = {
           recipients: [
             User.mock({_id: '10', name: 'Bobby Drake'}),
             User.mock({_id: '11', name: 'Warren Worthington'}),
-            User.mock({_id: '8', name: 'Scotty Summers'})
-          ]
+            User.mock({_id: '8', name: 'Scotty Summers'}),
+          ],
         }),
         ConversationMessage.mock({
           _id: '2694',
@@ -91,36 +91,36 @@ export const Conversation = {
           recipients: [
             User.mock({_id: '10', name: 'Bobby Drake'}),
             User.mock({_id: '11', name: 'Warren Worthington'}),
-            User.mock({_id: '8', name: 'Scotty Summers'})
-          ]
-        })
+            User.mock({_id: '8', name: 'Scotty Summers'}),
+          ],
+        }),
       ],
       pageInfo: PageInfo.mock({hasNextPage: false}),
-      __typename: 'ConversationMessageConnection'
+      __typename: 'ConversationMessageConnection',
     },
     conversationParticipantsConnection = {
       nodes: [
         ConversationParticipant.mock({
           _id: '252',
           id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUy',
-          user: User.mock({_id: '8', name: 'Scotty Summers'})
+          user: User.mock({_id: '8', name: 'Scotty Summers'}),
         }),
         ConversationParticipant.mock({
           _id: '254',
           id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU0',
           user: User.mock({_id: '10', name: 'Bobby Drake'}),
-          workflowState: 'unread'
+          workflowState: 'unread',
         }),
         ConversationParticipant.mock({
           _id: '253',
           id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUz',
           user: User.mock({_id: '11', name: 'Warren Worthington'}),
-          workflowState: 'unread'
+          workflowState: 'unread',
         }),
-        ConversationParticipant.mock()
+        ConversationParticipant.mock(),
       ],
-      __typename: 'ConversationParticipantConnection'
-    }
+      __typename: 'ConversationParticipantConnection',
+    },
   } = {}) => ({
     _id,
     id,
@@ -132,6 +132,6 @@ export const Conversation = {
     conversationParticipantsConnection,
     canReply,
     isPrivate,
-    __typename: 'Conversation'
-  })
+    __typename: 'Conversation',
+  }),
 }

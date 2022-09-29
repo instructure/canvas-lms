@@ -18,7 +18,7 @@
 
 import {
   NotificationPreferencesContext,
-  NotificationPreferencesContextProvider
+  NotificationPreferencesContextProvider,
 } from '@canvas/notification-preferences/react/NotificationPreferencesContextProvider'
 import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
 import CourseNotificationSettingsQuery from '@canvas/notification-preferences-course/react/CourseNotificationSettingsQuery'
@@ -46,5 +46,5 @@ export default function AccountNotificationSettingsView({accountId, userId}) {
 
 AccountNotificationSettingsView.propTypes = {
   accountId: string.isRequired,
-  userId: string.isRequired
+  userId: string.isRequired,
 }

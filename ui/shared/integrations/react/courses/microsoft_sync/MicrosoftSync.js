@@ -36,7 +36,7 @@ const stateMap = {
   retrying: I18n.t('Sync currently running'),
   errored: I18n.t('The sync encountered an error and did not complete'),
   completed: I18n.t('Sync completed successfully'),
-  deleted: I18n.t('Sync not enabled')
+  deleted: I18n.t('Sync not enabled'),
 }
 
 const MicrosoftSync = ({group, loading, children}) => {
@@ -63,7 +63,7 @@ const MicrosoftSync = ({group, loading, children}) => {
           'Also note that Microsoft Teams is unable to support courses with greater than %{max_enrollments} enrollments or greater than %{max_owners} owners. If your course exceeds these limits, sync will likely be interrupted.',
           {
             max_enrollments: ENV.MSFT_SYNC_MAX_ENROLLMENT_MEMBERS,
-            max_owners: ENV.MSFT_SYNC_MAX_ENROLLMENT_OWNERS
+            max_owners: ENV.MSFT_SYNC_MAX_ENROLLMENT_OWNERS,
           }
         )}
       </Text>

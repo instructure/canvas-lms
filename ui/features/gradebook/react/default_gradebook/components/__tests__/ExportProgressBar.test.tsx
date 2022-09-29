@@ -28,8 +28,8 @@ describe('ExportProgressBar', () => {
   const defaultParams: ExportProgressBarProps = {
     exportState: {
       filename: 'test-download',
-      completion: 10
-    }
+      completion: 10,
+    },
   }
 
   it('renders with valid completion & filename', () => {
@@ -44,8 +44,8 @@ describe('ExportProgressBar', () => {
     const params = {
       exportState: {
         filename: 'test-download',
-        completion: undefined
-      }
+        completion: undefined,
+      },
     }
     const {getByTestId} = render(<ExportProgressBar {...params} />)
     const progressBarElem = getByTestId('export-progress-bar')
@@ -58,7 +58,7 @@ describe('ExportProgressBar', () => {
       <ExportProgressBar
         exportState={{
           filename: 'test-download-complete',
-          completion: 100
+          completion: 100,
         }}
       />
     )

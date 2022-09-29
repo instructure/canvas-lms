@@ -21,7 +21,7 @@ import ImportOutcomesModal from './ImportOutcomesModal'
 
 export default {
   title: 'Examples/Outcomes/ImportOutcomesModal',
-  component: ImportOutcomesModal
+  component: ImportOutcomesModal,
 }
 
 // Similar to showImportOutcomesModal but without ReactDOM.render so we don't have to

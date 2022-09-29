@@ -25,25 +25,25 @@ const settingsMocks = [
   {
     request: {
       query: GET_SETTING_QUERY,
-      variables: {name: 'foobar_num_strands'}
+      variables: {name: 'foobar_num_strands'},
     },
     result: {
       data: {
         internalSetting: {
           id: 'SW50ZXJuYWxTZXR0aW5nLTE3',
           value: '10',
-          __typename: 'InternalSetting'
-        }
-      }
-    }
+          __typename: 'InternalSetting',
+        },
+      },
+    },
   },
   {
     request: {
       query: SET_SETTING_MUTATION,
       variables: {
         id: 'SW50ZXJuYWxTZXR0aW5nLTE3',
-        value: '14'
-      }
+        value: '14',
+      },
     },
     result: jest.fn(() => {
       return {
@@ -52,15 +52,15 @@ const settingsMocks = [
             internalSetting: {
               id: 'SW50ZXJuYWxTZXR0aW5nLTE3',
               value: '14',
-              __typename: 'InternalSetting'
+              __typename: 'InternalSetting',
             },
             errors: null,
-            __typename: 'UpdateInternalSettingPayload'
-          }
-        }
+            __typename: 'UpdateInternalSettingPayload',
+          },
+        },
       }
-    })
-  }
+    }),
+  },
 ]
 
 export default function renderWithMocks(element) {

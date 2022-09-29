@@ -28,12 +28,12 @@ import htmlEscape from 'html-escape'
 import numberHelper from '@canvas/i18n/numberHelper'
 import '@canvas/outcomes/find_outcome'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/loading-image'
-import '@canvas/util/templateData'/* fillTemplateData, getTemplateData */
+import '@canvas/util/templateData' /* fillTemplateData, getTemplateData */
 import '@canvas/rails-flash-notifications'
 import 'jquery-tinypubsub'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -133,8 +133,8 @@ const rubricEditing = {
         data: {
           ...data,
           min_points: rubricEditing.localizedPoints(data.min_points),
-          points: rubricEditing.localizedPoints(data.points)
-        }
+          points: rubricEditing.localizedPoints(data.points),
+        },
       })
       rubricEditing.flagInfinitesimalRating(
         $td,
@@ -172,7 +172,7 @@ const rubricEditing = {
         message: I18n.t(
           'rubric.import_outcome.duplicated_outcome',
           'This Outcome has not been added as it already exists in this rubric.'
-        )
+        ),
       })
 
       return true
@@ -380,7 +380,7 @@ const rubricEditing = {
     $rubric.find('.rubric_title .title').text(vals.title)
     $rubric.find('.rubric_table caption .title').text(vals.title)
     var vals = $rubric.getTemplateData({
-      textValues: ['title', 'description', 'rubric_total', 'rubric_association_id']
+      textValues: ['title', 'description', 'rubric_total', 'rubric_association_id'],
     })
     let data = {}
     data['rubric[title]'] = vals.title
@@ -432,8 +432,8 @@ const rubricEditing = {
           'learning_outcome_id',
           'mastery_points',
           'long_description',
-          'criterion_id'
-        ]
+          'criterion_id',
+        ],
       })
       if ($criterion.hasClass('learning_outcome_criterion')) {
         vals.long_description = $criterion.find('textarea.long_description').val()
@@ -456,7 +456,7 @@ const rubricEditing = {
       $criterion.find('.rating').each(function () {
         const $rating = $(this)
         const rating_vals = $rating.getTemplateData({
-          textValues: ['description', 'rating_long_description', 'points', 'rating_id']
+          textValues: ['description', 'rating_long_description', 'points', 'rating_id'],
         })
         const pre_rating = pre_criterion + '[ratings][' + rating_idx + ']'
         data[pre_rating + '[description]'] = rating_vals.description
@@ -538,8 +538,8 @@ const rubricEditing = {
         'free_form_criterion_comments',
         'hide_score_total',
         'hide_points',
-        'hide_outcome_results'
-      ]
+        'hide_outcome_results',
+      ],
     })
     $original_rubric.hide().after($rubric.show())
 
@@ -609,7 +609,7 @@ const rubricEditing = {
       data: rubric,
       id: 'rubric_' + rubric.id,
       hrefValues: ['id', 'rubric_association_id'],
-      avoid: '.criterion'
+      avoid: '.criterion',
     })
     $rubric.fillFormData(rubric)
     rubricEditing.isEditing = false
@@ -675,8 +675,8 @@ const rubricEditing = {
           data: {
             ...rating,
             min_points: rubricEditing.localizedPoints(rating.min_points),
-            points: rubricEditing.localizedPoints(rating.points)
-          }
+            points: rubricEditing.localizedPoints(rating.points),
+          },
         })
         $rating
           .find('.range_rating')
@@ -702,7 +702,7 @@ const rubricEditing = {
       .find('.custom_ratings')
       .showIf(rubric.free_form_criterion_comments)
     $rubric.find('.rubric_title .title').focus()
-  }
+  },
 }
 rubricEditing.sizeRatings = _.debounce(rubricEditing.originalSizeRatings, 10)
 
@@ -766,7 +766,7 @@ rubricEditing.init = function () {
           .fillTemplateData({
             data,
             htmlValues: ['description', 'long_description'],
-            avoid: 'textarea'
+            avoid: 'textarea',
           })
           .find('.displaying')
           .show()
@@ -804,7 +804,7 @@ rubricEditing.init = function () {
         width: 416,
         buttons: [],
         close: closeFunction,
-        beforeClose: beforeCloseFunction
+        beforeClose: beforeCloseFunction,
       })
 
       if (editing && !isLearningOutcome) {
@@ -816,7 +816,7 @@ rubricEditing.init = function () {
       const $criterion = $(this).parents('.criterion')
       const $rating = $(this).parents('.rating')
       const data = $rating.getTemplateData({
-        textValues: ['description', 'points', 'min_points', 'rating_long_description']
+        textValues: ['description', 'points', 'min_points', 'rating_long_description'],
       })
       const criterion_data = $criterion.getTemplateData({textValues: ['description']})
 
@@ -869,7 +869,7 @@ rubricEditing.init = function () {
           title: I18n.t('titles.edit_rubric_rating', 'Edit Rating'),
           width: 400,
           buttons: [],
-          close: close_function
+          close: close_function,
         })
       $rubric_rating_dialog.fixDialogButtons()
     })
@@ -879,7 +879,7 @@ rubricEditing.init = function () {
         width: 800,
         height: 380,
         resizable: true,
-        title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric')
+        title: I18n.t('titles.find_existing_rubric', 'Find Existing Rubric'),
       })
       if (!$rubric_dialog.hasClass('loaded')) {
         $rubric_dialog
@@ -900,8 +900,8 @@ rubricEditing.init = function () {
                 data: {
                   name: context.name,
                   context_code: context.context_code,
-                  rubrics: context.rubrics + ' rubrics'
-                }
+                  rubrics: context.rubrics + ' rubrics',
+                },
               })
               $rubric_dialog.find('.rubrics_dialog_contexts_select').append($context.show())
             })
@@ -959,7 +959,7 @@ rubricEditing.init = function () {
               callback()
             }
           })
-        }
+        },
       })
   })
 
@@ -971,7 +971,7 @@ rubricEditing.init = function () {
       $criterion = $rubric_long_description_dialog.data('current_criterion')
     const valid = $rubric_long_description_dialog.validateForm({
       required: ['description'],
-      labels: {description: I18n.t('Description')}
+      labels: {description: I18n.t('Description')},
     })
     if (!valid) {
       return
@@ -1009,7 +1009,7 @@ rubricEditing.init = function () {
     const valid = $rubric_rating_dialog.find('#edit_rating_form').validateForm({
       data,
       required: ['description'],
-      labels: {description: I18n.t('Rating Title')}
+      labels: {description: I18n.t('Rating Title')},
     })
     if (!valid) {
       return
@@ -1149,7 +1149,7 @@ rubricEditing.init = function () {
               rubric.rubric_total = rubric.points_possible
               $rubric.fillTemplateData({
                 data: rubric,
-                id: 'rubric_dialog_' + rubric.id
+                id: 'rubric_dialog_' + rubric.id,
               })
               rubric.data.forEach(criterion => {
                 criterion.criterion_points = criterion.points
@@ -1162,7 +1162,7 @@ rubricEditing.init = function () {
                   .clone()
                   .removeClass('blank')
                 $criterion.fillTemplateData({
-                  data: criterion
+                  data: criterion,
                 })
                 $criterion.find('.rating_holder').addClass('blank')
                 ratings.forEach(rating => {
@@ -1172,7 +1172,7 @@ rubricEditing.init = function () {
                     .removeClass('blank')
                   rating.rating = rating.description
                   $rating.fillTemplateData({
-                    data: rating
+                    data: rating,
                   })
                   $criterion.find('.ratings').append($rating.show())
                 })
@@ -1216,8 +1216,8 @@ rubricEditing.init = function () {
         textValues: [
           'rubric_association_type',
           'rubric_association_id',
-          'rubric_association_purpose'
-        ]
+          'rubric_association_purpose',
+        ],
       })
       data['rubric_association[association_type]'] = params.rubric_association_type
       data['rubric_association[association_id]'] = params.rubric_association_id
@@ -1317,7 +1317,7 @@ rubricEditing.init = function () {
             changePointsPossibleToMatchRubricDialog({
               assignmentPoints,
               rubricPoints,
-              pointRatio
+              pointRatio,
             })
           )
           const closeDialog = function (skip) {
@@ -1331,18 +1331,18 @@ rubricEditing.init = function () {
             buttons: [
               {
                 text: I18n.t('change', 'Change'),
-                click: closeDialog
+                click: closeDialog,
               },
               {
                 text: I18n.t('leave_different', 'Leave different'),
                 click() {
                   closeDialog(true)
-                }
-              }
+                },
+              },
             ],
             width: 400,
             resizable: false,
-            close: $confirmDialog.remove
+            close: $confirmDialog.remove,
           })
           return false
         }
@@ -1398,7 +1398,7 @@ rubricEditing.init = function () {
             {
               count: rubric.points_possible || 0,
               precision: 2,
-              strip_insignificant_zeros: true
+              strip_insignificant_zeros: true,
             }
           )
           $('.discussion-title .discussion-points').text(discussion_points_text)
@@ -1408,7 +1408,7 @@ rubricEditing.init = function () {
         }
         $rubric.find('.rubric_title .links:not(.locked)').show()
       }
-    }
+    },
   })
 
   $('#edit_rubric_form .cancel_button').click(function () {
@@ -1468,7 +1468,7 @@ rubricEditing.init = function () {
       const $target = $rating_cell.prev().find('.add_rating_link_after')
       const $previousRating = $rating_cell.prev('.rating')
       const previous_data = {
-        min_points: $rating_cell.next('.rating').find('.points').text()
+        min_points: $rating_cell.next('.rating').find('.points').text(),
       }
       $previousRating.fillTemplateData({data: previous_data})
       event.preventDefault()

@@ -27,7 +27,7 @@ import {
   IconStarLightLine,
   IconStarSolid,
   IconEmptyLine,
-  IconEmptySolid
+  IconEmptySolid,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React, {useContext, useState, useMemo} from 'react'
@@ -83,7 +83,7 @@ export const ConversationListItem = ({...props}) => {
         style={{
           // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
           boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
-          backgroundColor: props.isSelected && 'rgb(229,242,248)'
+          backgroundColor: props.isSelected && 'rgb(229,242,248)',
         }}
       >
         <View
@@ -138,12 +138,12 @@ export const ConversationListItem = ({...props}) => {
                 <Badge
                   count={props.conversation.messages.length}
                   countUntil={99}
-                  standalone
+                  standalone={true}
                   theme={{
                     colorPrimary: colors.backgroundDarkest,
                     borderRadius: '0.25rem',
                     fontSize: '0.8125rem',
-                    fontWeight: '700'
+                    fontWeight: '700',
                   }}
                 />
               </Grid.Col>
@@ -261,7 +261,7 @@ export const ConversationListItem = ({...props}) => {
     props.textSize,
     props.isUnread,
     isSubmissionCommentsType,
-    props.conversation
+    props.conversation,
   ])
 }
 
@@ -275,5 +275,5 @@ ConversationListItem.propTypes = {
   onStar: PropTypes.func,
   onMarkAsRead: PropTypes.func,
   onMarkAsUnread: PropTypes.func,
-  textSize: PropTypes.string
+  textSize: PropTypes.string,
 }

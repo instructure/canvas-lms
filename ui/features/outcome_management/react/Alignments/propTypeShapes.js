@@ -26,14 +26,14 @@ export const alignmentShape = PropTypes.shape({
   moduleTitle: PropTypes.string,
   moduleUrl: PropTypes.string,
   moduleWorkflowState: PropTypes.string,
-  assignmentContentType: PropTypes.oneOf(['assignment', 'discussion', 'quiz'])
+  assignmentContentType: PropTypes.oneOf(['assignment', 'discussion', 'quiz']),
 })
 
 export const outcomeWithAlignmentShape = PropTypes.shape({
   _id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  alignments: PropTypes.arrayOf(alignmentShape)
+  alignments: PropTypes.arrayOf(alignmentShape),
 })
 
 export const groupDataShape = PropTypes.shape({
@@ -42,7 +42,7 @@ export const groupDataShape = PropTypes.shape({
   outcomes: PropTypes.shape({
     pageInfo: PropTypes.shape({
       hasNextPage: PropTypes.bool.isRequired,
-      endCursor: PropTypes.string
+      endCursor: PropTypes.string,
     }),
     edges: PropTypes.arrayOf(
       PropTypes.shape({
@@ -50,9 +50,9 @@ export const groupDataShape = PropTypes.shape({
           _id: PropTypes.string.isRequired,
           title: PropTypes.string.isRequired,
           description: PropTypes.string,
-          alignments: PropTypes.arrayOf(alignmentShape)
-        })
+          alignments: PropTypes.arrayOf(alignmentShape),
+        }),
       })
-    )
-  })
+    ),
+  }),
 })

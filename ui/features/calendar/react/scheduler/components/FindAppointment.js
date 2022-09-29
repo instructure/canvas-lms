@@ -29,12 +29,12 @@ const I18n = useI18nScope('react_scheduler')
 export default class FindAppointment extends React.Component {
   static propTypes = {
     courses: PropTypes.array.isRequired,
-    store: PropTypes.object.isRequired
+    store: PropTypes.object.isRequired,
   }
 
   state = {
     isModalOpen: false,
-    selectedCourse: {}
+    selectedCourse: {},
   }
 
   handleSubmit() {
@@ -44,20 +44,20 @@ export default class FindAppointment extends React.Component {
     )
     this.setState({
       isModalOpen: false,
-      selectedCourse: {}
+      selectedCourse: {},
     })
   }
 
   selectCourse(courseId) {
     this.setState({
-      selectedCourse: this.props.courses.filter(c => c.id === courseId)[0]
+      selectedCourse: this.props.courses.filter(c => c.id === courseId)[0],
     })
   }
 
   openModal() {
     this.setState({
       isModalOpen: true,
-      selectedCourse: this.props.courses.length > 0 ? this.props.courses[0] : {}
+      selectedCourse: this.props.courses.length > 0 ? this.props.courses[0] : {},
     })
   }
 

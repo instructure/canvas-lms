@@ -23,7 +23,7 @@ import {MessageDetailItem} from '../MessageDetailItem'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 const defaultProps = {
@@ -31,9 +31,9 @@ const defaultProps = {
     author: {name: 'Tom Thompson'},
     recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
     createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-    body: 'This is the body text for the message.'
+    body: 'This is the body text for the message.',
   },
-  contextName: 'Fake Course 1'
+  contextName: 'Fake Course 1',
 }
 
 const setup = props => {
@@ -49,13 +49,13 @@ describe('MessageDetailItem', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -76,9 +76,9 @@ describe('MessageDetailItem', () => {
         recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
         body: 'This is the body text for the message.',
-        attachmentsConnection: {nodes: [{displayName: 'attachment1.jpeg', url: 'testingurl'}]}
+        attachmentsConnection: {nodes: [{displayName: 'attachment1.jpeg', url: 'testingurl'}]},
       },
-      contextName: 'Fake Course 1'
+      contextName: 'Fake Course 1',
     }
 
     const {getByText} = render(<MessageDetailItem {...props} />)
@@ -91,11 +91,11 @@ describe('MessageDetailItem', () => {
         author: {name: 'Tom Thompson'},
         recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: 'This is the body text for the message.'
+        body: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
       onReply: null,
-      onReplyAll: null
+      onReplyAll: null,
     }
 
     const {getByRole, queryByText, queryByTestId} = render(<MessageDetailItem {...props} />)
@@ -115,13 +115,13 @@ describe('MessageDetailItem', () => {
         author: {name: 'Tom Thompson'},
         recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
         createdAt: 'Tue, 20 Apr 2021 14:31:25 UTC +00:00',
-        body: 'This is the body text for the message.'
+        body: 'This is the body text for the message.',
       },
       contextName: 'Fake Course 1',
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
       onDelete: jest.fn(),
-      onForward: jest.fn()
+      onForward: jest.fn(),
     }
 
     const {getByTestId, getByText} = render(<MessageDetailItem {...props} />)
@@ -148,7 +148,7 @@ describe('MessageDetailItem', () => {
     describe('Mobile', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'}
+          mobile: {maxWidth: '67'},
         }))
       })
 
@@ -162,7 +162,7 @@ describe('MessageDetailItem', () => {
     describe('Tablet', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          tablet: {maxWidth: '67'}
+          tablet: {maxWidth: '67'},
         }))
       })
 
@@ -176,7 +176,7 @@ describe('MessageDetailItem', () => {
     describe('Desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {maxWidth: '67'}
+          desktop: {maxWidth: '67'},
         }))
       })
 

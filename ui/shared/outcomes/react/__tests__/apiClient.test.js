@@ -30,7 +30,7 @@ describe('apiClient', () => {
     function executeTest(apiRoute, apiClientCall) {
       moxios.stubRequest(apiRoute, {
         status: 200,
-        response: {}
+        response: {},
       })
 
       moxios.wait(() => {

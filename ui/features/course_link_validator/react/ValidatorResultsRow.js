@@ -33,7 +33,7 @@ import {
   IconQuestionLine,
   IconDocumentLine,
   IconImageSolid,
-  IconLinkSolid
+  IconLinkSolid,
 } from '@instructure/ui-icons'
 import sanitizeUrl from 'sanitize-url'
 
@@ -51,7 +51,7 @@ const TYPE_INFO = {
   quiz: {icon: IconQuizLine, label: I18n.t('Quiz')},
   wiki_page: {icon: IconDocumentLine, label: I18n.t('Page')},
   assessment_question: {icon: IconQuestionLine, label: I18n.t('Assessment Question')},
-  quiz_question: {icon: IconQuestionLine, label: I18n.t('Quiz Question')}
+  quiz_question: {icon: IconQuestionLine, label: I18n.t('Quiz Question')},
 }
 
 const REASON_DESCRIPTION = {
@@ -62,7 +62,7 @@ const REASON_DESCRIPTION = {
   missing_item: I18n.t('Non-existent content referenced in this resource:'),
   broken_link: I18n.t('External links in this resource were unreachable:'),
   broken_image: I18n.t('External images in this resource were unreachable:'),
-  deleted: I18n.t('Deleted content referenced in this resource:')
+  deleted: I18n.t('Deleted content referenced in this resource:'),
 }
 
 function simplifyReason(link) {
@@ -114,7 +114,7 @@ export default function ValidatorResultsRow(props) {
     rows.push(
       <List.Item key={reason}>
         {REASON_DESCRIPTION[reason]}
-        <List isUnstyled margin="none x-small small small">
+        <List isUnstyled={true} margin="none x-small small small">
           {links}
         </List>
       </List.Item>

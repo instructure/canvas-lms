@@ -30,11 +30,11 @@ export default class AppDetails extends React.Component {
   static propTypes = {
     store: PropTypes.object.isRequired,
     baseUrl: PropTypes.string.isRequired,
-    shortName: PropTypes.string.isRequired
+    shortName: PropTypes.string.isRequired,
   }
 
   state = {
-    app: null
+    app: null,
   }
 
   componentDidMount() {

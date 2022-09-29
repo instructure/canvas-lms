@@ -26,7 +26,7 @@ import {
   IconImportLine,
   IconOutcomesLine,
   IconPlusSolid,
-  IconSearchLine
+  IconSearchLine,
 } from '@instructure/ui-icons'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import FindOutcomesModal from './FindOutcomesModal'
@@ -43,7 +43,7 @@ const ManagementHeader = ({
   lhsGroupId,
   setTargetGroupIdsToRefetch,
   importsTargetGroup,
-  setImportsTargetGroup
+  setImportsTargetGroup,
 }) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
@@ -129,7 +129,7 @@ const ManagementHeader = ({
       />
       {isCreateOutcomeModalOpen && (
         <CreateOutcomeModal
-          isOpen
+          isOpen={true}
           onCloseHandler={closeCreateOutcomeModal}
           onSuccess={onSuccessfulCreateOutcome}
           starterGroupId={lhsGroupId}
@@ -140,7 +140,7 @@ const ManagementHeader = ({
 }
 
 ManagementHeader.defaultProps = {
-  onSuccessfulCreateOutcome: () => {}
+  onSuccessfulCreateOutcome: () => {},
 }
 
 ManagementHeader.propTypes = {
@@ -150,7 +150,7 @@ ManagementHeader.propTypes = {
   lhsGroupId: PropTypes.string,
   setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
   importsTargetGroup: PropTypes.object.isRequired,
-  setImportsTargetGroup: PropTypes.func.isRequired
+  setImportsTargetGroup: PropTypes.func.isRequired,
 }
 
 export default ManagementHeader

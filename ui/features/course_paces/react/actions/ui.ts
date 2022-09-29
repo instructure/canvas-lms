@@ -39,7 +39,7 @@ export enum Constants {
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
   START_SYNCING = 'UI/START_SYNCING',
-  SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED'
+  SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
 }
 
 /* Action creators */
@@ -60,7 +60,7 @@ export const regularActions = {
   setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
     createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
   startSyncing: () => createAction(Constants.START_SYNCING),
-  syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED)
+  syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED),
 }
 
 export const thunkActions = {
@@ -73,14 +73,14 @@ export const thunkActions = {
       const afterLoadActionCreator = (newSelectedPace: CoursePace): SetSelectedPaceType => {
         return {
           type: Constants.SET_SELECTED_PACE_CONTEXT,
-          payload: {contextType, contextId, newSelectedPace}
+          payload: {contextType, contextId, newSelectedPace},
         }
       }
       dispatch(
         coursePaceActions.loadLatestPaceByContext(contextType, contextId, afterLoadActionCreator)
       )
     }
-  }
+  },
 }
 
 export const actions = {...regularActions, ...thunkActions}

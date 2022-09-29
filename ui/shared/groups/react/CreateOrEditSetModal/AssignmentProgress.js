@@ -84,7 +84,7 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
               renderValue={v => {
                 return <Text size="large">{pctFormat(v.valueNow / v.valueMax)}</Text>
               }}
-              shouldAnimateOnMount
+              shouldAnimateOnMount={true}
             />
           </Flex.Item>
           <Flex.Item>
@@ -113,5 +113,5 @@ export const AssignmentProgress = ({url, onCompletion, apiCall}) => {
 AssignmentProgress.propTypes = {
   url: string.isRequired,
   onCompletion: func.isRequired,
-  apiCall: func // Used to override doFetchApi for storybook purposes
+  apiCall: func, // Used to override doFetchApi for storybook purposes
 }

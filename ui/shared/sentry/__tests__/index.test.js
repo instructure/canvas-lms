@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { isolate } from '..'
+import {isolate} from '..'
 
 describe('isolate', () => {
   beforeEach(() => {
@@ -24,12 +24,16 @@ describe('isolate', () => {
   })
 
   it('isolates throws from function', async () => {
-    await isolate(() => { throw new Error('nope') })()
+    await isolate(() => {
+      throw new Error('nope')
+    })()
     expect(console.error).toHaveBeenCalledWith(new Error('nope'))
   })
 
   it('isolates throws from async function', async () => {
-    await isolate(async () => { throw new Error('nope') })()
+    await isolate(async () => {
+      throw new Error('nope')
+    })()
     expect(console.error).toHaveBeenCalledWith(new Error('nope'))
   })
 

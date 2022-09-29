@@ -30,7 +30,7 @@ export default class PopoverMenuView extends View {
       focusin: 'cancelHide',
       focusout: 'hidePopover',
       outerclick: 'hidePopover',
-      keyup: 'checkEsc'
+      keyup: 'checkEsc',
     }
   }
 
@@ -67,7 +67,7 @@ export default class PopoverMenuView extends View {
           const content = this.$el.find('.popover-content')
           this.$el.css({top: coords.top, left: coords.left})
           return this.setPopoverContentHeight(this.$el, content, $('#content'))
-        }
+        },
       })
 
       if (focus) {

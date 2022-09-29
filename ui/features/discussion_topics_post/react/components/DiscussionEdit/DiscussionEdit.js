@@ -105,7 +105,7 @@ export const DiscussionEdit = props => {
       style={{
         width: '100%',
         // props.show allows you to load an RCE without displaying it which can aleviate load times
-        display: props.show ? '' : 'none'
+        display: props.show ? '' : 'none',
       }}
       data-testid="DiscussionEdit-container"
     >
@@ -152,7 +152,7 @@ export const DiscussionEdit = props => {
             }}
             editorOptions={{
               focus: true,
-              plugins: getPlugins()
+              plugins: getPlugins(),
             }}
             height={300}
             defaultContent={props.value}
@@ -169,7 +169,7 @@ export const DiscussionEdit = props => {
               marginCancel: 'xx-small',
               marginReply: 'xx-small',
               paddingAttachment: 'xx-small',
-              viewAs: 'div'
+              viewAs: 'div',
             },
             desktop: {
               direction: 'row',
@@ -177,8 +177,8 @@ export const DiscussionEdit = props => {
               marginCancel: '0 0 0 0',
               marginReply: '0 0 0 small',
               paddingAttachment: '0 0 0 0',
-              viewAs: 'span'
-            }
+              viewAs: 'span',
+            },
           }}
           render={(responsiveProps, matches) => {
             const rceButtons = [
@@ -228,7 +228,7 @@ export const DiscussionEdit = props => {
                     <Text size="medium">{props.isEdit ? I18n.t('Save') : I18n.t('Reply')}</Text>
                   </Button>
                 </span>
-              </View>
+              </View>,
             ]
             return matches.includes('mobile') ? (
               <View as="div" padding={undefined} key="mobileButtons">
@@ -239,13 +239,13 @@ export const DiscussionEdit = props => {
               </View>
             ) : (
               <Flex key="nonMobileButtons">
-                <Flex.Item shouldGrow textAlign="start">
+                <Flex.Item shouldGrow={true} textAlign="start">
                   <View as={responsiveProps.viewAs} padding={responsiveProps.paddingAttachment}>
                     <AttachmentDisplay attachment={attachment} setAttachment={setAttachment} />
                   </View>
                 </Flex.Item>
                 {ENV.draft_discussions && (
-                  <Flex.Item shouldGrow textAlign="start">
+                  <Flex.Item shouldGrow={true} textAlign="start">
                     {props.draftSaved ? (
                       !awaitingChanges && (
                         <span>
@@ -267,7 +267,7 @@ export const DiscussionEdit = props => {
                     )}
                   </Flex.Item>
                 )}
-                <Flex.Item shouldGrow textAlign="end">
+                <Flex.Item shouldGrow={true} textAlign="end">
                   {rceButtons}
                 </Flex.Item>
               </Flex>
@@ -292,7 +292,7 @@ DiscussionEdit.propTypes = {
   isEdit: PropTypes.bool,
   quotedEntry: PropTypes.object,
   updateDraft: PropTypes.func,
-  onInit: PropTypes.func
+  onInit: PropTypes.func,
 }
 
 DiscussionEdit.defaultProps = {
@@ -301,7 +301,7 @@ DiscussionEdit.defaultProps = {
   quotedEntry: null,
   value: '',
   updateDraft: () => {},
-  onInit: () => {}
+  onInit: () => {},
 }
 
 export default DiscussionEdit

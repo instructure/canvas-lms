@@ -37,7 +37,7 @@ ReactDOM.render(
       bottom: 0,
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
     }}
   >
     <Spinner renderTitle={I18n.t('Loading')} margin="large auto 0 auto" />

@@ -29,7 +29,7 @@ import {
   IconDiscussionLine,
   IconPublishSolid,
   IconQuizLine,
-  IconUnpublishedLine
+  IconUnpublishedLine,
 } from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -45,7 +45,7 @@ import {
   getCoursePace,
   getExcludeWeekends,
   getCoursePaceItemPosition,
-  isStudentPace
+  isStudentPace,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
@@ -92,7 +92,7 @@ type ComponentProps = PassedProps & StoreProps & DispatchProps
 export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   state: LocalState = {
     duration: String(this.props.coursePaceItem.duration),
-    hovering: false
+    hovering: false,
   }
 
   private debouncedCommitChanges: any
@@ -105,7 +105,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     super(props)
     this.debouncedCommitChanges = debounce(this.commitChanges, 300, {
       leading: false,
-      trailing: true
+      trailing: true,
     })
     this.dateFormatter = coursePaceDateFormatter()
   }
@@ -363,12 +363,12 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     isSyncing: getSyncing(state),
     showProjections: getShowProjections(state),
     isStudentPace: isStudentPace(state),
-    context_type: getSelectedContextType(state)
+    context_type: getSelectedContextType(state),
   }
 }
 
 const ConnectedAssignmentRow = connect(mapStateToProps, {
-  setPaceItemDuration: actions.setPaceItemDuration
+  setPaceItemDuration: actions.setPaceItemDuration,
 })(AssignmentRow)
 
 // This hack allows AssignmentRow to be rendered inside an InstUI Table.Body

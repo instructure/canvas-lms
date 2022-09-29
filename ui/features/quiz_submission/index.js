@@ -24,21 +24,21 @@ const I18n = useI18nScope('quizzes.quiz_submission')
 
 $(document).ready(() => {
   $('#questions.assessment_results .question').hover(
-    function() {
+    function () {
       $(this).addClass('hover')
     },
-    function() {
+    function () {
       $(this).removeClass('hover')
     }
   )
 
-  $('.quiz_response_text img').each(function() {
+  $('.quiz_response_text img').each(function () {
     $(this)
       .css({
         borderColor: '#f44',
         borderStyle: 'solid',
         borderWidth: '2px',
-        padding: 2
+        padding: 2,
       })
       .attr(
         'title',
@@ -49,13 +49,13 @@ $(document).ready(() => {
       )
   })
 
-  $('.quiz_response_text iframe').each(function() {
+  $('.quiz_response_text iframe').each(function () {
     $(this)
       .css({
         borderColor: '#f44',
         borderStyle: 'solid',
         borderWidth: '2px',
-        padding: 2
+        padding: 2,
       })
       .attr(
         'title',
@@ -69,11 +69,11 @@ $(document).ready(() => {
   const $list = $('nothing')
   $('.quiz_response_text')
     .find('object,embed')
-    .each(function() {
+    .each(function () {
       return $list.add($(this).parents('object,embed:first'))
     })
 
-  return $list.each(function() {
+  return $list.each(function () {
     const $holder = $('<span/>').css('display', 'inline-block')
     $holder.before($(this))
     $holder.append($(this))
@@ -82,7 +82,7 @@ $(document).ready(() => {
         borderColor: '#f44',
         borderStyle: 'solid',
         borderWidth: '2px',
-        padding: 2
+        padding: 2,
       })
       .attr(
         'title',

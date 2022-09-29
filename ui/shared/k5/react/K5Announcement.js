@@ -43,7 +43,7 @@ const ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE = 2
 
 const FAUX_ANNOUNCEMENT_ID = '_no_recent_announcments_announcement_'
 const noRecentAnnouncementsFauxAnnouncement = {
-  id: FAUX_ANNOUNCEMENT_ID
+  id: FAUX_ANNOUNCEMENT_ID,
 }
 
 export const K5AnnouncementLoadingMask = props => {
@@ -81,11 +81,11 @@ export default function K5Announcement({
   canEdit,
   canReadAnnouncements,
   showCourseDetails,
-  firstAnnouncement
+  firstAnnouncement,
 }) {
   const [loadingMore, setLoadingMore] = useState(false)
   const [homeroomAnnouncements, setHomeroomAnnouncements] = useState([
-    firstAnnouncement || noRecentAnnouncementsFauxAnnouncement
+    firstAnnouncement || noRecentAnnouncementsFauxAnnouncement,
   ])
   const [currentAnnouncement, setCurrentAnnouncement] = useState(homeroomAnnouncements[0])
   const [needPrevAnnouncement, setNeedPrevAnnouncement] = useState(false)
@@ -112,8 +112,8 @@ export default function K5Announcement({
             context_codes: [`course_${courseId}`],
             start_date: start_date.toISOString(),
             end_date: end_date.toISOString(),
-            per_page: ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE
-          }
+            per_page: ANNOUNCEMENT_LOOKAHEAD_PAGE_SIZE,
+          },
         }))
         setMoreHomeroomAnnouncementsURL(link?.next?.url)
 
@@ -128,7 +128,7 @@ export default function K5Announcement({
         showFlashAlert({
           message: I18n.t('Failed getting next batch of announcements.'),
           err: ex,
-          type: 'error'
+          type: 'error',
         })
       }
       setLoadingMore(false)
@@ -208,12 +208,12 @@ export default function K5Announcement({
       margin="medium 0 0"
       wrap="wrap"
     >
-      <Flex.Item shouldGrow>{content}</Flex.Item>
+      <Flex.Item shouldGrow={true}>{content}</Flex.Item>
       {canEdit && currentAnnouncement.id !== FAUX_ANNOUNCEMENT_ID && (
         <Flex.Item margin="0 0 0 x-small">
           <IconButton
             screenReaderLabel={I18n.t('Edit announcement %{title}', {
-              title: currentAnnouncement.title
+              title: currentAnnouncement.title,
             })}
             withBackground={false}
             withBorder={false}
@@ -228,8 +228,8 @@ export default function K5Announcement({
           <IconButton
             margin="0 0 0 x-small"
             screenReaderLabel={I18n.t('Previous announcement')}
-            withBackground
-            withBorder
+            withBackground={true}
+            withBorder={true}
             onClick={handlePrevAnnouncement}
             interaction={
               hasPrevAnnouncement() && !fetchForNeededAnnouncementIsInFlight()
@@ -242,8 +242,8 @@ export default function K5Announcement({
           <IconButton
             margin="0 0 0 x-small"
             screenReaderLabel={I18n.t('Next announcement')}
-            withBackground
-            withBorder
+            withBackground={true}
+            withBorder={true}
             onClick={handleNextAnnouncement}
             interaction={hasNextAnnouncement() ? 'enabled' : 'disabled'}
           >
@@ -258,7 +258,7 @@ export default function K5Announcement({
     if (currentAnnouncement.id === FAUX_ANNOUNCEMENT_ID) return null
     return (
       <Flex wrap="wrap" alignItems="end">
-        <Flex.Item align="start" shouldGrow shoulShrink margin="x-small x-small 0 0">
+        <Flex.Item align="start" shouldGrow={true} shoulShrink={true} margin="x-small x-small 0 0">
           <Heading level="h3">
             <Link href={currentAnnouncement.url} isWithinText={false}>
               {currentAnnouncement.title}
@@ -382,8 +382,8 @@ export const K5AnnouncementType = PropTypes.shape({
   attachment: PropTypes.shape({
     url: PropTypes.string.isRequired,
     filename: PropTypes.string.isRequired,
-    display_name: PropTypes.string.isRequired
-  })
+    display_name: PropTypes.string.isRequired,
+  }),
 })
 
 K5Announcement.propTypes = {
@@ -396,5 +396,5 @@ K5Announcement.propTypes = {
   canReadAnnouncements: PropTypes.bool.isRequired,
   showCourseDetails: PropTypes.bool.isRequired,
   // announcement
-  firstAnnouncement: K5AnnouncementType
+  firstAnnouncement: K5AnnouncementType,
 }

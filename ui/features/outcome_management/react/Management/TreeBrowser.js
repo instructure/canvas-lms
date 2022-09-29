@@ -27,11 +27,11 @@ const I18n = useI18nScope('OutcomeManagement')
 
 const KEYCODES = {
   ENTER: 13,
-  SPACE: 32
+  SPACE: 32,
 }
 
 const iconStyles = {
-  display: 'inline-block'
+  display: 'inline-block',
 }
 
 const contentItem = ({
@@ -42,7 +42,7 @@ const contentItem = ({
   containerRefs,
   onRefChange,
   onCreateGroup,
-  iconMargin
+  iconMargin,
 }) => {
   const onClick = e => {
     e.stopPropagation()
@@ -80,7 +80,7 @@ const contentItem = ({
 
   const themeOverrides = {
     hoverBackgroundColor: 'white',
-    hoverTextColor: 'brand'
+    hoverTextColor: 'brand',
   }
 
   return (
@@ -121,7 +121,7 @@ const TreeBrowser = ({
   showRootCollection,
   defaultExpandedIds,
   onCreateGroup,
-  loadedGroups
+  loadedGroups,
 }) => {
   const [expandedContentId, setExpandedContentId] = useState(null)
   const [containerRefs, setContainerRefs] = useState({})
@@ -134,7 +134,7 @@ const TreeBrowser = ({
   const onRefChange = useCallback((node, id) => {
     setContainerRefs(prevState => ({
       ...prevState,
-      [id]: node
+      [id]: node,
     }))
   }, [])
 
@@ -164,8 +164,8 @@ const TreeBrowser = ({
           containerRefs,
           onRefChange,
           onCreateGroup,
-          iconMargin
-        })
+          iconMargin,
+        }),
     }))
     .reduce((dict, collection) => {
       dict[collection.id] = collection
@@ -208,7 +208,7 @@ TreeBrowser.defaultProps = {
   showRootCollection: false,
   defaultExpandedIds: [],
   loadedGroups: [],
-  onCreateGroup: () => {}
+  onCreateGroup: () => {},
 }
 
 TreeBrowser.propTypes = {
@@ -220,7 +220,7 @@ TreeBrowser.propTypes = {
   showRootCollection: PropTypes.bool,
   defaultExpandedIds: PropTypes.arrayOf(PropTypes.string),
   loadedGroups: PropTypes.arrayOf(PropTypes.string),
-  onCreateGroup: PropTypes.func
+  onCreateGroup: PropTypes.func,
 }
 
 export default TreeBrowser

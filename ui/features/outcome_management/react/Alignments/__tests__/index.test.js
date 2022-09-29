@@ -42,7 +42,7 @@ describe('AlignmentSummary', () => {
       contextType = 'Course',
       contextId = '1',
       rootOutcomeGroup = {id: '1'},
-      mocks = courseAlignmentStatsMocks()
+      mocks = courseAlignmentStatsMocks(),
     } = {}
   ) => {
     return realRender(

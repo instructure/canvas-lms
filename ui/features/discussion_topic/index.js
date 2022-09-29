@@ -116,7 +116,7 @@ ready(() => {
   const topicView = new TopicView({
     el: '#main',
     model: new Backbone.Model(),
-    filterModel
+    filterModel,
   })
 
   const entriesView = new EntriesView({
@@ -125,18 +125,18 @@ ready(() => {
     descendants,
     children,
     threaded: ENV.DISCUSSION.THREADED,
-    model: filterModel
+    model: filterModel,
   })
 
   const toolbarView = new DiscussionToolbarView({
     el: '#discussion-toolbar',
-    model: filterModel
+    model: filterModel,
   })
 
   const filterView = new DiscussionFilterResultsView({
     el: '#filterResults',
     allData: data,
-    model: filterModel
+    model: filterModel,
   })
 
   const $container = $(window)
@@ -172,7 +172,7 @@ ready(() => {
     const top = $container.scrollTop()
     router.navigate('', {
       trigger: false,
-      replace: true
+      replace: true,
     })
     $container.scrollTop(top)
   })
@@ -259,7 +259,7 @@ ready(() => {
           entriesView.render()
           Backbone.history.start({
             pushState: true,
-            root: `${ENV.DISCUSSION.APP_URL}/`
+            root: `${ENV.DISCUSSION.APP_URL}/`,
           })
           if (initialEntry) {
             const fetchedModel = entries.get(initialEntry.id)
@@ -270,7 +270,7 @@ ready(() => {
             entriesView.render()
             router.navigate(`entry-${initialEntry.get('id')}`, true)
           }
-        }
+        },
       })
 
       topicView.on('addReply', entry => {
@@ -293,7 +293,7 @@ ready(() => {
       $('#module_sequence_footer').moduleSequenceFooter({
         assetType: ENV.DISCUSSION.SEQUENCE.ASSET_TYPE,
         assetID: ENV.DISCUSSION.SEQUENCE.ASSET_ID,
-        courseID: ENV.DISCUSSION.SEQUENCE.COURSE_ID
+        courseID: ENV.DISCUSSION.SEQUENCE.COURSE_ID,
       })
     })
   }

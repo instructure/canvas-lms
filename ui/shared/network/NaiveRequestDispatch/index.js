@@ -36,7 +36,7 @@ export default class NaiveRequestDispatch {
   constructor(options = {}) {
     this.options = {
       ...options,
-      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit)
+      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit),
     }
     this.requests = []
   }
@@ -72,7 +72,7 @@ export default class NaiveRequestDispatch {
   getDepaginated(url, params, pageCallback = () => {}, pagesEnqueuedCallback = () => {}) {
     const request = {
       deferred: new $.Deferred(),
-      active: false
+      active: false,
     }
 
     const allEnqueued = deferreds => {
@@ -117,7 +117,7 @@ export default class NaiveRequestDispatch {
   getJSON(url, params, resolve, reject) {
     const request = {
       deferred: new $.Deferred(),
-      active: false
+      active: false,
     }
 
     /* eslint-disable promise/catch-or-return */

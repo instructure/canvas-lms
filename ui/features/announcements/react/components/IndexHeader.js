@@ -31,7 +31,7 @@ import {
   IconPlusLine,
   IconSearchLine,
   IconTrashLine,
-  IconUnlockLine
+  IconUnlockLine,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
@@ -49,7 +49,7 @@ const I18n = useI18nScope('announcements_v2')
 export const SEARCH_TIME_DELAY = 750
 const filters = {
   all: I18n.t('All'),
-  unread: I18n.t('Unread')
+  unread: I18n.t('Unread'),
 }
 export default class IndexHeader extends Component {
   static propTypes = {
@@ -64,14 +64,14 @@ export default class IndexHeader extends Component {
     toggleSelectedAnnouncementsLock: func.isRequired,
     deleteSelectedAnnouncements: func.isRequired,
     searchInputRef: func,
-    announcementsLocked: bool.isRequired
+    announcementsLocked: bool.isRequired,
   }
 
   static defaultProps = {
     isBusy: false,
     atomFeedUrl: null,
     selectedCount: 0,
-    searchInputRef: null
+    searchInputRef: null,
   }
 
   onSearch = debounce(
@@ -82,7 +82,7 @@ export default class IndexHeader extends Component {
     SEARCH_TIME_DELAY,
     {
       leading: false,
-      trailing: true
+      trailing: true,
     }
   )
 
@@ -100,7 +100,7 @@ export default class IndexHeader extends Component {
         } else if (searchInput) {
           searchInput.focus()
         }
-      }
+      },
     })
   }
 
@@ -125,7 +125,7 @@ export default class IndexHeader extends Component {
                   onChange={e => this.props.searchAnnouncements({filter: e.target.value})}
                   style={{
                     margin: '0',
-                    width: '100%'
+                    width: '100%',
                   }}
                 >
                   {Object.keys(filters).map(filter => (
@@ -230,13 +230,13 @@ const connectState = state => ({
     'contextId',
     'permissions',
     'atomFeedUrl',
-    'announcementsLocked'
-  ])
+    'announcementsLocked',
+  ]),
 })
 const selectedActions = [
   'searchAnnouncements',
   'toggleSelectedAnnouncementsLock',
-  'deleteSelectedAnnouncements'
+  'deleteSelectedAnnouncements',
 ]
 const connectActions = dispatch => bindActionCreators(select(actions, selectedActions), dispatch)
 export const ConnectedIndexHeader = connect(connectState, connectActions)(IndexHeader)

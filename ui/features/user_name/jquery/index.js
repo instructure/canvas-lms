@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
@@ -30,15 +30,13 @@ import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDi
 
 const I18n = useI18nScope('user_name')
 
-$(document).ready(function() {
+$(document).ready(function () {
   $('#name_and_email').delegate('.edit_user_link', 'click', event => {
     event.preventDefault()
     $('#edit_student_dialog').dialog({
-      width: 450
+      width: 450,
     })
-    $('#edit_student_form :text:visible:first')
-      .focus()
-      .select()
+    $('#edit_student_form :text:visible:first').focus().select()
   })
   $('#edit_student_form').formSubmit({
     beforeSubmit(_data) {
@@ -68,12 +66,12 @@ $(document).ready(function() {
             'Updating user details failed, please try again'
           )
         )
-    }
+    },
   })
   $('#edit_student_dialog .cancel_button').click(() => {
     $('#edit_student_dialog').dialog('close')
   })
-  $('.remove_avatar_picture_link').click(async function(event) {
+  $('.remove_avatar_picture_link').click(async function (event) {
     event.preventDefault()
     const $link = $(this)
     const result = await showConfirmationDialog({
@@ -81,7 +79,7 @@ $(document).ready(function() {
       body: I18n.t(
         'confirms.remove_profile_picture',
         "Are you sure you want to remove this user's profile picture?"
-      )
+      ),
     })
     if (!result) {
       return
@@ -92,10 +90,7 @@ $(document).ready(function() {
       'PUT',
       {'avatar[state]': 'none'},
       _data => {
-        $link
-          .parents('tr')
-          .find('.avatar_image')
-          .remove()
+        $link.parents('tr').find('.avatar_image').remove()
         $link.remove()
       },
       _data => {
@@ -105,7 +100,7 @@ $(document).ready(function() {
       }
     )
   })
-  $('.report_avatar_picture_link').click(function(event) {
+  $('.report_avatar_picture_link').click(function (event) {
     event.preventDefault()
     event.preventDefault()
     const $link = $(this)
@@ -125,7 +120,7 @@ $(document).ready(function() {
       }
     )
   })
-  $('.clear_user_cache_link').click(function(event) {
+  $('.clear_user_cache_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $.ajaxJSON(
@@ -140,11 +135,11 @@ $(document).ready(function() {
       }
     )
   })
-  $('.destroy_user_link').click(async function(event) {
+  $('.destroy_user_link').click(async function (event) {
     event.preventDefault()
     const result = await showConfirmationDialog({
       label: I18n.t('Confirm Deletion'),
-      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts')
+      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts'),
     })
     if (!result) {
       return

@@ -26,13 +26,13 @@ propTypes.migrationState = oneOf(MigrationStates.statesList)
 
 propTypes.term = shape({
   id: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 propTypes.termList = arrayOf(propTypes.term)
 
 propTypes.account = shape({
   id: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 propTypes.accountList = arrayOf(propTypes.account)
 
@@ -43,11 +43,11 @@ propTypes.course = shape({
   term: propTypes.term.isRequired,
   teachers: arrayOf(
     shape({
-      display_name: string.isRequired
+      display_name: string.isRequired,
     })
   ),
   teacher_count: string,
-  sis_course_id: string
+  sis_course_id: string,
 })
 propTypes.courseList = arrayOf(propTypes.course)
 
@@ -55,7 +55,7 @@ propTypes.courseInfo = shape({
   id: string.isRequired,
   name: string.isRequired,
   enrollment_term_id: string.isRequired,
-  sis_course_id: string
+  sis_course_id: string,
 })
 
 propTypes.lockableAttribute = oneOf([
@@ -64,13 +64,13 @@ propTypes.lockableAttribute = oneOf([
   'due_dates',
   'availability_dates',
   'settings',
-  'deleted'
+  'deleted',
 ])
 propTypes.lockableAttributeList = arrayOf(propTypes.lockableAttribute)
 
 propTypes.migrationException = shape({
   course_id: string.isRequired,
-  conflicting_changes: propTypes.lockableAttributeList
+  conflicting_changes: propTypes.lockableAttributeList,
 })
 propTypes.migrationExceptionList = arrayOf(propTypes.migrationException)
 
@@ -87,12 +87,12 @@ propTypes.migrationChange = shape({
     'learning_outcome_group',
     'announcement',
     'rubric',
-    'syllabus'
+    'syllabus',
   ]).isRequired,
   asset_name: string.isRequired,
   change_type: oneOf(['created', 'updated', 'deleted']).isRequired,
   htnl_url: string,
-  exceptions: propTypes.migrationExceptionList
+  exceptions: propTypes.migrationExceptionList,
 })
 propTypes.migrationChangeList = arrayOf(propTypes.migrationChange)
 
@@ -104,7 +104,7 @@ propTypes.migration = shape({
   exports_started_at: string,
   imports_queued_at: string,
   imports_completed_at: string,
-  changes: propTypes.migrationChangeList
+  changes: propTypes.migrationChangeList,
 })
 propTypes.migrationList = arrayOf(propTypes.migration)
 
@@ -114,14 +114,14 @@ propTypes.unsyncedChange = shape({
   asset_name: string.isRequired,
   change_type: string.isRequired,
   html_url: string.isRequired,
-  locked: bool.isRequired
+  locked: bool.isRequired,
 })
 propTypes.unsyncedChanges = arrayOf(propTypes.unsyncedChange)
 
 propTypes.notification = shape({
   id: string.isRequired,
   message: string.isRequired,
-  err: instanceOf(Error)
+  err: instanceOf(Error),
 })
 propTypes.notificationList = arrayOf(propTypes.notification)
 
@@ -129,7 +129,7 @@ propTypes.itemLocks = shape({
   content: bool,
   points: bool,
   due_dates: bool,
-  availability_dates: bool
+  availability_dates: bool,
 })
 
 propTypes.itemLocksByObject = shape({
@@ -137,7 +137,7 @@ propTypes.itemLocksByObject = shape({
   discussion_topic: propTypes.itemLocks,
   wiki_page: propTypes.itemLocks,
   quiz: propTypes.itemLocks,
-  attachment: propTypes.itemLocks
+  attachment: propTypes.itemLocks,
 })
 
 export default propTypes

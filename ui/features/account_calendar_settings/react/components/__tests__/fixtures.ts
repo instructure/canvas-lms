@@ -23,7 +23,7 @@ export const RESPONSE_ACCOUNT_1 = [
     parent_account_id: null,
     root_account_id: '0',
     visible: true,
-    sub_account_count: 24
+    sub_account_count: 24,
   },
   {
     id: '11',
@@ -31,7 +31,7 @@ export const RESPONSE_ACCOUNT_1 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 15
+    sub_account_count: 15,
   },
   {
     id: '4',
@@ -39,7 +39,7 @@ export const RESPONSE_ACCOUNT_1 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 2
+    sub_account_count: 2,
   },
   {
     id: '6',
@@ -47,7 +47,7 @@ export const RESPONSE_ACCOUNT_1 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 1
+    sub_account_count: 1,
   },
   {
     id: '3',
@@ -55,8 +55,8 @@ export const RESPONSE_ACCOUNT_1 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: false,
-    sub_account_count: 0
-  }
+    sub_account_count: 0,
+  },
 ]
 
 export const RESPONSE_ACCOUNT_3 = [
@@ -66,8 +66,8 @@ export const RESPONSE_ACCOUNT_3 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 0
-  }
+    sub_account_count: 0,
+  },
 ]
 
 export const RESPONSE_ACCOUNT_4 = [
@@ -77,7 +77,7 @@ export const RESPONSE_ACCOUNT_4 = [
     parent_account_id: '1',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 1
+    sub_account_count: 1,
   },
   {
     id: '5',
@@ -85,6 +85,6 @@ export const RESPONSE_ACCOUNT_4 = [
     parent_account_id: '4',
     root_account_id: '1',
     visible: true,
-    sub_account_count: 1
-  }
+    sub_account_count: 1,
+  },
 ]

@@ -35,14 +35,14 @@ class CanvasCropper extends React.Component {
     imgFile: Cropper.propTypes.image, // selected image file object
     width: PropTypes.number, // desired cropped width
     height: PropTypes.number, // desired cropped height
-    onImageLoaded: PropTypes.func // if you care when the image is loaded
+    onImageLoaded: PropTypes.func, // if you care when the image is loaded
   }
 
   static defaultProps = {
     imgFile: null,
     width: 270,
     height: 270,
-    onImageLoaded: null
+    onImageLoaded: null,
   }
 
   constructor(/* props */) {

@@ -66,7 +66,7 @@ export default function loadFullCalendarLocaleData(locale) {
     'uk',
     'vi',
     'zh-cn',
-    'zh-tw'
+    'zh-tw',
   ]
 
   if (!FULLCALENDAR_LOCALES.includes(locale)) {

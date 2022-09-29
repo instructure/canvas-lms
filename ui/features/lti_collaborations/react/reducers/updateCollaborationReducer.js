@@ -21,7 +21,7 @@ import ACTION_NAMES from '../actions'
 const initialState = {
   updateCollaborationPending: false,
   updateCollaborationSuccessful: false,
-  updateCollaborationError: null
+  updateCollaborationError: null,
 }
 
 const updateHandlers = {
@@ -30,23 +30,23 @@ const updateHandlers = {
       ...state,
       updateCollaborationPending: true,
       updateCollaborationSuccessful: false,
-      updateCollaborationError: null
+      updateCollaborationError: null,
     }
   },
   [ACTION_NAMES.UPDATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
     return {
       ...state,
       updateCollaborationPending: false,
-      updateCollaborationSuccessful: true
+      updateCollaborationSuccessful: true,
     }
   },
   [ACTION_NAMES.UPDATE_COLLABORATION_FAILED]: (state, action) => {
     return {
       ...state,
       updateCollaborationPending: false,
-      updateCollaborationError: action.payload
+      updateCollaborationError: action.payload,
     }
-  }
+  },
 }
 
 const updateReducer = (state = initialState, action) => {

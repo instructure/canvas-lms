@@ -84,7 +84,7 @@ export const EditableCodeValue = (props: EditableCodeValueProps) => {
 
   const renderEdit = ({
     onBlur,
-    editorRef
+    editorRef,
   }: {
     onBlur: () => void
     editorRef: LegacyRef<HTMLInputElement>

@@ -29,13 +29,13 @@ const userList = [
   {displayName: 'Jeffrey Johnson', id: '0'},
   {displayName: 'Jewel Pearson', id: '8'},
   {displayName: 'Nic Nolan', id: '6'},
-  {displayName: 'Omar Soto Fortuno', id: '4'}
+  {displayName: 'Omar Soto Fortuno', id: '4'},
 ]
 
 export default {
   title: 'Examples/Conferences/VideoConferenceModal',
   component: VideoConferenceModal,
-  argTypes: {}
+  argTypes: {},
 }
 
 window.ENV.conference_type_details = [
@@ -45,7 +45,7 @@ window.ENV.conference_type_details = [
     settings: [],
     free_trial: false,
     lti_settings: null,
-    contexts: null
+    contexts: null,
   },
   {
     name: 'BigBlueButton',
@@ -53,8 +53,8 @@ window.ENV.conference_type_details = [
     settings: [],
     free_trial: false,
     lti_settings: null,
-    contexts: null
-  }
+    contexts: null,
+  },
 ]
 window.ENV.bbb_recording_enabled = true
 
@@ -63,7 +63,7 @@ const Template = args => <VideoConferenceModal {...args} />
 export const Default = Template.bind({})
 Default.args = {
   open: true,
-  availableAttendeesList: userList
+  availableAttendeesList: userList,
 }
 
 export const WhileEditing = Template.bind({})
@@ -78,5 +78,5 @@ WhileEditing.args = {
   attendeesOptions: ['share_webcam'],
   type: 'BigBlueButton',
   availableAttendeesList: userList,
-  selectedAttendees: ['2', '3', '7']
+  selectedAttendees: ['2', '3', '7'],
 }

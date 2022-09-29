@@ -57,8 +57,8 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
       error: useCallback(showFlashError(I18n.t('Failed to load todos')), []),
       forceResult: visible && !todos ? undefined : false,
       params: {
-        per_page: '100'
-      }
+        per_page: '100',
+      },
     },
     [visible]
   )
@@ -120,7 +120,7 @@ export const TodosPage = ({timeZone, visible, openTodosInNewTab}) => {
 TodosPage.propTypes = {
   timeZone: PropTypes.string.isRequired,
   visible: PropTypes.bool.isRequired,
-  openTodosInNewTab: PropTypes.bool.isRequired
+  openTodosInNewTab: PropTypes.bool.isRequired,
 }
 
 export default TodosPage

@@ -18,7 +18,7 @@
 
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 
 const I18n = useI18nScope('quiz_statistics')
 
@@ -28,10 +28,13 @@ const UserListDialog = ({answer_id, user_names}) => {
   return (
     <div>
       <button className="btn-link" type="button" onClick={() => displayDialog(true)}>
-        {I18n.t({
-          one: '1 respondent',
-          other: '%{count} respondents',
-        }, { count: user_names.length })}
+        {I18n.t(
+          {
+            one: '1 respondent',
+            other: '%{count} respondents',
+          },
+          {count: user_names.length}
+        )}
       </button>
 
       <CanvasModal
@@ -39,9 +42,11 @@ const UserListDialog = ({answer_id, user_names}) => {
         onDismiss={() => displayDialog(false)}
         label={I18n.t('user_names', 'User Names')}
       >
-        <div key={'answer-users-' + answer_id} style={{ width: 500 }}>
+        <div key={'answer-users-' + answer_id} style={{width: 500}}>
           <ul className="answer-response-list">
-            {user_names.map(x => <li key={x}>{x}</li>)}
+            {user_names.map(x => (
+              <li key={x}>{x}</li>
+            ))}
           </ul>
         </div>
       </CanvasModal>

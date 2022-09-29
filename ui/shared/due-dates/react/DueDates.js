@@ -53,12 +53,12 @@ export default class DueDates extends React.Component {
     availabilityDatesReadonly: PropTypes.bool,
     importantDates: PropTypes.bool,
     selectedGroupSetId: PropTypes.string,
-    defaultDueTime: PropTypes.string
+    defaultDueTime: PropTypes.string,
   }
 
   static defaultProps = {
     dueDatesReadonly: false,
-    availabilityDatesReadonly: false
+    availabilityDatesReadonly: false,
   }
 
   // -------------------
@@ -74,7 +74,7 @@ export default class DueDates extends React.Component {
     currentlySearching: false,
     allStudentsFetched: false,
     selectedGroupSetId: null,
-    importantDates: false
+    importantDates: false,
   }
 
   componentDidMount() {
@@ -84,7 +84,7 @@ export default class DueDates extends React.Component {
         sections: this.formattedSectionHash(this.props.sections),
         groups: {},
         selectedGroupSetId: this.props.selectedGroupSetId,
-        importantDates: this.props.importantDates
+        importantDates: this.props.importantDates,
       },
       this.fetchAdhocStudents
     )
@@ -109,14 +109,14 @@ export default class DueDates extends React.Component {
     this.setState({
       students: OverrideStudentStore.getStudents(),
       currentlySearching: OverrideStudentStore.currentlySearching(),
-      allStudentsFetched: OverrideStudentStore.allStudentsFetched()
+      allStudentsFetched: OverrideStudentStore.allStudentsFetched(),
     })
   }
 
   handleStudentGroupStoreChange = () => {
     this.setState({
       groups: this.formattedGroupHash(StudentGroupStore.getGroups()),
-      selectedGroupSetId: StudentGroupStore.getSelectedGroupSetId()
+      selectedGroupSetId: StudentGroupStore.getSelectedGroupSetId(),
     })
   }
 
@@ -184,7 +184,7 @@ export default class DueDates extends React.Component {
   datesFromOverride = override => ({
     due_at: override ? override.get('due_at') : null,
     lock_at: override ? override.get('lock_at') : null,
-    unlock_at: override ? override.get('unlock_at') : null
+    unlock_at: override ? override.get('unlock_at') : null,
   })
 
   groupsForSelectedSet = () => {
@@ -341,7 +341,7 @@ export default class DueDates extends React.Component {
     const overrides = _.map(this.props.overrides, override => override.attributes)
     const assignment = {
       due_at: this.props.dueAt,
-      only_visible_to_overrides: this.props.isOnlyVisibleToOverrides
+      only_visible_to_overrides: this.props.isOnlyVisibleToOverrides,
     }
 
     const effectiveDueDates = AssignmentOverrideHelper.effectiveDueDatesForAssignment(
@@ -366,19 +366,19 @@ export default class DueDates extends React.Component {
   validDropdownOptions = () => {
     let validStudents = this.valuesWithOmission({
       object: this.state.students,
-      keysToOmit: this.chosenStudentIds()
+      keysToOmit: this.chosenStudentIds(),
     })
     let validGroups = this.valuesWithOmission({
       object: this.groupsForSelectedSet(),
-      keysToOmit: this.chosenGroupIds()
+      keysToOmit: this.chosenGroupIds(),
     })
     let validSections = this.valuesWithOmission({
       object: this.state.sections,
-      keysToOmit: this.chosenSectionIds()
+      keysToOmit: this.chosenSectionIds(),
     })
     const validNoops = this.valuesWithOmission({
       object: this.state.noops,
-      keysToOmit: this.chosenNoops()
+      keysToOmit: this.chosenNoops(),
     })
     if (this.props.hasGradingPeriods && !_.includes(ENV.current_user_roles, 'admin')) {
       ;({validStudents, validGroups, validSections} =
@@ -413,7 +413,7 @@ export default class DueDates extends React.Component {
 
     return {
       groupsToOmit: _.values(omitted.groupsToOmit),
-      sectionsToOmit: _.values(omitted.sectionsToOmit)
+      sectionsToOmit: _.values(omitted.sectionsToOmit),
     }
   }
 
@@ -428,7 +428,7 @@ export default class DueDates extends React.Component {
       return {
         validStudents: _.difference(students, studentsToOmit),
         validGroups: _.difference(groups, groupsToOmit),
-        validSections: _.difference(sections, sectionsToOmit)
+        validSections: _.difference(sections, sectionsToOmit),
       }
     }
   }
@@ -518,7 +518,7 @@ export default class DueDates extends React.Component {
               this.setState({importantDates: event.target.checked})
             }}
             disabled={disabled}
-            inline
+            inline={true}
           />
         </div>
       )
@@ -535,7 +535,7 @@ export default class DueDates extends React.Component {
             {rowsToRender}
           </div>
           {this.props.dueDatesReadonly || this.props.availabilityDatesReadonly ? null : (
-            <DueDateAddRowButton handleAdd={this.addRow} display />
+            <DueDateAddRowButton handleAdd={this.addRow} display={true} />
           )}
         </div>
 

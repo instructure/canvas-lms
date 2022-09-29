@@ -21,7 +21,7 @@ import $ from 'jquery'
 
 describe('handleContentItem', () => {
   const contentView = {
-    trigger: jest.fn()
+    trigger: jest.fn(),
   }
   const callback = jest.fn()
 
@@ -35,7 +35,7 @@ describe('handleContentItem', () => {
       type: 'file',
       text: 'text',
       title: 'title',
-      icon: 'https://www.test.com/image.png'
+      icon: 'https://www.test.com/image.png',
     }
 
     beforeEach(() => {
@@ -50,10 +50,10 @@ describe('handleContentItem', () => {
             text: result.text,
             title: result.title,
             thumbnail: {
-              '@id': result.icon
-            }
-          }
-        ]
+              '@id': result.icon,
+            },
+          },
+        ],
       })
     })
 
@@ -68,7 +68,7 @@ describe('handleContentItem', () => {
       text: 'text',
       title: 'title',
       url: 'http://lti.example.com/content/launch/42',
-      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
     }
 
     beforeEach(() => {
@@ -84,11 +84,11 @@ describe('handleContentItem', () => {
             title: result.title,
             url: result.url,
             thumbnail: {
-              '@id': result.icon
+              '@id': result.icon,
             },
-            lookup_uuid: result.lookup_uuid
-          }
-        ]
+            lookup_uuid: result.lookup_uuid,
+          },
+        ],
       })
     })
 
@@ -102,8 +102,8 @@ describe('handleDeepLinkingError', () => {
   const error = 'Some error'
   const contentView = {
     model: {
-      id: 1
-    }
+      id: 1,
+    },
   }
   const reloadTool = jest.fn()
 

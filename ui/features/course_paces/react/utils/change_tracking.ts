@@ -37,7 +37,7 @@ const localizeDayCount = (days: number) =>
   I18n.t(
     {
       one: '1 day',
-      other: '%{count} days'
+      other: '%{count} days',
     },
     {count: days}
   )
@@ -51,11 +51,11 @@ const localizeChangeDescription = (
     ? I18n.t('%{descriptiveName} was changed from %{formattedOldValue} to %{formattedNewValue}.', {
         descriptiveName,
         formattedOldValue,
-        formattedNewValue
+        formattedNewValue,
       })
     : I18n.t('%{descriptiveName} was set to %{formattedNewValue}.', {
         descriptiveName,
-        formattedNewValue
+        formattedNewValue,
       })
 
 const formatBooleanSettingChange = (
@@ -100,7 +100,7 @@ export const summarizeItemChanges = (itemChanges: Change<CoursePaceItem>[]): Sum
       c.newValue.assignment_title,
       localizeDayCount(c.newValue.duration),
       c.oldValue && localizeDayCount(c.oldValue.duration)
-    )
+    ),
   }))
 
 export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedChange[] => {
@@ -125,7 +125,7 @@ export const summarizeSettingChanges = (settingChanges: Change[]): SummarizedCha
       case 'require_completion':
         if (change.newValue && endDateChange) {
           summary = I18n.t('Require Completion by End Date was turned on and set to %{date}.', {
-            date: I18n.l('date.formats.long', endDateChange.newValue)
+            date: I18n.l('date.formats.long', endDateChange.newValue),
           })
         } else {
           summary = formatBooleanSettingChange(

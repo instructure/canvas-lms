@@ -26,17 +26,17 @@ class HelpDialog extends React.Component {
   static propTypes = {
     links: HelpLinks.propTypes.links,
     hasLoaded: PropTypes.bool,
-    onFormSubmit: PropTypes.func
+    onFormSubmit: PropTypes.func,
   }
 
   static defaultProps = {
     hasLoaded: false,
     links: [],
-    onFormSubmit() {}
+    onFormSubmit() {},
   }
 
   state = {
-    view: 'links'
+    view: 'links',
   }
 
   handleLinkClick = url => {

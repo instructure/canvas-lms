@@ -23,16 +23,16 @@ describe('Ratings Helpers', () => {
   const testRatings = [
     {
       description: 'rating 1 description',
-      points: 1.25
+      points: 1.25,
     },
     {
       description: 'rating 2 description',
-      points: '2.50'
+      points: '2.50',
     },
     {
       description: 'rating 3 description',
-      points: 3
-    }
+      points: 3,
+    },
   ]
 
   describe('processRatingsAndMastery', () => {

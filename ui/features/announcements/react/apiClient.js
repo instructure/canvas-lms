@@ -33,7 +33,7 @@ export function getAnnouncements(
     {page: page || announcements.currentPage},
     {search_term: term || null},
     {filter_by: filter || null},
-    {no_avatar_fallback: '1'}
+    {no_avatar_fallback: '1'},
   ]
 
   if (contextType === 'course') {
@@ -53,7 +53,7 @@ export function lockAnnouncements({contextType, contextId}, announcements, locke
       return axios.put(url, {locked})
     },
     {
-      poolSize: MAX_CONCURRENT_REQS
+      poolSize: MAX_CONCURRENT_REQS,
     }
   )
 }
@@ -66,7 +66,7 @@ export function deleteAnnouncements({contextType, contextId}, announcements) {
       return axios.delete(url)
     },
     {
-      poolSize: MAX_CONCURRENT_REQS
+      poolSize: MAX_CONCURRENT_REQS,
     }
   )
 }
@@ -84,6 +84,6 @@ export function addExternalFeed({contextType, contextId}, {url, verbosity, heade
   return axios.post(`/api/v1/${contextType}s/${contextId}/external_feeds`, {
     url,
     verbosity,
-    header_match
+    header_match,
   })
 }

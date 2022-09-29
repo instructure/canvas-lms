@@ -38,8 +38,8 @@ export default {
     pointsError: undefined,
     isMobileView: false,
     position: 0,
-    canManage: true
-  }
+    canManage: true,
+  },
 }
 
 const Template = args => <ProficiencyRating {...args} />

@@ -17,4 +17,4 @@
  */
 
 export * from 'datetime/specHelpers'
-export { default as default } from 'datetime/specHelpers'
+export {default} from 'datetime/specHelpers'

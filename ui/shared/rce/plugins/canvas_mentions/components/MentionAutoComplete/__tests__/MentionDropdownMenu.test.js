@@ -23,12 +23,12 @@ import {ARIA_ID_TEMPLATES} from '../../../constants'
 const MentionMockUsers = [
   {
     id: 1,
-    name: 'Jeffrey Johnson'
+    name: 'Jeffrey Johnson',
   },
   {
     id: 2,
-    name: 'Matthew Lemon'
-  }
+    name: 'Matthew Lemon',
+  },
 ]
 
 const mockCoordinates = {
@@ -38,13 +38,13 @@ const mockCoordinates = {
   top: 250,
   width: 218,
   x: 312,
-  y: 25
+  y: 25,
 }
 
 const tinyMCE = {
   activeEditor: {
-    getParam: () => 'LTR'
-  }
+    getParam: () => 'LTR',
+  },
 }
 
 const setup = props => {

@@ -28,12 +28,12 @@ export default {
   component: OutcomeManagementPanel,
   args: {
     contextType: 'Account',
-    contextId: '1'
+    contextId: '1',
   },
   // Adding a story decorator will cause the component to re-render when a control change
   //  is presented. This is necessary becuase useEffect is only called once upon initial render
   //  and would otherwise not adjust the story when controls are modified
-  decorators: [Story => <Story />]
+  decorators: [Story => <Story />],
 }
 
 const Template = args => {
@@ -53,11 +53,11 @@ const Template = args => {
 
 export const Default = Template.bind({})
 Default.args = {
-  queryOptions: {childGroupsCount: 1}
+  queryOptions: {childGroupsCount: 1},
 }
 
 export const Query = Template.bind({})
 Query.args = {
   // Allow control of only the result data
-  response: accountMocks({childGroupsCount: 1})[0].result.data
+  response: accountMocks({childGroupsCount: 1})[0].result.data,
 }

@@ -33,7 +33,7 @@ export const Group = {
     id: string,
     _id: string,
     name: string,
-    userCount: number
+    userCount: number,
   }),
 
   mock: ({id = 'R3JvdXAtMw==', _id = '1', name = 'group 1', userCount = 2} = {}) => ({
@@ -41,6 +41,6 @@ export const Group = {
     _id,
     name,
     userCount,
-    __typename: 'Group'
-  })
+    __typename: 'Group',
+  }),
 }

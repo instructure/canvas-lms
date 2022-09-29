@@ -37,13 +37,13 @@ export default class GroupDetailView extends View {
 
     this.prototype.events = {
       'click .edit-group': 'editGroup',
-      'click .delete-group': 'deleteGroup'
+      'click .delete-group': 'deleteGroup',
     }
 
     this.prototype.els = {
       '.toggle-group': '$toggleGroup',
       '.al-trigger': '$groupActions',
-      '.edit-group': '$editGroupLink'
+      '.edit-group': '$editGroupLink',
     }
   }
 
@@ -83,7 +83,7 @@ export default class GroupDetailView extends View {
           role: this.model.get('role'),
           join_level: this.model.get('join_level'),
           group_limit: this.model.get('max_membership'),
-          members_count: this.model.get('members_count')
+          members_count: this.model.get('members_count'),
         }}
         label={I18n.t('Edit Group')}
         open={open}
@@ -105,7 +105,7 @@ export default class GroupDetailView extends View {
       if (groupHasSubmissions(this.model)) {
         this.cloneCategoryView = new GroupCategoryCloneView({
           model: this.model.collection.category,
-          openedFromCaution: true
+          openedFromCaution: true,
         })
         this.cloneCategoryView.open()
         return this.cloneCategoryView.on('close', () => {
@@ -134,7 +134,7 @@ export default class GroupDetailView extends View {
         return $.flashError(
           I18n.t('flash.removeError', 'Unable to remove the group. Please try again later.')
         )
-      }
+      },
     })
   }
 

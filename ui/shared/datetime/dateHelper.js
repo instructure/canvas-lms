@@ -44,7 +44,7 @@ const DateHelper = {
 
   isMidnight(date) {
     return tz.isMidnight(date)
-  }
+  },
 }
 
 export default DateHelper

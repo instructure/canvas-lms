@@ -31,7 +31,7 @@ describe('HighContrastModeToggle', () => {
   describe('when HCM is off', () => {
     const goodResponseOn = {
       feature: 'high_contrast',
-      state: 'on'
+      state: 'on',
     }
 
     beforeEach(() => {
@@ -56,7 +56,7 @@ describe('HighContrastModeToggle', () => {
       const response = JSON.parse(fetchMock.calls(route)[0][1].body)
       expect(response).toMatchObject({
         feature: 'high_contrast',
-        state: 'on'
+        state: 'on',
       })
     })
 
@@ -73,7 +73,7 @@ describe('HighContrastModeToggle', () => {
   describe('when HCM is on', () => {
     const goodResponseOff = {
       feature: 'high_contrast',
-      state: 'off'
+      state: 'off',
     }
 
     beforeEach(() => {
@@ -98,7 +98,7 @@ describe('HighContrastModeToggle', () => {
       const response = JSON.parse(fetchMock.calls(route)[0][1].body)
       expect(response).toMatchObject({
         feature: 'high_contrast',
-        state: 'off'
+        state: 'off',
       })
     })
 
@@ -116,7 +116,7 @@ describe('HighContrastModeToggle', () => {
     let liveRegion
     const badResponse = {
       feature: 'something_else',
-      state: 'who knows?'
+      state: 'who knows?',
     }
 
     beforeEach(() => {

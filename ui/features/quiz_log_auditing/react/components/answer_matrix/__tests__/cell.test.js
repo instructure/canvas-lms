@@ -18,7 +18,7 @@
 
 import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import Cell from '../cell'
 import assertChange from 'chai-assert-change'
 import K from '../../../../constants'
@@ -28,86 +28,78 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
     render(
       <Cell
         question={{
-          id: 'q1'
+          id: 'q1',
         }}
-
         event={{
-          data: [{ quizQuestionId: 'q1' }]
+          data: [{quizQuestionId: 'q1'}],
         }}
       />
     )
   })
 
   it('renders nothing if there is no event', () => {
-    render(<Cell question={{ id: 'q1' }} />)
+    render(<Cell question={{id: 'q1'}} />)
   })
 
   describe('when not expanded', () => {
     const question = {
-      question: { id: '1', questionType: 'multiple_choice_question' }
+      question: {id: '1', questionType: 'multiple_choice_question'},
     }
 
-    it('shows an emblem for an empty answer', function() {
-      const { getByTestId } = render(
-        <Cell {...question}
-          event={{ data: [{ quizQuestionId: '1', answer: null }] }}
-        />
-      );
+    it('shows an emblem for an empty answer', function () {
+      const {getByTestId} = render(
+        <Cell {...question} event={{data: [{quizQuestionId: '1', answer: null}]}} />
+      )
 
       expect(getByTestId('emblem').classList).toContain('is-empty')
-    });
+    })
 
-    it('shows an emblem for an answer', function() {
-      const { getByTestId } = render(
-        <Cell {...question}
+    it('shows an emblem for an answer', function () {
+      const {getByTestId} = render(
+        <Cell
+          {...question}
           event={{
-            data: [
-              { quizQuestionId: '1', answer: '123', answered: true }
-            ]
+            data: [{quizQuestionId: '1', answer: '123', answered: true}],
           }}
         />
-      );
+      )
 
       expect(getByTestId('emblem').classList).toContain('is-answered')
-    });
+    })
 
-    it('shows an emblem for the last answer', function() {
-      const { getByTestId } = render(
-        <Cell {...question}
+    it('shows an emblem for the last answer', function () {
+      const {getByTestId} = render(
+        <Cell
+          {...question}
           event={{
-            data: [
-              { quizQuestionId: '1', answer: '123', answered: true, last: true }
-            ]
+            data: [{quizQuestionId: '1', answer: '123', answered: true, last: true}],
           }}
         />
-      );
+      )
 
       expect(getByTestId('emblem').classList).toContain('is-answered')
       expect(getByTestId('emblem').classList).toContain('is-last')
-    });
+    })
 
-    it('shows nothing for no answer', function() {
-      const { queryByTestId } = render(
-        <Cell {...question} />
-      );
+    it('shows nothing for no answer', function () {
+      const {queryByTestId} = render(<Cell {...question} />)
 
       expect(queryByTestId('emblem')).toBeFalsy()
-    });
+    })
   })
 
   it('expands and truncates', () => {
     render(
       <Cell
-        expanded
-        shouldTruncate
+        expanded={true}
+        shouldTruncate={true}
         maxVisibleChars={5}
         question={{
           id: 'q1',
-          questionType: K.Q_SHORT_ANSWER
+          questionType: K.Q_SHORT_ANSWER,
         }}
-
         event={{
-          data: [{ quizQuestionId: 'q1', answer: 'hello world' }]
+          data: [{quizQuestionId: 'q1', answer: 'hello world'}],
         }}
       />
     )
@@ -118,15 +110,14 @@ describe('canvas_quizzes/events/views/answer_matrix/cell', () => {
   it('expands as json', () => {
     render(
       <Cell
-        expanded
-        shouldTruncate
+        expanded={true}
+        shouldTruncate={true}
         question={{
           id: 'q1',
-          questionType: K.Q_MULTIPLE_CHOICE
+          questionType: K.Q_MULTIPLE_CHOICE,
         }}
-
         event={{
-          data: [{ quizQuestionId: 'q1' }]
+          data: [{quizQuestionId: 'q1'}],
         }}
       />
     )

@@ -71,7 +71,7 @@ UsageRightsDialog.renderFolderTooltip = function (folders) {
   if (toolTipFolders.length) {
     const renderItems = toolTipFolders.map(item => ({
       cid: item.cid,
-      displayName: htmlEscape(item.displayName()).toString()
+      displayName: htmlEscape(item.displayName()).toString(),
     }))
     // Doing it this way so commas, don't show up when rendering the list out in the tooltip.
     const renderedNames = renderItems.map(item => item.displayName).join('<br />')

@@ -29,9 +29,9 @@ const I18n = useI18nScope('student_context_trayRating')
 class Rating extends React.Component {
   static propTypes = {
     metric: PropTypes.shape({
-      level: PropTypes.number
+      level: PropTypes.number,
     }).isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
   }
 
   formatValueText(currentRating, maxRating) {

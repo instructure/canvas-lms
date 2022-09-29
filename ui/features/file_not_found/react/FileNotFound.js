@@ -32,7 +32,7 @@ class FileNotFound extends React.Component {
   constructor() {
     super()
     this.state = {
-      status: 'composing'
+      status: 'composing',
     }
   }
 
@@ -46,7 +46,7 @@ class FileNotFound extends React.Component {
       )}
 
         ${I18n.t('This student wrote:')} ${ReactDOM.findDOMNode(this.refs.message).value}`,
-      context_code: this.props.contextCode
+      context_code: this.props.contextCode,
     }
 
     const dfd = $.post('/api/v1/conversations', conversationData)
@@ -87,7 +87,7 @@ class FileNotFound extends React.Component {
 }
 
 FileNotFound.propTypes = {
-  contextCode: PropTypes.string.isRequired
+  contextCode: PropTypes.string.isRequired,
 }
 
 export default FileNotFound

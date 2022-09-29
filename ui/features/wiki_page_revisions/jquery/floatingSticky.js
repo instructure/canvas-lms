@@ -97,13 +97,13 @@ class FloatingSticky {
     }
 
     return this.$el.css({
-      top: newTop
+      top: newTop,
     })
   }
 }
 
-$.fn.floatingSticky = function(container, options = {}) {
-  return this.map(function() {
+$.fn.floatingSticky = function (container, options = {}) {
+  return this.map(function () {
     return $(this).data('floatingSticky') || new FloatingSticky(this, container, options)
   })
 }

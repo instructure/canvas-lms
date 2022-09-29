@@ -54,7 +54,7 @@ const LongDescription = ({showLongDescription}) => (
   </Link>
 )
 LongDescription.propTypes = {
-  showLongDescription: PropTypes.func.isRequired
+  showLongDescription: PropTypes.func.isRequired,
 }
 
 const LongDescriptionDialog = ({open, close, longDescription}) => {
@@ -87,16 +87,16 @@ const LongDescriptionDialog = ({open, close, longDescription}) => {
 LongDescriptionDialog.propTypes = {
   close: PropTypes.func.isRequired,
   longDescription: PropTypes.string.isRequired,
-  open: PropTypes.bool
+  open: PropTypes.bool,
 }
 LongDescriptionDialog.defaultProps = {
-  open: false
+  open: false,
 }
 
 const Threshold = ({threshold}) => (
   <Text size="x-small" weight="normal">
     {I18n.t('threshold: %{pts}', {
-      pts: I18n.toNumber(threshold, {precision: 2, strip_insignificant_zeros: true})
+      pts: I18n.toNumber(threshold, {precision: 2, strip_insignificant_zeros: true}),
     })}
   </Text>
 )
@@ -128,7 +128,7 @@ export default class Criterion extends React.Component {
       savedComments,
       isSummary,
       hidePoints,
-      hasPointsColumn
+      hasPointsColumn,
     } = this.props
     const {dialogOpen} = this.state
     const isOutcome = criterion.learning_outcome_id !== undefined
@@ -141,7 +141,7 @@ export default class Criterion extends React.Component {
       // rubric_association model
       if (typeof tier === 'string') {
         tier = _.find(criterion.ratings, rating => rating.points.toString() === tier) || {
-          points: tier
+          points: tier,
         }
       }
       const text = tier.points.toString()
@@ -149,13 +149,13 @@ export default class Criterion extends React.Component {
       const valid = !Number.isNaN(value)
       if (isSelected) {
         onAssessmentChange({
-          points: {text: '', valid: true}
+          points: {text: '', valid: true},
         })
       } else {
         onAssessmentChange({
           points: {text, valid, value: valid ? value : undefined},
           description: tier.description,
-          id: tier.id
+          id: tier.id,
         })
       }
     }
@@ -226,7 +226,7 @@ export default class Criterion extends React.Component {
     const editComments = () =>
       onAssessmentChange({
         commentFocus: true,
-        editComments: true
+        editComments: true,
       })
     const commentButton = assessment !== null ? <CommentButton onClick={editComments} /> : null
 
@@ -276,7 +276,7 @@ Criterion.propTypes = {
   savedComments: PropTypes.arrayOf(PropTypes.string),
   isSummary: PropTypes.bool,
   hidePoints: PropTypes.bool,
-  hasPointsColumn: PropTypes.bool
+  hasPointsColumn: PropTypes.bool,
 }
 
 Criterion.defaultProps = {
@@ -288,5 +288,5 @@ Criterion.defaultProps = {
   savedComments: [],
   isSummary: false,
   hidePoints: false,
-  hasPointsColumn: true
+  hasPointsColumn: true,
 }

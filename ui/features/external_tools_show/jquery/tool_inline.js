@@ -155,7 +155,7 @@ ready(() => {
     $('#module_sequence_footer').moduleSequenceFooter({
       assetType: 'Lti',
       assetID: ENV.LTI.SEQUENCE.ASSET_ID,
-      courseID: ENV.LTI.SEQUENCE.COURSE_ID
+      courseID: ENV.LTI.SEQUENCE.COURSE_ID,
     })
   }
 

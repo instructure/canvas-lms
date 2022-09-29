@@ -41,92 +41,92 @@ export const PREDEFINED_COLORS = [
     hexcode: '#BD3C14',
     get name() {
       return I18n.t('Brick')
-    }
+    },
   },
   {
     hexcode: '#FF2717',
     get name() {
       return I18n.t('Red')
-    }
+    },
   },
   {
     hexcode: '#E71F63',
     get name() {
       return I18n.t('Magenta')
-    }
+    },
   },
   {
     hexcode: '#8F3E97',
     get name() {
       return I18n.t('Purple')
-    }
+    },
   },
   {
     hexcode: '#65499D',
     get name() {
       return I18n.t('Deep Purple')
-    }
+    },
   },
   {
     hexcode: '#4554A4',
     get name() {
       return I18n.t('Indigo')
-    }
+    },
   },
   {
     hexcode: '#1770AB',
     get name() {
       return I18n.t('Blue')
-    }
+    },
   },
   {
     hexcode: '#0B9BE3',
     get name() {
       return I18n.t('Light Blue')
-    }
+    },
   },
   {
     hexcode: '#06A3B7',
     get name() {
       return I18n.t('Cyan')
-    }
+    },
   },
   {
     hexcode: '#009688',
     get name() {
       return I18n.t('Teal')
-    }
+    },
   },
   {
     hexcode: '#009606',
     get name() {
       return I18n.t('Green')
-    }
+    },
   },
   {
     hexcode: '#8D9900',
     get name() {
       return I18n.t('Olive')
-    }
+    },
   },
   {
     hexcode: '#D97900',
     get name() {
       return I18n.t('Pumpkin')
-    }
+    },
   },
   {
     hexcode: '#FD5D10',
     get name() {
       return I18n.t('Orange')
-    }
+    },
   },
   {
     hexcode: '#F06291',
     get name() {
       return I18n.t('Pink')
-    }
-  }
+    },
+  },
 ]
 
 function shouldApplySwatchBorderColor(color) {
@@ -149,7 +149,7 @@ const ColorPicker = createReactClass({
     colors: PropTypes.arrayOf(
       PropTypes.shape({
         hexcode: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
+        name: PropTypes.string.isRequired,
       }).isRequired
     ),
     isOpen: PropTypes.bool,
@@ -178,7 +178,7 @@ const ColorPicker = createReactClass({
     withDarkCheck: PropTypes.bool,
     setStatusColor: PropTypes.func,
     allowWhite: PropTypes.bool,
-    focusOnMount: PropTypes.bool
+    focusOnMount: PropTypes.bool,
   },
 
   hexInputRef: null,
@@ -191,7 +191,7 @@ const ColorPicker = createReactClass({
     return {
       isOpen: this.props.isOpen,
       currentColor: this.props.currentColor,
-      saveInProgress: false
+      saveInProgress: false,
     }
   },
 
@@ -222,7 +222,7 @@ const ColorPicker = createReactClass({
       colors: PREDEFINED_COLORS,
       setStatusColor: () => {},
       allowWhite: false,
-      focusOnMount: true
+      focusOnMount: true,
     }
   },
 
@@ -241,7 +241,7 @@ const ColorPicker = createReactClass({
   componentWillReceiveProps(nextProps) {
     this.setState(
       {
-        isOpen: nextProps.isOpen
+        isOpen: nextProps.isOpen,
       },
       () => {
         if (this.state.isOpen) {
@@ -268,7 +268,7 @@ const ColorPicker = createReactClass({
   closeModal() {
     if (this.isMounted()) {
       this.setState({
-        isOpen: false
+        isOpen: false,
       })
 
       if (this.props.afterClose) {
@@ -296,12 +296,12 @@ const ColorPicker = createReactClass({
         url: '/api/v1/users/' + window.ENV.current_user_id + '/colors/' + this.props.assetString,
         type: 'PUT',
         data: {
-          hexcode: color
+          hexcode: color,
         },
         success: () => {
           this.props.afterUpdateColor(color)
         },
-        error: () => {}
+        error: () => {},
       })
     }
   },
@@ -326,11 +326,11 @@ const ColorPicker = createReactClass({
         message: I18n.t(
           "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.",
           {
-            chosenColor: this.state.currentColor
+            chosenColor: this.state.currentColor,
           }
         ),
         type: 'warning',
-        srOnly: true
+        srOnly: true,
       })
     }
   },
@@ -377,9 +377,9 @@ const ColorPicker = createReactClass({
     } else {
       showFlashAlert({
         message: I18n.t("'%{chosenColor}' is not a valid color.", {
-          chosenColor: this.state.currentColor
+          chosenColor: this.state.currentColor,
         }),
-        type: 'warning'
+        type: 'warning',
       })
     }
   },
@@ -424,7 +424,7 @@ const ColorPicker = createReactClass({
       const ref = 'colorSwatch' + idx
       const colorBlockStyles = classnames({
         ColorPicker__ColorBlock: true,
-        'with-dark-check': this.props.withDarkCheck
+        'with-dark-check': this.props.withDarkCheck,
       })
       return (
         <button
@@ -482,7 +482,7 @@ const ColorPicker = createReactClass({
 
     const inputColorStyle = {
       color: previewColor,
-      backgroundColor: previewColor
+      backgroundColor: previewColor,
     }
 
     return (
@@ -509,7 +509,7 @@ const ColorPicker = createReactClass({
       'with-animation': this.props.withAnimation,
       'with-arrow': this.props.withArrow,
       'with-border': this.props.withBorder,
-      'with-box-shadow': this.props.withBoxShadow
+      'with-box-shadow': this.props.withBoxShadow,
     })
 
     const inputId = 'ColorPickerCustomInput-' + this.props.assetString
@@ -579,8 +579,8 @@ const ColorPicker = createReactClass({
         bottom: 0,
         overflow: 'visible',
         padding: 0,
-        borderRadius: '0'
-      }
+        borderRadius: '0',
+      },
     }
 
     return (
@@ -600,7 +600,7 @@ const ColorPicker = createReactClass({
   render() {
     const body = this.pickerBody()
     return this.props.nonModal ? body : this.modalWrapping(body)
-  }
+  },
 })
 
 ColorPicker.getColorName = colorHex => {

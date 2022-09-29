@@ -27,7 +27,7 @@ export default class DiscussionToolbarView extends View {
       '#discussion-search': '$searchInput',
       '#onlyUnread': '$unread',
       '#showDeleted': '$deleted',
-      '.disableWhileFiltering': '$disableWhileFiltering'
+      '.disableWhileFiltering': '$disableWhileFiltering',
     }
 
     this.prototype.events = {
@@ -35,12 +35,12 @@ export default class DiscussionToolbarView extends View {
       'change #onlyUnread': 'toggleUnread',
       'change #showDeleted': 'toggleDeleted',
       'click #collapseAll': 'collapseAll',
-      'click #expandAll': 'expandAll'
+      'click #expandAll': 'expandAll',
     }
 
     this.prototype.filter = this.prototype.afterRender
 
-    this.prototype.filterBySearch = _.debounce(function() {
+    this.prototype.filterBySearch = _.debounce(function () {
       let value = this.$searchInput.val()
       if (value === '') {
         value = null

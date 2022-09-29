@@ -36,7 +36,7 @@ export interface BlackoutDate {
 export enum SyncState {
   SYNCED, // up to date
   SYNCING, // actively syncing
-  UNSYNCED // there are pending changes
+  UNSYNCED, // there are pending changes
 }
 export interface BlackoutDateState {
   syncing: SyncState

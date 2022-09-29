@@ -35,15 +35,7 @@ export default class OutcomeGroupIconView extends OutcomeIconBase {
   onRightArrowKey(e, $target) {
     $target.attr('aria-expanded', true).attr('tabindex', -1)
     this.triggerSelect()
-    return setTimeout(
-      () =>
-        $target
-          .parent()
-          .next()
-          .find('li[tabindex=0]')
-          .focus(),
-      1000
-    )
+    return setTimeout(() => $target.parent().next().find('li[tabindex=0]').focus(), 1000)
   }
 
   initDroppable() {
@@ -64,7 +56,7 @@ export default class OutcomeGroupIconView extends OutcomeIconBase {
           .dirForGroup(this.model)
           .promise()
           .done(dir => dir.moveModelHere(model, originaldir).done(() => disablingDfd.resolve()))
-      }
+      },
     })
   }
 

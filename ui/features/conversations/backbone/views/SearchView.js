@@ -31,13 +31,16 @@ export default class SearchView extends View {
     this.autocompleteView = new AutocompleteView({
       el: this.$autocomplete,
       single: true,
-      excludeAll: true
+      excludeAll: true,
     }).render()
     return this.autocompleteView.on('changeToken', this.onSearch, this)
   }
 
   onSearch(tokens) {
-    return this.trigger('search', _.map(tokens, x => `user_${x}`))
+    return this.trigger(
+      'search',
+      _.map(tokens, x => `user_${x}`)
+    )
   }
 }
 SearchView.initClass()

@@ -25,7 +25,7 @@ function defaultProps(overrides) {
     preferenceOptions: ['immediately', 'daily', 'weekly', 'never'],
     selectedPreference: 'immediately',
     updatePreference: jest.fn(),
-    ...overrides
+    ...overrides,
   }
 }
 

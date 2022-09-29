@@ -23,19 +23,17 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/events/views/answer_matrix/option', () => {
   it('renders', () => {
-    render(
-      <Option />
-    )
+    render(<Option />)
   })
 
   it('emits onChange', () => {
     const onChange = jest.fn()
-    const { getByTestId } = render(<Option onChange={onChange} />)
+    const {getByTestId} = render(<Option onChange={onChange} />)
 
     assertChange({
       fn: () => fireEvent.click(getByTestId('checkbox')),
       of: () => onChange.mock.calls.length,
-      by: 1
+      by: 1,
     })
   })
 })

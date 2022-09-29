@@ -30,19 +30,17 @@ export const notificationActions = createActions(
     NOTIFY_INFO: payload =>
       typeof payload === 'string' ? {type: 'info', message: payload} : {type: 'info', ...payload},
     NOTIFY_ERROR: payload =>
-      typeof payload === 'string' ? {type: 'error', message: payload} : {type: 'error', ...payload}
+      typeof payload === 'string' ? {type: 'error', message: payload} : {type: 'error', ...payload},
   },
   'CLEAR_NOTIFICATION'
 )
 
 const createNotification = data => ({
-  id: Math.random()
-    .toString(36)
-    .substring(2), // pseudo uuid
+  id: Math.random().toString(36).substring(2), // pseudo uuid
   timestamp: Date.now(),
   type: data.type || (data.err ? 'error' : 'info'),
   message: data.message,
-  err: data.err
+  err: data.err,
 })
 
 const handleNotificationActions = handleActions(
@@ -52,7 +50,7 @@ const handleNotificationActions = handleActions(
     [notificationActions.notifyError.toString()]: (state, action) =>
       state.concat([createNotification({...action.payload, type: 'error'})]),
     [notificationActions.clearNotification.toString()]: (state, action) =>
-      state.slice().filter(not => not.id !== action.payload)
+      state.slice().filter(not => not.id !== action.payload),
   },
   []
 )

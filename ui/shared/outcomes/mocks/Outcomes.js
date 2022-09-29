@@ -18,12 +18,12 @@
 
 import {
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-  COURSE_OUTCOME_PROFICIENCY_QUERY
+  COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '../graphql/MasteryScale'
 
 import {
   ACCOUNT_OUTCOME_CALCULATION_QUERY,
-  COURSE_OUTCOME_CALCULATION_QUERY
+  COURSE_OUTCOME_CALCULATION_QUERY,
 } from '../graphql/MasteryCalculation'
 
 import {courseMocks, accountMocks} from './Management'
@@ -35,7 +35,7 @@ const outcomeCalculationMethod = {
   contextType: 'Account',
   contextId: 1,
   calculationMethod: 'decaying_average',
-  calculationInt: 65
+  calculationInt: 65,
 }
 
 const outcomeProficiency = {
@@ -53,7 +53,7 @@ const outcomeProficiency = {
         color: '009606',
         description: 'Rating A',
         mastery: false,
-        points: 9
+        points: 9,
       },
       {
         __typename: 'ProficiencyRating',
@@ -61,10 +61,10 @@ const outcomeProficiency = {
         color: 'EF4437',
         description: 'Rating B',
         mastery: false,
-        points: 6
-      }
-    ]
-  }
+        points: 6,
+      },
+    ],
+  },
 }
 
 export const masteryScalesGraphqlMocks = [
@@ -72,34 +72,34 @@ export const masteryScalesGraphqlMocks = [
     request: {
       query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
       variables: {
-        contextId: '11'
-      }
+        contextId: '11',
+      },
     },
     result: {
       data: {
         context: {
           __typename: 'Account',
-          outcomeProficiency
-        }
-      }
-    }
+          outcomeProficiency,
+        },
+      },
+    },
   },
   {
     request: {
       query: COURSE_OUTCOME_PROFICIENCY_QUERY,
       variables: {
-        contextId: '12'
-      }
+        contextId: '12',
+      },
     },
     result: {
       data: {
         context: {
           __typename: 'Course',
-          outcomeProficiency
-        }
-      }
-    }
-  }
+          outcomeProficiency,
+        },
+      },
+    },
+  },
 ]
 
 export const masteryCalculationGraphqlMocks = [
@@ -107,44 +107,44 @@ export const masteryCalculationGraphqlMocks = [
     request: {
       query: ACCOUNT_OUTCOME_CALCULATION_QUERY,
       variables: {
-        contextId: '11'
-      }
+        contextId: '11',
+      },
     },
     result: {
       data: {
         context: {
           __typename: 'Account',
-          outcomeCalculationMethod
-        }
-      }
-    }
+          outcomeCalculationMethod,
+        },
+      },
+    },
   },
   {
     request: {
       query: COURSE_OUTCOME_CALCULATION_QUERY,
       variables: {
-        contextId: '12'
-      }
+        contextId: '12',
+      },
     },
     result: {
       data: {
         context: {
           __typename: 'Course',
-          outcomeCalculationMethod
-        }
-      }
-    }
-  }
+          outcomeCalculationMethod,
+        },
+      },
+    },
+  },
 ]
 
 export const outcomeGroupsMocks = [
   ...accountMocks({accountId: '11'}),
-  ...courseMocks({courseId: '12'})
+  ...courseMocks({courseId: '12'}),
 ]
 
 export const findModalMocks = ({
   includeGlobalRootGroup = false,
-  parentAccountChildren = 10
+  parentAccountChildren = 10,
 } = {}) => {
   const globalGroup = includeGlobalRootGroup ? globalGroupMock() : {}
 
@@ -156,19 +156,19 @@ export const findModalMocks = ({
           id: '1',
           type: 'Account',
           rootGroupId: includeGlobalRootGroup ? '1' : '0',
-          includeGlobalRootGroup
-        }
+          includeGlobalRootGroup,
+        },
       },
       result: {
         data: {
           context: {
             _id: '1',
             __typename: 'Account',
-            parentAccountsConnection: parentAccountMock(parentAccountChildren)
+            parentAccountsConnection: parentAccountMock(parentAccountChildren),
           },
-          ...globalGroup
-        }
-      }
+          ...globalGroup,
+        },
+      },
     },
     {
       request: {
@@ -177,8 +177,8 @@ export const findModalMocks = ({
           id: '1',
           type: 'Course',
           rootGroupId: '0',
-          includeGlobalRootGroup: false
-        }
+          includeGlobalRootGroup: false,
+        },
       },
       result: {
         data: {
@@ -191,14 +191,14 @@ export const findModalMocks = ({
               rootOutcomeGroup: {
                 title: `Course Account Outcome Group`,
                 __typename: 'LearningOutcomeGroup',
-                _id: '1'
+                _id: '1',
               },
-              parentAccountsConnection: parentAccountMock(parentAccountChildren)
-            }
-          }
-        }
-      }
-    }
+              parentAccountsConnection: parentAccountMock(parentAccountChildren),
+            },
+          },
+        },
+      },
+    },
   ]
 }
 
@@ -209,15 +209,15 @@ const parentAccountMock = count => ({
     rootOutcomeGroup: {
       title: `Root Account Outcome Group ${i}`,
       __typename: 'LearningOutcomeGroup',
-      _id: (100 + i).toString()
-    }
-  }))
+      _id: (100 + i).toString(),
+    },
+  })),
 })
 
 const globalGroupMock = () => ({
   globalRootGroup: {
     __typename: 'LearningOutcomeGroup',
     title: 'Global Root Outcome Group',
-    _id: '1'
-  }
+    _id: '1',
+  },
 })

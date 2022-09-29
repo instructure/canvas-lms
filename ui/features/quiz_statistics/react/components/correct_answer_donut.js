@@ -31,7 +31,7 @@ const CorrectAnswerDonut = props => {
     <section className="correct-answer-ratio-section">
       <p>
         {I18n.t('%{ratio}% answered correctly', {
-          ratio: round(props.correctResponseRatio * 100.0, 0)
+          ratio: round(props.correctResponseRatio * 100.0, 0),
         })}
       </p>
     </section>
@@ -39,7 +39,7 @@ const CorrectAnswerDonut = props => {
 }
 
 CorrectAnswerDonut.propTypes = {
-  correctResponseRatio: PropTypes.number.isRequired
+  correctResponseRatio: PropTypes.number.isRequired,
 }
 
 export default CorrectAnswerDonut

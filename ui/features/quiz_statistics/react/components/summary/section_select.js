@@ -40,7 +40,7 @@ const SectionLink = props => (
 
 class SectionSelect extends React.Component {
   state = {
-    sections: []
+    sections: [],
   }
 
   componentDidMount() {
@@ -51,18 +51,18 @@ class SectionSelect extends React.Component {
       cache: false,
       success: sections => {
         this.setState({sections})
-      }
+      },
     })
   }
 
   render() {
     let sectionTitle = I18n.t('Section Filter')
     if (config.section_ids && config.section_ids != 'all') {
-      sectionTitle = $.grep(this.state.sections, function(e) {
+      sectionTitle = $.grep(this.state.sections, function (e) {
         return e.id == config.section_ids
       })[0].name
     }
-    const sectionNodes = this.state.sections.map(function(section) {
+    const sectionNodes = this.state.sections.map(function (section) {
       return (
         <SectionLink
           key={`${section.id}-${section.name}`}

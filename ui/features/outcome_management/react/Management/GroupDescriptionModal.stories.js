@@ -25,11 +25,11 @@ export default {
   args: {
     outcomeGroup: {
       title: 'Outcome Group Title',
-      description: 'Description for Outcome Group.'
+      description: 'Description for Outcome Group.',
     },
     isOpen: true,
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const Template = args => <GroupDescriptionModal {...args} />

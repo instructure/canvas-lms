@@ -22,7 +22,7 @@ import {ReplyPreview} from './ReplyPreview'
 export default {
   title: 'Examples/Discussion Posts/Components/ReplyPreview',
   component: ReplyPreview,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <ReplyPreview {...args} />
@@ -33,10 +33,10 @@ Default.args = {
   previewMessage:
     'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
   author: {
-    shortName: 'Albus Dumbledore'
+    shortName: 'Albus Dumbledore',
   },
   editor: {
-    shortName: 'Harry Potter'
+    shortName: 'Harry Potter',
   },
-  deleted: false
+  deleted: false,
 }

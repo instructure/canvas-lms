@@ -245,7 +245,7 @@ export default class Quiz extends Backbone.Model {
   destroy(options) {
     const opts = {
       url: this.get('deletion_url'),
-      ...options
+      ...options,
     }
     Backbone.Model.prototype.destroy.call(this, opts)
   }
@@ -254,7 +254,7 @@ export default class Quiz extends Backbone.Model {
     return new DateGroup({
       due_at: this.get('due_at'),
       unlock_at: this.get('unlock_at'),
-      lock_at: this.get('lock_at')
+      lock_at: this.get('lock_at'),
     })
   }
 
@@ -315,7 +315,7 @@ export default class Quiz extends Backbone.Model {
     const id = this.get('id')
     const poller = new PandaPubPoller(interval, interval * 5, done => {
       this.fetch({
-        url: `/api/v1/courses/${course_id}/assignments/${id}?result_type=Quiz`
+        url: `/api/v1/courses/${course_id}/assignments/${id}?result_type=Quiz`,
       }).always(() => {
         done()
         if (!isProcessing()) {
@@ -389,7 +389,7 @@ export default class Quiz extends Backbone.Model {
       'lockAt',
       'unlockAt',
       'singleSectionDueDate',
-      'importantDates'
+      'importantDates',
     ]
     const hash = {id: this.get('id')}
     for (const field of fields) {
@@ -415,7 +415,7 @@ Quiz.prototype.defaults = {
   unpublishable: true,
   points_possible: null,
   post_to_sis: false,
-  require_lockdown_browser: false
+  require_lockdown_browser: false,
 }
 
 function __guard__(value, transform) {

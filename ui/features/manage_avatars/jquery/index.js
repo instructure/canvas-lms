@@ -20,11 +20,12 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
 const I18n = useI18nScope('manage_avatars')
 /* showIf */
 
-$(document).ready(function() {
-  $('.update_avatar_link').live('click', function(event) {
+$(document).ready(function () {
+  $('.update_avatar_link').live('click', function (event) {
     event.preventDefault()
     const $link = $(this)
     if ($link.attr('data-state') == 'none') {
@@ -69,10 +70,7 @@ $(document).ready(function() {
           .find('.approve_avatar_link')
           .hide()
         if (data.avatar_state == 'none') {
-          $td
-            .parents('tr')
-            .find('.avatar img')
-            .attr('src', '/images/dotted_pic.png')
+          $td.parents('tr').find('.avatar img').attr('src', '/images/dotted_pic.png')
         }
         $td.parents('tr').attr('class', data.avatar_state)
         $td.find('.progress').css('visibility', 'hidden')

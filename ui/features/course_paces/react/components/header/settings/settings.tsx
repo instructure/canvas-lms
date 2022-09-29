@@ -77,7 +77,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
     this.state = {
       showBlackoutDatesModal: false,
       showSettingsPopover: false,
-      blackoutDatesModalKey: uid('bod_', 2)
+      blackoutDatesModalKey: uid('bod_', 2),
     }
   }
 
@@ -86,13 +86,13 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   showBlackoutDatesModal = () => {
     this.setState({
       showBlackoutDatesModal: true,
-      blackoutDatesModalKey: uid()
+      blackoutDatesModalKey: uid(),
     })
   }
 
   closeBlackoutDatesModal = (): void => {
     this.setState({
-      showBlackoutDatesModal: false
+      showBlackoutDatesModal: false,
     })
   }
 
@@ -144,7 +144,7 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
             show={this.state.showSettingsPopover}
             onToggle={newState =>
               this.setState({
-                showSettingsPopover: newState
+                showSettingsPopover: newState,
               })
             }
             disabled={this.props.isBlueprintLocked}
@@ -184,7 +184,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     courseId: getCourse(state).id,
     excludeWeekends: getExcludeWeekends(state),
     coursePace: getCoursePace(state),
-    isSyncing: getSyncing(state)
+    isSyncing: getSyncing(state),
   }
 }
 
@@ -192,5 +192,5 @@ export default connect(mapStateToProps, {
   loadLatestPaceByContext: coursePaceActions.loadLatestPaceByContext,
   showLoadingOverlay: uiActions.showLoadingOverlay,
   toggleExcludeWeekends: coursePaceActions.toggleExcludeWeekends,
-  updateBlackoutDates: blackoutDateActions.updateBlackoutDates
+  updateBlackoutDates: blackoutDateActions.updateBlackoutDates,
 })(Settings)

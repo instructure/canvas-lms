@@ -42,7 +42,7 @@ export const DashboardCardHeaderHero = ({
   image,
   backgroundColor,
   hideColorOverlays,
-  onClick
+  onClick,
 }: DashboardCardHeaderHeroProps) => {
   if (image) {
     return (
@@ -127,7 +127,7 @@ export const DashboardCard = ({
   canChangeCoursePublishState,
   defaultView,
   pagesUrl,
-  frontPageTitle
+  frontPageTitle,
 }: DashboardCardProps) => {
   const handleNicknameChange = nickname => setNicknameInfo(getNicknameInfo(nickname))
 
@@ -135,7 +135,7 @@ export const DashboardCard = ({
     nickname,
     originalName,
     courseId: id,
-    onNicknameChange: handleNicknameChange
+    onNicknameChange: handleNicknameChange,
   })
 
   const [nicknameInfo, setNicknameInfo] = useState(getNicknameInfo(shortName))
@@ -173,7 +173,7 @@ export const DashboardCard = ({
     const modalProps = {
       courseId: id,
       courseName: originalName,
-      onConfirm: removeCourseFromFavorites
+      onConfirm: removeCourseFromFavorites,
     }
     showConfirmUnfavorite(modalProps)
   }
@@ -186,7 +186,7 @@ export const DashboardCard = ({
     const activityType = {
       'icon-announcement': 'Announcement',
       'icon-assignment': 'Message',
-      'icon-discussion': 'DiscussionTopic'
+      'icon-discussion': 'DiscussionTopic',
     }[icon]
 
     const itemStream = stream || []
@@ -209,7 +209,7 @@ export const DashboardCard = ({
       canMoveLeft: !isFirstCard,
       canMoveRight: !isLastCard,
       canMoveToBeginning: !isFirstCard,
-      canMoveToEnd: !isLastCard
+      canMoveToEnd: !isLastCard,
     }
   }
 
@@ -253,7 +253,7 @@ export const DashboardCard = ({
       handleMove,
       currentPosition: getCardPosition(),
       lastPosition: totalCards - 1,
-      menuOptions: calculateMenuOptions()
+      menuOptions: calculateMenuOptions(),
     }
 
     return (
@@ -281,7 +281,7 @@ export const DashboardCard = ({
               <i className="icon-more" aria-hidden="true" />
               <span className="screenreader-only">
                 {I18n.t('Choose a color or course nickname or move course card for %{course}', {
-                  course: nicknameInfo.nickname
+                  course: nicknameInfo.nickname,
                 })}
               </span>
             </button>
@@ -302,7 +302,7 @@ export const DashboardCard = ({
           {image
             ? I18n.t('Course image for %{course}', {course: nicknameInfo.nickname})
             : I18n.t('Course card color region for %{course}', {
-                course: nicknameInfo.nickname
+                course: nicknameInfo.nickname,
               })}
         </span>
         <DashboardCardHeaderHero

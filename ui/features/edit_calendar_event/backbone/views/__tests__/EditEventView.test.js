@@ -41,7 +41,7 @@ describe('EditEventView', () => {
       title: 'My Event',
       start_at: '2020-05-11T23:27:35.738Z',
       context_code: 'course_1',
-      ...overrides
+      ...overrides,
     })
     event.sync = () => {}
 
@@ -65,7 +65,7 @@ describe('EditEventView', () => {
   describe('conferences', () => {
     const CONFERENCE_TYPES = [
       {name: 'Type1', type: 'type1', contexts: ['course_1']},
-      {name: 'Type2', type: 'type2', contexts: ['course_2', 'course_3']}
+      {name: 'Type2', type: 'type2', contexts: ['course_2', 'course_3']},
     ]
 
     function enableConferences(conference_types = CONFERENCE_TYPES) {
@@ -114,11 +114,11 @@ describe('EditEventView', () => {
         lti_settings: {a: 1, b: 2, c: 3},
         title: 'My Event',
         user_settings: {
-          scheduled_date: '2020-05-11T00:00:00.000Z'
-        }
+          scheduled_date: '2020-05-11T00:00:00.000Z',
+        },
       }
       const view = render({
-        web_conference
+        web_conference,
       })
       view.model.save = jest.fn(params => {
         expect(params.web_conference).toEqual(web_conference)
@@ -164,7 +164,7 @@ describe('EditEventView', () => {
       window.ENV.K5_SUBJECT_COURSE = true
       render({important_dates: true})
       const checkbox = within(document.body).getByLabelText('Mark as Important Date', {
-        exact: false
+        exact: false,
       })
       expect(checkbox).toBeInTheDocument()
       expect(checkbox).toHaveAttribute('checked')
@@ -193,7 +193,7 @@ describe('EditEventView', () => {
       render({context_type: 'course', course_pacing_enabled: 'true'})
       expect(
         within(document.body).getByLabelText('Add to Course Pacing blackout dates', {
-          exact: false
+          exact: false,
         })
       ).toBeInTheDocument()
     })
@@ -203,14 +203,14 @@ describe('EditEventView', () => {
       render({
         context_type: 'course',
         course_pacing_enabled: 'true',
-        web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}
+        web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'},
       })
       const ids = [
         'more_options_start_time',
         'more_options_end_time',
         'calendar_event_location_name',
         'calendar_event_location_address',
-        'calendar_event_conference_field'
+        'calendar_event_conference_field',
       ]
       ids.forEach(id => expectEnabled(id))
       $('#calendar_event_blackout_date').attr('checked', true)

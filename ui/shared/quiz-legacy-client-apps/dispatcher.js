@@ -19,11 +19,11 @@
 const callbacks = {}
 let gActionIndex = 0
 
-const Dispatcher = function(inputConfig) {
+const Dispatcher = function (inputConfig) {
   this.config = inputConfig
 }
 
-Dispatcher.prototype.dispatch = function(action, params) {
+Dispatcher.prototype.dispatch = function (action, params) {
   return new Promise((resolve, reject) => {
     const actionIndex = ++gActionIndex
     const callback = callbacks[action]
@@ -38,7 +38,7 @@ Dispatcher.prototype.dispatch = function(action, params) {
   })
 }
 
-Dispatcher.prototype.register = function(action, callback) {
+Dispatcher.prototype.register = function (action, callback) {
   if (callbacks[action]) {
     throw new Error("A handler is already registered to '" + action + "'")
   }
@@ -48,7 +48,7 @@ Dispatcher.prototype.register = function(action, callback) {
   return callback
 }
 
-Dispatcher.prototype.clear = function() {
+Dispatcher.prototype.clear = function () {
   for (const action of Object.keys(callbacks)) {
     callbacks[action] = null
   }

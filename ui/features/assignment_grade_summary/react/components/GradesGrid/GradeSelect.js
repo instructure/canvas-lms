@@ -33,7 +33,7 @@ const NO_SELECTION_GRADE = {
   gradeInfo: {},
   label: NO_SELECTION_LABEL,
   value: NO_SELECTION,
-  disabled: true
+  disabled: true,
 }
 
 const INITIAL_STATE = {
@@ -44,7 +44,7 @@ const INITIAL_STATE = {
   selectedId: null,
   options: undefined,
   graderOptions: undefined,
-  customGradeOption: undefined
+  customGradeOption: undefined,
 }
 
 /* eslint-disable prettier/prettier */
@@ -58,25 +58,44 @@ function reducer(prevState, action) {
         selectedId: action.selectedId,
         graderOptions: action.graders,
         customGradeOption: action.custom,
-        options: action.opts
+        options: action.opts,
       }
     case 'show_options':
       return {...prevState, expanded: true}
     case 'hide_options':
       return {...prevState, expanded: false, highlightedId: null}
     case 'set_input':
-      state = {...prevState, input: action.input, typed: action.input, expanded: true, customGradeOption: action.custom}
-      state.options = action.custom ? [...prevState.graderOptions, action.custom] : prevState.graderOptions
+      state = {
+        ...prevState,
+        input: action.input,
+        typed: action.input,
+        expanded: true,
+        customGradeOption: action.custom,
+      }
+      state.options = action.custom
+        ? [...prevState.graderOptions, action.custom]
+        : prevState.graderOptions
       if (action.custom) state.highlightedId = action.custom.value
       return state
     case 'set_blur':
-      return {...prevState, typed: '', highlightedId: null, input: action.opt ? action.opt.label : NO_SELECTION_LABEL}
+      return {
+        ...prevState,
+        typed: '',
+        highlightedId: null,
+        input: action.opt ? action.opt.label : NO_SELECTION_LABEL,
+      }
     case 'set_highlight':
       state = {...prevState, highlightedId: action.id}
       if (action.type !== 'keydown') state.input = action.opt.label
       return state
     case 'set_select':
-      return {...prevState, selectedId: action.id, input: action.opt.label, typed: '', expanded: false}
+      return {
+        ...prevState,
+        selectedId: action.id,
+        input: action.opt.label,
+        typed: '',
+        expanded: false,
+      }
     default:
       throw new RangeError('bad event passed to dispatcher')
   }
@@ -87,7 +106,7 @@ function buildCustomGradeOption(gradeInfo, fmtr) {
   return {
     gradeInfo,
     label: `${fmtr(gradeInfo.score)} (${I18n.t('Custom')})`,
-    value: gradeInfo.graderId
+    value: gradeInfo.graderId,
   }
 }
 export default function GradeSelect(props) {
@@ -107,7 +126,7 @@ export default function GradeSelect(props) {
           gradeInfo,
           label: `${numFormatter(gradeInfo.score)} (${grader.graderName})`,
           value: gradeInfo.graderId,
-          disabled: !grader.graderSelectable
+          disabled: !grader.graderSelectable,
         })
       }
     })
@@ -204,7 +223,7 @@ export default function GradeSelect(props) {
             ...state.customGradeOption?.gradeInfo,
             graderId: props.finalGrader.graderId,
             score,
-            studentId: props.studentId
+            studentId: props.studentId,
           },
           numFormatter
         )
@@ -285,12 +304,12 @@ export default function GradeSelect(props) {
 GradeSelect.propTypes = {
   disabledCustomGrade: bool.isRequired,
   finalGrader: shape({
-    graderId: string.isRequired
+    graderId: string.isRequired,
   }),
   graders: arrayOf(
     shape({
       graderName: string,
-      graderId: string.isRequired
+      graderId: string.isRequired,
     })
   ).isRequired,
   grades: object.isRequired,
@@ -299,7 +318,7 @@ GradeSelect.propTypes = {
   onSelect: func,
   selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
   studentId: string.isRequired,
-  studentName: string.isRequired
+  studentName: string.isRequired,
 }
 
 GradeSelect.defaultProps = {
@@ -307,7 +326,7 @@ GradeSelect.defaultProps = {
   onClose: null,
   onOpen: null,
   onSelect: null,
-  selectProvisionalGradeStatus: null
+  selectProvisionalGradeStatus: null,
 }
 
 export {NO_SELECTION_LABEL}

@@ -32,9 +32,7 @@ $(document).ready(() => {
   $('.submit_error_link').click(event => {
     event.preventDefault()
     $('#submit_error_form').slideToggle(() =>
-      $('#submit_error_form :input:visible:first')
-        .focus()
-        .select()
+      $('#submit_error_form :input:visible:first').focus().select()
     )
   })
 
@@ -54,6 +52,6 @@ $(document).ready(() => {
     error(data) {
       $(this).loadingImage('remove')
       $(this).errorBox(I18n.t('message_failed', "Report didn't send.  Please try again."))
-    }
+    },
   })
 })

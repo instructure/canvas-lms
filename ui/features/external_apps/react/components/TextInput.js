@@ -34,7 +34,7 @@ export default createReactClass({
     hintText: PropTypes.string,
     placeholder: PropTypes.string,
     errors: PropTypes.object,
-    name: PropTypes.string
+    name: PropTypes.string,
   },
 
   render() {
@@ -57,5 +57,5 @@ export default createReactClass({
         </label>
       </div>
     )
-  }
+  },
 })

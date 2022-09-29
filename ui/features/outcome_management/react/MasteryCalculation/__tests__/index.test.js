@@ -20,7 +20,10 @@ import React from 'react'
 import {act, render as rtlRender, waitFor, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
-import {ACCOUNT_OUTCOME_CALCULATION_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '@canvas/outcomes/graphql/MasteryCalculation'
+import {
+  ACCOUNT_OUTCOME_CALCULATION_QUERY,
+  SET_OUTCOME_CALCULATION_METHOD,
+} from '@canvas/outcomes/graphql/MasteryCalculation'
 import MasteryCalculation from '../index'
 import {masteryCalculationGraphqlMocks} from '@canvas/outcomes/mocks/Outcomes'
 
@@ -35,19 +38,19 @@ describe('MasteryCalculation', () => {
           role: 'AccountAdmin',
           label: 'Account Admin',
           base_role_type: 'AccountMembership',
-          is_account_role: true
+          is_account_role: true,
         },
         {
           id: '2',
           role: 'TeacherEnrollment',
           label: 'Teacher',
           base_role_type: 'TeacherEnrollment',
-          is_account_role: false
-        }
+          is_account_role: false,
+        },
       ],
       PERMISSIONS: {
-        manage_proficiency_calculations: true
-      }
+        manage_proficiency_calculations: true,
+      },
     }
   })
 
@@ -77,7 +80,7 @@ describe('MasteryCalculation', () => {
   it('loads calculation data for Course', async () => {
     const {getByDisplayValue} = render(<MasteryCalculation />, {
       contextType: 'Course',
-      contextId: '12'
+      contextId: '12',
     })
     await act(async () => jest.runAllTimers())
     expect(getByDisplayValue(/65/)).not.toEqual(null)
@@ -108,18 +111,18 @@ describe('MasteryCalculation', () => {
         request: {
           query: ACCOUNT_OUTCOME_CALCULATION_QUERY,
           variables: {
-            contextId: '11'
-          }
+            contextId: '11',
+          },
         },
         result: {
           data: {
             context: {
               __typename: 'Account',
-              outcomeCalculationMethod: null
-            }
-          }
-        }
-      }
+              outcomeCalculationMethod: null,
+            },
+          },
+        },
+      },
     ]
     const {getByText} = render(<MasteryCalculation />, {mocks: emptyMocks})
     await act(async () => jest.runAllTimers())
@@ -131,7 +134,7 @@ describe('MasteryCalculation', () => {
       contextType: 'Account',
       contextId: '11',
       calculationMethod: 'decaying_average',
-      calculationInt: 88
+      calculationInt: 88,
     }
     const updateCall = jest.fn(() => ({
       data: {
@@ -139,21 +142,21 @@ describe('MasteryCalculation', () => {
           outcomeCalculationMethod: {
             _id: '1',
             locked: false,
-            ...variables
+            ...variables,
           },
-          errors: []
-        }
-      }
+          errors: [],
+        },
+      },
     }))
     const updateMocks = [
       ...masteryCalculationGraphqlMocks,
       {
         request: {
           query: SET_OUTCOME_CALCULATION_METHOD,
-          variables
+          variables,
         },
-        result: updateCall
-      }
+        result: updateCall,
+      },
     ]
     it('submits a request when calculation method is saved', async () => {
       const {getByText, findByLabelText} = render(<MasteryCalculation />, {mocks: updateMocks})

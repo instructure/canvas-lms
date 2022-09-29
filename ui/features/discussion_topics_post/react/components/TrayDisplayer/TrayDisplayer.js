@@ -45,7 +45,7 @@ export function TrayDisplayer({...props}) {
               data-testid="close-tray-button"
             />
           </Flex.Item>
-          <Flex.Item padding="none none medium none" shouldGrow shouldShrink>
+          <Flex.Item padding="none none medium none" shouldGrow={true} shouldShrink={true}>
             <Text size="x-large" weight="bold">
               {I18n.t('%{title}', {title: props.trayTitle})}
             </Text>
@@ -61,7 +61,7 @@ TrayDisplayer.propTypes = {
   setTrayOpen: PropTypes.func,
   trayTitle: PropTypes.string,
   trayComponent: PropTypes.any,
-  isTrayOpen: PropTypes.bool
+  isTrayOpen: PropTypes.bool,
 }
 
 export default TrayDisplayer

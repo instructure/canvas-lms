@@ -35,7 +35,7 @@ export default createReactClass({
     id: PropTypes.string,
     required: PropTypes.bool,
     hintText: PropTypes.string,
-    errors: PropTypes.object
+    errors: PropTypes.object,
   },
 
   renderSelectOptions() {
@@ -74,5 +74,5 @@ export default createReactClass({
         </label>
       </div>
     )
-  }
+  },
 })

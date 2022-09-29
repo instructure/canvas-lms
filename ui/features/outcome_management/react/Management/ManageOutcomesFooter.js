@@ -34,19 +34,19 @@ const ManageOutcomesFooter = ({
   selectedCount,
   onRemoveHandler,
   onMoveHandler,
-  onClearHandler
+  onClearHandler,
 }) => {
   const {isMobileView} = useCanvasContext()
   const btnState = selectedCount > 0 ? 'enabled' : 'disabled'
   const moveButtonProps = {
     interaction: btnState,
     onClick: onMoveHandler,
-    renderIcon: IconMoveEndLine
+    renderIcon: IconMoveEndLine,
   }
   const deleteButtonProps = {
     interaction: btnState,
     onClick: onRemoveHandler,
-    renderIcon: IconTrashLine
+    renderIcon: IconTrashLine,
   }
   const outcomesIconRef = useRef()
 
@@ -59,7 +59,7 @@ const ManageOutcomesFooter = ({
         bottom: 0,
         padding: isMobileView ? '0px' : '0px 24px 8px 0px',
         zIndex: '999',
-        backgroundColor: 'white'
+        backgroundColor: 'white',
       }}
     >
       <hr style={{margin: '0'}} />
@@ -83,7 +83,7 @@ const ManageOutcomesFooter = ({
                     display: 'flex',
                     alignSelf: 'center',
                     fontSize: '0.875rem',
-                    paddingLeft: isMobileView ? '0' : '0.75rem'
+                    paddingLeft: isMobileView ? '0' : '0.75rem',
                   }}
                 >
                   <IconOutcomesLine size="x-small" ref={outcomesIconRef} />
@@ -137,7 +137,7 @@ ManageOutcomesFooter.propTypes = {
   selectedCount: PropTypes.number.isRequired,
   onRemoveHandler: PropTypes.func.isRequired,
   onMoveHandler: PropTypes.func.isRequired,
-  onClearHandler: PropTypes.func.isRequired
+  onClearHandler: PropTypes.func.isRequired,
 }
 
 export default ManageOutcomesFooter

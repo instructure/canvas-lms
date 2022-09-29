@@ -36,7 +36,7 @@ export const Attachment = {
     id: string,
     mimeClass: string,
     url: string,
-    thumbnailUrl: string
+    thumbnailUrl: string,
   }),
 
   mock: ({
@@ -45,7 +45,7 @@ export const Attachment = {
     id = 'RmlsZS0zMDQ=',
     mimeClass = 'image',
     url = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-    thumbnailUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    thumbnailUrl = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
   } = {}) => ({
     _id,
     displayName,
@@ -53,6 +53,6 @@ export const Attachment = {
     mimeClass,
     url,
     thumbnailUrl,
-    __typename: 'File'
-  })
+    __typename: 'File',
+  }),
 }

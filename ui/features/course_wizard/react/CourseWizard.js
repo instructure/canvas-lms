@@ -36,14 +36,14 @@ export default function CourseWizard({onHideWizard}) {
         closeLink.current.focus()
         $.screenReaderFlashMessageExclusive(I18n.t('Course Setup Wizard is showing.'))
       }}
-      open
+      open={true}
       onDismiss={onHideWizard}
       label={I18n.t('Course Wizard')}
-      shouldContainFocus
-      shouldReturnFocus
-      unmountOnExit
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
+      unmountOnExit={true}
     >
-      <Mask theme={{background: 'transparent'}} fullscreen>
+      <Mask theme={{background: 'transparent'}} fullscreen={true}>
         <main role="main">
           <div className="ic-wizard-box">
             <div className="ic-wizard-box__header">
@@ -88,5 +88,5 @@ export default function CourseWizard({onHideWizard}) {
 }
 
 CourseWizard.propTypes = {
-  onHideWizard: PropTypes.func.isRequired
+  onHideWizard: PropTypes.func.isRequired,
 }

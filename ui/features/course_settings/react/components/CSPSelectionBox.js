@@ -31,20 +31,20 @@ export default class CSPSelectionBox extends Component {
   static propTypes = {
     apiLibrary: shape({
       get: func.isRequired,
-      put: func.isRequired
+      put: func.isRequired,
     }).isRequired,
     courseId: string.isRequired,
-    canManage: bool
+    canManage: bool,
   }
 
   static defaultProps = {
-    canManage: false
+    canManage: false,
   }
 
   state = {
     disabled: false,
     loading: true,
-    failedToLoad: false
+    failedToLoad: false,
   }
 
   componentDidMount() {
@@ -53,7 +53,7 @@ export default class CSPSelectionBox extends Component {
       .then(response => {
         this.setState({
           disabled: !response.data.enabled,
-          loading: false
+          loading: false,
         })
       })
       .catch(() => {
@@ -66,23 +66,23 @@ export default class CSPSelectionBox extends Component {
     const checked = e.currentTarget.checked
     this.setState(
       {
-        disabled: checked
+        disabled: checked,
       },
       () => {
         this.props.apiLibrary
           .put(`/api/v1/courses/${this.props.courseId}/csp_settings`, {
-            status: checked ? 'disabled' : 'enabled'
+            status: checked ? 'disabled' : 'enabled',
           })
           .then(response => {
             this.setState({
-              disabled: !response.data.enabled
+              disabled: !response.data.enabled,
             })
           })
           .catch(() => {
             // Something bad happened, revert to the original value
             this.setState(
               {
-                disabled: initialState
+                disabled: initialState,
               },
               showFlashError(I18n.t('Saving the CSP status failed, please try again.'))
             )

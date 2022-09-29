@@ -25,7 +25,7 @@ const TIME_UNITS = Object.freeze([
   60, // seconds in a minute
   60, // minutes in an hour
   24, // hours in a day
-  7 // days in a week
+  7, // days in a week
 ])
 
 const UNIT_NAMES = Object.freeze([
@@ -34,7 +34,7 @@ const UNIT_NAMES = Object.freeze([
   'minute',
   'hour',
   'day',
-  'week'
+  'week',
 ])
 
 function buildTime(msec) {
@@ -67,7 +67,7 @@ function timeDistance(times, opts) {
   const rtf = new Intl.RelativeTimeFormat(locale || ENV.LOCALE || navigator.language, {
     style: 'long',
     numeric: 'auto',
-    ...intlOpts
+    ...intlOpts,
   })
   while (unitArray.length > 1 && unitArray[0] === 0) {
     unitArray.shift()

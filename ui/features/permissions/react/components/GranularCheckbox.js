@@ -36,7 +36,7 @@ export default function GranularCheckbox({
   permissionName,
   permissionLabel,
   handleClick,
-  handleScroll
+  handleScroll,
 }) {
   const status = permission.enabled === ENABLED_FOR_NONE ? I18n.t('Disabled') : I18n.t('Enabled')
   const screenReaderTag = `${status} ${permissionLabel} ${roleLabel}`
@@ -44,7 +44,7 @@ export default function GranularCheckbox({
     <Spinner size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
   ) : (
     <Checkbox
-      inline
+      inline={true}
       checked={permission.enabled !== ENABLED_FOR_NONE}
       disabled={permission.readonly}
       label={<ScreenReaderContent>{screenReaderTag}</ScreenReaderContent>}
@@ -71,12 +71,12 @@ GranularCheckbox.propTypes = {
   permissionName: string.isRequired,
   permissionLabel: string.isRequired,
   handleClick: func.isRequired,
-  handleScroll: func
+  handleScroll: func,
 }
 
 GranularCheckbox.defaultProps = {
   roleLabel: '',
-  handleScroll: Function.prototype
+  handleScroll: Function.prototype,
 }
 
 function mapStateToProps(state, ownProps) {
@@ -88,7 +88,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  handleClick: actions.modifyPermissions
+  handleClick: actions.modifyPermissions,
 }
 
 export const ConnectedGranularCheckbox = connect(

@@ -24,7 +24,7 @@ import {Responsive} from '@instructure/ui-responsive'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TextInput} from '@instructure/ui-text-input'
 import CanvasDateInput, {
-  CanvasDateInputMessageType
+  CanvasDateInputMessageType,
 } from '@canvas/datetime/react/components/DateInput'
 import {coursePaceTimezone} from '../api/backend_serializer'
 
@@ -39,7 +39,7 @@ const dateTimeFormatter = new Intl.DateTimeFormat(ENV.LOCALE, {
   month: 'numeric',
   day: 'numeric',
   year: 'numeric',
-  timeZone: coursePaceTimezone
+  timeZone: coursePaceTimezone,
 })
 
 function formatDate(date): string {
@@ -74,7 +74,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
       titleMessages: [],
       startMessages: [],
       endMessages: [],
-      key: 1
+      key: 1,
     }
     this.titleInputRef = undefined
   }
@@ -83,7 +83,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
     const blackoutDate: BlackoutDate = {
       event_title: this.state.eventTitle.trim(),
       start_date: moment(this.state.startDate || this.state.endDate),
-      end_date: moment(this.state.endDate || this.state.startDate)
+      end_date: moment(this.state.endDate || this.state.startDate),
     }
 
     this.props.addBlackoutDate(blackoutDate)
@@ -93,7 +93,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
       endDate: '',
       startMessages: [],
       endMessages: [],
-      key: state.key + 1
+      key: state.key + 1,
     }))
   }
 
@@ -102,7 +102,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
     if (newTitle.length <= 100) {
       this.setState({
         eventTitle: newTitle,
-        titleMessages: []
+        titleMessages: [],
       })
     }
   }
@@ -110,7 +110,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   validateTitle = () => {
     if (this.titleInputRef?.value.trim().length === 0) {
       this.setState({
-        titleMessages: [{type: 'error' as const, text: I18n.t('Title required')}]
+        titleMessages: [{type: 'error' as const, text: I18n.t('Title required')}],
       })
     }
   }
@@ -124,8 +124,8 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
         startMessages = [
           {
             type: 'error' as const,
-            text: I18n.t('Date required')
-          }
+            text: I18n.t('Date required'),
+          },
         ]
       } else {
         const startDate = new Date(state.startDate)
@@ -134,8 +134,8 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           endMessages = [
             {
               type: 'error' as const,
-              text: I18n.t('End date cannot be before start date')
-            }
+              text: I18n.t('End date cannot be before start date'),
+            },
           ]
         }
       }
@@ -159,7 +159,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
   onChangeEndDate = (date: Date | null) => {
     this.setState(
       {
-        endDate: date ? date.toISOString() : ''
+        endDate: date ? date.toISOString() : '',
       },
       () => this.validateDates()
     )
@@ -183,7 +183,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
           smallest: {maxWidth: '432px'},
           smaller: {maxWidth: '576px'},
           small: {maxWidth: '635px'},
-          large: {minWidth: '635px'}
+          large: {minWidth: '635px'},
         }}
         render={(_props, matches) => {
           let addBtnMarginTop = '0'
@@ -221,7 +221,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         selectedDate={this.state.startDate}
                         width="140px"
                         messages={this.state.startMessages}
-                        withRunningValue
+                        withRunningValue={true}
                       />
                     </FlexItem>
                     <FlexItem data-testid="blackout-end-date" margin="0 small small 0">
@@ -234,7 +234,7 @@ class NewBlackoutDatesForm extends React.Component<PassedProps, LocalState> {
                         onBlur={this.onBlurDate}
                         width="140px"
                         messages={this.state.endMessages}
-                        withRunningValue
+                        withRunningValue={true}
                       />
                     </FlexItem>
                   </Flex>

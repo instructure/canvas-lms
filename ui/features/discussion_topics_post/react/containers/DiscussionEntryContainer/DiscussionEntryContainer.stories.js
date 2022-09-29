@@ -29,8 +29,8 @@ export default {
   component: DiscussionEntryContainer,
   argTypes: {
     onSave: {action: 'On Save'},
-    onCancel: {action: 'On Cancel'}
-  }
+    onCancel: {action: 'On Cancel'},
+  },
 }
 
 const Template = args => <DiscussionEntryContainer {...args} />
@@ -40,8 +40,8 @@ DiscussionTopic.args = {
   isTopic: true,
   postUtilities: (
     <PostToolbar
-      isPublished
-      isSubscribed
+      isPublished={true}
+      isSubscribed={true}
       repliesCount={24}
       unreadCount={4}
       onTogglePublish={() => {}}
@@ -52,7 +52,7 @@ DiscussionTopic.args = {
   author: User.mock({
     displayName: 'Harry Potter',
     courseRoles: ['Author', 'Student', 'TA'],
-    avatarUrl: ''
+    avatarUrl: '',
   }),
   title: 'Gryffindor Quidditch Team',
   message: 'The only role that really matters is seaker',
@@ -60,7 +60,7 @@ DiscussionTopic.args = {
   isIsolatedView: false,
   editor: User.mock({_id: '5', displayName: 'George Weasley'}),
   timingDisplay: 'Jan 1 4:20pm',
-  editedTimingDisplay: 'Apr 20 4:20pm'
+  editedTimingDisplay: 'Apr 20 4:20pm',
 }
 
 export const DiscussionTopicNoAuthor = Template.bind({})
@@ -68,8 +68,8 @@ DiscussionTopicNoAuthor.args = {
   isTopic: true,
   postUtilities: (
     <PostToolbar
-      isPublished
-      isSubscribed
+      isPublished={true}
+      isSubscribed={true}
       repliesCount={24}
       unreadCount={4}
       onTogglePublish={() => {}}
@@ -81,7 +81,7 @@ DiscussionTopicNoAuthor.args = {
   message: 'I have always thought Blastoise was the coolest personally.',
   isEditing: false,
   isIsolatedView: false,
-  timingDisplay: 'Feb 22 3:30pm'
+  timingDisplay: 'Feb 22 3:30pm',
 }
 
 export const DiscussionTopicLargePost = Template.bind({})
@@ -89,8 +89,8 @@ DiscussionTopicLargePost.args = {
   isTopic: true,
   postUtilities: (
     <PostToolbar
-      isPublished
-      isSubscribed
+      isPublished={true}
+      isSubscribed={true}
       repliesCount={24}
       unreadCount={4}
       onTogglePublish={() => {}}
@@ -105,7 +105,7 @@ DiscussionTopicLargePost.args = {
   isIsolatedView: false,
   editor: User.mock({_id: '5', displayName: 'George Weasley'}),
   timingDisplay: 'Jan 1 4:20pm',
-  editedTimingDisplay: 'Apr 20 4:20pm'
+  editedTimingDisplay: 'Apr 20 4:20pm',
 }
 
 export const DiscussionEntry = Template.bind({})
@@ -134,14 +134,14 @@ DiscussionEntry.args = {
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={() => {}} delimiterKey="reply" />
-      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked delimiterKey="like" />
+      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked={true} delimiterKey="like" />
       <ThreadingToolbar.Expansion
         onExpand={() => {}}
         expandText={<ReplyInfo replyCount={24} unreadCount={4} />}
         delimiterKey="expansion"
       />
     </ThreadingToolbar>
-  )
+  ),
 }
 
 export const DiscussionEntryEdit = Template.bind({})
@@ -168,14 +168,14 @@ DiscussionEntryEdit.args = {
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={() => {}} delimiterKey="reply" />
-      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked delimiterKey="like" />
+      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked={true} delimiterKey="like" />
       <ThreadingToolbar.Expansion
         onExpand={() => {}}
         expandText={<ReplyInfo replyCount={24} unreadCount={4} />}
         delimiterKey="expansion"
       />
     </ThreadingToolbar>
-  )
+  ),
 }
 
 export const DiscussionEntryNoAuthor = Template.bind({})
@@ -200,14 +200,14 @@ DiscussionEntryNoAuthor.args = {
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={() => {}} delimiterKey="reply" />
-      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked delimiterKey="like" />
+      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked={true} delimiterKey="like" />
       <ThreadingToolbar.Expansion
         onExpand={() => {}}
         expandText={<ReplyInfo replyCount={24} unreadCount={4} />}
         delimiterKey="expansion"
       />
     </ThreadingToolbar>
-  )
+  ),
 }
 
 export const DeletedEntry = Template.bind({})
@@ -225,12 +225,12 @@ DeletedEntry.args = {
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={() => {}} delimiterKey="reply" />
-      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked delimiterKey="like" />
+      <ThreadingToolbar.Like onClick={() => {}} likeCount={5} isLiked={true} delimiterKey="like" />
       <ThreadingToolbar.Expansion
         onExpand={() => {}}
         expandText={<ReplyInfo replyCount={24} unreadCount={4} />}
         delimiterKey="expansion"
       />
     </ThreadingToolbar>
-  )
+  ),
 }

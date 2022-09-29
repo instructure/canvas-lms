@@ -23,7 +23,7 @@ const I18n = useI18nScope('react_files')
 
 export default function LoadingIndicator(props) {
   const style = {
-    display: props.isLoading ? '' : 'none'
+    display: props.isLoading ? '' : 'none',
   }
 
   return (

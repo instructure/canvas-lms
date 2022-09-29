@@ -45,7 +45,7 @@ export function uploadFile(file, folderId, onSuccess, onFailure) {
         name: file.name,
         size: file.size,
         parent_folder_id: folderId,
-        on_duplicate: 'rename'
+        on_duplicate: 'rename',
       },
       stringIds
     )

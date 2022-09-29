@@ -25,7 +25,7 @@ import {
   IconPublishSolid,
   IconTroubleLine,
   IconLockSolid,
-  IconUnlockLine
+  IconUnlockLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
@@ -42,14 +42,14 @@ function setFlag(flagName, state) {
   return doFetchApi({
     method: 'PUT',
     path: `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/${flagName}`,
-    body: {state}
+    body: {state},
   })
 }
 
 function removeFlag(flagName) {
   return doFetchApi({
     method: 'DELETE',
-    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/${flagName}`
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/${flagName}`,
   })
 }
 
@@ -66,7 +66,7 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
     if (message) {
       const res = await showConfirmationDialog({
         label: displayName,
-        body: message
+        body: message,
       })
       if (!res) {
         return
@@ -87,7 +87,7 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
       showFlashAlert({
         message: I18n.t('An error occurred updating the flag'),
         err: null,
-        type: 'error'
+        type: 'error',
       })
     } finally {
       setApiBusy(false)
@@ -198,7 +198,7 @@ function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
 FeatureFlagButton.propTypes = {
   featureFlag: object.isRequired,
   displayName: string,
-  disableDefaults: bool
+  disableDefaults: bool,
 }
 
 export default React.memo(FeatureFlagButton)

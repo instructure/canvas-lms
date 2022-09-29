@@ -39,20 +39,20 @@ export default function AuthLoggingContentPaneView(options) {
   this.searchForm = new UserDateRangeSearchFormView({
     formName: 'logging',
     inputFilterView: new InputFilterView({
-      collection: this.options.users
+      collection: this.options.users,
     }),
     usersView: new PaginatedCollectionView({
       collection: this.options.users,
       itemView: UserView,
       buffer: 1000,
-      template: usersTemplate
+      template: usersTemplate,
     }),
-    collection: this.collection
+    collection: this.collection,
   })
   this.resultsView = new PaginatedCollectionView({
     template: authLoggingResultsTemplate,
     itemView: AuthLoggingItemView,
-    collection: this.collection
+    collection: this.collection,
   })
 }
 
@@ -74,5 +74,5 @@ Object.assign(AuthLoggingContentPaneView.prototype, {
     // view try to fetch more.
     this.collection.reset()
     return this.resultsView.detachScroll()
-  }
+  },
 })

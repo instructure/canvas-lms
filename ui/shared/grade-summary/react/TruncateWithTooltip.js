@@ -23,11 +23,11 @@ import {pickProps} from '@instructure/ui-react-utils'
 
 export default class TruncateWithTooltip extends React.Component {
   static propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
   }
 
   state = {
-    isTruncated: false
+    isTruncated: false,
   }
 
   onTruncationUpdate = isTruncated => {

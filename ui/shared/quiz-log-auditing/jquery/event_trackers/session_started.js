@@ -26,7 +26,7 @@ export default class SessionStarted extends EventTracker {
     debugConsole.log(`I've been loaded by ${userAgent}.`)
     if (location.href.indexOf('question') === -1 && location.href.indexOf('take') > 0) {
       return deliver({
-        user_agent: userAgent
+        user_agent: userAgent,
       })
     }
   }

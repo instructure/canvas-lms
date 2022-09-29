@@ -62,7 +62,7 @@ export const discussionTarget = {
       return moment(monitor.getItem().assignment.due_at) < moment()
     }
     return true
-  }
+  },
 }
 
 export class DiscussionsContainer extends Component {
@@ -79,7 +79,7 @@ export class DiscussionsContainer extends Component {
     permissions: propTypes.permissions.isRequired,
     pinned: bool,
     renderContainerBackground: func.isRequired,
-    title: string.isRequired
+    title: string.isRequired,
   }
 
   static defaultProps = {
@@ -89,14 +89,14 @@ export class DiscussionsContainer extends Component {
     },
     handleDrop: undefined,
     onMoveDiscussion: null,
-    pinned: undefined
+    pinned: undefined,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       discussions: props.discussions,
-      expanded: true
+      expanded: true,
     }
   }
 
@@ -159,9 +159,9 @@ export class DiscussionsContainer extends Component {
       discussions: {
         $splice: [
           [dragIndex, 1],
-          [hoverIndex, 0, dragDiscussion]
-        ]
-      }
+          [hoverIndex, 0, dragDiscussion],
+        ],
+      },
     })
     this.setState({discussions: newDiscussions.discussions})
   }
@@ -176,7 +176,7 @@ export class DiscussionsContainer extends Component {
           getDiscussionPosition={this.getDiscussionPosition}
           onMoveDiscussion={this.props.onMoveDiscussion}
           moveCard={this.moveCard}
-          draggable
+          draggable={true}
         />
       ) : (
         <ConnectedDiscussionRow
@@ -206,16 +206,16 @@ export class DiscussionsContainer extends Component {
             <Heading level="h2">{this.props.title}</Heading>
           </ScreenReaderContent>
           <ToggleDetails
-            fluidWidth
+            fluidWidth={true}
             expanded={this.state.expanded}
             onToggle={this.toggleExpanded}
             summary={
               <Flex>
-                <Flex.Item shouldGrow shouldShrink>
+                <Flex.Item shouldGrow={true} shouldShrink={true}>
                   <Text weight="bold">{this.props.title}</Text>
                 </Flex.Item>
                 {!this.props.pinned ? (
-                  <Flex.Item shouldShrink textAlign="end">
+                  <Flex.Item shouldShrink={true} textAlign="end">
                     <span className="recent-activity-text-container">
                       <Text fontStyle="italic">{I18n.t('Ordered by Recent Activity')}</Text>
                     </span>
@@ -244,7 +244,7 @@ export const mapState = (state, ownProps) => {
     contextId: state.contextId,
     deleteFocusPending: state.deleteFocusPending,
     discussions: filteredDiscussions,
-    permissions: state.permissions
+    permissions: state.permissions,
   }
   return {...ownProps, ...propsFromState}
 }
@@ -260,7 +260,7 @@ export const DroppableDiscussionsContainer = DropTarget(
   (dragConnect, monitor) => ({
     connectDropTarget: dragConnect.dropTarget(),
     isOver: monitor.isOver(),
-    canDrop: monitor.canDrop()
+    canDrop: monitor.canDrop(),
   })
 )(DiscussionsContainer)
 

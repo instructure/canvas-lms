@@ -26,7 +26,7 @@ export default function ToggleIcon({
   onToggleOn,
   onToggleOff,
   disabled,
-  className
+  className,
 }) {
   return (
     <span className={className}>
@@ -49,10 +49,10 @@ ToggleIcon.propTypes = {
   onToggleOn: PropTypes.func.isRequired,
   onToggleOff: PropTypes.func.isRequired,
   disabled: PropTypes.bool,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 ToggleIcon.defaultProps = {
   disabled: false,
-  className: ''
+  className: '',
 }

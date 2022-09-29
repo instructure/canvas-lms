@@ -50,12 +50,12 @@ describe('InstAccess', () => {
         expect(uri).toEqual('http://fake-gateway/graphql')
         expect(options.headers.authorization).toEqual('Bearer veryFakeToken')
         return {
-          status: 200
+          status: 200,
         }
       })
       const ia = new InstAccess({
         token: 'veryFakeToken',
-        preferredFetch: fakeFetch
+        preferredFetch: fakeFetch,
       })
       await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
       expect(fakeFetch.mock.calls.length).toEqual(1)
@@ -69,13 +69,13 @@ describe('InstAccess', () => {
             status: 200,
             json: () => {
               return {token: 'canvasProvidedToken'}
-            }
+            },
           }
         }
         expect(uri).toEqual('http://fake-gateway/graphql')
         expect(options.headers.authorization).toEqual('Bearer canvasProvidedToken')
         return {
-          status: 200
+          status: 200,
         }
       })
       const ia = new InstAccess({preferredFetch: fakeFetch})
@@ -91,7 +91,7 @@ describe('InstAccess', () => {
             status: 200,
             json: () => {
               return {token: 'freshCanvasProvidedToken'}
-            }
+            },
           }
         }
         expect(uri).toEqual('http://fake-gateway/graphql')
@@ -105,7 +105,7 @@ describe('InstAccess', () => {
       })
       const ia = new InstAccess({
         token: 'ExistingToken',
-        preferredFetch: fakeFetch
+        preferredFetch: fakeFetch,
       })
       const finalResponse = await ia.gatewayAuthenticatedFetch('http://fake-gateway/graphql', {})
       expect(finalResponse.status).toEqual(200)
@@ -120,7 +120,7 @@ describe('InstAccess', () => {
           json: async () => ({token: 'my-fake-token'}),
           text: async () => {
             return '{"data": { "aField": "aValue" }, "errors": []}'
-          }
+          },
         }
       }
       jest.spyOn(global, 'fetch')

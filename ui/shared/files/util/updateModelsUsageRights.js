@@ -49,8 +49,8 @@ export default function updateModelsUsageRights(apiData, models) {
             license: apiData && apiData.license,
             use_justification: apiData && apiData.use_justification,
             own_copyright: apiData && apiData.own_copyright,
-            license_name: apiData && apiData.license_name
-          }
+            license_name: apiData && apiData.license_name,
+          },
         })
 
         return affectedIds.splice(idx, 1)

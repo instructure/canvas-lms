@@ -43,7 +43,7 @@ export default function LoadingWrapper({
   // to present at least 1 skeleton in that case
   // set allowZeroSkeletons prop to false.
   allowZeroSkeletons = true,
-  persistInCache = true
+  persistInCache = true,
 }) {
   const generateKey = index => `skeleton-${id}-${index}`
   const wasLoading = useRef(false)
@@ -116,7 +116,7 @@ export default function LoadingWrapper({
 
 const requiredIfNotCustom = (props, _propName, _componentName) => {
   const propType = {
-    [_propName]: props.renderCustomSkeleton ? PropTypes.string : PropTypes.string.isRequired
+    [_propName]: props.renderCustomSkeleton ? PropTypes.string : PropTypes.string.isRequired,
   }
   return PropTypes.checkPropTypes(propType, props, 'prop', 'LoadingWrapper')
 }
@@ -136,5 +136,5 @@ LoadingWrapper.propTypes = {
   renderSkeletonsContainer: PropTypes.func,
   renderLoadedContainer: PropTypes.func,
   allowZeroSkeletons: PropTypes.bool,
-  persistInCache: PropTypes.bool
+  persistInCache: PropTypes.bool,
 }

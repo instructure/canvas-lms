@@ -33,7 +33,7 @@ const usersList = [
     sis_user_id: null,
     integration_id: null,
     login_id: 'Teacher3@mail.com',
-    email: 'Teacher3@mail.com'
+    email: 'Teacher3@mail.com',
   },
   {
     id: '456',
@@ -44,8 +44,8 @@ const usersList = [
     sis_user_id: null,
     integration_id: null,
     login_id: 'Teacher4@mail.com',
-    email: 'Teacher4@mail.com'
-  }
+    email: 'Teacher4@mail.com',
+  },
 ]
 
 describe('DirectShareSendToDialog', () => {
@@ -60,7 +60,7 @@ describe('DirectShareSendToDialog', () => {
     // There is currently a conflict between Lazy loading promises and jest timers being out of sync
     // so this is a temp way to bypass that state until it is fixed in jest
     jest.useFakeTimers()
-    const {unmount} = render(<DirectShareUserModal open />)
+    const {unmount} = render(<DirectShareUserModal open={true} />)
     await Promise.resolve().then(() => jest.runAllTimers())
     unmount()
   })
@@ -72,7 +72,9 @@ describe('DirectShareSendToDialog', () => {
 
   describe('dialog controls', () => {
     it('handles error when fetching users api fails', () => {
-      const {getByText, getByLabelText} = render(<DirectShareUserModal open courseId="123" />)
+      const {getByText, getByLabelText} = render(
+        <DirectShareUserModal open={true} courseId="123" />
+      )
       useContentShareUserSearchApi.mockImplementationOnce(({error}) =>
         error([{status: 400, body: 'error'}])
       )
@@ -92,7 +94,7 @@ describe('DirectShareSendToDialog', () => {
     })
 
     it('displays loading state when fetching user list', () => {
-      const {getByRole, getByLabelText} = render(<DirectShareUserModal open />)
+      const {getByRole, getByLabelText} = render(<DirectShareUserModal open={true} />)
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
       fireEvent.change(input, {target: {value: 'teac'}})
@@ -102,7 +104,9 @@ describe('DirectShareSendToDialog', () => {
     })
 
     it('displays user search results', () => {
-      const {getByText, getByLabelText} = render(<DirectShareUserModal open courseId="123" />)
+      const {getByText, getByLabelText} = render(
+        <DirectShareUserModal open={true} courseId="123" />
+      )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
       fireEvent.change(input, {target: {value: 'teac'}})
@@ -114,7 +118,7 @@ describe('DirectShareSendToDialog', () => {
 
     it('adds recipients to final list', () => {
       const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
-        <DirectShareUserModal open />
+        <DirectShareUserModal open={true} />
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
@@ -128,7 +132,7 @@ describe('DirectShareSendToDialog', () => {
 
     it('allows removal of recipient from final list', () => {
       const {getByText, getByTitle, getByLabelText, queryByTitle} = render(
-        <DirectShareUserModal open />
+        <DirectShareUserModal open={true} />
       )
       const input = getByLabelText(/send to:/i)
       fireEvent.focus(input)
@@ -143,13 +147,9 @@ describe('DirectShareSendToDialog', () => {
     })
 
     it('disables Send button when no recipient is selected', () => {
-      const {getByText} = render(<DirectShareUserModal open courseId="123" />)
+      const {getByText} = render(<DirectShareUserModal open={true} courseId="123" />)
 
-      expect(
-        getByText('Send')
-          .closest('button')
-          .getAttribute('disabled')
-      ).toBe('')
+      expect(getByText('Send').closest('button').getAttribute('disabled')).toBe('')
     })
   })
 })

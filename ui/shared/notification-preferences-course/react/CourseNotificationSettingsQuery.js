@@ -32,8 +32,8 @@ export default function CourseNotificationSettingsQuery(props) {
   const {loading, error, data} = useQuery(COURSE_NOTIFICATIONS_QUERY, {
     variables: {
       courseId: props.courseId,
-      userId: props.userId
-    }
+      userId: props.userId,
+    },
   })
 
   if (loading) return <LoadingIndicator />
@@ -60,5 +60,5 @@ export default function CourseNotificationSettingsQuery(props) {
 CourseNotificationSettingsQuery.propTypes = {
   courseId: string.isRequired,
   courseName: string,
-  userId: string.isRequired
+  userId: string.isRequired,
 }

@@ -30,7 +30,7 @@ export default class TakePictureView extends BaseView {
 
     this.prototype.events = {
       'click .take-snapshot-btn': 'onSnapshot',
-      'click .retry-snapshot-btn': 'onRetry'
+      'click .retry-snapshot-btn': 'onRetry',
     }
 
     this.prototype.els = {
@@ -39,7 +39,7 @@ export default class TakePictureView extends BaseView {
       '.webcam-preview': '$preview',
       '.webcam-capture-wrapper': '$captureWrapper',
       '.webcam-preview-wrapper': '$previewWrapper',
-      '.webcam-preview-staging-area': '$canvas'
+      '.webcam-preview-staging-area': '$canvas',
     }
 
     this.prototype.getUserMedia = (

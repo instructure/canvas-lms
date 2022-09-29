@@ -57,8 +57,8 @@ export const getContext = isMobileView => {
       rootIds,
       accountLevelMasteryScalesFF,
       outcomeAlignmentSummaryFF,
-      outcomeAllowAverageCalculationFF
-    }
+      outcomeAllowAverageCalculationFF,
+    },
   }
 }
 

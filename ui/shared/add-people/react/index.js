@@ -46,18 +46,18 @@ export default class AddPeopleApp {
         defaultInstitutionName: props.defaultInstitutionName || '',
         roles: props.roles || [],
         sections,
-        inviteUsersURL: props.inviteUsersURL
+        inviteUsersURL: props.inviteUsersURL,
       },
       inputParams: {
         searchType: defaultState.inputParams.searchType,
         nameList: defaultState.inputParams.nameList,
         role: props.roles.length ? props.roles[0].id : '',
         section: sections.length ? sections[0].id : '',
-        canReadSIS: props.canReadSIS
+        canReadSIS: props.canReadSIS,
       },
       apiState: defaultState.apiState,
       userValidationResult: defaultState.userValidationResult,
-      usersToBeEnrolled: defaultState.usersToBeEnrolled
+      usersToBeEnrolled: defaultState.usersToBeEnrolled,
     })
 
     // when ConnectedApp is rendered, these state members are passed as props
@@ -69,10 +69,7 @@ export default class AddPeopleApp {
     const mapDispatchToProps = dispatch => bindActionCreators(actions, dispatch)
 
     // connect our top-level component to redux
-    this.ConnectedApp = connect(
-      mapStateToProps,
-      mapDispatchToProps
-    )(AddPeople)
+    this.ConnectedApp = connect(mapStateToProps, mapDispatchToProps)(AddPeople)
   }
 
   open() {

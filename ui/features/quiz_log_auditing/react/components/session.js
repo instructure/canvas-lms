@@ -30,11 +30,11 @@ const I18n = useI18nScope('quiz_log_auditing')
 class Session extends React.Component {
   static defaultProps = {
     submission: {},
-    availableAttempts: []
+    availableAttempts: [],
   }
 
   state = {
-    accessibilityWarningFocused: false
+    accessibilityWarningFocused: false,
   }
 
   render() {
@@ -123,7 +123,7 @@ class Session extends React.Component {
           key={attempt}
           to={{
             pathname: '/',
-            search: `?attempt=${attempt}`
+            search: `?attempt=${attempt}`,
           }}
           className={className}
         >
@@ -135,7 +135,7 @@ class Session extends React.Component {
 
   toggleViewable() {
     this.setState(state => ({
-      accessibilityWarningFocused: !state.accessibilityWarningFocused
+      accessibilityWarningFocused: !state.accessibilityWarningFocused,
     }))
   }
 }

@@ -21,7 +21,7 @@ export default class MovingGameObject {
     this.img = gameImage
     this.position = {
       x,
-      y
+      y,
     }
     this.speed = speed
     this.points = points
@@ -40,7 +40,7 @@ export default class MovingGameObject {
       x: this.position.x,
       y: this.position.y,
       width: this.img.width,
-      height: this.img.height
+      height: this.img.height,
     }
   }
 

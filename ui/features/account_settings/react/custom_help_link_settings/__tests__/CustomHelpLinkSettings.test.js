@@ -33,7 +33,7 @@ function makeProps(overrides = {}) {
       type: 'default',
       is_featured: false,
       is_new: false,
-      feature_headline: ''
+      feature_headline: '',
     },
     {
       available_to: ['user', 'student', 'teacher', 'admin'],
@@ -43,7 +43,7 @@ function makeProps(overrides = {}) {
       type: 'default',
       is_featured: false,
       is_new: false,
-      feature_headline: ''
+      feature_headline: '',
     },
     {
       available_to: ['user', 'student', 'teacher', 'admin'],
@@ -53,8 +53,8 @@ function makeProps(overrides = {}) {
       type: 'default',
       is_featured: false,
       is_new: false,
-      feature_headline: ''
-    }
+      feature_headline: '',
+    },
   ]
 
   return {
@@ -62,7 +62,7 @@ function makeProps(overrides = {}) {
     icon: 'help',
     links: defaultLinks,
     defaultLinks,
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -148,7 +148,7 @@ describe('<CustomHelpLinkSettings/>', () => {
       const link = {
         text: 'test link',
         available_to: ['user', 'student', 'teacher', 'admin'],
-        url: ''
+        url: '',
       }
 
       const valid = [
@@ -156,7 +156,7 @@ describe('<CustomHelpLinkSettings/>', () => {
         'https://testurl.com',
         'ftp://test.url/.test',
         'tel:1-999-999-9999',
-        'mailto:test@test.com'
+        'mailto:test@test.com',
       ]
 
       const invalid = ['', null, 'nothing', 'myprotocol:foo']

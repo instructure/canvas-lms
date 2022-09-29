@@ -52,7 +52,7 @@ const DiscussionTopicManager = props => {
     pageNumber,
     setPageNumber,
     searchPageNumber,
-    setSearchPageNumber
+    setSearchPageNumber,
   }
 
   const goToTopic = () => {
@@ -122,21 +122,21 @@ const DiscussionTopicManager = props => {
     rootEntries: !searchTerm && filter === 'all',
     filter,
     sort,
-    courseID: window.ENV?.course_id
+    courseID: window.ENV?.course_id,
   }
 
   // in some cases, we want to refresh the results rather that use the current cache:
   // in the case: 'isUserMissingInitialPost' the cache is empty so we need to get the entries.
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network'
+    fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network',
   })
 
   const updateDraftCache = (cache, result) => {
     try {
       const options = {
         query: DISCUSSION_QUERY,
-        variables: {...variables}
+        variables: {...variables},
       }
       const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -161,7 +161,7 @@ const DiscussionTopicManager = props => {
     try {
       const options = {
         query: DISCUSSION_QUERY,
-        variables: {...variables}
+        variables: {...variables},
       }
       const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -182,7 +182,7 @@ const DiscussionTopicManager = props => {
     try {
       const options = {
         query: DISCUSSION_QUERY,
-        variables: {...variables}
+        variables: {...variables},
       }
       const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -222,7 +222,7 @@ const DiscussionTopicManager = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
-    }
+    },
   })
 
   if (discussionTopicQuery.loading && !searchTerm && filter === 'all') {
@@ -251,14 +251,14 @@ const DiscussionTopicManager = props => {
               discussionTopicId: ENV.discussion_topic_id,
               message,
               courseID: ENV.course_id,
-              isAnonymousAuthor
+              isAnonymousAuthor,
             },
             optimisticResponse: getOptimisticResponse({
               message,
               isAnonymous:
                 !!discussionTopicQuery.data.legacyNode.anonymousState &&
-                discussionTopicQuery.data.legacyNode.canReplyAnonymously
-            })
+                discussionTopicQuery.data.legacyNode.canReplyAnonymously,
+            }),
           })
         }}
         isHighlighted={isTopicHighlighted}
@@ -311,7 +311,7 @@ const DiscussionTopicManager = props => {
 }
 
 DiscussionTopicManager.propTypes = {
-  discussionTopicId: PropTypes.string.isRequired
+  discussionTopicId: PropTypes.string.isRequired,
 }
 
 export default DiscussionTopicManager

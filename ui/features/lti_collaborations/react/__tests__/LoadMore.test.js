@@ -24,7 +24,7 @@ describe('LoadMore', () => {
   const defaultProps = {
     hasMore: false,
     loadMore() {},
-    isLoading: false
+    isLoading: false,
   }
 
   it('renders the load more component', () => {
@@ -33,7 +33,7 @@ describe('LoadMore', () => {
 
   it('function is called on load more link click', () => {
     const mockLoadMore = jest.fn()
-    const wrapper = shallow(<LoadMore {...defaultProps} hasMore loadMore={mockLoadMore} />)
+    const wrapper = shallow(<LoadMore {...defaultProps} hasMore={true} loadMore={mockLoadMore} />)
     wrapper.find('.Button--link').simulate('click')
     expect(mockLoadMore).toHaveBeenCalled()
   })

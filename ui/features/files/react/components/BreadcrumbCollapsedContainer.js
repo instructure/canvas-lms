@@ -26,24 +26,24 @@ class BreadcrumbCollapsedContainer extends React.Component {
   static displayName = 'BreadcrumbCollapsedContainer'
 
   static propTypes = {
-    foldersToContain: PropTypes.arrayOf(customPropTypes.folder).isRequired
+    foldersToContain: PropTypes.arrayOf(customPropTypes.folder).isRequired,
   }
 
   state = {
-    open: false
+    open: false,
   }
 
   open = () => {
     window.clearTimeout(this.timeout)
     this.setState({
-      open: true
+      open: true,
     })
   }
 
   close = () => {
     this.timeout = window.setTimeout(() => {
       this.setState({
-        open: false
+        open: false,
       })
     }, 100)
   }
@@ -54,7 +54,7 @@ class BreadcrumbCollapsedContainer extends React.Component {
       closed: !this.state.open,
       popover: true,
       bottom: true,
-      'ef-breadcrumb-popover': true
+      'ef-breadcrumb-popover': true,
     })
 
     return (

@@ -37,13 +37,13 @@ describe('MicrosoftSyncButton', () => {
       root_account_id: 1,
       created_at: '2021-03-30T20:52:22Z',
       updated_at: '2021-03-30T20:52:38Z',
-      ms_group_id: '1444b70c-270b-444a-9120-9c7efbabf7a6'
+      ms_group_id: '1444b70c-270b-444a-9120-9c7efbabf7a6',
     },
     onError: () => {},
     onSuccess: () => {},
     onInfo: () => {},
     courseId: 14,
-    ...overrides
+    ...overrides,
   })
   const subject = overrides => render(<MicrosoftSyncButton {...props(overrides)} />)
 
@@ -61,7 +61,7 @@ describe('MicrosoftSyncButton', () => {
 
     expect(doFetchApi).toHaveBeenLastCalledWith({
       method: 'POST',
-      path: `/api/v1/courses/${props().courseId}/microsoft_sync/schedule_sync`
+      path: `/api/v1/courses/${props().courseId}/microsoft_sync/schedule_sync`,
     })
   })
 
@@ -144,7 +144,7 @@ describe('MicrosoftSyncButton', () => {
     beforeEach(() => {
       doFetchApi.mockImplementationOnce(() => Promise.resolve({json: props().group}))
       window.ENV = {
-        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false,
       }
     })
 
@@ -176,16 +176,16 @@ describe('MicrosoftSyncButton', () => {
       group: {
         ...props().group,
         last_manually_synced_at: new Date(),
-        workflow_state: 'completed'
+        workflow_state: 'completed',
       },
-      onInfo
+      onInfo,
     }
     const oldENV = window.ENV
 
     beforeEach(() => {
       window.ENV = {
         MANUAL_MSFT_SYNC_COOLDOWN: 5400, // 90 minutes
-        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false
+        MSFT_SYNC_CAN_BYPASS_COOLDOWN: false,
       }
     })
     afterEach(() => (window.ENV = oldENV))
@@ -213,7 +213,7 @@ describe('MicrosoftSyncButton', () => {
       beforeEach(() => {
         window.ENV = {
           MSFT_SYNC_CAN_BYPASS_COOLDOWN: true,
-          MANUAL_MSFT_SYNC_COOLDOWN: 5400 // 90 minutes
+          MANUAL_MSFT_SYNC_COOLDOWN: 5400, // 90 minutes
         }
       })
 
@@ -234,8 +234,8 @@ describe('MicrosoftSyncButton', () => {
           ...overrides,
           group: {
             ...props().group,
-            workflow_state: 'errored'
-          }
+            workflow_state: 'errored',
+          },
         })
 
         await waitFor(() =>

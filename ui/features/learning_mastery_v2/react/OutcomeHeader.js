@@ -52,7 +52,7 @@ const OutcomeHeader = ({title}) => (
           }
         >
           <Menu.Group label={I18n.t('Sort By')}>
-            <Menu.Item defaultSelected>{I18n.t('Default')}</Menu.Item>
+            <Menu.Item defaultSelected={true}>{I18n.t('Default')}</Menu.Item>
             <Menu.Item>{I18n.t('Ascending')}</Menu.Item>
             <Menu.Item>{I18n.t('Descending')}</Menu.Item>
           </Menu.Group>
@@ -65,7 +65,7 @@ const OutcomeHeader = ({title}) => (
 )
 
 OutcomeHeader.propTypes = {
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 }
 
 export default OutcomeHeader

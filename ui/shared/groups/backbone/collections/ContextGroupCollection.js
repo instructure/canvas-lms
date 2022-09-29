@@ -31,7 +31,7 @@ export default class ContextGroupCollection extends PaginatedCollection {
     const url_base = `/api/v1/courses/${this.options.course_id}/groups?`
     const params = {
       include: ['users', 'group_category', 'permissions'],
-      include_inactive_users: 'true'
+      include_inactive_users: 'true',
     }
     return url_base + $.param(params)
   }

@@ -38,7 +38,7 @@ const MediaCaptureStrings = {
   SAVE: I18n.t('Save'),
   SR_FILE_INPUT: I18n.t('File name'),
   START: I18n.t('Start Recording'),
-  START_OVER: I18n.t('Start Over')
+  START_OVER: I18n.t('Start Over'),
 }
 
 const UploadMediaStrings = {
@@ -71,14 +71,14 @@ const UploadMediaStrings = {
   REMOVE_FILE: I18n.t('Remove file'),
   NO_FILE_CHOSEN: I18n.t('No file selected'),
   SUPPORTED_FILE_TYPES: I18n.t('Supported file types: .vtt, .srt'),
-  ADD_NEW_CAPTION_OR_SUBTITLE: I18n.t('Add new caption or subtitle')
+  ADD_NEW_CAPTION_OR_SUBTITLE: I18n.t('Add new caption or subtitle'),
 }
 
 const SelectStrings = {
   USE_ARROWS: I18n.t('Use Arrows'),
   LIST_COLLAPSED: I18n.t('List Collapsed'),
   LIST_EXPANDED: I18n.t('List Expanded'),
-  OPTION_SELECTED: I18n.t('{option} Selected')
+  OPTION_SELECTED: I18n.t('{option} Selected'),
 }
 
 export {MediaCaptureStrings, UploadMediaStrings, SelectStrings}

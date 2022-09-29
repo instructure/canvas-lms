@@ -23,14 +23,10 @@ import QuizReports from '../../../../__tests__/fixtures/quiz_reports.json'
 
 describe('canvas_quizzes/statistics/views/summary', () => {
   it('renders', () => {
-    render(
-      <Summary quizReports={QuizReports.quiz_reports} />
-    )
+    render(<Summary quizReports={QuizReports.quiz_reports} />)
   })
 
   it('renders in loading state', () => {
-    render(
-      <Summary loading />
-    )
+    render(<Summary loading={true} />)
   })
 })

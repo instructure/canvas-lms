@@ -23,19 +23,17 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/discrimination_index', () => {
   it('renders', () => {
-    render(
-      <DiscriminationIndex />
-    )
+    render(<DiscriminationIndex />)
   })
 
   it('displays help modal', () => {
-    const { getByTestId } = render(<DiscriminationIndex />)
+    const {getByTestId} = render(<DiscriminationIndex />)
 
     assertChange({
       fn: () => fireEvent.click(getByTestId('display-help')),
       of: () => document.body.textContent.includes('Learn more about quiz statistics.'),
       from: false,
-      to: true
+      to: true,
     })
   })
 })

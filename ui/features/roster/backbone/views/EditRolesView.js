@@ -35,7 +35,7 @@ export default class EditRolesView extends DialogBaseView {
     this.prototype.dialogOptions = {
       width: '300px',
       id: 'edit_roles',
-      title: I18n.t('Edit Course Role')
+      title: I18n.t('Edit Course Role'),
     }
   }
 
@@ -93,8 +93,8 @@ export default class EditRolesView extends DialogBaseView {
               user_id: this.model.get('id'),
               role_id: new_role_id,
               limit_privileges_to_course_section: section_limited,
-              enrollment_state: en.enrollment_state
-            }
+              enrollment_state: en.enrollment_state,
+            },
           }
           deferreds.push(
             $.ajaxJSON(

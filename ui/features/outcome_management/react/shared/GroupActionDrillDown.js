@@ -43,7 +43,7 @@ const GroupActionDrillDown = ({
   outcomesCount,
   showActionLinkForRoot,
   selectedGroupId: incomingGroupId,
-  showOptions
+  showOptions,
 }) => {
   const {rootIds} = useCanvasContext()
   const [selectedGroupId, setSelectedGroupId] = useState(incomingGroupId || rootId)
@@ -91,10 +91,10 @@ const GroupActionDrillDown = ({
       }
       showFlashAlert({
         message: I18n.t(`Group "%{groupName}" entered.`, {
-          groupName: collections[parentGroupId].name
+          groupName: collections[parentGroupId].name,
         }),
         type: 'info',
-        srOnly: true
+        srOnly: true,
       })
     } else if (id !== LOADING_OPTION) {
       setSelectedGroupId(id)
@@ -125,7 +125,7 @@ const GroupActionDrillDown = ({
   )
 
   const selectedGroup = isLoadingGroupDetail ? (
-    <Select.Option id={VIEW_OPTION} isDisabled isHighlighted={false}>
+    <Select.Option id={VIEW_OPTION} isDisabled={true} isHighlighted={false}>
       {collections[selectedGroupId].name}
     </Select.Option>
   ) : (
@@ -139,16 +139,16 @@ const GroupActionDrillDown = ({
           <div
             style={{
               ...margin,
-              color: isActionLinkHighlighted ? '' : '#0374B5'
+              color: isActionLinkHighlighted ? '' : '#0374B5',
             }}
           >
             {I18n.t(
               {
                 one: 'View 1 Outcome',
-                other: 'View %{count} Outcomes'
+                other: 'View %{count} Outcomes',
               },
               {
-                count: outcomesCount
+                count: outcomesCount,
               }
             )}
           </div>
@@ -167,7 +167,7 @@ const GroupActionDrillDown = ({
           renderBeforeLabel={IconArrowOpenStartLine}
         >
           {I18n.t('Back')}
-        </Select.Option>
+        </Select.Option>,
       ]
     }
     if (hasSelectedGroup || showActionLinkForRoot) {
@@ -211,14 +211,14 @@ GroupActionDrillDown.propTypes = {
   outcomesCount: PropTypes.number,
   showActionLinkForRoot: PropTypes.bool,
   selectedGroupId: PropTypes.string,
-  showOptions: PropTypes.bool
+  showOptions: PropTypes.bool,
 }
 
 GroupActionDrillDown.defaultProps = {
   outcomesCount: 0,
   showActionLinkForRoot: false,
   selectedGroupId: '',
-  showOptions: false
+  showOptions: false,
 }
 
 export default GroupActionDrillDown

@@ -67,7 +67,7 @@ export const DiscussionTopicToolbarContainer = props => {
         childTopics={getGroupsMenuTopics()}
         selectedView={filter}
         sortDirection={sort}
-        isCollapsedReplies
+        isCollapsedReplies={true}
         onSearchChange={value => setCurrentSearchValue(value)}
         onViewFilter={onViewFilter}
         onSortClick={onSortClick}
@@ -82,7 +82,7 @@ export const DiscussionTopicToolbarContainer = props => {
 }
 
 DiscussionTopicToolbarContainer.propTypes = {
-  discussionTopic: Discussion.shape
+  discussionTopic: Discussion.shape,
 }
 
 export default DiscussionTopicToolbarContainer

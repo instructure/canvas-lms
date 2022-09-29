@@ -43,7 +43,7 @@ export default {
       .post(`/courses/${courseId}/user_lists.json`, {
         user_list: users,
         v2: true,
-        search_type: searchType
+        search_type: searchType,
       })
       .then(response => {
         // fill out the api response
@@ -88,7 +88,7 @@ export default {
       })
     }
     return Promise.reject({
-      message: I18n.t('You do not have permission to invite users that do not already exist.')
+      message: I18n.t('You do not have permission to invite users that do not already exist.'),
     })
   },
 
@@ -103,7 +103,7 @@ export default {
       user_tokens,
       role_id: role,
       course_section_id: section,
-      limit_privileges_to_course_section: limitPrivilege
+      limit_privileges_to_course_section: limitPrivilege,
     })
-  }
+  },
 }

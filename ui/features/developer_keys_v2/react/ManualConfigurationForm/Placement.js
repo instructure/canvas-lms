@@ -49,7 +49,7 @@ export default class Placement extends React.Component {
     'migration_selection',
     'homework_submission',
     'conference_selection',
-    'submission_type_selection'
+    'submission_type_selection',
   ]
 
   canBeEither = [
@@ -58,7 +58,7 @@ export default class Placement extends React.Component {
     'collaboration',
     'course_assignments_menu',
     'module_index_menu_modal',
-    'module_menu_modal'
+    'module_menu_modal',
   ]
 
   isAlwaysDeeplinking(placementName) {
@@ -143,7 +143,7 @@ export default class Placement extends React.Component {
 
     return (
       <View as="div" margin="medium 0">
-        <ToggleDetails summary={displayName} fluidWidth>
+        <ToggleDetails summary={displayName} fluidWidth={true}>
           <View as="div" margin="small">
             <FormFieldGroup
               description={<ScreenReaderContent>{I18n.t('Placement Values')}</ScreenReaderContent>}
@@ -169,7 +169,7 @@ export default class Placement extends React.Component {
                   name={`${placementName}_message_type`}
                   value={placement.message_type}
                   description={I18n.t('Select Message Type')}
-                  required
+                  required={true}
                   onChange={this.handleMessageTypeChange}
                   disabled={!this.messageTypeSelectable(placementName)}
                 >
@@ -222,9 +222,9 @@ export default class Placement extends React.Component {
 Placement.propTypes = {
   displayName: PropTypes.string.isRequired,
   placement: PropTypes.object,
-  placementName: PropTypes.string.isRequired
+  placementName: PropTypes.string.isRequired,
 }
 
 Placement.defaultProps = {
-  placement: {}
+  placement: {},
 }

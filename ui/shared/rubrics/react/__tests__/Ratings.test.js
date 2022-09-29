@@ -31,14 +31,14 @@ describe('The Ratings component', () => {
     tiers: [
       {id: '1', description: 'Superb', points: 10},
       {id: '2', description: 'Meh', long_description: 'More Verbosity', points: 5},
-      {id: '3', description: 'Subpar', points: 1}
+      {id: '3', description: 'Subpar', points: 1},
     ],
     defaultMasteryThreshold: 10,
     assessmentRatingId: '2',
     points: 5,
     pointsPossible: 10,
     isSummary: false,
-    useRange: false
+    useRange: false,
   }
 
   const component = mods => shallow(<Ratings {...{...props, ...mods}} />)
@@ -58,7 +58,7 @@ describe('The Ratings component', () => {
       {description: 'Superb', points: 10},
       {description: 'Meh', points: 5},
       {description: 'Meh 2, The Sequel', points: 5},
-      {description: 'Subpar', points: 1}
+      {description: 'Subpar', points: 1},
     ]
     const assessmentRatingId = null
     const selected = component({tiers, assessmentRatingId})
@@ -89,10 +89,7 @@ describe('The Ratings component', () => {
     const flashMock = jest.spyOn($, 'screenReaderFlashMessage')
     const el = component({onPointChange})
 
-    el.find('Rating')
-      .first()
-      .prop('onClick')
-      .call()
+    el.find('Rating').first().prop('onClick').call()
     expect(onPointChange.args[0]).toEqual([{id: '1', description: 'Superb', points: 10}, false])
     expect(flashMock).toHaveBeenCalledTimes(1)
     flashMock.mockRestore()
@@ -119,7 +116,7 @@ describe('The Ratings component', () => {
     const customRatings = [
       {points: 10, color: '09BCD3'},
       {points: 5, color: '65499D'},
-      {points: 1, color: 'F8971C'}
+      {points: 1, color: 'F8971C'},
     ]
     const ratings = (points, assessmentRatingId, useRange = false) =>
       component({points, assessmentRatingId, useRange, customRatings})
@@ -136,7 +133,7 @@ describe('The Ratings component', () => {
       {points: 100, color: '100100'},
       {points: 60, color: '606060'},
       {points: 10, color: '101010'},
-      {points: 1, color: '111111'}
+      {points: 1, color: '111111'},
     ]
     const ratings = (points, assessmentRatingId, pointsPossible = 10) =>
       component({points, assessmentRatingId, pointsPossible, customRatings, useRange: true})
@@ -160,7 +157,7 @@ describe('The Ratings component', () => {
   })
 
   const ratingComponent = overrides => (
-    <Rating {...props.tiers[0]} isSummary={false} assessing {...overrides} />
+    <Rating {...props.tiers[0]} isSummary={false} assessing={true} {...overrides} />
   )
 
   it('is navigable and clickable when assessing', () => {
@@ -197,7 +194,7 @@ describe('The Ratings component', () => {
       points: 6,
       assessmentRatingId: null,
       isSummary: true,
-      footer: <div>ow my foot</div>
+      footer: <div>ow my foot</div>,
     })
     const ratings = el.find('Rating')
 

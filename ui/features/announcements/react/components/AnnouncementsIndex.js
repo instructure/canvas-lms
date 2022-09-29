@@ -57,11 +57,11 @@ export default class AnnouncementsIndex extends Component {
     masterCourseData: masterCourseDataShape,
     deleteAnnouncements: func.isRequired,
     toggleAnnouncementsLock: func.isRequired,
-    announcementsLocked: bool.isRequired
+    announcementsLocked: bool.isRequired,
   }
 
   static defaultProps = {
-    masterCourseData: null
+    masterCourseData: null,
   }
 
   componentDidMount() {
@@ -81,7 +81,7 @@ export default class AnnouncementsIndex extends Component {
           onConfirm: () => {
             this.props.deleteAnnouncements(id)
             if (this.searchInput) this.searchInput.focus()
-          }
+          },
         })
         break
       case 'lock':
@@ -199,7 +199,7 @@ export default class AnnouncementsIndex extends Component {
 const connectState = state => ({
   isCourseContext: state.contextType === 'course',
   ...selectPaginationState(state, 'announcements'),
-  ...select(state, ['permissions', 'masterCourseData', 'announcementsLocked'])
+  ...select(state, ['permissions', 'masterCourseData', 'announcementsLocked']),
 })
 const connectActions = dispatch =>
   bindActionCreators(
@@ -207,7 +207,7 @@ const connectActions = dispatch =>
       'getAnnouncements',
       'announcementSelectionChangeStart',
       'deleteAnnouncements',
-      'toggleAnnouncementsLock'
+      'toggleAnnouncementsLock',
     ]),
     dispatch
   )

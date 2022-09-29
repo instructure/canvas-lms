@@ -24,13 +24,13 @@ export default {
   component: ShowMoreRepliesButton,
   argTypes: {
     onClick: {action: 'On Click'},
-    buttonText: 'Show older replies'
-  }
+    buttonText: 'Show older replies',
+  },
 }
 
 const Template = args => <ShowMoreRepliesButton {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  onClick: null
+  onClick: null,
 }

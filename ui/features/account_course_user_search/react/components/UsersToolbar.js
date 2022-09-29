@@ -140,9 +140,9 @@ UsersToolbar.propTypes = {
   roles: arrayOf(
     shape({
       id: string.isRequired,
-      label: string.isRequired
+      label: string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
 }
 
 UsersToolbar.defaultProps = {
@@ -150,5 +150,5 @@ UsersToolbar.defaultProps = {
   role_filter_id: '',
   errors: {},
   accountId: '',
-  roles: []
+  roles: [],
 }

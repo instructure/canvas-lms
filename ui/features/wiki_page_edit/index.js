@@ -31,7 +31,7 @@ ready(() => {
   const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
     revision: ENV.WIKI_PAGE_REVISION,
     contextAssetString: ENV.context_asset_string,
-    parse: true
+    parse: true,
   })
 
   const lockedItems = lockManager.isChildContent() ? lockManager.getItemLocks() : {}
@@ -41,7 +41,7 @@ ready(() => {
     wiki_pages_path: ENV.WIKI_PAGES_PATH,
     WIKI_RIGHTS: ENV.WIKI_RIGHTS,
     PAGE_RIGHTS: ENV.PAGE_RIGHTS,
-    lockedItems
+    lockedItems,
   })
 
   $('#content').append(wikiPageEditView.$el)

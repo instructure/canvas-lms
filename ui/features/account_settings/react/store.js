@@ -29,8 +29,8 @@ export const defaultState = {
     account: [],
     effective: [],
     inherited: [],
-    tools: {}
-  }
+    tools: {},
+  },
 }
 
 export function configStore(initialState, api, options = {}) {
@@ -39,7 +39,7 @@ export function configStore(initialState, api, options = {}) {
     process.env.NODE_ENV !== 'production' &&
       process.env.NODE_ENV !== 'test' &&
       !options.disableLogger &&
-      require('redux-logger').logger
+      require('redux-logger').logger,
   ].filter(Boolean)
 
   return createStore(rootReducer, initialState, applyMiddleware(...middleware))

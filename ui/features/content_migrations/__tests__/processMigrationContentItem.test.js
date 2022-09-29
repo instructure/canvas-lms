@@ -23,7 +23,7 @@ const oldEnv = window.ENV
 
 beforeAll(() => {
   window.ENV = {
-    DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com'
+    DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com',
   }
 })
 
@@ -41,7 +41,7 @@ function event(overrides) {
     origin: 'http://www.test.com',
     subject: 'LtiDeepLinkingResponse',
     type: 'file',
-    ...overrides
+    ...overrides,
   }
   return {
     origin: opts.origin,
@@ -54,11 +54,11 @@ function event(overrides) {
           expiresAt: '2019-05-24T19:30:19Z',
           url: 'https://lti-tool-provider-example.herokuapp.com/test_file.txt',
           title: 'Lti 1.3 Tool Title',
-          text: 'Lti 1.3 Tool Text'
-        }
+          text: 'Lti 1.3 Tool Text',
+        },
       ],
-      ltiEndpoint: 'http://web.canvas-lms.docker/courses/11/external_tools/retrieve'
-    }
+      ltiEndpoint: 'http://web.canvas-lms.docker/courses/11/external_tools/retrieve',
+    },
   }
 }
 

@@ -41,7 +41,7 @@ function keyupHandler(e) {
   }
 }
 
-$.fn.activate_keyclick = function(selector = null) {
+$.fn.activate_keyclick = function (selector = null) {
   this.on('keydown', selector, keydownHandler)
   return this.on('keyup', selector, keyupHandler)
 }

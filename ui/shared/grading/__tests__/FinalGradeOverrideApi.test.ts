@@ -43,15 +43,15 @@ describe('Gradebook FinalGradeOverrideApi', () => {
         final_grade_overrides: {
           1101: {
             course_grade: {
-              percentage: 90.12
+              percentage: 90.12,
             },
             grading_period_grades: {
               1501: {
-                percentage: 81.23
-              }
-            }
-          }
-        }
+                percentage: 81.23,
+              },
+            },
+          },
+        },
       }
 
       server.for(url).respond({status: 200, body: responseData})

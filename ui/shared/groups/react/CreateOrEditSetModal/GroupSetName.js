@@ -34,9 +34,9 @@ export const GroupSetName = ({onChange, errormsg, elementRef}) => {
       <Flex.Item padding="none medium none none">
         <Text>{I18n.t('Group Set Name')}</Text>
       </Flex.Item>
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         <TextInput
-          isRequired
+          isRequired={true}
           id="new-group-set-name"
           renderLabel={<ScreenReaderContent>{I18n.t('Group Set Name')}</ScreenReaderContent>}
           value={name}
@@ -53,5 +53,5 @@ export const GroupSetName = ({onChange, errormsg, elementRef}) => {
 GroupSetName.propTypes = {
   onChange: func.isRequired,
   errormsg: string,
-  elementRef: func
+  elementRef: func,
 }

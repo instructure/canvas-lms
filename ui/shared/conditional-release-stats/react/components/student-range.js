@@ -25,7 +25,7 @@ const {object, func} = PropTypes
 export default class StudentRange extends React.Component {
   static propTypes = {
     range: object.isRequired,
-    onStudentSelect: func.isRequired
+    onStudentSelect: func.isRequired,
   }
 
   render() {

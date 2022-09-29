@@ -36,12 +36,12 @@ export function DiscussionAvailabilityTray({...props}) {
       props={{
         tablet: {
           layout: 'stacked',
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
           layout: 'fixed',
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={responsiveProps => (
         <Table
@@ -108,5 +108,5 @@ export function DiscussionAvailabilityTray({...props}) {
 DiscussionAvailabilityTray.propTypes = {
   availabilities: PropTypes.array,
   lockAt: PropTypes.string,
-  delayedPostAt: PropTypes.string
+  delayedPostAt: PropTypes.string,
 }

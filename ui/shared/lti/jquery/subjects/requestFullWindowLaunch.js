@@ -21,12 +21,12 @@ const parseData = data => {
   const defaults = {
     display: 'borderless',
     launchType: 'same_window',
-    launchOptions: {}
+    launchOptions: {},
   }
   if (typeof data === 'string') {
     return {
       url: data,
-      ...defaults
+      ...defaults,
     }
   } else if (typeof data === 'object' && !(data instanceof Array)) {
     if (!data.url) {
@@ -34,7 +34,7 @@ const parseData = data => {
     }
     return {
       ...defaults,
-      ...data
+      ...data,
     }
   } else {
     throw new Error('message contents must either be a string or an object')

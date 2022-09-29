@@ -56,7 +56,7 @@ import {
   IconAnalyticsLine,
   IconAdminLine,
   IconHourGlassLine,
-  IconOffLine
+  IconOffLine,
 } from '@instructure/ui-icons'
 
 import {Link} from '@instructure/ui-link'
@@ -98,7 +98,7 @@ const icons = {
   analytics: IconAnalyticsLine,
   admin_tools: IconAdminLine,
   plugins: IconLtiLine,
-  jobs: IconHourGlassLine
+  jobs: IconHourGlassLine,
 }
 
 const getIcon = tab => icons[tab.id] || (tab.type === 'external' ? IconLtiLine : IconEmptyLine)
@@ -117,7 +117,7 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
     path: `/api/v1/${encodeURIComponent(contextType || defaultContextType)}/${encodeURIComponent(
       contextId || defaultContextId
     )}/tabs`,
-    success: useCallback(r => setTabs(r), [])
+    success: useCallback(r => setTabs(r), []),
   })
 
   if (tabs === null) return spinner
@@ -149,5 +149,5 @@ export default function MobileContextMenu({spinner, contextType, contextId}) {
 MobileContextMenu.propTypes = {
   spinner: node.isRequired,
   contextType: string,
-  contextId: string
+  contextId: string,
 }

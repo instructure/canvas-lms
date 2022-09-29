@@ -27,41 +27,41 @@ export const template = generateActionTemplates(
       title: I18n.t('Grades'),
       description: I18n.t(
         'Allows user to review an audit trail in assignments, both moderated and anonymous.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Grades'),
       description: I18n.t(
         'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To post or hide grades for an assignment, Grades - edit must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Grades'),
       description: I18n.t(
         'Allows user to review an audit trail in assignments, both moderated and anonymous.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Grades'),
       description: I18n.t(
         'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To post or hide grades for an assignment, Grades - edit must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

@@ -45,7 +45,7 @@ export const AssignmentOverride = {
     lockAt: string,
     unlockAt: string,
     title: string,
-    set: AdhocStudents.shape
+    set: AdhocStudents.shape,
   }),
 
   mock: ({
@@ -55,7 +55,7 @@ export const AssignmentOverride = {
     lockAt = '2021-04-03T23:59:59-06:00',
     unlockAt = '2021-03-24T00:00:00-06:00',
     title = 'assignment override title',
-    adhocStudents = AdhocStudents.mock()
+    adhocStudents = AdhocStudents.mock(),
   } = {}) => ({
     id,
     _id,
@@ -64,6 +64,6 @@ export const AssignmentOverride = {
     unlockAt,
     title,
     set: adhocStudents,
-    __typename: 'AssignmentOverride'
-  })
+    __typename: 'AssignmentOverride',
+  }),
 }

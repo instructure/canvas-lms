@@ -23,13 +23,13 @@ export default {
   title: 'Examples/Discussion Posts/Components/IsolatedView/BackButton',
   component: BackButton,
   argTypes: {
-    onClick: {action: 'On Click'}
-  }
+    onClick: {action: 'On Click'},
+  },
 }
 
 const Template = args => <BackButton {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  onClick: null
+  onClick: null,
 }

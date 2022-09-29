@@ -35,15 +35,15 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
     ;(async () => {
       const input = {
         id: outcomeGroup._id,
-        title: group.title
+        title: group.title,
       }
       if (group.description) input.description = group.description
 
       try {
         const result = await editOutcomeGroup({
           variables: {
-            input
-          }
+            input,
+          },
         })
 
         const updatedOutcomeGroup = result.data?.updateLearningOutcomeGroup?.learningOutcomeGroup
@@ -52,12 +52,12 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
 
         showFlashAlert({
           type: 'success',
-          message: I18n.t('"%{groupTitle}" was successfully updated.', {groupTitle: group.title})
+          message: I18n.t('"%{groupTitle}" was successfully updated.', {groupTitle: group.title}),
         })
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while editing this group. Please try again.'),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -78,7 +78,7 @@ const GroupEditModal = ({outcomeGroup, isOpen, onCloseHandler}) => {
 GroupEditModal.propTypes = {
   outcomeGroup: outcomeGroupShape.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
 }
 
 export default GroupEditModal

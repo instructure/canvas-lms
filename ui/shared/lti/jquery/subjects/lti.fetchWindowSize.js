@@ -24,7 +24,7 @@ export default function fetchWindowSize({responseMessages}) {
     width: window.innerWidth,
     offset: $('.tool_content_wrapper').offset(),
     footer: $('#fixed_bottom').height() || 0,
-    scrollY: window.scrollY
+    scrollY: window.scrollY,
   })
   return true
 }

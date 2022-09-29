@@ -102,5 +102,5 @@ export default {
   start() {
     page.start({click: false})
   },
-  getFolderSplat // Export getSplat for testing
+  getFolderSplat, // Export getSplat for testing
 }

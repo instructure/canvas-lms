@@ -21,7 +21,7 @@ import ImmersiveReader from '@canvas/immersive-reader/ImmersiveReader'
 
 jest.mock('@canvas/immersive-reader/ImmersiveReader', () => {
   return {
-    initializeReaderButton: jest.fn()
+    initializeReaderButton: jest.fn(),
   }
 })
 

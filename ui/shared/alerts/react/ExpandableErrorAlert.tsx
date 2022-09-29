@@ -75,7 +75,7 @@ export const ExpandableErrorAlert = ({
     if (transferFocus) {
       FocusRegionManager.focusRegion((focusRef || childrenRef).current, {
         onBlur: () => {},
-        onDismiss: () => {}
+        onDismiss: () => {},
       })
     }
     // We only ever want to transfer focus one time
@@ -88,7 +88,7 @@ export const ExpandableErrorAlert = ({
       `props.children` for the content that is appended there, which is a problem if the children contain content that
        is interactive and not useful to be read aloud as part of the live region announcement (ex: a Retry button). */}
       {liveRegionText && (
-        <Alert liveRegion={locateLiveRegion} open={open} screenReaderOnly>
+        <Alert liveRegion={locateLiveRegion} open={open} screenReaderOnly={true}>
           {liveRegionText}
         </Alert>
       )}

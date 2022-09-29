@@ -27,7 +27,7 @@ const defaultProps = {
   changeCount: 2,
   onUnpublishedNavigation,
   pacePublishing: false,
-  newPace: false
+  newPace: false,
 }
 
 afterEach(() => {
@@ -99,13 +99,15 @@ describe('UnpublishedChangesIndicator', () => {
   })
 
   it('displays a spinner indicating ongoing publishing when isSyncing is true', () => {
-    const {getAllByText} = render(<UnpublishedChangesIndicator {...defaultProps} isSyncing />)
+    const {getAllByText} = render(
+      <UnpublishedChangesIndicator {...defaultProps} isSyncing={true} />
+    )
     expect(getAllByText('Publishing pace...')[0]).toBeInTheDocument()
   })
 
   it('renders new pace message if pace has not yet been published', () => {
     const {getByText} = render(
-      <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace />
+      <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace={true} />
     )
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })

@@ -23,8 +23,8 @@ export default {
   title: 'Examples/Discussion Posts/Components/ThreadPagination',
   component: ThreadPagination,
   argTypes: {
-    setPage: {action: 'setPage'}
-  }
+    setPage: {action: 'setPage'},
+  },
 }
 
 const Template = args => <ThreadPagination {...args} />
@@ -32,5 +32,5 @@ const Template = args => <ThreadPagination {...args} />
 export const Default = Template.bind({})
 Default.args = {
   selectedPage: 1,
-  totalPages: 10
+  totalPages: 10,
 }

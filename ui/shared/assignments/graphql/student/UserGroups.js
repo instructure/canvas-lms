@@ -33,10 +33,10 @@ export const UserGroups = {
     groups: arrayOf(
       shape({
         _id: string,
-        name: string
+        name: string,
       })
-    )
-  })
+    ),
+  }),
 }
 
 export const DefaultMocks = {
@@ -44,8 +44,8 @@ export const DefaultMocks = {
     groups: [
       {
         _id: '1',
-        name: 'cool group name'
-      }
-    ]
-  })
+        name: 'cool group name',
+      },
+    ],
+  }),
 }

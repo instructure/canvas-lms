@@ -105,7 +105,7 @@ export default class HomeworkSubmissionLtiContainer {
       model: tool,
       launchType: 'homework_submission',
       launchParams: {assignment_id: ENV.SUBMIT_ASSIGNMENT.ID},
-      displayAsModal: false
+      displayAsModal: false,
     })
 
     this.contentReturnView = returnView
@@ -150,7 +150,7 @@ export default class HomeworkSubmissionLtiContainer {
 
     const homeworkSubmissionView = new ViewClass({
       externalTool: tool,
-      model: new Backbone.Model(item)
+      model: new Backbone.Model(item),
     })
 
     homeworkSubmissionView.on('relaunchTool', function (tool, _model) {
@@ -167,5 +167,5 @@ export default class HomeworkSubmissionLtiContainer {
 }
 HomeworkSubmissionLtiContainer.homeworkSubmissionViewMap = {
   FileItem: ExternalContentFileSubmissionView,
-  LtiLinkItem: ExternalContentLtiLinkSubmissionView
+  LtiLinkItem: ExternalContentLtiLinkSubmissionView,
 }

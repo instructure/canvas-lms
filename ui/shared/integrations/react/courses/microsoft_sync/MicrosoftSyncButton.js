@@ -51,7 +51,7 @@ const syncReducer = (state, action) => {
         readyForManualSync: readyStates.includes(group.workflow_state),
         // We don't need to show the countdown for Site Admins
         showCountdown:
-          coolDownRequiredStates.includes(group.workflow_state) && !state.canBypassCooldown
+          coolDownRequiredStates.includes(group.workflow_state) && !state.canBypassCooldown,
       }
     }
     case 'SCHEDULE_FAILED':
@@ -88,7 +88,7 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
     showCountdown: coolDownRequiredStates.includes(group.workflow_state),
     canBypassCooldown: ENV.MSFT_SYNC_CAN_BYPASS_COOLDOWN,
     enabled,
-    group
+    group,
   })
 
   useEffect(() => onSuccess(state.group), [state.group, onSuccess])
@@ -106,7 +106,7 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
     if (recentlyScheduled) {
       onInfo({
         message: I18n.t('Sync scheduled successfully! You may safely leave this page.'),
-        variant: 'success'
+        variant: 'success',
       })
     }
 
@@ -132,7 +132,7 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
           'Manual syncs are available every %{coolDown} minutes. Please wait %{minutesRemaining} minutes to sync again.',
           {
             coolDown: Math.round(state.coolDownSeconds / 60),
-            minutesRemaining: Math.round(state.secondsRemaining / 60)
+            minutesRemaining: Math.round(state.secondsRemaining / 60),
           }
         )
       )
@@ -146,14 +146,14 @@ const MicrosoftSyncButton = ({enabled, error, group, onError, onSuccess, onInfo,
     state.readyForManualSync,
     state.coolDownSeconds,
     state.showCountdown,
-    onInfo
+    onInfo,
   ])
 
   const scheduleSync = () => {
     dispatch({type: 'SCHEDULE'})
     doFetchApi({
       method: 'POST',
-      path: `/api/v1/courses/${courseId}/microsoft_sync/schedule_sync`
+      path: `/api/v1/courses/${courseId}/microsoft_sync/schedule_sync`,
     })
       .then(response => {
         dispatch({type: 'SCHEDULE_SUCCESS', payload: {group: response.json}})

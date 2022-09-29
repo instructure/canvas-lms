@@ -37,16 +37,16 @@ class Layout extends Component {
     assignment: shape({
       courseId: string.isRequired,
       gradesPublished: bool.isRequired,
-      id: string.isRequired
+      id: string.isRequired,
     }).isRequired,
     canEditCustomGrades: bool.isRequired,
     canViewStudentIdentities: bool.isRequired,
     finalGrader: shape({
-      graderId: string.isRequired
+      graderId: string.isRequired,
     }),
     graders: arrayOf(
       shape({
-        graderId: string.isRequired
+        graderId: string.isRequired,
       })
     ).isRequired,
     loadStudents: func.isRequired,
@@ -55,13 +55,13 @@ class Layout extends Component {
     selectProvisionalGradeStatuses: shape({}).isRequired,
     students: arrayOf(
       shape({
-        id: string.isRequired
+        id: string.isRequired,
       })
-    ).isRequired
+    ).isRequired,
   }
 
   static defaultProps = {
-    finalGrader: null
+    finalGrader: null,
   }
 
   componentDidMount() {
@@ -113,7 +113,7 @@ function mapStateToProps(state) {
     graders,
     provisionalGrades: state.grades.provisionalGrades,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
-    students: state.students.list
+    students: state.students.list,
   }
 }
 
@@ -125,7 +125,7 @@ function mapDispatchToProps(dispatch) {
 
     selectGrade(gradeInfo) {
       dispatch(selectFinalGrade(gradeInfo))
-    }
+    },
   }
 }
 

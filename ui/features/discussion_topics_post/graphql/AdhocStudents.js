@@ -21,13 +21,13 @@ import gql from 'graphql-tag'
 
 export const Student = {
   shape: shape({
-    shortName: string
+    shortName: string,
   }),
 
   mock: ({shortName = 'Rick Sanchez'} = {}) => ({
     shortName,
-    __typename: 'User'
-  })
+    __typename: 'User',
+  }),
 }
 
 export const AdhocStudents = {
@@ -40,7 +40,7 @@ export const AdhocStudents = {
   `,
 
   shape: shape({
-    students: arrayOf(Student.shape)
+    students: arrayOf(Student.shape),
   }),
 
   mock: ({
@@ -49,10 +49,10 @@ export const AdhocStudents = {
       Student.mock({shortName: 'Morty Smith'}),
       Student.mock({shortName: 'Jerry Smith'}),
       Student.mock({shortName: 'Beth Smith'}),
-      Student.mock({shortName: 'Summer Smith'})
-    ]
+      Student.mock({shortName: 'Summer Smith'}),
+    ],
   } = {}) => ({
     students,
-    __typename: 'AdhocStudents'
-  })
+    __typename: 'AdhocStudents',
+  }),
 }

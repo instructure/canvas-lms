@@ -32,8 +32,8 @@ export default function AccountNotificationSettingsQuery(props) {
   const {loading, error, data} = useQuery(ACCOUNT_NOTIFICATIONS_QUERY, {
     variables: {
       accountId: props.accountId,
-      userId: props.userId
-    }
+      userId: props.userId,
+    },
   })
 
   if (loading) return <LoadingIndicator />
@@ -57,5 +57,5 @@ export default function AccountNotificationSettingsQuery(props) {
 
 AccountNotificationSettingsQuery.propTypes = {
   accountId: string.isRequired,
-  userId: string.isRequired
+  userId: string.isRequired,
 }

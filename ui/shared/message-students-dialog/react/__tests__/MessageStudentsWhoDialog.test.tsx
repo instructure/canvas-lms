@@ -22,7 +22,7 @@ import {within} from '@testing-library/dom'
 import MessageStudentsWhoDialog, {
   Assignment,
   Props as ComponentProps,
-  Student
+  Student,
 } from '../MessageStudentsWhoDialog'
 import {MockedProvider} from '@apollo/react-testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
@@ -37,7 +37,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Ford, Betty',
     score: undefined,
-    submittedAt: undefined
+    submittedAt: undefined,
   },
   {
     id: '101',
@@ -46,7 +46,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Jones, Adam',
     score: undefined,
-    submittedAt: undefined
+    submittedAt: undefined,
   },
   {
     id: '102',
@@ -55,7 +55,7 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Xi, Charlie',
     score: undefined,
-    submittedAt: undefined
+    submittedAt: undefined,
   },
   {
     id: '103',
@@ -64,8 +64,8 @@ const students: Student[] = [
     redoRequest: false,
     sortableName: 'Smith, Dana',
     score: undefined,
-    submittedAt: undefined
-  }
+    submittedAt: undefined,
+  },
 ]
 
 const scoredAssignment: Assignment = {
@@ -75,7 +75,7 @@ const scoredAssignment: Assignment = {
   gradingType: 'points',
   id: '100',
   name: 'A pointed assignment',
-  submissionTypes: ['online_text_entry']
+  submissionTypes: ['online_text_entry'],
 }
 
 const ungradedAssignment: Assignment = {
@@ -85,7 +85,7 @@ const ungradedAssignment: Assignment = {
   dueDate: null,
   id: '200',
   name: 'A pointless assignment',
-  submissionTypes: ['online_text_entry']
+  submissionTypes: ['online_text_entry'],
 }
 
 const passFailAssignment: Assignment = {
@@ -95,7 +95,7 @@ const passFailAssignment: Assignment = {
   gradingType: 'pass_fail',
   id: '300',
   name: 'A pass-fail assignment',
-  submissionTypes: ['online_text_entry']
+  submissionTypes: ['online_text_entry'],
 }
 
 const unsubmittableAssignment: Assignment = {
@@ -105,7 +105,7 @@ const unsubmittableAssignment: Assignment = {
   gradingType: 'no_submission',
   id: '400',
   name: 'An unsubmittable assignment',
-  submissionTypes: ['on_paper']
+  submissionTypes: ['on_paper'],
 }
 
 function makeProps(overrides: object = {}): ComponentProps {
@@ -116,7 +116,7 @@ function makeProps(overrides: object = {}): ComponentProps {
     onSend: () => {},
     messageAttachmentUploadFolderId: '1',
     userId: '345',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -143,11 +143,11 @@ async function makeMocks(overrides = [], sameStudent = false) {
         query: OBSERVER_ENROLLMENTS_QUERY,
         variables: {
           courseId: '1',
-          studentIds: ['100', '101', '102', '103']
-        }
+          studentIds: ['100', '101', '102', '103'],
+        },
       },
-      result: resultQuery
-    }
+      result: resultQuery,
+    },
   ]
 }
 
@@ -961,7 +961,7 @@ describe.skip('MessageStudentsWhoDialog', () => {
         redoRequest: false,
         sortableName: 'Charlie, Brown',
         score: undefined,
-        submittedAt: undefined
+        submittedAt: undefined,
       }
       const {findByRole} = render(
         <MockedProvider mocks={mocks} cache={createCache()}>

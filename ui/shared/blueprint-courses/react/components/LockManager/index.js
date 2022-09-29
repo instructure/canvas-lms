@@ -37,7 +37,7 @@ export default class LockManager {
       itemLocks: [],
       isMasterContent: false,
       isChildContent: false,
-      itemId: ''
+      itemId: '',
     }
   }
 
@@ -68,7 +68,7 @@ export default class LockManager {
       isMasterContent: ENV.MASTER_COURSE_DATA.is_master_course_master_content,
       isChildContent: ENV.MASTER_COURSE_DATA.is_master_course_child_content,
       courseId: ENV.COURSE_ID,
-      itemId: get(ENV, this.props.itemIdPath)
+      itemId: get(ENV, this.props.itemIdPath),
     }
   }
 
@@ -96,7 +96,7 @@ export default class LockManager {
       .then(res => {
         if (res.data.success) {
           this.setState({
-            isLocked: !isLocked
+            isLocked: !isLocked,
           })
         } else {
           this.showToggleError()

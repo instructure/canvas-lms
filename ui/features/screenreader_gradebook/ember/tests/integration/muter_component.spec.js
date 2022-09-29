@@ -29,7 +29,7 @@ const sendSuccess = (server, url, state) =>
   server.respond('POST', url, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify({assignment: {muted: state}})
+    JSON.stringify({assignment: {muted: state}}),
   ])
 
 const checkLabel = stateLabel =>
@@ -66,7 +66,7 @@ QUnit.module('screenreader_gradebook assignment_muter_component: muted', {
   teardown() {
     this.server.restore()
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('dialog cancels dialog without changes', () => {
@@ -93,7 +93,7 @@ test('dialog opens and closes without changes', () => {
   })
 })
 
-test('dialog opens and makes changes upon confirmation', function() {
+test('dialog opens and makes changes upon confirmation', function () {
   const {server} = this
   checkLabel(ariaMuted)
   checkChecked(true)
@@ -136,7 +136,7 @@ QUnit.module('screenreader_gradebook assignment_muter_component: unmuted', {
   teardown() {
     this.server.restore()
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('dialog cancels dialog without changes', () => {
@@ -163,7 +163,7 @@ test('dialog opens and closes without changes', () => {
   })
 })
 
-test('dialog opens and makes changes upon confirmation', function() {
+test('dialog opens and makes changes upon confirmation', function () {
   const {server} = this
   checkLabel(ariaUnmuted)
   checkChecked(false)

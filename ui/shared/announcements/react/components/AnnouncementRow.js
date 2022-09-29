@@ -45,7 +45,7 @@ export default function AnnouncementRow({
   onSelectedChanged,
   onManageMenuSelect,
   canHaveSections,
-  announcementsLocked
+  announcementsLocked,
 }) {
   const dateFormatter = useDateTimeFormat('time.formats.medium')
   const timestamp = makeTimestamp(announcement, I18n.t('Delayed until:'), I18n.t('Posted on:'))
@@ -85,7 +85,7 @@ export default function AnnouncementRow({
         <ScreenReaderContent>
           {I18n.t('Delete announcement %{title}', {title: announcement.title})}
         </ScreenReaderContent>
-      </Menu.Item>
+      </Menu.Item>,
     ]
     if (!announcementsLocked) {
       menuList.push(
@@ -130,7 +130,7 @@ export default function AnnouncementRow({
       ref={rowRef}
       className="ic-announcement-row"
       selectable={canManage}
-      showAvatar
+      showAvatar={true}
       id={announcement.id}
       isRead={announcement.read_state === 'read'}
       author={announcement.author}
@@ -144,8 +144,8 @@ export default function AnnouncementRow({
           lockedText: I18n.t('%{title} is locked. Click to unlock', {title: announcement.title}),
           course_id: masterCourseData.masterCourse.id,
           content_id: announcement.id,
-          content_type: 'discussion_topic'
-        })
+          content_type: 'discussion_topic',
+        }),
       }}
       metaContent={
         <div>
@@ -165,7 +165,7 @@ export default function AnnouncementRow({
       showManageMenu={canManage}
       onManageMenuSelect={onManageMenuSelect}
       manageMenuOptions={renderMenuList}
-      hasReadBadge
+      hasReadBadge={true}
     />
   )
 }
@@ -178,7 +178,7 @@ AnnouncementRow.propTypes = {
   rowRef: func,
   onSelectedChanged: func,
   onManageMenuSelect: func,
-  announcementsLocked: bool
+  announcementsLocked: bool,
 }
 
 AnnouncementRow.defaultProps = {
@@ -188,5 +188,5 @@ AnnouncementRow.defaultProps = {
   rowRef() {},
   onSelectedChanged() {},
   onManageMenuSelect() {},
-  announcementsLocked: false
+  announcementsLocked: false,
 }

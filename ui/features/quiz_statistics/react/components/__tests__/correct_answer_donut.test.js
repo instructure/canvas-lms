@@ -22,8 +22,6 @@ import CorrectAnswerDonut from '../correct_answer_donut'
 
 describe('canvas_quizzes/statistics/views/correct_answer_donut', () => {
   it('renders', () => {
-    render(
-      <CorrectAnswerDonut correctResponseRatio={0.7} />
-    )
+    render(<CorrectAnswerDonut correctResponseRatio={0.7} />)
   })
 })

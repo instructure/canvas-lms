@@ -47,7 +47,7 @@ export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
           onFocus={onFocus}
         />
       }
-      shouldGrow
+      shouldGrow={true}
     />
   )
 }
@@ -68,11 +68,11 @@ SubjectInput.propTypes = {
   /**
    * Value prop for Subject Input
    */
-  value: PropTypes.string
+  value: PropTypes.string,
 }
 
 SubjectInput.defaultProps = {
   onBlur: () => {},
   onFocus: () => {},
-  value: ''
+  value: '',
 }

@@ -21,12 +21,12 @@ import MentionDropdownOption from './MentionDropdownOption'
 
 export default {
   title: 'Examples/RCE Plugins/MentionDropdown/Option',
-  component: MentionDropdownOption
+  component: MentionDropdownOption,
 }
 
 const Template = args => <MentionDropdownOption {...args} />
 
 export const Primary = Template.bind({})
 Primary.args = {
-  name: 'Jeffrey Johnson'
+  name: 'Jeffrey Johnson',
 }

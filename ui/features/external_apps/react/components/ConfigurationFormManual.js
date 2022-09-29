@@ -33,7 +33,7 @@ const PRIVACY_OPTIONS = {
   anonymous: I18n.t('Anonymous'),
   email_only: I18n.t('E-Mail Only'),
   name_only: I18n.t('Name Only'),
-  public: I18n.t('Public')
+  public: I18n.t('Public'),
 }
 
 export default class ConfigurationFormManual extends React.Component {
@@ -47,11 +47,11 @@ export default class ConfigurationFormManual extends React.Component {
     customFields: PropTypes.object,
     description: PropTypes.string,
     allowMembershipServiceAccess: PropTypes.bool,
-    membershipServiceFeatureFlagEnabled: PropTypes.bool
+    membershipServiceFeatureFlagEnabled: PropTypes.bool,
   }
 
   state = {
-    errors: {}
+    errors: {},
   }
 
   isValid = () => {
@@ -94,7 +94,7 @@ export default class ConfigurationFormManual extends React.Component {
       privacyLevel: this.refs.privacyLevel.state.value,
       customFields: this.refs.customFields.state.value,
       description: this.refs.description.state.value,
-      verifyUniqueness: 'true'
+      verifyUniqueness: 'true',
     }
 
     if (this.props.membershipServiceFeatureFlagEnabled) {
@@ -133,7 +133,7 @@ export default class ConfigurationFormManual extends React.Component {
           id="name"
           defaultValue={this.props.name}
           renderLabel={I18n.t('Name')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
 
@@ -166,7 +166,7 @@ export default class ConfigurationFormManual extends React.Component {
           id="url"
           defaultValue={this.props.url ? this.props.url : ''}
           renderLabel={I18n.t('Launch URL')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
 

@@ -35,14 +35,14 @@ class Collaboration extends React.Component {
 
   openConfirmation = () => {
     this.setState({
-      deleteConfirmationOpen: true
+      deleteConfirmationOpen: true,
     })
   }
 
   closeConfirmation = () => {
     this.setState(
       {
-        deleteConfirmationOpen: false
+        deleteConfirmationOpen: false,
       },
       () => {
         ReactDOM.findDOMNode(this.refs.deleteButton).focus()
@@ -71,6 +71,7 @@ class Collaboration extends React.Component {
             className="Collaboration-title"
             href={`/${context}/${contextId}/collaborations/${collaboration.id}`}
             target="_blank"
+            rel="noreferrer"
           >
             {collaboration.title}
           </a>
@@ -108,7 +109,7 @@ class Collaboration extends React.Component {
 
 Collaboration.propTypes = {
   collaboration: PropTypes.object,
-  deleteCollaboration: PropTypes.func
+  deleteCollaboration: PropTypes.func,
 }
 
 export default Collaboration

@@ -33,7 +33,7 @@ describe('response_messages', () => {
       targetWindow: {postMessage: postMessageMock},
       origin: 'http://tool.test',
       subject: 'subject',
-      ...overrides
+      ...overrides,
     }
     builder = buildResponseMessages(params)
   }
@@ -126,7 +126,7 @@ describe('response_messages', () => {
     expectCodeAndMessageInError({
       subject: builder => builder.sendError(code, message),
       code,
-      message
+      message,
     })
   })
 
@@ -135,7 +135,7 @@ describe('response_messages', () => {
 
     expectCodeAndMessageInError({
       subject: builder => builder.sendGenericError(message),
-      code: 'error'
+      code: 'error',
     })
   })
 
@@ -145,21 +145,21 @@ describe('response_messages', () => {
     expectCodeAndMessageInError({
       subject: builder => builder.sendBadRequestError(message),
       code: 'bad_request',
-      message
+      message,
     })
   })
 
   describe('sendWrongOriginError', () => {
     expectCodeAndMessageInError({
       subject: builder => builder.sendWrongOriginError(),
-      code: 'wrong_origin'
+      code: 'wrong_origin',
     })
   })
 
   describe('sendUnsupportedSubjectError', () => {
     expectCodeAndMessageInError({
       subject: builder => builder.sendUnsupportedSubjectError(),
-      code: 'unsupported_subject'
+      code: 'unsupported_subject',
     })
   })
 })

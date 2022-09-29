@@ -36,11 +36,7 @@ function handleMethod(link) {
   `
 
   if (target) form.attr('target', target)
-  form
-    .hide()
-    .append(metadataInputHtml)
-    .appendTo('body')
-    .submit()
+  form.hide().append(metadataInputHtml).appendTo('body').submit()
 }
 
 // For 'data-confirm' attribute:
@@ -52,7 +48,7 @@ function allowAction(element) {
   return confirm(message)
 }
 
-$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function(event) {
+$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function (event) {
   const $link = $(this)
 
   if ($link.data('handled') || !allowAction($link)) return false
@@ -80,10 +76,7 @@ function handleRemove($link) {
 
   // special case for handling links inside of a KyleMenu that were appendedTo the body and are
   // no longer children of where they should be
-  const closestKyleMenu = $link
-    .closest(':ui-popup')
-    .popup('option', 'trigger')
-    .data('KyleMenu')
+  const closestKyleMenu = $link.closest(':ui-popup').popup('option', 'trigger').data('KyleMenu')
   if (closestKyleMenu && closestKyleMenu.opts.appendMenuTo) {
     $startLookingFrom = closestKyleMenu.$placeholder
   }
@@ -98,7 +91,7 @@ function handleRemove($link) {
     },
     remove() {
       $elToRemove.remove()
-    }
+    },
   })
 
   $elToRemove.trigger('beforeremove')

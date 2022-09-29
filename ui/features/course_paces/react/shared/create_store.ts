@@ -28,7 +28,7 @@ export default (reducers = defaultReducers) => {
     const {createLogger} = require(`redux-logger`) // tslint:disable-line
     const logger = createLogger({
       diff: true,
-      duration: true
+      duration: true,
     })
     middlewares.push(logger)
   }

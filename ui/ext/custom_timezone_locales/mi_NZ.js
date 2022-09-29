@@ -21,7 +21,7 @@ module.exports = {
   name: 'mi_NZ',
   day: {
     abbrev: ['Ta', 'Ma', 'Tū', 'We', 'Tāi', 'Pa', 'Hā'],
-    full: ['Rātapu', 'Mane', 'Tūrei', 'Wenerei', 'Tāite', 'Paraire', 'Hātarei']
+    full: ['Rātapu', 'Mane', 'Tūrei', 'Wenerei', 'Tāite', 'Paraire', 'Hātarei'],
   },
   month: {
     abbrev: ['Hān', 'Pēp', 'Māe', 'Āpe', 'Mei', 'Hun', 'Hūr', 'Āku', 'Hep', 'Oke', 'Noe', 'Tīh'],
@@ -37,13 +37,13 @@ module.exports = {
       'Mahuru',
       'Whiringa-ā-nuku',
       'Whiringa-ā-rangi',
-      'Hakihea'
-    ]
+      'Hakihea',
+    ],
   },
   meridiem: ['ahau', 'pm'],
   date: '%d/%m/%y',
   time24: '%T',
   dateTime: 'Te %A, te %d o %B, %Y %T %Z',
   time12: '',
-  full: 'Te %A, te %d o %B, %Y %T %Z'
+  full: 'Te %A, te %d o %B, %Y %T %Z',
 }

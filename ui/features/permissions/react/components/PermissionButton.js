@@ -27,7 +27,7 @@ import {
   IconPublishSolid,
   IconTroubleLine,
   IconLockSolid,
-  IconOvalHalfSolid
+  IconOvalHalfSolid,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
@@ -37,7 +37,7 @@ import actions from '../actions'
 import propTypes, {
   ENABLED_FOR_NONE,
   ENABLED_FOR_ALL,
-  ENABLED_FOR_PARTIAL
+  ENABLED_FOR_PARTIAL,
 } from '@canvas/permissions/react/propTypes'
 
 const I18n = useI18nScope('permission_button')
@@ -47,8 +47,8 @@ const I18n = useI18nScope('permission_button')
 // of the button itself
 const themeOverrides = {
   [IconButton.theme]: {
-    largeHeight: '1.75rem'
-  }
+    largeHeight: '1.75rem',
+  },
 }
 
 const MENU_ID_DEFAULT = 1
@@ -60,13 +60,13 @@ const MENU_ID_LOCKED = 5
 const ENABLED_STATE_TO_MENU_ID = {
   [ENABLED_FOR_NONE]: MENU_ID_DISABLED,
   [ENABLED_FOR_PARTIAL]: MENU_ID_PARTIAL,
-  [ENABLED_FOR_ALL]: MENU_ID_ENABLED
+  [ENABLED_FOR_ALL]: MENU_ID_ENABLED,
 }
 
 const SelectionState = {
   INFERRED: undefined,
   ENABLED: true,
-  DISABLED: false
+  DISABLED: false,
 }
 
 export default class PermissionButton extends Component {
@@ -82,15 +82,15 @@ export default class PermissionButton extends Component {
     roleLabel: string,
     roleId: string.isRequired,
     setFocus: bool.isRequired,
-    onFocus: func
+    onFocus: func,
   }
 
   static defaultProps = {
-    roleLabel: ''
+    roleLabel: '',
   }
 
   state = {
-    showMenu: false
+    showMenu: false,
   }
 
   componentDidMount() {
@@ -116,7 +116,7 @@ export default class PermissionButton extends Component {
       this.props.fixButtonFocus({
         permissionName: this.props.permissionName,
         roleId: this.props.roleId,
-        inTray: this.props.inTray
+        inTray: this.props.inTray,
       })
     )
   }
@@ -162,7 +162,7 @@ export default class PermissionButton extends Component {
         screenReaderLabel={this.renderAllyScreenReaderTag({
           permission: this.props.permission,
           permissionLabel: this.props.permissionLabel,
-          roleLabel: this.props.roleLabel
+          roleLabel: this.props.roleLabel,
         })}
       >
         {stateIcon()}
@@ -199,7 +199,7 @@ export default class PermissionButton extends Component {
     function unboundAdjustPermissions({
       enabled = undefined,
       locked = false,
-      explicit = false
+      explicit = false,
     } = {}) {
       this.props.handleClick({
         name: this.props.permissionName,
@@ -207,7 +207,7 @@ export default class PermissionButton extends Component {
         inTray: this.props.inTray,
         enabled,
         locked,
-        explicit
+        explicit,
       })
     }
 
@@ -348,7 +348,7 @@ function mapStateToProps(state, ownProps) {
 const mapDispatchToProps = {
   handleClick: actions.modifyPermissions,
   fixButtonFocus: actions.fixButtonFocus,
-  cleanFocus: actions.cleanFocus
+  cleanFocus: actions.cleanFocus,
 }
 
 export const ConnectedPermissionButton = connect(

@@ -33,7 +33,7 @@ export default createReactClass({
     rows: PropTypes.number,
     required: PropTypes.bool,
     hintText: PropTypes.string,
-    errors: PropTypes.object
+    errors: PropTypes.object,
   },
 
   render() {
@@ -56,5 +56,5 @@ export default createReactClass({
         </label>
       </div>
     )
-  }
+  },
 })

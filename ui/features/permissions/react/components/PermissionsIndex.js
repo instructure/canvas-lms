@@ -40,7 +40,7 @@ import propTypes, {
   COURSE,
   ACCOUNT,
   ALL_ROLES_VALUE,
-  ALL_ROLES_LABEL
+  ALL_ROLES_LABEL,
 } from '@canvas/permissions/react/propTypes'
 
 import {ConnectedPermissionsTable} from './PermissionsTable'
@@ -71,7 +71,7 @@ export default function PermissionsIndex(props) {
 
     searchPermissions({
       permissionSearchString: debouncedSearchString,
-      contextType
+      contextType,
     })
   }, [contextType, debouncedSearchString, props.searchPermissions])
 
@@ -105,7 +105,7 @@ export default function PermissionsIndex(props) {
     const sel = props.roles.filter(r => resultSet.has(r.id))
     props.filterRoles({
       selectedRoles: sel,
-      contextType
+      contextType,
     })
   }
 
@@ -114,7 +114,7 @@ export default function PermissionsIndex(props) {
     const newContextType = id === 'tab-panel-course' ? COURSE : ACCOUNT
     props.filterRoles({
       selectedRoles: [{value: ALL_ROLES_VALUE, label: ALL_ROLES_LABEL}],
-      contextType
+      contextType,
     })
     setPermissionSearchString('')
     setContextType(newContextType)
@@ -158,7 +158,7 @@ export default function PermissionsIndex(props) {
                   }
                   placeholder={I18n.t('Search Permissions')}
                   renderAfterInput={() => (
-                    <span disabled>
+                    <span disabled={true}>
                       <IconSearchLine focusable={false} />
                     </span>
                   )}
@@ -233,14 +233,14 @@ PermissionsIndex.propTypes = {
   roles: arrayOf(propTypes.role).isRequired,
   searchPermissions: func.isRequired,
   tabChanged: func.isRequired,
-  selectedRoles: arrayOf(propTypes.filteredRole).isRequired
+  selectedRoles: arrayOf(propTypes.filteredRole).isRequired,
 }
 
 function mapStateToProps(state, ownProps) {
   return {
     ...ownProps,
     roles: state.roles,
-    selectedRoles: state.selectedRoles
+    selectedRoles: state.selectedRoles,
   }
 }
 
@@ -248,7 +248,7 @@ const mapDispatchToProps = {
   filterRoles: actions.filterRoles,
   searchPermissions: actions.searchPermissions,
   setAndOpenAddTray: actions.setAndOpenAddTray,
-  tabChanged: actions.tabChanged
+  tabChanged: actions.tabChanged,
 }
 
 export const ConnectedPermissionsIndex = connect(

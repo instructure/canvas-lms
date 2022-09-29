@@ -31,6 +31,6 @@ export default function getPosition(editor, markerSelector) {
     right: containerBoundingClientRect.right + markerBoundingClientRect.right,
     bottom: containerBoundingClientRect.bottom + markerBoundingClientRect.bottom,
     height: markerBoundingClientRect.height,
-    width: markerBoundingClientRect.width
+    width: markerBoundingClientRect.width,
   }
 }

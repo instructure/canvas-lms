@@ -28,29 +28,29 @@ import {getI18nFormats} from '../../../../../../boot/initializers/configureDateT
 const observerEnrollment = {
   id: '1',
   type: 'ObserverEnrollment',
-  lastActivityAt: '2022-07-07T12:00:00-08:00'
+  lastActivityAt: '2022-07-07T12:00:00-08:00',
 }
 
 const studentEnrollment = {
   id: '2',
   type: 'StudentEnrollment',
-  lastActivityAt: '2022-08-08T12:00:00-08:00'
+  lastActivityAt: '2022-08-08T12:00:00-08:00',
 }
 
 const teacherEnrollment = {
   id: '3',
   type: 'TeacherEnrollment',
-  lastActivityAt: '2022-09-09T12:00:00-03:05'
+  lastActivityAt: '2022-09-09T12:00:00-03:05',
 }
 
 const noLastActivityEnrollment = {
   id: '4',
   type: 'StudentEnrollment',
-  lastActivityAt: null
+  lastActivityAt: null,
 }
 
 const DEFAULT_PROPS = {
-  enrollments: [studentEnrollment, teacherEnrollment]
+  enrollments: [studentEnrollment, teacherEnrollment],
 }
 
 describe('RosterTableLastActivity', () => {
@@ -61,15 +61,15 @@ describe('RosterTableLastActivity', () => {
   beforeAll(() => {
     ENV = {
       TIMEZONE: 'America/Detroit',
-      CONTEXT_TIMEZONE: 'America/Chicago'
+      CONTEXT_TIMEZONE: 'America/Chicago',
     }
     tzInTest.configureAndRestoreLater({
       tz: tz(detroit, 'America/Detroit', chicago, 'America/Chicago'),
       tzData: {
         'America/Chicago': chicago,
-        'America/Detroit': detroit
+        'America/Detroit': detroit,
       },
-      formats: getI18nFormats()
+      formats: getI18nFormats(),
     })
   })
 

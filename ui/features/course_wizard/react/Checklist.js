@@ -30,16 +30,16 @@ class Checklist extends React.Component {
   static propTypes = {
     selectedItem: PropTypes.string.isRequired,
     clickHandler: PropTypes.func.isRequired,
-    className: PropTypes.string.isRequired
+    className: PropTypes.string.isRequired,
   }
 
   state = {
-    selectedItem: this.props.selectedItem || ''
+    selectedItem: this.props.selectedItem || '',
   }
 
   componentWillReceiveProps(newProps) {
     this.setState({
-      selectedItem: newProps.selectedItem
+      selectedItem: newProps.selectedItem,
     })
   }
 

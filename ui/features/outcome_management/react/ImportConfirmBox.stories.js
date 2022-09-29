@@ -25,8 +25,8 @@ export default {
   args: {
     count: 51,
     onImportHandler: () => {},
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const Template = args => <ImportConfirmBox {...args} />

@@ -28,8 +28,8 @@ export default {
     placeholder: 'Outcomes Search Placeholder',
     searchString: '',
     onChangeHandler: () => {},
-    onClearHandler: () => {}
-  }
+    onClearHandler: () => {},
+  },
 }
 
 const Template = args => <OutcomeSearchBar {...args} />

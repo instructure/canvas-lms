@@ -20,7 +20,7 @@ import moment from 'moment-timezone'
 
 export const MOCK_COURSE_SYLLABUS = {
   id: '30',
-  syllabus_body: '<p>This is really important.</p>'
+  syllabus_body: '<p>This is really important.</p>',
 }
 
 export const MOCK_COURSE_APPS = [
@@ -28,11 +28,11 @@ export const MOCK_COURSE_APPS = [
     id: '7',
     course_navigation: {
       text: 'Studio',
-      icon_url: 'studio.png'
+      icon_url: 'studio.png',
     },
     context_id: '30',
-    context_name: 'Arts and Crafts'
-  }
+    context_name: 'Arts and Crafts',
+  },
 ]
 
 export const MOCK_COURSE_TABS = [
@@ -40,33 +40,33 @@ export const MOCK_COURSE_TABS = [
     id: 'home',
     html_url: '/courses/30',
     label: 'Home',
-    visibility: 'public'
+    visibility: 'public',
   },
   {
     id: 'modules',
     html_url: '/courses/30/modules',
     label: 'Modules',
-    visibility: 'public'
+    visibility: 'public',
   },
   {
     id: 'assignments',
     html_url: '/courses/30/assignments',
     label: 'Assignments',
     visibility: 'admins',
-    hidden: true
+    hidden: true,
   },
   {
     id: 'groups',
     html_url: '/courses/30/groups',
     label: 'Groups',
-    visibility: 'public'
+    visibility: 'public',
   },
   {
     id: 'settings',
     html_url: '/courses/30/settings',
     label: 'Settings',
-    visibility: 'admins'
-  }
+    visibility: 'admins',
+  },
 ]
 
 export const MOCK_GRADING_PERIODS_EMPTY = {
@@ -74,9 +74,9 @@ export const MOCK_GRADING_PERIODS_EMPTY = {
   enrollments: [
     {
       current_grading_period_id: null,
-      totals_for_all_grading_periods_option: false
-    }
-  ]
+      totals_for_all_grading_periods_option: false,
+    },
+  ],
 }
 
 export const MOCK_GRADING_PERIODS_NORMAL = {
@@ -86,22 +86,22 @@ export const MOCK_GRADING_PERIODS_NORMAL = {
       title: 'Quarter 1',
       start_date: moment().subtract(10, 'months').toISOString(),
       end_date: moment().subtract(4, 'months').toISOString(),
-      workflow_state: 'active'
+      workflow_state: 'active',
     },
     {
       id: '2',
       title: 'Quarter 2',
       start_date: moment().subtract(4, 'months').toISOString(),
       end_date: moment().add(2, 'months').toISOString(),
-      workflow_state: 'active'
-    }
+      workflow_state: 'active',
+    },
   ],
   enrollments: [
     {
       current_grading_period_id: '2',
-      totals_for_all_grading_periods_option: true
-    }
-  ]
+      totals_for_all_grading_periods_option: true,
+    },
+  ],
 }
 
 export const MOCK_ASSIGNMENT_GROUPS = [
@@ -129,13 +129,13 @@ export const MOCK_ASSIGNMENT_GROUPS = [
           grading_period_id: '2',
           submission_comments: [
             {
-              id: '1'
-            }
-          ]
-        }
-      }
-    ]
-  }
+              id: '1',
+            },
+          ],
+        },
+      },
+    ],
+  },
 ]
 
 export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
@@ -172,10 +172,10 @@ export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
             seconds_late: 0,
             submission_comments: [
               {
-                id: '1'
-              }
+                id: '1',
+              },
             ],
-            read_state: 'read'
+            read_state: 'read',
           },
           {
             id: '53',
@@ -194,27 +194,27 @@ export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
             seconds_late: 0,
             submission_comments: [
               {
-                id: '1'
-              }
+                id: '1',
+              },
             ],
-            read_state: 'read'
-          }
-        ]
-      }
-    ]
-  }
+            read_state: 'read',
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 export const MOCK_ENROLLMENTS = [
   {
-    user_id: 'fake'
+    user_id: 'fake',
   },
   {
     user_id: '1',
     grades: {
-      current_score: 89.39
-    }
-  }
+      current_score: 89.39,
+    },
+  },
 ]
 
 export const MOCK_ENROLLMENTS_WITH_OBSERVED_USERS = [
@@ -232,11 +232,11 @@ export const MOCK_ENROLLMENTS_WITH_OBSERVED_USERS = [
             current_grade: null,
             current_score: 88,
             final_grade: null,
-            final_score: 88
-          }
-        }
-      ]
-    }
+            final_score: 88,
+          },
+        },
+      ],
+    },
   },
   {
     user_id: '1',
@@ -252,12 +252,12 @@ export const MOCK_ENROLLMENTS_WITH_OBSERVED_USERS = [
             current_grade: null,
             current_score: 76.2,
             final_grade: null,
-            final_score: 76.2
-          }
-        }
-      ]
-    }
-  }
+            final_score: 76.2,
+          },
+        },
+      ],
+    },
+  },
 ]
 
 export const MOCK_GROUPS = [
@@ -275,7 +275,7 @@ export const MOCK_GROUPS = [
     permissions: {
       create_discussion_topic: false,
       join: false,
-      create_announcement: false
+      create_announcement: false,
     },
     context_type: 'Course',
     course_id: '30',
@@ -295,9 +295,9 @@ export const MOCK_GROUPS = [
       course_id: '30',
       protected: false,
       allows_multiple_memberships: false,
-      is_member: false
+      is_member: false,
     },
     has_submission: false,
-    concluded: false
-  }
+    concluded: false,
+  },
 ]

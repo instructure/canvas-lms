@@ -74,7 +74,7 @@ Cell.defaultProps = {
   shouldTruncate: false,
   event: {data: []},
   question: {},
-  maxVisibleChars: K.MAX_VISIBLE_CHARS
+  maxVisibleChars: K.MAX_VISIBLE_CHARS,
 }
 
 export default Cell

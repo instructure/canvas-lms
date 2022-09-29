@@ -41,7 +41,7 @@ describe('fetchToolConfiguration', () => {
     install13Tool(clientId, createUrl, true)
     expect(axios.post).toHaveBeenCalledWith(createUrl, {
       client_id: clientId,
-      external_tool: {verify_uniqueness: true}
+      external_tool: {verify_uniqueness: true},
     })
   })
 })

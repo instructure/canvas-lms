@@ -32,17 +32,17 @@ export default class ThemeEditorFileUpload extends Component {
     currentValue: PropTypes.string,
     userInput: customTypes.userVariableInput,
     themeState: PropTypes.object,
-    handleThemeStateChange: PropTypes.func
+    handleThemeStateChange: PropTypes.func,
   }
 
   static defaultProps = {
     userInput: {},
     themeState: {},
-    handleThemeStateChange() {}
+    handleThemeStateChange() {},
   }
 
   state = {
-    selectedFileName: ''
+    selectedFileName: '',
   }
 
   hasSomethingToReset = () =>
@@ -68,7 +68,7 @@ export default class ThemeEditorFileUpload extends Component {
     this.props.handleThemeStateChange(this.props.name, null, {
       customFileUpload: true,
       resetValue: true,
-      useDefault: !this.hasUserInput() && this.props.currentValue
+      useDefault: !this.hasUserInput() && this.props.currentValue,
     })
     this.props.onChange(!this.hasUserInput() ? '' : null)
   }

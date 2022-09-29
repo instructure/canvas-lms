@@ -30,7 +30,7 @@ import Layout from './Layout'
 import {
   hideAssignmentGrades,
   hideAssignmentGradesForSections,
-  resolveHideAssignmentGradesStatus
+  resolveHideAssignmentGradesStatus,
 } from './Api'
 import {isHideable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -42,7 +42,7 @@ function initialShowState() {
     hideBySections: false,
     hidingGrades: false,
     open: true,
-    selectedSectionIds: []
+    selectedSectionIds: [],
   }
 }
 
@@ -62,7 +62,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       onExited() {},
       open: false,
       selectedSectionIds: [],
-      submissions: []
+      submissions: [],
     }
   }
 
@@ -73,7 +73,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
   show(context) {
     this.setState({
       ...context,
-      ...initialShowState()
+      ...initialShowState(),
     })
   }
 
@@ -90,7 +90,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       if (selectedSectionIds.length === 0) {
         showFlashAlert({
           message: I18n.t('At least one section must be selected to hide grades by section.'),
-          type: 'error'
+          type: 'error',
         })
 
         return
@@ -104,7 +104,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
     } else {
       hideRequest = hideAssignmentGrades(assignment.id)
       successMessage = I18n.t('Success! Grades have been hidden for %{assignmentName}.', {
-        assignmentName: assignment.name
+        assignmentName: assignment.name,
       })
     }
 
@@ -119,13 +119,13 @@ export default class HideAssignmentGradesTray extends PureComponent {
       if (!assignment.anonymousGrading || containerName !== 'SPEED_GRADER') {
         showFlashAlert({
           message: successMessage,
-          type: 'success'
+          type: 'success',
         })
       }
     } catch (_error) {
       showFlashAlert({
         message: I18n.t('There was a problem hiding assignment grades.'),
-        type: 'error'
+        type: 'error',
       })
       this.setState({hidingGrades: false})
     }
@@ -140,7 +140,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
           selectedSection => selectedSection !== sectionId
-        )
+        ),
       })
     }
   }

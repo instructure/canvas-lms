@@ -24,12 +24,12 @@ function setupCourseModulesResponse() {
   const response = [
     {
       id: '1',
-      name: 'Module Fire'
+      name: 'Module Fire',
     },
     {
       id: '2',
-      name: 'Module Water'
-    }
+      name: 'Module Water',
+    },
   ]
   fetchMock.mock('path:/api/v1/courses/1/modules', response)
   return response
@@ -49,7 +49,7 @@ describe('useModuleCourseSearchApi', () => {
     expect(error).not.toHaveBeenCalled()
     expect(success).toHaveBeenCalledWith([
       expect.objectContaining({id: '1', name: 'Module Fire'}),
-      expect.objectContaining({id: '2', name: 'Module Water'})
+      expect.objectContaining({id: '2', name: 'Module Water'}),
     ])
   })
 

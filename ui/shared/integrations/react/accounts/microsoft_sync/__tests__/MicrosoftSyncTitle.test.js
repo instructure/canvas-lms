@@ -36,7 +36,7 @@ describe('MicrosoftSyncTitle', () => {
 
     fireEvent.click(
       container.getByRole('checkbox', {
-        name: /allows syncing of canvas course members to a microsoft team/i
+        name: /allows syncing of canvas course members to a microsoft team/i,
       })
     )
 
@@ -48,7 +48,7 @@ describe('MicrosoftSyncTitle', () => {
 
     expect(
       container.getByRole('checkbox', {
-        name: /allows syncing of canvas course members to a microsoft team/i
+        name: /allows syncing of canvas course members to a microsoft team/i,
       }).checked
     ).toBeTruthy()
   })
@@ -57,7 +57,7 @@ describe('MicrosoftSyncTitle', () => {
     const container = setup({interactionDisabled: true})
     expect(
       container.getByRole('checkbox', {
-        name: /allows syncing of canvas course members to a microsoft team/i
+        name: /allows syncing of canvas course members to a microsoft team/i,
       }).disabled
     ).toBeTruthy()
   })

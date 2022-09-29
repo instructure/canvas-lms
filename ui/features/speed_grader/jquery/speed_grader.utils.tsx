@@ -159,7 +159,7 @@ export function initKeyCodes($window, $grade, $add_a_comment_textarea, EG) {
   }
   const keycodeOptions = {
     keyCodes: 'j k p n c r g',
-    ignore: 'input, textarea, embed, object'
+    ignore: 'input, textarea, embed, object',
   }
   $window.keycodes(keycodeOptions, event => {
     event.preventDefault()

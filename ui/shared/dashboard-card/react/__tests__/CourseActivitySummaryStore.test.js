@@ -24,13 +24,13 @@ describe('CourseActivitySummaryStore', () => {
     {
       type: 'DiscussionTopic',
       unread_count: 2,
-      count: 7
+      count: 7,
     },
     {
       type: 'Conversation',
       unread_count: 0,
-      count: 3
-    }
+      count: 3,
+    },
   ]
   beforeEach(() => {
     CourseActivitySummaryStore.setState({streams: {}})
@@ -60,8 +60,8 @@ describe('CourseActivitySummaryStore', () => {
         Promise.resolve().then(() => ({
           status: 200,
           clone: () => ({
-            json: () => Promise.resolve().then(() => stream)
-          })
+            json: () => Promise.resolve().then(() => stream),
+          }),
         }))
       )
       CourseActivitySummaryStore._fetchForCourse(1)
@@ -79,7 +79,7 @@ describe('CourseActivitySummaryStore', () => {
           statusText: 'Unauthorized',
           json: () => {
             throw new Error('should never make it here')
-          }
+          },
         }))
       )
       const errorFn = jest.fn()
@@ -98,7 +98,7 @@ describe('CourseActivitySummaryStore', () => {
           statusText: 'Service Unavailable',
           json: () => {
             throw new Error('should never make it here')
-          }
+          },
         }))
       )
       const errorFn = jest.fn()

@@ -25,7 +25,7 @@ import {
   renderWeeklyPlannerHeader,
   JumpToHeaderButton,
   preloadInitialItems,
-  reloadPlannerForObserver
+  reloadPlannerForObserver,
 } from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 
@@ -39,7 +39,7 @@ const SchedulePage = ({
   userHasEnrollments,
   visible,
   singleCourse,
-  observedUserId
+  observedUserId,
 }) => {
   const [isPlannerCreated, setPlannerCreated] = useState(false)
   const [hasPreloadedItems, setHasPreloadedItems] = useState(false)
@@ -91,7 +91,7 @@ const SchedulePage = ({
         id="dashboard_page_schedule"
         style={{
           display: visible ? 'flex' : 'none',
-          flexDirection: 'column'
+          flexDirection: 'column',
         }}
         aria-hidden={!visible}
       >
@@ -108,7 +108,7 @@ SchedulePage.propTypes = {
   userHasEnrollments: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   singleCourse: PropTypes.bool.isRequired,
-  observedUserId: PropTypes.string
+  observedUserId: PropTypes.string,
 }
 
 export default SchedulePage

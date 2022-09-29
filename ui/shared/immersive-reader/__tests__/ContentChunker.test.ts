@@ -19,8 +19,8 @@
 import ContentChunker from '../ContentChunker'
 
 describe('ContentChunker', () => {
-  let options = {}
-  let chunker = new ContentChunker(options)
+  const options = {}
+  const chunker = new ContentChunker(options)
 
   describe('chunk()', () => {
     let content = `
@@ -40,16 +40,16 @@ describe('ContentChunker', () => {
       expect(subject()).toMatchObject([
         {
           content: '<div>\n        Some simple content\n        </div>',
-          mimeType: 'text/html'
+          mimeType: 'text/html',
         },
         {
           content: '<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>',
-          mimeType: 'application/mathml+xml'
+          mimeType: 'application/mathml+xml',
         },
         {
           content: 'Some post math content\n      \n    ',
-          mimeType: 'text/html'
-        }
+          mimeType: 'text/html',
+        },
       ])
     })
 
@@ -80,8 +80,8 @@ describe('ContentChunker', () => {
               '            <img src="something" alt="something">\n' +
               '          </div>\n' +
               '        ',
-            mimeType: 'text/html'
-          }
+            mimeType: 'text/html',
+          },
         ])
       })
     })
@@ -152,23 +152,23 @@ describe('ContentChunker', () => {
         expect(subject()).toMatchObject([
           {
             content: '<div>\n            Pre-math\n            </div>',
-            mimeType: 'text/html'
+            mimeType: 'text/html',
           },
           {
             content:
               '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>A</mi><mo>=</mo><mi>&#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>',
-            mimeType: 'application/mathml+xml'
+            mimeType: 'application/mathml+xml',
           },
           {
             content: '<p>\n              \n                  \n                  </p>',
-            mimeType: 'text/html'
+            mimeType: 'text/html',
           },
           {
             content:
               '<math xmlns="http://www.w3.org/1998/Math/MathML"><mi>A</mi><mo>=</mo><mi>&#x03C0;</mi><msup><mi>r</mi><mn>2</mn></msup></math>',
-            mimeType: 'application/mathml+xml'
+            mimeType: 'application/mathml+xml',
           },
-          {content: 'Post-math\n          \n        ', mimeType: 'text/html'}
+          {content: 'Post-math\n          \n        ', mimeType: 'text/html'},
         ])
       })
     })
@@ -190,18 +190,18 @@ describe('ContentChunker', () => {
         expect(subject()).toMatchObject([
           {
             content: '<div>\n            Pre-math\n            </div>',
-            mimeType: 'text/html'
+            mimeType: 'text/html',
           },
           {
             content: '<mrow><apply><minus/><ci>a</ci><ci>b</ci></apply></mrow>',
-            mimeType: 'application/mathml+xml'
+            mimeType: 'application/mathml+xml',
           },
           {content: 'Between Math\n            ', mimeType: 'text/html'},
           {
             content: '<mrow><apply><minus/><ci>b</ci><ci>c</ci></apply></mrow>',
-            mimeType: 'application/mathml+xml'
+            mimeType: 'application/mathml+xml',
           },
-          {content: 'Post-math\n          \n        ', mimeType: 'text/html'}
+          {content: 'Post-math\n          \n        ', mimeType: 'text/html'},
         ])
       })
     })

@@ -20,7 +20,7 @@ import {
   doUpdateSettings,
   getTenantErrorMessages,
   setTenantInfoMessages,
-  getSuffixErrorMessages
+  getSuffixErrorMessages,
 } from './settingsHelper'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -60,7 +60,7 @@ export const reducerActions = {
   removeAlerts: 'removeAlerts',
   updateSuccess: 'updateSuccess',
   updateError: 'updateError',
-  toggleError: 'toggleError'
+  toggleError: 'toggleError',
 }
 
 /**
@@ -110,7 +110,7 @@ export const defaultState = {
   microsoft_sync_tenant: '',
   last_saved_microsoft_sync_tenant: '',
   microsoft_sync_login_attribute: 'email',
-  successMessage: ''
+  successMessage: '',
 }
 
 /**
@@ -128,26 +128,26 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         errorMessage: '',
-        successMessage: ''
+        successMessage: '',
       }
     }
     case reducerActions.updateAttribute: {
       return {
         ...state,
-        microsoft_sync_login_attribute: payload.microsoft_sync_login_attribute
+        microsoft_sync_login_attribute: payload.microsoft_sync_login_attribute,
       }
     }
     case reducerActions.updateSuffix: {
       return {
         ...state,
         microsoft_sync_login_attribute_suffix: payload.microsoft_sync_login_attribute_suffix,
-        suffixErrorMessages: []
+        suffixErrorMessages: [],
       }
     }
     case reducerActions.updateRemoteAttribute: {
       return {
         ...state,
-        microsoft_sync_remote_attribute: payload.microsoft_sync_remote_attribute
+        microsoft_sync_remote_attribute: payload.microsoft_sync_remote_attribute,
       }
     }
     case reducerActions.updateTenant: {
@@ -157,7 +157,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         microsoft_sync_tenant: payload.microsoft_sync_tenant,
         tenantErrorMessages: [],
-        tenantInfoMessages
+        tenantInfoMessages,
       }
     }
     case reducerActions.updateSettings: {
@@ -174,7 +174,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         errorMessage: '',
-        successMessage: ''
+        successMessage: '',
       }
     }
     case reducerActions.toggleSync: {
@@ -192,7 +192,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
       return {
         ...state,
         errorMessage: '',
-        successMessage: ''
+        successMessage: '',
       }
     }
     case reducerActions.fetchSuccess: {
@@ -200,13 +200,13 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         ...payload,
         last_saved_microsoft_sync_tenant:
-          payload.microsoft_sync_tenant || state.microsoft_sync_tenant
+          payload.microsoft_sync_tenant || state.microsoft_sync_tenant,
       }
     }
     case reducerActions.fetchLoading: {
       return {
         ...state,
-        loading: payload.loading
+        loading: payload.loading,
       }
     }
     case reducerActions.fetchError: {
@@ -214,7 +214,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         ...state,
         errorMessage: I18n.t(
           'Unable to fetch current Microsoft Teams Sync settings. Please check your internet connection. If the problem persists, please contact support.'
-        )
+        ),
       }
     }
     case reducerActions.updateSuccess: {
@@ -223,7 +223,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         successMessage: I18n.t('Microsoft Teams Sync settings updated!'),
         uiEnabled: true,
         last_saved_microsoft_sync_tenant: state.microsoft_sync_tenant,
-        tenantInfoMessages: []
+        tenantInfoMessages: [],
       }
     }
     case reducerActions.updateError: {
@@ -232,7 +232,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
         errorMessage: I18n.t(
           'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
         ),
-        uiEnabled: true
+        uiEnabled: true,
       }
     }
     case reducerActions.toggleError: {
@@ -242,7 +242,7 @@ export function settingsReducer(state, {type, payload, dispatch}) {
           'Unable to update Microsoft Teams Sync settings. Please try again. If the issue persists, please contact support.'
         ),
         microsoft_sync_enabled: !state.microsoft_sync_enabled,
-        uiEnabled: true
+        uiEnabled: true,
       }
     }
   }

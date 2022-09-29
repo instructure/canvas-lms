@@ -27,7 +27,7 @@ beforeAll(() => {
     rotate: jest.fn(),
     fillRect: jest.fn(),
     restore: jest.fn(),
-    drawImage: jest.fn()
+    drawImage: jest.fn(),
   })
   const htmlCanvasElement = document.createElement('canvas')
   htmlCanvasElement.id = 'confetti-canvas'
@@ -39,7 +39,7 @@ const asset1 = {
   type: 'svg',
   src: '/panda',
   weight: 0.05,
-  size: 40
+  size: 40,
 }
 
 const asset2 = {
@@ -47,17 +47,17 @@ const asset2 = {
   type: 'svg',
   src: '/gnome',
   weight: 0.05,
-  size: 40
+  size: 40,
 }
 
 const basicColors = [
   [165, 104, 246],
-  [230, 61, 135]
+  [230, 61, 135],
 ]
 
 const confettiOpts = {
   colors: basicColors,
-  props: ['square', asset1, asset2].filter(p => p !== null)
+  props: ['square', asset1, asset2].filter(p => p !== null),
 }
 
 const imageCreation = jest.fn()

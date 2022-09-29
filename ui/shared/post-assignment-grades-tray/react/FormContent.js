@@ -46,7 +46,7 @@ export default function FormContent({
   sectionSelectionChanged,
   sections,
   selectedSectionIds,
-  unpostedCount
+  unpostedCount,
 }) {
   if (postingGrades) {
     return (
@@ -127,7 +127,7 @@ export default function FormContent({
 FormContent.propTypes = {
   assignment: shape({
     anonymousGrading: bool.isRequired,
-    gradesPublished: bool.isRequired
+    gradesPublished: bool.isRequired,
   }).isRequired,
   dismiss: func.isRequired,
   postBySections: bool.isRequired,
@@ -139,10 +139,10 @@ FormContent.propTypes = {
   sections: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
   sectionSelectionChanged: func.isRequired,
   selectedSectionIds: arrayOf(string).isRequired,
-  unpostedCount: number.isRequired
+  unpostedCount: number.isRequired,
 }

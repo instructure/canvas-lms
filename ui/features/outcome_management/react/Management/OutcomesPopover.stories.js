@@ -28,12 +28,12 @@ export default {
       {linkId: 2, title: 'Outcome 2 Outcome Outcome Outcome'},
       {
         linkId: 3,
-        title: 'Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3'
-      }
+        title: 'Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3 Outcome 3',
+      },
     ],
     outcomeCount: 3,
-    onClearHandler: () => {}
-  }
+    onClearHandler: () => {},
+  },
 }
 
 const Template = args => <OutcomesPopover {...args} />
@@ -44,8 +44,8 @@ MoreThan10.args = {
   outcomeCount: 20,
   outcomes: new Array(20).fill(0).map((_v, i) => ({
     linkId: i + 1,
-    title: `Outcome ${i + 1}`
-  }))
+    title: `Outcome ${i + 1}`,
+  })),
 }
 
 export const ReallyLongTitles = Template.bind({})
@@ -53,6 +53,6 @@ ReallyLongTitles.args = {
   outcomeCount: 20,
   outcomes: new Array(20).fill(0).map((_v, i) => ({
     linkId: i + 1,
-    title: `Outcome ${i + 1} `.repeat(10)
-  }))
+    title: `Outcome ${i + 1} `.repeat(10),
+  })),
 }

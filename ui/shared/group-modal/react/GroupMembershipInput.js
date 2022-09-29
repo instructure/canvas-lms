@@ -28,7 +28,7 @@ const MAX = 100000
 
 GroupMembershipInput.propTypes = {
   onChange: func.isRequired,
-  value: string
+  value: string,
 }
 
 export default function GroupMembershipInput({onChange, value, ...props}) {
@@ -72,7 +72,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
     if (v < MIN || v > MAX) {
       setGroupLimit('')
       return setMessages([
-        {text: `Number must be between ${MIN} and ${I18n.n(MAX)}`, type: 'error'}
+        {text: `Number must be between ${MIN} and ${I18n.n(MAX)}`, type: 'error'},
       ])
     } else {
       return setGroupLimit(v)

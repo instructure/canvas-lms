@@ -30,7 +30,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -40,8 +40,8 @@ const mockAvailabilities = [
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 99,
-    name: 'section 2'
-  }
+    name: 'section 2',
+  },
 ]
 const mockLockAt = '2022-01-19T23:59:59-07:00'
 const mockDelayedPost = '2022-01-12T00:00:00-07:00'
@@ -61,7 +61,7 @@ describe('DiscussionAvailabilityTray', () => {
   describe('desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
 
@@ -77,7 +77,7 @@ describe('DiscussionAvailabilityTray', () => {
     it('correct text is shown when a date is not set', () => {
       const {getByText} = setup({
         lockAt: null,
-        delayedPostAt: null
+        delayedPostAt: null,
       })
       expect(getByText('No Start Date')).toBeInTheDocument()
       expect(getByText('No End Date')).toBeInTheDocument()
@@ -87,7 +87,7 @@ describe('DiscussionAvailabilityTray', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'},
       }))
     })
 
@@ -103,7 +103,7 @@ describe('DiscussionAvailabilityTray', () => {
     it('correct text is shown when a date is not set', () => {
       const {getByText} = setup({
         lockAt: null,
-        delayedPostAt: null
+        delayedPostAt: null,
       })
       expect(getByText('No Start Date')).toBeInTheDocument()
       expect(getByText('No End Date')).toBeInTheDocument()

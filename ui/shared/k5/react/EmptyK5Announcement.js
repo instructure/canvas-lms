@@ -44,7 +44,7 @@ export const K5AddAnnouncementButton = ({courseUrl, courseName}) => {
 }
 K5AddAnnouncementButton.propTypes = {
   courseUrl: string.isRequired,
-  courseName: string.isRequired
+  courseName: string.isRequired,
 }
 
 export default function EmptyK5Announcement({courseUrl, courseName, canReadAnnouncements}) {
@@ -73,5 +73,5 @@ export default function EmptyK5Announcement({courseUrl, courseName, canReadAnnou
 EmptyK5Announcement.propTypes = {
   courseUrl: string.isRequired,
   courseName: string.isRequired,
-  canReadAnnouncements: bool.isRequired
+  canReadAnnouncements: bool.isRequired,
 }

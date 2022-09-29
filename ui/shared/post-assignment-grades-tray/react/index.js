@@ -30,7 +30,7 @@ import {EVERYONE, GRADED} from './PostTypes'
 import {
   postAssignmentGrades,
   postAssignmentGradesForSections,
-  resolvePostAssignmentGradesStatus
+  resolvePostAssignmentGradesStatus,
 } from './Api'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
@@ -44,7 +44,7 @@ function initialShowState() {
     postingGrades: false,
     open: true,
     selectedSectionIds: [],
-    submissions: []
+    submissions: [],
   }
 }
 
@@ -66,7 +66,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       onExited() {},
       open: false,
       selectedSectionIds: [],
-      submissions: []
+      submissions: [],
     }
   }
 
@@ -77,7 +77,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
   show(context) {
     this.setState({
       ...initialShowState(),
-      ...context
+      ...context,
     })
   }
 
@@ -103,7 +103,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       if (selectedSectionIds.length === 0) {
         showFlashAlert({
           message: I18n.t('At least one section must be selected to post grades by section.'),
-          type: 'error'
+          type: 'error',
         })
         return
       }
@@ -119,14 +119,14 @@ export default class PostAssignmentGradesTray extends PureComponent {
         successMessage = I18n.t(
           'Success! Grades have been posted to everyone graded for %{assignmentName}.',
           {
-            assignmentName: assignment.name
+            assignmentName: assignment.name,
           }
         )
       } else {
         successMessage = I18n.t(
           'Success! Grades have been posted to everyone for %{assignmentName}.',
           {
-            assignmentName: assignment.name
+            assignmentName: assignment.name,
           }
         )
       }
@@ -143,13 +143,13 @@ export default class PostAssignmentGradesTray extends PureComponent {
       if (!assignment.anonymousGrading || containerName !== 'SPEED_GRADER') {
         showFlashAlert({
           message: successMessage,
-          type: 'success'
+          type: 'success',
         })
       }
     } catch (error) {
       showFlashAlert({
         message: I18n.t('There was a problem posting assignment grades.'),
-        type: 'error'
+        type: 'error',
       })
       this.setState({postingGrades: false})
     }
@@ -164,7 +164,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       this.setState({
         selectedSectionIds: selectedSectionIds.filter(
           selectedSection => selectedSection !== sectionId
-        )
+        ),
       })
     }
   }
@@ -180,7 +180,7 @@ export default class PostAssignmentGradesTray extends PureComponent {
       postType,
       sections,
       selectedSectionIds,
-      submissions
+      submissions,
     } = this.state
 
     if (!assignment) {

@@ -25,7 +25,7 @@ export const alignments = [
     moduleTitle: 'Module 1',
     moduleUrl: '/courses/1/modules/1',
     moduleWorkflowState: 'unpublished',
-    assignmentContentType: 'assignment'
+    assignmentContentType: 'assignment',
   },
   {
     _id: '2',
@@ -35,7 +35,7 @@ export const alignments = [
     moduleTitle: null,
     moduleUrl: null,
     moduleWorkflowState: null,
-    assignmentContentType: null
+    assignmentContentType: null,
   },
   {
     _id: '3',
@@ -45,7 +45,7 @@ export const alignments = [
     moduleTitle: 'Module 1',
     moduleUrl: '/courses/1/modules/1',
     moduleWorkflowState: 'unpublished',
-    assignmentContentType: 'quiz'
+    assignmentContentType: 'quiz',
   },
   {
     _id: '4',
@@ -55,8 +55,8 @@ export const alignments = [
     moduleTitle: 'Module 2',
     moduleUrl: '/courses/1/modules/2',
     moduleWorkflowState: 'active',
-    assignmentContentType: 'discussion'
-  }
+    assignmentContentType: 'discussion',
+  },
 ]
 
 export const generateOutcomes = num =>
@@ -65,8 +65,8 @@ export const generateOutcomes = num =>
       _id: String(el),
       title: `Outcome ${el + 1}`,
       description: `Outcome ${el + 1} description`,
-      alignments
-    }
+      alignments,
+    },
   }))
 
 export const generateRootGroup = (numOutcomes, hasNextPage = false) => ({
@@ -75,8 +75,8 @@ export const generateRootGroup = (numOutcomes, hasNextPage = false) => ({
   outcomes: {
     pageInfo: {
       hasNextPage,
-      endCursor: null
+      endCursor: null,
     },
-    edges: generateOutcomes(numOutcomes)
-  }
+    edges: generateOutcomes(numOutcomes),
+  },
 })

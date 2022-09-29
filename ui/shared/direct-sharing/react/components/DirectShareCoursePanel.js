@@ -36,7 +36,7 @@ const I18n = useI18nScope('direct_share_course_panel')
 DirectShareCoursePanel.propTypes = {
   sourceCourseId: string,
   contentSelection: contentSelectionShape,
-  onCancel: func
+  onCancel: func,
 }
 
 export default function DirectShareCoursePanel({sourceCourseId, contentSelection, onCancel}) {
@@ -57,9 +57,9 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
             source_course_id: sourceCourseId,
             insert_into_module_id: selectedModule?.id || null,
             insert_into_module_type: contentSelection ? Object.keys(contentSelection)[0] : null,
-            insert_into_module_position: selectedPosition
-          }
-        }
+            insert_into_module_position: selectedPosition,
+          },
+        },
       })
     )
   }

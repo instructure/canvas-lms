@@ -27,28 +27,28 @@ const SelectionButtonsView = Ember.View.extend({
   type: null,
   selected: null,
 
-  classPath: function() {
+  classPath: function () {
     return `${this.get('type')}_navigation`
   }.property('type'),
 
-  previousLabel: function() {
+  previousLabel: function () {
     const type = this.get('type').capitalize()
     return I18n.t('previous_object', 'Previous %{type}', {type})
   }.property('type'),
 
-  nextLabel: function() {
+  nextLabel: function () {
     const type = this.get('type').capitalize()
     return I18n.t('next_object', 'Next %{type}', {type})
   }.property('type'),
 
   disablePreviousButton: Ember.computed.lte('currentIndex', 0),
 
-  disableNextButton: function() {
+  disableNextButton: function () {
     const next = this.get('list').objectAt(this.get('currentIndex') + 1)
     return !(this.get('list.length') && next)
   }.property('currentIndex', 'list.@each'),
 
-  currentIndex: function() {
+  currentIndex: function () {
     return this.get('list').indexOf(this.get('selected'))
   }.property('selected', 'list.@each'),
 
@@ -75,8 +75,8 @@ const SelectionButtonsView = Ember.View.extend({
         this.set('selected', item)
         return this.get('controller').send('selectItem', this.get('type'), item)
       }
-    }
-  }
+    },
+  },
 })
 
 export default SelectionButtonsView

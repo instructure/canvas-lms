@@ -20,37 +20,37 @@ import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import ShortAnswer from '../short_answer'
 import assertChange from 'chai-assert-change'
-import { camelize } from '@canvas/quiz-legacy-client-apps/util/convert_case';
+import {camelize} from '@canvas/quiz-legacy-client-apps/util/convert_case'
 
 describe('canvas_quizzes/statistics/views/questions/short_answer', () => {
   it('renders', () => {
     const fixture = camelize({
-      "id": "15",
-      "question_type": "short_answer_question",
-      "question_text": "<p>Type something</p>",
-      "position": 5,
-      "responses": 156,
-      "answers": [
+      id: '15',
+      question_type: 'short_answer_question',
+      question_text: '<p>Type something</p>',
+      position: 5,
+      responses: 156,
+      answers: [
         {
-          "id": "4684",
-          "text": "Something",
-          "correct": true,
-          "responses": 58
+          id: '4684',
+          text: 'Something',
+          correct: true,
+          responses: 58,
         },
         {
-          "id": "1797",
-          "text": "False",
-          "correct": true,
-          "responses": 97
+          id: '1797',
+          text: 'False',
+          correct: true,
+          responses: 97,
         },
         {
-          "id": "other",
-          "text": "Other",
-          "correct": false,
-          "responses": 1
-        }
+          id: 'other',
+          text: 'Other',
+          correct: false,
+          responses: 1,
+        },
       ],
-      "correct": 155
+      correct: 155,
     })
 
     render(<ShortAnswer {...fixture} />)

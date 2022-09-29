@@ -42,8 +42,8 @@ export default class KalturaSessionLoader {
       entryUrl: this.kalturaUrl('/index.php/partnerservices2/addEntry'),
       uiconfUrl: this.kalturaUrl('/index.php/partnerservices2/getuiconf'),
       entryDefaults: {
-        partnerData: $.mediaComment.partnerData()
-      }
+        partnerData: $.mediaComment.partnerData(),
+      },
     }
   }
 

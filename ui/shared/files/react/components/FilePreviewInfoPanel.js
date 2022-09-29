@@ -32,7 +32,7 @@ class FilePreviewInfoPanel extends React.Component {
 
   static propTypes = {
     displayedItem: customPropTypes.filesystemObject.isRequired,
-    usageRightsRequiredForContext: PropTypes.bool
+    usageRightsRequiredForContext: PropTypes.bool,
   }
 
   render() {

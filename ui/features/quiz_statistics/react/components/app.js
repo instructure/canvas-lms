@@ -44,15 +44,15 @@ const Renderers = {
   matching_question: FillInMultipleBlanksRenderer,
   essay_question: EssayRenderer,
   calculated_question: CalculatedRenderer,
-  file_upload_question: FileUploadRenderer
+  file_upload_question: FileUploadRenderer,
 }
 
 class Statistics extends React.Component {
   static defaultProps = {
     quizStatistics: {
       submissionStatistics: {},
-      questionStatistics: []
-    }
+      questionStatistics: [],
+    },
   }
 
   render() {
@@ -152,7 +152,7 @@ class Statistics extends React.Component {
       key: 'question-' + question.id,
       participantCount: question.participantCount,
       speedGraderUrl: stats.speedGraderUrl,
-      quizSubmissionsZipUrl: stats.quizSubmissionsZipUrl
+      quizSubmissionsZipUrl: stats.quizSubmissionsZipUrl,
     })
 
     return <Renderer {...questionProps} />

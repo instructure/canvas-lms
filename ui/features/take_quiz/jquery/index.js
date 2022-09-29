@@ -30,8 +30,8 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/util/toJSON'
-import '@canvas/datetime'/* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* getFormData, errorBox */
+import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -143,7 +143,7 @@ const quizSubmission = (function () {
         ) {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {
-              t: $.friendlyDatetime(new Date())
+              t: $.friendlyDatetime(new Date()),
             })
           )
 
@@ -246,7 +246,7 @@ const quizSubmission = (function () {
             }
           },
           {
-            timeout: 15000
+            timeout: 15000,
           }
         )
       })(data)
@@ -417,14 +417,14 @@ const quizSubmission = (function () {
           modal: true,
           overlay: {
             backgroundColor: '#000',
-            opacity: 0.7
+            opacity: 0.7,
           },
           close() {
             if (!quizSubmission.submitting && quizSubmission.shouldSubmitAtEndAt()) {
               quizSubmission.submitting = true
               quizSubmission.submitQuiz()
             }
-          }
+          },
         })
     },
 
@@ -528,8 +528,8 @@ const quizSubmission = (function () {
       button.prop('disabled', true)
       const action = button.data('action')
       $('#submit_quiz_form').attr('action', action).submit()
-    }
-  };
+    },
+  }
 })()
 
 $(window).focus(evt => {
@@ -595,7 +595,7 @@ $(function () {
           data,
           type: 'POST',
           dataType: 'json',
-          async: false
+          async: false,
         })
 
         // since this is sync, a callback never fires to reset this
@@ -669,7 +669,7 @@ $(function () {
       },
       click(event) {
         quizSubmission.clearAccessCode = false
-      }
+      },
     })
 
   $questions.find('.group_top,.answer_select').bind({
@@ -678,7 +678,7 @@ $(function () {
     },
     mouseleave(event) {
       $(this).removeClass('hover')
-    }
+    },
   })
 
   $('.file-upload-question-holder').each((i, el) => {
@@ -723,7 +723,7 @@ $(function () {
             ? ''
             : I18n.n(precisionQuestionInputVal.toPrecision(precision), {
                 strip_insignificant_zeros: true,
-                precision
+                precision,
               })
         )
       }
@@ -746,7 +746,7 @@ $(function () {
             I18n.t('errors.only_numerical_values', 'only numerical values are accepted')
           )
         }
-      }
+      },
     })
     .delegate('.flag_question', 'click', function (e) {
       e.preventDefault()
@@ -883,7 +883,7 @@ $(function () {
             'confirms.unseen_questions',
             {
               one: "There is still 1 question you haven't seen yet.  Submit anyway?",
-              other: "There are still %{count} questions you haven't seen yet.  Submit anyway?"
+              other: "There are still %{count} questions you haven't seen yet.  Submit anyway?",
             },
             {count: unseen}
           )
@@ -896,7 +896,7 @@ $(function () {
             {
               one: 'You have 1 unanswered question (see the right sidebar for details).  Submit anyway?',
               other:
-                'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?'
+                'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?',
             },
             {count: unanswered}
           )
@@ -934,7 +934,7 @@ $(function () {
       RichContentEditor.loadNewEditor($(this), {
         manageParent: true,
         autosave: {enabled: false},
-        maxInitRenderedRCEs: 5
+        maxInitRenderedRCEs: 5,
       })
     })
   }, 2000)
@@ -948,7 +948,7 @@ $(function () {
 
     quizTakingPolice.postMessage({
       code: 'startStopwatch',
-      frequency: quizSubmission.clockInterval
+      frequency: quizSubmission.clockInterval,
     })
   } else {
     setInterval(quizSubmission.updateTime, quizSubmission.clockInterval)
@@ -982,7 +982,7 @@ showDeauthorizedDialog = function () {
         class: 'dialog_closer',
         click() {
           $(this).dialog('close')
-        }
+        },
       },
       {
         text: I18n.t('#buttons.login', 'Login'),
@@ -990,9 +990,9 @@ showDeauthorizedDialog = function () {
         click() {
           quizSubmission.navigatingToRelogin = true
           $('#deauthorized_dialog').submit()
-        }
-      }
-    ]
+        },
+      },
+    ],
   })
 }
 
@@ -1025,7 +1025,7 @@ $(() => {
     'aria-role': 'note',
     'aria-live': 'assertive',
     'aria-atomic': 'true',
-    'aria-relevant': 'additions'
+    'aria-relevant': 'additions',
   }).appendTo(document.body)
 
   $(document).on('keydown.timer_quickjump', function readTimeLeft(e) {

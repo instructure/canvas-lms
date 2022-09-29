@@ -25,13 +25,13 @@ export default class GradingForm {
   }
 
   ensureSelectEventsFire() {
-    $('input[type=text]').focus(function() {
+    $('input[type=text]').focus(function () {
       $(this).select()
     })
   }
 
   preventInsanity(onInputChange) {
-    $('#update_history_form input.question_input').keydown(function(event) {
+    $('#update_history_form input.question_input').keydown(function (event) {
       // stop enter from submitting for on DOWN,
       // otherwise it can actually wreck a database
       // because of the uniqueness constraints on the versions
@@ -45,7 +45,7 @@ export default class GradingForm {
         return false
       }
     })
-    $('#update_history_form input.question_input').keyup(function(event) {
+    $('#update_history_form input.question_input').keyup(function (event) {
       if (event.keyCode === 13) {
         // still let it submit when you're done pressing enter
         $('#update_history_form').submit()
@@ -95,13 +95,8 @@ export default class GradingForm {
   onScoreChanged() {
     const $total = $('#after_fudge_points_total')
     let total = 0
-    $('.display_question .user_points:visible').each(function() {
-      let points =
-        numberHelper.parse(
-          $(this)
-            .find('input.question_input')
-            .val()
-        ) || 0
+    $('.display_question .user_points:visible').each(function () {
+      let points = numberHelper.parse($(this).find('input.question_input').val()) || 0
       points = Math.round(points * 100.0) / 100.0
       total += points
     })

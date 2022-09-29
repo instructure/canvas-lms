@@ -37,7 +37,7 @@ const OutcomeGroupHeader = ({
   onMenuHandler,
   canManage,
   description,
-  hideOutcomesView
+  hideOutcomesView,
 }) => {
   const {isMobileView} = useCanvasContext()
   const hideButtonRef = useRef()
@@ -51,7 +51,7 @@ const OutcomeGroupHeader = ({
   return (
     <View as="div">
       <Flex as="div" alignItems={isMobileView ? 'center' : 'start'}>
-        <Flex.Item size={minWidth} shouldGrow>
+        <Flex.Item size={minWidth} shouldGrow={true}>
           <div style={{padding: isMobileView ? '0' : '0.21875rem 0'}}>
             {isMobileView ? (
               <div style={{overflowWrap: 'break-word', display: 'inline-block'}}>
@@ -88,8 +88,8 @@ const OutcomeGroupHeader = ({
         {canManage && (
           <Flex.Item>
             <OutcomeKebabMenu
-              canDestroy
-              isGroup
+              canDestroy={true}
+              isGroup={true}
               menuTitle={I18n.t('Menu for group %{title}', {title})}
               onMenuHandler={onMenuHandler}
               groupDescription={description}
@@ -106,7 +106,7 @@ OutcomeGroupHeader.defaultProps = {
   title: '',
   description: '',
   canManage: false,
-  hideOutcomesView: () => {}
+  hideOutcomesView: () => {},
 }
 
 OutcomeGroupHeader.propTypes = {
@@ -115,7 +115,7 @@ OutcomeGroupHeader.propTypes = {
   minWidth: PropTypes.string,
   canManage: PropTypes.bool,
   onMenuHandler: PropTypes.func.isRequired,
-  hideOutcomesView: PropTypes.func
+  hideOutcomesView: PropTypes.func,
 }
 
 export default OutcomeGroupHeader

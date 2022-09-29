@@ -24,18 +24,18 @@ export default {
   title: 'Examples/Canvas Inbox/MailboxSelectionDropdown',
   component: MailboxSelectionDropdown,
   argTypes: {
-    onSelect: {action: 'Changed'}
-  }
+    onSelect: {action: 'Changed'},
+  },
 }
 
 const Template = args => <MailboxSelectionDropdown {...args} />
 
 export const InboxSelected = Template.bind({})
 InboxSelected.args = {
-  activeMailbox: 'inbox'
+  activeMailbox: 'inbox',
 }
 
 export const UnreadSelected = Template.bind({})
 UnreadSelected.args = {
-  activeMailbox: 'unread'
+  activeMailbox: 'unread',
 }

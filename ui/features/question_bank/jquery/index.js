@@ -25,10 +25,10 @@ import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, .dim */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -79,20 +79,17 @@ export function updateAlignments(alignments) {
         .attr('disabled', false)
       const $outcomes = $('#aligned_outcomes_list')
       $outcomes.find('.outcome:not(.blank)').remove()
-      const $template = $outcomes
-        .find('.blank:first')
-        .clone(true)
-        .removeClass('blank')
+      const $template = $outcomes.find('.blank:first').clone(true).removeClass('blank')
       for (const idx in alignments) {
         const alignment = alignments[idx].content_tag
         const outcome = {
           short_description: alignment.learning_outcome.short_description,
-          mastery_threshold: Math.round(alignment.mastery_score * 10000) / 100.0
+          mastery_threshold: Math.round(alignment.mastery_score * 10000) / 100.0,
         }
         const $outcome = $template.clone(true)
         $outcome.attr('data-id', alignment.learning_outcome_id)
         $outcome.fillTemplateData({
-          data: outcome
+          data: outcome,
         })
         $outcomes.append($outcome.show())
       }
@@ -106,7 +103,7 @@ export function updateAlignments(alignments) {
 }
 
 export function attachPageEvents(e) {
-  $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function(event) {
+  $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function (event) {
     event.preventDefault()
     const result = confirm(
         I18n.t(
@@ -120,7 +117,7 @@ export function attachPageEvents(e) {
 
     if (result) {
       $outcome.dim()
-      $('#aligned_outcomes_list .outcome:not(.blank)').each(function() {
+      $('#aligned_outcomes_list .outcome:not(.blank)').each(function () {
         const id = $(this).attr('data-id')
         const pct =
           $(this).getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold / 100
@@ -149,7 +146,7 @@ export function attachPageEvents(e) {
       data => {}
     )
   }
-  $('.more_questions_link').click(function(event) {
+  $('.more_questions_link').click(function (event) {
     event.preventDefault()
     if ($(this).hasClass('loading')) {
       return
@@ -172,17 +169,15 @@ export function attachPageEvents(e) {
         for (const idx in data.questions) {
           const question = data.questions[idx].assessment_question
           question.assessment_question_id = question.id
-          const $question = $('#question_teaser_blank')
-            .clone()
-            .removeAttr('id')
+          const $question = $('#question_teaser_blank').clone().removeAttr('id')
           $question.fillTemplateData({
             data: question,
             id: 'question_teaser_' + question.id,
-            hrefValues: ['id']
+            hrefValues: ['id'],
           })
           $question.fillTemplateData({
             data: question.question_data,
-            htmlValues: ['question_text']
+            htmlValues: ['question_text'],
           })
           $question.data('question', question)
           $question.find('.assessment_question_id').text(question.id)
@@ -197,7 +192,7 @@ export function attachPageEvents(e) {
       }
     )
   })
-  $('.delete_bank_link').click(function(event) {
+  $('.delete_bank_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.question_bank')
@@ -209,10 +204,10 @@ export function attachPageEvents(e) {
         ),
         success() {
           location.href = $('.assessment_question_banks_url').attr('href')
-        }
+        },
       })
   })
-  $('.bookmark_bank_link').click(function(event) {
+  $('.bookmark_bank_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $link.find('.message').text(I18n.t('bookmarking', 'Bookmarking...'))
@@ -232,18 +227,13 @@ export function attachPageEvents(e) {
   $('.edit_bank_link').click(event => {
     event.preventDefault()
     const val = $('#edit_bank_form h2').text()
-    $('#edit_bank_form')
-      .find('.displaying')
-      .hide()
-      .end()
-      .find('.editing')
-      .show()
+    $('#edit_bank_form').find('.displaying').hide().end().find('.editing').show()
     $('.bank_name_box')
       .val(val || I18n.t('question_bank', 'Question Bank'))
       .focus()
       .select()
   })
-  $('#edit_bank_form .bank_name_box').keycodes('return esc', function(event) {
+  $('#edit_bank_form .bank_name_box').keycodes('return esc', function (event) {
     if (event.keyString == 'esc') {
       $(this).blur()
     } else if (event.keyString == 'return') {
@@ -251,12 +241,7 @@ export function attachPageEvents(e) {
     }
   })
   $('#edit_bank_form .bank_name_box').blur(() => {
-    $('#edit_bank_form')
-      .find('.displaying')
-      .show()
-      .end()
-      .find('.editing')
-      .hide()
+    $('#edit_bank_form').find('.displaying').show().end().find('.editing').hide()
   })
   $('#edit_bank_form').formSubmit({
     object_name: 'assessment_question_bank',
@@ -274,25 +259,20 @@ export function attachPageEvents(e) {
       $(this).loadingImage('remove')
       $('.edit_bank_link').click()
       $('#edit_bank_form').formErrors(data)
-    }
+    },
   })
   $('#show_question_details')
-    .change(function() {
+    .change(function () {
       $('#questions').toggleClass('brief', !$(this).attr('checked'))
     })
     .change()
 
   moveMultipleQuestionBanks.addEvents()
 
-  $('#questions').delegate('.move_question_link', 'click', function(event) {
+  $('#questions').delegate('.move_question_link', 'click', function (event) {
     event.preventDefault()
     const $dialog = $('#move_question_dialog')
-    $dialog
-      .find('.question_text')
-      .show()
-      .end()
-      .find('.questions')
-      .hide()
+    $dialog.find('.question_text').show().end().find('.questions').hide()
     $dialog.find('.copy_option').show()
     $dialog.find('.submit_button').text(I18n.t('title.move_copy_questions', 'Move/Copy Questions'))
     $dialog.find('.multiple_questions').val('0')
@@ -305,19 +285,16 @@ export function attachPageEvents(e) {
       .parents('.question_holder')
       .getTemplateData({textValues: ['question_name', 'question_text']})
     $dialog.fillTemplateData({
-      data: template
+      data: template,
     })
     $dialog.data('question', $(this).parents('.question_holder'))
     $dialog.dialog({
       width: 600,
-      title: I18n.t('title.move_copy_questions', 'Move/Copy Questions')
+      title: I18n.t('title.move_copy_questions', 'Move/Copy Questions'),
     })
-    $dialog
-      .parent()
-      .find('.ui-dialog-titlebar-close')
-      .focus()
+    $dialog.parent().find('.ui-dialog-titlebar-close').focus()
   })
-  $('#move_question_dialog .submit_button').click(function() {
+  $('#move_question_dialog .submit_button').click(function () {
     const $dialog = $('#move_question_dialog')
     const data = $dialog.getFormData()
     const multiple_questions = data.multiple_questions == '1'
@@ -341,17 +318,14 @@ export function attachPageEvents(e) {
     const url = $('#bank_urls .move_questions_url').attr('href')
     data.move = move ? '1' : '0'
     if (!multiple_questions) {
-      const id = $dialog
-        .data('question')
-        .find('.assessment_question_id')
-        .text()
+      const id = $dialog.data('question').find('.assessment_question_id').text()
       data['questions[' + id + ']'] = '1'
     }
     const ids = []
-    $dialog.find('.list_question :checkbox:checked').each(function() {
+    $dialog.find('.list_question :checkbox:checked').each(function () {
       ids.push($(this).val())
     })
-    const save = function(data) {
+    const save = function (data) {
       $.ajaxJSON(
         url,
         'POST',
@@ -383,7 +357,7 @@ export function attachPageEvents(e) {
               'buttons.submit_moving_failed',
               {
                 one: 'Moving Question Failed, please try again',
-                other: 'Moving Questions Failed, please try again'
+                other: 'Moving Questions Failed, please try again',
               },
               {count: multiple_questions ? 2 : 1}
             )
@@ -392,7 +366,7 @@ export function attachPageEvents(e) {
               'buttons.submit_copying_failed',
               {
                 one: 'Copying Question Failed, please try again',
-                other: 'Copying Questions Failed, please try again'
+                other: 'Copying Questions Failed, please try again',
               },
               {count: multiple_questions ? 2 : 1}
             )
@@ -437,7 +411,7 @@ export function attachPageEvents(e) {
   $('#move_question_dialog .cancel_button').click(() => {
     $('#move_question_dialog').dialog('close')
   })
-  $('#move_question_dialog :radio').change(function() {
+  $('#move_question_dialog :radio').change(function () {
     $('#move_question_dialog .new_question_bank_name').showIf(
       $(this).attr('checked') && $(this).val() == 'new'
     )

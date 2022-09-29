@@ -22,7 +22,7 @@ const initialState = {
   showModal: false,
   gettingImage: false,
   uploadingImage: false,
-  removingImage: false
+  removingImage: false,
 }
 
 export default initialState

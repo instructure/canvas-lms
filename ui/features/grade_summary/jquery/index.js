@@ -66,8 +66,8 @@ const GradeSummary = {
     return {
       numericalValue,
       formattedValue: GradeFormatHelper.formatGrade(numericalValue, {
-        defaultValue: defaultFormattedValue
-      })
+        defaultValue: defaultFormattedValue,
+      }),
     }
   },
 
@@ -76,7 +76,7 @@ const GradeSummary = {
     numericalValue = isNaN(numericalValue) ? null : numericalValue
     return {
       numericalValue,
-      formattedValue: $assignment.find('.original_score').text()
+      formattedValue: $assignment.find('.original_score').text(),
     }
   },
 
@@ -250,7 +250,7 @@ const GradeSummary = {
         $assignment.find('.grade').focus()
       }, 0)
     }
-  }
+  },
 }
 
 function addTooltipElementForAssignment($assignment) {
@@ -357,13 +357,13 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
     params = {
       bins: ENV.grading_periods,
       grades: calculatedGrades.gradingPeriods,
-      elementIdPrefix: '#submission_period'
+      elementIdPrefix: '#submission_period',
     }
   } else {
     params = {
       bins: ENV.assignment_groups,
       grades: calculatedGrades.assignmentGroups,
-      elementIdPrefix: '#submission_group'
+      elementIdPrefix: '#submission_group',
     }
   }
   if (params.grades) {
@@ -380,7 +380,7 @@ function calculateSubtotals(byGradingPeriod, calculatedGrades, currentOrFinal) {
       const subtotal = {
         teaserText: `${scoreText} / ${possibleText}`,
         gradeText: calculateGrade(grade.score, grade.possible),
-        rowElementId: `${params.elementIdPrefix}-${binId}`
+        rowElementId: `${params.elementIdPrefix}-${binId}`,
       }
       subtotals.push(subtotal)
     }
@@ -459,7 +459,7 @@ function calculateTotals(calculatedGrades, currentOrFinal, groupWeightingScheme)
   if (gradeChanged) {
     // User changed their points for an assignment => let's let them know their updated points
     const msg = I18n.t('Based on What-If scores, the new total is now %{grade}', {
-      grade: finalGrade
+      grade: finalGrade,
     })
     $.screenReaderFlashMessageExclusive(msg)
   }
@@ -581,7 +581,7 @@ function getSelectMenuGroupProps() {
     selectedCourseID: ENV.context_asset_string.match(/.*_(\d+)$/)[1],
     selectedGradingPeriodID: ENV.current_grading_period_id,
     selectedStudentID: ENV.student_id,
-    students: ENV.students
+    students: ENV.students,
   }
 }
 
@@ -789,5 +789,5 @@ export default _.extend(GradeSummary, {
   getSelectMenuGroupProps,
   renderSelectMenuGroup,
   updateScoreForAssignment,
-  updateStudentGrades
+  updateStudentGrades,
 })

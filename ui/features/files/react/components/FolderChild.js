@@ -126,7 +126,7 @@ FolderChild.renderEditingState = function () {
             className="Button ef-edit-name-form__button ef-edit-name-accept"
             onClick={this.saveNameEdit}
           >
-            <i className="icon-check" aria-hidden />
+            <i className="icon-check" aria-hidden={true} />
             <span className="screenreader-only">{I18n.t('accept', 'Accept')}</span>
           </button>
           <button
@@ -134,7 +134,7 @@ FolderChild.renderEditingState = function () {
             className="Button ef-edit-name-form__button ef-edit-name-cancel"
             onClick={this.cancelEditingName}
           >
-            <i className="icon-x" aria-hidden />
+            <i className="icon-x" aria-hidden={true} />
             <span className="screenreader-only">{I18n.t('cancel', 'Cancel')}</span>
           </button>
         </div>
@@ -204,14 +204,14 @@ FolderChild.renderUsageRightsIndicator = function () {
 FolderChild.render = function () {
   const user = this.props.model.get('user') || {}
   const selectCheckboxLabel = I18n.t('Select %{itemName}', {
-    itemName: this.props.model.displayName()
+    itemName: this.props.model.displayName(),
   })
   const keyboardCheckboxClass = classnames({
     'screenreader-only': this.state.hideKeyboardCheck,
-    'multiselectable-toggler': true
+    'multiselectable-toggler': true,
   })
   const keyboardLabelClass = classnames({
-    'screenreader-only': !this.state.hideKeyboardCheck
+    'screenreader-only': !this.state.hideKeyboardCheck,
   })
   const parentFolder = this.props.model.collection && this.props.model.collection.parentFolder
   const canManage =

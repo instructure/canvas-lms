@@ -26,7 +26,7 @@ const defaultPermissions = () => ({
   create: false,
   manage_course_content_edit: false,
   manage_course_content_delete: false,
-  moderate: false
+  moderate: false,
 })
 
 const defaultProps = () => ({
@@ -41,7 +41,7 @@ const defaultProps = () => ({
   toggleSelectedAnnouncementsLock: () => Promise.reject(new Error('Not Implemented')),
   deleteSelectedAnnouncements: () => Promise.reject(new Error('Not Implemented')),
   searchInputRef: null,
-  announcementsLocked: false
+  announcementsLocked: false,
 })
 
 test('renders', () => {

@@ -22,9 +22,7 @@ $(() =>
     const unread = ENV.badge_counts[type]
     if (unread > 0) {
       if (type === 'submissions') type = 'grades'
-      const $badge = $('<b/>')
-        .text(unread)
-        .addClass('nav-badge')
+      const $badge = $('<b/>').text(unread).addClass('nav-badge')
       $(`#section-tabs .${type}`).append($badge)
     }
   })

@@ -23,7 +23,7 @@ const I18n = useI18nScope('permissions_detail_sections')
 
 export const PERMISSION_DETAIL_SECTIONS = [
   {title: () => I18n.t('What it does'), key: 'what_it_does'},
-  {title: () => I18n.t('Additional considerations'), key: 'additional_considerations'}
+  {title: () => I18n.t('Additional considerations'), key: 'additional_considerations'},
 ]
 
 export const generateActionTemplates = (
@@ -34,10 +34,10 @@ export const generateActionTemplates = (
 ) => ({
   [ACCOUNT]: {
     [PERMISSION_DETAIL_SECTIONS[0].key]: accountDetails,
-    [PERMISSION_DETAIL_SECTIONS[1].key]: accountConsiderations
+    [PERMISSION_DETAIL_SECTIONS[1].key]: accountConsiderations,
   },
   [COURSE]: {
     [PERMISSION_DETAIL_SECTIONS[0].key]: courseDetails,
-    [PERMISSION_DETAIL_SECTIONS[1].key]: courseConsiderations
-  }
+    [PERMISSION_DETAIL_SECTIONS[1].key]: courseConsiderations,
+  },
 })

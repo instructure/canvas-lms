@@ -98,7 +98,7 @@ Object.assign(PlannerNote.prototype, {
         details: this.description,
         todo_date: fcUtil.unwrap(this.start).toISOString(),
         id: this.object.id,
-        type: 'planner_note'
+        type: 'planner_note',
       },
       success,
       error
@@ -115,5 +115,5 @@ Object.assign(PlannerNote.prototype, {
       url = `${plannerNotesAPI}/${this.object.id}`
     }
     return [method, url]
-  }
+  },
 })

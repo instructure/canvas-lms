@@ -27,20 +27,20 @@ import Quiz from '@canvas/quizzes/backbone/models/Quiz'
 import PublishButtonView from '@canvas/publish-button-view'
 import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_events'
 import CyoeStats from '@canvas/conditional-release-stats/react/index'
-import '@canvas/datetime'/* dateString, time_field, datetime_field */
+import '@canvas/datetime' /* dateString, time_field, datetime_field */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
 import '@canvas/rails-flash-notifications'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* ifExists, confirmDelete */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* ifExists, confirmDelete */
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/message-students-dialog/jquery/message_students'/* messageStudents */
+import '@canvas/message-students-dialog/jquery/message_students' /* messageStudents */
 import AssignmentExternalTools from '@canvas/assignments/react/AssignmentExternalTools'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 
 const I18n = useI18nScope('quizzes.show')
 
-$(document).ready(function() {
+$(document).ready(function () {
   if (ENV.QUIZ_SUBMISSION_EVENTS_URL) {
     QuizLogAuditingEventDumper(true)
   }
@@ -69,12 +69,10 @@ $(document).ready(function() {
     inputMethods.setWidths()
   }
 
-  $('form.edit_quizzes_quiz').on('submit', function(e) {
+  $('form.edit_quizzes_quiz').on('submit', function (e) {
     e.preventDefault()
     e.stopImmediatePropagation()
-    $(this)
-      .find('.loading')
-      .removeClass('hidden')
+    $(this).find('.loading').removeClass('hidden')
     const data = $(this).serializeArray()
     const url = $(this).attr('action')
     $.ajax({
@@ -82,14 +80,12 @@ $(document).ready(function() {
       data,
       type: 'POST',
       success() {
-        $('.edit_quizzes_quiz')
-          .parents('.alert')
-          .hide()
-      }
+        $('.edit_quizzes_quiz').parents('.alert').hide()
+      },
     })
   })
 
-  $('.delete_quiz_link').click(function(event) {
+  $('.delete_quiz_link').click(function (event) {
     event.preventDefault()
     let deleteConfirmMessage = I18n.t(
       'confirms.delete_quiz',
@@ -102,10 +98,9 @@ $(document).ready(function() {
         I18n.t(
           'confirms.delete_quiz_submissions_warning',
           {
-            one:
-              'Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
+            one: 'Warning: 1 student has already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
             other:
-              'Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.'
+              'Warning: %{count} students have already taken this quiz. If you delete it, any completed submissions will be deleted and no longer appear in the gradebook.',
           },
           {count: submittedCount}
         )
@@ -115,7 +110,7 @@ $(document).ready(function() {
       message: deleteConfirmMessage,
       success() {
         window.location.href = ENV.QUIZZES_URL
-      }
+      },
     })
   })
 
@@ -168,8 +163,8 @@ $(document).ready(function() {
         context: ENV.QUIZ.title,
         recipientGroups: [
           {name: haveTakenQuiz, recipients: submittedStudents},
-          {name: haveNotTakenQuiz, recipients: unsubmittedStudents}
-        ]
+          {name: haveNotTakenQuiz, recipients: unsubmittedStudents},
+        ],
       })
       dialog.open()
     })
@@ -211,7 +206,7 @@ $(document).ready(function() {
 
   $('.direct-share-copy-to-menu-item').click(openCopyTo)
 
-  $('#let_students_take_this_quiz_button').ifExists(function($link) {
+  $('#let_students_take_this_quiz_button').ifExists(function ($link) {
     const $unlock_for_how_long_dialog = $('#unlock_for_how_long_dialog')
 
     $link.click(() => {
@@ -235,8 +230,8 @@ $(document).ready(function() {
             .val($lock_at.data('iso8601'))
             .end()
             .submit()
-        }
-      }
+        },
+      },
     })
 
     $lock_at.datetime_field()
@@ -261,18 +256,16 @@ $(document).ready(function() {
         .text(I18n.t('buttons.publishing', 'Publishing...'))
     },
     success(data) {
-      $(this)
-        .find('button')
-        .text(I18n.t('buttons.already_published', 'Published!'))
+      $(this).find('button').text(I18n.t('buttons.already_published', 'Published!'))
       location.reload()
-    }
+    },
   })
 
   const $el = $('#quiz-publish-link')
   const model = new Quiz($.extend(ENV.QUIZ, {unpublishable: !$el.hasClass('disabled')}))
   const view = new PublishButtonView({model, el: $el})
 
-  const refresh = function() {
+  const refresh = function () {
     location.href = location.href
   }
   view.on('publish', refresh)

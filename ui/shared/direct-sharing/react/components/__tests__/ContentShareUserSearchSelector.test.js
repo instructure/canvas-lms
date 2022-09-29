@@ -46,7 +46,7 @@ describe('ContentShareUserSearchSelector', () => {
     expect(useContentShareUserSearchApi).toHaveBeenCalledWith(
       expect.objectContaining({
         courseId: '42',
-        params: {}
+        params: {},
       })
     )
   })
@@ -74,7 +74,7 @@ describe('ContentShareUserSearchSelector', () => {
     expect(loadingTextForSpinner).toBeInTheDocument()
     expect(useContentShareUserSearchApi).toHaveBeenCalledWith(
       expect.objectContaining({
-        params: {search_term: 'abc'}
+        params: {search_term: 'abc'},
       })
     )
   })
@@ -109,7 +109,7 @@ describe('ContentShareUserSearchSelector', () => {
     useContentShareUserSearchApi.mockImplementationOnce(({success}) =>
       success([
         {id: 'foo', name: 'shrek'},
-        {id: 'bar', name: 'extra shrek'}
+        {id: 'bar', name: 'extra shrek'},
       ])
     )
     fireEvent.change(selectInput, {target: {value: 'shr'}})

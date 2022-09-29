@@ -19,19 +19,20 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.instructure_misc_plugins'
+
 const I18n = useI18nScope('plugins')
 /* showIf */
 
-$('form.edit_plugin_setting').live('submit', function() {
+$('form.edit_plugin_setting').live('submit', function () {
   $(this)
     .find('button')
     .attr('disabled', true)
     .filter('.save_button')
     .text(I18n.t('buttons.saving', 'Saving...'))
 })
-$(document).ready(function() {
+$(document).ready(function () {
   $('.disabled_checkbox')
-    .change(function() {
+    .change(function () {
       $('#settings .plugin_settings').showIf(!$(this).attr('checked'))
     })
     .change()

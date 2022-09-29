@@ -28,10 +28,10 @@ describe('org.imsglobal.lti.get_data handler', () => {
   beforeEach(() => {
     responseMessages = {
       sendBadRequestError: jest.fn(),
-      sendResponse: jest.fn()
+      sendResponse: jest.fn(),
     }
     event = {
-      origin: 'http://example.com'
+      origin: 'http://example.com',
     }
     jest.spyOn(platformStorage, 'getData').mockImplementation(() => value)
   })

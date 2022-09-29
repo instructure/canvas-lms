@@ -99,7 +99,7 @@ const VideoConferenceTypeSelect = ({conferenceTypes, onSetConferenceType, isEdit
 VideoConferenceTypeSelect.prototype = {
   conferenceTypes: arrayOf(PropTypes.object),
   onSetConferenceType: PropTypes.func,
-  isEditing: PropTypes.bool
+  isEditing: PropTypes.bool,
 }
 
 export default VideoConferenceTypeSelect

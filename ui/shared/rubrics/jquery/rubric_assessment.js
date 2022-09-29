@@ -24,9 +24,9 @@ import htmlEscape from 'html-escape'
 import {truncateText} from '@canvas/util/TextHelper'
 import round from 'round'
 import numberHelper from '@canvas/i18n/numberHelper'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/util/templateData'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
@@ -42,24 +42,16 @@ window.rubricAssessment = {
     const $rubric_criterion_comments_dialog = $('#rubric_criterion_comments_dialog')
 
     $('.rubric')
-      .delegate('.rating', 'click', function(event) {
+      .delegate('.rating', 'click', function (event) {
         $(this)
           .parents('.criterion')
           .find('.criterion_points')
-          .val(
-            $(this)
-              .find('.points')
-              .text()
-          )
+          .val($(this).find('.points').text())
           .change()
       })
-      .delegate('.long_description_link', 'click', function(event) {
+      .delegate('.long_description_link', 'click', function (event) {
         event.preventDefault()
-        if (
-          !$(this)
-            .parents('.rubric')
-            .hasClass('editing')
-        ) {
+        if (!$(this).parents('.rubric').hasClass('editing')) {
           const data = $(this)
               .parents('.criterion')
               .getTemplateData({textValues: ['long_description', 'description']}),
@@ -76,26 +68,19 @@ window.rubricAssessment = {
             .end()
             .dialog({
               title: I18n.t('Criterion Long Description'),
-              width: 400
+              width: 400,
             })
         }
       })
-      .delegate('.criterion .saved_custom_rating', 'change', function() {
-        if (
-          $(this)
-            .parents('.rubric')
-            .hasClass('assessing')
-        ) {
+      .delegate('.criterion .saved_custom_rating', 'change', function () {
+        if ($(this).parents('.rubric').hasClass('assessing')) {
           const val = $(this).val()
           if (val && val.length > 0) {
-            $(this)
-              .parents('.custom_ratings_entry')
-              .find('.custom_rating_field')
-              .val(val)
+            $(this).parents('.custom_ratings_entry').find('.custom_rating_field').val(val)
           }
         }
       })
-      .delegate('.criterion_comments_link', 'click', function(event) {
+      .delegate('.criterion_comments_link', 'click', function (event) {
         event.preventDefault()
         const $rubric_criterion_comments_link = $(this)
         const $criterion = $(this).parents('.criterion')
@@ -103,7 +88,7 @@ window.rubricAssessment = {
         const editing = $(this).parents('.rubric.assessing').length > 0
         const data = {
           criterion_comments: comments,
-          criterion_description: $criterion.find('.description:first').text()
+          criterion_description: $criterion.find('.description:first').text(),
         }
 
         $rubric_criterion_comments_dialog.data('current_rating', $criterion)
@@ -116,13 +101,13 @@ window.rubricAssessment = {
           width: 400,
           close() {
             $rubric_criterion_comments_link.focus()
-          }
+          },
         })
         $rubric_criterion_comments_dialog.find('textarea.criterion_comments').focus()
       })
       // cant use a .delegate because up above when we delegate '.rating' 'click' it calls .change() and that doesnt bubble right so it doesen't get caught
       .find('.criterion_points')
-      .bind('keyup change blur', function(event) {
+      .bind('keyup change blur', function (event) {
         const $obj = $(event.target)
         if ($obj.parents('.rubric').hasClass('assessing')) {
           let val = numberHelper.parse($obj.val())
@@ -141,7 +126,7 @@ window.rubricAssessment = {
           $obj
             .parents('.rubric')
             .find('.criterion:visible:not(.ignore_criterion_for_scoring) .criterion_points')
-            .each(function() {
+            .each(function () {
               let criterionPoints = numberHelper.parse($(this).val(), 10)
               if (isNaN(criterionPoints)) {
                 criterionPoints = 0
@@ -149,21 +134,18 @@ window.rubricAssessment = {
               total += criterionPoints
             })
           total = window.rubricAssessment.roundAndFormat(total)
-          $obj
-            .parents('.rubric')
-            .find('.rubric_total')
-            .text(total)
+          $obj.parents('.rubric').find('.rubric_total').text(total)
         }
       })
 
-    $('.rubric_summary').delegate('.rating_comments_dialog_link', 'click', function(event) {
+    $('.rubric_summary').delegate('.rating_comments_dialog_link', 'click', function (event) {
       event.preventDefault()
       const $rubric_rating_comments_link = $(this)
       const $criterion = $(this).parents('.criterion')
       const comments = $criterion.getTemplateData({textValues: ['rating_custom']}).rating_custom
       const data = {
         criterion_comments: comments,
-        criterion_description: $criterion.find('.description_title:first').text()
+        criterion_description: $criterion.find('.description_title:first').text(),
       }
 
       $rubric_criterion_comments_dialog.data('current_rating', $criterion)
@@ -176,7 +158,7 @@ window.rubricAssessment = {
         width: 400,
         close() {
           $rubric_rating_comments_link.focus()
-        }
+        },
       })
       $rubric_criterion_comments_dialog.find('.criterion_description').focus()
     })
@@ -214,12 +196,8 @@ window.rubricAssessment = {
   },
 
   highlightCriterionScore($criterion, val) {
-    $criterion.find('.rating').each(function() {
-      const rating_val = numberHelper.parse(
-        $(this)
-          .find('.points')
-          .text()
-      )
+    $criterion.find('.rating').each(function () {
+      const rating_val = numberHelper.parse($(this).find('.points').text())
       const use_range = $criterion.find('.criterion_use_range').attr('checked')
       if (rating_val === val) {
         $(this).addClass('selected')
@@ -240,7 +218,7 @@ window.rubricAssessment = {
     const $visibleCriteria = $('.rubric .criterion:visible')
     if ($visibleCriteria.length) {
       const scrollTop = $.windowScrollTop()
-      $('.rubric .criterion:visible').each(function() {
+      $('.rubric .criterion:visible').each(function () {
         const $this = $(this),
           $ratings = $this.find('.ratings:visible')
         if ($ratings.length) {
@@ -288,36 +266,26 @@ window.rubricAssessment = {
           criteriaAssessment.id
         )
         data[section('[points]')] = !Number.isNaN(points) ? points : undefined
-        data[section('[description]')] = criteriaAssessment.description ? criteriaAssessment.description : I18n.t('No Details')
+        data[section('[description]')] = criteriaAssessment.description
+          ? criteriaAssessment.description
+          : I18n.t('No Details')
         data[section('[comments]')] = criteriaAssessment.comments || ''
         data[section('[save_comment]')] =
           criteriaAssessment.saveCommentsForLater === true ? '1' : '0'
       })
     } else {
-      $rubric.find('.criterion:not(.blank)').each(function() {
+      $rubric.find('.criterion:not(.blank)').each(function () {
         const id = $(this).attr('id')
         const pre = 'rubric_assessment[' + id + ']'
-        const points = numberHelper.parse(
-          $(this)
-            .find('.criterion_points')
-            .val()
-        )
+        const points = numberHelper.parse($(this).find('.criterion_points').val())
         data[pre + '[points]'] = !isNaN(points) ? points : undefined
         if ($(this).find('.rating.selected')) {
-          data[pre + '[description]'] = $(this)
-            .find('.rating.selected .description')
-            .text()
-          data[pre + '[comments]'] = $(this)
-            .find('.custom_rating')
-            .text()
+          data[pre + '[description]'] = $(this).find('.rating.selected .description').text()
+          data[pre + '[comments]'] = $(this).find('.custom_rating').text()
         }
         if ($(this).find('.custom_rating_field:visible').length > 0) {
-          data[pre + '[comments]'] = $(this)
-            .find('.custom_rating_field:visible')
-            .val()
-          data[pre + '[save_comment]'] = $(this)
-            .find('.save_custom_rating')
-            .attr('checked')
+          data[pre + '[comments]'] = $(this).find('.custom_rating_field:visible').val()
+          data[pre + '[save_comment]'] = $(this).find('.save_custom_rating').attr('checked')
             ? '1'
             : '0'
         }
@@ -463,17 +431,10 @@ window.rubricAssessment = {
         }
         const $criterion = $rubric.find('#criterion_' + rating.criterion_id)
         if (!rating.id) {
-          $criterion.find('.rating').each(function() {
-            const rating_val = parseFloat(
-              $(this)
-                .find('.points')
-                .text(),
-              10
-            )
+          $criterion.find('.rating').each(function () {
+            const rating_val = parseFloat($(this).find('.points').text(), 10)
             if (rating_val == rating.points) {
-              rating.id = $(this)
-                .find('.rating_id')
-                .text()
+              rating.id = $(this).find('.rating_id').text()
             }
           })
         }
@@ -542,7 +503,7 @@ window.rubricAssessment = {
             rubric={ENV.rubric}
             rubricAssessment={filled}
             rubricAssociation={rubricAssociation}
-            isSummary
+            isSummary={true}
           >
             {null}
           </Rubric>,
@@ -557,12 +518,7 @@ window.rubricAssessment = {
   },
 
   populateRubricSummary($rubricSummary, data, editing_data) {
-    $rubricSummary
-      .find('.criterion_points')
-      .text('')
-      .end()
-      .find('.rating_custom')
-      .text('')
+    $rubricSummary.find('.criterion_points').text('').end().find('.rating_custom').text('')
 
     if (data) {
       const assessment = data
@@ -587,27 +543,17 @@ window.rubricAssessment = {
           .find('.ignore_for_scoring')
           .showIf(rating.ignore_for_scoring)
         if (ratingHasScore(rating) && !$rubricSummary.hasClass('free_form')) {
-          $criterion
-            .find('.rating.description')
-            .show()
-            .text(rating.description)
-            .end()
+          $criterion.find('.rating.description').show().text(rating.description).end()
         }
         if (rating.comments_enabled && rating.comments) {
-          $criterion
-            .find('.rating_custom')
-            .show()
-            .text(rating.comments)
+          $criterion.find('.rating_custom').show().text(rating.comments)
         }
         if (rating.points && !rating.ignore_for_scoring) {
           total += rating.points
         }
       }
       total = window.rubricAssessment.roundAndFormat(total, round.DEFAULT)
-      $rubricSummary
-        .show()
-        .find('.rubric_total')
-        .text(total)
+      $rubricSummary.show().find('.rubric_total').text(total)
       $rubricSummary.closest('.edit').show()
     } else {
       $rubricSummary.hide()
@@ -624,7 +570,7 @@ window.rubricAssessment = {
     }
 
     return I18n.n(round(n, round.DEFAULT))
-  }
+  },
 }
 
 function ratingHasScore(rating) {

@@ -65,7 +65,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     }
 
     return new AuthLoggingContentPaneView({
-      users: this.options.users
+      users: this.options.users,
     })
   }
 
@@ -75,7 +75,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     }
 
     return new GradeChangeLoggingContentView({
-      users: this.options.users
+      users: this.options.users,
     })
   }
 

@@ -26,7 +26,7 @@ export default class ContextMessageView extends View {
 
     this.prototype.events = {
       'click a.context-more': 'toggle',
-      'click .delete-btn': 'triggerRemoval'
+      'click .delete-btn': 'triggerRemoval',
     }
   }
 

@@ -34,12 +34,12 @@ export default class MiniCalendar {
           height: 185,
           buttonSRText: {
             prev: I18n.t('Previous month'),
-            next: I18n.t('Next month')
+            next: I18n.t('Next month'),
           },
           header: {
             left: 'prev',
             center: 'title',
-            right: 'next'
+            right: 'next',
           },
           dayClick: this.dayClick,
           events: this.getEvents,
@@ -50,7 +50,7 @@ export default class MiniCalendar {
           dropAccept: '.fc-event,.undated_event',
           drop: this.drop,
           eventDrop: this.drop,
-          eventReceive: this.drop
+          eventReceive: this.drop,
         },
         calendarDefaults
       ),
@@ -59,7 +59,7 @@ export default class MiniCalendar {
         'Calendar/refetchEvents': this.refetchEvents,
         'Calendar/currentDate': this.gotoDate,
         'CommonEvent/eventDeleted': this.eventSaved,
-        'CommonEvent/eventSaved': this.eventSaved
+        'CommonEvent/eventSaved': this.eventSaved,
       })
     )
   }

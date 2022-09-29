@@ -101,7 +101,7 @@ export default class Calendar {
       el: $('.agenda-wrapper'),
       dataSource: this.dataSource,
       calendar: this,
-      contextObjects: this.contexts
+      contextObjects: this.contexts,
     })
 
     const fullCalendarParams = this.initializeFullCalendarParams()
@@ -192,7 +192,7 @@ export default class Calendar {
       'EventDataSource/ajaxEnded': this.ajaxEnded,
       'Calendar/refetchEvents': this.refetchEvents,
       'CommonEvent/assignmentSaved': this.updateOverrides,
-      'Calendar/colorizeContexts': this.colorizeContexts
+      'Calendar/colorizeContexts': this.colorizeContexts,
     })
   }
 
@@ -226,7 +226,7 @@ export default class Calendar {
         header: false,
         editable: true,
         buttonText: {
-          today: I18n.t('today', 'Today')
+          today: I18n.t('today', 'Today'),
         },
         defaultTimedEventDuration: '01:00:00',
         slotDuration: '00:30:00',
@@ -255,7 +255,7 @@ export default class Calendar {
         dragRevertDuration: 0,
         dragAppendTo: {month: '#calendar-drag-and-drop-container'},
         dragZIndex: {month: 350},
-        dragCursorAt: {month: {top: -5, left: -5}}
+        dragCursorAt: {month: {top: -5, left: -5}},
       },
 
       calendarDefaults
@@ -459,7 +459,7 @@ export default class Calendar {
         {
           // fake up the jsEvent
           currentTarget: element,
-          pageX: element.offset().left + parseInt(element.width() / 2, 10)
+          pageX: element.offset().left + parseInt(element.width() / 2, 10),
         },
         view
       )
@@ -480,7 +480,7 @@ export default class Calendar {
       element.tooltip({
         position: {my: 'center bottom', at: 'center top-10', collision: 'fit fit'},
         tooltipClass: 'center bottom vertical',
-        show: {delay: 300}
+        show: {delay: 300},
       })
       element.data('title', element.attr('title'))
     } else if (element.data('ui-tooltip')) {
@@ -526,7 +526,7 @@ export default class Calendar {
             'Assignment has a locked date. Due date cannot be set outside of locked date range.'
           ),
           err: null,
-          type: 'error'
+          type: 'error',
         })
         return
       }
@@ -621,7 +621,7 @@ export default class Calendar {
       if (alertContainer.length === 0) {
         showFlashAlert({
           message: I18n.t('You must select at least one calendar to create an event.'),
-          type: 'info'
+          type: 'info',
         })
       }
       return false
@@ -667,7 +667,7 @@ export default class Calendar {
       addClasses: false,
       appendTo: 'calendar-drag-and-drop-container',
       // clone doesn't seem to work :(
-      helper: 'clone'
+      helper: 'clone',
     })
   }
 
@@ -992,7 +992,7 @@ export default class Calendar {
   setCurrentDate(date) {
     this.updateFragment({
       view_start: date.format('YYYY-MM-DD'),
-      replaceState: true
+      replaceState: true,
     })
 
     $.publish('Calendar/currentDate', date)
@@ -1010,7 +1010,7 @@ export default class Calendar {
   setCurrentView(view) {
     this.updateFragment({
       view_name: view,
-      replaceState: !_.has(this.dataFromDocumentHash(), 'view_name')
+      replaceState: !_.has(this.dataFromDocumentHash(), 'view_name'),
     }) // use replaceState if view_name wasn't set before
 
     this.currentView = view
@@ -1109,7 +1109,7 @@ export default class Calendar {
       $.screenReaderFlashMessage(
         I18n.t('agenda_view_displaying_start_end', 'Now displaying %{start} through %{end}', {
           start: this.formatDate(start, 'date.formats.long'),
-          end: this.formatDate(end, 'date.formats.long')
+          end: this.formatDate(end, 'date.formats.long'),
         })
       )
     }, 500)
@@ -1263,9 +1263,9 @@ export default class Calendar {
             $.flashMessage(
               I18n.t('The next available appointment in this course is on *%{date}*', {
                 wrappers: [
-                  `<a href='#' class='gotoDate_link' data-date='${nextDate.toISOString()}'>$1</a>`
+                  `<a href='#' class='gotoDate_link' data-date='${nextDate.toISOString()}'>$1</a>`,
                 ],
-                date: tz.format(nextDate, 'date.formats.long')
+                date: tz.format(nextDate, 'date.formats.long'),
               }),
               30000
             )

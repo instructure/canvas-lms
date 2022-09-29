@@ -21,7 +21,7 @@ import $ from 'jquery'
 export default function scrollToTop() {
   $('html,body').animate(
     {
-      scrollTop: $('.tool_content_wrapper').offset().top
+      scrollTop: $('.tool_content_wrapper').offset().top,
     },
     'fast'
   )

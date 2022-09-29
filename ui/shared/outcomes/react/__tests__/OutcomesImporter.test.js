@@ -29,7 +29,7 @@ import * as apiClient from '../apiClient'
 jest.mock('@canvas/alerts/react/FlashAlert')
 jest.mock('../apiClient')
 
-jest.useFakeTimers({ legacyFakeTimers: true })
+jest.useFakeTimers({legacyFakeTimers: true})
 
 const file = sinon.createStubInstance(File)
 const defaultProps = (props = {}) =>
@@ -41,7 +41,7 @@ const defaultProps = (props = {}) =>
       file,
       contextUrlRoot: '/accounts/1',
       invokedImport: true,
-      learningOutcomeGroupAncestorIds: []
+      learningOutcomeGroupAncestorIds: [],
     },
     props
   )
@@ -54,7 +54,7 @@ it('renders the OutcomesImporter component', () => {
 it('disables the Outcome Views when upload starts', () => {
   const disableOutcomeViews = jest.fn()
   const modal = shallow(<OutcomesImporter {...defaultProps({disableOutcomeViews})} />, {
-    disableLifecycleMethods: true
+    disableLifecycleMethods: true,
   })
   apiClient.createImport.mockReturnValue(Promise.resolve({data: {id: 3}}))
   modal.instance().beginUpload()
@@ -83,7 +83,7 @@ it('shows a flash alert when upload successfully completes', () => {
   modal.instance().successfulUpload([])
   expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'success',
-    message: 'Your outcomes were successfully imported.'
+    message: 'Your outcomes were successfully imported.',
   })
 })
 
@@ -95,7 +95,7 @@ it('shows a flash alert when upload fails', () => {
     type: 'error',
     message:
       'There was an error with your import, please examine your file and attempt the upload again.' +
-      ' Check your email for more details.'
+      ' Check your email for more details.',
   })
   expect(resetOutcomeViews).toHaveBeenCalled()
 })
@@ -107,7 +107,7 @@ it('shows a flash alert when upload successfully completes but with warnings', (
   expect(showFlashAlert).toHaveBeenCalledWith({
     type: 'warning',
     message:
-      'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.'
+      'There was a problem importing some of the outcomes in the uploaded file. Check your email for more details.',
   })
   expect(resetOutcomeViews).toHaveBeenCalled()
 })

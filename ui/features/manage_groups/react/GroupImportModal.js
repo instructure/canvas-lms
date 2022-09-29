@@ -50,7 +50,7 @@ export default function ImportGroupsModal(props) {
         .catch(() => {
           showFlashAlert({
             type: 'error',
-            message: I18n.t('There was an error uploading your file. Please try again.')
+            message: I18n.t('There was an error uploading your file. Please try again.'),
           })
         })
     }
@@ -67,11 +67,11 @@ export default function ImportGroupsModal(props) {
 
   const styles = {
     width: '10rem',
-    margin: '0 auto'
+    margin: '0 auto',
   }
 
   return (
-    <CanvasModal size="fullscreen" label={I18n.t('Import Groups')} open onDismiss={hide}>
+    <CanvasModal size="fullscreen" label={I18n.t('Import Groups')} open={true} onDismiss={hide}>
       <FileDrop
         accept=".csv"
         onDrop={(acceptedFile, rejectedFile) => onSelection(acceptedFile, rejectedFile)}

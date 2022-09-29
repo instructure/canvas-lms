@@ -43,14 +43,14 @@ export default class AddExternalToolButton extends React.Component {
     modalIsOpen: bool,
     isLti2: bool,
     configurationType: string,
-    duplicateTool: bool
+    duplicateTool: bool,
   }
 
   static defaultProps = {
     modalIsOpen: false,
     isLti2: false,
     configurationType: '',
-    duplicateTool: false
+    duplicateTool: false,
   }
 
   constructor(props) {
@@ -66,7 +66,7 @@ export default class AddExternalToolButton extends React.Component {
       configurationType: props.configurationType,
       duplicateTool: props.duplicateTool,
       attemptedToolSaveData: {},
-      attemptedToolConfigurationType: ''
+      attemptedToolConfigurationType: '',
     }
   }
 
@@ -82,7 +82,7 @@ export default class AddExternalToolButton extends React.Component {
       modalIsOpen: true,
       tool: {},
       isLti2: false,
-      lti2RegistrationUrl: null
+      lti2RegistrationUrl: null,
     })
   }
 
@@ -95,7 +95,7 @@ export default class AddExternalToolButton extends React.Component {
       attemptedToolConfigurationType: '',
       clientId: null,
       toolConfiguration: null,
-      type: ''
+      type: '',
     })
   }
 
@@ -121,7 +121,7 @@ export default class AddExternalToolButton extends React.Component {
         lti2RegistrationUrl: null,
         duplicateTool: false,
         attemptedToolSaveData: {},
-        attemptedToolConfigurationType: ''
+        attemptedToolConfigurationType: '',
       },
       () => {
         $.flashMessage(I18n.t('The app was added'))
@@ -179,7 +179,7 @@ export default class AddExternalToolButton extends React.Component {
       this.setState({
         isLti2: true,
         lti2RegistrationUrl: data.registrationUrl,
-        tool: {}
+        tool: {},
       })
       e.currentTarget.closest('form').submit()
     } else if (configurationType === 'byClientId') {
@@ -191,14 +191,14 @@ export default class AddExternalToolButton extends React.Component {
         this.setState({
           type: 'byClientId',
           toolConfiguration,
-          clientId: data.client_id
+          clientId: data.client_id,
         })
       })
     } else if (!this.throttleCreation) {
       this.setState({
         configurationType,
         attemptedToolSaveData: data,
-        attemptedToolConfigurationType: configurationType
+        attemptedToolConfigurationType: configurationType,
       })
       store.save(
         configurationType,

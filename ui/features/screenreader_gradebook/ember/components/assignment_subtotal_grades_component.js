@@ -30,7 +30,7 @@ const AssignmentSubtotalGradesComponent = Ember.Component.extend({
   hasGrade: Ember.computed.bool('values.possible'),
   hasWeightedGroups: Ember.computed.equal('weightingScheme', 'percent'),
 
-  letterGrade: function() {
+  letterGrade: function () {
     const standard = this.get('gradingStandard')
     if (!standard || !this.get('hasGrade')) {
       return null
@@ -39,35 +39,35 @@ const AssignmentSubtotalGradesComponent = Ember.Component.extend({
     return scoreToGrade(percentage, standard)
   }.property('gradingStandard', 'hasGrade'),
 
-  values: function() {
+  values: function () {
     const student = this.get('student')
     return Ember.get(student, `${this.get('subtotal.key')}`)
   }.property('subtotal', 'student', 'student.total_grade'),
 
-  points: function() {
+  points: function () {
     const values = this.get('values')
     return `${I18n.n(round(values.score, round.DEFAULT))} / ${I18n.n(
       round(values.possible, round.DEFAULT)
     )}`
   }.property('values'),
 
-  rawPercent: function() {
+  rawPercent: function () {
     const values = this.get('values')
     return scoreToPercentage(values.score, values.possible)
   }.property('values'),
 
-  percent: function() {
+  percent: function () {
     return I18n.n(round(this.get('rawPercent'), round.DEFAULT), {percentage: true})
   }.property('values'),
 
-  scoreDetail: function() {
+  scoreDetail: function () {
     const points = this.get('points')
     return `(${points})`
   }.property('points'),
 
-  weight: function() {
+  weight: function () {
     return I18n.n(this.get('subtotal').weight, {percentage: true})
-  }.property('subtotal')
+  }.property('subtotal'),
 })
 
 export default AssignmentSubtotalGradesComponent

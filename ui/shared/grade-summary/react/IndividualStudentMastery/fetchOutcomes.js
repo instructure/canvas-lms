@@ -40,7 +40,7 @@ const combine = (promiseOfJson1, promiseOfJson2) =>
 export function fetchUrl(url, dispatch) {
   return dispatch
     .fetch(url, {
-      credentials: 'include'
+      credentials: 'include',
     })
     .then(response => {
       const linkHeader = response.headers.get('link')
@@ -75,7 +75,7 @@ const fetchOutcomes = (courseId, studentId) => {
     fetchWithDispatch(
       `/api/v1/courses/${courseId}/outcome_rollups?user_ids[]=${studentId}&per_page=100`
     ),
-    fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`)
+    fetchWithDispatch(`/api/v1/courses/${courseId}/outcome_alignments?student_id=${studentId}`),
   ])
     .then(([groups, links, rollups, alignments]) => {
       outcomeGroups = groups
@@ -119,7 +119,7 @@ const fetchOutcomes = (courseId, studentId) => {
         // id to manage expansion/contraction
         expansionId: uuid(),
         groupId: outcomeLink.outcome_group.id,
-        ...outcomeLink.outcome
+        ...outcomeLink.outcome,
       }))
 
       // filter empty outcome groups

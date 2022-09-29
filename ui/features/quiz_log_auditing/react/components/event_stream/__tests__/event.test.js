@@ -18,8 +18,8 @@
 
 import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import { shallow} from 'enzyme'
-import { MemoryRouter } from 'react-router-dom'
+import {shallow} from 'enzyme'
+import {MemoryRouter} from 'react-router-dom'
 import Event from '../event'
 import assertChange from 'chai-assert-change'
 import K from '../../../../constants'
@@ -44,10 +44,8 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           createdAt="2014-11-16T13:39:19Z"
           startedAt="2014-11-16T13:37:19Z"
           type={K.EVT_QUESTION_ANSWERED}
-          questions={[{ id: 'q1', questionType: K.Q_SHORT_ANSWER }]}
-          data={[
-            { quizQuestionId: 'q1', answer: 'hello world', answered: true }
-          ]}
+          questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
+          data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
       </MemoryRouter>
     )
@@ -60,10 +58,8 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           createdAt="2014-11-16T13:39:19Z"
           startedAt="2014-11-16T13:37:19Z"
           type={K.EVT_QUESTION_VIEWED}
-          questions={[{ id: 'q1', questionType: K.Q_SHORT_ANSWER }]}
-          data={[
-            { quizQuestionId: 'q1', answer: 'hello world', answered: true }
-          ]}
+          questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
+          data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
       </MemoryRouter>
     )
@@ -104,10 +100,8 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
           createdAt="2014-11-16T13:39:19Z"
           startedAt="2014-11-16T13:37:19Z"
           type={K.EVT_QUESTION_FLAGGED}
-          questions={[{ id: 'q1', questionType: K.Q_SHORT_ANSWER }]}
-          data={[
-            { quizQuestionId: 'q1', answer: 'hello world', answered: true }
-          ]}
+          questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]}
+          data={[{quizQuestionId: 'q1', answer: 'hello world', answered: true}]}
         />
       </MemoryRouter>
     )
@@ -120,30 +114,26 @@ describe('canvas_quizzes/events/views/event_stream/event', () => {
       questions: [],
       data: [],
       type: K.EVT_QUESTION_ANSWERED,
-      ...props
+      ...props,
     })
 
     it('renders a green "complete" icon when the user focus the quiz', () => {
       const wrapper = shallow(
-        <Event
-          {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})}
-        />
+        <Event {...defaultProps({type: K.EVT_QUESTION_VIEWED, flag: K.EVT_FLAG_OK})} />
       )
-      expect(wrapper.find('IconCompleteLine').props().color).toBe("success")
+      expect(wrapper.find('IconCompleteLine').props().color).toBe('success')
     })
 
     it('renders a red "trouble" icon when the user leaves the quiz', () => {
       const wrapper = shallow(
-        <Event
-          {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})}
-        />
+        <Event {...defaultProps({type: K.EVT_PAGE_BLURRED, flag: K.EVT_FLAG_WARNING})} />
       )
-      expect(wrapper.find('IconTroubleLine').props().color).toBe("warning")
+      expect(wrapper.find('IconTroubleLine').props().color).toBe('warning')
     })
 
     it('renders an "empty" grey icon when the user answers a question', () => {
       const wrapper = shallow(<Event {...defaultProps()} />)
-      expect(wrapper.find('IconEmptyLine').props().color).toBe("secondary")
+      expect(wrapper.find('IconEmptyLine').props().color).toBe('secondary')
     })
   })
 })

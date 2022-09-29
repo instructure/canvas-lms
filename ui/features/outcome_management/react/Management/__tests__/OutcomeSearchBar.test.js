@@ -30,7 +30,7 @@ describe('OutcomeSearchBar', () => {
     enabled: true,
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {

@@ -33,7 +33,7 @@ import {
   IconQuizStatsDeviationLine,
   IconQuizStatsHighLine,
   IconQuizStatsLowLine,
-  IconQuizStatsTimeLine
+  IconQuizStatsTimeLine,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('quiz_statistics.summary')
@@ -58,7 +58,7 @@ class Summary extends React.Component {
     scoreLow: 0,
     scoreStdev: 0,
     durationAverage: 0,
-    scores: {}
+    scores: {},
   }
 
   render() {
@@ -82,7 +82,7 @@ class Summary extends React.Component {
         </header>
 
         <table className="text-left">
-          <ScreenReaderContent tagName="caption" forceSentenceDelimiter>
+          <ScreenReaderContent tagName="caption" forceSentenceDelimiter={true}>
             {I18n.t('table_description', 'Summary statistics for all turned in submissions')}
           </ScreenReaderContent>
 
@@ -112,7 +112,7 @@ class Summary extends React.Component {
                 <td key="duration">{NA_LABEL}</td>
               ) : (
                 <td key="duration">
-                  <ScreenReaderContent forceSentenceDelimiter>
+                  <ScreenReaderContent forceSentenceDelimiter={true}>
                     {secondsToTime.toReadableString(this.props.durationAverage)}
                   </ScreenReaderContent>
                   {/*

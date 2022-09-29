@@ -47,7 +47,7 @@ export function initialState() {
     auto_refresh: (params.get('auto_refresh') || '0') !== '0',
     start_date: params.get('start_date'),
     end_date: params.get('end_date'),
-    time_zone: params.get('time_zone') || ENV?.TIMEZONE || 'UTC'
+    time_zone: params.get('time_zone') || ENV?.TIMEZONE || 'UTC',
   }
 }
 
@@ -63,7 +63,7 @@ export function jobsReducer(prevState, action) {
       groups_page: 1,
       jobs_page: 1,
       groups_page_count: 1,
-      jobs_page_count: 1
+      jobs_page_count: 1,
     }
   } else if (action.type === 'CHANGE_GROUP_TYPE') {
     setQargs({group_type: action.payload})
@@ -76,7 +76,7 @@ export function jobsReducer(prevState, action) {
       groups_page: 1,
       jobs_page: 1,
       groups_page_count: 1,
-      jobs_page_count: 1
+      jobs_page_count: 1,
     }
   } else if (action.type === 'CHANGE_GROUP_ORDER') {
     setQargs({group_order: action.payload})
@@ -93,7 +93,7 @@ export function jobsReducer(prevState, action) {
       return {
         ...prevState,
         groups_page_count: last,
-        groups_page: Math.min(prevState.groups_page, last)
+        groups_page: Math.min(prevState.groups_page, last),
       }
     }
   } else if (action.type === 'CHANGE_GROUPS_PAGE') {
@@ -108,7 +108,7 @@ export function jobsReducer(prevState, action) {
         jobs: [],
         job: null,
         jobs_page: 1,
-        jobs_page_count: 1
+        jobs_page_count: 1,
       }
     } else {
       return prevState
@@ -129,7 +129,7 @@ export function jobsReducer(prevState, action) {
       return {
         ...prevState,
         jobs_page_count: last,
-        jobs_page: Math.min(prevState.jobs_page, last)
+        jobs_page: Math.min(prevState.jobs_page, last),
       }
     }
   } else if (action.type === 'CHANGE_JOBS_PAGE') {
@@ -148,7 +148,7 @@ export function jobsReducer(prevState, action) {
       jobs_page: 1,
       groups_page_count: 1,
       jobs_page_count: 1,
-      scope: action.payload
+      scope: action.payload,
     }
   } else if (action.type === 'TOGGLE_AUTO_REFRESH') {
     if (prevState.auto_refresh) {
@@ -160,20 +160,20 @@ export function jobsReducer(prevState, action) {
         ...prevState,
         auto_refresh: true,
         groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
-        jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
+        jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1,
       }
     }
   } else if (action.type === 'REFRESH_ALL') {
     return {
       ...prevState,
       groups_refresh_nonce: prevState.groups_refresh_nonce + 1,
-      jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1
+      jobs_refresh_nonce: prevState.jobs_refresh_nonce + 1,
     }
   } else if (action.type === 'CHANGE_DATE_OPTIONS') {
     setQargs({
       start_date: action.payload.start_date || '',
       end_date: action.payload.end_date || '',
-      time_zone: action.payload.time_zone
+      time_zone: action.payload.time_zone,
     })
     if (
       action.payload.start_date !== prevState.start_date ||
@@ -189,12 +189,12 @@ export function jobsReducer(prevState, action) {
         groups_page: 1,
         jobs_page: 1,
         groups_page_count: 1,
-        jobs_page_count: 1
+        jobs_page_count: 1,
       }
     } else {
       return {
         ...prevState,
-        time_zone: action.payload.time_zone
+        time_zone: action.payload.time_zone,
       }
     }
   }

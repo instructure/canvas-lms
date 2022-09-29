@@ -32,7 +32,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   firstNameFirst,
   lastNameFirst,
-  nameParts
+  nameParts,
 } from '@canvas/user-sortable-name/jquery/user_utils'
 import preventDefault from 'prevent-default'
 import unflatten from 'obj-unflatten'
@@ -49,10 +49,10 @@ const initialState = {
   data: {
     user: {},
     pseudonym: {
-      send_confirmation: true
-    }
+      send_confirmation: true,
+    },
   },
-  errors: {}
+  errors: {},
 }
 
 export default class CreateOrUpdateUserModal extends React.Component {
@@ -66,18 +66,18 @@ export default class CreateOrUpdateUserModal extends React.Component {
       sortable_name: string,
       short_name: string,
       email: string,
-      time_zone: string
+      time_zone: string,
     }),
     customized_login_handle_name: string,
     delegated_authentication: bool.isRequired,
     showSIS: bool.isRequired,
-    afterSave: func.isRequired
+    afterSave: func.isRequired,
   }
 
   static defaultProps = {
     customized_login_handle_name: window.ENV.customized_login_handle_name,
     delegated_authentication: window.ENV.delegated_authentication,
-    showSIS: window.ENV.SHOW_SIS_ID_IN_NEW_USER_FORM
+    showSIS: window.ENV.SHOW_SIS_ID_IN_NEW_USER_FORM,
   }
 
   state = {...initialState}
@@ -99,7 +99,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
     this.setState(prevState => {
       let newState = update(prevState, {
         data: unflatten({[field]: {$set: value}}),
-        errors: {$set: {}}
+        errors: {$set: {}},
       })
 
       // set sensible defaults for sortable_name and short_name
@@ -158,18 +158,18 @@ export default class CreateOrUpdateUserModal extends React.Component {
         name: 'user[name]',
         label: I18n.t('Full Name'),
         hint: I18n.t('This name will be used by teachers for grading.'),
-        required: I18n.t('Full name is required')
+        required: I18n.t('Full name is required'),
       },
       {
         name: 'user[short_name]',
         label: I18n.t('Display Name'),
-        hint: I18n.t('People will see this name in discussions, messages and comments.')
+        hint: I18n.t('People will see this name in discussions, messages and comments.'),
       },
       {
         name: 'user[sortable_name]',
         label: I18n.t('Sortable Name'),
-        hint: I18n.t('This name appears in sorted lists.')
-      }
+        hint: I18n.t('This name appears in sorted lists.'),
+      },
     ]
       .concat(
         this.props.createOrUpdate === 'create'
@@ -179,35 +179,35 @@ export default class CreateOrUpdateUserModal extends React.Component {
                 label: this.props.customized_login_handle_name || I18n.t('Email'),
                 required: this.props.customized_login_handle_name
                   ? I18n.t('%{login_handle} is required', {
-                      login_handle: this.props.customized_login_handle_name
+                      login_handle: this.props.customized_login_handle_name,
                     })
-                  : I18n.t('Email is required')
+                  : I18n.t('Email is required'),
               },
               showCustomizedLoginId && {
                 name: 'pseudonym[path]',
                 label: I18n.t('Email'),
-                required: I18n.t('Email is required')
+                required: I18n.t('Email is required'),
               },
               this.props.showSIS && {
                 name: 'pseudonym[sis_user_id]',
-                label: I18n.t('SIS ID')
+                label: I18n.t('SIS ID'),
               },
               {
                 name: 'pseudonym[send_confirmation]',
                 label: I18n.t('Email the user about this account creation'),
-                Component: Checkbox
-              }
+                Component: Checkbox,
+              },
             ]
           : [
               {
                 name: 'user[email]',
-                label: I18n.t('Default Email')
+                label: I18n.t('Default Email'),
               },
               {
                 name: 'user[time_zone]',
                 label: I18n.t('Time Zone'),
-                Component: TimeZoneSelect
-              }
+                Component: TimeZoneSelect,
+              },
             ]
       )
       .filter(Boolean)
@@ -230,7 +230,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
                 size="small"
                 name={this.state.data.user.name}
                 src={this.props.user.avatar_url}
-                data-fs-exclude
+                data-fs-exclude={true}
               />{' '}
               {I18n.t('Edit User Details')}
             </span>
@@ -274,7 +274,7 @@ export default class CreateOrUpdateUserModal extends React.Component {
           onClick: (...args) => {
             if (child.props.onClick) child.props.onClick(...args)
             this.setState({open: true})
-          }
+          },
         })
       )}
     </span>

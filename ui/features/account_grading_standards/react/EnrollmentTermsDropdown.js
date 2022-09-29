@@ -26,7 +26,7 @@ const I18n = useI18nScope('EnrollmentTermsDropdown')
 class EnrollmentTermsDropdown extends React.Component {
   static propTypes = {
     terms: PropTypes.array.isRequired,
-    changeSelectedEnrollmentTerm: PropTypes.func.isRequired
+    changeSelectedEnrollmentTerm: PropTypes.func.isRequired,
   }
 
   sortedTerms = terms => {

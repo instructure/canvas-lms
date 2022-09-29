@@ -25,7 +25,7 @@ class FlickrImage extends React.Component {
 
   render() {
     const imageStyle = {
-      backgroundImage: `url(${this.props.url})`
+      backgroundImage: `url(${this.props.url})`,
     }
 
     return (

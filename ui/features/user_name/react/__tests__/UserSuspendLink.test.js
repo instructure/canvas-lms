@@ -24,22 +24,22 @@ import UserSuspendLink from '../UserSuspendLink'
 const allSuspended = {
   pseudonyms: [
     {id: 5, workflow_state: 'suspended', unique_id: 'suspended'},
-    {id: 6, workflow_state: 'suspended', unique_id: 'also suspended'}
-  ]
+    {id: 6, workflow_state: 'suspended', unique_id: 'also suspended'},
+  ],
 }
 
 const allActive = {
   pseudonyms: [
     {id: 5, workflow_state: 'active', unique_id: 'active'},
-    {id: 6, workflow_state: 'active', unique_id: 'also active'}
-  ]
+    {id: 6, workflow_state: 'active', unique_id: 'also active'},
+  ],
 }
 
 const mixedStates = {
   pseudonyms: [
     {id: 5, workflow_state: 'suspended', unique_id: 'suspended'},
-    {id: 6, workflow_state: 'active', unique_id: 'active'}
-  ]
+    {id: 6, workflow_state: 'active', unique_id: 'active'},
+  ],
 }
 
 const USER_ID = '31337'
@@ -127,7 +127,7 @@ describe('UserSuspendLink::', () => {
       button = await findByTestId('action-button')
       fireEvent.click(button)
       expect(fetchMock.lastCall(route)[1]).toMatchObject({
-        body: JSON.stringify({user: {event: 'suspend'}})
+        body: JSON.stringify({user: {event: 'suspend'}}),
       })
     })
 
@@ -138,7 +138,7 @@ describe('UserSuspendLink::', () => {
       button = await findByTestId('action-button')
       fireEvent.click(button)
       expect(fetchMock.lastCall(route)[1]).toMatchObject({
-        body: JSON.stringify({user: {event: 'unsuspend'}})
+        body: JSON.stringify({user: {event: 'unsuspend'}}),
       })
     })
   })

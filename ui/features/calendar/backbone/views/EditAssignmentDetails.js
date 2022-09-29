@@ -53,7 +53,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSIS:
         this.event.eventType === 'assignment' ? this.event.assignment.post_to_sis : undefined,
       datePickerFormat: 'medium_with_weekday',
-      important_dates: this.event.important_dates
+      important_dates: this.event.important_dates,
     })
     this.currentContextInfo = null
     if (this.event.override) {
@@ -156,7 +156,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
 
     // TODO: support adding a new assignment group from this select box
     const assignmentGroupsSelectOptionsInfo = {
-      collection: this.currentContextInfo.assignment_groups.sort(natcompare.byKey('name'))
+      collection: this.currentContextInfo.assignment_groups.sort(natcompare.byKey('name')),
     }
     this.$el
       .find('.assignment_group')
@@ -283,7 +283,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       postToSIS: post_to_sis,
       maxNameLength: max_name_length,
       name: data.name,
-      maxNameLengthRequired: max_name_length_required
+      maxNameLengthRequired: max_name_length_required,
     })
 
     if (!data.name || $.trim(data.name.toString()).length === 0) {
@@ -292,9 +292,9 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
       errors['assignment[name]'] = [
         {
           message: I18n.t('Name is too long, must be under %{length} characters', {
-            length: max_name_length + 1
-          })
-        }
+            length: max_name_length + 1,
+          }),
+        },
       ]
     }
     return errors
@@ -318,7 +318,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
         showFlashAlert({
           message: rangeErrorMessage,
           err: null,
-          type: 'error'
+          type: 'error',
         })
       }
     }
@@ -330,7 +330,7 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     const validationHelper = new SisValidationHelper({
       postToSIS: post_to_sis,
       dueDateRequired: ENV.DUE_DATE_REQUIRED_FOR_ACCOUNT,
-      dueDate: data.due_at
+      dueDate: data.due_at,
     })
 
     const error_tag = data.name != null ? 'assignment[due_at]' : 'assignment_override[due_at]'
@@ -344,21 +344,21 @@ export default class EditAssignmentDetailsRewrite extends ValidatedFormView {
     const $field = this.$el.find('.datetime_field')
     return $field.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday'))
-      }
+        dateFormat: datePickerFormat(I18n.t('#date.formats.medium_with_weekday')),
+      },
     })
   }
 }
 EditAssignmentDetailsRewrite.prototype.defaults = {
   width: 440,
-  height: 384
+  height: 384,
 }
 
 EditAssignmentDetailsRewrite.prototype.events = {
   ...EditAssignmentDetailsRewrite.prototype.events,
   'click .save_assignment': 'submitAssignment',
   'click .more_options_link': 'moreOptions',
-  'change .context_id': 'contextChange'
+  'change .context_id': 'contextChange',
 }
 
 EditAssignmentDetailsRewrite.prototype.template = editAssignmentTemplate

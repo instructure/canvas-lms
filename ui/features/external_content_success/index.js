@@ -95,7 +95,7 @@ ExternalContentSuccess.a2DataReady = function (data) {
       log: ENV.log,
       errormsg: ENV.error_message,
       errorlog: ENV.error_log,
-      ltiEndpoint: ENV.lti_endpoint
+      ltiEndpoint: ENV.lti_endpoint,
     },
     ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
   )
@@ -110,29 +110,30 @@ ExternalContentSuccess.processLtiMessages = async (messages, target) => {
     wrapper.setAttribute('id', 'lti_messages_wrapper')
     target.parentNode.insertBefore(wrapper, target)
 
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       ReactDOM.render(
         <>
           {[
             [errorMessage, true],
-            [message, false]
+            [message, false],
           ]
             .filter(([msg, _]) => msg !== undefined)
             .map(([msg, isError], index) => {
               return (
                 <Alert
                   key={index}
-                  variant={isError ? "error" : "info"}
+                  variant={isError ? 'error' : 'info'}
                   renderCloseButtonLabel="Close"
                   onDismiss={() => resolve()}
                   timeout={5000}
                 >
-                  <span id={isError ? "lti_error_message" : "lti_message"}>{msg}</span>
+                  <span id={isError ? 'lti_error_message' : 'lti_message'}>{msg}</span>
                 </Alert>
               )
             })}
-        </>
-        , wrapper)
+        </>,
+        wrapper
+      )
     })
     ReactDOM.unmountComponentAtNode(wrapper)
   }

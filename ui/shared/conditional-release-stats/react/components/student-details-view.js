@@ -36,21 +36,21 @@ export default class StudentDetailsView extends React.Component {
     triggerAssignment: shape({
       submission: shape({
         grade: string.isRequired,
-        submitted_at: string.isRequired
+        submitted_at: string.isRequired,
       }).isRequired,
-      assignment: assignmentShape.isRequired
+      assignment: assignmentShape.isRequired,
     }),
     followOnAssignments: arrayOf(
       shape({
         score: number,
         trend: number,
-        assignment: assignmentShape.isRequired
+        assignment: assignmentShape.isRequired,
       })
     ),
 
     selectNextStudent: func.isRequired,
     selectPrevStudent: func.isRequired,
-    unselectStudent: func.isRequired
+    unselectStudent: func.isRequired,
   }
 
   componentDidUpdate(prevProps) {
@@ -72,7 +72,7 @@ export default class StudentDetailsView extends React.Component {
           }}
           onClick={this.props.unselectStudent}
         >
-          <i aria-hidden className="icon-arrow-open-left" />
+          <i aria-hidden={true} className="icon-arrow-open-left" />
           {I18n.t('Back')}
         </button>
       </header>
@@ -94,10 +94,14 @@ export default class StudentDetailsView extends React.Component {
           onClick={this.props.selectPrevStudent}
           type="button"
         >
-          <i aria-hidden className="icon-arrow-open-left" />
+          <i aria-hidden={true} className="icon-arrow-open-left" />
         </button>
         <div className="crs-student-details__profile-inner-content">
-          <img src={studentAvatar} aria-hidden className="crs-student-details__profile-image" />
+          <img
+            src={studentAvatar}
+            aria-hidden={true}
+            className="crs-student-details__profile-image"
+          />
           <h3 className="crs-student-details__name">{student.name}</h3>
           <a
             target="_blank"
@@ -105,7 +109,7 @@ export default class StudentDetailsView extends React.Component {
             href={conversationUrl}
             className="crs-breakdown__link"
           >
-            <i aria-hidden className="icon-email crs-icon-email" />
+            <i aria-hidden={true} className="icon-email crs-icon-email" />
             {I18n.t('Send Message')}
           </a>
         </div>
@@ -115,7 +119,7 @@ export default class StudentDetailsView extends React.Component {
           onClick={this.props.selectNextStudent}
           type="button"
         >
-          <i aria-hidden className="icon-arrow-open-right" />
+          <i aria-hidden={true} className="icon-arrow-open-right" />
         </button>
       </section>
     )
@@ -199,7 +203,7 @@ export default class StudentDetailsView extends React.Component {
 
     const studentDetailsClasses = classNames({
       'crs-student-details': true,
-      'crs-student-details__hidden': isHidden
+      'crs-student-details__hidden': isHidden,
     })
 
     return (

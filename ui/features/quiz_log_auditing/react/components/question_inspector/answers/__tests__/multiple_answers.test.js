@@ -23,16 +23,18 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/events/views/question_inspector/answers/multiple_answers', () => {
   it('renders', () => {
-    const { getByTestId } = render(<MultipleAnswers
-      question={{
-        answers: [
-          { id: 1, text: 'one' },
-          { id: 2, text: 'two' },
-          { id: 3, text: 'three' }
-        ],
-      }}
-      answer={['1', '3']}
-    />)
+    const {getByTestId} = render(
+      <MultipleAnswers
+        question={{
+          answers: [
+            {id: 1, text: 'one'},
+            {id: 2, text: 'two'},
+            {id: 3, text: 'three'},
+          ],
+        }}
+        answer={['1', '3']}
+      />
+    )
 
     expect(getByTestId('answer-1').checked).toBe(true)
     expect(getByTestId('answer-2').checked).toBe(false)

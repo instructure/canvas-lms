@@ -37,12 +37,12 @@ class OutcomePopover extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
     outcomeProficiency: shapes.outcomeProficiencyShape,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
     outcomeProficiency: null,
-    breakpoints: {}
+    breakpoints: {},
   }
 
   constructor() {
@@ -74,8 +74,8 @@ class OutcomePopover extends React.Component {
       {points: mastery_points * 1.5, color: '127A1B', description: I18n.t('Exceeds Mastery')},
       {points: mastery_points, color: '0B874B', description: I18n.t('Meets Mastery')},
       {points: mastery_points / 2, color: 'FAB901', description: I18n.t('Near Mastery')},
-      {points: 0, color: 'E0061F', description: I18n.t('Well Below Mastery')}
-    ]
+      {points: 0, color: 'E0061F', description: I18n.t('Well Below Mastery')},
+    ],
   }))
 
   latestTime() {

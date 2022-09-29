@@ -49,7 +49,7 @@ const types = [
   'UPDATE_PERMISSIONS_SEARCH',
   'UPDATE_ROLE_FILTERS',
   'UPDATE_SELECTED_ROLES',
-  'DELETE_ROLE_SUCCESS'
+  'DELETE_ROLE_SUCCESS',
 ]
 
 const actions = createActions(...types)
@@ -62,7 +62,7 @@ actions.searchPermissions = function searchPermissions({permissionSearchString, 
     const message = I18n.t(
       {
         one: 'One permission found',
-        other: '%{count} permissions found'
+        other: '%{count} permissions found',
       },
       {count: numDisplayedPermissions}
     )
@@ -158,7 +158,7 @@ actions.modifyPermissions = function modifyPermissions({
   enabled,
   locked,
   explicit,
-  inTray
+  inTray,
 }) {
   return (dispatch, getState) => {
     const role = getState().roles.find(r => r.id === id)

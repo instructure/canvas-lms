@@ -23,14 +23,14 @@ import {ThreadingToolbar} from './ThreadingToolbar'
 export default {
   title: 'Examples/Discussion Posts/Components/ThreadingToolbar/Expansion',
   component: ThreadingToolbar.Expansion,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => (
-  <ThreadingToolbar.Expansion isExpanded expandText="" delimiterKey="expansion" {...args} />
+  <ThreadingToolbar.Expansion isExpanded={true} expandText="" delimiterKey="expansion" {...args} />
 )
 
 export const Default = Template.bind({})
 Default.args = {
-  expandText: '4 replies, 2 unread'
+  expandText: '4 replies, 2 unread',
 }

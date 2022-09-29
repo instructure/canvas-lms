@@ -49,22 +49,22 @@ ready(() => {
     searchForm: new UserDateRangeSearchFormView({
       formName: 'messages',
       inputFilterView: new InputFilterView({
-        collection: messagesUsers
+        collection: messagesUsers,
       }),
       usersView: new PaginatedCollectionView({
         collection: messagesUsers,
         itemView: UserView,
         buffer: 1000,
-        template: usersTemplate
+        template: usersTemplate,
       }),
-      collection: messages
+      collection: messages,
     }),
     resultsView: new PaginatedCollectionView({
       template: messagesSearchResultsTemplate,
       itemView: CommMessageItemView,
-      collection: messages
+      collection: messages,
     }),
-    collection: messages
+    collection: messages,
   })
 
   // Render tabs
@@ -74,17 +74,17 @@ ready(() => {
       courseRestore: ENV.PERMISSIONS.restore_course,
       viewMessages: ENV.PERMISSIONS.view_messages,
       logging: !!ENV.PERMISSIONS.logging,
-      bouncedEmails: ENV.bounced_emails_admin_tool
+      bouncedEmails: ENV.bounced_emails_admin_tool,
     },
     restoreContentPaneView: new RestoreContentPaneView({
       courseSearchFormView: new CourseSearchFormView({model: restoreModel}),
-      courseSearchResultsView: new CourseSearchResultsView({model: restoreModel})
+      courseSearchResultsView: new CourseSearchResultsView({model: restoreModel}),
     }),
     messageContentPaneView: messagesContentView,
     loggingContentPaneView: new LoggingContentPaneView({
       permissions: ENV.PERMISSIONS.logging,
-      users: loggingUsers
-    })
+      users: loggingUsers,
+    }),
   })
 
   app.render()

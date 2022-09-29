@@ -31,13 +31,13 @@ import ManualConfigurationForm from './ManualConfigurationForm/index'
 const I18n = useI18nScope('react_developer_keys')
 
 const validationMessageInvalidJson = [
-  {text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'}
+  {text: I18n.t('Json is not valid. Please submit properly formatted json.'), type: 'error'},
 ]
 const validationMessageRequiredField = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
 export default class ToolConfigurationForm extends React.Component {
   state = {
-    invalidJson: null
+    invalidJson: null,
   }
 
   get toolConfiguration() {
@@ -128,7 +128,7 @@ export default class ToolConfigurationForm extends React.Component {
         <SimpleSelect.Option id="url" key="url" value="url">
           {I18n.t('Enter URL')}
         </SimpleSelect.Option>
-      )
+      ),
     ].filter(o => o !== null)
   }
 
@@ -170,5 +170,5 @@ ToolConfigurationForm.propTypes = {
   updateToolConfiguration: PropTypes.func.isRequired,
   updateToolConfigurationUrl: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string.isRequired,
-  updateConfigurationMethod: PropTypes.func.isRequired
+  updateConfigurationMethod: PropTypes.func.isRequired,
 }

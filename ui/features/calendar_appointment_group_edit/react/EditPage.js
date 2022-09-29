@@ -46,7 +46,7 @@ const parseFormValues = data => ({
   title: data.title,
   limitUsersPerSlot: data.participants_per_appointment,
   limitSlotsPerUser: data.max_appointments_per_participant,
-  allowStudentsToView: data.participant_visibility === 'protected'
+  allowStudentsToView: data.participant_visibility === 'protected',
 })
 
 const parseTimeData = appointmentGroup => {
@@ -57,9 +57,9 @@ const parseTimeData = appointmentGroup => {
     timeData: {
       date: appointment.start_at,
       startTime: appointment.start_at,
-      endTime: appointment.end_at
+      endTime: appointment.end_at,
     },
-    slotEventId: appointment.id.toString()
+    slotEventId: appointment.id.toString(),
   }))
 }
 
@@ -70,7 +70,7 @@ const nullTimeFilter = timeBlock =>
 
 class EditPage extends React.Component {
   static propTypes = {
-    appointment_group_id: PropTypes.string
+    appointment_group_id: PropTypes.string,
   }
 
   constructor(props) {
@@ -79,12 +79,12 @@ class EditPage extends React.Component {
       appointmentGroup: {
         title: '',
         context_codes: [],
-        sub_context_codes: []
+        sub_context_codes: [],
       },
       formValues: {},
       contexts: [],
       isDeleting: false,
-      eventDataSource: null
+      eventDataSource: null,
     }
   }
 
@@ -98,7 +98,7 @@ class EditPage extends React.Component {
         this.setState(
           {
             formValues,
-            appointmentGroup: response.data
+            appointmentGroup: response.data,
           },
           () => {
             // Handle setting some pesky values
@@ -118,7 +118,7 @@ class EditPage extends React.Component {
       )
       this.setState({
         contexts,
-        eventDataSource: new EventDataSource(contexts)
+        eventDataSource: new EventDataSource(contexts),
       })
     })
   }
@@ -130,7 +130,7 @@ class EditPage extends React.Component {
 
   handleChange = e => {
     const formValues = Object.assign(this.state.formValues, {
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     })
 
     this.setState({formValues})
@@ -138,7 +138,7 @@ class EditPage extends React.Component {
 
   handleCheckboxChange = e => {
     const formValues = Object.assign(this.state.formValues, {
-      [e.target.name]: e.target.checked
+      [e.target.name]: e.target.checked,
     })
 
     this.setState({formValues})
@@ -147,7 +147,7 @@ class EditPage extends React.Component {
   messageStudents = () => {
     const messageStudentsDialog = new MessageParticipantsDialog({
       group: this.state.appointmentGroup,
-      dataSource: this.state.eventDataSource
+      dataSource: this.state.eventDataSource,
     })
     messageStudentsDialog.show()
   }
@@ -214,11 +214,11 @@ class EditPage extends React.Component {
           .filter(nullTimeFilter)
           .map(tb => [
             $.unfudgeDateForProfileTimezone(tb.timeData.startTime),
-            $.unfudgeDateForProfileTimezone(tb.timeData.endTime)
+            $.unfudgeDateForProfileTimezone(tb.timeData.endTime),
           ]),
         context_codes: [...this.contextSelector.state.selectedContexts],
-        sub_context_codes: [...this.contextSelector.state.selectedSubContexts]
-      }
+        sub_context_codes: [...this.contextSelector.state.selectedSubContexts],
+      },
     }
 
     axios
@@ -245,7 +245,7 @@ class EditPage extends React.Component {
         <ScreenReaderContent>
           <h1>
             {I18n.t('Edit %{pageTitle}', {
-              pageTitle: this.state.appointmentGroup.title
+              pageTitle: this.state.appointmentGroup.title,
             })}
           </h1>
         </ScreenReaderContent>
@@ -335,8 +335,8 @@ class EditPage extends React.Component {
                   dangerouslySetInnerHTML={{
                     __html: I18n.t('Limit each time slot to %{input_value} user(s). ', {
                       input_value:
-                        '<input class="ic-Input EditPage__Options-Input EditPage__Options-LimitUsersPerSlot" />'
-                    })
+                        '<input class="ic-Input EditPage__Options-Input EditPage__Options-LimitUsersPerSlot" />',
+                    }),
                   }}
                 />
               </div>
@@ -362,8 +362,8 @@ class EditPage extends React.Component {
                   dangerouslySetInnerHTML={{
                     __html: I18n.t('Limit students to attend %{input_value} slot(s). ', {
                       input_value:
-                        '<input class="ic-Input EditPage__Options-Input EditPage__Options-LimitSlotsPerUser" />'
-                    })
+                        '<input class="ic-Input EditPage__Options-Input EditPage__Options-LimitSlotsPerUser" />',
+                    }),
                   }}
                 />
               </div>

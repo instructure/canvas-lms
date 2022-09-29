@@ -45,8 +45,8 @@ const {borders, colors, typography} = variables
  */
 const baseFont = {
   typography: {
-    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`
-  }
+    fontFamily: `"Balsamiq Sans", ${typography.fontFamily}`,
+  },
 }
 const base = {
   typography: {
@@ -55,8 +55,8 @@ const base = {
     fontSizeSmall: '1rem',
     fontSizeMedium: '1.125rem',
     fontSizeLarge: '1.5rem',
-    fontSizeXLarge: '2rem'
-  }
+    fontSizeXLarge: '2rem',
+  },
 }
 
 /**
@@ -75,44 +75,44 @@ export const theme = {
     h4FontSize: '1.25rem',
     h4FontWeight: typography.fontWeightBold,
     h5FontSize: '1rem',
-    h5FontWeight: typography.fontWeightNormal
+    h5FontWeight: typography.fontWeightNormal,
   },
   [Tabs.Tab.theme]: {
-    fontSize: '1.25rem'
+    fontSize: '1.25rem',
   },
   [Grouping.theme]: {
     borderTopWidth: borders.widthMedium,
-    heroPadding: '0.125rem'
+    heroPadding: '0.125rem',
   },
   [Day.theme]: {
-    secondaryFontSize: '1rem'
+    secondaryFontSize: '1rem',
   },
   [PlannerItem.theme]: {
     iconColor: colors.licorice,
-    secondaryColor: colors.licorice
+    secondaryColor: colors.licorice,
   },
   [Table.Cell.theme]: {
-    padding: '1rem 0.75rem'
+    padding: '1rem 0.75rem',
   },
   [IconButton.theme]: {
-    iconSizeMedium: '1.5rem'
-  }
+    iconSizeMedium: '1.5rem',
+  },
 }
 
 /** Overrides applied specifically to resources pages */
 export const resourcesTheme = {
   [Heading.theme]: {
     h2FontSize: '1.375rem',
-    h3FontSize: '1.125rem'
-  }
+    h3FontSize: '1.125rem',
+  },
 }
 
 // A few overrides for the planner
 export const plannerTheme = {
   [ToggleDetails.theme]: {
     iconColor: colors.brand,
-    textColor: colors.textBrand
-  }
+    textColor: colors.textBrand,
+  },
 }
 
 export default {
@@ -120,5 +120,5 @@ export default {
     const fontOnly = options?.fontOnly || false
     baseTheme.use({overrides: fontOnly ? baseFont : base})
   },
-  variables: mergeDeep(variables, base)
+  variables: mergeDeep(variables, base),
 }

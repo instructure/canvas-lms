@@ -37,5 +37,5 @@ $form.formSubmit({
   },
   error(errors) {
     if (errors.nonce) location.href = '/login/canvas'
-  }
+  },
 })

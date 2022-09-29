@@ -20,7 +20,7 @@ import stubEnv from '@canvas/stub-env'
 
 describe('@canvas/brandable-css#loadStylesheet', () => {
   const env = stubEnv({
-    ASSET_HOST: 'http://cdn.example.com'
+    ASSET_HOST: 'http://cdn.example.com',
   })
 
   it('loads', () => {
@@ -52,8 +52,8 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
     jest.spyOn(BrandableCSS, 'getHandlebarsIndex').mockImplementation(() => [
       ['first_variant', 'second_variant'],
       {
-        fa0: ['xxx']
-      }
+        fa0: ['xxx'],
+      },
     ])
 
     subject({id: 'fa0', bundle: 'asdfasdf'})
@@ -61,7 +61,7 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
     expect(loadStylesheet).toHaveBeenCalled()
     expect(loadStylesheet).toHaveBeenCalledWith('asdfasdf', {
       combinedChecksum: 'xxx',
-      includesNoVariables: true
+      includesNoVariables: true,
     })
   })
 
@@ -76,7 +76,7 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
     expect(loadStylesheet).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        combinedChecksum: 'xxx'
+        combinedChecksum: 'xxx',
       })
     )
   })
@@ -92,7 +92,7 @@ describe('@canvas/brandable-css#loadStylesheetForJST', () => {
     expect(loadStylesheet).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        includesNoVariables: true
+        includesNoVariables: true,
       })
     )
   })
@@ -120,7 +120,7 @@ describe('@canvas/brandable-css#urlFor', () => {
     expect(
       subject(bundleId, {
         combinedChecksum: fingerprint,
-        includesNoVariables: true
+        includesNoVariables: true,
       })
     ).toEqual(`/dist/brandable_css/no_variables/${bundleId}-${fingerprint}.css`)
   })

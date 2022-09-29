@@ -58,7 +58,7 @@ export const GradeRow = ({
   hasComments,
   currentUserId,
   isStacked,
-  dateFormatter
+  dateFormatter,
 }) => {
   const cellTheme = isStacked ? {padding: '.5rem .75rem'} : undefined
 
@@ -68,7 +68,7 @@ export const GradeRow = ({
         <Text color="warning" size="small">
           {submissionDate
             ? I18n.t('Late %{date}', {
-                date: dateFormatter(submissionDate)
+                date: dateFormatter(submissionDate),
               })
             : I18n.t('Late')}
         </Text>
@@ -85,7 +85,7 @@ export const GradeRow = ({
       return (
         <Text color="success" size="small">
           {I18n.t('Submitted %{date}', {
-            date: dateFormatter(submissionDate)
+            date: dateFormatter(submissionDate),
           })}
         </Text>
       )
@@ -151,7 +151,7 @@ export const GradeRow = ({
         isWithinText={false}
         theme={{
           color: k5Theme.variables.colors.textDarkest,
-          hoverColor: k5Theme.variables.colors.textDarkest
+          hoverColor: k5Theme.variables.colors.textDarkest,
         }}
       >
         {assignmentName}
@@ -174,7 +174,7 @@ export const GradeRow = ({
               </ScreenReaderContent>
             )}
             theme={{
-              sizeNotification: '0.45rem'
+              sizeNotification: '0.45rem',
             }}
           >
             {renderTitleCell()}

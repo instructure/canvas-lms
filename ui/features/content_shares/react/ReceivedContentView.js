@@ -53,7 +53,7 @@ export default function ReceivedContentView() {
       const message = I18n.t(
         {
           one: '1 shared item loaded.',
-          other: '%{count} shared items loaded.'
+          other: '%{count} shared items loaded.',
         },
         {count: data.length}
       )
@@ -68,7 +68,7 @@ export default function ReceivedContentView() {
     error: setError,
     loading: setIsLoading,
     path: `${sharesUrl}/received`,
-    params: {page: currentPage}
+    params: {page: currentPage},
   })
 
   function removeShareFromList(doomedShare) {
@@ -80,7 +80,7 @@ export default function ReceivedContentView() {
     doFetchApi({
       method: 'PUT',
       path: `${sharesUrl}/${share_id}`,
-      body: updateParms
+      body: updateParms,
     })
       .then(r => {
         const {id, read_state} = r.json

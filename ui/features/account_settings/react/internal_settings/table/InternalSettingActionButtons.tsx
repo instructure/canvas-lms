@@ -81,9 +81,9 @@ export const InternalSettingActionButtons = (props: InternalSettingActionButtons
             buttonProps={{
               withBackground: false,
               withBorder: false,
-              margin: 'auto x-small'
+              margin: 'auto x-small',
             }}
-            tooltip
+            tooltip={true}
           />
         )}
         {props.onDelete && (

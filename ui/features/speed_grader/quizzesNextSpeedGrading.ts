@@ -76,7 +76,7 @@ function quizzesNextSpeedGrading(
       frame.contentWindow.postMessage(
         {
           submission,
-          subject: 'canvas.speedGraderSubmissionChange'
+          subject: 'canvas.speedGraderSubmissionChange',
         },
         '*'
       )
@@ -102,7 +102,7 @@ function quizzesNextSpeedGrading(
   return {
     onMessage,
     postChangeSubmissionMessage,
-    quizzesNextChange
+    quizzesNextChange,
   }
 }
 

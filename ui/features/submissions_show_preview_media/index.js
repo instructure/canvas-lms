@@ -19,7 +19,7 @@ import $ from 'jquery'
 import '@canvas/media-comments'
 
 $(document).ready(() => {
-  $('.play_media_recording_link').click(function(event) {
+  $('.play_media_recording_link').click(function (event) {
     event.preventDefault()
     const id = $('.media_comment_id:first').text()
     $('#media_recording_box .box_content').mediaComment('show_inline', id)

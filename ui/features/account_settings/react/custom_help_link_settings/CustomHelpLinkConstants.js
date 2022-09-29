@@ -26,7 +26,7 @@ const USER_TYPES = [
   {value: 'teacher', label: I18n.t('Teachers')},
   {value: 'admin', label: I18n.t('Admins')},
   {value: 'observer', label: I18n.t('Observers')},
-  {value: 'unenrolled', label: I18n.t('Unenrolled')}
+  {value: 'unenrolled', label: I18n.t('Unenrolled')},
 ]
 
 const DEFAULT_LINK = Object.freeze({
@@ -39,7 +39,7 @@ const DEFAULT_LINK = Object.freeze({
   state: 'new',
   is_featured: false,
   is_new: false,
-  feature_headline: ''
+  feature_headline: '',
 })
 
 const NAME_PREFIX = 'account[custom_help_links]'
@@ -47,5 +47,5 @@ const NAME_PREFIX = 'account[custom_help_links]'
 export default Object.freeze({
   USER_TYPES,
   DEFAULT_LINK,
-  NAME_PREFIX
+  NAME_PREFIX,
 })

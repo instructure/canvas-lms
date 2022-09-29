@@ -25,7 +25,7 @@ const I18n = useI18nScope('student_context_trayLastActivity')
 
 class LastActivity extends React.Component {
   static propTypes = {
-    user: PropTypes.object.isRequired
+    user: PropTypes.object.isRequired,
   }
 
   get lastActivity() {

@@ -26,7 +26,7 @@ function makeDate(date) {
   return {
     day: date.getDate(),
     month: date.getMonth(),
-    year: date.getFullYear()
+    year: date.getFullYear(),
   }
 }
 
@@ -49,7 +49,7 @@ export function changeMonth($month, change) {
   var data = {
     month_name: monthNames[current.getMonth() + 1],
     month_number: current.getMonth() + 1,
-    year_number: current.getFullYear()
+    year_number: current.getFullYear(),
   }
   $month.fillTemplateData({data})
   const firstDayOfWeek = moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek()
@@ -68,7 +68,7 @@ export function changeMonth($month, change) {
     lastDayOfPreviousMonth = {
       day: date.getDate(),
       month: firstDayOfSquare.month,
-      year: firstDayOfSquare.year
+      year: firstDayOfSquare.year,
     }
     date.setDate(1)
     date.setMonth(date.getMonth() + 1)
@@ -78,7 +78,7 @@ export function changeMonth($month, change) {
   const lastDayOfMonth = {
     day: date.getDate(),
     month: firstDayOfMonth.month,
-    year: firstDayOfMonth.yearh
+    year: firstDayOfMonth.yearh,
   }
   date.setDate(date.getDate() + 1)
   date.setDate(date.getDate() + (6 - date.getDay()))
@@ -110,14 +110,9 @@ export function changeMonth($month, change) {
       }
       $day.attr('class', class_names.join(' '))
     }
-    $day
-      .show()
-      .addClass('visible')
-      .parents('tr')
-      .show()
-      .addClass('visible')
+    $day.show().addClass('visible').parents('tr').show().addClass('visible')
     var data = {
-      day_number: day
+      day_number: day,
     }
     const month_number = month < 9 ? `0${month + 1}` : month + 1
     const day_number = day < 10 ? `0${day}` : day
@@ -173,10 +168,7 @@ export function changeMonth($month, change) {
   }
   while (idx < $days.length) {
     var $day = $days.eq(idx)
-    $day
-      .parents('tr')
-      .hide()
-      .removeClass('visible')
+    $day.parents('tr').hide().removeClass('visible')
     $day.hide().removeClass('visible')
     idx++
   }

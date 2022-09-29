@@ -23,7 +23,7 @@ import {View} from '@instructure/ui-view'
 
 import K5Announcement, {
   K5AnnouncementLoadingMask,
-  K5AnnouncementType
+  K5AnnouncementType,
 } from '@canvas/k5/react/K5Announcement'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
 
@@ -46,7 +46,7 @@ export default function HomeroomAnnouncementsLayout({homeroomAnnouncements, load
                 canEdit={homeroom.canEdit}
                 canReadAnnouncements={homeroom.canReadAnnouncements}
                 published={homeroom.published}
-                showCourseDetails
+                showCourseDetails={true}
                 firstAnnouncement={homeroom.announcement}
               />
             </View>
@@ -65,8 +65,8 @@ HomeroomAnnouncementsLayout.propTypes = {
       courseUrl: string.isRequired,
       published: bool,
       canEdit: bool,
-      announcement: K5AnnouncementType
+      announcement: K5AnnouncementType,
     })
   ),
-  loading: bool.isRequired
+  loading: bool.isRequired,
 }

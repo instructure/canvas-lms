@@ -25,7 +25,7 @@ import {ENABLED_FOR_ALL, ENABLED_FOR_NONE} from '@canvas/permissions/react/propT
 const defaultProps = () => ({
   permissions: [
     {permission_name: 'account_permission', label: 'account_permission', displayed: true},
-    {permission_name: 'course_permission', label: 'course_permission', displayed: true}
+    {permission_name: 'course_permission', label: 'course_permission', displayed: true},
   ],
   createNewRole: () => {},
   loading: false,
@@ -47,7 +47,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -55,9 +55,9 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
+          readonly: false,
+        },
+      },
     },
     {
       id: '4',
@@ -72,7 +72,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -80,9 +80,9 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
+          readonly: false,
+        },
+      },
     },
     {
       id: '5',
@@ -97,7 +97,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -105,9 +105,9 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
+          readonly: false,
+        },
+      },
     },
     {
       id: '6',
@@ -122,7 +122,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -130,9 +130,9 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
+          readonly: false,
+        },
+      },
     },
     {
       id: '7',
@@ -147,7 +147,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -155,9 +155,9 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
+          readonly: false,
+        },
+      },
     },
     {
       id: '1',
@@ -172,7 +172,7 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_ALL,
           explicit: false,
           locked: false,
-          readonly: false
+          readonly: false,
         },
         course_permission: {
           applies_to_descendants: true,
@@ -180,11 +180,11 @@ const defaultProps = () => ({
           enabled: ENABLED_FOR_NONE,
           explicit: false,
           locked: false,
-          readonly: false
-        }
-      }
-    }
-  ]
+          readonly: false,
+        },
+      },
+    },
+  ],
 })
 
 it('renders proper loading state for component', () => {
@@ -201,8 +201,8 @@ it('onChangeRoleName changes role name properly', () => {
   const inst = tree.instance()
   inst.onChangeRoleName({
     target: {
-      value: 'Awesome_aaron'
-    }
+      value: 'Awesome_aaron',
+    },
   })
   expect(tree.state().selectedRoleName).toEqual('Awesome_aaron')
 })
@@ -227,8 +227,8 @@ it('clears the empty role name error when text is entered', () => {
   expect(errors).toHaveLength(1)
   inst.onChangeRoleName({
     target: {
-      value: 'Custom Student Role'
-    }
+      value: 'Custom Student Role',
+    },
   })
   errors = tree.state().roleNameErrors
   expect(errors).toHaveLength(0)
@@ -239,7 +239,7 @@ it('does not pass in the account admin base role in mapStateToProps', () => {
   const state = {
     activeAddTray: {
       show: true,
-      loading: false
+      loading: false,
     },
     roles: [
       {
@@ -248,7 +248,7 @@ it('does not pass in the account admin base role in mapStateToProps', () => {
         label: 'Student',
         role: 'StudentEnrollment',
         displayed: true,
-        contextType: 'Course'
+        contextType: 'Course',
       },
       {
         id: '2',
@@ -256,9 +256,9 @@ it('does not pass in the account admin base role in mapStateToProps', () => {
         label: 'Account Admin',
         role: 'AccountAdmin',
         displayed: false,
-        contextType: 'Account'
-      }
-    ]
+        contextType: 'Account',
+      },
+    ],
   }
 
   const realProps = mapStateToProps(state, ownProps)
@@ -274,8 +274,8 @@ it('onChangeRoleLabel sets error if role is used', () => {
   const expectedErrorState = [
     {
       text: 'Cannot add role name teacher: already in use',
-      type: 'error'
-    }
+      type: 'error',
+    },
   ]
   expect(tree.state().roleNameErrors).toEqual(expectedErrorState)
 })

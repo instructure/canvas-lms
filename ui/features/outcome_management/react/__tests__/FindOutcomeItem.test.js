@@ -21,7 +21,7 @@ import FindOutcomeItem from '../FindOutcomeItem'
 import {
   IMPORT_COMPLETED,
   IMPORT_NOT_STARTED,
-  IMPORT_PENDING
+  IMPORT_PENDING,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {defaultRatingsAndCalculationMethod} from '../Management/__tests__/helpers'
@@ -47,7 +47,7 @@ describe('FindOutcomeItem', () => {
     sourceContextType: 'Account',
     onMenuHandler: onMenuHandlerMock,
     importOutcomeHandler: onImportOutcomeHandlerMock,
-    ...props
+    ...props,
   })
 
   const render = (
@@ -59,8 +59,8 @@ describe('FindOutcomeItem', () => {
         value={{
           env: {
             friendlyDescriptionFF,
-            accountLevelMasteryScalesFF
-          }
+            accountLevelMasteryScalesFF,
+          },
         }}
       >
         {children}
@@ -122,7 +122,7 @@ describe('FindOutcomeItem', () => {
       <FindOutcomeItem
         {...defaultProps({
           importGroupStatus: IMPORT_PENDING,
-          importOutcomeStatus: IMPORT_COMPLETED
+          importOutcomeStatus: IMPORT_COMPLETED,
         })}
       />
     )
@@ -168,7 +168,7 @@ describe('FindOutcomeItem', () => {
 
   it('calls onImportHandler if Add button is clicked', () => {
     const {getByText} = render(<FindOutcomeItem {...defaultProps()} />, {
-      contextType: 'Course'
+      contextType: 'Course',
     })
     fireEvent.click(getByText('Add'))
     expect(onImportOutcomeHandlerMock).toHaveBeenCalled()
@@ -178,7 +178,7 @@ describe('FindOutcomeItem', () => {
     const {getByText} = render(
       <FindOutcomeItem {...defaultProps({friendlyDescription: 'test friendly description'})} />,
       {
-        friendlyDescriptionFF: true
+        friendlyDescriptionFF: true,
       }
     )
 
@@ -190,7 +190,7 @@ describe('FindOutcomeItem', () => {
     const {queryByText, getByText} = render(
       <FindOutcomeItem {...defaultProps({friendlyDescription: 'test friendly description'})} />,
       {
-        friendlyDescriptionFF: false
+        friendlyDescriptionFF: false,
       }
     )
 
@@ -202,7 +202,7 @@ describe('FindOutcomeItem', () => {
     describe('when feature flag disabled', () => {
       it('enables caret button even if no description', () => {
         const {queryByTestId} = render(<FindOutcomeItem {...defaultProps({description: null})} />, {
-          accountLevelMasteryScalesFF: false
+          accountLevelMasteryScalesFF: false,
         })
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
       })

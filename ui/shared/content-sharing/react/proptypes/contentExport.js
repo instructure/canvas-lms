@@ -24,6 +24,6 @@ const contentExportShape = shape({
   progress_url: string,
   user_id: string,
   workflow_state: oneOf(['created', 'exporting', 'exported', 'failed']),
-  attachment: attachmentShape
+  attachment: attachmentShape,
 })
 export default contentExportShape

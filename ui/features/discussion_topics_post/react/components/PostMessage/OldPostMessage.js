@@ -45,17 +45,17 @@ export function OldPostMessage({...props}) {
     if (props.editor && props.editor?._id !== props.author?._id) {
       editText = I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
         editorName: props.editor.displayName,
-        editedTimingDisplay: props.editedTimingDisplay
+        editedTimingDisplay: props.editedTimingDisplay,
       })
     } else {
       editText = I18n.t('Edited %{editedTimingDisplay}', {
-        editedTimingDisplay: props.editedTimingDisplay
+        editedTimingDisplay: props.editedTimingDisplay,
       })
     }
   }
 
   const createdTooltip = I18n.t('Created %{timingDisplay}', {
-    timingDisplay: props.timingDisplay
+    timingDisplay: props.timingDisplay,
   })
 
   return (
@@ -66,7 +66,7 @@ export function OldPostMessage({...props}) {
             style={{
               float: 'left',
               marginLeft: '-24px',
-              marginTop: '13px'
+              marginTop: '13px',
             }}
             data-testid="is-unread"
             data-isforcedread={props.isForcedRead}
@@ -74,7 +74,7 @@ export function OldPostMessage({...props}) {
             <Badge
               type="notification"
               placement="start center"
-              standalone
+              standalone={true}
               formatOutput={() => (
                 <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>
               )}
@@ -90,16 +90,16 @@ export function OldPostMessage({...props}) {
           />
         )}
       </Flex.Item>
-      <Flex.Item shouldGrow shouldShrink>
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <Flex direction="column">
           <Flex.Item>
             <Flex direction="column" width="1">
-              <Flex.Item shouldGrow>
-                <Flex shouldGrow width="100">
+              <Flex.Item shouldGrow={true}>
+                <Flex shouldGrow={true} width="100">
                   <Flex.Item
                     align="start"
-                    shouldGrow
-                    shouldShrink
+                    shouldGrow={true}
+                    shouldShrink={true}
                     padding="xx-small none xx-small none"
                     display="inline-flex"
                   >
@@ -127,7 +127,7 @@ export function OldPostMessage({...props}) {
                 </Flex>
               </Flex.Item>
               {props.timingDisplay && (
-                <Flex.Item shouldShrink padding="0 0 0 small">
+                <Flex.Item shouldShrink={true} padding="0 0 0 small">
                   <InlineList>
                     {!props.showCreatedAsTooltip && (
                       <InlineList.Item>
@@ -161,7 +161,7 @@ export function OldPostMessage({...props}) {
                       <InlineList.Item>
                         <Text color="primary" size="small">
                           {I18n.t(`Last reply %{lastReplyAtDisplayText}`, {
-                            lastReplyAtDisplayText: props.lastReplyAtDisplayText
+                            lastReplyAtDisplayText: props.lastReplyAtDisplayText,
                           })}
                         </Text>
                       </InlineList.Item>
@@ -189,7 +189,7 @@ export function OldPostMessage({...props}) {
                     onCancel={props.onCancel}
                     value={props.message}
                     onSubmit={props.onSave}
-                    isEdit
+                    isEdit={true}
                   />
                 </View>
               ) : (
@@ -277,11 +277,11 @@ OldPostMessage.propTypes = {
   isForcedRead: PropTypes.bool,
   postUtilities: PropTypes.node,
   isIsolatedView: PropTypes.bool,
-  showCreatedAsTooltip: PropTypes.bool
+  showCreatedAsTooltip: PropTypes.bool,
 }
 
 OldPostMessage.defaultProps = {
-  isIsolatedView: false
+  isIsolatedView: false,
 }
 
 export default OldPostMessage

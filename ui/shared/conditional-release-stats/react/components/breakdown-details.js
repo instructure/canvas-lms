@@ -41,7 +41,7 @@ export default class BreakdownDetails extends React.Component {
 
     // actions
     selectStudent: func.isRequired,
-    closeSidebar: func.isRequired
+    closeSidebar: func.isRequired,
   }
 
   unselectStudent = () => {
@@ -87,7 +87,7 @@ export default class BreakdownDetails extends React.Component {
       <Tray
         open={this.props.showDetails}
         placement="end"
-        shouldContainFocus
+        shouldContainFocus={true}
         defaultFocusElement={() => this.closeButton}
       >
         <div className="crs-breakdown-details">

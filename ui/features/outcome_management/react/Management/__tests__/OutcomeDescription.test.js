@@ -40,7 +40,7 @@ describe('OutcomeDescription', () => {
     masteryPoints,
     pointsPossible,
     ratings,
-    ...props
+    ...props,
   })
 
   const render = (
@@ -84,11 +84,11 @@ describe('OutcomeDescription', () => {
           <OutcomeDescription
             {...defaultProps({
               truncated: false,
-              friendlyDescription: 'Friendly Description'
+              friendlyDescription: 'Friendly Description',
             })}
           />,
           {
-            friendlyDescriptionFF: true
+            friendlyDescriptionFF: true,
           }
         )
         expect(queryByTestId(friendlyExpandedTestId)).toBeInTheDocument()
@@ -99,12 +99,12 @@ describe('OutcomeDescription', () => {
           <OutcomeDescription
             {...defaultProps({
               truncated: false,
-              friendlyDescription: 'Friendly Description'
+              friendlyDescription: 'Friendly Description',
             })}
           />,
           {
             friendlyDescriptionFF: true,
-            isStudent: true
+            isStudent: true,
           }
         )
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
@@ -117,11 +117,11 @@ describe('OutcomeDescription', () => {
             {...defaultProps({
               truncated: false,
               friendlyDescription: 'Very Friendly Text',
-              description: ''
+              description: '',
             })}
           />,
           {
-            friendlyDescriptionFF: true
+            friendlyDescriptionFF: true,
           }
         )
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
@@ -136,7 +136,7 @@ describe('OutcomeDescription', () => {
           <OutcomeDescription
             {...defaultProps({
               truncated: false,
-              friendlyDescription: 'Friendly Description'
+              friendlyDescription: 'Friendly Description',
             })}
           />
         )
@@ -148,11 +148,11 @@ describe('OutcomeDescription', () => {
           <OutcomeDescription
             {...defaultProps({
               truncated: false,
-              friendlyDescription: 'Friendly Description'
+              friendlyDescription: 'Friendly Description',
             })}
           />,
           {
-            isStudent: true
+            isStudent: true,
           }
         )
         expect(getByTestId(expandedTestId)).toBeInTheDocument()
@@ -168,7 +168,7 @@ describe('OutcomeDescription', () => {
         const {queryByTestId} = render(
           <OutcomeDescription {...defaultProps({description: null, truncated: false})} />,
           {
-            accountLevelMasteryScalesFF: false
+            accountLevelMasteryScalesFF: false,
           }
         )
         expect(queryByTestId(ratingsTestId)).toBeInTheDocument()
@@ -176,14 +176,14 @@ describe('OutcomeDescription', () => {
 
       it('displays calculation method if description expanded', () => {
         const {getByText} = render(<OutcomeDescription {...defaultProps({truncated: false})} />, {
-          accountLevelMasteryScalesFF: false
+          accountLevelMasteryScalesFF: false,
         })
         expect(getByText('Proficiency Calculation:')).toBeInTheDocument()
       })
 
       it('hides calculation method if description truncated', () => {
         const {queryByText} = render(<OutcomeDescription {...defaultProps()} />, {
-          accountLevelMasteryScalesFF: false
+          accountLevelMasteryScalesFF: false,
         })
         expect(queryByText('Proficiency Calculation:')).not.toBeInTheDocument()
       })

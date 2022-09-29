@@ -28,7 +28,7 @@ import {
   IconRemoveFromCollectionLine,
   IconReplyAll2Line,
   IconReplyLine,
-  IconTrashLine
+  IconTrashLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -111,7 +111,7 @@ export const MessageActionButtons = props => {
 
   return (
     <Flex>
-      <Flex.Item shouldGrow>
+      <Flex.Item shouldGrow={true}>
         <View padding="0 medium 0 0">
           <ActionButton
             tip={I18n.t('Compose a new message')}
@@ -174,5 +174,5 @@ MessageActionButtons.propTypes = {
   unstar: PropTypes.func,
   shouldRenderMarkAsRead: PropTypes.bool,
   shouldRenderMarkAsUnread: PropTypes.bool,
-  hasMultipleSelectedMessages: PropTypes.bool
+  hasMultipleSelectedMessages: PropTypes.bool,
 }

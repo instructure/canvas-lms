@@ -24,7 +24,7 @@ describe('CreateTicketForm', () => {
 
   const props = {
     onCancel,
-    onSubmit
+    onSubmit,
   }
 
   beforeEach(() => {

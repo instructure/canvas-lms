@@ -26,7 +26,7 @@ describe('formatFileSize', () => {
     {size: 2560, expectation: '2.5 KB'},
     {size: 1048576, expectation: '1 MB'},
     {size: 3407872, expectation: '3.25 MB'},
-    {size: 1073742000, expectation: '1 GB'}
+    {size: 1073742000, expectation: '1 GB'},
   ]
 
   it('formats and returns file sizes as expected', () => {
@@ -42,47 +42,47 @@ describe('getFileThumbnail', () => {
       file: {
         mime_class: 'image',
         display_name: 'super_dank_image.png',
-        thumbnail_url: 'http://dank_images.com/super_dank_image'
+        thumbnail_url: 'http://dank_images.com/super_dank_image',
       },
       expectation: {
         type: 'img',
-        size: '3rem'
-      }
+        size: '3rem',
+      },
     },
     {
       file: {
         mime_class: 'image',
         display_name: 'super_dank_image.png',
-        thumbnail_url: 'http://dank_images.com/super_dank_image'
+        thumbnail_url: 'http://dank_images.com/super_dank_image',
       },
       size: 'x-small',
       expectation: {
         type: 'img',
-        size: '1.125rem'
-      }
+        size: '1.125rem',
+      },
     },
     {
       file: {mime_class: 'pdf'},
       expectation: {
         type: 'pdf',
-        size: 'medium'
-      }
+        size: 'medium',
+      },
     },
     {
       file: {mime_class: 'audio'},
       size: 'large',
       expectation: {
         type: 'attach-media',
-        size: 'large'
-      }
+        size: 'large',
+      },
     },
     {
       file: {mime_class: 'text'},
       size: 'x-large',
       expectation: {
         type: 'document',
-        size: 'x-large'
-      }
+        size: 'x-large',
+      },
     },
     // This is to account for both file objects obtained through graphql and
     // through the files API.
@@ -90,13 +90,13 @@ describe('getFileThumbnail', () => {
       file: {
         mimeClass: 'image',
         displayName: 'neat_image.png',
-        thumbnailUrl: 'http://neat_images.com/neat_image'
+        thumbnailUrl: 'http://neat_images.com/neat_image',
       },
       expectation: {
         type: 'img',
-        size: '3rem'
-      }
-    }
+        size: '3rem',
+      },
+    },
   ]
 
   it('returns the appropriate element', () => {

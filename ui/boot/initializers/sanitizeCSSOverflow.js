@@ -30,7 +30,7 @@ function sanitizeOverflow() {
     })
   )
 }
-const observer = new MutationObserver(function(e) {
+const observer = new MutationObserver(function (e) {
   // If there are any added nodes, sanitize them.
   if (e.find(mutationRecord => mutationRecord.addedNodes.length > 0)) {
     sanitizeOverflow()

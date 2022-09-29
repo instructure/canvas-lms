@@ -35,12 +35,12 @@ export default class CourseFilter extends React.Component {
     onChange: func,
     onActivate: func,
     terms: propTypes.termList.isRequired,
-    subAccounts: propTypes.accountList.isRequired
+    subAccounts: propTypes.accountList.isRequired,
   }
 
   static defaultProps = {
     onChange: () => {},
-    onActivate: () => {}
+    onActivate: () => {},
   }
 
   constructor(props) {
@@ -49,7 +49,7 @@ export default class CourseFilter extends React.Component {
       isActive: false,
       search: '',
       term: '',
-      subAccount: ''
+      subAccount: '',
     }
   }
 
@@ -65,7 +65,7 @@ export default class CourseFilter extends React.Component {
 
   onChange = () => {
     this.setState({
-      search: this.getSearchText()
+      search: this.getSearchText(),
     })
   }
 
@@ -78,7 +78,7 @@ export default class CourseFilter extends React.Component {
     if (!this.state.isActive) {
       this.setState(
         {
-          isActive: true
+          isActive: true,
         },
         () => {
           this.props.onActivate()
@@ -96,7 +96,7 @@ export default class CourseFilter extends React.Component {
 
         if (isEmpty && !this.wrapper.contains(document.activeElement)) {
           this.setState({
-            isActive: false
+            isActive: false,
           })
         }
       }
@@ -112,7 +112,7 @@ export default class CourseFilter extends React.Component {
         <CanvasSelect.Option key={term.id} id={term.id} value={term.id}>
           {term.name}
         </CanvasSelect.Option>
-      ))
+      )),
     ]
 
     const subAccountOptions = [
@@ -123,7 +123,7 @@ export default class CourseFilter extends React.Component {
         <CanvasSelect.Option key={account.id} id={account.id} value={account.id}>
           {account.name}
         </CanvasSelect.Option>
-      ))
+      )),
     ]
 
     return (

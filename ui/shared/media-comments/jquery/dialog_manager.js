@@ -46,7 +46,7 @@ export default class DialogManager {
       resizable: false,
       width: 470,
       height: 300,
-      modal: true
+      modal: true,
     })
     return (this.dialog = $('#media_comment_dialog'))
   }
@@ -67,7 +67,7 @@ export default class DialogManager {
       title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
       width: 650,
       height: 550,
-      modal: true
+      modal: true,
     })
   }
 
@@ -75,12 +75,8 @@ export default class DialogManager {
     return this.dialog.dialog('option', 'close', () => {
       const mountPoint = document.getElementById('record_media_tab')
       if (mountPoint) ReactDOM.unmountComponentAtNode(mountPoint)
-      $('#audio_record')
-        .before("<div id='audio_record'/>")
-        .remove()
-      $('#video_record')
-        .before("<div id='video_record'/>")
-        .remove()
+      $('#audio_record').before("<div id='audio_record'/>").remove()
+      $('#video_record').before("<div id='video_record'/>").remove()
       if (opts && opts.close && $.isFunction(opts.close)) {
         return opts.close.call(this.$dialog)
       }
@@ -106,12 +102,8 @@ export default class DialogManager {
   }
 
   resetRecordHolders() {
-    $('#audio_record')
-      .before("<div id='audio_record'/>")
-      .remove()
-    $('#video_record')
-      .before("<div id='video_record'/>")
-      .remove()
+    $('#audio_record').before("<div id='audio_record'/>").remove()
+    $('#video_record').before("<div id='video_record'/>").remove()
   }
 
   activateTabs() {

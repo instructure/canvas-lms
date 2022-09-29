@@ -37,7 +37,7 @@ const buildSet = function (attr = {}) {
     title: attr.title || '',
     weighted: !!attr.weighted,
     displayTotalsForAllGradingPeriods: !!attr.displayTotalsForAllGradingPeriods,
-    enrollmentTermIDs: attr.enrollmentTermIDs || []
+    enrollmentTermIDs: attr.enrollmentTermIDs || [],
   }
 }
 
@@ -59,23 +59,23 @@ class GradingPeriodSetForm extends React.Component {
       title: string,
       displayTotalsForAllGradingPeriods: bool,
       weighted: bool,
-      enrollmentTermIDs: array
+      enrollmentTermIDs: array,
     }).isRequired,
     enrollmentTerms: array.isRequired,
     disabled: bool,
     onSave: func.isRequired,
-    onCancel: func.isRequired
+    onCancel: func.isRequired,
   }
 
   constructor(props) {
     super(props)
     const setId = parseInt(props.set.id, 10)
     const associatedEnrollmentTerms = _.where(props.enrollmentTerms, {
-      gradingPeriodGroupId: props.set.id
+      gradingPeriodGroupId: props.set.id,
     })
     const set = {
       ...props.set,
-      enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, 'id')
+      enrollmentTermIDs: _.pluck(associatedEnrollmentTerms, 'id'),
     }
 
     this.state = {set: buildSet(set)}

@@ -23,8 +23,6 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/events/views/answer_matrix/legend', () => {
   it('renders', () => {
-    render(
-      <Legend />
-    )
+    render(<Legend />)
   })
 })

@@ -45,7 +45,7 @@ export function AssignmentAvailabilityContainer({...props}) {
           unlockAt: props.assignment?.unlockAt,
           lockAt: props.assignment?.lockAt,
           title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-          id: props.assignment?.id
+          id: props.assignment?.id,
         })
       : [
           {
@@ -53,8 +53,8 @@ export function AssignmentAvailabilityContainer({...props}) {
             unlockAt: props.assignment?.unlockAt,
             lockAt: props.assignment?.lockAt,
             title: assignmentOverrides.length > 0 ? I18n.t('Everyone Else') : I18n.t('Everyone'),
-            id: props.assignment?.id
-          }
+            id: props.assignment?.id,
+          },
         ]
   }
 
@@ -94,5 +94,5 @@ AssignmentAvailabilityContainer.propTypes = {
   assignment: PropTypes.object,
   isAdmin: PropTypes.bool,
   inPacedCourse: PropTypes.bool,
-  courseId: PropTypes.string
+  courseId: PropTypes.string,
 }

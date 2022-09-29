@@ -34,15 +34,15 @@ describe('LinkValidator', () => {
         sandbox = sinon.createSandbox()
         window.ENV = {
           validation_api_url: '/foo/bar',
-          VALIDATION_CONFETTI_ENABLED: true
+          VALIDATION_CONFETTI_ENABLED: true,
         }
         sandbox.stub($, 'ajax').callsFake(params =>
           params.success({
             workflow_state: 'completed',
             results: {
               version: 2,
-              issues: []
-            }
+              issues: [],
+            },
           })
         )
       })
@@ -70,7 +70,7 @@ describe('LinkValidator', () => {
         beforeEach(() => {
           window.ENV = {
             validation_api_url: '/foo/bar',
-            VALIDATION_CONFETTI_ENABLED: false
+            VALIDATION_CONFETTI_ENABLED: false,
           }
         })
 
@@ -99,7 +99,7 @@ describe('LinkValidator', () => {
         sandbox = sinon.createSandbox()
         window.ENV = {
           validation_api_url: '/foo/bar',
-          VALIDATION_CONFETTI_ENABLED: true
+          VALIDATION_CONFETTI_ENABLED: true,
         }
         sandbox.stub($, 'ajax').callsFake(params =>
           params.success({
@@ -115,17 +115,17 @@ describe('LinkValidator', () => {
                     {
                       url: 'http://example.foo',
                       reason: 'unreachable',
-                      link_text: 'foo'
+                      link_text: 'foo',
                     },
                     {
                       url: 'javascript:alert("lulz")',
                       reason: 'unreachable',
-                      link_text: 'hehehh'
-                    }
-                  ]
-                }
-              ]
-            }
+                      link_text: 'hehehh',
+                    },
+                  ],
+                },
+              ],
+            },
           })
         )
       })

@@ -23,17 +23,22 @@ import {ThreadingToolbar} from './ThreadingToolbar'
 export default {
   title: 'Examples/Discussion Posts/Components/ThreadingToolbar',
   component: ThreadingToolbar,
-  argTypes: {}
+  argTypes: {},
 }
 
 export const Default = () => (
   <ThreadingToolbar>
     <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
-    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked delimiterKey="like" />
+    <ThreadingToolbar.Like
+      onClick={Function.prototype}
+      likeCount={2}
+      isLiked={true}
+      delimiterKey="like"
+    />
     <ThreadingToolbar.Expansion
       onExpand={Function.prototype}
       expandText="4 replies, 2 unread"
-      isExpanded
+      isExpanded={true}
       delimiterKey="expansion"
     />
   </ThreadingToolbar>
@@ -45,7 +50,7 @@ export const WithoutLiking = () => (
     <ThreadingToolbar.Expansion
       onExpand={Function.prototype}
       expandText="4 replies, 2 unread"
-      isExpanded
+      isExpanded={true}
       delimiterKey="expansion"
     />
   </ThreadingToolbar>
@@ -54,7 +59,12 @@ export const WithoutLiking = () => (
 export const WithoutExpansion = () => (
   <ThreadingToolbar>
     <ThreadingToolbar.Reply onReply={Function.prototype} delimiterKey="reply" />
-    <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked delimiterKey="like" />
+    <ThreadingToolbar.Like
+      onClick={Function.prototype}
+      likeCount={2}
+      isLiked={true}
+      delimiterKey="like"
+    />
   </ThreadingToolbar>
 )
 

@@ -56,13 +56,13 @@ export default class ProficiencyRating extends React.Component {
     onMasteryChange: PropTypes.func.isRequired,
     onPointsChange: PropTypes.func.isRequired,
     points: PropTypes.string.isRequired,
-    pointsError: PropTypes.string
+    pointsError: PropTypes.string,
   }
 
   static defaultProps = {
     descriptionError: null,
     focusField: null,
-    pointsError: null
+    pointsError: null,
   }
 
   static displayName = 'Row'

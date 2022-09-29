@@ -25,49 +25,49 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Calendar'),
-      description: I18n.t('Allows user to add, edit, and delete events in the course calendar.')
+      description: I18n.t('Allows user to add, edit, and delete events in the course calendar.'),
     },
     {
       title: I18n.t('Scheduler'),
       description: I18n.t(
         'Allows user to create and manage appointments on the calendar using Scheduler.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
         'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.'
-      )
+      ),
     },
     {
       title: I18n.t('Scheduler'),
-      description: I18n.t('Scheduler must be enabled for your account.')
-    }
+      description: I18n.t('Scheduler must be enabled for your account.'),
+    },
   ],
   [
     {
       title: I18n.t('Calendar'),
-      description: I18n.t('Allows user to add, edit, and delete events in the course calendar.')
+      description: I18n.t('Allows user to add, edit, and delete events in the course calendar.'),
     },
     {
       title: I18n.t('Scheduler'),
       description: I18n.t(
         'Allows user to create and manage appointments on the calendar using Scheduler.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Calendar'),
       description: I18n.t(
         'Regardless of whether this permission is enabled or disabled, users will still be able to manage events in their personal calendar.'
-      )
+      ),
     },
     {
       title: I18n.t('Scheduler'),
-      description: I18n.t('Scheduler must be enabled by your Canvas admin.')
-    }
+      description: I18n.t('Scheduler must be enabled by your Canvas admin.'),
+    },
   ]
 )

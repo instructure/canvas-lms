@@ -23,7 +23,7 @@ describe('lti.screenReaderAlert handler', () => {
   it('prevents html from being passed to screenReaderFlashMessageExclusive', () => {
     const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
     handler({
-      message: {body: {html: 'abc'}}
+      message: {body: {html: 'abc'}},
     })
     expect(flashMessage).toHaveBeenCalledWith('{"html":"abc"}')
   })

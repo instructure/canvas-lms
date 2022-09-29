@@ -24,12 +24,12 @@ function editorOptions(width, id, tinyMCEInitOptions, enableBookmarkingOverride,
   const editorConfig = new EditorConfig(tinymce, INST, width, id)
 
   const config = {
-    ...editorConfig.defaultConfig()
+    ...editorConfig.defaultConfig(),
   }
 
   return {
     ...config,
-    ...mergeConfig(tinyMCEInitOptions.optionsToMerge || [], config, tinyMCEInitOptions.tinyOptions)
+    ...mergeConfig(tinyMCEInitOptions.optionsToMerge || [], config, tinyMCEInitOptions.tinyOptions),
   }
 }
 

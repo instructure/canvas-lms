@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import { initFlashContainer } from '../index'
+import {initFlashContainer} from '../index'
 
 describe('FlashNotifications', () => {
   let holder = null

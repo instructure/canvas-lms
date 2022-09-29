@@ -40,7 +40,7 @@ import {
   IconSpeedGraderSolid,
   IconTrashLine,
   IconUnlockLine,
-  IconUserLine
+  IconUserLine,
 } from '@instructure/ui-icons'
 import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
@@ -71,12 +71,12 @@ export function PostToolbar({repliesCount, unreadCount, ...props}) {
       props={{
         tablet: {
           justifyItems: 'space-between',
-          textSize: 'x-small'
+          textSize: 'x-small',
         },
         desktop: {
           justifyItems: 'end',
-          textSize: 'small'
-        }
+          textSize: 'small',
+        },
       }}
       render={responsiveProps => (
         <Flex justifyItems={repliesCount > 0 ? responsiveProps.justifyItems : 'end'}>
@@ -170,7 +170,7 @@ const getMenuConfigs = props => {
       key: 'read-all',
       icon: <IconMarkAsReadLine />,
       label: I18n.t('Mark All as Read'),
-      selectionCallback: props.onReadAll
+      selectionCallback: props.onReadAll,
     })
   }
   if (props.onUnreadAll) {
@@ -178,7 +178,7 @@ const getMenuConfigs = props => {
       key: 'unread-all',
       icon: <IconNextUnreadLine />,
       label: I18n.t('Mark All as Unread'),
-      selectionCallback: props.onUnreadAll
+      selectionCallback: props.onUnreadAll,
     })
   }
   if (props.onEdit) {
@@ -186,7 +186,7 @@ const getMenuConfigs = props => {
       key: 'edit',
       icon: <IconEditLine />,
       label: I18n.t('Edit'),
-      selectionCallback: props.onEdit
+      selectionCallback: props.onEdit,
     })
   }
   if (props.onDelete) {
@@ -194,7 +194,7 @@ const getMenuConfigs = props => {
       key: 'delete',
       icon: <IconTrashLine />,
       label: I18n.t('Delete'),
-      selectionCallback: props.onDelete
+      selectionCallback: props.onDelete,
     })
   }
   if (props.onCloseForComments) {
@@ -202,7 +202,7 @@ const getMenuConfigs = props => {
       key: 'close-comments',
       icon: <IconLockLine />,
       label: I18n.t('Close for Comments'),
-      selectionCallback: props.onCloseForComments
+      selectionCallback: props.onCloseForComments,
     })
   }
   if (props.onOpenForComments) {
@@ -210,7 +210,7 @@ const getMenuConfigs = props => {
       key: 'open-comments',
       icon: <IconUnlockLine />,
       label: I18n.t('Open for Comments'),
-      selectionCallback: props.onOpenForComments
+      selectionCallback: props.onOpenForComments,
     })
   }
   if (props.onSend) {
@@ -218,7 +218,7 @@ const getMenuConfigs = props => {
       key: 'send',
       icon: <IconUserLine />,
       label: I18n.t('Send To...'),
-      selectionCallback: props.onSend
+      selectionCallback: props.onSend,
     })
   }
   if (props.onCopy) {
@@ -226,7 +226,7 @@ const getMenuConfigs = props => {
       key: 'copy',
       icon: <IconDuplicateLine />,
       label: I18n.t('Copy To...'),
-      selectionCallback: props.onCopy
+      selectionCallback: props.onCopy,
     })
   }
   if (props.onOpenSpeedgrader) {
@@ -234,7 +234,7 @@ const getMenuConfigs = props => {
       key: 'speedGrader',
       icon: <IconSpeedGraderSolid />,
       label: I18n.t('Open in Speedgrader'),
-      selectionCallback: props.onOpenSpeedgrader
+      selectionCallback: props.onOpenSpeedgrader,
     })
   }
   if (props.addRubric || props.showRubric) {
@@ -242,7 +242,7 @@ const getMenuConfigs = props => {
       key: 'rubric',
       icon: <IconRubricSolid />,
       label: props.addRubric ? I18n.t('Add Rubric') : I18n.t('Show Rubric'),
-      selectionCallback: props.onDisplayRubric
+      selectionCallback: props.onDisplayRubric,
     })
   }
   if (props.canManageContent && ENV.discussion_topic_menu_tools?.length > 0) {
@@ -255,7 +255,7 @@ const getMenuConfigs = props => {
           window.location.assign(
             `${tool.base_url}&discussion_topics%5B%5D=${props.discussionTopicId}`
           )
-        }
+        },
       })
     })
   }
@@ -264,7 +264,7 @@ const getMenuConfigs = props => {
       key: 'peerReviews',
       icon: <IconPeerReviewLine />,
       label: I18n.t('Peer Reviews'),
-      selectionCallback: props.onPeerReviews
+      selectionCallback: props.onPeerReviews,
     })
   }
   return options
@@ -379,12 +379,12 @@ PostToolbar.propTypes = {
   /**
    * The discussion topic
    */
-  discussionTopic: PropTypes.object
+  discussionTopic: PropTypes.object,
 }
 
 PostToolbar.defaultProps = {
   repliesCount: 0,
-  unreadCount: 0
+  unreadCount: 0,
 }
 
 export default PostToolbar

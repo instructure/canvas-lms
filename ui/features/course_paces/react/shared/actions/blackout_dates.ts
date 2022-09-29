@@ -29,7 +29,7 @@ export enum Constants {
   BLACKOUT_DATES_SYNCED = 'BLACKOUT_DATES/SYNCED',
   BLACKOUT_DATES_SYNC_FAILED = 'BLACKOUT_DATES/SYNC_FAILED',
   UPDATE_BLACKOUT_DATES = 'BLACKOUT_DATES/UPDATE',
-  RESET_BLACKOUT_DATES = 'BLACKOUT_DATES/RESET'
+  RESET_BLACKOUT_DATES = 'BLACKOUT_DATES/RESET',
 }
 
 /* Action Creators */
@@ -42,7 +42,7 @@ const regularActions = {
   updateBlackoutDates: (blackoutDates: BlackoutDate[]) =>
     createAction(Constants.UPDATE_BLACKOUT_DATES, blackoutDates),
   resetBlackoutDates: (originalBlackoutDates: BlackoutDate[]) =>
-    createAction(Constants.RESET_BLACKOUT_DATES, originalBlackoutDates)
+    createAction(Constants.RESET_BLACKOUT_DATES, originalBlackoutDates),
 }
 
 const thunkActions = {
@@ -74,7 +74,7 @@ const thunkActions = {
           throw error
         })
     }
-  }
+  },
 }
 
 export const actions = {...regularActions, ...thunkActions}

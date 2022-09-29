@@ -25,7 +25,7 @@ function normalizeGraders() {
     graderId: grader.user_id || grader.anonymous_id,
     graderName: grader.grader_name || null,
     id: grader.id,
-    graderSelectable: grader.grader_selectable
+    graderSelectable: grader.grader_selectable,
   }))
 
   graders.sort((a, b) => (a.graderId < b.graderId ? -1 : 1))
@@ -43,7 +43,7 @@ export default function getEnv() {
   if (ENV.FINAL_GRADER) {
     finalGrader = {
       graderId: ENV.FINAL_GRADER.grader_id || 'FINAL_GRADER',
-      id: ENV.FINAL_GRADER.id
+      id: ENV.FINAL_GRADER.id,
     }
   }
 
@@ -51,7 +51,7 @@ export default function getEnv() {
     canViewGraderIdentities: ENV.CURRENT_USER.can_view_grader_identities,
     canViewStudentIdentities: ENV.CURRENT_USER.can_view_student_identities,
     graderId: ENV.CURRENT_USER.grader_id || null,
-    id: ENV.CURRENT_USER.id
+    id: ENV.CURRENT_USER.id,
   }
 
   if (currentUser.graderId == null) {
@@ -68,12 +68,12 @@ export default function getEnv() {
       id: ENV.ASSIGNMENT.id,
       muted: ENV.ASSIGNMENT.muted,
       gradesPublished: ENV.ASSIGNMENT.grades_published,
-      title: ENV.ASSIGNMENT.title
+      title: ENV.ASSIGNMENT.title,
     },
 
     currentUser,
     finalGrader,
 
-    graders: normalizeGraders()
+    graders: normalizeGraders(),
   }
 }

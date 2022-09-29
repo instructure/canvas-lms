@@ -33,7 +33,7 @@ const quizRubric = {
     $dialog.dialog({
       title: I18n.t('titles.details', 'Assignment Rubric Details'),
       width: 600,
-      resizable: true
+      resizable: true,
     })
   },
 
@@ -43,7 +43,7 @@ const quizRubric = {
     $('body').append($loading)
     $loading.dialog({
       width: 400,
-      height: 200
+      height: 200,
     })
     return $loading
   },
@@ -69,11 +69,11 @@ const quizRubric = {
         await quizRubric.replaceLoadingDialog(preloadedHtml, $loading)
       }
     }
-  }
+  },
 }
 
-$(document).ready(function() {
-  $('.show_rubric_link').click(function(event) {
+$(document).ready(function () {
+  $('.show_rubric_link').click(function (event) {
     event.preventDefault()
     const url = $(this).attr('rel')
     quizRubric.createRubricDialog(url)

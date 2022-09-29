@@ -39,7 +39,7 @@ export default class TimeBlockRow {
       },
       focusout: () => {
         timeoutId = setTimeout(() => this.$row.removeClass('focused'), 50)
-      }
+      },
     })
 
     this.$date = this.$row.find("input[name='date']")
@@ -47,7 +47,7 @@ export default class TimeBlockRow {
     this.$end_time = this.$row.find("input[name='end_time']")
 
     const $date_field = this.$date.date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
     })
     $date_field.change(this.validate)
     this.$start_time.time_field().change(this.validate)

@@ -35,7 +35,7 @@ export default class SectionView extends View {
     const groupsView = new CollectionView({
       el: this.$groups,
       collection: this.model.get('groups'),
-      itemView: GroupView
+      itemView: GroupView,
     })
     return groupsView.render()
   }

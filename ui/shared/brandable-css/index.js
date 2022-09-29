@@ -43,7 +43,7 @@ const brandableCss = {
       'dist',
       'brandable_css',
       brandAndVariant,
-      `${bundleName}-${combinedChecksum}.css`
+      `${bundleName}-${combinedChecksum}.css`,
     ].join('/')
   },
 
@@ -73,7 +73,7 @@ const brandableCss = {
     if (bundles[id].length === 1) {
       return brandableCss.loadStylesheet(bundle, {
         combinedChecksum: bundles[id][0],
-        includesNoVariables: true
+        includesNoVariables: true,
       })
     } else {
       // this can be a bit whoozy, remember the structure:
@@ -103,9 +103,9 @@ const brandableCss = {
 
       return brandableCss.loadStylesheet(bundle, {
         combinedChecksum: checksum,
-        includesNoVariables: false
+        includesNoVariables: false,
       })
     }
-  }
+  },
 }
 export default brandableCss

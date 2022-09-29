@@ -27,7 +27,7 @@ class SwitchEditorControl extends React.Component {
   static displayName = 'SwitchEditor'
 
   static propTypes = {
-    textarea: PropTypes.object.isRequired
+    textarea: PropTypes.object.isRequired,
   }
 
   state = {mode: 'rce'}

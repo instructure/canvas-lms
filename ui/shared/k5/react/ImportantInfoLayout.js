@@ -82,7 +82,7 @@ const ImportantInfoLayout = ({isLoading, importantInfos, courseId}) => {
 ImportantInfoLayout.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   importantInfos: PropTypes.arrayOf(PropTypes.shape(ImportantInfoShape)).isRequired,
-  courseId: PropTypes.string
+  courseId: PropTypes.string,
 }
 
 export default ImportantInfoLayout

@@ -51,7 +51,7 @@ const ManageOutcomeItem = ({
   removeOutcomeStatus,
   onMenuHandler,
   onCheckboxHandler,
-  canUnlink
+  canUnlink,
 }) => {
   const {
     contextType,
@@ -60,7 +60,7 @@ const ManageOutcomeItem = ({
     accountLevelMasteryScalesFF,
     canManage,
     isAdmin,
-    isCourse
+    isCourse,
   } = useCanvasContext()
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
@@ -130,7 +130,7 @@ const ManageOutcomeItem = ({
             </Flex>
           </div>
         </Flex.Item>
-        <Flex.Item align="start" size="50%" shouldGrow>
+        <Flex.Item align="start" size="50%" shouldGrow={true}>
           <div style={{padding: '0.625rem 0'}}>
             <Heading level="h4" data-testid="outcome-management-item-title">
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
@@ -157,7 +157,7 @@ const ManageOutcomeItem = ({
       </Flex>
       <Flex as="div" alignItems="start">
         <Flex.Item size="4.125rem" />
-        <Flex.Item size="50%" shouldGrow>
+        <Flex.Item size="50%" shouldGrow={true}>
           {shouldShowDescription && (
             <View as="div" padding="0 0 x-small">
               <OutcomeDescription
@@ -192,7 +192,7 @@ ManageOutcomeItem.propTypes = {
   removeOutcomeStatus: PropTypes.string,
   onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired,
-  canUnlink: PropTypes.bool.isRequired
+  canUnlink: PropTypes.bool.isRequired,
 }
 
 export default memo(ManageOutcomeItem)

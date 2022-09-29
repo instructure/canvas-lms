@@ -25,7 +25,7 @@ import type {
   RubricAssessment,
   StudentWithSubmission,
   Submission,
-  TurnitinAsset
+  TurnitinAsset,
 } from './speed_grader.d'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -60,13 +60,13 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconUploadLine,
   IconWarningLine,
-  IconCheckMarkIndeterminateLine
+  IconCheckMarkIndeterminateLine,
 } from '@instructure/ui-icons'
 import {Pill} from '@instructure/ui-pill'
 import {
   styleSubmissionStatusPills,
   determineSubmissionSelection,
-  makeSubmissionUpdateRequest
+  makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import round from 'round'
@@ -89,7 +89,7 @@ import {
   setupAnonymizableUserId,
   setupAnonymousGraders,
   setupIsAnonymous,
-  setupIsModerated
+  setupIsModerated,
 } from './speed_grader.utils'
 import SpeedGraderAlerts from '../react/SpeedGraderAlerts'
 // @ts-ignore
@@ -276,7 +276,7 @@ const utils = {
     // strings "true" or "false", but now we store boolean true/false values.
     const settingVal = userSettings.get('eg_hide_student_names')
     return settingVal === true || settingVal === 'true' || ENV.force_anonymous_grading
-  }
+  },
 }
 
 function sectionSelectionOptions(
@@ -293,14 +293,14 @@ function sectionSelectionOptions(
     {
       [anonymizableId]: 'section_all',
       data: {
-        'section-id': 'all'
+        'section-id': 'all',
       },
       name: I18n.t('Show all sections'),
       className: {
-        raw: 'section_all'
+        raw: 'section_all',
       },
-      anonymizableId
-    }
+      anonymizableId,
+    },
   ]
 
   courseSections.forEach(section => {
@@ -311,21 +311,21 @@ function sectionSelectionOptions(
     sectionOptions.push({
       [anonymizableId]: `section_${section.id}`,
       data: {
-        'section-id': section.id
+        'section-id': section.id,
       },
       name: I18n.t('Change section to %{sectionName}', {sectionName: section.name}),
       className: {
-        raw: `section_${section.id} ${selectedSectionId === section.id ? 'selected' : ''}`
+        raw: `section_${section.id} ${selectedSectionId === section.id ? 'selected' : ''}`,
       },
-      anonymizableId
+      anonymizableId,
     })
   })
 
   return [
     {
       name: `Showing: ${selectedSectionName}`,
-      options: sectionOptions
-    }
+      options: sectionOptions,
+    },
   ]
 }
 
@@ -435,7 +435,7 @@ function mergeStudentsAndSubmission() {
         resubmitted: 2,
         not_submitted: 3,
         graded: 4,
-        not_gradeable: 5
+        not_gradeable: 5,
       }
       jsonData.studentsWithSubmissions.sort(
         EG.compareStudentsBy(
@@ -566,7 +566,7 @@ function initDropdown() {
           top: $selectmenu_list.css('top'),
           width:
             $selectmenu_list.width() - ($selectmenu_list.hasScrollbar() && $.getScrollbarWidth()),
-          'z-index': Number($selectmenu_list.css('z-index')) + 1
+          'z-index': Number($selectmenu_list.css('z-index')) + 1,
         })
       })
       .selectmenu('option', 'close', () => {
@@ -584,13 +584,13 @@ function setupPostPolicies() {
       anonymousGrading: window.jsonData.anonymous_grading,
       gradesPublished,
       id: window.jsonData.id,
-      name: window.jsonData.title
+      name: window.jsonData.title,
     },
     sections: window.jsonData.context.active_course_sections,
     updateSubmission: EG.setOrUpdateSubmission,
     afterUpdateSubmission() {
       EG.showGrade()
-    }
+    },
   })
 
   renderPostGradesMenu()
@@ -599,7 +599,7 @@ function setupPostPolicies() {
 function setupHeader() {
   const elements = {
     nav: $gradebook_header.find('#prev-student-button, #next-student-button'),
-    settings: {form: $('#settings_form')}
+    settings: {form: $('#settings_form')},
   }
 
   return {
@@ -621,7 +621,7 @@ function setupHeader() {
           autoOpen: false,
           modal: true,
           resizable: false,
-          width: 400
+          width: 400,
         })
         .fixDialogButtons()
       // FF hack - when reloading the page, firefox seems to "remember" the disabled state of this
@@ -661,7 +661,7 @@ function setupHeader() {
       const gradeByQuestion = $('#enable_speedgrader_grade_by_question').prop('checked')
       // eslint-disable-next-line promise/catch-or-return
       $.post(ENV.settings_url, {
-        enable_speedgrader_grade_by_question: gradeByQuestion
+        enable_speedgrader_grade_by_question: gradeByQuestion,
       }).then(() => {
         SpeedgraderHelpers.reloadPage()
       })
@@ -672,7 +672,7 @@ function setupHeader() {
         event.preventDefault()
       }
       this.elements.settings.form.dialog('open')
-    }
+    },
   }
 }
 
@@ -688,16 +688,16 @@ function renderProgressIcon(attachment) {
   const iconAndTipMap = {
     pending: {
       icon: <IconUploadLine />,
-      tip: I18n.t('Uploading Submission')
+      tip: I18n.t('Uploading Submission'),
     },
     failed: {
       icon: <IconWarningLine />,
-      tip: I18n.t('Submission Failed to Submit')
+      tip: I18n.t('Submission Failed to Submit'),
     },
     default: {
       icon: <IconCheckMarkIndeterminateLine />,
-      tip: I18n.t('No File Submitted')
-    }
+      tip: I18n.t('No File Submitted'),
+    },
   }
 
   if (attachment.upload_status === 'success') {
@@ -802,7 +802,7 @@ function initCommentBox() {
       no_speech: I18n.t(
         'nodetect_message',
         'No speech was detected. You may need to adjust your microphone settings.'
-      )
+      ),
     }
 
     configureRecognition(recognition, messages)
@@ -829,7 +829,7 @@ function initCommentBox() {
       }
       $(
         speechRecognitionTemplate({
-          message: messages.begin
+          message: messages.begin,
         })
       ).dialog({
         title: I18n.t('titles.click_to_record', 'Speech to Text'),
@@ -843,7 +843,7 @@ function initCommentBox() {
             click() {
               recognition.stop()
               $(this).dialog('close').remove()
-            }
+            },
           },
           {
             id: 'record_button',
@@ -854,13 +854,13 @@ function initCommentBox() {
             click() {
               const $this = $(this)
               processSpeech($this)
-            }
-          }
+            },
+          },
         ],
         close() {
           recognition.stop()
           $(this).dialog('close').remove()
-        }
+        },
       })
       return false
     })
@@ -1012,8 +1012,8 @@ function initRubricStuff() {
 
     $rubric_holder.disableWhileLoading(promise, {
       buttons: {
-        '.save_rubric_button': 'Saving...'
-      }
+        '.save_rubric_button': 'Saving...',
+      },
     })
   })
 }
@@ -1024,7 +1024,7 @@ function initKeyCodes() {
   }
   const keycodeOptions = {
     keyCodes: 'j k p n c r g',
-    ignore: 'input, textarea, embed, object'
+    ignore: 'input, textarea, embed, object',
   }
   $window.keycodes(keycodeOptions, event => {
     event.preventDefault()
@@ -1106,7 +1106,7 @@ $.extend(INST, {
   },
   getQuizSubmissionSnapshot(user_id, version_number) {
     return snapshotCache[`${user_id}_${version_number}`]
-  }
+  },
 })
 
 function rubricAssessmentToPopulate() {
@@ -1185,7 +1185,7 @@ function allowsReassignment(submission) {
     'online_text_entry',
     'online_upload',
     'online_url',
-    'student_annotation'
+    'student_annotation',
   ]
 
   return (
@@ -1300,7 +1300,7 @@ EG = {
         stop(event, _ui) {
           event.stopImmediatePropagation()
           $resize_overlay.hide()
-        }
+        },
       })
       .click(function (this: HTMLElement, event) {
         event.preventDefault()
@@ -1411,7 +1411,7 @@ EG = {
       if (ENV.student_group_reason_for_change != null) {
         SpeedGraderAlerts.showStudentGroupChangeAlert({
           selectedStudentGroup: ENV.selected_student_group,
-          reasonForChange: ENV.student_group_reason_for_change
+          reasonForChange: ENV.student_group_reason_for_change,
         })
       }
       setupPostPolicies()
@@ -1486,7 +1486,7 @@ EG = {
         unsubmittedCommentsTemplate({
           message: I18n.t(
             'You have created a comment that has not been posted. Do you want to proceed and save this comment as a draft? (You can post draft comments at any time.)'
-          )
+          ),
         })
       ).dialog({
         title: I18n.t('Your comment is not posted'),
@@ -1510,7 +1510,7 @@ EG = {
             text: I18n.t('Cancel'),
             click: () => {
               closeDialog()
-            }
+            },
           },
           {
             id: 'unposted_comment_proceed',
@@ -1519,9 +1519,9 @@ EG = {
             click: () => {
               closeDialog()
               nextStudent(offset)
-            }
-          }
-        ]
+            },
+          },
+        ],
       })
     } else {
       nextStudent(offset)
@@ -1861,7 +1861,7 @@ EG = {
       if (selectedGrade) {
         this.setActiveProvisionalGradeFields({
           label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id],
-          grade: selectedGrade
+          grade: selectedGrade,
         })
       } else {
         this.setActiveProvisionalGradeFields()
@@ -1916,13 +1916,13 @@ EG = {
         assignment: {
           gradesPublishedAt: window.jsonData.grades_published_at,
           id: ENV.assignment_id,
-          pointsPossible: window.jsonData.points_possible
+          pointsPossible: window.jsonData.points_possible,
         },
         courseId: ENV.course_id,
         submission: {
           id: submission.id,
-          score: submission.score
-        }
+          score: submission.score,
+        },
       })
     }
 
@@ -1953,7 +1953,7 @@ EG = {
   plagiarismIndicator({
     plagiarismAsset,
     reportUrl,
-    tooltip
+    tooltip,
   }: {
     plagiarismAsset: TurnitinAsset
     reportUrl: null | string
@@ -2001,7 +2001,7 @@ EG = {
       const tooltip = I18n.t('Similarity Score - See detailed report')
       let reportUrl = $.replaceTags(urlContainer.attr('href'), {
         [anonymizableUserId]: submission[anonymizableUserId],
-        asset_string: assetString
+        asset_string: assetString,
       })
       reportUrl += (reportUrl.includes('?') ? '&' : '?') + 'attempt=' + submission.attempt
 
@@ -2009,7 +2009,7 @@ EG = {
         const $indicator = this.plagiarismIndicator({
           plagiarismAsset: turnitinAsset_,
           reportUrl,
-          tooltip
+          tooltip,
         })
         $turnitinScoreContainer.empty().append($indicator)
       } else {
@@ -2018,7 +2018,7 @@ EG = {
             state: `${turnitinAsset_.state || 'no'}_score`,
             reportUrl,
             tooltip,
-            score: `${turnitinAsset_.similarity_score}%`
+            score: `${turnitinAsset_.similarity_score}%`,
           })
         )
       }
@@ -2037,14 +2037,14 @@ EG = {
       const $turnitinSimilarityScore = ENV.new_gradebook_plagiarism_icons_enabled
         ? this.plagiarismIndicator({
             plagiarismAsset: turnitinAsset_,
-            tooltip
+            tooltip,
           })
         : $(
             turnitinScoreTemplate({
               icon: `/images/turnitin_submission_${turnitinAsset_.status}.png`,
               reportUrl: '#',
               state: `submission_${turnitinAsset_.status}`,
-              tooltip
+              tooltip,
             })
           )
 
@@ -2066,7 +2066,7 @@ EG = {
             turnitinAsset_.status === 'error'
               ? turnitinAsset_.public_error_message || defaultErrorMessage
               : defaultInfoMessage,
-          showResubmit: showLegacyResubmit
+          showResubmit: showLegacyResubmit,
         })
       )
       $turnitinInfoContainer_.append($turnitinInfo)
@@ -2097,7 +2097,7 @@ EG = {
       if (!isAnonymous) {
         reportUrl = $.replaceTags($assignment_submission_vericite_report_url.attr('href'), {
           user_id: submission.user_id,
-          asset_string: assetString
+          asset_string: assetString,
         })
         tooltip = I18n.t('VeriCite Similarity Score - See detailed report')
       } else {
@@ -2108,7 +2108,7 @@ EG = {
         const $indicator = this.plagiarismIndicator({
           plagiarismAsset: vericiteAsset_,
           reportUrl,
-          tooltip
+          tooltip,
         })
         $vericiteScoreContainer_.empty().append($indicator)
       } else {
@@ -2117,7 +2117,7 @@ EG = {
             state: `${vericiteAsset_.state || 'no'}_score`,
             reportUrl,
             tooltip,
-            score: `${vericiteAsset_.similarity_score}%`
+            score: `${vericiteAsset_.similarity_score}%`,
           })
         )
       }
@@ -2136,14 +2136,14 @@ EG = {
       const $vericiteSimilarityScore = ENV.new_gradebook_plagiarism_icons_enabled
         ? this.plagiarismIndicator({
             plagiarismAsset: vericiteAsset_,
-            tooltip
+            tooltip,
           })
         : $(
             vericiteScoreTemplate({
               icon: `/images/turnitin_submission_${vericiteAsset_.status}.png`,
               reportUrl: '#',
               state: `submission_${vericiteAsset_.status}`,
-              tooltip
+              tooltip,
             })
           )
       $vericiteScoreContainer_.append($vericiteSimilarityScore)
@@ -2167,7 +2167,7 @@ EG = {
             vericiteAsset_.status === 'error'
               ? vericiteAsset_.public_error_message || defaultErrorMessage
               : defaultInfoMessage,
-          showResubmit: vericiteAsset_.status === 'error' && isMostRecent
+          showResubmit: vericiteAsset_.status === 'error' && isMostRecent,
         })
       )
       $vericiteInfoContainer_.append($vericiteInfo)
@@ -2200,7 +2200,7 @@ EG = {
       // xsslint safeString.method t
       const wordCountHTML = wordCount
         ? `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
-            count: wordCount
+            count: wordCount,
           })}`
         : ''
       $word_count.html($.raw(wordCountHTML))
@@ -2340,7 +2340,7 @@ EG = {
 
       if (!window.jsonData.anonymize_students || isAdmin) {
         studentViewedAtHTML = studentViewedAtTemplate({
-          viewed_at: $.datetimeString(attachment.viewed_at)
+          viewed_at: $.datetimeString(attachment.viewed_at),
         })
       }
 
@@ -2355,9 +2355,9 @@ EG = {
             [anonymizableSubmissionIdKey]: submission[anonymizableUserId],
             attachmentId: attachment.id,
             display_name: attachment.display_name,
-            attachmentWorkflow: attachment.upload_status
+            attachmentWorkflow: attachment.upload_status,
           },
-          hrefValues: [anonymizableSubmissionIdKey, 'attachmentId']
+          hrefValues: [anonymizableSubmissionIdKey, 'attachmentId'],
         })
         .appendTo($submission_files_list)
         .find('a.display_name')
@@ -2550,7 +2550,7 @@ EG = {
           excused: EG.currentStudent.submission.excused,
           selected: selectedIndex === i,
           submittedAt: $.datetimeString(s.submitted_at) || noSubmittedAt,
-          grade
+          grade,
         }
       })
 
@@ -2560,8 +2560,8 @@ EG = {
         submissions: templateSubmissions,
         linkToQuizHistory: window.jsonData.too_many_quiz_submissions,
         quizHistoryHref: $.replaceTags(ENV.quiz_history_url, {
-          user_id: this.currentStudent[anonymizableId]
-        })
+          user_id: this.currentStudent[anonymizableId],
+        }),
       })
     }
     $multiple_submissions.html($.raw(innerHTML || ''))
@@ -2633,7 +2633,7 @@ EG = {
     $x_of_x_students.text(
       I18n.t('%{x}/%{y}', {
         x: I18n.n(EG.currentIndex() + 1),
-        y: I18n.n(this.totalStudentCount())
+        y: I18n.n(this.totalStudentCount()),
       })
     )
     $('#gradee').text(gradeeLabel)
@@ -2658,7 +2658,7 @@ EG = {
 
       if (window.jsonData.points_possible) {
         percent = I18n.n(Math.round(100 * (avg(scores) / window.jsonData.points_possible)), {
-          percentage: true
+          percentage: true,
         })
 
         outOf = [' / ', I18n.n(window.jsonData.points_possible), ' (', percent, ')'].join('')
@@ -2673,7 +2673,7 @@ EG = {
     $grded_so_far.text(
       I18n.t('portion_graded', '%{x}/%{y}', {
         x: I18n.n(gradedStudents.length),
-        y: I18n.n(window.jsonData.studentsWithSubmissions.length)
+        y: I18n.n(window.jsonData.studentsWithSubmissions.length),
       })
     )
   },
@@ -2756,7 +2756,7 @@ EG = {
     const iframe = SpeedgraderHelpers.buildIframe(htmlEscape(launchUrl), {
       className: 'tool_launch',
       allow: iframeAllowances(),
-      allowfullscreen: true
+      allowfullscreen: true,
     })
     $div.html($.raw(iframe)).show()
   },
@@ -2767,7 +2767,7 @@ EG = {
       sessionLimit - 10 * 60 * 1000,
       sessionLimit - 5 * 60 * 1000,
       sessionLimit - 2 * 60 * 1000,
-      sessionLimit - 1 * 60 * 1000
+      sessionLimit - 1 * 60 * 1000,
     ]
   },
 
@@ -2798,7 +2798,8 @@ EG = {
       submission_id: this.currentStudent.submission.id,
       attachment_view_inline_ping_url: attachment.view_inline_ping_url,
       attachment_preview_processing:
-        attachment.workflow_state === 'pending_upload' || attachment.workflow_state === 'processing'
+        attachment.workflow_state === 'pending_upload' ||
+        attachment.workflow_state === 'processing',
     }
 
     if (
@@ -2830,7 +2831,7 @@ EG = {
 
       $iframe_holder.show().loadDocPreview(
         $.extend(previewOptions, {
-          crocodoc_session_url: attachment.provisional_crocodoc_url || attachment.crocodoc_url
+          crocodoc_session_url: attachment.provisional_crocodoc_url || attachment.crocodoc_url,
         })
       )
     } else if (attachment.canvadoc_url) {
@@ -2840,7 +2841,7 @@ EG = {
       $iframe_holder.show().loadDocPreview(
         $.extend(previewOptions, {
           canvadoc_session_url: attachment.provisional_canvadoc_url || attachment.canvadoc_url,
-          iframe_min_height: 0
+          iframe_min_height: 0,
         })
       )
     } else if ($.isPreviewable(attachment.content_type, 'google')) {
@@ -2848,7 +2849,7 @@ EG = {
 
       const currentStudentIDAsOfAjaxCall = this.currentStudent[anonymizableId]
       previewOptions = $.extend(previewOptions, {
-        ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId]
+        ajax_valid: () => currentStudentIDAsOfAjaxCall === this.currentStudent[anonymizableId],
       })
       $iframe_holder.show().loadDocPreview(previewOptions)
     } else if (browserableCssClasses.test(attachment.mime_class)) {
@@ -2953,7 +2954,7 @@ EG = {
 
   renderCommentAttachment(comment, attachmentData, incomingOpts) {
     const defaultOpts = {
-      commentAttachmentBlank: $comment_attachment_blank
+      commentAttachmentBlank: $comment_attachment_blank,
     }
     const opts = {...defaultOpts, ...incomingOpts}
     const attachment = attachmentData.attachment ? attachmentData.attachment : attachmentData
@@ -2964,7 +2965,7 @@ EG = {
 
     attachmentElement = attachmentElement.fillTemplateData({
       data: attachment,
-      hrefValues: ['comment_id', 'id', 'submitter_id']
+      hrefValues: ['comment_id', 'id', 'submitter_id'],
     })
     attachmentElement.find('a').addClass(attachment.mime_class)
 
@@ -3016,7 +3017,7 @@ EG = {
               $(this).slideUp(function () {
                 $(this).remove()
               })
-            }
+            },
           })
       })
       .showIf(commentIsDeleteableByMe)
@@ -3076,7 +3077,7 @@ EG = {
     let hideStudentName = false
     const defaultOpts = {
       commentBlank: $comment_blank,
-      commentAttachmentBlank: $comment_attachment_blank
+      commentAttachmentBlank: $comment_attachment_blank,
     }
     const opts = {...defaultOpts, ...incomingOpts}
     let commentElement = opts.commentBlank.clone(true)
@@ -3117,7 +3118,7 @@ EG = {
     if (comment.draft) {
       commentElement.addClass('draft')
       submitCommentButtonText = I18n.t('Submit comment: %{commentText}', {
-        commentText: spokenComment
+        commentText: spokenComment,
       })
       commentElement.find('.submit_comment_button').attr('aria-label', submitCommentButtonText)
     } else {
@@ -3168,7 +3169,7 @@ EG = {
     const commentRenderingOptions = {
       hideStudentNames: utils.shouldHideStudentNames(),
       commentBlank: $comment_blank,
-      commentAttachmentBlank: $comment_attachment_blank
+      commentAttachmentBlank: $comment_attachment_blank,
     }
 
     $comments.html('')
@@ -3201,7 +3202,7 @@ EG = {
 
   revertFromFormSubmit: ({
     draftComment = null,
-    errorSubmitting = false
+    errorSubmitting = false,
   }: {
     draftComment?: null | boolean
     errorSubmitting?: boolean
@@ -3305,7 +3306,7 @@ EG = {
       'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
       'submission[comment]': $add_a_comment_textarea.val(),
       'submission[draft_comment]': draftComment,
-      [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId]
+      [`submission[${anonymizableId}]`]: EG.currentStudent[anonymizableId],
     }
 
     if (ENV.group_comments_per_attempt) {
@@ -3315,7 +3316,7 @@ EG = {
     if ($('#media_media_recording').data('comment_id')) {
       $.extend(formData, {
         'submission[media_comment_type]': $('#media_media_recording').data('comment_type'),
-        'submission[media_comment_id]': $('#media_media_recording').data('comment_id')
+        'submission[media_comment_id]': $('#media_media_recording').data('comment_id'),
       })
     }
     if (ENV.grading_role === 'moderator' || ENV.grading_role === 'provisional_grader') {
@@ -3400,7 +3401,7 @@ EG = {
         {},
         {
           ...submission,
-          versioned_attachments: versionedAttachments
+          versioned_attachments: versionedAttachments,
         }
       )
     }
@@ -3446,7 +3447,7 @@ EG = {
     const formData = {
       'submission[assignment_id]': window.jsonData.id,
       [`submission[${anonymizableUserId}]`]: EG.currentStudent[anonymizableId],
-      'submission[graded_anonymously]': isAnonymous ? true : utils.shouldHideStudentNames()
+      'submission[graded_anonymously]': isAnonymous ? true : utils.shouldHideStudentNames(),
     }
 
     const grade = SpeedgraderHelpers.determineGradeToSubmit(
@@ -3522,7 +3523,7 @@ EG = {
 
         EG.setActiveProvisionalGradeFields({
           grade: existingGrade,
-          label: customProvisionalGraderLabel
+          label: customProvisionalGraderLabel,
         })
       }
     }
@@ -3542,7 +3543,7 @@ EG = {
       if (selectedGrade) {
         EG.setActiveProvisionalGradeFields({
           grade: selectedGrade,
-          label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id]
+          label: provisionalGraderDisplayNames[selectedGrade.provisional_grade_id],
         })
       } else {
         EG.showGrade()
@@ -3699,7 +3700,7 @@ EG = {
     if ($reassign_assignment[0]) {
       $reassign_assignment.parent().tooltip({
         position: {my: 'left bottom', at: 'left top'},
-        tooltipClass: 'center bottom vertical'
+        tooltipClass: 'center bottom vertical',
       })
     }
   },
@@ -3816,7 +3817,7 @@ EG = {
 
   selectProvisionalGrade(provisionalGradeId: string, refetchOnSuccess: boolean = false) {
     const selectGradeUrl = $.replaceTags(ENV.provisional_select_url, {
-      provisional_grade_id: provisionalGradeId
+      provisional_grade_id: provisionalGradeId,
     })
 
     const submitSucceeded = data => {
@@ -3895,7 +3896,7 @@ EG = {
 
   setActiveProvisionalGradeFields({
     label = '',
-    grade = null
+    grade = null,
   }: {
     label?: string
     grade?: null | {grade: number; score: number; readonly: boolean}
@@ -3920,7 +3921,7 @@ EG = {
 
   handleProvisionalGradeSelected({
     selectedGrade,
-    isNewGrade = false
+    isNewGrade = false,
   }: {
     isNewGrade?: boolean
     selectedGrade?: {provisional_grade_id: string}
@@ -3931,7 +3932,7 @@ EG = {
       this.selectProvisionalGrade(selectedGradeId)
       this.setActiveProvisionalGradeFields({
         grade: selectedGrade,
-        label: provisionalGraderDisplayNames[selectedGradeId]
+        label: provisionalGraderDisplayNames[selectedGradeId],
       })
     } else if (isNewGrade) {
       // If this is a "new" grade with no value, don't submit anything to the
@@ -3975,7 +3976,7 @@ EG = {
       },
       pointsPossible: window.jsonData.points_possible,
       provisionalGraderDisplayNames,
-      provisionalGrades
+      provisionalGrades,
     }
 
     const gradeSelector = <SpeedGraderProvisionalGradeSelector {...props} />
@@ -3990,7 +3991,7 @@ EG = {
     } else {
       SpeedgraderHelpers.reloadPage()
     }
-  }
+  },
 }
 
 function getGradingPeriods() {
@@ -4041,7 +4042,7 @@ function speedGraderJSONErrorFn(_data, xhr, _textStatus, _errorThrown) {
   if (xhr.status === 504) {
     const alertProps = {
       variant: 'error',
-      dismissible: false
+      dismissible: false,
     }
 
     ReactDOM.render(
@@ -4146,7 +4147,7 @@ function renderSettingsMenu() {
     openKeyboardShortcutsModal: showKeyboardShortcutsModal,
     showModerationMenuItem: ENV.grading_role === 'moderator',
     showHelpMenuItem: ENV.show_help_menu_item,
-    showKeyboardShortcutsMenuItem: !ENV.disable_keyboard_shortcuts
+    showKeyboardShortcutsMenuItem: !ENV.disable_keyboard_shortcuts,
   }
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
@@ -4186,7 +4187,7 @@ function renderPostGradesMenu() {
     allowPostingGradesOrComments,
     hasGradesOrPostableComments,
     onHideGrades,
-    onPostGrades
+    onPostGrades,
   }
 
   ReactDOM.render(
@@ -4267,5 +4268,5 @@ export default {
     teardownBeforeLeavingSpeedgrader()
   },
 
-  EG
+  EG,
 }

@@ -34,7 +34,7 @@ export default class PathOption extends React.Component {
     optionIndex: number.isRequired,
     setId: number.isRequired,
     selectedOption: number,
-    selectOption: func.isRequired
+    selectOption: func.isRequired,
   }
 
   selectOption = () => {
@@ -51,7 +51,7 @@ export default class PathOption extends React.Component {
       'item-group-container': true,
       'cmp-option': true,
       'cmp-option__selected': selected,
-      'cmp-option__disabled': disabled
+      'cmp-option__disabled': disabled,
     })
 
     return (

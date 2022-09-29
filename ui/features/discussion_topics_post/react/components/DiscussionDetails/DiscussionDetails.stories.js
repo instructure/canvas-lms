@@ -26,7 +26,7 @@ import {Assignment} from '../../../graphql/Assignment'
 export default {
   title: 'Examples/Discussion Posts/Components/DiscussionDetails',
   component: DiscussionDetails,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <DiscussionDetails {...args} />
@@ -35,7 +35,7 @@ export const SingleDueDate = Template.bind({})
 SingleDueDate.args = {
   pointsPossible: 5,
   assignment: Assignment.mock(),
-  isAdmin: true
+  isAdmin: true,
 }
 
 export const MultipleDueDates = Template.bind({})
@@ -44,22 +44,22 @@ MultipleDueDates.args = {
     {
       id: '1',
       dueAt: 'Sat, 29 May 2021 05:59:59 UTC +00:00',
-      title: 'Mutants Group 1'
+      title: 'Mutants Group 1',
     },
     {
       id: '2',
       dueAt: 'Sun, 30 May 2021 05:59:59 UTC +00:00',
       title: 'Mutants Group 2',
       unlockAt: 'Fri, 28 May 2021 05:59:59 UTC +00:00',
-      lockAt: 'Tue, 1 June 2021 05:59:59 UTC +00:00'
+      lockAt: 'Tue, 1 June 2021 05:59:59 UTC +00:00',
     },
     {
       id: '3',
       dueAt: 'Mon, 31 May 2021 05:59:59 UTC +00:00',
-      title: 'Mutants Group 3'
-    }
+      title: 'Mutants Group 3',
+    },
   ],
   canSeeMultipleDueDates: true,
   pointsPossible: 5,
-  dueAtDisplayText: 'Jan 26 11:49pm'
+  dueAtDisplayText: 'Jan 26 11:49pm',
 }

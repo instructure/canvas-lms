@@ -39,7 +39,7 @@ class KalturaAnalytics {
       'event:objectType': 'KalturaStatsEvent',
       'event:partnerId': this.pluginSettings.partner_id,
       'event:uiconfId': this.pluginSettings.kcw_ui_conf,
-      'event:queryStringReferrer': window.location.href
+      'event:queryStringReferrer': window.location.href,
     }
   }
 
@@ -95,7 +95,7 @@ class KalturaAnalytics {
       // iframe, so just send them every 4 seconds
       const queue = []
       const f = ((iframe, queue) =>
-        function() {
+        function () {
           let url
           if ((url = queue.shift())) {
             return (iframe.src = url)
@@ -180,7 +180,7 @@ class KalturaAnalytics {
             0.25 * this.mediaElement.duration,
             0.5 * this.mediaElement.duration,
             0.75 * this.mediaElement.duration,
-            0.98 * this.mediaElement.duration // :)
+            0.98 * this.mediaElement.duration, // :)
           ]
           const {currentTime} = this.mediaElement
           if (!isNaN(currentTime) && currentTime > 0) {
@@ -211,7 +211,7 @@ class KalturaAnalytics {
   }
 }
 
-export default function(mediaId, mediaElement, pluginSettings) {
+export default function (mediaId, mediaElement, pluginSettings) {
   if (pluginSettings && pluginSettings.do_analytics) {
     const ka = new KalturaAnalytics(mediaId, mediaElement, pluginSettings)
     ka.addListeners()

@@ -30,7 +30,7 @@ QUnit.module('FinalGradeComponent', hooks => {
     const targetObject = {
       onEditFinalGradeOverride(grade) {
         strictEqual(grade, '93%')
-      }
+      },
     }
 
     component.set('onEditFinalGradeOverride', 'onEditFinalGradeOverride')

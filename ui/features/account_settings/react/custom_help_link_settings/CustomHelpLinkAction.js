@@ -25,11 +25,11 @@ export default class CustomHelpLinkAction extends React.Component {
     link: CustomHelpLinkPropTypes.link.isRequired,
     label: PropTypes.string.isRequired,
     iconClass: PropTypes.string.isRequired,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
   }
 
   static defaultProps = {
-    onClick: null
+    onClick: null,
   }
 
   handleClick = e => {

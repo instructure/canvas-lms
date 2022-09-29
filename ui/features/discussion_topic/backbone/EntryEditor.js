@@ -67,11 +67,11 @@ export default class EntryEditor extends EditorToggle {
       return this.view.model.save(
         {
           messageNotification: I18n.t('Saving...'),
-          message: this.content
+          message: this.content,
         },
         {
           success: this.onSaveSuccess.bind(this),
-          error: this.onSaveError.bind(this)
+          error: this.onSaveError.bind(this),
         }
       )
     } else {
@@ -102,7 +102,7 @@ export default class EntryEditor extends EditorToggle {
         .css({
           float: 'none',
           marginLeft: '.5em',
-          fontSize: '1.25rem'
+          fontSize: '1.25rem',
         })
         .click(() => this.delAttachment())
     )
@@ -156,7 +156,7 @@ export default class EntryEditor extends EditorToggle {
   // @api private
   onSaveError() {
     this.view.model.set({
-      messageNotification: I18n.t('Failed to save, please try again later')
+      messageNotification: I18n.t('Failed to save, please try again later'),
     })
     return this.edit()
   }

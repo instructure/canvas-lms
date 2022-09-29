@@ -27,7 +27,7 @@ import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
 jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {
   return {
-    alertForMatchingAccounts: jest.fn()
+    alertForMatchingAccounts: jest.fn(),
   }
 })
 
@@ -36,7 +36,7 @@ const defaultProps = {
   searchValue: 'elemen',
   filterValue: FilterType.SHOW_ALL,
   visibilityChanges: [],
-  onAccountToggled: jest.fn()
+  onAccountToggled: jest.fn(),
 }
 
 const accountListUrl = (searchTerm = '', filter = '') =>

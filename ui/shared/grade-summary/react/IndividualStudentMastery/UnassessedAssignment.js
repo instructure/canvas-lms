@@ -50,7 +50,7 @@ const UnassessedAssignment = ({assignment}) => {
 }
 
 UnassessedAssignment.propTypes = {
-  assignment: object.isRequired
+  assignment: object.isRequired,
 }
 
 export default UnassessedAssignment

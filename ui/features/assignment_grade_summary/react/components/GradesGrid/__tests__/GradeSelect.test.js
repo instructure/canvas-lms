@@ -29,13 +29,13 @@ const DEFAULT_PROPS = {
   disabledCustomGrade: false,
   finalGrader: {
     graderId: 'teach',
-    id: '1105'
+    id: '1105',
   },
   graders: [
     {graderId: 'frizz', graderName: 'Miss Frizzle', graderSelectable: true},
     {graderId: 'robin', graderName: 'Mr. Keating', graderSelectable: true},
     {graderId: 'ednak', graderName: 'Mrs. Krabappel', graderSelectable: true},
-    {graderId: 'feeny', graderName: 'Mr. Feeny', graderSelectable: true}
+    {graderId: 'feeny', graderName: 'Mr. Feeny', graderSelectable: true},
   ],
   grades: {
     frizz: {
@@ -44,7 +44,7 @@ const DEFAULT_PROPS = {
       id: '4601',
       score: 10,
       selected: false,
-      studentId: '1111'
+      studentId: '1111',
     },
     robin: {
       grade: 'B',
@@ -52,7 +52,7 @@ const DEFAULT_PROPS = {
       id: '4602',
       score: 8.6,
       selected: false,
-      studentId: '1111'
+      studentId: '1111',
     },
     feeny: {
       grade: 'C+',
@@ -60,13 +60,13 @@ const DEFAULT_PROPS = {
       id: '4603',
       score: 7.9,
       selected: false,
-      studentId: '1111'
-    }
+      studentId: '1111',
+    },
   },
   onSelect: Function.prototype,
   selectProvisionalGradeStatus: null,
   studentId: '1111',
-  studentName: STUDENT_NAME
+  studentName: STUDENT_NAME,
 }
 
 function mountComponent(props) {
@@ -219,7 +219,7 @@ describe('GradeSummary::GradeSelect', () => {
         id: '9999',
         score,
         selected: true,
-        studentId: '1111'
+        studentId: '1111',
       }
 
       const {input} = await mountAndClick(props)
@@ -307,7 +307,7 @@ describe('GradeSummary::GradeSelect', () => {
         id: '9999',
         score,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       }
     })
 
@@ -562,7 +562,7 @@ describe('GradeSummary::GradeSelect', () => {
         id: '4604',
         score,
         selected: true,
-        studentId: '1111'
+        studentId: '1111',
       }
       const {input, menu} = await mountAndClick(props)
       fireEvent.change(input, {target: {value: 'cust'}})

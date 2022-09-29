@@ -22,7 +22,7 @@ export default class NaiveFetchDispatch {
   constructor(options = {}) {
     this.options = {
       activeRequestLimit: ACTIVE_REQUEST_LIMIT,
-      ...options
+      ...options,
     }
     this.requests = []
   }
@@ -57,7 +57,7 @@ export default class NaiveFetchDispatch {
 
   fetch(...args) {
     const request = {
-      active: false
+      active: false,
     }
 
     request.promise = new Promise((resolve, reject) => {

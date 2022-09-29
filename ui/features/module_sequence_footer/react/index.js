@@ -38,9 +38,9 @@ class ModuleSequenceFooter extends Component {
       axios.put(`/api/v1/courses/${this.props.courseId}/gradebook_settings`, {
         gradebook_settings: {
           filter_rows_by: {
-            student_group_id: selectedStudentGroupId
-          }
-        }
+            student_group_id: selectedStudentGroupId,
+          },
+        },
       })
 
       this.setState({selectedStudentGroupId})

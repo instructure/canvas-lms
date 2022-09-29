@@ -42,9 +42,9 @@ export const Course = {
       nodes: arrayOf({
         _id: string,
         id: string,
-        name: string
-      })
-    })
+        name: string,
+      }),
+    }),
   }),
   mock: {
     _id: 'asdfasdfasdf',
@@ -55,9 +55,9 @@ export const Course = {
         {
           _id: 'iuejvUDIUShgdi832',
           id: '234',
-          name: 'Ron Weasley'
-        }
-      ]
-    })
-  }
+          name: 'Ron Weasley',
+        },
+      ],
+    }),
+  },
 }

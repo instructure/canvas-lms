@@ -34,7 +34,7 @@ const types = {
   },
   get DesignerEnrollment() {
     return I18n.t('designer', 'Designer')
-  }
+  },
 }
 
 export default function enrollmentName(type) {

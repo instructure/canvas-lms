@@ -26,11 +26,11 @@ class CurrentUploads extends React.Component {
   state = {currentUploads: []}
 
   static propTypes = {
-    onUploadChange: func
+    onUploadChange: func,
   }
 
   static defaultProps = {
-    onUploadChange: () => {}
+    onUploadChange: () => {},
   }
 
   handleUploadQueueChange = upload_queue => {
@@ -47,7 +47,7 @@ class CurrentUploads extends React.Component {
     UploadQueue.removeChangeListener(this.handleUploadQueueChange)
   }
 
-  renderUploadProgress = function() {
+  renderUploadProgress = function () {
     if (this.state.currentUploads.length) {
       const progessComponents = this.state.currentUploads.map(uploader => {
         return <UploadProgress uploader={uploader} key={uploader.getFileName()} />
@@ -60,7 +60,7 @@ class CurrentUploads extends React.Component {
 
   render() {
     const classes = classnames({
-      current_uploads: this.state.currentUploads.length
+      current_uploads: this.state.currentUploads.length,
     })
 
     return <div className={classes}>{this.renderUploadProgress()}</div>

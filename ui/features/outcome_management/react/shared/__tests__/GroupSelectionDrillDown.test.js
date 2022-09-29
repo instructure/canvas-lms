@@ -29,38 +29,38 @@ describe('GroupSelectionDrillDown', () => {
         id: '1',
         name: 'Root Group',
         collections: ['2', '3'],
-        parentGroupId: 0
+        parentGroupId: 0,
       },
       2: {
         id: '2',
         name: 'Group 2',
         collections: ['4'],
-        parentGroupId: '1'
+        parentGroupId: '1',
       },
       3: {
         id: '3',
         name: 'Group 3',
         collections: ['4'],
-        parentGroupId: '1'
+        parentGroupId: '1',
       },
       4: {
         id: '4',
         name: 'Group 4',
         collections: [],
-        parentGroupId: '3'
+        parentGroupId: '3',
       },
       5: {
         id: '5',
         name: 'Group Without Parent',
         collections: [],
-        parentGroupId: '999'
-      }
+        parentGroupId: '999',
+      },
     },
     rootId: '0',
     selectedGroupId: '1',
     loadedGroups: ['1'],
     onCollectionClick: mockOnCollectionClick,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -105,7 +105,7 @@ describe('GroupSelectionDrillDown', () => {
     expect(mockOnCollectionClick).toHaveBeenCalledWith(
       expect.anything(),
       expect.objectContaining({
-        id: '999'
+        id: '999',
       })
     )
   })

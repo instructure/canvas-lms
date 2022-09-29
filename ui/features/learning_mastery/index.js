@@ -18,9 +18,10 @@
 
 import LearningMastery from './react/LearningMastery'
 import ready from '@instructure/ready'
+
 import('@canvas/context-cards/react/StudentContextCardTrigger')
 
 ready(() => {
   const learningMastery = new LearningMastery(ENV.GRADEBOOK_OPTIONS)
-  learningMastery.start()  
+  learningMastery.start()
 })

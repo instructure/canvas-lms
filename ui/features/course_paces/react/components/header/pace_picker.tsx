@@ -79,7 +79,7 @@ export const PacePicker: React.FC<ComponentProps> = ({
   selectedContextType,
   selectedContextId,
   setSelectedPaceContext,
-  responsiveSize
+  responsiveSize,
 }) => {
   const [open, setOpen] = useState(false)
   const [pendingContext, setPendingContext] = useState('')
@@ -172,8 +172,8 @@ export const PacePicker: React.FC<ComponentProps> = ({
     <ApplyTheme
       theme={{
         [(Menu as any).theme]: {
-          maxWidth: PICKER_WIDTH
-        }
+          maxWidth: PICKER_WIDTH,
+        },
       }}
     >
       <Menu
@@ -224,9 +224,9 @@ const mapStateToProps = (state: StoreState) => ({
   selectedContextId: getSelectedContextId(state),
   selectedContextType: getSelectedContextType(state),
   changeCount: getUnpublishedChangeCount(state),
-  responsiveSize: getResponsiveSize(state)
+  responsiveSize: getResponsiveSize(state),
 })
 
 export default connect(mapStateToProps, {
-  setSelectedPaceContext: actions.setSelectedPaceContext
+  setSelectedPaceContext: actions.setSelectedPaceContext,
 })(PacePicker)

@@ -24,8 +24,8 @@ const CyoeClient = {
       url: apiUrl + path,
       dataType: 'json',
       headers: {
-        Authorization: 'Bearer ' + jwt
-      }
+        Authorization: 'Bearer ' + jwt,
+      },
     }).then(res => res.data)
   },
 
@@ -37,7 +37,7 @@ const CyoeClient = {
   loadStudent(state, studentId) {
     const path = `/student_details?trigger_assignment=${state.assignment.id}&student_id=${studentId}`
     return CyoeClient.call(state, path)
-  }
+  },
 }
 
 export default CyoeClient

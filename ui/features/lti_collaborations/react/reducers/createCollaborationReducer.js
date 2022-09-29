@@ -21,7 +21,7 @@ import ACTION_NAMES from '../actions'
 const initialState = {
   createCollaborationPending: false,
   createCollaborationSuccessful: false,
-  createCollaborationError: null
+  createCollaborationError: null,
 }
 
 const createHandlers = {
@@ -30,23 +30,23 @@ const createHandlers = {
       ...state,
       createCollaborationPending: true,
       createCollaborationSuccessful: false,
-      createCollaborationError: null
+      createCollaborationError: null,
     }
   },
   [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
     return {
       ...state,
       createCollaborationPending: false,
-      createCollaborationSuccessful: true
+      createCollaborationSuccessful: true,
     }
   },
   [ACTION_NAMES.CREATE_COLLABORATION_FAILED]: (state, action) => {
     return {
       ...state,
       createCollaborationPending: false,
-      createCollaborationError: action.payload
+      createCollaborationError: action.payload,
     }
-  }
+  },
 }
 
 export default (state = initialState, action) => {

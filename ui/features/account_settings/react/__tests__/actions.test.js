@@ -35,11 +35,11 @@ describe('setCspEnabled', () => {
     const thunk = Actions.setCspEnabled('course', 1, true)
     const fakeDispatch = jest.fn()
     const fakeAxios = {
-      put: jest.fn(() => ({then() {}}))
+      put: jest.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
-      status: 'enabled'
+      status: 'enabled',
     })
   })
 
@@ -47,11 +47,11 @@ describe('setCspEnabled', () => {
     const thunk = Actions.setCspEnabled('courses', 1, true)
     const fakeDispatch = jest.fn()
     const fakeAxios = {
-      put: jest.fn(() => ({then() {}}))
+      put: jest.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.put).toHaveBeenCalledWith(expect.stringContaining('courses'), {
-      status: 'enabled'
+      status: 'enabled',
     })
   })
 
@@ -63,17 +63,17 @@ describe('setCspEnabled', () => {
         then(func) {
           const fakeResponse = {data: {enabled: true}}
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: true,
-      type: 'SET_CSP_ENABLED_OPTIMISTIC'
+      type: 'SET_CSP_ENABLED_OPTIMISTIC',
     })
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
       payload: true,
-      type: 'SET_CSP_ENABLED'
+      type: 'SET_CSP_ENABLED',
     })
   })
 })
@@ -83,7 +83,7 @@ describe('getCspEnabled', () => {
     const thunk = Actions.getCspEnabled('course', 1)
     const fakeDispatch = jest.fn()
     const fakeAxios = {
-      get: jest.fn(() => ({then() {}}))
+      get: jest.fn(() => ({then() {}})),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAxios.get).toHaveBeenCalledWith(expect.stringContaining('courses'))
@@ -97,13 +97,13 @@ describe('getCspEnabled', () => {
         then(func) {
           const fakeResponse = {data: {enabled: true}}
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
-      type: 'SET_CSP_ENABLED'
+      type: 'SET_CSP_ENABLED',
     })
   })
 })
@@ -136,17 +136,17 @@ describe('addDomain', () => {
           const fakeResponse = {}
           func(fakeResponse)
           return {then() {}}
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: {account: 'instructure.com'},
-      type: 'ADD_DOMAIN_OPTIMISTIC'
+      type: 'ADD_DOMAIN_OPTIMISTIC',
     })
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
       payload: {account: 'instructure.com'},
-      type: 'ADD_DOMAIN'
+      type: 'ADD_DOMAIN',
     })
   })
 
@@ -162,10 +162,10 @@ describe('addDomain', () => {
           return {
             then(fn) {
               fn()
-            }
+            },
           }
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeAfterAdd).toHaveBeenCalled()
@@ -182,17 +182,17 @@ describe('addDomainBulkAction', () => {
             {
               id: '1',
               name: 'Cool Tool 1',
-              account_id: '1'
-            }
-          ]
-        }
+              account_id: '1',
+            },
+          ],
+        },
       })
     ).toMatchSnapshot()
   })
   it('creates an error action if passed an invalid domainMap', () => {
     expect(
       Actions.addDomainBulkAction({
-        lti: ['google.com']
+        lti: ['google.com'],
       })
     ).toMatchSnapshot()
   })
@@ -216,15 +216,15 @@ describe('getCurrentWhitelist', () => {
                   {
                     id: '1',
                     name: 'Cool Tool 1',
-                    account_id: '1'
-                  }
-                ]
-              }
-            }
+                    account_id: '1',
+                  },
+                ],
+              },
+            },
           }
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
@@ -236,12 +236,12 @@ describe('getCurrentWhitelist', () => {
             {
               id: '1',
               name: 'Cool Tool 1',
-              account_id: '1'
-            }
-          ]
-        }
+              account_id: '1',
+            },
+          ],
+        },
       },
-      type: 'ADD_DOMAIN_BULK'
+      type: 'ADD_DOMAIN_BULK',
     })
   })
 })
@@ -267,17 +267,17 @@ describe('removeDomain', () => {
         then(func) {
           const fakeResponse = {}
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: 'instructure.com',
-      type: 'REMOVE_DOMAIN_OPTIMISTIC'
+      type: 'REMOVE_DOMAIN_OPTIMISTIC',
     })
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
       payload: 'instructure.com',
-      type: 'REMOVE_DOMAIN'
+      type: 'REMOVE_DOMAIN',
     })
   })
 })
@@ -304,21 +304,21 @@ describe('setCspInherited', () => {
         then(func) {
           const fakeResponse = {
             data: {
-              inherited: true
-            }
+              inherited: true,
+            },
           }
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenNthCalledWith(1, {
       payload: true,
-      type: 'SET_CSP_INHERITED_OPTIMISTIC'
+      type: 'SET_CSP_INHERITED_OPTIMISTIC',
     })
     expect(fakeDispatch).toHaveBeenNthCalledWith(2, {
       payload: true,
-      type: 'SET_CSP_INHERITED'
+      type: 'SET_CSP_INHERITED',
     })
   })
 
@@ -332,21 +332,21 @@ describe('setCspInherited', () => {
           const fakeResponse = {
             data: {
               inherited: true,
-              enabled: true
-            }
+              enabled: true,
+            },
           }
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
-      type: 'SET_CSP_ENABLED'
+      type: 'SET_CSP_ENABLED',
     })
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: {effective: [], account: [], tools: {}},
-      type: 'ADD_DOMAIN_BULK'
+      type: 'ADD_DOMAIN_BULK',
     })
   })
 
@@ -361,17 +361,17 @@ describe('setCspInherited', () => {
             data: {
               inherited: false,
               enabled: true,
-              current_account_whitelist: []
-            }
+              current_account_whitelist: [],
+            },
           }
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
-      type: 'SET_DIRTY'
+      type: 'SET_DIRTY',
     })
   })
 })
@@ -385,13 +385,13 @@ describe('getCspInherited', () => {
         then(func) {
           const fakeResponse = {data: {inherited: true}}
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, null, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: true,
-      type: 'SET_CSP_INHERITED'
+      type: 'SET_CSP_INHERITED',
     })
   })
 })
@@ -420,7 +420,7 @@ describe('copyInheritedIfNeeded', () => {
     const fakeDispatch = jest.fn()
     const fakeGetState = () => ({
       isDirty: false,
-      whitelistedDomains: {inherited: ['canvaslms.com']}
+      whitelistedDomains: {inherited: ['canvaslms.com']},
     })
     const fakeAxios = {}
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
@@ -438,21 +438,21 @@ describe('copyInheritedIfNeeded', () => {
             data: {
               inherited: false,
               enabled: true,
-              current_account_whitelist: ['canvaslms.com']
-            }
+              current_account_whitelist: ['canvaslms.com'],
+            },
           }
           func(fakeResponse)
-        }
-      }))
+        },
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: false,
-      type: 'SET_DIRTY'
+      type: 'SET_DIRTY',
     })
     expect(fakeDispatch).toHaveBeenCalledWith({
       payload: ['canvaslms.com'],
-      type: 'COPY_INHERITED_SUCCESS'
+      type: 'COPY_INHERITED_SUCCESS',
     })
   })
 
@@ -462,8 +462,8 @@ describe('copyInheritedIfNeeded', () => {
     const fakeGetState = () => ({isDirty: true, whitelistedDomains: {inherited: ['canvaslms.com']}})
     const fakeAxios = {
       post: jest.fn(() => ({
-        then: jest.fn()
-      }))
+        then: jest.fn(),
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(
@@ -477,12 +477,12 @@ describe('copyInheritedIfNeeded', () => {
     const fakeDispatch = jest.fn()
     const fakeGetState = () => ({
       isDirty: true,
-      whitelistedDomains: {inherited: ['canvaslms.com', 'instructure.com']}
+      whitelistedDomains: {inherited: ['canvaslms.com', 'instructure.com']},
     })
     const fakeAxios = {
       post: jest.fn(() => ({
-        then: jest.fn()
-      }))
+        then: jest.fn(),
+      })),
     }
     thunk(fakeDispatch, fakeGetState, {axios: fakeAxios})
     expect(fakeAxios.post).toHaveBeenCalledWith(

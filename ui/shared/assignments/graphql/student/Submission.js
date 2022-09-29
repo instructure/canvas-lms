@@ -19,7 +19,7 @@ import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
 import {
   SubmissionInterface,
-  DefaultMocks as SubmissionInterfaceDefaultMocks
+  DefaultMocks as SubmissionInterfaceDefaultMocks,
 } from './SubmissionInterface'
 
 export const Submission = {
@@ -35,16 +35,16 @@ export const Submission = {
   shape: shape({
     ...SubmissionInterface.shape.propTypes,
     _id: string.isRequired,
-    id: string.isRequired
-  })
+    id: string.isRequired,
+  }),
 }
 
 export const DefaultMocks = {
   Submission: () => ({
     ...SubmissionInterfaceDefaultMocks.SubmissionInterface(),
     _id: '1',
-    id: '1'
-  })
+    id: '1',
+  }),
 }
 
 export const SubmissionMocks = {
@@ -53,8 +53,8 @@ export const SubmissionMocks = {
       activeSubmissionType: 'online_upload',
       attachments: [{_id: '1'}],
       meetsAssignmentCriteria: true,
-      meetsUploadCriteria: true
-    }
+      meetsUploadCriteria: true,
+    },
   },
 
   basicLtiLaunchReadyToSubmit: {
@@ -62,12 +62,12 @@ export const SubmissionMocks = {
       activeSubmissionType: 'basic_lti_launch',
       externalTool: {
         _id: '1',
-        name: 'some external tool'
+        name: 'some external tool',
       },
       ltiLaunchUrl: '/lti-launch',
       meetsBasicLtiLaunchCriteria: true,
-      resourceLinkLookupUuid: 'some_uuid'
-    }
+      resourceLinkLookupUuid: 'some_uuid',
+    },
   },
 
   basicLtiLaunchSubmitted: {
@@ -75,7 +75,7 @@ export const SubmissionMocks = {
     resourceLinkLookupUuid: 'some_uuid',
     state: 'submitted',
     submissionType: 'basic_lti_launch',
-    url: '/submitted-lti-launch'
+    url: '/submitted-lti-launch',
   },
 
   graded: {
@@ -86,7 +86,7 @@ export const SubmissionMocks = {
     gradingStatus: 'graded',
     state: 'graded',
     submissionStatus: 'submitted',
-    submittedAt: new Date().toISOString()
+    submittedAt: new Date().toISOString(),
   },
 
   submitted: {
@@ -94,12 +94,12 @@ export const SubmissionMocks = {
     gradingStatus: 'needs_grading',
     state: 'submitted',
     submissionStatus: 'submitted',
-    submittedAt: new Date().toISOString()
+    submittedAt: new Date().toISOString(),
   },
 
   excused: {
     gradingStatus: 'excused',
-    state: 'graded'
+    state: 'graded',
   },
 
   missing: {
@@ -108,7 +108,7 @@ export const SubmissionMocks = {
     grade: '0',
     gradingStatus: 'graded',
     state: 'graded',
-    submissionStatus: 'missing'
+    submissionStatus: 'missing',
   },
 
   late: {
@@ -119,6 +119,6 @@ export const SubmissionMocks = {
     gradingStatus: 'graded',
     state: 'graded',
     submissionStatus: 'late',
-    submittedAt: new Date().toISOString()
-  }
+    submittedAt: new Date().toISOString(),
+  },
 }

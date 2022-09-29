@@ -28,22 +28,22 @@ describe('HelpTray', () => {
       subtext: 'Find answers to common questions',
       url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
       type: 'default',
-      id: 'search_the_canvas_guides'
+      id: 'search_the_canvas_guides',
     },
     {
       text: 'Report a Problem',
       subtext: 'If Canvas misbehaves, tell us about it',
       url: '#create_ticket',
       type: 'default',
-      id: 'report_a_problem'
-    }
+      id: 'report_a_problem',
+    },
   ]
 
   const props = {
     trayTitle,
     links,
     hasLoaded: true,
-    closeTray: jest.fn()
+    closeTray: jest.fn(),
   }
 
   beforeEach(() => {

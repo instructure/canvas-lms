@@ -25,7 +25,7 @@ import {Heading} from '@instructure/ui-heading'
 import {
   IconArrowOpenDownLine,
   IconArrowOpenUpLine,
-  IconAttachMediaLine
+  IconAttachMediaLine,
 } from '@instructure/ui-icons'
 import UploadMedia from '@instructure/canvas-media'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
@@ -36,7 +36,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import {
   UploadMediaStrings,
   MediaCaptureStrings,
-  SelectStrings
+  SelectStrings,
 } from '@canvas/upload-media-translations'
 import {Modal} from '@instructure/ui-modal'
 import {NumberInput} from '@instructure/ui-number-input'
@@ -57,7 +57,7 @@ import {
   AttachmentDisplay,
   MediaAttachment,
   addAttachmentsFn,
-  removeAttachmentFn
+  removeAttachmentFn,
 } from '@canvas/message-attachments'
 import type {CamelizedAssignment} from '@canvas/grading/grading.d'
 
@@ -141,38 +141,38 @@ const filterCriteria: FilterCriterion[] = [
     shouldShow: assignment =>
       !['on_paper', 'none', 'not_graded', ''].includes(assignment.submissionTypes[0]),
     title: I18n.t('Have not yet submitted'),
-    value: 'unsubmitted'
+    value: 'unsubmitted',
   },
   {
     requiresCutoff: false,
     shouldShow: () => true,
     title: I18n.t('Have not been graded'),
-    value: 'ungraded'
+    value: 'ungraded',
   },
   {
     requiresCutoff: true,
     shouldShow: isScored,
     title: I18n.t('Scored more than'),
-    value: 'scored_more_than'
+    value: 'scored_more_than',
   },
   {
     requiresCutoff: true,
     shouldShow: isScored,
     title: I18n.t('Scored less than'),
-    value: 'scored_less_than'
+    value: 'scored_less_than',
   },
   {
     requiresCutoff: false,
     shouldShow: assignment => assignment.gradingType === 'pass_fail',
     title: I18n.t('Marked incomplete'),
-    value: 'marked_incomplete'
+    value: 'marked_incomplete',
   },
   {
     requiresCutoff: false,
     shouldShow: isReassignable,
     title: I18n.t('Reassigned'),
-    value: 'reassigned'
-  }
+    value: 'reassigned',
+  },
 ]
 
 function observerCount(students, observers) {
@@ -230,12 +230,12 @@ function defaultSubject(criterion, assignment, cutoff) {
     case 'scored_more_than':
       return I18n.t('Scored more than %{cutoff} on %{assignment}', {
         cutoff,
-        assignment: assignment.name
+        assignment: assignment.name,
       })
     case 'scored_less_than':
       return I18n.t('Scored less than %{cutoff} on %{assignment}', {
         cutoff,
-        assignment: assignment.name
+        assignment: assignment.name,
       })
     case 'marked_incomplete':
       return I18n.t('%{assignment} is incomplete', {assignment: assignment.name})
@@ -250,7 +250,7 @@ const MessageStudentsWhoDialog = ({
   students,
   onSend,
   messageAttachmentUploadFolderId,
-  userId
+  userId,
 }: Props) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [open, setOpen] = useState(true)
@@ -280,8 +280,8 @@ const MessageStudentsWhoDialog = ({
   const {loading, data} = useQuery(OBSERVER_ENROLLMENTS_QUERY, {
     variables: {
       courseId: assignment.courseId,
-      studentIds: students.map(student => student.id)
-    }
+      studentIds: students.map(student => student.id),
+    },
   })
 
   const observerEnrollments = data?.course?.enrollmentsConnection?.nodes || []
@@ -398,20 +398,20 @@ const MessageStudentsWhoDialog = ({
     } else {
       const recipientsIds = [
         ...selectedStudents,
-        ...Object.values(selectedObservers).flat()
+        ...Object.values(selectedObservers).flat(),
       ] as string[]
       const uniqueRecipientsIds: string[] = [...new Set(recipientsIds)]
 
       const args: SendMessageArgs = {
         recipientsIds: uniqueRecipientsIds,
         subject,
-        body: message
+        body: message,
       }
 
       if (mediaUploadFile) {
         args.mediaFile = {
           id: mediaUploadFile.media_id,
-          type: mediaUploadFile.media_type
+          type: mediaUploadFile.media_type,
         }
       }
 
@@ -588,7 +588,7 @@ const MessageStudentsWhoDialog = ({
                 label={
                   <Text weight="bold">
                     {I18n.t('%{observerCount} Observers', {
-                      observerCount: observersDisplayed
+                      observerCount: observersDisplayed,
                     })}
                   </Text>
                 }
@@ -678,7 +678,7 @@ const MessageStudentsWhoDialog = ({
                     src: mediaPreviewURL,
                     title: mediaTitle || mediaUploadFile.title,
                     type: mediaUploadFile.media_type,
-                    mediaTracks: mediaUploadFile.media_tracks
+                    mediaTracks: mediaUploadFile.media_tracks,
                   }}
                   onRemoveMediaComment={onRemoveMediaComment}
                 />
@@ -750,7 +750,7 @@ const MessageStudentsWhoDialog = ({
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         languages={Object.keys(closedCaptionLanguages).map(key => ({
           id: key,
-          label: closedCaptionLanguages[key]
+          label: closedCaptionLanguages[key],
         }))}
         rcsConfig={{contextId: userId, contextType: 'user'}}
         disableSubmitWhileUploading={true}

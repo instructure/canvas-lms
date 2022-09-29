@@ -47,7 +47,14 @@ function ProfileTab({id, html_url, label, counts}) {
     if (found.length === 0) return null // no count defined for this label
     const count = counts[found[0].countName]
     if (count === 0) return null // zero count is not displayed
-    return <Badge count={count} standalone margin="0 0 xxx-small small" formatOutput={a11yCount} />
+    return (
+      <Badge
+        count={count}
+        standalone={true}
+        margin="0 0 xxx-small small"
+        formatOutput={a11yCount}
+      />
+    )
   }
 
   return (
@@ -66,7 +73,7 @@ ProfileTab.propTypes = {
   id: string.isRequired,
   label: string.isRequired,
   html_url: string.isRequired,
-  counts: object
+  counts: object,
 }
 
 export default function ProfileTray(props) {
@@ -82,7 +89,7 @@ export default function ProfileTray(props) {
           size="x-large"
           display="block"
           margin="auto"
-          data-fs-exclude
+          data-fs-exclude={true}
         />
         <div style={{wordBreak: 'break-word'}}>
           <Heading level="h3" as="h2">
@@ -97,7 +104,7 @@ export default function ProfileTray(props) {
         <LogoutButton size="small" margin="medium 0 x-small 0" />
       </View>
       <hr role="presentation" />
-      <List isUnstyled margin="none" itemSpacing="small">
+      <List isUnstyled={true} margin="none" itemSpacing="small">
         {loaded ? (
           tabs.map(tab => <ProfileTab key={tab.id} {...tab} counts={counts} />)
         ) : (
@@ -120,5 +127,5 @@ ProfileTray.propTypes = {
   loaded: bool.isRequired,
   userPronouns: string,
   tabs: arrayOf(shape(ProfileTab.propTypes)).isRequired,
-  counts: object.isRequired
+  counts: object.isRequired,
 }

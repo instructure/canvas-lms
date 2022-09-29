@@ -26,7 +26,7 @@ const defaultProps = () => ({
   hasLoadedFeed: false,
   getExternalFeeds: () => {},
   deleteExternalFeed: () => {},
-  focusLastElement: () => {}
+  focusLastElement: () => {},
 })
 
 const defaultFeeds = () => [
@@ -34,32 +34,32 @@ const defaultFeeds = () => [
     display_name: 'felix',
     id: '22',
     external_feed_entries_count: 10,
-    url: 'donotcare.com'
+    url: 'donotcare.com',
   },
   {
     display_name: 'steven',
     id: '24',
     external_feed_entries_count: 12,
-    url: 'donotcare.com'
+    url: 'donotcare.com',
   },
   {
     display_name: 'landon',
     id: '67',
     external_feed_entries_count: 0,
-    url: 'donotcare.com'
+    url: 'donotcare.com',
   },
   {
     display_name: 'aaron',
     id: '32',
     external_feed_entries_count: 4,
-    url: 'donotcare.com'
+    url: 'donotcare.com',
   },
   {
     display_name: 'venk',
     id: '55',
     external_feed_entries_count: 5,
-    url: 'donotcare.com'
-  }
+    url: 'donotcare.com',
+  },
 ]
 
 test('renders the RSSFeedList component', () => {
@@ -111,20 +111,20 @@ test('calls deleteExternalFeed with correct feed ID when deleting feed', () => {
       display_name: 'felix',
       id: '22',
       external_feed_entries_count: 10,
-      url: 'donotcare.com'
+      url: 'donotcare.com',
     },
     {
       display_name: 'steven',
       id: '24',
       external_feed_entries_count: 12,
-      url: 'donotcare.com'
+      url: 'donotcare.com',
     },
     {
       display_name: 'aaron',
       id: '32',
       external_feed_entries_count: 4,
-      url: 'donotcare.com'
-    }
+      url: 'donotcare.com',
+    },
   ]
   const tree = mount(<RSSFeedList {...props} />)
   const instance = tree.instance()

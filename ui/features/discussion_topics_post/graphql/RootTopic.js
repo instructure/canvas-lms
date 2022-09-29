@@ -35,13 +35,13 @@ export const RootTopic = {
   shape: shape({
     id: string,
     _id: string,
-    childTopics: arrayOf(ChildTopic.shape)
+    childTopics: arrayOf(ChildTopic.shape),
   }),
 
   mock: ({id = 'QXNzaWdubWVu2323wewrwr', _id = '7', childTopics = [ChildTopic.mock()]} = {}) => ({
     id,
     _id,
     childTopics,
-    __typename: 'Discussion'
-  })
+    __typename: 'Discussion',
+  }),
 }

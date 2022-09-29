@@ -29,7 +29,7 @@ const initialState = {
   list: [],
   inheritedList: [],
   nextPage: null,
-  inheritedNextPage: null
+  inheritedNextPage: null,
 }
 
 const developerKeysHandlers = {
@@ -38,7 +38,7 @@ const developerKeysHandlers = {
     list: action.payload ? [] : state.list,
     listDeveloperKeysPending: true,
     listDeveloperKeysSuccessful: false,
-    listDeveloperKeysError: null
+    listDeveloperKeysError: null,
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_SUCCESSFUL]: (state, action) => {
     return {
@@ -46,7 +46,7 @@ const developerKeysHandlers = {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: true,
       list: action.payload.developerKeys,
-      nextPage: action.payload.next
+      nextPage: action.payload.next,
     }
   },
   [ACTION_NAMES.LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL]: (state, action) => {
@@ -57,7 +57,7 @@ const developerKeysHandlers = {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: true,
       list,
-      nextPage: action.payload.next
+      nextPage: action.payload.next,
     }
   },
   [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_START]: (state, action) => ({
@@ -65,7 +65,7 @@ const developerKeysHandlers = {
     inheritedList: action.payload ? [] : state.inheritedList,
     listInheritedDeveloperKeysPending: true,
     listInheritedDeveloperKeysSuccessful: false,
-    listInheritedDeveloperKeysError: null
+    listInheritedDeveloperKeysError: null,
   }),
   [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL]: (state, action) => {
     return {
@@ -73,7 +73,7 @@ const developerKeysHandlers = {
       listInheritedDeveloperKeysPending: false,
       listInheritedDeveloperKeysSuccessful: true,
       inheritedList: action.payload.developerKeys,
-      inheritedNextPage: action.payload.next
+      inheritedNextPage: action.payload.next,
     }
   },
   [ACTION_NAMES.LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL]: (state, action) => {
@@ -84,14 +84,14 @@ const developerKeysHandlers = {
       listInheritedDeveloperKeysPending: false,
       listInheritedDeveloperKeysSuccessful: true,
       inheritedList,
-      inheritedNextPage: action.payload.next
+      inheritedNextPage: action.payload.next,
     }
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE]: (state, action) => ({
     ...state,
     list: state.list.map(developerKey =>
       action.payload.id === developerKey.id ? action.payload : developerKey
-    )
+    ),
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE]: (state, action) => {
     const developerKeyId = action.payload.developerKeyId
@@ -114,7 +114,7 @@ const developerKeysHandlers = {
     return {
       ...state,
       list: newList,
-      inheritedList: newInheritedList
+      inheritedList: newInheritedList,
     }
   },
   [ACTION_NAMES.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL]: (state, action) => {
@@ -135,7 +135,7 @@ const developerKeysHandlers = {
     return {
       ...state,
       list: newList,
-      inheritedList: newInheritedList
+      inheritedList: newInheritedList,
     }
   },
   [ACTION_NAMES.SET_BINDING_WORKFLOW_STATE_FAILED]: (state, action) => {
@@ -167,33 +167,33 @@ const developerKeysHandlers = {
     return {
       ...state,
       list: newList,
-      inheritedList: newInheritedList
+      inheritedList: newInheritedList,
     }
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_DELETE]: (state, action) => ({
     ...state,
     list: state.list.filter(
       developerKey => action.payload.id.toString() !== developerKey.id.toString()
-    )
+    ),
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_PREPEND]: (state, action) => {
     const list = state.list.slice()
     list.unshift(action.payload)
     return {
       ...state,
-      list
+      list,
     }
   },
   [ACTION_NAMES.LIST_DEVELOPER_KEYS_FAILED]: (state, action) => ({
     ...state,
     listDeveloperKeysPending: false,
-    listDeveloperKeysError: action.payload
+    listDeveloperKeysError: action.payload,
   }),
   [ACTION_NAMES.LIST_INHERITED_DEVELOPER_KEYS_FAILED]: (state, action) => ({
     ...state,
     listInheritedDeveloperKeysPending: false,
-    listInheritedDeveloperKeysError: action.payload
-  })
+    listInheritedDeveloperKeysError: action.payload,
+  }),
 }
 
 export default (state = initialState, action) => {

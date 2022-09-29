@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import enhanceEverything, {enhanceUserContent} from '../'
+import enhanceEverything, {enhanceUserContent} from '..'
 import stubEnv from '@canvas/stub-env'
 import sinon from 'sinon'
 
@@ -89,7 +89,7 @@ describe('enhanceUserContent:media', () => {
     sandbox = sinon.createSandbox({
       // properties: ['clock', 'mock', 'server', 'spy', 'stub'],
       useFakeServer: false,
-      useFakeTimers: false
+      useFakeTimers: false,
     })
     document.body.appendChild(elem)
   })

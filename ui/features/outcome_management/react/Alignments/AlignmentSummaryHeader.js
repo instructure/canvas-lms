@@ -41,7 +41,7 @@ const AlignmentSummaryHeader = ({
   searchString,
   updateSearchHandler,
   clearSearchHandler,
-  updateFilterHandler
+  updateFilterHandler,
 }) => {
   const [selectedFilter, setSelectedFilter] = useState('ALL_OUTCOMES')
   const {isMobileView} = useCanvasContext()
@@ -63,16 +63,16 @@ const AlignmentSummaryHeader = ({
     const filterOptions = {
       ALL_OUTCOMES: {
         label: I18n.t('All Outcomes'),
-        value: totalOutcomes || 0
+        value: totalOutcomes || 0,
       },
       WITH_ALIGNMENTS: {
         label: I18n.t('With Alignments'),
-        value: withAlignments
+        value: withAlignments,
       },
       NO_ALIGNMENTS: {
         label: I18n.t('Without Alignments'),
-        value: withoutAlignments
-      }
+        value: withoutAlignments,
+      },
     }
 
     return (
@@ -96,7 +96,7 @@ const AlignmentSummaryHeader = ({
         display: 'flex',
         flexWrap: 'wrap',
         overflow: isMobileView ? 'hidden' : 'auto',
-        justifyItems: 'start'
+        justifyItems: 'start',
       }}
     >
       <Flex.Item
@@ -219,7 +219,7 @@ AlignmentSummaryHeader.defaultProps = {
   totalAlignments: 0,
   totalArtifacts: 0,
   alignedArtifacts: 0,
-  searchString: ''
+  searchString: '',
 }
 
 AlignmentSummaryHeader.propTypes = {
@@ -232,7 +232,7 @@ AlignmentSummaryHeader.propTypes = {
   searchString: PropTypes.string,
   updateSearchHandler: PropTypes.func.isRequired,
   clearSearchHandler: PropTypes.func.isRequired,
-  updateFilterHandler: PropTypes.func.isRequired
+  updateFilterHandler: PropTypes.func.isRequired,
 }
 
 export default AlignmentSummaryHeader

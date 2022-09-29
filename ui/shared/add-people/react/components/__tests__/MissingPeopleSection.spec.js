@@ -28,16 +28,16 @@ describe('MissingPeopleSection', () => {
       address: 'addr2',
       type: 'unique_id',
       createNew: true,
-      newUserInfo: {name: 'the name2', email: 'email2'}
-    }
+      newUserInfo: {name: 'the name2', email: 'email2'},
+    },
   }
   const missingEmails = {
     addr1: {
       address: 'addr1',
       type: 'email',
       createNew: true,
-      newUserInfo: {name: 'Searched Name1', email: 'addr1'}
-    }
+      newUserInfo: {name: 'Searched Name1', email: 'addr1'},
+    },
   }
   const noop = function () {}
   const inviteUsersURL = '/courses/#/invite_users'
@@ -109,8 +109,8 @@ describe('MissingPeopleSection', () => {
         address: 'addr1',
         type: 'email',
         createNew: false,
-        newUserInfo: {name: 'Searched Name1', email: 'addr1'}
-      }
+        newUserInfo: {name: 'Searched Name1', email: 'addr1'},
+      },
     }
 
     const {container} = render(

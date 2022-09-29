@@ -48,10 +48,10 @@ CourseListHeader.propTypes = {
   id: string.isRequired,
   label: string.isRequired,
   tipDesc: string.isRequired,
-  tipAsc: string.isRequired
+  tipAsc: string.isRequired,
 }
 
 CourseListHeader.defaultProps = {
   sort: 'sis_course_id',
-  order: 'asc'
+  order: 'asc',
 }

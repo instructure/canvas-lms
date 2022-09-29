@@ -44,7 +44,7 @@ const defaultProps = (props = {}) => {
       toggleItemSelected: () => {},
       userCanAddFilesForContext: true,
       userCanEditFilesForContext: true,
-      userCanRestrictFilesForContext: true
+      userCanRestrictFilesForContext: true,
     },
     props
   )
@@ -58,9 +58,9 @@ describe('ShowFolder', () => {
     window.ENV = {
       COURSE_ID: '101',
       FEATURES: {
-        files_dnd: true
+        files_dnd: true,
       },
-      context_asset_string: 'course_17'
+      context_asset_string: 'course_17',
     }
     sandbox = sinon.createSandbox()
     sandbox.stub(Folder, 'resolvePath').returns(new Promise(() => {}))

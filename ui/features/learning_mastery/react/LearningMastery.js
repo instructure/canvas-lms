@@ -40,12 +40,12 @@ export default class LearningMastery {
 
     this.view = new OutcomeGradebookView({
       el: $('.outcome-gradebook'),
-      learningMastery: this
+      learningMastery: this,
     })
 
     this.data = {
       currentSectionId: currentSectionIdFromSettings(options.settings),
-      sections: normalizeSections(options)
+      sections: normalizeSections(options),
     }
   }
 
@@ -80,9 +80,9 @@ export default class LearningMastery {
     const data = {
       gradebook_settings: {
         filter_rows_by: {
-          section_id: this.getCurrentSectionId()
-        }
-      }
+          section_id: this.getCurrentSectionId(),
+        },
+      },
     }
 
     $.ajaxJSON(this.options.settings_update_url, 'PUT', data)
@@ -109,7 +109,7 @@ export default class LearningMastery {
     const props = {
       courseUrl: this.options.context_url,
       learningMasteryEnabled: true,
-      variant: 'DefaultGradebookLearningMastery'
+      variant: 'DefaultGradebookLearningMastery',
     }
     ReactDOM.render(<GradebookMenu {...props} />, $container)
   }

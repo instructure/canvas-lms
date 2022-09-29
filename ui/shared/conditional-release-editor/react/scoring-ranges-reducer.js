@@ -25,12 +25,15 @@ import {onSuccessOnly} from './reducer-helpers'
 const DEFAULT_SCORING_RANGES = Immutable.fromJS([
   {upper_bound: null, lower_bound: 0.7, assignment_sets: [{assignment_set_associations: []}]},
   {upper_bound: 0.7, lower_bound: 0.4, assignment_sets: [{assignment_set_associations: []}]},
-  {upper_bound: 0.4, lower_bound: null, assignment_sets: [{assignment_set_associations: []}]}
+  {upper_bound: 0.4, lower_bound: null, assignment_sets: [{assignment_set_associations: []}]},
 ])
 
 const emptyAssignmentSet = () => Map({assignment_set_associations: List()})
 
-const identity = (dflt = '') => (s, _a) => (s == null ? dflt : s)
+const identity =
+  (dflt = '') =>
+  (s, _a) =>
+    s == null ? dflt : s
 
 const scoringRangesReducer = (state, action) => {
   if (state === undefined) return List()
@@ -153,7 +156,7 @@ const splitAssignmentSet = (state, action) => {
   state = state.insert(
     assignmentSetIndex + 1,
     Map({
-      assignment_set_associations: assignments.slice(splitIndex).map(assg => assg.delete('id'))
+      assignment_set_associations: assignments.slice(splitIndex).map(assg => assg.delete('id')),
     })
   )
 
@@ -213,7 +216,7 @@ const assignmentSetReducer = (state, action) => {
 const overallAssignmentSetReducer = handleActions(
   {
     [actions.MERGE_ASSIGNMENT_SETS]: mergeAssignmentSets,
-    [actions.SPLIT_ASSIGNMENT_SET]: splitAssignmentSet
+    [actions.SPLIT_ASSIGNMENT_SET]: splitAssignmentSet,
   },
   List(emptyAssignmentSet())
 )
@@ -230,10 +233,10 @@ const singleAssignmentSetReducer = combineReducers({
       [actions.ADD_ASSIGNMENTS_TO_RANGE_SET]: addAssignments,
       [actions.REMOVE_ASSIGNMENT]: removeAssignment,
       [actions.INSERT_ASSIGNMENT]: insertAssignment,
-      [actions.UPDATE_ASSIGNMENT_INDEX]: updateAssignmentIndex
+      [actions.UPDATE_ASSIGNMENT_INDEX]: updateAssignmentIndex,
     },
     List()
-  )
+  ),
 })
 
 const overallScoringRangesReducer = handleActions(
@@ -241,7 +244,7 @@ const overallScoringRangesReducer = handleActions(
     [actions.LOAD_RULE_FOR_ASSIGNMENT]: gotRuleSetScoringRanges,
     [actions.LOAD_DEFAULT_RULE]: getDefaultScoringRanges,
     [actions.SAVE_RULE]: savedRuleSetScoringRanges,
-    [actions.SET_SCORE_AT_INDEX]: juggleBounds
+    [actions.SET_SCORE_AT_INDEX]: juggleBounds,
   },
   List()
 )
@@ -249,7 +252,7 @@ const overallScoringRangesReducer = handleActions(
 const structuredSingleScoringRangeReducer = combineReducers({
   error: handleActions(
     {
-      [actions.SET_ERROR_AT_SCORE_INDEX]: (_s, a) => a.payload.error
+      [actions.SET_ERROR_AT_SCORE_INDEX]: (_s, a) => a.payload.error,
     },
     ''
   ),
@@ -263,5 +266,5 @@ const structuredSingleScoringRangeReducer = combineReducers({
   updated_at: identity(),
   id: identity(),
   rule_id: identity(),
-  position: identity(null)
+  position: identity(null),
 })

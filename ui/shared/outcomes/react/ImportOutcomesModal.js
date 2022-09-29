@@ -52,16 +52,16 @@ export default class ImportOutcomesModal extends Component {
     toolbar: instanceOf(Element),
     onFileDrop: func,
     learningOutcomeGroup: instanceOf(Object),
-    learningOutcomeGroupAncestorIds: array
+    learningOutcomeGroupAncestorIds: array,
   }
 
   static defaultProps = {
-    parent: null
+    parent: null,
   }
 
   state = {
     show: false,
-    messages: []
+    messages: [],
   }
 
   onCancel = () => {
@@ -98,7 +98,7 @@ export default class ImportOutcomesModal extends Component {
   render() {
     const styles = {
       width: '10rem',
-      margin: '0 auto'
+      margin: '0 auto',
     }
     return (
       <Modal
@@ -108,7 +108,7 @@ export default class ImportOutcomesModal extends Component {
         label={
           this.props.learningOutcomeGroup
             ? I18n.t('Import Outcomes to "%{groupName}"', {
-                groupName: this.props.learningOutcomeGroup.title
+                groupName: this.props.learningOutcomeGroup.title,
               })
             : I18n.t('Import Outcomes')
         }

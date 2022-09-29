@@ -18,5 +18,5 @@
 
 export const processRatingsAndMastery = (ratings, masteryPoints) => ({
   ratings: ratings.map(({description, points}) => ({description, points: parseFloat(points)})),
-  masteryPoints: Number(parseFloat(masteryPoints).toFixed(2))
+  masteryPoints: Number(parseFloat(masteryPoints).toFixed(2)),
 })

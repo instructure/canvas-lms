@@ -20,7 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('quiz_statistics')
 
-const pad = function(duration) {
+const pad = function (duration) {
   return ('00' + duration).slice(-2)
 }
 
@@ -40,7 +40,7 @@ const pad = function(duration) {
  *
  * @return {String}
  */
-const secondsToTime = function(seconds) {
+const secondsToTime = function (seconds) {
   let hh, mm, ss
 
   if (seconds > 3600) {
@@ -49,10 +49,7 @@ const secondsToTime = function(seconds) {
     ss = seconds % 60
     return [hh, mm, ss].map(pad).join(':')
   } else {
-    return [seconds / 60, seconds % 60]
-      .map(Math.floor)
-      .map(pad)
-      .join(':')
+    return [seconds / 60, seconds % 60].map(Math.floor).map(pad).join(':')
   }
 }
 
@@ -78,7 +75,7 @@ const secondsToTime = function(seconds) {
  * @return {String}
  *         A human-readable string representation of the duration.
  */
-secondsToTime.toReadableString = function(seconds) {
+secondsToTime.toReadableString = function (seconds) {
   let hours, minutes, strHours, strMinutes, strSeconds
 
   if (seconds < 60) {
@@ -86,7 +83,7 @@ secondsToTime.toReadableString = function(seconds) {
       'duration_in_seconds',
       {
         one: '1 second',
-        other: '%{count} seconds'
+        other: '%{count} seconds',
       },
       {count: Math.floor(seconds)}
     )
@@ -98,7 +95,7 @@ secondsToTime.toReadableString = function(seconds) {
       'duration_in_minutes',
       {
         one: '1 minute',
-        other: '%{count} minutes'
+        other: '%{count} minutes',
       },
       {count: minutes}
     )
@@ -107,16 +104,16 @@ secondsToTime.toReadableString = function(seconds) {
       'duration_in_seconds',
       {
         one: '1 second',
-        other: '%{count} seconds'
+        other: '%{count} seconds',
       },
       {
-        count: seconds
+        count: seconds,
       }
     )
 
     return I18n.t('duration_in_minutes_and_seconds', '%{minutes} and %{seconds}', {
       minutes: strMinutes,
-      seconds: strSeconds
+      seconds: strSeconds,
     })
   } else {
     hours = Math.floor(seconds / 3600)
@@ -126,10 +123,10 @@ secondsToTime.toReadableString = function(seconds) {
       'duration_in_minutes',
       {
         one: '1 minute',
-        other: '%{count} minutes'
+        other: '%{count} minutes',
       },
       {
-        count: minutes
+        count: minutes,
       }
     )
 
@@ -137,16 +134,16 @@ secondsToTime.toReadableString = function(seconds) {
       'duration_in_hours',
       {
         one: '1 hour',
-        other: '%{count} hours'
+        other: '%{count} hours',
       },
       {
-        count: hours
+        count: hours,
       }
     )
 
     return I18n.t('duration_in_hours_and_minutes', '%{hours} and %{minutes}', {
       minutes: strMinutes,
-      hours: strHours
+      hours: strHours,
     })
   }
 }

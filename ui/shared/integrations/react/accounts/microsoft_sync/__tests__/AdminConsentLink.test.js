@@ -27,7 +27,7 @@ describe('AdminConsentLink', () => {
     clientId: '2345-2345-23452-qefqewr',
     redirectUri: 'https://www.instructure.com/',
     tenant: 'canvas.onmicrosoft.com',
-    ...overrides
+    ...overrides,
   })
   const subject = overrides => render(<AdminConsentLink {...props(overrides)} />)
 

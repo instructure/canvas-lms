@@ -43,7 +43,7 @@ function termGroup(term) {
 const termGroups = {
   active: I18n.t('Active Terms'),
   future: I18n.t('Future Terms'),
-  past: I18n.t('Past Terms')
+  past: I18n.t('Past Terms'),
 }
 
 const allTermsGroup = (
@@ -62,7 +62,7 @@ export default function CoursesToolbar({
   isLoading,
   errors,
   draftFilters,
-  toggleSRMessage
+  toggleSRMessage,
 }) {
   const groupedTerms = groupBy(terms.data, termGroup)
   const searchLabel =
@@ -201,10 +201,10 @@ CoursesToolbar.propTypes = {
     ),
     search_by: oneOf(['course', 'teacher']).isRequired,
     search_term: string.isRequired,
-    enrollment_term_id: string.isRequired
+    enrollment_term_id: string.isRequired,
   }).isRequired,
   errors: shape({search_term: string}).isRequired,
-  terms: termsPropType
+  terms: termsPropType,
 }
 
 CoursesToolbar.defaultProps = {
@@ -212,7 +212,7 @@ CoursesToolbar.defaultProps = {
     window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_courses,
   terms: {
     data: [],
-    loading: false
+    loading: false,
   },
-  isLoading: false
+  isLoading: false,
 }

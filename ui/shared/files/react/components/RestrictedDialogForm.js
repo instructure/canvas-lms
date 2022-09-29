@@ -27,7 +27,7 @@ import RestrictedDialogForm from './LegacyRestrictedDialogForm'
 
 const I18n = useI18nScope('restrict_student_access')
 
-RestrictedDialogForm.renderUsageRightsWarning = function() {
+RestrictedDialogForm.renderUsageRightsWarning = function () {
   return (
     <div className="RestrictedDialogForm__banner col-xs-12">
       <span className="alert">
@@ -43,11 +43,11 @@ RestrictedDialogForm.renderUsageRightsWarning = function() {
 //   of rendering.
 //   Future Refactor: Move this to another component should it's use elsewhere
 //                  be meritted.
-RestrictedDialogForm.renderRestrictedAccessForm = function(options) {
+RestrictedDialogForm.renderRestrictedAccessForm = function (options) {
   const formContainerClasses = classNames({
     RestrictedDialogForm__form: true,
     'col-xs-9': true,
-    'off-xs-3': options && options.offset
+    'off-xs-3': options && options.offset,
   })
 
   return (
@@ -80,7 +80,7 @@ RestrictedDialogForm.renderRestrictedAccessForm = function(options) {
   )
 }
 
-RestrictedDialogForm.render = function() {
+RestrictedDialogForm.render = function () {
   // Doing this here to prevent possible repeat runs of this.usageRightsOnAll and this.allFolders
   const showUsageRights =
     this.props.usageRightsRequiredForContext && !this.usageRightsOnAll() && !this.allFolders()

@@ -27,17 +27,17 @@ describe('K5AppLink', () => {
       courses: [
         {
           id: '1',
-          name: 'Physics'
+          name: 'Physics',
         },
         {
           id: '2',
-          name: 'English'
-        }
+          name: 'English',
+        },
       ],
       title: 'YouTube',
       icon: '/youtubeicon.png',
-      ...overrides
-    }
+      ...overrides,
+    },
   })
 
   let assign
@@ -45,13 +45,13 @@ describe('K5AppLink', () => {
   beforeAll(() => {
     assign = window.location.assign
     Object.defineProperty(window, 'location', {
-      value: {assign: jest.fn()}
+      value: {assign: jest.fn()},
     })
   })
 
   afterAll(() => {
     Object.defineProperty(window, 'location', {
-      value: {assign}
+      value: {assign},
     })
   })
 
@@ -79,9 +79,9 @@ describe('K5AppLink', () => {
       courses: [
         {
           id: '14',
-          name: 'Science'
-        }
-      ]
+          name: 'Science',
+        },
+      ],
     }
     const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
     const button = getByText('YouTube')
@@ -94,10 +94,10 @@ describe('K5AppLink', () => {
       courses: [
         {
           id: '14',
-          name: 'Science'
-        }
+          name: 'Science',
+        },
       ],
-      windowTarget: '_blank'
+      windowTarget: '_blank',
     }
     const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
     const button = getByText('YouTube')
@@ -128,7 +128,7 @@ describe('K5AppLink', () => {
 
   it('includes display borderless in links to launch tools in the modal if windowTarget is present', () => {
     const overrides = {
-      windowTarget: '_blank'
+      windowTarget: '_blank',
     }
     const {getByText} = render(<K5AppLink {...getProps(overrides)} />)
     const button = getByText('YouTube')

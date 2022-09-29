@@ -23,7 +23,7 @@ import AvatarLink from '../AvatarLink'
 const DEFAULT_PROPS = {
   name: 'Test User',
   avatarUrl: 'https://gravatar.com/avatar/52c160622b09015c70fa0f4c25de6cca?s=200&d=identicon&r=pg',
-  href: 'http://test.host/courses/1/users/2'
+  href: 'http://test.host/courses/1/users/2',
 }
 
 describe('AvatarLink', () => {

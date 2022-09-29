@@ -26,7 +26,7 @@ const I18n = useI18nScope('external_tools')
 export default class ConfigurationTypeSelector extends React.Component {
   static propTypes = {
     handleChange: PropTypes.func.isRequired,
-    configurationType: PropTypes.string.isRequired
+    configurationType: PropTypes.string.isRequired,
   }
 
   componentDidMount() {

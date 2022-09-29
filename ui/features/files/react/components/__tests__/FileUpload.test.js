@@ -42,7 +42,7 @@ describe('FileUpload', () => {
     return merge(
       {
         filesDirectoryRef: ref,
-        currentFolder: new Folder()
+        currentFolder: new Folder(),
       },
       props
     )

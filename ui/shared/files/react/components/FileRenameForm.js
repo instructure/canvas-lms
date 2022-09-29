@@ -26,7 +26,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('file_rename_form')
 
-FileRenameForm.buildContent = function() {
+FileRenameForm.buildContent = function () {
   const {onRenameFileMessage, onLockFileMessage} = this.props
   const nameToUse = this.state.fileOptions.name || this.state.fileOptions.file.name
   let buildContentToRender
@@ -69,7 +69,7 @@ FileRenameForm.buildContent = function() {
   return buildContentToRender
 }
 
-FileRenameForm.buildButtons = function() {
+FileRenameForm.buildButtons = function () {
   let buildButtonsToRender
   if (this.state.fileOptions.cannotOverwrite) {
     buildButtonsToRender = [
@@ -80,7 +80,7 @@ FileRenameForm.buildButtons = function() {
         onClick={this.handleChangeClick}
       >
         {I18n.t('Change')}
-      </button>
+      </button>,
     ]
   } else if (!this.state.isEditing) {
     buildButtonsToRender = [
@@ -99,7 +99,7 @@ FileRenameForm.buildButtons = function() {
         onClick={this.handleReplaceClick}
       >
         {I18n.t('Replace')}
-      </button>
+      </button>,
     ]
     if (this.props.allowSkip) {
       buildButtonsToRender.unshift(
@@ -130,14 +130,14 @@ FileRenameForm.buildButtons = function() {
         onClick={this.handleChangeClick}
       >
         {I18n.t('Change')}
-      </button>
+      </button>,
     ]
   }
 
   return buildButtonsToRender
 }
 
-FileRenameForm.render = function() {
+FileRenameForm.render = function () {
   return (
     <div>
       <Modal

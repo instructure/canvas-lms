@@ -36,13 +36,13 @@ import SelectContent from '../select_content'
 import setDefaultToolValues from '../setDefaultToolValues'
 import processSingleContentItem from '@canvas/deep-linking/processors/processSingleContentItem'
 import {findLinkForService, getUserServices} from '@canvas/services/findLinkForService'
-import '@canvas/datetime'/* datetime_field */
+import '@canvas/datetime' /* datetime_field */
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, ajaxJSONFiles, getFormData, errorBox */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, ajaxJSONFiles, getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -215,7 +215,7 @@ SelectContentDialog.Events = {
       if ($dialog.length == 0) {
         $dialog = $('<div/>', {
           id: 'resource_selection_dialog',
-          style: 'padding: 0; overflow-y: hidden;'
+          style: 'padding: 0; overflow-y: hidden;',
         })
         $dialog.append(`<div class="before_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">
@@ -233,7 +233,7 @@ SelectContentDialog.Events = {
             borderstyle: '0',
             tabindex: '0',
             allow: iframeAllowances(),
-            'data-lti-launch': 'true'
+            'data-lti-launch': 'true',
           })
         )
         $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
@@ -288,7 +288,7 @@ SelectContentDialog.Events = {
             open: () => {
               SelectContentDialog.attachDeepLinkingListner()
             },
-            title: I18n.t('link_from_external_tool', 'Link Resource from External Tool')
+            title: I18n.t('link_from_external_tool', 'Link Resource from External Tool'),
           })
           .bind('dialogresize', function () {
             $(this)
@@ -310,7 +310,7 @@ SelectContentDialog.Events = {
                     height: this.offsetHeight + 'px',
                     position: 'absolute',
                     opacity: '0.001',
-                    zIndex: 10000000
+                    zIndex: 10000000,
                   })
                   .css($(this).offset())
                   .appendTo('body')
@@ -361,7 +361,7 @@ SelectContentDialog.Events = {
         .text($tool.data('tool').domain)
       $('#external_tool_create_title').val(placement.title)
     }
-  }
+  },
 }
 
 SelectContentDialog.extractContextExternalToolItemData = function () {
@@ -387,7 +387,7 @@ SelectContentDialog.extractContextExternalToolItemData = function () {
     'item[custom_params]': $('#external_tool_create_custom_params').val(),
     'item[assignment_id]': $('#external_tool_create_assignment_id').val(),
     'item[iframe][width]': $('#external_tool_create_iframe_width').val(),
-    'item[iframe][height]': $('#external_tool_create_iframe_height').val()
+    'item[iframe][height]': $('#external_tool_create_iframe_height').val(),
   }
 }
 
@@ -428,7 +428,7 @@ $(document).ready(function () {
           $service.attr(
             'title',
             I18n.t('titles.find_links_using_service', 'Find links using %{service}', {
-              service: service.service
+              service: service.service,
             })
           )
           const $img = $('<img/>')
@@ -460,7 +460,7 @@ $(document).ready(function () {
             options.close()
           }
           upload_form?.onClose()
-        }
+        },
       })
       .fixDialogButtons()
 
@@ -512,7 +512,7 @@ $(document).ready(function () {
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
         ).val(),
         'item[new_tab]': $('#external_url_create_new_tab').attr('checked') ? '1' : '0',
-        'item[indent]': $('#content_tag_indent').val()
+        'item[indent]': $('#content_tag_indent').val(),
       }
 
       item_data['item[url]'] = $('#content_tag_create_url').val()
@@ -537,7 +537,7 @@ $(document).ready(function () {
 
       if (item_data['item[url]'] === '') {
         const $errorBox = $('<div />', {class: 'alert alert-error', role: 'alert'}).css({
-          marginTop: 8
+          marginTop: 8,
         })
         $errorBox.text(
           I18n.t('errors.external_tool_url', "An external tool can't be saved without a URL.")
@@ -554,7 +554,7 @@ $(document).ready(function () {
         'item[id]': $(
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
         ).val(),
-        'item[indent]': $('#content_tag_indent').val()
+        'item[indent]': $('#content_tag_indent').val(),
       }
       item_data['item[title]'] = $('#sub_header_title').val()
       submit(item_data)
@@ -578,7 +578,7 @@ $(document).ready(function () {
           'item[id]': item_id,
           'item[title]': $option.text(),
           'item[indent]': $('#content_tag_indent').val(),
-          quiz_lti
+          quiz_lti,
         }
         if (item_data['item[id]'] == 'new') {
           const $urls = $(
@@ -592,7 +592,7 @@ $(document).ready(function () {
             data = {
               'assignment[title]': data['quiz[title]'],
               'assignment[assignment_group_id]': data['quiz[assignment_group_id]'],
-              quiz_lti: 1
+              quiz_lti: 1,
             }
           }
           const process_upload = function (udata, done = true) {
@@ -716,7 +716,7 @@ $(document).ready(function () {
     const doNotDisable = [
       'external_url',
       'context_external_tool',
-      'context_module_sub_header'
+      'context_module_sub_header',
     ].includes(selectedOption)
     if (doNotDisable) {
       $('.add_item_button').removeClass('disabled').attr('aria-disabled', false)
@@ -728,7 +728,7 @@ $(document).ready(function () {
     if ($(this).val() === 'attachment') {
       fileSelectBox = ReactDOM.render(
         React.createFactory(FileSelectBox)({
-          contextString: ENV.context_asset_string
+          contextString: ENV.context_asset_string,
         }),
         $('#module_item_select_file')[0]
       )
@@ -780,8 +780,8 @@ $(document).ready(function () {
                   'domain',
                   'name',
                   'placements',
-                  'description'
-                ]
+                  'description',
+                ],
               })
               $tool.data('tool', tool)
               $select.find('.tools').append($tool.show())
@@ -891,7 +891,7 @@ function renderFileUploadForm() {
     alwaysUploadZips: true,
     onChange: update_foc,
     onRenameFileMessage: renameFileMessage,
-    onLockFileMessage: lockFileMessage
+    onLockFileMessage: lockFileMessage,
   }
   // only show the choose files + folder form if [new files] is selected
   if ($('#select_context_content_dialog').val() === 'new') {

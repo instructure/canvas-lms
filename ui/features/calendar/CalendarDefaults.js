@@ -30,5 +30,5 @@ export default {
 
   // localization config
   // note: timeFormat && columnFormat change based on lang
-  lang: window.ENV.FULLCALENDAR_LOCALE
+  lang: window.ENV.FULLCALENDAR_LOCALE,
 }

@@ -26,5 +26,5 @@ export default class PageFocused extends EventTracker {
 }
 PageFocused.prototype.eventType = K.EVT_PAGE_FOCUSED
 PageFocused.prototype.options = {
-  frequency: 5000
+  frequency: 5000,
 }

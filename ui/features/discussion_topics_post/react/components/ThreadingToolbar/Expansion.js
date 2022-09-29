@@ -34,12 +34,12 @@ export function Expansion({...props}) {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
           textSize: 'medium',
-          itemSpacing: 'none'
-        }
+          itemSpacing: 'none',
+        },
       }}
       render={responsiveProps => (
         <span className="discussion-expand-btn">
@@ -57,10 +57,10 @@ export function Expansion({...props}) {
             >
               {props.isExpanded
                 ? I18n.t('Collapse discussion thread from %{author}', {
-                    author: props.authorName
+                    author: props.authorName,
                   })
                 : I18n.t('Expand discussion thread from %{author}', {
-                    author: props.authorName
+                    author: props.authorName,
                   })}
             </ScreenReaderContent>
             <Text
@@ -101,9 +101,9 @@ Expansion.propTypes = {
   /**
    * Disable/Enable for the button
    */
-  isReadOnly: PropTypes.bool
+  isReadOnly: PropTypes.bool,
 }
 
 Expansion.defaultPropTypes = {
-  isReadOnly: true
+  isReadOnly: true,
 }

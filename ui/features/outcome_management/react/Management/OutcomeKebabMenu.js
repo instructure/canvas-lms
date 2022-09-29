@@ -28,7 +28,7 @@ import {
   IconMoveEndLine,
   IconInfoLine,
   IconSearchLine,
-  IconImportLine
+  IconImportLine,
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -42,7 +42,7 @@ const OutcomeKebabMenu = ({
   canEdit,
   canDestroy,
   isGroup,
-  groupDescription
+  groupDescription,
 }) => {
   const hasDescription =
     typeof groupDescription === 'string' &&
@@ -106,13 +106,13 @@ OutcomeKebabMenu.propTypes = {
   canDestroy: PropTypes.bool.isRequired,
   groupDescription: PropTypes.string,
   isGroup: PropTypes.bool,
-  canEdit: PropTypes.bool
+  canEdit: PropTypes.bool,
 }
 
 OutcomeKebabMenu.defaultProps = {
   menuTitle: '',
   canEdit: true,
-  isGroup: false
+  isGroup: false,
 }
 
 export default OutcomeKebabMenu

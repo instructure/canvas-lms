@@ -22,12 +22,12 @@ class ExplodingParticle {
 
     this.position = {
       x,
-      y
+      y,
     }
 
     this.speed = {
       x: -3 + Math.random() * 6,
-      y: -3 + Math.random() * 6
+      y: -3 + Math.random() * 6,
     }
 
     this.radius = 3 + Math.random() * 3

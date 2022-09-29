@@ -27,8 +27,8 @@ export default {
     canEdit: true,
     canDestroy: true,
     groupDescription: undefined,
-    onMenuHandler: () => {}
-  }
+    onMenuHandler: () => {},
+  },
 }
 
 const Template = args => <OutcomeKebabMenu {...args} />
@@ -37,22 +37,22 @@ export const Default = Template.bind({})
 
 export const withoutDestroyPermission = Template.bind({})
 withoutDestroyPermission.args = {
-  canDestroy: false
+  canDestroy: false,
 }
 
 export const withoutEditPermission = Template.bind({})
 withoutEditPermission.args = {
-  canEdit: false
+  canEdit: false,
 }
 
 export const groupWithDescription = Template.bind({})
 groupWithDescription.args = {
   isGroup: true,
-  groupDescription: 'Group description'
+  groupDescription: 'Group description',
 }
 
 export const groupWithoutDescription = Template.bind({})
 groupWithoutDescription.args = {
   isGroup: true,
-  groupDescription: ''
+  groupDescription: '',
 }

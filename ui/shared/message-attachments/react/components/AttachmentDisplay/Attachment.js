@@ -64,7 +64,7 @@ export const Attachment = ({...props}) => {
         ref={input => (attachmentInput = input)}
         type="file"
         style={{display: 'none'}}
-        aria-hidden
+        aria-hidden={true}
         onChange={props.onReplace}
       />
     </RemovableItem>
@@ -75,13 +75,13 @@ export const attachmentProp = PropTypes.shape({
   id: PropTypes.string,
   display_name: PropTypes.string,
   thumbnail_url: PropTypes.string,
-  mime_class: PropTypes.string
+  mime_class: PropTypes.string,
 })
 
 Attachment.propTypes = {
   attachment: attachmentProp.isRequired,
   onReplace: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired
+  onDelete: PropTypes.func.isRequired,
 }
 
 export default Attachment

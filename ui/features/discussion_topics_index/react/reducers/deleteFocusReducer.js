@@ -24,7 +24,7 @@ import {actionTypes} from '../actions'
 const deleteFocusReducer = handleActions(
   {
     [actionTypes.DELETE_FOCUS_PENDING]: () => true,
-    [actionTypes.DELETE_FOCUS_CLEANUP]: () => false
+    [actionTypes.DELETE_FOCUS_CLEANUP]: () => false,
   },
   false
 )

@@ -50,7 +50,7 @@ const stubEnv = nextEnv => {
   return nextEnv
 }
 
-const snapshot = ({ ...initial }) => {
+const snapshot = ({...initial}) => {
   return current => {
     for (const x of Object.getOwnPropertyNames(current)) {
       delete current[x]

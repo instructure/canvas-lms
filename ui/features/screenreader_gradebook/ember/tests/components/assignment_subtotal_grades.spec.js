@@ -30,8 +30,8 @@ const groupScores = {
     score: 946.65,
     submission_count: 10,
     submissions: [],
-    weight: 90
-  }
+    weight: 90,
+  },
 }
 const periodScores = {
   grading_period_1: {
@@ -39,8 +39,8 @@ const periodScores = {
     score: 95.1225,
     submission_count: 30,
     submissions: [],
-    weight: 60
-  }
+    weight: 60,
+  },
 }
 
 QUnit.module('assignment_subtotal_grades_component by group', {
@@ -49,14 +49,18 @@ QUnit.module('assignment_subtotal_grades_component by group', {
     const App = startApp()
     this.component = App.AssignmentSubtotalGradesComponent.create()
     this.component.reopen({
-      gradingStandard: function() {
+      gradingStandard: function () {
         originalGradingStandard = this._super
-        return [['A', 0.5], ['C', 0.05], ['F', 0.0]]
+        return [
+          ['A', 0.5],
+          ['C', 0.05],
+          ['F', 0.0],
+        ]
       }.property(),
-      weightingScheme: function() {
+      weightingScheme: function () {
         originalWeightingScheme = this._super
         return 'percent'
-      }.property()
+      }.property(),
     })
     return run(() => {
       this.assignment_group = Ember.copy(fixtures.assignment_groups, true).findBy('id', '1')
@@ -66,8 +70,8 @@ QUnit.module('assignment_subtotal_grades_component by group', {
         subtotal: {
           name: this.assignment_group.name,
           weight: this.assignment_group.group_weight,
-          key: `assignment_group_${this.assignment_group.id}`
-        }
+          key: `assignment_group_${this.assignment_group.id}`,
+        },
       })
     })
   },
@@ -77,30 +81,30 @@ QUnit.module('assignment_subtotal_grades_component by group', {
       this.component.destroy()
       return App.destroy()
     })
-  }
+  },
 })
 
-test('values', function() {
+test('values', function () {
   deepEqual(this.component.get('values'), groupScores.assignment_group_1)
 })
 
-test('points', function() {
+test('points', function () {
   const expected = '946.65 / 1,000'
   equal(this.component.get('points'), expected)
 })
 
-test('percent', function() {
+test('percent', function () {
   const expected = '94.67%'
   strictEqual((946.65 / 1000) * 100, 94.66499999999999)
   strictEqual(this.component.get('percent'), expected)
 })
 
-test('letterGrade', function() {
+test('letterGrade', function () {
   const expected = 'A'
   equal(this.component.get('letterGrade'), expected)
 })
 
-test('scoreDetail', function() {
+test('scoreDetail', function () {
   const expected = '(946.65 / 1,000)'
   equal(this.component.get('scoreDetail'), expected)
 })
@@ -111,10 +115,14 @@ QUnit.module('assignment_subtotal_grades_component by period', {
     const App = startApp()
     this.component = App.AssignmentSubtotalGradesComponent.create()
     this.component.reopen({
-      gradingStandard: function() {
+      gradingStandard: function () {
         originalGradingStandard = this._super
-        return [['A', 0.5], ['C', 0.05], ['F', 0.0]]
-      }.property()
+        return [
+          ['A', 0.5],
+          ['C', 0.05],
+          ['F', 0.0],
+        ]
+      }.property(),
     })
     return run(() => {
       this.student = Ember.Object.create(Ember.copy(periodScores))
@@ -123,8 +131,8 @@ QUnit.module('assignment_subtotal_grades_component by period', {
         subtotal: {
           name: 'Grading Period 1',
           weight: 0.65,
-          key: 'grading_period_1'
-        }
+          key: 'grading_period_1',
+        },
       })
     })
   },
@@ -134,29 +142,29 @@ QUnit.module('assignment_subtotal_grades_component by period', {
       this.component.destroy()
       return App.destroy()
     })
-  }
+  },
 })
 
-test('values', function() {
+test('values', function () {
   deepEqual(this.component.get('values'), periodScores.grading_period_1)
 })
 
-test('points', function() {
+test('points', function () {
   const expected = '95.12 / 1,800.11'
   equal(this.component.get('points'), expected)
 })
 
-test('percent', function() {
+test('percent', function () {
   const expected = '5.28%'
   equal(this.component.get('percent'), expected)
 })
 
-test('letterGrade', function() {
+test('letterGrade', function () {
   const expected = 'C'
   equal(this.component.get('letterGrade'), expected)
 })
 
-test('scoreDetail', function() {
+test('scoreDetail', function () {
   const expected = '(95.12 / 1,800.11)'
   equal(this.component.get('scoreDetail'), expected)
 })

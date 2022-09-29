@@ -37,7 +37,7 @@ const {Item} = Menu as any
 const tableHeaders: [string, string, string, boolean][] = [
   ['name', I18n.t('Name'), '45%', true],
   ['value', I18n.t('Value'), '40%', true],
-  ['actions', I18n.t('Actions'), '15%', false]
+  ['actions', I18n.t('Actions'), '15%', false],
 ]
 
 export type InternalSettingsTableProps = {
@@ -56,7 +56,7 @@ export type InternalSettingsTableProps = {
 export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   const [sort, setSort] = useState<{ascending: boolean; sortBy: string}>({
     ascending: true,
-    sortBy: 'name'
+    sortBy: 'name',
   })
 
   const handleSort = (_, {id}: {id: string}) => {
@@ -65,7 +65,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
     } else {
       setSort({
         sortBy: id,
-        ascending: true
+        ascending: true,
       })
     }
   }
@@ -198,7 +198,7 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
                   onSubmitPendingChange={() => props.onSubmitPendingChange(internalSetting.id)}
                   onClearPendingChange={() => props.onClearPendingChange(internalSetting.id)}
                   onDelete={() => props.onDelete(internalSetting.id)}
-                  allowCopy
+                  allowCopy={true}
                 />
               </Cell>
             </Row>

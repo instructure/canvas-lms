@@ -20,7 +20,7 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
-  useCourseModuleItemApi
+  useCourseModuleItemApi,
 } from '../../effects/useModuleCourseSearchApi'
 import CourseAndModulePicker from '../CourseAndModulePicker'
 
@@ -45,7 +45,7 @@ describe('CourseAndModulePicker', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
     const setCourse = jest.fn()
@@ -60,13 +60,13 @@ describe('CourseAndModulePicker', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     const setModule = jest.fn()
@@ -83,19 +83,19 @@ describe('CourseAndModulePicker', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'a', title: 'Item 1', position: '5'},
-        {id: 'b', title: 'Item 2', position: '6'}
+        {id: 'b', title: 'Item 2', position: '6'},
       ])
     })
     const setPosition = jest.fn()
@@ -115,13 +115,13 @@ describe('CourseAndModulePicker', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     const setModule = jest.fn()
@@ -129,7 +129,7 @@ describe('CourseAndModulePicker', () => {
       <CourseAndModulePicker
         selectedCourseId="abc"
         setSelectedModule={setModule}
-        disableModuleInsertion
+        disableModuleInsertion={true}
       />
     )
     const selector = queryByText(/select a module/i)

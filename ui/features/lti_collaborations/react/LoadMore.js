@@ -27,7 +27,7 @@ class LoadMore extends React.Component {
     hasMore: PropTypes.bool.isRequired,
     loadMore: PropTypes.func.isRequired,
     isLoading: PropTypes.bool,
-    children: PropTypes.any
+    children: PropTypes.any,
   }
 
   componentDidUpdate(oldProps) {
@@ -70,7 +70,7 @@ LoadMore.propTypes = {
   hasMore: PropTypes.bool.isRequired,
   loadMore: PropTypes.func.isRequired,
   isLoading: PropTypes.bool,
-  children: PropTypes.any
+  children: PropTypes.any,
 }
 
 export default LoadMore

@@ -34,7 +34,7 @@ const I18n = useI18nScope('external_tools')
 
 export default class AppList extends React.Component {
   static propTypes = {
-    baseUrl: PropTypes.string.isRequired
+    baseUrl: PropTypes.string.isRequired,
   }
 
   state = store.getState()

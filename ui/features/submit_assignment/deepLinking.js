@@ -36,7 +36,7 @@ export function handleDeepLinkingError(e, contentView, reloadTool) {
 function legacyContentItem(ltiAdvantageContentItem) {
   const types = {
     ltiResourceLink: 'LtiLinkItem',
-    file: 'FileItem'
+    file: 'FileItem',
   }
   const {type, title, text, icon, url, lookup_uuid} = ltiAdvantageContentItem
   const legacyType = types[type]
@@ -51,8 +51,8 @@ function legacyContentItem(ltiAdvantageContentItem) {
     text,
     url,
     thumbnail: {
-      '@id': icon
-    }
+      '@id': icon,
+    },
   }
 
   if (type === 'ltiResourceLink' && lookup_uuid) {

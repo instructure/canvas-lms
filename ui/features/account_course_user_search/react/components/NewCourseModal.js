@@ -45,7 +45,7 @@ const renderAccountOptions = (accounts = [], depth = 0) =>
 
 NewCourseModal.propTypes = {
   terms: termsPropType,
-  children: node.isRequired
+  children: node.isRequired,
 }
 
 const emptyData = {name: '', course_code: ''}
@@ -79,7 +79,7 @@ export default function NewCourseModal({terms, children}) {
         closeModal()
         showFlashAlert({
           type: 'success',
-          message: I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name})
+          message: I18n.t('%{course_name} successfully added!', {course_name: createdCourse.name}),
         })
       })
       .error(() => {
@@ -112,7 +112,7 @@ export default function NewCourseModal({terms, children}) {
               renderLabel={I18n.t('Course Name')}
               value={data.name}
               onChange={onChange('name')}
-              isRequired
+              isRequired={true}
               messages={errors.name && [{type: 'error', text: errors.name}]}
             />
 
@@ -120,7 +120,7 @@ export default function NewCourseModal({terms, children}) {
               renderLabel={I18n.t('Reference Code')}
               value={data.course_code}
               onChange={onChange('course_code')}
-              isRequired
+              isRequired={true}
               messages={errors.course_code && [{type: 'error', text: errors.course_code}]}
             />
 
@@ -164,7 +164,7 @@ export default function NewCourseModal({terms, children}) {
           onClick: (...args) => {
             if (child.props.onClick) child.props.onClick(...args)
             setIsOpen(true)
-          }
+          },
         })
       )}
     </span>

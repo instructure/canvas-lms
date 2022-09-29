@@ -38,7 +38,7 @@ const OutcomeDescription = ({
   calculationMethod,
   calculationInt,
   masteryPoints,
-  ratings
+  ratings,
 }) => {
   const {friendlyDescriptionFF, isStudent, accountLevelMasteryScalesFF} = useCanvasContext()
   const shouldShowFriendlyDescription = friendlyDescriptionFF && friendlyDescription
@@ -67,7 +67,7 @@ const OutcomeDescription = ({
               style={{
                 whiteSpace: 'nowrap',
                 overflow: 'hidden',
-                textOverflow: 'ellipsis'
+                textOverflow: 'ellipsis',
               }}
             >
               {truncatedDescription}
@@ -119,7 +119,7 @@ const OutcomeDescription = ({
             ratings={prepareRatings(ratings)}
             masteryPoints={{
               value: masteryPoints,
-              error: null
+              error: null,
             }}
             canManage={false}
           />
@@ -135,7 +135,7 @@ const OutcomeDescription = ({
 }
 
 OutcomeDescription.defaultProps = {
-  friendlyDescription: ''
+  friendlyDescription: '',
 }
 
 OutcomeDescription.propTypes = {
@@ -145,7 +145,7 @@ OutcomeDescription.propTypes = {
   masteryPoints: PropTypes.number,
   ratings: ratingsShape,
   friendlyDescription: PropTypes.string,
-  truncated: PropTypes.bool.isRequired
+  truncated: PropTypes.bool.isRequired,
 }
 
 export default OutcomeDescription

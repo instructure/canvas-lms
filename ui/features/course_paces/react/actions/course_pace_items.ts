@@ -19,14 +19,14 @@
 import {createAction, ActionsUnion} from '../shared/types'
 
 export enum Constants {
-  SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION'
+  SET_PACE_ITEM_DURATION = 'COURSE_PACE_ITEMS/SET_PACE_ITEM_DURATION',
 }
 
 /* Action creators */
 
 export const actions = {
   setPaceItemDuration: (paceItemId: string, duration: number) =>
-    createAction(Constants.SET_PACE_ITEM_DURATION, {paceItemId, duration})
+    createAction(Constants.SET_PACE_ITEM_DURATION, {paceItemId, duration}),
 }
 
 export type CoursePaceItemAction = ActionsUnion<typeof actions>

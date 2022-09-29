@@ -49,7 +49,7 @@ export default class TopicView extends Backbone.View {
       'click .mark_all_as_read': 'markAllAsRead',
       'click .mark_all_as_unread': 'markAllAsUnread',
       'click .direct-share-send-to-menu-item': 'openSendTo',
-      'click .direct-share-copy-to-menu-item': 'openCopyTo'
+      'click .direct-share-copy-to-menu-item': 'openCopyTo',
     }
 
     this.prototype.els = {
@@ -61,7 +61,7 @@ export default class TopicView extends Backbone.View {
       '.topic-subscribe-button': '$subscribeButton',
       '.topic-unsubscribe-button': '$unsubscribeButton',
       '.announcement_cog': '$announcementCog',
-      '#assignment_external_tools': '$AssignmentExternalTools'
+      '#assignment_external_tools': '$AssignmentExternalTools',
     }
 
     this.prototype.filter = this.prototype.afterRender
@@ -107,7 +107,7 @@ export default class TopicView extends Backbone.View {
     if (($el = this.$('#topic_publish_button'))) {
       this.topic.set({
         unpublishable: ENV.DISCUSSION.TOPIC.CAN_UNPUBLISH,
-        published: ENV.DISCUSSION.TOPIC.IS_PUBLISHED
+        published: ENV.DISCUSSION.TOPIC.IS_PUBLISHED,
       })
       new PublishButtonView({model: this.topic, el: $el}).render()
     }

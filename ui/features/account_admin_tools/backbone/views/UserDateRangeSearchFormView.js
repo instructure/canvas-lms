@@ -47,7 +47,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
       '.dateStartSearchField': '$dateStartSearchField',
       '.dateEndSearchField': '$dateEndSearchField',
       '.search-controls': '$searchControls',
-      '.search-people-status': '$searchPeopleStatus'
+      '.search-people-status': '$searchPeopleStatus',
     }
 
     this.optionProperty('formName')
@@ -101,7 +101,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
   }
 
   selectUser(e) {
-    this.usersView.$el.find('tr').each(function() {
+    this.usersView.$el.find('tr').each(function () {
       $(this).removeClass('selected')
     })
     if (e) {
@@ -124,7 +124,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
             text: I18n.t('Cancel'),
             click() {
               $(this).dialog('close')
-            }
+            },
           },
           {
             text: I18n.t('Find'),
@@ -141,9 +141,9 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
               self.$hiddenDateEnd.val(self.$dateEndSearchField.val())
               self.$el.submit()
               $(this).dialog('close')
-            }
-          }
-        ]
+            },
+          },
+        ],
       })
     } else {
       return this.$userIdField.val('')
@@ -168,22 +168,22 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
     if (startDate && endDate && startDate > endDate) {
       errors[`${this.formName}_end_time`] = [
         {
-          message: I18n.t('To Date cannot come before From Date')
-        }
+          message: I18n.t('To Date cannot come before From Date'),
+        },
       ]
     } else {
       if (!this.dateIsValid(startDateField)) {
         errors[`${this.formName}_start_time`] = [
           {
-            message: I18n.t('Not a valid date')
-          }
+            message: I18n.t('Not a valid date'),
+          },
         ]
       }
       if (!this.dateIsValid(endDateField)) {
         errors[`${this.formName}_end_time`] = [
           {
-            message: I18n.t('Not a valid date')
-          }
+            message: I18n.t('Not a valid date'),
+          },
         ]
       }
     }

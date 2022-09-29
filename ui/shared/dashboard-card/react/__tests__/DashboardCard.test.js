@@ -28,7 +28,7 @@ function createMockProps(opts = {}) {
     assetString: 'foo',
     href: 'courses/1',
     enrollmentType: 'StudentEnrollment',
-    ...opts
+    ...opts,
   }
 }
 
@@ -70,25 +70,25 @@ describe('DashboardCardHeaderHero', () => {
 })
 
 describe('PublishButton', () => {
-    it('renders the button for users that have the permission', () => {
-      const props = createMockProps({
-        published: false,
-        canChangeCoursePublishState: true,
-        pagesUrl: '',
-        defaultView: ''
-      })
-      const {queryByText} = render(<DashboardCard {...props} />)
-      expect(queryByText(/Publish/i)).toBeInTheDocument()
+  it('renders the button for users that have the permission', () => {
+    const props = createMockProps({
+      published: false,
+      canChangeCoursePublishState: true,
+      pagesUrl: '',
+      defaultView: '',
     })
+    const {queryByText} = render(<DashboardCard {...props} />)
+    expect(queryByText(/Publish/i)).toBeInTheDocument()
+  })
 
-    it('does not render the button for users that do not have the permission', () => {
-      const props = createMockProps({
-        published: false,
-        canChangeCoursePublishState: false,
-        pagesUrl: '',
-        defaultView: ''
-      })
-      const {queryByText} = render(<DashboardCard {...props} />)
-      expect(queryByText(/Publish/i)).not.toBeInTheDocument()
+  it('does not render the button for users that do not have the permission', () => {
+    const props = createMockProps({
+      published: false,
+      canChangeCoursePublishState: false,
+      pagesUrl: '',
+      defaultView: '',
     })
+    const {queryByText} = render(<DashboardCard {...props} />)
+    expect(queryByText(/Publish/i)).not.toBeInTheDocument()
+  })
 })

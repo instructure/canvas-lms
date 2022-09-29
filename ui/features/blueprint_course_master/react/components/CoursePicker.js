@@ -42,20 +42,20 @@ export default class CoursePicker extends React.Component {
     isLoadingCourses: bool.isRequired,
     onSelectedChanged: func,
     detailsRef: func,
-    isExpanded: bool
+    isExpanded: bool,
   }
 
   static defaultProps = {
     detailsRef: () => {},
     onSelectedChanged: () => {},
-    isExpanded: true
+    isExpanded: true,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       isExpanded: props.isExpanded,
-      announceChanges: false
+      announceChanges: false,
     }
     this._homeRef = null
   }
@@ -75,7 +75,7 @@ export default class CoursePicker extends React.Component {
         I18n.t(
           {
             one: 'Loading courses complete: one course found',
-            other: 'Loading courses complete: %{count} courses found'
+            other: 'Loading courses complete: %{count} courses found',
           },
           {count: nextProps.courses.length}
         )
@@ -89,7 +89,7 @@ export default class CoursePicker extends React.Component {
 
   onFilterActivate = () => {
     this.setState({
-      isExpanded: true
+      isExpanded: true,
     })
   }
 
@@ -105,7 +105,7 @@ export default class CoursePicker extends React.Component {
     this.setState({
       filters,
       isExpanded: true,
-      announceChanges: true
+      announceChanges: true,
     })
   }
 

@@ -33,12 +33,12 @@ export const RubricRating = {
     id: string.isRequired,
     description: string.isRequired,
     long_description: string,
-    points: number
-  })
+    points: number,
+  }),
 }
 
 export const DefaultMocks = {
   RubricRating: () => ({
-    _id: '1'
-  })
+    _id: '1',
+  }),
 }

@@ -31,7 +31,7 @@ const MentionDropdownMenu = ({
   instanceId,
   highlightMouse,
   onOptionMouseEnter,
-  isInteractive
+  isInteractive,
 }) => {
   // Hooks & Variables
   const directionality = tinyMCE?.activeEditor?.getParam('directionality')
@@ -42,7 +42,7 @@ const MentionDropdownMenu = ({
     return {
       getBoundingClientRect: () => {
         return coordiantes
-      }
+      },
     }
   }, [coordiantes])
   const [popperElement, setPopperElement] = useState(null)
@@ -53,10 +53,10 @@ const MentionDropdownMenu = ({
         name: 'flip',
         options: {
           flipVariations: false,
-          fallbackPlacements: ['bottom', 'bottom-end', 'bottom-start']
-        }
-      }
-    ]
+          fallbackPlacements: ['bottom', 'bottom-end', 'bottom-start'],
+        },
+      },
+    ],
   })
 
   // Memoize map of Mention Options
@@ -68,7 +68,7 @@ const MentionDropdownMenu = ({
           onSelect={() => {
             onSelect({
               ...user,
-              elementId: ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id)
+              elementId: ARIA_ID_TEMPLATES.activeDescendant(instanceId, user.id),
             })
           }}
           isSelected={selectedUser === user.id}
@@ -90,7 +90,7 @@ const MentionDropdownMenu = ({
     highlightMouse,
     isInteractive,
     onSelect,
-    onOptionMouseEnter
+    onOptionMouseEnter,
   ])
 
   // Don't show if menu is empty
@@ -130,7 +130,7 @@ const MentionDropdownMenu = ({
             paddingInlineStart: '0px',
             marginBlockStart: '0px',
             marginBlockEnd: '0px',
-            margin: '0'
+            margin: '0',
           }}
         >
           {menuItems}
@@ -179,10 +179,10 @@ MentionDropdownMenu.proptypes = {
    * isInteractive determines if menu will recieve events
    * This is used for the hidden menu offscreen in the RCE
    */
-  isInteractive: PropTypes.bool
+  isInteractive: PropTypes.bool,
 }
 
 MentionDropdownMenu.defaultProps = {
   isInteractive: true,
-  onSelect: () => {}
+  onSelect: () => {},
 }

@@ -25,7 +25,7 @@ const _originalHeadCellHtml = fullCalendar.Grid.prototype.headCellHtml
 // duplicate var from vender fullcalendar.js so can access here
 const dayIDs = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 
-fullCalendar.Grid.prototype.headCellHtml = function(cell) {
+fullCalendar.Grid.prototype.headCellHtml = function (cell) {
   if (this.view.name === 'agendaWeek') {
     const date = cell.start
     return `

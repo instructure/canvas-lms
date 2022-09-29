@@ -31,7 +31,7 @@ function createMockProps(opts = {}) {
     defaultView: 'modules',
     frontPageTitle: '',
     courseNickname: 'nickname',
-    ...opts
+    ...opts,
   }
 }
 

@@ -48,8 +48,8 @@ describe('doFetchApi', () => {
     const path = '/api/v1/blah'
     fetchMock.mock(`path:${path}`, {
       headers: {
-        Link: '<http://api?page=3>; rel="current",<http://api?page=1>; rel="first",<http://api?page=5>; rel="last", <http://api?page=4>; rel="next", <http://api?page=2>; rel="prev"'
-      }
+        Link: '<http://api?page=3>; rel="current",<http://api?page=1>; rel="first",<http://api?page=5>; rel="last", <http://api?page=4>; rel="next", <http://api?page=2>; rel="prev"',
+      },
     })
     return expect(doFetchApi({path})).resolves.toMatchObject({
       link: {
@@ -57,8 +57,8 @@ describe('doFetchApi', () => {
         prev: {page: '2'},
         current: {page: '3'},
         next: {page: '4'},
-        last: {page: '5'}
-      }
+        last: {page: '5'},
+      },
     })
   })
 
@@ -111,9 +111,9 @@ describe('doFetchApi', () => {
         Accept: expect.stringMatching(/application\/json\+canvas-string-ids/),
         'X-Requested-With': 'XMLHttpRequest',
         foo: 'bar',
-        baz: 'bing'
+        baz: 'bing',
       },
-      additional: 'option'
+      additional: 'option',
     })
   })
 

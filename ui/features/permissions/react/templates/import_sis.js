@@ -27,22 +27,22 @@ export const template = generateActionTemplates(
       title: I18n.t('Account Navigation'),
       description: I18n.t(
         'Determines visibility and management of SIS Import link in Account Navigation.'
-      )
+      ),
     },
     {
       title: I18n.t('SIS Import'),
-      description: I18n.t('Allows user to import SIS data.')
-    }
+      description: I18n.t('Allows user to import SIS data.'),
+    },
   ],
   [
     {
       title: I18n.t('SIS Import'),
-      description: I18n.t('To manage SIS data, SIS Data - manage must also be enabled.')
+      description: I18n.t('To manage SIS data, SIS Data - manage must also be enabled.'),
     },
     {
       title: I18n.t('Subaccounts'),
-      description: I18n.t('Not available at the subaccount level')
-    }
+      description: I18n.t('Not available at the subaccount level'),
+    },
   ],
   [],
   []

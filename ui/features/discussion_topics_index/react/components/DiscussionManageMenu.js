@@ -37,15 +37,15 @@ export default class DiscussionManageMenu extends Component {
     menuOptions: func.isRequired,
     entityTitle: string.isRequired,
     // Use this if you want the calling component to have a handle to this menu
-    menuRefFn: func
+    menuRefFn: func,
   }
 
   static defaultProps = {
-    menuRefFn: _ => {}
+    menuRefFn: _ => {},
   }
 
   state = {
-    manageMenuOpen: false
+    manageMenuOpen: false,
   }
 
   toggleManageMenuOpen = (shown, _) => {

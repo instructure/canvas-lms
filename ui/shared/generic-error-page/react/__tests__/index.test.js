@@ -34,7 +34,7 @@ afterEach(() => {
 const defaultProps = () => ({
   errorSubject: 'Testing Stuff',
   errorCategory: 'Error Category',
-  imageUrl: 'testurl'
+  imageUrl: 'testurl',
 })
 
 describe('GenericErrorPage component', () => {
@@ -69,8 +69,8 @@ describe('GenericErrorPage component', () => {
       status: 200,
       response: {
         logged: true,
-        id: '7'
-      }
+        id: '7',
+      },
     })
     userEvent.click(getByText('Report Issue'))
     userEvent.type(getByPlaceholderText('email@example.com'), 'foo@bar.com')
@@ -96,8 +96,8 @@ describe('GenericErrorPage component', () => {
       status: 200,
       response: {
         logged: true,
-        id: '7'
-      }
+        id: '7',
+      },
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'
@@ -119,8 +119,8 @@ describe('GenericErrorPage component', () => {
       status: 503,
       response: {
         logged: false,
-        id: '7'
-      }
+        id: '7',
+      },
     })
     const modifiedProps = defaultProps()
     modifiedProps.errorSubject = 'Testing Stuff'

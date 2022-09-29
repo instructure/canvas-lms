@@ -23,7 +23,7 @@ $(document).ready(() => {
     $stop_debugging = $('.stop_debugging'),
     $refresh_debugging = $('.refresh_debugging')
 
-  const stop_debugging = function($link) {
+  const stop_debugging = function ($link) {
     const $container = $link.closest('div.debugging')
     $container.find('.start_debugging').show()
     $container.find('.refresh_debugging').hide()
@@ -33,7 +33,7 @@ $(document).ready(() => {
     debug_data.hide()
   }
 
-  const load_debug_data = function($link, new_debug_session) {
+  const load_debug_data = function ($link, new_debug_session) {
     const url = $link.attr('href')
     let method = 'GET'
     let debug_data

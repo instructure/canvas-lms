@@ -33,19 +33,19 @@ export const PageInfo = {
     endCursor: string,
     hasNextPage: bool,
     hasPreviousPage: bool,
-    startCursor: string
+    startCursor: string,
   }),
 
   mock: ({
     endCursor = 'MjA',
     hasNextPage = true,
     hasPreviousPage = true,
-    startCursor = 'MQ'
+    startCursor = 'MQ',
   } = {}) => ({
     endCursor,
     hasNextPage,
     hasPreviousPage,
     startCursor,
-    __typename: 'PageInfo'
-  })
+    __typename: 'PageInfo',
+  }),
 }

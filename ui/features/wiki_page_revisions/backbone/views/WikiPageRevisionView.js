@@ -31,7 +31,7 @@ export default class WikiPageRevisionView extends Backbone.View {
 
     this.prototype.events = {
       'click .restore-link': 'restore',
-      'keydown .restore-link': 'restore'
+      'keydown .restore-link': 'restore',
     }
 
     this.prototype.els = {'.revision-details': '$revisionButton'}
@@ -63,8 +63,8 @@ export default class WikiPageRevisionView extends Backbone.View {
       IS: {
         LATEST: !!this.model.get('latest'),
         SELECTED: !!this.model.get('selected'),
-        LOADED: !!this.model.get('title') && !!this.model.get('body')
-      }
+        LOADED: !!this.model.get('title') && !!this.model.get('body'),
+      },
     }
     json.IS.SAME_AS_LATEST =
       json.IS.LOADED &&
@@ -83,7 +83,7 @@ export default class WikiPageRevisionView extends Backbone.View {
     const restore = await showConfirmationDialog({
       label: I18n.t('Confirm Restore'),
       body: I18n.t('Are you sure you want to restore this revision?'),
-      confirmText: I18n.t('Restore')
+      confirmText: I18n.t('Restore'),
     })
 
     if (!restore) return

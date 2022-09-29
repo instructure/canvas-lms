@@ -77,7 +77,7 @@ class Group extends React.Component {
     this.props.group.users.sort(natcompare.by(u => u.name || u.display_name))
     const groupName = I18n.t('%{group_name} in %{group_category_name} group category', {
       group_name: this.props.group.name,
-      group_category_name: this.props.group.group_category.name
+      group_category_name: this.props.group.group_category.name,
     })
     const isMember = this.props.group.users.some(u => u.id === ENV.current_user_id)
     const leaderId = this.props.group.leader && this.props.group.leader.id
@@ -204,12 +204,12 @@ class Group extends React.Component {
       } else if (canSelfSignup && !isAllowedToJoin) {
         toolTip = I18n.t('Group is not available at this time')
         ariaLabel = I18n.t('Group %{group_name} is not available at this time', {
-          group_name: groupName
+          group_name: groupName,
         })
       } else {
         toolTip = I18n.t('Group is joined by invitation only')
         ariaLabel = I18n.t('Group %{group_name} is joined by invitation only', {
-          group_name: groupName
+          group_name: groupName,
         })
       }
       membershipAction = (

@@ -25,8 +25,8 @@ export default {
   component: CourseSelect,
   argTypes: {
     onFailure: {action: 'failure_alert'},
-    onSuccess: {action: 'success_alert'}
-  }
+    onSuccess: {action: 'success_alert'},
+  },
 }
 
 const Template = args => (
@@ -42,34 +42,34 @@ const options = {
     {
       _id: ALL_COURSES_ID,
       contextName: 'All Courses',
-      assetString: 'all_courses'
-    }
+      assetString: 'all_courses',
+    },
   ],
   favoriteCourses: [
     {_id: 1, contextName: 'Charms', assetString: 'course_1'},
-    {_id: 2, contextName: 'Transfiguration', assetString: 'course_2'}
+    {_id: 2, contextName: 'Transfiguration', assetString: 'course_2'},
   ],
   moreCourses: [
     {_id: 3, contextName: 'Potions', assetString: 'course_3'},
     {_id: 4, contextName: 'History of Magic', assetString: 'course_4'},
     {_id: 5, contextName: 'Herbology', assetString: 'course_5'},
-    {_id: 6, contextName: 'Defense Against the Dark Arts', assetString: 'course_6'}
+    {_id: 6, contextName: 'Defense Against the Dark Arts', assetString: 'course_6'},
   ],
   concludedCourses: [
     {_id: 7, contextName: 'Muggle Studies', assetString: 'course_7'},
-    {_id: 8, contextName: 'Astronomy', assetString: 'course_8'}
+    {_id: 8, contextName: 'Astronomy', assetString: 'course_8'},
   ],
   groups: [
     {_id: 1, contextName: 'Gryffindor Bros', assetString: 'group_1'},
     {_id: 2, contextName: 'Quidditch', assetString: 'group_2'},
-    {_id: 3, contextName: "Dumbledore's Army", assetString: 'group_3'}
-  ]
+    {_id: 3, contextName: "Dumbledore's Army", assetString: 'group_3'},
+  ],
 }
 
 export const MainPage = Template.bind({})
 MainPage.args = {
   mainPage: true,
-  options
+  options,
 }
 
 const composeModalOptions = JSON.parse(JSON.stringify(options))
@@ -78,5 +78,5 @@ delete composeModalOptions.groups
 export const ComposeModal = Template.bind({})
 ComposeModal.args = {
   mainPage: false,
-  options: composeModalOptions
+  options: composeModalOptions,
 }

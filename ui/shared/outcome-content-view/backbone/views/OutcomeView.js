@@ -46,7 +46,7 @@ export default class OutcomeView extends OutcomeContentBase {
         'click .save_rating_link': 'saveRating',
         'click .insert_rating': 'insertRating',
         'change .calculation_method': 'updateCalcMethod',
-        'keyup .mastery_points': 'changeMasteryPoints'
+        'keyup .mastery_points': 'changeMasteryPoints',
       },
       OutcomeContentBase.prototype.events
     )
@@ -65,7 +65,7 @@ export default class OutcomeView extends OutcomeContentBase {
           ) {
             return I18n.t('mastery_error', 'Must be greater than or equal to 0')
           }
-        }
+        },
       },
       OutcomeContentBase.prototype.validations
     )
@@ -76,7 +76,7 @@ export default class OutcomeView extends OutcomeContentBase {
     this.useForScoring = useForScoring
     this.inFindDialog = inFindDialog
     this.calculationMethodFormView = new CalculationMethodFormView({
-      model: this.model
+      model: this.model,
     })
     this.originalConfirmableValues = this.getFormData()
     super.initialize(...arguments)
@@ -92,7 +92,7 @@ export default class OutcomeView extends OutcomeContentBase {
       assessed: this.model.get('assessed'),
       hasUpdateableRubrics: this.model.get('has_updateable_rubrics'),
       modifiedFields: this.getModifiedFields(newData),
-      onConfirm: _confirmEvent => super.submit(event)
+      onConfirm: _confirmEvent => super.submit(event),
     })
   }
 
@@ -103,7 +103,7 @@ export default class OutcomeView extends OutcomeContentBase {
     return {
       masteryPoints:
         data.mastery_points !== numberHelper.parse(this.originalConfirmableValues.mastery_points),
-      scoringMethod: !this.scoringMethodsEqual(data, this.originalConfirmableValues)
+      scoringMethod: !this.scoringMethodsEqual(data, this.originalConfirmableValues),
     }
   }
 
@@ -212,7 +212,7 @@ export default class OutcomeView extends OutcomeContentBase {
       e.preventDefault()
     }
     return this.model.set({
-      calculation_method: $(e.target).val()
+      calculation_method: $(e.target).val(),
     })
   }
 
@@ -225,7 +225,7 @@ export default class OutcomeView extends OutcomeContentBase {
       if (_.isNaN(val)) return
       if (val >= 0 && val <= this.model.get('points_possible')) {
         this.model.set({
-          mastery_points: val
+          mastery_points: val,
         })
         if (this.calculationMethodFormView) this.calculationMethodFormView.render()
       }
@@ -249,12 +249,12 @@ export default class OutcomeView extends OutcomeContentBase {
     points.html(
       $.raw(
         I18n.t('%{points_possible} Points', {
-          points_possible: I18n.n(total, {precision: 2, strip_insignificant_zeros: true})
+          points_possible: I18n.n(total, {precision: 2, strip_insignificant_zeros: true}),
         })
       )
     )
     return this.model.set({
-      points_possible: total
+      points_possible: total,
     })
   }
 
@@ -273,7 +273,7 @@ export default class OutcomeView extends OutcomeContentBase {
           outcomeFormTemplate(
             _.extend(data, {
               calculationMethods: this.model.calculationMethods(),
-              hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES
+              hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES,
             })
           )
         )
@@ -328,7 +328,7 @@ export default class OutcomeView extends OutcomeContentBase {
               assessedInContext:
                 !this.readOnly() &&
                 (this.model.outcomeLink.assessed ||
-                  (this.model.isNative() && this.model.get('assessed')))
+                  (this.model.isNative() && this.model.get('assessed'))),
             })
           )
         )

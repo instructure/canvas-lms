@@ -22,8 +22,6 @@ import Help from '../help'
 
 describe('canvas_quizzes/statistics/views/discrimination_index/help', () => {
   it('renders', () => {
-    render(
-      <Help />
-    )
+    render(<Help />)
   })
 })

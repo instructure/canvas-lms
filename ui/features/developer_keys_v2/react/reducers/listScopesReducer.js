@@ -23,7 +23,7 @@ const initialState = {
   listDeveloperKeyScopesPending: false,
   listDeveloperKeyScopesSuccessful: false,
   listDeveloperKeyScopesError: undefined,
-  selectedScopes: []
+  selectedScopes: [],
 }
 
 const developerKeysHandlers = {
@@ -31,27 +31,27 @@ const developerKeysHandlers = {
     ...state,
     listDeveloperKeyScopesPending: true,
     listDeveloperKeyScopesSuccessful: false,
-    listDeveloperKeyScopesError: undefined
+    listDeveloperKeyScopesError: undefined,
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL]: (state, action) => ({
     ...state,
     availableScopes: action.payload || state.availableScopes,
     listDeveloperKeyScopesPending: false,
     listDeveloperKeyScopesSuccessful: true,
-    listDeveloperKeyScopesError: undefined
+    listDeveloperKeyScopesError: undefined,
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_FAILED]: state => ({
     ...state,
     listDeveloperKeyScopesSuccessful: false,
     listDeveloperKeyScopesPending: false,
-    listDeveloperKeyScopesError: true
+    listDeveloperKeyScopesError: true,
   }),
   [ACTION_NAMES.LIST_DEVELOPER_KEY_SCOPES_SET]: (state, action) => {
     return {
       ...state,
-      selectedScopes: action.payload
+      selectedScopes: action.payload,
     }
-  }
+  },
 }
 
 export default (state = initialState, action) => {

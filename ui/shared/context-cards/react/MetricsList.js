@@ -27,13 +27,13 @@ class MetricsList extends React.Component {
   static propTypes = {
     analytics: PropTypes.object,
     user: PropTypes.object,
-    allowFinalGradeOverride: PropTypes.bool
+    allowFinalGradeOverride: PropTypes.bool,
   }
 
   static defaultProps = {
     analytics: null,
     user: {},
-    allowFinalGradeOverride: false
+    allowFinalGradeOverride: false,
   }
 
   get grade() {

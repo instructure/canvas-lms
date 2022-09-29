@@ -44,7 +44,7 @@ const confettiFlavors = [
   'rocket',
   'star',
   'thumbs_up',
-  'trophy'
+  'trophy',
 ]
 
 /**

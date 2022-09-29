@@ -106,8 +106,8 @@ UsersListRow.propTypes = {
   permissions: shape({
     can_masquerade: bool,
     can_message_users: bool,
-    can_edit_users: bool
-  }).isRequired
+    can_edit_users: bool,
+  }).isRequired,
 }
 
 UsersListRow.displayName = 'Row'

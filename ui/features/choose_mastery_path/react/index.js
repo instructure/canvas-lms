@@ -36,7 +36,7 @@ export default {
 
     const ConnectedApp = connect(state => ({
       options: state.options,
-      selectedOption: state.selectedOption
+      selectedOption: state.selectedOption,
     }))(ChooseMasteryPath)
 
     ReactDOM.render(
@@ -45,5 +45,5 @@ export default {
       </Provider>,
       root
     )
-  }
+  },
 }

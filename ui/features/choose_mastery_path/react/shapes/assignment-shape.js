@@ -26,5 +26,5 @@ export default shape({
   description: string,
   points_possible: number.isRequired,
   due_at: instanceOf(Date),
-  category: categoryShape.isRequired
+  category: categoryShape.isRequired,
 })

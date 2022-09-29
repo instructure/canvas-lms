@@ -31,12 +31,12 @@ export default {
     onCloseHandler: () => {},
     isCourse: false,
     includeGlobalRootGroup: false,
-    isMobileView: false
+    isMobileView: false,
   },
   // Adding a story decorator will cause the component to re-render when a control change
   //  is presented. This is necessary becuase useEffect is only called once upon initial render
   //  and would otherwise not adjust the story when controls are modified
-  decorators: [Story => <Story />]
+  decorators: [Story => <Story />],
 }
 
 const Template = args => {
@@ -44,7 +44,7 @@ const Template = args => {
   // we only show the global root group for the account context
   if (args.includeGlobalRootGroup && !args.isCourse) {
     window.ENV = {
-      GLOBAL_ROOT_OUTCOME_GROUP_ID: '1'
+      GLOBAL_ROOT_OUTCOME_GROUP_ID: '1',
     }
   }
   const response = findModalMocks(args)
@@ -58,8 +58,8 @@ const Template = args => {
         env: {
           contextType: args.isCourse ? 'Course' : 'Account',
           contextId: '1',
-          isMobileView: args.isMobileView
-        }
+          isMobileView: args.isMobileView,
+        },
       }}
     >
       <MockedProvider mocks={response} cache={createCache()}>
@@ -74,13 +74,13 @@ export const Default = Template.bind({})
 export const Query = Template.bind({})
 Query.args = {
   // Allow control of only the result data
-  response: findModalMocks()[0].result.data
+  response: findModalMocks()[0].result.data,
 }
 
 export const withTargetGroup = Template.bind({})
 withTargetGroup.args = {
   targetGroup: {
     _id: '1',
-    title: 'Group Name'
-  }
+    title: 'Group Name',
+  },
 }

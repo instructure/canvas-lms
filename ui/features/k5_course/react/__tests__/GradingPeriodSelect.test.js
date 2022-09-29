@@ -28,7 +28,7 @@ describe('GradingPeriodSelect', () => {
     onGradingPeriodSelected: jest.fn(),
     currentGradingPeriodId: '2',
     courseName: 'History',
-    ...overrides
+    ...overrides,
   })
 
   it('renders a select with provided active grading periods and all periods as options', () => {

@@ -29,7 +29,7 @@ class ContextSelector extends React.Component {
   static propTypes = {
     appointmentGroup: PropTypes.object,
     contexts: PropTypes.array,
-    className: PropTypes.string
+    className: PropTypes.string,
   }
 
   constructor() {
@@ -40,7 +40,7 @@ class ContextSelector extends React.Component {
       showDropdown: false,
       selectedContexts: new Set(),
       selectedSubContexts: new Set(),
-      expandedContexts: new Set()
+      expandedContexts: new Set(),
     }
   }
 
@@ -52,7 +52,7 @@ class ContextSelector extends React.Component {
     this.setState({
       selectedContexts: new Set(nextProps.appointmentGroup.context_codes),
       selectedSubContexts: new Set(nextProps.appointmentGroup.sub_context_codes),
-      expandedContexts: new Set()
+      expandedContexts: new Set(),
     })
   }
 
@@ -71,7 +71,7 @@ class ContextSelector extends React.Component {
   handleContextSelectorButtonClick = e => {
     e.preventDefault()
     this.setState({
-      showDropdown: !this.state.showDropdown
+      showDropdown: !this.state.showDropdown,
     })
   }
 
@@ -79,7 +79,7 @@ class ContextSelector extends React.Component {
     e.preventDefault()
     this.dropdownButton.focus()
     this.setState({
-      showDropdown: false
+      showDropdown: false,
     })
   }
 
@@ -134,7 +134,7 @@ class ContextSelector extends React.Component {
     }
     this.setState({
       selectedContexts: contexts,
-      selectedSubContexts: subContexts
+      selectedSubContexts: subContexts,
     })
   }
 
@@ -181,7 +181,7 @@ class ContextSelector extends React.Component {
     }
     this.setState({
       selectedContexts: contexts,
-      selectedSubContexts: subContexts
+      selectedSubContexts: subContexts,
     })
   }
 

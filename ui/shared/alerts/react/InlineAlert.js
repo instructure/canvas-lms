@@ -25,7 +25,7 @@ CanvasInlineAlert.propTypes = {
   liveAlert: bool,
   screenReaderOnly: bool,
   politeness: oneOf(['assertive', 'polite']),
-  children: node
+  children: node,
 }
 
 export default function CanvasInlineAlert({
@@ -38,7 +38,7 @@ export default function CanvasInlineAlert({
   let body = children
   if (liveAlert || screenReaderOnly) {
     body = (
-      <span role="alert" aria-live={politeness} aria-atomic>
+      <span role="alert" aria-live={politeness} aria-atomic={true}>
         {body}
       </span>
     )

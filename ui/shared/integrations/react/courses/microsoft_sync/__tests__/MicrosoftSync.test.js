@@ -25,10 +25,10 @@ describe('MicrosoftSync', () => {
     enabled: true,
     group: {
       last_synced_at: 'Tue, 30 Mar 2021 20:44:10 UTC +00:00',
-      workflow_state: 'completed'
+      workflow_state: 'completed',
     },
     loading: false,
-    ...overrides
+    ...overrides,
   })
   const subject = overrides => render(<MicrosoftSync {...props(overrides)} />)
 

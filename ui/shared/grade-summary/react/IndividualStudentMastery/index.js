@@ -36,12 +36,12 @@ class IndividualStudentMastery extends React.Component {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     studentId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onExpansionChange: PropTypes.func,
-    outcomeProficiency: shapes.outcomeProficiencyShape
+    outcomeProficiency: shapes.outcomeProficiencyShape,
   }
 
   static defaultProps = {
     onExpansionChange: () => {},
-    outcomeProficiency: null
+    outcomeProficiency: null,
   }
 
   constructor() {
@@ -82,7 +82,7 @@ class IndividualStudentMastery extends React.Component {
     this.setState(
       {
         expandedGroups: groups,
-        expandedOutcomes: outcomes
+        expandedOutcomes: outcomes,
       },
       () => this.notifyExpansionChange()
     )
@@ -92,7 +92,7 @@ class IndividualStudentMastery extends React.Component {
     this.setState(
       {
         expandedGroups: Set(),
-        expandedOutcomes: Set()
+        expandedOutcomes: Set(),
       },
       () => this.notifyExpansionChange()
     )
@@ -104,7 +104,7 @@ class IndividualStudentMastery extends React.Component {
         const {outcomeGroups, outcomes} = oldState
         return {
           expandedGroups: Set(outcomeGroups.map(g => g.id)),
-          expandedOutcomes: Set(outcomes.map(o => o.expansionId))
+          expandedOutcomes: Set(outcomes.map(o => o.expansionId)),
         }
       },
       () => this.notifyExpansionChange()
@@ -161,7 +161,7 @@ class IndividualStudentMastery extends React.Component {
     const {outcomeProficiency} = this.props
     return (
       <div>
-        <List isUnstyled>
+        <List isUnstyled={true}>
           {outcomeGroups.sort(natcompare.byKey('title')).map(outcomeGroup => (
             <List.Item key={outcomeGroup.id}>
               <OutcomeGroup

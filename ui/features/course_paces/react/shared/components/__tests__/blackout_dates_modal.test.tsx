@@ -29,7 +29,7 @@ const defaultProps = {
   open: true,
   blackoutDates: BLACKOUT_DATES,
   onCancel,
-  onSave
+  onSave,
 }
 
 describe('BlackoutDatesModal', () => {

@@ -23,14 +23,14 @@ import DashboardCardBox from './DashboardCardBox'
 import DefaultDragDropContext from './DefaultDragDropContext'
 
 const cardTarget = {
-  drop() {}
+  drop() {},
 }
 
 const getDroppableDashboardCardBox = (withDragDropContext = DefaultDragDropContext) =>
   compose(
     withDragDropContext,
     DropTarget(ItemTypes.CARD, cardTarget, connect => ({
-      connectDropTarget: connect.dropTarget()
+      connectDropTarget: connect.dropTarget(),
     }))
   )(DashboardCardBox)
 

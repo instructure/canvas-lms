@@ -35,12 +35,12 @@ import {
   OBSERVER_1,
   DATETIME_PATTERN,
   STOPWATCH_PATTERN,
-  SITE_ADMIN_ENV
+  SITE_ADMIN_ENV,
 } from '../../../util/test-constants'
 
 jest.mock('../../../util/utils', () => ({
   ...jest.requireActual('../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('CoursePeople', () => {
@@ -66,12 +66,12 @@ describe('CoursePeople', () => {
       return {
         matches: true,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '1024px'}
+      desktop: {minWidth: '1024px'},
     }))
   })
 
@@ -104,7 +104,7 @@ describe('CoursePeople', () => {
 
   it('should render cards with user data on tablet size screens and smaller', async () => {
     responsiveQuerySizes.mockImplementation(() => ({
-      tablet: {maxWidth: '100px'}
+      tablet: {maxWidth: '100px'},
     }))
     const container = setup(getRosterQueryMock({mockUsers}))
     expect(await container.findByRole('list')).toBeInTheDocument()

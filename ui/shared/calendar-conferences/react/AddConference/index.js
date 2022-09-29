@@ -33,7 +33,7 @@ const AddConference = ({
   conferenceTypes,
   setConference,
   inputRef,
-  disabled
+  disabled,
 }) => {
   const localInputRef = useRef(null)
   const [isRetrievingLTI, setRetrievingLTI] = useState(false)
@@ -43,7 +43,7 @@ const AddConference = ({
     setConference({
       conference_type: type.type,
       title: I18n.t('%{name} Conference', {name: type.name}),
-      description: ''
+      description: '',
     })
   }
 
@@ -73,7 +73,7 @@ const AddConference = ({
         conference_type: 'LtiConference',
         title: title || I18n.t('%{name} Conference', {name: selectedType.name}),
         description: description || '',
-        lti_settings: ltiSettings
+        lti_settings: ltiSettings,
       })
     },
     [selectedType, setConference]
@@ -130,13 +130,13 @@ AddConference.propTypes = {
   currentConferenceType: webConferenceType,
   setConference: PropTypes.func.isRequired,
   inputRef: PropTypes.func,
-  disabled: PropTypes.bool
+  disabled: PropTypes.bool,
 }
 
 AddConference.defaultProps = {
   currentConferenceType: null,
   inputRef: null,
-  disabled: false
+  disabled: false,
 }
 
 export default AddConference

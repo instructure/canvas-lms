@@ -26,7 +26,7 @@ import {
   opportunities,
   createPlannerMocks,
   defaultK5DashboardProps as defaultProps,
-  defaultEnv
+  defaultEnv,
 } from './mocks'
 import {resetCardCache} from '@canvas/dashboard-card'
 import {MOCK_CARDS, MOCK_CARDS_2} from '@canvas/k5/react/__tests__/fixtures'
@@ -35,7 +35,7 @@ import {fetchShowK5Dashboard} from '@canvas/observer-picker/react/utils'
 jest.useFakeTimers()
 jest.mock('@canvas/observer-picker/react/utils', () => ({
   ...jest.requireActual('@canvas/observer-picker/react/utils'),
-  fetchShowK5Dashboard: jest.fn()
+  fetchShowK5Dashboard: jest.fn(),
 }))
 
 const currentUserId = defaultProps.currentUser.id
@@ -63,15 +63,15 @@ describe('K5Dashboard Parent Support', () => {
       points_possible: 10,
       html_url: '/courses/23/assignments/3',
       due_at: '2021-02-15T05:59:00Z',
-      submission_types: ['online_text_entry']
-    }
+      submission_types: ['online_text_entry'],
+    },
   ]
 
   it('shows picker when user is an observer', () => {
     const {getByTestId} = render(
       <K5Dashboard
         {...defaultProps}
-        canAddObservee
+        canAddObservee={true}
         currentUserRoles={['user', 'observer']}
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
       />
@@ -84,14 +84,14 @@ describe('K5Dashboard Parent Support', () => {
   it('prefetches dashboard cards with the correct url param', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
       status: 200,
-      response: MOCK_CARDS
+      response: MOCK_CARDS,
     })
 
     render(
       <K5Dashboard
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
-        canAddObservee
+        canAddObservee={true}
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
       />
     )
@@ -110,17 +110,17 @@ describe('K5Dashboard Parent Support', () => {
   it('does not make a request if the user has been already requested', async () => {
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
       status: 200,
-      response: MOCK_CARDS
+      response: MOCK_CARDS,
     })
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
       status: 200,
-      response: MOCK_CARDS_2
+      response: MOCK_CARDS_2,
     })
     const {findByText, getByTestId, getByText, queryByText} = render(
       <K5Dashboard
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
-        canAddObservee
+        canAddObservee={true}
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
       />
     )
@@ -155,21 +155,21 @@ describe('K5Dashboard Parent Support', () => {
     moxios.requests.reset()
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=4', {
       status: 200,
-      response: MOCK_CARDS
+      response: MOCK_CARDS,
     })
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
       status: 200,
-      response: MOCK_CARDS_2
+      response: MOCK_CARDS_2,
     })
     moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=4.*/, {
       status: 200,
       headers: {link: 'url; rel="current"'},
-      response: opportunities
+      response: opportunities,
     })
     moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submissions\?.*observed_user_id=2.*/, {
       status: 200,
       headers: {link: 'url; rel="current"'},
-      response: opportunities2
+      response: opportunities2,
     })
     createPlannerMocks()
 
@@ -178,8 +178,8 @@ describe('K5Dashboard Parent Support', () => {
         {...defaultProps}
         currentUserRoles={['user', 'observer', 'teacher']}
         observedUsersList={MOCK_OBSERVED_USERS_LIST}
-        canAddObservee
-        plannerEnabled
+        canAddObservee={true}
+        plannerEnabled={true}
       />
     )
     // let the dashboard execute all its queries and render
@@ -192,17 +192,19 @@ describe('K5Dashboard Parent Support', () => {
 
     const missingItemsLink = await findByTestId('number-missing')
     expect(missingItemsLink).toBeInTheDocument()
-    expect(missingItemsLink).toHaveTextContent('View 2 missing items for course Economics 1012 missing')
+    expect(missingItemsLink).toHaveTextContent(
+      'View 2 missing items for course Economics 1012 missing'
+    )
 
     const observerSelect = getByTestId('observed-student-dropdown')
     act(() => observerSelect.click())
     act(() => getByText('Student 2').click())
 
-    await waitFor(
-      () => {
-        expect(getByTestId('number-missing')).toHaveTextContent('View 1 missing items for course Economics 203')
-      }
-    )
+    await waitFor(() => {
+      expect(getByTestId('number-missing')).toHaveTextContent(
+        'View 1 missing items for course Economics 203'
+      )
+    })
     expect(getByTestId('number-missing')).toBeInTheDocument()
   })
 
@@ -222,9 +224,7 @@ describe('K5Dashboard Parent Support', () => {
     act(() => select.click())
     act(() => getByText('Student 4').click())
     expect(select.value).toBe('Student 4')
-    await waitFor(() =>
-      expect(queryByTestId('k5-dashboard-options')).not.toBeInTheDocument()
-    )
+    await waitFor(() => expect(queryByTestId('k5-dashboard-options')).not.toBeInTheDocument())
   })
 
   describe('switching to classic student', () => {
@@ -236,14 +236,14 @@ describe('K5Dashboard Parent Support', () => {
       reloadMock = jest.fn()
       Object.defineProperty(window, 'location', {
         configurable: true,
-        value: {...window.location, reload: reloadMock}
+        value: {...window.location, reload: reloadMock},
       })
     })
 
     afterAll(() => {
       Object.defineProperty(window, 'location', {
         configurable: true,
-        value: originalLocation
+        value: originalLocation,
       })
     })
 
@@ -258,8 +258,8 @@ describe('K5Dashboard Parent Support', () => {
           {...defaultProps}
           currentUserRoles={['user', 'observer', 'teacher']}
           observedUsersList={MOCK_OBSERVED_USERS_LIST}
-          canAddObservee
-          plannerEnabled
+          canAddObservee={true}
+          plannerEnabled={true}
         />
       )
       const select = await findByRole('combobox', {name: 'Select a student to view'})
@@ -271,7 +271,7 @@ describe('K5Dashboard Parent Support', () => {
     it('does not reload the page if observer_picker is off', async () => {
       moxios.stubRequest('/api/v1/dashboard/dashboard_cards?observed_user_id=2', {
         status: 200,
-        response: MOCK_CARDS_2
+        response: MOCK_CARDS_2,
       })
 
       const {findByRole, getByText, findByText} = render(
@@ -279,8 +279,8 @@ describe('K5Dashboard Parent Support', () => {
           {...defaultProps}
           currentUserRoles={['user', 'observer', 'teacher']}
           observedUsersList={MOCK_OBSERVED_USERS_LIST}
-          canAddObservee
-          plannerEnabled
+          canAddObservee={true}
+          plannerEnabled={true}
           observerPickerEnabled={false}
         />
       )

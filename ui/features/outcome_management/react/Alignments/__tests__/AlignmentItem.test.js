@@ -30,7 +30,7 @@ describe('AlignmentItem', () => {
     moduleUrl: '/courses/1/modules/1',
     moduleWorkflowState: 'active',
     assignmentContentType: 'Assignment',
-    ...props
+    ...props,
   })
 
   it('renders component', () => {

@@ -28,16 +28,16 @@ describe('ImportantInfoLayout', () => {
         courseId: '10',
         courseName: 'Homeroom 1',
         canEdit: true,
-        content: '<p>Hello 1!</p>'
+        content: '<p>Hello 1!</p>',
       },
       {
         courseId: '11',
         courseName: 'Homeroom 2',
         canEdit: false,
-        content: '<p>Hello 2!</p>'
-      }
+        content: '<p>Hello 2!</p>',
+      },
     ],
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {
@@ -58,8 +58,8 @@ describe('ImportantInfoLayout', () => {
         courseId: '10',
         courseName: 'Homeroom 1',
         canEdit: true,
-        content: '<p>Hello 1!</p>'
-      }
+        content: '<p>Hello 1!</p>',
+      },
     ]
     const {getByText, queryByText, getByRole} = render(
       <ImportantInfoLayout {...getProps({importantInfos})} />

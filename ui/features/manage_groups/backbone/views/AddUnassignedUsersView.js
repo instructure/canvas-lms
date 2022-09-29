@@ -26,8 +26,8 @@ export default class AddUnassignedUsersView extends CollectionView {
       ...options,
       itemView: View.extend({tagName: 'li'}),
       itemViewOptions: {
-        template: itemTemplate
-      }
+        template: itemTemplate,
+      },
     })
   }
 
@@ -55,7 +55,7 @@ export default class AddUnassignedUsersView extends CollectionView {
         this.collection.options.params != null
           ? this.collection.options.params.search_term
           : undefined,
-      termError: this.collection.termError
+      termError: this.collection.termError,
     }
   }
 }

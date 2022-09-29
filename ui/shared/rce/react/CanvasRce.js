@@ -79,7 +79,7 @@ const CanvasRce = forwardRef(function CanvasRce(props, rceRef) {
   })
   const [autosave_] = useState({
     enabled: true,
-    interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
+    interval: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
   })
   const [refCreated, setRefCreated] = useState(null)
 
@@ -173,7 +173,7 @@ CanvasRce.propTypes = {
   onFocus: func, // f(RCEWrapper component) (sorry)
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)
-  onContentChange: func // f(content), don't mistake this as an indication CanvasRce is a controlled component
+  onContentChange: func, // f(content), don't mistake this as an indication CanvasRce is a controlled component
 }
 
 CanvasRce.defaultProps = {
@@ -189,5 +189,5 @@ CanvasRce.defaultProps = {
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},
-  onInit: () => {}
+  onInit: () => {},
 }

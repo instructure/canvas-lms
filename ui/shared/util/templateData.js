@@ -29,13 +29,13 @@ import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
 //    and globally replaces "{{ value }}" with data[value].  Useful for adding
 //    new elements asynchronously, when you don't know what their URL will be
 //    until they're created.
-$.fn.fillTemplateData = function(options) {
+$.fn.fillTemplateData = function (options) {
   if (this.length && options) {
     if (options.iterator) {
       //  todo: replace .andSelf with .addBack when JQuery is upgraded.
       this.find('*')
         .andSelf()
-        .each(function() {
+        .each(function () {
           const $el = $(this)
           $.each(['name', 'id', 'class'], (i, attr) => {
             if ($el.attr(attr)) {
@@ -58,7 +58,7 @@ $.fn.fillTemplateData = function(options) {
         }
         const $found_all = this.find('.' + item)
         var avoid = options.avoid || ''
-        $found_all.each(function() {
+        $found_all.each(function () {
           const $found = $(this)
           if ($found.length > 0 && $found.closest(avoid).length === 0) {
             if (typeof options.data[item] === 'undefined' || options.data[item] === null) {
@@ -84,7 +84,7 @@ $.fn.fillTemplateData = function(options) {
       }
     }
     if (options.hrefValues && options.data) {
-      this.find('a,span[rel]').each(function() {
+      this.find('a,span[rel]').each(function () {
         let $obj = $(this),
           oldHref,
           oldRel,
@@ -124,7 +124,7 @@ $.fn.fillTemplateData.defaults = {htmlValues: null, hrefValues: null}
 
 // Reverse version of fillTemplateData.  Lets you pull out the string versions of values held in divs, spans, etc.
 // Based on the usage of class names within an object to specify an object's sub-parts.
-$.fn.getTemplateData = function(options) {
+$.fn.getTemplateData = function (options) {
   if (!this.length || !options) {
     return {}
   }
@@ -170,7 +170,7 @@ $.fn.getTemplateData = function(options) {
   return result
 }
 
-$.fn.getTemplateValue = function(value, options) {
+$.fn.getTemplateValue = function (value, options) {
   const opts = $.extend({}, options, {textValues: [value]})
   return this.getTemplateData(opts)[value]
 }

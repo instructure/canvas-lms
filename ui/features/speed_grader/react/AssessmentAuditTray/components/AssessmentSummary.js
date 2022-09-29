@@ -65,7 +65,7 @@ export default function AssessmentSummary(props) {
     overallAnonymityDescription = I18n.t('Anonymous was never turned on')
   } else {
     overallAnonymityDescription = (
-      <FriendlyDatetime dateTime={anonymityDate} prefix={I18n.t('As of')} showTime />
+      <FriendlyDatetime dateTime={anonymityDate} prefix={I18n.t('As of')} showTime={true} />
     )
   }
 
@@ -93,7 +93,7 @@ export default function AssessmentSummary(props) {
           </PresentationContent>
 
           <Text fontStyle="italic" size="small">
-            <FriendlyDatetime dateTime={props.finalGradeDate} showTime />
+            <FriendlyDatetime dateTime={props.finalGradeDate} showTime={true} />
           </Text>
         </Text>
       </Flex.Item>
@@ -104,7 +104,7 @@ export default function AssessmentSummary(props) {
         <Text as="div">{I18n.t('Posted to student')}</Text>
 
         <Text as="div" fontStyle="italic" size="small" weight="bold">
-          <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime />
+          <FriendlyDatetime dateTime={props.assignment.gradesPublishedAt} showTime={true} />
         </Text>
       </Flex.Item>
 
@@ -136,15 +136,15 @@ AssessmentSummary.propTypes = {
   anonymityDate: propTypes.anonymityDate,
   assignment: shape({
     gradesPublishedAt: string,
-    pointsPossible: number
+    pointsPossible: number,
   }).isRequired,
   finalGradeDate: propTypes.finalGradeDate.isRequired,
   overallAnonymity: propTypes.overallAnonymity.isRequired,
   submission: shape({
-    score: number
-  }).isRequired
+    score: number,
+  }).isRequired,
 }
 
 AssessmentSummary.defaultProps = {
-  anonymityDate: null
+  anonymityDate: null,
 }

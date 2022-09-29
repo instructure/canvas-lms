@@ -32,9 +32,7 @@ const apiUserContent = {
       // only ever gets put there by us (in Api::Html::Content::apply_mathml).
       // Any user content that gets sent to the server will have the
       // x-canvaslms-safe-mathml attribute stripped out.
-      const mathml = $('<div/>')
-        .html($equationImage.attr('x-canvaslms-safe-mathml'))
-        .html()
+      const mathml = $('<div/>').html($equationImage.attr('x-canvaslms-safe-mathml')).html()
       const mathmlSpan = $('<span class="hidden-readable"></span>')
       mathmlSpan.html(mathml)
       return mathmlSpan
@@ -64,7 +62,7 @@ const apiUserContent = {
     // finds any <video/audio class="instructure_inline_media_comment"> and turns them into media comment thumbnails
     $dummy
       .find('video.instructure_inline_media_comment,audio.instructure_inline_media_comment')
-      .replaceWith(function() {
+      .replaceWith(function () {
         return apiUserContent.toMediaCommentLink(this)
       })
 
@@ -81,7 +79,7 @@ const apiUserContent = {
       // content handling
       $dummy
         .find('object.instructure_user_content,embed.instructure_user_content')
-        .replaceWith(function() {
+        .replaceWith(function () {
           const $this = $(this)
           if (!$this.data('uc_snippet') || !$this.data('uc_sig')) {
             return this
@@ -104,13 +102,13 @@ const apiUserContent = {
           $form.append(
             $("<input type='hidden'/>").attr({
               name: 'object_data',
-              value: $this.data('uc_snippet')
+              value: $this.data('uc_snippet'),
             })
           )
           $form.append(
             $("<input type='hidden'/>").attr({
               name: 's',
-              value: $this.data('uc_sig')
+              value: $this.data('uc_sig'),
             })
           )
           $('body').append($form)
@@ -136,7 +134,7 @@ const apiUserContent = {
       })
     }
     return $dummy.html()
-  }
+  },
 }
 
 export default apiUserContent

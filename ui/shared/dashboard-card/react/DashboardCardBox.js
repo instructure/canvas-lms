@@ -36,7 +36,7 @@ export default class DashboardCardBox extends React.Component {
     hideColorOverlays: PropTypes.bool,
     connectDropTarget: PropTypes.func,
     showSplitDashboardView: PropTypes.bool,
-    observedUserId: PropTypes.string
+    observedUserId: PropTypes.string,
   }
 
   static defaultProps = {
@@ -44,21 +44,21 @@ export default class DashboardCardBox extends React.Component {
     headingLevel: 'h2',
     hideColorOverlays: false,
     connectDropTarget: el => el,
-    showSplitDashboardView: false
+    showSplitDashboardView: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      observedUserId: props.observedUserId
+      observedUserId: props.observedUserId,
     }
     this.handleRerenderCards = this.handleRerenderCards.bind(this)
   }
 
   UNSAFE_componentWillMount() {
     this.setState({
-      courseCards: this.props.courseCards
+      courseCards: this.props.courseCards,
     })
   }
 
@@ -73,7 +73,7 @@ export default class DashboardCardBox extends React.Component {
     // Only reset card state if the passed-in card props actually changed
     if (this.props.courseCards !== newProps.courseCards) {
       this.setState({
-        courseCards: newProps.courseCards
+        courseCards: newProps.courseCards,
       })
     }
   }
@@ -108,7 +108,7 @@ export default class DashboardCardBox extends React.Component {
     })
     this.setState(
       {
-        courseCards: newCards
+        courseCards: newCards,
       },
       () => {
         MovementUtils.updatePositions(this.state.courseCards, window.ENV.current_user_id)
@@ -126,7 +126,7 @@ export default class DashboardCardBox extends React.Component {
     newCards.splice(cardIndex, 1)
     this.setState(
       {
-        courseCards: newCards
+        courseCards: newCards,
       },
       () => {
         if (newCards.length === 0) {
@@ -194,7 +194,7 @@ export default class DashboardCardBox extends React.Component {
         <div className="ic-DashboardCard__box">
           <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Published Courses (%{count})`, {
-              count: I18n.n(publishedCourses.length)
+              count: I18n.n(publishedCourses.length),
             })}
           </HeadingElement>
           {publishedCourses.length > 0 ? (
@@ -206,7 +206,7 @@ export default class DashboardCardBox extends React.Component {
         <div className="ic-DashboardCard__box">
           <HeadingElement className="ic-DashboardCard__box__header">
             {I18n.t(`Unpublished Courses (%{count})`, {
-              count: I18n.n(unpublishedCourses.length)
+              count: I18n.n(unpublishedCourses.length),
             })}
           </HeadingElement>
           {unpublishedCourses.length > 0 ? (

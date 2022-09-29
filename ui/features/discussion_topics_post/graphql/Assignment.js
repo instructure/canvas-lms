@@ -60,7 +60,7 @@ export const Assignment = {
     pointsPossible: number,
     assignmentOverrides: shape({nodes: arrayOf(AssignmentOverride.shape)}),
     assessmentRequest: arrayOf(AssessmentRequest.shape),
-    peerReviews: PeerReviews.shape
+    peerReviews: PeerReviews.shape,
   }),
 
   mock: ({
@@ -73,10 +73,10 @@ export const Assignment = {
     pointsPossible = 10,
     assignmentOverrides = {
       nodes: [AssignmentOverride.mock()],
-      __typename: 'AssignmentOverrideConnection'
+      __typename: 'AssignmentOverrideConnection',
     },
     assessmentRequestsForCurrentUser = [AssessmentRequest.mock()],
-    peerReviews = PeerReviews.mock()
+    peerReviews = PeerReviews.mock(),
   } = {}) => ({
     id,
     _id,
@@ -88,8 +88,8 @@ export const Assignment = {
     assignmentOverrides,
     assessmentRequestsForCurrentUser,
     peerReviews,
-    __typename: 'Assignment'
-  })
+    __typename: 'Assignment',
+  }),
 }
 
 export const DefaultMocks = {
@@ -102,7 +102,7 @@ export const DefaultMocks = {
     pointsPossible: 10,
     assignmentOverrides: {
       nodes: [AssignmentOverride.mock()],
-      __typename: 'AssignmentOverrideConnection'
-    }
-  })
+      __typename: 'AssignmentOverrideConnection',
+    },
+  }),
 }

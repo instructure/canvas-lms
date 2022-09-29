@@ -46,22 +46,22 @@ export const MessageDetailItem = ({...props}) => {
           usernames: 'x-small',
           courseNameDate: 'x-small',
           messageBody: 'x-small',
-          dataTestId: 'message-detail-item-mobile'
+          dataTestId: 'message-detail-item-mobile',
         },
         tablet: {
           avatar: 'medium',
           usernames: 'small',
           courseNameDate: 'x-small',
           messageBody: 'small',
-          dataTestId: 'message-detail-item-tablet'
+          dataTestId: 'message-detail-item-tablet',
         },
         desktop: {
           avatar: 'medium',
           usernames: 'medium',
           courseNameDate: 'x-small',
           messageBody: 'medium',
-          dataTestId: 'message-detail-item-desktop'
-        }
+          dataTestId: 'message-detail-item-desktop',
+        },
       }}
       render={responsiveProps => (
         <>
@@ -74,7 +74,7 @@ export const MessageDetailItem = ({...props}) => {
                 src={props.conversationMessage.author.avatarUrl}
               />
             </Flex.Item>
-            <Flex.Item shouldShrink shouldGrow>
+            <Flex.Item shouldShrink={true} shouldGrow={true}>
               <Flex direction="column">
                 <Flex.Item>
                   <MessageDetailParticipants
@@ -107,7 +107,7 @@ export const MessageDetailItem = ({...props}) => {
           </Flex>
           <Text size={responsiveProps.messageBody}>{props.conversationMessage.body}</Text>
           {props.conversationMessage.attachmentsConnection?.nodes?.length > 0 && (
-            <List isUnstyled margin="medium auto small">
+            <List isUnstyled={true} margin="medium auto small">
               {props.conversationMessage.attachmentsConnection.nodes.map(attachment => {
                 return (
                   <List.Item as="div" key={attachment.id}>
@@ -135,9 +135,9 @@ MessageDetailItem.propTypes = {
   onReply: PropTypes.func,
   onReplyAll: PropTypes.func,
   onDelete: PropTypes.func,
-  onForward: PropTypes.func
+  onForward: PropTypes.func,
 }
 
 MessageDetailItem.defaultProps = {
-  conversationMessage: {}
+  conversationMessage: {},
 }

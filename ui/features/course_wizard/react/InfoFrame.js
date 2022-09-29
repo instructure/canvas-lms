@@ -35,7 +35,7 @@ const courseNotSetUpItem = {
   get warning() {
     return I18n.t('This course is visible only to teachers until it is published.')
   },
-  iconClass: 'icon-instructure'
+  iconClass: 'icon-instructure',
 }
 
 const checklistComplete = {
@@ -44,7 +44,7 @@ const checklistComplete = {
       "Now that your course is set up and available, you probably won't need this checklist anymore. But we'll keep it around in case you realize later you want to try something new, or you just want a little extra help as you make changes to your course content."
     )
   },
-  iconClass: 'icon-instructure'
+  iconClass: 'icon-instructure',
 }
 
 class InfoFrame extends React.Component {
@@ -52,17 +52,17 @@ class InfoFrame extends React.Component {
 
   static propTypes = {
     closeModal: PropTypes.func.isRequired,
-    className: PropTypes.string
+    className: PropTypes.string,
   }
 
   state = {
-    itemShown: courseNotSetUpItem
+    itemShown: courseNotSetUpItem,
   }
 
   componentWillMount() {
     if (window.ENV.COURSE_WIZARD.checklist_states.publish_step) {
       this.setState({
-        itemShown: checklistComplete
+        itemShown: checklistComplete,
       })
     }
   }
@@ -76,7 +76,7 @@ class InfoFrame extends React.Component {
 
     this.setState(
       {
-        itemShown: item
+        itemShown: item,
       },
       function () {
         const $messageBox = $(this.messageBox)

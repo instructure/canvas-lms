@@ -23,7 +23,7 @@ import {
   accountMocks,
   smallOutcomeTree,
   moveOutcomeMock,
-  groupMocks
+  groupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
@@ -48,8 +48,8 @@ describe('OutcomeMoveModal', () => {
           linkId: `${ind + 1}`,
           title: `Outcome ${101 + ind}`,
           canUnlink: true,
-          parentGroupId
-        }
+          parentGroupId,
+        },
       }),
       {}
     )
@@ -61,9 +61,9 @@ describe('OutcomeMoveModal', () => {
     outcomes: generateOutcomes(1),
     initialTargetGroup: {
       id: '1',
-      name: 'Root account folder'
+      name: 'Root account folder',
     },
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -78,8 +78,8 @@ describe('OutcomeMoveModal', () => {
         title: 'Root account folder',
         groupId: '1',
         childGroupTitlePrefix: 'Account folder',
-        childGroupOffset: 100
-      })
+        childGroupOffset: 100,
+      }),
     ]
   })
 
@@ -94,7 +94,7 @@ describe('OutcomeMoveModal', () => {
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
       mocks = defaultMocks,
-      treeBrowserRootGroupId = '1'
+      treeBrowserRootGroupId = '1',
     } = {}
   ) => {
     return realRender(
@@ -152,7 +152,7 @@ describe('OutcomeMoveModal', () => {
 
   it('enables the move button by default', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
-      mocks: [...smallOutcomeTree()]
+      mocks: [...smallOutcomeTree()],
     })
     await act(async () => jest.runAllTimers())
     expect(getByText('Move').closest('button')).toBeEnabled()
@@ -160,7 +160,7 @@ describe('OutcomeMoveModal', () => {
 
   it('enables the move button when a child group is selected', async () => {
     const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
-      mocks: [...defaultMocks, ...smallOutcomeTree()]
+      mocks: [...defaultMocks, ...smallOutcomeTree()],
     })
     await act(async () => jest.runAllTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -174,8 +174,8 @@ describe('OutcomeMoveModal', () => {
       mocks: [
         ...defaultMocks,
         ...smallOutcomeTree('Account'),
-        moveOutcomeMock({outcomeLinkIds: ['1']})
-      ]
+        moveOutcomeMock({outcomeLinkIds: ['1']}),
+      ],
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -184,12 +184,12 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '"Outcome 101" has been moved to "Account folder 1".',
-      type: 'success'
+      type: 'success',
     })
     expect(onSuccess).toHaveBeenCalledWith({
       movedOutcomeLinkIds: ['1'],
       groupId: '101',
-      targetAncestorsIds: ['101', '1']
+      targetAncestorsIds: ['101', '1'],
     })
   })
 
@@ -200,9 +200,9 @@ describe('OutcomeMoveModal', () => {
         ...smallOutcomeTree('Account'),
         moveOutcomeMock({
           failResponse: true,
-          outcomeLinkIds: ['1']
-        })
-      ]
+          outcomeLinkIds: ['1'],
+        }),
+      ],
     })
     await act(async () => jest.runOnlyPendingTimers())
     fireEvent.click(getByText('Account folder 1'))
@@ -211,7 +211,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving this outcome. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -222,8 +222,8 @@ describe('OutcomeMoveModal', () => {
         mocks: [
           ...defaultMocks,
           ...smallOutcomeTree('Account'),
-          moveOutcomeMock({outcomeLinkIds: ['1']})
-        ]
+          moveOutcomeMock({outcomeLinkIds: ['1']}),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -238,8 +238,8 @@ describe('OutcomeMoveModal', () => {
         mocks: [
           ...defaultMocks,
           ...smallOutcomeTree('Account'),
-          moveOutcomeMock({outcomeLinkIds: ['1']})
-        ]
+          moveOutcomeMock({outcomeLinkIds: ['1']}),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -252,7 +252,7 @@ describe('OutcomeMoveModal', () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
       {
-        mocks: [...defaultMocks, ...smallOutcomeTree(), moveOutcomeMock()]
+        mocks: [...defaultMocks, ...smallOutcomeTree(), moveOutcomeMock()],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -262,12 +262,12 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '2 outcomes have been moved to "Account folder 1".',
-      type: 'success'
+      type: 'success',
     })
     expect(onSuccess).toHaveBeenCalledWith({
       movedOutcomeLinkIds: ['1', '2'],
       groupId: '101',
-      targetAncestorsIds: ['101', '1']
+      targetAncestorsIds: ['101', '1'],
     })
   })
 
@@ -279,9 +279,9 @@ describe('OutcomeMoveModal', () => {
           ...defaultMocks,
           ...smallOutcomeTree(),
           moveOutcomeMock({
-            failResponse: true
-          })
-        ]
+            failResponse: true,
+          }),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -291,7 +291,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -303,9 +303,9 @@ describe('OutcomeMoveModal', () => {
           ...defaultMocks,
           ...smallOutcomeTree(),
           moveOutcomeMock({
-            failMutation: true
-          })
-        ]
+            failMutation: true,
+          }),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -315,7 +315,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -327,9 +327,9 @@ describe('OutcomeMoveModal', () => {
           ...defaultMocks,
           ...smallOutcomeTree(),
           moveOutcomeMock({
-            failMutationNoErrMsg: true
-          })
-        ]
+            failMutationNoErrMsg: true,
+          }),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -339,7 +339,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -351,9 +351,9 @@ describe('OutcomeMoveModal', () => {
           ...defaultMocks,
           ...smallOutcomeTree(),
           moveOutcomeMock({
-            partialSuccess: true
-          })
-        ]
+            partialSuccess: true,
+          }),
+        ],
       }
     )
     await act(async () => jest.runOnlyPendingTimers())
@@ -363,7 +363,7 @@ describe('OutcomeMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving these outcomes. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 })

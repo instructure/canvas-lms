@@ -47,7 +47,7 @@ class ItemCog extends React.Component {
     userCanEditFilesForContext: PropTypes.bool,
     userCanDeleteFilesForContext: PropTypes.bool,
     userCanRestrictFilesForContext: PropTypes.bool.isRequired,
-    usageRightsRequiredForContext: PropTypes.bool
+    usageRightsRequiredForContext: PropTypes.bool,
   }
 
   constructor(props) {
@@ -92,7 +92,7 @@ class ItemCog extends React.Component {
   openUsageRightsDialog = event => {
     const contents = (
       <UsageRightsDialog
-        isOpen
+        isOpen={true}
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={[this.props.model]}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
@@ -149,7 +149,7 @@ class ItemCog extends React.Component {
         let args = {
           contextType,
           contextId,
-          returnFocusTo: ReactDOM.findDOMNode(this.settingsCogBtnRef.current)
+          returnFocusTo: ReactDOM.findDOMNode(this.settingsCogBtnRef.current),
         }
 
         args = $.extend(args, params)
@@ -244,7 +244,7 @@ class ItemCog extends React.Component {
               href="#"
               onClick={wrap(openMoveDialog, {
                 clearSelectedItems: this.props.clearSelectedItems,
-                onMove: this.props.onMove
+                onMove: this.props.onMove,
               })}
               data-testid="move"
               role="menuitem"
@@ -304,7 +304,7 @@ class ItemCog extends React.Component {
           className="al-trigger al-trigger-gray btn btn-link"
           aria-label={I18n.t('Actions')}
           data-popup-within="#application"
-          data-append-to-body
+          data-append-to-body={true}
         >
           <i className="icon-more" />
         </button>

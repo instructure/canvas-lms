@@ -42,7 +42,7 @@ const LegacyFileUpload = ({index}) => {
 }
 
 LegacyFileUpload.propTypes = {
-  index: PropTypes.number.isRequired
+  index: PropTypes.number.isRequired,
 }
 
 const Attachment = ({index, setBlob}) => {
@@ -94,7 +94,7 @@ const Attachment = ({index, setBlob}) => {
             style={{
               position: 'absolute',
               top: '0.4em',
-              [direction('right')]: '0.4em'
+              [direction('right')]: '0.4em',
             }}
           >
             <Focus timeout={500}>
@@ -136,7 +136,7 @@ const Attachment = ({index, setBlob}) => {
 
 Attachment.propTypes = {
   index: PropTypes.number.isRequired,
-  setBlob: PropTypes.func.isRequired
+  setBlob: PropTypes.func.isRequired,
 }
 
 Attachment.defaultProps = {}

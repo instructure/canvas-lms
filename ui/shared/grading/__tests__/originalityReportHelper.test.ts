@@ -24,7 +24,7 @@ function submission(overrides = {}) {
     id: 1,
     _id: 1,
     submitted_at: '05 October 2011 14:48 UTC',
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -39,8 +39,8 @@ describe('originalityReportSubmissionKey', () => {
     const gqlSubmission = await mockSubmission({
       Submission: {
         submittedAt: '2011-10-05T14:48:00Z',
-        id: 1
-      }
+        id: 1,
+      },
     })
     expect(originalityReportSubmissionKey(gqlSubmission)).toEqual(
       'submission_1_2011-10-05T14:48:00Z'
@@ -49,7 +49,7 @@ describe('originalityReportSubmissionKey', () => {
 
   describe('when the submission does not have a valid "submitted_at"', () => {
     const overrides = {
-      submitted_at: 'banana'
+      submitted_at: 'banana',
     }
 
     it('returns the an empty string', () => {
@@ -65,32 +65,32 @@ describe('getOriginalityData', () => {
       state: 'acceptable',
       report_url: 'http://example.com',
       status: 'scored',
-      data: '{}'
+      data: '{}',
     },
     attachment_2: {
       similarity_score: 10,
       state: 'error',
       report_url: 'http://example.com',
       status: 'error',
-      data: '{}'
+      data: '{}',
     },
     attachment_3: {
-      data: null
+      data: null,
     },
     submission_1: {
       similarity_score: 10,
       state: 'acceptable',
       report_url: 'http://example.com',
       status: 'scored',
-      data: '{}'
+      data: '{}',
     },
     'submission_4_2011-10-05T14:48:00Z': {
       similarity_score: 99,
       state: 'acceptable',
       report_url: 'http://example.com',
       status: 'scored',
-      data: '{}'
-    }
+      data: '{}',
+    },
   }
 
   const attachments = [
@@ -101,7 +101,7 @@ describe('getOriginalityData', () => {
       mimeClass: 'image',
       submissionPreviewUrl: '/preview_url',
       thumbnailUrl: '/thumbnail_url',
-      url: '/url'
+      url: '/url',
     },
     {
       _id: '2',
@@ -110,7 +110,7 @@ describe('getOriginalityData', () => {
       mimeClass: 'image',
       submissionPreviewUrl: '/preview_url',
       thumbnailUrl: '/thumbnail_url',
-      url: '/url'
+      url: '/url',
     },
     {
       _id: '3',
@@ -119,8 +119,8 @@ describe('getOriginalityData', () => {
       mimeClass: 'image',
       submissionPreviewUrl: '/preview_url',
       thumbnailUrl: '/thumbnail_url',
-      url: '/url'
-    }
+      url: '/url',
+    },
   ]
 
   it('returns the camelized data if there is data associated with an attachment with a score and report', () => {
@@ -129,7 +129,7 @@ describe('getOriginalityData', () => {
       score: 0,
       state: 'acceptable',
       reportUrl: 'http://example.com',
-      status: 'scored'
+      status: 'scored',
     })
   })
 
@@ -150,14 +150,14 @@ describe('getOriginalityData', () => {
         _id: 4,
         submittedAt: '2011-10-05T14:48:00Z',
         originalityData,
-        submissionType: 'online_text_entry'
-      }
+        submissionType: 'online_text_entry',
+      },
     })
     expect(getOriginalityData(gqlSubmission, 0)).toEqual({
       score: 99,
       state: 'acceptable',
       reportUrl: 'http://example.com',
-      status: 'scored'
+      status: 'scored',
     })
   })
 
@@ -167,7 +167,7 @@ describe('getOriginalityData', () => {
       score: 10,
       state: 'acceptable',
       reportUrl: 'http://example.com',
-      status: 'scored'
+      status: 'scored',
     })
   })
 })

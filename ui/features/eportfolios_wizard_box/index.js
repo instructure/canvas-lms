@@ -46,10 +46,8 @@ $(document).ready(() => {
 
   $('.page_add_subsection_hover').on('mouseover focus', () => $('#edit_page_sidebar ul').indicate())
 
-  $('#wizard_box').bind('wizard_opened', function() {
-    $(this)
-      .find('.option.information_step')
-      .click()
+  $('#wizard_box').bind('wizard_opened', function () {
+    $(this).find('.option.information_step').click()
   })
 
   $(document).bind('submission_dialog_opened', () => {

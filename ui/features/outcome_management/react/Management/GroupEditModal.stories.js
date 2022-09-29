@@ -27,11 +27,11 @@ export default {
     contextId: '1',
     outcomeGroup: {
       title: 'Grade 2',
-      description: 'This is the Amazing Group 2.'
+      description: 'This is the Amazing Group 2.',
     },
     isOpen: true,
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const Template = args => <GroupEditModal {...args} />
@@ -41,13 +41,13 @@ export const Default = Template.bind({})
 export const veryLongGroupTitle = Template.bind({})
 veryLongGroupTitle.args = {
   outcomeGroup: {
-    title: 'This is a very long title.'.repeat(10)
-  }
+    title: 'This is a very long title.'.repeat(10),
+  },
 }
 
 export const emptyGroupTitle = Template.bind({})
 emptyGroupTitle.args = {
   outcomeGroup: {
-    title: ''
-  }
+    title: '',
+  },
 }

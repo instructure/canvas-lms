@@ -36,12 +36,12 @@ const FastSelectComponent = Component.extend({
 
   didInsertElement() {
     const self = this
-    return this.$().on('change', function() {
+    return this.$().on('change', function () {
       return set(self, 'value', this.value)
     })
   },
 
-  valueDidChange: function() {
+  valueDidChange: function () {
     const {items} = this
     const {value} = this
     let selected = null
@@ -53,7 +53,7 @@ const FastSelectComponent = Component.extend({
     .observes('value')
     .on('init'),
 
-  itemsWillChange: function() {
+  itemsWillChange: function () {
     const {items} = this
     if (items) {
       items.removeArrayObserver(this)
@@ -63,7 +63,7 @@ const FastSelectComponent = Component.extend({
     .observesBefore('items')
     .on('willDestroyElement'),
 
-  itemsDidChange: function() {
+  itemsDidChange: function () {
     const {items} = this
     if (items) {
       items.addArrayObserver(this)
@@ -91,7 +91,7 @@ const FastSelectComponent = Component.extend({
     })()
   },
 
-  updateSelection: function() {
+  updateSelection: function () {
     const selected = get(this, 'selected')
     if (!selected) {
       return
@@ -104,7 +104,7 @@ const FastSelectComponent = Component.extend({
     }
   }.observes('selected'),
 
-  updateOptions: function() {
+  updateOptions: function () {
     this.arrayWillChange(this.items, 0, get(this.items, 'length'), 0)
     this.arrayDidChange(this.items, 0, 0, get(this.items, 'length'))
   }.observes('labelPath'),
@@ -138,7 +138,7 @@ const FastSelectComponent = Component.extend({
     set(this, 'value', select.value)
   },
 
-  insertDefaultOption: function() {
+  insertDefaultOption: function () {
     if (!this.labelDefault || !!this.hasDefaultOption) {
       return
     }
@@ -151,7 +151,7 @@ const FastSelectComponent = Component.extend({
     set(this, 'hasDefaultOption', true)
   }
     .observes('items')
-    .on('didInsertElement')
+    .on('didInsertElement'),
 })
 
 export default FastSelectComponent

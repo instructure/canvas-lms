@@ -65,7 +65,7 @@ App.initializer({
   name: 'routes',
   initialize(container, application) {
     return application.Router.map(routes)
-  }
+  },
 })
 
 export default App.reopen({
@@ -81,5 +81,5 @@ export default App.reopen({
   AssignmentsView,
   LearningMasteryView,
   ScreenreaderGradebookView,
-  SelectionButtonsView
+  SelectionButtonsView,
 })

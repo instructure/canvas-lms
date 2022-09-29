@@ -73,7 +73,7 @@ describe('useFetchApi', () => {
     expect(meta).toHaveBeenCalled()
     expect(meta.mock.calls[0][0]).toMatchObject({
       link: {first: {page: '1'}},
-      response: {status: 200}
+      response: {status: 200},
     })
     expect(error).not.toHaveBeenCalled()
   })
@@ -156,7 +156,7 @@ describe('useFetchApi', () => {
     const meta = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({path}) => useFetchApi({success, error, meta, path}), {
-      initialProps: {path: '/api/v1/blah'}
+      initialProps: {path: '/api/v1/blah'},
     })
     await fetchMock.flush(true)
     rerender({path: '/api/v1/frog'})
@@ -174,7 +174,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
-      initialProps: {params: {foo: 42}}
+      initialProps: {params: {foo: 42}},
     })
     await fetchMock.flush(true)
     rerender({params: {foo: 44}})
@@ -191,7 +191,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({headers}) => useFetchApi({success, error, path, headers}), {
-      initialProps: {headers: {foo: 42}}
+      initialProps: {headers: {foo: 42}},
     })
     await fetchMock.flush(true)
     rerender({headers: {foo: 44}})
@@ -208,7 +208,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({fetchOpts}) => useFetchApi({success, error, path, fetchOpts}), {
-      initialProps: {fetchOpts: {foo: 42}}
+      initialProps: {fetchOpts: {foo: 42}},
     })
     await fetchMock.flush(true)
     rerender({fetchOpts: {foo: 44}})
@@ -229,15 +229,15 @@ describe('useFetchApi', () => {
         path,
         params: {foo: 42},
         headers: {bar: 43},
-        fetchOpts: {bing: 44}
-      }
+        fetchOpts: {bing: 44},
+      },
     })
     await fetchMock.flush(true)
     rerender({
       path,
       params: {foo: 42},
       headers: {bar: 43},
-      fetchOpts: {bing: 44}
+      fetchOpts: {bing: 44},
     })
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
@@ -256,7 +256,7 @@ describe('useFetchApi', () => {
   it('only reports forceResult once if it has not changed', () => {
     const success = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, path: '/blah', forceResult: {fake: 'news'}}
+      initialProps: {success, path: '/blah', forceResult: {fake: 'news'}},
     })
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     rerender({success, path: '/blah', forceResult: {fake: 'news'}})
@@ -267,7 +267,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const meta = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, meta, path: '/blah', forceResult: {fake: 'news'}}
+      initialProps: {success, meta, path: '/blah', forceResult: {fake: 'news'}},
     })
     expect(success).toHaveBeenCalledWith({fake: 'news'})
     rerender({success, path: '/blah', forceResult: {other: 'thing'}})
@@ -282,7 +282,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const meta = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, meta, path, forceResult: {fake: 'news'}}
+      initialProps: {success, meta, path, forceResult: {fake: 'news'}},
     })
     rerender({success, meta, path})
     await fetchMock.flush(true)
@@ -298,7 +298,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const meta = jest.fn()
     const {rerender} = renderHook(props => useFetchApi(props), {
-      initialProps: {success, meta, path}
+      initialProps: {success, meta, path},
     })
     await fetchMock.flush(true)
     expect(fetchMock.done()).toBe(true)
@@ -316,7 +316,7 @@ describe('useFetchApi', () => {
     const meta = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, meta, error, path, params}), {
-      initialProps: {params: {foo: 42}}
+      initialProps: {params: {foo: 42}},
     })
     // don't wait for flush, just start another one
     rerender({params: {foo: 44}})
@@ -335,7 +335,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
-      initialProps: {params: {foo: 42}}
+      initialProps: {params: {foo: 42}},
     })
     // don't wait for flush, just start another one
     rerender({params: {foo: 44}})
@@ -352,7 +352,7 @@ describe('useFetchApi', () => {
     const success = jest.fn()
     const error = jest.fn()
     const {rerender} = renderHook(({params}) => useFetchApi({success, error, path, params}), {
-      initialProps: {params: {foo: 42}}
+      initialProps: {params: {foo: 42}},
     })
     // don't wait for flush, just start another one
     rerender({params: {foo: 44}})
@@ -370,7 +370,7 @@ describe('useFetchApi', () => {
       const success = jest.fn()
       const error = jest.fn()
       const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
-        initialProps: {nonce: 'foo'}
+        initialProps: {nonce: 'foo'},
       })
       await fetchMock.flush(true)
       rerender({nonce: 'baz'})
@@ -387,7 +387,7 @@ describe('useFetchApi', () => {
       const success = jest.fn()
       const error = jest.fn()
       const {rerender} = renderHook(({nonce}) => useFetchApi({success, error, path}, [nonce]), {
-        initialProps: {nonce: 'foo'}
+        initialProps: {nonce: 'foo'},
       })
       await fetchMock.flush(true)
       rerender({nonce: 'foo'})
@@ -567,7 +567,7 @@ describe('useFetchApi', () => {
           meta,
           error,
           fetchAllPages: true,
-          fetchNumPages: 1
+          fetchNumPages: 1,
         })
       )
       await loadingDone

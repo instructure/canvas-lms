@@ -36,7 +36,7 @@ import {
   IMPORT_COMPLETED,
   IMPORT_NOT_STARTED,
   IMPORT_FAILED,
-  IMPORT_PENDING
+  IMPORT_PENDING,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const I18n = useI18nScope('OutcomeManagement')
@@ -55,7 +55,7 @@ const FindOutcomesView = ({
   importGroupStatus,
   importOutcomesStatus,
   importOutcomeHandler,
-  shouldFocusAddAllBtn
+  shouldFocusAddAllBtn,
 }) => {
   const groupTitle = collection?.name || I18n.t('Outcome Group')
   const isRootGroup = collection?.isRootGroup
@@ -107,10 +107,10 @@ const FindOutcomesView = ({
             {I18n.t(
               {
                 one: '%{count} Outcome',
-                other: '%{count} Outcomes'
+                other: '%{count} Outcomes',
               },
               {
-                count: outcomesCount || 0
+                count: outcomesCount || 0,
               }
             )}
           </Text>
@@ -154,7 +154,7 @@ const FindOutcomesView = ({
       </View>
       <View as="div" position="relative" padding={isMobileView ? '0 0 0 xx-small' : '0 0 small'}>
         <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
-          <Flex.Item size="50%" shouldGrow>
+          <Flex.Item size="50%" shouldGrow={true}>
             <SearchBreadcrumb
               groupTitle={groupTitle}
               searchString={searchString}
@@ -191,7 +191,7 @@ const FindOutcomesView = ({
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'auto',
-                padding: '0 0.25rem'
+                padding: '0 0.25rem',
               }
         }
       >
@@ -210,7 +210,7 @@ const FindOutcomesView = ({
                 justifyItems="center"
                 alignItems="center"
                 padding="medium 0 small"
-                shouldGrow
+                shouldGrow={true}
               >
                 <Flex.Item>
                   {loading ? (
@@ -246,8 +246,8 @@ const FindOutcomesView = ({
                       masteryPoints,
                       ratings,
                       friendlyDescription,
-                      isImported
-                    }
+                      isImported,
+                    },
                   },
                   index
                 ) => (
@@ -283,11 +283,11 @@ FindOutcomesView.defaultProps = {
   collection: {
     id: '0',
     name: '',
-    isRootGroup: false
+    isRootGroup: false,
   },
   importGroupStatus: IMPORT_NOT_STARTED,
   mobileScrollContainer: null,
-  shouldFocusAddAllBtn: false
+  shouldFocusAddAllBtn: false,
 }
 
 FindOutcomesView.propTypes = {
@@ -304,7 +304,7 @@ FindOutcomesView.propTypes = {
   importGroupStatus: PropTypes.string,
   importOutcomesStatus: PropTypes.object.isRequired,
   importOutcomeHandler: PropTypes.func.isRequired,
-  shouldFocusAddAllBtn: PropTypes.bool
+  shouldFocusAddAllBtn: PropTypes.bool,
 }
 
 export default FindOutcomesView

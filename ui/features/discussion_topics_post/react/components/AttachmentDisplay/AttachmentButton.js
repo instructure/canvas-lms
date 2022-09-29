@@ -62,5 +62,5 @@ AttachmentButton.propTypes = {
    * When we click the close (x button) on the RemovableItem.
    * Used to delete the attachment.
    */
-  onDeleteItem: PropTypes.func.isRequired
+  onDeleteItem: PropTypes.func.isRequired,
 }

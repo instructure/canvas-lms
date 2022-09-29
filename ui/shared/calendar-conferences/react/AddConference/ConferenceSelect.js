@@ -52,7 +52,7 @@ const ConferenceSelect = ({
   currentConferenceType,
   conferenceTypes,
   onSelectConferenceType,
-  inputRef
+  inputRef,
 }) => {
   const localInputRef = useRef(null)
   const [showingOptions, setShowingOptions] = useState(false)
@@ -92,7 +92,7 @@ const ConferenceSelect = ({
       onRequestHideOptions={hideOptionsAndFocus}
       onRequestHighlightOption={(_e, {id}) => setHighlightedIndex(getIndex(id))}
       onRequestSelectOption={(_e, {id}) => onSelect(getIndex(id))}
-      isInline
+      isInline={true}
     >
       {conferenceTypes.map((conferenceType, index) => {
         const id = makeId(index)
@@ -116,12 +116,12 @@ ConferenceSelect.propTypes = {
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
   onSelectConferenceType: PropTypes.func.isRequired,
-  inputRef: PropTypes.func
+  inputRef: PropTypes.func,
 }
 
 ConferenceSelect.defaultProps = {
   currentConferenceType: null,
-  inputRef: null
+  inputRef: null,
 }
 
 export default ConferenceSelect

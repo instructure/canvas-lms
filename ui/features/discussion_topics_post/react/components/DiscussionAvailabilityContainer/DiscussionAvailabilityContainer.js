@@ -60,12 +60,12 @@ export function DiscussionAvailabilityContainer({...props}) {
       props={{
         tablet: {
           textSize: 'x-small',
-          margin: '0 0 0 xxx-small'
+          margin: '0 0 0 xxx-small',
         },
         desktop: {
           textSize: 'small',
-          margin: '0 0 0 xx-small'
-        }
+          margin: '0 0 0 xx-small',
+        },
       }}
       render={responsiveProps => {
         return (
@@ -123,5 +123,5 @@ DiscussionAvailabilityContainer.propTypes = {
   lockAt: PropTypes.string,
   delayedPostAt: PropTypes.string,
   totalUserCount: PropTypes.number,
-  groupSet: PropTypes.object
+  groupSet: PropTypes.object,
 }

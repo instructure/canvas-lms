@@ -26,7 +26,7 @@ import {queries as domQueries} from '@testing-library/dom'
 import CanvasMediaPlayer, {
   setPlayerSize,
   getAutoTrack,
-  formatTracksForMediaPlayer
+  formatTracksForMediaPlayer,
 } from '../CanvasMediaPlayer'
 import {uniqueId} from 'lodash'
 
@@ -40,7 +40,7 @@ const defaultMediaObject = (overrides = {}) => ({
   src: uniqueId('anawesomeurl-') + '.test',
   label: 'an awesome label',
   width: '1000',
-  ...overrides
+  ...overrides,
 })
 
 describe('CanvasMediaPlayer', () => {
@@ -99,13 +99,13 @@ describe('CanvasMediaPlayer', () => {
           media_sources={[
             defaultMediaObject({bitrate: '3000', label: '3000'}),
             defaultMediaObject({bitrate: '2000', label: '2000'}),
-            defaultMediaObject({bitrate: '1000', label: '1000'})
+            defaultMediaObject({bitrate: '1000', label: '1000'}),
           ]}
         />
       )
       fireEvent.canPlay(container.querySelector('video'))
       const settings = getByRole('button', {
-        name: /settings/i
+        name: /settings/i,
       })
       fireEvent.click(settings)
       const sourceChooser = getAllByText('Quality')[0].closest('button')
@@ -186,7 +186,7 @@ describe('CanvasMediaPlayer', () => {
         let component
         await act(async () => {
           component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
-            container: document.getElementById('here').firstElementChild
+            container: document.getElementById('here').firstElementChild,
           })
           await waitFor(() => {
             jest.runOnlyPendingTimers()
@@ -225,7 +225,7 @@ describe('CanvasMediaPlayer', () => {
               SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS={2}
             />,
             {
-              container: document.getElementById('here').firstElementChild
+              container: document.getElementById('here').firstElementChild,
             }
           )
 
@@ -256,7 +256,7 @@ describe('CanvasMediaPlayer', () => {
             component.getByText(
               'Your media has been uploaded and will appear here after processing.',
               {
-                exact: false
+                exact: false,
               }
             )
           ).toBeInTheDocument()
@@ -308,7 +308,7 @@ describe('CanvasMediaPlayer', () => {
         let component
         await act(async () => {
           component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
-            container: document.getElementById('here').firstElementChild
+            container: document.getElementById('here').firstElementChild,
           })
           expect(component.getByText('Loading')).toBeInTheDocument()
 
@@ -331,7 +331,7 @@ describe('CanvasMediaPlayer', () => {
           queryAllByText,
           queryByLabelText,
           container,
-          getByRole
+          getByRole,
         } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
@@ -340,7 +340,7 @@ describe('CanvasMediaPlayer', () => {
         )
         fireEvent.canPlay(container.querySelector('video'))
         const settings = getByRole('button', {
-          name: /settings/i
+          name: /settings/i,
         })
         fireEvent.click(settings)
         // need queryAll because some of the buttons have tooltip and text
@@ -361,7 +361,7 @@ describe('CanvasMediaPlayer', () => {
           queryAllByText,
           queryByLabelText,
           container,
-          getByRole
+          getByRole,
         } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
@@ -370,7 +370,7 @@ describe('CanvasMediaPlayer', () => {
         )
         fireEvent.canPlay(container.querySelector('video'))
         const settings = getByRole('button', {
-          name: /settings/i
+          name: /settings/i,
         })
         fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
@@ -389,7 +389,7 @@ describe('CanvasMediaPlayer', () => {
           queryAllByText,
           queryByLabelText,
           container,
-          getByRole
+          getByRole,
         } = render(
           <CanvasMediaPlayer
             media_id="dummy_media_id"
@@ -398,7 +398,7 @@ describe('CanvasMediaPlayer', () => {
         )
         fireEvent.canPlay(container.querySelector('video'))
         const settings = getByRole('button', {
-          name: /settings/i
+          name: /settings/i,
         })
         fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
@@ -456,14 +456,14 @@ describe('CanvasMediaPlayer', () => {
                 src: '/media_objects/more/stuff',
                 label: 'English',
                 language: 'en',
-                type: 'subtitles'
-              }
+                type: 'subtitles',
+              },
             ]}
           />
         )
         fireEvent.canPlay(container.querySelector('video'))
         const settings = getByRole('button', {
-          name: /settings/i
+          name: /settings/i,
         })
         fireEvent.click(settings)
         expect(getAllByText('Play')[0]).toBeInTheDocument()
@@ -483,8 +483,8 @@ describe('CanvasMediaPlayer', () => {
         videoHeight: h,
         style: {},
         classList: {
-          add: jest.fn()
-        }
+          add: jest.fn(),
+        },
       }
     }
 
@@ -591,14 +591,14 @@ describe('CanvasMediaPlayer', () => {
     beforeEach(() => {
       global.ENV = {
         auto_show_cc: true,
-        locale: 'es'
+        locale: 'es',
       }
     })
 
     it('finds the track for the user locale', () => {
       const tracks = [
         {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'}
+        {id: 2, locale: 'es'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('es')
@@ -608,7 +608,7 @@ describe('CanvasMediaPlayer', () => {
       global.ENV.locale = 'en-US'
       const tracks = [
         {id: 1, locale: 'en-UK'},
-        {id: 2, locale: 'en'}
+        {id: 2, locale: 'en'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en')
@@ -618,7 +618,7 @@ describe('CanvasMediaPlayer', () => {
       global.ENV.locale = 'en-US'
       const tracks = [
         {id: 1, locale: 'en-UK'},
-        {id: 2, locale: 'es-MX'}
+        {id: 2, locale: 'es-MX'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en-UK')
@@ -630,7 +630,7 @@ describe('CanvasMediaPlayer', () => {
       const tracks = [
         {id: 1, locale: 'en'},
         {id: 2, locale: 'es'},
-        {id: 3, locale: 'he'}
+        {id: 3, locale: 'he'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('he')
@@ -642,7 +642,7 @@ describe('CanvasMediaPlayer', () => {
       const tracks = [
         {id: 1, locale: 'en'},
         {id: 2, locale: 'es'},
-        {id: 3, locale: 'he'}
+        {id: 3, locale: 'he'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toEqual('en')
@@ -651,7 +651,7 @@ describe('CanvasMediaPlayer', () => {
     it('returns undefined if the right track is not found', () => {
       const tracks = [
         {id: 1, locale: 'en'},
-        {id: 2, locale: 'he'}
+        {id: 2, locale: 'he'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toBeUndefined()
@@ -666,7 +666,7 @@ describe('CanvasMediaPlayer', () => {
       global.ENV.auto_show_cc = false
       const tracks = [
         {id: 1, locale: 'en'},
-        {id: 2, locale: 'es'}
+        {id: 2, locale: 'es'},
       ]
       const found = getAutoTrack(tracks)
       expect(found).toBeUndefined()
@@ -682,7 +682,7 @@ describe('CanvasMediaPlayer', () => {
         src: '/media_objects/123/media_tracks/456',
         label: 'en',
         type: 'subtitles',
-        language: 'en'
+        language: 'en',
       })
     })
   })

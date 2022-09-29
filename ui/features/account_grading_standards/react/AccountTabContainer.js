@@ -33,14 +33,12 @@ class AccountTabContainer extends React.Component {
       gradingPeriodSetsURL: string.isRequired,
       gradingPeriodsUpdateURL: string.isRequired,
       enrollmentTermsURL: string.isRequired,
-      deleteGradingPeriodURL: string.isRequired
-    }).isRequired
+      deleteGradingPeriodURL: string.isRequired,
+    }).isRequired,
   }
 
   componentDidMount() {
-    $(this.tabContainer)
-      .children('.ui-tabs-minimal')
-      .tabs()
+    $(this.tabContainer).children('.ui-tabs-minimal').tabs()
   }
 
   render() {

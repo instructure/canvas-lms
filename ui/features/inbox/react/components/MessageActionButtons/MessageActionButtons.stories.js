@@ -30,8 +30,8 @@ export default {
     delete: {action: 'delete'},
     markAsUnread: {action: 'markAsUnread'},
     forward: {action: 'forward'},
-    star: {action: 'star'}
-  }
+    star: {action: 'star'},
+  },
 }
 
 const Template = args => <MessageActionButtons {...args} />
@@ -40,5 +40,5 @@ export const MessageSelected = Template.bind({})
 
 export const SubmissionComment = Template.bind({})
 SubmissionComment.args = {
-  isSubmissionComment: true
+  isSubmissionComment: true,
 }

@@ -47,7 +47,7 @@ const render = (
     canManage = true,
     canImport = true,
     renderer = rtlRender,
-    mocks = []
+    mocks = [],
   } = {}
 ) => {
   return renderer(
@@ -73,7 +73,7 @@ describe('ManagementHeader', () => {
     setImportsTargetGroup: setImportsTargetGroupMock,
     canManage: true,
     canImport: true,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -104,21 +104,21 @@ describe('ManagementHeader', () => {
   describe('User does not have manage_outcomes permissions', () => {
     it('Create button does not appear', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(queryByText('Create')).not.toBeInTheDocument()
     })
 
     it('Find button does not appear', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(queryByText('Find')).not.toBeInTheDocument()
     })
 
     it('Import button does appear if user has import_outcomes permissions', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(getByText('Import')).toBeInTheDocument()
     })
@@ -127,21 +127,21 @@ describe('ManagementHeader', () => {
   describe('User does not have import_outcomes permissions', () => {
     it('Import button does not appear', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canImport: false
+        canImport: false,
       })
       expect(queryByText('Import')).not.toBeInTheDocument()
     })
 
     it('Create button does appear if user has manage_outcomes permissions', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canImport: false
+        canImport: false,
       })
       expect(queryByText('Create')).toBeInTheDocument()
     })
 
     it('Find button does appear if user has manage_outcomes permissions', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        canManage: true
+        canManage: true,
       })
       expect(getByText('Find')).toBeInTheDocument()
     })
@@ -180,7 +180,7 @@ describe('ManagementHeader', () => {
   describe('Responsiveness', () => {
     it('renders only the Add Button', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        isMobileView: true
+        isMobileView: true,
       })
       expect(getByText('Add')).toBeInTheDocument()
     })
@@ -189,14 +189,14 @@ describe('ManagementHeader', () => {
       const {queryByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true,
         canManage: false,
-        canImport: false
+        canImport: false,
       })
       expect(queryByText('Add')).not.toBeInTheDocument()
     })
 
     it('renders the Menu Items', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        isMobileView: true
+        isMobileView: true,
       })
       fireEvent.click(getByText('Add'))
       expect(getByText('Import')).toBeInTheDocument()
@@ -207,7 +207,7 @@ describe('ManagementHeader', () => {
     it('only renders Import Menu Item if user only has import permissions', () => {
       const {getByText, queryByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true,
-        canManage: false
+        canManage: false,
       })
       fireEvent.click(getByText('Add'))
       expect(getByText('Import')).toBeInTheDocument()
@@ -218,7 +218,7 @@ describe('ManagementHeader', () => {
     it('only renders Create and Find Menu Items if user only has manage permissions', () => {
       const {getByText, queryByText} = render(<ManagementHeader {...defaultProps()} />, {
         isMobileView: true,
-        canImport: false
+        canImport: false,
       })
       fireEvent.click(getByText('Add'))
       expect(queryByText('Import')).not.toBeInTheDocument()
@@ -228,7 +228,7 @@ describe('ManagementHeader', () => {
 
     it('calls showImportOutcomesModal when click on Import Menu Item', () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        isMobileView: true
+        isMobileView: true,
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Import'))
@@ -237,7 +237,7 @@ describe('ManagementHeader', () => {
 
     it('opens FindOutcomesModal when Find Menu Item is clicked', async () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        isMobileView: true
+        isMobileView: true,
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Find'))
@@ -247,7 +247,7 @@ describe('ManagementHeader', () => {
 
     it('opens CreateOutcomeModal when Create Menu Item is clicked', async () => {
       const {getByText} = render(<ManagementHeader {...defaultProps()} />, {
-        isMobileView: true
+        isMobileView: true,
       })
       fireEvent.click(getByText('Add'))
       fireEvent.click(getByText('Create'))
@@ -262,7 +262,7 @@ describe('ManagementHeader', () => {
       const lhsGroupId = 'starter group id'
 
       const {queryByText} = render(<ManagementHeader {...defaultProps({lhsGroupId})} />, {
-        mocks: smallOutcomeTree()
+        mocks: smallOutcomeTree(),
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(queryByText('Create'))

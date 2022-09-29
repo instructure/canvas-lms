@@ -30,24 +30,24 @@ $(document).ready(() => {
     })
     .triggerHandler('resize')
   let maxWidth = 0
-  $('.context_module_item').each(function() {
+  $('.context_module_item').each(function () {
     maxWidth = Math.max(maxWidth, $(this).width())
   })
 
   $('.context_module_item').width(maxWidth)
   $(
     '#modules .context_module_item.attachment a.title,#modules .context_module_item.external_url a.title'
-  ).each(function() {
+  ).each(function () {
     $(this).attr('href', `${$(this).attr('href')}?already_inline=1`)
   })
 
   $('#modules .context_module_item')
     .filter('.attachment,.external_url')
     .find('a.title')
-    .each(function() {
+    .each(function () {
       $(this).attr('target', 'content_preview')
     })
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       $('#file_display_name').text($(this).text())
       const {id} = $(this)
@@ -81,9 +81,7 @@ $(document).ready(() => {
 
   $('.hide_sidebar_link').click(event => {
     event.preventDefault()
-    $('#modules')
-      .parent()
-      .hide()
+    $('#modules').parent().hide()
   })
 
   $('body').css('overflow', 'hidden')

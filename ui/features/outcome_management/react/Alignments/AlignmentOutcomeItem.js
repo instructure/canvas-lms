@@ -78,7 +78,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item size="50%" shouldGrow>
+        <Flex.Item size="50%" shouldGrow={true}>
           <div style={{padding: '0.625rem 0'}}>
             <Heading level="h4" as="h3">
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
@@ -96,7 +96,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     style={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
                     }}
                   >
                     {truncatedDescription}
@@ -126,7 +126,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
                     moduleName: moduleTitle,
                     moduleUrl,
                     moduleWorkflowState,
-                    assignmentContentType
+                    assignmentContentType,
                   }) => (
                     <AlignmentItem
                       id={_id}
@@ -159,7 +159,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
               style={{
                 padding: '0.4375rem 0.5rem 0 0',
                 display: 'flex',
-                flexFlow: 'row-reverse nowrap'
+                flexFlow: 'row-reverse nowrap',
               }}
             >
               <Text size="medium" weight="bold" data-testid="outcome-alignments">
@@ -179,7 +179,7 @@ const AlignmentOutcomeItem = ({title, description, alignments}) => {
 AlignmentOutcomeItem.propTypes = {
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  alignments: PropTypes.arrayOf(alignmentShape).isRequired
+  alignments: PropTypes.arrayOf(alignmentShape).isRequired,
 }
 
 export default memo(AlignmentOutcomeItem)

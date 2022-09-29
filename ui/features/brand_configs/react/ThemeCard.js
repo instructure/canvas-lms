@@ -47,7 +47,7 @@ export default function ThemeCard(props) {
               className="ic-ThemeCard-fake-radio__inner"
               style={{
                 backgroundColor: getVar('ic-brand-primary'),
-                borderColor: getVar('ic-brand-primary')
+                borderColor: getVar('ic-brand-primary'),
               }}
             />
           </div>
@@ -145,7 +145,7 @@ export default function ThemeCard(props) {
       {props.isBeingDeleted && (
         <Modal
           as="form"
-          open
+          open={true}
           onDismiss={props.cancelDeleting}
           onSubmit={props.onDelete}
           label={I18n.t('Delete Theme?')}
@@ -198,5 +198,5 @@ ThemeCard.propTypes = {
   cancelDeleting: func.isRequired,
   onDelete: func.isRequired,
   open: func.isRequired,
-  getVariable: func.isRequired
+  getVariable: func.isRequired,
 }

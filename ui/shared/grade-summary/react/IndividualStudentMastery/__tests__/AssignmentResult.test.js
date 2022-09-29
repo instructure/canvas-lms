@@ -29,7 +29,7 @@ const defaultProps = (props = {}) => ({
     results: [],
     title: 'foo',
     mastery_points: 3,
-    points_possible: 5
+    points_possible: 5,
   },
   result: {
     id: 1,
@@ -39,10 +39,10 @@ const defaultProps = (props = {}) => ({
       id: 1,
       html_url: 'http://foo',
       name: 'My assignment',
-      submission_types: 'online_quiz'
-    }
+      submission_types: 'online_quiz',
+    },
   },
-  ...props
+  ...props,
 })
 
 it('renders the AlignmentResult component', () => {
@@ -109,7 +109,7 @@ it('falls back to using mastery points if points possible is 0', () => {
     results: [],
     title: 'foo',
     mastery_points: 3,
-    points_possible: 0
+    points_possible: 0,
   }
   const wrapper = render(<AssignmentResult {...props} />)
   expect(wrapper.text()).toMatch('Your score: 0.6')

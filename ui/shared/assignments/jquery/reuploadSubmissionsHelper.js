@@ -74,13 +74,13 @@ export function setupSubmitHandler(userAssetString) {
       preparedFileUpload: true,
       singleFile: true,
       upload_only: true,
-      preferFileValueForInputName: false
+      preferFileValueForInputName: false,
     },
     object_name: 'attachment',
     beforeSubmit,
     error,
     errorFormatter,
-    success
+    success,
   }
 
   $(`#${formId}`).formSubmit(options)

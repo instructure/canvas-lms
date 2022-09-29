@@ -32,8 +32,8 @@ it('properly renders with a quiz icon when submission type is online quiz', () =
       id: 1,
       title: 'example',
       url: 'www.example.com',
-      submission_types: ['online_quiz']
-    }
+      submission_types: ['online_quiz'],
+    },
   }
   const wrapper = render(<UnassessedAssignment {...props} />)
   expect(wrapper.find('svg[name="IconQuiz"]')).toHaveLength(1)

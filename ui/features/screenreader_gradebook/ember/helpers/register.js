@@ -25,7 +25,7 @@ export default function register(type, name, obj) {
     name,
     initialize(container) {
       return container.register(`${type}:${name}`, obj)
-    }
+    },
   })
   return obj
 }

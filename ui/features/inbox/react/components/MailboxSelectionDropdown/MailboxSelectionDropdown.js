@@ -30,7 +30,7 @@ export const mailboxLabels = {
   starred: () => I18n.t('Starred'),
   sent: () => I18n.t('Sent'),
   archived: () => I18n.t('Archived'),
-  submission_comments: () => I18n.t('Submission Comments')
+  submission_comments: () => I18n.t('Submission Comments'),
 }
 
 export const MailboxSelectionDropdown = ({...props}) => {
@@ -57,7 +57,7 @@ MailboxSelectionDropdown.propTypes = {
   /**
    * Which mailbox to list as selected
    */
-  activeMailbox: PropTypes.oneOf(Object.keys(mailboxLabels)).isRequired
+  activeMailbox: PropTypes.oneOf(Object.keys(mailboxLabels)).isRequired,
 }
 
 export default MailboxSelectionDropdown

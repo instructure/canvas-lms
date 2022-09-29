@@ -30,12 +30,12 @@ export default class GravatarView extends AvatarUploadBaseView {
 
     this.prototype.events = {
       'click .gravatar-preview-btn': 'onPreview',
-      'keydown .gravatar-preview-input': 'onInputKeyDown'
+      'keydown .gravatar-preview-input': 'onInputKeyDown',
     }
 
     this.prototype.els = {
       '.gravatar-preview-image': '$gravatarPreviewImage',
-      '.gravatar-preview-input': '$gravatarPreviewInput'
+      '.gravatar-preview-input': '$gravatarPreviewInput',
     }
   }
 
@@ -62,7 +62,7 @@ export default class GravatarView extends AvatarUploadBaseView {
   updateAvatar() {
     const url = '/api/v1/users/self'
     const updateParams = {
-      'user[avatar][url]': this._gravatarUrl(this._gravatarHashFromInput(), this.avatarSize.w)
+      'user[avatar][url]': this._gravatarUrl(this._gravatarHashFromInput(), this.avatarSize.w),
     }
     return $.ajaxJSON(url, 'PUT', updateParams)
   }

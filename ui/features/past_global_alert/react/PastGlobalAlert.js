@@ -25,7 +25,7 @@ const I18n = useI18nScope('past_global_announcements')
 
 export default class PastGlobalAlert extends React.Component {
   state = {
-    shouldRender: false
+    shouldRender: false,
   }
 
   componentDidMount() {

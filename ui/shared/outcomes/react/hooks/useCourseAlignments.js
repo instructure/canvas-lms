@@ -44,21 +44,21 @@ const useCourseAlignments = () => {
     id: rootOutcomeGroup.id,
     outcomesContextType: contextType,
     outcomesContextId: contextId,
-    searchFilter
+    searchFilter,
   }
   const debouncedString = debounceSearchString(searchString)
   if (debouncedString) variables.searchQuery = debouncedString
 
   const {loading, error, data, fetchMore} = useQuery(SEARCH_OUTCOME_ALIGNMENTS, {
     variables,
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
   })
 
   useEffect(() => {
     if (error) {
       showFlashAlert({
         message: I18n.t('An error occurred while loading outcome alignments.'),
-        type: 'error'
+        type: 'error',
       })
     }
   }, [error])
@@ -79,7 +79,7 @@ const useCourseAlignments = () => {
       showFlashAlert({
         message: screenreaderText,
         type: 'info',
-        srOnly: true
+        srOnly: true,
       })
       setLastSearch(searchString)
     }
@@ -89,7 +89,7 @@ const useCourseAlignments = () => {
     if (!loading) {
       fetchMore({
         variables: {
-          outcomesCursor: data?.group?.outcomes?.pageInfo?.endCursor
+          outcomesCursor: data?.group?.outcomes?.pageInfo?.endCursor,
         },
         updateQuery: (prevData, {fetchMoreResult}) => ({
           ...prevData,
@@ -98,10 +98,10 @@ const useCourseAlignments = () => {
             outcomes: {
               ...prevData.group.outcomes,
               edges: [...prevData.group.outcomes.edges, ...fetchMoreResult.group.outcomes.edges],
-              pageInfo: fetchMoreResult.group.outcomes.pageInfo
-            }
-          }
-        })
+              pageInfo: fetchMoreResult.group.outcomes.pageInfo,
+            },
+          },
+        }),
       })
     }
   }
@@ -115,7 +115,7 @@ const useCourseAlignments = () => {
     onSearchChangeHandler: onChangeHandler,
     onSearchClearHandler: onClearHandler,
     searchFilter,
-    onFilterChangeHandler: setSearchFilter
+    onFilterChangeHandler: setSearchFilter,
   }
 }
 

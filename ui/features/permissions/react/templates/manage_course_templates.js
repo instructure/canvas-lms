@@ -25,42 +25,46 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Course Templates - create'),
-      description: I18n.t('Allows user to set a template for an account.')
+      description: I18n.t('Allows user to set a template for an account.'),
     },
     {
-      description: I18n.t('Allows user to select a course as a course template in Course Settings.')
+      description: I18n.t(
+        'Allows user to select a course as a course template in Course Settings.'
+      ),
     },
     {
-      description: I18n.t('Allows user to view names of course templates in the root account.')
+      description: I18n.t('Allows user to view names of course templates in the root account.'),
     },
     {
       title: I18n.t('Course Templates - delete'),
-      description: I18n.t('Allows user to remove a course as a course template in Course Settings.')
+      description: I18n.t(
+        'Allows user to remove a course as a course template in Course Settings.'
+      ),
     },
     {
-      description: I18n.t('Allows user to set an account to not use a template.')
+      description: I18n.t('Allows user to set an account to not use a template.'),
     },
     {
       title: I18n.t('Course Templates - edit'),
-      description: I18n.t('Allows user to change the template being used by an account.')
+      description: I18n.t('Allows user to change the template being used by an account.'),
     },
     {
-      description: I18n.t('Allows user to view names of course templates in the root account.')
-    }
+      description: I18n.t('Allows user to view names of course templates in the root account.'),
+    },
   ],
   [
     {
       title: I18n.t('Account Settings'),
       description: I18n.t(
         'To access the Account Settings tab, Account-level settings - manage must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Courses'),
       description: I18n.t(
         'To create a new course to use as a course template, Courses - add must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [],
   []

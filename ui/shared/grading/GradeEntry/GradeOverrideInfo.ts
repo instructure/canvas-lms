@@ -23,7 +23,7 @@ export default class GradeOverrideInfo {
       enteredValue: '',
       grade: null,
       valid: null,
-      ...attr
+      ...attr,
     }
   }
 

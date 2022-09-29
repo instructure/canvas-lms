@@ -42,7 +42,7 @@ debugConsole.debug('QuizLogAuditing: will be using localStorage.')
 EventBuffer.setStorageAdapter(K.EVT_STORAGE_LOCAL_STORAGE)
 
 eventManager.options.deliveryUrl = ENV.QUIZ_SUBMISSION_EVENTS_URL
-eventManager.options.errorHandler = function(resp) {
+eventManager.options.errorHandler = function (resp) {
   // Something has been malaligned and we now need ruby to figure out where we should be
   console.log(resp)
   if (resp.status === 401 || resp.statusText === 'Unauthorized') {

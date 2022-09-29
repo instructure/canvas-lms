@@ -23,7 +23,7 @@ import {DiscussionEntryMessageContainer} from '../DiscussionEntryMessageContaine
 
 describe('DiscussionEntryMessageContainer', () => {
   const defaultProps = (discussionEntry = {}) => ({
-    discussionEntry: {...DiscussionEntry.mock(), ...discussionEntry}
+    discussionEntry: {...DiscussionEntry.mock(), ...discussionEntry},
   })
 
   const setup = props => {
@@ -42,8 +42,8 @@ describe('DiscussionEntryMessageContainer', () => {
           id: 'vfx5000',
           _id: '99',
           displayName: 'Eddy Tor',
-          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-        }
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        },
       })
     )
     expect(container.getByTestId('created-tooltip')).toBeTruthy()
@@ -59,8 +59,8 @@ describe('DiscussionEntryMessageContainer', () => {
           id: 'wqe54678',
           _id: '2',
           displayName: 'Hank McCoy',
-          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-        }
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        },
       })
     )
     expect(container.getByText('Edited Apr 13, 2021 4pm')).toBeInTheDocument()
@@ -69,7 +69,7 @@ describe('DiscussionEntryMessageContainer', () => {
   it('should not display edit info when no editor', () => {
     const container = setup(
       defaultProps({
-        editor: null
+        editor: null,
       })
     )
     expect(container.queryByText(/Edited by/)).toBeNull()

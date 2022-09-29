@@ -40,7 +40,7 @@ export default class CriterionInfo extends React.Component {
     super(props)
 
     this.state = {
-      open: false
+      open: false,
     }
   }
 
@@ -70,7 +70,7 @@ export default class CriterionInfo extends React.Component {
           }}
           size="medium"
           label={I18n.t('Criterion Ratings')}
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={true}
         >
           <Modal.Header>
             {this.renderCloseButton()}

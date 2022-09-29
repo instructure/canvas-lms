@@ -27,11 +27,11 @@ export const MOCK_TODOS = [
       all_dates: [
         {
           base: true,
-          due_at: null
-        }
+          due_at: null,
+        },
       ],
       name: 'Drain a drain',
-      points_possible: 10
+      points_possible: 10,
     },
     context_id: '7',
     context_type: 'Course',
@@ -40,7 +40,7 @@ export const MOCK_TODOS = [
     ignore: '/api/v1/users/self/todo/assignment_10/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_10/grading?permanent=1',
     needs_grading_count: 2,
-    type: 'grading'
+    type: 'grading',
   },
   {
     assignment: {
@@ -49,11 +49,11 @@ export const MOCK_TODOS = [
       all_dates: [
         {
           base: true,
-          due_at: '2021-06-22T23:59:59Z'
-        }
+          due_at: '2021-06-22T23:59:59Z',
+        },
       ],
       name: 'Plant a plant',
-      points_possible: 15
+      points_possible: 15,
     },
     context_id: '5',
     context_type: 'Course',
@@ -62,7 +62,7 @@ export const MOCK_TODOS = [
     ignore: '/api/v1/users/self/todo/assignment_11/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_11/grading?permanent=1',
     needs_grading_count: 3,
-    type: 'grading'
+    type: 'grading',
   },
   {
     assignment: {
@@ -71,11 +71,11 @@ export const MOCK_TODOS = [
       all_dates: [
         {
           base: true,
-          due_at: '2021-07-15T23:59:59Z'
-        }
+          due_at: '2021-07-15T23:59:59Z',
+        },
       ],
       name: 'Dream a dream',
-      points_possible: 5
+      points_possible: 5,
     },
     context_id: '2',
     context_type: 'Course',
@@ -84,7 +84,7 @@ export const MOCK_TODOS = [
     ignore: '/api/v1/users/self/todo/assignment_12/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_12/grading?permanent=1',
     needs_grading_count: 1,
-    type: 'grading'
+    type: 'grading',
   },
   {
     assignment: {
@@ -93,11 +93,11 @@ export const MOCK_TODOS = [
       all_dates: [
         {
           base: true,
-          due_at: '2021-07-15T23:59:59Z'
-        }
+          due_at: '2021-07-15T23:59:59Z',
+        },
       ],
       name: 'Long essay',
-      points_possible: 50
+      points_possible: 50,
     },
     context_id: '2',
     context_type: 'Course',
@@ -106,8 +106,8 @@ export const MOCK_TODOS = [
     ignore: '/api/v1/users/self/todo/assignment_13/grading?permanent=0',
     ignore_permanently: '/api/v1/users/self/todo/assignment_13/grading?permanent=1',
     needs_grading_count: 1,
-    type: 'submitting'
-  }
+    type: 'submitting',
+  },
 ]
 
 export const opportunities = [
@@ -118,7 +118,7 @@ export const opportunities = [
     points_possible: 23,
     html_url: '/courses/1/assignments/1',
     due_at: '2021-01-10T05:59:00Z',
-    submission_types: ['online_quiz']
+    submission_types: ['online_quiz'],
   },
   {
     id: '2',
@@ -127,19 +127,19 @@ export const opportunities = [
     points_possible: 10,
     html_url: '/courses/1/assignments/2',
     due_at: '2021-01-15T05:59:00Z',
-    submission_types: ['online_url']
-  }
+    submission_types: ['online_url'],
+  },
 ]
 
 export function createPlannerMocks() {
   moxios.stubRequest(/\/api\/v1\/dashboard\/dashboard_cards$/, {
     status: 200,
-    response: MOCK_CARDS
+    response: MOCK_CARDS,
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*end_date=.*/, {
     status: 200,
     headers: {link: 'url; rel="current"'},
-    response: MOCK_PLANNER_ITEM
+    response: MOCK_PLANNER_ITEM,
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?start_date=.*per_page=1/, {
     status: 200,
@@ -155,15 +155,15 @@ export function createPlannerMocks() {
           created_at: '2020-03-16T17:17:17Z',
           id: '12',
           title: 'Announcement 12',
-          updated_at: '2020-03-16T17:31:52Z'
+          updated_at: '2020-03-16T17:31:52Z',
         },
         plannable_date: moment().subtract(6, 'months').toISOString(),
         plannable_id: '12',
         plannable_type: 'announcement',
         planner_override: null,
-        submissions: {}
-      }
-    ]
+        submissions: {},
+      },
+    ],
   })
   moxios.stubRequest(/api\/v1\/planner\/items\?end_date=.*per_page=1/, {
     status: 200,
@@ -179,20 +179,20 @@ export function createPlannerMocks() {
           created_at: '2022-03-16T17:17:17Z',
           id: '8',
           title: 'Discussion 8',
-          updated_at: '2022-03-16T17:31:52Z'
+          updated_at: '2022-03-16T17:31:52Z',
         },
         plannable_date: moment().add(6, 'months').toISOString(),
         plannable_id: '8',
         plannable_type: 'discussion',
         planner_override: null,
-        submissions: {}
-      }
-    ]
+        submissions: {},
+      },
+    ],
   })
   moxios.stubRequest(/\/api\/v1\/users\/self\/missing_submission.*/, {
     status: 200,
     headers: {link: 'url; rel="current"'},
-    response: opportunities
+    response: opportunities,
   })
 }
 
@@ -200,7 +200,7 @@ const currentUser = {
   id: '1',
   display_name: 'Geoffrey Jellineck',
   name: 'Geoffrey Jellineck',
-  avatar_image_url: 'http://avatar'
+  avatar_image_url: 'http://avatar',
 }
 
 export const defaultEnv = {
@@ -208,10 +208,10 @@ export const defaultEnv = {
   current_user_id: '1',
   K5_USER: true,
   PREFERENCES: {
-    hide_dashcard_color_overlays: false
+    hide_dashcard_color_overlays: false,
   },
   MOMENT_LOCALE: 'en',
-  TIMEZONE: 'America/Denver'
+  TIMEZONE: 'America/Denver',
 }
 
 export const defaultK5DashboardProps = {
@@ -230,5 +230,5 @@ export const defaultK5DashboardProps = {
   canAddObservee: false,
   observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
   openTodosInNewTab: true,
-  observerPickerEnabled: true
+  observerPickerEnabled: true,
 }

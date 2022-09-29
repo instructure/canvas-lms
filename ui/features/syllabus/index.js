@@ -42,7 +42,7 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
   // Setup the collections
   collections = [
     new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'event'),
-    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment')
+    new SyllabusCalendarEventsCollection([ENV.context_asset_string], 'assignment'),
   ]
 
   // Don't show appointment groups for non-logged in users
@@ -74,10 +74,10 @@ if (!(ENV.IN_PACED_COURSE && !ENV.current_user_is_student) && showCourseSummary)
 
     collection.fetch({
       data: {
-        per_page: ENV.SYLLABUS_PER_PAGE || 50
+        per_page: ENV.SYLLABUS_PER_PAGE || 50,
       },
       success,
-      error
+      error,
     })
 
     return deferred
@@ -88,7 +88,7 @@ ready(() => {
   // Attach the immersive reader button if enabled
   const activeMountPoints = [
     immersive_reader_mount_point(),
-    immersive_reader_mobile_mount_point()
+    immersive_reader_mobile_mount_point(),
   ].filter(node => !!node)
 
   if (activeMountPoints.length > 0) {
@@ -111,7 +111,7 @@ ready(() => {
       el: '#syllabusTableBody',
       collection: acollection,
       can_read: ENV.CAN_READ,
-      is_valid_user: !!ENV.current_user_id
+      is_valid_user: !!ENV.current_user_id,
     })
   }
 

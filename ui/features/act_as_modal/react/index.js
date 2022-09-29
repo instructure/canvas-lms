@@ -50,17 +50,17 @@ export default class ActAsModal extends React.Component {
         PropTypes.shape({
           login_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
           sis_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-          integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+          integration_id: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
         })
-      )
-    }).isRequired
+      ),
+    }).isRequired,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      isLoading: false
+      isLoading: false,
     }
 
     this._button = null
@@ -169,7 +169,7 @@ export default class ActAsModal extends React.Component {
           transition="fade"
           size="fullscreen"
           label={I18n.t('Act as User')}
-          open
+          open={true}
         >
           <Modal.Body>
             {this.state.isLoading ? (
@@ -191,7 +191,7 @@ export default class ActAsModal extends React.Component {
                     <View as="div" textAlign="center" padding="0 0 x-small 0">
                       <Text size="x-large" weight="light">
                         {I18n.t('Act as %{name}', {
-                          name: user.short_name
+                          name: user.short_name,
                         })}
                         {user.pronouns ? ` (${user.pronouns})` : null}
                       </Text>
@@ -214,7 +214,7 @@ export default class ActAsModal extends React.Component {
                         src={user.avatar_image_url}
                         size="small"
                         margin="medium 0 x-small 0"
-                        data-fs-exclude
+                        data-fs-exclude={true}
                       />
                     </View>
                     <View as="div" textAlign="center">

@@ -34,7 +34,7 @@ export default class MoveSelect extends React.Component {
     items: arrayOf(itemShape).isRequired,
     moveOptions: moveOptionsType.isRequired,
     onSelect: func.isRequired,
-    onClose: func.isRequired
+    onClose: func.isRequired,
   }
 
   constructor(props) {
@@ -42,14 +42,14 @@ export default class MoveSelect extends React.Component {
     this.state = {
       selectedGroup: this.props.moveOptions.groups && this.getFilteredGroups()[0],
       selectedPosition: positions.first,
-      selectedSibling: 0
+      selectedSibling: 0,
     }
   }
 
   selectGroup = e => {
     this.setState({
       selectedGroup:
-        this.props.moveOptions.groups.find(group => group.id === e.target.value) || null
+        this.props.moveOptions.groups.find(group => group.id === e.target.value) || null,
     })
   }
 
@@ -70,14 +70,14 @@ export default class MoveSelect extends React.Component {
       order = selectedPosition.apply({
         items: items.map(({id}) => id),
         order: itemsInGroup.map(({id}) => id),
-        relativeTo: selectedSibling
+        relativeTo: selectedSibling,
       })
     }
 
     this.props.onSelect({
       groupId: moveOptions.groups ? selectedGroup.id : null,
       itemIds: items.map(({id}) => id),
-      order
+      order,
     })
   }
 
@@ -160,28 +160,26 @@ export default class MoveSelect extends React.Component {
             selectSibling={this.selectSibling}
           />
         )}
-        {
-          <View textAlign="end" display="block">
-            <hr aria-hidden="true" />
-            <Button
-              id="move-item-tray-cancel-button"
-              onClick={this.props.onClose}
-              margin="0 x-small 0 0"
-            >
-              {I18n.t('Cancel')}
-            </Button>
-            <Button
-              id="move-item-tray-submit-button"
-              disabled={!this.isDoneSelecting()}
-              type="submit"
-              color="primary"
-              onClick={this.submitSelection}
-              margin="0 x-small 0 0"
-            >
-              {I18n.t('Move')}
-            </Button>
-          </View>
-        }
+        <View textAlign="end" display="block">
+          <hr aria-hidden="true" />
+          <Button
+            id="move-item-tray-cancel-button"
+            onClick={this.props.onClose}
+            margin="0 x-small 0 0"
+          >
+            {I18n.t('Cancel')}
+          </Button>
+          <Button
+            id="move-item-tray-submit-button"
+            disabled={!this.isDoneSelecting()}
+            type="submit"
+            color="primary"
+            onClick={this.submitSelection}
+            margin="0 x-small 0 0"
+          >
+            {I18n.t('Move')}
+          </Button>
+        </View>
       </div>
     )
   }

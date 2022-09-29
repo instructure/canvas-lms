@@ -42,7 +42,7 @@ describe('GradebookMenu', () => {
   const defaultProps = {
     courseUrl: '/courseUrl',
     learningMasteryEnabled: true,
-    variant: 'DefaultGradebook'
+    variant: 'DefaultGradebook',
   }
 
   describe('when variant is "DefaultGradebook"', () => {
@@ -59,7 +59,7 @@ describe('GradebookMenu', () => {
         [
           '/courseUrl/gradebook?view=learning_mastery',
           '/courseUrl/gradebook/change_gradebook_version?version=individual',
-          '/courseUrl/gradebook/history'
+          '/courseUrl/gradebook/history',
         ]
       )
     })
@@ -73,7 +73,7 @@ describe('GradebookMenu', () => {
 
       checkMenuItemContents(getAllByRole('menuitem'), [
         'Individual Gradebook…',
-        'Gradebook History…'
+        'Gradebook History…',
       ])
     })
   })
@@ -93,7 +93,7 @@ describe('GradebookMenu', () => {
         [
           '/courseUrl/gradebook?view=gradebook',
           '/courseUrl/gradebook/change_gradebook_version?version=individual',
-          '/courseUrl/gradebook/history'
+          '/courseUrl/gradebook/history',
         ]
       )
     })
@@ -115,7 +115,7 @@ describe('GradebookMenu', () => {
         [
           '/courseUrl/gradebook?view=gradebook',
           '/courseUrl/gradebook/change_gradebook_version?version=individual',
-          '/courseUrl/gradebook?view=learning_mastery'
+          '/courseUrl/gradebook?view=learning_mastery',
         ]
       )
     })

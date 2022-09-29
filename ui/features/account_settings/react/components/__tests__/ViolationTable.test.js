@@ -25,13 +25,13 @@ describe('Violation Table', () => {
     {
       uri: 'http://example.com/something.js',
       latest_hit: '2019-11-11T00:00:00.000Z',
-      count: 7
+      count: 7,
     },
     {
       uri: 'http://clayd.dev/nothing.js',
       latest_hit: '2019-11-12T00:00:00.000Z',
-      count: 2
-    }
+      count: 2,
+    },
   ]
 
   const getProps = overrides => ({
@@ -39,7 +39,7 @@ describe('Violation Table', () => {
     whitelistedDomains: {account: []},
     accountId: '123',
     addDomain: () => {},
-    ...overrides
+    ...overrides,
   })
 
   it('shows each violation given on a row', async () => {
@@ -111,7 +111,7 @@ describe('Violation Table', () => {
       fireEvent.click(addButton)
       expect(fakeAlert).toHaveBeenCalledWith({
         message: 'Success: You added clayd.dev as an allowed domain.',
-        type: 'success'
+        type: 'success',
       })
     })
   })
@@ -121,18 +121,18 @@ describe('Violation Table', () => {
       {
         uri: 'http://example.com/something.js',
         latest_hit: '2019-11-11T00:00:00.000Z',
-        count: 5
+        count: 5,
       },
       {
         uri: 'http://instructure.com/nothing.js',
         latest_hit: '2019-11-13T00:00:00.000Z',
-        count: 3
+        count: 3,
       },
       {
         uri: 'http://clayd.dev/nothing.js',
         latest_hit: '2019-11-12T00:00:00.000Z',
-        count: 2
-      }
+        count: 2,
+      },
     ]
 
     it('defaults to sorting descending based on the attempt count', () => {

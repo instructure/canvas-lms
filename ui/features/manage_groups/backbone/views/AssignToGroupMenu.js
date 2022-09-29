@@ -29,7 +29,7 @@ export default class AssignToGroupMenu extends PopoverMenuView {
     this.prototype.events = {
       ...PopoverMenuView.prototype.events,
       'click .set-group': 'setGroup',
-      'focusin .focus-bound': 'boundFocused'
+      'focusin .focus-bound': 'boundFocused',
     }
 
     this.prototype.tagName = 'div'
@@ -52,7 +52,7 @@ export default class AssignToGroupMenu extends PopoverMenuView {
     if (groupHasSubmissions(this.collection.get(newGroupId))) {
       this.cloneCategoryView = new GroupCategoryCloneView({
         model: this.model.collection.category,
-        openedFromCaution: true
+        openedFromCaution: true,
       })
       this.cloneCategoryView.open()
       return this.cloneCategoryView.on('close', () => {
@@ -81,7 +81,7 @@ export default class AssignToGroupMenu extends PopoverMenuView {
     return {
       groups: this.collection.toJSON(),
       noGroups: !hasGroups,
-      allFull: hasGroups && this.collection.models.every(g => g.isFull())
+      allFull: hasGroups && this.collection.models.every(g => g.isFull()),
     }
   }
 
@@ -93,10 +93,7 @@ export default class AssignToGroupMenu extends PopoverMenuView {
     const noGroupsToJoin =
       this.collection.length <= 0 || this.collection.models.every(g => g.isFull())
     const toFocus = noGroupsToJoin ? '.popover-content p' : 'li a' // focus text if no groups, focus first group if groups
-    return this.$el
-      .find(toFocus)
-      .first()
-      .focus()
+    return this.$el.find(toFocus).first().focus()
   }
 
   boundFocused() {

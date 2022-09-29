@@ -37,11 +37,11 @@ const I18n = useI18nScope('blueprint_settingsUnsyncedChanges')
 
 export default class UnsyncedChanges extends Component {
   static propTypes = {
-    unsyncedChanges: propTypes.unsyncedChanges
+    unsyncedChanges: propTypes.unsyncedChanges,
   }
 
   static defaultProps = {
-    unsyncedChanges: []
+    unsyncedChanges: [],
   }
 
   maybeRenderChanges() {

@@ -31,7 +31,7 @@ ready(() => {
           'Registration succeeded. Refresh page to proxy Inst-FS requests through ServiceWorker.'
         )
       })
-      .catch(function(err) {
+      .catch(function (err) {
         console.log('Inst-FS ServiceWorker registration failed. :(', err)
       })
   }

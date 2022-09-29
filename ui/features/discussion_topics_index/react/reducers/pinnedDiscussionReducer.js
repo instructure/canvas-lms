@@ -67,7 +67,7 @@ const reducerMap = {
   [actionTypes.DRAG_AND_DROP_FAIL]: (state, action) => {
     const updatedState = copyAndUpdateDiscussionState(state, action.payload.discussion)
     return orderPinnedDiscussions(updatedState, action.payload.order)
-  }
+  },
 }
 
 Object.assign(reducerMap, duplicationReducerMap, deleteReducerMap)

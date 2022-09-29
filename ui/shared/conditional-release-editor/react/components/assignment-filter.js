@@ -33,7 +33,7 @@ class AssignmentFilter extends React.Component {
     return {
       onNameFilter: func.isRequired,
       onCategoryFilter: func.isRequired,
-      defaultCategoryFilter: string
+      defaultCategoryFilter: string,
     }
   }
 

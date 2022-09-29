@@ -24,7 +24,7 @@ import * as propTypes from './propTypes'
 
 export default class AuditTrail extends PureComponent {
   static propTypes = {
-    auditTrail: propTypes.auditTrail.isRequired
+    auditTrail: propTypes.auditTrail.isRequired,
   }
 
   render() {

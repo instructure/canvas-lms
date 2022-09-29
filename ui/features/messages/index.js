@@ -47,7 +47,7 @@ class MessageModal {
       secureId,
       messageId,
       subject: `re: ${$message.find('.h6:first').text()}`,
-      from: $message.find('.message-to').text()
+      from: $message.find('.message-to').text(),
     })
 
     this.$el = $(this.tpl).dialog(this.dialogOptions)
@@ -99,7 +99,7 @@ class MessageModal {
 MessageModal.prototype.dialogOptions = {
   autoOpen: false,
   modal: true,
-  title: I18n.t('dialog.title', 'Send a reply message')
+  title: I18n.t('dialog.title', 'Send a reply message'),
 }
 
 $(() => $('.reply-button').on('click', showDialog))

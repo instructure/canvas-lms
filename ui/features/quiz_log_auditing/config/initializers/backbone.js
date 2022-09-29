@@ -22,6 +22,6 @@ import CoreAdapter from '@canvas/quiz-legacy-client-apps/adapter'
 
 const Adapter = new CoreAdapter(config)
 
-Backbone.ajax = function(options) {
+Backbone.ajax = function (options) {
   return Adapter.request(options)
 }

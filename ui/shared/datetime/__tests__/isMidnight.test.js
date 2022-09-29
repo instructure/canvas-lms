@@ -18,8 +18,8 @@
 
 import detroit from 'timezone/America/Detroit'
 import timezone from 'timezone'
-import { configureAndRestoreLater, epoch, moonwalk, restore } from 'datetime/specHelpers'
-import { isMidnight as subject } from '../'
+import {configureAndRestoreLater, epoch, moonwalk, restore} from 'datetime/specHelpers'
+import {isMidnight as subject} from '..'
 
 describe('isMidnight', () => {
   afterEach(restore)
@@ -45,8 +45,8 @@ describe('isMidnight', () => {
     configureAndRestoreLater({
       tz: timezone(detroit, 'America/Detroit'),
       tzData: {
-        'America/Detrot': detroit
-      }
+        'America/Detrot': detroit,
+      },
     })
 
     expect(subject(epoch)).toEqual(false)

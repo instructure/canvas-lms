@@ -21,55 +21,55 @@ import MentionDropdownMenu from './MentionDropdownMenu'
 
 export default {
   title: 'Examples/RCE Plugins/MentionDropdown/Menu',
-  component: MentionDropdownMenu
+  component: MentionDropdownMenu,
 }
 
-const Template = args => <MentionDropdownMenu onSelect={() => {}} show {...args} />
+const Template = args => <MentionDropdownMenu onSelect={() => {}} show={true} {...args} />
 
 export const Primary = Template.bind({})
 Primary.args = {
   mentionOptions: [
     {
       id: 1,
-      name: 'Jeffrey Johnson'
+      name: 'Jeffrey Johnson',
     },
     {
       id: 2,
-      name: 'Matthew Lemon'
+      name: 'Matthew Lemon',
     },
     {
       id: 3,
-      name: 'Rob Orton'
+      name: 'Rob Orton',
     },
     {
       id: 4,
-      name: 'Davis Hyer'
+      name: 'Davis Hyer',
     },
     {
       id: 5,
-      name: 'Drake Harper'
+      name: 'Drake Harper',
     },
     {
       id: 6,
-      name: 'Omar Soto-Fortuño'
+      name: 'Omar Soto-Fortuño',
     },
     {
       id: 7,
-      name: 'Chawn Neal'
+      name: 'Chawn Neal',
     },
     {
       id: 8,
-      name: 'Mauricio Ribeiro'
+      name: 'Mauricio Ribeiro',
     },
     {
       id: 9,
-      name: 'Caleb Guanzon'
+      name: 'Caleb Guanzon',
     },
     {
       id: 10,
-      name: 'Jason Gillett'
-    }
-  ]
+      name: 'Jason Gillett',
+    },
+  ],
 }
 
 export const OneOption = Template.bind({})
@@ -77,9 +77,9 @@ OneOption.args = {
   mentionOptions: [
     {
       id: 1,
-      name: 'Jeffrey Johnson'
-    }
-  ]
+      name: 'Jeffrey Johnson',
+    },
+  ],
 }
 
 export const TwoOptions = Template.bind({})
@@ -87,18 +87,18 @@ TwoOptions.args = {
   mentionOptions: [
     {
       id: 1,
-      name: 'Jeffrey Johnson'
+      name: 'Jeffrey Johnson',
     },
     {
       id: 2,
-      name: 'Matthew Lemon'
-    }
-  ]
+      name: 'Matthew Lemon',
+    },
+  ],
 }
 
 export const Empty = Template.bind({})
 Empty.args = {
-  mentionOptions: []
+  mentionOptions: [],
 }
 
 export const NotShowing = Template.bind({})
@@ -106,12 +106,12 @@ NotShowing.args = {
   mentionOptions: [
     {
       id: 1,
-      name: 'Jeffrey Johnson'
+      name: 'Jeffrey Johnson',
     },
     {
       id: 2,
-      name: 'Matthew Lemon'
-    }
+      name: 'Matthew Lemon',
+    },
   ],
-  show: false
+  show: false,
 }

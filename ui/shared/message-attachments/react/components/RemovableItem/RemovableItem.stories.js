@@ -24,8 +24,8 @@ export default {
   title: 'Examples/Canvas Inbox/RemovableItem',
   component: RemovableItem,
   argTypes: {
-    onRemove: {action: 'Remove'}
-  }
+    onRemove: {action: 'Remove'},
+  },
 }
 
 const Template = args => <RemovableItem {...args} />
@@ -33,5 +33,5 @@ const Template = args => <RemovableItem {...args} />
 export const Default = Template.bind({})
 Default.args = {
   screenReaderLabel: 'Remove me!',
-  children: <div style={{width: '80px', height: '80px', background: 'grey'}} />
+  children: <div style={{width: '80px', height: '80px', background: 'grey'}} />,
 }

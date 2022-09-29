@@ -21,6 +21,7 @@ import $ from 'jquery'
 import Slick from 'slickgrid'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
+
 const I18n = useI18nScope('jobs')
 /*
 xsslint safeString.identifier klass d out_of runtime_string
@@ -227,45 +228,45 @@ window.Jobs = class Jobs extends FlavorGrid {
         name: I18n.t('columns.id', 'id'),
         field: 'id',
         width: 100,
-        formatter: this.id_formatter.bind(this)
+        formatter: this.id_formatter.bind(this),
       },
       {
         id: 'tag',
         name: I18n.t('columns.tag', 'tag'),
         field: 'tag',
-        width: 200
+        width: 200,
       },
       {
         id: 'attempts',
         name: I18n.t('columns.attempt', 'attempt'),
         field: 'attempts',
         width: 65,
-        formatter: this.attempts_formatter.bind(this)
+        formatter: this.attempts_formatter.bind(this),
       },
       {
         id: 'priority',
         name: I18n.t('columns.priority', 'priority'),
         field: 'priority',
-        width: 60
+        width: 60,
       },
       {
         id: 'strand',
         name: I18n.t('columns.strand', 'strand'),
         field: 'strand',
-        width: 100
+        width: 100,
       },
       {
         id: 'singleton',
         name: I18n.t('columns.singleton', 'singleton'),
         field: 'singleton',
-        width: 100
+        width: 100,
       },
       {
         id: 'run_at',
         name: I18n.t('columns.run_at', 'run at'),
         field: 'run_at',
-        width: 165
-      }
+        width: 165,
+      },
     ]
   }
 
@@ -291,7 +292,7 @@ window.Jobs = class Jobs extends FlavorGrid {
     const params = {
       flavor: this.options.flavor,
       q: this.query,
-      update_action: action
+      update_action: action,
     }
 
     if (this.grid.getSelectedRows().length < 1) {
@@ -396,8 +397,8 @@ class Workers extends Jobs {
         id: 'worker',
         name: I18n.t('columns.worker', 'worker'),
         field: 'locked_by',
-        width: 90
-      }
+        width: 90,
+      },
     ].concat(super.build_columns())
     cols.pop()
     cols.push({
@@ -405,7 +406,7 @@ class Workers extends Jobs {
       name: I18n.t('columns.runtime', 'runtime'),
       field: 'locked_at',
       width: 85,
-      formatter: this.runtime_formatter.bind(this)
+      formatter: this.runtime_formatter.bind(this),
     })
     for (const col of cols) {
       col.sortable = true
@@ -452,9 +453,9 @@ class Workers extends Jobs {
     this.grid.setSortColumn('runtime', false)
     return (this.sortData = {
       sortCol: {
-        field: 'locked_at'
+        field: 'locked_at',
       },
-      sortAsc: false
+      sortAsc: false,
     })
   }
 }
@@ -470,14 +471,14 @@ class Tags extends FlavorGrid {
         id: 'tag',
         name: I18n.t('columns.tag', 'tag'),
         field: 'tag',
-        width: 200
+        width: 200,
       },
       {
         id: 'count',
         name: I18n.t('columns.count', 'count'),
         field: 'count',
-        width: 50
-      }
+        width: 50,
+      },
     ]
   }
 
@@ -495,21 +496,21 @@ class Tags extends FlavorGrid {
 $.extend(window, {
   Jobs,
   Workers,
-  Tags
+  Tags,
 })
 
 $(document).ready(() => {
-  $('#tags-flavor').change(function() {
+  $('#tags-flavor').change(function () {
     return window.tags.change_flavor($(this).val())
   })
-  $('#jobs-flavor').change(function() {
+  $('#jobs-flavor').change(function () {
     return window.jobs.change_flavor($(this).val())
   })
 
   $('#jobs-refresh').click(() => window.jobs.refresh())
 
   const search_event = $('#jobs-search')[0].onsearch === undefined ? 'change' : 'search'
-  $('#jobs-search').bind(search_event, function() {
+  $('#jobs-search').bind(search_event, function () {
     return window.jobs.search($(this).val())
   })
 
@@ -527,7 +528,7 @@ $(document).ready(() => {
           title: I18n.t('titles.job_handler', 'Job Handler'),
           width: 900,
           height: 700,
-          modal: true
+          modal: true,
         })
     )
     return false
@@ -541,7 +542,7 @@ $(document).ready(() => {
           title: I18n.t('titles.last_error', 'Last Error'),
           width: 900,
           height: 700,
-          modal: true
+          modal: true,
         })
     )
     return false

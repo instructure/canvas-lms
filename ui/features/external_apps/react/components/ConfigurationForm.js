@@ -37,11 +37,11 @@ export default class ConfigurationForm extends React.Component {
     showConfigurationSelector: PropTypes.bool,
     hideComponent: PropTypes.bool,
     membershipServiceFeatureFlagEnabled: PropTypes.bool,
-    children: PropTypes.node
+    children: PropTypes.node,
   }
 
   static defaultProps = {
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
 
   constructor(props, context) {
@@ -79,7 +79,7 @@ export default class ConfigurationForm extends React.Component {
     configUrl: '',
     registrationUrl: '',
     xml: '',
-    allow_membership_service_access: false
+    allow_membership_service_access: false,
   })
 
   reset = () => {
@@ -95,13 +95,13 @@ export default class ConfigurationForm extends React.Component {
       configUrl: '',
       registrationUrl: '',
       xml: '',
-      allow_membership_service_access: false
+      allow_membership_service_access: false,
     })
   }
 
   handleSwitchConfigurationType = e => {
     this.setState({
-      configurationType: e.target.value
+      configurationType: e.target.value,
     })
   }
 

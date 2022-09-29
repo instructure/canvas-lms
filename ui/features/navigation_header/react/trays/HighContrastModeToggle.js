@@ -49,8 +49,8 @@ const hcmOverrides = {
     uncheckedIconColor: licorice,
     checkedBackground: shamrock,
     checkedIconColor: shamrock,
-    focusOutlineColor: brand
-  }
+    focusOutlineColor: brand,
+  },
 }
 
 const HighContrastLabel = ({loading, isMobile}) => {
@@ -92,7 +92,7 @@ const HighContrastLabel = ({loading, isMobile}) => {
 
 HighContrastLabel.propTypes = {
   loading: bool.isRequired,
-  isMobile: bool.isRequired
+  isMobile: bool.isRequired,
 }
 
 export default function HighContrastModeToggle({isMobile}) {
@@ -116,7 +116,7 @@ export default function HighContrastModeToggle({isMobile}) {
       const {json} = await doFetchApi({
         path,
         method: 'PUT',
-        body: {feature: 'high_contrast', state: newState}
+        body: {feature: 'high_contrast', state: newState},
       })
       if (json.feature !== 'high_contrast') throw new Error('Unexpected response from API call')
       setEnabled(json.state === 'on')
@@ -124,7 +124,7 @@ export default function HighContrastModeToggle({isMobile}) {
     } catch (err) {
       showFlashAlert({
         message: I18n.t('An error occurred while trying to change the UI'),
-        err
+        err,
       })
     } finally {
       setLoading(false)
@@ -155,9 +155,9 @@ export default function HighContrastModeToggle({isMobile}) {
 }
 
 HighContrastModeToggle.propTypes = {
-  isMobile: bool
+  isMobile: bool,
 }
 
 HighContrastModeToggle.defaultProps = {
-  isMobile: false
+  isMobile: false,
 }

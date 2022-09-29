@@ -32,8 +32,8 @@ export default {
     onEdit: {action: 'Edit'},
     onTogglePublish: {action: 'Toggle Publish'},
     onToggleSubscription: {action: 'Toggle Subscription'},
-    onPeerReviews: {action: 'Peer Reviews'}
-  }
+    onPeerReviews: {action: 'Peer Reviews'},
+  },
 }
 
 const Template = args => <PostToolbar {...args} />
@@ -43,7 +43,7 @@ Default.args = {
   isPublished: true,
   isSubscribed: true,
   repliesCount: 24,
-  unreadCount: 4
+  unreadCount: 4,
 }
 
 export const StudentView = Template.bind({})
@@ -56,11 +56,11 @@ StudentView.args = {
   onTogglePublish: null,
   onToggleSubscription: null,
   onOpenSpeedgrader: null,
-  onShareToCommons: null
+  onShareToCommons: null,
 }
 
 export const NoReplies = Template.bind({})
 NoReplies.args = {
   isPublished: true,
-  isSubscribed: true
+  isSubscribed: true,
 }

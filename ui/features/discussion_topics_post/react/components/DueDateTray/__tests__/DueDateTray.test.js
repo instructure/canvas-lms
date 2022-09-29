@@ -32,7 +32,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -46,7 +46,7 @@ const overrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-07T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null
+    adhocStudents: null,
   }),
   AssignmentOverride.mock({
     id: 'QXNzaWdubWVudE92ZXJyaWRlLTM=',
@@ -55,8 +55,8 @@ const overrides = [
     dueAt: '2021-05-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    adhocStudents: null
-  })
+    adhocStudents: null,
+  }),
 ]
 
 const setup = props => {
@@ -67,7 +67,7 @@ describe('DueDateTray', () => {
   describe('desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
 
@@ -86,9 +86,9 @@ describe('DueDateTray', () => {
           AssignmentOverride.mock({
             dueAt: null,
             unlockAt: null,
-            lockAt: null
-          })
-        ]
+            lockAt: null,
+          }),
+        ],
       })
       expect(getByText('No Due Date')).toBeInTheDocument()
       expect(getByText('No Start Date')).toBeInTheDocument()
@@ -114,10 +114,10 @@ describe('DueDateTray', () => {
         assignmentOverrides: [
           AssignmentOverride.mock({
             adhocStudents: AdhocStudents.mock({
-              students
-            })
-          })
-        ]
+              students,
+            }),
+          }),
+        ],
       })
       expect(
         getByText(
@@ -139,10 +139,10 @@ describe('DueDateTray', () => {
         assignmentOverrides: [
           AssignmentOverride.mock({
             adhocStudents: AdhocStudents.mock({
-              students
-            })
-          })
-        ]
+              students,
+            }),
+          }),
+        ],
       })
       fireEvent.click(getByText('6 more'))
       expect(getByText(students.map(student => student.shortName).join(', '))).toBeInTheDocument()
@@ -153,7 +153,7 @@ describe('DueDateTray', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '1000px'}
+        tablet: {maxWidth: '1000px'},
       }))
     })
 
@@ -171,9 +171,9 @@ describe('DueDateTray', () => {
           AssignmentOverride.mock({
             dueAt: null,
             unlockAt: null,
-            lockAt: null
-          })
-        ]
+            lockAt: null,
+          }),
+        ],
       })
       expect(getByText('No Due Date')).toBeInTheDocument()
       expect(getByText('No Start Date')).toBeInTheDocument()

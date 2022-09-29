@@ -23,7 +23,7 @@ const propTypes = {}
 propTypes.section = shape({
   id: string.isRequired,
   name: string.isRequired,
-  user_count: number
+  user_count: number,
 })
 
 propTypes.sectionList = arrayOf(propTypes.section)

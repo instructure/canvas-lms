@@ -34,13 +34,13 @@ const I18n = useI18nScope('ExternalToolDialog')
 const EMPTY_BUTTON = {
   height: 300,
   width: 400,
-  name: ' '
+  name: ' ',
 }
 
 const EMPTY_FORM = {
   url: '',
   selection: '',
-  contents: ''
+  contents: '',
 }
 
 export default class ExternalToolDialog extends React.Component {
@@ -51,25 +51,25 @@ export default class ExternalToolDialog extends React.Component {
       confirm: PropTypes.func.isRequired,
       dispatchEvent: PropTypes.func.isRequired,
       innerHeight: PropTypes.number.isRequired,
-      $: PropTypes.func.isRequired
+      $: PropTypes.func.isRequired,
     }).isRequired,
     editor: PropTypes.shape({
       id: PropTypes.string.isRequired,
       selection: PropTypes.shape({
-        getContent: PropTypes.func.isRequired
+        getContent: PropTypes.func.isRequired,
       }),
       getContent: PropTypes.func.isRequired,
-      focus: PropTypes.func.isRequired
+      focus: PropTypes.func.isRequired,
     }).isRequired,
     contextAssetString: PropTypes.string.isRequired,
     iframeAllowances: PropTypes.string.isRequired,
     resourceSelectionUrl: PropTypes.string,
-    deepLinkingOrigin: PropTypes.string
+    deepLinkingOrigin: PropTypes.string,
   }
 
   static defaultProps = {
     resourceSelectionUrl: null,
-    deepLinkingOrigin: ''
+    deepLinkingOrigin: '',
   }
 
   state = {
@@ -77,7 +77,7 @@ export default class ExternalToolDialog extends React.Component {
     button: EMPTY_BUTTON,
     infoAlert: null,
     form: EMPTY_FORM,
-    iframeLoaded: false
+    iframeLoaded: false,
   }
 
   open(button) {
@@ -220,7 +220,7 @@ export default class ExternalToolDialog extends React.Component {
               height: button.use_tray ? '100%' : button.height || frameHeight,
               border: '0',
               display: 'block',
-              visibility: iframeLoaded ? 'visible' : 'hidden'
+              visibility: iframeLoaded ? 'visible' : 'hidden',
             }}
             allow={iframeAllowances}
             borderstyle="0"

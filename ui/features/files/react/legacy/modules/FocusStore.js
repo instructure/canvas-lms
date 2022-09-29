@@ -33,5 +33,5 @@ export default {
     } else {
       throw new Error('FocusStore has not been set.')
     }
-  }
+  },
 }

@@ -37,7 +37,7 @@ export const Section = {
     id: string,
     name: string,
     updatedAt: string,
-    userCount: number
+    userCount: number,
   }),
 
   mock: ({
@@ -46,7 +46,7 @@ export const Section = {
     id = '2',
     name = 'X-Men A-Team',
     updatedAt = '2020-11-13T11:27:58-07:00',
-    userCount = 1
+    userCount = 1,
   } = {}) => ({
     _id,
     createdAt,
@@ -54,6 +54,6 @@ export const Section = {
     name,
     updatedAt,
     userCount,
-    __typename: 'Section'
-  })
+    __typename: 'Section',
+  }),
 }

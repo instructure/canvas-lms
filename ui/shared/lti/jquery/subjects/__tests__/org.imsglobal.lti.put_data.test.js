@@ -28,10 +28,10 @@ describe('org.imsglobal.lti.put_data handler', () => {
     responseMessages = {
       sendBadRequestError: jest.fn(),
       sendResponse: jest.fn(),
-      sendError: jest.fn()
+      sendError: jest.fn(),
     }
     event = {
-      origin: 'http://example.com'
+      origin: 'http://example.com',
     }
     jest.spyOn(platformStorage, 'clearData').mockImplementation(() => {})
     jest.spyOn(platformStorage, 'putData').mockImplementation(() => {})

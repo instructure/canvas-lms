@@ -32,7 +32,7 @@ export function typeNameToFuncName(typeName) {
 export function createAction(actionType) {
   const actionCreator = payload => ({
     type: actionType,
-    payload
+    payload,
   })
 
   actionCreator.type = actionType

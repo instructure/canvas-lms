@@ -25,7 +25,7 @@ const defaultProps = () => ({
   showUnassessedStudents: false,
   toggleInactiveEnrollments: () => {},
   toggleConcludedEnrollments: () => {},
-  toggleUnassessedStudents: () => {}
+  toggleUnassessedStudents: () => {},
 })
 
 it('calls toggleInactiveEnrollments to enable displaying inactive enrollments', () => {
@@ -44,7 +44,7 @@ it('calls toggleInactiveEnrollments to disable displaying inactive enrollments',
     <OutcomeFilterView
       {...defaultProps()}
       toggleInactiveEnrollments={toggleInactiveEnrollments}
-      showInactiveEnrollments
+      showInactiveEnrollments={true}
     />
   )
   fireEvent.click(getByRole('button'))
@@ -71,7 +71,7 @@ it('calls toggleConcludedEnrollments to disable displaying Concluded enrollments
     <OutcomeFilterView
       {...defaultProps()}
       toggleConcludedEnrollments={toggleConcludedEnrollments}
-      showConcludedEnrollments
+      showConcludedEnrollments={true}
     />
   )
   fireEvent.click(getByRole('button'))
@@ -95,7 +95,7 @@ it('calls toggleUnassessedStudents to disable displaying Unassessed students', (
     <OutcomeFilterView
       {...defaultProps()}
       toggleUnassessedStudents={toggleUnassessedStudents}
-      showUnassessedStudents
+      showUnassessedStudents={true}
     />
   )
   fireEvent.click(getByRole('button'))

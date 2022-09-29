@@ -37,6 +37,6 @@ handlers[SET_LOAD_STUDENTS_STATUS] = (state, {payload}) =>
 export default buildReducer(handlers, {
   students: {
     list: [],
-    loadStudentsStatus: null
-  }
+    loadStudentsStatus: null,
+  },
 })

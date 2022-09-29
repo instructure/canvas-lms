@@ -67,8 +67,8 @@ export default class GradingPeriodSetCollection extends React.Component {
       gradingPeriodSetsURL: string.isRequired,
       gradingPeriodsUpdateURL: string.isRequired,
       enrollmentTermsURL: string.isRequired,
-      deleteGradingPeriodURL: string.isRequired
-    }).isRequired
+      deleteGradingPeriodURL: string.isRequired,
+    }).isRequired,
   }
 
   state = {
@@ -80,8 +80,8 @@ export default class GradingPeriodSetCollection extends React.Component {
     selectedTermID: '0',
     editSet: {
       id: null,
-      saving: false
-    }
+      saving: false,
+    },
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -97,7 +97,7 @@ export default class GradingPeriodSetCollection extends React.Component {
         sets: [set].concat(this.state.sets),
         expandedSetIDs: this.state.expandedSetIDs.concat([set.id]),
         enrollmentTerms: this.associateTermsWithSet(set.id, termIDs),
-        showNewSetForm: false
+        showNewSetForm: false,
       },
       () => {
         this.refs.addSetFormButton.focus()
@@ -214,7 +214,7 @@ export default class GradingPeriodSetCollection extends React.Component {
         {
           one: '1 set of grading periods found.',
           other: '%{count} sets of grading periods found.',
-          zero: 'No matching sets of grading periods found.'
+          zero: 'No matching sets of grading periods found.',
         },
         {count: numSets}
       )
@@ -231,7 +231,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     const filterByTermArgs = [
       setsFilteredBySearchText,
       this.state.enrollmentTerms,
-      this.state.selectedTermID
+      this.state.selectedTermID,
     ]
     const visibleSets = this.filterSetsBySelectedTerm(...filterByTermArgs)
     this.alertForMatchingSets(visibleSets.length)
@@ -302,7 +302,7 @@ export default class GradingPeriodSetCollection extends React.Component {
 
   selectableTermsForEditSetForm = setID => {
     const termsBelongingToThisSet = _.where(this.termsBelongingToActiveSets(), {
-      gradingPeriodGroupId: setID
+      gradingPeriodGroupId: setID,
     })
     return _.union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet)
   }
@@ -348,7 +348,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     const urls = {
       batchUpdateURL: this.props.urls.gradingPeriodsUpdateURL,
       gradingPeriodSetsURL: this.props.urls.gradingPeriodSetsURL,
-      deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL
+      deleteGradingPeriodURL: this.props.urls.deleteGradingPeriodURL,
     }
 
     return _.map(this.getVisibleSets(), set => {

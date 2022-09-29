@@ -29,7 +29,7 @@ export const LoadStates = (function initLoadStates() {
   const states = statesList.reduce(
     (map, state) =>
       Object.assign(map, {
-        [state]: state
+        [state]: state,
       }),
     {}
   )
@@ -39,7 +39,7 @@ export const LoadStates = (function initLoadStates() {
     statesList,
     isLoading: state => state === states.LOADING,
     hasLoaded: state => state === states.LOADED,
-    isNotLoaded: state => state === states.NOT_LOADED
+    isNotLoaded: state => state === states.NOT_LOADED,
   }
 })()
 
@@ -50,7 +50,7 @@ function createActionTypes(name) {
     start: `GET_${upperName}_START`,
     success: `GET_${upperName}_SUCCESS`,
     fail: `GET_${upperName}_FAIL`,
-    clear: `CLEAR_${upperName}_PAGE`
+    clear: `CLEAR_${upperName}_PAGE`,
   }
 }
 
@@ -67,17 +67,17 @@ function createReducePage(actions) {
         [actions.start]: () => LoadStates.LOADING,
         [actions.success]: () => LoadStates.LOADED,
         [actions.fail]: () => LoadStates.ERRORED,
-        [actions.clear]: () => LoadStates.NOT_LOADED
+        [actions.clear]: () => LoadStates.NOT_LOADED,
       },
       LoadStates.NOT_LOADED
     ),
     items: handleActions(
       {
         [actions.success]: (state, action) => action.payload.data,
-        [actions.clear]: () => []
+        [actions.clear]: () => [],
       },
       []
-    )
+    ),
   })
 }
 
@@ -98,7 +98,7 @@ function createPagesReducer(actions) {
         (newState, curPage) => {
           const pageState = state[curPage]
           return Object.assign(newState, {
-            [curPage]: createReducePage(actions)(pageState, action)
+            [curPage]: createReducePage(actions)(pageState, action),
           })
         },
         {...state}
@@ -134,17 +134,17 @@ export function createPaginatedReducer(name) {
   return combineReducers({
     currentPage: handleActions(
       {
-        [actions.select]: (state, action) => action.payload.page
+        [actions.select]: (state, action) => action.payload.page,
       },
       DEFAULT_PAGE
     ),
     lastPage: handleActions(
       {
-        [actions.success]: (state, action) => action.payload.lastPage || state
+        [actions.success]: (state, action) => action.payload.lastPage || state,
       },
       DEFAULT_PAGE
     ),
-    pages: createPagesReducer(actions)
+    pages: createPagesReducer(actions),
   })
 }
 
@@ -155,40 +155,41 @@ function wrapGetPageThunk(actions, name, thunk) {
    * @param {bool} select whether to select the page we are fetching
    * @param {bool} forceGet if page is already loaded, force get it anyway
    */
-  return (payload = {}) => (dispatch, getState) => {
-    if (payload.select) {
-      dispatch({type: actions.select, payload: {page: payload.page}})
+  return (payload = {}) =>
+    (dispatch, getState) => {
+      if (payload.select) {
+        dispatch({type: actions.select, payload: {page: payload.page}})
+      }
+
+      const state = getState()
+      const page = payload.page || state[name].currentPage
+      const pageData = state[name].pages[page] || {}
+
+      // only fetch page data is it has not been loaded or we are force getting it
+      if (!LoadStates.hasLoaded(pageData.loadState) || payload.forceGet) {
+        dispatch({type: actions.start, payload: {page}})
+
+        new Promise(thunk(dispatch, getState, {page}))
+          .then(res => {
+            const successPayload = {page, data: res.data}
+
+            // sometimes the canvas API provides us with link header that gives
+            // us the URL to the last page. we can try parse that URL to determine
+            // how many pages there are in total
+            // works only with axios res objects, aka assumes thunk is axios promise
+            const links = parseLinkHeader(res)
+            if (links.last) {
+              try {
+                successPayload.lastPage = Number(/&page=([0-9]+)&/.exec(links.last)[1])
+              } catch (e) {} // eslint-disable-line
+            }
+            dispatch({type: actions.success, payload: successPayload})
+          })
+          .catch(err => {
+            dispatch({type: actions.fail, payload: {page, ...err}})
+          })
+      }
     }
-
-    const state = getState()
-    const page = payload.page || state[name].currentPage
-    const pageData = state[name].pages[page] || {}
-
-    // only fetch page data is it has not been loaded or we are force getting it
-    if (!LoadStates.hasLoaded(pageData.loadState) || payload.forceGet) {
-      dispatch({type: actions.start, payload: {page}})
-
-      new Promise(thunk(dispatch, getState, {page}))
-        .then(res => {
-          const successPayload = {page, data: res.data}
-
-          // sometimes the canvas API provides us with link header that gives
-          // us the URL to the last page. we can try parse that URL to determine
-          // how many pages there are in total
-          // works only with axios res objects, aka assumes thunk is axios promise
-          const links = parseLinkHeader(res)
-          if (links.last) {
-            try {
-              successPayload.lastPage = Number(/&page=([0-9]+)&/.exec(links.last)[1])
-          } catch (e) {} // eslint-disable-line
-          }
-          dispatch({type: actions.success, payload: successPayload})
-        })
-        .catch(err => {
-          dispatch({type: actions.fail, payload: {page, ...err}})
-        })
-    }
-  }
 }
 
 function fetchAllEntries(actions, totalCount, getThunk) {
@@ -199,7 +200,7 @@ function fetchAllEntries(actions, totalCount, getThunk) {
       const successPayload = {
         page: 1,
         lastPage: 1,
-        data: []
+        data: [],
       }
       dispatch({type: actions.success, payload: successPayload})
     } else {
@@ -212,7 +213,7 @@ function fetchAllEntries(actions, totalCount, getThunk) {
           const successPayload = {
             page: 1,
             lastPage: 1,
-            data: allDiscussions
+            data: allDiscussions,
           }
           dispatch({type: actions.success, payload: successPayload})
         })
@@ -278,8 +279,8 @@ export function createPaginationActions(name, thunk, opts = {}) {
   return {
     actionTypes: Object.keys(actionTypes).map(key => actionTypes[key]),
     actionCreators: {
-      [`get${capitalizedName}`]: fetchFunction()
-    }
+      [`get${capitalizedName}`]: fetchFunction(),
+    },
   }
 }
 
@@ -299,6 +300,6 @@ export function selectPaginationState(state, name) {
     [`${name}Page`]: itemsState.currentPage,
     [`${name}LastPage`]: itemsState.lastPage,
     [`isLoading${capitalizedName}`]: LoadStates.isLoading(page.loadState),
-    [`hasLoaded${capitalizedName}`]: LoadStates.hasLoaded(page.loadState)
+    [`hasLoaded${capitalizedName}`]: LoadStates.hasLoaded(page.loadState),
   }
 }

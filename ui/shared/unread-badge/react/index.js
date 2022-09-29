@@ -51,5 +51,5 @@ UnreadBadge.propTypes = {
   unreadCount: oneOfType([string, number]).isRequired,
   totalCount: oneOfType([string, number]).isRequired,
   unreadLabel: oneOfType([string, node]).isRequired,
-  totalLabel: oneOfType([string, node]).isRequired
+  totalLabel: oneOfType([string, node]).isRequired,
 }

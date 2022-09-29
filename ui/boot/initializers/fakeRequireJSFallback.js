@@ -47,7 +47,7 @@ if (!('require' in window)) {
 
     underscore: () => import('underscore').then(getDefaultExport),
     'jsx/course_wizard/ListItems': () =>
-      import('../../features/course_wizard/react/ListItems').then(getDefaultExport)
+      import('../../features/course_wizard/react/ListItems').then(getDefaultExport),
   }
 
   const getModule = module => {

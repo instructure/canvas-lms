@@ -48,7 +48,7 @@ export default class CourseRestore extends Backbone.Model {
         const message = $.parseJSON(response.responseText)
         this.set(response)
         return model.trigger('doneSearching')
-      }
+      },
     })
   }
 
@@ -81,7 +81,7 @@ export default class CourseRestore extends Backbone.Model {
         url,
         type: method,
         success: restoreSuccess,
-        error: restoreError
+        error: restoreError,
       })
 
     var restoreError = (response = {}) => {

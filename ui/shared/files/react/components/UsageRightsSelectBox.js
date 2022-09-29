@@ -34,30 +34,30 @@ function omitEmptyValues(obj) {
 const CONTENT_OPTIONS = [
   {
     display: I18n.t('Choose usage rights...'),
-    value: 'choose'
+    value: 'choose',
   },
   {
     display: I18n.t('I hold the copyright'),
-    value: 'own_copyright'
+    value: 'own_copyright',
   },
   {
     display: I18n.t('I have obtained permission to use this file.'),
-    value: 'used_by_permission'
+    value: 'used_by_permission',
   },
   {
     display: I18n.t('The material is in the public domain'),
-    value: 'public_domain'
+    value: 'public_domain',
   },
   {
     display: I18n.t(
       'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
     ),
-    value: 'fair_use'
+    value: 'fair_use',
   },
   {
     display: I18n.t('The material is licensed under Creative Commons'),
-    value: 'creative_commons'
-  }
+    value: 'creative_commons',
+  },
 ]
 
 export default class UsageRightsSelectBox extends React.Component {
@@ -67,7 +67,7 @@ export default class UsageRightsSelectBox extends React.Component {
     copyright: PropTypes.string,
     showMessage: PropTypes.bool,
     contextType: PropTypes.string,
-    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   }
 
   state = {
@@ -78,7 +78,7 @@ export default class UsageRightsSelectBox extends React.Component {
     showMessage: this.props.showMessage,
     usageRightSelectionValue: this.props.use_justification
       ? this.props.use_justification
-      : undefined
+      : undefined,
   }
 
   componentDidMount() {
@@ -86,8 +86,9 @@ export default class UsageRightsSelectBox extends React.Component {
   }
 
   apiUrl() {
-    return `/api/v1/${filesEnv.contextType || this.props.contextType}/${filesEnv.contextId ||
-      this.props.contextId}/content_licenses`
+    return `/api/v1/${filesEnv.contextType || this.props.contextType}/${
+      filesEnv.contextId || this.props.contextId
+    }/content_licenses`
   }
 
   // Exposes the selected values to the outside world.
@@ -98,7 +99,7 @@ export default class UsageRightsSelectBox extends React.Component {
       copyright: this.state.showTextBox ? (x = this.copyright) && x.value : undefined,
       cc_license: this.state.showCreativeCommonsOptions
         ? (x = this.creativeCommons) && x.value
-        : undefined
+        : undefined,
     }
 
     return omitEmptyValues(obj)
@@ -107,7 +108,7 @@ export default class UsageRightsSelectBox extends React.Component {
   getUsageRightsOptions() {
     return $.get(this.apiUrl(), data => {
       this.setState({
-        licenseOptions: data
+        licenseOptions: data,
       })
     })
   }
@@ -117,7 +118,7 @@ export default class UsageRightsSelectBox extends React.Component {
       usageRightSelectionValue: event.target.value,
       showTextBox: event.target.value !== 'choose',
       showCreativeCommonsOptions: event.target.value === 'creative_commons',
-      showMessage: this.props.showMessage && event.target.value === 'choose'
+      showMessage: this.props.showMessage && event.target.value === 'choose',
     })
   }
 
@@ -127,7 +128,7 @@ export default class UsageRightsSelectBox extends React.Component {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       this.setState(
         {
-          usageRightSelectionValue: event.target.value
+          usageRightSelectionValue: event.target.value,
         },
         this.handleChange(event)
       )

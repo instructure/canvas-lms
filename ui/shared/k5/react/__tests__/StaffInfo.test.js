@@ -30,7 +30,7 @@ describe('StaffInfo', () => {
     bio: 'Office Hours: 9-10am MWF',
     avatarUrl: '/avatar1.png',
     role: 'TeacherEnrollment',
-    ...overrides
+    ...overrides,
   })
 
   it('renders the name, role, and bio of staff member', () => {

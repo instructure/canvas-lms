@@ -44,7 +44,7 @@ describe('useSettings', () => {
     const lastCall = useFetchApi.mock.calls.pop()
 
     expect(lastCall[0]).toMatchObject({
-      path: `/api/v1/courses/${courseId}/microsoft_sync/group`
+      path: `/api/v1/courses/${courseId}/microsoft_sync/group`,
     })
   })
 
@@ -73,7 +73,7 @@ describe('useSettings', () => {
 
       expect(axios.request).toHaveBeenLastCalledWith({
         method: 'post',
-        url: `/api/v1/courses/${courseId}/microsoft_sync/group`
+        url: `/api/v1/courses/${courseId}/microsoft_sync/group`,
       })
     })
 
@@ -91,7 +91,7 @@ describe('useSettings', () => {
 
       expect(axios.request).toHaveBeenLastCalledWith({
         method: 'delete',
-        url: `/api/v1/courses/${courseId}/microsoft_sync/group`
+        url: `/api/v1/courses/${courseId}/microsoft_sync/group`,
       })
     })
 

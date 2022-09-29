@@ -40,7 +40,7 @@ const CyoeStats = {
         : [assignment.submission_types]
       const initState = {
         assignment,
-        apiUrl: stats_url
+        apiUrl: stats_url,
       }
 
       const store = createStore(initState)
@@ -55,7 +55,7 @@ const CyoeStats = {
 
       return app
     }
-  }
+  },
 }
 
 export default CyoeStats

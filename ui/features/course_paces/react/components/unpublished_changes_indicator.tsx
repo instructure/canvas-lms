@@ -55,7 +55,7 @@ const text = (changeCount: number) => {
   return I18n.t(
     {
       one: '1 unpublished change',
-      other: '%{count} unpublished changes'
+      other: '%{count} unpublished changes',
     },
     {count: changeCount}
   )
@@ -79,7 +79,7 @@ export const UnpublishedChangesIndicator = ({
   pacePublishing,
   isSyncing,
   publishError,
-  onUnpublishedNavigation = triggerBrowserWarning
+  onUnpublishedNavigation = triggerBrowserWarning,
 }: UnpublishedChangesIndicatorProps) => {
   const hasChanges = changeCount > 0
 
@@ -140,7 +140,7 @@ const mapStateToProps = (state: StoreState) => ({
   blackoutDatesSyncing: getBlackoutDatesSyncing(state),
   pacePublishing: getPacePublishing(state),
   isSyncing: getSyncing(state),
-  publishError: getCategoryError(state, ['publish', 'blackout_dates'])
+  publishError: getCategoryError(state, ['publish', 'blackout_dates']),
 })
 
 export default connect(mapStateToProps)(UnpublishedChangesIndicator)

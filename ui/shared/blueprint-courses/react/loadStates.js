@@ -22,10 +22,10 @@ const loadStates = {
   states: statesList.reduce(
     (map, state) =>
       Object.assign(map, {
-        [state]: state
+        [state]: state,
       }),
     {}
-  )
+  ),
 }
 
 loadStates.isLoading = state => state === loadStates.states.loading

@@ -26,7 +26,7 @@ describe('MessageDetailItem', () => {
       onReply: jest.fn(),
       onReplyAll: jest.fn(),
       onDelete: jest.fn(),
-      onForward: jest.fn()
+      onForward: jest.fn(),
     }
     const {getByRole, getByText} = render(<MessageDetailActions {...props} />)
 

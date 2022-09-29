@@ -40,7 +40,7 @@ describe('isValid', () => {
   describe('when the client id input is not empty', () => {
     beforeEach(() => {
       wrapper.instance().setState({
-        clientId: '100000005'
+        clientId: '100000005',
       })
     })
 
@@ -62,7 +62,7 @@ describe('getFormData', () => {
 
     beforeEach(() => {
       wrapper.instance().setState({
-        clientId
+        clientId,
       })
     })
 

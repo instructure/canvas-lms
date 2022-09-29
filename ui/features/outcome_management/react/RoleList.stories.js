@@ -29,16 +29,16 @@ export default {
         id: '1',
         role: 'Teacher_role',
         label: 'Teacher',
-        base_role_type: 'Teacher'
+        base_role_type: 'Teacher',
       },
       {
         id: '2',
         role: 'Admin',
         label: 'Admin',
-        base_role_type: 'Admin'
-      }
-    ]
-  }
+        base_role_type: 'Admin',
+      },
+    ],
+  },
 }
 
 const Template = args => <RoleList {...args} />

@@ -19,7 +19,7 @@
 import NaiveRequestDispatch, {
   DEFAULT_ACTIVE_REQUEST_LIMIT,
   MAX_ACTIVE_REQUEST_LIMIT,
-  MIN_ACTIVE_REQUEST_LIMIT
+  MIN_ACTIVE_REQUEST_LIMIT,
 } from '../index'
 import FakeServer from './FakeServer'
 
@@ -90,10 +90,7 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
     function getJSON(resourceIndex) {
       return new Promise((resolve, reject) => {
         /* eslint-disable promise/catch-or-return */
-        dispatch
-          .getJSON(URL, {resourceIndex})
-          .then(resolve)
-          .fail(reject)
+        dispatch.getJSON(URL, {resourceIndex}).then(resolve).fail(reject)
         /* eslint-enable promise/catch-or-return */
       })
     }
@@ -143,10 +140,7 @@ describe('Shared > Network > NaiveRequestDispatch', () => {
     function getDepaginated(resourceIndex) {
       return new Promise((resolve, reject) => {
         /* eslint-disable promise/catch-or-return */
-        dispatch
-          .getDepaginated(URL, {resourceIndex})
-          .then(resolve)
-          .fail(reject)
+        dispatch.getDepaginated(URL, {resourceIndex}).then(resolve).fail(reject)
         /* eslint-enable promise/catch-or-return */
       })
     }

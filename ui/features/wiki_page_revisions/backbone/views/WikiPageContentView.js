@@ -80,7 +80,7 @@ export default class WikiPageContentView extends Backbone.View {
       PUBLISH: !!this.WIKI_RIGHTS.publish_page,
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
-      READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
+      READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions,
     }
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS
     json.CAN.VIEW_TOOLBAR =

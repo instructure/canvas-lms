@@ -45,13 +45,11 @@ const inlineMediaComment = {
   collapseComment($holder) {
     __guard__($holder.find('video,audio').data('mediaelementplayer'), x => x.pause())
     $holder.remove()
-  }
+  },
 }
 
 const initialFocusInnerhold = e => {
-  $(e.target)
-    .find('div.mejs-audio')
-    .focus()
+  $(e.target).find('div.mejs-audio').focus()
 }
 
 const minTdWidth = 300
@@ -62,10 +60,7 @@ const isVideoInTd = $link => {
 }
 
 const isContainingTdSmall = $link => {
-  const tdWidth = $link
-    .closest('td')
-    .css('width')
-    .replace('px', '')
+  const tdWidth = $link.closest('td').css('width').replace('px', '')
   return tdWidth < minTdWidth
 }
 
@@ -83,7 +78,7 @@ const resizeContainingTd = $link => {
 $(document).on(
   'click',
   'a.instructure_inline_media_comment',
-  preventDefault(function() {
+  preventDefault(function () {
     if (!INST.kalturaSettings) {
       alert(I18n.t('alerts.kaltura_disabled', 'Kaltura has been disabled for this Canvas site'))
       return

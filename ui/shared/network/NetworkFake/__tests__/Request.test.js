@@ -84,14 +84,14 @@ describe('Shared > Network > NetworkFake > Request', () => {
     it('is the parsed form body from the request', async () => {
       const formData = {
         examples: [{one: 1, two: 'two'}],
-        sample: true
+        sample: true,
       }
       sendPostFormRequest('/example', null, formData)
       await network.allRequestsReady()
       const [request] = network.getRequests()
       expect(request.formBody).toEqual({
         examples: [{one: '1', two: 'two'}],
-        sample: 'true'
+        sample: 'true',
       })
     })
   })
@@ -100,14 +100,14 @@ describe('Shared > Network > NetworkFake > Request', () => {
     it('is the parsed form body from the request', async () => {
       const formData = {
         examples: [{one: 1, two: 'two'}],
-        sample: true
+        sample: true,
       }
       sendPostJsonRequest('/example', null, formData)
       await network.allRequestsReady()
       const [request] = network.getRequests()
       expect(request.jsonBody).toEqual({
         examples: [{one: 1, two: 'two'}],
-        sample: true
+        sample: true,
       })
     })
   })

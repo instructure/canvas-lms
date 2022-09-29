@@ -35,7 +35,7 @@ export default function CourseNotificationSettingsManager(props) {
     },
     onError() {
       setOnFailure(I18n.t('Failed to update course notification settings'))
-    }
+    },
   })
 
   const handleUpdateComplete = data => {
@@ -59,8 +59,8 @@ export default function CourseNotificationSettingsManager(props) {
             channelId: data.channel?._id,
             category: data.category?.split(' ').join('_'),
             frequency: data.frequency,
-            sendScoresInEmails: data.sendScoresInEmails
-          }
+            sendScoresInEmails: data.sendScoresInEmails,
+          },
         })
       }
       notificationPreferences={props.notificationPreferences}
@@ -74,5 +74,5 @@ CourseNotificationSettingsManager.propTypes = {
   courseName: string.isRequired,
   enabled: bool.isRequired,
   notificationPreferences: NotificationPreferencesShape,
-  userId: string.isRequired
+  userId: string.isRequired,
 }

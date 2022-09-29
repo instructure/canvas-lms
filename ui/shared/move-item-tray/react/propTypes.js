@@ -21,22 +21,22 @@ import {string, shape, arrayOf, oneOfType, bool} from 'prop-types'
 export const itemShape = shape({
   id: string.isRequired,
   title: string.isRequired,
-  groupId: string
+  groupId: string,
 })
 
 export const groupShape = shape({
   id: string.isRequired,
   title: string.isRequired,
-  items: arrayOf(itemShape)
+  items: arrayOf(itemShape),
 })
 
 export const moveOptionsType = oneOfType([
   shape({
-    siblings: arrayOf(itemShape).isRequired
+    siblings: arrayOf(itemShape).isRequired,
   }),
   shape({
     groupsLabel: string.isRequired,
     groups: arrayOf(groupShape).isRequired,
-    excludeCurrent: bool
-  })
+    excludeCurrent: bool,
+  }),
 ])

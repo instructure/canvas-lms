@@ -63,7 +63,7 @@ function RubricManagement(props) {
 }
 
 RubricManagement.propTypes = {
-  accountId: string.isRequired
+  accountId: string.isRequired,
 }
 
 export default RubricManagement

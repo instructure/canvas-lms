@@ -32,7 +32,7 @@ describe('GroupModal', () => {
     role: '',
     join_level: '',
     group_limit: 2,
-    members_count: 2
+    members_count: 2,
   }
 
   beforeEach(() => {
@@ -133,11 +133,7 @@ describe('GroupModal', () => {
           onDismiss={onDismiss}
         />
       )
-      expect(
-        getByText('Save')
-          .closest('button')
-          .hasAttribute('disabled')
-      ).toBeTruthy()
+      expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
 
     it('enables the save button if group name is provided', () => {
@@ -153,11 +149,7 @@ describe('GroupModal', () => {
         />
       )
       userEvent.type(getByPlaceholderText('Name'), 'foo')
-      expect(
-        getByText('Save')
-          .closest('button')
-          .hasAttribute('disabled')
-      ).toBeFalsy()
+      expect(getByText('Save').closest('button').hasAttribute('disabled')).toBeFalsy()
     })
 
     it('creates a non student organized group and reports status', async () => {
@@ -181,7 +173,7 @@ describe('GroupModal', () => {
         group_category_id: '1',
         isFull: '',
         max_membership: '2',
-        name: 'Teacher Organized'
+        name: 'Teacher Organized',
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))
@@ -210,7 +202,7 @@ describe('GroupModal', () => {
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
         group_category_id: '1',
         join_level: 'invitation_only',
-        name: 'Student Organized'
+        name: 'Student Organized',
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))
@@ -259,7 +251,7 @@ describe('GroupModal', () => {
         group_category_id: '1',
         isFull: '',
         max_membership: '3',
-        name: 'Beetle Juice'
+        name: 'Beetle Juice',
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))
@@ -288,7 +280,7 @@ describe('GroupModal', () => {
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
         group_category_id: '1',
         join_level: 'invitation_only',
-        name: 'Sleepy Hollow'
+        name: 'Sleepy Hollow',
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))
@@ -304,7 +296,7 @@ describe('GroupModal', () => {
           group={{...group, name: 'nameOnly'}}
           label="Edit Group"
           open={open}
-          nameOnly
+          nameOnly={true}
           requestMethod="PUT"
           onSave={onSave}
           onDismiss={onDismiss}
@@ -317,7 +309,7 @@ describe('GroupModal', () => {
       expect(fetchOptions.method).toBe('PUT')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
         group_category_id: '1',
-        name: 'Name Only'
+        name: 'Name Only',
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))
@@ -347,7 +339,7 @@ describe('GroupModal', () => {
         group_category_id: '1',
         isFull: '',
         max_membership: '',
-        name: 'Empty Group Limit'
+        name: 'Empty Group Limit',
       })
     })
   })

@@ -28,11 +28,11 @@ describe('FeaturedHelpLink', () => {
     url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
     is_featured: true,
     is_new: false,
-    feature_headline: 'Little Lost? Try here first!'
+    feature_headline: 'Little Lost? Try here first!',
   }
   const props = {
     featuredLink,
-    handleClick() {}
+    handleClick() {},
   }
 
   beforeEach(() => {

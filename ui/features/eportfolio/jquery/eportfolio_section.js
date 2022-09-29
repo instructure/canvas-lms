@@ -30,12 +30,12 @@ export function fetchContent($section, section_type, name) {
   } else if (section_type == 'submission') {
     data[name + '[section_type]'] = 'submission'
     data[name + '[submission_id]'] = $section.getTemplateData({
-      textValues: ['submission_id']
+      textValues: ['submission_id'],
     }).submission_id
   } else if (section_type == 'attachment') {
     data[name + '[section_type]'] = 'attachment'
     data[name + '[attachment_id]'] = $section.getTemplateData({
-      textValues: ['attachment_id']
+      textValues: ['attachment_id'],
     }).attachment_id
   }
   return data

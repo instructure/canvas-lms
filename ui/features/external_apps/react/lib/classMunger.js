@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const classMunger = function(staticClassName, conditionalClassNames) {
+const classMunger = function (staticClassName, conditionalClassNames) {
   const classNames = []
   if (typeof conditionalClassNames === 'undefined') {
     conditionalClassNames = staticClassName

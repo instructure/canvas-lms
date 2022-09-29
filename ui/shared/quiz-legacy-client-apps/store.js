@@ -20,7 +20,7 @@ import _ from 'lodash-underscore'
 
 const extend = _.extend
 
-const Store = function(key, proto, Dispatcher) {
+const Store = function (key, proto, Dispatcher) {
   const emitChange = this.emitChange.bind(this)
 
   extend(this, proto || {})
@@ -29,11 +29,11 @@ const Store = function(key, proto, Dispatcher) {
   this.__reset__()
 
   Object.keys(this.actions).forEach(
-    function(action) {
+    function (action) {
       const handler = this.actions[action].bind(this)
       const scopedAction = [key, action].join(':')
 
-      Dispatcher.register(scopedAction, function(params, resolve, reject) {
+      Dispatcher.register(scopedAction, function (params, resolve, reject) {
         try {
           handler(
             params,
@@ -67,7 +67,7 @@ extend(Store.prototype, {
   },
 
   emitChange() {
-    this._callbacks.forEach(function(callback) {
+    this._callbacks.forEach(function (callback) {
       callback()
     })
   },
@@ -93,7 +93,7 @@ extend(Store.prototype, {
   setState(newState) {
     extend(this.state, newState)
     this.emitChange()
-  }
+  },
 })
 
 export default Store

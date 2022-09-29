@@ -54,11 +54,11 @@ NameLink.propTypes = {
   htmlUrl: string.isRequired,
   name: string.isRequired,
   pronouns: string,
-  enrollments: arrayOf(shape({type: string}))
+  enrollments: arrayOf(shape({type: string})),
 }
 
 NameLink.defaultProps = {
-  pronouns: null
+  pronouns: null,
 }
 
 export default NameLink

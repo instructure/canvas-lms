@@ -28,7 +28,7 @@ function selectProps(override = {}) {
     label: 'Choose one',
     value: {undefined},
     onChange: () => {},
-    ...override
+    ...override,
   }
 }
 
@@ -42,7 +42,7 @@ function selectOpts() {
     </CanvasSelect.Option>,
     <CanvasSelect.Option key="3" id="3" value="three">
       Three
-    </CanvasSelect.Option>
+    </CanvasSelect.Option>,
   ]
 }
 
@@ -101,7 +101,7 @@ describe('CanvasSelect component', () => {
         <CanvasSelect.Option key="2" id="2" value="two">
           Two
         </CanvasSelect.Option>
-        <CanvasSelect.Option key="3" id="3" value="three" isDisabled>
+        <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
       </CanvasSelect>
@@ -123,7 +123,7 @@ describe('CanvasSelect component', () => {
           One
         </CanvasSelect.Option>
         undefined
-        <CanvasSelect.Option key="3" id="3" value="three" isDisabled>
+        <CanvasSelect.Option key="3" id="3" value="three" isDisabled={true}>
           Three
         </CanvasSelect.Option>
       </CanvasSelect>
@@ -217,17 +217,17 @@ describe('CanvasSelect component', () => {
         items: [
           {id: '1', value: 'one', label: 'One'},
           {id: '2', value: 'two', label: 'Two'},
-          {id: '3', value: 'three', label: 'Three'}
-        ]
+          {id: '3', value: 'three', label: 'Three'},
+        ],
       },
       {
         label: 'Group B',
         items: [
           {id: '4', value: 'four', label: 'Four'},
           {id: '5', value: 'five', label: 'Five'},
-          {id: '6', value: 'siz', label: 'Six'}
-        ]
-      }
+          {id: '6', value: 'siz', label: 'Six'},
+        ],
+      },
     ]
 
     let k = 0

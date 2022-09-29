@@ -38,7 +38,7 @@ ready(() => {
     collection: daySubCollection,
     emptyMessage: () => I18n.t('no_day_substitutions', 'No Day Substitutions Added'),
     itemView: DaySubstitutionView,
-    template
+    template,
   })
 
   const content_migration = new ContentMigration()
@@ -49,14 +49,14 @@ ready(() => {
     daySubstitution: daySubCollectionView,
     oldStartDate: ENV.OLD_START_DATE,
     oldEndDate: ENV.OLD_END_DATE,
-    addHiddenInput: true
+    addHiddenInput: true,
   })
 
   const importQuizzesNextView = new ImportQuizzesNextView({
     model: content_migration,
     quizzesNextEnabled: ENV.QUIZZES_NEXT_ENABLED,
     migrationDefault: ENV.NEW_QUIZZES_MIGRATION_DEFAULT,
-    questionBank: null
+    questionBank: null,
   })
   $('#new_quizzes_migrate').html(importQuizzesNextView.render().el)
   $('#importQuizzesNext').attr('name', 'settings[import_quizzes_next]')

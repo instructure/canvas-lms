@@ -29,7 +29,7 @@ export const castIdsToInt = (accounts: AccountData[]): Account[] =>
     children: [],
     heading: '',
     parent_account_id:
-      account.parent_account_id != null ? parseInt(account.parent_account_id, 10) : null
+      account.parent_account_id != null ? parseInt(account.parent_account_id, 10) : null,
   }))
 
 export const addAccountsToTree = (
@@ -49,9 +49,9 @@ export const addAccountsToTree = (
       ...{
         heading: I18n.t('%{accountName} (%{accountCount})', {
           accountName: account.name,
-          accountCount: account.sub_account_count + 1 // to include parent account in the count
-        })
-      }
+          accountCount: account.sub_account_count + 1, // to include parent account in the count
+        }),
+      },
     }
 
     if (account.parent_account_id && account.parent_account_id != account.id) {

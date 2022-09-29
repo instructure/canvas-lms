@@ -29,7 +29,7 @@ class ExportListItem extends React.Component {
     date: PropTypes.string.isRequired,
     link: PropTypes.string.isRequired,
     workflowState: PropTypes.string.isRequired,
-    newExport: PropTypes.bool.isRequired
+    newExport: PropTypes.bool.isRequired,
   }
 
   render() {

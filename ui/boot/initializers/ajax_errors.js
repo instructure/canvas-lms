@@ -26,13 +26,13 @@ import '@canvas/rails-flash-notifications' // flashError
 const I18n = useI18nScope('ajax_errors')
 
 INST.errorCount = 0
-window.onerror = function(msg, url, line, column, errorObj) {
+window.onerror = function (msg, url, line, column, errorObj) {
   INST.errorCount += 1
 }
 
 // puts the little red box when something bad happens in ajax.
-$(document).ready(function() {
-  $('#instructure_ajax_error_result').defaultAjaxError(function(
+$(document).ready(function () {
+  $('#instructure_ajax_error_result').defaultAjaxError(function (
     event,
     request,
     settings,
@@ -88,7 +88,7 @@ $(document).ready(function() {
       {skipDefaultError: true}
     )
     const $obj = $(this)
-    var ajaxErrorFlash = function(message, xhr) {
+    var ajaxErrorFlash = function (message, xhr) {
       const i = $obj[0]
       if (!i) {
         return

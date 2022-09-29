@@ -111,7 +111,7 @@ const reducerMap = {
     }
 
     return newState
-  }
+  },
 }
 
 const allDiscussionsReducer = handleActions(reducerMap, {})

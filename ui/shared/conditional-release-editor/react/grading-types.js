@@ -23,24 +23,24 @@ const I18n = useI18nScope('conditional_release')
 const GradingTypes = {
   points: {
     label: () => I18n.t('points'),
-    key: 'points'
+    key: 'points',
   },
   percent: {
     label: () => I18n.t('percent'),
-    key: 'percent'
+    key: 'percent',
   },
   letter_grade: {
     label: () => I18n.t('letter grade'),
-    key: 'letter_grade'
+    key: 'letter_grade',
   },
   gpa_scale: {
     label: () => I18n.t('GPA scale'),
-    key: 'gpa_scale'
+    key: 'gpa_scale',
   },
   other: {
     label: () => I18n.t('other'),
-    key: 'other'
-  }
+    key: 'other',
+  },
 }
 
 export default GradingTypes

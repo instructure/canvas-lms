@@ -34,8 +34,8 @@ if (ENV.INCOMPLETE_REGISTRATION) {
           click() {
             $(this).dialog('close')
           },
-          class: 'btn-primary'
-        }
-      ]
+          class: 'btn-primary',
+        },
+      ],
     })
 }

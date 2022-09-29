@@ -47,13 +47,13 @@ class TimeBlockSelectorRow extends React.Component {
     timeData: PropTypes.shape({
       date: PropTypes.date,
       startTime: PropTypes.date,
-      endTime: PropTypes.date
+      endTime: PropTypes.date,
     }).isRequired,
     slotEventId: PropTypes.string,
     readOnly: PropTypes.bool,
     onBlur: PropTypes.func,
     handleDelete: PropTypes.func,
-    setData: PropTypes.func
+    setData: PropTypes.func,
   }
 
   constructor(props) {
@@ -76,7 +76,7 @@ class TimeBlockSelectorRow extends React.Component {
     const data = {
       date: $(this.date).data('date'),
       startTime: $(this.startTime).data('date'),
-      endTime: $(this.endTime).data('date')
+      endTime: $(this.endTime).data('date'),
     }
 
     this.props.setData && this.props.setData(this.props.slotEventId, data)

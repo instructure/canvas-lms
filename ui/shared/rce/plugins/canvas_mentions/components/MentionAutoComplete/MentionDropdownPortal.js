@@ -71,7 +71,7 @@ MentionDropdownPortal.propTypes = {
   /**
    * Unique ID supplied for ARIA support
    */
-  instanceId: PropTypes.string
+  instanceId: PropTypes.string,
 }
 
 export default MentionDropdownPortal

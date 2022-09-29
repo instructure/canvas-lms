@@ -43,8 +43,8 @@ export default class RedirectReturnContainer {
     const data = {
       migration_type: 'canvas_cartridge_importer',
       settings: {
-        file_url
-      }
+        file_url,
+      },
     }
 
     const migrationUrl = `/api/v1/courses/${ENV.course_id}/content_migrations`

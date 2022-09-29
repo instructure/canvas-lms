@@ -110,7 +110,7 @@ export default function MicrosoftSyncAccountSettings() {
                   tenantInputHandler={event =>
                     dispatch({
                       type: reducerActions.updateTenant,
-                      payload: {microsoft_sync_tenant: event.target.value}
+                      payload: {microsoft_sync_tenant: event.target.value},
                     })
                   }
                   messages={state.tenantErrorMessages.concat(state.tenantInfoMessages)}
@@ -143,7 +143,7 @@ export default function MicrosoftSyncAccountSettings() {
                   attributeChangedHandler={(event, {value}) => {
                     dispatch({
                       type: reducerActions.updateAttribute,
-                      payload: {microsoft_sync_login_attribute: value}
+                      payload: {microsoft_sync_login_attribute: value},
                     })
                   }}
                   selectedLoginAttribute={state.microsoft_sync_login_attribute}
@@ -173,7 +173,7 @@ export default function MicrosoftSyncAccountSettings() {
                   suffixInputHandler={event => {
                     dispatch({
                       type: reducerActions.updateSuffix,
-                      payload: {microsoft_sync_login_attribute_suffix: event.target.value}
+                      payload: {microsoft_sync_login_attribute_suffix: event.target.value},
                     })
                   }}
                   messages={state.suffixErrorMessages}
@@ -203,7 +203,7 @@ export default function MicrosoftSyncAccountSettings() {
                   fieldChangedHandler={(event, {value}) => {
                     dispatch({
                       type: reducerActions.updateRemoteAttribute,
-                      payload: {microsoft_sync_remote_attribute: value}
+                      payload: {microsoft_sync_remote_attribute: value},
                     })
                   }}
                   selectedLookupField={state.microsoft_sync_remote_attribute}

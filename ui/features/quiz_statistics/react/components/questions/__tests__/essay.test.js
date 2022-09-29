@@ -26,23 +26,21 @@ describe('canvas_quizzes/statistics/views/questions/essay', () => {
     render(<Essay />)
   })
 
-  it('renders a link to speedgrader', function() {
-    const speedGraderUrl = "http://localhost/courses/1/gradebook/speed_grader?assignment_id=10"
-    const { getByText } = render(<Essay speedGraderUrl={speedGraderUrl} />)
+  it('renders a link to speedgrader', function () {
+    const speedGraderUrl = 'http://localhost/courses/1/gradebook/speed_grader?assignment_id=10'
+    const {getByText} = render(<Essay speedGraderUrl={speedGraderUrl} />)
     const link = getByText('View in SpeedGrader')
 
     expect(link.href).toBe(speedGraderUrl)
     expect(link.target).toBe('_blank')
-  });
+  })
 
   it('does not render a link to speed grader when url is absent', () => {
-    const { getByText } = render(<Essay />)
+    const {getByText} = render(<Essay />)
 
     try {
       getByText('View in SpeedGrader')
       expect(false).toBe(true)
-    }
-    catch (e) {
-    }
+    } catch (e) {}
   })
 })

@@ -35,14 +35,14 @@ RenderSelect.propTypes = {
   options: arrayOf(node),
   className: string,
   selectOneDefault: bool,
-  testId: string
+  testId: string,
 }
 
 RenderSelect.defaultProps = {
   options: [],
   className: '',
   selectOneDefault: false,
-  testId: null
+  testId: null,
 }
 
 export function RenderSelect({label, onChange, options, className, selectOneDefault, testId}) {
@@ -55,7 +55,7 @@ export function RenderSelect({label, onChange, options, className, selectOneDefa
           className="move-select-form"
           style={{
             margin: '0',
-            width: '100%'
+            width: '100%',
           }}
         >
           {selectOneDefault && <option>{I18n.t('Select one')}</option>}
@@ -71,13 +71,13 @@ SelectPosition.propTypes = {
   siblings: arrayOf(itemShape).isRequired,
   selectedPosition: shape({type: string}),
   selectPosition: func,
-  selectSibling: func
+  selectSibling: func,
 }
 
 SelectPosition.defaultProps = {
   selectedPosition: {type: 'absolute'},
   selectPosition: () => {},
-  selectSibling: () => {}
+  selectSibling: () => {},
 }
 
 export default function SelectPosition({
@@ -85,7 +85,7 @@ export default function SelectPosition({
   siblings,
   selectedPosition,
   selectPosition,
-  selectSibling
+  selectSibling,
 }) {
   const positionSelected = !!(selectedPosition && selectedPosition.type === 'relative')
 
@@ -131,7 +131,7 @@ export default function SelectPosition({
       {positionSelected ? (
         <div>
           <ConnectorIcon
-            aria-hidden
+            aria-hidden={true}
             style={{position: 'absolute', transform: 'translate(-15px, -35px)'}}
           />
           {renderSelectSibling(items)}

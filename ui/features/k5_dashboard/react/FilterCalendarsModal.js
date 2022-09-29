@@ -42,14 +42,14 @@ export const ContextCheckbox = ({
   maxContextsReached,
   shortName,
   onChange,
-  selected
+  selected,
 }) => (
   <ApplyTheme
     theme={{
       [CheckboxFacade.theme]: {
         checkedBackground: color,
-        checkedBorderColor: color
-      }
+        checkedBorderColor: color,
+      },
     }}
   >
     <Checkbox
@@ -69,7 +69,7 @@ const FilterCalendarsModal = ({
   isOpen,
   selectedContextCodes,
   selectedContextsLimit,
-  updateSelectedContextCodes
+  updateSelectedContextCodes,
 }) => {
   const [pendingSelectedContexts, setPendingSelectedContexts] = useState([...selectedContextCodes])
 
@@ -121,7 +121,7 @@ const FilterCalendarsModal = ({
             {I18n.t(
               {
                 one: 'Choose up to 1 subject calendar',
-                other: 'Choose up to %{count} subject calendars'
+                other: 'Choose up to %{count} subject calendars',
               },
               {count: selectedContextsLimit}
             )}
@@ -144,14 +144,14 @@ const FilterCalendarsModal = ({
         </FormFieldGroup>
       </Modal.Body>
       <Modal.Footer>
-        <Flex.Item shouldGrow margin="0 0 0 small">
+        <Flex.Item shouldGrow={true} margin="0 0 0 small">
           <Flex>
-            <Flex.Item shouldGrow shouldShrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Text data-testid="calendars-left-text">
                 {I18n.t(
                   {
                     one: 'You have 1 calendar left',
-                    other: 'You have %{count} calendars left'
+                    other: 'You have %{count} calendars left',
                   },
                   {count: selectedContextsLimit - pendingSelectedContexts.length}
                 )}
@@ -177,7 +177,7 @@ FilterCalendarsModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string).isRequired,
   selectedContextsLimit: PropTypes.number.isRequired,
-  updateSelectedContextCodes: PropTypes.func.isRequired
+  updateSelectedContextCodes: PropTypes.func.isRequired,
 }
 
 export default FilterCalendarsModal

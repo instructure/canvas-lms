@@ -36,7 +36,7 @@ const defaultProps = (props = {}) => ({
   onMasteryChange: () => {},
   onPointsChange: () => {},
   points: '10.0',
-  ...props
+  ...props,
 })
 
 it('renders the ProficiencyRating component', () => {
@@ -48,7 +48,7 @@ it('mastery checkbox is checked if mastery', () => {
   const wrapper = shallow(
     <ProficiencyRating
       {...defaultProps({
-        mastery: true
+        mastery: true,
       })}
     />
   )
@@ -76,8 +76,9 @@ describe('focus handling', () => {
         <tbody>
           <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
         </tbody>
-      </table>
-    , { attachTo: containerElement })
+      </table>,
+      {attachTo: containerElement}
+    )
     expect(wrapper.find('RadioInput').find('input').instance()).toBe(document.activeElement)
   })
 })
@@ -154,7 +155,7 @@ it('clicking disabled delete button does not triggers delete', () => {
         <ProficiencyRating
           {...defaultProps({
             onDelete,
-            disableDelete: true
+            disableDelete: true,
           })}
         />
       </tbody>

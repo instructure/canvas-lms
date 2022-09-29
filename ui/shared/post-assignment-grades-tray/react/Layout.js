@@ -43,7 +43,7 @@ export default function Layout({
   sectionSelectionChanged,
   sections,
   selectedSectionIds,
-  unpostedCount
+  unpostedCount,
 }) {
   return (
     <>
@@ -102,9 +102,9 @@ export default function Layout({
 Layout.propTypes = {
   assignment: shape({
     anonymousGrading: bool.isRequired,
-    gradesPublished: bool.isRequired
+    gradesPublished: bool.isRequired,
   }).isRequired,
   containerName: string,
   sections: arrayOf(any).isRequired,
-  ...FormContent.propTypes
+  ...FormContent.propTypes,
 }

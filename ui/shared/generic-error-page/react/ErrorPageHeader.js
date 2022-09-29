@@ -27,7 +27,7 @@ export default function ErrorPageHeader(props) {
   return (
     <View display="block">
       <Heading level="h1">{I18n.t('Sorry, Something Broke')}</Heading>
-      <View maxWidth="16rem" margin="large auto" display="block" aria-hidden>
+      <View maxWidth="16rem" margin="large auto" display="block" aria-hidden={true}>
         <img alt="" src={props.imageUrl} />
       </View>
     </View>
@@ -35,5 +35,5 @@ export default function ErrorPageHeader(props) {
 }
 
 ErrorPageHeader.propTypes = {
-  imageUrl: string.isRequired
+  imageUrl: string.isRequired,
 }

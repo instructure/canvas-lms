@@ -31,7 +31,7 @@ import {
   IconPlaySolid,
   IconPauseSolid,
   IconCalendarClockLine,
-  IconCalendarClockSolid
+  IconCalendarClockSolid,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('jobs_v2')
@@ -48,7 +48,7 @@ export default function JobsHeader({
   startDate,
   endDate,
   timeZone,
-  onChangeDateOptions
+  onChangeDateOptions,
 }) {
   const [dateModalOpen, setDateModalOpen] = useState(false)
 
@@ -100,7 +100,7 @@ export default function JobsHeader({
           <strong>{I18n.t('Scope:')}</strong>
         </PresentationContent>
       </Flex.Item>
-      <Flex.Item align="end" shouldGrow>
+      <Flex.Item align="end" shouldGrow={true}>
         <SimpleSelect
           renderLabel={<ScreenReaderContent>{I18n.t('Scope')}</ScreenReaderContent>}
           onChange={onChangeScope}

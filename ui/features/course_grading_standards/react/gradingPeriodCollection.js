@@ -38,7 +38,7 @@ class GradingPeriodCollection extends React.Component {
     periods: null,
     readOnly: false,
     disabled: false,
-    saveDisabled: true
+    saveDisabled: true,
   }
 
   componentWillMount() {
@@ -53,7 +53,7 @@ class GradingPeriodCollection extends React.Component {
           periods: self.deserializePeriods(periods),
           readOnly: periods.grading_periods_read_only,
           disabled: false,
-          saveDisabled: _.isEmpty(periods.grading_periods)
+          saveDisabled: _.isEmpty(periods.grading_periods),
         })
       })
       .error(() => {
@@ -88,7 +88,7 @@ class GradingPeriodCollection extends React.Component {
         },
         error() {
           $.flashError(I18n.t('There was a problem deleting the grading period'))
-        }
+        },
       })
     }
   }
@@ -178,7 +178,7 @@ class GradingPeriodCollection extends React.Component {
       id: period.id,
       title: period.title,
       start_date: period.startDate,
-      end_date: period.endDate
+      end_date: period.endDate,
     }))
     return {grading_periods: periods}
   }
@@ -192,13 +192,13 @@ class GradingPeriodCollection extends React.Component {
           dataType: 'json',
           contentType: 'application/json',
           data: JSON.stringify(this.serializeDataForSubmission()),
-          context: this
+          context: this,
         })
-          .success(function(response) {
+          .success(function (response) {
             $.flashMessage(I18n.t('All changes were saved'))
             this.setState({disabled: false, periods: this.deserializePeriods(response)})
           })
-          .error(function(error) {
+          .error(function (error) {
             this.setState({disabled: false})
             $.flashError(I18n.t('There was a problem saving the grading period'))
           })

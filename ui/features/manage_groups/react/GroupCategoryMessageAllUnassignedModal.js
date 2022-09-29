@@ -38,7 +38,7 @@ GroupCategoryMessageAllUnassignedModal.propTypes = {
   groupCategory: shape({name: string.isRequired}),
   recipients: arrayOf(shape({id: string.isRequired, short_name: string.isRequired})),
   open: bool.isRequired,
-  onDismiss: func.isRequired
+  onDismiss: func.isRequired,
 }
 
 export default function GroupCategoryMessageAllUnassignedModal({
@@ -55,7 +55,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
   const payload = {
     body: message,
     context_code: contextAssetString,
-    recipients: recipients.map(user => user.id)
+    recipients: recipients.map(user => user.id),
   }
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
         doFetchApi({
           method: 'POST',
           path: `/api/v1/conversations`,
-          body: chunkData
+          body: chunkData,
         })
       )
     })
@@ -124,7 +124,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
 
   const alert = alertMessage ? (
     <Alert variant={status}>
-      <div role="alert" aria-live="assertive" aria-atomic>
+      <div role="alert" aria-live="assertive" aria-atomic={true}>
         {alertMessage}
       </div>
       {status === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
@@ -134,7 +134,7 @@ export default function GroupCategoryMessageAllUnassignedModal({
   return (
     <CanvasModal
       label={I18n.t('Message students for %{groupCategoryName}', {
-        groupCategoryName: groupCategory.name
+        groupCategoryName: groupCategory.name,
       })}
       size="medium"
       shouldCloseOnDocumentClick={false}

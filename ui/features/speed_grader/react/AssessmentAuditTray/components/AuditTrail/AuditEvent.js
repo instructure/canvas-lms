@@ -32,7 +32,7 @@ import {
   auditEventStudentAnonymityStates,
   iconFor,
   labelFor,
-  snippetFor
+  snippetFor,
 } from '../../AuditTrailHelpers'
 import * as propTypes from './propTypes'
 
@@ -42,7 +42,7 @@ const {OFF, TURNED_OFF} = auditEventStudentAnonymityStates
 
 export default class AuditEvent extends PureComponent {
   static propTypes = {
-    ...propTypes.auditEventInfo
+    ...propTypes.auditEventInfo,
   }
 
   render() {

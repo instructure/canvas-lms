@@ -22,7 +22,7 @@ import {Errors} from './errors'
 
 export default {
   title: 'Examples/Course Pacing/errors',
-  component: Errors
+  component: Errors,
 }
 
 const Template = args => <Errors {...args} errors={{publish: 'TypeError: Failed to fetch'}} />

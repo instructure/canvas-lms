@@ -48,7 +48,7 @@ function combineAssignmentGroupGrades(assignmentGroupGrades, includeUngraded: bo
 
   return {
     score: sumBy(scopedAssignmentGroupGrades, 'score'),
-    possible: sumBy(scopedAssignmentGroupGrades, 'possible')
+    possible: sumBy(scopedAssignmentGroupGrades, 'possible'),
   }
 }
 
@@ -69,7 +69,7 @@ function combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, includeUngrad
 
   return {
     score: round(totalScore, 2),
-    possible: 100
+    possible: 100,
   }
 }
 
@@ -99,7 +99,7 @@ function extractPeriodBasedAssignmentGroups(assignmentGroups, effectiveDueDates)
         const groupWithAssignedAssignments = {...assignmentGroup, assignments: assignedAssignments}
         return [
           ...periodBasedGroups,
-          ...divideGroupByGradingPeriods(groupWithAssignedAssignments, effectiveDueDates)
+          ...divideGroupByGradingPeriods(groupWithAssignedAssignments, effectiveDueDates),
         ]
       }
       return periodBasedGroups
@@ -122,14 +122,14 @@ function recombinePeriodBasedAssignmentGroupGrades(grades) {
           submission_count: previousGrade.current.submission_count + grade.current.submission_count,
           submissions: [...previousGrade.current.submissions, ...grade.current.submissions],
           score: sum([previousGrade.current.score, grade.current.score]),
-          possible: sum([previousGrade.current.possible, grade.current.possible])
+          possible: sum([previousGrade.current.possible, grade.current.possible]),
         },
         final: {
           submission_count: previousGrade.final.submission_count + grade.final.submission_count,
           submissions: [...previousGrade.final.submissions, ...grade.final.submissions],
           score: sum([previousGrade.final.score, grade.final.score]),
-          possible: sum([previousGrade.final.possible, grade.final.possible])
-        }
+          possible: sum([previousGrade.final.possible, grade.final.possible]),
+        },
       }
     } else {
       map[grade.assignmentGroupId] = grade
@@ -181,7 +181,7 @@ function calculateWithGradingPeriods(
       assignmentGroups: groupGrades,
       current: combineAssignmentGroupGrades(groupGradesList, false, options),
       final: combineAssignmentGroupGrades(groupGradesList, true, options),
-      scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
+      scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points',
     }
   }
 
@@ -191,7 +191,7 @@ function calculateWithGradingPeriods(
       gradingPeriods: gradingPeriodGradesByPeriodId,
       current: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, false, options),
       final: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, true, options),
-      scoreUnit: 'percentage'
+      scoreUnit: 'percentage',
     }
   }
 
@@ -208,7 +208,7 @@ function calculateWithGradingPeriods(
     gradingPeriods: gradingPeriodGradesByPeriodId,
     current: combineAssignmentGroupGrades(allAssignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(allAssignmentGroupGrades, true, options),
-    scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
+    scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points',
   }
 }
 
@@ -225,7 +225,7 @@ function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) 
     assignmentGroups: _.keyBy(assignmentGroupGrades, grade => grade.assignmentGroupId),
     current: combineAssignmentGroupGrades(assignmentGroupGrades, false, options),
     final: combineAssignmentGroupGrades(assignmentGroupGrades, true, options),
-    scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points'
+    scoreUnit: options.weightAssignmentGroups ? 'percentage' : 'points',
   }
 }
 
@@ -339,7 +339,7 @@ function calculate(
   const options = {
     weightGradingPeriods: gradingPeriodSet && !!gradingPeriodSet.weighted,
     weightAssignmentGroups: weightingScheme === 'percent',
-    ignoreUnpostedAnonymous
+    ignoreUnpostedAnonymous,
   }
 
   if (gradingPeriodSet && effectiveDueDates) {
@@ -356,5 +356,5 @@ function calculate(
 }
 
 export default {
-  calculate
+  calculate,
 }

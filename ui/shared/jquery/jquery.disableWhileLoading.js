@@ -45,8 +45,8 @@ function eraseFromArray(array, victim) {
   })
 }
 
-$.fn.disableWhileLoading = function(deferred, options) {
-  return this.each(function() {
+$.fn.disableWhileLoading = function (deferred, options) {
+  return this.each(function () {
     const opts = $.extend(true, {}, $.fn.disableWhileLoading.defaults, options)
     const $this = $(this)
     const data = $this.data()
@@ -84,25 +84,23 @@ $.fn.disableWhileLoading = function(deferred, options) {
           $($spinHolder.data().spinner.el).css({'max-width': '100px'})
         }
 
-        $disabledArea.css('opacity', function(i, currentOpacity) {
+        $disabledArea.css('opacity', function (i, currentOpacity) {
           $(this).data(dataKey + 'opacityBefore', this.style.opacity || 1)
           return opts.opacity
         })
-        $.each(opts.buttons, function(selector, text) {
+        $.each(opts.buttons, function (selector, text) {
           // if you pass an array to $.each the first arg is indexInArray, we need second arg
           if ($.isArray(opts.buttons)) {
             selector = text
             text = null
           }
-          $disabledArea.find(selector).text(function(i, currentText) {
+          $disabledArea.find(selector).text(function (i, currentText) {
             $(this).data(dataKey, currentText)
             return (
               text ||
               $(this).data('textWhileLoading') ||
               ($(this).is('.ui-button-text') &&
-                $(this)
-                  .closest('.ui-button')
-                  .data('textWhileLoading')) ||
+                $(this).closest('.ui-button').data('textWhileLoading')) ||
               // if nothing was passed in as the text value or if they pass an array for opts.buttons,
               // just use a default loading... text.
               I18n.t('loading', 'Loading...')
@@ -111,19 +109,19 @@ $.fn.disableWhileLoading = function(deferred, options) {
         })
       }, 13)
 
-      $.when(deferred).always(function() {
+      $.when(deferred).always(function () {
         clearTimeout(disabler)
         if (disabled) {
           if ($spinHolder) {
             $spinHolder.css('display', previousSpinHolderDisplay).spin(false) // stop spinner
           }
-          $disabledArea.css('opacity', function() {
+          $disabledArea.css('opacity', function () {
             return $(this).data(dataKey + 'opacityBefore') || 1
           })
           $inputsToDisable.prop('disabled', false)
-          $.each(opts.buttons, function(selector, text) {
+          $.each(opts.buttons, function (selector, text) {
             if (typeof selector === 'number') selector = '' + this // for arrays
-            $disabledArea.find(selector).text(function() {
+            $disabledArea.find(selector).text(function () {
               return $(this).data(dataKey)
             })
           })
@@ -140,5 +138,5 @@ $.fn.disableWhileLoading = function(deferred, options) {
 }
 $.fn.disableWhileLoading.defaults = {
   opacity: 0.5,
-  buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text']
+  buttons: ['button[type="submit"], .ui-dialog-buttonpane .ui-button .ui-button-text'],
 }

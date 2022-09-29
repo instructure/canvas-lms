@@ -50,7 +50,7 @@ const GradeSummaryShape = {
   grade: PropTypes.string,
   score: PropTypes.number,
   showTotalsForAllGradingPeriods: PropTypes.bool,
-  showingAllGradingPeriods: PropTypes.bool
+  showingAllGradingPeriods: PropTypes.bool,
 }
 
 export const GradeCourseImage = ({onClick, courseImage, courseColor, size = DEFAULT_SIZE}) => (
@@ -66,7 +66,7 @@ export const GradeCourseImage = ({onClick, courseImage, courseColor, size = DEFA
       boxShadow: '0 0 0.2rem rgba(0, 0, 0, 0.2)',
       height: `${size}px`,
       width: `${size}px`,
-      cursor: 'pointer'
+      cursor: 'pointer',
     }}
     aria-hidden="true"
     data-testid="k5-grades-course-image"
@@ -79,7 +79,7 @@ GradeCourseImage.propTypes = {
   onClick: PropTypes.func.isRequired,
   courseColor: PropTypes.string,
   courseImage: PropTypes.string,
-  size: PropTypes.number
+  size: PropTypes.number,
 }
 
 export const GradeSummaryLine = ({
@@ -93,14 +93,14 @@ export const GradeSummaryLine = ({
   grade,
   score,
   showTotalsForAllGradingPeriods,
-  showingAllGradingPeriods
+  showingAllGradingPeriods,
 }) => {
   let gradeText = grade
   let isPercentage = false
   if (!grade) {
     if (score || score === 0) {
       gradeText = I18n.toPercentage(score, {
-        precision: 0
+        precision: 0,
       })
       isPercentage = true
     } else {
@@ -130,7 +130,7 @@ export const GradeSummaryLine = ({
             onClick={handleImageClick}
           />
         </Flex.Item>
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <View as="div">
             <Text transform="uppercase">
               <Heading as="h2" level="h3" margin="small 0">
@@ -141,7 +141,7 @@ export const GradeSummaryLine = ({
                   theme={{
                     color: k5Theme.variables.colors.textDarkest,
                     hoverColor: k5Theme.variables.colors.textDarkest,
-                    fontWeight: 700
+                    fontWeight: 700,
                   }}
                 >
                   <div
@@ -149,7 +149,7 @@ export const GradeSummaryLine = ({
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
                       textTransform: 'uppercase',
-                      whiteSpace: 'nowrap'
+                      whiteSpace: 'nowrap',
                     }}
                     title={courseName}
                   >
@@ -214,7 +214,7 @@ const GradesSummary = ({courses}) => {
 
 GradesSummary.displayName = 'GradesSummary'
 GradesSummary.propTypes = {
-  courses: PropTypes.arrayOf(PropTypes.shape(GradeSummaryShape)).isRequired
+  courses: PropTypes.arrayOf(PropTypes.shape(GradeSummaryShape)).isRequired,
 }
 
 export default GradesSummary

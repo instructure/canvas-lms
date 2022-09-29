@@ -28,15 +28,15 @@ import {proficiencyRatingShape} from './shapes'
 const themeOverride = {
   [Tag.theme]: {
     defaultBackground: 'white',
-    maxWidth: '12rem'
-  }
+    maxWidth: '12rem',
+  },
 }
 
 const iconStyle = {
   display: 'inline-block',
   transform: 'scale(1.3)',
   margin: '0 4px 0 4px',
-  verticalAlign: 'middle'
+  verticalAlign: 'middle',
 }
 
 const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => {
@@ -83,7 +83,7 @@ const ProficiencyRating = ({points, masteryAt, color, description, onClick}) => 
 
 ProficiencyRating.propTypes = {
   ...proficiencyRatingShape,
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default ProficiencyRating

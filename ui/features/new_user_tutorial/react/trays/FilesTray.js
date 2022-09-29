@@ -29,25 +29,25 @@ const FilesTray = () => (
     image="/images/tutorial-tray-images/Panda_Files.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use Files as an instructor?'),
-        href: I18n.t('#community.instructor_use_files')
+        href: I18n.t('#community.instructor_use_files'),
       },
       {
         label: I18n.t('How do I upload a file to a course?'),
-        href: I18n.t('#community.instructor_upload_course_file')
+        href: I18n.t('#community.instructor_upload_course_file'),
       },
       {
         label: I18n.t('How do I bulk upload files to a course?'),
-        href: I18n.t('#community.instructor_bulk_upload')
+        href: I18n.t('#community.instructor_bulk_upload'),
       },
       {
         label: I18n.t('How do I move and organize my files as an instructor?'),
-        href: I18n.t('#community.instructor_organize_files')
-      }
+        href: I18n.t('#community.instructor_organize_files'),
+      },
     ]}
   >
     {I18n.t(`Upload and store course files, or any other files you need to keep

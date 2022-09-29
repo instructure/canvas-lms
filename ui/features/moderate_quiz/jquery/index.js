@@ -21,15 +21,16 @@ import $ from 'jquery'
 import timing from './quiz_timing'
 import openModerateStudentDialog from './openModerateStudentDialog'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* datetimeString */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData */
+import '@canvas/datetime' /* datetimeString */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf */
 import '@canvas/rails-flash-notifications'
-import '@canvas/util/templateData'/* fillTemplateData */
+import '@canvas/util/templateData' /* fillTemplateData */
 import 'date-js'
+
 const I18n = useI18nScope('quizzes.moderate')
 /* Date.parse */
 
@@ -44,7 +45,7 @@ const DIALOG_WIDTH = 490
  * @param {Number} extraTime
  *        The submission's extra allotted time.
  */
-const updateExtraTime = function($studentBlock, extraTime) {
+const updateExtraTime = function ($studentBlock, extraTime) {
   const $extraTime = $studentBlock.find('.extra_time_allowed')
 
   if (extraTime > 0) {
@@ -59,7 +60,7 @@ window.moderation = {
   updateTimes() {
     const now = new Date()
     moderation.studentsCurrentlyTakingQuiz = !!$('#students .student.in_progress')
-    $('#students .student.in_progress').each(function() {
+    $('#students .student.in_progress').each(function () {
       const $row = $(this)
       const row = $row.data('timing') || {}
       const started_at = $row.attr('data-started-at')
@@ -114,14 +115,14 @@ window.moderation = {
     let state_text = ''
     if (submission.workflow_state == 'complete' || submission.workflow_state == 'pending_review') {
       state_text = I18n.t('finished_in_duration', 'finished in %{duration}', {
-        duration: submission.finished_in_words
+        duration: submission.finished_in_words,
       })
     }
     const data = {
       attempt: submission.attempt || '--',
       extra_time: submission.extra_time,
       extra_attempts: submission.extra_attempts,
-      score: submission.kept_score == null ? null : I18n.n(submission.kept_score)
+      score: submission.kept_score == null ? null : I18n.n(submission.kept_score),
     }
     if (submission.attempts_left == -1) {
       data.attempts_left = '--'
@@ -145,10 +146,10 @@ window.moderation = {
     updateExtraTime($student, submission.extra_time)
   },
   lastUpdatedAt: '',
-  studentsCurrentlyTakingQuiz: false
+  studentsCurrentlyTakingQuiz: false,
 }
 
-$(document).ready(function(event) {
+$(document).ready(function (event) {
   timing.initTimes()
   setInterval(moderation.updateTimes, 500)
   let updateErrors = 0
@@ -230,33 +231,33 @@ $(document).ready(function(event) {
     $('#checked_count').text(cnt)
     $('.moderate_multiple_link').showIf(cnt)
   }
-  $('#check_all').change(function() {
+  $('#check_all').change(function () {
     const isChecked = $(this).is(':checked')
     $('.student_check').each((index, elem) => {
       $(elem).prop('checked', isChecked)
     })
     checkChange()
   })
-  $('.student_check').change(function() {
+  $('.student_check').change(function () {
     if (!$(this).attr('checked')) {
       $('#check_all').attr('checked', false)
     }
     checkChange()
   })
 
-  $('.moderate_multiple_link').live('click', function(event) {
+  $('.moderate_multiple_link').live('click', function (event) {
     event.preventDefault()
     const student_ids = []
     const data = {}
-    $('.student_check:checked').each(function() {
+    $('.student_check:checked').each(function () {
       const $student = $(this).parents('.student')
       student_ids.push($(this).attr('data-id'))
       const student_data = {
         manually_unlocked: $student.hasClass('manually_unlocked') ? '1' : '0',
         extra_attempts: parseInt($student.find('.extra_attempts').text(), 10) || '',
-        extra_time: parseInt($student.find('.extra_time').text(), 10) || ''
+        extra_time: parseInt($student.find('.extra_time').text(), 10) || '',
       }
-      $.each(['manually_unlocked', 'extra_attempts', 'extra_time'], function() {
+      $.each(['manually_unlocked', 'extra_attempts', 'extra_time'], function () {
         if (data[this] == null) {
           data[this] = student_data[this].toString()
         } else if (data[this] != student_data[this].toString()) {
@@ -276,32 +277,24 @@ $(document).ready(function(event) {
     $('#moderate_student_dialog')
       .dialog({
         title: I18n.t('titles.student_extensions', 'Student Extensions'),
-        width: DIALOG_WIDTH
+        width: DIALOG_WIDTH,
       })
       .fixDialogButtons()
   })
 
-  $('.moderate_student_link').live('click', function(event) {
+  $('.moderate_student_link').live('click', function (event) {
     event.preventDefault()
     const $student = $(this).parents('.student')
     const data = {
       manually_unlocked: $student.hasClass('manually_unlocked') ? '1' : '0',
       extra_attempts: parseInt($student.find('.extra_attempts').text(), 10) || '',
       extra_time:
-        parseInt(
-          $student
-            .find('.extra_time_allowed')
-            .text()
-            .replace(/[^\d]/g, ''),
-          10
-        ) || ''
+        parseInt($student.find('.extra_time_allowed').text().replace(/[^\d]/g, ''), 10) || '',
     }
     const name = $student.find('.student_name').text()
     $('#moderate_student_form').fillFormData(data)
     $('#moderate_student_form').data('ids', [$student.attr('data-user-id')])
-    $('#moderate_student_form')
-      .find('button')
-      .attr('disabled', false)
+    $('#moderate_student_form').find('button').attr('disabled', false)
     $('#moderate_student_dialog h2').text(
       I18n.t('extensions_for_student', 'Extensions for %{student}', {student: name})
     )
@@ -315,17 +308,17 @@ $(document).ready(function(event) {
   })
 
   $('#extension_extra_time')
-    .on('invalid:not_a_number', function(e) {
+    .on('invalid:not_a_number', function (e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_not_a_number', 'Extra time must be a number.')
       )
     })
-    .on('invalid:greater_than', function(e) {
+    .on('invalid:greater_than', function (e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_too_short', 'Extra time must be greater than 0.')
       )
     })
-    .on('invalid:less_than', function(e) {
+    .on('invalid:less_than', function (e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_time_too_long',
@@ -335,7 +328,7 @@ $(document).ready(function(event) {
     })
 
   $('#extension_extra_attempts')
-    .on('invalid:not_a_number', function(e) {
+    .on('invalid:not_a_number', function (e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_not_a_number',
@@ -343,7 +336,7 @@ $(document).ready(function(event) {
         )
       )
     })
-    .on('invalid:greater_than', function(e) {
+    .on('invalid:greater_than', function (e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_short',
@@ -351,7 +344,7 @@ $(document).ready(function(event) {
         )
       )
     })
-    .on('invalid:less_than', function(e) {
+    .on('invalid:less_than', function (e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_long',
@@ -360,7 +353,7 @@ $(document).ready(function(event) {
       )
     })
 
-  $('#moderate_student_form').submit(function(event) {
+  $('#moderate_student_form').submit(function (event) {
     event.preventDefault()
     event.stopPropagation()
     const ids = $(this).data('ids')
@@ -482,14 +475,14 @@ $(document).ready(function(event) {
     $dialog.fillTemplateData({
       data: {
         end_at,
-        started_at
-      }
+        started_at,
+      },
     })
     $dialog.find('button').attr('disabled', false)
     $dialog
       .dialog({
         title: I18n.t('titles.extend_quiz_time', 'Extend Quiz Time'),
-        width: DIALOG_WIDTH
+        width: DIALOG_WIDTH,
       })
       .fixDialogButtons()
   })
@@ -643,9 +636,7 @@ $(document).ready(function(event) {
     closeDialog() {
       $('#autosubmit_content_description_things_to_do').hide()
       $('#autosubmit_content_description_all_done').hide()
-      $('.autosubmit_data_row')
-        .not('.example_autosubmit_row')
-        .remove()
+      $('.autosubmit_data_row').not('.example_autosubmit_row').remove()
       this.cleanUpEventListeners()
       this.dialog.dialog('close')
     },
@@ -659,7 +650,7 @@ $(document).ready(function(event) {
           modal: true,
           width: DIALOG_WIDTH,
           height: 200,
-          close: this.closeDialog.bind(this)
+          close: this.closeDialog.bind(this),
         })
         .dialog('open')
         .fixDialogButtons()
@@ -671,7 +662,7 @@ $(document).ready(function(event) {
       $('#autosubmit_form_submit_btn').on('click keyclick', this.submitOutstandings.bind(this))
 
       this.setFocusOnLoad()
-    }
+    },
   }
   outstanding.fetchData()
   $('#check_outstanding').click(outstanding.init.bind(outstanding))

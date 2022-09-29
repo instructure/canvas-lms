@@ -27,7 +27,7 @@ describe('AlignmentOutcomeItemList', () => {
     rootGroup: generateRootGroup(5),
     loading: false,
     loadMore,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {

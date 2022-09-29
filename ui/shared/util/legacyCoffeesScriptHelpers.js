@@ -43,7 +43,7 @@ export function shimGetterShorthand(hostObject, getters) {
     Object.defineProperty(hostObject, key, {
       get: getters[key],
       enumerable: true,
-      configurable: true
+      configurable: true,
     })
   )
   return hostObject

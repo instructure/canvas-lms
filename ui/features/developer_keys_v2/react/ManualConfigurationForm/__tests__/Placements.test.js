@@ -33,10 +33,10 @@ const props = (overrides = {}, placementOverrides = {}) => {
         text: 'asdf',
         selection_height: 10,
         selection_width: 10,
-        ...placementOverrides
-      }
+        ...placementOverrides,
+      },
     ],
-    ...overrides
+    ...overrides,
   }
 }
 

@@ -81,7 +81,7 @@ export default class PostPolicies {
       onHidden = submissionsPostedAtUpdater({
         afterUpdateSubmission: this._afterUpdateSubmission,
         submissionsMap,
-        updateSubmission: this._updateSubmission
+        updateSubmission: this._updateSubmission,
       })
     }
 
@@ -93,8 +93,8 @@ export default class PostPolicies {
       submissions: submissions.map(submission => ({
         postedAt: submission.posted_at,
         score: submission.score,
-        workflowState: submission.workflow_state
-      }))
+        workflowState: submission.workflow_state,
+      })),
     })
   }
 
@@ -109,7 +109,7 @@ export default class PostPolicies {
       onPosted = submissionsPostedAtUpdater({
         afterUpdateSubmission: this._afterUpdateSubmission,
         submissionsMap,
-        updateSubmission: this._updateSubmission
+        updateSubmission: this._updateSubmission,
       })
     }
 
@@ -122,8 +122,8 @@ export default class PostPolicies {
         hasPostableComments: !!submission.has_postable_comments,
         postedAt: submission.posted_at,
         score: submission.score,
-        workflowState: submission.workflow_state
-      }))
+        workflowState: submission.workflow_state,
+      })),
     })
   }
 }

@@ -28,7 +28,7 @@ const SHORTCUTS = [
   {keycode: 'e', description: I18n.t('Edit Current Message')},
   {keycode: 'd', description: I18n.t('Delete Current Message')},
   {keycode: 'r', description: I18n.t('Reply to Current Message')},
-  {keycode: 'n', description: I18n.t('Reply to Topic')}
+  {keycode: 'n', description: I18n.t('Reply to Topic')},
 ]
 
 export default function DiscussionTopicKeyboardShortcutModal(props) {

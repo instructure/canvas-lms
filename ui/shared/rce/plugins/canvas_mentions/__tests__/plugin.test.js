@@ -30,24 +30,24 @@ const mockAnchorNode = {wholeText: mockAnchorWholeText}
 jest.mock('@instructure/canvas-rce/es/rce/tinyRCE', () => ({
   create: jest.fn(),
   PluginManager: {
-    add: jest.fn()
+    add: jest.fn(),
   },
   plugins: {
-    CanvasMentionsPlugin: {}
+    CanvasMentionsPlugin: {},
   },
   activeEditor: {
     selection: {
       getSel: () => ({
         anchorOffset: mockAnchorOffset,
-        anchorNode: mockAnchorNode
-      })
-    }
-  }
+        anchorNode: mockAnchorNode,
+      }),
+    },
+  },
 }))
 
 jest.mock('../events', () => ({
   ...jest.requireActual('../events'),
-  onMentionsExit: jest.fn()
+  onMentionsExit: jest.fn(),
 }))
 
 jest.mock('../components/MentionAutoComplete/MentionDropdown')
@@ -80,7 +80,7 @@ describe('pluginDefinition', () => {
     editor = new FakeEditor()
     plugin.pluginDefinition.init(editor)
     global.tinymce = {
-      activeEditor: editor
+      activeEditor: editor,
     }
   })
 

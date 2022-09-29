@@ -40,7 +40,7 @@ function submissionGradingPeriodInformation(assignment: Assignment, student: Stu
   const submissionInfo = assignment.effectiveDueDates[student.id] || {}
   return {
     gradingPeriodID: submissionInfo.grading_period_id,
-    inClosedGradingPeriod: submissionInfo.in_closed_grading_period
+    inClosedGradingPeriod: submissionInfo.in_closed_grading_period,
   }
 }
 
@@ -68,7 +68,7 @@ function gradingPeriodInfoForCell(
   return {
     inNoGradingPeriod,
     inOtherGradingPeriod,
-    inClosedGradingPeriod
+    inClosedGradingPeriod,
   }
 }
 
@@ -129,7 +129,7 @@ function missingSubmission(student: Student, assignment: Assignment) {
     excused: false,
     late: false,
     missing: false,
-    seconds_late: 0
+    seconds_late: 0,
   }
   const dueDates = assignment.effectiveDueDates[student.id] || {}
   if (dueDates.due_at != null && new Date(dueDates.due_at) < new Date()) {

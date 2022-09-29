@@ -29,25 +29,25 @@ const ConferencesTray = () => (
     image="/images/tutorial-tray-images/Panda_Conferences.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I create a conference in a course?'),
-        href: I18n.t('#community.instructor_create_conference')
+        href: I18n.t('#community.instructor_create_conference'),
       },
       {
         label: I18n.t('How do I start a conference?'),
-        href: I18n.t('#community.instructor_start_conference')
+        href: I18n.t('#community.instructor_start_conference'),
       },
       {
         label: I18n.t('How do I conclude a conference?'),
-        href: I18n.t('#community.instructor_conclude_conference')
+        href: I18n.t('#community.instructor_conclude_conference'),
       },
       {
         label: I18n.t('How do I record a conference?'),
-        href: I18n.t('#community.instructor_record_conference')
-      }
+        href: I18n.t('#community.instructor_record_conference'),
+      },
     ]}
   >
     {I18n.t(`Conduct lectures, office hours, and student group meetings all

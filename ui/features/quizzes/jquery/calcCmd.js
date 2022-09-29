@@ -22,7 +22,7 @@ const I18n = useI18nScope('calculator.command')
 
 const calcCmd = {}
 
-;(function() {
+;(function () {
   const methods = {}
   const predefinedVariables = {}
   let variables = {}
@@ -39,9 +39,9 @@ const calcCmd = {}
     {regex: /\)/, token: 'close_paren'},
     {regex: /\,/, token: 'comma'},
     {regex: /\^/, token: 'power'},
-    {regex: /\=/, token: 'equals'}
+    {regex: /\=/, token: 'equals'},
   ]
-  const parseToken = function(command, index) {
+  const parseToken = function (command, index) {
     const value = command.substring(index)
     const item = {}
     for (const idx in expressions) {
@@ -56,7 +56,7 @@ const calcCmd = {}
     }
     return null
   }
-  const parseSyntax = function(command) {
+  const parseSyntax = function (command) {
     let index = 0
     const result = []
     while (index < command.length) {
@@ -70,7 +70,7 @@ const calcCmd = {}
     return result
   }
   let syntaxIndex = 0
-  const parseArgument = function(syntax) {
+  const parseArgument = function (syntax) {
     let result = null
     switch (syntax[syntaxIndex].token) {
       case 'number':
@@ -127,7 +127,7 @@ const calcCmd = {}
     syntaxIndex++
     return result
   }
-  const parseModifier = function(syntax) {
+  const parseModifier = function (syntax) {
     switch (syntax[syntaxIndex].token) {
       case 'add':
         return syntax[syntaxIndex++]
@@ -150,10 +150,10 @@ const calcCmd = {}
     throw 'unexpected ' + value + ' at ' + index
   }
 
-  var parseExpression = function(syntax, enders) {
+  var parseExpression = function (syntax, enders) {
     const result = {
       token: 'expression',
-      newIndex: syntax[syntaxIndex].newIndex
+      newIndex: syntax[syntaxIndex].newIndex,
     }
     result.expressionItems = []
     result.expressionItems.push(parseArgument(syntax))
@@ -174,7 +174,7 @@ const calcCmd = {}
     }
     return result
   }
-  const parseFullExpression = function(syntax) {
+  const parseFullExpression = function (syntax) {
     const newSyntax = []
     for (const idx in syntax) {
       if (syntax[idx].token != 'whitespace') {
@@ -191,7 +191,7 @@ const calcCmd = {}
     ) {
       result = {
         token: 'variable_assignment',
-        newIndex: syntax[syntaxIndex].newIndex
+        newIndex: syntax[syntaxIndex].newIndex,
       }
       result.variable = syntax[syntaxIndex]
       if (syntax.length > 2) {
@@ -205,7 +205,7 @@ const calcCmd = {}
     }
     return result
   }
-  const computeExpression = function(tree) {
+  const computeExpression = function (tree) {
     const round0 = tree.expressionItems
     const round1 = [round0[0]]
     for (var idx = 1; idx < round0.length; idx += 2) {
@@ -259,14 +259,14 @@ const calcCmd = {}
       return compute(round3[0])
     }
   }
-  var numberItem = function(number) {
+  var numberItem = function (number) {
     return {
       token: 'number',
       value: number,
-      calculatedValue: number
+      calculatedValue: number,
     }
   }
-  var compute = function(tree) {
+  var compute = function (tree) {
     switch (tree.token) {
       case 'number':
         return parseFloat(tree.value)
@@ -319,12 +319,12 @@ const calcCmd = {}
     }
     throw 'Unexpected token type: ' + tree.token
   }
-  calcCmd.clearMemory = function() {
+  calcCmd.clearMemory = function () {
     variables = {}
     lastComputedResult = null
   }
   const cached_trees = {}
-  calcCmd.compute = function(command) {
+  calcCmd.compute = function (command) {
     const result = {}
     command = command.toString()
     result.command = command
@@ -341,13 +341,13 @@ const calcCmd = {}
     lastComputedResult = result.computedValue
     return result
   }
-  calcCmd.computeValue = function(command) {
+  calcCmd.computeValue = function (command) {
     return calcCmd.compute(command).computedValue
   }
-  const isFunction = function(arg) {
+  const isFunction = function (arg) {
     return true
   }
-  calcCmd.addFunction = function(methodName, method, description, examples) {
+  calcCmd.addFunction = function (methodName, method, description, examples) {
     if (typeof methodName === 'string' && isFunction(method)) {
       method.friendlyName = methodName
       method.description = description
@@ -360,43 +360,43 @@ const calcCmd = {}
     }
     return false
   }
-  calcCmd.addPredefinedVariable = function(variableName, value, description) {
+  calcCmd.addPredefinedVariable = function (variableName, value, description) {
     value = parseFloat(value)
     if (typeof variableName === 'string' && (value || value == 0)) {
       predefinedVariables[variableName] = value
     }
   }
-  calcCmd.functionDescription = function(method) {
+  calcCmd.functionDescription = function (method) {
     if (methods[method]) {
       return (
         methods[method].description ||
         I18n.t('no_description', 'No description found for the function, %{functionName}', {
-          functionName: method
+          functionName: method,
         })
       )
     } else {
       return I18n.t('unrecognized', '%{functionName} is not a recognized function', {
-        functionName: method
+        functionName: method,
       })
     }
   }
-  calcCmd.functionExamples = function(method) {
+  calcCmd.functionExamples = function (method) {
     if (methods[method]) {
       return methods[method].examples || []
     } else {
       return []
     }
   }
-  calcCmd.functionList = function() {
+  calcCmd.functionList = function () {
     const result = []
     for (const idx in methods) {
       const method = methods[idx]
       result.push([
         idx,
-        method.description || I18n.t('default_description', 'No description given')
+        method.description || I18n.t('default_description', 'No description given'),
       ])
     }
-    result.sort(function(a, b) {
+    result.sort(function (a, b) {
       if (a[0] > b[0]) {
         return 1
       } else if (a[0] < b[0]) {
@@ -408,11 +408,11 @@ const calcCmd = {}
     return result
   }
 })()
-;(function() {
-  const p = function(name, value, description) {
+;(function () {
+  const p = function (name, value, description) {
     calcCmd.addPredefinedVariable(name, value, description)
   }
-  const f = function(name, func, description, example) {
+  const f = function (name, func, description, example) {
     calcCmd.addFunction(name, func, description, example)
   }
 
@@ -421,7 +421,7 @@ const calcCmd = {}
 
   f(
     'abs',
-    function(val) {
+    function (val) {
       return Math.abs(val)
     },
     I18n.t('abs.description', 'Returns the absolute value of the given value'),
@@ -429,7 +429,7 @@ const calcCmd = {}
   )
   f(
     'asin',
-    function(x) {
+    function (x) {
       return Math.asin(x)
     },
     I18n.t('asin.description', 'Returns the arcsin of the given value'),
@@ -437,7 +437,7 @@ const calcCmd = {}
   )
   f(
     'acos',
-    function(x) {
+    function (x) {
       return Math.acos(x)
     },
     I18n.t('acos.description', 'Returns the arccos of the given value'),
@@ -445,7 +445,7 @@ const calcCmd = {}
   )
   f(
     'atan',
-    function(x) {
+    function (x) {
       return Math.atan(x)
     },
     I18n.t('atan.description', 'Returns the arctan of the given value'),
@@ -453,7 +453,7 @@ const calcCmd = {}
   )
   f(
     'log',
-    function(x, base) {
+    function (x, base) {
       return Math.log(x) / Math.log(base || 10)
     },
     I18n.t('log.description', 'Returns the log of the given value with an optional base'),
@@ -461,7 +461,7 @@ const calcCmd = {}
   )
   f(
     'ln',
-    function(x) {
+    function (x) {
       return Math.log(x)
     },
     I18n.t('ln.description', 'Returns the natural log of the given value'),
@@ -469,7 +469,7 @@ const calcCmd = {}
   )
   f(
     'rad_to_deg',
-    function(x) {
+    function (x) {
       return (x * 180) / Math.PI
     },
     I18n.t('rad_to_deg.description', 'Returns the given value converted from radians to degrees'),
@@ -477,7 +477,7 @@ const calcCmd = {}
   )
   f(
     'deg_to_rad',
-    function(x) {
+    function (x) {
       return (x * Math.PI) / 180
     },
     I18n.t('deg_to_rad.description', 'Returns the given value converted from degrees to radians'),
@@ -485,7 +485,7 @@ const calcCmd = {}
   )
   f(
     'sin',
-    function(x) {
+    function (x) {
       return Math.sin(x)
     },
     I18n.t('sin.description', 'Returns the sine of the given value'),
@@ -493,7 +493,7 @@ const calcCmd = {}
   )
   f(
     'cos',
-    function(x) {
+    function (x) {
       return Math.cos(x)
     },
     I18n.t('cos.description', 'Returns the cosine of the given value'),
@@ -501,7 +501,7 @@ const calcCmd = {}
   )
   f(
     'tan',
-    function(x) {
+    function (x) {
       return Math.tan(x)
     },
     I18n.t('tan.description', 'Returns the tangent of the given value'),
@@ -510,7 +510,7 @@ const calcCmd = {}
 
   f(
     'sec',
-    function(x) {
+    function (x) {
       return 1 / Math.cos(x)
     },
     I18n.t('sec.description', 'Returns the secant of the given value'),
@@ -518,7 +518,7 @@ const calcCmd = {}
   )
   f(
     'cosec',
-    function(x) {
+    function (x) {
       return 1 / Math.sin(x)
     },
     I18n.t('cosec.description', 'Returns the cosecant of the given value'),
@@ -526,7 +526,7 @@ const calcCmd = {}
   )
   f(
     'cotan',
-    function(x) {
+    function (x) {
       return 1 / Math.tan(x)
     },
     I18n.t('cotan.description', 'Returns the cotangent of the given value'),
@@ -535,7 +535,7 @@ const calcCmd = {}
 
   f(
     'pi',
-    function(x) {
+    function (x) {
       return Math.PI
     },
     I18n.t('pi.description', 'Returns the computed value of pi'),
@@ -543,7 +543,7 @@ const calcCmd = {}
   )
   f(
     'if',
-    function(bool, pass, fail) {
+    function (bool, pass, fail) {
       return bool ? pass : fail
     },
     I18n.t(
@@ -552,7 +552,7 @@ const calcCmd = {}
     ),
     'if(bool,success,fail)'
   )
-  const make_list = function(args) {
+  const make_list = function (args) {
     if (args.length == 1 && args[0] instanceof Array) {
       return args[0]
     } else {
@@ -561,7 +561,7 @@ const calcCmd = {}
   }
   f(
     'max',
-    function() {
+    function () {
       const args = make_list(arguments)
       let max = args[0]
       for (let idx = 0; idx < args.length; idx++) {
@@ -575,7 +575,7 @@ const calcCmd = {}
   )
   f(
     'min',
-    function() {
+    function () {
       const args = make_list(arguments)
       let min = args[0]
       for (let idx = 0; idx < args.length; idx++) {
@@ -589,7 +589,7 @@ const calcCmd = {}
   )
   f(
     'sqrt',
-    function(x) {
+    function (x) {
       return Math.sqrt(x)
     },
     I18n.t('sqrt.description', 'Returns the square root of the given value'),
@@ -597,13 +597,13 @@ const calcCmd = {}
   )
   f(
     'sort',
-    function(x) {
+    function (x) {
       const args = make_list(arguments)
       const list = []
       for (let idx = 0; idx < args.length; idx++) {
         list.push(args[idx])
       }
-      return list.sort(function(a, b) {
+      return list.sort(function (a, b) {
         return a - b
       })
     },
@@ -612,7 +612,7 @@ const calcCmd = {}
   )
   f(
     'reverse',
-    function(x) {
+    function (x) {
       const args = make_list(arguments)
       const list = []
       for (let idx = 0; idx < args.length; idx++) {
@@ -625,7 +625,7 @@ const calcCmd = {}
   )
   f(
     'first',
-    function() {
+    function () {
       return make_list(arguments)[0]
     },
     I18n.t('first.description', 'Returns the first value in the list'),
@@ -633,7 +633,7 @@ const calcCmd = {}
   )
   f(
     'last',
-    function() {
+    function () {
       const args = make_list(arguments)
       return args[args.length - 1]
     },
@@ -642,7 +642,7 @@ const calcCmd = {}
   )
   f(
     'at',
-    function(list, x) {
+    function (list, x) {
       return list[x]
     },
     I18n.t('at.description', 'Returns the indexed value in the given list'),
@@ -650,7 +650,7 @@ const calcCmd = {}
   )
   f(
     'rand',
-    function(x) {
+    function (x) {
       return Math.random() * (x || 1)
     },
     I18n.t(
@@ -661,13 +661,13 @@ const calcCmd = {}
   )
   f(
     'length',
-    function() {
+    function () {
       return make_list(arguments).length
     },
     I18n.t('length.description', 'Returns the number of arguments in the given list'),
     ['length(a,b,c...)', 'length(list)']
   )
-  const sum = function(list) {
+  const sum = function (list) {
     let total = 0
     for (let idx = 0; idx < list.length; idx++) {
       // in list) {
@@ -679,7 +679,7 @@ const calcCmd = {}
   }
   f(
     'mean',
-    function() {
+    function () {
       const args = make_list(arguments)
       return sum(args) / args.length
     },
@@ -688,13 +688,13 @@ const calcCmd = {}
   )
   f(
     'median',
-    function() {
+    function () {
       const args = make_list(arguments)
       var list = []
       for (let idx = 0; idx < args.length; idx++) {
         list.push(args[idx])
       }
-      var list = list.sort(function(a, b) {
+      var list = list.sort(function (a, b) {
         return parseFloat(a) - parseFloat(b)
       })
       if (list.length % 2 == 1) {
@@ -708,7 +708,7 @@ const calcCmd = {}
   )
   f(
     'range',
-    function() {
+    function () {
       const args = make_list(arguments)
       let list = []
       for (let idx = 0; idx < args.length; idx++) {
@@ -722,7 +722,7 @@ const calcCmd = {}
   )
   f(
     'count',
-    function() {
+    function () {
       return make_list(arguments).length
     },
     I18n.t('count.description', 'Returns the number of items in the list'),
@@ -730,14 +730,14 @@ const calcCmd = {}
   )
   f(
     'sum',
-    function() {
+    function () {
       return sum(make_list(arguments))
     },
     I18n.t('sum.description', 'Returns the sum of the list of values'),
     ['sum(a,b,c...)', 'sum(list)']
   )
   const factorials = {}
-  var fact = function(n) {
+  var fact = function (n) {
     n = Math.max(parseInt(n), 0)
     if (n == 0 || n == 1) {
       return 1
@@ -751,7 +751,7 @@ const calcCmd = {}
   }
   f(
     'fact',
-    function(n) {
+    function (n) {
       return fact(n)
     },
     I18n.t('fact.description', 'Returns the factorial of the given number'),
@@ -759,7 +759,7 @@ const calcCmd = {}
   )
   f(
     'perm',
-    function(n, k) {
+    function (n, k) {
       return fact(n) / fact(n - k)
     },
     I18n.t('perm.description', 'Returns the permutation result for the given values'),
@@ -767,7 +767,7 @@ const calcCmd = {}
   )
   f(
     'comb',
-    function(n, k) {
+    function (n, k) {
       return fact(n) / (fact(k) * fact(n - k))
     },
     I18n.t('comb.description', 'Returns the combination result for the given values'),
@@ -775,7 +775,7 @@ const calcCmd = {}
   )
   f(
     'ceil',
-    function(x) {
+    function (x) {
       return Math.ceil(x)
     },
     I18n.t('ceil.description', 'Returns the ceiling for the given value'),
@@ -783,7 +783,7 @@ const calcCmd = {}
   )
   f(
     'floor',
-    function(x) {
+    function (x) {
       return Math.floor(x)
     },
     I18n.t('floor.description', 'Returns the floor for the given value'),
@@ -791,7 +791,7 @@ const calcCmd = {}
   )
   f(
     'round',
-    function(x) {
+    function (x) {
       return Math.round(x)
     },
     I18n.t('round.description', 'Returns the given value rounded to the nearest whole number'),
@@ -799,7 +799,7 @@ const calcCmd = {}
   )
   f(
     'e',
-    function(x) {
+    function (x) {
       return Math.exp(x || 1)
     },
     I18n.t('e.description', 'Returns the value for e'),

@@ -25,12 +25,12 @@ describe('initializeExternalTools', () => {
     global.INST = {
       editorButtons: [
         {id: 'button_id'},
-        {id: 'fav_id', favorite: true, name: 'fav tool', canvas_icon_class: 'fav-tool'}
-      ]
+        {id: 'fav_id', favorite: true, name: 'fav tool', canvas_icon_class: 'fav-tool'},
+      ],
     }
 
     ENV = {
-      context_asset_string: 'course_1'
+      context_asset_string: 'course_1',
     }
 
     fakeEditor = {
@@ -38,7 +38,7 @@ describe('initializeExternalTools', () => {
       focus: jest.fn(),
       getContent() {},
       selection: {
-        getContent() {}
+        getContent() {},
       },
       addCommand: jest.fn(),
       ui: {
@@ -46,9 +46,9 @@ describe('initializeExternalTools', () => {
           addButton: jest.fn(),
           addMenuButton: jest.fn(),
           addIcon: jest.fn(),
-          addNestedMenuItem: jest.fn()
-        }
-      }
+          addNestedMenuItem: jest.fn(),
+        },
+      },
     }
   })
 
@@ -59,7 +59,7 @@ describe('initializeExternalTools', () => {
       tooltip: 'Apps',
       icon: 'lti',
       fetch: expect.any(Function),
-      onSetup: expect.any(Function)
+      onSetup: expect.any(Function),
     })
   })
 
@@ -73,7 +73,7 @@ describe('initializeExternalTools', () => {
         onAction: expect.any(Function),
         tooltip: favButtonConfig.title,
         icon: favButtonConfig.icon,
-        title: favButtonConfig.title
+        title: favButtonConfig.title,
       }
     )
   })
@@ -84,7 +84,7 @@ describe('initializeExternalTools', () => {
     expect(fakeEditor.ui.registry.addNestedMenuItem).toHaveBeenCalledWith('lti_tools_menuitem', {
       text: 'Apps',
       icon: 'lti',
-      getSubmenuItems: expect.any(Function)
+      getSubmenuItems: expect.any(Function),
     })
   })
 

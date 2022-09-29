@@ -21,7 +21,7 @@
 // %a %b %-d, %Y %-l:%M%P
 // %a %b %-d, %Y %-k:%M
 // %b %-d, %Y
-import { adjustFormat } from 'datetime'
+import {adjustFormat} from 'datetime'
 
 export default function datePickerFormat(format) {
   return adjustFormat(quoteLiteralStrings(format))

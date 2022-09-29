@@ -23,7 +23,7 @@ import ready from '@instructure/ready'
 
 ready(() => {
   const groupCategories = new GroupCategoryCollection(ENV.group_categories, {
-    markInactiveStudents: true
+    markInactiveStudents: true,
   })
   const app = new GroupCategoriesView({collection: groupCategories})
   app.render()

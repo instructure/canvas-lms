@@ -24,7 +24,7 @@ import {BLACKOUT_DATES} from '../../../__tests__/fixtures'
 import BlackoutDateRow from '../blackout_date_row'
 
 const defaultProps = {
-  blackoutDate: BLACKOUT_DATES[0]
+  blackoutDate: BLACKOUT_DATES[0],
 }
 
 describe('BlackoutDateRow', () => {

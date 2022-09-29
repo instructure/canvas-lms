@@ -33,7 +33,7 @@ export default function HelpTray({
   hasLoaded,
   showNotes,
   badgeDisabled,
-  setBadgeDisabled
+  setBadgeDisabled,
 }) {
   return (
     <View as="div" padding="medium" id="help_tray">
@@ -56,7 +56,7 @@ HelpTray.propTypes = {
   hasLoaded: bool,
   showNotes: bool,
   badgeDisabled: bool,
-  setBadgeDisabled: func
+  setBadgeDisabled: func,
 }
 
 HelpTray.defaultProps = {
@@ -64,5 +64,5 @@ HelpTray.defaultProps = {
     return I18n.t('Help')
   },
   hasLoaded: false,
-  links: []
+  links: [],
 }

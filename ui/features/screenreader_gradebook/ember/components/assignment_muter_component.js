@@ -44,11 +44,11 @@ const AssignmentMuterComponent = Ember.Component.extend({
   type: 'checkbox',
   attributeBindings: ['type', 'checked', 'ariaLabel:aria-label', 'disabled'],
 
-  checked: function() {
+  checked: function () {
     return this.get('assignment.muted')
   }.property('assignment.muted'),
 
-  ariaLabel: function() {
+  ariaLabel: function () {
     if (this.get('assignment.muted')) {
       return I18n.t('assignment_muted', 'Click to unmute.')
     } else {
@@ -56,7 +56,7 @@ const AssignmentMuterComponent = Ember.Component.extend({
     }
   }.property('assignment.muted'),
 
-  disabled: function() {
+  disabled: function () {
     return (
       this.get('assignment.muted') &&
       this.get('assignment.moderated_grading') &&
@@ -64,7 +64,7 @@ const AssignmentMuterComponent = Ember.Component.extend({
     )
   }.property('assignment.muted', 'assignment.moderated_grading', 'assignment.grades_published'),
 
-  setup: function() {
+  setup: function () {
     let assignment
     if ((assignment = this.get('assignment'))) {
       const url = `${ENV.GRADEBOOK_OPTIONS.context_url}/assignments/${assignment.id}/mute`
@@ -73,7 +73,7 @@ const AssignmentMuterComponent = Ember.Component.extend({
     }
   }
     .observes('assignment')
-    .on('init')
+    .on('init'),
 })
 
 export default AssignmentMuterComponent

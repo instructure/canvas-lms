@@ -25,43 +25,37 @@ describe('canvas_quizzes/events/views/answer_matrix/table', () => {
   it('renders', () => {
     render(
       <Table
-        expandAll
-        questions={[
-          { id: 'q1' }
-        ]}
+        expandAll={true}
+        questions={[{id: 'q1'}]}
         events={[
           {
             id: 'e1',
             type: 'question_answered',
-            createdAt: "2014-11-16T13:39:19Z",
-            data: [{"quizQuestionId":"q1","answer":null,"answered":false}]
-          }
+            createdAt: '2014-11-16T13:39:19Z',
+            data: [{quizQuestionId: 'q1', answer: null, answered: false}],
+          },
         ]}
-
         submission={{
-          "startedAt": "2014-11-16T13:37:19Z"
+          startedAt: '2014-11-16T13:37:19Z',
         }}
       />
     )
   })
 
   it('expands a question when clicked', () => {
-    const { getByTestId } = render(
+    const {getByTestId} = render(
       <Table
-        questions={[
-          { id: 'q1' }
-        ]}
+        questions={[{id: 'q1'}]}
         events={[
           {
             id: 'e1',
             type: 'question_answered',
-            createdAt: "2014-11-16T13:39:19Z",
-            data: [{"quizQuestionId":"q1","answer":'ANSWER!',"answered":false}]
-          }
+            createdAt: '2014-11-16T13:39:19Z',
+            data: [{quizQuestionId: 'q1', answer: 'ANSWER!', answered: false}],
+          },
         ]}
-
         submission={{
-          "startedAt": "2014-11-16T13:37:19Z"
+          startedAt: '2014-11-16T13:37:19Z',
         }}
       />
     )
@@ -70,7 +64,7 @@ describe('canvas_quizzes/events/views/answer_matrix/table', () => {
       fn: () => fireEvent.click(getByTestId('event-toggler-e1')),
       of: () => !!document.body.textContent.match('ANSWER!'),
       from: false,
-      to: true
+      to: true,
     })
   })
 })

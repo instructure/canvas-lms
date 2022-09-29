@@ -23,9 +23,6 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/summary/score_percentile_chart', () => {
   it('renders', () => {
-    render(
-      <ScorePercentileChart
-      />
-    )
+    render(<ScorePercentileChart />)
   })
 })

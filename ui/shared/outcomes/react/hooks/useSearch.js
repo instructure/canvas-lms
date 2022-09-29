@@ -42,7 +42,7 @@ const useSearch = (debounceTime = 500) => {
     search,
     debouncedSearch,
     onChangeHandler,
-    onClearHandler
+    onClearHandler,
   }
 }
 

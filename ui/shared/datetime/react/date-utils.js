@@ -46,7 +46,7 @@ export function makeTimestamp({delayed_post_at, posted_at}, delayedLabel, posted
             {delayedLabel}
           </span>
         ),
-        date: delayed_post_at
+        date: delayed_post_at,
       }
     : {title: postedOnLabel, date: posted_at}
 }

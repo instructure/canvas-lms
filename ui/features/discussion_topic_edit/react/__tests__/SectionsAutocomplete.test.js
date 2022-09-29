@@ -23,7 +23,7 @@ import SectionsAutocomplete from '../SectionsAutocomplete'
 describe('Sections Autocomplete', () => {
   const defaultProps = () => ({
     sections: [{id: '1', name: 'awesome section'}],
-    flashMessage: () => {}
+    flashMessage: () => {},
   })
 
   it('renders SectionsAutocomplete', () => {
@@ -50,26 +50,26 @@ describe('Sections Autocomplete', () => {
     moreSections.sections = [
       {id: '1', name: 'drink cup'},
       {id: '1', name: 'awesome section'},
-      {id: '1', name: '1234 section'}
+      {id: '1', name: '1234 section'},
     ]
     const wrapper = shallow(<SectionsAutocomplete {...moreSections} />)
     expect(wrapper.instance().state.sections).toEqual([
       {
         id: '1',
-        name: '1234 section'
+        name: '1234 section',
       },
       {
         id: 'all',
-        name: 'All Sections'
+        name: 'All Sections',
       },
       {
         id: '1',
-        name: 'awesome section'
+        name: 'awesome section',
       },
       {
         id: '1',
-        name: 'drink cup'
-      }
+        name: 'drink cup',
+      },
     ])
   })
 
@@ -77,7 +77,7 @@ describe('Sections Autocomplete', () => {
     const wrapper = shallow(<SectionsAutocomplete {...defaultProps()} />)
     wrapper.instance().onAutocompleteChange([])
     expect(wrapper.instance().state.messages).toEqual([
-      {text: 'A section is required', type: 'error'}
+      {text: 'A section is required', type: 'error'},
     ])
   })
 
@@ -93,8 +93,8 @@ describe('Sections Autocomplete', () => {
       ...defaultProps(),
       sections: [
         {id: '1', name: 'awesome section'},
-        {id: '3', name: 'other section'}
-      ]
+        {id: '3', name: 'other section'},
+      ],
     }
 
     const wrapper = shallow(<SectionsAutocomplete {...props} />)

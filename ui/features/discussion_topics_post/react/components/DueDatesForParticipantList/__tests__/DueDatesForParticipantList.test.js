@@ -34,9 +34,9 @@ describe('DueDatesForParticipantList', () => {
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({
         adhocStudents: AdhocStudents.mock({
-          students
-        })
-      })
+          students,
+        }),
+      }),
     })
     expect(
       getByText(
@@ -57,9 +57,9 @@ describe('DueDatesForParticipantList', () => {
     const {getByText} = setup({
       assignmentOverride: AssignmentOverride.mock({
         adhocStudents: AdhocStudents.mock({
-          students
-        })
-      })
+          students,
+        }),
+      }),
     })
     fireEvent.click(getByText('6 more'))
     expect(getByText(students.map(student => student.shortName).join(', '))).toBeInTheDocument()

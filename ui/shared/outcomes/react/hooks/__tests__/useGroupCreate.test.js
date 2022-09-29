@@ -49,7 +49,7 @@ describe('useGroupCreate', () => {
 
   it('creates custom hook with proper exports', () => {
     const {result} = renderHook(() => useGroupCreate(), {
-      wrapper
+      wrapper,
     })
     expect(typeof result.current.createGroup).toBe('function')
     expect(typeof result.current.createdGroups).toBe('object')
@@ -59,7 +59,7 @@ describe('useGroupCreate', () => {
 
   it('adds created group id to createdGroups if group created', async () => {
     const {result} = renderHook(() => useGroupCreate(), {
-      wrapper
+      wrapper,
     })
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
@@ -70,7 +70,7 @@ describe('useGroupCreate', () => {
 
   it('displays flash confirmation if group created', async () => {
     const {result} = renderHook(() => useGroupCreate(), {
-      wrapper
+      wrapper,
     })
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
@@ -78,7 +78,7 @@ describe('useGroupCreate', () => {
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '"New Group" was successfully created.',
-      type: 'success'
+      type: 'success',
     })
   })
 
@@ -86,8 +86,8 @@ describe('useGroupCreate', () => {
     const {result} = renderHook(() => useGroupCreate(), {
       wrapper,
       initialProps: {
-        mocks: createOutcomeGroupMocks({failResponse: true})
-      }
+        mocks: createOutcomeGroupMocks({failResponse: true}),
+      },
     })
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
@@ -95,7 +95,7 @@ describe('useGroupCreate', () => {
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -103,8 +103,8 @@ describe('useGroupCreate', () => {
     const {result} = renderHook(() => useGroupCreate(), {
       wrapper,
       initialProps: {
-        mocks: createOutcomeGroupMocks({failMutationNoErrMsg: true})
-      }
+        mocks: createOutcomeGroupMocks({failMutationNoErrMsg: true}),
+      },
     })
     act(() => {
       result.current.createGroup(groupName, parentGroupId)
@@ -112,13 +112,13 @@ describe('useGroupCreate', () => {
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while creating this group. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
   it('clears createdGroups if clearCreatedGroups fn called', async () => {
     const {result} = renderHook(() => useGroupCreate(), {
-      wrapper
+      wrapper,
     })
     act(() => {
       result.current.createGroup(groupName, parentGroupId)

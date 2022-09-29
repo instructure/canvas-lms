@@ -57,7 +57,7 @@ export default new Store(
          *
          * @see #loadInitialData.
          */
-        latestAttempt: attempt
+        latestAttempt: attempt,
       }
     },
 
@@ -111,8 +111,8 @@ export default new Store(
         reset: true,
         data: {
           quiz_submission_id: this.state.submission.get('id'),
-          quiz_submission_attempt: this.state.attempt
-        }
+          quiz_submission_attempt: this.state.attempt,
+        },
       })
     },
 
@@ -125,11 +125,11 @@ export default new Store(
           reset: true,
           data: {
             attempt: this.state.attempt,
-            per_page: 50
-          }
+            per_page: 50,
+          },
         })
         .then(function decorateAnswerEvents(/* payload */) {
-          const answerEvents = events.filter(function(model) {
+          const answerEvents = events.filter(function (model) {
             return model.get('type') === K.EVT_QUESTION_ANSWERED
           })
 
@@ -172,7 +172,7 @@ export default new Store(
         this.state.attempt = attempt
         this.load()
       }
-    }
+    },
   },
   Dispatcher
 )

@@ -37,7 +37,7 @@ export default function GroupsTable({
   onClickGroup,
   onClickHeader,
   onUnblock,
-  timeZone
+  timeZone,
 }) {
   const renderColHeader = useCallback(
     (attr, width, content) => {
@@ -61,11 +61,11 @@ export default function GroupsTable({
       <Responsive
         query={{
           small: {maxWidth: '719px'},
-          large: {minWidth: '720px'}
+          large: {minWidth: '720px'},
         }}
         props={{
           small: {layout: 'stacked'},
-          large: {layout: 'auto'}
+          large: {layout: 'auto'},
         }}
       >
         {props => (

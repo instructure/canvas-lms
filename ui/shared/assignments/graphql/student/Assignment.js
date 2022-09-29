@@ -82,8 +82,8 @@ export const Assignment = {
     nonDigitalSubmission: bool.isRequired,
     pointsPossible: number.isRequired,
     submissionTypes: arrayOf(string.isRequired),
-    unlockAt: string
-  })
+    unlockAt: string,
+  }),
 }
 
 export const AssignmentSubmissionsConnection = {
@@ -103,9 +103,9 @@ export const AssignmentSubmissionsConnection = {
 
   shape: shape({
     submissionsConnection: shape({
-      nodes: arrayOf(Submission.shape)
-    })
-  })
+      nodes: arrayOf(Submission.shape),
+    }),
+  }),
 }
 
 export const DefaultMocks = {
@@ -119,21 +119,21 @@ export const DefaultMocks = {
     pointsPossible: 10,
     rubric: null,
     submissionsConnection: {
-      nodes: [{}] // only return one submission
+      nodes: [{}], // only return one submission
     },
-    submissionTypes: ['online_upload']
-  })
+    submissionTypes: ['online_upload'],
+  }),
 }
 
 export const AssignmentMocks = {
   noSubmission: {
     expectsSubmission: false,
     nonDigitalSubmission: true,
-    submissionTypes: ['none']
+    submissionTypes: ['none'],
   },
   onPaper: {
     expectsSubmission: false,
     nonDigitalSubmission: true,
-    submissionTypes: ['on_paper']
-  }
+    submissionTypes: ['on_paper'],
+  },
 }

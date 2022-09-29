@@ -45,7 +45,7 @@ const StudentView = createReactClass({
   panelRef: null,
   propTypes: {
     enableGroupCreation: PropTypes.bool,
-    enableEveryoneTab: PropTypes.bool
+    enableEveryoneTab: PropTypes.bool,
   },
 
   getInitialState() {
@@ -53,9 +53,9 @@ const StudentView = createReactClass({
       filter: '',
       showNewStudentGroupModal: false,
       userCollection: new UserCollection(null, {
-        params: {enrollment_type: 'student', per_page: 15, sort: 'username'}
+        params: {enrollment_type: 'student', per_page: 15, sort: 'username'},
       }),
-      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id})
+      groupCollection: new ContextGroupCollection([], {course_id: ENV.course_id}),
     }
   },
 
@@ -70,7 +70,7 @@ const StudentView = createReactClass({
       close: _e => {
         ReactDOM.unmountComponentAtNode($dialog[0])
         $(this).remove()
-      }
+      },
     })
 
     const closeDialog = e => {
@@ -203,7 +203,7 @@ const StudentView = createReactClass({
       // from another section joined that group after the page loaded for the current user
       () =>
         this._extendAttribute(this.state.groupCollection.get(group.id), 'permissions', {
-          join: false
+          join: false,
         })
     )
     // eslint-disable-next-line react/no-find-dom-node
@@ -301,7 +301,7 @@ const StudentView = createReactClass({
         )}
       </div>
     )
-  }
+  },
 })
 
 export default StudentView

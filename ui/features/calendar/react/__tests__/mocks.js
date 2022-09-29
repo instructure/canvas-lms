@@ -25,7 +25,7 @@ export const userContext = {
   k5_course: false,
   can_create_calendar_events: true,
   type: 'user',
-  course_pacing_enabled: false
+  course_pacing_enabled: false,
 }
 
 export const courseContext = {
@@ -35,7 +35,7 @@ export const courseContext = {
   k5_course: false,
   can_create_calendar_events: true,
   type: 'course',
-  course_pacing_enabled: true
+  course_pacing_enabled: true,
 }
 
 export const accountContext = {
@@ -45,7 +45,7 @@ export const accountContext = {
   k5_course: false,
   can_create_calendar_events: true,
   type: 'account',
-  course_pacing_enabled: true
+  course_pacing_enabled: true,
 }
 
 const formHolder = document.getElementById('edit_calendar_event_form_holder')
@@ -72,13 +72,13 @@ const event = {
   important_info: false,
   can_change_context: true,
   object: {context_code: 'user_1'},
-  old_context_code: null
+  old_context_code: null,
 }
 
 export const conference = {
   name: 'BigBlueButton',
   title: 'BigBlueButton',
-  conference_type: 'BigBlueButton'
+  conference_type: 'BigBlueButton',
 }
 
 export const eventFormProps = () => {
@@ -89,7 +89,7 @@ export const eventFormProps = () => {
     closeCB: jest.fn(),
     contextChangeCB: jest.fn(),
     setSetContextCB: jest.fn(),
-    timezone: 'Etc/UTC'
+    timezone: 'Etc/UTC',
   }
 }
 
@@ -102,7 +102,7 @@ export const accountCalendarsAPIPage1Response = {
       root_account_id: '0',
       visible: true,
       asset_string: 'account_5',
-      type: 'account'
+      type: 'account',
     },
     {
       id: '4',
@@ -111,10 +111,10 @@ export const accountCalendarsAPIPage1Response = {
       root_account_id: '2',
       visible: true,
       asset_string: 'account_4',
-      type: 'account'
-    }
+      type: 'account',
+    },
   ],
-  total_results: 4
+  total_results: 4,
 }
 
 export const accountCalendarsAPIPage2Response = {
@@ -126,7 +126,7 @@ export const accountCalendarsAPIPage2Response = {
       root_account_id: '0',
       visible: true,
       asset_string: 'account_1',
-      type: 'account'
+      type: 'account',
     },
     {
       id: '2',
@@ -135,10 +135,10 @@ export const accountCalendarsAPIPage2Response = {
       root_account_id: '0',
       visible: true,
       asset_string: 'account_2',
-      type: 'account'
-    }
+      type: 'account',
+    },
   ],
-  total_results: 4
+  total_results: 4,
 }
 
 export const accountCalendarsAPISearchResponse = {
@@ -150,21 +150,21 @@ export const accountCalendarsAPISearchResponse = {
       root_account_id: '0',
       visible: true,
       asset_string: 'account_1',
-      type: 'account'
-    }
+      type: 'account',
+    },
   ],
-  total_results: 1
+  total_results: 1,
 }
 
 export const allAccountCalendarsResponse = {
   account_calendars: [
     ...accountCalendarsAPIPage1Response.account_calendars,
-    ...accountCalendarsAPIPage2Response.account_calendars
+    ...accountCalendarsAPIPage2Response.account_calendars,
   ],
-  total_results: 4
+  total_results: 4,
 }
 
 export const emptyResponse = {
   account_calendars: [],
-  total_results: 0
+  total_results: 0,
 }

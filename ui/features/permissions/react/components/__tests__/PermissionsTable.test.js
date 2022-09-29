@@ -31,9 +31,9 @@ const defaultProps = () => ({
       base_role_type: 'lead',
       permissions: {
         permission_1: 'permission_1',
-        permission_2: 'permission_2'
+        permission_2: 'permission_2',
       },
-      displayed: true
+      displayed: true,
     },
     {
       id: '2',
@@ -41,18 +41,18 @@ const defaultProps = () => ({
       base_role_type: 'lead',
       permissions: {
         permission_1: 'permission_1',
-        permission_2: 'permission_2'
+        permission_2: 'permission_2',
       },
-      displayed: true
-    }
+      displayed: true,
+    },
   ],
   modifyPermissions: () => {},
   setAndOpenRoleTray: () => {},
   setAndOpenPermissionTray: () => {},
   permissions: [
     {permission_name: 'permission_1', label: 'Permission 1', contextType: COURSE, displayed: true},
-    {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true}
-  ]
+    {permission_name: 'permission_2', label: 'Permission 2', contextType: COURSE, displayed: true},
+  ],
 })
 
 const granularPermissionProps = () => ({
@@ -67,25 +67,25 @@ const granularPermissionProps = () => ({
           explicit: true,
           group: 'granular_permission_group',
           locked: false,
-          readonly: false
+          readonly: false,
         },
         granular_2: {
           enabled: ENABLED_FOR_ALL,
           explicit: true,
           group: 'granular_permission_group',
           locked: false,
-          readonly: false
+          readonly: false,
         },
         granular_permission_group: {
           built_from_granular_permissions: true,
           enabled: ENABLED_FOR_ALL,
           explicit: true,
           locked: false,
-          readonly: false
-        }
+          readonly: false,
+        },
       },
-      displayed: true
-    }
+      displayed: true,
+    },
   ],
   modifyPermissions: () => {},
   setAndOpenRoleTray: () => {},
@@ -101,17 +101,17 @@ const granularPermissionProps = () => ({
           permission_name: 'granular_1',
           label: 'Granular 1',
           granular_permission_group: 'granular_permission_group',
-          granular_permission_group_label: 'Grouped Permission Label'
+          granular_permission_group_label: 'Grouped Permission Label',
         },
         {
           permission_name: 'granular_2',
           label: 'Granular 2',
           granular_permission_group: 'granular_permission_group',
-          granular_permission_group_label: 'Grouped Permission Label'
-        }
-      ]
-    }
-  ]
+          granular_permission_group_label: 'Grouped Permission Label',
+        },
+      ],
+    },
+  ],
 })
 
 it('calls setAndOpenRoleTray on clicking one of the top headers', () => {

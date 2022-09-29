@@ -25,7 +25,7 @@ let component
 
 const props = {
   courseId: '1',
-  moduleId: '1'
+  moduleId: '1',
 }
 
 beforeEach(() => {
@@ -57,8 +57,8 @@ it('fetchRootFolder sets folderState ', done => {
         folder: {
           context_id: '1',
           context_type: 'Course',
-          files: ['a.txt']
-        }
+          files: ['a.txt'],
+        },
       })
       done() // eslint-disable-line promise/no-callback-in-promise
     })

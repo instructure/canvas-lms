@@ -50,7 +50,7 @@ export const DiscussionEntryContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
-    }
+    },
   })
 
   const findDraftMessage = () => {
@@ -87,58 +87,62 @@ export const DiscussionEntryContainer = props => {
         tablet: {
           direction: 'column-reverse',
           authorInfo: {
-            padding: '0'
+            padding: '0',
           },
           postUtilities: {
             align: 'stretch',
             margin: '0 0 x-small 0',
-            padding: 'xx-small'
+            padding: 'xx-small',
           },
           postMessage: {
             padding: '0 xx-small xx-small',
             paddingNoAuthor: '0 xx-small xx-small',
-            margin: 'xx-small 0 0 0'
-          }
+            margin: 'xx-small 0 0 0',
+          },
         },
         desktop: {
           direction: 'row',
           authorInfo: {
-            padding: 'xx-small 0 0 0'
+            padding: 'xx-small 0 0 0',
           },
           postUtilities: {
             align: 'start',
             margin: '0',
-            padding: 'xx-small'
+            padding: 'xx-small',
           },
           postMessage: {
             padding: 'x-small 0 small xx-large',
             paddingNoAuthor: '0 0 xx-small xx-small',
-            margin: '0'
-          }
+            margin: '0',
+          },
         },
         mobile: {
           direction: 'column-reverse',
           authorInfo: {
-            padding: '0'
+            padding: '0',
           },
           postUtilities: {
             align: 'stretch',
             margin: '0 0 x-small 0',
-            padding: 'xx-small'
+            padding: 'xx-small',
           },
           postMessage: {
             padding: '0 xx-small xx-small',
             paddingNoAuthor: '0 xx-small xx-small',
-            margin: 'xx-small 0 0 0'
-          }
-        }
+            margin: 'xx-small 0 0 0',
+          },
+        },
       }}
       render={responsiveProps => (
         <Flex direction="column">
-          <Flex.Item shouldGrow shouldShrink overflowY="visible">
+          <Flex.Item shouldGrow={true} shouldShrink={true} overflowY="visible">
             <Flex direction={props.isTopic ? responsiveProps.direction : 'row'}>
               {hasAuthor && (
-                <Flex.Item shouldGrow shouldShrink padding={responsiveProps.authorInfo.padding}>
+                <Flex.Item
+                  shouldGrow={true}
+                  shouldShrink={true}
+                  padding={responsiveProps.authorInfo.padding}
+                >
                   <AuthorInfo
                     author={props.author}
                     anonymousAuthor={props.anonymousAuthor}
@@ -196,8 +200,8 @@ export const DiscussionEntryContainer = props => {
                   variables: {
                     discussionTopicId: ENV.discussion_topic_id,
                     message: newDraftMessage,
-                    discussionEntryId: props.isEditing ? props.discussionEntry._id : null
-                  }
+                    discussionEntryId: props.isEditing ? props.discussionEntry._id : null,
+                  },
                 })
               }
             >
@@ -239,9 +243,9 @@ DiscussionEntryContainer.propTypes = {
   isTopicAuthor: PropTypes.bool,
   updateDraftCache: PropTypes.func,
   quotedEntry: PropTypes.object,
-  attachment: Attachment.shape
+  attachment: Attachment.shape,
 }
 
 DiscussionEntryContainer.defaultProps = {
-  deleted: false
+  deleted: false,
 }

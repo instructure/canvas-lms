@@ -42,12 +42,12 @@ export function AssignmentContext({...props}) {
       props={{
         tablet: {
           textSize: 'x-small',
-          displayText: null
+          displayText: null,
         },
         desktop: {
           textSize: 'small',
-          displayText: groupDisplayText
-        }
+          displayText: groupDisplayText,
+        },
       }}
       render={responsiveProps => {
         return responsiveProps.displayText ? (
@@ -64,10 +64,10 @@ export function AssignmentContext({...props}) {
 
 AssignmentContext.propTypes = {
   group: PropTypes.string,
-  assignmentOverride: PropTypes.object
+  assignmentOverride: PropTypes.object,
 }
 
 AssignmentContext.defaultProps = {
   group: '',
-  assignmentOverride: null
+  assignmentOverride: null,
 }

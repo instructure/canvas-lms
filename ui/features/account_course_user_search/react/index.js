@@ -58,11 +58,11 @@ AccountCourseUserSearch.propTypes = {
   accountId: string.isRequired,
   rootAccountId: string.isRequired,
   permissions: shape({
-    analytics: bool.isRequired
+    analytics: bool.isRequired,
   }).isRequired,
   store: shape({
-    getState: func.isRequired
-  }).isRequired
+    getState: func.isRequired,
+  }).isRequired,
 }
 
 export default AccountCourseUserSearch

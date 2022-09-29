@@ -25,11 +25,11 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
   const open = true
   const recipients = [{id: '1', short_name: 'name'}]
   const groupCategory = {
-    name: 'Group Set'
+    name: 'Group Set',
   }
 
   stubEnv({
-    context_asset_string: 'course_1'
+    context_asset_string: 'course_1',
   })
 
   afterEach(() => {
@@ -74,7 +74,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
-      target: {value: 'foo'}
+      target: {value: 'foo'},
     })
     expect(getByLabelText('Required input. Message all unassigned students.')).toHaveValue('foo')
     fireEvent.click(getByText('Cancel'))
@@ -111,7 +111,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
-      target: {value: 't'}
+      target: {value: 't'},
     })
     expect(getByText('Send Message').closest('button').hasAttribute('disabled')).toBeFalsy()
   })
@@ -127,7 +127,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
-      target: {value: 'hi'}
+      target: {value: 'hi'},
     })
     fireEvent.click(getByText('Send Message'))
     const [, fetchOptions] = fetchMock.lastCall()
@@ -135,7 +135,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
       body: 'hi',
       context_code: 'course_1',
-      recipients: ['1']
+      recipients: ['1'],
     })
     expect(getAllByText(/Sending Message/i)).toBeTruthy()
     await fetchMock.flush(true)
@@ -163,7 +163,7 @@ describe('GroupCategoryMessageAllUnassignedModal', () => {
         />
       )
       fireEvent.input(getByLabelText('Required input. Message all unassigned students.'), {
-        target: {value: 'hi'}
+        target: {value: 'hi'},
       })
       fireEvent.click(getByText('Send Message'))
       await fetchMock.flush(true)

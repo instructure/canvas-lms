@@ -107,12 +107,12 @@ describe('spacing()', () => {
 
   describe('when the content is missing matching tags', () => {
     beforeEach(() => {
-        content = `
+      content = `
           <div>
             <span>
               keep me!
         `
-      })
+    })
 
     it('adds a matching tag', () => {
       expect(subject()).toEqual('<div><span>keepme!</span></div>')

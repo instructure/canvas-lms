@@ -34,7 +34,7 @@ export const mockUser = ({
   sisRole = 'student',
   sectionID = '1',
   sectionName = 'Section 1',
-  additionalEnrollments = []
+  additionalEnrollments = [],
 } = {}) => ({
   name,
   _id,
@@ -60,11 +60,11 @@ export const mockUser = ({
         _id: sectionID,
         id: Buffer.from(`Section-${sectionID}`).toString('base64'),
         name: sectionName,
-        __typename: 'section'
-      }
+        __typename: 'section',
+      },
     },
-    ...additionalEnrollments
-  ]
+    ...additionalEnrollments,
+  ],
 })
 
 export const mockEnrollment = ({
@@ -79,7 +79,7 @@ export const mockEnrollment = ({
   associatedUserID = '2',
   associatedUserName = 'Test User',
   sectionID = '1',
-  sectionName = 'Section 1'
+  sectionName = 'Section 1',
 } = {}) => ({
   id: Buffer.from(`Enrollment-${associatedUserID}`).toString('base64'),
   type: enrollmentType,
@@ -94,14 +94,14 @@ export const mockEnrollment = ({
     _id: associatedUserID,
     id: Buffer.from(`User-${associatedUserID}`).toString('base64'),
     name: associatedUserName,
-    __typename: 'associatedUser'
+    __typename: 'associatedUser',
   },
   section: {
     _id: sectionID,
     id: Buffer.from(`Section-${sectionID}`).toString('base64'),
     name: sectionName,
-    __typename: 'section'
-  }
+    __typename: 'section',
+  },
 })
 
 export const getRosterQueryMock = ({mockUsers = [], courseID = '1', shouldError = false} = {}) => [
@@ -109,20 +109,20 @@ export const getRosterQueryMock = ({mockUsers = [], courseID = '1', shouldError 
     request: {
       query: ROSTER_QUERY,
       variables: {
-        courseID
-      }
+        courseID,
+      },
     },
     result: {
       data: {
         course: {
           usersConnection: {
             nodes: [...mockUsers],
-            __typename: 'usersConnection'
+            __typename: 'usersConnection',
           },
-          __typename: 'course'
-        }
-      }
+          __typename: 'course',
+        },
+      },
     },
-    ...(shouldError && {error: new Error('graphql error')})
-  }
+    ...(shouldError && {error: new Error('graphql error')}),
+  },
 ]

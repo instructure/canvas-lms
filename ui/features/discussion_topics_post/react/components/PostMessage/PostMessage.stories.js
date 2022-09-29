@@ -25,7 +25,7 @@ import {User} from '../../../graphql/User'
 export default {
   title: 'Examples/Discussion Posts/Components/PostMessage',
   component: PostMessage,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => (
@@ -37,7 +37,7 @@ Default.args = {}
 
 export const LargePost = Template.bind({})
 LargePost.args = {
-  message: 'This is the post that never ends. It goes on and on my friends. '.repeat(10)
+  message: 'This is the post that never ends. It goes on and on my friends. '.repeat(10),
 }
 
 export const WithChildren = Template.bind({})
@@ -46,12 +46,12 @@ WithChildren.args = {
   children: (
     <ThreadingToolbar>
       <ThreadingToolbar.Reply onReply={Function.prototype} />
-      <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked />
+      <ThreadingToolbar.Like onClick={Function.prototype} likeCount={2} isLiked={true} />
       <ThreadingToolbar.Expansion
         onExpand={Function.prototype}
         expandText="4 replies, 2 unread"
-        isExpanded
+        isExpanded={true}
       />
     </ThreadingToolbar>
-  )
+  ),
 }

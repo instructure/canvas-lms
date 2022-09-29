@@ -67,47 +67,47 @@ export class CourseSelect extends React.Component {
         PropTypes.shape({
           _id: PropTypes.oneOf([ALL_COURSES_ID]).isRequired,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       favoriteCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       moreCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       concludedCourses: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
       ),
       groups: PropTypes.arrayOf(
         PropTypes.shape({
           _id: PropTypes.string,
           contextName: PropTypes.string,
-          assetString: PropTypes.string
+          assetString: PropTypes.string,
         })
-      )
+      ),
     }).isRequired,
     onCourseFilterSelect: PropTypes.func,
     activeCourseFilterID: PropTypes.string,
-    courseMessages: PropTypes.array
+    courseMessages: PropTypes.array,
   }
 
   static getDerivedStateFromProps(props, state) {
     if (props.options !== state.options) {
       return {
-        filteredOptions: filterOptions(state.inputValue, props.options)
+        filteredOptions: filterOptions(state.inputValue, props.options),
       }
     }
     return null
@@ -122,7 +122,7 @@ export class CourseSelect extends React.Component {
       this.props.options
     ),
     highlightedOptionId: null,
-    selectedOptionId: this.props.activeCourseFilterID ? this.props.activeCourseFilterID : null
+    selectedOptionId: this.props.activeCourseFilterID ? this.props.activeCourseFilterID : null,
   }
 
   getDefaultHighlightedOption = (newOptions = []) => {
@@ -140,7 +140,7 @@ export class CourseSelect extends React.Component {
     const message = isNewGroup
       ? I18n.t('Group %{newOptionGroup} entered. %{newOptionContextName}', {
           newOptionContextName,
-          newOptionGroup
+          newOptionGroup,
         })
       : newOption.contextName
     return message
@@ -165,13 +165,13 @@ export class CourseSelect extends React.Component {
     if (!option) return // prevent highlighting of empty options
     if (event.key) {
       this.setState({
-        highlightedOptionId: id
+        highlightedOptionId: id,
       })
     } else {
       this.setState(
         state => ({
           highlightedOptionId: id,
-          inputValue: state.inputValue
+          inputValue: state.inputValue,
         }),
         () => {
           this.context.setOnSuccess(this.getGroupChangedMessage(option))
@@ -191,7 +191,7 @@ export class CourseSelect extends React.Component {
         selectedOptionId: id,
         inputValue: id === null ? '' : option.contextName,
         isShowingOptions: false,
-        filteredOptions: this.props.options
+        filteredOptions: this.props.options,
       },
       () => {
         this.context.setOnSuccess(I18n.t('%{contextName} selected', {contextName}))
@@ -207,7 +207,7 @@ export class CourseSelect extends React.Component {
       filteredOptions: newOptions,
       highlightedOptionId: this.getDefaultHighlightedOption(newOptions),
       isShowingOptions: true,
-      selectedOptionId: value === '' ? null : state.selectedOptionId
+      selectedOptionId: value === '' ? null : state.selectedOptionId,
     }))
   }
 
@@ -215,14 +215,14 @@ export class CourseSelect extends React.Component {
     if (this.state.inputValue !== '') return
 
     this.setState({
-      isShowingOptions: true
+      isShowingOptions: true,
     })
   }
 
   handleHideOptions = () => {
     this.setState({
       isShowingOptions: false,
-      highlightedOptionId: null
+      highlightedOptionId: null,
     })
   }
 
@@ -269,7 +269,7 @@ export class CourseSelect extends React.Component {
       inputValue: '',
       isShowingOptions: false,
       highlightedOptionId: null,
-      selectedOptionId: null
+      selectedOptionId: null,
     })
   }
 

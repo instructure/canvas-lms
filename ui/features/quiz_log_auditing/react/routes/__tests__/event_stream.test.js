@@ -18,7 +18,7 @@
 
 import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import EventStreamRoute from '../event_stream'
 import assertChange from 'chai-assert-change'
 

@@ -25,20 +25,20 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Account Calendars - add / edit / delete events'),
-      description: I18n.t('Allows user to add, edit, and delete events in account calendars.')
+      description: I18n.t('Allows user to add, edit, and delete events in account calendars.'),
     },
     {
       title: I18n.t('Account Calendars - change visibility'),
-      description: I18n.t('Allows user to change visibility of account calendars.')
-    }
+      description: I18n.t('Allows user to change visibility of account calendars.'),
+    },
   ],
   [
     {
       title: I18n.t('Account Calendars'),
       description: I18n.t(
         'Even with the Account Calendars - add / edit / delete events permission enabled, events can only be created in account calendars that are visible.'
-      )
-    }
+      ),
+    },
   ],
   [],
   []

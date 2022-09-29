@@ -28,6 +28,6 @@ export default function vddTooltip() {
         const el = document.querySelector(selector)
         return $(el).html()
       } catch (err) {}
-    }
+    },
   })
 }

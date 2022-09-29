@@ -38,7 +38,7 @@ const createRootReducer = () => {
           [actions.SET_ARIA_ALERT]: (state, action) => action.payload,
           [actions.CLEAR_ARIA_ALERT]: () => '',
           [actions.SET_GLOBAL_WARNING]: (state, action) => action.payload,
-          [actions.CLEAR_GLOBAL_WARNING]: () => ''
+          [actions.CLEAR_GLOBAL_WARNING]: () => '',
         },
         ''
       ),
@@ -48,7 +48,7 @@ const createRootReducer = () => {
           [actions.LOAD_RULE_FOR_ASSIGNMENT]: gotHttpError,
           [actions.SAVE_RULE]: gotHttpError,
           [actions.GET_ASSIGNMENTS]: gotHttpError,
-          [actions.DELETE_RULE]: gotHttpError
+          [actions.DELETE_RULE]: gotHttpError,
         },
         ''
       ),
@@ -56,14 +56,14 @@ const createRootReducer = () => {
       global_warning: handleActions(
         {
           [actions.SET_GLOBAL_WARNING]: (state, action) => action.payload,
-          [actions.CLEAR_GLOBAL_WARNING]: () => ''
+          [actions.CLEAR_GLOBAL_WARNING]: () => '',
         },
         ''
       ),
 
       course_id: handleActions(
         {
-          [actions.SET_COURSE_ID]: (state, action) => action.payload
+          [actions.SET_COURSE_ID]: (state, action) => action.payload,
         },
         ''
       ),
@@ -72,17 +72,17 @@ const createRootReducer = () => {
         id: handleActions(
           {
             [actions.LOAD_RULE_FOR_ASSIGNMENT]: gotRuleSetRuleId,
-            [actions.SAVE_RULE]: savedRuleSetRuleId
+            [actions.SAVE_RULE]: savedRuleSetRuleId,
           },
           ''
         ),
 
-        scoring_ranges: scoringRangesReducer
+        scoring_ranges: scoringRangesReducer,
       }),
 
       assignments: handleActions(
         {
-          [actions.GET_ASSIGNMENTS]: gotAssignments
+          [actions.GET_ASSIGNMENTS]: gotAssignments,
         },
         Map()
       ),
@@ -91,7 +91,7 @@ const createRootReducer = () => {
 
       trigger_assignment: handleActions(
         {
-          [actions.UPDATE_ASSIGNMENT]: mergePayload
+          [actions.UPDATE_ASSIGNMENT]: mergePayload,
         },
         Map()
       ),
@@ -99,17 +99,17 @@ const createRootReducer = () => {
       received: combineReducers({
         rule: handleActions(
           {
-            [actions.LOAD_RULE_FOR_ASSIGNMENT]: () => true
+            [actions.LOAD_RULE_FOR_ASSIGNMENT]: () => true,
           },
           false
         ),
         assignments: handleActions(
           {
-            [actions.GET_ASSIGNMENTS]: () => true
+            [actions.GET_ASSIGNMENTS]: () => true,
           },
           false
-        )
-      })
+        ),
+      }),
     })
   )
 }

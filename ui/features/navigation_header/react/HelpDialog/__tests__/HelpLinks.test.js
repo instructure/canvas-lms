@@ -28,7 +28,7 @@ describe('HelpLinks', () => {
     url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
     is_featured: true,
     is_new: false,
-    feature_headline: 'Little Lost? Try here first!'
+    feature_headline: 'Little Lost? Try here first!',
   }
   const newLink = {
     id: 'link1',
@@ -38,7 +38,7 @@ describe('HelpLinks', () => {
     type: 'custom',
     available_to: ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
     is_featured: false,
-    is_new: true
+    is_new: true,
   }
   const regularLink = {
     id: 'report_a_problem',
@@ -48,12 +48,12 @@ describe('HelpLinks', () => {
     subtext: 'If Canvas misbehaves, tell us about it',
     url: '#create_ticket',
     is_featured: false,
-    is_new: false
+    is_new: false,
   }
   const props = {
     links: [featuredLink, newLink, regularLink],
     hasLoaded: true,
-    onClick() {}
+    onClick() {},
   }
 
   beforeEach(() => {

@@ -29,7 +29,7 @@ const duplicationReducerMap = {
     newStateBeginning.push(newDiscussion.id)
     const newStateEnd = state.slice(oldIndex + 1, state.length)
     return newStateBeginning.concat(newStateEnd)
-  }
+  },
 }
 
 export default duplicationReducerMap

@@ -39,7 +39,7 @@ const friendlyShareNames = {
   discussion_topic: I18n.t('Discussion Topic'),
   module: I18n.t('Module'),
   page: I18n.t('Page'),
-  quiz: I18n.t('Quiz')
+  quiz: I18n.t('Quiz'),
 }
 
 ReceivedTable.propTypes = {
@@ -47,7 +47,7 @@ ReceivedTable.propTypes = {
   onPreview: func,
   onImport: func,
   onRemove: func,
-  onUpdate: func
+  onUpdate: func,
 }
 
 export default function ReceivedTable({shares, onPreview, onImport, onRemove, onUpdate}) {
@@ -188,7 +188,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
             size="small"
             name={share.sender.display_name}
             src={share.sender.avatar_image_url}
-            data-fs-exclude
+            data-fs-exclude={true}
           />{' '}
           {share.sender.display_name}
         </Table.Cell>
@@ -199,7 +199,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
   }
 
   return (
-    <Table caption={I18n.t('Content shared by others to you')} layout="auto" hover>
+    <Table caption={I18n.t('Content shared by others to you')} layout="auto" hover={true}>
       <Table.Head>
         <Table.Row>
           <Table.ColHeader id="unread">

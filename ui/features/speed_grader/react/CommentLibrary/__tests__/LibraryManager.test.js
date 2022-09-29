@@ -27,7 +27,7 @@ import {
   makeDeleteCommentMutation,
   makeCreateMutationMock,
   searchMocks,
-  makeUpdateMutationMock
+  makeUpdateMutationMock,
 } from './mocks'
 import LibraryManager from '../LibraryManager'
 
@@ -44,7 +44,7 @@ describe('LibraryManager', () => {
       userId: '1',
       commentAreaText: '',
       suggestionsRef: document.body,
-      ...props
+      ...props,
     }
   }
 
@@ -64,7 +64,7 @@ describe('LibraryManager', () => {
   const render = ({
     props = defaultProps(),
     mocks = commentBankItemMocks({numberOfComments: 10}),
-    func = rtlRender
+    func = rtlRender,
   } = {}) =>
     func(
       <MockedProvider mocks={mocks} cache={createCache()}>
@@ -84,7 +84,7 @@ describe('LibraryManager', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error loading comment library',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -138,7 +138,7 @@ describe('LibraryManager', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error creating comment',
-        type: 'error'
+        type: 'error',
       })
     })
   })
@@ -158,7 +158,7 @@ describe('LibraryManager', () => {
     it('deletes the comment and removes the comment from the tray when the trash button is clicked', async () => {
       const mutationMock = await makeDeleteCommentMutation({
         overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
-        variables: {id: '0'}
+        variables: {id: '0'},
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText, queryByText} = render({mocks})
@@ -180,7 +180,7 @@ describe('LibraryManager', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error deleting comment',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -188,7 +188,7 @@ describe('LibraryManager', () => {
       window.confirm.mockImplementation(() => false)
       const mutationMock = await makeDeleteCommentMutation({
         overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
-        variables: {id: '0'}
+        variables: {id: '0'},
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
@@ -203,7 +203,7 @@ describe('LibraryManager', () => {
     it("focuses on the previous comment's trash icon after deleting", async () => {
       const mutationMock = await makeDeleteCommentMutation({
         overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '1'}},
-        variables: {id: '1'}
+        variables: {id: '1'},
       })
       const mocks = [...commentBankItemMocks(), ...mutationMock]
       const {getByText} = render({mocks})
@@ -218,7 +218,7 @@ describe('LibraryManager', () => {
     it('focuses on the close tray button if the last comment was deleted', async () => {
       const mutationMock = await makeDeleteCommentMutation({
         overrides: {DeleteCommentBankItemPayload: {commentBankItemId: '0'}},
-        variables: {id: '0'}
+        variables: {id: '0'},
       })
       const mocks = [...commentBankItemMocks({numberOfComments: 1}), ...mutationMock]
       const {getByText} = render({mocks})
@@ -236,7 +236,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
-        mocks
+        mocks,
       })
 
       await act(async () => jest.runAllTimers())
@@ -247,7 +247,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks({query: 'se'})]
       const {queryByText} = render({
         props: defaultProps({commentAreaText: 'se'}),
-        mocks
+        mocks,
       })
       await act(async () => jest.runAllTimers())
       expect(queryByText('search result 0')).not.toBeInTheDocument()
@@ -257,7 +257,7 @@ describe('LibraryManager', () => {
       const mocks = [...commentBankItemMocks(), ...searchMocks()]
       const {getByText, queryByText} = render({
         props: defaultProps({commentAreaText: 'search'}),
-        mocks
+        mocks,
       })
 
       await act(async () => jest.advanceTimersByTime(50))
@@ -270,7 +270,7 @@ describe('LibraryManager', () => {
       const mocks = [
         ...commentBankItemMocks(),
         ...searchMocks({query: 'search'}),
-        ...searchMocks({query: 'search results 0', maxResults: 1})
+        ...searchMocks({query: 'search results 0', maxResults: 1}),
       ]
       const props = defaultProps({commentAreaText: 'search'})
       const {getByText, queryByText, rerender} = render({props, mocks})
@@ -281,7 +281,7 @@ describe('LibraryManager', () => {
       render({
         props: defaultProps({commentAreaText: 'search result 0'}),
         mocks,
-        func: rerender
+        func: rerender,
       })
       await act(async () => jest.runAllTimers())
       expect(queryByText('search result 0')).not.toBeInTheDocument()
@@ -315,8 +315,8 @@ describe('LibraryManager', () => {
         method: 'PUT',
         path: '/api/v1/users/self/settings',
         body: {
-          comment_library_suggestions_enabled: false
-        }
+          comment_library_suggestions_enabled: false,
+        },
       })
       expect(getByLabelText('Show suggestions when typing')).not.toBeChecked()
       await act(async () => jest.runAllTimers())
@@ -335,7 +335,7 @@ describe('LibraryManager', () => {
       expect(ENV.comment_library_suggestions_enabled).toBe(true)
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error saving suggestion preference',
-        type: 'error'
+        type: 'error',
       })
     })
   })
@@ -360,7 +360,7 @@ describe('LibraryManager', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Comment updated',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -376,7 +376,7 @@ describe('LibraryManager', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Error updating comment',
-        type: 'error'
+        type: 'error',
       })
     })
   })

@@ -30,7 +30,7 @@ import {ApolloProvider} from 'react-apollo'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('HeaderInputs', () => {
@@ -38,12 +38,12 @@ describe('HeaderInputs', () => {
   const defaultProps = props => ({
     courses: {
       favoriteGroupsConnection: {
-        nodes: [Group.mock()]
+        nodes: [Group.mock()],
       },
       favoriteCoursesConnection: {
-        nodes: [Course.mock()]
+        nodes: [Course.mock()],
       },
-      enrollments: [Enrollment.mock()]
+      enrollments: [Enrollment.mock()],
     },
     onContextSelect: jest.fn(),
     onSelectedIdsChange: jest.fn(),
@@ -53,7 +53,7 @@ describe('HeaderInputs', () => {
     onSubjectChange: jest.fn(),
     onRemoveMediaComment: jest.fn(),
     setUserNote: jest.fn(),
-    ...props
+    ...props,
   })
 
   beforeAll(() => {
@@ -67,13 +67,13 @@ describe('HeaderInputs', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -81,8 +81,8 @@ describe('HeaderInputs', () => {
     window.ENV = {
       CONVERSATIONS: {
         NOTES_ENABLED: false,
-        CAN_ADD_NOTES_FOR_ACCOUNT: false
-      }
+        CAN_ADD_NOTES_FOR_ACCOUNT: false,
+      },
     }
   })
 
@@ -116,8 +116,8 @@ describe('HeaderInputs', () => {
         CONVERSATIONS: {
           NOTES_ENABLED: true,
           CAN_ADD_NOTES_FOR_ACCOUNT: true,
-          CAN_ADD_NOTES_FOR_COURSES: {1: true}
-        }
+          CAN_ADD_NOTES_FOR_COURSES: {1: true},
+        },
       }
     })
 
@@ -129,15 +129,15 @@ describe('HeaderInputs', () => {
         commonCoursesInfo: [
           {
             courseID: props.courseID,
-            courseRole: props.courseRole
-          }
-        ]
+            courseRole: props.courseRole,
+          },
+        ],
       }
     }
 
     const defaultRecipientProps = () => ({
       activeCourseFilter: {contextID: 'course_1', contextName: 'course 1'},
-      selectedRecipients: [mockedRecipient()]
+      selectedRecipients: [mockedRecipient()],
     })
 
     it('does not render if no recipients are chosen', async () => {
@@ -162,8 +162,8 @@ describe('HeaderInputs', () => {
     it('does not render if CAN_AND_NOTES_FOR_ACCOUNT is false', async () => {
       window.ENV = {
         CONVERSATIONS: {
-          CAN_ADD_NOTES_FOR_ACCOUNT: false
-        }
+          CAN_ADD_NOTES_FOR_ACCOUNT: false,
+        },
       }
       const recipientPropInfo = defaultRecipientProps()
       recipientPropInfo.activeCourseFilter = undefined
@@ -189,8 +189,8 @@ describe('HeaderInputs', () => {
         CONVERSATIONS: {
           NOTES_ENABLED: true,
           CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {}
-        }
+          CAN_ADD_NOTES_FOR_COURSES: {},
+        },
       }
       const props = defaultProps(defaultRecipientProps())
       const container = setup(props)
@@ -203,8 +203,8 @@ describe('HeaderInputs', () => {
         CONVERSATIONS: {
           NOTES_ENABLED: true,
           CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {2: true}
-        }
+          CAN_ADD_NOTES_FOR_COURSES: {2: true},
+        },
       }
       const props = defaultProps(defaultRecipientProps())
       const container = setup(props)
@@ -217,8 +217,8 @@ describe('HeaderInputs', () => {
         CONVERSATIONS: {
           NOTES_ENABLED: true,
           CAN_ADD_NOTES_FOR_ACCOUNT: true,
-          CAN_ADD_NOTES_FOR_COURSES: {}
-        }
+          CAN_ADD_NOTES_FOR_COURSES: {},
+        },
       }
       const props = defaultProps(defaultRecipientProps())
       const container = setup(props)
@@ -231,8 +231,8 @@ describe('HeaderInputs', () => {
         CONVERSATIONS: {
           NOTES_ENABLED: true,
           CAN_ADD_NOTES_FOR_ACCOUNT: false,
-          CAN_ADD_NOTES_FOR_COURSES: {1: true}
-        }
+          CAN_ADD_NOTES_FOR_COURSES: {1: true},
+        },
       }
       const props = defaultProps(defaultRecipientProps())
       const container = setup(props)

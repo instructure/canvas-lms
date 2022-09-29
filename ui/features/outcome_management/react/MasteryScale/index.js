@@ -26,7 +26,7 @@ import RoleList from '../RoleList'
 import {
   saveProficiency,
   ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-  COURSE_OUTCOME_PROFICIENCY_QUERY
+  COURSE_OUTCOME_PROFICIENCY_QUERY,
 } from '@canvas/outcomes/graphql/MasteryScale'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 
@@ -39,7 +39,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
 
   const {loading, error, data} = useQuery(query, {
     variables: {contextId},
-    fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache'
+    fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache',
   })
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
@@ -54,7 +54,7 @@ const MasteryScale = ({onNotifyPendingChanges}) => {
       } catch (e) {
         setUpdateProficiencyRatingsError(
           I18n.t('An error occurred updating the mastery scale: %{message}', {
-            message: e.message
+            message: e.message,
           })
         )
         throw e

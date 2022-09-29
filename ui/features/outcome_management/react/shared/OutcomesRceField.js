@@ -53,7 +53,7 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
             autosave={false}
             editorOptions={{
               focus: false,
-              plugins: []
+              plugins: [],
             }}
             renderKBShortcutModal={false}
             height={300}
@@ -70,11 +70,11 @@ const OutcomesRceField = ({onChangeHandler, defaultContent}) => {
 
 OutcomesRceField.propTypes = {
   defaultContent: PropTypes.string,
-  onChangeHandler: PropTypes.func.isRequired
+  onChangeHandler: PropTypes.func.isRequired,
 }
 
 OutcomesRceField.defaultProps = {
-  defaultContent: ''
+  defaultContent: '',
 }
 
 export default OutcomesRceField

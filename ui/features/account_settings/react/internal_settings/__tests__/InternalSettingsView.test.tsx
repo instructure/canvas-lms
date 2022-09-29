@@ -32,10 +32,10 @@ const mockInternalSettingsQuery = async () => {
   return [
     {
       request: {
-        query: INTERNAL_SETTINGS_QUERY
+        query: INTERNAL_SETTINGS_QUERY,
       },
-      result: queryResult as ExecutionResult<InternalSettingsData>
-    }
+      result: queryResult as ExecutionResult<InternalSettingsData>,
+    },
   ]
 }
 
@@ -53,7 +53,7 @@ describe('InternalSettingsView', () => {
     const elementArrays = await Promise.all(
       internalSettingMocks[0].result.data!.internalSettings.flatMap(internalSetting => [
         findAllByText(internalSetting.name),
-        internalSetting.secret ? [] : findAllByText(internalSetting.value!)
+        internalSetting.secret ? [] : findAllByText(internalSetting.value!),
       ])
     )
 

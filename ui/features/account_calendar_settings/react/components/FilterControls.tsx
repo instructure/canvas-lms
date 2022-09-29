@@ -24,7 +24,7 @@ import {
   IconXLine,
   IconFilterLine,
   IconFilterSolid,
-  IconEyeLine
+  IconEyeLine,
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {SimpleSelect} from '@instructure/ui-simple-select'
@@ -41,7 +41,7 @@ const {Option: SimpleSelectOption} = SimpleSelect as any
 export enum FilterType {
   SHOW_ALL = 'all',
   SHOW_VISIBLE = 'visible',
-  SHOW_HIDDEN = 'hidden'
+  SHOW_HIDDEN = 'hidden',
 }
 
 type ComponentProps = {
@@ -56,20 +56,20 @@ const FILTER_OPTIONS = [
   {
     id: FilterType.SHOW_VISIBLE,
     value: FilterType.SHOW_VISIBLE,
-    name: I18n.t('Show only enabled calendars')
+    name: I18n.t('Show only enabled calendars'),
   },
   {
     id: FilterType.SHOW_HIDDEN,
     value: FilterType.SHOW_HIDDEN,
-    name: I18n.t('Show only disabled calendars')
-  }
+    name: I18n.t('Show only disabled calendars'),
+  },
 ]
 
 export const FilterControls: React.FC<ComponentProps> = ({
   searchValue,
   filterValue,
   setSearchValue,
-  setFilterValue
+  setFilterValue,
 }) => {
   const clearSearchButton = (
     <IconButton
@@ -93,7 +93,7 @@ export const FilterControls: React.FC<ComponentProps> = ({
         renderAfterInput={searchValue?.length ? clearSearchButton : undefined}
         // @ts-ignore
         theme={{
-          borderRadius: '2rem'
+          borderRadius: '2rem',
         }}
         value={searchValue}
         onChange={(_, value) => setSearchValue(value)}

@@ -25,14 +25,14 @@ describe('QuizEngineModal', () => {
     ENV = Object.assign(ENV, {
       URLS: {
         new_assignment_url: 'http://localhost/assignments',
-        new_quiz_url: 'http://localhost/quizzes'
-      }
+        new_quiz_url: 'http://localhost/quizzes',
+      },
     })
   })
 
   it('renders a header, close button, and children', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     expect(getByText('Choose a Quiz Engine').tagName).toBe('H2')
     expect(getByText('Submit')).toBeInTheDocument()
     expect(getByText('Cancel')).toBeInTheDocument()
@@ -44,13 +44,13 @@ describe('QuizEngineModal', () => {
 
   it('submit is disabled without a selected choice', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     expect(getByText('Submit').closest('button').getAttribute('disabled')).toBeDefined()
   })
 
   it('submit is enabled with a selected choice', () => {
     const handleDismiss = jest.fn()
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
     expect(getByText('Submit').closest('button').getAttribute('disabled')).toBeNull()
   })
@@ -60,7 +60,7 @@ describe('QuizEngineModal', () => {
     const windLoc = global.window.location
     delete global.window.location
     global.window.location = {href: 'http://localhost'}
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('New Quizzes'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(window.location.href).toBe('http://localhost/assignments?quiz_lti')
@@ -70,7 +70,7 @@ describe('QuizEngineModal', () => {
   it('submits to classic quizzes without saving', () => {
     const handleDismiss = jest.fn()
     window.HTMLFormElement.prototype.submit = jest.fn()
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
     fireEvent.click(getByText('Submit').closest('button'))
     expect(window.HTMLFormElement.prototype.submit).toHaveBeenCalled()
@@ -83,7 +83,7 @@ describe('QuizEngineModal', () => {
     const windLoc = global.window.location
     delete global.window.location
     global.window.location = {href: 'http://localhost'}
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('New Quizzes'))
     fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))
@@ -94,7 +94,7 @@ describe('QuizEngineModal', () => {
   it('redirects to classic quizzes after saving engine choice', () => {
     const handleDismiss = jest.fn()
     window.HTMLFormElement.prototype.submit = jest.fn()
-    const {getByText} = render(<QuizEngineModal setOpen onDismiss={handleDismiss} />)
+    const {getByText} = render(<QuizEngineModal setOpen={true} onDismiss={handleDismiss} />)
     fireEvent.click(getByText('Classic Quizzes'))
     fireEvent.change(getByText('Remember my choice for this course'))
     fireEvent.click(getByText('Submit').closest('button'))

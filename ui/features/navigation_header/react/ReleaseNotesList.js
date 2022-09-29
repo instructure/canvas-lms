@@ -38,7 +38,7 @@ function persistBadgeDisabled(state) {
   doFetchApi({
     path: '/api/v1/users/self/settings',
     method: 'PUT',
-    body: {release_notes_badge_disabled: state}
+    body: {release_notes_badge_disabled: state},
   })
 }
 
@@ -52,7 +52,7 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
     success: setReleaseNotes,
     loading: setLoading,
     error: setError,
-    path: '/api/v1/release_notes/latest'
+    path: '/api/v1/release_notes/latest',
   })
 
   if (loading) {
@@ -85,7 +85,7 @@ export default function ReleaseNotesList({badgeDisabled, setBadgeDisabled}) {
         </Flex>
         <hr role="presentation" style={{marginTop: '0'}} />
       </View>
-      <List isUnstyled margin="small 0" itemSpacing="small">
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
         {releaseNotes.map(note => {
           const has_new_tag = note.new
           return (

@@ -29,25 +29,25 @@ const PeopleTray = () => (
     image="/images/tutorial-tray-images/Panda_People.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the People page in a course as an instructor?'),
-        href: I18n.t('#community.instructor_use_people_page')
+        href: I18n.t('#community.instructor_use_people_page'),
       },
       {
         label: I18n.t('How do I add users to a course?'),
-        href: I18n.t('#community.instructor_add_users')
+        href: I18n.t('#community.instructor_add_users'),
       },
       {
         label: I18n.t('How do I view a context card for a student in a course?'),
-        href: I18n.t('#community.instructor_view_student_context_card')
+        href: I18n.t('#community.instructor_view_student_context_card'),
       },
       {
         label: I18n.t('How do I view user details for an enrollment in a course?'),
-        href: I18n.t('#community.instructor_view_enrollment_details')
-      }
+        href: I18n.t('#community.instructor_view_enrollment_details'),
+      },
     ]}
   >
     {I18n.t(

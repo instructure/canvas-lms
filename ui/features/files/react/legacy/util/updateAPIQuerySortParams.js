@@ -27,7 +27,7 @@ export default function updateAPIQuerySortParams(collection, queryParams) {
     include: ['user', 'usage_rights', 'enhanced_preview_url', 'context_asset_string'],
     per_page: 20,
     sort: queryParams.sort || '',
-    order: queryParams.order || ''
+    order: queryParams.order || '',
   }
 
   const oldUrl = collection.url

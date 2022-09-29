@@ -79,7 +79,7 @@ function buildBigF(keepCount: number, cannotDrop, sortFn) {
   return function bigF(q, submissions) {
     const ratedScores = _.map(submissions, submission => [
       submission.score - q * submission.total,
-      submission
+      submission,
     ])
     const rankedScores = ratedScores.sort(sortFn)
     const keptScores = rankedScores.slice(0, keepCount)
@@ -233,7 +233,7 @@ function calculateGroupGrade(group, allSubmissions, opts) {
     score: parseScore(submission.score),
     submitted: submission.score != null && submission.score !== '',
     pending_review: submission.workflow_state === 'pending_review',
-    submission
+    submission,
   }))
 
   let relevantSubmissionData = submissionData
@@ -262,9 +262,9 @@ function calculateGroupGrade(group, allSubmissions, opts) {
         score: parseScore(submissionDatum.score),
         possible: submissionDatum.total,
         submission: submissionDatum.submission,
-        submitted: submissionDatum.submitted
+        submitted: submissionDatum.submitted,
       }
-    })
+    }),
   }
 }
 
@@ -318,16 +318,16 @@ function calculate(allSubmissions, assignmentGroup, ignoreUnpostedAnonymous) {
     assignmentGroupWeight: assignmentGroup.group_weight,
     current: calculateGroupGrade(assignmentGroup, submissions, {
       includeUngraded: false,
-      ignoreUnpostedAnonymous
+      ignoreUnpostedAnonymous,
     }),
     final: calculateGroupGrade(assignmentGroup, submissions, {
       includeUngraded: true,
-      ignoreUnpostedAnonymous
+      ignoreUnpostedAnonymous,
     }),
-    scoreUnit: 'points'
+    scoreUnit: 'points',
   }
 }
 
 export default {
-  calculate
+  calculate,
 }

@@ -39,7 +39,7 @@ const formattedCategoryNames = {
   scheduling: () => I18n.t('Scheduling'),
   groups: () => I18n.t('Groups'),
   conferences: () => I18n.t('Conferences'),
-  alerts: () => I18n.t('Alerts')
+  alerts: () => I18n.t('Alerts'),
 }
 
 const notificationCategories = {
@@ -55,42 +55,42 @@ const notificationCategories = {
     'All Submissions': {},
     'Late Grading': {},
     'Submission Comment': {},
-    Blueprint: {}
+    Blueprint: {},
   },
   discussions: {
     Discussion: {},
     DiscussionEntry: {},
-    DiscussionMention: {}
+    DiscussionMention: {},
   },
   conversations: {
     'Added To Conversation': {},
     'Conversation Message': {},
-    'Conversation Created': {}
+    'Conversation Created': {},
   },
   scheduling: {
     'Student Appointment Signups': {},
     'Appointment Signups': {},
     'Appointment Cancelations': {},
     'Appointment Availability': {},
-    Calendar: {}
+    Calendar: {},
   },
   groups: {
-    'Membership Update': {}
+    'Membership Update': {},
   },
   conferences: {
-    'Recording Ready': {}
+    'Recording Ready': {},
   },
   alerts: {
     Other: {},
     'Content Link Error': {},
-    'Account Notification': {}
-  }
+    'Account Notification': {},
+  },
 }
 
 const formatCategoryKey = category => {
   let categoryStrings = category.split(/(?=[A-Z])/)
   categoryStrings = categoryStrings.map(word => word[0].toLowerCase() + word.slice(1))
-  return categoryStrings.join('_').replace(/\s/g, '');
+  return categoryStrings.join('_').replace(/\s/g, '')
 }
 
 const pushNotificationCategoryRestricted = category => {
@@ -115,7 +115,7 @@ const renderNotificationCategory = (
     {!(notificationCategory === 'conversations' && ENV.current_user_disabled_inbox) && (
       <Table
         caption={I18n.t('%{categoryName} notification preferences', {
-          categoryName: formattedCategoryNames[notificationCategory]()
+          categoryName: formattedCategoryNames[notificationCategory](),
         })}
         margin="medium 0"
         layout="fixed"
@@ -182,7 +182,7 @@ const renderNotificationCategory = (
                           __html:
                             notificationPreferences.channels[0].categories[notificationCategory][
                               category
-                            ].notification.categoryDescription
+                            ].notification.categoryDescription,
                         }}
                         data-testid={`${formatCategoryKey(category)}_description`}
                       />
@@ -208,7 +208,7 @@ const renderNotificationCategory = (
                         __html:
                           notificationPreferences.channels[0].categories[notificationCategory][
                             category
-                          ].notification.categoryDescription
+                          ].notification.categoryDescription,
                       }}
                       data-testid={`${formatCategoryKey(category)}_screenReader`}
                     />
@@ -345,7 +345,7 @@ const NotificationPreferencesTable = props => {
 
 NotificationPreferencesTable.propTypes = {
   preferences: NotificationPreferencesShape,
-  updatePreference: func.isRequired
+  updatePreference: func.isRequired,
 }
 
 export default NotificationPreferencesTable

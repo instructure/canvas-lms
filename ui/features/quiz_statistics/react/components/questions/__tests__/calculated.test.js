@@ -27,13 +27,11 @@ describe('canvas_quizzes/statistics/views/questions/calculated', () => {
   })
 
   it('does not render a link to speed grader', () => {
-    const { getByText } = render(<Calculated />)
+    const {getByText} = render(<Calculated />)
 
     try {
       getByText('View in SpeedGrader')
       expect(false).toBe(true)
-    }
-    catch (e) {
-    }
+    } catch (e) {}
   })
 })

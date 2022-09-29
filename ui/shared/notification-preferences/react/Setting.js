@@ -26,7 +26,7 @@ import {
   IconCalendarDaySolid,
   IconCalendarMonthSolid,
   IconMutedLine,
-  IconNoLine
+  IconNoLine,
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
@@ -38,26 +38,26 @@ const preferenceConfigs = {
   immediately: {
     icon: IconAlertsSolid,
     color: 'success',
-    getScreenReaderLabel: () => I18n.t('Notify immediately')
+    getScreenReaderLabel: () => I18n.t('Notify immediately'),
   },
   daily: {
     icon: IconCalendarDaySolid,
     color: 'success',
-    getScreenReaderLabel: () => I18n.t('Daily summary')
+    getScreenReaderLabel: () => I18n.t('Daily summary'),
   },
   weekly: {
     icon: IconCalendarMonthSolid,
     color: 'success',
-    getScreenReaderLabel: () => I18n.t('Weekly summary')
+    getScreenReaderLabel: () => I18n.t('Weekly summary'),
   },
   never: {
     icon: IconMutedLine,
-    getScreenReaderLabel: () => I18n.t('Notifications off')
+    getScreenReaderLabel: () => I18n.t('Notifications off'),
   },
   disabled: {
     icon: IconNoLine,
-    getScreenReaderLabel: () => I18n.t('Notifications unsupported')
-  }
+    getScreenReaderLabel: () => I18n.t('Notifications unsupported'),
+  },
 }
 
 const renderPreferenceButton = preferenceConfig => (
@@ -87,7 +87,7 @@ const renderPreferenceMenuItem = preferenceConfig => (
 const NotificationPreferencesSetting = ({
   selectedPreference,
   preferenceOptions,
-  updatePreference
+  updatePreference,
 }) => {
   const [selection, setSelection] = useState(selectedPreference)
 
@@ -119,7 +119,7 @@ const NotificationPreferencesSetting = ({
 NotificationPreferencesSetting.propTypes = {
   selectedPreference: string,
   preferenceOptions: arrayOf(string),
-  updatePreference: func
+  updatePreference: func,
 }
 
 export default NotificationPreferencesSetting

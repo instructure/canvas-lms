@@ -37,7 +37,7 @@ const I18n = useI18nScope('course_people')
 // InstUI Table.ColHeader id prop is not passed to HTML <th> element
 const idProps = name => ({
   id: name,
-  'data-testid': name
+  'data-testid': name,
 })
 
 const RosterTable = ({data}) => {
@@ -47,7 +47,7 @@ const RosterTable = ({data}) => {
     read_reports,
     can_allow_admin_actions,
     manage_admin_users,
-    manage_students
+    manage_students,
   } = ENV?.permissions || {}
   const showCourseSections = ENV?.course?.hideSectionsOnCourseUsersPage === false
 
@@ -163,10 +163,10 @@ RosterTable.propTypes = {
   data: shape({
     course: shape({
       usersConnection: shape({
-        nodes: arrayOf(object).isRequired
-      }).isRequired
-    }).isRequired
-  }).isRequired
+        nodes: arrayOf(object).isRequired,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 RosterTable.defaultProps = {}

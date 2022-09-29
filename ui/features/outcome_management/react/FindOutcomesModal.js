@@ -39,7 +39,7 @@ import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport, {
   IMPORT_COMPLETED,
-  ROOT_GROUP
+  ROOT_GROUP,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 import {getOutcomeGroupAncestorsWithSelf} from '../helpers/getOutcomeGroupAncestorsWithSelf'
 
@@ -51,7 +51,7 @@ const FindOutcomesModal = ({
   targetGroup,
   importsTargetGroup,
   setImportsTargetGroup,
-  setTargetGroupIdsToRefetch
+  setTargetGroupIdsToRefetch,
 }) => {
   const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
@@ -71,7 +71,7 @@ const FindOutcomesModal = ({
     updateSearch,
     clearSearch,
     error,
-    loadedGroups
+    loadedGroups,
   } = useFindOutcomeModal(open)
 
   const {group, loading, loadMore} = useGroupDetail({
@@ -80,7 +80,7 @@ const FindOutcomesModal = ({
     loadOutcomesIsImported: true,
     searchString: debouncedSearchString,
     targetGroupId: rootOutcomeGroup?.id,
-    rhsGroupIdsToRefetch
+    rhsGroupIdsToRefetch,
   })
 
   useEffect(() => {
@@ -97,7 +97,7 @@ const FindOutcomesModal = ({
     importGroupsStatus,
     importOutcomesStatus,
     hasAddedOutcomes,
-    setHasAddedOutcomes
+    setHasAddedOutcomes,
   } = useOutcomesImport()
 
   const onCloseModalHandler = () => {
@@ -141,10 +141,10 @@ const FindOutcomesModal = ({
       )
 
       setTargetGroupIdsToRefetch([
-        ...new Set([...newlyImportedGroupIds].map(gid => importsTargetGroup[gid]))
+        ...new Set([...newlyImportedGroupIds].map(gid => importsTargetGroup[gid])),
       ])
       setRhsGroupIdsToRefetch(gidsToRefetch => [
-        ...new Set([...gidsToRefetch, ...newRhsGroupIdsToRefetch])
+        ...new Set([...gidsToRefetch, ...newRhsGroupIdsToRefetch]),
       ])
     }
   }, [importGroupsStatus]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -170,7 +170,7 @@ const FindOutcomesModal = ({
         )
       )
       setImportedOutcomesIds(importedOids => [
-        ...new Set([...importedOids, ...newlyImportedOutcomesIds])
+        ...new Set([...importedOids, ...newlyImportedOutcomesIds]),
       ])
       setTargetGroupIdsToRefetch([...targetGroupIdsToRefetch])
     }
@@ -182,15 +182,15 @@ const FindOutcomesModal = ({
         targetGroupId: targetGroup?._id,
         targetGroupTitle: targetGroup?.title,
         outcomeOrGroupId: selectedGroupId,
-        groupTitle: group.title
+        groupTitle: group.title,
       })
       setImportedGroupAncestors({
         ...importedGroupAncestors,
-        [selectedGroupId]: getOutcomeGroupAncestorsWithSelf(collections, selectedGroupId)
+        [selectedGroupId]: getOutcomeGroupAncestorsWithSelf(collections, selectedGroupId),
       })
       setImportsTargetGroup({
         ...importsTargetGroup,
-        [selectedGroupId]: targetGroup ? targetGroup._id : ROOT_GROUP
+        [selectedGroupId]: targetGroup ? targetGroup._id : ROOT_GROUP,
       })
     }
 
@@ -208,7 +208,7 @@ const FindOutcomesModal = ({
         onCloseHandler: () => {
           closeConfirmBox()
           focusAddAllBtn()
-        }
+        },
       })
     } else {
       callImportApiToGroup()
@@ -222,17 +222,17 @@ const FindOutcomesModal = ({
       targetGroupId: targetGroup?._id,
       targetGroupTitle: targetGroup?.title,
       sourceContextId,
-      sourceContextType
+      sourceContextType,
     })
     setImportsTargetGroup({
       ...importsTargetGroup,
-      [outcomeId]: targetGroup ? targetGroup._id : ROOT_GROUP
+      [outcomeId]: targetGroup ? targetGroup._id : ROOT_GROUP,
     })
   }
 
   const modalLabel = targetGroup
     ? I18n.t('Add Outcomes to "%{groupName}"', {
-        groupName: targetGroup.title
+        groupName: targetGroup.title,
       })
     : isCourse
     ? I18n.t('Add Outcomes to Course')
@@ -272,10 +272,10 @@ const FindOutcomesModal = ({
         <Text color="danger">
           {isCourse
             ? I18n.t('An error occurred while loading course outcomes: %{error}', {
-                error
+                error,
               })
             : I18n.t('An error occurred while loading account outcomes: %{error}', {
-                error
+                error,
               })}
         </Text>
       ) : isMobileView ? (
@@ -298,7 +298,7 @@ const FindOutcomesModal = ({
     <Modal
       open={open}
       onDismiss={onCloseModalHandler}
-      shouldReturnFocus
+      shouldReturnFocus={true}
       size="fullscreen"
       label={modalLabel}
       shouldCloseOnDocumentClick={false}
@@ -346,7 +346,7 @@ const FindOutcomesModal = ({
                   height: '100%',
                   cursor: 'col-resize',
                   background:
-                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
+                    '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%',
                 }}
               />
             </Flex.Item>
@@ -373,7 +373,7 @@ const FindOutcomesModal = ({
                 flex: '1 0 24rem',
                 position: 'relative',
                 overflow: 'auto',
-                height: '100%'
+                height: '100%',
               }}
               ref={setScrollContainer}
             >
@@ -403,11 +403,11 @@ FindOutcomesModal.propTypes = {
   onCloseHandler: PropTypes.func.isRequired,
   targetGroup: PropTypes.shape({
     _id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
   }),
   setTargetGroupIdsToRefetch: PropTypes.func.isRequired,
   importsTargetGroup: PropTypes.object.isRequired,
-  setImportsTargetGroup: PropTypes.func.isRequired
+  setImportsTargetGroup: PropTypes.func.isRequired,
 }
 
 export default FindOutcomesModal

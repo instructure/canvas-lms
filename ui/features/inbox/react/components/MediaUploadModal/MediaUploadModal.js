@@ -46,7 +46,7 @@ const translations = {
   SAVE: () => I18n.t('Save'),
   SR_FILE_INPUT: () => I18n.t('File name'),
   START: () => I18n.t('Start Recording'),
-  START_OVER: () => I18n.t('Start Over')
+  START_OVER: () => I18n.t('Start Over'),
 }
 
 // Function for applying a function to each value of an object, returning a new object
@@ -69,7 +69,7 @@ export function MediaUploadModal({onClose, onFileUpload, onOpen, onRecordingSave
       onOpen={onOpen}
       open={open}
       size="medium"
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         <Heading>{I18n.t('Record/Upload Media Comment')}</Heading>
@@ -97,7 +97,7 @@ export function MediaUploadModal({onClose, onFileUpload, onOpen, onRecordingSave
             </label>
             <input
               id="media-upload-file-input"
-              hidden
+              hidden={true}
               onChange={e => {
                 onFileUpload(e.target.files)
               }}
@@ -129,13 +129,13 @@ MediaUploadModal.propTypes = {
   onFileUpload: PropTypes.func.isRequired,
   onOpen: PropTypes.func,
   onRecordingSave: PropTypes.func.isRequired,
-  open: PropTypes.bool
+  open: PropTypes.bool,
 }
 
 MediaUploadModal.defaultProps = {
   onClose: () => {},
   onOpen: () => {},
-  open: false
+  open: false,
 }
 
 export default MediaUploadModal

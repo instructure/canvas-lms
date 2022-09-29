@@ -39,7 +39,7 @@ import {
   IconInboxLine,
   IconCalendarMonthLine,
   IconClockLine,
-  IconHomeLine
+  IconHomeLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import HelpDialog from './HelpDialog/index'
@@ -56,33 +56,33 @@ function ActiveText({children, url}) {
 }
 ActiveText.propTypes = {
   url: string.isRequired,
-  children: oneOfType([arrayOf(node), node]).isRequired
+  children: oneOfType([arrayOf(node), node]).isRequired,
 }
 
 export default class MobileGlobalMenu extends React.Component {
   state = {
     externalTools: [],
-    showGroups: false
+    showGroups: false,
   }
 
   static propTypes = {
     current_user: shape({
       display_name: string,
-      avatar_image_url: string
+      avatar_image_url: string,
     }),
     DesktopNavComponent: shape({
       ensureLoaded: func.isRequired,
-      state: object.isRequired
+      state: object.isRequired,
     }).isRequired,
     onDismiss: func.isRequired,
     k5User: bool,
-    isStudent: bool
+    isStudent: bool,
   }
 
   static defaultProps = {
     current_user: ENV.current_user,
     k5User: ENV.K5_USER,
-    isStudent: ENV.current_user_roles?.every(role => role === 'student' || role === 'user')
+    isStudent: ENV.current_user_roles?.every(role => role === 'student' || role === 'user'),
   }
 
   UNSAFE_componentWillMount() {
@@ -95,7 +95,7 @@ export default class MobileGlobalMenu extends React.Component {
         href: el.querySelector('a').getAttribute('href'),
         isActive: el.classList.contains('ic-app-header__menu-list-item--active'),
         label: el.querySelector('.menu-item__text').innerText,
-        ...(svg ? {svgPath: svg.innerHTML} : {imgSrc: el.querySelector('img').getAttribute('src')})
+        ...(svg ? {svgPath: svg.innerHTML} : {imgSrc: el.querySelector('img').getAttribute('src')}),
       }
     })
     this.setState({externalTools, showGroups})
@@ -263,7 +263,7 @@ export default class MobileGlobalMenu extends React.Component {
                           >
                             {I18n.t('All Accounts')}
                           </Link>
-                        </List.Item>
+                        </List.Item>,
                       ])
                   ) : (
                     <List.Item>
@@ -324,7 +324,7 @@ export default class MobileGlobalMenu extends React.Component {
                         >
                           {this.props.k5User ? I18n.t('All Subjects') : I18n.t('All Courses')}
                         </Link>
-                      </List.Item>
+                      </List.Item>,
                     ])
                 ) : (
                   <List.Item>
@@ -378,7 +378,7 @@ export default class MobileGlobalMenu extends React.Component {
                           >
                             {I18n.t('All Groups')}
                           </Link>
-                        </List.Item>
+                        </List.Item>,
                       ])
                   ) : (
                     <List.Item>

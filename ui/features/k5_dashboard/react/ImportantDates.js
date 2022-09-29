@@ -46,7 +46,7 @@ const ImportantDates = ({
   selectedContextCodes: initialSelectedContextCodes,
   selectedContextsLimit,
   timeZone,
-  observedUserId
+  observedUserId,
 }) => {
   const [calendarsModalOpen, setCalendarsModalOpen] = useState(false)
   const [loadingAssignments, setLoadingAssignments] = useState(true)
@@ -98,7 +98,7 @@ const ImportantDates = ({
     isObservingUser,
     observedUserId,
     observerMode,
-    selectedContextsLimit
+    selectedContextsLimit,
   ])
 
   const contextsLoaded = !!contexts && !!selectedContextCodes
@@ -110,7 +110,7 @@ const ImportantDates = ({
     context_codes: [...(selectedContextCodes || [])], // need to clone this list so the fetchApi effect will trigger on change
     start_date: useCallback(() => moment().tz(timeZone).startOf('day').toISOString(), [timeZone]),
     end_date: useCallback(() => moment().tz(timeZone).add(2, 'years').toISOString(), [timeZone]),
-    per_page: 100
+    per_page: 100,
   }
 
   useFetchApi({
@@ -123,9 +123,9 @@ const ImportantDates = ({
     loading: setLoadingAssignments,
     params: {
       type: 'assignment',
-      ...fetchParams
+      ...fetchParams,
     },
-    forceResult: selectedContextCodes?.length ? undefined : []
+    forceResult: selectedContextCodes?.length ? undefined : [],
   })
 
   useFetchApi({
@@ -135,9 +135,9 @@ const ImportantDates = ({
     loading: setLoadingEvents,
     params: {
       type: 'event',
-      ...fetchParams
+      ...fetchParams,
     },
-    forceResult: selectedContextCodes?.length ? undefined : []
+    forceResult: selectedContextCodes?.length ? undefined : [],
   })
 
   const closeCalendarsModal = () => setCalendarsModalOpen(false)
@@ -170,7 +170,7 @@ const ImportantDates = ({
     <>
       <View as="div" padding="medium">
         <Flex margin="small 0" alignItems="center">
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <Heading as="h2" level="h4" margin="small 0">
               {I18n.t('Important Dates')}
             </Heading>
@@ -202,7 +202,7 @@ const ImportantDates = ({
         <PresentationContent>
           <hr
             style={{
-              margin: 0
+              margin: 0,
             }}
           />
         </PresentationContent>
@@ -247,7 +247,7 @@ ImportantDates.propTypes = {
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
   timeZone: PropTypes.string.isRequired,
-  observedUserId: PropTypes.string
+  observedUserId: PropTypes.string,
 }
 
 export default ImportantDates

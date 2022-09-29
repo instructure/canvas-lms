@@ -19,11 +19,11 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* time_field, datetime_field */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, formErrors */
+import '@canvas/datetime' /* time_field, datetime_field */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
@@ -35,30 +35,27 @@ import '@canvas/context-cards/react/StudentContextCardTrigger'
 
 const I18n = useI18nScope('section')
 
-$(document).ready(function() {
+$(document).ready(function () {
   const section_id = window.location.pathname.split('/')[4],
     $edit_section_form = $('#edit_section_form'),
     $edit_section_link = $('.edit_section_link'),
     currentEnrollmentList = new PaginatedList($('#current-enrollment-list'), {
       presenter: sectionEnrollmentPresenter,
       template: enrollmentTemplate,
-      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
+      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
     }),
     completedEnrollmentList = new PaginatedList($('#completed-enrollment-list'), {
       presenter: sectionEnrollmentPresenter,
       requestParams: {state: 'completed', page: 1, per_page: 25},
       template: enrollmentTemplate,
-      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed'
+      url: '/api/v1/sections/' + section_id + '/enrollments?include[]=can_be_removed',
     })
 
   $edit_section_form
     .formSubmit({
       beforeSubmit(data) {
         $edit_section_form.hide()
-        $edit_section_form
-          .find('.name')
-          .text(data['course_section[name]'])
-          .show()
+        $edit_section_form.find('.name').text(data['course_section[name]']).show()
         $edit_section_form.loadingImage({image_size: 'small'})
       },
       success(data) {
@@ -70,17 +67,14 @@ $(document).ready(function() {
       error(data) {
         $edit_section_form.loadingImage('remove')
         $edit_section_form.show()
-      }
+      },
     })
     .find(':text')
-    .keycodes('return esc', function(event) {
+    .keycodes('return esc', function (event) {
       if (event.keyString == 'return') {
         $edit_section_form.submit()
       } else {
-        $(this)
-          .parents('.section')
-          .find('.name')
-          .show()
+        $(this).parents('.section').find('.name').show()
         $edit_section_form.hide()
       }
     })
@@ -93,12 +87,10 @@ $(document).ready(function() {
   $edit_section_link.click(event => {
     event.preventDefault()
     $edit_section_form.toggle()
-    $('#edit_section_form :text:visible:first')
-      .focus()
-      .select()
+    $('#edit_section_form :text:visible:first').focus().select()
   })
 
-  $('.user_list').delegate('.unenroll_user_link', 'click', function(event) {
+  $('.user_list').delegate('.unenroll_user_link', 'click', function (event) {
     event.preventDefault()
     $(this)
       .parents('.user')
@@ -109,24 +101,24 @@ $(document).ready(function() {
         ),
         url: $(this).attr('href'),
         success() {
-          $(this).slideUp(function() {
+          $(this).slideUp(function () {
             $(this).remove()
           })
-        }
+        },
       })
   })
   $('.datetime_field').datetime_field()
   $('.uncrosslist_link').click(event => {
     event.preventDefault()
     $('#uncrosslist_form').dialog({
-      width: 400
+      width: 400,
     })
   })
   $('#uncrosslist_form .cancel_button')
     .click(event => {
       $('#uncrosslist_form').dialog('close')
     })
-    .submit(function() {
+    .submit(function () {
       $(this)
         .find('button')
         .attr('disabled', true)
@@ -136,26 +128,24 @@ $(document).ready(function() {
   $('.crosslist_link').click(event => {
     event.preventDefault()
     $('#crosslist_course_form').dialog({
-      width: 450
+      width: 450,
     })
     $('#crosslist_course_form .submit_button').attr('disabled', true)
     $('#course_autocomplete_id_lookup').val('')
-    $('#course_id')
-      .val('')
-      .change()
+    $('#course_id').val('').change()
   })
   $('#course_autocomplete_id_lookup').autocomplete({
     source: $('#course_autocomplete_url').attr('href'),
     select(event, ui) {
       $('#course_id').val('')
       $('#crosslist_course_form').triggerHandler('id_entered', ui.item)
-    }
+    },
   })
-  $('#course_id').keycodes('return', function(event) {
+  $('#course_id').keycodes('return', function (event) {
     event.preventDefault()
     $(this).change()
   })
-  $('#course_id').bind('change', function() {
+  $('#course_id').bind('change', function () {
     $('#course_autocomplete_id_lookup').val('')
     $('#crosslist_course_form').triggerHandler('id_entered', {id: $(this).val()})
   })
@@ -179,7 +169,7 @@ $(document).ready(function() {
       I18n.t('default_course_name', 'Course ID "%{course_id}"', {course_id: course.id})
     $('#course_autocomplete_name_holder').show()
     const confirmingText = I18n.t('status.confirming_course', 'Confirming %{course_name}...', {
-      course_name: course.name
+      course_name: course.name,
     })
     $('#course_autocomplete_name').text(confirmingText)
     $.screenReaderFlashMessage(confirmingText)
@@ -199,7 +189,7 @@ $(document).ready(function() {
         if (data && data.allowed) {
           const template_data = {
             sis_id: data.course && data.course.sis_source_id,
-            account_name: data.account && data.account.name
+            account_name: data.account && data.account.name,
           }
           $('#course_autocomplete_name_holder').fillTemplateData({data: template_data})
           $('#course_autocomplete_name').text(data.course.name)

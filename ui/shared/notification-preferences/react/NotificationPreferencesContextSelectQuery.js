@@ -30,8 +30,8 @@ export default function NotificationPreferencesContextSelectQuery(props) {
   const {setOnFailure} = useContext(AlertManagerContext)
   const {error, data} = useQuery(NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY, {
     variables: {
-      userId: props.userId
-    }
+      userId: props.userId,
+    },
   })
 
   useEffect(() => {
@@ -52,5 +52,5 @@ export default function NotificationPreferencesContextSelectQuery(props) {
 NotificationPreferencesContextSelectQuery.propTypes = {
   userId: string.isRequired,
   currentContext: object.isRequired,
-  onContextChanged: func
+  onContextChanged: func,
 }

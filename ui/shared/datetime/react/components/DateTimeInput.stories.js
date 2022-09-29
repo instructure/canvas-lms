@@ -21,7 +21,7 @@ import DateTimeInput from './DateTimeInput'
 
 export default {
   title: 'Examples/Shared/Date and Time Helpers/DateTimeInput',
-  component: DateTimeInput
+  component: DateTimeInput,
 }
 
 const locale = 'en-US'
@@ -31,7 +31,7 @@ const divStyles = {
   width: '240px',
   border: '1px solid blue',
   margin: '12px',
-  padding: '6px'
+  padding: '6px',
 }
 
 const Wrapper = props => {
@@ -63,5 +63,5 @@ Selector.args = {
   timezone,
   onChange: Function.prototype,
   value: sampleDateTime,
-  description: 'Pick a Date and Time'
+  description: 'Pick a Date and Time',
 }

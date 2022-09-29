@@ -37,7 +37,9 @@ function findTabByName(tabName, opts) {
   const expectedSelectedValue = opts?.selected ? 'true' : 'false'
 
   if (actualSelectedValue !== expectedSelectedValue) {
-    throw new Error(`tab ${tabName} found in DOM, but had incorrect selected state of ${expectedSelectedValue} (was: ${actualSelectedValue})`)
+    throw new Error(
+      `tab ${tabName} found in DOM, but had incorrect selected state of ${expectedSelectedValue} (was: ${actualSelectedValue})`
+    )
   }
 
   return tabElement
@@ -48,7 +50,7 @@ describe('K5Dashboard Tabs', () => {
     moxios.install()
     moxios.stubRequest('/api/v1/dashboard/dashboard_cards', {
       status: 200,
-      response: []
+      response: [],
     })
   })
 
@@ -68,7 +70,7 @@ describe('K5Dashboard Tabs', () => {
 
   it('default to the Homeroom tab', async () => {
     render(<K5Dashboard {...defaultProps} />)
-    expect(findTabByName('Homeroom', { selected: true })).toBeInTheDocument()
+    expect(findTabByName('Homeroom', {selected: true})).toBeInTheDocument()
   })
   describe('store current tab ID to URL', () => {
     afterEach(() => {
@@ -78,27 +80,27 @@ describe('K5Dashboard Tabs', () => {
     it('and start at that tab if it is valid', async () => {
       window.location.hash = '#grades'
       render(<K5Dashboard {...defaultProps} />)
-      expect(findTabByName('Grades', { selected: true })).toBeInTheDocument()
+      expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
     })
 
     it('and start at the default tab if it is invalid', async () => {
       window.location.hash = 'tab-not-a-real-tab'
       render(<K5Dashboard {...defaultProps} />)
-      expect(findTabByName('Homeroom', { selected: true })).toBeInTheDocument()
+      expect(findTabByName('Homeroom', {selected: true})).toBeInTheDocument()
     })
 
     it('and update the current tab as tabs are changed', async () => {
       render(<K5Dashboard {...defaultProps} />)
 
-      act(() => findTabByName('Grades', { selected: false }).click())
+      act(() => findTabByName('Grades', {selected: false}).click())
       await act(async () => jest.runAllTimers())
-      expect(findTabByName('Grades', { selected: true })).toBeInTheDocument()
+      expect(findTabByName('Grades', {selected: true})).toBeInTheDocument()
 
-      act(() => findTabByName('Resources', { selected: false }).click())
+      act(() => findTabByName('Resources', {selected: false}).click())
       await act(async () => jest.runAllTimers())
 
-      expect(findTabByName('Grades', { selected: false })).toBeInTheDocument()
-      expect(findTabByName('Resources', { selected: true })).toBeInTheDocument()
+      expect(findTabByName('Grades', {selected: false})).toBeInTheDocument()
+      expect(findTabByName('Resources', {selected: true})).toBeInTheDocument()
     })
   })
 })

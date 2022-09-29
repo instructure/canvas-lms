@@ -32,7 +32,7 @@ const editorExtensions = {
       const editor = tinymce.get(this.getTextarea().id)
       editor && editor.focus(true)
     }
-  }
+  },
 }
 
 const sidebarExtensions = {
@@ -44,7 +44,7 @@ const sidebarExtensions = {
   hide() {
     // TODO generalize/adapt this once in service
     $('#editor_tabs').hide()
-  }
+  },
 }
 
 const polyfill = {
@@ -56,7 +56,7 @@ const polyfill = {
   wrapSidebar(sidebar) {
     const extensions = {...sidebarExtensions, ...sidebar}
     return Object.assign(sidebar, extensions)
-  }
+  },
 }
 
 export default polyfill

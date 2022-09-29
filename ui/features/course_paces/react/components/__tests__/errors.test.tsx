@@ -29,10 +29,10 @@ describe('Errors', () => {
     errors: {
       publish: 'TypeError: Failed to fetch',
       loading: 'TypeError: Failed to fetch',
-      darkMode: 'E_THEME_TOO_DARK: Theme too dark, user could trip and fall'
+      darkMode: 'E_THEME_TOO_DARK: Theme too dark, user could trip and fall',
     },
     responsiveSize: 'large',
-    syncUnpublishedChanges
+    syncUnpublishedChanges,
   }
 
   it('renders nothing when there are no errors', () => {
@@ -47,7 +47,7 @@ describe('Errors', () => {
     for (const error of [
       ...getAllByText('There was an error publishing your course pace.'),
       ...getAllByText('There was an error loading the pace.'),
-      ...getAllByText('An error has occurred.')
+      ...getAllByText('An error has occurred.'),
     ]) {
       expect(error).toBeInTheDocument()
     }

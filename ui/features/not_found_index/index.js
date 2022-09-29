@@ -36,7 +36,7 @@ export const handleGameStartClick = event => {
     const startGameEvent = new KeyboardEvent('keydown', {
       keyCode: 32,
       bubbles: true,
-      cancelable: true
+      cancelable: true,
     })
     document.dispatchEvent(startGameEvent)
   }

@@ -65,12 +65,12 @@ FeaturedHelpLink.propTypes = {
     subtext: string,
     feature_headline: string,
     is_featured: bool,
-    is_new: bool
+    is_new: bool,
   }),
-  handleClick: func
+  handleClick: func,
 }
 
 FeaturedHelpLink.defaultProps = {
   featuredLink: null,
-  handleClick: () => {}
+  handleClick: () => {},
 }

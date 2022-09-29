@@ -21,15 +21,13 @@ import React from 'react'
 import Button from '../button'
 
 const setup = props => {
-  return render(
-    <Button onClick={Function.prototype} {...props} />
-  )
+  return render(<Button onClick={Function.prototype} {...props} />)
 }
 
 describe('canvas_quizzes/components/button', () => {
   it('calls onClick on click', () => {
     const onClick = jest.fn()
-    const {getByTestId} = setup({ onClick })
+    const {getByTestId} = setup({onClick})
     expect(onClick.mock.calls.length).toBe(0)
     fireEvent.click(getByTestId('button'))
     expect(onClick.mock.calls.length).toBe(1)

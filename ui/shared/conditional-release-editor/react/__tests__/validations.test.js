@@ -29,7 +29,7 @@ const defaultScoringInfo = () => {
     max_score: null,
     title: 'Point Assignment',
     id: '6',
-    description: ''
+    description: '',
   })
 }
 
@@ -51,12 +51,12 @@ const defaultScoringInfoLetter = () => {
       'A-': 0.9,
       'B-': 0.8,
       'D-': 0.61,
-      'C-': 0.7
+      'C-': 0.7,
     }),
     max_score: null,
     title: 'Letter Assignment',
     id: '5',
-    description: ''
+    description: '',
   })
 }
 

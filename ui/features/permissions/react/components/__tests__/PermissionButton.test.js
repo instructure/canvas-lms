@@ -19,7 +19,11 @@
 import React from 'react'
 import {noop} from 'lodash'
 import {render} from '@testing-library/react'
-import {ENABLED_FOR_NONE, ENABLED_FOR_ALL, ENABLED_FOR_PARTIAL} from '@canvas/permissions/react/propTypes'
+import {
+  ENABLED_FOR_NONE,
+  ENABLED_FOR_ALL,
+  ENABLED_FOR_PARTIAL,
+} from '@canvas/permissions/react/propTypes'
 
 import PermissionButton from '../PermissionButton'
 
@@ -30,7 +34,7 @@ function buildProps({
   enabled = ENABLED_FOR_ALL,
   locked = false,
   readonly = false,
-  explicit = true
+  explicit = true,
 }) {
   return {
     permission: {enabled, locked, readonly, explicit},
@@ -44,7 +48,7 @@ function buildProps({
     roleLabel: ROLE_LABEL,
     fixButtonFocus: noop,
     handleClick: noop,
-    apiBusy: false
+    apiBusy: false,
   }
 }
 
@@ -59,7 +63,7 @@ describe('permissions::PermissionButton', () => {
   }
 
   it('displays a spinner whilst the API is in flight', () => {
-    const {getByText} = render(<PermissionButton {...buildProps({})} apiBusy />)
+    const {getByText} = render(<PermissionButton {...buildProps({})} apiBusy={true} />)
 
     expect(getByText('Waiting for request to complete')).toBeInTheDocument()
   })

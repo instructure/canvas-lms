@@ -18,7 +18,7 @@
 
 import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import AppRoute from '../app'
 import assertChange from 'chai-assert-change'
 
@@ -26,7 +26,7 @@ describe('canvas_quizzes/events/AppRoute', () => {
   it('renders', () => {
     render(
       <MemoryRouter>
-        <AppRoute params={{ id: 1 }} query={{}} />
+        <AppRoute params={{id: 1}} query={{}} />
       </MemoryRouter>
     )
   })

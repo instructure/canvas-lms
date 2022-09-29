@@ -25,7 +25,7 @@ import {
   IconRubricLine,
   IconQuizLine,
   IconDiscussionLine,
-  IconBankLine
+  IconBankLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {alignmentShape} from './propTypeShapes'
@@ -41,7 +41,7 @@ const AlignmentItem = ({
   moduleTitle,
   moduleUrl,
   moduleWorkflowState,
-  assignmentContentType
+  assignmentContentType,
 }) => {
   const renderIcon = () => {
     let icon
@@ -69,7 +69,7 @@ const AlignmentItem = ({
           display: 'inline-flex',
           alignSelf: 'center',
           fontSize: '1rem',
-          padding: '0.5rem 0 0'
+          padding: '0.5rem 0 0',
         }}
       >
         {icon}

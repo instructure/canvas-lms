@@ -56,7 +56,7 @@ const useCanvasContext = () => {
     rootIds,
     accountLevelMasteryScalesFF,
     outcomeAlignmentSummaryFF,
-    outcomeAllowAverageCalculationFF
+    outcomeAllowAverageCalculationFF,
   }
 }
 

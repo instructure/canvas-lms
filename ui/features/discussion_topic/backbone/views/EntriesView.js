@@ -29,7 +29,7 @@ export default class EntriesView extends Backbone.View {
       initialPage: 0,
       descendants: 2,
       showMoreDescendants: 50,
-      children: 3
+      children: 3,
     }
 
     this.prototype.$window = $(window)
@@ -137,10 +137,7 @@ export default class EntriesView extends Backbone.View {
     return this.$window.scrollTo($el, 200, {
       offset: -150,
       onAfter: () => {
-        $el
-          .find('.discussion-title a')
-          .first()
-          .focus()
+        $el.find('.discussion-title a').first().focus()
         // pretty blinking
         setTimeout(() => $el.addClass('highlight'), 200)
         setTimeout(() => $el.removeClass('highlight'), 400)
@@ -156,7 +153,7 @@ export default class EntriesView extends Backbone.View {
           this.$window.on('scroll', once)
           return setTimeout(once, 5000)
         }, 10)
-      }
+      },
     })
   }
 
@@ -172,7 +169,7 @@ export default class EntriesView extends Backbone.View {
       displayShowMore: false,
       threaded: this.options.threaded,
       root: true,
-      collapsed: this.model.get('collapsed')
+      collapsed: this.model.get('collapsed'),
     })
     this.collectionView.render()
     this.renderPageNav()

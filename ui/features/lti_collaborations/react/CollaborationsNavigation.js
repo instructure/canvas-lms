@@ -49,7 +49,7 @@ class CollaborationsNavigation extends React.Component {
 
 CollaborationsNavigation.propTypes = {
   ltiCollaborators: PropTypes.object.isRequired,
-  actions: PropTypes.object
+  actions: PropTypes.object,
 }
 
 export default CollaborationsNavigation

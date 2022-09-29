@@ -25,32 +25,32 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Item Banks'),
-      description: I18n.t('Allows user to view all item banks in the account.')
+      description: I18n.t('Allows user to view all item banks in the account.'),
     },
     {
-      description: I18n.t('Allows user to view all item banks in a course.')
-    }
+      description: I18n.t('Allows user to view all item banks in a course.'),
+    },
   ],
   [
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
         'If this permission is not enabled, users can view item banks created by them, shared with them from another user, or shared indirectly via the course where they are enrolled with an instructor role.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Item Banks'),
-      description: I18n.t('Allows user to view all item banks in a course.')
-    }
+      description: I18n.t('Allows user to view all item banks in a course.'),
+    },
   ],
   [
     {
       title: I18n.t('Item Banks'),
       description: I18n.t(
         'If this permission is not enabled, users can view item banks created by them, shared with them from another user, or shared indirectly via the course where they are enrolled with an instructor role.'
-      )
-    }
+      ),
+    },
   ]
 )

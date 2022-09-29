@@ -103,7 +103,7 @@ export default class JsUploader {
       'audio',
       'webm',
       'video/webm',
-      'audio/webm'
+      'audio/webm',
     ])
     this.uploader = new K5Uploader(session)
     this.uploader.addEventListener('K5.fileError', this.onFileError)

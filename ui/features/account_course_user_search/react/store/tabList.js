@@ -28,13 +28,13 @@ export default [
     path: '',
     title: I18n.t('Courses'),
     permissions: ['can_read_course_list'],
-    button_class: 'courses'
+    button_class: 'courses',
   },
   {
     pane: UsersPane,
     path: '/users',
     title: I18n.t('People'),
     permissions: ['can_read_roster'],
-    button_class: 'users'
-  }
+    button_class: 'users',
+  },
 ]

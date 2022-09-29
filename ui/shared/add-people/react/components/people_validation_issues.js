@@ -33,16 +33,16 @@ class PeopleValidationIssues extends React.Component {
     duplicates: PropTypes.shape(shapes.duplicatesShape),
     missing: PropTypes.shape(shapes.missingsShape),
     onChangeDuplicate: PropTypes.func.isRequired,
-    onChangeMissing: PropTypes.func.isRequired
+    onChangeMissing: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    inviteUsersURL: undefined
+    inviteUsersURL: undefined,
   }
 
   static defaultProps = {
     duplicates: {},
-    missing: {}
+    missing: {},
   }
 
   constructor(props) {
@@ -50,7 +50,7 @@ class PeopleValidationIssues extends React.Component {
 
     this.state = {
       newUsersForMissing: {},
-      focusElem: null
+      focusElem: null,
     }
   }
 

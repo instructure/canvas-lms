@@ -23,11 +23,11 @@ const CustomColumnCellComponent = Ember.Component.extend({
   column: null,
   student: null,
   dataForStudent: null,
-  id: function() {
+  id: function () {
     return `custom_col_${this.get('column.id')}`
   }.property('column'),
 
-  dataForColumn: function() {
+  dataForColumn: function () {
     const studentData = this.get('dataForStudent')
     if (!studentData) {
       return null
@@ -35,7 +35,7 @@ const CustomColumnCellComponent = Ember.Component.extend({
     return studentData.findBy('column_id', this.get('column.id'))
   }.property('student', 'column', 'column.isLoaded', 'dataForStudent.@each.content'),
 
-  contentDidChange: function() {
+  contentDidChange: function () {
     return this.set('value', this.get('dataForColumn.content'))
   }
     .observes('dataForColumn.content')
@@ -50,11 +50,11 @@ const CustomColumnCellComponent = Ember.Component.extend({
     return ENV.GRADEBOOK_OPTIONS.custom_column_datum_url
   },
 
-  disabled: function() {
+  disabled: function () {
     return this.get('column.isLoading') || this.get('column.read_only')
   }.property('column', 'column.isLoading', 'column.read_only'),
 
-  saveURL: function() {
+  saveURL: function () {
     return this.customColURL()
       .replace(/:id/, this.get('column.id'))
       .replace(/:user_id/, this.get('student.id'))
@@ -72,14 +72,14 @@ const CustomColumnCellComponent = Ember.Component.extend({
     const xhr = this.ajax(this.get('saveURL'), {
       type: 'PUT',
       data: {
-        'column_data[content]': value
-      }
+        'column_data[content]': value,
+      },
     })
 
     return xhr.then(this.boundSaveSuccess)
   },
 
-  textAreaInput: function(event) {
+  textAreaInput: function (event) {
     const note = event.target.value
     if (GradebookHelpers.textareaIsGreaterThanMaxLength(note.length)) {
       event.target.value = note.substring(0, GradebookConstants.MAX_NOTE_LENGTH)
@@ -90,13 +90,13 @@ const CustomColumnCellComponent = Ember.Component.extend({
     }
   }.on('input'),
 
-  bindSave: function() {
+  bindSave: function () {
     return (this.boundSaveSuccess = this.onSaveSuccess.bind(this))
   }.on('init'),
 
   onSaveSuccess(columnDatum) {
     return this.sendAction('on-column-save', columnDatum, this.get('column.id'))
-  }
+  },
 })
 
 export default CustomColumnCellComponent

@@ -66,12 +66,12 @@ function submissionLoaded(data) {
       comment.posted_at = $.datetimeString(comment.created_at)
       $comment.fillTemplateData({
         data: comment,
-        id: 'submission_comment_' + comment.id
+        id: 'submission_comment_' + comment.id,
       })
       if (comment.media_comment_id) {
         const $media_comment_link = $('#comment_media_blank').clone(true).removeAttr('id')
         $media_comment_link.fillTemplateData({
-          data: comment
+          data: comment,
         })
         $comment.find('.comment').empty().append($media_comment_link.show())
       } else {
@@ -81,7 +81,7 @@ function submissionLoaded(data) {
           attachment.comment_id = comment.id
           $attachment.fillTemplateData({
             data: attachment,
-            hrefValues: ['comment_id', 'id']
+            hrefValues: ['comment_id', 'id'],
           })
           $comment.find('.comment_attachments').append($attachment.show())
         }
@@ -96,7 +96,7 @@ function submissionLoaded(data) {
     if (submission) {
       showGrade(submission)
       $('.submission_details').fillTemplateData({
-        data: submission
+        data: submission,
       })
       $('#add_comment_form .comment_attachments').empty()
     }
@@ -138,7 +138,7 @@ function makeRubricAccessible($rubric) {
   const keyCodes = {
     9: 'tab',
     13: 'enter',
-    27: 'esc'
+    27: 'esc',
   }
   $('.hide_rubric_link').keydown(function (e) {
     if (keyCodes[e.which] == 'enter') {
@@ -259,7 +259,7 @@ export function setup() {
       const method = $('.update_submission_url').attr('title')
       const formData = {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
-        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0'
+        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
       }
 
       const anonymizableIdKey = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
@@ -315,7 +315,7 @@ export function setup() {
       const formData = {
         'submission[assignment_id]': ENV.SUBMISSION.assignment_id,
         'submission[user_id]': ENV.SUBMISSION.user_id,
-        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0'
+        'submission[group_comment]': $('#submission_group_comment').attr('checked') ? '1' : '0',
       }
       if ($('.grading_value:visible').length > 0) {
         formData['submission[grade]'] = GradeFormatHelper.delocalizeGrade($('.grading_value').val())

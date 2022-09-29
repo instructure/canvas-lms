@@ -29,7 +29,7 @@ export default class SelectButton extends React.Component {
   static propTypes = {
     isSelected: bool,
     isDisabled: bool,
-    onSelect: func.isRequired
+    onSelect: func.isRequired,
   }
 
   onClick = () => {
@@ -49,7 +49,7 @@ export default class SelectButton extends React.Component {
       'ic-badge': isBadge,
       'cmp-button': true,
       'cmp-button__selected': isSelected,
-      'cmp-button__disabled': isDisabled
+      'cmp-button__disabled': isDisabled,
     })
 
     let text = ''

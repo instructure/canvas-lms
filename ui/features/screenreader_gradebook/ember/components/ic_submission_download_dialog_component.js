@@ -49,13 +49,13 @@ export default register(
 
     dialogTitle: I18n.t('download_submissions_title', 'Download Assignment Submissions'),
 
-    bindFunctions: function() {
+    bindFunctions: function () {
       this.reviewProgress = this.reviewProgress.bind(this)
       this.progressError = this.progressError.bind(this)
       return (this.checkForChange = this.checkForChange.bind(this))
     }.on('init'),
 
-    status: function() {
+    status: function () {
       if (this.fileReady()) {
         return 'finished'
       } else if (this.get('percentComplete') >= 95) {
@@ -65,7 +65,7 @@ export default register(
       }
     }.property('attachment', 'percentComplete', 'isOpened'),
 
-    progress: function() {
+    progress: function () {
       const attachment = this.get('attachment')
       let new_val = 0
       if (attachment && this.fileReady()) {
@@ -84,21 +84,21 @@ export default register(
       return this.set('percentComplete', new_val)
     }.observes('attachment'),
 
-    keepChecking: function() {
+    keepChecking: function () {
       if (this.get('percentComplete') !== 100 && !!this.get('isOpened')) {
         return true
       }
     }.property('percentComplete', 'isOpened'),
 
-    url: function() {
+    url: function () {
       return `${this.get('submissionsDownloadUrl')}`
     }.property('submissionsDownloadUrl'),
 
-    statusText: function() {
+    statusText: function () {
       switch (this.get('status')) {
         case 'starting':
           return I18n.t('gathering_files', 'Gathering Files (%{progress})...', {
-            progress: I18n.toPercentage(this.get('percentComplete'), {precision: 0})
+            progress: I18n.toPercentage(this.get('percentComplete'), {precision: 0}),
           })
         case 'zipping':
           return I18n.t('creating_zip', 'Creating zip file...')
@@ -107,21 +107,21 @@ export default register(
       }
     }.property('status', 'percentComplete'),
 
-    updateProgressBar: function() {
+    updateProgressBar: function () {
       return $('#progressbar').progressbar({value: this.get('percentComplete')})
     }.observes('percentComplete'),
 
-    downloadCompletedFile: function() {
+    downloadCompletedFile: function () {
       if (this.get('percentComplete') === 100) {
         return (location.href = this.get('url'))
       }
     }.observes('percentComplete'),
 
-    resetAttachment: function() {
+    resetAttachment: function () {
       return this.set('attachment', null)
     }.observes('isOpened'),
 
-    closeOnEsc: function(event) {
+    closeOnEsc: function (event) {
       if (event.keyCode === 27) {
         // esc
         return this.close()
@@ -134,7 +134,7 @@ export default register(
         if (this.dialogOptions == null) {
           this.dialogOptions = {
             title: 'Download Assignment Submissions',
-            resizable: false
+            resizable: false,
           }
         }
         if (this.$dialog == null) {
@@ -146,7 +146,7 @@ export default register(
 
       closeDialog() {
         return this.close()
-      }
+      },
     },
 
     close() {
@@ -179,6 +179,6 @@ export default register(
       if (this.get('keepChecking')) {
         return setTimeout(this.checkForChange, time)
       }
-    }
+    },
   })
 )

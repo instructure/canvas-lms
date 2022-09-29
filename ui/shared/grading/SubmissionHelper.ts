@@ -23,7 +23,7 @@ import type {
   PlagiarismDataMap,
   SimilarityEntry,
   SimilarityType,
-  SubmissionWithOriginalityReport
+  SubmissionWithOriginalityReport,
 } from '@canvas/grading/grading.d'
 
 export function isGraded(submission) {

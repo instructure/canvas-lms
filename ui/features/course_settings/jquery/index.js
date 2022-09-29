@@ -139,7 +139,7 @@ var GradePublishing = {
       },
       error
     )
-  }
+  },
 }
 
 function checkHomeroomSyncProgress(progress) {
@@ -214,7 +214,7 @@ $(document).ready(function () {
         .text(I18n.t('buttons.add_section', 'Add Section'))
       $section.fillTemplateData({
         data: section,
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
       $section.find('.screenreader-only').each((_index, el) => {
         const $el = $(el)
@@ -236,7 +236,7 @@ $(document).ready(function () {
         .find('button')
         .attr('disabled', false)
         .text(I18n.t('errors.section', 'Add Section Failed, Please Try Again'))
-    }
+    },
   })
   $('.cant_delete_section_link').click(function (event) {
     alert($(this).attr('title'))
@@ -261,7 +261,7 @@ $(document).ready(function () {
         $section.loadingImage('remove').find('.edit_section_link').click()
         $edit_section_form.formErrors(data)
         this.find('#course_section_name_edit').focus()
-      }
+      },
     })
     .find(':text')
     .bind('blur', () => {
@@ -300,7 +300,7 @@ $(document).ready(function () {
             $(this).remove()
             $toFocus.focus()
           })
-        }
+        },
       })
     return false
   })
@@ -330,7 +330,7 @@ $(document).ready(function () {
     $('#nav_form').dialog({
       modal: true,
       resizable: false,
-      width: 400
+      width: 400,
     })
   })
 
@@ -338,7 +338,7 @@ $(document).ready(function () {
     .sortable({
       items: 'li.enabled',
       connectWith: '.connectedSortable',
-      axis: 'y'
+      axis: 'y',
     })
     .disableSelection()
 
@@ -360,14 +360,14 @@ $(document).ready(function () {
     source: $('#course_account_id_url').attr('href'),
     select(event, ui) {
       $('#course_account_id').val(ui.item.id)
-    }
+    },
   })
   $('.move_course_link').click(event => {
     event.preventDefault()
     $('#move_course_dialog')
       .dialog({
         title: I18n.t('titles.move_course', 'Move Course'),
-        width: 500
+        width: 500,
       })
       .fixDialogButtons()
   })
@@ -411,7 +411,7 @@ $(document).ready(function () {
     error(data) {
       $(this).loadingImage('remove')
     },
-    disableWhileLoading: 'spin_on_success'
+    disableWhileLoading: 'spin_on_success',
   })
   $('.associated_user_link').click(function (event) {
     event.preventDefault()
@@ -419,7 +419,7 @@ $(document).ready(function () {
     const $enrollment = $(this).parents('.enrollment_link')
     const user_data = $user.getTemplateData({textValues: ['name']})
     const enrollment_data = $enrollment.getTemplateData({
-      textValues: ['enrollment_id', 'associated_user_id']
+      textValues: ['enrollment_id', 'associated_user_id'],
     })
     link_enrollment.choose(
       user_data.name,
@@ -483,13 +483,13 @@ $(document).ready(function () {
       {},
       data => {
         $enrollment_dialog.fillTemplateData({
-          data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+          data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
         })
         $link.text(I18n.t('invitation_sent', 'Invitation Sent!'))
         const $user = $enrollment_dialog.data('user')
         if ($user) {
           $user.fillTemplateData({
-            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
           })
         }
       },
@@ -532,7 +532,7 @@ $(document).ready(function () {
         $('.user_list .user.pending').each(function () {
           const $user = $(this)
           $user.fillTemplateData({
-            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
           })
         })
         setTimeout(() => {
@@ -566,7 +566,7 @@ $(document).ready(function () {
       event.preventDefault()
       $('#reset_course_content_dialog').dialog({
         title: I18n.t('titles.reset_course_content_dialog_help', 'Reset Course Content'),
-        width: 500
+        width: 500,
       })
 
       $('.ui-dialog').focus()

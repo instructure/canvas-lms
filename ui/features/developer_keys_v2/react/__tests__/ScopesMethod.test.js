@@ -22,7 +22,7 @@ import DeveloperKeyScopesMethod from '../ScopesMethod'
 
 const props = {
   method: 'get',
-  margin: 'small small medium large'
+  margin: 'small small medium large',
 }
 
 it('renders the correct method', () => {
