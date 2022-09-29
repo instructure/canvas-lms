@@ -35,12 +35,12 @@ function submissionCommentDate(date) {
 
 type Props = {
   id: string
-  author: string
-  authorAvatarUrl: string
-  authorUrl: string
+  author?: string
+  authorAvatarUrl?: string
+  authorUrl?: string
   createdAt: Date
   comment: string
-  editedAt?: Date
+  editedAt: Date | null
   editing: boolean
   last: boolean
   cancelCommenting: () => void
@@ -129,7 +129,7 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
                   theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
                   margin="none none xxx-small"
                 >
-                  {truncateText(this.props.author, {max: 18})}
+                  {truncateText(this.props.author || '', {max: 18})}
                 </Link>
               </div>
 

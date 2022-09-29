@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import AssignmentGroupColumnHeader from './AssignmentGroupColumnHeader'
+import type GridSupport from '../GridSupport/index'
 import type Gradebook from '../../Gradebook'
 
 function getProps(column, gradebook, options) {
@@ -43,7 +44,7 @@ function getProps(column, gradebook, options) {
 
     assignmentGroup: {
       groupWeight: assignmentGroup.group_weight,
-      name: assignmentGroup.name
+      name: assignmentGroup.name,
     },
 
     onApplyScoreToUngraded,
@@ -65,12 +66,12 @@ function getProps(column, gradebook, options) {
       onSortByGradeDescending: () => {
         gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
-    weightedGroups: gradebook.weightedGroups()
+    weightedGroups: gradebook.weightedGroups(),
   }
 }
 
@@ -81,12 +82,12 @@ export default class AssignmentGroupColumnHeaderRenderer {
     this.gradebook = gradebook
   }
 
-  render(column, $container, _gridSupport, options) {
+  render(column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
     ReactDOM.render(<AssignmentGroupColumnHeader {...props} />, $container)
   }
 
-  destroy(column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

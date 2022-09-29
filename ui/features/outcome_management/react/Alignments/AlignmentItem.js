@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {memo, useState} from 'react'
+import React, {memo} from 'react'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -27,7 +27,6 @@ import {
   IconDiscussionLine,
   IconBankLine
 } from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {alignmentShape} from './propTypeShapes'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -44,8 +43,6 @@ const AlignmentItem = ({
   moduleWorkflowState,
   assignmentContentType
 }) => {
-  const [shouldUnderline, setShouldUnderline] = useState(false)
-  const handleLinkFocus = () => setShouldUnderline(prevState => !prevState)
   const renderIcon = () => {
     let icon
     let screenReaderText
@@ -91,20 +88,13 @@ const AlignmentItem = ({
       <Flex.Item size="50%" shouldGrow={true}>
         <Flex as="div" direction="column">
           <Flex.Item as="div" padding="xxx-small">
-            <Link
-              interaction="enabled"
-              isWithinText={shouldUnderline}
-              href={url}
-              target="_blank"
-              onFocus={handleLinkFocus}
-              onBlur={handleLinkFocus}
-            >
+            <a href={url} target="_blank" rel="noreferrer">
               <TruncateText>
                 <Text size="medium" data-testid="alignment-item-title">
                   {title}
                 </Text>
               </TruncateText>
-            </Link>
+            </a>
           </Flex.Item>
           <Flex.Item as="div">
             <Flex as="div" padding="xxx-small" alignItems="start">
@@ -115,18 +105,13 @@ const AlignmentItem = ({
                 {moduleTitle && moduleUrl ? (
                   <div style={{paddingTop: '0.14rem'}}>
                     <Text size="small">
-                      <Link
-                        interaction="enabled"
-                        isWithinText={false}
-                        href={moduleUrl}
-                        target="_blank"
-                      >
+                      <a href={moduleUrl} target="_blank" rel="noreferrer">
                         <TruncateText>
                           {moduleWorkflowState === 'unpublished'
                             ? I18n.t('%{moduleTitle} (unpublished)', {moduleTitle})
                             : moduleTitle}
                         </TruncateText>
-                      </Link>
+                      </a>
                     </Text>
                   </div>
                 ) : (

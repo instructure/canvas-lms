@@ -30,8 +30,8 @@ export default {
     colorPickerButtonRef: () => {},
     colorPickerContentRef: () => {},
     colorPickerAfterClose: () => {},
-    afterSetColor: () => {}
-  }
+    afterSetColor: () => {},
+  },
 }
 
 const Template = args => <StatusColorListItem {...args} />

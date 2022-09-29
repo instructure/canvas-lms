@@ -226,7 +226,7 @@ with the following parameters:
     </tr>
     <tr>
       <td class="mono">replace_tokens</td>
-      <td>(optional) If this option is provided, existing access tokens issued for this developer key/secret will be destroyed and replaced with the new token that is returned from this request</td>
+      <td>(optional) If this option is set to `1`, existing access tokens issued for this developer key/secret will be destroyed and replaced with the new token that is returned from this request</td>
     </tr>
   </tbody>
 </table>

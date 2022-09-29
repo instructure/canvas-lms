@@ -32,7 +32,7 @@ describe('transformRubricData', () => {
   it('assigns the criterion _id to id', () => {
     const criterion = transformRubricData({
       _id: '123',
-      criteria: [{_id: '456'}]
+      criteria: [{_id: '456'}],
     }).criteria[0]
 
     expect(criterion.id).toBe('456')
@@ -42,7 +42,7 @@ describe('transformRubricData', () => {
   it('assigns the outcome _id to the criterion learning_outcome_id', () => {
     const criterion = transformRubricData({
       _id: '123',
-      criteria: [{_id: '456', outcome: {_id: '789'}}]
+      criteria: [{_id: '456', outcome: {_id: '789'}}],
     }).criteria[0]
 
     expect(criterion.learning_outcome_id).toBe('789')
@@ -52,7 +52,7 @@ describe('transformRubricData', () => {
   it('assigns the criterion rating _id to id', () => {
     const criterion = transformRubricData({
       _id: '123',
-      criteria: [{_id: '456', ratings: [{_id: '789'}]}]
+      criteria: [{_id: '456', ratings: [{_id: '789'}]}],
     }).criteria[0]
 
     expect(criterion.ratings[0].id).toBe('789')
@@ -68,7 +68,7 @@ describe('transformRubricAssessmentData', () => {
   it('assigns the rating _id to id, but leaves _id in place', () => {
     const rating = transformRubricAssessmentData({
       _id: '123',
-      data: [{_id: '456'}]
+      data: [{_id: '456'}],
     }).data[0]
     expect(rating.id).toBe('456')
     expect(rating._id).toBe('456')
@@ -77,7 +77,7 @@ describe('transformRubricAssessmentData', () => {
   it('assigns the rating criterion_id to null if no criterion exists', () => {
     const rating = transformRubricAssessmentData({
       _id: '123',
-      data: [{_id: '456'}]
+      data: [{_id: '456'}],
     }).data[0]
     expect(rating.criterion_id).toBe(null)
   })
@@ -85,7 +85,7 @@ describe('transformRubricAssessmentData', () => {
   it('assigns the rating criterion _id to criterion_id', () => {
     const rating = transformRubricAssessmentData({
       _id: '123',
-      data: [{_id: '456', criterion: {_id: '789'}}]
+      data: [{_id: '456', criterion: {_id: '789'}}],
     }).data[0]
     expect(rating.criterion_id).toBe('789')
     expect(rating.criterion).toBe(undefined)
@@ -94,7 +94,7 @@ describe('transformRubricAssessmentData', () => {
   it('assigns the rating outcome _id to learning_outcome_id', () => {
     const rating = transformRubricAssessmentData({
       _id: '123',
-      data: [{_id: '456', outcome: {_id: '789'}}]
+      data: [{_id: '456', outcome: {_id: '789'}}],
     }).data[0]
     expect(rating.learning_outcome_id).toBe('789')
     expect(rating.outcome).toBe(undefined)

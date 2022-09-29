@@ -29,7 +29,7 @@ QUnit.module('GradeSummary PageNavigation', suiteHooks => {
     props = {
       currentPage: 1,
       onPageClick: sinon.spy(),
-      pageCount: 10
+      pageCount: 10,
     }
   })
 

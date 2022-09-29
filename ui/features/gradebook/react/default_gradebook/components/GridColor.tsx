@@ -27,7 +27,7 @@ function GridColor(props) {
       [
         `.even .gradebook-cell.${status} { background-color: ${props.colors[status]}; }`,
         `.odd .gradebook-cell.${status} { background-color: ${darken(props.colors[status], 5)}; }`,
-        `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`
+        `.slick-cell.editable .gradebook-cell.${status} { background-color: white; }`,
       ].join('')
     )
     .join('')
@@ -46,13 +46,13 @@ GridColor.propTypes = {
     resubmitted: string,
     dropped: string,
     excused: string,
-    extended: string
+    extended: string,
   }).isRequired,
-  statuses: arrayOf(string)
+  statuses: arrayOf(string),
 }
 
 GridColor.defaultProps = {
-  statuses
+  statuses,
 }
 
 export default GridColor

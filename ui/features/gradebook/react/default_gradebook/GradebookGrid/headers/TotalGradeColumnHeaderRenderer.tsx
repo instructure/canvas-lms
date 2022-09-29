@@ -20,8 +20,9 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TotalGradeColumnHeader from './TotalGradeColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
-function getProps(_column, gradebook, gridSupport, options) {
+function getProps(_column, gradebook: Gradebook, gridSupport: GridSupport, options) {
   const columnId = 'total_grade'
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
 
@@ -44,14 +45,14 @@ function getProps(_column, gradebook, gridSupport, options) {
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
     grabFocus: gradebook.totalColumnShouldFocus(),
 
     gradeDisplay: {
       currentDisplay: gradebook.options.show_total_grade_as_points ? 'points' : 'percentage',
       disabled: !gradebook.contentLoadStates.submissionsLoaded,
       hidden: gradebook.weightedGrades(),
-      onSelect: gradebook.togglePointsOrPercentTotals
+      onSelect: gradebook.togglePointsOrPercentTotals,
     },
 
     onHeaderKeyDown: event => {
@@ -65,11 +66,11 @@ function getProps(_column, gradebook, gridSupport, options) {
       isInBack,
       isInFront,
       onMoveToBack: gradebook.moveTotalGradeColumnToEnd,
-      onMoveToFront: gradebook.freezeTotalGradeColumn
+      onMoveToFront: gradebook.freezeTotalGradeColumn,
     },
 
     onApplyScoreToUngraded,
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
 
     sortBySetting: {
       direction: sortRowsBySetting.direction,
@@ -81,28 +82,28 @@ function getProps(_column, gradebook, gridSupport, options) {
       onSortByGradeDescending: () => {
         gradebook.setSortRowsBySetting(columnId, 'grade', 'descending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     isRunningScoreToUngraded: gradebook.isRunningScoreToUngraded,
-    weightedGroups: gradebook.weightedGroups()
+    weightedGroups: gradebook.weightedGroups(),
   }
 }
 
 export default class TotalGradeColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(column, $container, gridSupport, options) {
+  render(column, $container: HTMLElement, gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, gridSupport, options)
     ReactDOM.render(<TotalGradeColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

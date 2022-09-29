@@ -1552,13 +1552,12 @@ class CoursesController < ApplicationController
                BLUEPRINT_RESTRICTIONS_BY_OBJECT_TYPE: restrictions_by_object_type
              })
 
-      @course_settings_sub_navigation_tools = ContextExternalTool.all_tools_for(@context,
-                                                                                type: :course_settings_sub_navigation,
-                                                                                root_account: @domain_root_account,
-                                                                                current_user: @current_user)
-      unless @context.grants_right?(@current_user, session, :read_as_admin)
-        @course_settings_sub_navigation_tools.reject! { |tool| tool.course_settings_sub_navigation(:visibility) == "admins" }
-      end
+      @course_settings_sub_navigation_tools = Lti::ContextToolFinder.new(
+        @context, type: :course_settings_sub_navigation,
+                  root_account: @domain_root_account, current_user: @current_user
+      ).all_tools_sorted_array(
+        exclude_admin_visibility: !@context.grants_right?(@current_user, session, :read_as_admin)
+      )
     end
   end
 
@@ -2294,12 +2293,13 @@ class CoursesController < ApplicationController
           @recent_feedback = @current_user.recent_feedback(contexts: @contexts) || []
         end
 
-        @course_home_sub_navigation_tools =
-          ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
-                                                      root_account: @domain_root_account, current_user: @current_user).to_a
-        unless @context.grants_any_right?(@current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
-          @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == "admins" }
-        end
+        can_see_admin_tools = @context.grants_any_right?(
+          @current_user, session, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS
+        )
+        @course_home_sub_navigation_tools = Lti::ContextToolFinder.new(
+          @context, type: :course_home_sub_navigation,
+                    root_account: @domain_root_account, current_user: @current_user
+        ).all_tools_sorted_array(exclude_admin_visibility: !can_see_admin_tools)
 
         css_bundle :dashboard
         css_bundle :react_todo_sidebar if planner_enabled?
@@ -3918,7 +3918,17 @@ class CoursesController < ApplicationController
   end
 
   def visibility_configuration(params)
-    @course.apply_visibility_configuration(params[:course_visibility], params[:syllabus_visibility_option])
+    @course.apply_visibility_configuration(params[:course_visibility])
+
+    if params[:custom_course_visibility].present? && !value_to_boolean(params[:custom_course_visibility])
+      Course::CUSTOMIZABLE_PERMISSIONS.each do |key, _|
+        @course.apply_custom_visibility_configuration(key, "inherit")
+      end
+    else
+      Course::CUSTOMIZABLE_PERMISSIONS.each do |key, _|
+        @course.apply_custom_visibility_configuration(key, params[:"#{key}_visibility_option"])
+      end
+    end
   end
 
   def can_change_group_weighting_scheme?

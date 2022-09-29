@@ -19,18 +19,23 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import assignmentHelper from '../shared/helpers/assignmentHelper'
+import LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 import {showConfirmationDialog} from '@canvas/feature-flags/react/ConfirmationDialog'
+import getTextWidth from '../shared/helpers/TextMeasure'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import _ from 'lodash'
 import htmlEscape from 'html-escape'
+import filterTypes from './constants/filterTypes'
 import type {
+  CustomColumn,
+  ColumnSizeSettings,
   Filter,
   FilterType,
   FilterPreset,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
   PartialFilterPreset,
-  SubmissionFilterValue
+  SubmissionFilterValue,
 } from './gradebook.d'
 import type {
   Assignment,
@@ -38,16 +43,17 @@ import type {
   GradingPeriod,
   Module,
   Section,
-  SectionMap,
   StudentGroup,
   StudentGroupCategory,
-  StudentGroupCategoryMap,
   StudentMap,
-  Submission
+  Submission,
 } from '../../../../api.d'
-import filterTypes from './constants/filterTypes'
+import type {GridColumn} from './grid'
+import {columnWidths} from './initialState'
 
 const I18n = useI18nScope('gradebook')
+
+const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
 
 export function compareAssignmentDueDates(assignment1, assignment2) {
   return assignmentHelper.compareByDueDate(assignment1.object, assignment2.object)
@@ -66,7 +72,6 @@ export function forEachSubmission(students: StudentMap, fn) {
   Object.keys(students).forEach(function (studentIdx) {
     const student = students[studentIdx]
     Object.keys(student).forEach(function (key) {
-      const ASSIGNMENT_KEY_REGEX = /^assignment_(?!group)/
       if (key.match(ASSIGNMENT_KEY_REGEX)) {
         fn(student[key])
       }
@@ -83,13 +88,13 @@ export function getAssignmentGroupPointsPossible(assignmentGroup) {
 export function getCourseFeaturesFromOptions(options) {
   return {
     finalGradeOverrideEnabled: options.final_grade_override_enabled,
-    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero
+    allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero,
   }
 }
 
 export function getCourseFromOptions(options) {
   return {
-    id: options.context_id
+    id: options.context_id,
   }
 }
 
@@ -146,7 +151,7 @@ export async function confirmViewUngradedAsZero({currentValue, onAccepted}) {
       ),
       confirmText: I18n.t('OK'),
       label: I18n.t('View Ungraded as Zero'),
-      confirmColor: undefined
+      confirmColor: undefined,
     })
 
   // If the setting was already enabled, no need to show the confirmation
@@ -161,6 +166,18 @@ export function hiddenStudentIdsForAssignment(studentIds: string[], assignment: 
   return _.difference(studentIds, assignment.assignment_visibility)
 }
 
+export function getColumnTypeForColumnId(columnId: string): string {
+  if (columnId.match(/^custom_col/)) {
+    return 'custom_column'
+  } else if (columnId.match(ASSIGNMENT_KEY_REGEX)) {
+    return 'assignment'
+  } else if (columnId.match(/^assignment_group/)) {
+    return 'assignment_group'
+  } else {
+    return columnId
+  }
+}
+
 export function getDefaultSettingKeyForColumnType(columnType: string) {
   if (
     columnType === 'assignment' ||
@@ -168,13 +185,13 @@ export function getDefaultSettingKeyForColumnType(columnType: string) {
     columnType === 'total_grade'
   ) {
     return 'grade'
-  } else if (columnType === 'student') {
-    return 'sortable_name'
   }
+  // default value for other column types
+  return 'sortable_name'
 }
 
-export function sectionList(sections: SectionMap) {
-  const x: Section[] = _.values(sections)
+export function sectionList(sections: {[id: string]: Pick<Section, 'name' | 'id'>}) {
+  const x: Pick<Section, 'name' | 'id'>[] = _.values(sections)
   return x
     .sort((a, b) => a.id.localeCompare(b.id))
     .map(section => {
@@ -223,14 +240,14 @@ export const deserializeFilter = (json: GradebookFilterApiResponse): FilterPrese
       id: c.id,
       type: c.type,
       value: c.value,
-      created_at: String(c.created_at)
+      created_at: String(c.created_at),
     }))
   return {
     id: filterPreset.id,
     name: String(filterPreset.name),
     filters,
     created_at: String(filterPreset.created_at),
-    updated_at: String(filterPreset.updated_at)
+    updated_at: String(filterPreset.updated_at),
   }
 }
 
@@ -238,8 +255,8 @@ export const serializeFilter = (filterPreset: PartialFilterPreset): GradebookFil
   return {
     name: filterPreset.name,
     payload: {
-      conditions: filterPreset.filters
-    }
+      conditions: filterPreset.filters,
+    },
   }
 }
 
@@ -252,7 +269,7 @@ export const getLabelForFilter = (
   gradingPeriods: Pick<GradingPeriod, 'id' | 'title'>[],
   modules: Pick<Module, 'id' | 'name'>[],
   sections: Pick<Section, 'id' | 'name'>[],
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategory[]
 ) => {
   if (!filter.type) throw new Error('missing condition type')
 
@@ -284,7 +301,7 @@ export const getLabelForFilter = (
     const options: any = {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
     }
     if (typeof filter.value !== 'string') throw new Error('invalid start-date value')
     const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
@@ -293,7 +310,7 @@ export const getLabelForFilter = (
     const options: any = {
       year: 'numeric',
       month: 'numeric',
-      day: 'numeric'
+      day: 'numeric',
     }
     if (typeof filter.value !== 'string') throw new Error('invalid end-date value')
     const value = Intl.DateTimeFormat(I18n.currentLocale(), options).format(new Date(filter.value))
@@ -331,4 +348,88 @@ export function doesSubmissionNeedGrading(s: Submission) {
   if (!s.grade_matches_current_submission) return true
 
   return typeof s.score !== 'number'
+}
+
+export function assignmentSearchMatcher(
+  option: {
+    label: string
+  },
+  searchTerm: string
+): boolean {
+  const term = searchTerm?.toLowerCase() || ''
+  const assignmentName = option.label?.toLowerCase() || ''
+  return assignmentName.includes(term)
+}
+
+export function buildStudentColumn(
+  columnId: string,
+  gradebookColumnSizeSetting: string,
+  defaultWidth: number
+): GridColumn {
+  const studentColumnWidth = gradebookColumnSizeSetting
+    ? parseInt(gradebookColumnSizeSetting, 10)
+    : defaultWidth
+  return {
+    id: columnId,
+    type: columnId,
+    width: studentColumnWidth,
+    cssClass: 'meta-cell primary-column student',
+    headerCssClass: 'primary-column student',
+    resizable: true,
+  }
+}
+
+export function buildCustomColumn(customColumn: CustomColumn): GridColumn {
+  const columnId = getCustomColumnId(customColumn.id)
+  return {
+    id: columnId,
+    type: 'custom_column',
+    field: `custom_col_${customColumn.id}`,
+    width: 100,
+    cssClass: `meta-cell custom_column ${columnId}`,
+    headerCssClass: `custom_column ${columnId}`,
+    resizable: true,
+    editor: LongTextEditor,
+    customColumnId: customColumn.id,
+    autoEdit: false,
+    maxLength: 255,
+  }
+}
+
+export const buildAssignmentGroupColumnFn =
+  (gradebookColumnSizeSettings: ColumnSizeSettings) =>
+  (assignmentGroup: Pick<AssignmentGroup, 'id' | 'name'>): GridColumn => {
+    let width
+    const columnId = getAssignmentGroupColumnId(assignmentGroup.id)
+    const fieldName = `assignment_group_${assignmentGroup.id}`
+    if (gradebookColumnSizeSettings && gradebookColumnSizeSettings[fieldName]) {
+      width = parseInt(gradebookColumnSizeSettings[fieldName], 10)
+    } else {
+      width = testWidth(
+        assignmentGroup.name,
+        columnWidths.assignmentGroup.min,
+        columnWidths.assignmentGroup.default_max
+      )
+    }
+    return {
+      id: columnId,
+      field: fieldName,
+      toolTip: assignmentGroup.name,
+      object: assignmentGroup,
+      minWidth: columnWidths.assignmentGroup.min,
+      maxWidth: columnWidths.assignmentGroup.max,
+      width,
+      cssClass: `meta-cell assignment-group-cell ${columnId}`,
+      headerCssClass: `assignment_group ${columnId}`,
+      type: 'assignment_group',
+      assignmentGroupId: assignmentGroup.id,
+    }
+  }
+
+const HEADER_START_AND_END_WIDTHS_IN_PIXELS = 36
+export function testWidth(text: string, minWidth: number, maxWidth: number) {
+  const padding = HEADER_START_AND_END_WIDTHS_IN_PIXELS * 2
+  const textWidth = getTextWidth(text) || 0
+  const width = Math.max(textWidth + padding, minWidth)
+  return Math.min(width, maxWidth)
 }

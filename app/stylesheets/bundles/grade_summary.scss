@@ -183,6 +183,7 @@
 #grades_summary th.title {
   font-weight: normal;
   border-bottom-color: $ic-border-light;
+  word-break: break-word;
 }
 
 #grades_summary th.title .context {
@@ -197,6 +198,9 @@
     margin: 5px 0;
     padding: 0;
   }
+}
+#grades_summary th.title a {
+  word-break: break-word;
 }
 
 body:not(.responsive_student_grades_page) {

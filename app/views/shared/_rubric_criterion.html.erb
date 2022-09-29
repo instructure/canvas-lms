@@ -24,6 +24,7 @@
   rubric_association ||= nil
   edit_view ||= false
   assessment_rating ||= nil
+  friendly_description ||= ''
   range_rating_enabled = @domain_root_account.feature_enabled?(:rubric_criterion_range)
   learning_outcome_criterion = criterion.try(:learning_outcome_id)
   range_rating_visible = range_rating_enabled && !learning_outcome_criterion
@@ -51,7 +52,7 @@
         <span class="learning_outcome_id" style="display: none;"><%= learning_outcome_criterion %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
         <% if !assessing %>
-          <div class="long_description small_description"><%= long_description_text.html_safe %></div>
+          <div class="long_description small_description"><%= (@context.respond_to?(:user_is_student?) && @context.user_is_student?(@current_user, include_fake_student: true) && friendly_description.length > 0) ? friendly_description.html_safe : long_description_text.html_safe %></div>
         <% end %>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">

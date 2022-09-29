@@ -37,7 +37,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor ReadOnlyCell', suiteHoo
       gradeInfo: gradeEntry.parseValue('91%'),
       gradeIsUpdating: false,
       onGradeUpdate: sinon.stub(),
-      pendingGradeInfo: null
+      pendingGradeInfo: null,
     }
   })
 

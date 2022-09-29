@@ -925,4 +925,44 @@ describe RubricAssessment do
       expect(assessment.root_account_id).to eq @rubric.root_account_id
     end
   end
+
+  describe "mark_unread_assessments" do
+    context "when feedback visibility ff on" do
+      before do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+        @submission = @assignment.find_or_create_submission(@student)
+      end
+
+      it "is unread after assessing with comments or points" do
+        @assessment = @association.assess({
+                                            user: @student,
+                                            assessor: @teacher,
+                                            artifact: @submission,
+                                            assessment: {
+                                              assessment_type: "grading",
+                                              criterion_crit1: {
+                                                points: 5,
+                                                comments: "comments",
+                                              }
+                                            }
+                                          })
+
+        expect(@submission.unread_item?(@student, "rubric")).to be_truthy
+      end
+
+      it "does not save participation if assessment is missing comments and points" do
+        expect do
+          @assessment = @association.assess({
+                                              user: @student,
+                                              assessor: @teacher,
+                                              artifact: @submission,
+                                              assessment: {
+                                                assessment_type: "grading",
+                                                criterion_crit1: {}
+                                              }
+                                            })
+        end.to change(ContentParticipation, :count).by 0
+      end
+    end
+  end
 end

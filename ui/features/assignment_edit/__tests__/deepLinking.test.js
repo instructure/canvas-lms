@@ -24,7 +24,7 @@ describe('handles DeepLinking responses', () => {
 
   beforeAll(() => {
     window.ENV = {
-      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://www.test.com'
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'https://www.test.com',
     }
     mockEditViewElements()
     loadSelectors()
@@ -46,7 +46,7 @@ describe('handles DeepLinking responses', () => {
       '[new_tab]': 'assignment_external_tool_tag_attributes_new_tab',
       '[custom_params]': 'assignment_external_tool_tag_attributes_custom_params',
       '[link_settings][selection_width]': 'assignment_external_tool_tag_attributes_iframe_width',
-      '[link_settings][selection_height]': 'assignment_external_tool_tag_attributes_iframe_height'
+      '[link_settings][selection_height]': 'assignment_external_tool_tag_attributes_iframe_height',
     }
 
     for (const [attribute, html_id] of Object.entries(content_tag_attributes)) {
@@ -85,7 +85,7 @@ describe('handles DeepLinking responses', () => {
       ),
       height: document.querySelector(
         "input[name='external_tool_tag_attributes[link_settings][selection_height]']"
-      )
+      ),
     }
   }
 
@@ -112,13 +112,13 @@ describe('handles DeepLinking responses', () => {
             custom: {
               RootAccountId: '$Canvas.rootAccount.id',
               ExternalToolGlobalId: '$Canvas.externalTool.global_id',
-              ShardId: '$Canvas.shard.id'
-            }
-          }
+              ShardId: '$Canvas.shard.id',
+            },
+          },
         ],
-        ltiEndpoint: 'http://canvas.docker/courses/1/external_tools/retrieve'
+        ltiEndpoint: 'http://canvas.docker/courses/1/external_tools/retrieve',
       },
-      ...overrides
+      ...overrides,
     }
   }
 
@@ -158,11 +158,11 @@ describe('handles DeepLinking responses', () => {
                 title: 'Lti 1.3 Tool Title',
                 text: 'Lti 1.3 Tool Text',
                 new_tab: '1',
-                custom: ''
-              }
+                custom: '',
+              },
             ],
-            ltiEndpoint: 'http://canvas.docker/courses/1/external_tools/retrieve'
-          }
+            ltiEndpoint: 'http://canvas.docker/courses/1/external_tools/retrieve',
+          },
         }
         handleResponse(event(opt))
         expect(html_elements.new_tab.checked).toBe(true)
@@ -196,11 +196,11 @@ describe('handles DeepLinking responses', () => {
                 text: 'Lti 1.3 Tool Text',
                 iframe: {
                   width: 345,
-                  height: 678
-                }
-              }
-            ]
-          }
+                  height: 678,
+                },
+              },
+            ],
+          },
         }
         handleResponse(event(opts))
 
@@ -218,11 +218,11 @@ describe('handles DeepLinking responses', () => {
                 title: 'Lti 1.3 Tool Title',
                 text: 'Lti 1.3 Tool Text',
                 iframe: {
-                  width: 345
-                }
-              }
-            ]
-          }
+                  width: 345,
+                },
+              },
+            ],
+          },
         }
         handleResponse(event(opts))
 
@@ -240,11 +240,11 @@ describe('handles DeepLinking responses', () => {
                 title: 'Lti 1.3 Tool Title',
                 text: 'Lti 1.3 Tool Text',
                 iframe: {
-                  height: 678
-                }
-              }
-            ]
-          }
+                  height: 678,
+                },
+              },
+            ],
+          },
         }
         handleResponse(event(opts))
 

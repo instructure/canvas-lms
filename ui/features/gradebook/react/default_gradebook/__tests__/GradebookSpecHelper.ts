@@ -17,6 +17,7 @@
  */
 
 import Gradebook from '../Gradebook'
+import type {GradebookProps} from '../Gradebook'
 import GradebookGrid from '../GradebookGrid/index'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
@@ -25,7 +26,7 @@ import {RequestDispatch} from '@canvas/network'
 import {camelize} from 'convert-case'
 
 const performance_controls = {
-  students_chunk_size: 2 // students per page
+  students_chunk_size: 2, // students per page
 }
 
 export const defaultGradebookEnv = {
@@ -40,7 +41,7 @@ export const defaultGradebookEnv = {
   context_url: '/courses/1/',
   course_settings: {
     allow_final_grade_override: false,
-    filter_speed_grader_by_student_group: false
+    filter_speed_grader_by_student_group: false,
   },
   currentUserId: '1',
   dataloader_improvements: true,
@@ -49,7 +50,7 @@ export const defaultGradebookEnv = {
     ['B', 0.8],
     ['C', 0.7],
     ['D', 0.6],
-    ['F', 0.0]
+    ['F', 0.0],
   ],
   editable: true,
   export_gradebook_csv_url: 'http://example.com/export',
@@ -66,10 +67,10 @@ export const defaultGradebookEnv = {
         ['🙂', 0.8],
         ['😐', 0.7],
         ['😢', 0.6],
-        ['💩', 0]
+        ['💩', 0],
       ],
-      title: 'Emoji Grades'
-    }
+      title: 'Emoji Grades',
+    },
   ],
   has_modules: true,
   hideAssignmentGroupTotals: false,
@@ -78,59 +79,91 @@ export const defaultGradebookEnv = {
   locale: 'en',
   new_gradebook_development_enabled: true,
   outcome_gradebook_enabled: false,
+  performanceControls: new PerformanceControls(),
   post_grades_ltis: [],
   publish_to_sis_enabled: false,
   sections: [],
   settings: {
     show_concluded_enrollments: 'false',
-    show_inactive_enrollments: 'false'
+    show_inactive_enrollments: 'false',
   },
   settings_update_url: '/path/to/settingsUpdateUrl',
   speed_grader_enabled: true,
-  student_groups: {}
+  student_groups: {},
 }
 
-export const defaultGradebookProps = {
+export const defaultGradebookProps: GradebookProps = {
   appliedFilters: [],
-  hideGrid: true,
-  isFiltersLoading: false,
-  onFiltersChange: () => {},
+  applyScoreToUngradedModalNode: document.createElement('div'),
+  customColumns: [],
+  dispatch: new RequestDispatch(),
+  fetchStudentIds: () => Promise.resolve([]),
+  filterNavNode: document.createElement('div'),
   flashAlerts: [],
+  flashMessageContainer: document.createElement('div'),
+  gradebookEnv: defaultGradebookEnv,
+  gradebookGridNode: document.createElement('div'),
+  gradebookMenuNode: document.createElement('div'),
+  gradingPeriodAssignments: {},
+  gradingPeriodsFilterContainer: document.createElement('div'),
+  gridColorNode: document.createElement('div'),
+  hideGrid: true,
+  isCustomColumnsLoading: false,
+  isFiltersLoading: false,
+  isGradingPeriodAssignmentsLoading: false,
+  isModulesLoading: false,
+  isStudentIdsLoading: false,
+  locale: 'en',
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Another Module', position: 2},
-    {id: '3', name: 'Module 2', position: 3}
+    {id: '3', name: 'Module 2', position: 3},
   ],
-  isModulesLoading: false,
-  flashMessageContainer: document.createElement('div'),
-  gradebookMenuNode: document.createElement('div'),
   settingsModalButtonContainer: document.createElement('div'),
-  gridColorNode: document.createElement('div'),
-  filterNavNode: document.createElement('div'),
+  studentIds: [],
   viewOptionsMenuNode: document.createElement('div'),
   gradingPeriodsFilterContainer: document.createElement('div'),
-  gradebookEnv: defaultGradebookEnv
+  gradebookEnv: defaultGradebookEnv,
+  colors: {
+    dropped: 'test',
+    excused: 'test',
+    extended: 'test',
+    late: 'test',
+    missing: 'test',
+    resubmitted: 'test'
+  },
+  dispatch: new RequestDispatch(),
+  gradebookGridNode: document.createElement('div'),
+  performanceControls: new PerformanceControls(),
+  isCustomColumnsLoading: false,
+  customColumns: [],
 }
 
-export function createGradebook(options = {}) {
+export function createGradebook(
+  options: {
+    performance_controls?: any
+    gradebook_is_editable?: any
+    gradebookGridNode?: HTMLElement
+  } = {}
+) {
   const performanceControls = new PerformanceControls({
     ...performance_controls,
-    ...camelize(options.performance_controls)
+    ...camelize(options.performance_controls),
   })
   const dispatch = new RequestDispatch({
-    activeRequestLimit: performanceControls.activeRequestLimit
+    activeRequestLimit: performanceControls.activeRequestLimit,
   })
 
   const gradebook = new Gradebook({
     ...defaultGradebookProps,
     ...options,
     performanceControls,
-    dispatch
+    dispatch,
   })
 
   gradebook.keyboardNav = {
     addGradebookElement() {},
-    removeGradebookElement() {}
+    removeGradebookElement() {},
   }
 
   const formatterFactory = new CellFormatterFactory(gradebook)
@@ -141,15 +174,15 @@ export function createGradebook(options = {}) {
     data: gradebook.gridData,
     editable: options.gradebook_is_editable,
     formatterFactory,
-    columnHeaderRenderer
+    columnHeaderRenderer,
   })
 
   gradebook.gradebookGrid.gridSupport = {
     columns: {
       updateColumnHeaders() {},
       scrollToStart() {},
-      scrollToEnd() {}
-    }
+      scrollToEnd() {},
+    },
   }
 
   gradebook.bindGridEvents()

@@ -26,11 +26,11 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
     gradebook.gradebookGrid.gridSupport = {
       state: {
         getActiveLocation: () => ({region: 'body', cell: 0, row: 1}),
-        setActiveLocation: sinon.stub()
+        setActiveLocation: sinon.stub(),
       },
       helper: {
-        commitCurrentEdit() {}
-      }
+        commitCurrentEdit() {},
+      },
     }
     gradebook.students = {
       1100: {
@@ -41,8 +41,8 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
-        }
+          seconds_late: 0,
+        },
       },
       1101: {
         id: '1101',
@@ -52,8 +52,8 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
-        }
+          seconds_late: 0,
+        },
       },
       1102: {
         id: '1102',
@@ -63,9 +63,9 @@ QUnit.module('Gradebook#loadTrayStudent', hooks => {
           late: false,
           missing: false,
           excused: false,
-          seconds_late: 0
-        }
-      }
+          seconds_late: 0,
+        },
+      },
     }
     sinon.stub(gradebook, 'listRows').returns([1100, 1101, 1102].map(id => gradebook.students[id]))
     sinon.stub(gradebook, 'updateRowAndRenderSubmissionTray')

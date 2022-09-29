@@ -25,7 +25,7 @@ import RubricTab from './RubricTab'
 
 LoggedOutTabs.propTypes = {
   assignment: Assignment.shape.isRequired,
-  nonAcceptedEnrollment: bool
+  nonAcceptedEnrollment: bool,
 }
 
 export default function LoggedOutTabs(props) {

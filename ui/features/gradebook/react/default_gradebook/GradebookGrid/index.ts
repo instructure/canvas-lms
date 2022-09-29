@@ -22,21 +22,33 @@ import CellEditorFactory from './editors/CellEditorFactory'
 import Columns from './Columns/index'
 import Events from './Events'
 import GridSupport from './GridSupport/index'
+import type {GridData} from '../grid.d'
+import type CellFormatterFactory from './formatters/CellFormatterFactory'
+import type ColumnHeaderRenderer from './headers/ColumnHeaderRenderer'
+
+export type GradebookGridOptions = {
+  $container: HTMLElement
+  activeBorderColor: string
+  editable: boolean
+  formatterFactory: CellFormatterFactory
+  columnHeaderRenderer: ColumnHeaderRenderer
+  data: GridData
+}
 
 export default class GradebookGrid {
   columns: Columns
 
   events: Events
 
-  gridData: any
+  gridData: GridData
 
-  options: any
+  options: GradebookGridOptions
 
   grid: slickgrid.Grid
 
   gridSupport?: GridSupport
 
-  constructor(options) {
+  constructor(options: GradebookGridOptions) {
     this.gridData = options.data
     this.options = options
 
@@ -55,7 +67,7 @@ export default class GradebookGrid {
       headerHeight: 38,
       numberOfColumnsToFreeze: this.gridData.columns.frozen.length,
       rowHeight: 35,
-      syncColumnCellResize: true
+      syncColumnCellResize: true,
     }
 
     const columns = [...this.gridData.columns.frozen, ...this.gridData.columns.scrollable].map(
@@ -67,7 +79,7 @@ export default class GradebookGrid {
     const gridSupportOptions = {
       activeBorderColor: this.options.activeBorderColor,
       columnHeaderRenderer: this.options.columnHeaderRenderer,
-      rows: this.gridData.rows
+      rows: this.gridData.rows,
     }
     this.gridSupport = new GridSupport(this.grid, gridSupportOptions)
 
@@ -88,7 +100,7 @@ export default class GradebookGrid {
     }
   }
 
-  invalidateRow(index) {
+  invalidateRow(index: number) {
     if (this.grid) {
       this.grid.invalidateRow(index)
     }
@@ -108,7 +120,7 @@ export default class GradebookGrid {
     }
   }
 
-  updateRowCell(studentId, columnId) {
+  updateRowCell(studentId: string, columnId: string) {
     if (this.grid) {
       const columnIndex = this.columns.getIndexOfColumn(columnId)
       const rowIndex = this.gridData.rows.findIndex(row => row.id === studentId)

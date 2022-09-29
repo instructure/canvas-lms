@@ -49,7 +49,7 @@ export function multipleTypesDrafted(submission) {
     submissionDraft?.meetsBasicLtiLaunchCriteria,
     submissionDraft?.meetsTextEntryCriteria,
     submissionDraft?.meetsUploadCriteria,
-    submissionDraft?.meetsUrlCriteria
+    submissionDraft?.meetsUrlCriteria,
   ].filter(criteria => criteria === true)
 
   return matchingCriteria.length > 1

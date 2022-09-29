@@ -25,10 +25,10 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
   suiteHooks.beforeEach(() => {
     gradebookOptions = {
       course_settings: {
-        allow_final_grade_override: false
+        allow_final_grade_override: false,
       },
 
-      final_grade_override_enabled: true
+      final_grade_override_enabled: true,
     }
   })
 
@@ -77,7 +77,7 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
       contextHooks.beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(false)
         gradebook.courseSettings.handleUpdated({
-          allowFinalGradeOverride: true
+          allowFinalGradeOverride: true,
         })
       })
 
@@ -94,7 +94,7 @@ QUnit.module('Gradebook CourseSettings', suiteHooks => {
       contextHooks.beforeEach(() => {
         gradebook.courseSettings.setAllowFinalGradeOverride(true)
         gradebook.courseSettings.handleUpdated({
-          allowFinalGradeOverride: false
+          allowFinalGradeOverride: false,
         })
       })
 

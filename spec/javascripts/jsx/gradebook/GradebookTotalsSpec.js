@@ -20,7 +20,7 @@ import $ from 'jquery'
 import UserSettings from '@canvas/user-settings'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -45,13 +45,13 @@ QUnit.module('#switchTotalDisplay()', hooks => {
   function createAndStubGradebook() {
     gradebook = createGradebook({
       show_total_grade_as_points: true,
-      setting_update_url: 'http://settingUpdateUrl'
+      setting_update_url: 'http://settingUpdateUrl',
     })
 
     gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: sinon.stub()
-      }
+        updateColumnHeaders: sinon.stub(),
+      },
     }
 
     sandbox.stub(gradebook.gradebookGrid, 'invalidate')
@@ -124,7 +124,7 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
   setup() {
     this.gradebook = createGradebook({
       show_total_grade_as_points: true,
-      setting_update_url: 'http://settingUpdateUrl'
+      setting_update_url: 'http://settingUpdateUrl',
     })
     sandbox.stub(this.gradebook, 'switchTotalDisplay')
 
@@ -135,7 +135,7 @@ QUnit.module('Gradebook#togglePointsOrPercentTotals', {
   teardown() {
     UserSettings.contextRemove('warned_about_totals_display')
     $('.ui-dialog').remove()
-  }
+  },
 })
 
 test('when user is ignoring warnings, immediately toggles the total grade display', function () {

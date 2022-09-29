@@ -129,16 +129,18 @@
     float: direction(right);
   }
 
-  .context_list_context .ContextList__DeleteBtn {
-    visibility: hidden;
-  }
-
-  .context_list_context:hover .ContextList__DeleteBtn {
-    visibility: visible;
-  }
-
-  .context_list_context:focus-within .ContextList__DeleteBtn {
-    visibility: visible;
+  @include breakpoint(desktop) {
+    .context_list_context .ContextList__DeleteBtn {
+      visibility: hidden;
+    }
+  
+    .context_list_context:hover .ContextList__DeleteBtn {
+      visibility: visible;
+    }
+  
+    .context_list_context:focus-within .ContextList__DeleteBtn {
+      visibility: visible;
+    }
   }
 }
 

@@ -20,7 +20,11 @@ import React from 'react'
 import {mount} from 'enzyme'
 
 import AcceptGradesButton from 'ui/features/assignment_grade_summary/react/components/GradersTable/AcceptGradesButton.js'
-import {FAILURE, STARTED, SUCCESS} from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import {
+  FAILURE,
+  STARTED,
+  SUCCESS,
+} from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
 
 QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
   let props
@@ -33,8 +37,8 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
       onClick: sinon.stub(),
       selectionDetails: {
         allowed: true,
-        provisionalGradeIds: ['4601']
-      }
+        provisionalGradeIds: ['4601'],
+      },
     }
   })
 
@@ -180,7 +184,7 @@ QUnit.module('GradeSummary AcceptGradesButton', suiteHooks => {
     contextHooks.beforeEach(() => {
       props.selectionDetails = {
         allowed: false,
-        provisionalGradeIds: []
+        provisionalGradeIds: [],
       }
       mountComponent()
     })

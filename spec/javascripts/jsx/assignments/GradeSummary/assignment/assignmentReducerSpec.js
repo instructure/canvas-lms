@@ -29,12 +29,12 @@ QUnit.module('GradeSummary assignmentReducer()', suiteHooks => {
         gradesPublished: false,
         id: '2301',
         muted: true,
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
-      ]
+        {graderId: '1102', graderName: 'Mr. Keating'},
+      ],
     })
   })
 

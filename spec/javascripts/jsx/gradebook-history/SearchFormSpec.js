@@ -35,18 +35,18 @@ const defaultProps = () => ({
   assignments: {
     fetchStatus: 'started',
     items: [],
-    nextPage: ''
+    nextPage: '',
   },
   graders: {
     fetchStatus: 'started',
     items: [],
-    nextPage: ''
+    nextPage: '',
   },
   students: {
     fetchStatus: 'started',
     items: [],
-    nextPage: ''
-  }
+    nextPage: '',
+  },
 })
 
 const liveRegion = document.createElement('div')
@@ -64,48 +64,48 @@ QUnit.module('SearchForm', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('has a form field group', function() {
+test('has a form field group', function () {
   ok(this.wrapper.find(FormFieldGroup).exists())
 })
 
-test('has an Autocomplete with id #graders', function() {
+test('has an Autocomplete with id #graders', function () {
   const input = this.wrapper.find('#graders')
   equal(input.length, 1)
   ok(input.is(CanvasAsyncSelect))
 })
 
-test('has an Autocomplete with id #students', function() {
+test('has an Autocomplete with id #students', function () {
   const input = this.wrapper.find('#students')
   equal(input.length, 1)
   ok(input.is(CanvasAsyncSelect))
 })
 
-test('has an Autocomplete with id #assignments', function() {
+test('has an Autocomplete with id #assignments', function () {
   const input = this.wrapper.find('#assignments')
   equal(input.length, 1)
   ok(input.is(CanvasAsyncSelect))
 })
 
-test('has date pickers for from date and to date', function() {
+test('has date pickers for from date and to date', function () {
   const inputs = this.wrapper.find(CanvasDateInput)
   equal(inputs.length, 2)
   ok(inputs.every(CanvasDateInput))
 })
 
-test('has a Button for submitting', function() {
+test('has a Button for submitting', function () {
   ok(this.wrapper.find(Button).exists())
 })
 
-test('disables the submit button if To date is before From date', function() {
+test('disables the submit button if To date is before From date', function () {
   this.wrapper.setState(
     {
       selected: {
         from: {value: '2017-05-02T00:00:00-05:00'},
-        to: {value: '2017-05-01T00:00:00-05:00'}
-      }
+        to: {value: '2017-05-01T00:00:00-05:00'},
+      },
     },
     () => {
       const button = this.wrapper.find(Button)
@@ -114,13 +114,13 @@ test('disables the submit button if To date is before From date', function() {
   )
 })
 
-test('does not disable the submit button if To date is after From date', function() {
+test('does not disable the submit button if To date is after From date', function () {
   this.wrapper.setState(
     {
       selected: {
         from: {value: '2017-05-01T00:00:00-05:00'},
-        to: {value: '2017-05-02T00:00:00-05:00'}
-      }
+        to: {value: '2017-05-02T00:00:00-05:00'},
+      },
     },
     () => {
       const button = this.wrapper.find(Button)
@@ -129,7 +129,7 @@ test('does not disable the submit button if To date is after From date', functio
   )
 })
 
-test('does not disable the submit button when there are no dates selected', function() {
+test('does not disable the submit button when there are no dates selected', function () {
   const {from, to} = this.wrapper.state().selected
   const button = this.wrapper.find(Button)
   notOk(from.value)
@@ -137,13 +137,13 @@ test('does not disable the submit button when there are no dates selected', func
   notOk(button.props().disabled)
 })
 
-test('does not disable the submit button when only from date is entered', function() {
+test('does not disable the submit button when only from date is entered', function () {
   this.wrapper.setState(
     {
       selected: {
         from: {value: '1994-04-08T00:00:00-05:00'},
-        to: {value: ''}
-      }
+        to: {value: ''},
+      },
     },
     () => {
       const button = this.wrapper.find(Button)
@@ -152,13 +152,13 @@ test('does not disable the submit button when only from date is entered', functi
   )
 })
 
-test('does not disable the submit button when only to date is entered', function() {
+test('does not disable the submit button when only to date is entered', function () {
   this.wrapper.setState(
     {
       selected: {
         from: {value: ''},
-        to: {value: '2017-05-01T00:00:00-05:00'}
-      }
+        to: {value: '2017-05-01T00:00:00-05:00'},
+      },
     },
     () => {
       const button = this.wrapper.find(Button)
@@ -182,21 +182,21 @@ QUnit.module('SearchForm when button is clicked', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('dispatches with the state of input', function() {
+test('dispatches with the state of input', function () {
   const selected = {
     assignment: '1',
     grader: '2',
     student: '3',
     from: {value: '2017-05-20T00:00:00-05:00'},
-    to: {value: '2017-05-21T00:00:00-05:00'}
+    to: {value: '2017-05-21T00:00:00-05:00'},
   }
 
   this.wrapper.setState(
     {
-      selected
+      selected,
     },
     () => {
       this.wrapper.find(Button).simulate('click')
@@ -212,28 +212,25 @@ QUnit.module('SearchForm Autocomplete options', {
     this.graders = Fixtures.userArray()
     this.students = Fixtures.userArray()
     this.wrapper = mount(<SearchFormComponent {...this.props} />, {
-      attachTo: document.getElementById('fixtures')
+      attachTo: document.getElementById('fixtures'),
     })
   },
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('selecting a grader from options sets state to its id', function() {
+test('selecting a grader from options sets state to its id', function () {
   this.wrapper.setProps({
     graders: {
       fetchStatus: 'success',
       items: this.graders,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#graders')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#graders').last().instance()
   input.click()
 
   const graderNames = this.graders.map(grader => grader.name)
@@ -244,19 +241,16 @@ test('selecting a grader from options sets state to its id', function() {
   strictEqual(this.wrapper.state().selected.grader, this.graders[0].id)
 })
 
-test('selecting a student from options sets state to its id', function() {
+test('selecting a student from options sets state to its id', function () {
   this.wrapper.setProps({
     students: {
       fetchStatus: 'success',
       items: this.students,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#students')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#students').last().instance()
   input.click()
   const studentNames = this.students.map(student => student.name)
 
@@ -266,19 +260,16 @@ test('selecting a student from options sets state to its id', function() {
   strictEqual(this.wrapper.state().selected.student, this.students[0].id)
 })
 
-test('selecting an assignment from options sets state to its id', function() {
+test('selecting an assignment from options sets state to its id', function () {
   this.wrapper.setProps({
     assignments: {
       fetchStatus: 'success',
       items: this.assignments,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#assignments')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#assignments').last().instance()
   input.click()
 
   const assignmentNames = this.assignments.map(assignment => assignment.name)
@@ -289,19 +280,16 @@ test('selecting an assignment from options sets state to its id', function() {
   strictEqual(this.wrapper.state().selected.assignment, this.assignments[0].id)
 })
 
-test('selecting an assignment from options sets that option in the list', function() {
+test('selecting an assignment from options sets that option in the list', function () {
   this.wrapper.setProps({
     assignments: {
       fetchStatus: 'success',
       items: this.assignments,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#assignments')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#assignments').last().instance()
   input.click()
 
   const assignmentNames = this.assignments.map(assignment => assignment.name)
@@ -314,27 +302,24 @@ test('selecting an assignment from options sets that option in the list', functi
   strictEqual(this.props.getSearchOptions.firstCall.args[1], this.assignments[0].name)
 })
 
-test('selecting an assignment from options sets showFinalGradeOverridesOnly to false', function() {
+test('selecting an assignment from options sets showFinalGradeOverridesOnly to false', function () {
   this.wrapper.setState({
     selected: {
       from: {value: ''},
       showFinalGradeOverridesOnly: true,
-      to: {value: '2017-05-01T00:00:00-05:00'}
-    }
+      to: {value: '2017-05-01T00:00:00-05:00'},
+    },
   })
 
   this.wrapper.setProps({
     assignments: {
       fetchStatus: 'success',
       items: this.assignments,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#assignments')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#assignments').last().instance()
   input.click()
 
   const assignmentNames = this.assignments.map(assignment => assignment.name)
@@ -345,19 +330,16 @@ test('selecting an assignment from options sets showFinalGradeOverridesOnly to f
   strictEqual(this.wrapper.state().selected.showFinalGradeOverridesOnly, false)
 })
 
-test('selecting a grader from options sets that option in the list', function() {
+test('selecting a grader from options sets that option in the list', function () {
   this.wrapper.setProps({
     graders: {
       fetchStatus: 'success',
       items: this.graders,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#graders')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#graders').last().instance()
   input.click()
 
   const graderNames = this.graders.map(grader => grader.name)
@@ -370,19 +352,16 @@ test('selecting a grader from options sets that option in the list', function() 
   strictEqual(this.props.getSearchOptions.firstCall.args[1], this.graders[0].name)
 })
 
-test('selecting a student from options sets that option in the list', function() {
+test('selecting a student from options sets that option in the list', function () {
   this.wrapper.setProps({
     students: {
       fetchStatus: 'success',
       items: this.students,
-      nextPage: ''
-    }
+      nextPage: '',
+    },
   })
 
-  const input = this.wrapper
-    .find('#students')
-    .last()
-    .instance()
+  const input = this.wrapper.find('#students').last().instance()
   input.click()
 
   const studentNames = this.students.map(student => student.name)
@@ -398,17 +377,14 @@ test('selecting a student from options sets that option in the list', function()
 QUnit.module('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
   QUnit.module('when the OVERRIDE_GRADES_ENABLED environment variable is set to true', hooks => {
     const clickOverrideGradeCheckbox = wrapper =>
-      wrapper
-        .find('#show_final_grade_overrides_only')
-        .last()
-        .simulate('change')
+      wrapper.find('#show_final_grade_overrides_only').last().simulate('change')
 
     const fullMount = (props = {}) => mount(<SearchFormComponent {...defaultProps()} {...props} />)
 
     const assignmentData = {
       fetchStatus: 'success',
       items: [{id: '1', name: 'Just an assignment'}],
-      nextPage: ''
+      nextPage: '',
     }
 
     const initialState = {
@@ -416,8 +392,8 @@ QUnit.module('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
         assignment: '1',
         from: {value: '2017-05-02T00:00:00-05:00'},
         showFinalGradeOverridesOnly: false,
-        to: {value: '2017-05-01T00:00:00-05:00'}
-      }
+        to: {value: '2017-05-01T00:00:00-05:00'},
+      },
     }
 
     hooks.beforeEach(() => {

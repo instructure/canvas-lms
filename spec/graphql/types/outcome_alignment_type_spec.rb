@@ -29,10 +29,10 @@ describe Types::OutcomeAlignmentType do
     @quiz_item = assignment_quiz([], course: @course, title: "BBB Quiz")
     @quiz = @assignment
     @assignment = @course.assignments.create!(title: "AAA Assignment")
-    @discussion = @course.assignments.create!(title: "CCC Discussion")
-    @discussion_item = @course.discussion_topics.create!(
+    @discussion = @course.assignments.create!(title: "CCC Graded Discussion")
+    @course.discussion_topics.create!(
       user: @teacher,
-      title: "discussion item",
+      title: "CCC discussion item",
       assignment: @discussion
     )
     @module = @course.context_modules.create!(name: "module")
@@ -46,15 +46,15 @@ describe Types::OutcomeAlignmentType do
     outcome_type.resolve("alignments(contextType: \"Course\", contextId: #{@course.id}) { #{field_name} }")[0]
   end
 
-  describe "for each outcome alignment" do
+  describe "for direct outcome alignments to assignment, quiz and graded discussion" do
     before do
       @module.add_item type: "assignment", id: @assignment.id
       @rubric.associate_with(@assignment, @course, purpose: "grading")
       @outcome_alignment = ContentTag.last
     end
 
-    it "returns _id = alignment_id + '_' + module_id" do
-      expect(resolve_field("_id")).to eq [@outcome_alignment.id.to_s, @module.id.to_s].join("_")
+    it "returns _id like D_{alignment_id}_{module_id}" do
+      expect(resolve_field("_id")).to eq ["D", @outcome_alignment.id.to_s, @module.id.to_s].join("_")
     end
 
     it "returns learning_outcome_id" do
@@ -82,7 +82,7 @@ describe Types::OutcomeAlignmentType do
     end
 
     it "returns url" do
-      expect(resolve_field("url")).to eq "/courses/#{@course.id}/outcomes/#{@outcome.id}/alignments/#{@outcome_alignment.id}"
+      expect(resolve_field("url")).to eq "/courses/#{@course.id}/assignments/#{@assignment.id}"
     end
 
     it "returns module_id" do
@@ -108,8 +108,8 @@ describe Types::OutcomeAlignmentType do
       @outcome_alignment = ContentTag.last
     end
 
-    it "returns _id = alignment_id" do
-      expect(resolve_field("_id")).to eq @outcome_alignment.id.to_s
+    it "returns _id not appended with module_id" do
+      expect(resolve_field("_id")).to eq ["D", @outcome_alignment.id.to_s].join("_")
     end
   end
 
@@ -133,7 +133,26 @@ describe Types::OutcomeAlignmentType do
     end
   end
 
-  describe "for outcome alignment to a Discussion" do
+  describe "for indirect outcome alignment to Quiz via question bank" do
+    before do
+      assessment_question_bank_with_questions
+      @outcome.align(@bank, @bank.context)
+      @quiz2 = assignment_quiz([], course: @course, title: "DDD quiz with questions from questions bank")
+      @quiz2_assignment = @assignment
+      @quiz2.add_assessment_questions [@q1, @q2]
+      @module.add_item type: "quiz", id: @quiz2.id
+    end
+
+    it "returns _id like I_{quiz_assignment_id}_{module_id}" do
+      expect(resolve_field("_id")).to eq ["I", @quiz2_assignment.id.to_s, @module.id.to_s].join("_")
+    end
+
+    it "returns assignment_content_type 'quiz'" do
+      expect(resolve_field("assignmentContentType")).to eq "quiz"
+    end
+  end
+
+  describe "for outcome alignment to a Graded Discussion" do
     before do
       @rubric.associate_with(@discussion, @course, purpose: "grading")
     end
@@ -146,6 +165,23 @@ describe Types::OutcomeAlignmentType do
   describe "for outcome alignment to a Rubric" do
     it "returns null assignment_content_type" do
       expect(resolve_field("assignmentContentType")).to be_nil
+    end
+
+    it "returns url for the rubric" do
+      expect(resolve_field("url")).to eq "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+    end
+  end
+
+  describe "for outcome alignment to a Question Bank" do
+    before do
+      assessment_question_bank_model
+      @bank.title = "EEE question bank"
+      @bank.save!
+      @outcome.align(@bank, @bank.context)
+    end
+
+    it "returns url for the question bank" do
+      expect(resolve_field("url")).to eq "/courses/#{@course.id}/question_banks/#{@bank.id}"
     end
   end
 end

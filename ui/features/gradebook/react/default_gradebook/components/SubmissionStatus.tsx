@@ -29,15 +29,15 @@ const I18n = useI18nScope('gradebook')
 export default class SubmissionStatus extends React.Component {
   static defaultProps = {
     submission: {
-      drop: false
-    }
+      drop: false,
+    },
   }
 
   static propTypes = {
     assignment: shape({
       anonymizeStudents: bool.isRequired,
       postManually: bool.isRequired,
-      published: bool.isRequired
+      published: bool.isRequired,
     }).isRequired,
     isConcluded: bool.isRequired,
     isInClosedGradingPeriod: bool.isRequired,
@@ -50,8 +50,8 @@ export default class SubmissionStatus extends React.Component {
       hasPostableComments: bool,
       postedAt: instanceOf(Date),
       score: number,
-      workflowState: string.isRequired
-    }).isRequired
+      workflowState: string.isRequired,
+    }).isRequired,
   }
 
   getStatusPills() {
@@ -101,7 +101,7 @@ export default class SubmissionStatus extends React.Component {
   getStatusNotifications() {
     const statusNotificationComponents = []
     const statusNotificationContainerStyle = {
-      display: 'flex'
+      display: 'flex',
     }
 
     if (this.props.isConcluded) {
@@ -158,7 +158,7 @@ export default class SubmissionStatus extends React.Component {
     const statusNotificationComponents = this.getStatusNotifications()
     const statusContainerStyle = {
       display: 'flex',
-      justifyContent: 'left'
+      justifyContent: 'left',
     }
 
     return (

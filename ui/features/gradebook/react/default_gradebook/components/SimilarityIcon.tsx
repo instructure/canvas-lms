@@ -23,7 +23,7 @@ import {
   IconEmptySolid,
   IconOvalHalfLine,
   IconClockLine,
-  IconWarningLine
+  IconWarningLine,
 } from '@instructure/ui-icons'
 
 export default function SimilarityIcon({similarityScore, status}) {
@@ -44,5 +44,5 @@ export default function SimilarityIcon({similarityScore, status}) {
 
 SimilarityIcon.propTypes = {
   similarityScore: number,
-  status: oneOf(['error', 'pending', 'scored']).isRequired
+  status: oneOf(['error', 'pending', 'scored']).isRequired,
 }

@@ -26,7 +26,7 @@ export function sendMessageStudentsWho({recipientLids, subject, body, contextCod
     context_code: contextCode,
     mode: 'async',
     group_conversation: true,
-    bulk_message: true
+    bulk_message: true,
   }
 
   return axios.post('/api/v1/conversations', apiParams)

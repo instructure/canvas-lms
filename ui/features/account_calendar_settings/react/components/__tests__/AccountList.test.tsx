@@ -22,7 +22,7 @@ import fetchMock from 'fetch-mock'
 
 import {AccountList} from '../AccountList'
 import {FilterType} from '../FilterControls'
-import {RESPONSE_ACCOUNT_3, RESPONSE_ACCOUNT_4} from '../../__tests__/fixtures'
+import {RESPONSE_ACCOUNT_3, RESPONSE_ACCOUNT_4} from './fixtures'
 import {alertForMatchingAccounts} from '@canvas/calendar/AccountCalendarsUtils'
 
 jest.mock('@canvas/calendar/AccountCalendarsUtils', () => {

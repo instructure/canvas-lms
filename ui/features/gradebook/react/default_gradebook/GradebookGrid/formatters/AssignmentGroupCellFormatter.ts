@@ -53,7 +53,7 @@ export default class AssignmentGroupCellFormatter {
     const templateOpts = {
       percentage: I18n.n(round(percentage, round.DEFAULT), {percentage: true}),
       possible,
-      score: I18n.n(round(value.score, round.DEFAULT))
+      score: I18n.n(round(value.score, round.DEFAULT)),
     }
 
     return render(templateOpts)

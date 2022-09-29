@@ -30,7 +30,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_next_item', 'Focus on the next assignment or group')
-      }
+      },
     },
     {
       keyCode: 75,
@@ -40,7 +40,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_prev_item', 'Focus on the previous assignment or group')
-      }
+      },
     },
     {
       keyCode: 69,
@@ -50,7 +50,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_edit_item', 'Edit the current assignment or group')
-      }
+      },
     },
     {
       keyCode: 68,
@@ -60,7 +60,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_del_item', 'Delete the current assignment or group')
-      }
+      },
     },
     {
       keyCode: 65,
@@ -70,7 +70,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_add_item', 'Add an assignment to selected group')
-      }
+      },
     },
     {
       keyCode: 70,
@@ -80,7 +80,7 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_show_assign', 'Show full preview of the selected assignment')
-      }
+      },
     },
     {
       keyCode: null,
@@ -89,8 +89,8 @@ export default {
       },
       get desc() {
         return I18n.t('keyboard_close_menu', 'Close the active dialog')
-      }
-    }
+      },
+    },
   ],
 
   handleKeys(e) {
@@ -102,5 +102,5 @@ export default {
       }
       return e.stopPropagation()
     }
-  }
+  },
 }

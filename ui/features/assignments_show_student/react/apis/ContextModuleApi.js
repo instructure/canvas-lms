@@ -22,7 +22,7 @@ function getContextModuleData(courseID, assignmentID) {
   const instance = new ModuleSequenceFooter({
     assetType: 'Assignment',
     assetID: assignmentID,
-    courseID
+    courseID,
   })
 
   // Calling fetch() will set the data we want on the calling instance, so we
@@ -36,5 +36,5 @@ function getContextModuleData(courseID, assignmentID) {
 }
 
 export default {
-  getContextModuleData
+  getContextModuleData,
 }

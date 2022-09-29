@@ -31,9 +31,9 @@ QUnit.module('renderModuleSequenceFooter', hooks => {
     env = {
       COURSE_ID: '1201',
       SETTINGS: {
-        filter_speed_grader_by_student_group: false
+        filter_speed_grader_by_student_group: false,
       },
-      speed_grader_url: '/speedgrader'
+      speed_grader_url: '/speedgrader',
     }
 
     fakeENV.setup(env)
@@ -83,9 +83,12 @@ QUnit.module('renderModuleSequenceFooter', hooks => {
       env.group_categories = [
         {
           id: '2201',
-          groups: [{id: '2101', name: 'group 1'}, {id: '2102', name: 'group 2'}],
-          name: 'group category 1'
-        }
+          groups: [
+            {id: '2101', name: 'group 1'},
+            {id: '2102', name: 'group 2'},
+          ],
+          name: 'group category 1',
+        },
       ]
       env.SETTINGS.filter_speed_grader_by_student_group = true
       env.selected_student_group_id = '2101'

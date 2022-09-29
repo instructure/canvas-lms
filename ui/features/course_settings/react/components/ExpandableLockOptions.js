@@ -21,9 +21,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import cx from 'classnames'
 
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {PresentationContent} from '@instructure/ui-a11y-content'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
 
@@ -93,17 +93,19 @@ export default class ExpandableLockOptions extends React.Component {
     const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
     return (
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
-        <Button variant="icon" onClick={this.toggle}>
-          <Text size="medium">
-            <Icon />
-          </Text>
-          <ScreenReaderContent>
-            {`${itemTypeLabelPlurals[this.props.objectType]},
+        <IconButton
+          withBorder={false}
+          withBackground={false}
+          screenReaderLabel={`${itemTypeLabelPlurals[this.props.objectType]},
             ${this.state.open ? I18n.t('Expanded') : I18n.t('Collapsed')},
             ${formatLockObject(this.state.locks) ? I18n.t('Locked') : I18n.t('Unlocked')},
             ${formatLockObject(this.state.locks)}`}
-          </ScreenReaderContent>
-        </Button>
+          renderIcon={
+            <Text size="medium">
+              <Icon />
+            </Text>
+          }
+        />
       </div>
     )
   }
@@ -135,7 +137,11 @@ export default class ExpandableLockOptions extends React.Component {
       (isLocked, lockProp) => isLocked || this.state.locks[lockProp],
       false
     )
-    const Icon = hasLocks ? <IconLock /> : <IconUnlock />
+    const Icon = hasLocks ? (
+      <IconLock data-testid="lock-icon" />
+    ) : (
+      <IconUnlock data-testid="unlock-icon" />
+    )
     return <div className="bcs_tab-icon">{Icon}</div>
   }
 
@@ -145,7 +151,7 @@ export default class ExpandableLockOptions extends React.Component {
       'bcs_sub-menu-viewable': this.state.open
     })
     return (
-      <div className={viewableClasses}>
+      <div className={viewableClasses} data-testid="sub-list">
         <LockCheckList
           formName={`[blueprint_restrictions_by_object_type][${this.props.objectType}]`}
           locks={this.state.locks}
@@ -159,7 +165,7 @@ export default class ExpandableLockOptions extends React.Component {
   render() {
     return (
       <div className="bcs__object-tab">
-        <div onClick={this.toggle}>
+        <div onClick={this.toggle} data-testid="toggle">
           <Grid>
             <Grid.Row>
               <Grid.Col width={4}>{this.renderTitle()}</Grid.Col>

@@ -351,7 +351,6 @@ CanvasRails::Application.routes.draw do
       get :finished
       collection do
         get :retrieve
-        get :homework_submissions
       end
     end
 
@@ -2098,6 +2097,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :progress) do
       get "progress/:id", action: :show, as: "progress"
+      post "progress/:id/cancel", action: :cancel
     end
 
     scope(controller: :app_center) do
@@ -2410,6 +2410,7 @@ CanvasRails::Application.routes.draw do
       get "courses/:course_id/course_pacing/new", action: :new
       get "courses/:course_id/course_pacing/:id", action: :api_show
       put "courses/:course_id/course_pacing/:id", action: :update
+      delete "courses/:course_id/course_pacing/:id", action: :destroy
       post "courses/:course_id/course_pacing/:id/publish", action: :publish
       post "courses/:course_id/course_pacing/compress_dates", action: :compress_dates
     end
@@ -2439,6 +2440,14 @@ CanvasRails::Application.routes.draw do
       put "users/:user_id/eportfolios", action: :moderate_all
       put "eportfolios/:eportfolio_id/restore", action: :restore
     end
+
+    scope(controller: "course_pacing/section_paces_api") do
+      get "courses/:course_id/section_paces", action: :index, as: :section_paces
+      get "courses/:course_id/sections/:course_section_id/pace", action: :show, as: :section_pace
+      post "courses/:course_id/sections/:course_section_id/paces", action: :create, as: :new_section_pace
+      patch "courses/:course_id/sections/:course_section_id/pace", action: :update, as: :patch_section_pace
+      delete "courses/:course_id/sections/:course_section_id/pace", action: :delete, as: :delete_section_pace
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
@@ -2461,6 +2470,7 @@ CanvasRails::Application.routes.draw do
       get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
+      put "jobs2/unstuck", action: :unstuck
     end
   end
 

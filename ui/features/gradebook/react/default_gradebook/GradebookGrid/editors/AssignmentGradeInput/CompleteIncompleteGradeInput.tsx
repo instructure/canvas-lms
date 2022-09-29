@@ -60,14 +60,14 @@ function componentForGrade(grade, options = {}) {
 function getGradeInfo(value, assignment) {
   return parseTextValue(value, {
     enterGradesAs: 'passFail',
-    pointsPossible: assignment.pointsPossible
+    pointsPossible: assignment.pointsPossible,
   })
 }
 
 export default class CompleteIncompleteGradeInput extends Component {
   static propTypes = {
     assignment: shape({
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     disabled: bool,
     menuContentRef: func,
@@ -75,20 +75,20 @@ export default class CompleteIncompleteGradeInput extends Component {
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
-      valid: bool.isRequired
+      valid: bool.isRequired,
     }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
-      excused: bool.isRequired
-    }).isRequired
+      excused: bool.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
     disabled: false,
     menuContentRef: null,
     onMenuDismiss() {},
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {
@@ -100,7 +100,7 @@ export default class CompleteIncompleteGradeInput extends Component {
     this.handleSelect = this.handleSelect.bind(this)
     const grade = this.props.submission.excused ? 'EX' : this.props.submission.enteredGrade
     this.state = {
-      gradeInfo: this.props.pendingGradeInfo || getGradeInfo(grade, this.props.assignment)
+      gradeInfo: this.props.pendingGradeInfo || getGradeInfo(grade, this.props.assignment),
     }
   }
 
@@ -140,7 +140,7 @@ export default class CompleteIncompleteGradeInput extends Component {
       {status: 'complete', value: 'complete'},
       {status: 'incomplete', value: 'incomplete'},
       {status: 'ungraded', value: null},
-      {status: 'excused', value: 'EX'}
+      {status: 'excused', value: 'EX'},
     ]
 
     return (

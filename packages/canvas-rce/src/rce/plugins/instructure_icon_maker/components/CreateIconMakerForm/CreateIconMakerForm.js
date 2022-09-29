@@ -40,6 +40,7 @@ export const CreateIconMakerForm = ({
         onChange={dispatch}
         allowNameChange={allowNameChange}
         nameRef={nameRef}
+        editing={editing}
       />
       <ShapeSection settings={settings} onChange={dispatch} />
       <ColorSection settings={settings} onChange={dispatch} />

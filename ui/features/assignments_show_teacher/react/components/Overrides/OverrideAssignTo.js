@@ -33,11 +33,11 @@ const I18n = useI18nScope('assignments_2')
 OverrideAssignTo.propTypes = {
   override: OverrideShape.isRequired,
   variant: oneOf(['summary', 'detail']),
-  readOnly: bool
+  readOnly: bool,
 }
 OverrideAssignTo.defaultProps = {
   variant: 'summary',
-  readOnly: false
+  readOnly: false,
 }
 
 // mostly lifted from instui Pill, but that component uppercases
@@ -49,7 +49,7 @@ const pillStyle = {
   borderRadius: '.75rem',
   height: '1.5rem',
   border: '1px solid #c7cdd1',
-  backgroundColor: '#eee'
+  backgroundColor: '#eee',
 }
 
 export default function OverrideAssignTo(props) {

@@ -25,7 +25,7 @@ test('SET_MODAL_OPEN actions result in expected state', () => {
   const initialState1 = {modalIsOpen: false}
   const action1 = {
     type: Actions.SET_MODAL_OPEN,
-    payload: true
+    payload: true,
   }
   const expectedState1 = {modalIsOpen: true}
   const newState1 = Reducer(initialState1, action1)
@@ -34,7 +34,7 @@ test('SET_MODAL_OPEN actions result in expected state', () => {
   const initialState2 = {modalIsOpen: true}
   const action2 = {
     type: Actions.SET_MODAL_OPEN,
-    payload: false
+    payload: false,
   }
   const expectedState2 = {modalIsOpen: false}
   const newState2 = Reducer(initialState2, action2)
@@ -65,7 +65,7 @@ test('SET_WEIGHTED actions result in expected state', () => {
   const initialState1 = {weighted: false}
   const action1 = {
     type: Actions.SET_WEIGHTED,
-    payload: true
+    payload: true,
   }
   const expectedState1 = {weighted: true}
   const newState1 = Reducer(initialState1, action1)
@@ -74,7 +74,7 @@ test('SET_WEIGHTED actions result in expected state', () => {
   const initialState2 = {weighted: true}
   const action2 = {
     type: Actions.SET_WEIGHTED,
-    payload: false
+    payload: false,
   }
   const expectedState2 = {weighted: false}
   const newState2 = Reducer(initialState2, action2)

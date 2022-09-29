@@ -113,7 +113,7 @@ export const VideoConferenceModal = ({
         setDuration(durationToBeValidated)
       }
       setDurationValidationMessages([
-        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'}
+        {text: I18n.t('Duration must be less than 99,999,999 minutes'), type: 'error'},
       ])
     } else {
       setDurationValidationMessages([])
@@ -143,11 +143,27 @@ export const VideoConferenceModal = ({
     addToCalendar ? setShowCalendarOptions(true) : setShowCalendarOptions(false)
   }, [addToCalendar])
 
+  const normalizeDate = calendarString => {
+    if (!calendarString) {
+      return null
+    }
+    const date = new Date(calendarString)
+    if (!Number.isNaN(date) && date instanceof Date) {
+      return date.toISOString()
+    } else {
+      return calendarString
+    }
+  }
+
   // Validate Calendar EndAt > StartAt
   useEffect(() => {
-    if (addToCalendar && !(endCalendarDate > startCalendarDate)) {
+    const endDate = normalizeDate(endCalendarDate)
+    const startDate = normalizeDate(startCalendarDate)
+
+    if ((addToCalendar && !(endDate > startDate)) || !endDate || !startDate) {
       setCalendarValidationMessages([
-        {text: I18n.t('End at must be later than Start at'), type: 'error'},
+        [{text: I18n.t('Start Date/Time must be before the End Date/Time'), type: 'error'}],
+        [{text: I18n.t('End Date/Time must be later than Start Date/Time'), type: 'error'}],
       ])
     } else {
       setCalendarValidationMessages([])
@@ -188,7 +204,6 @@ export const VideoConferenceModal = ({
           onAttendeesChange={setSelectedAttendees}
           availableAttendeesList={availableAttendeesList}
           selectedAttendees={selectedAttendees}
-          savedAttendees={props.savedAttendees}
           showCalendar={showCalendarOptions}
           setAddToCalendar={setAddToCalendar}
           addToCalendar={addToCalendar}
@@ -224,7 +239,6 @@ export const VideoConferenceModal = ({
         onAttendeesChange={setSelectedAttendees}
         availableAttendeesList={availableAttendeesList}
         selectedAttendees={selectedAttendees}
-        savedAttendees={props.savedAttendees}
         nameValidationMessages={nameValidationMessages}
         descriptionValidationMessages={descriptionValidationMessages}
         hasBegun={props.hasBegun}
@@ -267,7 +281,7 @@ export const VideoConferenceModal = ({
           setIsLoading(false)
         }
       }}
-      size="auto"
+      size="large"
       label={header}
       shouldCloseOnDocumentClick={false}
     >
@@ -336,8 +350,7 @@ VideoConferenceModal.propTypes = {
   attendeesOptions: PropTypes.arrayOf(PropTypes.string),
   type: PropTypes.string,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
-  selectedAttendees: PropTypes.arrayOf(PropTypes.string),
-  savedAttendees: PropTypes.arrayOf(PropTypes.string),
+  selectedAttendees: PropTypes.arrayOf(PropTypes.object),
   startCalendarDate: PropTypes.string,
   endCalendarDate: PropTypes.string,
 }

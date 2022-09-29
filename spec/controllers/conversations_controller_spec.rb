@@ -384,10 +384,12 @@ describe ConversationsController do
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = "active"
       enrollment.save
-      post "create", params: { recipients: [new_user.id.to_s], body: "yo" }
+      attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
+      post "create", params: { recipients: [new_user.id.to_s], body: "yo", attachment_ids: [attachment.id] }
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.created.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.sent.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 1)
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
@@ -748,6 +750,30 @@ describe ConversationsController do
       expect(InstStatsd::Statsd).not_to have_received(:increment).with("inbox.conversation.archived.react")
     end
 
+    it "updates the archived conversation to be read" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
+
+      allow(InstStatsd::Statsd).to receive(:increment)
+      post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "read" } }
+
+      expect(response).to be_successful
+      @conversation.reload
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
+    it "updates the archived conversation to be unread" do
+      course_with_student_logged_in(active_all: true)
+      conversation(num_other_users: 2).update_attribute(:workflow_state, "archived")
+
+      allow(InstStatsd::Statsd).to receive(:increment)
+      post "update", params: { id: @conversation.conversation_id, conversation: { workflow_state: "unread" } }
+
+      expect(response).to be_successful
+      @conversation.reload
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
     it "updates the conversation to be unstarred" do
       course_with_student_logged_in(active_all: true)
       conversation(num_other_users: 2).update(starred: true)
@@ -811,10 +837,12 @@ describe ConversationsController do
       @conversation.last_message_at = expected_lma
       @conversation.save!
 
-      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world" }
+      attachment = @user.conversation_attachments_folder.attachments.create!(filename: "somefile.doc", context: @user, uploaded_data: StringIO.new("test"))
+      post "add_message", params: { conversation_id: @conversation.conversation_id, body: "hello world", attachment_ids: [attachment.id] }
 
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.legacy")
       expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.isReply.legacy")
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.message.sent.attachment.legacy")
       expect(InstStatsd::Statsd).to have_received(:count).with("inbox.message.sent.recipients.legacy", 0)
       expect(response).to be_successful
       expect(@conversation.messages.size).to eq 2

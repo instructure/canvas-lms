@@ -84,7 +84,7 @@ it('displays multiple attempts', () => {
   const attempts = [
     {attempt: 1, score: 2, submittedAt: '2019-01-13T08:21:42Z'},
     {attempt: 2, score: 3, submittedAt: '2019-01-14T09:21:42Z'},
-    {attempt: 3, score: 4, submittedAt: '2019-01-15T12:21:42Z'}
+    {attempt: 3, score: 4, submittedAt: '2019-01-15T12:21:42Z'},
   ]
   const submission = mockSubmission({nodes: [user], submissionHistories: {nodes: attempts}})
   const assignment = mockAssignment()
@@ -113,7 +113,7 @@ it('indicates when a submission draft is present', () => {
   const submission = mockSubmission({
     nodes: [user],
     submissionHistories: {nodes: []},
-    submissionDraft: {submissionAttempt: '0'}
+    submissionDraft: {submissionAttempt: '0'},
   })
   const assignment = mockAssignment()
 
@@ -124,7 +124,7 @@ it('indicates when a submission draft is present', () => {
 it('renders submission status pill', () => {
   const submission = mockSubmission({
     submittedAt: null,
-    submissionStatus: 'late'
+    submissionStatus: 'late',
   })
   const assignment = mockAssignment()
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`
@@ -141,7 +141,7 @@ it('renders excused status pill', () => {
   const submission = mockSubmission({
     submittedAt: null,
     submissionStatus: 'late',
-    excused: true
+    excused: true,
   })
   const assignment = mockAssignment()
   const submittedAt = `${tz.format(submission.submittedAt, I18n.t('#date.formats.full'))}`

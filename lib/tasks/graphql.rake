@@ -50,7 +50,7 @@ namespace :graphql do
       config = load_config(require_keys: [variant_key, :graph_name, :registry_key])
 
       graph_ref = "#{config[:graph_name]}@#{config[variant_key]}"
-      cmd = "APOLLO_KEY=#{config[:registry_key]} rover subgraph publish #{graph_ref} --name canvas --schema -"
+      cmd = "APOLLO_KEY=#{config[:registry_key]} rover subgraph publish #{graph_ref} --client-timeout 60 --name canvas --schema -"
 
       Tempfile.create("subgraph_schema") do |schema|
         schema.write(CanvasSchema.for_federation.federation_sdl)

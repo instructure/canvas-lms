@@ -23,14 +23,9 @@ import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Flex} from '@instructure/ui-flex'
 import {Tag} from '@instructure/ui-tag'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter, FilterDrilldownData} from '../gradebook.d'
-import type {
-  AssignmentGroup,
-  GradingPeriod,
-  Module,
-  Section,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 import {getLabelForFilter, doFiltersMatch, isFilterNotEmpty} from '../Gradebook.utils'
 import useStore from '../stores/index'
 import FilterDropdown from './FilterDropdown'
@@ -46,8 +41,8 @@ export type FilterNavProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  gradingPeriods: GradingPeriod[]
-  studentGroupCategories: StudentGroupCategoryMap
+  gradingPeriods: CamelizedGradingPeriod[]
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterNav({
@@ -55,7 +50,7 @@ export default function FilterNav({
   gradingPeriods,
   modules,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterNavProps) {
   const [isTrayOpen, setIsTrayOpen] = useState(false)
   const [isDateModalOpen, setIsDateModalOpen] = useState(false)
@@ -86,7 +81,7 @@ export default function FilterNav({
         dismissible={true}
         onClick={() =>
           useStore.setState({
-            appliedFilters: appliedFilters.filter(c => c.id !== filter.id)
+            appliedFilters: appliedFilters.filter(c => c.id !== filter.id),
           })
         }
         margin="0 xx-small 0 0"
@@ -99,8 +94,8 @@ export default function FilterNav({
       id: '1',
       parentId: null,
       name: I18n.t('Saved Filter Presets'),
-      items: []
-    }
+      items: [],
+    },
   }
 
   for (const filterPreset of filterPresets) {
@@ -115,7 +110,7 @@ export default function FilterNav({
         } else {
           applyFilters(filterPreset.filters)
         }
-      }
+      },
     }
     dataMap[filterPreset.id] = item
     dataMap['1'].items?.push(item)
@@ -138,11 +133,11 @@ export default function FilterNav({
             id: uuid(),
             type: 'section',
             value: a.id,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
-      }))
+        },
+      })),
     }
     dataMap.sections = filterItems.sections
   }
@@ -162,11 +157,11 @@ export default function FilterNav({
             id: uuid(),
             type: 'module',
             value: m.id,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
-      }))
+        },
+      })),
     }
     dataMap.modules = filterItems.modules
   }
@@ -186,12 +181,12 @@ export default function FilterNav({
             id: uuid(),
             type: 'grading-period',
             value: a.id,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
+        },
       })),
-      itemGroups: []
+      itemGroups: [],
     }
     dataMap['grading-periods'] = filterItems['grading-periods']
   }
@@ -211,12 +206,12 @@ export default function FilterNav({
             id: uuid(),
             type: 'assignment-group',
             value: a.id,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
+        },
       })),
-      itemGroups: []
+      itemGroups: [],
     }
     dataMap['assignment-groups'] = filterItems['assignment-groups']
   }
@@ -245,12 +240,12 @@ export default function FilterNav({
                   id: uuid(),
                   type: 'student-group',
                   value: group.id,
-                  created_at: new Date().toISOString()
+                  created_at: new Date().toISOString(),
                 }
                 toggleFilter(filter)
-              }
-            }))
-        }))
+              },
+            })),
+        })),
     }
     dataMap['student-groups'] = filterItems['student-groups']
   }
@@ -272,10 +267,10 @@ export default function FilterNav({
             id: uuid(),
             type: 'submissions',
             value: 'has-ungraded-submissions',
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
+        },
       },
       {
         id: '2',
@@ -288,12 +283,12 @@ export default function FilterNav({
             id: uuid(),
             type: 'submissions',
             value: 'has-submissions',
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           toggleFilter(filter)
-        }
-      }
-    ]
+        },
+      },
+    ],
   }
   dataMap.submissions = filterItems.submissions
 
@@ -304,7 +299,7 @@ export default function FilterNav({
     isSelected: appliedFilters.some(
       f => (f.type === 'start-date' || f.type === 'end-date') && isFilterNotEmpty(f)
     ),
-    onToggle: () => setIsDateModalOpen(true)
+    onToggle: () => setIsDateModalOpen(true),
   }
 
   const startDate = appliedFilters.find((c: Filter) => c.type === 'start-date')?.value || null
@@ -357,13 +352,13 @@ export default function FilterNav({
             id: uuid(),
             type: 'start-date',
             value: startDateValue,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           const endDateCondition: Filter = {
             id: uuid(),
             type: 'end-date',
             value: endDateValue,
-            created_at: new Date().toISOString()
+            created_at: new Date().toISOString(),
           }
           addFilters([startDateCondition, endDateCondition])
         }}

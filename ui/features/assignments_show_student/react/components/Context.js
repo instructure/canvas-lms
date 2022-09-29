@@ -26,7 +26,7 @@ export const StudentViewContextDefaults = {
   showDraftAction: () => {},
   startNewAttemptAction: () => {},
   latestSubmission: {},
-  lastSubmittedSubmission: {}
+  lastSubmittedSubmission: {},
 }
 
 const StudentViewContext = React.createContext(StudentViewContextDefaults)

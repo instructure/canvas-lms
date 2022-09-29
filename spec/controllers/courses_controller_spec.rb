@@ -3527,7 +3527,7 @@ describe CoursesController do
     let(:controller) { CoursesController.new }
 
     before do
-      controller.instance_variable_set(:@course, Course.new)
+      controller.instance_variable_set(:@course, Course.new(root_account: Account.default))
     end
 
     it "allows setting course visibility with flag" do

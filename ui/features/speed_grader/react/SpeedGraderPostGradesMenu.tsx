@@ -21,7 +21,6 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('SpeedGraderPostGradesMenu')
@@ -57,7 +56,7 @@ export default function SpeedGraderPostGradesMenu(props: Props) {
           <Text>{I18n.t('Post Grades')}</Text>
         </MenuItem>
       ) : (
-        <MenuItem name="postGrades" disabled>
+        <MenuItem name="postGrades" disabled={true}>
           <Text>
             {props.hasGradesOrPostableComments
               ? I18n.t('All Grades Posted')
@@ -71,7 +70,7 @@ export default function SpeedGraderPostGradesMenu(props: Props) {
           <Text>{I18n.t('Hide Grades')}</Text>
         </MenuItem>
       ) : (
-        <MenuItem name="hideGrades" disabled>
+        <MenuItem name="hideGrades" disabled={true}>
           <Text>
             {props.hasGradesOrPostableComments
               ? I18n.t('All Grades Hidden')

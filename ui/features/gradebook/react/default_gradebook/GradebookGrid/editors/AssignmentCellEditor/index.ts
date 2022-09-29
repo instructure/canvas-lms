@@ -42,7 +42,7 @@ export default class AssignmentCellEditor {
       editorOptions: this.options,
       ref: ref => {
         this.component = ref
-      }
+      },
     }
 
     const Component = props.gradeIsEditable ? AssignmentRowCell : ReadOnlyCell

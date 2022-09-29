@@ -28,14 +28,14 @@ function getSubmission(student, assignmentId: string) {
     has_postable_comments: false,
     posted_at: null,
     score: null,
-    workflow_state: null
+    workflow_state: null,
   }
 
   return {
     hasPostableComments: !!submission.has_postable_comments,
     postedAt: submission.posted_at,
     score: submission.score,
-    workflowState: submission.workflow_state
+    workflowState: submission.workflow_state,
   }
 }
 
@@ -58,7 +58,7 @@ export default class PostPolicies {
     ;[
       'assignment-posting-policy-tray',
       'hide-assignment-grades-tray',
-      'post-assignment-grades-tray'
+      'post-assignment-grades-tray',
     ].forEach(id => {
       const node = document.getElementById(id)
       if (node) ReactDOM.unmountComponentAtNode(node)
@@ -115,10 +115,10 @@ export default class PostPolicies {
         id,
         moderatedGrading: assignment.moderated_grading,
         name,
-        postManually: assignment.post_manually
+        postManually: assignment.post_manually,
       },
       onAssignmentPostPolicyUpdated: this._onAssignmentPostPolicyUpdated,
-      onExited
+      onExited,
     })
   }
 
@@ -145,12 +145,12 @@ export default class PostPolicies {
         anonymousGrading: anonymous_grading,
         gradesPublished: grades_published,
         id,
-        name
+        name,
       },
       onExited,
       onHidden: this._onGradesPostedOrHidden,
       sections,
-      submissions
+      submissions,
     })
   }
 
@@ -177,23 +177,23 @@ export default class PostPolicies {
         anonymousGrading: anonymous_grading,
         gradesPublished: grades_published,
         id,
-        name
+        name,
       },
       onExited: () => {
         this._gradebook.postAssignmentGradesTrayOpenChanged({
           assignmentId: assignment.id,
-          isOpen: false
+          isOpen: false,
         })
         onExited()
       },
       sections,
       submissions,
-      onPosted: this._onGradesPostedOrHidden
+      onPosted: this._onGradesPostedOrHidden,
     })
 
     this._gradebook.postAssignmentGradesTrayOpenChanged({
       assignmentId: assignment.id,
-      isOpen: true
+      isOpen: true,
     })
   }
 

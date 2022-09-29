@@ -18,7 +18,6 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import tz from '@canvas/timezone'
 
 import {Table} from '@instructure/ui-table'
 import {Link} from '@instructure/ui-link'
@@ -36,6 +35,12 @@ const I18n = useI18nScope('grade_row')
 // displayName="row".
 // For this reason GradeRow is plain old js function and not a React function component.
 // Except for having no PropTypes, the code is exactly the same.
+
+/*
+ * ***** CAUTION:  this looks like a React component but is not called like one!
+ * ***** CAUTION:  if modifying this, do not try to add any React Hooks, they will not work!
+ */
+
 export const GradeRow = ({
   id,
   assignmentName,
@@ -52,7 +57,8 @@ export const GradeRow = ({
   missing,
   hasComments,
   currentUserId,
-  isStacked
+  isStacked,
+  dateFormatter
 }) => {
   const cellTheme = isStacked ? {padding: '.5rem .75rem'} : undefined
 
@@ -62,7 +68,7 @@ export const GradeRow = ({
         <Text color="warning" size="small">
           {submissionDate
             ? I18n.t('Late %{date}', {
-                date: tz.format(submissionDate, 'date.formats.full_with_weekday')
+                date: dateFormatter(submissionDate)
               })
             : I18n.t('Late')}
         </Text>
@@ -79,7 +85,7 @@ export const GradeRow = ({
       return (
         <Text color="success" size="small">
           {I18n.t('Submitted %{date}', {
-            date: tz.format(submissionDate, 'date.formats.full_with_weekday')
+            date: dateFormatter(submissionDate)
           })}
         </Text>
       )
@@ -177,9 +183,7 @@ export const GradeRow = ({
           renderTitleCell()
         )}
       </Table.Cell>
-      <Table.Cell theme={cellTheme}>
-        {dueDate && <Text>{tz.format(dueDate, 'date.formats.full_with_weekday')}</Text>}
-      </Table.Cell>
+      <Table.Cell theme={cellTheme}>{dueDate && <Text>{dateFormatter(dueDate)}</Text>}</Table.Cell>
       <Table.Cell theme={cellTheme}>
         <Text>{assignmentGroupName}</Text>
       </Table.Cell>

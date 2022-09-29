@@ -23,10 +23,11 @@ QUnit.module('ReuploadSubmissionsDialogManager#constructor')
 test('constructs reupload url from given assignment data and url template', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
-    'user_22'
+    'user_22',
+    {}
   )
 
   strictEqual(manager.reuploadUrl, 'the_the_id_url')
@@ -35,23 +36,19 @@ test('constructs reupload url from given assignment data and url template', () =
 QUnit.module('ReuploadSubmissionsDialogManager#isDialogEnabled')
 
 test('returns true when assignment submssions have been downloaded', () => {
-  const manager = new ReuploadSubmissionsDialogManager(
-    {hasDownloadedSubmissions: true},
-    'the_url',
-    'user_22'
-  )
+  const manager = new ReuploadSubmissionsDialogManager({id: '123'}, 'the_url', 'user_22', {
+    123: true,
+  })
 
   strictEqual(manager.isDialogEnabled(), true)
 })
 
 test('returns false when assignment submssions have not been downloaded', () => {
-  const manager = new ReuploadSubmissionsDialogManager(
-    {hasDownloadedSubmissions: true},
-    'the_url',
-    'user_22'
-  )
+  const manager = new ReuploadSubmissionsDialogManager({id: '123'}, 'the_url', 'user_22', {
+    123: false,
+  })
 
-  strictEqual(manager.isDialogEnabled(), true)
+  strictEqual(manager.isDialogEnabled(), false)
 })
 
 QUnit.module('ReuploadSubmissionsDialogManager#showDialog')
@@ -59,10 +56,11 @@ QUnit.module('ReuploadSubmissionsDialogManager#showDialog')
 test('sets form action to reupload url', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
-    'user_22'
+    'user_22',
+    {}
   )
   const dialog = sinon.stub()
   const attr = sinon.stub().returns({dialog})
@@ -75,10 +73,11 @@ test('sets form action to reupload url', () => {
 test('opens dialog', () => {
   const manager = new ReuploadSubmissionsDialogManager(
     {
-      id: 'the_id'
+      id: 'the_id',
     },
     'the_{{ assignment_id }}_url',
-    'user_22'
+    'user_22',
+    {}
   )
   const dialog = sinon.stub()
   const attr = sinon.stub().returns({dialog})

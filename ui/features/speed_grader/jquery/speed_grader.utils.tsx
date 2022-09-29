@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 
@@ -134,7 +133,7 @@ export const configureRecognition = (recognition, messages) => {
 
   // xsslint safeString.function linebreak
   function linebreak(transcript) {
-    return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>');
+    return htmlEscape(transcript).replace(/\n\n/g, '<p></p>').replace(/\n/g, '<br>')
   }
 }
 

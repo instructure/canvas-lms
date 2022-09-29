@@ -44,7 +44,7 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
       assignment: {
         gradingType: 'points',
         id: '2301',
-        pointsPossible: 10
+        pointsPossible: 10,
       },
       enterGradesAs: 'points',
       gradeIsVisible: true,
@@ -53,12 +53,12 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
         ['B', 0.8],
         ['C', 0.7],
         ['D', 0.6],
-        ['F', 0.0]
+        ['F', 0.0],
       ],
       isSubmissionTrayOpen: false,
       onToggleSubmissionTrayOpen() {},
       student: {
-        id: '1101'
+        id: '1101',
       },
       submission: {
         assignmentId: '2301',
@@ -67,8 +67,8 @@ QUnit.module('GradebookGrid ReadOnlyCell', suiteHooks => {
         id: '2501',
         rawGrade: '6.8',
         score: 7.8,
-        userId: '1101'
-      }
+        userId: '1101',
+      },
     }
   })
 

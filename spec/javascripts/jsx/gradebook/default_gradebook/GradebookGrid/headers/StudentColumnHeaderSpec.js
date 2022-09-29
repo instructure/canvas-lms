@@ -70,9 +70,9 @@ QUnit.module('GradebookGrid StudentColumnHeader', suiteHooks => {
         // sort callbacks with additional sort options disabled
         onSortBySortableNameAscending() {},
         onSortBySortableNameDescending() {},
-        settingKey: 'sortable_name'
+        settingKey: 'sortable_name',
       },
-      studentGroupsEnabled: true
+      studentGroupsEnabled: true,
     }
   })
 

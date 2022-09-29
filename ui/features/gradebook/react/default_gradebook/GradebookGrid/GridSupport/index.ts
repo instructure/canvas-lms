@@ -22,11 +22,19 @@ import GridHelper from './GridHelper'
 import Navigation from './Navigation'
 import State from './State'
 import Style from './Style'
+import slickgrid from 'slickgrid'
+import type ColumnHeaderRenderer from '../headers/ColumnHeaderRenderer'
+
+export type GridSupportOptions = {
+  activeBorderColor?: string
+  columnHeaderRenderer?: ColumnHeaderRenderer
+  rows: any[]
+}
 
 export default class GridSupport {
-  grid: any
+  grid: slickgrid.Grid
 
-  options: any
+  options: GridSupportOptions
 
   events: Events
 
@@ -40,7 +48,10 @@ export default class GridSupport {
 
   style: Style
 
-  constructor(grid, options = {}) {
+  constructor(
+    grid: slickgrid.Grid,
+    options: GridSupportOptions = {rows: [], activeBorderColor: ''}
+  ) {
     this.grid = grid
     this.options = options
 

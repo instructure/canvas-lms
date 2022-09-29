@@ -25,7 +25,7 @@ const SubmissionTrayCommentPropTypes = {
   authorUrl: string.isRequired,
   createdAt: instanceOf(Date).isRequired,
   comment: string.isRequired,
-  editedAt: instanceOf(Date)
+  editedAt: instanceOf(Date),
 }
 
 export default SubmissionTrayCommentPropTypes

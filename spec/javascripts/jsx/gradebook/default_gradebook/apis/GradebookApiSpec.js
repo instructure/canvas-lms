@@ -26,7 +26,7 @@ QUnit.module('GradebookApi.createTeacherNotesColumn', {
       hidden: false,
       position: 1,
       teacher_notes: true,
-      title: 'Notes'
+      title: 'Notes',
     }
     this.createTeacherNotesColumnUrl = '/api/v1/courses/1201/custom_gradebook_columns'
     this.server = sinon.fakeServer.create({respondImmediately: true})
@@ -34,7 +34,7 @@ QUnit.module('GradebookApi.createTeacherNotesColumn', {
     this.server.respondWith('POST', this.createTeacherNotesColumnUrl, [
       200,
       {'Content-Type': 'application/json'},
-      responseBody
+      responseBody,
     ])
   },
 
@@ -47,7 +47,7 @@ QUnit.module('GradebookApi.createTeacherNotesColumn', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('sends a post request to the "create teacher notes column" url', function () {
@@ -97,7 +97,7 @@ QUnit.module('GradebookApi.updateTeacherNotesColumn', {
     this.server.respondWith('PUT', this.updateTeacherNotesColumnUrl, [
       200,
       {'Content-Type': 'application/json'},
-      responseBody
+      responseBody,
     ])
   },
 
@@ -110,7 +110,7 @@ QUnit.module('GradebookApi.updateTeacherNotesColumn', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('sends a post request to the "create teacher notes column" url', function () {
@@ -163,7 +163,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
     server.respondWith('PUT', updateSubmissionUrl, [
       200,
       {'Content-Type': 'application/json'},
-      responseBody
+      responseBody,
     ])
   })
 
@@ -178,7 +178,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
 
   test('sends a put request to the "update submission" url', () =>
     GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
+      latePolicyStatus: 'none',
     }).then(() => {
       const request = getRequest()
       strictEqual(request.method, 'PUT')
@@ -187,7 +187,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
 
   test('includes params for updating a submission', () =>
     GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
+      latePolicyStatus: 'none',
     }).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)
       deepEqual(bodyData.submission.late_policy_status, 'none')
@@ -195,7 +195,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
 
   test('includes params to request visibility for the submission', () =>
     GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
+      latePolicyStatus: 'none',
     }).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)
       strictEqual(bodyData.include.includes('visibility'), true)
@@ -203,7 +203,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
 
   test('sends the column data to the success handler', () =>
     GradebookApi.updateSubmission(courseId, assignmentId, userId, {
-      latePolicyStatus: 'none'
+      latePolicyStatus: 'none',
     }).then(({data}) => {
       deepEqual(data, submissionData)
     }))
@@ -214,7 +214,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
       assignmentId,
       userId,
       {
-        latePolicyStatus: 'none'
+        latePolicyStatus: 'none',
       },
       'points'
     ).then(() => {
@@ -228,7 +228,7 @@ QUnit.module('GradebookApi.updateSubmission', hooks => {
       assignmentId,
       userId,
       {
-        latePolicyStatus: 'none'
+        latePolicyStatus: 'none',
       },
       'percent'
     ).then(() => {

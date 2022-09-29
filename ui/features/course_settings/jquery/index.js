@@ -588,29 +588,40 @@ $(document).ready(function () {
     }
   })
 
-  $('#course_course_visibility').change(function (event) {
-    const order = $(this).children()
-    const selected = $(this).find(':selected')
+  const refresh_visibility_options = () => {
+    const visibility_options = $('#course_course_visibility').children()
+    const course_visibility = $('#course_course_visibility').find(':selected')
+
     $.each($('#customize_course_visibility select'), (i, sel) => {
+      const current = $(sel).find(':selected')
+
       $(sel).children('option').remove()
-      for (var i = $.inArray(selected[0], order), len = order.length; i < len; i++) {
-        $(order[i]).clone().appendTo($(sel))
-      }
+
+      const allow_tighter = ['tighter', 'any'].includes($(sel).data('flexibility'))
+      const allow_looser = ['looser', 'any', null, undefined, ''].includes(
+        $(sel).data('flexibility')
+      )
+
+      let found_current = false
+      visibility_options.each((_index, item) => {
+        const isCourseSel = item == course_visibility[0]
+        if (isCourseSel) found_current = true
+        if (isCourseSel || (allow_tighter && !found_current) || (allow_looser && found_current)) {
+          $(item).clone().appendTo($(sel))
+        }
+      })
+
+      $(sel).val($(current).val())
     })
+  }
+
+  $('#course_course_visibility').change(function (event) {
+    refresh_visibility_options()
     $('#customize_course_visibility select').val($('#course_course_visibility').val())
   })
 
   $('#course_custom_course_visibility').ready(event => {
-    const order = $('#course_course_visibility').children()
-    const selected = $('#course_course_visibility').find(':selected')
-    const current = $('#customize_course_visibility select').find(':selected')
-    $.each($('#customize_course_visibility select'), (i, sel) => {
-      $(sel).children('option').remove()
-      for (var i = $.inArray(selected[0], order), len = order.length; i < len; i++) {
-        $(order[i]).clone().appendTo($(sel))
-      }
-    })
-    $('#customize_course_visibility select').val($(current).val())
+    refresh_visibility_options()
   })
 
   $('#course_show_announcements_on_home_page').change(function (event) {

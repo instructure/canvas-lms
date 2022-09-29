@@ -90,7 +90,7 @@ const ManageOutcomesFooter = ({
                 </div>
               </Flex.Item>
               <Flex.Item as="div">
-                <div style={{paddingLeft: isMobileView ? '.75rem' : '1.1875rem'}}>
+                <div style={{paddingLeft: isMobileView ? '1.55rem' : '2.85rem'}}>
                   <OutcomesPopover
                     outcomes={selected}
                     outcomeCount={selectedCount}

@@ -584,7 +584,8 @@ describe DiscussionTopicsController, type: :request do
                             "thumbnail_url" => nil,
                             "mime_class" => @attachment.mime_class,
                             "media_entry_id" => @attachment.media_entry_id,
-                            "category" => "uncategorized" }],
+                            "category" => "uncategorized",
+                            "visibility_level" => @attachment.visibility_level }],
         "discussion_type" => "side_comment",
         "locked" => false,
         "can_lock" => true,
@@ -2939,7 +2940,8 @@ describe DiscussionTopicsController, type: :request do
         "modified_at" => @attachment.modified_at.as_json,
         "mime_class" => @attachment.mime_class,
         "media_entry_id" => @attachment.media_entry_id,
-        "category" => "uncategorized"
+        "category" => "uncategorized",
+        "visibility_level" => @attachment.visibility_level
       }
 
       v0 = json["view"][0]

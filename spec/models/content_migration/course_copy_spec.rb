@@ -556,12 +556,12 @@ describe ContentMigration do
       visibility_type = "superfunvisibility"
       allow_any_instantiation_of(@copy_from.root_account).to receive(:available_course_visibility_override_options)
         .and_return({ visibility_type => { setting: "Some label" } })
-      @copy_from.apply_visibility_configuration(visibility_type, nil)
+      @copy_from.apply_visibility_configuration(visibility_type)
       @copy_from.save!
       run_course_copy
       expect(@copy_to.reload.overridden_course_visibility).to eq visibility_type
 
-      @copy_from.apply_visibility_configuration("public", nil)
+      @copy_from.apply_visibility_configuration("public")
       @copy_from.save!
       run_course_copy
       expect(@copy_to.reload.overridden_course_visibility).to be_blank

@@ -1698,6 +1698,26 @@ describe AssignmentsController do
       get "syllabus", params: { course_id: @course.id }
       expect(assigns[:syllabus_body]).not_to be_nil
     end
+
+    context "assigning @course_home_sub_navigation" do
+      before :once do
+        @tool = external_tool_model(context: @course, opts: { course_home_sub_navigation: { enabled: true, visibility: "admins" } })
+      end
+
+      it "shows admin-level course_home_sub_navigation external tools for teachers" do
+        user_session(@teacher)
+
+        get "syllabus", params: { course_id: @course.id }
+        expect(assigns[:course_home_sub_navigation_tools].size).to eq 1
+      end
+
+      it "rejects admin-level course_home_sub_navigation external tools for students" do
+        user_session(@student)
+
+        get "syllabus", params: { course_id: @course.id }
+        expect(assigns[:course_home_sub_navigation_tools].size).to eq 0
+      end
+    end
   end
 
   describe "PUT 'toggle_mute'" do

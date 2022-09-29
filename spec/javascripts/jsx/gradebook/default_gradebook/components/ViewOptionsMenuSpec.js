@@ -35,13 +35,13 @@ function defaultProps({props, filterSettings} = {}) {
       onSortByPointsAscending() {},
       onSortByPointsDescending() {},
       onSortByModuleAscending() {},
-      onSortByModuleDescending() {}
+      onSortByModuleDescending() {},
     },
     filterSettings: {
       available: ['assignmentGroups', 'gradingPeriods', 'modules', 'sections'],
       onSelect() {},
       selected: [],
-      ...filterSettings
+      ...filterSettings,
     },
     onSelectShowStatusesModal() {},
     onSelectShowUnpublishedAssignments() {},
@@ -56,15 +56,15 @@ function defaultProps({props, filterSettings} = {}) {
     teacherNotes: {
       disabled: false,
       onSelect() {},
-      selected: true
+      selected: true,
     },
     overrides: {
       disabled: false,
       label: 'Overrides',
       onSelect() {},
-      selected: false
+      selected: false,
     },
-    ...props
+    ...props,
   }
 }
 
@@ -72,7 +72,7 @@ function mouseover($el) {
   const event = new MouseEvent('mouseover', {
     bubbles: true,
     cancelable: true,
-    view: window
+    view: window,
   })
   $el.dispatchEvent(event)
 }
@@ -114,7 +114,7 @@ QUnit.module('ViewOptionsMenu#focus')
 test('trigger is focused', () => {
   const props = defaultProps()
   const wrapper = mount(<ViewOptionsMenu {...props} />, {
-    attachTo: document.getElementById('fixtures')
+    attachTo: document.getElementById('fixtures'),
   })
   wrapper.instance().focus()
   equal(document.activeElement, wrapper.find('button').instance())
@@ -128,7 +128,7 @@ QUnit.module('ViewOptionsMenu - notes', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('teacher notes are optionally enabled', function () {
@@ -184,7 +184,7 @@ QUnit.module('ViewOptionsMenu - Overrides', moduleHooks => {
 QUnit.module('ViewOptionsMenu - Filters', {
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('includes each available filter', function () {
@@ -232,8 +232,8 @@ test('onSelect is called with list of selected filters upon any selection change
   const props = defaultProps({
     filterSettings: {
       onSelect,
-      selected: ['assignmentGroups', 'sections']
-    }
+      selected: ['assignmentGroups', 'sections'],
+    },
   })
   this.wrapper = mountAndOpenOptions(props)
   getMenuItem(this.wrapper.instance().menuContent, 'Filters', 'Grading Periods').click()
@@ -244,7 +244,7 @@ QUnit.module('ViewOptionsMenu - view ungraded as 0', {
   mountViewOptionsMenu({
     viewUngradedAsZero = false,
     allowViewUngradedAsZero = false,
-    onSelectViewUngradedAsZero = () => {}
+    onSelectViewUngradedAsZero = () => {},
   } = {}) {
     const props = defaultProps()
     return mount(
@@ -261,7 +261,7 @@ QUnit.module('ViewOptionsMenu - view ungraded as 0', {
     if (this.wrapper) {
       this.wrapper.unmount()
     }
-  }
+  },
 })
 
 test('"View Ungraded As 0" is shown when allowViewUngradedAsZero is true', function () {
@@ -279,7 +279,7 @@ test('"View Ungraded As 0" is not shown when allowViewUngradedAsZero is false', 
 test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', function () {
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: true,
-    allowViewUngradedAsZero: true
+    allowViewUngradedAsZero: true,
   })
   this.wrapper.find('button').simulate('click')
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0')
@@ -289,7 +289,7 @@ test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', functio
 test('"View Ungraded As 0" is not selected when viewUngradedAsZero is false', function () {
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: false,
-    allowViewUngradedAsZero: true
+    allowViewUngradedAsZero: true,
   })
   this.wrapper.find('button').simulate('click')
   const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0')
@@ -301,7 +301,7 @@ test('onSelectViewUngradedAsZero is called when selected', function () {
   this.wrapper = this.mountViewOptionsMenu({
     viewUngradedAsZero: false,
     allowViewUngradedAsZero: true,
-    onSelectViewUngradedAsZero: onSelectViewUngradedAsZeroStub
+    onSelectViewUngradedAsZero: onSelectViewUngradedAsZeroStub,
   })
   this.wrapper.find('button').simulate('click')
   getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0').click()
@@ -311,7 +311,7 @@ test('onSelectViewUngradedAsZero is called when selected', function () {
 QUnit.module('ViewOptionsMenu - unpublished assignments', {
   mountViewOptionsMenu({
     showUnpublishedAssignments = true,
-    onSelectShowUnpublishedAssignments = () => {}
+    onSelectShowUnpublishedAssignments = () => {},
   } = {}) {
     const props = defaultProps()
     return mount(
@@ -327,7 +327,7 @@ QUnit.module('ViewOptionsMenu - unpublished assignments', {
     if (this.wrapper) {
       this.wrapper.unmount()
     }
-  }
+  },
 })
 
 test('Unpublished Assignments is selected when showUnpublishedAssignments is true', function () {
@@ -347,7 +347,7 @@ test('Unpublished Assignments is not selected when showUnpublishedAssignments is
 test('onSelectShowUnpublishedAssignment is called when selected', function () {
   const onSelectShowUnpublishedAssignmentsStub = sinon.stub()
   this.wrapper = this.mountViewOptionsMenu({
-    onSelectShowUnpublishedAssignments: onSelectShowUnpublishedAssignmentsStub
+    onSelectShowUnpublishedAssignments: onSelectShowUnpublishedAssignmentsStub,
   })
   this.wrapper.find('button').simulate('click')
   getMenuItem(this.wrapper.instance().menuContent, 'Unpublished Assignments').click()
@@ -357,7 +357,7 @@ test('onSelectShowUnpublishedAssignment is called when selected', function () {
 QUnit.module('ViewOptionsMenu - show student last and first names separately', {
   mountViewOptionsMenu({
     showSeparateFirstLastNames = true,
-    allowShowSeparateFirstLastNames = true
+    allowShowSeparateFirstLastNames = true,
   } = {}) {
     const props = defaultProps()
     return mount(
@@ -373,7 +373,7 @@ QUnit.module('ViewOptionsMenu - show student last and first names separately', {
     if (this.wrapper) {
       this.wrapper.unmount()
     }
-  }
+  },
 })
 
 test('Split student names is not show shown when allowShowSeparateFirstLastNames is false', function () {
@@ -413,10 +413,10 @@ QUnit.module('ViewOptionsMenu - Column Sorting', {
         onSortByPointsAscending: sinon.stub(),
         onSortByPointsDescending: sinon.stub(),
         onSortByModuleAscending: sinon.stub(),
-        onSortByModuleDescending: sinon.stub()
-      }
+        onSortByModuleDescending: sinon.stub(),
+      },
     }
-  }
+  },
 })
 
 test('Default Order is selected when criterion is default and direction is ascending', function () {
@@ -679,7 +679,7 @@ QUnit.module('ViewOptionsMenu - Statuses')
 test('clicking Statuses calls onSelectShowStatusesModal', () => {
   const props = {
     ...defaultProps(),
-    onSelectShowStatusesModal: sinon.stub()
+    onSelectShowStatusesModal: sinon.stub(),
   }
   const wrapper = mountAndOpenOptions(props)
   getMenuItem(wrapper.instance().menuContent, 'Statuses…').click()

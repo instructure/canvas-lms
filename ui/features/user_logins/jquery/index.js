@@ -22,11 +22,12 @@ import ReactDOM from 'react-dom'
 import SuspendedIcon from '../react/SuspendedIcon'
 import $ from 'jquery'
 import Pseudonym from '@canvas/pseudonyms/backbone/models/Pseudonym.coffee'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
 import 'jqueryui/dialog'
 import '@canvas/util/jquery/fixDialogButtons'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf */
 import '@canvas/util/templateData'
+import '../react/externalIdFields'
 
 const I18n = useI18nScope('user_logins')
 
@@ -98,10 +99,6 @@ $(function () {
     })
     .delegate('.edit_pseudonym_link', 'click', function (event) {
       event.preventDefault()
-      const $sis_row = $form.find('.sis_user_id')
-      const $integration_id_row = $form.find('.integration_id')
-      $sis_row.hide()
-      $integration_id_row.hide()
       $form.attr('action', $(this).attr('rel')).attr('method', 'PUT')
       const data = $(this)
         .parents('.login')
@@ -110,14 +107,17 @@ $(function () {
         })
       data.password = ''
       data.password_confirmation = ''
-      $form.fillFormData(data, {object_name: 'pseudonym'})
-      if (data.can_edit_sis_user_id === 'true') {
-        $sis_row.show()
-        $integration_id_row.show()
-      } else {
-        $sis_row.remove()
-        $integration_id_row.remove()
-      }
+      $form.fillFormData(
+        {
+          unique_id: data.unique_id
+        },
+        {object_name: 'pseudonym'}
+      )
+      window.canvas_pseudonyms.jqInterface.onEdit({
+        canEditSisUserId: data.can_edit_sis_user_id === 'true',
+        integrationId: data.integration_id,
+        sisUserId: data.sis_user_id
+      })
       const passwordable = $(this).parents('.links').hasClass('passwordable')
       const delegated = passwordable && $(this).parents('.links').hasClass('delegated-auth')
       $form.toggleClass('passwordable', passwordable)
@@ -138,6 +138,7 @@ $(function () {
           ) {
             $form.data('unique_id_text').parents('.login').remove()
           }
+          window.canvas_pseudonyms.jqInterface.onCancel()
         }
       })
       $form

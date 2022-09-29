@@ -38,11 +38,11 @@ type State = {
 
 export default class StudentFirstNameColumnHeader extends ColumnHeader<Props, State> {
   static propTypes = {
-    ...ColumnHeader.propTypes
+    ...ColumnHeader.propTypes,
   }
 
   static defaultProps = {
-    ...ColumnHeader.defaultProps
+    ...ColumnHeader.defaultProps,
   }
 
   render() {

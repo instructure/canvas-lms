@@ -39,8 +39,8 @@ it("pulls everyone else's dates from the assignment", () => {
     unlockAt: aUnlockAt,
     lockAt: aLockAt,
     assignmentOverrides: {
-      nodes: [override]
-    }
+      nodes: [override],
+    },
   })
 
   const {getByText, getAllByText} = render(

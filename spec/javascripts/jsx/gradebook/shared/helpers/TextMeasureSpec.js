@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TextMeasure from 'ui/features/gradebook/react/shared/helpers/TextMeasure'
+import getTextWidth from 'ui/features/gradebook/react/shared/helpers/TextMeasure'
 
 QUnit.module('TextMeasure', hooks => {
   let $fixture
@@ -32,32 +32,32 @@ QUnit.module('TextMeasure', hooks => {
     $fixture.remove()
   })
 
-  QUnit.module('getWidth', () => {
+  QUnit.module('getTextWidth', () => {
     test('returns a numerical width for the given text', () => {
-      const width = TextMeasure.getWidth('example')
+      const width = getTextWidth('example')
       equal(typeof width, 'number')
     })
 
     test('returns integers', () => {
-      const width = TextMeasure.getWidth('example')
+      const width = getTextWidth('example')
       strictEqual(width, Math.floor(width))
     })
 
     test('returns larger numbers for wider text', () => {
       const orderedWords = ['a', 'aa', 'aaa']
-      const orderedWidths = ['aaa', 'a', 'aa'].map(TextMeasure.getWidth).sort()
-      deepEqual(orderedWidths, orderedWords.map(TextMeasure.getWidth))
+      const orderedWidths = ['aaa', 'a', 'aa'].map(getTextWidth).sort()
+      deepEqual(orderedWidths, orderedWords.map(getTextWidth))
     })
 
     test('creates a "text-measure" element attached to the "content" element', () => {
-      TextMeasure.getWidth('example')
+      getTextWidth('example')
       const $textMeasure = document.getElementById('text-measure')
       equal($textMeasure.parentElement, document.getElementById('content'))
     })
 
     test('creates only one "text-measure" element', () => {
-      TextMeasure.getWidth('example')
-      TextMeasure.getWidth('sample')
+      getTextWidth('example')
+      getTextWidth('sample')
       strictEqual(document.getElementById('content').children.length, 1)
     })
   })

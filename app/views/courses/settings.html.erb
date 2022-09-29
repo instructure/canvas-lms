@@ -439,12 +439,21 @@
             <div class="panel-border">
               <%= f.check_box :custom_course_visibility %>
               <%= f.label :custom_course_visibility, :en => "Customize" %>
-              <% @context.customize_course_visibility_list.map do |setting, options| %>
-                <div id="customize_course_visibility">
-                  <%= f.label :syllabus_visibility_option, options[:setting], :class => "syllabus-visibility" %>
-                  <%= f.select :syllabus_visibility_option, @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] }, {}, {:id => options[:setting], "aria-label" => t("Syllabus Visibility Options")} %>
-                </div>
-              <% end %>
+              <div id="customize_course_visibility">
+                <% Course::CUSTOMIZABLE_PERMISSIONS.map do |setting, options| %>
+                  <%= f.label :"#{setting}_visibility_option", options[:setting], :class => "#{setting}-visibility" %>
+                  <%= f.select(
+                    :"#{setting}_visibility_option",
+                    @context.course_visibility_options.map{ |id, attrs| [attrs[:setting], "#{id}"] },
+                    {},
+                    {
+                      :id => options[:setting],
+                      "aria-label" => t(:visibility_option, "%{type} Visibility Options", type: options[:setting]),
+                      "data-flexibility" => options[:flex]
+                    }
+                  ) %>
+                <% end %>
+              </div>
             </div>
             <br/>
             <div class="public_options checkbox-flex-container">

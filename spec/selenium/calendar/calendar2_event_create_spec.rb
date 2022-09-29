@@ -53,6 +53,16 @@ describe "calendar2" do
         expect(edit_event_dialog).to be_displayed
       end
 
+      it "displays a flash alert if no calendar is selected when trying to create an event" do
+        @user.set_preference(:selected_calendar_contexts, "[]")
+        get "/calendar2"
+        wait_for_ajaximations
+
+        f("#create_new_event_link").click
+        flash_holder = f(".flashalert-message")
+        expect(flash_holder.text).to include("You must select at least one calendar to create an event.")
+      end
+
       it "creates an event with a location name" do
         event_name = "event with location"
         create_middle_day_event(event_name, with_location: true)

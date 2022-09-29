@@ -30,12 +30,12 @@ AllowedAttempts.propTypes = {
   attempts: number, // not required, may be null to specify a blank value
   locked: bool,
   onLimitedChange: func.isRequired,
-  onAttemptsChange: func.isRequired
+  onAttemptsChange: func.isRequired,
 }
 
 AllowedAttempts.defaultProps = {
   attempts: -1,
-  locked: false
+  locked: false,
 }
 
 export default function AllowedAttempts({
@@ -43,7 +43,7 @@ export default function AllowedAttempts({
   attempts,
   locked,
   onLimitedChange,
-  onAttemptsChange
+  onAttemptsChange,
 }) {
   const selectIdRef = useRef(shortid())
   const limitedValue = limited ? 'limited' : 'unlimited'

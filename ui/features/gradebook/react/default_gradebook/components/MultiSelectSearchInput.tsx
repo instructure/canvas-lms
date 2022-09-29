@@ -60,15 +60,15 @@ MultiSelectSearchInput.propTypes = {
   options: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,
-      text: PropTypes.string.isRequired
+      text: PropTypes.string.isRequired,
     })
   ).isRequired,
   onChange: PropTypes.func.isRequired,
-  placeholder: PropTypes.string.isRequired
+  placeholder: PropTypes.string.isRequired,
 }
 
 MultiSelectSearchInput.defaultProps = {
-  customMatcher: null
+  customMatcher: null,
 }
 
 export default MultiSelectSearchInput

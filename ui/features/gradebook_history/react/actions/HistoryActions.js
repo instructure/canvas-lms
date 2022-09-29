@@ -54,7 +54,7 @@ function formatHistoryItems(data) {
         anonymousGrading: assignments[item.links.assignment].anonymous_grading,
         gradingType: assignments[item.links.assignment].grading_type,
         muted: assignments[item.links.assignment].muted,
-        name: assignments[item.links.assignment].name
+        name: assignments[item.links.assignment].name,
       }
     } else {
       assignment = {}
@@ -76,14 +76,14 @@ function formatHistoryItems(data) {
         ? item.points_possible_before.toString()
         : '–',
       pointsPossibleCurrent: pointsPossibleCurrent(assignments, item),
-      student: users[item.links.student] ? users[item.links.student].name : ''
+      student: users[item.links.student] ? users[item.links.student].name : '',
     }
   })
 }
 
 export function fetchHistoryStart() {
   return {
-    type: FETCH_HISTORY_START
+    type: FETCH_HISTORY_START,
   }
 }
 
@@ -92,20 +92,20 @@ export function fetchHistorySuccess({events, linked: {assignments, users}}, {lin
     type: FETCH_HISTORY_SUCCESS,
     payload: {
       items: formatHistoryItems({events, assignments, users}),
-      link: parseLinkHeader(link).next
-    }
+      link: parseLinkHeader(link).next,
+    },
   }
 }
 
 export function fetchHistoryFailure() {
   return {
-    type: FETCH_HISTORY_FAILURE
+    type: FETCH_HISTORY_FAILURE,
   }
 }
 
 export function fetchHistoryNextPageStart() {
   return {
-    type: FETCH_HISTORY_NEXT_PAGE_START
+    type: FETCH_HISTORY_NEXT_PAGE_START,
   }
 }
 
@@ -114,13 +114,13 @@ export function fetchHistoryNextPageSuccess({events, linked: {assignments, users
     type: FETCH_HISTORY_NEXT_PAGE_SUCCESS,
     payload: {
       items: formatHistoryItems({events, assignments, users}),
-      link: parseLinkHeader(link).next
-    }
+      link: parseLinkHeader(link).next,
+    },
   }
 }
 
 export function fetchHistoryNextPageFailure() {
   return {
-    type: FETCH_HISTORY_NEXT_PAGE_FAILURE
+    type: FETCH_HISTORY_NEXT_PAGE_FAILURE,
   }
 }

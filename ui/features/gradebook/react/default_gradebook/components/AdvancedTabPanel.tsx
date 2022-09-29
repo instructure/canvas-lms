@@ -45,7 +45,7 @@ export default function AdvancedTabPanel(props) {
 
 AdvancedTabPanel.propTypes = {
   courseSettings: shape({
-    allowFinalGradeOverride: bool.isRequired
+    allowFinalGradeOverride: bool.isRequired,
   }).isRequired,
-  onCourseSettingsChange: func.isRequired
+  onCourseSettingsChange: func.isRequired,
 }

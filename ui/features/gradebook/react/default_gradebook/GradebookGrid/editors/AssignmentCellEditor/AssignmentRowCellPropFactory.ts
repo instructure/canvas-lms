@@ -17,8 +17,9 @@
  */
 
 import {extractSimilarityInfo} from '@canvas/grading/SubmissionHelper'
+import type Gradebook from '../../../gradebook'
 
-function isTrayOpen(gradebook, student, assignment) {
+function isTrayOpen(gradebook: Gradebook, student, assignment) {
   const {open, studentId, assignmentId} = gradebook.getSubmissionTrayState()
   return open && studentId === student.id && assignmentId === assignment.id
 }
@@ -31,7 +32,7 @@ function similarityInfoToShow(submission) {
 
     return {
       similarityScore: similarity_score,
-      status
+      status,
     }
   }
 
@@ -39,7 +40,9 @@ function similarityInfoToShow(submission) {
 }
 
 export default class AssignmentRowCellPropFactory {
-  constructor(gradebook) {
+  gradebook: Gradebook
+
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
@@ -63,7 +66,7 @@ export default class AssignmentRowCellPropFactory {
       rawGrade: submission.rawGrade,
       score: submission.score,
       similarityInfo,
-      userId: student.id
+      userId: student.id,
     }
 
     const pendingGradeInfo = this.gradebook.getPendingGradeInfo(cleanSubmission)
@@ -71,7 +74,7 @@ export default class AssignmentRowCellPropFactory {
     return {
       assignment: {
         id: assignment.id,
-        pointsPossible: assignment.points_possible
+        pointsPossible: assignment.points_possible,
       },
 
       enterGradesAs: this.gradebook.getEnterGradesAsSetting(assignment.id),
@@ -88,7 +91,7 @@ export default class AssignmentRowCellPropFactory {
       pendingGradeInfo,
       student,
       submission: cleanSubmission,
-      submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid
+      submissionIsUpdating: !!pendingGradeInfo && pendingGradeInfo.valid,
     }
   }
 }

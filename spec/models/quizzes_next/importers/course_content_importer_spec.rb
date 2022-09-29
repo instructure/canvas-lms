@@ -24,7 +24,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
     described_class.new(data, migration)
   end
 
-  context ".import_content" do
+  describe ".import_content" do
     let(:course) { course_factory }
     let(:migration) { ContentMigration.create!(context: course) }
     let!(:quiz01) do
@@ -57,8 +57,24 @@ describe QuizzesNext::Importers::CourseContentImporter do
         title: practice_quiz_title
       )
     end
+    let!(:survey_quiz) do
+      Quizzes::Quiz.create(
+        context: course,
+        quiz_type: "graded_survey",
+        title: survey_quiz_title
+      )
+    end
+    let!(:ungraded_survey) do
+      Quizzes::Quiz.create(
+        context: course,
+        quiz_type: "survey",
+        title: ungraded_survey_title
+      )
+    end
 
     let(:practice_quiz_title) { SecureRandom.hex(40) }
+    let(:survey_quiz_title) { SecureRandom.hex(40) }
+    let(:ungraded_survey_title) { SecureRandom.hex(40) }
 
     let(:data) { double }
 
@@ -66,7 +82,7 @@ describe QuizzesNext::Importers::CourseContentImporter do
       allow(migration)
         .to receive(:imported_migration_items_by_class)
         .with(Quizzes::Quiz)
-        .and_return([quiz01, quiz02, quiz03, practice_quiz])
+        .and_return([quiz01, quiz02, quiz03, practice_quiz, survey_quiz, ungraded_survey])
     end
 
     it "makes lti assignments" do
@@ -77,16 +93,22 @@ describe QuizzesNext::Importers::CourseContentImporter do
         expect(migration.workflow_state).not_to eq("imported")
         original_setup_assets_imported.call(lti_assignment_quiz_set)
       end
-      expect { importer.import_content(double) }.to change(Assignment, :count).by(2)
+      expect { importer.import_content(double) }.to change(Assignment, :count).by(3)
       expect(migration.workflow_state).to eq("imported")
       practice_assginment = Assignment.find_by(title: practice_quiz_title)
+      survey_assignment = Assignment.find_by(title: survey_quiz_title)
+      ungraded_survey_assignment = Assignment.find_by(title: ungraded_survey_title)
       expect(practice_assginment).not_to be_nil
+      expect(survey_assignment).not_to be_nil
+      expect(ungraded_survey_assignment).not_to be_nil
       expect(migration.migration_settings[:imported_assets][:lti_assignment_quiz_set])
         .to eq([
                  [assignment01.global_id, quiz01.global_id],
                  [assignment02.global_id, quiz02.global_id],
                  [quiz03.assignment.global_id, quiz03.global_id],
-                 [practice_assginment.global_id, practice_quiz.global_id]
+                 [practice_assginment.global_id, practice_quiz.global_id],
+                 [survey_assignment.global_id, survey_quiz.global_id],
+                 [ungraded_survey_assignment.global_id, ungraded_survey.global_id]
                ])
       expect(practice_assginment.omit_from_final_grade).to be(true)
     end

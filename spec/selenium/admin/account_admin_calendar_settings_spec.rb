@@ -52,17 +52,16 @@ describe "Account Calendar Settings" do
     it "shows multiple accounts and subaccounts with checkboxes" do
       get("/accounts/#{account.id}/calendar_settings")
 
-      expect(account_folder(account.name, 3)).to be_displayed
-      expect(account_folder(@sub1_account.name, 2)).to be_displayed
-      expect(element_exists?(account_folder_selector(@sub2_account.name, 1))).to be_falsey
+      expect(account_folder(account.id)).to be_displayed
+      expect(account_folder(@sub1_account.id)).to be_displayed
+      expect(element_exists?(account_folder_selector(@sub2_account.id))).to be_falsey
 
-      default_account_checkboxes = account_checkboxes(account.name, 3)
-
+      default_account_checkboxes = account_checkboxes(account.id)
       expect(default_account_checkboxes[0]).to include_text(account.name)
       expect(default_account_checkboxes[1]).to include_text(@sub2_account.name)
 
-      click_account_folder(@sub1_account.name, 2)
-      sub1_account_checkboxes = account_checkboxes(@sub1_account.name, 2)
+      click_account_folder(@sub1_account.id)
+      sub1_account_checkboxes = account_checkboxes(@sub1_account.id)
 
       expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
       expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
@@ -71,18 +70,18 @@ describe "Account Calendar Settings" do
     it "expands and hides accounts section" do
       get("/accounts/#{account.id}/calendar_settings")
 
-      click_account_folder(account.name, 3)
-      expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_falsey
-      click_account_folder(account.name, 3)
-      expect(element_exists?(account_folder_selector(@sub1_account.name, 2))).to be_truthy
+      click_account_folder(account.id)
+      expect(element_exists?(account_folder_selector(@sub1_account.id))).to be_falsey
+      click_account_folder(account.id)
+      expect(element_exists?(account_folder_selector(@sub1_account.id))).to be_truthy
     end
 
-    it "enables the calendar in the list when clicked and applied", ignore_js_errors: true do
+    it "enables the calendar in the list when clicked and applied" do
       get("/accounts/#{account.id}/calendar_settings")
 
       expect(apply_changes_button).to be_disabled
 
-      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+      click_account_checkbox(account_checkboxes(account.id)[1])
 
       expect(apply_changes_button).to be_enabled
 
@@ -99,7 +98,7 @@ describe "Account Calendar Settings" do
 
       expect(apply_changes_button).to be_disabled
 
-      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+      click_account_checkbox(account_checkboxes(account.id)[1])
 
       expect(apply_changes_button).to be_enabled
 
@@ -114,11 +113,11 @@ describe "Account Calendar Settings" do
 
       expect(calendars_selected_text).to include_text("No account calendars selected")
 
-      click_account_checkbox(account_checkboxes(account.name, 3)[0])
+      click_account_checkbox(account_checkboxes(account.id)[0])
 
       expect(calendars_selected_text).to include_text("1 Account calendar selected")
 
-      click_account_checkbox(account_checkboxes(account.name, 3)[1])
+      click_account_checkbox(account_checkboxes(account.id)[1])
 
       expect(calendars_selected_text).to include_text("2 Account calendars selected")
     end

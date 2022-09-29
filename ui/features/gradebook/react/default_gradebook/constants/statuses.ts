@@ -29,5 +29,5 @@ export const statusesTitleMap = {
   resubmitted: I18n.t('Resubmitted'),
   dropped: I18n.t('Dropped'),
   excused: I18n.t('Excused'),
-  extended: I18n.t('Extended')
+  extended: I18n.t('Extended'),
 }

@@ -26,29 +26,29 @@ export default {
     assignment: {
       anonymizeStudents: false,
       gradingType: ['gpa_scale', 'letter_grade', 'not_graded', 'pass_fail', 'points', 'percent'],
-      pointsPossible: 100
+      pointsPossible: 100,
     },
     disabled: false,
     enterGradesAs: 'points',
     gradingScheme: [
       ['A', 90],
       ['B', 80],
-      ['C', 70]
+      ['C', 70],
     ],
     onSubmissionUpdate: () => {},
     pendingGradeInfo: {
       excused: false,
       grade: '95',
-      valid: true
+      valid: true,
     },
     submission: {
       enteredGrade: 'A',
       enteredScore: 95,
       excused: false,
-      id: '1'
+      id: '1',
     },
-    submissionUpdating: false
-  }
+    submissionUpdating: false,
+  },
 }
 
 const Template = args => <GradeInput {...args} />

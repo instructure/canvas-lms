@@ -18,6 +18,9 @@
 
 import {chunk} from 'lodash'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+import type PerformanceControls from '../PerformanceControls'
 
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 
@@ -50,34 +53,42 @@ const submissionsParams = {
     'submitted_at',
     'url',
     'user_id',
-    'workflow_state'
-  ]
+    'workflow_state',
+  ],
 }
 
-function flashStudentLoadError() {
+function flashStudentLoadError(): void {
   showFlashAlert({
     message: I18n.t('There was a problem loading students.'),
-    type: 'error'
+    type: 'error',
+    err: null,
   })
 }
 
-function flashSubmissionLoadError() {
+function flashSubmissionLoadError(): void {
   showFlashAlert({
     message: I18n.t('There was a problem loading submissions.'),
-    type: 'error'
+    type: 'error',
+    err: null,
   })
 }
 
 function ignoreFailure() {}
 
-function getStudentsChunk(courseId, studentIds, options) {
+function getStudentsChunk(
+  courseId: string,
+  studentIds: string[],
+  options: {
+    dispatch: RequestDispatch
+  }
+) {
   const url = `/api/v1/courses/${courseId}/users`
   const params = {
     enrollment_state: ['active', 'completed', 'inactive', 'invited'],
     enrollment_type: ['student', 'student_view'],
     include: ['avatar_url', 'enrollments', 'group_ids', 'last_name', 'first_name'],
     per_page: studentIds.length,
-    user_ids: studentIds
+    user_ids: studentIds,
   }
 
   return options.dispatch.getJSON(url, params)
@@ -99,7 +110,15 @@ function getSubmissionsForStudents(options, studentIds, allEnqueued, dispatch) {
   })
 }
 
-function getContentForStudentIdChunk(studentIds, options) {
+function getContentForStudentIdChunk(
+  studentIds: string[],
+  options: {
+    dispatch: RequestDispatch
+    gradebook: Gradebook
+    submissionsChunkSize: number
+    courseId: string
+  }
+) {
   const {dispatch, gradebook, submissionsChunkSize} = options
 
   let resolveEnqueued
@@ -112,7 +131,7 @@ function getContentForStudentIdChunk(studentIds, options) {
   )
 
   const submissionRequestChunks = chunk(studentIds, submissionsChunkSize)
-  const submissionRequests = []
+  const submissionRequests: Promise<void>[] = []
 
   submissionRequestChunks.forEach(submissionRequestChunkIds => {
     let submissions
@@ -140,18 +159,32 @@ function getContentForStudentIdChunk(studentIds, options) {
   return {
     allEnqueued,
     studentRequest: studentRequest.catch(flashStudentLoadError), // ignore failed student requests
-    submissionRequests
+    submissionRequests,
   }
 }
 
 export default class StudentContentDataLoader {
-  constructor({dispatch, gradebook, performanceControls}) {
+  _dispatch: RequestDispatch
+
+  _gradebook: Gradebook
+
+  _performanceControls: PerformanceControls
+
+  constructor({
+    dispatch,
+    gradebook,
+    performanceControls,
+  }: {
+    dispatch: RequestDispatch
+    gradebook: Gradebook
+    performanceControls: PerformanceControls
+  }) {
     this._dispatch = dispatch
     this._gradebook = gradebook
     this._performanceControls = performanceControls
   }
 
-  load(studentIds) {
+  load(studentIds: string[]) {
     const gradebook = this._gradebook
 
     if (studentIds.length === 0) {
@@ -165,21 +198,25 @@ export default class StudentContentDataLoader {
       dispatch: this._dispatch,
       gradebook,
       submissionsChunkSize: this._performanceControls.submissionsChunkSize,
-      submissionsPerPage: this._performanceControls.submissionsPerPage
+      submissionsPerPage: this._performanceControls.submissionsPerPage,
     }
 
-    const studentRequests = []
-    const submissionRequests = []
-    const studentIdChunks = chunk(studentIds, this._performanceControls.studentsChunkSize)
+    const studentRequests: Promise<void>[] = []
+    const submissionRequests: Promise<void>[] = []
+    const studentIdChunks: string[][] = chunk(
+      studentIds,
+      this._performanceControls.studentsChunkSize
+    )
 
     // wait for all chunk requests to have been enqueued
     return new Promise<void>(resolve => {
       const getNextChunk = () => {
         if (studentIdChunks.length) {
-          const nextChunkIds = studentIdChunks.shift()
+          const nextChunkIds = studentIdChunks.shift() as string[]
           const chunkRequestDatum = getContentForStudentIdChunk(nextChunkIds, options)
 
           // when the current chunk requests are all enqueued
+          // eslint-disable-next-line promise/catch-or-return
           chunkRequestDatum.allEnqueued.then(() => {
             submissionRequests.push(...chunkRequestDatum.submissionRequests)
             studentRequests.push(chunkRequestDatum.studentRequest)
@@ -194,8 +231,9 @@ export default class StudentContentDataLoader {
     })
       .then(() => {
         const {courseSettings, finalGradeOverrides} = gradebook
+
         let finalGradeOverridesRequest
-        if (courseSettings.allowFinalGradeOverride) {
+        if (courseSettings.allowFinalGradeOverride && finalGradeOverrides) {
           finalGradeOverridesRequest = finalGradeOverrides.loadFinalGradeOverrides()
         }
 

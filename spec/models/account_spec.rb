@@ -736,7 +736,7 @@ describe Account do
       hash[k][:user] = user
     end
 
-    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms]
+    limited_access = %i[read read_as_admin manage update delete read_outcomes read_terms read_files]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
     conditional_access += [:view_bounced_emails, :view_account_calendar_details] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)

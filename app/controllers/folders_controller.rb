@@ -117,7 +117,7 @@ class FoldersController < ApplicationController
   before_action :require_context, except: %i[api_index show api_destroy update create create_file copy_folder copy_file]
 
   def index
-    if authorized_action(@context, @current_user, :read)
+    if authorized_action(@context, @current_user, :read_files)
       render json: Folder.root_folders(@context).map { |f| f.as_json(permissions: { user: @current_user, session: session }) }
     end
   end
@@ -168,7 +168,7 @@ class FoldersController < ApplicationController
   #
   # @returns [Folder]
   def list_all_folders
-    if authorized_action(@context, @current_user, :read)
+    if authorized_action(@context, @current_user, :read_files)
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
 
       url = named_context_url(@context, :api_v1_context_folders_url, include_host: true)
@@ -205,7 +205,7 @@ class FoldersController < ApplicationController
   # @returns [Folder]
   def resolve_path
     # as long as one granted permission holds true, in most cases :read, user is authorized
-    if authorized_action(@context, @current_user, [:read, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
+    if authorized_action(@context, @current_user, [:read_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       can_view_hidden_files = can_view_hidden_files?(@context, @current_user, session)
       folders = Folder.resolve_path(@context, params[:full_path], can_view_hidden_files)
       raise ActiveRecord::RecordNotFound if folders.blank?
@@ -661,7 +661,7 @@ class FoldersController < ApplicationController
   # @returns Folder
   def media_folder
     require_context
-    if authorized_action(@context, @current_user, :read)
+    if authorized_action(@context, @current_user, :read_files)
       folder_context =
         if @context.grants_any_right?(@current_user, session, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
           @context

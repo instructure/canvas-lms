@@ -238,6 +238,10 @@ class Rubric < ActiveRecord::Base
     (data || []).filter_map { |c| c[:learning_outcome_id] }.map(&:to_i).uniq
   end
 
+  def outcome_friendly_descriptions
+    OutcomeFriendlyDescription.where(learning_outcome_id: data_outcome_ids)
+  end
+
   def criteria_object
     OpenObject.process(data)
   end

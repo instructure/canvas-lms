@@ -33,11 +33,11 @@ ContentTabs.propTypes = {
   onChangeAssignment: func.isRequired,
   onValidate: func.isRequired,
   invalidMessage: func.isRequired,
-  readOnly: bool
+  readOnly: bool,
 }
 
 ContentTabs.defaultProps = {
-  readOnly: false
+  readOnly: false,
 }
 
 export default function ContentTabs(props) {

@@ -33,8 +33,8 @@ function historyEvent() {
       course: 1,
       grader: 1,
       page_view: null,
-      student: idCounter
-    }
+      student: idCounter,
+    },
   }
 }
 
@@ -45,7 +45,7 @@ function historyEventArray() {
 function user() {
   return {
     id: `${++idCounter}`,
-    name: `User #${idCounter}`
+    name: `User #${idCounter}`,
   }
 }
 
@@ -56,7 +56,7 @@ function userArray() {
 function assignment() {
   return {
     id: `${++idCounter}`,
-    name: `Assignment #${idCounter}`
+    name: `Assignment #${idCounter}`,
   }
 }
 
@@ -84,24 +84,23 @@ function historyResponse() {
         assignments: assignmentArray(),
         courses: [],
         page_views: [],
-        users: userArray()
+        users: userArray(),
       },
-      links: {}
+      links: {},
     },
     headers: {
       'content-type': 'application/json; charset=utf-8',
       date: 'Thu, 01 Jun 2017 00:09:21 GMT',
-      link:
-        '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
-      status: '304 Not Modified'
-    }
+      link: '<http://example.com/3?&page=first>; rel="current",<http://example.com/3?&page=bookmark:asdf>; rel="next"',
+      status: '304 Not Modified',
+    },
   }
 }
 
 function timeFrame() {
   return {
     from: '2017-05-20T00:00:00-05:00',
-    to: '2017-05-25T00:00:00-05:00'
+    to: '2017-05-25T00:00:00-05:00',
   }
 }
 
@@ -114,5 +113,5 @@ export default {
   assignmentArray,
   user,
   userArray,
-  userMap
+  userMap,
 }

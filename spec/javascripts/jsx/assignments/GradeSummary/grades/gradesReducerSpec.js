@@ -28,14 +28,14 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
       assignment: {
         courseId: '1201',
         id: '2301',
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
         {graderId: '1102', graderName: 'Mr. Keating'},
         {graderId: '1103', graderName: 'Mrs. Krabappel'},
-        {graderId: '1104', graderName: 'Mr. Feeny'}
-      ]
+        {graderId: '1104', graderName: 'Mr. Feeny'},
+      ],
     })
 
     provisionalGrades = [
@@ -45,7 +45,7 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
         id: '4601',
         score: 10,
         selected: true,
-        studentId: '1111'
+        studentId: '1111',
       },
       {
         grade: 'B',
@@ -53,7 +53,7 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
         id: '4602',
         score: 9,
         selected: false,
-        studentId: '1112'
+        studentId: '1112',
       },
       {
         grade: 'C',
@@ -61,7 +61,7 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
         id: '4603',
         score: 8,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       },
       {
         grade: 'C',
@@ -69,8 +69,8 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
         id: '4604',
         score: 8,
         selected: false,
-        studentId: '1113'
-      }
+        studentId: '1113',
+      },
     ]
   })
 
@@ -277,7 +277,7 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
           id: '4601',
           score: 10,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         },
         {
           grade: 'B',
@@ -285,7 +285,7 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
           id: '4602',
           score: 9,
           selected: false,
-          studentId: '1112'
+          studentId: '1112',
         },
         {
           grade: 'C',
@@ -293,8 +293,8 @@ QUnit.module('GradeSummary gradesReducer()', suiteHooks => {
           id: '4603',
           score: 8,
           selected: false,
-          studentId: '1112'
-        }
+          studentId: '1112',
+        },
       ]
     })
 

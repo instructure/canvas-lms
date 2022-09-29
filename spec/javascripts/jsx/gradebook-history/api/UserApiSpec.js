@@ -24,21 +24,21 @@ QUnit.module('UserApi', {
     this.courseId = 525600
     this.getStub = sandbox.stub(axios, 'get').returns(
       Promise.resolve({
-        response: {}
+        response: {},
       })
     )
-  }
+  },
 })
 
-test('getUsersByName for graders searches by teachers and TAs in a course', function() {
+test('getUsersByName for graders searches by teachers and TAs in a course', function () {
   const searchTerm = 'Norval'
   const url = `/api/v1/courses/${this.courseId}/users`
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['teacher', 'ta'],
-      enrollment_state: []
-    }
+      enrollment_state: [],
+    },
   }
   const promise = UserApi.getUsersByName(this.courseId, 'graders', searchTerm)
 
@@ -49,15 +49,15 @@ test('getUsersByName for graders searches by teachers and TAs in a course', func
   })
 })
 
-test('getUsersByName for students searches by students', function() {
+test('getUsersByName for students searches by students', function () {
   const searchTerm = 'Norval'
   const url = `/api/v1/courses/${this.courseId}/users`
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
-      enrollment_state: []
-    }
+      enrollment_state: [],
+    },
   }
   const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm)
 
@@ -68,7 +68,7 @@ test('getUsersByName for students searches by students', function() {
   })
 })
 
-test('getUsersByName restricts results by enrollment state if specified', function() {
+test('getUsersByName restricts results by enrollment state if specified', function () {
   const searchTerm = 'Norval'
   const enrollmentState = ['completed']
   const url = `/api/v1/courses/${this.courseId}/users`
@@ -76,8 +76,8 @@ test('getUsersByName restricts results by enrollment state if specified', functi
     params: {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
-      enrollment_state: enrollmentState
-    }
+      enrollment_state: enrollmentState,
+    },
   }
   const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm, ['completed'])
 
@@ -88,15 +88,15 @@ test('getUsersByName restricts results by enrollment state if specified', functi
   })
 })
 
-test('getUsersByName does not restrict results by enrollment state if argument omitted', function() {
+test('getUsersByName does not restrict results by enrollment state if argument omitted', function () {
   const searchTerm = 'Norval'
   const url = `/api/v1/courses/${this.courseId}/users`
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
-      enrollment_state: []
-    }
+      enrollment_state: [],
+    },
   }
   const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm)
 
@@ -107,15 +107,15 @@ test('getUsersByName does not restrict results by enrollment state if argument o
   })
 })
 
-test('getUsersByName does not restrict results by enrollment state if passed an empty array', function() {
+test('getUsersByName does not restrict results by enrollment state if passed an empty array', function () {
   const searchTerm = 'Norval'
   const url = `/api/v1/courses/${this.courseId}/users`
   const params = {
     params: {
       search_term: searchTerm,
       enrollment_type: ['student', 'student_view'],
-      enrollment_state: []
-    }
+      enrollment_state: [],
+    },
   }
   const promise = UserApi.getUsersByName(this.courseId, 'students', searchTerm, [])
 
@@ -126,7 +126,7 @@ test('getUsersByName does not restrict results by enrollment state if passed an 
   })
 })
 
-test('getUsersNextPage makes a request with given url', function() {
+test('getUsersNextPage makes a request with given url', function () {
   const url = 'https://example.com/users?page=2'
   const promise = UserApi.getUsersNextPage(url)
 

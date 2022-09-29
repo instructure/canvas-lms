@@ -45,8 +45,12 @@ describe OutcomeResultResolverHelper do
     it "if there is a rubric result for that student, assignment, and outcome" do
       create_outcome
       create_alignment
-      create_learning_outcome_result @students[0], 1.0
+      lor = create_learning_outcome_result @students[0], 1.0
       authoritative_results = JSON.parse(authoritative_results_from_db)["results"]
+
+      # We cannot have two LORs for the same student, assignment, and outcome in the db
+      lor.workflow_state = "deleted"
+      lor.save!
 
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
@@ -57,9 +61,15 @@ describe OutcomeResultResolverHelper do
     it "if a rubric result exists for multiple students for the same assignment and outcome" do
       create_outcome
       create_alignment
-      create_learning_outcome_result @students[0], 1.0
-      create_learning_outcome_result @students[1], 1.0
+      lor1 = create_learning_outcome_result @students[0], 1.0
+      lor2 = create_learning_outcome_result @students[1], 1.0
       authoritative_results = JSON.parse(authoritative_results_from_db)["results"]
+
+      # We cannot have two LORs for the same student, assignment, and outcome in the db
+      lor1.workflow_state = "deleted"
+      lor1.save!
+      lor2.workflow_state = "deleted"
+      lor2.save!
 
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
@@ -71,9 +81,13 @@ describe OutcomeResultResolverHelper do
     it "for just one student if a rubric result exists for their assignment and outcome" do
       create_outcome
       create_alignment
-      create_learning_outcome_result @students[0], 1.0
+      lor = create_learning_outcome_result @students[0], 1.0
       create_learning_outcome_result @students[1], 1.0
       authoritative_results = JSON.parse(authoritative_results_from_db)["results"]
+
+      # We cannot have two LORs for the same student, assignment, and outcome in the db
+      lor.workflow_state = "deleted"
+      lor.save!
 
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0
@@ -88,8 +102,12 @@ describe OutcomeResultResolverHelper do
 
       create_outcome
       create_alignment
-      create_learning_outcome_result @students[0], 1.0
+      lor = create_learning_outcome_result @students[0], 1.0
       authoritative_results = JSON.parse(authoritative_results_from_db)["results"]
+
+      # We cannot have two LORs for the same student, assignment, and outcome in the db
+      lor.workflow_state = "deleted"
+      lor.save!
 
       create_alignment_with_rubric({ assignment: @assignment })
       create_learning_outcome_result_from_rubric @students[0], 1.0

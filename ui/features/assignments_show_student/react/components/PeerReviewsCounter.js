@@ -25,7 +25,7 @@ const I18n = useI18nScope('assignments_2')
 
 PeerReviewsCounter.propTypes = {
   current: number,
-  total: number
+  total: number,
 }
 
 export default function PeerReviewsCounter(props) {

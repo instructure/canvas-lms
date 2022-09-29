@@ -25,6 +25,8 @@ import {PREVIEW_WIDTH, PREVIEW_HEIGHT, BACKGROUND_SQUARE_SIZE} from './constants
 import {useMouseWheel} from './useMouseWheel'
 import {useKeyMouseEvents} from './useKeyMouseEvents'
 import checkerboardStyle from '../../../../shared/CheckerboardStyling'
+import {View} from '@instructure/ui-view'
+import {getBrowser} from '../../../../../getBrowser'
 
 /**
  * Remove the node contents and append the svg element.
@@ -73,54 +75,69 @@ export const Preview = ({settings, dispatch}) => {
     translateX: tempTranslateX,
     translateY: tempTranslateY,
     rotation,
-    scaleRatio: tempScaleRatio
+    scaleRatio: tempScaleRatio,
   })
+
+  // Clip is not supported in Safari until v16.
+  // It's needed here to prevent a strange screenreader
+  // behavior that makes the cropper look bad. 'hidden'
+  // suffices when clip is not available, although it's not perfect
+  // TODO: remove when Safari versions >= 16 are more commonplace
+  const {name, version} = getBrowser()
+  const overflow = name === 'Safari' && parseFloat(version) < 16 ? 'hidden' : 'clip'
 
   return (
     <div
-      id="cropper-preview"
-      ref={previewRef}
       style={{
-        display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        position: 'relative',
-        width: `${PREVIEW_WIDTH}px`,
-        height: `${PREVIEW_HEIGHT}px`,
-        top: 0,
-        left: 0,
-        overflow: 'hidden',
-        ...checkerboardStyle(BACKGROUND_SQUARE_SIZE)
+        overflow,
+        ...checkerboardStyle(BACKGROUND_SQUARE_SIZE),
       }}
-      onWheel={onWheelCallback}
     >
-      <img
-        src={image}
-        ref={imgRef}
-        alt={formatMessage('Image to crop')}
-        style={{
-          height: '100%',
-          objectFit: 'contain',
-          textAlign: 'center',
-          transform: transformValue
-        }}
-        onMouseDown={e => onMouseDownCallback(e, previewRef.current)}
-      />
-      <div
-        id="cropShapeContainer"
-        ref={shapeRef}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          pointerEvents: 'none'
-        }}
-      />
+      <View
+        as="div"
+        tabIndex={0}
+        id="cropper-preview"
+        ref={previewRef}
+        height={PREVIEW_HEIGHT}
+        width={PREVIEW_WIDTH}
+        position="relative"
+        focusPosition="inset"
+        insetInlineStart="0"
+        insetBlockStart="0"
+        textAlign="center"
+        shouldAnimateFocus={false}
+        onWheel={onWheelCallback}
+      >
+        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
+        <img
+          src={image}
+          ref={imgRef}
+          alt={formatMessage('Image to crop')}
+          style={{
+            height: '100%',
+            objectFit: 'contain',
+            textAlign: 'center',
+            transform: transformValue,
+          }}
+          onMouseDown={onMouseDownCallback}
+        />
+        <div
+          id="cropShapeContainer"
+          ref={shapeRef}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+          }}
+        />
+      </View>
     </div>
   )
 }
 
 Preview.propTypes = {
   settings: ImageCropperSettingsPropTypes.isRequired,
-  dispatch: PropTypes.func.isRequired
+  dispatch: PropTypes.func.isRequired,
 }

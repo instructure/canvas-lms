@@ -49,7 +49,7 @@ export default function useMonitorJobCompletion({progressUrl, pollingInterval = 
         message: await extractFetchErrorMessage(
           err,
           I18n.t('There was an error retrieving job progress')
-        )
+        ),
       })
     }
 
@@ -71,9 +71,7 @@ export default function useMonitorJobCompletion({progressUrl, pollingInterval = 
       setJobRunning(true)
       setJobSuccess(false)
       setJobErrors(null)
-      doFetchApi({path: progressUrl})
-        .then(interpretCompletionResponse)
-        .catch(reportFetchError)
+      doFetchApi({path: progressUrl}).then(interpretCompletionResponse).catch(reportFetchError)
     }
 
     // We really only want to start a polling session if the progressUrl changes, and not if just
@@ -104,6 +102,6 @@ export default function useMonitorJobCompletion({progressUrl, pollingInterval = 
     jobSuccess,
     setJobSuccess,
     jobErrors,
-    setJobErrors
+    setJobErrors,
   }
 }

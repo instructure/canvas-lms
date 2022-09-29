@@ -1039,6 +1039,48 @@ describe Attachment do
     end
   end
 
+  describe "computed_visibility_level" do
+    let_once(:user) { user_model }
+    let_once(:course) do
+      course_model
+      @course.offer
+      @course.update_attribute(:is_public, false)
+      @course
+    end
+    let_once(:student) do
+      course.enroll_student(user_model).accept
+      @user
+    end
+    let_once(:attachment) do
+      attachment_model(context: course)
+    end
+
+    it "always returns 'context' if the Course is not published" do
+      course.claim
+      expect(attachment.computed_visibility_level).to eq("context")
+      attachment.update!(visibility_level: "public")
+      expect(attachment.computed_visibility_level).to eq("context")
+    end
+
+    it "returns the Course setting if 'inherit'" do
+      attachment.update(visibility_level: "inherit")
+
+      course.apply_custom_visibility_configuration("files", "course")
+      course.save!
+      expect(attachment.computed_visibility_level).to eq("context")
+
+      course.apply_custom_visibility_configuration("files", "institution")
+      course.save!
+      attachment.reload
+      expect(attachment.computed_visibility_level).to eq("institution")
+
+      course.apply_custom_visibility_configuration("files", "public")
+      course.save!
+      attachment.reload
+      expect(attachment.computed_visibility_level).to eq("public")
+    end
+  end
+
   context "adheres_to_policy" do
     let_once(:user) { user_model }
     let_once(:course) do
@@ -1056,15 +1098,20 @@ describe Attachment do
     end
 
     it "does not allow unauthorized users to read files" do
-      a = attachment_model(context: course_model)
+      a = attachment_model(context: course_model, visibility_level: "context")
       @course.update_attribute(:is_public, false)
       expect(a.grants_right?(user, :read)).to eql(false)
     end
 
-    it "allows anonymous access for public contexts" do
-      a = attachment_model(context: course_model)
-      @course.update_attribute(:is_public, true)
+    it "disallows anonymous access for unpublished public contexts" do
+      a = attachment_model(context: course_model, visibility_level: "public")
       expect(a.grants_right?(user, :read)).to eql(false)
+    end
+
+    it "allows anonymous access for public contexts" do
+      a = attachment_model(context: course_model, visibility_level: "public")
+      @course.offer
+      expect(a.grants_right?(user, :read)).to eql(true)
     end
 
     it "allows students to read files" do

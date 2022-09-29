@@ -26,7 +26,10 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
 
   hooks.beforeEach(() => {
     props = {
-      availableModerators: [{name: 'John Doe', id: '923'}, {name: 'Jane Doe', id: '492'}],
+      availableModerators: [
+        {name: 'John Doe', id: '923'},
+        {name: 'Jane Doe', id: '492'},
+      ],
       finalGraderID: undefined,
       graderCommentsVisibleToGraders: true,
       graderNamesVisibleToFinalGrader: true,
@@ -37,7 +40,7 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
       availableGradersCount: 10,
       moderatedGradingEnabled: true,
       onGraderCommentsVisibleToGradersChange() {},
-      onModeratedGradingChange() {}
+      onModeratedGradingChange() {},
     }
   })
 
@@ -85,22 +88,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed moderatedGradingEnabled: false', () => {
       props.moderatedGradingEnabled = false
       mountComponent()
-      strictEqual(
-        moderatedGradingCheckbox()
-          .at(0)
-          .instance().checked,
-        false
-      )
+      strictEqual(moderatedGradingCheckbox().at(0).instance().checked, false)
     })
 
     test('renders a checked checkbox when passed moderatedGradingEnabled: true', () => {
       mountComponent()
-      strictEqual(
-        moderatedGradingCheckbox()
-          .at(0)
-          .instance().checked,
-        true
-      )
+      strictEqual(moderatedGradingCheckbox().at(0).instance().checked, true)
     })
 
     test('hides the moderated grading content when the checkbox is unchecked', () => {
@@ -147,22 +140,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed graderCommentsVisibleToGraders: false', () => {
       props.graderCommentsVisibleToGraders = false
       mountComponent()
-      strictEqual(
-        graderCommentsVisibleToGradersCheckbox()
-          .at(0)
-          .instance().checked,
-        false
-      )
+      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).instance().checked, false)
     })
 
     test('renders a checked checkbox when passed graderCommentsVisibleToGraders: true', () => {
       mountComponent()
-      strictEqual(
-        graderCommentsVisibleToGradersCheckbox()
-          .at(0)
-          .instance().checked,
-        true
-      )
+      strictEqual(graderCommentsVisibleToGradersCheckbox().at(0).instance().checked, true)
     })
   })
 
@@ -179,22 +162,12 @@ QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
     test('renders an unchecked checkbox when passed graderNamesVisibleToFinalGrader: false', () => {
       props.graderNamesVisibleToFinalGrader = false
       mountComponent()
-      strictEqual(
-        graderNamesVisibleToFinalGraderCheckbox()
-          .at(0)
-          .instance().checked,
-        false
-      )
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).instance().checked, false)
     })
 
     test('renders a checked checkbox for Moderated Grading when passed graderNamesVisibleToFinalGrader: true', () => {
       mountComponent()
-      strictEqual(
-        graderNamesVisibleToFinalGraderCheckbox()
-          .at(0)
-          .instance().checked,
-        true
-      )
+      strictEqual(graderNamesVisibleToFinalGraderCheckbox().at(0).instance().checked, true)
     })
   })
 })

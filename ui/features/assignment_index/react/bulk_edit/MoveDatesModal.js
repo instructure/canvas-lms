@@ -36,7 +36,7 @@ export default function MoveDatesModal({onShiftDays, onRemoveDates, onCancel, ..
   const [shiftDaysState, shiftDaysProps] = useNumberInputDriver({
     initialNumberValue: 1,
     minNumberValue: 1,
-    maxNumberValue: 999
+    maxNumberValue: 999,
   })
 
   const handleOk = useCallback(() => {

@@ -27,7 +27,7 @@ QUnit.module('GraderCommentVisibilityCheckbox', hooks => {
   hooks.beforeEach(() => {
     props = {
       checked: false,
-      onChange() {}
+      onChange() {},
     }
   })
 

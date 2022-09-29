@@ -25,7 +25,7 @@ import GenericErrorPage from '@canvas/generic-error-page'
 import ObserverOptions from '@canvas/observer-picker'
 import {
   getHandleChangeObservedUser,
-  autoFocusObserverPicker
+  autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
 import React from 'react'
 import ReactDOM from 'react-dom'

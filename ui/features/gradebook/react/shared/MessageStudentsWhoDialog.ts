@@ -24,7 +24,7 @@ const MessageStudentsWhoDialog = {
     const settings = messageStudentsWhoHelper.settings(assignment, students)
     settings.onClose = onClose
     window.messageStudents(settings)
-  }
+  },
 }
 
 export default MessageStudentsWhoDialog

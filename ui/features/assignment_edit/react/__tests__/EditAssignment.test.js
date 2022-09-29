@@ -32,7 +32,7 @@ describe('AnnotatedDocumentSelector', function () {
       props = {
         attachment: {name: filename},
         onSelect() {},
-        onRemove() {}
+        onRemove() {},
       }
     })
 
@@ -65,7 +65,7 @@ describe('AnnotatedDocumentSelector', function () {
       context_type: 'course',
       can_upload: true,
       locked_for_user: false,
-      parent_folder_id: null
+      parent_folder_id: null,
     }
 
     const files = [
@@ -74,15 +74,15 @@ describe('AnnotatedDocumentSelector', function () {
         display_name: 'thumbnail.jpg',
         folder_id: 1,
         thumbnail_url: 'thumbnail.jpg',
-        'content-type': 'text/html'
-      }
+        'content-type': 'text/html',
+      },
     ]
 
     beforeEach(function () {
       props = {
         attachment: null,
         onSelect() {},
-        onRemove() {}
+        onRemove() {},
       }
 
       window.ENV = {context_asset_string: 'courses_1'}
@@ -91,13 +91,13 @@ describe('AnnotatedDocumentSelector', function () {
       moxios.stubRequest('/api/v1/courses/1/folders/root', {
         status: 200,
         responseText: courseFolder,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
     })
 

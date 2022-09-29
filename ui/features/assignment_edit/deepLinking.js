@@ -53,7 +53,7 @@ function process_resource_link_attributes(content_item) {
     type: content_item.type,
     url: content_item.url,
     new_tab: content_item.new_tab,
-    custom_params: content_item.custom
+    custom_params: content_item.custom,
   }
 
   const existing_elements = {
@@ -63,7 +63,7 @@ function process_resource_link_attributes(content_item) {
     new_tab: document.querySelector('input#assignment_external_tool_tag_attributes_new_tab'),
     custom_params: document.querySelector(
       'input#assignment_external_tool_tag_attributes_custom_params'
-    )
+    ),
   }
 
   for (const [attribute, value] of Object.entries(received_attributes)) {

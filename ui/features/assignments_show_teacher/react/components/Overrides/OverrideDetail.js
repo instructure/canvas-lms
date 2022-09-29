@@ -30,11 +30,11 @@ export default class OverrideDetail extends React.Component {
     onChangeOverride: func.isRequired,
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   handleChangeDate = (which, value) => {

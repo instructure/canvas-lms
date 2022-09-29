@@ -41,11 +41,11 @@ const I18n = useI18nScope('assignments_2')
 export default class FilePreview extends Component {
   static propTypes = {
     submission: Submission.shape,
-    originalityReportsForA2: bool
+    originalityReportsForA2: bool,
   }
 
   state = {
-    selectedFile: 0
+    selectedFile: 0,
   }
 
   translateMimeClass(mimeClass) {
@@ -192,7 +192,7 @@ export default class FilePreview extends Component {
               ${theme.variables.spacing.medium}
               0
               ${theme.variables.spacing.medium}
-            `
+            `,
           }}
         >
           <Text size="large">{message}</Text>
@@ -206,7 +206,7 @@ export default class FilePreview extends Component {
       maxWidth: '1366px',
       height: '0',
       paddingBottom: '130%',
-      position: 'relative'
+      position: 'relative',
     }
 
     const iframeStyle = {
@@ -214,7 +214,7 @@ export default class FilePreview extends Component {
       width: '100%',
       height: '100%',
       position: 'absolute',
-      borderLeft: `1px solid ${theme.variables.colors.borderMedium}`
+      borderLeft: `1px solid ${theme.variables.colors.borderMedium}`,
     }
 
     const selectedFile = this.props.submission.attachments[this.state.selectedFile]
@@ -224,7 +224,7 @@ export default class FilePreview extends Component {
           style={{
             textAlign: 'center',
             padding: `${theme.variables.spacing.medium} 0 0 0`,
-            borderLeft: `1px solid ${theme.variables.colors.borderMedium}`
+            borderLeft: `1px solid ${theme.variables.colors.borderMedium}`,
           }}
         >
           <div style={{display: 'block'}}>

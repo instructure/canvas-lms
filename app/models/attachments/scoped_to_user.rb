@@ -32,9 +32,9 @@ module Attachments
       if can_view_hidden_files?(context, user)
         context.attachments.not_deleted
       else
-        context.attachments.visible.not_hidden.not_locked.where({
-                                                                  folder_id: Folder.all_visible_folder_ids(context)
-                                                                })
+        context.attachments.visible.not_hidden.not_locked.visible_to(user, context).where({
+                                                                                            folder_id: Folder.all_visible_folder_ids(context)
+                                                                                          })
       end
     end
 
@@ -42,7 +42,7 @@ module Attachments
       if can_view_hidden_files?(context, user)
         context.active_file_attachments
       else
-        context.visible_file_attachments.not_hidden.not_locked
+        context.visible_file_attachments.not_hidden.not_locked.visible_to(user, context.context)
       end
     end
   end

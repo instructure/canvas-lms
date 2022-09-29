@@ -26,14 +26,14 @@ import theme from '@instructure/canvas-theme'
 
 AddHorizontalRuleButton.propTypes = {
   onClick: func.isRequired,
-  label: string.isRequired
+  label: string.isRequired,
 }
 
 const addHorizontalRuleButtonStyle = {
   boxSizing: 'border-box',
   position: 'relative',
   height: theme.variables.forms.inputHeightMedium,
-  textAlign: 'center'
+  textAlign: 'center',
 }
 const layoutStyle = {
   boxSizing: 'border-box',
@@ -41,13 +41,13 @@ const layoutStyle = {
   width: '100%',
   left: 0,
   top: '50%',
-  transform: 'translateY(-50%)'
+  transform: 'translateY(-50%)',
 }
 const ruleStyle = {
   display: 'block',
   height: theme.variables.borders.widthSmall,
   color: theme.variables.colors.borderMedium,
-  margin: 0
+  margin: 0,
 }
 
 // a horizontal rule with a + icon button in the middle

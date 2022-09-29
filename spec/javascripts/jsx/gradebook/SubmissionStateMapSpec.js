@@ -25,14 +25,14 @@ import fakeENV from 'helpers/fakeENV'
 const studentWithoutSubmission = {
   id: '1',
   group_ids: ['1'],
-  sections: ['1']
+  sections: ['1'],
 }
 
 const studentWithSubmission = {
   id: '1',
   group_ids: ['1'],
   sections: ['1'],
-  assignment_1: {}
+  assignment_1: {},
 }
 
 const yesterday = moment(new Date()).subtract(1, 'day')
@@ -42,22 +42,22 @@ const baseAssignment = fromJS({
   id: '1',
   published: true,
   effectiveDueDates: {
-    1: {due_at: new Date(), grading_period_id: '2', in_closed_grading_period: true}
-  }
+    1: {due_at: new Date(), grading_period_id: '2', in_closed_grading_period: true},
+  },
 })
 const unpublishedAssignment = baseAssignment.merge({published: false})
 const anonymousMutedAssignment = baseAssignment.merge({
   anonymize_students: true,
   anonymous_grading: true,
-  muted: true
+  muted: true,
 })
 const moderatedAndGradesUnpublishedAssignment = baseAssignment.merge({
   moderated_grading: true,
-  grades_published: false
+  grades_published: false,
 })
 const hiddenFromStudent = baseAssignment.merge({
   only_visible_to_overrides: true,
-  assignment_visibility: []
+  assignment_visibility: [],
 })
 const hasGradingPeriodsAssignment = baseAssignment
 
@@ -65,7 +65,7 @@ function createMap(opts = {}) {
   const defaults = {
     hasGradingPeriods: false,
     selectedGradingPeriodID: '0',
-    isAdmin: false
+    isAdmin: false,
   }
 
   const params = {...defaults, ...opts}
@@ -84,12 +84,12 @@ QUnit.module('#setSubmissionCellState', () => {
   test('the submission state is locked if assignment is not published', () => {
     const assignment = {
       id: '1',
-      published: false
+      published: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, true)
   })
@@ -97,12 +97,12 @@ QUnit.module('#setSubmissionCellState', () => {
   test('the submission state has hideGrade set if assignment is not published', () => {
     const assignment = {
       id: '1',
-      published: false
+      published: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, true)
   })
@@ -112,12 +112,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       only_visible_to_overrides: true,
-      assignment_visibility: []
+      assignment_visibility: [],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, true)
   })
@@ -127,12 +127,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       only_visible_to_overrides: true,
-      assignment_visibility: []
+      assignment_visibility: [],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, true)
   })
@@ -141,12 +141,12 @@ QUnit.module('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: false
+      only_visible_to_overrides: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, false)
   })
@@ -155,12 +155,12 @@ QUnit.module('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      only_visible_to_overrides: false
+      only_visible_to_overrides: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, false)
   })
@@ -170,12 +170,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       only_visible_to_overrides: true,
-      assignment_visibility: ['2']
+      assignment_visibility: ['2'],
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, true)
   })
@@ -184,12 +184,12 @@ QUnit.module('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      moderated_grading: false
+      moderated_grading: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, false)
   })
@@ -198,12 +198,12 @@ QUnit.module('#setSubmissionCellState', () => {
     const assignment = {
       id: '1',
       published: true,
-      moderated_grading: false
+      moderated_grading: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, false)
   })
@@ -213,12 +213,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: true,
-      grades_published: true
+      grades_published: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, false)
   })
@@ -228,12 +228,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: true,
-      grades_published: true
+      grades_published: true,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, false)
   })
@@ -243,12 +243,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: true,
-      grades_published: false
+      grades_published: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.locked, true)
   })
@@ -258,12 +258,12 @@ QUnit.module('#setSubmissionCellState', () => {
       id: '1',
       published: true,
       moderated_grading: true,
-      grades_published: false
+      grades_published: false,
     }
     const map = createAndSetupMap(assignment, studentWithSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithSubmission.id,
-      assignment_id: assignment.id
+      assignment_id: assignment.id,
     })
     strictEqual(submission.hideGrade, false)
   })
@@ -280,7 +280,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
       strictEqual(submission.locked, true)
     })
@@ -290,7 +290,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
       strictEqual(submission.hideGrade, true)
     })
@@ -299,7 +299,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
       strictEqual(submission.locked, false)
     })
@@ -308,7 +308,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const map = createAndSetupMap(assignment, studentWithSubmission)
       const submission = map.getSubmissionState({
         user_id: studentWithSubmission.id,
-        assignment_id: assignment.id
+        assignment_id: assignment.id,
       })
       strictEqual(submission.hideGrade, false)
     })
@@ -319,7 +319,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const assignment = {
         id: '1',
         published: true,
-        effectiveDueDates: {1: {due_at: yesterday}}
+        effectiveDueDates: {1: {due_at: yesterday}},
       }
       const map = createAndSetupMap(assignment, studentWithoutSubmission)
       const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -330,7 +330,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const assignment = {
         id: '1',
         published: true,
-        effectiveDueDates: {1: {due_at: tomorrow}}
+        effectiveDueDates: {1: {due_at: tomorrow}},
       }
       const map = createAndSetupMap(assignment, studentWithoutSubmission)
       const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -344,7 +344,7 @@ QUnit.module('#setSubmissionCellState', () => {
         const assignment = {
           id: '1',
           published: true,
-          effectiveDueDates: {}
+          effectiveDueDates: {},
         }
         const map = createAndSetupMap(assignment, studentWithoutSubmission)
         const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -356,7 +356,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const assignment = {
         id: '1',
         published: true,
-        effectiveDueDates: {1: {due_at: new Date()}}
+        effectiveDueDates: {1: {due_at: new Date()}},
       }
       const map = createAndSetupMap(assignment, studentWithoutSubmission)
       const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -367,7 +367,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const assignment = {
         id: '1',
         published: true,
-        effectiveDueDates: {1: {due_at: new Date()}}
+        effectiveDueDates: {1: {due_at: new Date()}},
       }
       const map = createAndSetupMap(assignment, studentWithoutSubmission)
       const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -378,7 +378,7 @@ QUnit.module('#setSubmissionCellState', () => {
       const assignment = {
         id: '1',
         published: true,
-        effectiveDueDates: {1: {due_at: new Date()}}
+        effectiveDueDates: {1: {due_at: new Date()}},
       }
       const map = createAndSetupMap(assignment, studentWithoutSubmission)
       const submission = map.getSubmission(studentWithoutSubmission.id, assignment.id)
@@ -390,7 +390,7 @@ QUnit.module('#setSubmissionCellState', () => {
     const map = createAndSetupMap(unpublishedAssignment.toJS(), studentWithoutSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithoutSubmission.id,
-      assignment_id: moderatedAndGradesUnpublishedAssignment.get('id')
+      assignment_id: moderatedAndGradesUnpublishedAssignment.get('id'),
     })
     deepEqual(submission, {locked: true, hideGrade: true})
   })
@@ -402,7 +402,7 @@ QUnit.module('#setSubmissionCellState', () => {
     )
     const submission = map.getSubmissionState({
       user_id: studentWithoutSubmission.id,
-      assignment_id: moderatedAndGradesUnpublishedAssignment.get('id')
+      assignment_id: moderatedAndGradesUnpublishedAssignment.get('id'),
     })
     deepEqual(submission, {locked: true, hideGrade: false})
   })
@@ -411,7 +411,7 @@ QUnit.module('#setSubmissionCellState', () => {
     const map = createAndSetupMap(hiddenFromStudent.toJS(), studentWithoutSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithoutSubmission.id,
-      assignment_id: hiddenFromStudent.get('id')
+      assignment_id: hiddenFromStudent.get('id'),
     })
     deepEqual(submission, {locked: true, hideGrade: true})
   })
@@ -422,7 +422,7 @@ QUnit.module('#setSubmissionCellState', () => {
     const map = createAndSetupMap(baseAssignment.toJS(), studentWithoutSubmission)
     const submission = map.getSubmissionState({
       user_id: studentWithoutSubmission.id,
-      assignment_id: baseAssignment.get('id')
+      assignment_id: baseAssignment.get('id'),
     })
     deepEqual(submission, {locked: false, hideGrade: false})
   })
@@ -434,7 +434,7 @@ QUnit.module('#setSubmissionCellState', () => {
         const map = createAndSetupMap(assignment.toJS(), studentWithSubmission)
         const submission = map.getSubmissionState({
           user_id: studentWithSubmission.id,
-          assignment_id: assignment.get('id')
+          assignment_id: assignment.get('id'),
         })
         deepEqual(submission, {locked: true, hideGrade: true})
       })
@@ -444,7 +444,7 @@ QUnit.module('#setSubmissionCellState', () => {
         const map = createAndSetupMap(assignment.toJS(), studentWithSubmission)
         const submission = map.getSubmissionState({
           user_id: studentWithSubmission.id,
-          assignment_id: assignment.get('id')
+          assignment_id: assignment.get('id'),
         })
         deepEqual(submission, {locked: true, hideGrade: true})
       })
@@ -454,7 +454,7 @@ QUnit.module('#setSubmissionCellState', () => {
         const map = createAndSetupMap(assignment.toJS(), studentWithSubmission)
         const submission = map.getSubmissionState({
           user_id: studentWithSubmission.id,
-          assignment_id: assignment.get('id')
+          assignment_id: assignment.get('id'),
         })
         deepEqual(submission, {locked: true, hideGrade: false})
       })
@@ -462,11 +462,11 @@ QUnit.module('#setSubmissionCellState', () => {
       test('is hidden from the student takes precendence over one that has grading periods', () => {
         const assignment = hasGradingPeriodsAssignment.merge(hiddenFromStudent)
         const map = createAndSetupMap(assignment.toJS(), studentWithSubmission, {
-          hasGradingPeriods: true
+          hasGradingPeriods: true,
         })
         const submission = map.getSubmissionState({
           user_id: studentWithSubmission.id,
-          assignment_id: assignment.get('id')
+          assignment_id: assignment.get('id'),
         })
         deepEqual(submission, {locked: true, hideGrade: true})
       })
@@ -474,18 +474,18 @@ QUnit.module('#setSubmissionCellState', () => {
       test('has grading periods takes precendence over all other assignments', () => {
         const assignment = hasGradingPeriodsAssignment.merge(baseAssignment)
         const map = createAndSetupMap(assignment.toJS(), studentWithSubmission, {
-          hasGradingPeriods: true
+          hasGradingPeriods: true,
         })
         const actualSubmissionState = map.getSubmissionState({
           user_id: studentWithSubmission.id,
-          assignment_id: assignment.get('id')
+          assignment_id: assignment.get('id'),
         })
         const expectedSubmissionState = {
           locked: true,
           hideGrade: false,
           inClosedGradingPeriod: true,
           inNoGradingPeriod: false,
-          inOtherGradingPeriod: false
+          inOtherGradingPeriod: false,
         }
         deepEqual(actualSubmissionState, expectedSubmissionState)
       })
@@ -505,7 +505,7 @@ test('initializes a new submission state map', () => {
 
 test('sets the submission state map .hasGradingPeriods to true when a grading period set exists', () => {
   const gradebook = createGradebook({
-    grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]}
+    grading_period_set: {id: '1501', grading_periods: [{id: '701'}, {id: '702'}]},
   })
   strictEqual(gradebook.submissionStateMap.hasGradingPeriods, true)
 })

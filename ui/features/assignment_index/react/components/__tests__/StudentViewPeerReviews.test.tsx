@@ -31,16 +31,16 @@ describe('StudentViewPeerReviews Component Tests', () => {
             anonymous_id: 'anonymous1',
             user_id: 'user1',
             user_name: 'username1',
-            available: true
+            available: true,
           },
           {
             anonymous_id: 'anonymous2',
             user_id: 'user2',
             user_name: 'username2',
-            available: true
-          }
-        ]
-      }
+            available: true,
+          },
+        ],
+      },
     }
 
     const {container, queryByText, queryAllByText} = render(
@@ -71,22 +71,22 @@ describe('StudentViewPeerReviews Component Tests', () => {
             anonymous_id: 'anonymous1',
             user_id: 'user1',
             user_name: 'username1',
-            available: true
+            available: true,
           },
           {
             anonymous_id: 'anonymous2',
             user_id: 'user2',
             user_name: 'username2',
-            available: true
+            available: true,
           },
           {
             anonymous_id: 'anonymous3',
             user_id: 'user3',
             user_name: 'username3',
-            available: true
-          }
-        ]
-      }
+            available: true,
+          },
+        ],
+      },
     }
 
     const {container, queryByText} = render(<StudentViewPeerReviews {...defaultProps} />)
@@ -120,16 +120,16 @@ describe('StudentViewPeerReviews Component Tests', () => {
             anonymous_id: 'anonymous1',
             user_id: 'user1',
             user_name: 'username1',
-            available: true
+            available: true,
           },
           {
             anonymous_id: 'anonymous2',
             user_id: 'user2',
             user_name: 'username2',
-            available: false
-          }
-        ]
-      }
+            available: false,
+          },
+        ],
+      },
     }
     const {container, queryByText} = render(<StudentViewPeerReviews {...defaultProps} />)
     expect(container.querySelectorAll('li')).toHaveLength(2)

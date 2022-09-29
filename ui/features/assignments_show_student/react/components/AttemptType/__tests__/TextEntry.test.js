@@ -25,8 +25,8 @@ import StudentViewContext from '../../Context'
 
 jest.mock('@canvas/tinymce-external-tools/TinyMCEContentItem', () => ({
   fromJSON: contentItem => ({
-    codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`
-  })
+    codePayload: `<a href="${contentItem.url}" title="${contentItem.title}" target="${contentItem.linkTarget}">${contentItem.title}</a>`,
+  }),
 }))
 
 async function makeProps(opts = {}) {
@@ -34,8 +34,8 @@ async function makeProps(opts = {}) {
     opts.submission ||
     (await mockSubmission({
       Submission: {
-        submissionDraft: {body: 'words'}
-      }
+        submissionDraft: {body: 'words'},
+      },
     }))
 
   return {
@@ -45,7 +45,7 @@ async function makeProps(opts = {}) {
     readOnly: opts.readOnly || false,
     onContentsChanged: jest.fn(),
     submission: mockedSubmission,
-    updateEditingDraft: jest.fn()
+    updateEditingDraft: jest.fn(),
   }
 }
 
@@ -54,7 +54,7 @@ describe('TextEntry', () => {
 
   beforeAll(() => {
     window.INST = {
-      editorButtons: []
+      editorButtons: [],
     }
     const liveRegion = document.createElement('div')
     liveRegion.id = 'flash_screenreader_holder'
@@ -125,8 +125,8 @@ describe('TextEntry', () => {
               id: '1',
               _id: '1',
               body: 'I am graded!',
-              state: 'graded'
-            }
+              state: 'graded',
+            },
           })
           const {findByDisplayValue} = await renderEditor(props)
 
@@ -140,8 +140,8 @@ describe('TextEntry', () => {
               id: '1',
               _id: '1',
               body: 'I am not graded!',
-              state: 'submitted'
-            }
+              state: 'submitted',
+            },
           })
           const {findByDisplayValue} = await renderEditor(props)
 
@@ -154,8 +154,8 @@ describe('TextEntry', () => {
             submission: {
               id: '1',
               _id: '1',
-              submissionDraft: {body: 'just a draft'}
-            }
+              submissionDraft: {body: 'just a draft'},
+            },
           })
           const {findByDisplayValue} = await renderEditor(props)
 
@@ -169,8 +169,8 @@ describe('TextEntry', () => {
               id: '1',
               _id: '1',
               body: 'this should be ignored',
-              state: 'unsubmitted'
-            }
+              state: 'unsubmitted',
+            },
           })
           const {findByDisplayValue} = await renderEditor(props)
           const textarea = await findByDisplayValue('', {exact: true})
@@ -184,8 +184,8 @@ describe('TextEntry', () => {
               id: '1',
               _id: '1',
               body: '<p>HELLO WORLD</p>',
-              state: 'unsubmitted'
-            }
+              state: 'unsubmitted',
+            },
           })
           const {queryByTestId} = await renderEditor(props)
           expect(await queryByTestId('read-only-content')).toBeInTheDocument()
@@ -199,8 +199,8 @@ describe('TextEntry', () => {
               id: '1',
               _id: '1',
               body: '<p>HELLO WORLD</p>',
-              state: 'unsubmitted'
-            }
+              state: 'unsubmitted',
+            },
           })
           const {queryByTestId} = await renderEditor(props)
           expect(await queryByTestId('text-editor')).toBeInTheDocument()
@@ -216,7 +216,7 @@ describe('TextEntry', () => {
       _id: '1',
       attempt: 1,
       state: 'unsubmitted',
-      submissionDraft: {body: 'hello'}
+      submissionDraft: {body: 'hello'},
     }
 
     const doInitialRender = async () => {
@@ -230,8 +230,8 @@ describe('TextEntry', () => {
       const updatedProps = await makeProps({
         submission: {
           ...initialSubmission,
-          submissionDraft: {body: 'hello?'}
-        }
+          submissionDraft: {body: 'hello?'},
+        },
       })
       const setModeSpy = jest.spyOn(fakeEditor.mode, 'set')
 
@@ -249,8 +249,8 @@ describe('TextEntry', () => {
           _id: '1',
           attempt: 2,
           state: 'unsubmitted',
-          submissionDraft: {body: 'hello, again'}
-        }
+          submissionDraft: {body: 'hello, again'},
+        },
       })
       const setContentSpy = jest.spyOn(fakeEditor, 'setContent')
       rerender(<TextEntry {...newProps} />)
@@ -266,8 +266,8 @@ describe('TextEntry', () => {
           _id: '1',
           attempt: 2,
           state: 'unsubmitted',
-          submissionDraft: {body: 'hello'}
-        }
+          submissionDraft: {body: 'hello'},
+        },
       })
       const setContentSpy = jest.spyOn(fakeEditor, 'setContent')
       rerender(<TextEntry {...newProps} />)
@@ -277,7 +277,7 @@ describe('TextEntry', () => {
     it('does not set the content of the editor if the attempt has not changed', async () => {
       const {rerender} = await doInitialRender()
       const newProps = await makeProps({
-        submission: {...initialSubmission, grade: 0, state: 'graded'}
+        submission: {...initialSubmission, grade: 0, state: 'graded'},
       })
       jest.spyOn(fakeEditor, 'setContent')
 
@@ -296,9 +296,9 @@ describe('TextEntry', () => {
           '@type': 'LtiLinkItem',
           linkTarget: '_blank',
           title: 'a fake item',
-          url: 'http://localhost'
-        }
-      ]
+          url: 'http://localhost',
+        },
+      ],
     }
 
     const realEvent = {
@@ -308,15 +308,15 @@ describe('TextEntry', () => {
           '@type': 'LtiLinkItem',
           linkTarget: '_blank',
           title: 'first item',
-          url: 'http://localhost:3000/item1'
+          url: 'http://localhost:3000/item1',
         },
         {
           '@type': 'LtiLinkItem',
           linkTarget: '_blank',
           title: 'second item',
-          url: 'http://localhost:3000/item2'
-        }
-      ]
+          url: 'http://localhost:3000/item2',
+        },
+      ],
     }
 
     beforeEach(async () => {
@@ -409,8 +409,8 @@ describe('TextEntry', () => {
           id: '1',
           _id: '1',
           attempt: 2,
-          state: 'unsubmitted'
-        }
+          state: 'unsubmitted',
+        },
       })
       rerender(<TextEntry {...newProps} />)
 
@@ -433,8 +433,8 @@ describe('TextEntry', () => {
           activeSubmissionType: 'online_text_entry',
           attempt: 1,
           body: 'hello there!',
-          id: '1'
-        }
+          id: '1',
+        },
       })
     })
   })

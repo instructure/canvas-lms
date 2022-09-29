@@ -27,12 +27,12 @@ export default {
     attachment: {},
     postGradesLtis: [],
     publishGradesToSis: {
-      publishToSisUrl: ''
+      publishToSisUrl: '',
     },
     postGradesFeature: {
-      enabled: true
-    }
-  }
+      enabled: true,
+    },
+  },
 }
 
 const Template = args => <EnhancedActionMenu {...args} />

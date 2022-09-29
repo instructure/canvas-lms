@@ -23,24 +23,50 @@ import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import GradingPeriodAssignmentsLoader from './GradingPeriodAssignmentsLoader'
 import SisOverridesLoader from './SisOverridesLoader'
 import StudentContentDataLoader from './StudentContentDataLoader'
-import StudentIdsLoader from './StudentIdsLoader'
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+import type PerformanceControls from '../PerformanceControls'
 
 export default class DataLoader {
-  constructor({dispatch, gradebook, performanceControls}) {
+  _gradebook: Gradebook
+
+  assignmentGroupsLoader: AssignmentGroupsLoader
+
+  customColumnsDataLoader: CustomColumnsDataLoader
+
+  gradingPeriodAssignmentsLoader: GradingPeriodAssignmentsLoader
+
+  sisOverridesLoader: SisOverridesLoader
+
+  studentContentDataLoader: StudentContentDataLoader
+
+  fetchStudentIds: () => Promise<string[]>
+
+  constructor({
+    dispatch,
+    gradebook,
+    performanceControls,
+    fetchStudentIds,
+  }: {
+    dispatch: RequestDispatch
+    gradebook: Gradebook
+    performanceControls: PerformanceControls
+    fetchStudentIds: () => Promise<string[]>
+  }) {
     this._gradebook = gradebook
+    this.fetchStudentIds = fetchStudentIds
 
     const loaderConfig = {
       requestCharacterLimit: 8000, // apache limit
       dispatch,
       gradebook,
-      performanceControls
+      performanceControls,
     }
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
     this.gradingPeriodAssignmentsLoader = new GradingPeriodAssignmentsLoader(loaderConfig)
     this.sisOverridesLoader = new SisOverridesLoader(loaderConfig)
     this.studentContentDataLoader = new StudentContentDataLoader(loaderConfig)
-    this.studentIdsLoader = new StudentIdsLoader(loaderConfig)
   }
 
   loadInitialData() {
@@ -51,11 +77,11 @@ export default class DataLoader {
       gradebook,
       getAssignmentGroups: true,
       getModules: gradebook.options.has_modules,
-      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
+      getGradingPeriodAssignments: gradebook.gradingPeriodSet != null,
     })
   }
 
-  loadCustomColumnData(customColumnId) {
+  loadCustomColumnData(customColumnId: string) {
     this.customColumnsDataLoader.loadCustomColumnsData([customColumnId])
   }
 
@@ -65,19 +91,19 @@ export default class DataLoader {
 
   reloadStudentDataForEnrollmentFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: true
+      getGradingPeriodAssignments: true,
     })
   }
 
   reloadStudentDataForSectionFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: false
+      getGradingPeriodAssignments: false,
     })
   }
 
   reloadStudentDataForStudentGroupFilterChange() {
     this.__reloadStudentData({
-      getGradingPeriodAssignments: false
+      getGradingPeriodAssignments: false,
     })
   }
 
@@ -92,20 +118,25 @@ export default class DataLoader {
     return this.__loadGradebookData({
       dataLoader: this,
       gradebook,
-
       getGradingPeriodAssignments:
-        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null
+        loadOptions.getGradingPeriodAssignments && gradebook.gradingPeriodSet != null,
     })
   }
 
-  async __loadGradebookData(options) {
+  async __loadGradebookData(options: {
+    dataLoader: DataLoader
+    gradebook: Gradebook
+    getGradingPeriodAssignments: boolean
+    getAssignmentGroups?: boolean
+    getModules?: boolean
+  }) {
     const {dataLoader, gradebook} = options
 
     // Store currently-loaded student ids for diffing below.
     const loadedStudentIds = gradebook.courseContent.students.listStudentIds()
 
     // Begin loading Student IDs before any other data.
-    const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
+    const gotStudentIds: Promise<string[]> = this.fetchStudentIds()
 
     let gotGradingPeriodAssignments
     if (options.getGradingPeriodAssignments) {
@@ -124,9 +155,8 @@ export default class DataLoader {
       }
     }
 
-    await gotStudentIds
+    const studentIds = await gotStudentIds
 
-    const studentIds = gradebook.courseContent.students.listStudentIds()
     const studentIdsToLoad = difference(studentIds, loadedStudentIds)
 
     await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
@@ -138,7 +168,7 @@ export default class DataLoader {
      */
     if (
       !gradebook.contentLoadStates.customColumnsLoaded ||
-      gradebook.listVisibleCustomColumns().length
+      gradebook.listVisibleCustomColumns().length > 0
     ) {
       dataLoader.customColumnsDataLoader.loadCustomColumnsData()
     }

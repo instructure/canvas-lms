@@ -71,7 +71,7 @@ module Lti::Concerns
       )
     end
 
-    # Generates a token that will initialized a new sesssion when
+    # Generates a token that will initialize a new session when
     # sent in a Canvas request
     def generate_session_token
       # only allow from API, and not from files domain, as /login/session_token does
@@ -105,8 +105,8 @@ module Lti::Concerns
         assignment_launch_link(assignment, session_token)
       elsif options[:module_item].present?
         module_item_link(options[:module_item], session_token)
-      elsif options[:launch_url] && options[:id].blank? && options[:launch_type].blank?
-        retrieve_launch_link(context, session_token, options[:launch_url])
+      elsif (options[:launch_url] || options[:lookup_id]) && options[:id].blank? && options[:launch_type].blank?
+        retrieve_launch_link(context, session_token, options[:launch_url], options[:lookup_id])
       else
         course_or_account_launch_link(context, tool, session_token, options[:launch_url])
       end
@@ -130,7 +130,7 @@ module Lti::Concerns
       )
     end
 
-    def retrieve_launch_link(context, session_token, launch_url)
+    def retrieve_launch_link(context, session_token, launch_url, lookup_id)
       context_type = context.class.to_s.downcase
 
       send(
@@ -138,7 +138,8 @@ module Lti::Concerns
         context.id,
         url: launch_url,
         display: :borderless,
-        session_token: session_token
+        session_token: session_token,
+        resource_link_lookup_uuid: lookup_id
       )
     end
 

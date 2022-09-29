@@ -60,7 +60,7 @@ describe "calendar2" do
 
       expect(sidebar).to contain_css(".new-feature-pill")
       open_other_calendars_modal
-      wait_for_ajaximations
+      wait_for_ajax_requests
       modal_cancel_btn.click
       driver.navigate.refresh
       expect(sidebar).not_to contain_css(".new-feature-pill")
@@ -116,7 +116,7 @@ describe "calendar2" do
     end
 
     context "Add other calendars modal" do
-      it "adds an account calendar to the list of other calendars and shows its events" do
+      it "adds an account calendar to the list of other calendars and shows its calendar events" do
         account_admin_user(account: @subaccount1)
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
@@ -130,6 +130,25 @@ describe "calendar2" do
         expect(other_calendars_container).to be_displayed
         expect(account_calendar.first.text).to eq @subaccount1.name
         assert_title(event_title, false)
+      end
+
+      it "removes an account calendar from the list of other calendars and removes its calendar events" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        user_session(@student)
+        event_title = "event of #{@subaccount1.name}"
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+        get "/calendar2"
+        # Confirm the account calendar is active
+        account_calendar = other_calendars_context_labels
+        expect(account_calendar.first.text).to eq @subaccount1.name
+        assert_title(event_title, false)
+        # Removing the account calendar
+        open_other_calendars_modal
+        select_other_calendar(@subaccount1.id)
+        click_modal_save_btn
+        wait_for_ajaximations
+        expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+        expect(calendar_body).not_to contain_css(calendar_event_selector)
       end
 
       it "keeps added account calendars as selected context after refreshing the page" do
@@ -185,6 +204,63 @@ describe "calendar2" do
         edit_calendar_event_form_submit_button.click
         wait_for_ajaximations
         assert_title(event_title, false)
+      end
+
+      context "search bar" do
+        it "can search accounts with at least 2 characters" do
+          saccount1 = @root_account.sub_accounts.create!(name: "Account-1", account_calendar_visible: true)
+          saccount2 = @root_account.sub_accounts.create!(name: "Account-2", account_calendar_visible: true)
+          course_with_student_logged_in(user: @student, account: saccount1)
+          course_with_student_logged_in(user: @student, account: saccount2)
+
+          user_session(@student)
+          get "/calendar2"
+          open_other_calendars_modal
+          expect(account_calendars_list).to contain_css(account_calendar_checkbox_selector(@subaccount1.id))
+          expect(account_calendar_list_items.count).to eq(3)
+
+          search_account("Acc")
+          expect(account_calendars_list).not_to contain_css(account_calendar_checkbox_selector(@subaccount1.id))
+          expect(account_calendar_list_items.count).to eq(2)
+        end
+
+        it "displays an empty state if no matching accounts were found" do
+          user_session(@student)
+          get "/calendar2"
+          open_other_calendars_modal
+          expect(account_calendar_list_items.count).to eq(1)
+          expect(account_calendars_list).not_to contain_css(modal_empty_state_selector)
+
+          search_account("non")
+          expect(modal_empty_state).to be_displayed
+        end
+      end
+    end
+
+    context "does not show links to unauthorized pages" do
+      it "does not display the link to the event details page if the user is not authorized" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        make_event(context: @subaccount1, start: 0.days.from_now, title: "account event")
+        get "/calendar2"
+
+        # event title is displayed but not as a link
+        fj(calendar_event_selector).click
+        expect(event_popover).to be_displayed
+        expect(event_popover_title).to be_displayed
+        expect(event_popover_title.text).to eq "account event"
+        expect(event_popover_title).not_to contain_css(event_link_selector)
+      end
+
+      it "does not display the link to the calendar context if the user is not authorized" do
+        @student.set_preference(:enabled_account_calendars, @subaccount1.id)
+        make_event(context: @subaccount1, start: 0.days.from_now, title: "account event")
+        get "/calendar2"
+
+        # event context is displayed but not as a link
+        fj(calendar_event_selector).click
+        expect(event_popover).to be_displayed
+        expect(event_popover_content).to be_displayed
+        expect(event_popover_content).not_to contain_css("a")
       end
     end
   end

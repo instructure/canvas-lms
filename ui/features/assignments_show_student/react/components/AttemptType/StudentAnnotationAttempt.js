@@ -35,7 +35,7 @@ export default function StudentAnnotationAttempt(props) {
       .post('/api/v1/canvadoc_session', {
         submission_attempt:
           isSubmitted && props.submission.attempt !== 0 ? props.submission.attempt : 'draft',
-        submission_id: props.submission._id
+        submission_id: props.submission._id,
       })
       .then(result => {
         setIframeURL(result.data.canvadocs_session_url)
@@ -47,8 +47,8 @@ export default function StudentAnnotationAttempt(props) {
             variables: {
               id: props.submission.id,
               activeSubmissionType: 'student_annotation',
-              attempt: props.submission.attempt || 1
-            }
+              attempt: props.submission.attempt || 1,
+            },
           })
         }
       })

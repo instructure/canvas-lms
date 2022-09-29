@@ -42,11 +42,11 @@ export default class OverrideAttempts extends React.Component {
     allowedAttempts: number,
     onChange: requiredIfDetail,
     variant: oneOf(['summary', 'detail']).isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   onChangeAttemptsAllowed = (_event, selection) => {

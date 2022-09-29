@@ -249,5 +249,95 @@ describe JwtsController do
         expect(response.status).to eq(400)
       end
     end
+
+    context "current_user is different than the sub claim" do
+      before do
+        enable_default_developer_key!
+        allow(CanvasSecurity::ServicesJwt).to receive(:decrypt).and_return({ "sub" => token_user.global_id })
+        Setting.set("write_feature_flag_audit_logs", "false")
+        Account.site_admin.enable_feature!(:new_quizzes_allow_service_jwt_refresh)
+      end
+
+      context "calling user cannot refresh for another user" do
+        before do
+          access_token = other_user.access_tokens.create!.full_token
+          request.headers["Authorization"] = "Bearer #{access_token}"
+          post "refresh", params: { jwt: "testjwt" }, format: "json"
+        end
+
+        it "returns an invalid refresh error" do
+          expect(response.body).to match(/invalid refresh/)
+          expect(response.status).to eq(400)
+        end
+      end
+
+      context "calling user is able to refresh for another user" do
+        before do
+          pseudonym(admin_user)
+          access_token = admin_user.access_tokens.create!.full_token
+          admin_user.access_tokens.first.developer_key.update!(internal_service: true)
+          request.headers["Authorization"] = "Bearer #{access_token}"
+          expect(CanvasSecurity::ServicesJwt).to receive(:refresh_for_user)
+            .with(
+              "testjwt",
+              request.host_with_port,
+              token_user,
+              real_user: nil,
+              symmetric: true
+            ).and_return("fresh-jwt")
+
+          post "refresh", params: { jwt: "testjwt" }, format: "json"
+        end
+
+        it "returns with a fresh JWT" do
+          expect(response.status).to eq(200)
+          expect(response.body).to match(/fresh-jwt/)
+        end
+      end
+
+      context "the developer key of the calling user is not an internal service key" do
+        before do
+          pseudonym(admin_user)
+          access_token = admin_user.access_tokens.create!.full_token
+          admin_user.access_tokens.first.developer_key.update!(internal_service: false)
+          request.headers["Authorization"] = "Bearer #{access_token}"
+
+          post "refresh", params: { jwt: "testjwt" }, format: "json"
+        end
+
+        it "returns an invalid refresh error" do
+          expect(response.body).to match(/invalid refresh/)
+          expect(response.status).to eq(400)
+        end
+      end
+
+      context "incoming JWT is invalid and decryption fails" do
+        before do
+          allow(CanvasSecurity::ServicesJwt).to receive(:decrypt).and_raise(JSON::JWE::DecryptionFailed)
+          pseudonym(admin_user)
+          access_token = admin_user.access_tokens.create!.full_token
+          admin_user.access_tokens.first.developer_key.update!(internal_service: true)
+          request.headers["Authorization"] = "Bearer #{access_token}"
+
+          post "refresh", params: { jwt: "invalid jwt" }, format: "json"
+        end
+
+        it "returns an invalid refresh error" do
+          expect(response.body).to match(/invalid refresh/)
+          expect(response.status).to eq(400)
+        end
+
+        context "incoming jwt invalid formatting" do
+          before do
+            allow(CanvasSecurity::ServicesJwt).to receive(:decrypt).and_raise(JSON::JWT::InvalidFormat)
+          end
+
+          it "returns an invalid refresh error" do
+            expect(response.body).to match(/invalid refresh/)
+            expect(response.status).to eq(400)
+          end
+        end
+      end
+    end
   end
 end

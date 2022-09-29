@@ -81,7 +81,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       lateSubmissionMinimumPercent: 0,
       lateSubmissionMinimumPercentEnabled: false,
       missingSubmissionDeduction: 0,
-      missingSubmissionDeductionEnabled: false
+      missingSubmissionDeductionEnabled: false,
     }
     postPolicy = {postManually: true}
 
@@ -90,7 +90,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       allowViewUngradedAsZero: true,
       anonymousAssignmentsPresent: false,
       courseFeatures: {
-        finalGradeOverrideEnabled: true
+        finalGradeOverrideEnabled: true,
       },
       courseId: '1201',
       courseSettings: new CourseSettings(gradebook, {allowFinalGradeOverride: false}),
@@ -101,7 +101,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
         showNotes: true,
         showUnpublishedAssignments: true,
         statusColors: {...defaultColors},
-        viewUngradedAsZero: true
+        viewUngradedAsZero: true,
       }),
       locale: 'en',
       onClose: sinon.spy(),
@@ -109,7 +109,7 @@ QUnit.module('GradebookSettingsModal', suiteHooks => {
       onEntered: sinon.spy(),
       onLatePolicyUpdate() {},
       onViewOptionsUpdated: sinon.stub().resolves(),
-      postPolicies: new PostPolicies(gradebook)
+      postPolicies: new PostPolicies(gradebook),
     }
 
     fetchLatePolicyPromise = {}

@@ -30,7 +30,7 @@ QUnit.module('GradebookGrid CustomColumnHeader', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
 
     props = {
-      title: 'Notes'
+      title: 'Notes',
     }
   })
 

@@ -48,8 +48,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           postedAt: null,
           score: 7,
           submittedAt: null,
-          workflowState: 'graded'
-        }
+          workflowState: 'graded',
+        },
       },
 
       {
@@ -63,8 +63,8 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           postedAt: null,
           score: 8,
           submittedAt: new Date('Thu Feb 02 2017 16:33:19 GMT-0500 (EST)'),
-          workflowState: 'graded'
-        }
+          workflowState: 'graded',
+        },
       },
 
       {
@@ -78,9 +78,9 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
           postedAt: null,
           score: null,
           submittedAt: null,
-          workflowState: 'unsubmitted'
-        }
-      }
+          workflowState: 'unsubmitted',
+        },
+      },
     ]
 
     gradebookElements = []
@@ -102,29 +102,29 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         pointsPossible: 10,
         postManually: false,
         published: true,
-        submissionTypes: ['online_text_entry']
+        submissionTypes: ['online_text_entry'],
       },
 
       assignmentDetailsAction: {
         disabled: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       curveGradesAction: {
         isDisabled: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       downloadSubmissionsAction: {
         hidden: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       enterGradesAsSetting: {
         hidden: false,
         onSelect() {},
         selected: 'points',
-        showGradingSchemeOption: true
+        showGradingSchemeOption: true,
       },
 
       getCurrentlyShownStudents: () => students.slice(0, 2),
@@ -132,14 +132,14 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
       hideGradesAction: {
         hasGradesOrPostableComments: true,
         hasGradesOrCommentsToHide: true,
-        onSelect() {}
+        onSelect() {},
       },
 
       postGradesAction: {
         enabledForUser: false,
         hasGradesOrPostableComments: true,
         hasGradesOrCommentsToPost: true,
-        onSelect() {}
+        onSelect() {},
       },
 
       onMenuDismiss() {},
@@ -150,16 +150,16 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
 
       reuploadSubmissionsAction: {
         hidden: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       setDefaultGradeAction: {
         disabled: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       showGradePostingPolicyAction: {
-        onSelect() {}
+        onSelect() {},
       },
 
       showUnpostedMenuItem: true,
@@ -173,12 +173,12 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSortByLate() {},
         onSortByMissing() {},
         onSortByUnposted() {},
-        settingKey: 'grade'
+        settingKey: 'grade',
       },
 
       submissionsLoaded: true,
 
-      userId: '123'
+      userId: '123',
     }
   })
 

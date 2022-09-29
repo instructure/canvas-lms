@@ -21,11 +21,11 @@ import {
   CREATE_SUBMISSION,
   CREATE_SUBMISSION_DRAFT,
   DELETE_SUBMISSION_DRAFT,
-  SET_MODULE_ITEM_COMPLETION
+  SET_MODULE_ITEM_COMPLETION,
 } from '@canvas/assignments/graphql/student/Mutations'
 import {
   SUBMISSION_HISTORIES_QUERY,
-  USER_GROUPS_QUERY
+  USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {act, fireEvent, render, screen, waitFor, within} from '@testing-library/react'
 import ContextModuleApi from '../../apis/ContextModuleApi'
@@ -85,7 +85,7 @@ describe('SubmissionManager', () => {
 
   it('renders a submit button when the draft criteria is met for the active type', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
     const {getByText} = render(
       <MockedProvider>
@@ -101,9 +101,9 @@ describe('SubmissionManager', () => {
       Submission: {
         submissionDraft: {
           activeSubmissionType: 'online_upload',
-          body: 'some text here'
-        }
-      }
+          body: 'some text here',
+        },
+      },
     })
     const {getByText} = render(
       <MockedProvider>
@@ -120,9 +120,9 @@ describe('SubmissionManager', () => {
         submissionDraft: {
           meetsAssignmentCriteria: true,
           activeSubmissionType: 'online_text_entry',
-          body: '<p><span aria-label="Loading" data-placeholder-for="filename"> </span></p>'
-        }
-      }
+          body: '<p><span aria-label="Loading" data-placeholder-for="filename"> </span></p>',
+        },
+      },
     })
     const {getByText} = render(
       <MockedProvider>
@@ -135,7 +135,7 @@ describe('SubmissionManager', () => {
 
   it('does not render submit button for observers', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
     const {queryByText} = renderInContext(
       {allowChangesToSubmission: false, isObserver: true},
@@ -149,7 +149,7 @@ describe('SubmissionManager', () => {
 
   it('does not render the submit button if we are not on the latest submission', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.graded
+      Submission: SubmissionMocks.graded,
     })
     const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
@@ -163,7 +163,7 @@ describe('SubmissionManager', () => {
   it('does not render the submit button if the assignment is locked', async () => {
     const props = await mockAssignmentAndSubmission({
       LockInfo: {isLocked: true},
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
     const {queryByText} = render(
       <MockedProvider>
@@ -176,7 +176,7 @@ describe('SubmissionManager', () => {
 
   it('does not render the submit button if the submission cannot be modified', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
 
     const {queryByText} = renderInContext(
@@ -190,7 +190,7 @@ describe('SubmissionManager', () => {
 
   it('does not render submit button when the the submission is excused', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: {...SubmissionMocks.excused}
+      Submission: {...SubmissionMocks.excused},
     })
 
     const {queryByText} = renderInContext(
@@ -209,7 +209,7 @@ describe('SubmissionManager', () => {
         window.ENV = {
           CONFETTI_ENABLED: enabled,
           ASSIGNMENT_ID: '1',
-          COURSE_ID: '1'
+          COURSE_ID: '1',
         }
       })
 
@@ -218,23 +218,23 @@ describe('SubmissionManager', () => {
 
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_url']
+            submissionTypes: ['online_url'],
           },
           Submission: {
             submissionDraft: {
               activeSubmissionType: 'online_url',
               meetsUrlCriteria: true,
               url: 'http://localhost',
-              type: 'online_url'
-            }
-          }
+              type: 'online_url',
+            },
+          },
         })
 
         const variables = {
           assignmentLid: '1',
           submissionID: '1',
           type: 'online_url',
-          url: 'http://localhost'
+          url: 'http://localhost',
         }
         const createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
         const submissionHistoriesResult = await mockQuery(
@@ -245,12 +245,12 @@ describe('SubmissionManager', () => {
         const mocks = [
           {
             request: {query: CREATE_SUBMISSION, variables},
-            result: createSubmissionResult
+            result: createSubmissionResult,
           },
           {
             request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
-            result: submissionHistoriesResult
-          }
+            result: submissionHistoriesResult,
+          },
         ]
 
         const {getByTestId, queryByTestId} = render(
@@ -278,17 +278,17 @@ describe('SubmissionManager', () => {
   testConfetti('renders confetti for on time submissions', {
     enabled: true,
     dueDate: Date.now() + 100000,
-    inDocument: true
+    inDocument: true,
   })
   testConfetti('does not render confetti if not enabled', {
     enabled: false,
     dueDate: Date.now() + 100000,
-    inDocument: false
+    inDocument: false,
   })
   testConfetti('does not render confetti if past the due date', {
     enabled: true,
     dueDate: Date.now() - 100000,
-    inDocument: false
+    inDocument: false,
   })
 
   describe('Submission completed modal after clicking the "Submit Assignment" button', () => {
@@ -298,14 +298,14 @@ describe('SubmissionManager', () => {
       assignmentLid: '1',
       submissionID: '1',
       type: 'online_upload',
-      fileIds: ['1']
+      fileIds: ['1'],
     }
 
     beforeEach(async () => {
       oldEnv = window.ENV
       window.ENV = {
         ASSIGNMENT_ID: '1',
-        COURSE_ID: '1'
+        COURSE_ID: '1',
       }
       delete window.location
       window.location = {assign: jest.fn(), origin: 'http://localhost'}
@@ -319,15 +319,15 @@ describe('SubmissionManager', () => {
       mocks = [
         {
           request: {query: CREATE_SUBMISSION, variables},
-          result: createSubmissionResult
+          result: createSubmissionResult,
         },
         {
           request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
-          result: submissionHistoriesResult
-        }
+          result: submissionHistoriesResult,
+        },
       ]
       props = await mockAssignmentAndSubmission({
-        Submission: SubmissionMocks.onlineUploadReadyToSubmit
+        Submission: SubmissionMocks.onlineUploadReadyToSubmit,
       })
       props.submission = {
         ...props.submission,
@@ -335,14 +335,14 @@ describe('SubmissionManager', () => {
           {
             anonymousUser: null,
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned'
+            workflowState: 'assigned',
           },
           {
             anonymousUser: null,
             anonymousId: 'baT9cx',
-            workflowState: 'assigned'
-          }
-        ]
+            workflowState: 'assigned',
+          },
+        ],
       }
     })
 
@@ -400,14 +400,14 @@ describe('SubmissionManager', () => {
           {
             anonymizedUser: {_id: '1'},
             anonymousId: 'xaU9cd',
-            workflowState: 'assigned'
+            workflowState: 'assigned',
           },
           {
             anonymizedUser: {_id: '2'},
             anonymousId: 'baT9cx',
-            workflowState: 'assigned'
-          }
-        ]
+            workflowState: 'assigned',
+          },
+        ],
       }
 
       const {getByText, queryByRole} = render(
@@ -462,14 +462,14 @@ describe('SubmissionManager', () => {
 
   it('disables the submit button after it is pressed', async () => {
     const props = await mockAssignmentAndSubmission({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
 
     const variables = {
       assignmentLid: '1',
       submissionID: '1',
       type: 'online_upload',
-      fileIds: ['1']
+      fileIds: ['1'],
     }
     const createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
     const submissionHistoriesResult = await mockQuery(
@@ -480,12 +480,12 @@ describe('SubmissionManager', () => {
     const mocks = [
       {
         request: {query: CREATE_SUBMISSION, variables},
-        result: createSubmissionResult
+        result: createSubmissionResult,
       },
       {
         request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
-        result: submissionHistoriesResult
-      }
+        result: submissionHistoriesResult,
+      },
     ]
 
     const {getByText} = render(
@@ -505,7 +505,7 @@ describe('SubmissionManager', () => {
     it('renders a confirmation modal if the submit button is pressed', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {
-          submissionTypes: ['online_text_entry', 'online_url']
+          submissionTypes: ['online_text_entry', 'online_url'],
         },
         Submission: {
           submissionDraft: {
@@ -513,9 +513,9 @@ describe('SubmissionManager', () => {
             body: 'some text here',
             meetsTextEntryCriteria: true,
             meetsUrlCriteria: true,
-            url: 'http://www.google.com'
-          }
-        }
+            url: 'http://www.google.com',
+          },
+        },
       })
 
       const {getByTestId} = render(
@@ -550,10 +550,10 @@ describe('SubmissionManager', () => {
           setModuleItemCompletion: {
             __typename: '',
             moduleItem: null,
-            errors: null
-          }
+            errors: null,
+          },
         },
-        errors: null
+        errors: null,
       }
 
       const failedResponse = {data: null, errors: 'yes'}
@@ -562,13 +562,13 @@ describe('SubmissionManager', () => {
         window.ENV.CONTEXT_MODULE_ITEM = {
           done: false,
           id: '1',
-          module_id: '2'
+          module_id: '2',
         }
 
         props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_url']
-          }
+            submissionTypes: ['online_url'],
+          },
         })
       })
 
@@ -604,14 +604,14 @@ describe('SubmissionManager', () => {
         const variables = {
           done: true,
           itemId: '1',
-          moduleId: '2'
+          moduleId: '2',
         }
 
         const mocks = [
           {
             request: {query: SET_MODULE_ITEM_COMPLETION, variables},
-            result: successfulResponse
-          }
+            result: successfulResponse,
+          },
         ]
 
         const {getByTestId} = render(
@@ -640,14 +640,14 @@ describe('SubmissionManager', () => {
         const variables = {
           done: true,
           itemId: '1',
-          moduleId: '2'
+          moduleId: '2',
         }
 
         const mocks = [
           {
             request: {query: SET_MODULE_ITEM_COMPLETION, variables},
-            result: successfulResponse
-          }
+            result: successfulResponse,
+          },
         ]
 
         const {getByTestId} = render(
@@ -674,14 +674,14 @@ describe('SubmissionManager', () => {
         const variables = {
           done: true,
           itemId: '1',
-          moduleId: '2'
+          moduleId: '2',
         }
 
         const mocks = [
           {
             request: {query: SET_MODULE_ITEM_COMPLETION, variables},
-            result: failedResponse
-          }
+            result: failedResponse,
+          },
         ]
 
         const {getByTestId} = render(
@@ -721,9 +721,9 @@ describe('SubmissionManager', () => {
       it('is rendered if changes can be made to the submission', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_text_entry']
+            submissionTypes: ['online_text_entry'],
           },
-          Submission: {...SubmissionMocks.submitted}
+          Submission: {...SubmissionMocks.submitted},
         })
 
         const {getByTestId} = render(
@@ -738,9 +738,9 @@ describe('SubmissionManager', () => {
       it('is not rendered for observers', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_text_entry']
+            submissionTypes: ['online_text_entry'],
           },
-          Submission: {...SubmissionMocks.submitted}
+          Submission: {...SubmissionMocks.submitted},
         })
         const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false, isObserver: true},
@@ -751,7 +751,7 @@ describe('SubmissionManager', () => {
 
       it('is not rendered if changes cannot be made to the submission', async () => {
         const props = await mockAssignmentAndSubmission({
-          Submission: {...SubmissionMocks.submitted}
+          Submission: {...SubmissionMocks.submitted},
         })
         const {queryByTestId} = renderInContext(
           {allowChangesToSubmission: false},
@@ -775,8 +775,8 @@ describe('SubmissionManager', () => {
       const props = await mockAssignmentAndSubmission({
         Submission: {
           ...SubmissionMocks.graded,
-          attempt: 0
-        }
+          attempt: 0,
+        },
       })
       const {queryByTestId} = render(
         <MockedProvider>
@@ -788,7 +788,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if excused', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.excused}
+        Submission: {...SubmissionMocks.excused},
       })
       const {queryByTestId} = render(
         <MockedProvider>
@@ -801,7 +801,7 @@ describe('SubmissionManager', () => {
     it('is not rendered if the assignment is locked', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {lockInfo: {isLocked: true}},
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
       const {queryByTestId} = render(<SubmissionManager {...props} />)
       expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
@@ -810,7 +810,7 @@ describe('SubmissionManager', () => {
     it('is not rendered if there are no more attempts', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 1},
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
       const {queryByTestId} = render(<SubmissionManager {...props} />)
       expect(queryByTestId('try-again-button')).not.toBeInTheDocument()
@@ -819,7 +819,7 @@ describe('SubmissionManager', () => {
     it('accounts for any extra attempts awarded to the student', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {allowedAttempts: 1},
-        Submission: {...SubmissionMocks.submitted, extraAttempts: 2}
+        Submission: {...SubmissionMocks.submitted, extraAttempts: 2},
       })
       const {queryByTestId} = render(<SubmissionManager {...props} />)
       expect(queryByTestId('try-again-button')).toBeInTheDocument()
@@ -829,7 +829,7 @@ describe('SubmissionManager', () => {
   describe('"Back to Attempt" button', () => {
     it('is rendered if a draft exists and a previous attempt is shown', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
@@ -840,7 +840,7 @@ describe('SubmissionManager', () => {
 
     it('includes the current attempt number', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
       const latestSubmission = {attempt: 2, state: 'unsubmitted'}
 
@@ -851,7 +851,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if no current draft exists', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
 
       const {queryByTestId} = render(
@@ -864,7 +864,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if the current draft is selected', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
       const latestSubmission = props.submission
 
@@ -874,13 +874,13 @@ describe('SubmissionManager', () => {
 
     it('calls the showDraftAction function supplied by the context when clicked', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
 
       const latestSubmission = {
         activeSubmissionType: 'online_text_entry',
         attempt: 2,
-        state: 'unsubmitted'
+        state: 'unsubmitted',
       }
       const showDraftAction = jest.fn()
 
@@ -899,7 +899,7 @@ describe('SubmissionManager', () => {
   describe('"Cancel Attempt" button', () => {
     it('is rendered if a draft exists and is shown', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2},
       })
 
       const {getByTestId} = renderInContext(
@@ -913,7 +913,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered when working on the initial attempt', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 1}
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 1},
       })
 
       const {queryByTestId} = renderInContext(
@@ -927,7 +927,7 @@ describe('SubmissionManager', () => {
 
     it('includes the attempt number in the button text', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2}
+        Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2},
       })
 
       const {getByTestId} = renderInContext(
@@ -943,7 +943,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if no draft exists', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted, attempt: 2}
+        Submission: {...SubmissionMocks.submitted, attempt: 2},
       })
 
       const {queryByTestId} = render(
@@ -957,7 +957,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if a draft exists but is not shown', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted, attempt: 1}
+        Submission: {...SubmissionMocks.submitted, attempt: 1},
       })
 
       const {queryByTestId} = renderInContext(
@@ -997,7 +997,7 @@ describe('SubmissionManager', () => {
       describe.skip('when the current draft has actual content', () => {
         const renderDraft = async () => {
           const props = await mockAssignmentAndSubmission({
-            Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2, id: '123'}
+            Submission: {...SubmissionMocks.onlineUploadReadyToSubmit, attempt: 2, id: '123'},
           })
 
           const variables = {submissionId: '123'}
@@ -1010,7 +1010,7 @@ describe('SubmissionManager', () => {
           const mocks = [
             {
               request: {query: DELETE_SUBMISSION_DRAFT, variables},
-              result: deleteSubmissionDraftResult
+              result: deleteSubmissionDraftResult,
             },
             {
               request: {query: USER_GROUPS_QUERY, variables: {userID: '1'}},
@@ -1018,11 +1018,11 @@ describe('SubmissionManager', () => {
                 USER_GROUPS_QUERY,
                 {
                   Node: {__typename: 'User'},
-                  User: {groups: []}
+                  User: {groups: []},
                 },
                 {userID: '1'}
-              )
-            }
+              ),
+            },
           ]
 
           return renderInContext(
@@ -1066,9 +1066,9 @@ describe('SubmissionManager', () => {
           const props = await mockAssignmentAndSubmission({
             Assignment: {
               id: '1',
-              submissionTypes: ['online_url']
+              submissionTypes: ['online_url'],
             },
-            Submission: {attempt: 2}
+            Submission: {attempt: 2},
           })
 
           return renderInContext(
@@ -1120,15 +1120,15 @@ describe('SubmissionManager', () => {
         submissionDraft: {
           activeSubmissionType: 'online_text_entry',
           body: 'some draft text',
-          meetsTextEntryCriteria: true
-        }
+          meetsTextEntryCriteria: true,
+        },
       }
       const props = await mockAssignmentAndSubmission({
         Assignment: {
           id: '1',
-          submissionTypes: ['online_text_entry']
+          submissionTypes: ['online_text_entry'],
         },
-        Submission: submission
+        Submission: submission,
       })
 
       const result = renderInContext(
@@ -1189,15 +1189,15 @@ describe('SubmissionManager', () => {
         activeSubmissionType: 'online_text_entry',
         attempt: 1,
         body: 'some edited draft text',
-        id: '1'
+        id: '1',
       }
 
       const successfulResult = await mockQuery(CREATE_SUBMISSION_DRAFT, {}, variables)
       const mocks = [
         {
           request: {query: CREATE_SUBMISSION_DRAFT, variables},
-          result: successfulResult
-        }
+          result: successfulResult,
+        },
       ]
 
       const {findByText} = await renderTextAttempt({mocks})
@@ -1215,13 +1215,13 @@ describe('SubmissionManager', () => {
         activeSubmissionType: 'online_text_entry',
         attempt: 1,
         body: 'some edited draft text',
-        id: '1'
+        id: '1',
       }
       const mocks = [
         {
           request: {query: CREATE_SUBMISSION_DRAFT, variables},
-          result: {data: null, errors: 'yes'}
-        }
+          result: {data: null, errors: 'yes'},
+        },
       ]
 
       const {findByText} = await renderTextAttempt({mocks})
@@ -1239,9 +1239,9 @@ describe('SubmissionManager', () => {
     it('is rendered if at least one button can be shown', async () => {
       const props = await mockAssignmentAndSubmission({
         Assignment: {
-          submissionTypes: ['online_text_entry']
+          submissionTypes: ['online_text_entry'],
         },
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
 
       const {getByTestId} = render(
@@ -1255,7 +1255,7 @@ describe('SubmissionManager', () => {
 
     it('is not rendered if no buttons can be shown', async () => {
       const props = await mockAssignmentAndSubmission({
-        Submission: {...SubmissionMocks.submitted}
+        Submission: {...SubmissionMocks.submitted},
       })
 
       const {queryByTestId} = renderInContext(
@@ -1274,7 +1274,7 @@ describe('SubmissionManager', () => {
         window.ENV = {
           ...oldEnv,
           ASSIGNMENT_ID: '1',
-          COURSE_ID: '1'
+          COURSE_ID: '1',
         }
 
         ContextModuleApi.getContextModuleData.mockClear()
@@ -1287,14 +1287,14 @@ describe('SubmissionManager', () => {
       it('renders next and previous module links if they exist for the assignment', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_text_entry']
+            submissionTypes: ['online_text_entry'],
           },
-          Submission: {...SubmissionMocks.submitted}
+          Submission: {...SubmissionMocks.submitted},
         })
 
         ContextModuleApi.getContextModuleData.mockResolvedValue({
           next: {url: '/next', tooltipText: {string: 'some module'}},
-          previous: {url: '/previous', tooltipText: {string: 'some module'}}
+          previous: {url: '/previous', tooltipText: {string: 'some module'}},
         })
 
         const {getByTestId} = render(
@@ -1316,9 +1316,9 @@ describe('SubmissionManager', () => {
       it('does not render module buttons if no next/previous modules exist for the assignment', async () => {
         const props = await mockAssignmentAndSubmission({
           Assignment: {
-            submissionTypes: ['online_text_entry']
+            submissionTypes: ['online_text_entry'],
           },
-          Submission: {...SubmissionMocks.submitted}
+          Submission: {...SubmissionMocks.submitted},
         })
 
         ContextModuleApi.getContextModuleData.mockResolvedValue({})
@@ -1343,12 +1343,12 @@ describe('SubmissionManager', () => {
       window.ENV.SIMILARITY_PLEDGE = {
         COMMENTS: 'hi',
         EULA_URL: 'http://someurl.com',
-        PLEDGE_TEXT: 'some text'
+        PLEDGE_TEXT: 'some text',
       }
 
       props = await mockAssignmentAndSubmission({
         Assignment: {
-          submissionTypes: ['online_text_entry', 'online_url']
+          submissionTypes: ['online_text_entry', 'online_url'],
         },
         Submission: {
           submissionDraft: {
@@ -1356,9 +1356,9 @@ describe('SubmissionManager', () => {
             body: 'some text here',
             meetsTextEntryCriteria: true,
             meetsUrlCriteria: true,
-            url: 'http://www.google.com'
-          }
-        }
+            url: 'http://www.google.com',
+          },
+        },
       })
     })
 

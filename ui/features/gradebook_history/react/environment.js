@@ -38,5 +38,5 @@ export default {
   overrideGradesEnabled,
   courseId,
   courseIsConcluded,
-  timezone
+  timezone,
 }

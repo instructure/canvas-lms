@@ -42,7 +42,7 @@ const attachmentNameStyle = {
   textOverflow: 'ellipsis',
   verticalAlign: 'middle',
   whiteSpace: 'nowrap',
-  width: '280px'
+  width: '280px',
 }
 
 function FileBrowserWrapper(props) {
@@ -89,13 +89,13 @@ export function AnnotatedDocumentSelector({attachment, defaultUploadFolderId, on
 AnnotatedDocumentSelector.propTypes = {
   attachment: PropTypes.shape({
     id: PropTypes.string,
-    name: PropTypes.string
+    name: PropTypes.string,
   }),
   defaultUploadFolderId: PropTypes.string,
   onSelect: PropTypes.func,
-  onRemove: PropTypes.func
+  onRemove: PropTypes.func,
 }
 
 AnnotatedDocumentSelector.defaultProps = {
-  defaultUploadFolderId: null
+  defaultUploadFolderId: null,
 }

@@ -27,9 +27,9 @@ export default {
     gradebookIsEditable: true,
     onChange: () => {},
     settings: {
-      postManually: true
-    }
-  }
+      postManually: true,
+    },
+  },
 }
 
 const Template = args => <GradePostingPolicyTabPanel {...args} />

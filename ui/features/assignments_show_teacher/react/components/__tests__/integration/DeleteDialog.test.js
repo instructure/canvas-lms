@@ -36,7 +36,7 @@ describe('assignments 2 delete dialog', () => {
     render: renderTeacherView,
     getOpenDialogElt: fns => fns.getByText('delete assignment'),
     confirmDialogOpen: fns => fns.getByText(/are you sure/i, {exact: false}),
-    getCancelDialogElt: fns => fns.getByTestId('delete-dialog-cancel-button')
+    getCancelDialogElt: fns => fns.getByTestId('delete-dialog-cancel-button'),
   })
 
   // eslint-disable-next-line jest/no-disabled-tests
@@ -46,7 +46,7 @@ describe('assignments 2 delete dialog', () => {
 
     const assignment = mockAssignment()
     const {getByTestId} = await openDeleteDialog(assignment, [
-      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'})
+      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}),
     ])
     const reallyDeleteButton = await waitFor(() => getByTestId('delete-dialog-confirm-button'))
     fireEvent.click(reallyDeleteButton)
@@ -57,7 +57,7 @@ describe('assignments 2 delete dialog', () => {
   it.skip('reports errors', async () => {
     const assignment = mockAssignment()
     const {getByTestId, getAllByText} = await openDeleteDialog(assignment, [
-      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats')
+      saveAssignmentResult(assignment, {state: 'deleted'}, {state: 'deleted'}, 'well rats'),
     ])
     const reallyDeleteButton = await waitFor(() => getByTestId('delete-dialog-confirm-button'))
     fireEvent.click(reallyDeleteButton)

@@ -85,6 +85,22 @@ describe Rubric do
           expect(rubric_criterion.ratings.length).to eq 2
           expect(@rubric.points_possible).to eq 8
         end
+
+        it "when friendly descriptions found" do
+          @rubric.update_learning_outcome_criteria(@outcome)
+          rubric_criterion = @rubric.criteria_object.first
+          friendly_description = "a friendly description"
+          OutcomeFriendlyDescription.create!({ learning_outcome: @outcome, context: @course, description: friendly_description })
+          learning_outcome_friendly_description = @rubric.outcome_friendly_descriptions.first
+          expect(rubric_criterion.learning_outcome_id).to eq learning_outcome_friendly_description.learning_outcome_id
+          expect(learning_outcome_friendly_description.description).to eq "a friendly description"
+        end
+
+        it "when friendly descriptions not found" do
+          @rubric.update_learning_outcome_criteria(@outcome)
+          outcome_friendly_descriptions = @rubric.outcome_friendly_descriptions
+          expect(outcome_friendly_descriptions).to eq []
+        end
       end
 
       context "from mastery scales" do

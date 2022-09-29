@@ -120,6 +120,10 @@ describe Outcomes::ResultAnalytics do
   end
 
   describe "#find_outcome_results" do
+    let_once :assignment_2 do
+      assignment_model
+    end
+
     before(:once) do
       course_with_student
 
@@ -134,9 +138,11 @@ describe Outcomes::ResultAnalytics do
       rubric = outcome_with_rubric context: @course
       @assignment = assignment_model
       @alignment = @outcome.align(@assignment, @course)
+      @alignment_2 = @outcome.align(assignment_2, @course)
       @rubric_association = rubric.associate_with(@assignment, @course, purpose: "grading")
+      @rubric_association_2 = rubric.associate_with(assignment_2, @course, purpose: "grading")
       lor
-      lor(hidden: true)
+      lor({ hidden: true, alignment: @alignment_2, association_id: @rubric_association_2.id })
       lor({ hidden: true }, @students[0])
       lor({ hidden: true }, @students[1])
       lor({ hidden: true }, @students[2])

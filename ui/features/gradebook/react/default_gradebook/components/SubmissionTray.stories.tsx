@@ -26,7 +26,7 @@ export default {
     colors: {
       late: '#FEF7E5',
       missing: '#F99',
-      excused: '#E5F3FC'
+      excused: '#E5F3FC',
     },
     editedCommentId: null,
     editSubmissionComment() {},
@@ -36,7 +36,7 @@ export default {
       ['A', 0.9],
       ['B+', 0.85],
       ['B', 0.8],
-      ['B-', 0.75]
+      ['B-', 0.75],
     ],
     locale: 'en',
     onAnonymousSpeedGraderClick() {},
@@ -53,7 +53,7 @@ export default {
       id: '27',
       name: 'Jane Doe',
       gradesUrl: '',
-      isConcluded: false
+      isConcluded: false,
     },
     submission: {
       assignmentId: '30',
@@ -72,7 +72,7 @@ export default {
       secondsLate: 50000,
       submissionType: 'online_text_entry',
       userId: '27',
-      workflowState: 'graded'
+      workflowState: 'graded',
     },
     updateSubmission() {},
     updateSubmissionComment() {},
@@ -87,7 +87,7 @@ export default {
       muted: false,
       pointsPossible: 10,
       postManually: false,
-      published: true
+      published: true,
     },
     isFirstAssignment: false,
     isLastAssignment: false,
@@ -106,8 +106,8 @@ export default {
     isInOtherGradingPeriod: false,
     isInClosedGradingPeriod: false,
     isInNoGradingPeriod: false,
-    isNotCountedForScore: false
-  }
+    isNotCountedForScore: false,
+  },
 }
 
 const Template = args => <SubmissionTray {...args} />

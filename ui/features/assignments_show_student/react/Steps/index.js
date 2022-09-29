@@ -41,7 +41,7 @@ class Steps extends Component {
       if (inProgressArr.length > 1) {
         new Error('Warning: Step has two StepItems with a status of in-progress')
       }
-    }
+    },
   }
 
   static findInProgressChild(element) {
@@ -118,7 +118,7 @@ class Steps extends Component {
             >
               {safeCloneElement(child, {
                 pinSize: '32px',
-                placement: this.handlePlacement(filteredChildren.length, index)
+                placement: this.handlePlacement(filteredChildren.length, index),
               })}
             </li>
           ))}

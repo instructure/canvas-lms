@@ -40,7 +40,7 @@ describe Mutations::CreateSubmissionComment do
     stringify ? "\"#{value}\"" : value
   end
 
-  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil)
+  def mutation_str(submission_id: nil, attempt: nil, comment: "hello", file_ids: [], media_object_id: nil, media_object_type: nil, reviewer_submission_id: nil)
     <<~GQL
       mutation {
         createSubmissionComment(input: {
@@ -50,6 +50,7 @@ describe Mutations::CreateSubmissionComment do
           mediaObjectId: #{value_or_null(media_object_id)}
           mediaObjectType: #{value_or_null(media_object_type)}
           submissionId: #{value_or_null(submission_id || @submission.id)}
+          reviewerSubmissionId: #{value_or_null(reviewer_submission_id)}
         }) {
           submissionComment {
             _id
@@ -200,6 +201,36 @@ describe Mutations::CreateSubmissionComment do
 
     it "gracefully handles the media object not being found" do
       result = run_mutation(media_object_id: "m-2pRR7YQkQAR9mBzBdwmT1EZbYfUpzkMY")
+      expect(result[:errors].length).to eq 1
+      expect(result[:errors][0][:message]).to eq "not found"
+    end
+  end
+
+  describe "reviewer_submission_id argument" do
+    before(:once) do
+      @assignment.update_attribute(:peer_reviews, true)
+      reviewer = User.create!(name: "John Connor")
+      @course.enroll_user(reviewer, "StudentEnrollment", enrollment_state: "active")
+      @assessment_request = @assignment.assign_peer_review(reviewer, @student)
+      @reviewer_submission = @assignment.submission_for_student(reviewer)
+    end
+
+    it "marks the workflow_state as complete for the associated assessment request" do
+      expect(@assessment_request.workflow_state).to eq "assigned"
+      run_mutation(reviewer_submission_id: @reviewer_submission.id)
+      @assessment_request.reload
+      expect(@assessment_request.workflow_state).to eq "completed"
+    end
+
+    it "gracefully handles the reviewer submission not being found" do
+      result = run_mutation(reviewer_submission_id: "9")
+      expect(result[:errors].length).to eq 1
+      expect(result[:errors][0][:message]).to eq "not found"
+    end
+
+    it "gracefully handles the assessment request not being found" do
+      @assessment_request.destroy!
+      result = run_mutation(reviewer_submission_id: @reviewer_submission.id)
       expect(result[:errors].length).to eq 1
       expect(result[:errors][0][:message]).to eq "not found"
     end

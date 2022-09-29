@@ -22,13 +22,13 @@ import GridColor from 'ui/features/gradebook/react/default_gradebook/components/
 import {
   darken,
   defaultColors,
-  statusColors
+  statusColors,
 } from 'ui/features/gradebook/react/default_gradebook/constants/colors'
 
 function defaultProps(props = {}) {
   return {
     colors: statusColors(),
-    ...props
+    ...props,
   }
 }
 
@@ -38,7 +38,7 @@ QUnit.module('GridColor', {
   },
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('it renders style', function () {
@@ -51,7 +51,7 @@ QUnit.module('GridColor rendered html', {
   },
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('it has blue as a default color', function () {

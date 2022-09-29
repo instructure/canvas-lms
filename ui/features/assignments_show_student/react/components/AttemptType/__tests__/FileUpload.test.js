@@ -38,24 +38,24 @@ async function createGraphqlMocks(overrides = {}) {
     {
       request: {
         query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
+        variables: {courseID: '1'},
       },
-      result: externalToolsResult
+      result: externalToolsResult,
     },
     {
       request: {
         query: EXTERNAL_TOOLS_QUERY,
-        variables: {courseID: '1'}
+        variables: {courseID: '1'},
       },
-      result: externalToolsResult
+      result: externalToolsResult,
     },
     {
       request: {
         query: USER_GROUPS_QUERY,
-        variables: {userID: '1'}
+        variables: {userID: '1'},
       },
-      result: userGroupsResult
-    }
+      result: userGroupsResult,
+    },
   ]
 }
 
@@ -69,7 +69,7 @@ async function makeProps(overrides) {
     onUploadRequested: jest.fn(),
     filesToUpload: [],
     uploadingFiles: false,
-    focusOnInit: false
+    focusOnInit: false,
   }
   return props
 }
@@ -87,8 +87,8 @@ describe('FileUpload', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
-        files
-      }
+        files,
+      },
     })
   }
 
@@ -164,7 +164,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {displayName: 'foobarbaz'}
+      File: {displayName: 'foobarbaz'},
     })
 
     const {getByTestId, getAllByText} = render(
@@ -180,7 +180,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {displayName: 'foobarbaz', mimeClass: 'image'}
+      File: {displayName: 'foobarbaz', mimeClass: 'image'},
     })
     const {container, getByTestId} = render(
       <MockedProvider mocks={mocks}>
@@ -195,7 +195,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {displayName: 'foobarbaz', mimeClass: 'pdf'}
+      File: {displayName: 'foobarbaz', mimeClass: 'pdf'},
     })
 
     const {container, getByTestId} = render(
@@ -235,8 +235,8 @@ describe('FileUpload', () => {
         expect.objectContaining({
           files: [
             expect.objectContaining({preview: 'perry_preview'}),
-            expect.objectContaining({preview: 'perry_preview'})
-          ]
+            expect.objectContaining({preview: 'perry_preview'}),
+          ],
         })
       )
     })
@@ -271,7 +271,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const setOnSuccess = jest.fn()
     const props = await makeProps({
-      Submission: {attempt: 0}
+      Submission: {attempt: 0},
     })
     uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'LemonRules.jpg'})
 
@@ -292,10 +292,10 @@ describe('FileUpload', () => {
             {
               url: 'http://lemon.com',
               title: 'LemonRules.txt',
-              mediaType: 'plain/txt'
-            }
-          ]
-        }
+              mediaType: 'plain/txt',
+            },
+          ],
+        },
       })
     )
 
@@ -306,9 +306,9 @@ describe('FileUpload', () => {
             {
               mediaType: 'plain/txt',
               title: 'LemonRules.txt',
-              url: 'http://lemon.com'
-            }
-          ]
+              url: 'http://lemon.com',
+            },
+          ],
         })
       )
     })
@@ -318,7 +318,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const setOnSuccess = jest.fn()
     const props = await makeProps({
-      Submission: {attempt: 0}
+      Submission: {attempt: 0},
     })
     uploadFileModule.uploadFile.mockResolvedValueOnce({id: '1', name: 'LemonRules.jpg'})
 
@@ -339,10 +339,10 @@ describe('FileUpload', () => {
             {
               url: 'http://lemon.com',
               title: 'LemonRules.txt',
-              mediaType: 'application/octet-stream'
-            }
-          ]
-        }
+              mediaType: 'application/octet-stream',
+            },
+          ],
+        },
       })
     )
 
@@ -353,9 +353,9 @@ describe('FileUpload', () => {
             {
               mediaType: '',
               title: 'LemonRules.txt',
-              url: 'http://lemon.com'
-            }
-          ]
+              url: 'http://lemon.com',
+            },
+          ],
         })
       )
     })
@@ -378,8 +378,8 @@ describe('FileUpload', () => {
       new MessageEvent('message', {
         data: {
           subject: 'A2ExternalContentReady',
-          content_items: []
-        }
+          content_items: [],
+        },
       })
     )
 
@@ -404,8 +404,8 @@ describe('FileUpload', () => {
       new MessageEvent('message', {
         data: {
           subject: 'LtiDeepLinkingResponse',
-          errormsg
-        }
+          errormsg,
+        },
       })
     )
 
@@ -434,11 +434,11 @@ describe('FileUpload', () => {
             {
               url: 'http://lemon.com',
               title: 'LemonRules.txt',
-              mediaType: 'plain/txt'
-            }
+              mediaType: 'plain/txt',
+            },
           ],
-          errormsg
-        }
+          errormsg,
+        },
       })
     )
 
@@ -449,7 +449,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {_id: '1', displayName: 'foobarbaz'}
+      File: {_id: '1', displayName: 'foobarbaz'},
     })
 
     const {container, getByText} = render(
@@ -467,12 +467,12 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const attachmentOverrides = [
       {_id: '1', displayName: 'foobarbaz1'},
-      {_id: '2', displayName: 'foobarbaz2'}
+      {_id: '2', displayName: 'foobarbaz2'},
     ]
     const props = await makeProps({
       Submission: {
-        submissionDraft: {attachments: attachmentOverrides}
-      }
+        submissionDraft: {attachments: attachmentOverrides},
+      },
     })
 
     const {container, getByText} = render(
@@ -491,7 +491,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {displayName: 'c'.repeat(22)}
+      File: {displayName: 'c'.repeat(22)},
     })
 
     const {getByText} = render(
@@ -508,7 +508,7 @@ describe('FileUpload', () => {
     const filename = 'c'.repeat(21)
     const props = await makeProps({
       Submission: SubmissionMocks.onlineUploadReadyToSubmit,
-      File: {displayName: filename}
+      File: {displayName: filename},
     })
 
     const {getAllByText} = render(
@@ -536,7 +536,7 @@ describe('FileUpload', () => {
   it('displays allowed extensions in the upload box', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg, png']}
+      Assignment: {allowedExtensions: ['jpg, png']},
     })
     const {getByTestId, getByText} = render(
       <MockedProvider mocks={mocks}>
@@ -564,7 +564,7 @@ describe('FileUpload', () => {
   it('renders an error when adding a file that is not an allowed extension', async () => {
     const mocks = await createGraphqlMocks()
     const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg']}
+      Assignment: {allowedExtensions: ['jpg']},
     })
     const {container, getByText} = render(
       <MockedProvider mocks={mocks}>
@@ -583,7 +583,7 @@ describe('FileUpload', () => {
     const mocks = await createGraphqlMocks()
     const setOnSuccess = jest.fn()
     const props = await makeProps({
-      Assignment: {allowedExtensions: ['jpg']}
+      Assignment: {allowedExtensions: ['jpg']},
     })
     const {container, queryByText} = render(
       <MockedProvider mocks={mocks}>
@@ -606,8 +606,8 @@ describe('FileUpload', () => {
     const attachmentOverrides = [{_id: '1', displayName: 'just a file'}]
     const props = await makeProps({
       Submission: {
-        submissionDraft: {attachments: attachmentOverrides}
-      }
+        submissionDraft: {attachments: attachmentOverrides},
+      },
     })
 
     const {container, getByTestId} = render(
@@ -626,7 +626,7 @@ describe('FileUpload', () => {
     const props = await makeProps()
     props.filesToUpload = [
       {id: '1', name: 'file1.pdf', isLoading: true, loaded: 10, total: 100},
-      {id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250}
+      {id: '2', name: 'file2.pdf', isLoading: true, loaded: 50, total: 250},
     ]
 
     const {getAllByRole} = render(
@@ -672,7 +672,7 @@ describe('FileUpload', () => {
     it('is available when the assignment allows PNG files', async () => {
       const mocks = await createGraphqlMocks()
       const props = await makeProps({
-        Assignment: {allowedExtensions: ['jpg', 'png']}
+        Assignment: {allowedExtensions: ['jpg', 'png']},
       })
 
       const {findByRole} = render(
@@ -687,7 +687,7 @@ describe('FileUpload', () => {
     it('is not available when the assignment does not allow PNG files', async () => {
       const mocks = await createGraphqlMocks()
       const props = await makeProps({
-        Assignment: {allowedExtensions: ['xls']}
+        Assignment: {allowedExtensions: ['xls']},
       })
 
       const {findByRole, queryByRole} = render(

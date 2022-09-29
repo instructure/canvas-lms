@@ -21,6 +21,9 @@ import PropTypes from 'prop-types'
 import {Flex} from '@instructure/ui-flex'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {IconButton} from '@instructure/ui-buttons'
+import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 import AlignmentStatItem from './AlignmentStatItem'
 import OutcomeSearchBar from '../Management/OutcomeSearchBar'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -48,6 +51,8 @@ const AlignmentSummaryHeader = ({
   const avgPerArtifact = totalArtifacts !== 0 ? artifactAlignments / totalArtifacts : 0
   const withAlignments = totalOutcomes !== 0 ? alignedOutcomes : 0
   const withoutAlignments = totalOutcomes !== 0 ? totalOutcomes - alignedOutcomes : 0
+  const [showStats, setShowStats] = useState(false)
+  const toggleStats = () => setShowStats(prevState => !prevState)
 
   const handleFilterChange = (_event, {id}) => {
     setSelectedFilter(id)
@@ -85,6 +90,87 @@ const AlignmentSummaryHeader = ({
     )
   }
 
+  const renderAlignmentStats = () => (
+    <div
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        overflow: isMobileView ? 'hidden' : 'auto',
+        justifyItems: 'start'
+      }}
+    >
+      <Flex.Item
+        as="div"
+        size={isMobileView ? '100%' : '31rem'}
+        padding={isMobileView ? 'xx-small x-small x-small' : 'x-small small x-small x-small'}
+        shouldGrow={!!isMobileView}
+      >
+        <AlignmentStatItem
+          type="outcome"
+          count={totalOutcomes}
+          percent={percentCoverage}
+          average={avgPerOutcome}
+        />
+      </Flex.Item>
+      <Flex.Item
+        as="div"
+        size={isMobileView ? '100%' : '31rem'}
+        padding={isMobileView ? 'xx-small x-small x-small' : 'x-small small x-small x-small'}
+        shouldGrow={!!isMobileView}
+      >
+        <AlignmentStatItem
+          type="artifact"
+          count={totalArtifacts}
+          percent={percentWithAlignments}
+          average={avgPerArtifact}
+        />
+      </Flex.Item>
+    </div>
+  )
+
+  const renderResponsiveAlignmentStats = () => {
+    const showStatsMsg = I18n.t('Show Outcomes Statistics')
+    const hideStatsMsg = I18n.t('Hide Outcomes Statistics')
+
+    return (
+      <Flex as="div" direction="column">
+        <Flex as="div">
+          <Flex.Item as="div" size="2.5rem">
+            <Flex as="div" alignItems="start" justifyItems="center">
+              <Flex.Item>
+                <div style={{padding: '0.3125rem 0'}}>
+                  <IconButton
+                    size="small"
+                    screenReaderLabel={showStats ? hideStatsMsg : showStatsMsg}
+                    withBackground={false}
+                    withBorder={false}
+                    interaction="enabled"
+                    onClick={toggleStats}
+                    data-testid="alignment-summary-outcome-expand-toggle"
+                  >
+                    <div style={{display: 'flex', alignSelf: 'center', fontSize: '0.875rem'}}>
+                      {!showStats ? (
+                        <IconArrowOpenEndLine data-testid="alignment-summary-icon-arrow-right" />
+                      ) : (
+                        <IconArrowOpenDownLine data-testid="alignment-summary-icon-arrow-down" />
+                      )}
+                    </div>
+                  </IconButton>
+                </div>
+              </Flex.Item>
+            </Flex>
+          </Flex.Item>
+          <Flex.Item size="50%" shouldGrow={true}>
+            <div style={{padding: '0.625rem 0'}}>
+              <Text>{showStats ? hideStatsMsg : showStatsMsg}</Text>
+            </div>
+          </Flex.Item>
+        </Flex>
+        {showStats && renderAlignmentStats()}
+      </Flex>
+    )
+  }
+
   return (
     <Flex
       as="div"
@@ -92,38 +178,12 @@ const AlignmentSummaryHeader = ({
       position="relative"
       data-testid="outcome-alignment-summary-header"
     >
-      <Flex.Item as="div">
-        <div
-          style={{display: 'flex', flexWrap: isMobileView ? 'nowrap' : 'wrap', overflow: 'auto'}}
-          className="alignment-summary-stats"
-        >
-          <Flex.Item
-            as="div"
-            size={isMobileView ? '17.5rem' : '31rem'}
-            padding={isMobileView ? 'xx-small x-small x-small' : 'x-small small x-small x-small'}
-          >
-            <AlignmentStatItem
-              type="outcome"
-              count={totalOutcomes}
-              percent={percentCoverage}
-              average={avgPerOutcome}
-            />
-          </Flex.Item>
-          <Flex.Item
-            as="div"
-            size={isMobileView ? '17.5rem' : '31rem'}
-            padding={
-              isMobileView ? 'xx-small x-small x-small small' : 'x-small small x-small x-small'
-            }
-          >
-            <AlignmentStatItem
-              type="artifact"
-              count={totalArtifacts}
-              percent={percentWithAlignments}
-              average={avgPerArtifact}
-            />
-          </Flex.Item>
-        </div>
+      <Flex.Item
+        as="div"
+        overflowX={isMobileView ? 'hidden' : 'auto'}
+        overflowY={isMobileView ? 'hidden' : 'auto'}
+      >
+        {isMobileView ? renderResponsiveAlignmentStats() : renderAlignmentStats()}
       </Flex.Item>
       <Flex.Item as="div" padding="xx-small 0 0">
         <Flex as="div" wrap="wrap" direction={isMobileView ? 'column' : 'row'}>

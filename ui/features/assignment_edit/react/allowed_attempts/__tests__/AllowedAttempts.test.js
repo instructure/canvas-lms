@@ -24,7 +24,7 @@ function renderAllowedAttempts(opts) {
   const defaults = {
     limited: false,
     onLimitedChange: jest.fn(),
-    onAttemptsChange: jest.fn()
+    onAttemptsChange: jest.fn(),
   }
 
   return {...render(<AllowedAttempts {...defaults} {...opts} />), ...defaults, ...opts}

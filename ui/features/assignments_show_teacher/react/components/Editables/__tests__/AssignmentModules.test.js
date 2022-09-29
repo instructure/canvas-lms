@@ -32,7 +32,7 @@ function makeModuleList() {
   return [
     {lid: '1', name: 'Module 1'},
     {lid: '2', name: 'Module 2'},
-    {lid: '3', name: 'Module 3'}
+    {lid: '3', name: 'Module 3'},
   ]
 }
 

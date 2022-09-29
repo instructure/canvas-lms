@@ -20,7 +20,7 @@ import _ from 'underscore'
 import $ from 'jquery'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
@@ -35,14 +35,14 @@ QUnit.module('Gradebook#updateModulesFilterVisibility', {
     this.gradebook = createGradebook()
     this.gradebook.setContextModules([
       {id: '1', name: 'Module 1', position: 1},
-      {id: '2', name: 'Module 2', position: 2}
+      {id: '2', name: 'Module 2', position: 2},
     ])
     this.gradebook.setSelectedViewOptionsFilters(['modules'])
   },
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('renders the module select when not already rendered', function () {
@@ -70,14 +70,14 @@ QUnit.module('Gradebook#updateAssignmentGroupFilterVisibility', {
     this.gradebook = createGradebook()
     this.gradebook.setAssignmentGroups([
       {id: '1', name: 'Assignments', position: 1},
-      {id: '2', name: 'Other', position: 2}
+      {id: '2', name: 'Other', position: 2},
     ])
     this.gradebook.setSelectedViewOptionsFilters(['assignmentGroups'])
   },
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('renders the assignment group select when not already rendered', function () {
@@ -103,7 +103,7 @@ QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
     this.gradebook = createGradebook()
     this.gradebook.setAssignmentGroups({
       301: {name: 'Assignments', group_weight: 40},
-      302: {name: 'Homework', group_weight: 60}
+      302: {name: 'Homework', group_weight: 60},
     })
     this.gradebook.gradingPeriodSet = {id: '1501'}
     this.gradebook.setContextModules([{id: '2601'}, {id: '2602'}])
@@ -112,7 +112,7 @@ QUnit.module('Gradebook#getFilterSettingsViewOptionsMenuProps', {
     sandbox.stub(this.gradebook, 'renderViewOptionsMenu')
     sandbox.stub(this.gradebook, 'renderFilters')
     sandbox.stub(this.gradebook, 'saveSettings')
-  }
+  },
 })
 
 test('includes available filters', function () {
@@ -122,7 +122,7 @@ test('includes available filters', function () {
     'gradingPeriods',
     'modules',
     'sections',
-    'studentGroups'
+    'studentGroups',
   ])
 })
 
@@ -211,19 +211,19 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
       {
         groups: [
           {id: '1', name: 'First Group Set 1'},
-          {id: '2', name: 'First Group Set 2'}
+          {id: '2', name: 'First Group Set 2'},
         ],
         id: '1',
-        name: 'First Group Set'
+        name: 'First Group Set',
       },
       {
         groups: [
           {id: '3', name: 'Second Group Set 1'},
-          {id: '4', name: 'Second Group Set 2'}
+          {id: '4', name: 'Second Group Set 2'},
         ],
         id: '2',
-        name: 'Second Group Set'
-      }
+        name: 'Second Group Set',
+      },
     ]
 
     gradebook = createGradebook({student_groups: studentGroups})
@@ -268,7 +268,7 @@ QUnit.module('Gradebook#updateStudentGroupFilterVisibility', hooks => {
       'First Group Set 1',
       'First Group Set 2',
       'Second Group Set 1',
-      'Second Group Set 2'
+      'Second Group Set 2',
     ])
   })
 
@@ -324,7 +324,7 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
     this.container = $fixtures.querySelector(`#${sectionsFilterContainerSelector}`)
     const sections = [
       {id: '2001', name: 'Freshmen / First-Year'},
-      {id: '2002', name: 'Sophomores'}
+      {id: '2002', name: 'Sophomores'},
     ]
     this.gradebook = createGradebook({sections})
     this.gradebook.sections_enabled = true
@@ -333,7 +333,7 @@ QUnit.module('Gradebook#updateSectionFilterVisibility', {
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('renders the section filter when not already rendered', function () {
@@ -415,7 +415,7 @@ QUnit.module('Gradebook#renderStudentSearchFilter', {
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('does not render old set up/search field', function () {
@@ -472,7 +472,7 @@ QUnit.module('Gradebook#updateCurrentSection', {
 
     this.gradebook = createGradebook({settings_update_url: '/settingUrl'})
     this.gradebook.postGradesStore = {
-      setSelectedSection: sinon.stub()
+      setSelectedSection: sinon.stub(),
     }
     sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForSectionFilterChange')
     sinon.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
@@ -481,7 +481,7 @@ QUnit.module('Gradebook#updateCurrentSection', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('updates the filter setting with the given section id', function () {
@@ -552,7 +552,7 @@ QUnit.module('Gradebook#isFilteringColumnsByGradingPeriod', {
     this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '701'}, {id: '702'}]}
     this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '702')
     this.gradebook.setCurrentGradingPeriod()
-  }
+  },
 })
 
 test('returns true when the "filter columns by" setting includes a grading period', function () {
@@ -601,7 +601,7 @@ QUnit.module('Gradebook#filterAssignments', {
         published: true,
         submission_types: ['online_text_entry'],
         assignment_group_id: '1',
-        module_ids: ['2']
+        module_ids: ['2'],
       },
       {
         assignment_group: {position: 2},
@@ -611,7 +611,7 @@ QUnit.module('Gradebook#filterAssignments', {
         published: false,
         submission_types: ['online_text_entry'],
         assignment_group_id: '2',
-        module_ids: ['1']
+        module_ids: ['1'],
       },
       {
         assignment_group: {position: 2},
@@ -621,7 +621,7 @@ QUnit.module('Gradebook#filterAssignments', {
         published: true,
         submission_types: ['not_graded'],
         assignment_group_id: '2',
-        module_ids: ['2']
+        module_ids: ['2'],
       },
       {
         assignment_group: {position: 1},
@@ -631,32 +631,32 @@ QUnit.module('Gradebook#filterAssignments', {
         published: true,
         submission_types: ['attendance'],
         assignment_group_id: '1',
-        module_ids: ['1']
-      }
+        module_ids: ['1'],
+      },
     ]
     this.gradebook = createGradebook()
     this.gradebook.setAssignmentGroups([
       {id: '1', name: 'Assignments', position: 1},
-      {id: '2', name: 'Homework', position: 2}
+      {id: '2', name: 'Homework', position: 2},
     ])
     this.gradebook.courseContent.gradingPeriodAssignments = {
       1401: ['2301', '2303'],
-      1402: ['2302', '2304']
+      1402: ['2302', '2304'],
     }
     this.gradebook.courseContent.contextModules = [
       {id: '1', name: 'Algebra', position: 1},
-      {id: '2', name: 'English', position: 2}
+      {id: '2', name: 'English', position: 2},
     ]
     this.gradebook.gradingPeriodSet = {
       id: '1501',
       gradingPeriods: [
         {id: '1401', title: 'Grading Period #1'},
-        {id: '1402', title: 'Grading Period #2'}
-      ]
+        {id: '1402', title: 'Grading Period #2'},
+      ],
     }
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
-  }
+  },
 })
 
 test('when filtering by assignments, only includes assignments in the filter', function () {
@@ -780,8 +780,8 @@ test('returns empty array when all settings are off', () => {
   const gradebook = createGradebook({
     settings: {
       show_concluded_enrollments: 'false',
-      show_inactive_enrollments: 'false'
-    }
+      show_inactive_enrollments: 'false',
+    },
   })
   equal(gradebook.getSelectedEnrollmentFilters().length, 0)
 })
@@ -790,8 +790,8 @@ test('returns array including "concluded" when setting is on', () => {
   const gradebook = createGradebook({
     settings: {
       show_concluded_enrollments: 'true',
-      show_inactive_enrollments: 'false'
-    }
+      show_inactive_enrollments: 'false',
+    },
   })
 
   ok(gradebook.getSelectedEnrollmentFilters().includes('concluded'))
@@ -802,8 +802,8 @@ test('returns array including "inactive" when setting is on', () => {
   const gradebook = createGradebook({
     settings: {
       show_concluded_enrollments: 'false',
-      show_inactive_enrollments: 'true'
-    }
+      show_inactive_enrollments: 'true',
+    },
   })
   ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'))
   notOk(gradebook.getSelectedEnrollmentFilters().includes('concluded'))
@@ -813,8 +813,8 @@ test('returns array including multiple values when settings are on', () => {
   const gradebook = createGradebook({
     settings: {
       show_concluded_enrollments: 'true',
-      show_inactive_enrollments: 'true'
-    }
+      show_inactive_enrollments: 'true',
+    },
   })
   ok(gradebook.getSelectedEnrollmentFilters().includes('inactive'))
   ok(gradebook.getSelectedEnrollmentFilters().includes('concluded'))
@@ -825,12 +825,12 @@ QUnit.module('Gradebook#toggleEnrollmentFilter', {
     this.gradebook = createGradebook()
     this.gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders: sinon.stub()
-      }
+        updateColumnHeaders: sinon.stub(),
+      },
     }
     sandbox.stub(this.gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
     sandbox.stub(this.gradebook, 'saveSettings').callsFake(() => Promise.resolve())
-  }
+  },
 })
 
 test('changes the value of @getSelectedEnrollmentFilters', function () {
@@ -874,15 +874,15 @@ QUnit.module('Gradebook#updateCurrentModule', {
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
-          context_module_id: '2'
+          context_module_id: '2',
         },
-        selected_view_options_filters: ['modules']
-      }
+        selected_view_options_filters: ['modules'],
+      },
     })
     this.gradebook.setContextModules([
       {id: '1', name: 'Module 1', position: 1},
       {id: '2', name: 'Another Module', position: 2},
-      {id: '3', name: 'Module 2', position: 3}
+      {id: '3', name: 'Module 2', position: 3},
     ])
     sinon.spy(this.gradebook, 'setFilterColumnsBySetting')
     sandbox.spy($, 'ajaxJSON')
@@ -892,7 +892,7 @@ QUnit.module('Gradebook#updateCurrentModule', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('updates the filter setting with the given module id', function () {
@@ -934,14 +934,14 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
     this.gradebook = createGradebook({
       settings: {
         filter_columns_by: {
-          assignment_group_id: '2'
+          assignment_group_id: '2',
         },
-        selected_view_options_filters: ['assignmentGroups']
-      }
+        selected_view_options_filters: ['assignmentGroups'],
+      },
     })
     this.gradebook.setAssignmentGroups({
       1: {id: '1', name: 'First'},
-      2: {id: '2', name: 'Second'}
+      2: {id: '2', name: 'Second'},
     })
     sinon.spy(this.gradebook, 'setFilterColumnsBySetting')
     sandbox.spy($, 'ajaxJSON')
@@ -951,7 +951,7 @@ QUnit.module('Gradebook#updateCurrentAssignmentGroup', {
 
   teardown() {
     this.server.restore()
-  }
+  },
 })
 
 test('updates the filter setting with the given assignment group id', function () {
@@ -998,9 +998,9 @@ QUnit.module('Gradebook (3)', () => {
         publish_to_sis_enabled: false,
         grading_period_set: {
           id: '1501',
-          grading_periods: [{id: '701'}, {id: '702'}]
+          grading_periods: [{id: '701'}, {id: '702'}],
         },
-        current_grading_period_id: '702'
+        current_grading_period_id: '702',
       }
     })
 
@@ -1038,31 +1038,31 @@ QUnit.module('Gradebook (3)', () => {
         id: '1501',
         grading_periods: [
           {id: '1401', title: 'Grading Period #1'},
-          {id: '1402', title: 'Grading Period #2'}
-        ]
+          {id: '1402', title: 'Grading Period #2'},
+        ],
       },
       sections: [
         {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
+        {id: '2002', name: 'Sophomores'},
       ],
       sections_enabled: true,
       settings: {
         filter_columns_by: {
           assignment_group_id: '2',
           grading_period_id: '1402',
-          context_module_id: '2'
+          context_module_id: '2',
         },
         filter_rows_by: {
-          section_id: '2001'
+          section_id: '2001',
         },
-        selected_view_options_filters: currentFilters
+        selected_view_options_filters: currentFilters,
       },
       isModulesLoading: false,
       modules: [
         {id: '1', name: 'Module 1', position: 1},
         {id: '2', name: 'Another Module', position: 2},
-        {id: '3', name: 'Module 2', position: 3}
-      ]
+        {id: '3', name: 'Module 2', position: 3},
+      ],
     }
 
     hooks.beforeEach(() => {
@@ -1071,7 +1071,7 @@ QUnit.module('Gradebook (3)', () => {
       gradebook = createGradebook(options)
       gradebook.setAssignmentGroups({
         1: {id: '1', name: 'Assignment Group #1'},
-        2: {id: '2', name: 'Assignment Group #2'}
+        2: {id: '2', name: 'Assignment Group #2'},
       })
 
       sinon.spy(gradebook, 'setFilterColumnsBySetting')
@@ -1135,7 +1135,7 @@ QUnit.module('Gradebook (3)', () => {
     test('does not delete the modules filter setting when the filter is hidden and modules have not loaded', () => {
       gradebook = createGradebook({
         ...options,
-        isModulesLoading: true
+        isModulesLoading: true,
       })
       gradebook.updateFilterSettings(currentFilters.filter(type => type !== 'modules'))
       strictEqual(gradebook.getFilterColumnsBySetting('contextModuleId'), '2')
@@ -1155,11 +1155,11 @@ QUnit.module('Gradebook (3)', () => {
 QUnit.module('Gradebook#hideAggregateColumns', {
   createGradebook() {
     const gradebook = createGradebook({
-      all_grading_periods_totals: false
+      all_grading_periods_totals: false,
     })
     gradebook.gradingPeriodSet = {id: '1', gradingPeriods: [{id: '701'}, {id: '702'}]}
     return gradebook
-  }
+  },
 })
 
 test('returns false if there are no grading periods', function () {
@@ -1212,7 +1212,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
       id: '2301',
       name: 'graded assignment',
       position: 1,
-      published: true
+      published: true,
     }
     notGradedAssignment = {
       assignment_group: {position: 2},
@@ -1221,7 +1221,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
       id: '2302',
       name: 'not graded assignment',
       position: 2,
-      published: true
+      published: true,
     }
     const submissionsChunk = [
       {
@@ -1232,7 +1232,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
             posted_at: null,
             score: 10,
             user_id: '1101',
-            workflow_state: 'graded'
+            workflow_state: 'graded',
           },
           {
             assignment_id: '2302',
@@ -1240,16 +1240,16 @@ QUnit.module('#listHiddenAssignments', hooks => {
             posted_at: null,
             score: 9,
             user_id: '1101',
-            workflow_state: 'graded'
-          }
+            workflow_state: 'graded',
+          },
         ],
-        user_id: '1101'
-      }
+        user_id: '1101',
+      },
     ]
     gradebook = createGradebook()
     gradebook.assignments = {
       2301: gradedAssignment,
-      2302: notGradedAssignment
+      2302: notGradedAssignment,
     }
     gradebook.students = {
       1101: {
@@ -1261,7 +1261,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
           missing: false,
           excused: false,
           seconds_late: 0,
-          user_id: '1101'
+          user_id: '1101',
         },
         assignment_2302: {
           assignment_id: '2302',
@@ -1269,20 +1269,20 @@ QUnit.module('#listHiddenAssignments', hooks => {
           missing: false,
           excused: false,
           seconds_late: 0,
-          user_id: '1101'
-        }
-      }
+          user_id: '1101',
+        },
+      },
     }
     gradebook.gotSubmissionsChunk(submissionsChunk)
     gradebook.setAssignmentGroups([
       {
         id: '1',
-        assignments: [gradedAssignment]
+        assignments: [gradedAssignment],
       },
       {
         id: '2',
-        assignments: [notGradedAssignment]
-      }
+        assignments: [notGradedAssignment],
+      },
     ])
     gradebook.setAssignmentsLoaded()
     gradebook.setSubmissionsLoaded(true)
@@ -1316,16 +1316,16 @@ QUnit.module('Gradebook#updateGradingPeriodFilterVisibility', {
         id: '1501',
         grading_periods: [
           {id: '701', title: 'Grading Period 1', startDate: new Date(1)},
-          {id: '702', title: 'Grading Period 2', startDate: new Date(2)}
-        ]
-      }
+          {id: '702', title: 'Grading Period 2', startDate: new Date(2)},
+        ],
+      },
     })
     this.gradebook.setSelectedViewOptionsFilters(['gradingPeriods'])
   },
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('renders the grading period filter when not already rendered', function () {
@@ -1384,10 +1384,10 @@ QUnit.module('Gradebook#setCurrentGradingPeriod', hooks => {
         id: '1501',
         grading_periods: [
           {id: '701', weight: 50},
-          {id: '702', weight: 50}
+          {id: '702', weight: 50},
         ],
-        weighted: true
-      }
+        weighted: true,
+      },
     })
   })
 
@@ -1435,15 +1435,15 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
         id: '1501',
         grading_periods: [
           {id: '1401', title: 'Grading Period #1'},
-          {id: '1402', title: 'Grading Period #2'}
-        ]
+          {id: '1402', title: 'Grading Period #2'},
+        ],
       },
       settings: {
         filter_columns_by: {
-          grading_period_id: '1402'
+          grading_period_id: '1402',
         },
-        selected_view_options_filters: ['gradingPeriods']
-      }
+        selected_view_options_filters: ['gradingPeriods'],
+      },
     })
     sinon.spy(this.gradebook, 'saveSettings')
     sandbox.stub(this.gradebook, 'resetGrading')
@@ -1456,7 +1456,7 @@ QUnit.module('Gradebook#updateCurrentGradingPeriod', {
   teardown() {
     this.server.restore()
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('updates the filter setting with the given grading period id', function () {

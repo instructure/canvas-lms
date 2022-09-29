@@ -28,7 +28,7 @@ import {
   mockPageInfo,
   saveAssignmentResult,
   waitForNoElement,
-  initialTeacherViewGQLMocks
+  initialTeacherViewGQLMocks,
 } from '../../../test-utils'
 import {DateTime} from '@instructure/ui-i18n'
 
@@ -39,7 +39,7 @@ const newOverrideLockAt = '2019-04-02T13:00:00.000-05:00'
 
 const override = mockOverride()
 const assignment = mockAssignment({
-  assignmentOverrides: {pageInfo: mockPageInfo(), nodes: [override]}
+  assignmentOverrides: {pageInfo: mockPageInfo(), nodes: [override]},
 })
 
 function mocks() {
@@ -64,13 +64,13 @@ function mocks() {
             unlockAt: override.unlockAt && new Date(override.unlockAt).toISOString(),
             sectionId: override.set.lid,
             groupId: undefined,
-            studentIds: undefined
-          }
-        ]
+            studentIds: undefined,
+          },
+        ],
       },
       {},
       undefined
-    )
+    ),
   ]
 }
 

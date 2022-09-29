@@ -571,6 +571,9 @@ module ApplicationHelper
   end
 
   def editor_buttons
+    # called outside of Lti::ContextToolFinder to make sure that
+    # @context is non-nil and also a type of Context that would have
+    # tools in it (ie Course/Account/Group/User)
     contexts = ContextExternalTool.contexts_to_search(@context)
     return [] if contexts.empty?
 
@@ -578,13 +581,7 @@ module ApplicationHelper
       Rails
       .cache
       .fetch((["editor_buttons_for2"] + contexts.uniq).cache_key) do
-        tools =
-          ContextExternalTool
-          .shard(@context.shard)
-          .active
-          .having_setting("editor_button")
-          .where(context: contexts)
-          .order(:id)
+        tools = Lti::ContextToolFinder.new(@context, type: :editor_button).all_tools_scope_union.to_unsorted_array.sort_by(&:id)
 
         # force the YAML to be deserialized before caching, since it's expensive
         tools.each(&:settings)

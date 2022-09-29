@@ -40,7 +40,7 @@ QUnit.module('GraderCountNumberInput', hooks => {
     props = {
       currentGraderCount: null,
       locale: 'en',
-      availableGradersCount: 10
+      availableGradersCount: 10,
     }
   })
 
@@ -99,43 +99,27 @@ QUnit.module('GraderCountNumberInput', hooks => {
   test('shows an error message if the grader count is 0', () => {
     mountComponent()
     numberInput().simulate('change', {target: {value: '0'}})
-    ok(
-      numberInputContainer()
-        .text()
-        .includes('Must have at least 1 grader')
-    )
+    ok(numberInputContainer().text().includes('Must have at least 1 grader'))
   })
 
   test('shows a message if the grader count is > the max', () => {
     mountComponent()
     numberInput().simulate('change', {target: {value: '11'}})
-    ok(
-      numberInputContainer()
-        .text()
-        .includes('There are currently 10 available graders')
-    )
+    ok(numberInputContainer().text().includes('There are currently 10 available graders'))
   })
 
   test('shows a message with correct grammar if the grader count is > the max and the max is 1', () => {
     props.availableGradersCount = 1
     mountComponent()
     numberInput().simulate('change', {target: {value: '2'}})
-    ok(
-      numberInputContainer()
-        .text()
-        .includes('There is currently 1 available grader')
-    )
+    ok(numberInputContainer().text().includes('There is currently 1 available grader'))
   })
 
   test('shows an error message on blur if the grader count is the empty string', () => {
     mountComponent()
     numberInput().simulate('change', {target: {value: ''}})
     numberInput().simulate('blur', {type: 'blur', target: {value: ''}})
-    ok(
-      numberInputContainer()
-        .text()
-        .includes('Must have at least 1 grader')
-    )
+    ok(numberInputContainer().text().includes('Must have at least 1 grader'))
   })
 
   test('does not pass any validation error messages to the NumberInput if the input is valid', () => {

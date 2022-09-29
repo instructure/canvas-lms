@@ -3524,6 +3524,22 @@ describe User do
     end
   end
 
+  describe "root_admin_for?" do
+    before(:once) do
+      user_factory(active_all: true)
+      @account = Account.default
+    end
+
+    it "returns false if the user not an admin in a root account" do
+      expect(@user.root_admin_for?(@account)).to be false
+    end
+
+    it "returns true if the user an admin in a root account" do
+      @account.account_users.create!(user: @user, role: admin_role)
+      expect(@user.root_admin_for?(@account)).to be true
+    end
+  end
+
   it "does not grant user_notes rights to restricted users" do
     course_with_ta(active_all: true)
     student_in_course(course: @course, active_all: true)

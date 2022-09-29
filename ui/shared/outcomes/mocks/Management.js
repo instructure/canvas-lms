@@ -2591,7 +2591,7 @@ export const courseAlignmentMocks = ({
             endCursor: 'Mg',
             __typename: 'PageInfo'
           },
-          edges: generateEdges([1, 2], isRefetch),
+          edges: numOfOutcomes > 0 ? generateEdges([1, 2], isRefetch) : [],
           __typename: 'ContentTagConnection'
         }
       }

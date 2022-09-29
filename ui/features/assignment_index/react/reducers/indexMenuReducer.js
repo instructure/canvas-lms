@@ -24,7 +24,7 @@ const initialState = {
   externalTools: [],
   modalIsOpen: false,
   selectedTool: null,
-  weighted: false
+  weighted: false,
 }
 
 const handlers = {
@@ -48,7 +48,7 @@ const handlers = {
     const newState = {...state, weighted: action.payload}
 
     return newState
-  }
+  },
 }
 
 function reducer(state, action) {

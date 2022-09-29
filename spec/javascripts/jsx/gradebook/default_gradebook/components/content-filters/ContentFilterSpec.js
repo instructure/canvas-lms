@@ -36,10 +36,13 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         allItemsId: 'all',
         allItemsLabel: 'All Items',
         disabled: false,
-        items: [{id: '1', name: 'Item 1'}, {id: '2', name: 'Item 2'}],
+        items: [
+          {id: '1', name: 'Item 1'},
+          {id: '2', name: 'Item 2'},
+        ],
         label: 'Example Filter',
         onSelect: sinon.stub(),
-        selectedItemId: 'all'
+        selectedItemId: 'all',
       }
 
       component = null
@@ -105,7 +108,10 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
       QUnit.module('when sortAlphabetically is enabled', hooks => {
         hooks.beforeEach(() => {
           props.sortAlphabetically = true
-          props.items = [{id: '2', name: 'Item 2'}, {id: '1', name: 'Item 1'}]
+          props.items = [
+            {id: '2', name: 'Item 2'},
+            {id: '1', name: 'Item 1'},
+          ]
         })
 
         test('labels each item option using the related item .name in alphabetical order', () => {
@@ -119,21 +125,27 @@ QUnit.module('Gradebook > Default Gradebook > Components > Content Filters', () 
         hooks.beforeEach(() => {
           props.items = [
             {
-              children: [{id: '11', name: 'Item A1'}, {id: '12', name: 'Item A2'}],
+              children: [
+                {id: '11', name: 'Item A1'},
+                {id: '12', name: 'Item A2'},
+              ],
               id: '1',
-              name: 'Group A'
+              name: 'Group A',
             },
 
             {
               id: '3',
-              name: 'Root Item'
+              name: 'Root Item',
             },
 
             {
-              children: [{id: '21', name: 'Item B1'}, {id: '22', name: 'Item B2'}],
+              children: [
+                {id: '21', name: 'Item B1'},
+                {id: '22', name: 'Item B2'},
+              ],
               id: '2',
-              name: 'Group B'
-            }
+              name: 'Group B',
+            },
           ]
         })
 

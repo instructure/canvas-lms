@@ -34,15 +34,15 @@ const defaultFilterPreset: FilterPreset = {
       id: '456',
       created_at: '2021-11-02T20:56:23.616Z',
       type: 'module',
-      value: undefined
+      value: undefined,
     },
     {
       id: '567',
       created_at: '2021-11-02T20:56:23.617Z',
       type: 'section',
-      value: undefined
-    }
-  ]
+      value: undefined,
+    },
+  ],
 }
 
 const defaultProps: FilterTrayPresetProps = {
@@ -57,17 +57,17 @@ const defaultProps: FilterTrayPresetProps = {
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
-    {id: '3', name: 'Module 3', position: 3}
+    {id: '3', name: 'Module 3', position: 3},
   ],
   assignmentGroups: [
     {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
     {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
-    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []}
+    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []},
   ],
   sections: [
     {id: '7', name: 'Section 7'},
     {id: '8', name: 'Section 8'},
-    {id: '9', name: 'Section 9'}
+    {id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
     {
@@ -75,22 +75,22 @@ const defaultProps: FilterTrayPresetProps = {
       title: 'Grading Period 1',
       startDate: new Date(),
       endDate: new Date(),
-      isClosed: false
+      isClosed: false,
     },
     {
       id: '2',
       title: 'Grading Period 2',
       startDate: new Date(),
       endDate: new Date(),
-      isClosed: false
+      isClosed: false,
     },
     {
       id: '3',
       title: 'Grading Period 3',
       startDate: new Date(),
       endDate: new Date(),
-      isClosed: false
-    }
+      isClosed: false,
+    },
   ],
   studentGroupCategories: {
     '1': {
@@ -98,7 +98,7 @@ const defaultProps: FilterTrayPresetProps = {
       name: 'Student Group Category 1',
       groups: [
         {id: '1', name: 'Student Group 1'},
-        {id: '2', name: 'Student Group 2'}
+        {id: '2', name: 'Student Group 2'},
       ],
       allows_multiple_memberships: false,
       auto_leader: 'none',
@@ -111,9 +111,9 @@ const defaultProps: FilterTrayPresetProps = {
       role: null,
       self_signup: 'restricted',
       sis_group_category_id: null,
-      sis_import_id: null
-    }
-  }
+      sis_import_id: null,
+    },
+  },
 }
 
 describe('FilterNavFilter', () => {

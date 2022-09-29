@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, screen} from '@testing-library/react'
 
 import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
@@ -46,7 +46,8 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
-      open: true
+      open: true,
+      isIconMaker: false
     }
   })
 
@@ -54,6 +55,35 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
     render(<ImageOptionsTray {...props} />)
     tray = ImageOptionsTrayDriver.find()
   }
+
+  describe('when image is an icon maker icon', () => {
+    beforeEach(() => {
+      props.isIconMaker = true
+    })
+
+    afterAll(() => {
+      props.isIconMaker = false
+    })
+
+    it('opens the tray to edit Icon Options instead of Image Options', () => {
+      props.open = true
+      render(<ImageOptionsTray {...props} />)
+      expect(screen.getByText('Icon Options')).toBeInTheDocument()
+      const imageOptionsText = screen.queryByText('Image Options')
+      expect(imageOptionsText).not.toBeInTheDocument()
+    })
+
+    it('excludes from the tray options that are not related to alt text', () => {
+      props.open = true
+      render(<ImageOptionsTray {...props} />)
+      const displayOptions = screen.queryByText('Display Options')
+      const imageSize = screen.queryByText('Size')
+      const dimensionType = screen.queryByText('Dimension Type')
+      expect(displayOptions).not.toBeInTheDocument()
+      expect(imageSize).not.toBeInTheDocument()
+      expect(dimensionType).not.toBeInTheDocument()
+    })
+  })
 
   it('is optionally rendered open', () => {
     props.open = true

@@ -28,6 +28,15 @@ module Factories
     @course_pace
   end
 
+  def section_pace_model(opts = {})
+    section = opts.delete(:section) || opts[:context] || add_section(course_model(reusable: true))
+    @section_pace = factory_with_protected_attributes(section.course.course_paces, valid_section_pace_attributes(section).merge(opts))
+    section.course.context_module_tags.can_have_assignment.not_deleted.each do |module_item|
+      @section_pace.course_pace_module_items.create(module_item: module_item, duration: 0)
+    end
+    @section_pace
+  end
+
   def valid_course_pace_attributes
     {
       workflow_state: "active",
@@ -36,6 +45,18 @@ module Factories
       hard_end_dates: true,
       published_at: Time.current,
       course_section: nil,
+      user: nil
+    }
+  end
+
+  def valid_section_pace_attributes(section)
+    {
+      workflow_state: "active",
+      end_date: "2021-09-30",
+      exclude_weekends: true,
+      hard_end_dates: true,
+      published_at: Time.current,
+      course_section: section,
       user: nil
     }
   end

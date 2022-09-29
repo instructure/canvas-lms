@@ -21,7 +21,7 @@ const gradingTypeOptionMap = {
   letter_grade: ['points', 'percent', 'gradingScheme'],
   pass_fail: ['passFail'],
   percent: ['points', 'percent'],
-  points: ['points', 'percent']
+  points: ['points', 'percent'],
 }
 
 const gradingTypeDefaultOptionMap = {
@@ -29,13 +29,13 @@ const gradingTypeDefaultOptionMap = {
   letter_grade: 'gradingScheme',
   pass_fail: 'passFail',
   percent: 'percent',
-  points: 'points'
+  points: 'points',
 }
 
-export function defaultOptionForGradingType(gradingType) {
+export function defaultOptionForGradingType(gradingType: string) {
   return gradingTypeDefaultOptionMap[gradingType] || null
 }
 
-export function optionsForGradingType(gradingType) {
+export function optionsForGradingType(gradingType: string) {
   return gradingTypeOptionMap[gradingType] || []
 }

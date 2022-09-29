@@ -89,5 +89,5 @@ ModeratedGradingCheckbox.propTypes = {
   gradedSubmissionsExist: bool.isRequired,
   isGroupAssignment: bool.isRequired,
   isPeerReviewAssignment: bool.isRequired,
-  onChange: func.isRequired
+  onChange: func.isRequired,
 }

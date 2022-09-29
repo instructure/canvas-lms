@@ -16,8 +16,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+import type PerformanceControls from '../PerformanceControls'
+
 export default class AssignmentGroupsLoader {
-  constructor({dispatch, gradebook, performanceControls, requestCharacterLimit}) {
+  _gradebook: Gradebook
+
+  _dispatch: RequestDispatch
+
+  _performanceControls: PerformanceControls
+
+  pathName: string
+
+  requestCharacterLimit: number
+
+  constructor({
+    dispatch,
+    gradebook,
+    performanceControls,
+    requestCharacterLimit,
+  }: {
+    dispatch: RequestDispatch
+    gradebook: Gradebook
+    performanceControls: PerformanceControls
+    requestCharacterLimit: number
+  }) {
     this._dispatch = dispatch
     this._gradebook = gradebook
     this._performanceControls = performanceControls
@@ -31,7 +55,7 @@ export default class AssignmentGroupsLoader {
       'assignment_visibility',
       'assignments',
       'grades_published',
-      'post_manually'
+      'post_manually',
     ]
 
     if (this._gradebook.options.has_modules) {
@@ -46,11 +70,11 @@ export default class AssignmentGroupsLoader {
         'description',
         'in_closed_grading_period',
         'needs_grading_count',
-        'rubric'
+        'rubric',
       ],
       include: includes,
       override_assignment_dates: false,
-      per_page: this._performanceControls.assignmentGroupsPerPage
+      per_page: this._performanceControls.assignmentGroupsPerPage,
     }
 
     const periodId = this._gradingPeriodId()
@@ -81,7 +105,7 @@ export default class AssignmentGroupsLoader {
 
   // If we're filtering by grading period in Gradebook, send two requests for assignments:
   // one for assignments in the selected grading period, and one for the rest.
-  _loadAssignmentGroupsForGradingPeriods(params, periodId) {
+  _loadAssignmentGroupsForGradingPeriods(params, periodId: string) {
     const assignmentIdsByGradingPeriod = this._gradingPeriodAssignmentIds(periodId)
     const maxAssignments = this._maxAssignmentCount(params)
 
@@ -114,13 +138,13 @@ export default class AssignmentGroupsLoader {
     return gotGroups
   }
 
-  _getAssignmentGroups(params, gradingPeriodIds) {
+  _getAssignmentGroups(params, gradingPeriodIds?: string[]) {
     return this._dispatch.getDepaginated(this.pathName, params).then(assignmentGroups => {
       this._gradebook.updateAssignmentGroups(assignmentGroups, gradingPeriodIds)
     })
   }
 
-  _gradingPeriodAssignmentIds(selectedPeriodId) {
+  _gradingPeriodAssignmentIds(selectedPeriodId: string) {
     const gpAssignments = this._gradebook.courseContent.gradingPeriodAssignments
     const selectedIds = this._gradebook.getGradingPeriodAssignments(selectedPeriodId)
     const restIds = Object.values(gpAssignments)
@@ -131,8 +155,8 @@ export default class AssignmentGroupsLoader {
       selected: selectedIds,
       rest: {
         ids: [...new Set(restIds)],
-        gradingPeriodIds: Object.keys(gpAssignments).filter(gpId => gpId !== selectedPeriodId)
-      }
+        gradingPeriodIds: Object.keys(gpAssignments).filter(gpId => gpId !== selectedPeriodId),
+      },
     }
   }
 

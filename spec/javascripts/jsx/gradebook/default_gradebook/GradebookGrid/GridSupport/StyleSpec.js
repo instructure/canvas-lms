@@ -32,7 +32,7 @@ function createColumns() {
       cssClass: `${columnId}${primaryClass}`,
       field: `columnData${id}`,
       headerCssClass: `${columnId}${primaryClass}`,
-      name: `Column ${id}`
+      name: `Column ${id}`,
     }
   })
 }
@@ -44,7 +44,7 @@ function createRows() {
     columnData1: `${id}1`,
     columnData2: `${id}2`,
     columnData3: `${id}3`,
-    columnData4: `${id}4`
+    columnData4: `${id}4`,
   }))
 }
 
@@ -56,11 +56,11 @@ function createGrid() {
     editorFactory: {
       getEditor() {
         return Editors.Text
-      }
+      },
     },
     enableCellNavigation: true,
     enableColumnReorder: false,
-    numberOfColumnsToFreeze: 2 // for possible edge cases with multiple grid viewports
+    numberOfColumnsToFreeze: 2, // for possible edge cases with multiple grid viewports
   }
   return new Grid('#example-grid', createRows(), createColumns(), options)
 }
@@ -75,7 +75,7 @@ QUnit.module('GradebookGrid GridSupport Style', hooks => {
     $fixtures.appendChild($gridContainer)
     grid = createGrid()
     gridSupport = new GridSupport(grid, {
-      activeBorderColor: 'rgb(12, 34, 56)'
+      activeBorderColor: 'rgb(12, 34, 56)',
     })
     gridSupport.initialize()
     grid.invalidate()

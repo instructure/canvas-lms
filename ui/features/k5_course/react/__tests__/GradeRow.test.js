@@ -18,8 +18,20 @@
 
 import React from 'react'
 import {render} from '@testing-library/react'
-import tz from '@canvas/timezone'
 import {GradeRow} from '../GradeRow'
+
+const dtf = new Intl.DateTimeFormat('en', {
+  // MMM D, YYYY h:mma
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZone: ENV.TIMEZONE
+})
+
+const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
 
 describe('GradeRow', () => {
   const getProps = (overrides = {}) => ({
@@ -40,6 +52,7 @@ describe('GradeRow', () => {
     missing: false,
     hasComments: false,
     currentUserId: '1',
+    dateFormatter,
     ...overrides
   })
 
@@ -289,11 +302,7 @@ describe('GradeRow', () => {
           <tbody>{GradeRow({...getProps()})}</tbody>
         </table>
       )
-      expect(
-        getByText(
-          `Submitted ${tz.format('2020-03-18T05:59:59Z', 'date.formats.full_with_weekday')}`
-        )
-      ).toBeInTheDocument()
+      expect(getByText(`Submitted ${dateFormatter('2020-03-18T05:59:59Z')}`)).toBeInTheDocument()
     })
 
     it('shows late if marked as late but not submitted', () => {
@@ -325,9 +334,7 @@ describe('GradeRow', () => {
           </tbody>
         </table>
       )
-      expect(
-        getByText(`Late ${tz.format('2020-05-18T05:59:59Z', 'date.formats.full_with_weekday')}`)
-      ).toBeInTheDocument()
+      expect(getByText(`Late ${dateFormatter('2020-05-18T05:59:59Z')}`)).toBeInTheDocument()
     })
   })
 })

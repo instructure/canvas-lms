@@ -28,20 +28,28 @@ import numberHelper from '@canvas/i18n/numberHelper'
 const MAX_PRECISION = 15 // the maximum precision of a score persisted to the database
 const PERCENTAGES = /[%％﹪٪]/
 
+type PassFailResult = {
+  enteredAs: null | string
+  excused: boolean
+  grade: string
+  score: null | number
+  valid: boolean
+}
+
 export const GradingSchemeBounds = Object.freeze({
   LOWER: 'LOWER',
   UPPER: 'UPPER'
 })
 
-function toNumber(bigValue) {
-  return parseFloat(bigValue.round(MAX_PRECISION).toString(), 10)
+function toNumber(bigValue: Big) {
+  return parseFloat(bigValue.round(MAX_PRECISION).toString())
 }
 
-function pointsFromPercentage(percentage, pointsPossible) {
+function pointsFromPercentage(percentage: number, pointsPossible: number) {
   return toNumber(new Big(percentage).div(100).times(pointsPossible))
 }
 
-function percentageFromPoints(points, pointsPossible) {
+function percentageFromPoints(points: number, pointsPossible: number) {
   return toNumber(new Big(points).div(pointsPossible).times(100))
 }
 
@@ -55,7 +63,7 @@ function invalid(value) {
   }
 }
 
-function parseAsGradingScheme(value, options) {
+function parseAsGradingScheme(value: string, options) {
   if (!options.gradingScheme) {
     return null
   }
@@ -74,8 +82,9 @@ function parseAsGradingScheme(value, options) {
   }
 }
 
-function parseAsPercent(value, options) {
+function parseAsPercent(value: string, options) {
   const percentage = numberHelper.parse(value.replace(PERCENTAGES, ''))
+  // eslint-disable-next-line no-restricted-globals
   if (isNaN(percentage)) {
     return null
   }
@@ -85,6 +94,7 @@ function parseAsPercent(value, options) {
 
   if (!options.pointsPossible) {
     points = numberHelper.parse(value)
+    // eslint-disable-next-line no-restricted-globals
     if (isNaN(points)) {
       percent = 0
       points = 0
@@ -99,8 +109,9 @@ function parseAsPercent(value, options) {
   }
 }
 
-function parseAsPoints(value, options) {
+function parseAsPoints(value: string, options) {
   const points = numberHelper.parse(value)
+  // eslint-disable-next-line no-restricted-globals
   if (isNaN(points)) {
     return null
   }
@@ -169,9 +180,15 @@ function parseForPoints(value, options) {
   return invalid(value)
 }
 
-function parseForPassFail(value, options) {
+function parseForPassFail(value: string, options: {pointsPossible: number}): PassFailResult {
   const cleanValue = value.toLowerCase()
-  const result = {enteredAs: 'passFail', excused: false, grade: cleanValue, valid: true}
+  const result: PassFailResult = {
+    enteredAs: 'passFail',
+    excused: false,
+    grade: cleanValue,
+    valid: true,
+    score: null
+  }
 
   if (cleanValue === 'complete') {
     result.score = options.pointsPossible || 0
@@ -188,10 +205,20 @@ export function isExcused(grade) {
   return `${grade}`.trim().toLowerCase() === 'ex'
 }
 
-export function parseEntryValue(value, gradingScheme) {
+type ParseResult = {
+  enteredValue: string
+  isCleared: boolean
+  isExcused: boolean
+  isPoints: boolean
+  isPercentage: boolean
+  isSchemeKey: boolean | null
+  value: null | number
+}
+
+export function parseEntryValue(value, gradingScheme): ParseResult {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
-  const result = {
+  const result: ParseResult = {
     enteredValue: trimmedValue,
     isCleared: trimmedValue === '',
     isExcused: isExcused(trimmedValue),
@@ -226,7 +253,7 @@ export function parseEntryValue(value, gradingScheme) {
   return result
 }
 
-export function parseTextValue(value, options) {
+export function parseTextValue(value: string, options) {
   const trimmedValue = value != null ? `${value}`.trim() : ''
 
   if (trimmedValue === '') {

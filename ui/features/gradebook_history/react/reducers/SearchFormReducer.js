@@ -24,7 +24,7 @@ import {
   FETCH_RECORDS_FAILURE,
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
-  FETCH_RECORDS_NEXT_PAGE_FAILURE
+  FETCH_RECORDS_NEXT_PAGE_FAILURE,
 } from '../actions/SearchFormActions'
 
 const initialState = {
@@ -32,19 +32,19 @@ const initialState = {
     assignments: {
       fetchStatus: null,
       items: [],
-      nextPage: null
+      nextPage: null,
     },
     graders: {
       fetchStatus: null,
       items: [],
-      nextPage: null
+      nextPage: null,
     },
     students: {
       fetchStatus: null,
       items: [],
-      nextPage: null
-    }
-  }
+      nextPage: null,
+    },
+  },
 }
 
 function searchForm(state = initialState, {type, payload}) {
@@ -58,9 +58,9 @@ function searchForm(state = initialState, {type, payload}) {
             ...state.records[payload.recordType],
             fetchStatus: 'started',
             items: [],
-            nextPage: null
-          }
-        }
+            nextPage: null,
+          },
+        },
       }
     }
     case FETCH_RECORDS_SUCCESS: {
@@ -72,9 +72,9 @@ function searchForm(state = initialState, {type, payload}) {
             ...state.records[payload.recordType],
             fetchStatus: 'success',
             items: payload.data,
-            nextPage: parseLinkHeader(payload.link).next
-          }
-        }
+            nextPage: parseLinkHeader(payload.link).next,
+          },
+        },
       }
     }
     case FETCH_RECORDS_FAILURE: {
@@ -86,9 +86,9 @@ function searchForm(state = initialState, {type, payload}) {
             ...state.records[payload.recordType],
             fetchStatus: 'failure',
             items: [],
-            nextPage: null
-          }
-        }
+            nextPage: null,
+          },
+        },
       }
     }
     case FETCH_RECORDS_NEXT_PAGE_START: {
@@ -99,9 +99,9 @@ function searchForm(state = initialState, {type, payload}) {
           [payload.recordType]: {
             ...state.records[payload.recordType],
             fetchStatus: 'started',
-            nextPage: null
-          }
-        }
+            nextPage: null,
+          },
+        },
       }
     }
     case FETCH_RECORDS_NEXT_PAGE_SUCCESS: {
@@ -113,9 +113,9 @@ function searchForm(state = initialState, {type, payload}) {
             ...state.records[payload.recordType],
             fetchStatus: 'success',
             items: state.records[payload.recordType].items.concat(payload.data),
-            nextPage: parseLinkHeader(payload.link).next
-          }
-        }
+            nextPage: parseLinkHeader(payload.link).next,
+          },
+        },
       }
     }
     case FETCH_RECORDS_NEXT_PAGE_FAILURE: {
@@ -126,9 +126,9 @@ function searchForm(state = initialState, {type, payload}) {
           [payload.recordType]: {
             ...state.records[payload.recordType],
             fetchStatus: 'failure',
-            nextPage: null
-          }
-        }
+            nextPage: null,
+          },
+        },
       }
     }
     case CLEAR_RECORDS: {
@@ -140,9 +140,9 @@ function searchForm(state = initialState, {type, payload}) {
             ...state.records[payload.recordType],
             fetchStatus: null,
             items: [],
-            nextPage: null
-          }
-        }
+            nextPage: null,
+          },
+        },
       }
     }
     default: {

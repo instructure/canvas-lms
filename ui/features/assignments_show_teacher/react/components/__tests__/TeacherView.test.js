@@ -22,11 +22,11 @@ import {
   findInputForLabel,
   saveAssignmentResult,
   waitForNoElement,
-  closest
+  closest,
 } from '../../test-utils'
 import {
   renderTeacherView,
-  renderTeacherQueryAndWaitForResult
+  renderTeacherQueryAndWaitForResult,
 } from './integration/integration-utils'
 
 describe('TeacherView', () => {
@@ -51,7 +51,7 @@ describe('TeacherView', () => {
     it.skip('unpublishes the assignment', async () => {
       const assignment = mockAssignment()
       const {getByText, container} = await renderTeacherQueryAndWaitForResult(assignment, [
-        saveAssignmentResult(assignment, {state: 'unpublished'}, {state: 'unpublished'})
+        saveAssignmentResult(assignment, {state: 'unpublished'}, {state: 'unpublished'}),
       ])
       const publish = getByText('publish', {exact: false})
       const publishCheckbox = findInputForLabel(publish, container)
@@ -79,10 +79,10 @@ describe('TeacherView', () => {
             dueAt: assignment.dueAt && new Date(assignment.dueAt).toISOString(),
             unlockAt: assignment.unlockAt && new Date(assignment.unlockAt).toISOString(),
             lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
-            assignmentOverrides: []
+            assignmentOverrides: [],
           },
           {state: 'published'}
-        )
+        ),
       ])
       const publish = getByText('publish', {exact: false})
       const publishCheckbox = findInputForLabel(publish, container)
@@ -110,11 +110,11 @@ describe('TeacherView', () => {
             dueAt: assignment.dueAt && new Date(assignment.dueAt).toISOString(),
             unlockAt: assignment.unlockAt && new Date(assignment.unlockAt).toISOString(),
             lockAt: assignment.lockAt && new Date(assignment.lockAt).toISOString(),
-            assignmentOverrides: []
+            assignmentOverrides: [],
           },
           {},
           'this failed!'
-        )
+        ),
       ])
       const publish = getByText('publish', {exact: false})
       const publishCheckbox = findInputForLabel(publish, container)
@@ -133,7 +133,7 @@ describe('TeacherView', () => {
     it.skip('render footer when assignment is changed', async () => {
       const assignment = mockAssignment({name: 'old name'})
       const {getByText, getByDisplayValue, getByTestId} = await renderTeacherView(assignment, [], {
-        readOnly: false
+        readOnly: false,
       })
 
       // put name into edit
@@ -155,7 +155,7 @@ describe('TeacherView', () => {
         assignment,
         [],
         {
-          readOnly: false
+          readOnly: false,
         }
       )
 
@@ -185,7 +185,7 @@ describe('TeacherView', () => {
         assignment,
         [],
         {
-          readOnly: false
+          readOnly: false,
         }
       )
 
@@ -214,7 +214,7 @@ describe('TeacherView', () => {
         assignment,
         [],
         {
-          readOnly: false
+          readOnly: false,
         }
       )
 

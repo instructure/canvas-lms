@@ -39,16 +39,16 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
       assignment: {
         courseId: '1201',
         id: '2301',
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       currentUser: {
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
       graders: [
         {graderId: '1101', graderName: 'Miss Frizzle'},
-        {graderId: '1102', graderName: 'Mr. Keating'}
-      ]
+        {graderId: '1102', graderName: 'Mr. Keating'},
+      ],
     }
     sinon.stub(FlashAlert, 'showFlashAlert')
   })
@@ -97,7 +97,7 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         id: '4601',
         score: 10,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       }
       store.dispatch(GradeActions.setSelectProvisionalGradeStatus(gradeInfo, GradeActions.SUCCESS))
     })
@@ -126,7 +126,7 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         id: '4601',
         score: 10,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       }
       store.dispatch(GradeActions.setSelectProvisionalGradeStatus(gradeInfo, GradeActions.FAILURE))
     })
@@ -213,7 +213,7 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         id: '4601',
         score: 10,
         selected: true,
-        studentId: '1111'
+        studentId: '1111',
       }
       store.dispatch(GradeActions.setUpdateGradeStatus(gradeInfo, GradeActions.SUCCESS))
     })
@@ -244,7 +244,7 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         id: '4601',
         score: 10,
         selected: true,
-        studentId: '1111'
+        studentId: '1111',
       }
     })
 
@@ -306,7 +306,7 @@ QUnit.module('GradeSummary FlashMessageHolder', suiteHooks => {
         id: '4601',
         score: 10,
         selected: false,
-        studentId: '1111'
+        studentId: '1111',
       }
     })
 

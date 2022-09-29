@@ -55,10 +55,10 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): M
             {
               key: 'modules-loading-error',
               message: I18n.t('There was an error fetching modules.'),
-              variant: 'error'
-            }
-          ])
+              variant: 'error',
+            },
+          ]),
         })
       })
-  }
+  },
 })

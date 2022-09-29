@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
@@ -50,7 +50,7 @@ QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
           name: 'Math Assignment',
           only_visible_to_overrides: false,
           points_possible: 10,
-          published: true
+          published: true,
         },
 
         {
@@ -60,8 +60,8 @@ QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
           name: 'English Assignment',
           only_visible_to_overrides: true,
           points_possible: 10,
-          published: false
-        }
+          published: false,
+        },
       ]
 
       assignmentGroups = [
@@ -70,7 +70,7 @@ QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
           group_weight: 40,
           id: '2201',
           name: 'Assignments',
-          position: 1
+          position: 1,
         },
 
         {
@@ -78,8 +78,8 @@ QUnit.module('Gradebook > Assignment Groups', suiteHooks => {
           group_weight: 60,
           id: '2202',
           name: 'Homework',
-          position: 2
-        }
+          position: 2,
+        },
       ]
     })
 

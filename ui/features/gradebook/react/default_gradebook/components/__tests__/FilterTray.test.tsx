@@ -37,11 +37,11 @@ const defaultFilterPresets: FilterPreset[] = [
         id: '2',
         type: 'module',
         value: '1',
-        created_at: '2022-02-05T10:18:34-07:00'
-      }
+        created_at: '2022-02-05T10:18:34-07:00',
+      },
     ],
     created_at: '2022-02-05T10:18:34-07:00',
-    updated_at: '2022-02-05T10:18:34-07:00'
+    updated_at: '2022-02-05T10:18:34-07:00',
   },
   {
     id: 'preset-2',
@@ -51,18 +51,18 @@ const defaultFilterPresets: FilterPreset[] = [
         id: '3',
         type: 'section',
         value: '7',
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       },
       {
         id: '4',
         type: 'section',
         value: '8',
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     ],
     created_at: '2022-02-06T10:18:34-07:00',
-    updated_at: '2022-02-06T10:18:34-07:00'
-  }
+    updated_at: '2022-02-06T10:18:34-07:00',
+  },
 ]
 
 const defaultAppliedFilters: Filter[] = [
@@ -70,8 +70,8 @@ const defaultAppliedFilters: Filter[] = [
     id: '2',
     type: 'module',
     value: '1',
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 ]
 
 const defaultProps: FilterTrayProps = {
@@ -82,14 +82,14 @@ const defaultProps: FilterTrayProps = {
   assignmentGroups: [],
   sections: [],
   gradingPeriods: [],
-  studentGroupCategories: {}
+  studentGroupCategories: {},
 }
 
 describe('FilterTray', () => {
   beforeEach(() => {
     store.setState({
       filterPresets: defaultFilterPresets,
-      appliedFilters: defaultAppliedFilters
+      appliedFilters: defaultAppliedFilters,
     })
     fetchMock.mock('*', 200)
   })

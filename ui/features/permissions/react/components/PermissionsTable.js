@@ -25,11 +25,10 @@ import {maxBy} from 'lodash'
 // For screenreaderFlashMessageExclusive  Maybe there's a better way
 import '@canvas/rails-flash-notifications'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Link} from '@instructure/ui-link'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 import actions from '../actions'
@@ -142,18 +141,16 @@ export default class PermissionsTable extends Component {
                   className="ic-permissions__header-content ic-permissions__header-content-col"
                   id={`ic-permissions__role-header-for-role-${role.id}`}
                 >
-                  <Tooltip renderTip={role.label}>
-                    <Button
-                      id={`role_${role.id}`}
-                      variant="link"
-                      onClick={() => this.openRoleTray(role)}
-                      onFocus={this.fixHorizontalScroll}
-                      size="small"
-                      theme={{smallPadding: '0', smallHeight: 'normal'}}
-                    >
-                      {role.label}
-                    </Button>
-                  </Tooltip>
+                  <Link
+                    isWithinText={false}
+                    as="button"
+                    id={`role_${role.id}`}
+                    onClick={() => this.openRoleTray(role)}
+                    onFocus={this.fixHorizontalScroll}
+                    size="small"
+                  >
+                    <Text size="medium">{role.label}</Text>
+                  </Link>
                 </div>
               </div>
             </th>

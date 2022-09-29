@@ -2179,6 +2179,38 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(0)
     end
 
+    it "unarchives conversations by marking as read" do
+      conversations = %w[archived archived archived].map do |state|
+        conversation(@me, @bob, workflow_state: state)
+      end
+
+      conversation_ids = conversations.map { |c| c.conversation.id }
+      allow(InstStatsd::Statsd).to receive(:increment)
+      json = api_call(:put, "/api/v1/conversations",
+                      { controller: "conversations", action: "batch_update", format: "json" },
+                      { event: "mark_as_read", conversation_ids: conversation_ids })
+      run_jobs
+      progress = Progress.find(json["id"])
+      expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
+    it "unarchives conversations by marking as unread" do
+      conversations = %w[archived archived archived].map do |state|
+        conversation(@me, @bob, workflow_state: state)
+      end
+
+      conversation_ids = conversations.map { |c| c.conversation.id }
+      allow(InstStatsd::Statsd).to receive(:increment)
+      json = api_call(:put, "/api/v1/conversations",
+                      { controller: "conversations", action: "batch_update", format: "json" },
+                      { event: "mark_as_unread", conversation_ids: conversation_ids })
+      run_jobs
+      progress = Progress.find(json["id"])
+      expect(progress.message.to_s).to include "#{conversation_ids.size} conversations processed"
+      expect(InstStatsd::Statsd).to have_received(:increment).with("inbox.conversation.unarchived.legacy")
+    end
+
     it "destroys conversations" do
       json = api_call(:put, "/api/v1/conversations",
                       { controller: "conversations", action: "batch_update", format: "json" },

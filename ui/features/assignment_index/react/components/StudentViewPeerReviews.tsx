@@ -88,7 +88,7 @@ const PeerReview = ({assessment, assignment, index}: PeerReviewProps) => {
               top: 'auto',
               width: '1px',
               height: '1px',
-              overflow: 'hidden'
+              overflow: 'hidden',
             }}
             href={studentPeerReviewUrl()}
           >

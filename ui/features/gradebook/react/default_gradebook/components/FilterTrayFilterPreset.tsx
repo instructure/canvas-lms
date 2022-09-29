@@ -27,14 +27,9 @@ import {Flex} from '@instructure/ui-flex'
 import FilterComponent from './FilterTrayFilter'
 import {ToggleGroup} from '@instructure/ui-toggle-details'
 import {Text} from '@instructure/ui-text'
-import type {PartialFilterPreset, FilterPreset, Filter, FilterType} from '../gradebook.d'
-import type {
-  AssignmentGroup,
-  GradingPeriod,
-  Module,
-  Section,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
+import type {Filter, FilterPreset, FilterType, PartialFilterPreset} from '../gradebook.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 import {isFilterNotEmpty} from '../Gradebook.utils'
 
 const I18n = useI18nScope('gradebook')
@@ -45,7 +40,7 @@ export type FilterTrayPresetProps = {
   applyFilters: (filters: PartialFilterPreset['filters']) => void
   assignmentGroups: AssignmentGroup[]
   filterPreset: PartialFilterPreset | FilterPreset
-  gradingPeriods: GradingPeriod[]
+  gradingPeriods: CamelizedGradingPeriod[]
   isActive: boolean
   modules: Module[]
   onChange?: (filter: PartialFilterPreset) => void
@@ -55,7 +50,7 @@ export type FilterTrayPresetProps = {
   onToggle: (boolean) => void
   isExpanded: boolean
   sections: Section[]
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterTrayPreset({
@@ -71,7 +66,7 @@ export default function FilterTrayPreset({
   onToggle,
   isExpanded,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterTrayPresetProps) {
   const [name, setName] = useState(filterPreset.name)
   const [filterPresetWasChanged, setFilterPresetWasChanged] = useState(false)
@@ -105,7 +100,7 @@ export default function FilterTrayPreset({
       onCreate({
         ...filterPreset,
         name,
-        filters: stagedFilters.filter(isFilterNotEmpty)
+        filters: stagedFilters.filter(isFilterNotEmpty),
       })
       setName('')
       setStagedFilters(filterPreset.filters)
@@ -118,7 +113,7 @@ export default function FilterTrayPreset({
       const updatedFilter = {
         ...filterPreset,
         name,
-        filters: stagedFilters.filter(isFilterNotEmpty)
+        filters: stagedFilters.filter(isFilterNotEmpty),
       } as FilterPreset
       onUpdate(updatedFilter)
       setFilterPresetWasChanged(false)
@@ -133,7 +128,7 @@ export default function FilterTrayPreset({
       id: uuid.v4(),
       type,
       value: undefined,
-      created_at: new Date().toISOString()
+      created_at: new Date().toISOString(),
     }
 
   const sectionFilter = sections.length > 0 ? ensureFilter(stagedFilters, 'section') : undefined
@@ -163,7 +158,7 @@ export default function FilterTrayPreset({
 
   const filtersAlwaysShownChunks = [
     [gradingPeriodFilter, submissionFilter],
-    [startDateFilter, endDateFilter]
+    [startDateFilter, endDateFilter],
   ]
 
   const isSaveButtonEnabled =
@@ -174,7 +169,7 @@ export default function FilterTrayPreset({
   return (
     <ToggleGroup
       toggleLabel={I18n.t('Toggle %{filterPresetName}', {
-        filterPresetName: filterPreset.name || I18n.t('Create Filter Preset')
+        filterPresetName: filterPreset.name || I18n.t('Create Filter Preset'),
       })}
       onToggle={(_event: React.MouseEvent, expanded: boolean) => {
         onToggle(expanded)
@@ -195,10 +190,10 @@ export default function FilterTrayPreset({
                     {
                       zero: 'No Filters',
                       one: '1 Filter',
-                      other: '{{count}} Filters'
+                      other: '{{count}} Filters',
                     },
                     {
-                      count: stagedFilters.filter(isFilterNotEmpty).length
+                      count: stagedFilters.filter(isFilterNotEmpty).length,
                     }
                   )}
                 </Text>

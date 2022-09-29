@@ -388,6 +388,45 @@ RSpec.describe SubmissionComment do
       end.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to eq true
     end
+
+    context "read state when feedback visibility ff is on" do
+      before do
+        Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      end
+
+      it "is unread after submission is commented on by teacher" do
+        expect do
+          @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
+        end.to change(ContentParticipation, :count).by(1)
+
+        expect(@submission.unread?(@student)).to be_truthy
+      end
+
+      it "is read after submission is commented on by self" do
+        expect do
+          @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
+        end.to change(ContentParticipation, :count).by(0)
+
+        expect(@submission.read?(@student)).to be_truthy
+      end
+
+      it "is unread when at least a comment is not commented by self" do
+        expect do
+          @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
+          @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
+        end.to change(ContentParticipation, :count).by(1)
+
+        expect(@submission.unread?(@student)).to be_truthy
+      end
+
+      it "does not set unread state when a provisional comment is made" do
+        expect do
+          @submission.add_comment(author: @teacher, comment: "wat", provisional: true)
+        end.to change(ContentParticipation, :count).by(0)
+
+        expect(@submission.read?(@student)).to be_truthy
+      end
+    end
   end
 
   describe "after_destroy #delete_other_comments_in_this_group" do

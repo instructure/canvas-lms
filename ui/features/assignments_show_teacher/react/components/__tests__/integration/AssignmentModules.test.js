@@ -36,8 +36,8 @@ const mocks = [
     request: {
       query: COURSE_MODULES_QUERY,
       variables: {
-        courseId: '55'
-      }
+        courseId: '55',
+      },
     },
     result: {
       data: {
@@ -48,7 +48,7 @@ const mocks = [
             pageInfo: {
               endCursor: 'Ng==',
               hasNextPage: true,
-              __typename: 'PageInfo'
+              __typename: 'PageInfo',
             },
             __typename: 'ModuleConnection',
             nodes: [
@@ -57,29 +57,29 @@ const mocks = [
                 gid: 'TW9kdWxlLTc5',
                 name: 'Module X',
                 position: 1,
-                __typename: 'Module'
+                __typename: 'Module',
               },
               {
                 lid: '80',
                 gid: 'TW9kdWxlLTgw',
                 name: 'Module Y',
                 position: 2,
-                __typename: 'Module'
-              }
-            ]
+                __typename: 'Module',
+              },
+            ],
           },
-          __typename: 'Course'
-        }
-      }
-    }
+          __typename: 'Course',
+        },
+      },
+    },
   },
   {
     request: {
       query: COURSE_MODULES_QUERY,
       variables: {
         courseId: '55',
-        cursor: 'Ng=='
-      }
+        cursor: 'Ng==',
+      },
     },
     result: {
       data: {
@@ -90,7 +90,7 @@ const mocks = [
             pageInfo: {
               endCursor: 'XX==',
               hasNextPage: false,
-              __typename: 'PageInfo'
+              __typename: 'PageInfo',
             },
             __typename: 'ModuleConnection',
             nodes: [
@@ -99,15 +99,15 @@ const mocks = [
                 gid: 'TW9kdWxlLTgx',
                 name: 'Module Z',
                 position: 3,
-                __typename: 'Module'
-              }
-            ]
+                __typename: 'Module',
+              },
+            ],
           },
-          __typename: 'Course'
-        }
-      }
-    }
-  }
+          __typename: 'Course',
+        },
+      },
+    },
+  },
 ]
 
 describe('AssignmentModules', () => {

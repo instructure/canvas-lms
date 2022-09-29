@@ -23,10 +23,10 @@ import numberHelper from '@canvas/i18n/numberHelper'
 import {waitForProcessing} from './wait_for_processing'
 import ProcessGradebookUpload from './process_gradebook_upload'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import 'slickgrid'/* global Slick */
-import 'slickgrid/slick.editors'/* global.Slick.Editors */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* errorBox */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\.detect/ */
+import 'slickgrid' /* global Slick */
+import 'slickgrid/slick.editors' /* global.Slick.Editors */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* errorBox */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\.detect/ */
 import '@canvas/util/templateData'
 const I18n = useI18nScope('gradebook_uploads')
 /* fillTemplateData */
@@ -74,17 +74,17 @@ const GradebookUploader = {
           field: 'student',
           width: 250,
           cssClass: 'cell-title',
-          formatter: GradebookUploader.createGeneralFormatter('name')
-        }
+          formatter: GradebookUploader.createGeneralFormatter('name'),
+        },
       ],
       options: {
         enableAddRow: false,
         editable: true,
         enableColumnReorder: false,
         asyncEditorLoading: true,
-        rowHeight: 30
+        rowHeight: 30,
       },
-      data: []
+      data: [],
     }
 
     const labelData = {
@@ -93,15 +93,15 @@ const GradebookUploader = {
           id: 'assignmentGrouping',
           name: '',
           field: 'assignmentGrouping',
-          width: 250
-        }
+          width: 250,
+        },
       ],
       options: {
         enableAddRow: false,
         enableColumnReorder: false,
-        asyncEditorLoading: false
+        asyncEditorLoading: false,
       },
-      data: []
+      data: [],
     }
 
     delete uploadedGradebook.missing_objects
@@ -118,7 +118,7 @@ const GradebookUploader = {
         formatter: GradebookUploader.createNumberFormatter('grade'),
         active: true,
         previous_id: this.previous_id,
-        cssClass: 'new-grade'
+        cssClass: 'new-grade',
       }
 
       if (this.grading_type !== 'letter_grade') {
@@ -134,14 +134,14 @@ const GradebookUploader = {
         formatter: GradebookUploader.createNumberFormatter('original_grade'),
         field: `${this.id}_conflicting`,
         name: htmlEscape(I18n.t('From')),
-        cssClass: 'conflicting-grade'
+        cssClass: 'conflicting-grade',
       }
 
       const assignmentHeaderColumn = {
         id: this.id,
         width: 250,
         name: htmlEscape(this.title),
-        headerCssClass: 'assignment'
+        headerCssClass: 'assignment',
       }
 
       labelData.columns.push(assignmentHeaderColumn)
@@ -162,7 +162,7 @@ const GradebookUploader = {
         editorFormatter: 'custom_column',
         editorParser: 'custom_column',
         active: true,
-        cssClass: 'new-grade'
+        cssClass: 'new-grade',
       }
 
       const conflictingCustomColumn = {
@@ -171,14 +171,14 @@ const GradebookUploader = {
         formatter: GradebookUploader.createGeneralFormatter('current_content'),
         field: `custom_col_${column.id}_conflicting`,
         name: htmlEscape(I18n.t('From')),
-        cssClass: 'conflicting-grade'
+        cssClass: 'conflicting-grade',
       }
 
       const customColumnHeaderColumn = {
         id: `custom_col_${column.id}`,
         width: 250,
         name: htmlEscape(column.title),
-        headerCssClass: 'assignment'
+        headerCssClass: 'assignment',
       }
 
       labelData.columns.push(customColumnHeaderColumn)
@@ -200,7 +200,7 @@ const GradebookUploader = {
     $.each(uploadedGradebook.students, function (index) {
       const row = {
         student: this,
-        id: this.id
+        id: this.id,
       }
       $.each(this.submissions, function () {
         if (
@@ -354,8 +354,8 @@ const GradebookUploader = {
                 data: {
                   name: record.name,
                   title: record.title,
-                  points_possible: I18n.n(record.points_possible)
-                }
+                  points_possible: I18n.n(record.points_possible),
+                },
               })
               .appendTo(`#gradebook_importer_resolution_section .${thing}_section table tbody`)
               .show()
@@ -507,7 +507,7 @@ const GradebookUploader = {
       editorParser: 'override_score',
       formatter: GradebookUploader.createNumberFormatter('new_score'),
       active: true,
-      cssClass: 'new-grade'
+      cssClass: 'new-grade',
     }
 
     const conflictingOverrideScoreColumn = {
@@ -516,7 +516,7 @@ const GradebookUploader = {
       formatter: GradebookUploader.createNumberFormatter('current_score'),
       field: `override_score_${id}_conflicting`,
       name: htmlEscape(I18n.t('From')),
-      cssClass: 'conflicting-grade'
+      cssClass: 'conflicting-grade',
     }
     gridData.columns.push(conflictingOverrideScoreColumn, newOverrideScoreColumn)
 
@@ -524,10 +524,10 @@ const GradebookUploader = {
       id: `override_score_${id}`,
       width: 250,
       name: htmlEscape(title),
-      headerCssClass: 'assignment'
+      headerCssClass: 'assignment',
     }
     labelData.columns.push(overrideScoreHeaderColumn)
-  }
+  },
 }
 
 export default GradebookUploader

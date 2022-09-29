@@ -44,13 +44,13 @@ ModuleFilter.propTypes = {
   modules: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
 
-  selectedModuleId: string
+  selectedModuleId: string,
 }
 
 ModuleFilter.defaultProps = {
-  selectedModuleId: null
+  selectedModuleId: null,
 }

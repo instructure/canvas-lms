@@ -43,8 +43,7 @@ RUN --mount=target=/tmp/src \
   tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
     bin \
     config/environments \
-    # This is intentionally only a single-level directory - and really should be cut down more later.
-    gems/*/lib \
+    gems/{autoextend,canvas_color,canvas_text_helper,config_file,i18n_extraction,i18n_tasks,utf8_cleaner}/lib \
     lib/canvas/cdn \
     lib/rake \
     lib/tasks \

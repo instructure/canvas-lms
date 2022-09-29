@@ -34,6 +34,7 @@ import StudentViewContext from '../Context'
 import {SUBMISSION_COMMENT_QUERY} from '@canvas/assignments/graphql/student/Queries'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {useQuery} from 'react-apollo'
+import {bool} from 'prop-types'
 
 const I18n = useI18nScope('assignments_2')
 
@@ -42,11 +43,11 @@ export default function CommentsTrayBody(props) {
 
   const queryVariables = {
     submissionId: props.submission.id,
-    submissionAttempt: props.submission.attempt
+    submissionAttempt: props.submission.attempt,
   }
 
   const {loading, error, data, fetchMore} = useQuery(SUBMISSION_COMMENT_QUERY, {
-    variables: queryVariables
+    variables: queryVariables,
   })
 
   const loadMoreComments = async () => {
@@ -54,7 +55,7 @@ export default function CommentsTrayBody(props) {
     await fetchMore({
       variables: {
         cursor: data.submissionComments.commentsConnection.pageInfo.startCursor,
-        ...queryVariables
+        ...queryVariables,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         const newNodes = fetchMoreResult.submissionComments.commentsConnection.nodes
@@ -66,7 +67,7 @@ export default function CommentsTrayBody(props) {
           results.submissionComments.commentsConnection.nodes.push(...newNodes)
         }
         return results
-      }
+      },
     })
     setIsFetchingMoreComments(false)
   }
@@ -102,7 +103,7 @@ export default function CommentsTrayBody(props) {
     >
       <Flex as="div" direction="column" height="100%" data-testid="comments-container">
         <Flex.Item shouldGrow={true}>
-          {props.submission.gradeHidden && comments.length === 0 && (
+          {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length === 0 && (
             <SVGWithTextPlaceholder
               text={hiddenCommentsMessage}
               url={ClosedDiscussionSVG}
@@ -110,7 +111,7 @@ export default function CommentsTrayBody(props) {
             />
           )}
 
-          {props.submission.gradeHidden && comments.length > 0 && (
+          {!props.isPeerReviewEnabled && props.submission.gradeHidden && comments.length > 0 && (
             <Alert variant="info" margin="small small x-large">
               {hiddenCommentsMessage}
             </Alert>
@@ -126,7 +127,12 @@ export default function CommentsTrayBody(props) {
               )}
           </div>
 
-          <CommentContent comments={comments} submission={props.submission} />
+          <CommentContent
+            comments={comments}
+            assignment={props.assignment}
+            submission={props.submission}
+            isPeerReviewEnabled={props.isPeerReviewEnabled}
+          />
         </Flex.Item>
 
         {allowChangesToSubmission && (
@@ -138,7 +144,11 @@ export default function CommentsTrayBody(props) {
             )}
 
             <Flex.Item padding="x-small medium">
-              <CommentTextArea assignment={props.assignment} submission={props.submission} />
+              <CommentTextArea
+                assignment={props.assignment}
+                submission={props.submission}
+                reviewerSubmission={props.reviewerSubmission}
+              />
             </Flex.Item>
           </Flex>
         )}
@@ -149,5 +159,11 @@ export default function CommentsTrayBody(props) {
 
 CommentsTrayBody.propTypes = {
   assignment: Assignment.shape.isRequired,
-  submission: Submission.shape.isRequired
+  submission: Submission.shape.isRequired,
+  reviewerSubmission: Submission.shape,
+  isPeerReviewEnabled: bool,
+}
+
+CommentsTrayBody.defaultProps = {
+  isPeerReviewEnabled: false,
 }

@@ -52,13 +52,13 @@ export default class EditableDateTime extends React.Component {
     messages: arrayOf(shape({type: string.isRequired, text: string.isRequired})),
     readOnly: bool,
     required: bool,
-    placeholder: string
+    placeholder: string,
   }
 
   static defaultProps = {
     displayFormat: 'lll',
     readOnly: false,
-    required: false
+    required: false,
   }
 
   constructor(props) {
@@ -66,7 +66,7 @@ export default class EditableDateTime extends React.Component {
 
     this.state = {
       initialValue: props.value,
-      isValid: true
+      isValid: true,
     }
     this._timers = [] // track the in-flight setTimeout timers
     this._elementRef = null
@@ -81,7 +81,7 @@ export default class EditableDateTime extends React.Component {
   static getDerivedStateFromProps(props, _state) {
     if (props.mode === 'view') {
       return {
-        initialValue: props.value
+        initialValue: props.value,
       }
     }
     return null

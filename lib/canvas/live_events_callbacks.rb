@@ -93,8 +93,6 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.master_template_created(obj)
     when MasterCourses::ChildSubscription
       Canvas::LiveEvents.blueprint_subscription_created(obj)
-    when MasterCourses::MasterContentTag
-      Canvas::LiveEvents.blueprint_restrictions_updated(obj) if obj.quiz_lti_content?
     end
   end
 

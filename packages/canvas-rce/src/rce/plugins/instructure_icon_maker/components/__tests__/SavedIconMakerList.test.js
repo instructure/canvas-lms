@@ -20,76 +20,76 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import SavedIconMakerList from '../SavedIconMakerList'
 
+let mockContent = {
+  images: {
+    Course: {
+      files: [
+        {
+          id: 722,
+          filename: 'grid.png',
+          thumbnail_url:
+            'http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
+          display_name: 'image_one.png',
+          href: 'http://canvas.docker/courses/21/files/722?wrap=1',
+          download_url: 'http://canvas.docker/files/722/download?download_frd=1',
+          content_type: 'image/png',
+          published: true,
+          hidden_to_user: true,
+          locked_for_user: false,
+          unlock_at: null,
+          lock_at: null,
+          date: '2021-11-03T19:21:27Z',
+          uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
+        },
+        {
+          id: 716,
+          filename: '1635371359_565__0266554465.jpeg',
+          thumbnail_url:
+            'http://canvas.docker/images/thumbnails/716/9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
+          display_name: 'image_two.jpg',
+          href: 'http://canvas.docker/courses/21/files/716?wrap=1',
+          download_url: 'http://canvas.docker/files/716/download?download_frd=1',
+          content_type: 'image/jpeg',
+          published: true,
+          hidden_to_user: false,
+          locked_for_user: false,
+          unlock_at: null,
+          lock_at: null,
+          date: '2021-10-27T21:49:19Z',
+          uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
+        },
+        {
+          id: 715,
+          filename: '1635371358_548__h3zmqPb-6dw.jpg',
+          thumbnail_url:
+            'http://canvas.docker/images/thumbnails/715/rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
+          display_name: 'image_three.jpg',
+          href: 'http://canvas.docker/courses/21/files/715?wrap=1',
+          download_url: 'http://canvas.docker/files/715/download?download_frd=1',
+          content_type: 'image/jpeg',
+          published: true,
+          hidden_to_user: false,
+          locked_for_user: false,
+          unlock_at: null,
+          lock_at: null,
+          date: '2021-10-27T21:49:18Z',
+          uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
+        }
+      ],
+      bookmark: 'bookmark',
+      isLoading: false,
+      hasMore: false
+    }
+  },
+  contextType: 'Course',
+  fetchInitialImages: jest.fn(),
+  fetchNextImages: jest.fn()
+}
 jest.mock('../../../shared/StoreContext', () => {
   return {
-    useStoreProps: () => ({
-      images: {
-        Course: {
-          files: [
-            {
-              id: 722,
-              filename: 'grid.png',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/722/E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
-              display_name: 'image_one.png',
-              href: 'http://canvas.docker/courses/21/files/722?wrap=1',
-              download_url: 'http://canvas.docker/files/722/download?download_frd=1',
-              content_type: 'image/png',
-              published: true,
-              hidden_to_user: true,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-11-03T19:21:27Z',
-              uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
-            },
-            {
-              id: 716,
-              filename: '1635371359_565__0266554465.jpeg',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/716/9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
-              display_name: 'image_two.jpg',
-              href: 'http://canvas.docker/courses/21/files/716?wrap=1',
-              download_url: 'http://canvas.docker/files/716/download?download_frd=1',
-              content_type: 'image/jpeg',
-              published: true,
-              hidden_to_user: false,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-10-27T21:49:19Z',
-              uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
-            },
-            {
-              id: 715,
-              filename: '1635371358_548__h3zmqPb-6dw.jpg',
-              thumbnail_url:
-                'http://canvas.docker/images/thumbnails/715/rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
-              display_name: 'image_three.jpg',
-              href: 'http://canvas.docker/courses/21/files/715?wrap=1',
-              download_url: 'http://canvas.docker/files/715/download?download_frd=1',
-              content_type: 'image/jpeg',
-              published: true,
-              hidden_to_user: false,
-              locked_for_user: false,
-              unlock_at: null,
-              lock_at: null,
-              date: '2021-10-27T21:49:18Z',
-              uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
-            }
-          ],
-          bookmark: 'bookmark',
-          isLoading: false,
-          hasMore: false
-        }
-      },
-      contextType: 'Course',
-      fetchInitialImages: jest.fn(),
-      fetchNextImages: jest.fn()
-    })
+    useStoreProps: () => mockContent
   }
 })
-
 describe('SavedIconMakerList()', () => {
   let props
   const subject = () => render(<SavedIconMakerList {...props} />)
@@ -137,6 +137,27 @@ describe('SavedIconMakerList()', () => {
           "uuid": "E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b",
         }
       `)
+    })
+  })
+  describe('When no course icons', () => {
+    beforeAll(() => {
+      mockContent = {
+        images: {
+          Course: {
+            files: [],
+            bookmark: 'bookmark',
+            isLoading: false,
+            hasMore: false
+          }
+        },
+        contextType: 'Course',
+        fetchInitialImages: jest.fn(),
+        fetchNextImages: jest.fn()
+      }
+    })
+    it('displays No results message', () => {
+      const {getByText} = subject()
+      expect(getByText('No results.')).toBeInTheDocument()
     })
   })
 })

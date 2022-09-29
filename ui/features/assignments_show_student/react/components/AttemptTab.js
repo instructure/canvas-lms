@@ -32,7 +32,7 @@ import {
   IconAttachMediaLine,
   IconLinkLine,
   IconUploadLine,
-  IconTextLine
+  IconTextLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
@@ -104,17 +104,17 @@ const iconsByType = {
   online_text_entry: IconTextLine,
   online_upload: IconUploadLine,
   online_url: IconLinkLine,
-  student_annotation: IconAnnotateLine
+  student_annotation: IconAnnotateLine,
 }
 
 function SubmissionTypeSelector({
   assignment,
   activeSubmissionType,
   selectedExternalTool,
-  updateActiveSubmissionType
+  updateActiveSubmissionType,
 }) {
   const {data, loading: loadingExternalTools} = useQuery(EXTERNAL_TOOLS_QUERY, {
-    variables: {courseID: assignment.env.courseId}
+    variables: {courseID: assignment.env.courseId},
   })
 
   const externalTools = data?.course?.externalToolsConnection.nodes || []
@@ -175,7 +175,7 @@ function GroupSubmissionReminder({groupSet}) {
   return (
     <Alert variant="warning" margin="medium 0">
       {I18n.t('Keep in mind, this submission will count for everyone in your %{groupName} group.', {
-        groupName: groupSet.name
+        groupName: groupSet.name,
       })}
     </Alert>
   )
@@ -194,11 +194,11 @@ export default class AttemptTab extends Component {
     updateActiveSubmissionType: func,
     updateEditingDraft: func,
     updateUploadingFiles: func,
-    uploadingFiles: bool
+    uploadingFiles: bool,
   }
 
   state = {
-    filesToUpload: []
+    filesToUpload: [],
   }
 
   renderFileUpload = () => {
@@ -239,7 +239,7 @@ export default class AttemptTab extends Component {
           // "loaded and "total" values. Set some placeholder values so that
           // we start at 0%.
           return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
-        })
+        }),
       },
       onSuccess
     )
@@ -264,8 +264,8 @@ export default class AttemptTab extends Component {
         id: submission.id,
         activeSubmissionType: 'online_upload',
         attempt: submission.attempt || 1,
-        fileIds: existingAttachments.map(file => file._id).concat(newFileIDs)
-      }
+        fileIds: existingAttachments.map(file => file._id).concat(newFileIDs),
+      },
     })
   }
 
@@ -301,7 +301,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: true
+            submit_assignment: true,
           },
           null,
           axios,
@@ -313,7 +313,7 @@ export default class AttemptTab extends Component {
           {
             name: file.name,
             content_type: file.type,
-            submit_assignment: true
+            submit_assignment: true,
           },
           file,
           axios,
@@ -418,7 +418,7 @@ export default class AttemptTab extends Component {
               // If an LTI returns a file attachment and not a link,
               // switch to the upload panel to show it
               this.props.updateActiveSubmissionType('online_upload')
-            }
+            },
           })
         }}
         submission={this.props.submission}
@@ -494,7 +494,7 @@ export default class AttemptTab extends Component {
               <div
                 style={{
                   backgroundColor: theme.variables.colors.backgroundLight,
-                  borderTop: `2px solid ${theme.variables.colors.borderMedium}`
+                  borderTop: `2px solid ${theme.variables.colors.borderMedium}`,
                 }}
               >
                 {this.renderByType(selectedType, context, this.props.selectedExternalTool)}

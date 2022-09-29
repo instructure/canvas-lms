@@ -28,14 +28,14 @@ const IndexMenuActions = {
   setModalOpen(value) {
     return {
       type: this.SET_MODAL_OPEN,
-      payload: !!value
+      payload: !!value,
     }
   },
 
   launchTool(tool) {
     return {
       type: this.LAUNCH_TOOL,
-      payload: tool
+      payload: tool,
     }
   },
 
@@ -46,7 +46,7 @@ const IndexMenuActions = {
         .then(response => {
           dispatch({
             type: this.SET_TOOLS,
-            payload: response.data
+            payload: response.data,
           })
         })
         .catch(response => {
@@ -58,9 +58,9 @@ const IndexMenuActions = {
   setWeighted(value) {
     return {
       type: this.SET_WEIGHTED,
-      payload: value
+      payload: value,
     }
-  }
+  },
 }
 
 export default IndexMenuActions

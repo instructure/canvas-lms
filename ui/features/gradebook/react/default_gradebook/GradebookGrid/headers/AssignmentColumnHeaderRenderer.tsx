@@ -21,9 +21,14 @@ import ReactDOM from 'react-dom'
 import {isGraded, isPostable} from '@canvas/grading/SubmissionHelper'
 import {optionsForGradingType} from '../../../shared/EnterGradesAsSetting'
 import AssignmentColumnHeader from './AssignmentColumnHeader'
+import type {AssignmentColumnHeaderProps} from './AssignmentColumnHeader'
 import type Gradebook from '../../Gradebook'
+import type {PartialStudent} from '@canvas/grading/grading.d'
+import type {Student} from '../../../../../../api.d'
+import type GridSupport from '../GridSupport/index'
+import type {SendMessageArgs} from '@canvas/message-students-dialog/react/MessageStudentsWhoDialog'
 
-function getSubmission(student, assignmentId) {
+function getSubmission(student: Student, assignmentId: string) {
   const submission = student[`assignment_${assignmentId}`]
 
   if (!submission) {
@@ -36,7 +41,7 @@ function getSubmission(student, assignmentId) {
       postedAt: null,
       score: null,
       submittedAt: null,
-      workflowState: null
+      workflowState: null,
     }
   }
 
@@ -49,11 +54,16 @@ function getSubmission(student, assignmentId) {
     postedAt: submission.posted_at,
     score: submission.score,
     submittedAt: submission.submitted_at,
-    workflowState: submission.workflow_state
+    workflowState: submission.workflow_state,
   }
 }
 
-function getProps(column, gradebook, options) {
+type Column = {
+  id: string
+  assignmentId: string
+}
+
+function getProps(column: Column, gradebook: Gradebook, options): AssignmentColumnHeaderProps {
   const assignmentId = column.assignmentId
   const columnId = column.id
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
@@ -64,25 +74,28 @@ function getProps(column, gradebook, options) {
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
-  const processStudent = student => ({
+  const processStudent = (student: Student): PartialStudent => ({
     id: student.id,
     isInactive: student.isInactive,
     isTestStudent: student.enrollments[0].type === 'StudentViewEnrollment',
     name: student.name,
     sortableName: student.sortable_name,
-    submission: getSubmission(student, assignmentId)
+    submission: getSubmission(student, assignmentId),
   })
 
   // Menu options for posting and hiding grades should always take into account
   // all loaded students, regardless of any active filters.
-  const allStudents = Object.values(gradebook.studentsThatCanSeeAssignment(assignmentId)).map(
-    processStudent
+  const studentsThatCanSeeAssignment = gradebook.studentsThatCanSeeAssignment(assignmentId)
+  const allStudents: PartialStudent[] = Object.keys(studentsThatCanSeeAssignment).map(key =>
+    processStudent(studentsThatCanSeeAssignment[key])
   )
 
   // For the "Message Students Who" window, we only want to show students who
   // match active filters, and so must retrieve the list each time.
-  const getCurrentlyShownStudents = () =>
-    Object.values(gradebook.visibleStudentsThatCanSeeAssignment(assignmentId)).map(processStudent)
+  const getCurrentlyShownStudents = () => {
+    const students = gradebook.visibleStudentsThatCanSeeAssignment(assignmentId)
+    return Object.keys(students).map(key => processStudent(students[key]))
+  }
 
   const hasGradesOrPostableComments = allStudents.some(
     student => isGraded(student.submission) || student.submission.hasPostableComments
@@ -90,7 +103,7 @@ function getProps(column, gradebook, options) {
 
   return {
     ref: options.ref,
-    addGradebookElement: gradebook.keyboardNav.addGradebookElement,
+    addGradebookElement: gradebook.keyboardNav?.addGradebookElement,
 
     allStudents,
     assignment: {
@@ -106,7 +119,7 @@ function getProps(column, gradebook, options) {
       pointsPossible: assignment.points_possible,
       postManually: assignment.post_manually,
       published: assignment.published,
-      submissionTypes: assignment.submission_types
+      submissionTypes: assignment.submission_types,
     },
 
     curveGradesAction: gradebook.getCurveGradesAction(assignmentId),
@@ -120,7 +133,7 @@ function getProps(column, gradebook, options) {
       selected: gradebook.getEnterGradesAsSetting(assignmentId),
       showGradingSchemeOption: optionsForGradingType(assignment.grading_type).includes(
         'gradingScheme'
-      )
+      ),
     },
     getCurrentlyShownStudents,
 
@@ -138,7 +151,7 @@ function getProps(column, gradebook, options) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showHideAssignmentGradesTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
     postGradesAction: {
@@ -149,10 +162,10 @@ function getProps(column, gradebook, options) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
-    removeGradebookElement: gradebook.keyboardNav.removeGradebookElement,
+    removeGradebookElement: gradebook.keyboardNav?.removeGradebookElement,
     reuploadSubmissionsAction: gradebook.getReuploadSubmissionsAction(assignmentId),
     setDefaultGradeAction: gradebook.getSetDefaultGradeAction(assignmentId),
 
@@ -161,7 +174,7 @@ function getProps(column, gradebook, options) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showAssignmentPostingPolicyTray({assignmentId, onExited})
         }
-      }
+      },
     },
 
     showMessageStudentsWithObserversDialog:
@@ -187,30 +200,30 @@ function getProps(column, gradebook, options) {
       onSortByUnposted: () => {
         gradebook.setSortRowsBySetting(columnId, 'unposted', 'ascending')
       },
-      settingKey: sortRowsBySetting.settingKey
+      settingKey: sortRowsBySetting.settingKey,
     },
 
     submissionsLoaded: gradebook.contentLoadStates.submissionsLoaded,
     messageAttachmentUploadFolderId: gradebook.options.message_attachment_upload_folder_id,
     userId: gradebook.options.currentUserId,
 
-    onSendMessageStudentsWho: args => gradebook.sendMessageStudentsWho(args)
+    onSendMessageStudentsWho: (args: SendMessageArgs) => gradebook.sendMessageStudentsWho(args),
   }
 }
 
 export default class AssignmentColumnHeaderRenderer {
   gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(column, $container, _gridSupport, options) {
+  render(column: Column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(column, this.gradebook, options)
     ReactDOM.render(<AssignmentColumnHeader {...props} />, $container)
   }
 
-  destroy(column, $container, _gridSupport) {
+  destroy(_column: Column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

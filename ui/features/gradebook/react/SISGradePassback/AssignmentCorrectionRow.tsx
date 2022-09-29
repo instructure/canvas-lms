@@ -104,7 +104,7 @@ class AssignmentCorrectionRow extends React.Component {
     const rowClass = classnames({
       row: true,
       'correction-row': true,
-      'ignore-row': assignment.please_ignore
+      'ignore-row': assignment.please_ignore,
     })
 
     const nameEmptyError = assignmentUtils.nameEmpty(assignment) && !assignment.please_ignore
@@ -149,7 +149,7 @@ class AssignmentCorrectionRow extends React.Component {
           {anyError || assignment.please_ignore ? null : <i className="success-mark icon-check" />}
           <div
             className={classnames({
-              'error-circle': nameError || nameTooLongError || nameEmptyError
+              'error-circle': nameError || nameTooLongError || nameEmptyError,
             })}
           >
             <label className="screenreader-only">{I18n.t('Name Error')}</label>
@@ -175,7 +175,7 @@ class AssignmentCorrectionRow extends React.Component {
         <div className="span2 date_field_container input-container assignment_correction_input">
           <div
             className={classnames({
-              'error-circle': dueAtError
+              'error-circle': dueAtError,
             })}
           >
             <label className="screenreader-only">{I18n.t('Date Error')}</label>

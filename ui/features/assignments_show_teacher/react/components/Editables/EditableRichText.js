@@ -36,12 +36,12 @@ export default class EditableRichText extends React.Component {
     onChange: func.isRequired, // when flips from edit to view, notify consumer of the new value
     onChangeMode: func.isRequired, // when mode changes
     placeholder: string, // the string to display when the text value is empty
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
     placeholder: '',
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
@@ -50,7 +50,7 @@ export default class EditableRichText extends React.Component {
     this.state = {
       value: props.value,
       initialValue: props.value,
-      htmlValue: apiUserContent.convert(props.value)
+      htmlValue: apiUserContent.convert(props.value),
     }
   }
 
@@ -117,10 +117,10 @@ export default class EditableRichText extends React.Component {
       manageParent: false,
       tinyOptions: {
         init_instance_callback: this.handleRCEInit,
-        height: 300
+        height: 300,
       },
       onFocus: this.handleEditorFocus,
-      onBlur: this.handleEditorBlur
+      onBlur: this.handleEditorBlur,
     })
   }
 
@@ -193,7 +193,7 @@ export default class EditableRichText extends React.Component {
     this.setState(
       {
         value: event.target.value,
-        htmlValue: apiUserContent.convert(event.target.value)
+        htmlValue: apiUserContent.convert(event.target.value),
       },
       () => {
         this.props.onChange(this.state.value)

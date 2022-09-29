@@ -75,7 +75,7 @@ describe('AssignmentName', () => {
     const {getByDisplayValue} = renderAssignmentName({
       mode: 'edit',
       onChange,
-      onChangeMode
+      onChangeMode,
     })
 
     const input = getByDisplayValue('the name')

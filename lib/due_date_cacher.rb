@@ -70,6 +70,18 @@ class DueDateCacher
 
   INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
     CASE
+    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL AND (
+      SELECT EXISTS (
+        SELECT
+          *
+        FROM
+          #{Quizzes::QuizSubmission.quoted_table_name} qs
+        WHERE
+          quiz_submission_id = qs.id
+        AND workflow_state = 'pending_review'
+      )
+    ) THEN
+      'pending_review'
     WHEN grade IS NOT NULL OR excused IS TRUE THEN
       'graded'
     WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN

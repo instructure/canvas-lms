@@ -80,9 +80,13 @@
   visibility: hidden;
 }
 
-.math_equation_latex {
-  /*visibility: hidden;*/
+img.equation_image {
   display: inline-block;
+  visibility: hidden;
+}
+
+.math_equation_latex {
+  visibility: hidden;
   // adding new style for centering preview of formulae
   text-align: center;
 }

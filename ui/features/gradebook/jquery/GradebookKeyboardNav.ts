@@ -45,28 +45,28 @@ const defaultkeyBindings: KeyBinding[] = [
     //   desc: string describing what the shortcut does - for use in the help dialog
     handler: 'sortOnHeader',
     key: I18n.t('keycodes.sort', 's'),
-    desc: I18n.t('keyboard_sort_desc', 'Sort the grid on the current active column')
+    desc: I18n.t('keyboard_sort_desc', 'Sort the grid on the current active column'),
   },
   {
     handler: 'toggleColumnHeaderMenu',
     key: I18n.t('keycodes.menu', 'm'),
-    desc: I18n.t('keyboard_menu_desc', 'Open menu for the active column')
+    desc: I18n.t('keyboard_menu_desc', 'Open menu for the active column'),
   },
   {
     // this one is just for display in the dialog, the menu will take care of itself
     key: I18n.t('keycodes.close_menu', 'esc'),
-    desc: I18n.t('keyboard_close_menu', 'Close the currently active menu')
+    desc: I18n.t('keyboard_close_menu', 'Close the currently active menu'),
   },
   {
     handler: 'gotoAssignment',
     key: I18n.t('keycodes.goto_assignment', 'g'),
-    desc: I18n.t('keyboard_assignment_desc', "Go to the current assignment's detail page")
+    desc: I18n.t('keyboard_assignment_desc', "Go to the current assignment's detail page"),
   },
   {
     handler: 'showSubmissionTray',
     key: 'c',
-    desc: I18n.t('Open the grade detail tray')
-  }
+    desc: I18n.t('Open the grade detail tray'),
+  },
 ]
 
 export default class GradebookKeyboardNav {

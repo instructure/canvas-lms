@@ -23,15 +23,14 @@ import CanvasDateInput from '@canvas/datetime/react/components/DateInput'
 import moment from 'moment'
 import {MomentInput} from 'moment-timezone'
 import tz from '@canvas/timezone'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {Filter} from '../gradebook.d'
 import type {
   AssignmentGroup,
-  GradingPeriod,
   Module,
   Section,
   StudentGroup,
   StudentGroupCategory,
-  StudentGroupCategoryMap
 } from '../../../../../api.d'
 import natcompare from '@canvas/util/natcompare'
 
@@ -46,7 +45,7 @@ type SubmissionTypeOption = ['has-ungraded-submissions' | 'has-submissions' | '_
 const submissionTypeOptions: SubmissionTypeOption[] = [
   ['__EMPTY__', I18n.t('--')],
   ['has-ungraded-submissions', I18n.t('Has ungraded submissions')],
-  ['has-submissions', I18n.t('Has submissions')]
+  ['has-submissions', I18n.t('Has submissions')],
 ]
 
 const filterTypeLabels = {
@@ -57,17 +56,17 @@ const filterTypeLabels = {
   'student-group': I18n.t('Student Groups'),
   submission: I18n.t('Submissions'),
   'start-date': I18n.t('Start Date'),
-  'end-date': I18n.t('End Date')
+  'end-date': I18n.t('End Date'),
 }
 
 export type FilterNavFilterProps = {
   assignmentGroups: AssignmentGroup[]
   filter: Filter
-  gradingPeriods: GradingPeriod[]
+  gradingPeriods: CamelizedGradingPeriod[]
   modules: Module[]
   onChange: any
   sections: Section[]
-  studentGroupCategories: StudentGroupCategoryMap
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 type MenuItem = [id: string, name: string]
@@ -79,7 +78,7 @@ export default function ({
   assignmentGroups,
   gradingPeriods,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterNavFilterProps) {
   let items: MenuItem[] = []
   let itemGroups: [string, string, MenuItem[]][] = []
@@ -110,7 +109,7 @@ export default function ({
           c.name,
           c.groups
             .sort((g1: StudentGroup, g2: StudentGroup) => natcompare.strings(g1.name, g2.name))
-            .map(g => [g.id, g.name])
+            .map(g => [g.id, g.name]),
         ])
       break
     }
@@ -137,7 +136,7 @@ export default function ({
           onChange={(_event, {value}) => {
             onChange({
               ...filter,
-              value
+              value,
             })
           }}
         >
@@ -175,7 +174,7 @@ export default function ({
           onSelectedDateChange={(value: MomentInput) => {
             onChange({
               ...filter,
-              value: value ? moment(value).toISOString() : null
+              value: value ? moment(value).toISOString() : null,
             })
           }}
         />
@@ -191,7 +190,7 @@ export default function ({
           onChange={(_event, {value}) => {
             onChange({
               ...filter,
-              value
+              value,
             })
           }}
         >

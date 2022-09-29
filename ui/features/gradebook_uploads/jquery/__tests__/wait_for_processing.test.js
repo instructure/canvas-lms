@@ -25,7 +25,7 @@ describe('waitForProcessing', () => {
     progress = {
       queued: {workflow_state: 'queued', message: ''},
       failed: {workflow_state: 'failed', message: ''},
-      completed: {workflow_state: 'completed', message: ''}
+      completed: {workflow_state: 'completed', message: ''},
     }
     const newDiv = document.createElement('div')
     newDiv.id = 'spinner'
@@ -59,7 +59,7 @@ describe('waitForProcessing', () => {
           }
         }
         return Promise.resolve(progress.queued)
-      }
+      },
     })
   }
 
@@ -103,7 +103,7 @@ describe('waitForProcessing', () => {
   it('manages spinner', () => {
     jest.spyOn($, 'ajaxJSON').mockImplementation(() => {
       return {
-        promise: () => null
+        promise: () => null,
       }
     })
     return waitForProcessing(progress.completed).then(() => {

@@ -41,7 +41,7 @@ const Countdown = ({seconds}) => (
 )
 
 Countdown.propTypes = {
-  seconds: number.isRequired
+  seconds: number.isRequired,
 }
 
 const WebcamAccessRequired = () => (
@@ -138,7 +138,7 @@ export default function WebcamCapture({onSelectImage}) {
     canvas.toBlob(blob => {
       setTakenImage({
         dataURL,
-        blob
+        blob,
       })
     })
   }
@@ -242,5 +242,5 @@ export default function WebcamCapture({onSelectImage}) {
 }
 
 WebcamCapture.propTypes = {
-  onSelectImage: func.isRequired
+  onSelectImage: func.isRequired,
 }
