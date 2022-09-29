@@ -71,6 +71,7 @@ describe "Section Paces API" do
   describe "show" do
     it "returns the pace for the requested section" do
       section_pace = section_pace_model(section: section)
+      Progress.create!(context: section_pace, tag: "course_pace_publish")
       get api_v1_section_pace_path(course, section), params: { format: :json }
       expect(response.status).to eq 200
       json = JSON.parse(response.body)
@@ -112,10 +113,14 @@ describe "Section Paces API" do
         post api_v1_new_section_pace_path(course, section), params: { format: :json }
       end.to change {
         section.course_paces.reload.count
-      }.by 1
+      }.by(1)
+        .and change { Progress.count }.by(1)
+      expect(Progress.last.queued?).to be_truthy
       expect(response.status).to eq 201
       json = JSON.parse(response.body)
       expect(json["pace"]["section"]["name"]).to eq section.name
+      expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
+      expect(json["progress"]["tag"]).to eq("course_pace_publish")
     end
 
     it "returns a 404 if the section and course are unrelated" do
@@ -139,6 +144,8 @@ describe "Section Paces API" do
         expect(response.status).to eq 201
         json = JSON.parse(response.body)
         expect(json["pace"]["id"]).to eq section_pace.id
+        expect(json["progress"]["context_id"]).to eq(CoursePace.last.id)
+        expect(json["progress"]["tag"]).to eq("course_pace_publish")
       end
     end
   end
@@ -154,9 +161,10 @@ describe "Section Paces API" do
             exclude_weekends: false
           }
         }
-      end.to change {
-        pace.reload.exclude_weekends
-      }.to false
+      end.to change { pace.reload.exclude_weekends }
+        .to(false)
+        .and change { Progress.count }.by(1)
+      expect(Progress.last.queued?).to be_truthy
       expect(response.status).to eq 200
     end
 
