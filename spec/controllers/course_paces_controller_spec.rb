@@ -683,6 +683,13 @@ describe CoursePacesController, type: :controller do
         expect(json_response["errors"]).to eq("You cannot delete the default course pace.")
       end
 
+      it "does not increment when the course pace delete api endpoint is called" do
+        allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+
+        delete :destroy, params: { course_id: @course.id, id: @course_pace.id }
+        expect(InstStatsd::Statsd).not_to have_received(:increment).with("course_pacing.deleted_course_pace")
+      end
+
       context "with fallback paces" do
         before do
           Setting.set("course_pace_publish_interval", "0") # run publishes immediately

@@ -564,6 +564,43 @@ describe CoursePace do
     end
   end
 
+  context "course pace deletes" do
+    before :once do
+      Account.site_admin.enable_feature!(:course_paces_redesign)
+      course_with_student active_all: true
+      @course.root_account.enable_feature!(:course_paces)
+      @course.enable_course_paces = true
+      @course.save!
+      @module = @course.context_modules.create!
+      @assignment = @course.assignments.create!
+      @tag = @assignment.context_module_tags.create! context_module: @module, context: @course, tag_type: "context_module"
+    end
+
+    it "increments the course pace deletion to statsd" do
+      # This destroy does work and we log it here, but in general, the code doesn't allow for the default
+      # course pace to be deleted for now.
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      course_pace = @course.course_paces.create! workflow_state: "active"
+      course_pace.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_course_pace").once
+    end
+
+    it "increments the section-type course pace deletion to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      new_section = @course.course_sections.create! name: "new_section"
+      section_plan = @course.course_paces.create! course_section: new_section
+      section_plan.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_section_pace").once
+    end
+
+    it "increments the student-type course pace deletion to statsd" do
+      allow(InstStatsd::Statsd).to receive(:increment).and_call_original
+      user_plan = @course.course_paces.create!(user: @student, workflow_state: "active")
+      user_plan.destroy!
+      expect(InstStatsd::Statsd).to have_received(:increment).with("course_pacing.deleted_user_pace").once
+    end
+  end
+
   context "course pace publish logs statsd for various values" do
     before :once do
       course_with_student active_all: true
