@@ -37,7 +37,6 @@ class CalendarsController < ApplicationController
                          else
                            @current_user.get_preference(:selected_calendar_contexts)
                          end
-    @inline_titles = @domain_root_account&.feature_enabled?(:wrap_calendar_event_titles)
     @account_calendar_events_seen = @current_user.get_preference(:account_calendar_events_seen)
     # somewhere there's a bad link that doesn't separate parameters properly.
     # make sure we don't do a find on a non-numeric id.

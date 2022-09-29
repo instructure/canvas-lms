@@ -409,13 +409,6 @@ use_semi_colon_field_separators_in_gradebook_exports:
     exports so they can be imported into Excel for users in some locales.
   applies_to: User
   custom_transition_proc: use_semi_colon_field_separators_in_gradebook_exports_custom_transition_hook
-wrap_calendar_event_titles:
-  type: setting
-  state: allowed
-  display_name: event title tooltips in Calendar month view
-  description: Display a tooltip for calendar events if the title doesn't fit on a single line
-  applies_to: RootAccount
-  root_opt_in: true
 gradebook_show_first_last_names:
   state: hidden
   applies_to: SiteAdmin
