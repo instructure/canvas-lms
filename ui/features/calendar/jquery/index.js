@@ -354,7 +354,7 @@ export default class Calendar {
     }
     this.closeEventPopups()
     this.drawNowLine()
-    if (ENV.FEATURES.wrap_calendar_event_titles && _view.name === 'month') {
+    if (_view.name === 'month') {
       // add a delay to wait until the calendar elements get resized
       setTimeout(() => {
         $.each($('.fc-event'), (i, e) => this.renderTooltipIfNeeded($(e)))
@@ -396,7 +396,7 @@ export default class Calendar {
     }
 
     const newTitle =
-      ENV.FEATURES.wrap_calendar_event_titles && _view.name === 'month'
+      _view.name === 'month'
         ? $.trim(htmlEscape(element.find('.fc-title').text()))
         : $.trim(
             `${timeString}\n${$element.find('.fc-title').text()}\n\n${I18n.t(
@@ -465,7 +465,7 @@ export default class Calendar {
       )
     }
 
-    if (ENV.FEATURES.wrap_calendar_event_titles && view.name === 'month') {
+    if (view.name === 'month') {
       this.renderTooltipIfNeeded(element)
     }
   }
