@@ -20,17 +20,17 @@ import {mount} from 'enzyme'
 import {
   pinnedDiscussionBackground,
   unpinnedDiscussionsBackground,
-  closedDiscussionBackground
+  closedDiscussionBackground,
 } from 'ui/features/discussion_topics_index/react/components/DiscussionBackgrounds.js'
 
 const defaultProps = () => ({
   permissions: {
     create: true,
     manage_content: true,
-    moderate: true
+    moderate: true,
   },
   courseID: 12,
-  contextType: 'Course'
+  contextType: 'Course',
 })
 
 QUnit.module('DiscussionBackgrounds components')

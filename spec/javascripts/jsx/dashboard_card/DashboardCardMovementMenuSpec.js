@@ -40,8 +40,8 @@ QUnit.module('DashboardCardMovementMenu', suiteHooks => {
         canMoveLeft: true,
         canMoveRight: true,
         canMoveToBeginning: true,
-        canMoveToEnd: true
-      }
+        canMoveToEnd: true,
+      },
     }
   })
 

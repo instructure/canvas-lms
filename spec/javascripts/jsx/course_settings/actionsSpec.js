@@ -25,8 +25,8 @@ test('calling setModalVisibility produces the proper object', () => {
   let expected = {
     type: 'MODAL_VISIBILITY',
     payload: {
-      showModal: true
-    }
+      showModal: true,
+    },
   }
 
   deepEqual(actual, expected, 'the objects match')
@@ -35,8 +35,8 @@ test('calling setModalVisibility produces the proper object', () => {
   expected = {
     type: 'MODAL_VISIBILITY',
     payload: {
-      showModal: false
-    }
+      showModal: false,
+    },
   }
 
   deepEqual(actual, expected)
@@ -47,8 +47,8 @@ test('calling gotCourseImage produces the proper object', () => {
   const expected = {
     type: 'GOT_COURSE_IMAGE',
     payload: {
-      imageUrl: 'http://imageUrl'
-    }
+      imageUrl: 'http://imageUrl',
+    },
   }
 
   deepEqual(actual, expected, 'the objects match')
@@ -58,8 +58,8 @@ test('getCourseImage', assert => {
   const done = assert.async()
   const fakeResponse = {
     data: {
-      image: 'http://imageUrl'
-    }
+      image: 'http://imageUrl',
+    },
   }
 
   const fakeAjaxLib = {
@@ -67,14 +67,14 @@ test('getCourseImage', assert => {
       return new Promise(resolve => {
         setTimeout(() => resolve(fakeResponse), 100)
       })
-    }
+    },
   }
 
   const expectedAction = {
     type: 'GOT_COURSE_IMAGE',
     payload: {
-      imageUrl: 'http://imageUrl'
-    }
+      imageUrl: 'http://imageUrl',
+    },
   }
 
   Actions.getCourseImage(
@@ -93,8 +93,8 @@ test('setCourseImageId creates the proper action', () => {
     type: 'SET_COURSE_IMAGE_ID',
     payload: {
       imageUrl: 'http://imageUrl',
-      imageId: 12
-    }
+      imageId: 12,
+    },
   }
 
   deepEqual(actual, expected, 'the objects match')
@@ -111,8 +111,8 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
   const done = assert.async()
   const fakeResponse = {
     data: {
-      url: 'http://imageUrl'
-    }
+      url: 'http://imageUrl',
+    },
   }
 
   const fakeAjaxLib = {
@@ -120,7 +120,7 @@ test('prepareSetImage without a imageUrl calls the API to get the url', assert =
       return new Promise(resolve => {
         setTimeout(() => resolve(fakeResponse), 100)
       })
-    }
+    },
   }
 
   sinon.spy(Actions, 'putImageData')
@@ -164,18 +164,18 @@ test('uploadFile returns false when image is not valid', assert => {
         {
           name: 'test file',
           size: 12345,
-          type: 'image/tiff'
-        }
-      ]
+          type: 'image/tiff',
+        },
+      ],
     },
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   const expectedAction = {
     type: 'REJECTED_UPLOAD',
     payload: {
-      rejectedFiletype: 'image/tiff'
-    }
+      rejectedFiletype: 'image/tiff',
+    },
   }
 
   Actions.uploadFile(
@@ -196,15 +196,15 @@ test('uploadFile dispatches UPLOADING_IMAGE when file type is valid', assert => 
         {
           name: 'test file',
           size: 12345,
-          type: 'image/jpeg'
-        }
-      ]
+          type: 'image/jpeg',
+        },
+      ],
     },
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   const expectedAction = {
-    type: 'UPLOADING_IMAGE'
+    type: 'UPLOADING_IMAGE',
   }
 
   Actions.uploadFile(
@@ -227,8 +227,8 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
       resolve({
         data: {
           upload_params: {fakeKey: 'fakeValue', success_url: successUrl},
-          upload_url: 'http://uploadUrl'
-        }
+          upload_url: 'http://uploadUrl',
+        },
       })
     )
   })
@@ -238,8 +238,8 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
       resolve({
         data: {
           url: 'http://fileDownloadUrl',
-          id: 1
-        }
+          id: 1,
+        },
       })
     )
   })
@@ -252,7 +252,7 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
 
   const fakeAjaxLib = {
     post: postStub,
-    get: getStub
+    get: getStub,
   }
 
   const fakeDragonDropEvent = {
@@ -261,11 +261,11 @@ test('uploadFile dispatches prepareSetImage when successful', assert => {
         new File(['fake'], 'fake.jpg', {
           name: 'test file',
           size: 12345,
-          type: 'image/jpeg'
-        })
-      ]
+          type: 'image/jpeg',
+        }),
+      ],
     },
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   sinon.spy(Actions, 'prepareSetImage')

@@ -32,32 +32,32 @@ QUnit.module('EditConferenceView', {
       users: [
         {id: 1, name: 'Owlswick Clamp'},
         {id: 2, name: 'Abby Zollinger'},
-        {id: 3, name: 'Bruce Young'}
+        {id: 3, name: 'Bruce Young'},
       ],
       sections: [
         {id: 1, name: 'Section 1'},
-        {id: 2, name: 'Section 2'}
+        {id: 2, name: 'Section 2'},
       ],
       groups: [
         {id: 1, name: 'Study Group 1'},
-        {id: 2, name: 'Study Group 2'}
+        {id: 2, name: 'Study Group 2'},
       ],
       section_user_ids_map: {1: [1, 2], 2: [3]},
-      group_user_ids_map: {1: [1], 2: [1, 2]}
+      group_user_ids_map: {1: [1], 2: [1, 2]},
     })
   },
   teardown() {
     this.view.$el.remove()
     fakeENV.teardown()
     tzInTest.restore()
-  }
+  },
 })
 
 test('updateConferenceUserSettingDetailsForConference localizes values for datepicker settings', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(french, 'fr_FR'),
     momentLocale: 'fr',
-    formats: {'date.formats.full_with_weekday': '%a %-d %b, %Y %-k:%M'}
+    formats: {'date.formats.full_with_weekday': '%a %-d %b, %Y %-k:%M'},
   })
 
   const conferenceData = {user_settings: {datepickerSetting: '2015-08-07T17:00:00Z'}}
@@ -70,11 +70,11 @@ test('#show sets the proper title for new conferences', function () {
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -89,11 +89,11 @@ test('#show sets the proper title for editing conferences', function () {
     title: 'InstructureCon',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -108,12 +108,12 @@ test('#show sets localized durataion when editing conference', function () {
     title: 'InstructureCon',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
+      update: true,
     },
-    duration: 1234.5
+    duration: 1234.5,
   }
 
   const conference = new Conference(attributes)
@@ -127,11 +127,11 @@ test('"remove observers" modifies "invite all course members"', function () {
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
   const conference = new Conference(attributes)
   this.view.show(conference, {isEditing: true})
@@ -147,11 +147,11 @@ test('sections should appear in member list if course has more than one section'
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -165,11 +165,11 @@ test('sections should not appear in member list if course has only section', fun
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   window.ENV.sections = [{name: 'Section 1', id: 1}]
@@ -184,11 +184,11 @@ test('groups should appear in member list if course has one or more groups', fun
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -201,11 +201,11 @@ test('checking/unchecking a section also checks/unchecks the members that are in
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -223,11 +223,11 @@ test('checking/unchecking a groups also checks/unchecks the members that are in 
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -244,11 +244,11 @@ test('unchecking a group only unchecks members that have not been selected by se
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -268,11 +268,11 @@ test('unchecking a section only unchecks members that have not been selected by 
   const attributes = {
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
 
   const conference = new Conference(attributes)
@@ -294,12 +294,12 @@ test('While editing a conference the box for a group should be checked and disab
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
+      update: true,
     },
-    user_ids: [1]
+    user_ids: [1],
   }
   const conference = new Conference(attributes)
   this.view.show(conference, {isEditing: true})
@@ -313,12 +313,12 @@ test('While editing a conference the box for a section should be checked and dis
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
+      update: true,
     },
-    user_ids: [3]
+    user_ids: [3],
   }
   const conference = new Conference(attributes)
   this.view.show(conference, {isEditing: true})
@@ -332,12 +332,12 @@ test('While editing a conference unchecking a group should only uncheck members 
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
+      update: true,
     },
-    user_ids: [1]
+    user_ids: [1],
   }
   const conference = new Conference(attributes)
   this.view.show(conference, {isEditing: true})
@@ -358,12 +358,12 @@ test('While editing a conference unchecking a section should only uncheck member
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
+      update: true,
     },
-    user_ids: [1]
+    user_ids: [1],
   }
   const conference = new Conference(attributes)
   this.view.show(conference, {isEditing: true})
@@ -384,11 +384,11 @@ test('while context_is_group = true no sections or groups should appear in the m
     title: 'Making Money',
     recordings: [],
     user_settings: {
-      scheduled_date: new Date()
+      scheduled_date: new Date(),
     },
     permissions: {
-      update: true
-    }
+      update: true,
+    },
   }
   window.ENV.context_is_group = true
   const conference = new Conference(attributes)

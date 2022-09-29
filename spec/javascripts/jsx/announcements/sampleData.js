@@ -28,7 +28,7 @@ const data = {
       author: {
         id: '1',
         display_name: 'John Doe',
-        html_url: 'http://example.org/user/5'
+        html_url: 'http://example.org/user/5',
       },
       read_state: 'read',
       unread_count: 0,
@@ -37,10 +37,10 @@ const data = {
       user_count: 2,
       html_url: 'http://example.org/announcement/5',
       permissions: {
-        delete: true
-      }
-    }
-  ]
+        delete: true,
+      },
+    },
+  ],
 }
 
 export default data

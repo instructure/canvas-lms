@@ -40,14 +40,14 @@ function assertEnabled(component) {
 const urls = {
   batchUpdateURL: 'api/v1/accounts/1/grading_period_sets',
   deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D',
-  gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets'
+  gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
 }
 
 const allPermissions = {
   read: true,
   create: true,
   update: true,
-  delete: true
+  delete: true,
 }
 
 const examplePeriods = [
@@ -57,7 +57,7 @@ const examplePeriods = [
     weight: 33,
     startDate: new Date('2015-01-01T20:11:00+00:00'),
     endDate: new Date('2015-03-01T00:00:00+00:00'),
-    closeDate: new Date('2015-03-01T00:00:00+00:00')
+    closeDate: new Date('2015-03-01T00:00:00+00:00'),
   },
   {
     id: '3',
@@ -65,7 +65,7 @@ const examplePeriods = [
     weight: 25.75,
     startDate: new Date('2014-11-01T20:11:00+00:00'),
     endDate: new Date('2014-11-11T00:00:00+00:00'),
-    closeDate: new Date('2014-11-11T00:00:00+00:00')
+    closeDate: new Date('2014-11-11T00:00:00+00:00'),
   },
   {
     id: '2',
@@ -73,8 +73,8 @@ const examplePeriods = [
     weight: 0,
     startDate: new Date('2015-04-01T20:11:00+00:00'),
     endDate: new Date('2015-05-01T00:00:00+00:00'),
-    closeDate: new Date('2015-05-01T00:00:00+00:00')
-  }
+    closeDate: new Date('2015-05-01T00:00:00+00:00'),
+  },
 ]
 
 const examplePeriod = {
@@ -83,7 +83,7 @@ const examplePeriod = {
   weight: 25,
   startDate: new Date('2015-03-02T20:11:00+00:00'),
   endDate: new Date('2015-03-03T00:00:00+00:00'),
-  closeDate: new Date('2015-03-03T00:00:00+00:00')
+  closeDate: new Date('2015-03-03T00:00:00+00:00'),
 }
 
 const props = {
@@ -91,7 +91,7 @@ const props = {
     id: '1',
     title: 'Example Set',
     weighted: true,
-    displayTotalsForAllGradingPeriods: false
+    displayTotalsForAllGradingPeriods: false,
   },
   terms: [],
   onEdit() {},
@@ -103,7 +103,7 @@ const props = {
   actionsDisabled: false,
   readOnly: false,
   urls,
-  permissions: allPermissions
+  permissions: allPermissions,
 }
 
 QUnit.module('GradingPeriodSet', {
@@ -127,44 +127,44 @@ QUnit.module('GradingPeriodSet', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('renders without set body when the "expanded" property is false', function() {
+test('renders without set body when the "expanded" property is false', function () {
   const set = this.renderComponent({expanded: false})
   notOk(!!set._refs.setBody)
 })
 
-test('renders with set body when the "expanded" property is true', function() {
+test('renders with set body when the "expanded" property is true', function () {
   const set = this.renderComponent({expanded: true})
   ok(set._refs.setBody)
 })
 
-test('expands the set body when the toggle is clicked', function() {
+test('expands the set body when the toggle is clicked', function () {
   const spy = sinon.spy()
   const set = this.renderComponent({onToggleBody: spy})
   Simulate.click(set._refs.toggleSetBody)
   ok(spy.calledOnce)
 })
 
-test('disables action buttons when "actionsDisabled" is true', function() {
+test('disables action buttons when "actionsDisabled" is true', function () {
   const set = this.renderComponent({actionsDisabled: true})
   assertDisabled(set._refs.editButton)
   assertDisabled(set._refs.deleteButton)
 })
 
-test('disables the "add grading period" button when "actionsDisabled" is true', function() {
+test('disables the "add grading period" button when "actionsDisabled" is true', function () {
   const set = this.renderComponent({actionsDisabled: true})
   assertDisabled(set._refs.addPeriodButton)
 })
 
-test('disables grading period action buttons when "actionsDisabled" is true', function() {
+test('disables grading period action buttons when "actionsDisabled" is true', function () {
   const set = this.renderComponent({actionsDisabled: true})
   ok(set._refs['show-grading-period-2'].props.actionsDisabled)
   ok(set._refs['show-grading-period-3'].props.actionsDisabled)
 })
 
-test('sorts grading periods by start date, ascending', function() {
+test('sorts grading periods by start date, ascending', function () {
   const set = this.renderComponent()
   const startDates = Array.from(set._refs.gradingPeriodList.children).map(
     // get the "Nov 1, 2014" from "Starts: Nov 1, 2014"
@@ -173,14 +173,14 @@ test('sorts grading periods by start date, ascending', function() {
   deepEqual(startDates, ['Nov 1, 2014', 'Jan 1, 2015', 'Apr 1, 2015'])
 })
 
-test('calls the onEdit prop when the "edit grading period set" button is clicked', function() {
+test('calls the onEdit prop when the "edit grading period set" button is clicked', function () {
   const set = this.renderComponent()
   set._refs.editButton.click()
   ok(set.props.onEdit.calledOnce)
   equal(set.props.onEdit.args[0][0], set.props.set)
 })
 
-test('does not delete the set if the user cancels the delete confirmation', function() {
+test('does not delete the set if the user cancels the delete confirmation', function () {
   sandbox.stub(axios, 'delete')
   sandbox.stub(window, 'confirm').returns(false)
   const set = this.renderComponent()
@@ -188,7 +188,7 @@ test('does not delete the set if the user cancels the delete confirmation', func
   ok(set.props.onDelete.notCalled)
 })
 
-test('deletes the set if the user confirms deletion', function() {
+test('deletes the set if the user confirms deletion', function () {
   const deletePromise = this.stubDeleteSuccess()
   sandbox.stub(window, 'confirm').returns(true)
   const set = this.renderComponent()
@@ -211,17 +211,17 @@ QUnit.module('GradingPeriodSet "Edit Grading Period"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('renders the "GradingPeriodForm" when "edit grading period" is clicked', function() {
+test('renders the "GradingPeriodForm" when "edit grading period" is clicked', function () {
   const set = this.renderComponent()
   notOk(!!set._refs.editPeriodForm)
   set._refs['show-grading-period-1']._refs.editButton.click()
   ok(set._refs.editPeriodForm)
 })
 
-test('disables all grading period actions while open', function() {
+test('disables all grading period actions while open', function () {
   const set = this.renderComponent()
   notOk(!!set._refs.editPeriodForm)
   set._refs['show-grading-period-1']._refs.editButton.click()
@@ -230,7 +230,7 @@ test('disables all grading period actions while open', function() {
   ok(set._refs['show-grading-period-3'].props.actionsDisabled)
 })
 
-test('disables set toggling while open', function() {
+test('disables set toggling while open', function () {
   const spy = sinon.spy()
   const set = this.renderComponent({onToggleBody: spy})
   set._refs['show-grading-period-1']._refs.editButton.click()
@@ -238,21 +238,21 @@ test('disables set toggling while open', function() {
   notOk(spy.called)
 })
 
-test('"onCancel" removes the "edit grading period" form', function() {
+test('"onCancel" removes the "edit grading period" form', function () {
   const set = this.renderComponent()
   set._refs['show-grading-period-1']._refs.editButton.click()
   set._refs.editPeriodForm.props.onCancel()
   notOk(!!set._refs.editPeriodForm)
 })
 
-test('"onCancel" focuses on the "edit grading period" button', function() {
+test('"onCancel" focuses on the "edit grading period" button', function () {
   const set = this.renderComponent()
   set._refs['show-grading-period-1']._refs.editButton.click()
   set._refs.editPeriodForm.props.onCancel()
   strictEqual(set._refs['show-grading-period-1']._refs.editButton, document.activeElement)
 })
 
-test('"onCancel" re-enables all grading period actions', function() {
+test('"onCancel" re-enables all grading period actions', function () {
   const set = this.renderComponent()
   set._refs['show-grading-period-1']._refs.editButton.click()
   set._refs.editPeriodForm.props.onCancel()
@@ -262,7 +262,7 @@ test('"onCancel" re-enables all grading period actions', function() {
   notOk(set._refs['show-grading-period-3'].props.actionsDisabled)
 })
 
-test('"onCancel" re-enables set toggling', function() {
+test('"onCancel" re-enables set toggling', function () {
   const spy = sinon.spy()
   const set = this.renderComponent({onToggleBody: spy})
   set._refs['show-grading-period-1']._refs.editButton.click()
@@ -289,10 +289,10 @@ QUnit.module('GradingPeriodSet "Edit Grading Period - onSave"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('updates the given grading period in the set', function() {
+test('updates the given grading period in the set', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -302,7 +302,7 @@ test('updates the given grading period in the set', function() {
   })
 })
 
-test('ensures sorted grading periods', function() {
+test('ensures sorted grading periods', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -314,12 +314,12 @@ test('ensures sorted grading periods', function() {
     deepEqual(titles, [
       'Como estas?',
       'We did it! We did it! We did it! #dora #boots',
-      'Swiper no swiping!'
+      'Swiper no swiping!',
     ])
   })
 })
 
-test('disables the "edit period form"', function() {
+test('disables the "edit period form"', function () {
   const success = new Promise(() => {})
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -327,7 +327,7 @@ test('disables the "edit period form"', function() {
   assertDisabled(set._refs.addPeriodButton)
 })
 
-test('calls the onPeriodsChange prop upon completion', function() {
+test('calls the onPeriodsChange prop upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const spy = sinon.spy()
@@ -340,7 +340,7 @@ test('calls the onPeriodsChange prop upon completion', function() {
   })
 })
 
-test('removes the "edit period form" upon completion', function() {
+test('removes the "edit period form" upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -350,7 +350,7 @@ test('removes the "edit period form" upon completion', function() {
   })
 })
 
-test('focuses on the grading period "edit button" upon completion', function() {
+test('focuses on the grading period "edit button" upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -360,7 +360,7 @@ test('focuses on the grading period "edit button" upon completion', function() {
   })
 })
 
-test('re-enables all grading period actions upon completion', function() {
+test('re-enables all grading period actions upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -373,7 +373,7 @@ test('re-enables all grading period actions upon completion', function() {
   })
 })
 
-test('re-enables set toggling upon completion', function() {
+test('re-enables set toggling upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const spy = sinon.spy()
@@ -397,7 +397,7 @@ QUnit.module('GradingPeriodSet "Edit Grading Period - validations"', {
       ...props,
       ref(ref) {
         component = ref
-      }
+      },
     }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs['show-grading-period-1']._refs.editButton.click()
@@ -410,16 +410,16 @@ QUnit.module('GradingPeriodSet "Edit Grading Period - validations"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('does not save a grading period without a title', function() {
+test('does not save a grading period without a title', function () {
   const period = {
     id: '1',
     title: '',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -428,13 +428,13 @@ test('does not save a grading period without a title', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with a title of spaces only', function() {
+test('does not save a grading period with a title of spaces only', function () {
   const period = {
     id: '1',
     title: '    ',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -443,14 +443,14 @@ test('does not save a grading period with a title of spaces only', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with a negative weight', function() {
+test('does not save a grading period with a negative weight', function () {
   const period = {
     id: '1',
     title: 'Some valid title',
     weight: -50,
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   const update = this.stubUpdate()
   const set = this.renderComponent()
@@ -459,12 +459,12 @@ test('does not save a grading period with a negative weight', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period without a valid startDate', function() {
+test('does not save a grading period without a valid startDate', function () {
   const period = {
     title: 'Period without Start Date',
     startDate: undefined,
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -473,12 +473,12 @@ test('does not save a grading period without a valid startDate', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period without a valid endDate', function() {
+test('does not save a grading period without a valid endDate', function () {
   const period = {
     title: 'Period without End Date',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: null,
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -487,12 +487,12 @@ test('does not save a grading period without a valid endDate', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period without a valid closeDate', function() {
+test('does not save a grading period without a valid closeDate', function () {
   const period = {
     title: 'Period without End Date',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: null
+    closeDate: null,
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -501,12 +501,12 @@ test('does not save a grading period without a valid closeDate', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with overlapping startDate', function() {
+test('does not save a grading period with overlapping startDate', function () {
   const period = {
     title: 'Period with Overlapping Start Date',
     startDate: new Date('2015-04-30T20:11:00+00:00'),
     endDate: new Date('2015-05-30T00:00:00+00:00'),
-    closeDate: new Date('2015-05-30T00:00:00+00:00')
+    closeDate: new Date('2015-05-30T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -515,12 +515,12 @@ test('does not save a grading period with overlapping startDate', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with overlapping endDate', function() {
+test('does not save a grading period with overlapping endDate', function () {
   const period = {
     title: 'Period with Overlapping End Date',
     startDate: new Date('2014-12-30T20:11:00+00:00'),
     endDate: new Date('2015-01-30T00:00:00+00:00'),
-    closeDate: new Date('2015-01-03T00:00:00+00:00')
+    closeDate: new Date('2015-01-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -529,12 +529,12 @@ test('does not save a grading period with overlapping endDate', function() {
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with endDate before startDate', function() {
+test('does not save a grading period with endDate before startDate', function () {
   const period = {
     title: 'Overlapping Period',
     startDate: new Date('2015-03-03T00:00:00+00:00'),
     endDate: new Date('2015-03-02T20:11:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -543,12 +543,12 @@ test('does not save a grading period with endDate before startDate', function() 
   ok(set._refs.editPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with closeDate before endDate', function() {
+test('does not save a grading period with closeDate before endDate', function () {
   const period = {
     title: 'Overlapping Period',
     startDate: new Date('2015-03-01T00:00:00+00:00'),
     endDate: new Date('2015-03-02T20:11:00+00:00'),
-    closeDate: new Date('2015-03-02T20:10:59+00:00')
+    closeDate: new Date('2015-03-02T20:10:59+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -566,7 +566,7 @@ QUnit.module('GradingPeriodSet "Add Grading Period"', {
       readOnly,
       ref(ref) {
         component = ref
-      }
+      },
     }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     return component
@@ -574,32 +574,32 @@ QUnit.module('GradingPeriodSet "Add Grading Period"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('shows the "add grading period" button when "create" is permitted', function() {
+test('shows the "add grading period" button when "create" is permitted', function () {
   const set = this.renderComponent()
   ok(set._refs.addPeriodButton)
 })
 
-test('does not show the "add grading period" button when "create" is not permitted', function() {
+test('does not show the "add grading period" button when "create" is not permitted', function () {
   const set = this.renderComponent({create: false})
   notOk(!!set._refs.addPeriodButton)
 })
 
-test('does not show the "add grading period" button when "read only"', function() {
+test('does not show the "add grading period" button when "read only"', function () {
   const set = this.renderComponent({create: true}, true)
   notOk(!!set._refs.addPeriodButton)
 })
 
-test('renders the "GradingPeriodForm" when "add grading period" is clicked', function() {
+test('renders the "GradingPeriodForm" when "add grading period" is clicked', function () {
   const set = this.renderComponent()
   notOk(!!set._refs.newPeriodForm)
   set._refs.addPeriodButton.click()
   ok(set._refs.newPeriodForm)
 })
 
-test('disables all grading period actions while open', function() {
+test('disables all grading period actions while open', function () {
   const set = this.renderComponent()
   set._refs.addPeriodButton.click()
   ok(set._refs['show-grading-period-1'].props.actionsDisabled)
@@ -607,21 +607,21 @@ test('disables all grading period actions while open', function() {
   ok(set._refs['show-grading-period-3'].props.actionsDisabled)
 })
 
-test('"onCancel" removes the "new period form"', function() {
+test('"onCancel" removes the "new period form"', function () {
   const set = this.renderComponent()
   set._refs.addPeriodButton.click()
   set._refs.newPeriodForm.props.onCancel()
   notOk(!!set._refs.newPeriodForm)
 })
 
-test('"onCancel" focuses on the "add grading period" button', function() {
+test('"onCancel" focuses on the "add grading period" button', function () {
   const set = this.renderComponent()
   set._refs.addPeriodButton.click()
   set._refs.newPeriodForm.props.onCancel()
   strictEqual(set._refs.addPeriodButton, document.activeElement)
 })
 
-test('"onCancel" re-enables all grading period actions', function() {
+test('"onCancel" re-enables all grading period actions', function () {
   const set = this.renderComponent()
   set._refs.addPeriodButton.click()
   set._refs.newPeriodForm.props.onCancel()
@@ -638,7 +638,7 @@ QUnit.module('GradingPeriodSet "Remove Grading Period"', {
       ...props,
       ref(ref) {
         component = ref
-      }
+      },
     }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     return component
@@ -646,10 +646,10 @@ QUnit.module('GradingPeriodSet "Remove Grading Period"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('removeGradingPeriod removes the grading period with the given id', function() {
+test('removeGradingPeriod removes the grading period with the given id', function () {
   const set = this.renderComponent()
   set.removeGradingPeriod('1')
   const periodIDs = _.map(set.state.gradingPeriods, 'id')
@@ -664,7 +664,7 @@ QUnit.module('GradingPeriodSet "New Grading Period - onSave"', {
       ...opts,
       ref(ref) {
         component = ref
-      }
+      },
     }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs.addPeriodButton.click()
@@ -677,10 +677,10 @@ QUnit.module('GradingPeriodSet "New Grading Period - onSave"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('adds the given grading period to the set', function() {
+test('adds the given grading period to the set', function () {
   const allPeriods = examplePeriods.concat([examplePeriod])
   const success = Promise.resolve(allPeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
@@ -691,7 +691,7 @@ test('adds the given grading period to the set', function() {
   })
 })
 
-test('ensures sorted grading periods', function() {
+test('ensures sorted grading periods', function () {
   const allPeriods = examplePeriods.concat([examplePeriod])
   const success = Promise.resolve(allPeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
@@ -705,12 +705,12 @@ test('ensures sorted grading periods', function() {
       'Como estas?',
       'We did it! We did it! We did it! #dora #boots',
       'Example Period',
-      'Swiper no swiping!'
+      'Swiper no swiping!',
     ])
   })
 })
 
-test('disables the "new period form"', function() {
+test('disables the "new period form"', function () {
   const success = new Promise(() => {})
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -718,7 +718,7 @@ test('disables the "new period form"', function() {
   ok(set._refs.newPeriodForm.props.disabled)
 })
 
-test('calls the onPeriodsChange prop upon completion', function() {
+test('calls the onPeriodsChange prop upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const spy = sinon.spy()
@@ -731,7 +731,7 @@ test('calls the onPeriodsChange prop upon completion', function() {
   })
 })
 
-test('removes the "new period form" upon completion', function() {
+test('removes the "new period form" upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -741,7 +741,7 @@ test('removes the "new period form" upon completion', function() {
   })
 })
 
-test('re-enables all grading period actions upon completion', function() {
+test('re-enables all grading period actions upon completion', function () {
   const success = Promise.resolve(examplePeriods)
   sandbox.stub(gradingPeriodsApi, 'batchUpdate').returns(success)
   const set = this.renderComponent()
@@ -766,7 +766,7 @@ QUnit.module('GradingPeriodSet "New Grading Period - validations"', {
       ...props,
       ref(ref) {
         component = ref
-      }
+      },
     }
     ReactDOM.render(React.createElement(GradingPeriodSet, updatedProps), wrapper)
     component._refs.addPeriodButton.click()
@@ -779,15 +779,15 @@ QUnit.module('GradingPeriodSet "New Grading Period - validations"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('does not save a grading period without a title', function() {
+test('does not save a grading period without a title', function () {
   const period = {
     title: '',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -796,14 +796,14 @@ test('does not save a grading period without a title', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with a negative weight', function() {
+test('does not save a grading period with a negative weight', function () {
   const period = {
     id: '1',
     title: 'Some valid title',
     weight: -50,
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   const update = this.stubUpdate()
   const set = this.renderComponent()
@@ -812,12 +812,12 @@ test('does not save a grading period with a negative weight', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period without a valid startDate', function() {
+test('does not save a grading period without a valid startDate', function () {
   const period = {
     title: 'Period without Start Date',
     startDate: undefined,
     endDate: new Date('2015-03-03T00:00:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -826,12 +826,12 @@ test('does not save a grading period without a valid startDate', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period without a valid endDate', function() {
+test('does not save a grading period without a valid endDate', function () {
   const period = {
     title: 'Period without End Date',
     startDate: new Date('2015-03-02T20:11:00+00:00'),
     endDate: null,
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -840,12 +840,12 @@ test('does not save a grading period without a valid endDate', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with overlapping startDate', function() {
+test('does not save a grading period with overlapping startDate', function () {
   const period = {
     title: 'Period with Overlapping Start Date',
     startDate: new Date('2015-04-30T20:11:00+00:00'),
     endDate: new Date('2015-05-30T00:00:00+00:00'),
-    closeDate: new Date('2015-05-30T00:00:00+00:00')
+    closeDate: new Date('2015-05-30T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -854,12 +854,12 @@ test('does not save a grading period with overlapping startDate', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with overlapping endDate', function() {
+test('does not save a grading period with overlapping endDate', function () {
   const period = {
     title: 'Period with Overlapping End Date',
     startDate: new Date('2014-12-30T20:11:00+00:00'),
     endDate: new Date('2015-01-30T00:00:00+00:00'),
-    closeDate: new Date('2015-01-30T00:00:00+00:00')
+    closeDate: new Date('2015-01-30T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()
@@ -868,12 +868,12 @@ test('does not save a grading period with overlapping endDate', function() {
   ok(set._refs.newPeriodForm, 'form is still visible')
 })
 
-test('does not save a grading period with endDate before startDate', function() {
+test('does not save a grading period with endDate before startDate', function () {
   const period = {
     title: 'Overlapping Period',
     startDate: new Date('2015-03-03T00:00:00+00:00'),
     endDate: new Date('2015-03-02T20:11:00+00:00'),
-    closeDate: new Date('2015-03-03T00:00:00+00:00')
+    closeDate: new Date('2015-03-03T00:00:00+00:00'),
   }
   this.stubUpdate()
   const set = this.renderComponent()

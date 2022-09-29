@@ -34,7 +34,7 @@ test('responds to updateCollaborationStart', () => {
   const initialState = {
     updateCollaborationPending: false,
     updateCollaborationSuccessful: false,
-    updateCollaborationError: {}
+    updateCollaborationError: {},
   }
 
   const action = actions.updateCollaborationStart()
@@ -48,7 +48,7 @@ test('responds to updateCollaborationStart', () => {
 test('responds to updateCollaborationSuccessful', () => {
   const initialState = {
     updateCollaborationPending: true,
-    updateCollaborationSuccessful: false
+    updateCollaborationSuccessful: false,
   }
 
   const action = actions.updateCollaborationSuccessful({})
@@ -61,7 +61,7 @@ test('responds to updateCollaborationSuccessful', () => {
 test('responds to updateCollaborationFailed', () => {
   const initialState = {
     updateCollaborationPending: true,
-    updateCollaborationError: null
+    updateCollaborationError: null,
   }
 
   const error = {}

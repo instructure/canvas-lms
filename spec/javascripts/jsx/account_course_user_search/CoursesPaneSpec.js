@@ -34,13 +34,13 @@ QUnit.module('Account Course User Search CoursesPane View', {
         accountId="1"
         roles={[{id: '1'}]}
         queryParams={{}}
-        onUpdateQueryParams={function() {}}
+        onUpdateQueryParams={function () {}}
       />
     )
   },
   teardown() {
     stores.forEach(store => store.reset({}))
-  }
+  },
 })
 
 test('onUpdateFilters calls debouncedApplyFilters after updating state', () => {

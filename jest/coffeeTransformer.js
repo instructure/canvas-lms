@@ -24,6 +24,6 @@ exports.process = (coffee, path) => {
 
   return transform(esm, {
     filename: path,
-    plugins: ['@babel/plugin-transform-modules-commonjs']
+    plugins: ['@babel/plugin-transform-modules-commonjs'],
   })
 }

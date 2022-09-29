@@ -28,11 +28,11 @@ QUnit.module('Announcements app', {
       app = null
     }
     container.innerHTML = ''
-  }
+  },
 })
 
 const defaultData = () => ({
-  contextCodes: ['course_1']
+  contextCodes: ['course_1'],
 })
 
 test('mounts Announcements to container component', () => {

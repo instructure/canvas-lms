@@ -27,12 +27,12 @@ QUnit.module('ContextSelector', {
   setup() {
     props = {
       contexts: [],
-      appointmentGroup: {}
+      appointmentGroup: {},
     }
   },
   teardown() {
     props = null
-  }
+  },
 })
 
 test('renders the ContextSelector component', () => {
@@ -60,10 +60,10 @@ test('renders a course in the ContextSelector dropdown', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -82,10 +82,10 @@ test('renders a course section in the ContextSelector dropdown', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.contexts = [
     {
@@ -95,10 +95,10 @@ test('renders a course section in the ContextSelector dropdown', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -117,10 +117,10 @@ test('handleDoneClick properly sets state', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.contexts = [
     {
@@ -130,10 +130,10 @@ test('handleDoneClick properly sets state', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -157,10 +157,10 @@ test('toggleCourse toggles correct courses', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -180,10 +180,10 @@ test('toggleCourse toggles section correctly', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -205,14 +205,14 @@ test('toggle section when course is selected', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
+          asset_string: 'course_section_1',
         },
         {
           id: '2',
-          asset_string: 'course_section_2'
-        }
-      ]
-    }
+          asset_string: 'course_section_2',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1', 'course_section_2']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
@@ -221,7 +221,7 @@ test('toggle section when course is selected', () => {
   ok(component.contextCheckboxes.course_1.checked)
   ok(component.sectionsCheckboxes.course_section_1.checked)
   TestUtils.Simulate.change(component.sectionsCheckboxes.course_section_1, {
-    target: {checked: false}
+    target: {checked: false},
   })
   ok(!component.sectionsCheckboxes.course_section_1.checked)
   ok(component.contextCheckboxes.course_1.checked)
@@ -236,24 +236,24 @@ test('parent course is selected when sub sections are selected', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
+          asset_string: 'course_section_1',
         },
         {
           id: '2',
-          asset_string: 'course_section_2'
-        }
-      ]
-    }
+          asset_string: 'course_section_2',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1', 'course_section_2']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
   ok(!component.sectionsCheckboxes.course_section_2.checked)
   ok(!component.sectionsCheckboxes.course_section_2.checked)
   TestUtils.Simulate.change(component.sectionsCheckboxes.course_section_1, {
-    target: {checked: true}
+    target: {checked: true},
   })
   TestUtils.Simulate.change(component.sectionsCheckboxes.course_section_2, {
-    target: {checked: true}
+    target: {checked: true},
   })
   ok(component.sectionsCheckboxes.course_section_2.checked)
   ok(component.sectionsCheckboxes.course_section_2.checked)
@@ -269,20 +269,20 @@ test('toggleSections toggles correct section', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
   ok(!component.sectionsCheckboxes.course_section_1.checked)
   TestUtils.Simulate.change(component.sectionsCheckboxes.course_section_1, {
-    target: {checked: true}
+    target: {checked: true},
   })
   ok(component.sectionsCheckboxes.course_section_1.checked)
   TestUtils.Simulate.change(component.sectionsCheckboxes.course_section_1, {
-    target: {checked: false}
+    target: {checked: false},
   })
   ok(!component.sectionsCheckboxes.course_section_1.checked)
 })
@@ -296,10 +296,10 @@ test('toggle course expanded', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const wrapper = mount(<ContextSelector {...props} />)
@@ -318,10 +318,10 @@ test('renders button text correctly on already selected contexts', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.contexts = [
     {
@@ -331,10 +331,10 @@ test('renders button text correctly on already selected contexts', () => {
       sections: [
         {
           id: '1',
-          asset_string: 'course_section_1'
-        }
-      ]
-    }
+          asset_string: 'course_section_1',
+        },
+      ],
+    },
   ]
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)

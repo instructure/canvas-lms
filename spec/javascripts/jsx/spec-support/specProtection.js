@@ -31,7 +31,7 @@ export const contextTracker = new ContextTracker(QUnit)
 export const sandboxFactory = new SandboxFactory({
   contextTracker,
   global: window,
-  qunit: QUnit
+  qunit: QUnit,
 })
 
 export const asyncTracker = new AsyncTracker({
@@ -55,7 +55,7 @@ export const asyncTracker = new AsyncTracker({
    * - 'clear': cancel all unresolved behavior and continue specs
    * - 'fail': cancel all unresolved behavior and fail the current spec
    */
-  unmanagedBehaviorStrategy: 'none'
+  unmanagedBehaviorStrategy: 'none',
 })
 
 export const eventTracker = new EventTracker({
@@ -78,7 +78,7 @@ export const eventTracker = new EventTracker({
    * - 'remove': remove all remaining listeners and continue specs
    * - 'fail': remove all remaining listeners and fail the current spec
    */
-  unmanagedListenerStrategy: 'none'
+  unmanagedListenerStrategy: 'none',
 })
 
 export const safetyNet = new SafetyNet()

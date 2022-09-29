@@ -20,7 +20,7 @@ import {
   destroyContainer,
   showFlashAlert,
   showFlashError,
-  showFlashSuccess
+  showFlashSuccess,
 } from '@canvas/alerts/react/FlashAlert'
 
 QUnit.module('FlashAlert', hooks => {
@@ -50,7 +50,7 @@ QUnit.module('FlashAlert', hooks => {
     }
 
     const defaultProps = {
-      message: 'Example Message'
+      message: 'Example Message',
     }
     showFlashAlert({...defaultProps, ...props})
   }

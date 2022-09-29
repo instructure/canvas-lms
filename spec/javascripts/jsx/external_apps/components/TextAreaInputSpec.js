@@ -35,7 +35,7 @@ const createElement = data => (
   />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const inputNode = component.refs.input
   const hintNode = component.refs.hintText
@@ -45,7 +45,7 @@ const getDOMNodes = function(data) {
 QUnit.module('ExternalApps.TextAreaInput', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {
@@ -56,7 +56,7 @@ test('renders', () => {
     rows: 10,
     required: true,
     hintText: 'Enter comments above',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, data.defaultValue)
@@ -74,7 +74,7 @@ test('renders without hint text and required', () => {
     rows: 10,
     required: false,
     hintText: null,
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, data.defaultValue)
@@ -90,7 +90,7 @@ test('renders with error hint text', () => {
     id: 'comments',
     required: true,
     hintText: null,
-    errors: {comments: 'Must be present'}
+    errors: {comments: 'Must be present'},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, '')
@@ -104,7 +104,7 @@ test('modifies state when text is entered', () => {
     id: 'comments',
     required: true,
     hintText: 'Enter comments above',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   Simulate.click(inputNode)

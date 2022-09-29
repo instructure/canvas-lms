@@ -25,12 +25,12 @@ import GradingPeriodSetForm from 'ui/features/account_grading_standards/react/Ed
 
 const wrapper = document.getElementById('fixtures')
 
-const assertDisabled = function(component) {
+const assertDisabled = function (component) {
   const $el = ReactDOM.findDOMNode(component)
   strictEqual($el.getAttribute('disabled'), '')
 }
 
-const assertEnabled = function(component) {
+const assertEnabled = function (component) {
   const $el = ReactDOM.findDOMNode(component)
   strictEqual($el.getAttribute('disabled'), null)
 }
@@ -39,7 +39,7 @@ const exampleSet = {
   id: '1',
   title: 'Fall 2015',
   weighted: true,
-  displayTotalsForAllGradingPeriods: false
+  displayTotalsForAllGradingPeriods: false,
 }
 
 QUnit.module('EditGradingPeriodSetForm', {
@@ -49,11 +49,11 @@ QUnit.module('EditGradingPeriodSetForm', {
       enrollmentTerms: [
         {id: '1', gradingPeriodGroupId: '1'},
         {id: '2', gradingPeriodGroupId: '2'},
-        {id: '3', gradingPeriodGroupId: '1'}
+        {id: '3', gradingPeriodGroupId: '1'},
       ],
       disabled: false,
       onSave: () => {},
-      onCancel: () => {}
+      onCancel: () => {},
     }
     const element = React.createElement(GradingPeriodSetForm, _.defaults(opts, defaults))
     return ReactDOM.render(element, wrapper)
@@ -61,52 +61,52 @@ QUnit.module('EditGradingPeriodSetForm', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('renders with the save button enabled', function() {
+test('renders with the save button enabled', function () {
   const form = this.renderComponent()
   assertEnabled(form.refs.saveButton)
 })
 
-test('renders with the cancel button enabled', function() {
+test('renders with the cancel button enabled', function () {
   const form = this.renderComponent()
   assertEnabled(form.refs.cancelButton)
 })
 
-test('optionally renders with the save and cancel buttons disabled', function() {
+test('optionally renders with the save and cancel buttons disabled', function () {
   const form = this.renderComponent({disabled: true})
   assertDisabled(form.refs.saveButton)
   assertDisabled(form.refs.cancelButton)
 })
 
-test('uses attributes from the given set', function() {
+test('uses attributes from the given set', function () {
   const form = this.renderComponent()
   equal(ReactDOM.findDOMNode(form.refs.title).value, 'Fall 2015')
   equal(form.weightedCheckbox.checked, true)
   equal(form.state.set.id, '1')
 })
 
-test('updates weighted state when checkbox is clicked', function() {
+test('updates weighted state when checkbox is clicked', function () {
   const form = this.renderComponent()
   equal(form.state.set.weighted, true)
   form.weightedCheckbox.handleChange({target: {checked: false}})
   equal(form.state.set.weighted, false)
 })
 
-test('defaults to unchecked for the "Display totals for All Grading Periods option" checkbox', function() {
+test('defaults to unchecked for the "Display totals for All Grading Periods option" checkbox', function () {
   const set = {id: '1', title: 'Fall 2015', weighted: true, displayTotalsForAllGradingPeriods: null}
   const form = this.renderComponent({set})
   notOk(form.displayTotalsCheckbox._input.checked)
 })
 
-test('initializes to checked for the "Display totals for All Grading Periods option" checkbox if passed true', function() {
+test('initializes to checked for the "Display totals for All Grading Periods option" checkbox if passed true', function () {
   const set = {id: '1', title: 'Fall 2015', weighted: true, displayTotalsForAllGradingPeriods: true}
   const form = this.renderComponent({set})
   ok(form.displayTotalsCheckbox._input.checked)
 })
 
-test('the "Display totals for All Grading Periods option" checkbox changes state when clicked', function() {
+test('the "Display totals for All Grading Periods option" checkbox changes state when clicked', function () {
   const form = this.renderComponent()
   const beforeChecked = form.displayTotalsCheckbox._input.checked
   Simulate.change(form.displayTotalsCheckbox._input, {target: {checked: true}})
@@ -114,7 +114,7 @@ test('the "Display totals for All Grading Periods option" checkbox changes state
   notEqual(beforeChecked, afterChecked)
 })
 
-test('the "Display totals for All Grading Periods option" checkbox state is included when the set is saved', function() {
+test('the "Display totals for All Grading Periods option" checkbox state is included when the set is saved', function () {
   const saveStub = sinon.stub()
   const form = this.renderComponent({onSave: saveStub})
   const saveButton = ReactDOM.findDOMNode(form.refs.saveButton)
@@ -124,12 +124,12 @@ test('the "Display totals for All Grading Periods option" checkbox state is incl
   equal(displayTotalsForAllGradingPeriods, false, 'includes displayTotalsForAllGradingPeriods')
 })
 
-test('uses associated enrollment terms to update set state', function() {
+test('uses associated enrollment terms to update set state', function () {
   const form = this.renderComponent()
   deepEqual(form.state.set.enrollmentTermIDs, ['1', '3'])
 })
 
-test("calls the 'onSave' callback when the save button is clicked", function() {
+test("calls the 'onSave' callback when the save button is clicked", function () {
   const spy = sinon.spy()
   const form = this.renderComponent({onSave: spy})
   const saveButton = ReactDOM.findDOMNode(form.refs.saveButton)
@@ -138,7 +138,7 @@ test("calls the 'onSave' callback when the save button is clicked", function() {
   ok(spy.calledWith(form.state.set))
 })
 
-test("calls the 'onCancel' callback when the cancel button is clicked", function() {
+test("calls the 'onCancel' callback when the cancel button is clicked", function () {
   const spy = sinon.spy()
   const form = this.renderComponent({onCancel: spy})
   const cancelButton = ReactDOM.findDOMNode(form.refs.cancelButton)
@@ -146,7 +146,7 @@ test("calls the 'onCancel' callback when the cancel button is clicked", function
   ok(spy.calledOnce)
 })
 
-test("does not call 'onSave' when the set has no title", function() {
+test("does not call 'onSave' when the set has no title", function () {
   const spy = sinon.spy()
   const updatedSet = {...exampleSet, title: '', enrollmentTermIDs: ['1']}
   const form = this.renderComponent({onSave: spy, set: updatedSet})

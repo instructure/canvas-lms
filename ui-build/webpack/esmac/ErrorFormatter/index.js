@@ -19,14 +19,12 @@
 const formatAccessViolationError = require('./formatAccessViolationError')
 const formatSpecifierMismatchError = require('./formatSpecifierMismatchError')
 
-module.exports = function(error) {
+module.exports = function (error) {
   if (error.name === 'AccessViolationError') {
     return formatAccessViolationError(error)
-  }
-  else if (error.name === 'SpecifierMismatchError') {
+  } else if (error.name === 'SpecifierMismatchError') {
     return formatSpecifierMismatchError(error)
-  }
-  else {
+  } else {
     return error.toString()
   }
 }

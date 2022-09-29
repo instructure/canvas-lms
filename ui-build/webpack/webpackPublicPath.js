@@ -19,10 +19,10 @@
 switch (process.env.NODE_ENV) {
   case 'production':
     module.exports = '/dist/webpack-production/'
-  break;
+    break
   case 'test':
     module.exports = '/dist/webpack-test/'
-  break;
+    break
   default:
     module.exports = '/dist/webpack-dev/'
 }

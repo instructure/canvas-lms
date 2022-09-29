@@ -60,19 +60,19 @@ FakeDashboard.propTypes = {
   menuRef: PropTypes.func.isRequired,
   view: PropTypes.string,
   planner_enabled: PropTypes.bool,
-  onDashboardChange: PropTypes.func
+  onDashboardChange: PropTypes.func,
 }
 
 FakeDashboard.defaultProps = {
   view: 'cards',
   planner_enabled: false,
-  onDashboardChange: () => {}
+  onDashboardChange: () => {},
 }
 
 QUnit.module('Dashboard Options Menu', {
   afterEach() {
     ReactDOM.unmountComponentAtNode(container)
-  }
+  },
 })
 
 test('it renders', () => {

@@ -38,14 +38,14 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         gradesPublished: true,
         id: '2301',
         name: 'Math 1.1',
-        postManually: false
+        postManually: false,
       },
       onExited: sinon.spy(),
       onPosted: sinon.spy(),
       sections: [
         {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
-      ]
+        {id: '2002', name: 'Sophomores'},
+      ],
     }
 
     const bindRef = ref => {
@@ -241,7 +241,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         context.submissions = [
           {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
           {postedAt: null, score: 1, workflowState: 'graded'},
-          {postedAt: null, score: null, workflowState: 'unsubmitted'}
+          {postedAt: null, score: null, workflowState: 'unsubmitted'},
         ]
         await show()
         strictEqual(getUnpostedCount().textContent, '1')
@@ -251,7 +251,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
         context.submissions = [
           {postedAt: new Date().toISOString(), hasPostableComments: true},
           {postedAt: null, score: 1, workflowState: 'graded'},
-          {postedAt: null, score: null, workflowState: 'unsubmitted'}
+          {postedAt: null, score: null, workflowState: 'unsubmitted'},
         ]
         await show()
         strictEqual(getUnpostedCount().textContent, '1')
@@ -262,7 +262,7 @@ QUnit.module('PostAssignmentGradesTray', suiteHooks => {
       unpostedSubmissionsHooks.beforeEach(() => {
         context.submissions = [
           {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
-          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'}
+          {postedAt: new Date().toISOString(), score: 1, workflowState: 'graded'},
         ]
 
         return show()

@@ -64,7 +64,7 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
 
     defaultUploadedGradebook = {
       assignments: [
-        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'}
+        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'},
       ],
       custom_columns: [],
       missing_objects: {
@@ -74,10 +74,10 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
             id: '73',
             points_possible: 10,
             previous_id: null,
-            title: 'existing'
-          }
+            title: 'existing',
+          },
         ],
-        students: []
+        students: [],
       },
       original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}],
       students: [
@@ -87,13 +87,13 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
           name: 'Zac Efron',
           previous_id: '1',
           submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}],
-          custom_column_data: []
-        }
+          custom_column_data: [],
+        },
       ],
       warning_messages: {
         prevented_grading_ungradeable_submission: false,
-        prevented_new_assignment_creation_in_closed_period: false
-      }
+        prevented_new_assignment_creation_in_closed_period: false,
+      },
     }
   })
 
@@ -104,7 +104,7 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
   test('recognizes that there are no changed assignments when the grades are the same', async () => {
     const uploadedGradebook = {
       ...defaultUploadedGradebook,
-      original_submissions: [{assignment_id: '73', gradeable: true, score: '0.0', user_id: '1'}]
+      original_submissions: [{assignment_id: '73', gradeable: true, score: '0.0', user_id: '1'}],
     }
     const waitForProcessingStub = sinon
       .stub(waitForProcessing, 'waitForProcessing')
@@ -120,7 +120,7 @@ QUnit.module('gradebook_uploads#handleThingsNeedingToBeResolved', hooks => {
   test('recognizes that there are changed assignments when original grade was ungraded', async () => {
     const uploadedGradebook = {
       ...defaultUploadedGradebook,
-      original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}]
+      original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}],
     }
     const waitForProcessingStub = sinon
       .stub(waitForProcessing, 'waitForProcessing')
@@ -167,7 +167,7 @@ QUnit.module('override score changes', hooks => {
 
     defaultUploadedGradebook = {
       assignments: [
-        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'}
+        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'},
       ],
       custom_columns: [],
       missing_objects: {
@@ -177,19 +177,19 @@ QUnit.module('override score changes', hooks => {
             id: '73',
             points_possible: 10,
             previous_id: null,
-            title: 'existing'
-          }
+            title: 'existing',
+          },
         ],
-        students: []
+        students: [],
       },
       original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}],
       override_scores: {
         grading_periods: [
           {id: 1, title: 'first GP'},
           {id: 2, title: 'second GP'},
-          {id: 3, title: 'third GP'}
+          {id: 3, title: 'third GP'},
         ],
-        includes_course_scores: false
+        includes_course_scores: false,
       },
       students: [
         {
@@ -201,26 +201,26 @@ QUnit.module('override score changes', hooks => {
             {
               current_score: '70',
               grading_period_id: '1',
-              new_score: '80'
+              new_score: '80',
             },
             {
               current_score: '71',
               grading_period_id: '2',
-              new_score: '61'
+              new_score: '61',
             },
             {
               current_score: '50',
-              new_score: null
-            }
+              new_score: null,
+            },
           ],
           previous_id: '1',
-          submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}]
-        }
+          submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}],
+        },
       ],
       warning_messages: {
         prevented_grading_ungradeable_submission: false,
-        prevented_new_assignment_creation_in_closed_period: false
-      }
+        prevented_new_assignment_creation_in_closed_period: false,
+      },
     }
 
     gridStub = sinon.stub(gradebook_uploads, 'createGrid')
@@ -233,7 +233,7 @@ QUnit.module('override score changes', hooks => {
         render: () => {},
         setCellCssStyles: (_style, reviewRow) => {
           gradeReviewRow = reviewRow
-        }
+        },
       }
     })
 
@@ -267,7 +267,7 @@ QUnit.module('override score changes', hooks => {
         'override_score_2_conflicting',
         'override_score_2',
         'override_score_3_conflicting',
-        'override_score_3'
+        'override_score_3',
       ])
     })
 
@@ -281,7 +281,7 @@ QUnit.module('override score changes', hooks => {
       deepEqual(headers, [
         'Override Score (first GP)',
         'Override Score (second GP)',
-        'Override Score (third GP)'
+        'Override Score (third GP)',
       ])
     })
 
@@ -326,7 +326,7 @@ QUnit.module('override score changes', hooks => {
       const dataForStudent = mainGridArgs.data.find(datum => datum.id === '1')
       deepEqual(dataForStudent.override_score_course, {
         current_score: '50',
-        new_score: null
+        new_score: null,
       })
     })
 
@@ -337,7 +337,7 @@ QUnit.module('override score changes', hooks => {
       deepEqual(dataForStudent.override_score_1, {
         current_score: '70',
         grading_period_id: '1',
-        new_score: '80'
+        new_score: '80',
       })
     })
 
@@ -386,8 +386,8 @@ QUnit.module('override score changes', hooks => {
         {
           current_score: '70',
           grading_period_id: '1',
-          new_score: '70'
-        }
+          new_score: '70',
+        },
       ]
       initGradebook()
 
@@ -401,8 +401,8 @@ QUnit.module('override score changes', hooks => {
         {
           current_score: null,
           grading_period_id: '1',
-          new_score: '70'
-        }
+          new_score: '70',
+        },
       ]
       initGradebook()
 

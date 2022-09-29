@@ -28,7 +28,7 @@ QUnit.module('AssessmentAuditButton', suiteHooks => {
   suiteHooks.beforeEach(() => {
     $container = document.body.appendChild(document.createElement('div'))
     props = {
-      onClick: sinon.spy()
+      onClick: sinon.spy(),
     }
   })
 

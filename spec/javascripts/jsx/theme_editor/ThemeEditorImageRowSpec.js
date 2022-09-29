@@ -28,9 +28,9 @@ QUnit.module('ThemeEditorImageRow Component', {
     elem = document.createElement('div')
     props = {
       varDef: {},
-      onChange: sinon.spy()
+      onChange: sinon.spy(),
     }
-  }
+  },
 })
 
 test('renders with human name heading', () => {

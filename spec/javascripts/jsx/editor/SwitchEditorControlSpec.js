@@ -29,7 +29,7 @@ QUnit.module('SwitchEditorControl', {
 
   teardown() {
     RichContentEditor.callOnRCE.restore()
-  }
+  },
 })
 
 test('changes text on each click', () => {

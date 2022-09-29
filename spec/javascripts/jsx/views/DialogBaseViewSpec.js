@@ -27,7 +27,7 @@ QUnit.module('DialogBaseView', {
   },
   teardown() {
     $('.ui-dialog').remove()
-  }
+  },
 })
 
 test('it removes the created dialog upon close when the destroy option is set', () => {

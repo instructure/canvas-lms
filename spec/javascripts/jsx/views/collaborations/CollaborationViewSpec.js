@@ -61,7 +61,7 @@ QUnit.module('CollaborationsView screenreader only content', {
   teardown() {
     fakeENV.teardown()
     fixtures.empty()
-  }
+  },
 })
 
 test('shows beginning info alert and adds class to iframe', () => {

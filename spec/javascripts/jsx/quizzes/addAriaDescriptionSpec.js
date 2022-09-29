@@ -38,7 +38,7 @@ QUnit.module('Add aria descriptions', {
 
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('add aria descriptions to quiz answer options', () => {

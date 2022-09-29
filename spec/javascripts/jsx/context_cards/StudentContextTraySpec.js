@@ -41,24 +41,24 @@ QUnit.module('StudentContextTray', hooks => {
       data: {loading: true},
       returnFocusTo: () => {},
       courseId: '1',
-      studentId: '1'
+      studentId: '1',
     }
 
     user = {
       short_name: 'wooper',
-      enrollments: []
+      enrollments: [],
     }
 
     course = {
       permissions: {
-        view_analytics: true
+        view_analytics: true,
       },
-      submissionsConnection: {edges: []}
+      submissionsConnection: {edges: []},
     }
 
     analytics = {
       participations: {level: 2},
-      page_views: {level: 3}
+      page_views: {level: 3},
     }
   })
   hooks.afterEach(() => {
@@ -76,7 +76,7 @@ QUnit.module('StudentContextTray', hooks => {
     props.returnFocusTo = () => [$('#someButton')]
     tray = renderTray()
     const fakeEvent = {
-      preventDefault() {}
+      preventDefault() {},
     }
     tray.handleRequestClose(fakeEvent)
     strictEqual(document.activeElement, document.getElementById('someButton'))
@@ -126,8 +126,8 @@ QUnit.module('StudentContextTray', hooks => {
             'http://example.com/courses/1/external_tools/29?launch_type=student_context_card',
           tool_id: 'fd75124a-140e-470f-944c-114d2d93bb40',
           icon_url: null,
-          canvas_icon_class: 'icon-analytics'
-        }
+          canvas_icon_class: 'icon-analytics',
+        },
       ]
       tray = renderTray()
       const quickLinks = tray.renderQuickLinks(userWithAnalytics, course)

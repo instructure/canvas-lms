@@ -27,7 +27,7 @@ test('renders the ExportListItem component', () => {
     date: 'Sept 11, 2001 at 8:46am',
     link: 'https://example.com/neverforget',
     workflowState: 'generated',
-    newExport: false
+    newExport: false,
   }
   const tree = enzyme.shallow(<ExportListItem {...props} />)
   const node = tree.find('.webzipexport__list__item')
@@ -39,7 +39,7 @@ test('renders different text for last success', () => {
     date: '2017-01-13T2:30:00Z',
     link: 'https://example.com/alwaysremember',
     workflowState: 'generated',
-    newExport: true
+    newExport: true,
   }
   const tree = enzyme.shallow(<ExportListItem {...props} />)
   const node = tree.find('.webzipexport__list__item')
@@ -51,7 +51,7 @@ test('renders error text if last object failed', () => {
     date: '2017-01-13T2:30:00Z',
     link: 'https://example.com/alwaysremember',
     workflowState: 'failed',
-    newExport: true
+    newExport: true,
   }
   const tree = enzyme.shallow(<ExportListItem {...props} />)
   const node = tree.find('.text-error')

@@ -28,12 +28,12 @@ QUnit.module('ConfirmEndTutorialDialog Spec', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 const defaultProps = {
   isOpen: true,
-  handleRequestClose() {}
+  handleRequestClose() {},
 }
 
 test('handleOkayButtonClick calls the proper api endpoint and data', () => {

@@ -23,30 +23,29 @@ const findUp = require('find-up')
 exports.bracketize = message => {
   const lines = message.split('\n')
 
-  return lines.slice(0,1).concat(
-    [':']
-  ).concat(
-    lines.slice(1).map(line => `|  ${line}`)
-  ).concat(
-    [':']
-  ).join("\n")
+  return lines
+    .slice(0, 1)
+    .concat([':'])
+    .concat(lines.slice(1).map(line => `|  ${line}`))
+    .concat([':'])
+    .join('\n')
 }
 
 // webpack's stack trace is padded by 1 space, it's easier on the eyes to align
 // the message to it
-exports.alignWithWebpackStackTrace = message => (
-  message.split("\n").map(x => ` ${x}`).join("\n")
-)
+exports.alignWithWebpackStackTrace = message =>
+  message
+    .split('\n')
+    .map(x => ` ${x}`)
+    .join('\n')
 
-exports.wordWrap = (paragraph, columns = 72) => wrapAnsi(
-  paragraph.trim().replace(/\s{2,}/g, ' '),
-  columns
-)
+exports.wordWrap = (paragraph, columns = 72) =>
+  wrapAnsi(paragraph.trim().replace(/\s{2,}/g, ' '), columns)
 
 // node's path#relative() function doesn't show a leading ./, which is confusing
 // if you're trying to communicate a path should be relative because it
 // otherwise looks bare
-exports.withLeadingDotSlash = x => x.startsWith('.') ? x : `./${x}`;
+exports.withLeadingDotSlash = x => (x.startsWith('.') ? x : `./${x}`)
 
 // if the original file has an extension, keep it in the suggested version,
 // otherwise omit it (suggested is assumed to always have an extension!)
@@ -61,14 +60,13 @@ exports.withOrWithoutExtension = (original, suggested) => {
 
   if (suggestedExt.length) {
     return suggested.slice(0, -suggestedExt.length)
-  }
-  else {
+  } else {
     return suggested
   }
 }
 
 const findPackageJSON = (file, names) => {
-  const pjsonFile = findUp.sync('package.json', { cwd: path.dirname(file) })
+  const pjsonFile = findUp.sync('package.json', {cwd: path.dirname(file)})
 
   if (!pjsonFile) {
     return null
@@ -78,8 +76,7 @@ const findPackageJSON = (file, names) => {
 
   if (pjson.name && names.includes(pjson.name)) {
     return [pjsonFile, pjson]
-  }
-  else {
+  } else {
     return findPackageJSON(path.dirname(pjsonFile), names)
   }
 }

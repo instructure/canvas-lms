@@ -23,7 +23,7 @@ const container = document.getElementById('fixtures')
 QUnit.module('MoveItem utils', {
   teardown: () => {
     container.innerHTML = ''
-  }
+  },
 })
 
 test('reorderElements puts elements in correct order', () => {
@@ -55,12 +55,16 @@ test('backbone.collectionToItems parses collection correctly', () => {
     models: [
       {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
       {attributes: {id: '6', title: 'bar', beep: 'boop'}},
-      {attributes: {id: '8', name: 'buzz'}}
-    ]
+      {attributes: {id: '8', name: 'buzz'}},
+    ],
   }
 
   const result = backbone.collectionToItems(coll)
-  const desired = [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}, {id: '8', title: 'buzz'}]
+  const desired = [
+    {id: '4', title: 'foo'},
+    {id: '6', title: 'bar'},
+    {id: '8', title: 'buzz'},
+  ]
 
   deepEqual(result, desired)
 })
@@ -75,10 +79,10 @@ test('backbone.collectionToGroups parses collection correctly', () => {
           users: {
             models: [
               {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
-              {attributes: {id: '6', title: 'bar', beep: 'boop'}}
-            ]
-          }
-        }
+              {attributes: {id: '6', title: 'bar', beep: 'boop'}},
+            ],
+          },
+        },
       },
       {
         attributes: {
@@ -87,18 +91,32 @@ test('backbone.collectionToGroups parses collection correctly', () => {
           users: {
             models: [
               {attributes: {id: '4', name: 'foo', thing: 'fizz'}},
-              {attributes: {id: '6', title: 'bar', beep: 'boop'}}
-            ]
-          }
-        }
-      }
-    ]
+              {attributes: {id: '6', title: 'bar', beep: 'boop'}},
+            ],
+          },
+        },
+      },
+    ],
   }
 
   const result = backbone.collectionToGroups(coll, col => col.attributes.users)
   const desired = [
-    {id: '4', title: 'foo', items: [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}]},
-    {id: '6', title: 'bar', items: [{id: '4', title: 'foo'}, {id: '6', title: 'bar'}]}
+    {
+      id: '4',
+      title: 'foo',
+      items: [
+        {id: '4', title: 'foo'},
+        {id: '6', title: 'bar'},
+      ],
+    },
+    {
+      id: '6',
+      title: 'bar',
+      items: [
+        {id: '4', title: 'foo'},
+        {id: '6', title: 'bar'},
+      ],
+    },
   ]
 
   deepEqual(result, desired)

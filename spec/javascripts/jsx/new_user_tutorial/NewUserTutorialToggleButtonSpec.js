@@ -33,7 +33,7 @@ test('Deafaults to expanded', () => {
 
 test('Toggles isCollapsed when clicked', () => {
   const fakeEvent = {
-    preventDefault() {}
+    preventDefault() {},
   }
 
   const store = createTutorialStore()

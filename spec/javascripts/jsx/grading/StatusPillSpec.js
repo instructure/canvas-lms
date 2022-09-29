@@ -35,7 +35,7 @@ QUnit.module('StatusPill', {
   },
   tearDown() {
     wrapper.innerHTML = ''
-  }
+  },
 })
 
 test('renderPills mounts a <Pill /> with correct text to each .submission-missing-pill', () => {

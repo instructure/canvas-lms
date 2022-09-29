@@ -23,28 +23,28 @@ let calendarEvent
 const getFakeChildEvents = () => [
   {user: {sortable_name: 'Stark, Tony'}},
   {user: {sortable_name: 'Parker, Peter'}},
-  {user: {sortable_name: 'Rogers, Steve'}}
+  {user: {sortable_name: 'Rogers, Steve'}},
 ]
 
 QUnit.module('CommonEvent.CalendarEvent', {
   setup() {
     const data = {
-      child_events: []
+      child_events: [],
     }
     const contexts = ['course_1']
     calendarEvent = new CalendarEvent(data, contexts)
   },
   teardown() {
     calendarEvent = null
-  }
+  },
 })
 
 test('Constructor sets reservedUsers from child_events limited to 5 and joined by "; "', () => {
   const data = {
     child_events: getFakeChildEvents().concat([
       {user: {sortable_name: 'Banner, Bruce'}},
-      {user: {sortable_name: 'Lang, Scott'}}
-    ])
+      {user: {sortable_name: 'Lang, Scott'}},
+    ]),
   }
   calendarEvent = new CalendarEvent(data, ['course_1'])
   const expected = 'Banner, Bruce; Lang, Scott; Parker, Peter; Rogers, Steve; Stark, Tony'
@@ -56,8 +56,8 @@ test('Constructor sets reservedUsers from child_events limited to 5 and joined b
     child_events: getFakeChildEvents().concat([
       {user: {sortable_name: 'Banner, Bruce'}},
       {user: {sortable_name: 'Lang, Scott'}},
-      {user: {sortable_name: 'Barton, Clint'}}
-    ])
+      {user: {sortable_name: 'Barton, Clint'}},
+    ]),
   }
   calendarEvent = new CalendarEvent(data, ['course_1'])
   const expected =

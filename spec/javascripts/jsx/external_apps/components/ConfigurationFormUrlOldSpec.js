@@ -36,7 +36,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 QUnit.module('ExternalApps.ConfigurationFormUrl', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('isValid when not valid', () => {
@@ -44,13 +44,13 @@ test('isValid when not valid', () => {
     name: '',
     consumerKey: '',
     sharedSecret: '',
-    configUrl: ''
+    configUrl: '',
   }
   const component = renderComponent(data)
   ok(!component.isValid())
   deepEqual(component.state.errors, {
     name: 'This field is required',
-    configUrl: 'This field is required'
+    configUrl: 'This field is required',
   })
 })
 
@@ -59,7 +59,7 @@ test('isValid when valid', () => {
     name: 'My App',
     consumerKey: 'A',
     sharedSecret: 'B',
-    configUrl: 'http://google.com'
+    configUrl: 'http://google.com',
   }
   const component = renderComponent(data)
   ok(component.isValid())
@@ -71,14 +71,14 @@ test('sets verifyUniqueness to true', () => {
     name: 'My App',
     consumerKey: 'A',
     sharedSecret: 'B',
-    configUrl: 'http://google.com'
+    configUrl: 'http://google.com',
   }
   const expectedData = {
     name: 'My App',
     consumerKey: 'A',
     sharedSecret: 'B',
     configUrl: 'http://google.com',
-    verifyUniqueness: 'true'
+    verifyUniqueness: 'true',
   }
   const component = renderComponent(data)
   deepEqual(component.getFormData(), expectedData)

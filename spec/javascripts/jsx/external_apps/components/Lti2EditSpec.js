@@ -36,7 +36,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 QUnit.module('ExternalApps.Lti2Edit', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {
@@ -47,11 +47,11 @@ test('renders', () => {
       description: null,
       enabled: false,
       installed_locally: true,
-      name: 'Twitter'
+      name: 'Twitter',
     },
     handleActivateLti2() {},
     handleDeactivateLti2() {},
-    handleCancel() {}
+    handleCancel() {},
   }
   const component = renderComponent(data)
   ok(component)

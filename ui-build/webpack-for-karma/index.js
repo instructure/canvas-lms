@@ -18,10 +18,10 @@
 
 const path = require('path')
 const glob = require('glob')
-const { DefinePlugin, EnvironmentPlugin, ProvidePlugin } = require('webpack')
+const {DefinePlugin, EnvironmentPlugin, ProvidePlugin} = require('webpack')
 const partitioning = require('./partitioning')
 const PluginSpecsRunner = require('./PluginSpecsRunner')
-const { canvasDir } = require('#params')
+const {canvasDir} = require('#params')
 
 const {
   CONTEXT_COFFEESCRIPT_SPEC,
@@ -40,10 +40,7 @@ const WEBPACK_PLUGIN_SPECS = path.join(canvasDir, 'tmp/webpack-plugin-specs.js')
 module.exports = {
   mode: 'development',
   module: {
-    noParse: [
-      require.resolve('jquery'),
-      require.resolve('tinymce'),
-    ],
+    noParse: [require.resolve('jquery'), require.resolve('tinymce')],
     rules: [
       {
         test: /\.m?js$/,
@@ -54,15 +51,13 @@ module.exports = {
           path.resolve(canvasDir, 'packages/datetime/index.js'),
         ],
         resolve: {
-          fullySpecified: false
-        }
+          fullySpecified: false,
+        },
       },
       {
         test: /\.js$/,
         type: 'javascript/auto',
-        include: [
-          path.resolve(canvasDir, 'node_modules/@instructure'),
-        ]
+        include: [path.resolve(canvasDir, 'node_modules/@instructure')],
       },
       {
         test: /\.(js|ts|tsx)$/,
@@ -78,21 +73,18 @@ module.exports = {
           path.join(canvasDir, 'packages/with-breakpoints'),
           path.join(canvasDir, 'spec/javascripts/jsx'),
           path.join(canvasDir, 'spec/coffeescripts'),
-          /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//
+          /gems\/plugins\/.*\/app\/(jsx|coffeescripts)\//,
         ],
         exclude: [/node_modules/],
         parser: {
-          requireInclude: 'allow'
+          requireInclude: 'allow',
         },
         use: {
           loader: 'babel-loader',
           options: {
             cacheDirectory: false,
             configFile: false,
-            presets: [
-              ['@babel/preset-react', { useBuiltIns: true }],
-              ['@babel/preset-typescript'],
-            ],
+            presets: [['@babel/preset-react', {useBuiltIns: true}], ['@babel/preset-typescript']],
             plugins: [
               // we need to have babel transpile ESM to CJS and can't just let
               // Webpack do it because Sinon is evidently no longer compatible
@@ -100,10 +92,10 @@ module.exports = {
               // symbols is concerned
               '@babel/plugin-transform-modules-commonjs',
               '@babel/plugin-proposal-optional-chaining',
-              '@babel/plugin-proposal-class-properties'
-            ]
-          }
-        }
+              '@babel/plugin-proposal-class-properties',
+            ],
+          },
+        },
       },
       {
         test: /\.coffee$/,
@@ -115,43 +107,40 @@ module.exports = {
         ].concat(
           glob.sync('gems/plugins/*/{app,spec_canvas}/coffeescripts/', {
             cwd: canvasDir,
-            absolute: true
+            absolute: true,
           })
         ),
-        use: ['coffee-loader']
+        use: ['coffee-loader'],
       },
       {
         test: /\.handlebars$/,
-        include: [
-          path.join(canvasDir, 'ui'),
-          /gems\/plugins\/.*\/app\/views\/jst\//
-        ],
+        include: [path.join(canvasDir, 'ui'), /gems\/plugins\/.*\/app\/views\/jst\//],
         use: [
           {
             loader: require.resolve('#webpack-i18nliner-handlebars-loader'),
             options: {
               // brandable_css assets are not available in test
-              injectBrandableStylesheet: false
-            }
-          }
-        ]
+              injectBrandableStylesheet: false,
+            },
+          },
+        ],
       },
       {
         test: /\.hbs$/,
         include: [path.join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
-        use: [require.resolve('#webpack-ember-handlebars-loader')]
+        use: [require.resolve('#webpack-ember-handlebars-loader')],
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|svg|gif)$/,
-        loader: 'file-loader'
+        loader: 'file-loader',
       },
       {
         test: /\.(woff(2)?|otf|ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        use: 'file-loader'
+        use: 'file-loader',
       },
 
       // Our spec files expect qunit's global `test`, `module`, `asyncTest` and
@@ -167,13 +156,13 @@ module.exports = {
         ].concat(
           glob.sync('gems/plugins/*/spec_canvas/coffeescripts/', {
             cwd: canvasDir,
-            absolute: true
+            absolute: true,
           })
         ),
 
-        use: ['imports-loader?test=>QUnit.test']
+        use: ['imports-loader?test=>QUnit.test'],
       },
-    ]
+    ],
   },
   resolve: {
     alias: {
@@ -206,12 +195,12 @@ module.exports = {
       path.join(canvasDir, 'public/javascripts'),
       path.join(canvasDir, 'gems/plugins'),
       path.join(canvasDir, 'spec/coffeescripts'),
-      'node_modules'
+      'node_modules',
     ],
   },
 
   resolveLoader: {
-    modules: ['node_modules', path.resolve(__dirname, '../webpack')]
+    modules: ['node_modules', path.resolve(__dirname, '../webpack')],
   },
 
   plugins: [
@@ -223,7 +212,7 @@ module.exports = {
       RESOURCE_EMBER_GRADEBOOK_SPEC,
       RESOURCE_JSX_SPEC,
       WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
-      process: { env: {} },
+      process: {env: {}},
     }),
 
     new EnvironmentPlugin({
@@ -232,26 +221,28 @@ module.exports = {
       JSPEC_RECURSE: '1',
       JSPEC_VERBOSE: '0',
       A11Y_REPORT: false,
-      GIT_COMMIT: null
+      GIT_COMMIT: null,
     }),
 
     new PluginSpecsRunner({
       pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
-      outfile: WEBPACK_PLUGIN_SPECS
+      outfile: WEBPACK_PLUGIN_SPECS,
     }),
 
     // needed for modules that expect Buffer to be present like fetch-mock (or
     // whatwg-url, its dependency)
     new ProvidePlugin({
-      'Buffer': ['buffer', 'Buffer']
+      Buffer: ['buffer', 'Buffer'],
     }),
   ].concat(
-    process.env.JSPEC_GROUP ? [
-      partitioning.createPlugin({
-        group: process.env.JSPEC_GROUP,
-        nodeIndex: +process.env.CI_NODE_INDEX,
-        nodeTotal: +process.env.CI_NODE_TOTAL,
-      })
-    ] : []
-  )
+    process.env.JSPEC_GROUP
+      ? [
+          partitioning.createPlugin({
+            group: process.env.JSPEC_GROUP,
+            nodeIndex: +process.env.CI_NODE_INDEX,
+            nodeTotal: +process.env.CI_NODE_TOTAL,
+          }),
+        ]
+      : []
+  ),
 }

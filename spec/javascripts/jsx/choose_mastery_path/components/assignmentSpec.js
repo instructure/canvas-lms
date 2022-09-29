@@ -33,9 +33,9 @@ const defaultProps = () => ({
     description: 'a quiz',
     category: {
       id: 'other',
-      label: 'Other'
-    }
-  }
+      label: 'Other',
+    },
+  },
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<Assignment {...props} />)

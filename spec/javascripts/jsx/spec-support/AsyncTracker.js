@@ -22,7 +22,7 @@ const SLOW_SPEC_LIMIT = 1500
 
 const originalFunctions = {
   clearTimeout: window.clearTimeout,
-  setTimeout: window.setTimeout
+  setTimeout: window.setTimeout,
 }
 
 export default class AsyncTracker {
@@ -70,7 +70,7 @@ export default class AsyncTracker {
       () => {
         logTrackers(this._trackers, (type, trackersOfType) => ({
           logType: 'warn',
-          message: `${trackersOfType.length} ${type}(s) have not yet resolved`
+          message: `${trackersOfType.length} ${type}(s) have not yet resolved`,
         }))
       },
       SLOW_SPEC_LIMIT
@@ -94,7 +94,7 @@ export default class AsyncTracker {
         currentContext: contextTracker.getCurrentContext(),
         duration,
         sourceStack: debugging ? getStack('setTimeout') : null,
-        type: 'setTimeout'
+        type: 'setTimeout',
       }
 
       addTimeoutTracker(tracker)
@@ -105,7 +105,7 @@ export default class AsyncTracker {
             // TODO: remove this after figuring out why it is happening
             logCurrentContext(tracker.currentContext, {
               message: 'callback is not a function',
-              sourceStack: tracker.sourceStack
+              sourceStack: tracker.sourceStack,
             })
           } else {
             callback()
@@ -156,7 +156,7 @@ export default class AsyncTracker {
   logUnmanagedBehavior() {
     logTrackers(this._trackers, (type, trackersOfType) => ({
       logType: this._options.unmanagedBehaviorStrategy === 'fail' ? 'error' : 'warn',
-      message: `${trackersOfType.length} ${type}(s) did not resolve before the test completed`
+      message: `${trackersOfType.length} ${type}(s) did not resolve before the test completed`,
     }))
   }
 

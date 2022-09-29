@@ -31,19 +31,19 @@ QUnit.module('#SubmissionDetailsDialog', {
     this.clock = sinon.useFakeTimers()
     sandbox.stub($, 'publish')
     ENV.GRADEBOOK_OPTIONS = {
-      has_grading_periods: false
+      has_grading_periods: false,
     }
     sandbox.stub($, 'ajaxJSON')
 
     assignment = {
       id: 1,
       grading_type: 'points',
-      points_possible: 10
+      points_possible: 10,
     }
     student = {
       assignment_1: {
-        submission_history: []
-      }
+        submission_history: [],
+      },
     }
     options = {change_grade_url: ''}
   },
@@ -53,10 +53,10 @@ QUnit.module('#SubmissionDetailsDialog', {
     fakeENV.teardown()
     $('.use-css-transitions-for-show-hide').remove()
     $('.ui-dialog').remove()
-  }
+  },
 })
 
-test('flashWarning is called when score is 150% points possible', function() {
+test('flashWarning is called when score is 150% points possible', function () {
   const submissionsDetailsDialog = new SubmissionDetailsDialog(assignment, student, options)
   const flashWarningStub = sandbox.stub($, 'flashWarning')
   $('.submission_details_grade_form', submissionsDetailsDialog.dialog).trigger('submit')
@@ -72,14 +72,14 @@ test('display name by default', () => {
     submission_comments: [
       {
         author: {
-          id: '2'
+          id: '2',
         },
         author_id: '2',
         author_name: 'Some Author',
         comment: 'a comment',
-        id: '27'
-      }
-    ]
+        id: '27',
+      },
+    ],
   }
   submissionDetailsDialog.update(submissionData)
 
@@ -93,14 +93,14 @@ test("when anonymous hides student's name from address section", () => {
     submission_comments: [
       {
         author: {
-          id: '2'
+          id: '2',
         },
         author_id: '2',
         author_name: 'Some Author',
         comment: 'a comment',
-        id: '27'
-      }
-    ]
+        id: '27',
+      },
+    ],
   }
   submissionDetailsDialog.update(submissionData)
 
@@ -115,14 +115,14 @@ test("when anonymous does not hide the user's name", () => {
     submission_comments: [
       {
         author: {
-          id: ENV.current_user_id
+          id: ENV.current_user_id,
         },
         author_id: ENV.current_user_id,
         author_name: 'Some Author',
         comment: 'a comment',
-        id: '27'
-      }
-    ]
+        id: '27',
+      },
+    ],
   }
   submissionDetailsDialog.update(submissionData)
 

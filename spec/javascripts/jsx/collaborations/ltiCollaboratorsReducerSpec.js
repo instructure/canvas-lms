@@ -36,7 +36,7 @@ test('responds to listCollaborationsStart', () => {
   const state = {
     listLTICollaboratorsPending: false,
     listLTICollaboratorsSuccessful: true,
-    listLTICollaboratorsError: {}
+    listLTICollaboratorsError: {},
   }
 
   const action = actions.listLTICollaborationsStart()
@@ -50,7 +50,7 @@ test('responds to listLTICollaborationsSuccessful', () => {
   const state = {
     listLTICollaboratorsPending: true,
     listLTICollaboratorsSuccessful: false,
-    ltiCollaboratorsData: []
+    ltiCollaboratorsData: [],
   }
   const ltiCollaboratorsData = []
 
@@ -64,7 +64,7 @@ test('responds to listLTICollaborationsSuccessful', () => {
 test('responds to listLTICollaborationsFailed', () => {
   const state = {
     listLTICollaboratorsPending: true,
-    listLTICollaboratorsError: null
+    listLTICollaboratorsError: null,
   }
   const error = {}
 

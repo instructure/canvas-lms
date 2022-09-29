@@ -34,7 +34,7 @@ const defaultProps = {
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
   setNotificationMessage: noop,
-  includeCourseSettings: noop
+  includeCourseSettings: noop,
 }
 
 test('renders the MigrationOptions component', () => {

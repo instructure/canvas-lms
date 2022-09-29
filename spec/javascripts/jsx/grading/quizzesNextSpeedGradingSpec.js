@@ -23,17 +23,17 @@ const fakeIframeHolder = {
   children: sinon.stub().returns([
     {
       contentWindow: {
-        postMessage: postMessageStub
-      }
-    }
-  ])
+        postMessage: postMessageStub,
+      },
+    },
+  ]),
 }
 
 const registerCbStub = sinon.stub()
 const refreshGradesCbStub = sinon.stub()
 const addEventListenerStub = sinon.stub()
 const speedGraderWindow = {
-  addEventListener: addEventListenerStub
+  addEventListener: addEventListenerStub,
 }
 
 const refreshSubmissionsToViewStub = sinon.stub()
@@ -53,7 +53,7 @@ const fakeEG = {
   updateStatsInHeader: updateStatsInHeaderStub,
   refreshFullRubric: refreshFullRubricStub,
   setGradeReadOnly: setGradeReadOnlStub,
-  showSubmissionDetails: showSubmissionDetailsStub
+  showSubmissionDetails: showSubmissionDetailsStub,
 }
 
 const resetStubs = function () {
@@ -130,7 +130,7 @@ QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
       'showRubric',
       'updateStatsInHeader',
       'refreshFullRubric',
-      'setGradeReadOnly'
+      'setGradeReadOnly',
     ]
 
     const fns = quizzesNextSpeedGrading(
@@ -162,7 +162,7 @@ QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
     ok(
       postMessageStub.calledWith({
         submission: arbitrarySubmissionData,
-        subject: 'canvas.speedGraderSubmissionChange'
+        subject: 'canvas.speedGraderSubmissionChange',
       })
     )
   })

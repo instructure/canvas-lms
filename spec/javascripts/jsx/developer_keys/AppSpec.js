@@ -27,12 +27,12 @@ import DeveloperKeysApp from 'ui/features/developer_keys_v2/react/App.js'
 QUnit.module('DevelopersKeyApp', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 const listDeveloperKeyScopes = {
   availableScopes: {},
-  listDeveloperKeyScopesPending: false
+  listDeveloperKeyScopesPending: false,
 }
 
 function developerKeyRows(componentNode, index) {
@@ -49,7 +49,7 @@ function generateKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({
     id: `${n}`,
     api_key: 'abc12345678',
-    created_at: '2012-06-07T20:36:50Z'
+    created_at: '2012-06-07T20:36:50Z',
   }))
 }
 
@@ -65,19 +65,19 @@ function initialApplicationState(list = null, inheritedList = null) {
           id: 2,
           api_key: 'abc12345678',
           created_at: '2012-06-07T20:36:50Z',
-          inherited_from: 'global'
-        }
+          inherited_from: 'global',
+        },
       ],
       list: list || [{id: 1, api_key: 'abc12345678', created_at: '2012-06-07T20:36:50Z'}],
       nextPage: 'http://...',
-      inheritedNextPage: 'http://...'
-    }
+      inheritedNextPage: 'http://...',
+    },
   }
 }
 
 function fakeStore() {
   return {
-    dispatch: () => {}
+    dispatch: () => {},
   }
 }
 
@@ -100,10 +100,10 @@ function renderComponent(overrides = {}) {
     store: fakeStore(),
     ctx: {
       params: {
-        contextId: ''
-      }
+        contextId: '',
+      },
     },
-    ...overrides
+    ...overrides,
   }
   return TestUtils.renderIntoDocument(<DeveloperKeysApp {...props} />)
 }
@@ -113,8 +113,8 @@ test('requests more inherited dev keys when the inherited "show all" button is c
   const overrides = {
     applicationState: initialApplicationState(generateKeyList(), generateKeyList(20)),
     actions: {
-      getRemainingInheritedDeveloperKeys: () => callbackSpy
-    }
+      getRemainingInheritedDeveloperKeys: () => callbackSpy,
+    },
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
@@ -130,8 +130,8 @@ test('requests more account dev keys when the account "show all" button is click
   const overrides = {
     applicationState: initialApplicationState(generateKeyList()),
     actions: {
-      getRemainingDeveloperKeys: () => () => ({})
-    }
+      getRemainingDeveloperKeys: () => () => ({}),
+    },
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
@@ -147,9 +147,9 @@ test('calls the tables setFocusCallback after loading more account keys', () => 
     applicationState: initialApplicationState(generateKeyList()),
     actions: {
       getRemainingDeveloperKeys: () => () => ({
-        then: callbackSpy
-      })
-    }
+        then: callbackSpy,
+      }),
+    },
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
@@ -167,9 +167,9 @@ test('calls the tables setFocusCallback after loading more inherited keys', () =
     applicationState: initialApplicationState(generateKeyList(), generateKeyList()),
     actions: {
       getRemainingInheritedDeveloperKeys: () => () => ({
-        then: callbackSpy
-      })
-    }
+        then: callbackSpy,
+      }),
+    },
   }
   const component = renderComponent(overrides)
   const componentNode = ReactDOM.findDOMNode(component)
@@ -242,8 +242,8 @@ test('displays the show more button', () => {
       listDeveloperKeysPending: false,
       listDeveloperKeysSuccessful: false,
       list,
-      nextPage: 'http://...'
-    }
+      nextPage: 'http://...',
+    },
   }
 
   const component = renderComponent({applicationState})
@@ -263,10 +263,10 @@ test('renders the list of developer_keys when there are some', () => {
         {
           id: '111',
           api_key: 'abc12345678',
-          created_at: '2012-06-07T20:36:50Z'
-        }
-      ]
-    }
+          created_at: '2012-06-07T20:36:50Z',
+        },
+      ],
+    },
   }
 
   const component = renderComponent({applicationState})
@@ -287,10 +287,10 @@ test('displays the developer key on click of show key button', () => {
         {
           id: '111',
           api_key: 'abc12345678',
-          created_at: '2012-06-07T20:36:50Z'
-        }
-      ]
-    }
+          created_at: '2012-06-07T20:36:50Z',
+        },
+      ],
+    },
   }
   const props = {
     applicationState,
@@ -298,9 +298,9 @@ test('displays the developer key on click of show key button', () => {
     store: fakeStore(),
     ctx: {
       params: {
-        contextId: ''
-      }
-    }
+        contextId: '',
+      },
+    },
   }
   const wrapper = mount(<DeveloperKeysApp {...props} />)
 
@@ -322,10 +322,10 @@ test('renders the spinner', () => {
         {
           id: '111',
           api_key: 'abc12345678',
-          created_at: '2012-06-07T20:36:50Z'
-        }
-      ]
-    }
+          created_at: '2012-06-07T20:36:50Z',
+        },
+      ],
+    },
   }
 
   const component = renderComponent({applicationState})
@@ -345,10 +345,10 @@ test('opens the key selection menu when the create button is clicked', () => {
         {
           id: '111',
           api_key: 'abc12345678',
-          created_at: '2012-06-07T20:36:50Z'
-        }
-      ]
-    }
+          created_at: '2012-06-07T20:36:50Z',
+        },
+      ],
+    },
   }
 
   const props = {
@@ -357,9 +357,9 @@ test('opens the key selection menu when the create button is clicked', () => {
     store: fakeStore(),
     ctx: {
       params: {
-        contextId: ''
-      }
-    }
+        contextId: '',
+      },
+    },
   }
   const wrapper = mount(<DeveloperKeysApp {...props} />)
 
@@ -387,14 +387,14 @@ test('does not have the create button on inherited tab', () => {
           {
             id: '111',
             api_key: 'abc12345678',
-            created_at: '2012-06-07T20:36:50Z'
-          }
-        ]
-      }
+            created_at: '2012-06-07T20:36:50Z',
+          },
+        ],
+      },
     },
     actions: {
-      developerKeysModalOpen: openSpy
-    }
+      developerKeysModalOpen: openSpy,
+    },
   }
 
   const component = renderComponent(overrides)

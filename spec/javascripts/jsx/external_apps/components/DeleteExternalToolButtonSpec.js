@@ -52,7 +52,7 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
           'Talent provides an online, interactive video platform for professional development',
         enabled: true,
         installed_locally: true,
-        name: 'Talent'
+        name: 'Talent',
       },
       {
         app_id: 2,
@@ -60,8 +60,8 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
         description: null,
         enabled: true,
         installed_locally: true,
-        name: 'Twitter'
-      }
+        name: 'Twitter',
+      },
     ]
     store.reset()
     return store.setState({externalTools: this.tools})
@@ -69,7 +69,7 @@ QUnit.module('ExternalApps.DeleteExternalToolButton', {
   teardown() {
     store.reset()
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('does not render when the canAddEdit permission is false', () => {

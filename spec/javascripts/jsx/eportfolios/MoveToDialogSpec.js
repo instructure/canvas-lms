@@ -31,9 +31,9 @@ const mountDialog = (opts = {}) => {
     source: {label: 'foo', id: '0'},
     destinations: [
       {label: 'bar', id: '1'},
-      {label: 'baz', id: '2'}
+      {label: 'baz', id: '2'},
     ],
-    ...opts
+    ...opts,
   }
 
   const element = <MoveToDialog {...opts} />
@@ -57,7 +57,7 @@ QUnit.module('MoveToDialog', {
     ReactDOM.unmountComponentAtNode(root)
     appRoot.removeAttribute('aria-hidden')
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('calls onMove with a destination id when selected', assert => {
@@ -66,7 +66,7 @@ test('calls onMove with a destination id when selected', assert => {
     onMove: val => {
       strictEqual(val, '1')
       done()
-    }
+    },
   })
   const button = document.getElementById('MoveToDialog__move')
   TestUtils.Simulate.click(button)
@@ -82,7 +82,7 @@ test('does not call onMove when cancelled via close button', assert => {
       // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
       expect(0)
       done()
-    }
+    },
   })
   const button = document.getElementById('MoveToDialog__cancel')
   TestUtils.Simulate.click(button)
@@ -95,7 +95,7 @@ test('does not fail when no onMove is specified', assert => {
       // eslint-disable-next-line jest/valid-expect, qunit/no-global-expect
       expect(0)
       done()
-    }
+    },
   })
   const button = document.getElementById('MoveToDialog__move')
   TestUtils.Simulate.click(button)

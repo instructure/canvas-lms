@@ -27,13 +27,16 @@ const defaultProps = () => ({
   items: [
     {
       id: '10',
-      title: 'Foo Bar'
-    }
+      title: 'Foo Bar',
+    },
   ],
   moveOptions: {
-    siblings: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    siblings: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   },
-  onSelect: () => {}
+  onSelect: () => {},
 })
 
 test('renders the MoveSelect component', () => {
@@ -72,7 +75,10 @@ test('hasSelectedPosition() is true if selectedPosition is a relative position a
 test('isDoneSelecting() is true if props.moveOptions is siblings and hasSelectedPosition() is true', () => {
   const props = defaultProps()
   props.moveOptions = {
-    siblings: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    siblings: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
@@ -83,7 +89,10 @@ test('isDoneSelecting() is true if props.moveOptions is siblings and hasSelected
 test('isDoneSelecting() is true if props.moveOptions is siblings because of default position', () => {
   const props = defaultProps()
   props.moveOptions = {
-    siblings: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    siblings: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
@@ -95,7 +104,10 @@ test('isDoneSelecting() is false if props.moveOptions is groups and selectedGrou
   const props = defaultProps()
   props.moveOptions = {
     groupsLabel: 'groups',
-    groups: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    groups: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
@@ -109,14 +121,14 @@ test('isDoneSelecting() is true if props.moveOptions is groups and selectedGroup
     groupsLabel: 'groups',
     groups: [
       {id: '12', title: 'Making Cake', items: [{id: '2', title: 'foo bar'}]},
-      {id: '30', title: 'Very Hard Quiz', items: [{id: '4', title: 'foo baz'}]}
-    ]
+      {id: '30', title: 'Very Hard Quiz', items: [{id: '4', title: 'foo baz'}]},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({
     selectedGroup: props.moveOptions.groups[0],
-    selectedPosition: positions.before
+    selectedPosition: positions.before,
   })
   ok(instance.isDoneSelecting())
 })
@@ -127,8 +139,8 @@ test('isDoneSelecting() is true if props.moveOptions is groups and selectedGroup
     groupsLabel: 'groups',
     groups: [
       {id: '12', title: 'Making Cake', items: [{id: '2', title: 'foo bar'}]},
-      {id: '30', title: 'Very Hard Quiz', items: [{id: '4', title: 'foo baz'}]}
-    ]
+      {id: '30', title: 'Very Hard Quiz', items: [{id: '4', title: 'foo baz'}]},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
@@ -140,7 +152,10 @@ test('isDoneSelecting() is true if props.moveOptions is groups and selectedGroup
   const props = defaultProps()
   props.moveOptions = {
     groupsLabel: 'groups',
-    groups: [{id: '12', title: 'Making Cake'}, {id: '30', title: 'Very Hard Quiz'}]
+    groups: [
+      {id: '12', title: 'Making Cake'},
+      {id: '30', title: 'Very Hard Quiz'},
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
@@ -167,21 +182,27 @@ test('submitSelection() calls onSelect with properly ordered items for groups', 
       {
         id: '12',
         title: 'Making Cake',
-        items: [{id: '2', title: 'foo bar'}, {id: '8', title: 'baz foo'}]
+        items: [
+          {id: '2', title: 'foo bar'},
+          {id: '8', title: 'baz foo'},
+        ],
       },
       {
         id: '30',
         title: 'Very Hard Quiz',
-        items: [{id: '4', title: 'foo baz'}, {id: '6', title: 'bar foo'}]
-      }
-    ]
+        items: [
+          {id: '4', title: 'foo baz'},
+          {id: '6', title: 'bar foo'},
+        ],
+      },
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({
     selectedPosition: positions.before,
     selectedGroup: props.moveOptions.groups[0],
-    selectedSibling: 1
+    selectedSibling: 1,
   })
   instance.submitSelection()
   ok(props.onSelect.calledWith({groupId: '12', order: ['2', '10', '8'], itemIds: ['10']}))
@@ -193,16 +214,16 @@ test('submitSelection() calls onSelect with properly ordered items for multple i
     {
       id: '88',
       title: 'Bleh Bar',
-      groupId: '12'
+      groupId: '12',
     },
     {
       id: '14',
-      title: 'Blerp Bar'
+      title: 'Blerp Bar',
     },
     {
       id: '12',
-      title: 'Blop Bar'
-    }
+      title: 'Blop Bar',
+    },
   ]
   props.onSelect = sinon.spy()
   props.moveOptions = {
@@ -211,28 +232,34 @@ test('submitSelection() calls onSelect with properly ordered items for multple i
       {
         id: '12',
         title: 'Making Cake',
-        items: [{id: '2', title: 'foo bar'}, {id: '8', title: 'baz foo'}]
+        items: [
+          {id: '2', title: 'foo bar'},
+          {id: '8', title: 'baz foo'},
+        ],
       },
       {
         id: '30',
         title: 'Very Hard Quiz',
-        items: [{id: '4', title: 'foo baz'}, {id: '6', title: 'bar foo'}]
-      }
-    ]
+        items: [
+          {id: '4', title: 'foo baz'},
+          {id: '6', title: 'bar foo'},
+        ],
+      },
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({
     selectedPosition: positions.before,
     selectedGroup: props.moveOptions.groups[1],
-    selectedSibling: 1
+    selectedSibling: 1,
   })
   instance.submitSelection()
   ok(
     props.onSelect.calledWith({
       groupId: '30',
       order: ['4', '88', '14', '12', '6'],
-      itemIds: ['88', '14', '12']
+      itemIds: ['88', '14', '12'],
     })
   )
 })
@@ -243,16 +270,16 @@ test('submitSelection() calls onSelect with properly ordered items for multple i
     {
       id: '88',
       title: 'Bleh Bar',
-      groupId: '12'
+      groupId: '12',
     },
     {
       id: '14',
-      title: 'Blerp Bar'
+      title: 'Blerp Bar',
     },
     {
       id: '12',
-      title: 'Blop Bar'
-    }
+      title: 'Blop Bar',
+    },
   ]
   props.onSelect = sinon.spy()
   props.moveOptions = {
@@ -261,28 +288,34 @@ test('submitSelection() calls onSelect with properly ordered items for multple i
       {
         id: '12',
         title: 'Making Cake',
-        items: [{id: '2', title: 'foo bar'}, {id: '8', title: 'baz foo'}]
+        items: [
+          {id: '2', title: 'foo bar'},
+          {id: '8', title: 'baz foo'},
+        ],
       },
       {
         id: '30',
         title: 'Very Hard Quiz',
-        items: [{id: '4', title: 'foo baz'}, {id: '6', title: 'bar foo'}]
-      }
-    ]
+        items: [
+          {id: '4', title: 'foo baz'},
+          {id: '6', title: 'bar foo'},
+        ],
+      },
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({
     selectedPosition: positions.last,
     selectedGroup: props.moveOptions.groups[1],
-    selectedSibling: 1
+    selectedSibling: 1,
   })
   instance.submitSelection()
   ok(
     props.onSelect.calledWith({
       groupId: '30',
       order: ['4', '6', '88', '14', '12'],
-      itemIds: ['88', '14', '12']
+      itemIds: ['88', '14', '12'],
     })
   )
 })
@@ -293,16 +326,16 @@ test('submitSelection() calls onSelect with properly ordered items for a selecte
     {
       id: '88',
       title: 'Bleh Bar',
-      groupId: '12'
+      groupId: '12',
     },
     {
       id: '14',
-      title: 'Blerp Bar'
+      title: 'Blerp Bar',
     },
     {
       id: '12',
-      title: 'Blop Bar'
-    }
+      title: 'Blop Bar',
+    },
   ]
   props.onSelect = sinon.spy()
   props.moveOptions = {
@@ -311,28 +344,34 @@ test('submitSelection() calls onSelect with properly ordered items for a selecte
       {
         id: '12',
         title: 'Making Cake',
-        items: [{id: '2', title: 'foo bar'}, {id: '8', title: 'baz foo'}]
+        items: [
+          {id: '2', title: 'foo bar'},
+          {id: '8', title: 'baz foo'},
+        ],
       },
       {
         id: '30',
         title: 'Very Hard Quiz',
-        items: [{id: '4', title: 'foo baz'}, {id: '6', title: 'bar foo'}]
-      }
-    ]
+        items: [
+          {id: '4', title: 'foo baz'},
+          {id: '6', title: 'bar foo'},
+        ],
+      },
+    ],
   }
   const tree = enzyme.mount(<MoveSelect {...props} />)
   const instance = tree.instance()
   instance.setState({
     selectedPosition: positions.first,
     selectedGroup: props.moveOptions.groups[0],
-    selectedSibling: 0
+    selectedSibling: 0,
   })
   instance.submitSelection()
   ok(
     props.onSelect.calledWith({
       groupId: '12',
       order: ['88', '14', '12', '2', '8'],
-      itemIds: ['88', '14', '12']
+      itemIds: ['88', '14', '12'],
     })
   )
 })

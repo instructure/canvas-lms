@@ -33,9 +33,9 @@ QUnit.module('ThemeCard Component', {
       startDeleting: sinon.stub(),
       cancelDelete: sinon.stub(),
       onDelete: sinon.stub(),
-      getVariable: sinon.stub()
+      getVariable: sinon.stub(),
     }
-  }
+  },
 })
 
 test('Renders the name', () => {

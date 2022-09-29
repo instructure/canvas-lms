@@ -29,11 +29,11 @@ QUnit.module('BlueprintModal component', {
 
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 const defaultProps = () => ({
-  isOpen: true
+  isOpen: true,
 })
 
 const render = (props = defaultProps(), children = <p>content</p>) => (
@@ -59,17 +59,12 @@ test('renders the Checkbox, Save, and Cancel buttons when there are changes', ()
     ...defaultProps(),
     hasChanges: true,
     willAddAssociations: true,
-    canAutoPublishCourses: true
+    canAutoPublishCourses: true,
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')
   equal(buttons.length, 2)
-  ok(
-    wrapper
-      .find('ModalFooter')
-      .find('Checkbox')
-      .exists()
-  )
+  ok(wrapper.find('ModalFooter').find('Checkbox').exists())
   equal(buttons.at(0).prop('children'), 'Cancel')
   equal(buttons.at(1).prop('children'), 'Save')
 })
@@ -78,11 +73,10 @@ test('renders the Done button when there are changes, but is in the process of s
   const props = {
     ...defaultProps(),
     hasChanges: true,
-    isSaving: true
+    isSaving: true,
   }
   const wrapper = enzyme.shallow(render(props))
   const buttons = wrapper.find('ModalFooter').find('Button')
   equal(buttons.length, 1)
   equal(buttons.at(0).prop('children'), 'Done')
 })
-

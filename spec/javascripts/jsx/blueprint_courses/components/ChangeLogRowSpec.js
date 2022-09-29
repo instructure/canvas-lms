@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
-import ChangeLogRow, {ChangeRow} from 'ui/features/blueprint_course_child/react/components/ChangeLogRow.js'
+import ChangeLogRow, {
+  ChangeRow,
+} from 'ui/features/blueprint_course_child/react/components/ChangeLogRow.js'
 import getSampleData from '../getSampleData'
 
 QUnit.module('ChangeLogRow component')
@@ -28,7 +30,7 @@ const defaultProps = () => ({
   col2: 'col #2',
   col3: 'col #3',
   col4: 'col #4',
-  isHeading: false
+  isHeading: false,
 })
 
 test('renders the ChangeLogRow component', () => {

@@ -39,18 +39,18 @@ QUnit.module('TimeBlockSelectRow', {
       timeData: {
         date: new Date('2016-10-28T19:00:00.000Z'),
         startTime: new Date('2016-10-28T19:00:00.000Z'),
-        endTime: new Date('2016-10-28T19:30:00.000Z')
+        endTime: new Date('2016-10-28T19:30:00.000Z'),
       },
       setData() {},
       handleDelete() {},
-      onBlur() {}
+      onBlur() {},
     }
   },
   teardown() {
     props = null
     tz.restore(tzSnapshot)
     fakeENV.teardown()
-  }
+  },
 })
 
 test('componentDidMount sets up the date and time fields', () => {
@@ -90,7 +90,7 @@ test('handleDelete calls props.handleDelete passing the slotEventId', () => {
   props.handleDelete = sinon.spy()
   props.slotEventId = '123'
   const fakeEvent = {
-    preventDefault() {}
+    preventDefault() {},
   }
   const component = TestUtils.renderIntoDocument(<TimeBlockSelectRow {...props} />)
   component.handleDelete(fakeEvent)
@@ -101,7 +101,7 @@ test('handleFieldBlur calls setData', () => {
   props.setData = sinon.spy()
   props.slotEventId = '123'
   const fakeEvent = {
-    target: {}
+    target: {},
   }
   const component = TestUtils.renderIntoDocument(<TimeBlockSelectRow {...props} />)
   component.handleFieldBlur(fakeEvent)
@@ -128,7 +128,7 @@ test('handleFieldBlur calls onBlur when non-blank and when the target row is the
     target: TestUtils.findRenderedDOMComponentWithClass(
       timeBlockRows[1],
       'TimeBlockSelectorRow__Date'
-    )
+    ),
   }
   timeBlockRows[1].handleFieldBlur(fakeEvent)
   ok(props.onBlur.called)

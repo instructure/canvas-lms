@@ -28,15 +28,15 @@ QUnit.module('SpeedGraderSelectMenu', () => {
         id: 4,
         name: 'Guy B. Studying',
         submission_state: 'not_graded',
-        submission: {score: null, grade: null}
+        submission: {score: null, grade: null},
       },
       {
         index: 1,
         id: 12,
         name: 'Sil E. Bus',
         submission_state: 'graded',
-        submission: {score: 7, grade: 70}
-      }
+        submission: {score: 7, grade: 70},
+      },
     ]
 
     const menuOptions = students.map(student => {
@@ -80,7 +80,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
         strictEqual(status.hasClass('graded'), false)
 
@@ -89,7 +89,7 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
         strictEqual(status.hasClass('graded'), true)
       })
@@ -103,13 +103,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(0)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check')
             .length,
@@ -135,13 +132,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(1)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(1)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")')
             .length,
@@ -167,13 +161,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(0)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon').length,
           1
@@ -201,13 +192,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(0)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon:contains("●")')
             .length,
@@ -236,13 +224,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(0)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon > i.icon-check')
             .length,
@@ -270,15 +255,15 @@ QUnit.module('SpeedGraderSelectMenu', () => {
               id: 'section_0',
               data: {'section-id': 0},
               name: 'Show all sections',
-              className: {raw: 'section_0'}
+              className: {raw: 'section_0'},
             },
             {
               id: 'section_123',
               data: {'section-id': 123},
               name: 'Not everybody',
-              className: {raw: 'section_123'}
-            }
-          ]
+              className: {raw: 'section_123'},
+            },
+          ],
         }
         menuOptions.unshift(sections)
       })
@@ -292,13 +277,10 @@ QUnit.module('SpeedGraderSelectMenu', () => {
           student,
           isCurrentStudent,
           newStudentInfo,
-          anonymizableId: 'id'
+          anonymizableId: 'id',
         })
 
-        const entry = selectMenu
-          .data('selectmenu')
-          .list.find('li:eq(0)')
-          .children()
+        const entry = selectMenu.data('selectmenu').list.find('li:eq(0)').children()
         strictEqual(
           entry.find('span.ui-selectmenu-item-icon.speedgrader-selectmenu-icon i.icon-check')
             .length,

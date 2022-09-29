@@ -32,7 +32,7 @@ class ConditionalReleaseEditor {
       saveRule: sinon.stub(),
       getErrors: sinon.stub(),
       focusOnError: sinon.stub(),
-      env
+      env,
     }
     return editor
   }
@@ -75,7 +75,7 @@ QUnit.module('Conditional Release component', {
     component = null
     editor = null
     ajax.restore()
-  }
+  },
 })
 
 test('it creates a cyoe editor', () => {
@@ -91,7 +91,7 @@ test('it transforms validations', () => {
   editor.getErrors.returns([
     {index: 0, error: 'foo bar'},
     {index: 0, error: 'baz bat'},
-    {index: 1, error: 'foo baz'}
+    {index: 1, error: 'foo baz'},
   ])
   const transformed = component.validateBeforeSave()
   deepEqual(transformed, [{message: 'foo bar'}, {message: 'baz bat'}, {message: 'foo baz'}])
@@ -143,7 +143,7 @@ test('it times out', assert => {
 
 test('it updates assignments', assert => {
   component.updateAssignment({
-    points_possible: 100
+    points_possible: 100,
   })
   ok(editor.updateAssignment.calledWithMatch({points_possible: 100}))
 })

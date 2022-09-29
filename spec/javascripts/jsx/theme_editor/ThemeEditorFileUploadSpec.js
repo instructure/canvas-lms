@@ -26,9 +26,9 @@ QUnit.module('ThemeEditorFileUpload Component', {
   setup() {
     elem = document.createElement('div')
     props = {
-      onChange: sinon.spy()
+      onChange: sinon.spy(),
     }
-  }
+  },
 })
 
 test('renders button disabled if nothing to reset', () => {

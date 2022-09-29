@@ -23,14 +23,14 @@ import ManageAppListButton from 'ui/features/external_apps/react/components/Mana
 
 const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
-const onUpdateAccessToken = function() {}
+const onUpdateAccessToken = function () {}
 const createElement = () => <ManageAppListButton onUpdateAccessToken={onUpdateAccessToken} />
 const renderComponent = () => ReactDOM.render(createElement(), wrapper)
 
 QUnit.module('ExternalApps.ManageAppListButton', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('open and close modal', () => {

@@ -29,14 +29,14 @@ test('renders the ExportList component', () => {
       date: 'July 4, 1776 at 3:33pm',
       link: 'https://example.com/declarationofindependence',
       workflowState: 'generated',
-      newExport: false
+      newExport: false,
     },
     {
       date: 'Nov 9, 1989 at 9am',
       link: 'https://example.com/berlinwallfalls',
       workflowState: 'generated',
-      newExport: false
-    }
+      newExport: false,
+    },
   ]
 
   const tree = enzyme.shallow(<ExportList exports={exports} />)

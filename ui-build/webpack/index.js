@@ -59,7 +59,7 @@ const createBundleAnalyzerPlugin = (...args) => {
 const readOnlyCachePlugin = () => {
   return function apply(compiler) {
     compiler.cache.hooks.store.intercept({
-      register: (tapInfo) => ({ ...tapInfo, fn: () => {} }),
+      register: tapInfo => ({...tapInfo, fn: () => {}}),
     })
   }
 }
@@ -67,18 +67,22 @@ const readOnlyCachePlugin = () => {
 module.exports = {
   mode: process.env.NODE_ENV,
   target: ['web', 'es2021'],
-  cache: useBuildCache ? {
-    type: 'filesystem',
-    allowCollectingMemory: false,
-    buildDependencies: { config: [] },
-    compression: 'gzip',
-  } : false,
-  snapshot: useBuildCache ? {
-    buildDependencies: { hash: true, timestamp: false },
-    module: { hash: true, timestamp: false },
-    resolve: { hash: true, timestamp: false },
-    resolveBuildDependencies: { hash: true, timestamp: false }
-  } : {},
+  cache: useBuildCache
+    ? {
+        type: 'filesystem',
+        allowCollectingMemory: false,
+        buildDependencies: {config: []},
+        compression: 'gzip',
+      }
+    : false,
+  snapshot: useBuildCache
+    ? {
+        buildDependencies: {hash: true, timestamp: false},
+        module: {hash: true, timestamp: false},
+        resolve: {hash: true, timestamp: false},
+        resolveBuildDependencies: {hash: true, timestamp: false},
+      }
+    : {},
   performance: skipSourcemaps
     ? false
     : {
@@ -93,7 +97,7 @@ module.exports = {
         // to where they are all under the default value of 250000 and then remove this
         // TODO: decrease back to 1200000 LS-1222
         // NOTE: if maxAssetSize changes, update: ~build/new-jenkins/library/vars/webpackStage.groovy
-        maxAssetSize: 1400000
+        maxAssetSize: 1400000,
       },
   optimization: {
     moduleIds: 'deterministic',
@@ -121,14 +125,14 @@ module.exports = {
             properties: false,
             reduce_funcs: false,
             reduce_vars: false,
-            typeofs: false
+            typeofs: false,
           },
           output: {
             comments: false,
-            semicolons: false // prevents everything being on one line so it's easier to view in devtools
-          }
-        }
-      })
+            semicolons: false, // prevents everything being on one line so it's easier to view in devtools
+          },
+        },
+      }),
     ],
 
     splitChunks: {
@@ -139,7 +143,7 @@ module.exports = {
       maxInitialRequests: 10,
 
       chunks: 'all',
-      cacheGroups: {defaultVendors: false} // don't split out node_modules and app code in different chunks
+      cacheGroups: {defaultVendors: false}, // don't split out node_modules and app code in different chunks
     },
   },
   // In prod build, don't attempt to continue if there are any errors.
@@ -151,8 +155,7 @@ module.exports = {
 
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' ||
-      process.env.COVERAGE === '1'
+    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1'
     ? 'source-map'
     : 'eval',
 
@@ -180,7 +183,7 @@ module.exports = {
 
   resolve: {
     alias: {
-      'underscore$': path.resolve(canvasDir, 'ui/shims/underscore.js'),
+      underscore$: path.resolve(canvasDir, 'ui/shims/underscore.js'),
     },
 
     fallback: {
@@ -189,15 +192,12 @@ module.exports = {
       path: false,
       // for parse-link-header, which requires "querystring" which is a node
       // module. btw we have at least 3 implementations of "parse-link-header"!
-      querystring: require.resolve('querystring-es3')
+      querystring: require.resolve('querystring-es3'),
     },
 
-    modules: [
-      path.resolve(canvasDir, 'public/javascripts'),
-      'node_modules'
-    ],
+    modules: [path.resolve(canvasDir, 'public/javascripts'), 'node_modules'],
 
-    extensions: ['.js', '.ts', '.tsx']
+    extensions: ['.js', '.ts', '.tsx'],
   },
 
   module: {
@@ -212,10 +212,7 @@ module.exports = {
     // This can boost the performance when ignoring big libraries.
     // The files are expected to have no call to require, define or similar.
     // They are allowed to use exports and module.exports.
-    noParse: [
-      require.resolve('jquery'),
-      require.resolve('tinymce'),
-    ],
+    noParse: [require.resolve('jquery'), require.resolve('tinymce')],
     rules: [
       // packages that do specify "type": "module" for their package but are
       // still using non-fully qualified relative imports (e.g. "./foo"
@@ -240,8 +237,8 @@ module.exports = {
           path.resolve(canvasDir, 'packages/datetime/index.js'),
         ],
         resolve: {
-          fullySpecified: false
-        }
+          fullySpecified: false,
+        },
       },
       // remove when you no longer get an error from @instructure/ui* around
       // import/export with a package not marked as ESM:
@@ -253,9 +250,7 @@ module.exports = {
       {
         test: /\.js$/,
         type: 'javascript/auto',
-        include: [
-          path.resolve(canvasDir, 'node_modules/@instructure'),
-        ]
+        include: [path.resolve(canvasDir, 'node_modules/@instructure')],
       },
       {
         test: /\.(js|ts|tsx)$/,
@@ -275,7 +270,7 @@ module.exports = {
         ],
         exclude: [/node_modules/],
         parser: {
-          requireInclude: 'allow'
+          requireInclude: 'allow',
         },
         use: {
           loader: 'babel-loader',
@@ -283,44 +278,50 @@ module.exports = {
             configFile: false,
             cacheDirectory: process.env.NODE_ENV !== 'production',
             assumptions: {
-              setPublicClassFields: true
+              setPublicClassFields: true,
             },
             env: {
               development: {
-                plugins: ['babel-plugin-typescript-to-proptypes']
+                plugins: ['babel-plugin-typescript-to-proptypes'],
               },
               production: {
                 plugins: [
-                  ['@babel/plugin-transform-runtime', {
-                    helpers: true,
-                    corejs: 3,
-                    useESModules: true
-                  }],
+                  [
+                    '@babel/plugin-transform-runtime',
+                    {
+                      helpers: true,
+                      corejs: 3,
+                      useESModules: true,
+                    },
+                  ],
                   'transform-react-remove-prop-types',
                   '@babel/plugin-transform-react-inline-elements',
-                  '@babel/plugin-transform-react-constant-elements'
-                ]
-              }
+                  '@babel/plugin-transform-react-constant-elements',
+                ],
+              },
             },
             presets: [
               ['@babel/preset-typescript'],
-              ['@babel/preset-env', {
-                useBuiltIns: 'entry',
-                corejs: '3.20',
-                modules: false,
-                // This is needed to fix a Safari < 16 bug
-                // https://github.com/babel/babel/issues/14289
-                // https://bugs.webkit.org/show_bug.cgi?id=236843
-                include: ['@babel/plugin-proposal-class-properties'],
-              }],
-              ['@babel/preset-react', { useBuiltIns: true }]
+              [
+                '@babel/preset-env',
+                {
+                  useBuiltIns: 'entry',
+                  corejs: '3.20',
+                  modules: false,
+                  // This is needed to fix a Safari < 16 bug
+                  // https://github.com/babel/babel/issues/14289
+                  // https://bugs.webkit.org/show_bug.cgi?id=236843
+                  include: ['@babel/plugin-proposal-class-properties'],
+                },
+              ],
+              ['@babel/preset-react', {useBuiltIns: true}],
             ],
             targets: {
               browsers: 'last 2 versions',
-              esmodules: true
-            }
-          }
-        }
+              esmodules: true,
+            },
+          },
+        },
       },
       {
         test: /\.coffee$/,
@@ -329,44 +330,41 @@ module.exports = {
           path.resolve(canvasDir, 'spec/coffeescripts'),
           path.resolve(canvasDir, 'packages/backbone-input-filter-view/src'),
           path.resolve(canvasDir, 'packages/backbone-input-view/src'),
-          ...globPlugins('{app,spec_canvas}/coffeescripts/')
+          ...globPlugins('{app,spec_canvas}/coffeescripts/'),
         ],
-        use: ['coffee-loader']
+        use: ['coffee-loader'],
       },
       {
         test: /\.handlebars$/,
-        include: [
-          path.resolve(canvasDir, 'ui'),
-          ...globPlugins('app/views/jst/'),
-        ],
+        include: [path.resolve(canvasDir, 'ui'), ...globPlugins('app/views/jst/')],
         use: [
           {
             loader: require.resolve('./i18nLinerHandlebars'),
             options: {
               // brandable_css assets are not available in test
-              injectBrandableStylesheet: process.env.NODE_ENV !== 'test'
-            }
-          }
-        ]
+              injectBrandableStylesheet: process.env.NODE_ENV !== 'test',
+            },
+          },
+        ],
       },
       {
         test: /\.hbs$/,
         include: [path.join(canvasDir, 'ui/features/screenreader_gradebook/jst')],
-        use: [require.resolve('./emberHandlebars')]
+        use: [require.resolve('./emberHandlebars')],
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|svg|gif)$/,
-        loader: 'file-loader'
+        loader: 'file-loader',
       },
       {
         test: /\.(woff(2)?|otf|ttf|eot)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        use: 'file-loader'
-      }
-    ]
+        use: 'file-loader',
+      },
+    ],
   },
 
   plugins: [
@@ -376,21 +374,21 @@ module.exports = {
     new webpack.EnvironmentPlugin({
       NODE_ENV: null,
       GIT_COMMIT: null,
-      ALWAYS_APPEND_UI_TESTABLE_LOCATORS: null
+      ALWAYS_APPEND_UI_TESTABLE_LOCATORS: null,
     }),
 
     // Only include timezone data starting from 2011 (canvaseption) to 15 years from now,
     // so we don't clutter the vendor bundle with a bunch of old timezone data
     new MomentTimezoneDataPlugin({
       startYear: 2011,
-      endYear: new Date().getFullYear() + 15
+      endYear: new Date().getFullYear() + 15,
     }),
 
     // allow plugins to extend source files
     new SourceFileExtensionsPlugin({
       context: canvasDir,
       include: glob.sync(path.join(canvasDir, 'gems/plugins/*/package.json'), {absolute: true}),
-      tmpDir: path.join(canvasDir, 'tmp/webpack-source-file-extensions')
+      tmpDir: path.join(canvasDir, 'tmp/webpack-source-file-extensions'),
     }),
 
     new WebpackHooks(),
@@ -401,16 +399,15 @@ module.exports = {
         path.resolve(canvasDir, 'ui'),
         path.resolve(canvasDir, 'packages'),
         path.resolve(canvasDir, 'public/javascripts'),
-        path.resolve(canvasDir, 'gems/plugins')
+        path.resolve(canvasDir, 'gems/plugins'),
       ],
       exclude: [/\/node_modules\//],
       formatter: require('./esmac/ErrorFormatter'),
       rules: require('./esmac/moduleAccessRules'),
-      permit: process.env.WEBPACK_ENCAPSULATION_DEBUG === '1' ? (
-        []
-      ) : (
-        require('./esmac/errorsPendingRemoval.json')
-      )
+      permit:
+        process.env.WEBPACK_ENCAPSULATION_DEBUG === '1'
+          ? []
+          : require('./esmac/errorsPendingRemoval.json'),
     }),
 
     new webpack.DefinePlugin({
@@ -422,17 +419,15 @@ module.exports = {
       // referencing through the EnvironmentPlugin (below) and risk a hard
       // runtime error in case we didn't cover them all, or provide a sink like
       // this, which i'm gonna go with for now:
-      process: { env: {} },
+      process: {env: {}},
     }),
   ]
-    .concat(
-      writeBuildCache ? [] : readOnlyCachePlugin()
-    )
+    .concat(writeBuildCache ? [] : readOnlyCachePlugin())
     .concat(
       // return a non-zero exit code if there are any warnings so we don't continue compiling assets if webpack fails
       process.env.WEBPACK_PEDANTIC !== '0'
         ? function (compiler) {
-            compiler.hooks.done.tap('Canvas:FailOnWebpackWarnings', (compilation) => {
+            compiler.hooks.done.tap('Canvas:FailOnWebpackWarnings', compilation => {
               if (compilation.warnings && compilation.warnings.length) {
                 console.error(compilation.warnings)
                 // If there's a bad import, webpack doesn't say where.
@@ -455,8 +450,8 @@ module.exports = {
             openAnalyzer: false,
             generateStatsFile: false,
             statsOptions: {
-              source: false
-            }
+              source: false,
+            },
           })
         : []
     )
@@ -469,7 +464,7 @@ module.exports = {
             // include_js_bundles from rails.
             new webpack.IgnorePlugin({
               resourceRegExp: /^\.\/locale$/,
-              contextRegExp: /moment$/
+              contextRegExp: /moment$/,
             }),
 
             // outputs a json file so Rails knows which hash fingerprints to add
@@ -478,10 +473,10 @@ module.exports = {
             new WebpackManifestPlugin({
               fileName: 'webpack-manifest.json',
               publicPath: '',
-              useEntryKeys: true
+              useEntryKeys: true,
             }),
           ]
-    )
+    ),
 }
 
 // since istanbul-instrumenter-loader adds so much overhead, only use it when generating crystalball map
@@ -505,15 +500,15 @@ if (process.env.CRYSTALBALL_MAP === '1') {
     exclude: [/test\//, /spec/],
     use: {
       loader: 'coverage-istanbul-loader',
-      options: {esModules: true, produceSourceMap: true}
+      options: {esModules: true, produceSourceMap: true},
     },
-    enforce: 'post'
+    enforce: 'post',
   })
 }
 
 function globPlugins(pattern) {
   return glob.sync(`gems/plugins/*/${pattern}`, {
     absolute: true,
-    cwd: canvasDir
+    cwd: canvasDir,
   })
 }

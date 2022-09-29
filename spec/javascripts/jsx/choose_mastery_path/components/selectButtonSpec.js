@@ -25,7 +25,7 @@ QUnit.module('Select Button')
 const defaultProps = () => ({
   isSelected: false,
   isDisabled: false,
-  onSelect: () => {}
+  onSelect: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<SelectButton {...props} />)

@@ -32,10 +32,10 @@ const defaultProps = () => ({
         upper_bound: 1.0,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
+      students: [],
     },
     {
       scoring_range: {
@@ -45,10 +45,10 @@ const defaultProps = () => ({
         upper_bound: 0.7,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
+      students: [],
     },
     {
       scoring_range: {
@@ -58,11 +58,11 @@ const defaultProps = () => ({
         upper_bound: 0.4,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
-    }
+      students: [],
+    },
   ],
   enrolled: 10,
   assignment: {
@@ -72,11 +72,11 @@ const defaultProps = () => ({
     points_possible: 15,
     grading_type: 'points',
     submission_types: 'on_paper',
-    grading_scheme: null
+    grading_scheme: null,
   },
   isLoading: false,
   selectRange: () => {},
-  openSidebar: () => {}
+  openSidebar: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<BreakdownGraph {...props} />)

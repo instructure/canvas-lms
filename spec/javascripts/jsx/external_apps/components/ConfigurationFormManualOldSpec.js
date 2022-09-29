@@ -40,7 +40,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 QUnit.module('ExternalApps.ConfigurationFormManual', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('customFieldsToMultiLine', () => {
@@ -54,9 +54,9 @@ test('customFieldsToMultiLine', () => {
     customFields: {
       a: 1,
       b: 2,
-      c: 3
+      c: 3,
     },
-    description: 'My awesome app!'
+    description: 'My awesome app!',
   }
   const component = renderComponent(data)
   equal(component.customFieldsToMultiLine(), 'a=1\nb=2\nc=3')
@@ -71,14 +71,14 @@ test('isValid when not valid', () => {
     domain: '',
     privacyLevel: '',
     customFields: {},
-    description: ''
+    description: '',
   }
   const component = renderComponent(data)
   ok(!component.isValid())
   deepEqual(component.state.errors, {
     name: 'This field is required',
     url: 'Either the url or domain should be set.',
-    domain: 'Either the url or domain should be set.'
+    domain: 'Either the url or domain should be set.',
   })
 })
 
@@ -91,7 +91,7 @@ test('isValid when valid', () => {
     domain: '',
     privacyLevel: '',
     customFields: {},
-    description: ''
+    description: '',
   }
   const component = renderComponent(data)
   ok(component.isValid())
@@ -107,7 +107,7 @@ test('sets verifyUniqueness to true', () => {
     domain: '',
     privacyLevel: '',
     customFields: {},
-    description: ''
+    description: '',
   }
   const expectedData = {
     name: 'My App',
@@ -118,7 +118,7 @@ test('sets verifyUniqueness to true', () => {
     privacyLevel: '',
     customFields: '',
     description: '',
-    verifyUniqueness: 'true'
+    verifyUniqueness: 'true',
   }
   const component = renderComponent(data)
   deepEqual(component.getFormData(), expectedData)

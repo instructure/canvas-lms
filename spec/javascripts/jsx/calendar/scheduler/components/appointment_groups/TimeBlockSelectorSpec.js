@@ -30,12 +30,12 @@ QUnit.module('TimeBlockSelector', {
   setup() {
     props = {
       timeData: [],
-      onChange() {}
+      onChange() {},
     }
   },
   teardown() {
     props = null
-  }
+  },
 })
 
 test('it renders', () => {
@@ -59,7 +59,7 @@ test('handleSlotDivision divides slots and adds new rows to the selector', () =>
   newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
   newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
   component.setState({
-    timeBlockRows: [newRow, {timeData: {startTime: null, endTime: null}}]
+    timeBlockRows: [newRow, {timeData: {startTime: null, endTime: null}}],
   })
   component.handleSlotDivision()
   equal(component.state.timeBlockRows.length, 6)
@@ -114,7 +114,7 @@ test('calls onChange when there are modifications made', () => {
   newRow.timeData.startTime = new Date('Oct 26 2016 10:00')
   newRow.timeData.endTime = new Date('Oct 26 2016 15:00')
   component.setState({
-    timeBlockRows: [newRow]
+    timeBlockRows: [newRow],
   })
   ok(props.onChange.called)
 })

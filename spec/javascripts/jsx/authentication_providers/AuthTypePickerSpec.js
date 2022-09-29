@@ -20,7 +20,10 @@ import React from 'react'
 import AuthTypePicker from 'ui/features/authentication_providers/react/AuthTypePicker.js'
 import {mount} from 'enzyme'
 
-const authTypes = [{name: 'TypeOne', value: '1'}, {name: 'TypeTwo', value: '2'}]
+const authTypes = [
+  {name: 'TypeOne', value: '1'},
+  {name: 'TypeTwo', value: '2'},
+]
 
 QUnit.module('AuthTypePicker')
 

@@ -32,7 +32,7 @@ QUnit.module('submitHtmlForm', {
     md5 = '0123456789abcdef0123456789abcdef'
     csrfToken = 'csrftoken'
     sandbox.stub(jQuery, 'cookie').returns(csrfToken)
-  }
+  },
 })
 
 function getForm() {

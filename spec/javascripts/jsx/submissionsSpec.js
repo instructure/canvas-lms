@@ -29,7 +29,7 @@ QUnit.module('submissions', {
     ENV.SUBMISSION = {
       user_id: 1,
       assignment_id: 27,
-      submission: {}
+      submission: {},
     }
     $('#fixtures').html(`
       <div id='preview_frame'>
@@ -70,7 +70,7 @@ QUnit.module('submissions', {
     teardown()
     fakeENV.teardown()
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('comment_change posts to update_submission_url', () => {

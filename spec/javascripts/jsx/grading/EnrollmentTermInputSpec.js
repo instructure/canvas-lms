@@ -38,7 +38,7 @@ QUnit.module('EnrollmentTermInput', {
           workflowState: 'active',
           gradingPeriodGroupId: '65',
           sisTermId: null,
-          displayName: 'Fall 2009 - Art'
+          displayName: 'Fall 2009 - Art',
         },
         {
           id: '2',
@@ -49,7 +49,7 @@ QUnit.module('EnrollmentTermInput', {
           workflowState: 'active',
           gradingPeriodGroupId: '62',
           sisTermId: null,
-          displayName: 'Term created Oct 27, 2015'
+          displayName: 'Term created Oct 27, 2015',
         },
         {
           id: '5',
@@ -60,11 +60,11 @@ QUnit.module('EnrollmentTermInput', {
           workflowState: 'active',
           gradingPeriodGroupId: '64',
           sisTermId: null,
-          displayName: 'Term starting Jun 6, 2016'
-        }
+          displayName: 'Term starting Jun 6, 2016',
+        },
       ],
       selectedIDs: ['2'],
-      setSelectedEnrollmentTermIDs() {}
+      setSelectedEnrollmentTermIDs() {},
     }
 
     const element = React.createElement(Input, _.defaults(props, defaultProps))
@@ -73,23 +73,23 @@ QUnit.module('EnrollmentTermInput', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test("displays 'No unassigned terms' if there are no selectable terms", function() {
+test("displays 'No unassigned terms' if there are no selectable terms", function () {
   const enrollmentTermInput = this.renderComponent({enrollmentTerms: [], selectedIDs: []})
   const header = findRenderedDOMComponentWithClass(enrollmentTermInput, 'ic-tokeninput-header')
   const title = ReactDOM.findDOMNode(header).textContent
   equal(title, 'No unassigned terms')
 })
 
-test('selectedEnrollmentTerms uses the enrollment term display name', function() {
+test('selectedEnrollmentTerms uses the enrollment term display name', function () {
   const enrollmentTermInput = this.renderComponent()
   const termNames = _.pluck(enrollmentTermInput.selectedEnrollmentTerms(), 'name')
   propEqual(termNames, ['Term created Oct 27, 2015'])
 })
 
-test('selectableOptions uses the enrollment term display name', function() {
+test('selectableOptions uses the enrollment term display name', function () {
   const enrollmentTermInput = this.renderComponent()
   const options = enrollmentTermInput.selectableOptions('active')
   const termNames = _.map(options, option => option.props.children)

@@ -27,7 +27,7 @@ QUnit.module('CanvasCropper', hooks => {
     const blob = dataURItoBlob(filedata)
     file = new File([blob], 'test.jpg', {
       type: 'image/jpeg',
-      lastModified: Date.now()
+      lastModified: Date.now(),
     })
     wrapper = mount(<Cropper imgFile={file} width={100} height={100} />)
   })
@@ -60,10 +60,7 @@ function dataURItoBlob(dataURI) {
   const byteString = atob(dataURI.split(',')[1])
 
   // separate out the mime component
-  const mimeString = dataURI
-    .split(',')[0]
-    .split(':')[1]
-    .split(';')[0]
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
 
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length)

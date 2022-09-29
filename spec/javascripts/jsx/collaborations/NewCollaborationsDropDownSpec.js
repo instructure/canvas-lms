@@ -24,7 +24,7 @@ import NewCollaborationsDropDown from 'ui/features/lti_collaborations/react/NewC
 QUnit.module('NewCollaborationsDropDown')
 
 const defaultProps = {
-  ltiCollaborators: [{name: 'A name', id: '1'}]
+  ltiCollaborators: [{name: 'A name', id: '1'}],
 }
 
 test('renders the create-collaborations-dropdown div', () => {
@@ -56,13 +56,13 @@ test('has a dropdown if there is more than one tool', () => {
     ltiCollaborators: [
       {
         name: 'A name',
-        id: '1'
+        id: '1',
       },
       {
         name: 'Another name',
-        id: '2'
-      }
-    ]
+        id: '2',
+      },
+    ],
   }
 
   const component = TestUtils.renderIntoDocument(<NewCollaborationsDropDown {...props} />)

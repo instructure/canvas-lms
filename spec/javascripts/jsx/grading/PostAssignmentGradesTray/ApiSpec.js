@@ -30,7 +30,7 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES,
-          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: false}
+          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: false},
         },
         result: {
           data: {
@@ -39,16 +39,16 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
               progress: {
                 __typename: 'Progress',
                 _id: PROGRESS_ID,
-                state: 'queued'
-              }
-            }
-          }
-        }
+                state: 'queued',
+              },
+            },
+          },
+        },
       },
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES,
-          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: true}
+          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: true},
         },
         result: {
           data: {
@@ -57,26 +57,26 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
               progress: {
                 __typename: 'Progress',
                 _id: PROGRESS_ID,
-                state: 'queued'
-              }
-            }
-          }
-        }
+                state: 'queued',
+              },
+            },
+          },
+        },
       },
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES,
-          variables: {assignmentId: BAD_ASSIGNMENT_ID, gradedOnly: false}
+          variables: {assignmentId: BAD_ASSIGNMENT_ID, gradedOnly: false},
         },
         result: {
           data: null,
-          errors: [{message: 'a graphql error'}]
-        }
+          errors: [{message: 'a graphql error'}],
+        },
       },
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES_FOR_SECTIONS,
-          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: false, sectionIds: SECTION_IDS}
+          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: false, sectionIds: SECTION_IDS},
         },
         result: {
           data: {
@@ -85,16 +85,16 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
               progress: {
                 __typename: 'Progress',
                 _id: PROGRESS_ID,
-                state: 'queued'
-              }
-            }
-          }
-        }
+                state: 'queued',
+              },
+            },
+          },
+        },
       },
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES_FOR_SECTIONS,
-          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: true, sectionIds: SECTION_IDS}
+          variables: {assignmentId: ASSIGNMENT_ID, gradedOnly: true, sectionIds: SECTION_IDS},
         },
         result: {
           data: {
@@ -103,22 +103,22 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
               progress: {
                 __typename: 'Progress',
                 _id: PROGRESS_ID,
-                state: 'queued'
-              }
-            }
-          }
-        }
+                state: 'queued',
+              },
+            },
+          },
+        },
       },
       {
         request: {
           query: Api.POST_ASSIGNMENT_GRADES_FOR_SECTIONS,
-          variables: {assignmentId: BAD_ASSIGNMENT_ID, gradedOnly: false, sectionIds: SECTION_IDS}
+          variables: {assignmentId: BAD_ASSIGNMENT_ID, gradedOnly: false, sectionIds: SECTION_IDS},
         },
         result: {
           data: null,
-          errors: [{message: 'a graphql error'}]
-        }
-      }
+          errors: [{message: 'a graphql error'}],
+        },
+      },
     ])
   })
 
@@ -151,7 +151,7 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
   QUnit.module('.postAssignmentGradesForSections()', () => {
     test('accepts an optional gradedOnly argument', async () => {
       const progress = await Api.postAssignmentGradesForSections(ASSIGNMENT_ID, SECTION_IDS, {
-        gradedOnly: true
+        gradedOnly: true,
       })
       const expectedProgress = {id: PROGRESS_ID, workflowState: 'queued'}
       deepEqual(progress, expectedProgress)
@@ -188,16 +188,16 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
       const responseData = {
         results: {submission_ids: ['201', '202', '203']},
         url: `/api/v1/progress/${PROGRESS_ID}`,
-        workflow_state: 'completed'
+        workflow_state: 'completed',
       }
       server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
         200,
         {},
-        JSON.stringify(responseData)
+        JSON.stringify(responseData),
       ])
       const results = await Api.resolvePostAssignmentGradesStatus({
         id: PROGRESS_ID,
-        workflowState: 'queued'
+        workflowState: 'queued',
       })
       deepEqual(results.submissionIds, ['201', '202', '203'])
     })
@@ -206,12 +206,12 @@ QUnit.module('PostAssignmentGradesTray Api', suiteHooks => {
       const responseData = {
         message: 'job failed',
         url: `/api/v1/progress/${PROGRESS_ID}`,
-        workflow_state: 'failed'
+        workflow_state: 'failed',
       }
       server.respondWith('GET', `/api/v1/progress/${PROGRESS_ID}`, [
         200,
         {},
-        JSON.stringify(responseData)
+        JSON.stringify(responseData),
       ])
 
       try {

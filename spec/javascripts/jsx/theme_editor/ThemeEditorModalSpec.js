@@ -24,7 +24,7 @@ const defaultProps = {
   showProgressModal: false,
   showSubAccountProgress: false,
   progress: 0.5,
-  activeSubAccountProgresses: []
+  activeSubAccountProgresses: [],
 }
 
 QUnit.module('ThemeEditorModal Component')

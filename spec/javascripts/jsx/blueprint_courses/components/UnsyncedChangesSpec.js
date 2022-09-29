@@ -31,7 +31,7 @@ const unsyncedChanges = [
     asset_name: 'Another Discussion',
     change_type: 'deleted',
     html_url: '/courses/4/assignments/22',
-    locked: false
+    locked: false,
   },
   {
     asset_id: '96',
@@ -39,7 +39,7 @@ const unsyncedChanges = [
     asset_name: 'Bulldog.png',
     change_type: 'updated',
     html_url: '/courses/4/files/96',
-    locked: true
+    locked: true,
   },
   {
     asset_id: 'page-1',
@@ -47,8 +47,8 @@ const unsyncedChanges = [
     asset_name: 'Page 1',
     change_type: 'created',
     html_url: '/4/pages/page-1',
-    locked: false
-  }
+    locked: false,
+  },
 ]
 
 const defaultProps = {
@@ -59,13 +59,13 @@ const defaultProps = {
 
   willSendNotification: false,
   willIncludeCustomNotificationMessage: false,
-  notificationMessage: ''
+  notificationMessage: '',
 }
 const actionProps = {
   loadUnsyncedChanges: noop,
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
-  setNotificationMessage: noop
+  setNotificationMessage: noop,
 }
 
 function mockStore(props = {...defaultProps}) {

@@ -44,9 +44,12 @@ QUnit.module('SpecificSections', suiteHooks => {
       checked: false,
       disabled: false,
       onCheck: () => {},
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'},
+      ],
       sectionSelectionChanged: () => {},
-      selectedSectionIds: []
+      selectedSectionIds: [],
     }
   })
 
@@ -63,11 +66,7 @@ QUnit.module('SpecificSections', suiteHooks => {
   test('section toggle is checked when checked is true', () => {
     context.checked = true
     mountComponent()
-    ok(
-      getSectionToggleInput()
-        .getAttributeNames()
-        .includes('checked')
-    )
+    ok(getSectionToggleInput().getAttributeNames().includes('checked'))
   })
 
   test('sections are shown when checked is true', () => {

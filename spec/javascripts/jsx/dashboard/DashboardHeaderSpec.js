@@ -29,7 +29,7 @@ import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
 import {
   SHOW_K5_DASHBOARD_ROUTE,
-  showK5DashboardResponse
+  showK5DashboardResponse,
 } from '@canvas/observer-picker/react/__tests__/fixtures'
 
 const container = document.getElementById('fixtures')
@@ -62,14 +62,14 @@ FakeDashboard.propTypes = {
   planner_enabled: PropTypes.bool,
   dashboard_view: PropTypes.string,
   headerRef: PropTypes.func,
-  loadDashboardSidebar: PropTypes.func
+  loadDashboardSidebar: PropTypes.func,
 }
 
 FakeDashboard.defaultProps = {
   planner_enabled: false,
   dashboard_view: 'cards',
   headerRef: () => {},
-  loadDashboardSidebar: () => {}
+  loadDashboardSidebar: () => {},
 }
 
 let plannerStub, saveDashboardViewStub, cardLoadSpy
@@ -81,7 +81,7 @@ QUnit.module('Dashboard Header', hooks => {
       TIMEZONE: 'UTC',
       current_user: {},
       PREFERENCES: {},
-      STUDENT_PLANNER_COURSES: []
+      STUDENT_PLANNER_COURSES: [],
     }
     moxios.install()
     plannerStub = sinon.stub(DashboardHeader.prototype, 'loadPlannerComponent')
@@ -123,7 +123,7 @@ QUnit.module('Dashboard Header', hooks => {
 
       moxios.stubOnce('GET', '/api/v1/planner/items', {
         status: 200,
-        responseText: {}
+        responseText: {},
       })
       const promiseToGetNewCourseForm = import('ui/features/dashboard/jquery/util/newCourseForm')
 
@@ -282,7 +282,7 @@ QUnit.module('Dashboard Header', hooks => {
 
     moxios.stubRequest('/dashboard/view', {
       status: 500,
-      response: {error: 'Error Text'}
+      response: {error: 'Error Text'},
     })
 
     dashboardHeader.changeDashboard('cards')
@@ -338,7 +338,7 @@ QUnit.module('Dashboard Header', hooks => {
       ENV.current_user_roles = ['user', 'observer']
       ENV.OBSERVED_USERS_LIST = [
         {id: '17', name: 'bob', avatar_url: undefined},
-        {id: '19', name: 'mary', avatar_url: undefined}
+        {id: '19', name: 'mary', avatar_url: undefined},
       ]
 
       fetchMock.get(SHOW_K5_DASHBOARD_ROUTE, JSON.stringify(showK5DashboardResponse(false)))

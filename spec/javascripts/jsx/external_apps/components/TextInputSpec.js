@@ -44,7 +44,7 @@ const getDOMNodes = function (data) {
 QUnit.module('ExternalApps.TextInput', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {
@@ -54,7 +54,7 @@ test('renders', () => {
     id: 'name',
     isRequired: true,
     hintText: 'First Name',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, 'Joe')
@@ -70,7 +70,7 @@ test('renders without hint text and isRequired', () => {
     id: 'name',
     isRequired: false,
     hintText: null,
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, 'Joe')
@@ -86,7 +86,7 @@ test('renders with error hint text', () => {
     id: 'name',
     isRequired: true,
     hintText: null,
-    errors: {name: 'Must be present'}
+    errors: {name: 'Must be present'},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, '')
@@ -100,7 +100,7 @@ test('modifies state when text is entered', () => {
     id: 'name',
     isRequired: true,
     hintText: 'First Name',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   Simulate.click(inputNode)

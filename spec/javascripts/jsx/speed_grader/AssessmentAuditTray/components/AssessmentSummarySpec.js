@@ -39,7 +39,7 @@ QUnit.module('AssessmentSummary', suiteHooks => {
     tzInTest.configureAndRestoreLater({
       tz: timezone(newYork, 'America/New_York'),
       tzData: {
-        'America/New_York': newYork
+        'America/New_York': newYork,
       },
       formats: getI18nFormats(),
     })
@@ -48,13 +48,13 @@ QUnit.module('AssessmentSummary', suiteHooks => {
       anonymityDate: new Date('2015-04-04T19:00:00.000Z'),
       assignment: {
         gradesPublishedAt: '2015-05-04T16:00:00.000Z',
-        pointsPossible: 10
+        pointsPossible: 10,
       },
       finalGradeDate: new Date('2015-04-18T17:00:00.000Z'),
       overallAnonymity: FULL,
       submission: {
-        score: 9.5
-      }
+        score: 9.5,
+      },
     }
   })
 

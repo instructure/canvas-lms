@@ -24,7 +24,7 @@ import getSampleData from '../getSampleData'
 
 const defaultProps = () => ({
   subAccounts: getSampleData().subAccounts,
-  terms: getSampleData().terms
+  terms: getSampleData().terms,
 })
 let fixtures
 

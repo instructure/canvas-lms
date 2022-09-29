@@ -23,7 +23,7 @@ import CreatorEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTra
 import {
   buildAssignmentCreatedEvent,
   buildAssignmentUpdatedEvent,
-  buildEvent
+  buildEvent,
 } from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
 import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail.js'
 
@@ -41,7 +41,7 @@ QUnit.module('AssessmentAuditTray CreatorEventGroup', suiteHooks => {
     auditEvents = [
       buildAssignmentCreatedEvent({id: '4901', createdAt: '2018-09-01T12:00:00Z'}),
       buildEvent({id: '4902', userId: '1101', createdAt: '2018-09-02T12:00:00Z'}),
-      buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-02T12:00:00Z'})
+      buildEvent({id: '4903', userId: '1101', createdAt: '2018-09-02T12:00:00Z'}),
     ]
     users = [{id: '1101', name: 'Adam Jones', role: 'final_grader'}]
     externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]

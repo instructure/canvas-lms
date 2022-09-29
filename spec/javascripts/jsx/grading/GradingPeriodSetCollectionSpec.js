@@ -27,12 +27,12 @@ import GradingPeriodSetCollection from 'ui/features/account_grading_standards/re
 
 const wrapper = document.getElementById('fixtures')
 
-const assertCollapsed = function(component, setId) {
+const assertCollapsed = function (component, setId) {
   const message = `set with id: ${setId} is 'collapsed'`
   equal(component.refs[`show-grading-period-set-${setId}`].props.expanded, false, message)
 }
 
-const assertExpanded = function(component, setId) {
+const assertExpanded = function (component, setId) {
   const message = `set with id: ${setId} is 'expanded'`
   equal(component.refs[`show-grading-period-set-${setId}`].props.expanded, true, message)
 }
@@ -47,18 +47,18 @@ const exampleSet = {
       title: 'Q1',
       startDate: new Date('2015-09-01T12:00:00Z'),
       endDate: new Date('2015-10-31T12:00:00Z'),
-      closeDate: new Date('2015-10-31T12:00:00Z')
+      closeDate: new Date('2015-10-31T12:00:00Z'),
     },
     {
       id: '2',
       title: 'Q2',
       startDate: new Date('2015-11-01T12:00:00Z'),
       endDate: new Date('2015-12-31T12:00:00Z'),
-      closeDate: new Date('2015-12-31T12:00:00Z')
-    }
+      closeDate: new Date('2015-12-31T12:00:00Z'),
+    },
   ],
   permissions: {read: true, create: true, update: true, delete: true},
-  createdAt: new Date('2015-08-27T16:51:41Z')
+  createdAt: new Date('2015-08-27T16:51:41Z'),
 }
 
 const exampleSets = [
@@ -69,8 +69,8 @@ const exampleSets = [
     title: 'Spring 2016',
     gradingPeriods: [],
     permissions: {read: true, create: true, update: true, delete: true},
-    createdAt: new Date('2015-06-27T16:51:41Z')
-  }
+    createdAt: new Date('2015-06-27T16:51:41Z'),
+  },
 ]
 
 const exampleTerms = [
@@ -81,7 +81,7 @@ const exampleTerms = [
     endAt: new Date('2013-12-03T02:57:53Z'),
     createdAt: new Date('2015-10-27T16:51:41Z'),
     gradingPeriodGroupId: '2',
-    displayName: 'Fall 2013 - Art'
+    displayName: 'Fall 2013 - Art',
   },
   {
     id: '3',
@@ -90,7 +90,7 @@ const exampleTerms = [
     endAt: new Date('2014-03-03T02:58:42Z'),
     createdAt: new Date('2013-06-02T17:29:19Z'),
     gradingPeriodGroupId: '22',
-    displayName: 'Term starting Jan 3, 2014'
+    displayName: 'Term starting Jan 3, 2014',
   },
   {
     id: '4',
@@ -99,8 +99,8 @@ const exampleTerms = [
     endAt: null,
     createdAt: new Date('2014-05-02T17:29:19Z'),
     gradingPeriodGroupId: '1',
-    displayName: 'Term created May 2, 2014'
-  }
+    displayName: 'Term created May 2, 2014',
+  },
 ]
 
 const exampleProps = {
@@ -108,9 +108,9 @@ const exampleProps = {
     gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
     enrollmentTermsURL: 'api/v1/accounts/1/terms',
     deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D',
-    gradingPeriodsUpdateURL: 'api/v1/accounts/1/grading_periods/batch_update'
+    gradingPeriodsUpdateURL: 'api/v1/accounts/1/grading_periods/batch_update',
   },
-  readOnly: false
+  readOnly: false,
 }
 
 function renderComponent(props = {}) {
@@ -120,7 +120,7 @@ function renderComponent(props = {}) {
       component = ref
     },
     ...exampleProps,
-    ...props
+    ...props,
   })
   ReactDOM.render(element, wrapper)
   return component
@@ -147,10 +147,10 @@ QUnit.module('GradingPeriodSetCollection - API Data Load', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('loads enrollment terms', function() {
+test('loads enrollment terms', function () {
   const terms = this.stubTermsSuccess()
   const sets = this.stubSetsSuccess()
   const collection = renderComponent()
@@ -160,7 +160,7 @@ test('loads enrollment terms', function() {
   })
 })
 
-test('loads grading period sets', function() {
+test('loads grading period sets', function () {
   const terms = this.stubTermsSuccess()
   const sets = this.stubSetsSuccess()
   const collection = renderComponent()
@@ -170,7 +170,7 @@ test('loads grading period sets', function() {
   })
 })
 
-test('has an empty set collection if sets failed to load', function() {
+test('has an empty set collection if sets failed to load', function () {
   const terms = this.stubTermsSuccess()
   const sets = this.stubSetsFailure()
   const collection = renderComponent()
@@ -190,10 +190,10 @@ QUnit.module('GradingPeriodSetCollection', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('uses the name, start date (if no name), or creation date (if no start) for the display name', function() {
+test('uses the name, start date (if no name), or creation date (if no start) for the display name', function () {
   const collection = renderComponent()
   const expectedNames = ['Fall 2013 - Art', 'Term starting Jan 3, 2014', 'Term created May 2, 2014']
 
@@ -203,7 +203,7 @@ test('uses the name, start date (if no name), or creation date (if no start) for
   })
 })
 
-test('initially renders each set as "collapsed"', function() {
+test('initially renders each set as "collapsed"', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     assertCollapsed(collection, '1')
@@ -211,7 +211,7 @@ test('initially renders each set as "collapsed"', function() {
   })
 })
 
-test('each set "onToggleBody" property will toggle its "expanded" state', function() {
+test('each set "onToggleBody" property will toggle its "expanded" state', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     collection.refs['show-grading-period-set-1'].props.onToggleBody()
@@ -226,14 +226,14 @@ test('each set "onToggleBody" property will toggle its "expanded" state', functi
   })
 })
 
-test('does not show the new set form on initial load', function() {
+test('does not show the new set form on initial load', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     notOk(collection.refs.newSetForm)
   })
 })
 
-test('has the add new set button enabled on initial load', function() {
+test('has the add new set button enabled on initial load', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     const component = collection.refs.addSetFormButton
@@ -242,7 +242,7 @@ test('has the add new set button enabled on initial load', function() {
   })
 })
 
-test('disables the add new set button after it is clicked', function() {
+test('disables the add new set button after it is clicked', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     const component = collection.refs.addSetFormButton
@@ -252,7 +252,7 @@ test('disables the add new set button after it is clicked', function() {
   })
 })
 
-test('shows the new set form when the add new set button is clicked', function() {
+test('shows the new set form when the add new set button is clicked', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     const component = collection.refs.addSetFormButton
@@ -262,7 +262,7 @@ test('shows the new set form when the add new set button is clicked', function()
   })
 })
 
-test('closes the new set form when closeNewSetForm is called', function() {
+test('closes the new set form when closeNewSetForm is called', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     collection.closeNewSetForm()
@@ -270,7 +270,7 @@ test('closes the new set form when closeNewSetForm is called', function() {
   })
 })
 
-test('termsBelongingToActiveSets only includes terms that belong to active (non-deleted) sets', function() {
+test('termsBelongingToActiveSets only includes terms that belong to active (non-deleted) sets', function () {
   const collection = renderComponent()
 
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -281,7 +281,7 @@ test('termsBelongingToActiveSets only includes terms that belong to active (non-
   })
 })
 
-test('termsNotBelongingToActiveSets only includes terms that do not belong to active (non-deleted) sets', function() {
+test('termsNotBelongingToActiveSets only includes terms that do not belong to active (non-deleted) sets', function () {
   const collection = renderComponent()
 
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -302,13 +302,13 @@ QUnit.module('GradingPeriodSetCollection - Search', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('setAndGradingPeriodTitles returns an array of set and grading period title names', function() {
+test('setAndGradingPeriodTitles returns an array of set and grading period title names', function () {
   const set = {
     title: 'Set!',
-    gradingPeriods: [{title: 'Grading Period 1'}, {title: 'Grading Period 2'}]
+    gradingPeriods: [{title: 'Grading Period 1'}, {title: 'Grading Period 2'}],
   }
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -317,10 +317,10 @@ test('setAndGradingPeriodTitles returns an array of set and grading period title
   })
 })
 
-test('setAndGradingPeriodTitles filters out empty, null, and undefined titles', function() {
+test('setAndGradingPeriodTitles filters out empty, null, and undefined titles', function () {
   const set = {
     title: null,
-    gradingPeriods: [{title: 'Grading Period 1'}, {}, {title: 'Grading Period 2'}, {title: ''}]
+    gradingPeriods: [{title: 'Grading Period 1'}, {}, {title: 'Grading Period 2'}, {title: ''}],
   }
 
   const collection = renderComponent()
@@ -330,7 +330,7 @@ test('setAndGradingPeriodTitles filters out empty, null, and undefined titles', 
   })
 })
 
-test('changeSearchText calls setState if the new search text differs from the old search text', function() {
+test('changeSearchText calls setState if the new search text differs from the old search text', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     const setStateSpy = sandbox.spy(collection, 'setState')
@@ -340,7 +340,7 @@ test('changeSearchText calls setState if the new search text differs from the ol
   })
 })
 
-test('changeSearchText does not call setState if the new search text equals the old search text', function() {
+test('changeSearchText does not call setState if the new search text equals the old search text', function () {
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
     const setStateSpy = sandbox.spy(collection, 'setState')
@@ -350,7 +350,7 @@ test('changeSearchText does not call setState if the new search text equals the 
   })
 })
 
-test('searchTextMatchesTitles returns true if the search text exactly matches one of the titles', function() {
+test('searchTextMatchesTitles returns true if the search text exactly matches one of the titles', function () {
   const titles = ['hello world', 'goodbye friend']
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -359,7 +359,7 @@ test('searchTextMatchesTitles returns true if the search text exactly matches on
   })
 })
 
-test('searchTextMatchesTitles returns true if the search text is a substring of one of the titles', function() {
+test('searchTextMatchesTitles returns true if the search text is a substring of one of the titles', function () {
   const titles = ['hello world', 'goodbye friend']
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -368,7 +368,7 @@ test('searchTextMatchesTitles returns true if the search text is a substring of 
   })
 })
 
-test('searchTextMatchesTitles returns false if the search text is a not a substring of any of the titles', function() {
+test('searchTextMatchesTitles returns false if the search text is a not a substring of any of the titles', function () {
   const titles = ['hello world', 'goodbye friend']
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -377,7 +377,7 @@ test('searchTextMatchesTitles returns false if the search text is a not a substr
   })
 })
 
-test('getVisibleSets returns sets that match the search text', function() {
+test('getVisibleSets returns sets that match the search text', function () {
   const collection = renderComponent()
 
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -399,7 +399,7 @@ test('getVisibleSets returns sets that match the search text', function() {
   })
 })
 
-test('announces number of search results for screen readers', function() {
+test('announces number of search results for screen readers', function () {
   const collection = renderComponent()
 
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -413,7 +413,7 @@ test('announces number of search results for screen readers', function() {
   })
 })
 
-test('preserves the "expanded" state of each set', function() {
+test('preserves the "expanded" state of each set', function () {
   const collection = renderComponent()
 
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -432,7 +432,7 @@ test('preserves the "expanded" state of each set', function() {
   })
 })
 
-test('deserializes enrollment terms if the AJAX call is successful', function() {
+test('deserializes enrollment terms if the AJAX call is successful', function () {
   const deserializedTerm = exampleTerms[0]
   const collection = renderComponent()
 
@@ -442,7 +442,7 @@ test('deserializes enrollment terms if the AJAX call is successful', function() 
   })
 })
 
-test('uses the name, start date (if no name), or creation date (if no start) for the display name', function() {
+test('uses the name, start date (if no name), or creation date (if no start) for the display name', function () {
   const expectedNames = _.pluck(exampleTerms, 'displayName')
   const collection = renderComponent()
 
@@ -452,7 +452,7 @@ test('uses the name, start date (if no name), or creation date (if no start) for
   })
 })
 
-test('filterSetsBySelectedTerm returns all the sets if "All Terms" is selected', function() {
+test('filterSetsBySelectedTerm returns all the sets if "All Terms" is selected', function () {
   const ALL_TERMS_ID = '0'
   const selectedTermID = ALL_TERMS_ID
   const collection = renderComponent()
@@ -466,7 +466,7 @@ test('filterSetsBySelectedTerm returns all the sets if "All Terms" is selected',
   })
 })
 
-test('filterSetsBySelectedTerm filters to only show the set that the selected term belongs to', function() {
+test('filterSetsBySelectedTerm filters to only show the set that the selected term belongs to', function () {
   let selectedTermID = '1'
   const collection = renderComponent()
   return Promise.all([this.terms, this.sets]).then(() => {
@@ -495,10 +495,10 @@ QUnit.module('GradingPeriodSetCollection - Add Set', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('addGradingPeriodSet adds the set to the collection', function() {
+test('addGradingPeriodSet adds the set to the collection', function () {
   const collection = renderComponent()
 
   return Promise.all([this.sets, this.terms]).then(() => {
@@ -509,7 +509,7 @@ test('addGradingPeriodSet adds the set to the collection', function() {
   })
 })
 
-test('addGradingPeriodSet renders the new set expanded', function() {
+test('addGradingPeriodSet renders the new set expanded', function () {
   const collection = renderComponent()
 
   return Promise.all([this.sets, this.terms]).then(() => {
@@ -528,10 +528,10 @@ QUnit.module('GradingPeriodSetCollection - Delete Set', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('removeGradingPeriodSet removes the set from the collection', function() {
+test('removeGradingPeriodSet removes the set from the collection', function () {
   const collection = renderComponent()
 
   return Promise.all([this.sets, this.terms]).then(() => {
@@ -541,7 +541,7 @@ test('removeGradingPeriodSet removes the set from the collection', function() {
   })
 })
 
-test('removeGradingPeriodSet focuses on the set above the one deleted, if one exists', function() {
+test('removeGradingPeriodSet focuses on the set above the one deleted, if one exists', function () {
   const collection = renderComponent()
 
   return Promise.all([this.sets, this.terms]).then(() => {
@@ -556,7 +556,7 @@ test('removeGradingPeriodSet focuses on the set above the one deleted, if one ex
 test(
   'removeGradingPeriodSet focuses on the "+ Set of Grading Periods" button' +
     ' after deletion if there are no sets above the one that was deleted',
-  function() {
+  function () {
     const collection = renderComponent()
 
     return Promise.all([this.sets, this.terms]).then(() => {
@@ -577,10 +577,10 @@ QUnit.module('GradingPeriodSetCollection - Update Set Periods', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('updateSetPeriods updates the grading periods on the given set', function() {
+test('updateSetPeriods updates the grading periods on the given set', function () {
   const collection = renderComponent()
 
   return Promise.all([this.sets, this.terms]).then(() => {
@@ -600,10 +600,10 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('renders the "edit grading period set" when "edit grading period set" is clicked', function() {
+test('renders the "edit grading period set" when "edit grading period set" is clicked', function () {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
     notOk(
@@ -616,7 +616,7 @@ test('renders the "edit grading period set" when "edit grading period set" is cl
   })
 })
 
-test('disables other "grading period set" actions while open', function() {
+test('disables other "grading period set" actions while open', function () {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
     const {editButton} = set.refs['show-grading-period-set-1']._refs
@@ -626,7 +626,7 @@ test('disables other "grading period set" actions while open', function() {
   })
 })
 
-test('"onCancel" removes the "edit grading period set" form', function() {
+test('"onCancel" removes the "edit grading period set" form', function () {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
     const {editButton} = set.refs['show-grading-period-set-1']._refs
@@ -636,7 +636,7 @@ test('"onCancel" removes the "edit grading period set" form', function() {
   })
 })
 
-test('"onCancel" focuses on the "edit grading period set" button', function() {
+test('"onCancel" focuses on the "edit grading period set" button', function () {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
     const {editButton} = set.refs['show-grading-period-set-1']._refs
@@ -646,7 +646,7 @@ test('"onCancel" focuses on the "edit grading period set" button', function() {
   })
 })
 
-test('"onCancel" re-enables all grading period set actions', function() {
+test('"onCancel" re-enables all grading period set actions', function () {
   const set = renderComponent()
   return Promise.all([this.sets, this.terms]).then(() => {
     const {editButton} = set.refs['show-grading-period-set-1']._refs
@@ -680,10 +680,10 @@ QUnit.module('GradingPeriodSetCollection "Edit Grading Period Set - onSave"', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('removes the "edit grading period set" form', function() {
+test('removes the "edit grading period set" form', function () {
   const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
@@ -695,7 +695,7 @@ test('removes the "edit grading period set" form', function() {
   })
 })
 
-test('updates the given grading period set', function() {
+test('updates the given grading period set', function () {
   const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
@@ -707,7 +707,7 @@ test('updates the given grading period set', function() {
   })
 })
 
-test('re-enables all grading period set actions', function() {
+test('re-enables all grading period set actions', function () {
   const updatedSet = {...exampleSet, title: 'Updated Title'}
   const success = Promise.resolve(updatedSet)
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(success)
@@ -722,7 +722,7 @@ test('re-enables all grading period set actions', function() {
   })
 })
 
-test('preserves the "edit grading period set" form upon failure', function() {
+test('preserves the "edit grading period set" form upon failure', function () {
   const failure = Promise.reject(new Error('FAIL'))
   sandbox.stub(gradingPeriodSetsApi, 'update').returns(failure)
   const collection = this.renderComponent()

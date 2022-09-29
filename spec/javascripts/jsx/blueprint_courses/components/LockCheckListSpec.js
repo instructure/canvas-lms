@@ -27,10 +27,10 @@ const defaultProps = () => ({
     content: false,
     points: false,
     due_dates: false,
-    availability_dates: false
+    availability_dates: false,
   },
   lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates'],
-  formName: '[blueprint_restrictions_by_object_type]'
+  formName: '[blueprint_restrictions_by_object_type]',
 })
 
 test('renders the LockCheckList', () => {
@@ -55,8 +55,8 @@ test('selecting checkbox calls onChange', assert => {
   const checkbox = tree.find('.bcs_check_box-group Checkbox')
   checkbox.at(0).simulate('change', {
     target: {
-      checked: true
-    }
+      checked: true,
+    },
   })
   setTimeout(() => {
     equal(props.onChange.callCount, 1)
@@ -65,8 +65,8 @@ test('selecting checkbox calls onChange', assert => {
         content: true,
         points: false,
         due_dates: false,
-        availability_dates: false
-      }
+        availability_dates: false,
+      },
     ])
     done()
   }, 0)

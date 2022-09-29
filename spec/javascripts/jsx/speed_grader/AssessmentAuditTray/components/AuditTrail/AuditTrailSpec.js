@@ -38,19 +38,19 @@ QUnit.module('AssessmentAuditTray AuditTrail', suiteHooks => {
       buildEvent(
         {id: '4905', eventType: 'submission_updated', userId: '1101'},
         {grade: [null, 'A']}
-      )
+      ),
     ]
     const users = [
       {id: '1101', name: 'A sedulous pupil', role: 'student'},
       {id: '1102', name: 'A quizzical administrator', role: 'administrator'},
-      {id: '1103', name: 'A querulous final-grader', role: 'final_grader'}
+      {id: '1103', name: 'A querulous final-grader', role: 'final_grader'},
     ]
 
     const externalTools = []
     const quizzes = []
 
     props = {
-      auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes})
+      auditTrail: buildAuditTrail({auditEvents, users, externalTools, quizzes}),
     }
   })
 

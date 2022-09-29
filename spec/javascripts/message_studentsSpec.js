@@ -41,9 +41,9 @@ QUnit.module('MessageStudents dialog', hooks => {
         {name: 'Boudica', sortableName: 'Boudica', id: '1', score: 50},
         {name: 'Vercingetorix', sortableName: 'Vercingetorix', id: '2', score: 40},
         {name: 'Ariovistus', sortableName: 'Ariovistus', id: '10', score: 53},
-        {name: 'Gaius Julius Caesar', sortableName: 'Caesar, Gaius Julius', id: '20', score: 48}
+        {name: 'Gaius Julius Caesar', sortableName: 'Caesar, Gaius Julius', id: '20', score: 48},
       ],
-      title: 'My Great Course!!!'
+      title: 'My Great Course!!!',
     }
 
     fixtures = $('#fixtures')
@@ -107,7 +107,7 @@ QUnit.module('MessageStudents dialog', hooks => {
       'Ariovistus',
       'Boudica',
       'Gaius Julius Caesar',
-      'Vercingetorix'
+      'Vercingetorix',
     ])
   })
 
@@ -116,7 +116,7 @@ QUnit.module('MessageStudents dialog', hooks => {
       id: String(Number.MAX_SAFE_INTEGER + 1),
       name: 'Student From Another World',
       score: 48,
-      sortableName: 'World, Student From Another'
+      sortableName: 'World, Student From Another',
     }
     settings.students.push(crossShardStudent)
 
@@ -126,7 +126,7 @@ QUnit.module('MessageStudents dialog', hooks => {
       'Boudica',
       'Gaius Julius Caesar',
       'Vercingetorix',
-      'Student From Another World'
+      'Student From Another World',
     ])
   })
 })

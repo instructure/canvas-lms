@@ -41,7 +41,7 @@ const developerKey = {
   user_name: 'billy bob',
   vendor_code: 'b3w9w9bf',
   workflow_state: 'active',
-  test_cluster_only: true
+  test_cluster_only: true,
 }
 
 function formFieldOfTypeAndName(devKey, fieldType, name, isLtiKey) {

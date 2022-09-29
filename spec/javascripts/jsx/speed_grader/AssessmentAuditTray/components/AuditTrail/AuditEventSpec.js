@@ -34,7 +34,7 @@ QUnit.module('AssessmentAuditTray AuditEvent', suiteHooks => {
 
     props = {
       auditEvent: buildEvent({eventType: 'grades_posted'}),
-      studentAnonymity: ON
+      studentAnonymity: ON,
     }
   })
 

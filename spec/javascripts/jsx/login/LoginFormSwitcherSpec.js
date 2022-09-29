@@ -27,23 +27,23 @@ let switcher
 QUnit.module('LoginFormSwitcher', {
   setup() {
     loginFormInput = {
-      focus: sinon.stub()
+      focus: sinon.stub(),
     }
     loginForm = {
       hide: sinon.stub(),
       show: sinon.stub(),
-      find: () => loginFormInput
+      find: () => loginFormInput,
     }
     forgotPasswordFormInput = {
-      focus: sinon.stub()
+      focus: sinon.stub(),
     }
     forgotPasswordForm = {
       hide: sinon.stub(),
       show: sinon.stub(),
-      find: () => forgotPasswordFormInput
+      find: () => forgotPasswordFormInput,
     }
     switcher = new LoginFormSwitcher(loginForm, forgotPasswordForm)
-  }
+  },
 })
 
 test('switches to login', () => {

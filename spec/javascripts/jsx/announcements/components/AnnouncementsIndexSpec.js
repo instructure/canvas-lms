@@ -36,12 +36,12 @@ const makeProps = (props = {}) =>
       permissions: {
         create: true,
         manage_content: true,
-        moderate: true
+        moderate: true,
       },
       getAnnouncements() {},
       setAnnouncementSelection() {},
       deleteAnnouncements() {},
-      toggleAnnouncementsLock() {}
+      toggleAnnouncementsLock() {},
     },
     props
   )
@@ -55,14 +55,14 @@ const store = {
     permissions: {
       create: true,
       manage_content: true,
-      moderate: true
+      moderate: true,
     },
-    selectedAnnouncements: []
+    selectedAnnouncements: [],
   }),
   // we only need to define these functions so that we match the react-redux contextTypes
   // shape for a store otherwise react-redux thinks our store is invalid
   dispatch() {},
-  subscribe() {}
+  subscribe() {},
 }
 
 QUnit.module('AnnouncementsIndex component')
@@ -121,8 +121,8 @@ test('clicking announcement checkbox triggers setAnnouncementSelection with corr
     announcementSelectionChangeStart: selectSpy,
     hasLoadedAnnouncements: true,
     permissions: {
-      moderate: true
-    }
+      moderate: true,
+    },
   }
   const tree = mount(
     <Provider store={store}>
@@ -144,8 +144,8 @@ test('onManageAnnouncement shows delete modal when called with delete action', a
     announcements: sampleData.announcements,
     hasLoadedAnnouncements: true,
     permissions: {
-      moderate: true
-    }
+      moderate: true,
+    },
   }
 
   function indexRef(c) {
@@ -174,9 +174,9 @@ test('onManageAnnouncement calls toggleAnnouncementsLock when called with lock a
     announcements: sampleData.announcements,
     hasLoadedAnnouncements: true,
     permissions: {
-      moderate: true
+      moderate: true,
     },
-    toggleAnnouncementsLock: lockSpy
+    toggleAnnouncementsLock: lockSpy,
   }
 
   function indexRef(c) {

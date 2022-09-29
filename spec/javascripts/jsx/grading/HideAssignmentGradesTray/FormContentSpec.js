@@ -67,17 +67,20 @@ QUnit.module('HideAssignmentGradesTray FormContent', suiteHooks => {
       assignment: {
         anonymousGrading: false,
         gradesPublished: true,
-        ...assignment
+        ...assignment,
       },
       dismiss() {},
       hideBySections: true,
       hideBySectionsChanged() {},
       hidingGrades: false,
       onHideClick() {},
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'},
+      ],
       sectionSelectionChanged() {},
       selectedSectionIds: [],
-      ...props
+      ...props,
     }
   }
 

@@ -29,7 +29,7 @@ const allTermsProps = {
   draftFilters: {
     search_by: 'course',
     search_term: '',
-    enrollment_term_id: ''
+    enrollment_term_id: '',
   },
   errors: {},
   terms: {
@@ -38,31 +38,31 @@ const allTermsProps = {
         id: '1',
         name: 'Future Term 1',
         start_at: '2099-01-01',
-        end_at: '3099-01-01'
+        end_at: '3099-01-01',
       },
       {
         id: '2',
         name: 'Future Term 2',
-        start_at: '2099-01-01'
+        start_at: '2099-01-01',
       },
       {
         id: '3',
         name: 'Active Term 1',
         start_at: '1999-01-01',
-        end_at: '3099-01-01'
+        end_at: '3099-01-01',
       },
       {
         id: '4',
-        name: 'Term With No Start Or End 1'
+        name: 'Term With No Start Or End 1',
       },
       {
         id: '5',
         name: 'Past Term 1',
-        end_at: '1999-01-01'
-      }
+        end_at: '1999-01-01',
+      },
     ],
-    loading: false
-  }
+    loading: false,
+  },
 }
 
 QUnit.module('CoursesToolbar', suiteHooks => {
@@ -114,7 +114,7 @@ QUnit.module('CoursesToolbar', suiteHooks => {
       'Term With No Start Or End 1',
       'Future Term 1',
       'Future Term 2',
-      'Past Term 1'
+      'Past Term 1',
     ])
   })
 
