@@ -29,7 +29,7 @@ import {
   SET_CSP_INHERITED_OPTIMISTIC,
   SET_DIRTY,
   COPY_INHERITED_SUCCESS,
-  WHITELISTS_LOADED
+  WHITELISTS_LOADED,
 } from './actions'
 
 export function cspEnabled(state = false, action) {
@@ -139,5 +139,5 @@ export default combineReducers({
   cspInherited,
   isDirty,
   whitelistedDomains,
-  whitelistsHaveLoaded
+  whitelistsHaveLoaded,
 })

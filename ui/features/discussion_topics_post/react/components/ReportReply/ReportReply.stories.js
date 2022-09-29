@@ -22,7 +22,7 @@ import {ReportReply} from './ReportReply'
 export default {
   title: 'Examples/Discussion Posts/Components/ReportReply',
   component: ReportReply,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => {
@@ -33,7 +33,7 @@ export const Default = Template.bind({})
 Default.args = {
   onCloseReportModal: () => {},
   onSubmit: () => {},
-  showReportModal: true
+  showReportModal: true,
 }
 
 export const Loading = Template.bind({})
@@ -41,5 +41,5 @@ Loading.args = {
   onCloseReportModal: () => {},
   onSubmit: () => {},
   showReportModal: true,
-  isLoading: true
+  isLoading: true,
 }

@@ -35,12 +35,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'A Term'
-        }
+          name: 'A Term',
+        },
       },
       {
         id: '2',
@@ -52,12 +52,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'Ba Term'
-        }
+          name: 'Ba Term',
+        },
       },
       {
         id: '3',
@@ -69,12 +69,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'Bb Term'
-        }
+          name: 'Bb Term',
+        },
       },
       {
         id: '4',
@@ -86,12 +86,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'C Term'
-        }
+          name: 'C Term',
+        },
       },
       {
         id: '5',
@@ -103,12 +103,12 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'De Term'
-        }
+          name: 'De Term',
+        },
       },
       {
         id: '6',
@@ -120,13 +120,13 @@ describe('Account Course User Search CoursesList Sorting', () => {
         teachers: [
           {
             id: '1',
-            display_name: 'Testing Teacher'
-          }
+            display_name: 'Testing Teacher',
+          },
         ],
         term: {
-          name: 'Dz Term'
-        }
-      }
+          name: 'Dz Term',
+        },
+      },
     ],
     roles: [
       {
@@ -134,14 +134,14 @@ describe('Account Course User Search CoursesList Sorting', () => {
         course_id: '1',
         roles: [
           {
-            base_role_type: 'StudentEnrollment'
-          }
-        ]
-      }
+            base_role_type: 'StudentEnrollment',
+          },
+        ],
+      },
     ],
     sort: 'course_name',
     order: 'asc',
-    onChangeSort: () => {}
+    onChangeSort: () => {},
   }
 
   map(
@@ -150,7 +150,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
       sis_course_id: 'SIS ID',
       term: 'Term',
       teacher: 'Teacher',
-      subaccount: 'Sub-Account'
+      subaccount: 'Sub-Account',
     },
     (label, columnID) => {
       test(`sorting by ${columnID} asc puts up-arrow on ${label} only`, () => {
@@ -159,7 +159,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
             {...{
               ...coursesProps,
               sort: columnID,
-              order: 'asc'
+              order: 'asc',
             }}
           />
         )
@@ -172,7 +172,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         const expectedTip =
           {
             course_name: 'Click to sort by name descending',
-            total_students: 'Click to sort by number of students descending'
+            total_students: 'Click to sort by number of students descending',
           }[columnID] || `Click to sort by ${label} descending`
 
         expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
@@ -185,7 +185,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
             {...{
               ...coursesProps,
               sort: columnID,
-              order: 'desc'
+              order: 'desc',
             }}
           />
         )
@@ -198,7 +198,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
         const expectedTip =
           {
             course_name: 'Click to sort by name ascending',
-            total_students: 'Click to sort by number of students ascending'
+            total_students: 'Click to sort by number of students ascending',
           }[columnID] || `Click to sort by ${label} ascending`
 
         expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
@@ -211,7 +211,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
           <CoursesList
             {...{
               ...coursesProps,
-              onChangeSort
+              onChangeSort,
             }}
           />
         )
@@ -235,7 +235,7 @@ describe('Account Course User Search CoursesList Sorting', () => {
   test(`doesn't display SIS ID column if no course has one`, () => {
     const propsWithoutSISids = {
       ...coursesProps,
-      courses: coursesProps.courses.map(c => omit(c, ['sis_course_id']))
+      courses: coursesProps.courses.map(c => omit(c, ['sis_course_id'])),
     }
     const wrapper = shallow(<CoursesList {...propsWithoutSISids} />)
     expect(wrapper.findWhere(n => n.prop('label') === 'SIS ID').exists()).toBeFalsy()

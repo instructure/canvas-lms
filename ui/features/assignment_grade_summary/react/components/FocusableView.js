@@ -76,7 +76,7 @@ function bindVerticalHandler(handlers, $el) {
 
 export default class FocusableView extends Component {
   static propTypes = {
-    children: func.isRequired
+    children: func.isRequired,
   }
 
   constructor(props) {
@@ -106,7 +106,7 @@ export default class FocusableView extends Component {
       <div className="FocusableView" onKeyDown={this.handleKeyDown} style={style} tabIndex="0">
         {this.props.children({
           horizontalScrollRef: this.bindHorizontalScroll,
-          verticalScrollRef: this.bindVerticalScroll
+          verticalScrollRef: this.bindVerticalScroll,
         })}
       </div>
     )

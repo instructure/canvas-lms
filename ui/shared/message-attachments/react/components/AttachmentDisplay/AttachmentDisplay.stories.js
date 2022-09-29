@@ -25,8 +25,8 @@ export default {
   component: AttachmentDisplay,
   argTypes: {
     onReplaceItem: {action: 'Replace'},
-    onDeleteItem: {action: 'Delete'}
-  }
+    onDeleteItem: {action: 'Delete'},
+  },
 }
 
 const Template = args => <AttachmentDisplay {...args} />
@@ -35,15 +35,15 @@ export const Default = Template.bind({})
 Default.args = {
   attachments: [
     {id: '1', displayName: 'Foo Bar'},
-    {id: '2', displayName: 'Bar Foo'}
-  ]
+    {id: '2', displayName: 'Bar Foo'},
+  ],
 }
 
 export const LargeAttachmentCount = Template.bind({})
 LargeAttachmentCount.args = {
   attachments: [...Array(30).keys()].map(i => {
     return {id: i.toString(), displayName: `Attachment ${i.toString()}`}
-  })
+  }),
 }
 
 export const WithThumbnailPreview = Template.bind({})
@@ -51,11 +51,11 @@ WithThumbnailPreview.args = {
   attachments: [
     {id: '1', displayName: 'Small Thumbnail', thumbnailUrl: 'https://placehold.it/48x48'},
     {id: '2', displayName: 'Large Thumbnail', thumbnailUrl: 'https://placehold.it/480x480'},
-    {id: '3', displayName: 'Oblong Thumbnail', thumbnailUrl: 'https://placehold.it/480x48'}
-  ]
+    {id: '3', displayName: 'Oblong Thumbnail', thumbnailUrl: 'https://placehold.it/480x48'},
+  ],
 }
 
 export const WithLongDisplayName = Template.bind({})
 WithLongDisplayName.args = {
-  attachments: [{id: '1', displayName: 'longer and '.repeat(10).concat('longer')}]
+  attachments: [{id: '1', displayName: 'longer and '.repeat(10).concat('longer')}],
 }

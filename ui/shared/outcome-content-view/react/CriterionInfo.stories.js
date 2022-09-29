@@ -21,7 +21,7 @@ import CriterionInfo from './CriterionInfo'
 
 export default {
   title: 'Examples/Outcomes/CriterionInfo',
-  component: CriterionInfo
+  component: CriterionInfo,
 }
 
 const Template = args => <CriterionInfo {...args} />

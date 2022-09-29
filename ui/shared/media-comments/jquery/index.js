@@ -24,8 +24,8 @@ import htmlEscape from 'html-escape'
 import './mediaComment'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.h/, /\$\.fileSize/ */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, /\.log\(/ */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.h/, /\$\.fileSize/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, /\.log\(/ */
 import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('media_comments_publicjs')
@@ -35,18 +35,18 @@ const getDefaultExport = mod => (mod.default ? mod.default : mod)
 ;('use strict')
 let jsUploader
 
-$.mediaComment = function(command, arg1, arg2) {
+$.mediaComment = function (command, arg1, arg2) {
   const $container = $('<div/>')
   $('body').append($container.hide())
   $.fn.mediaComment.apply($container, arguments)
 }
 
 let domainRootAccountId
-$.mediaComment.partnerData = function(params) {
+$.mediaComment.partnerData = function (params) {
   const hash = {
     context_code: $.mediaComment.contextCode(),
     root_account_id: ENV.DOMAIN_ROOT_ACCOUNT_ID,
-    context_source: ENV.CONTEXT_ACTION_SOURCE
+    context_source: ENV.CONTEXT_ACTION_SOURCE,
   }
   if (ENV.SIS_SOURCE_ID) {
     hash.sis_source_id = ENV.SIS_SOURCE_ID
@@ -57,7 +57,7 @@ $.mediaComment.partnerData = function(params) {
   return JSON.stringify(hash)
 }
 
-$.mediaComment.contextCode = function() {
+$.mediaComment.contextCode = function () {
   // if we can't figure out which context we are in assume that it is the current logged in user
   return ENV.media_comment_asset_string || ENV.context_asset_string || 'user_' + ENV.current_user_id
 }
@@ -76,7 +76,7 @@ function addEntry(entry, isAudioFile) {
         type: mediaType,
         context_code: contextCode,
         title: entry.title,
-        user_entered_title: entry.userTitle
+        user_entered_title: entry.userTitle,
       },
       data => {
         pubsub.publish('media_object_created', data)
@@ -88,14 +88,14 @@ function addEntry(entry, isAudioFile) {
 }
 
 const addedEntryIds = {}
-$.mediaComment.entryAdded = function(entryId, entryType, title, userTitle) {
+$.mediaComment.entryAdded = function (entryId, entryType, title, userTitle) {
   if (!entryId || addedEntryIds[entryId]) return
   addedEntryIds[entryId] = true
   const entry = {
     mediaType: entryType,
     entryId,
     title,
-    userTitle
+    userTitle,
   }
   addEntry(entry)
 }
@@ -128,7 +128,7 @@ $.mediaComment.audio_delegate = {
   },
   uploadErrorHandler() {
     $.mediaComment.upload_delegate.uploadErrorHandler('audio')
-  }
+  },
 }
 
 // **********************************************************************
@@ -172,7 +172,7 @@ $.mediaComment.video_delegate = {
   },
   uploadErrorHandler() {
     $.mediaComment.upload_delegate.uploadErrorHandler('video')
-  }
+  },
 }
 
 // **********************************************************************
@@ -190,9 +190,7 @@ $.mediaComment.upload_delegate = {
     if (files.length == 0) {
       return
     }
-    $('#media_upload_progress')
-      .css('visibility', 'visible')
-      .progressbar({value: 1})
+    $('#media_upload_progress').css('visibility', 'visible').progressbar({value: 1})
     $('#media_upload_submit')
       .attr('disabled', true)
       .text(I18n.t('messages.submitting', 'Submitting Media File...'))
@@ -284,12 +282,12 @@ $.mediaComment.upload_delegate = {
     $('#media_upload_feedback').css('visibility', 'visible')
     $('#audio_upload_holder').css('visibility', 'hidden')
     $('#video_upload_holder').css('visibility', 'hidden')
-  }
+  },
 }
 
 let reset_selectors = false
 let lastInit = null
-$.mediaComment.init = function(mediaType, opts) {
+$.mediaComment.init = function (mediaType, opts) {
   require.ensure(
     [],
     () => {
@@ -305,7 +303,7 @@ $.mediaComment.init = function(mediaType, opts) {
       }
       const defaultTitle =
         opts.defaultTitle || user_name || I18n.t('titles.media_contribution', 'Media Contribution')
-      const mediaCommentReady = function() {
+      const mediaCommentReady = function () {
         let ks, uid
         if (INST.kalturaSettings.js_uploader) {
           ks = jsUploader.getKs()
@@ -319,25 +317,17 @@ $.mediaComment.init = function(mediaType, opts) {
           title: I18n.t('titles.record_upload_media_comment', 'Record/Upload Media Comment'),
           width: 560,
           height: 475,
-          modal: true
+          modal: true,
         })
         $dialog.dialog('option', 'close', () => {
-          $('#audio_record')
-            .before("<div id='audio_record'/>")
-            .remove()
-          $('#video_record')
-            .before("<div id='video_record'/>")
-            .remove()
+          $('#audio_record').before("<div id='audio_record'/>").remove()
+          $('#video_record').before("<div id='video_record'/>").remove()
           if (opts && opts.close && $.isFunction(opts.close)) {
             opts.close.call($dialog)
           }
         })
-        $('#audio_record')
-          .before("<div id='audio_record'/>")
-          .remove()
-        $('#video_record')
-          .before("<div id='video_record'/>")
-          .remove()
+        $('#audio_record').before("<div id='audio_record'/>").remove()
+        $('#video_record').before("<div id='video_record'/>").remove()
 
         if (mediaType == 'video') {
           $('#video_record_option').click()
@@ -385,7 +375,7 @@ $.mediaComment.init = function(mediaType, opts) {
             partner_data: $.mediaComment.partnerData(),
             entryName: temporaryName,
             soundcodec: 'Speex',
-            autoPreview: '0'
+            autoPreview: '0',
           }
 
           var params = {
@@ -396,7 +386,7 @@ $.mediaComment.init = function(mediaType, opts) {
             allowScriptAccess: 'sameDomain',
             type: 'application/x-shockwave-flash',
             pluginspage: 'http://www.adobe.com/go/getflashplayer',
-            wmode: 'opaque'
+            wmode: 'opaque',
           }
           $('#audio_record').text(
             I18n.t('messages.flash_required_record_audio', 'Flash required for recording audio.')
@@ -447,7 +437,7 @@ $.mediaComment.init = function(mediaType, opts) {
           partnerData: $.mediaComment.partnerData(),
           partner_data: $.mediaComment.partnerData(),
           uiConfId: INST.kalturaSettings.upload_ui_conf,
-          jsDelegate: '$.mediaComment.audio_delegate'
+          jsDelegate: '$.mediaComment.audio_delegate',
         }
 
         const params = {
@@ -458,7 +448,7 @@ $.mediaComment.init = function(mediaType, opts) {
           allowScriptAccess: 'always',
           type: 'application/x-shockwave-flash',
           pluginspage: 'http://www.adobe.com/go/getflashplayer',
-          wmode: 'transparent'
+          wmode: 'transparent',
         }
         $('#audio_upload').text(
           I18n.t('messages.flash_required_upload_audio', 'Flash required for uploading audio.')
@@ -601,27 +591,23 @@ $.mediaComment.init = function(mediaType, opts) {
           (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
           (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
         ) {
-          import('@canvas/media-recorder').then(
-            ({default: renderCanvasMediaRecorder}) => {
-              let tryToRenderInterval
-              const renderFunc = () => {
-                const e = document.getElementById('record_media_tab')
-                if (e) {
-                  renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
-                  clearInterval(tryToRenderInterval)
-                }
+          import('@canvas/media-recorder').then(({default: renderCanvasMediaRecorder}) => {
+            let tryToRenderInterval
+            const renderFunc = () => {
+              const e = document.getElementById('record_media_tab')
+              if (e) {
+                renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+                clearInterval(tryToRenderInterval)
               }
-              tryToRenderInterval = setInterval(renderFunc, 10)
             }
-          )
+            tryToRenderInterval = setInterval(renderFunc, 10)
+          })
         }
       }
 
       const now = new Date()
       if (now - lastInit > 300000) {
-        $('#media_comment_dialog')
-          .dialog('close')
-          .remove()
+        $('#media_comment_dialog').dialog('close').remove()
       }
       lastInit = now
 
@@ -634,7 +620,7 @@ $.mediaComment.init = function(mediaType, opts) {
           resizable: false,
           width: 470,
           height: 300,
-          modal: true
+          modal: true,
         })
 
         // **********************************************************************
@@ -668,9 +654,11 @@ $.mediaComment.init = function(mediaType, opts) {
         // **********************************************************************
         // Load dialog html
         // **********************************************************************
-        var checkForKS = function() {
+        var checkForKS = function () {
           if ($div.data('ks')) {
-            const mediaCommentsTemplate = getDefaultExport(require('../jst/MediaComments.handlebars'))
+            const mediaCommentsTemplate = getDefaultExport(
+              require('../jst/MediaComments.handlebars')
+            )
             $div.html(mediaCommentsTemplate())
             require('jqueryui/tabs')
             $div
@@ -695,7 +683,7 @@ $.mediaComment.init = function(mediaType, opts) {
   )
 } // End of init function
 
-$(document).ready(function() {
+$(document).ready(function () {
   $(document).bind('reset_media_comment_forms', () => {
     $('#audio_record_holder_message,#video_record_holder_message')
       .removeClass('saving')
@@ -734,7 +722,7 @@ $(document).ready(function() {
   $('#media_upload_submit').live('click', event => {
     $.mediaComment.upload_delegate.submit()
   })
-  $('#video_record_option,#audio_record_option').live('click', function(event) {
+  $('#video_record_option,#audio_record_option').live('click', function (event) {
     event.preventDefault()
     $('#video_record_option,#audio_record_option').removeClass('selected_option')
     $(this).addClass('selected_option')
@@ -778,14 +766,12 @@ $(document).bind('media_recording_error', () => {
     )
 })
 
-window.mediaCommentCallback = function(results) {
+window.mediaCommentCallback = function (results) {
   _.each(results, addEntry)
-  $('#media_comment_create_dialog')
-    .empty()
-    .dialog('close')
+  $('#media_comment_create_dialog').empty().dialog('close')
 }
 
-window.beforeAddEntry = function() {
+window.beforeAddEntry = function () {
   const attemptId = Math.random()
   $.mediaComment.lastAddAttemptId = attemptId
   setTimeout(() => {
@@ -795,13 +781,13 @@ window.beforeAddEntry = function() {
   }, 30000)
   $('#audio_record_holder_message,#video_record_holder_message').addClass('saving')
 }
-window.addEntryFail = function() {
+window.addEntryFail = function () {
   $(document).triggerHandler('media_recording_error')
 }
-window.addEntryFailed = function() {
+window.addEntryFailed = function () {
   $(document).triggerHandler('media_recording_error')
 }
-window.addEntryComplete = function(entries) {
+window.addEntryComplete = function (entries) {
   $.mediaComment.lastAddAttemptId = null
   $('#audio_record_holder_message,#video_record_holder_message').removeClass('saving')
   try {
@@ -812,9 +798,7 @@ window.addEntryComplete = function(entries) {
     for (let idx = 0; idx < entries.length; idx++) {
       const entry = entries[idx]
       if ($('#media_record_tabs').tabs('option', 'selected') == 0) {
-        userTitle = $('#video_record_title,#audio_record_title')
-          .filter(':visible:first')
-          .val()
+        userTitle = $('#video_record_title,#audio_record_title').filter(':visible:first').val()
       } else if ($('#media_record_tabs').tabs('option', 'selected') == 1) {
       }
       if (entry.entryType == 1 && $('#audio_record_option').hasClass('selected_option')) {

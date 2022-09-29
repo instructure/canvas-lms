@@ -26,7 +26,10 @@ import {createPaginatedReducer} from '@canvas/pagination/redux/actions'
 
 const MIN_SEATCH_LENGTH = 3
 
-const identity = (defaultState = null) => state => (state === undefined ? defaultState : state)
+const identity =
+  (defaultState = null) =>
+  state =>
+    state === undefined ? defaultState : state
 
 const reduceAnnouncementsPagination = createPaginatedReducer('announcements')
 
@@ -37,7 +40,7 @@ const reduceItems = handleActions(
       return state.map(item =>
         successIds.includes(item.id) ? {...item, locked: action.payload.locked} : item
       )
-    }
+    },
   },
   []
 )
@@ -51,8 +54,8 @@ function reduceCurrentPage(currentPage) {
     ...announcements,
     pages: {
       ...announcements.pages,
-      [currentPage]: reducePage(announcements.pages[currentPage], action)
-    }
+      [currentPage]: reducePage(announcements.pages[currentPage], action),
+    },
   })
 }
 
@@ -76,7 +79,7 @@ export default combineReducers({
   atomFeedUrl: identity(null),
   isToggleLocking: handleActions(
     {
-      [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING]: (state, action) => action.payload
+      [actionTypes.SET_ANNOUNCEMENTS_IS_LOCKING]: (state, action) => action.payload,
     },
     false
   ),
@@ -97,7 +100,7 @@ export default combineReducers({
           } else {
             return term
           }
-        }
+        },
       },
       ''
     ),
@@ -110,10 +113,10 @@ export default combineReducers({
           } else {
             return filter
           }
-        }
+        },
       },
       'all'
-    )
+    ),
   }),
   selectedAnnouncements: handleActions(
     {
@@ -125,7 +128,7 @@ export default combineReducers({
         }
       },
       [actionTypes.CLEAR_ANNOUNCEMENT_SELECTIONS]: () => [],
-      [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => []
+      [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => [],
     },
     []
   ),
@@ -133,7 +136,7 @@ export default combineReducers({
     {
       [actionTypes.LOCK_ANNOUNCEMENTS_START]: () => true,
       [actionTypes.LOCK_ANNOUNCEMENTS_SUCCESS]: () => false,
-      [actionTypes.LOCK_ANNOUNCEMENTS_FAIL]: () => false
+      [actionTypes.LOCK_ANNOUNCEMENTS_FAIL]: () => false,
     },
     false
   ),
@@ -141,7 +144,7 @@ export default combineReducers({
     {
       [actionTypes.DELETE_ANNOUNCEMENTS_START]: () => true,
       [actionTypes.DELETE_ANNOUNCEMENTS_SUCCESS]: () => false,
-      [actionTypes.DELETE_ANNOUNCEMENTS_FAIL]: () => false
+      [actionTypes.DELETE_ANNOUNCEMENTS_FAIL]: () => false,
     },
     false
   ),
@@ -150,7 +153,7 @@ export default combineReducers({
       {
         [actionTypes.ADD_EXTERNAL_FEED_START]: () => true,
         [actionTypes.ADD_EXTERNAL_FEED_FAIL]: () => false,
-        [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: () => false
+        [actionTypes.ADD_EXTERNAL_FEED_SUCCESS]: () => false,
       },
       false
     ),
@@ -158,7 +161,7 @@ export default combineReducers({
       {
         [actionTypes.DELETE_EXTERNAL_FEED_START]: () => true,
         [actionTypes.DELETE_EXTERNAL_FEED_FAIL]: () => false,
-        [actionTypes.DELETE_EXTERNAL_FEED_SUCCESS]: () => false
+        [actionTypes.DELETE_EXTERNAL_FEED_SUCCESS]: () => false,
       },
       false
     ),
@@ -193,7 +196,7 @@ export default combineReducers({
             return state
           }
           return removedState
-        }
+        },
       },
       []
     ),
@@ -201,11 +204,11 @@ export default combineReducers({
       {
         [actionTypes.LOADING_EXTERNAL_FEED_START]: () => false,
         [actionTypes.LOADING_EXTERNAL_FEED_SUCCESS]: () => true,
-        [actionTypes.LOADING_EXTERNAL_FEED_FAIL]: () => true
+        [actionTypes.LOADING_EXTERNAL_FEED_FAIL]: () => true,
       },
       false
-    )
+    ),
   }),
   notifications: reduceNotifications,
-  announcementsLocked: identity(false)
+  announcementsLocked: identity(false),
 })

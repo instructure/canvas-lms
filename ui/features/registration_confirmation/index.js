@@ -61,13 +61,10 @@ $(() => {
     })
   }
 
-  $registration_form
-    .find(':text:first')
-    .focus()
-    .select()
+  $registration_form.find(':text:first').focus().select()
   $registration_form.formSubmit({
     disableWhileLoading: 'spin_on_success',
     errorFormatter: registrationErrors,
-    success: data => (location.href = data.url || '/')
+    success: data => (location.href = data.url || '/'),
   })
 })

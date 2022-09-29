@@ -29,7 +29,7 @@ describe('ImportantDateItem', () => {
     color: '#AAABBB',
     type: 'text_entry',
     url: 'http://localhost/paper',
-    ...overrides
+    ...overrides,
   })
 
   it('renders the context name', () => {

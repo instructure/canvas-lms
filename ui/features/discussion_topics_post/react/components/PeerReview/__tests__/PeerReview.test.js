@@ -30,7 +30,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -39,7 +39,7 @@ describe('PeerReview', () => {
   describe('desktop', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        desktop: {maxWidth: '1000px'}
+        desktop: {maxWidth: '1000px'},
       }))
     })
     it('displays the correct message when the review is assigned', () => {
@@ -47,7 +47,7 @@ describe('PeerReview', () => {
         dueAtDisplayText: 'Jan 26 11:49pm',
         revieweeName: 'Morty Smith',
         reviewLinkUrl: '#',
-        workflowState: 'assigned'
+        workflowState: 'assigned',
       }
       const {getByText} = render(<PeerReview {...props} />)
 
@@ -58,7 +58,7 @@ describe('PeerReview', () => {
       const props = {
         revieweeName: 'Morty Smith',
         reviewLinkUrl: '#',
-        workflowState: 'assigned'
+        workflowState: 'assigned',
       }
       const {getByText} = render(<PeerReview {...props} />)
 
@@ -68,7 +68,7 @@ describe('PeerReview', () => {
     it('displays the correct message when the review is completed', () => {
       const props = {
         revieweeName: 'Rick Sanchez',
-        workflowState: 'completed'
+        workflowState: 'completed',
       }
       const {getByText} = render(<PeerReview {...props} />)
 
@@ -79,7 +79,7 @@ describe('PeerReview', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1000px'}
+        mobile: {maxWidth: '1000px'},
       }))
     })
     it('displays the correct message when the review is assigned', () => {
@@ -87,7 +87,7 @@ describe('PeerReview', () => {
         dueAtDisplayText: '2021-07-03T23:59:59-06:00',
         revieweeName: 'Morty Smith',
         reviewLinkUrl: '#',
-        workflowState: 'assigned'
+        workflowState: 'assigned',
       }
       const {getByText} = render(<PeerReview {...props} />)
 
@@ -98,7 +98,7 @@ describe('PeerReview', () => {
       const props = {
         revieweeName: 'Morty Smith',
         reviewLinkUrl: '#',
-        workflowState: 'assigned'
+        workflowState: 'assigned',
       }
       const {getByText} = render(<PeerReview {...props} />)
 
@@ -108,7 +108,7 @@ describe('PeerReview', () => {
     it('displays the correct message when the review is completed', () => {
       const props = {
         revieweeName: 'Rick Sanchez',
-        workflowState: 'completed'
+        workflowState: 'completed',
       }
       const {getByText} = render(<PeerReview {...props} />)
 

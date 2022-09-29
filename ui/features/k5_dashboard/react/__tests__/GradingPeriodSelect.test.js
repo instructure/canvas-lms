@@ -25,7 +25,7 @@ import {GRADING_PERIODS} from '@canvas/k5/react/__tests__/fixtures'
 const defaultProps = {
   gradingPeriods: GRADING_PERIODS,
   handleSelectGradingPeriod: () => {},
-  selectedGradingPeriodId: ''
+  selectedGradingPeriodId: '',
 }
 
 describe('GradingPeriodSelect', () => {

@@ -36,7 +36,7 @@ class LtiThumbnailLauncher {
       src: element.attr('href'),
       allowfullscreen: '',
       width: placement.displayWidth || 500,
-      height: placement.displayHeight || 500
+      height: placement.displayHeight || 500,
     })
     element.replaceWith(iframe)
   }

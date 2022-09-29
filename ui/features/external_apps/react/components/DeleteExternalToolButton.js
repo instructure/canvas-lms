@@ -30,11 +30,11 @@ export default class DeleteExternalToolButton extends React.Component {
     tool: PropTypes.shape({name: PropTypes.string}).isRequired,
     returnFocus: PropTypes.func.isRequired,
     canDelete: PropTypes.bool.isRequired,
-    canAddEdit: PropTypes.bool.isRequired
+    canAddEdit: PropTypes.bool.isRequired,
   }
 
   state = {
-    modalIsOpen: false
+    modalIsOpen: false,
   }
 
   isDeleting = false

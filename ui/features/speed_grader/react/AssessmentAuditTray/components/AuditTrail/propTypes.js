@@ -21,18 +21,18 @@ import {arrayOf, bool, instanceOf, oneOf, shape, string} from 'prop-types'
 import {auditEventStudentAnonymityStates, overallAnonymityStates} from '../../AuditTrailHelpers'
 
 export const auditEvent = shape({
-  eventType: string.isRequired
+  eventType: string.isRequired,
 })
 
 export const auditEventInfo = {
   auditEvent: auditEvent.isRequired,
-  studentAnonymity: oneOf(Object.values(auditEventStudentAnonymityStates)).isRequired
+  studentAnonymity: oneOf(Object.values(auditEventStudentAnonymityStates)).isRequired,
 }
 
 export const dateEventGroup = shape({
   auditEvents: arrayOf(shape(auditEventInfo)).isRequired,
   startDate: instanceOf(Date).isRequired,
-  startDateKey: string.isRequired
+  startDateKey: string.isRequired,
 })
 
 export const creator = shape({
@@ -40,13 +40,13 @@ export const creator = shape({
   key: string.isRequired,
   name: string.isRequired,
   role: string.isRequired,
-  type: string.isRequired
+  type: string.isRequired,
 })
 
 export const creatorEventGroup = shape({
   anonymousOnly: bool.isRequired,
   creator: creator.isRequired,
-  dateEventGroups: arrayOf(dateEventGroup).isRequired
+  dateEventGroups: arrayOf(dateEventGroup).isRequired,
 })
 
 export const anonymityDate = instanceOf(Date)
@@ -57,5 +57,5 @@ export const auditTrail = shape({
   anonymityDate,
   finalGradeDate: finalGradeDate.isRequired,
   overallAnonymity: overallAnonymity.isRequired,
-  creatorEventGroups: arrayOf(creatorEventGroup).isRequired
+  creatorEventGroups: arrayOf(creatorEventGroup).isRequired,
 })

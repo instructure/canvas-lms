@@ -45,7 +45,7 @@ class QuestionBankPage {
       setQuizMastery: true,
       shouldImport: false,
       disableGroupImport: true,
-      rootOutcomeGroup: this.rootOutcomeGroup
+      rootOutcomeGroup: this.rootOutcomeGroup,
     })
     this.$els.dialog.on('import', this.onOutcomeImport)
   }
@@ -68,7 +68,7 @@ class QuestionBankPage {
       const $outcome = $(o)
       const [id, percent] = Array.from([
         $outcome.data('id'),
-        $outcome.getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold / 100.0
+        $outcome.getTemplateData({textValues: ['mastery_threshold']}).mastery_threshold / 100.0,
       ])
       if (id !== outcome.get('id')) {
         return [id, percent]

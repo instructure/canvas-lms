@@ -58,7 +58,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
           <hr role="presentation" style={{marginTop: '0'}} />
         </View>
       )}
-      <List isUnstyled margin="small 0" itemSpacing="small">
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
         {nonFeaturedLinks
           .map(link => {
             const has_new_tag = link.is_new && featuredLinksEnabled
@@ -106,7 +106,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                       {I18n.t('Show Welcome Tour')}
                     </Link>
                   </View>
-                </List.Item>
+                </List.Item>,
               ]
           )
           .concat(
@@ -120,7 +120,7 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
                 <Link isWithinText={false} href="/accounts/self/settings#custom_help_link_settings">
                   {I18n.t('Customize this menu')}
                 </Link>
-              </List.Item>
+              </List.Item>,
             ]
           )
           .filter(Boolean)}
@@ -138,15 +138,15 @@ HelpLinks.propTypes = {
       subtext: string,
       feature_headline: string,
       is_featured: bool,
-      is_new: bool
+      is_new: bool,
     })
   ).isRequired,
   hasLoaded: bool,
-  onClick: func
+  onClick: func,
 }
 
 HelpLinks.defaultProps = {
   hasLoaded: false,
   links: [],
-  onClick: () => {}
+  onClick: () => {},
 }

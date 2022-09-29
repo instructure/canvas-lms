@@ -41,7 +41,7 @@ const QR_CODE_LIFETIME = 1000 * 10 * 60 // 10 minutes
 const DISPLAY_STATE = {
   canceled: 0,
   warning: 1,
-  displayed: 2
+  displayed: 2,
 }
 
 const modalLabel = () => I18n.t('Confirm QR code display')
@@ -128,7 +128,7 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
         const newValidFor =
           Date.now() < validUntil
             ? I18n.t('This code expires %{timeFromNow}.', {
-                timeFromNow: fromNow(validUntil)
+                timeFromNow: fromNow(validUntil),
               })
             : I18n.t('This code has expired.')
         setValidFor(newValidFor)
@@ -145,7 +145,7 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while retrieving your QR Code'),
-          err
+          err,
         })
       } finally {
         isFetching = false
@@ -245,17 +245,17 @@ const flexViewProps = {
   padding: 'medium',
   margin: 'medium small',
   maxWidth: '30rem',
-  as: 'div'
+  as: 'div',
 }
 
 QRMobileLogin.propTypes = {
   refreshInterval: number,
   pollInterval: number,
-  withWarning: bool
+  withWarning: bool,
 }
 
 QRMobileLogin.defaultProps = {
   refreshInterval: REFRESH_INTERVAL,
   pollInterval: POLL_INTERVAL,
-  withWarning: false
+  withWarning: false,
 }

@@ -35,12 +35,7 @@ export default class TimeBlockList {
     this.blankRow = blankRow
 
     this.element.delegate('input', 'change', event => {
-      if (
-        $(event.currentTarget)
-          .closest('tr')
-          .is(':last-child')
-      )
-        this.addRow()
+      if ($(event.currentTarget).closest('tr').is(':last-child')) this.addRow()
     })
     this.render()
   }

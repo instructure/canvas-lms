@@ -33,7 +33,7 @@ import useFetchApi from '@canvas/use-fetch-api-hook'
 import {
   getAssignmentGrades,
   getAssignmentGroupTotals,
-  getTotalGradeStringFromEnrollments
+  getTotalGradeStringFromEnrollments,
 } from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
@@ -52,7 +52,7 @@ const GradeDetails = ({
   currentUser,
   loadingGradingPeriods,
   userIsCourseAdmin,
-  observedUserId
+  observedUserId,
 }) => {
   const [loadingTotalGrade, setLoadingTotalGrade] = useState(true)
   const [loadingAssignmentGroups, setLoadingAssignmentGroups] = useState(true)
@@ -99,8 +99,8 @@ const GradeDetails = ({
     fetchAllPages: true,
     params: {
       include,
-      ...gradingPeriodParam
-    }
+      ...gradingPeriodParam,
+    },
   })
 
   useFetchApi({
@@ -115,8 +115,8 @@ const GradeDetails = ({
     params: {
       user_id: currentUser.id,
       ...(observedUserId && {include: 'observed_users'}),
-      ...gradingPeriodParam
-    }
+      ...gradingPeriodParam,
+    },
   })
 
   useEffect(() => {
@@ -239,7 +239,7 @@ const GradeDetails = ({
             dateFormatter,
             isStacked,
             currentUserId: observedUserId || currentUser.id,
-            ...assignment
+            ...assignment,
           })
         )}
       </LoadingWrapper>
@@ -255,7 +255,7 @@ GradeDetails.propTypes = {
   currentUser: PropTypes.object.isRequired,
   loadingGradingPeriods: PropTypes.bool.isRequired,
   userIsCourseAdmin: PropTypes.bool.isRequired,
-  observedUserId: PropTypes.string
+  observedUserId: PropTypes.string,
 }
 
 export default GradeDetails

@@ -22,8 +22,6 @@ import Summary from '../summary/index'
 
 describe('canvas_quizzes/statistics/views/summary', () => {
   it('renders', () => {
-    render(
-      <Summary correctResponseRatio={0.7} />
-    )
+    render(<Summary correctResponseRatio={0.7} />)
   })
 })

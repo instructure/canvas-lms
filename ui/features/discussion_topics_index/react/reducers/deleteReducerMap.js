@@ -19,7 +19,7 @@ import {actionTypes} from '../actions'
 
 const deleteReducerMap = {
   [actionTypes.DELETE_DISCUSSION_SUCCESS]: (state, action) =>
-    state.filter(id => id !== action.payload.discussion.id)
+    state.filter(id => id !== action.payload.discussion.id),
 }
 
 export default deleteReducerMap

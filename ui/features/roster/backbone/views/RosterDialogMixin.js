@@ -24,7 +24,7 @@ const I18n = useI18nScope('RosterDialogMixin')
 const RosterDialogMixin = {
   disable(dfds) {
     return this.$el.disableWhileLoading(dfds, {
-      buttons: {'.btn-primary .ui-button-text': I18n.t('updating', 'Updating...')}
+      buttons: {'.btn-primary .ui-button-text': I18n.t('updating', 'Updating...')},
     })
   },
 
@@ -36,7 +36,7 @@ const RosterDialogMixin = {
     const sectionIds = _.pluck(enrollments, 'course_section_id')
     const sections = _.filter(ENV.SECTIONS, s => _.includes(sectionIds, s.id))
     return this.model.set({enrollments, sections})
-  }
+  },
 }
 
 export default RosterDialogMixin

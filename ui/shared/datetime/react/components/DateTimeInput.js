@@ -104,7 +104,7 @@ function DateTimeInput(props) {
         month: 'long',
         day: 'numeric',
         year: 'numeric',
-        timeZone: timezone
+        timeZone: timezone,
       })
       return formatter.format(jsDate)
     },
@@ -121,7 +121,7 @@ function DateTimeInput(props) {
         year: 'numeric',
         hour: 'numeric',
         minute: 'numeric',
-        timeZone: timezone
+        timeZone: timezone,
       })
       return formatter.format(jsDate)
     },
@@ -183,7 +183,7 @@ function DateTimeInput(props) {
         locale={locale}
         timezone="UTC"
         onSelectedDateChange={onDateUpdate}
-        withRunningValue
+        withRunningValue={true}
       />
       <TimeSelect
         renderLabel={props.timeLabel || I18n.t('Time')}
@@ -203,7 +203,7 @@ DateTimeInput.propTypes = {
   timezone: string,
   onChange: func.isRequired,
   value: string,
-  description: node.isRequired
+  description: node.isRequired,
 }
 
 function dontRerender(prevProps, props) {

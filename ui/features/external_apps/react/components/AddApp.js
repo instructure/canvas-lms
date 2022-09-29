@@ -36,7 +36,7 @@ export default createReactClass({
 
   propTypes: {
     handleToolInstalled: PropTypes.func.isRequired,
-    app: PropTypes.object.isRequired
+    app: PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -44,7 +44,7 @@ export default createReactClass({
       modalIsOpen: false,
       isValid: false,
       errorMessage: null,
-      fields: {}
+      fields: {},
     }
   },
 
@@ -55,7 +55,7 @@ export default createReactClass({
       type: 'text',
       value: this.props.app.name,
       required: true,
-      description: I18n.t('Name')
+      description: I18n.t('Name'),
     }
 
     if (this.props.app.requires_secret) {
@@ -63,13 +63,13 @@ export default createReactClass({
         type: 'text',
         value: '',
         required: true,
-        description: I18n.t('Consumer Key')
+        description: I18n.t('Consumer Key'),
       }
       fields.shared_secret = {
         type: 'text',
         value: '',
         required: true,
-        description: I18n.t('Shared Secret')
+        description: I18n.t('Shared Secret'),
       }
     }
 
@@ -78,7 +78,7 @@ export default createReactClass({
         type: opt.param_type,
         value: opt.default_value,
         required: opt.is_required || opt.is_required === 1,
-        description: opt.description
+        description: opt.description,
       }
     })
 
@@ -154,8 +154,8 @@ export default createReactClass({
       )
       this.setState({
         errorMessage: I18n.t('The following fields are invalid: %{fields}', {
-          fields: invalidFieldNames
-        })
+          fields: invalidFieldNames,
+        }),
       })
       return
     }
@@ -187,7 +187,7 @@ export default createReactClass({
   onSaveFail(tool) {
     $(this.refs.addButton).removeAttr('disabled')
     this.setState({
-      errorMessage: I18n.t('There was an error in processing your request')
+      errorMessage: I18n.t('There was an error in processing your request'),
     })
   },
 
@@ -246,5 +246,5 @@ export default createReactClass({
         </Modal>
       </div>
     )
-  }
+  },
 })

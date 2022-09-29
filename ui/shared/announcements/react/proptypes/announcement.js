@@ -32,7 +32,7 @@ const announcement = shape({
   discussion_subentry_count: number.isRequired,
   unread_count: number.isRequired,
   locked: bool.isRequired,
-  html_url: string.isRequired
+  html_url: string.isRequired,
 })
 
 export const announcementList = arrayOf(announcement)

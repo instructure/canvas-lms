@@ -77,7 +77,7 @@ export default class DueDateList {
     const override = AssignmentOverride.defaultDueDate({
       due_at: this.assignment.get('due_at'),
       lock_at: this.assignment.get('lock_at'),
-      unlock_at: this.assignment.get('unlock_at')
+      unlock_at: this.assignment.get('unlock_at'),
     })
     return this.overrides.add(override)
   }

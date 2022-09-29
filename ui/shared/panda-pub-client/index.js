@@ -43,7 +43,7 @@ class Client {
     this.tokens[fullChannel] = token
 
     const dfd = new $.Deferred()
-    dfd.cancel = function() {}
+    dfd.cancel = function () {}
 
     this.client(faye => {
       const subscription = faye.subscribe(fullChannel, message => cb(message))
@@ -66,12 +66,12 @@ class Client {
         if (message.channel === '/meta/subscribe') {
           if (message.subscription in this.tokens) {
             ;(message.ext || (message.ext = {})).auth = {
-              token: this.tokens[message.subscription]
+              token: this.tokens[message.subscription],
             }
           }
         }
         return cb(message)
-      }
+      },
     }
   }
 

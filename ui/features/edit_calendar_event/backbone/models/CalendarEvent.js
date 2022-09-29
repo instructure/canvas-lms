@@ -32,7 +32,7 @@ const I18n = useI18nScope('calendar.edit')
 const LOADING_STATE = {
   PRE_SPINNER: 0,
   SPINNER_UP: 1,
-  LOADED: 2
+  LOADED: 2,
 }
 
 export default class CalendarEvent extends Backbone.Model {

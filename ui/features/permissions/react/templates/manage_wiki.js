@@ -25,117 +25,117 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Pages - create'),
-      description: I18n.t('Allows user to create course pages.')
+      description: I18n.t('Allows user to create course pages.'),
     },
     {
       title: I18n.t('Pages - delete'),
-      description: I18n.t('Allows user to delete course pages.')
+      description: I18n.t('Allows user to delete course pages.'),
     },
     {
       title: I18n.t('Pages - update'),
-      description: I18n.t('Allows user to edit course pages.')
+      description: I18n.t('Allows user to edit course pages.'),
     },
     {
-      description: I18n.t('Allows user to define users allowed to edit the page.')
+      description: I18n.t('Allows user to define users allowed to edit the page.'),
     },
     {
-      description: I18n.t('Allows user to add page to student to-do list.')
+      description: I18n.t('Allows user to add page to student to-do list.'),
     },
     {
-      description: I18n.t('Allows user to publish and unpublish pages.')
+      description: I18n.t('Allows user to publish and unpublish pages.'),
     },
     {
-      description: I18n.t('Allows user to view page history and set front page.')
+      description: I18n.t('Allows user to view page history and set front page.'),
     },
     {
       description: I18n.t(
         'Allows user to edit Blueprint Course lock settings in the Pages index page and for an individual page in a Blueprint master course.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Blueprint Courses'),
-      description: I18n.t('Blueprint courses must be enabled for an account by an admin.')
+      description: I18n.t('Blueprint courses must be enabled for an account by an admin.'),
     },
     {
       description: I18n.t(
         'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'However, if these additional permissions are enabled, but the Pages - update permission is not enabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.'
-      )
+      ),
     },
     {
       title: I18n.t('Student Page History'),
       description: I18n.t(
         'Students can edit and view page history if allowed in the options for an individual page.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Pages - create'),
-      description: I18n.t('Allows user to create course pages.')
+      description: I18n.t('Allows user to create course pages.'),
     },
     {
       description: I18n.t(
         'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.'
-      )
+      ),
     },
     {
       title: I18n.t('Pages - delete'),
-      description: I18n.t('Allows user to delete course pages.')
+      description: I18n.t('Allows user to delete course pages.'),
     },
     {
       description: I18n.t(
         'Allows user to edit Blueprint lock settings for individual pages in a Blueprint Master Course.'
-      )
+      ),
     },
     {
       title: I18n.t('Pages - update'),
-      description: I18n.t('Allows user to edit course pages.')
+      description: I18n.t('Allows user to edit course pages.'),
     },
     {
-      description: I18n.t('Allows user to define users allowed to edit the page.')
+      description: I18n.t('Allows user to define users allowed to edit the page.'),
     },
     {
-      description: I18n.t('Allows user to add page to student to-do list.')
+      description: I18n.t('Allows user to add page to student to-do list.'),
     },
     {
-      description: I18n.t('Allows user to publish and unpublish pages.')
+      description: I18n.t('Allows user to publish and unpublish pages.'),
     },
     {
-      description: I18n.t('Allows user to view page history and set front page.')
+      description: I18n.t('Allows user to view page history and set front page.'),
     },
     {
       description: I18n.t(
         'Allows user to edit Blueprint lock settings in the Pages index page and for an individual page in a Blueprint master course.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Blueprint Courses'),
-      description: I18n.t('Blueprint courses must be enabled for an account by an admin.')
+      description: I18n.t('Blueprint courses must be enabled for an account by an admin.'),
     },
     {
       description: I18n.t(
         'Course roles can only manage content in Blueprint Courses if they are added to the Blueprint Course as a teacher, TA, or designer role.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If the Pages - Update permission is disabled, the user can still adjust content lock settings on individual pages in a Blueprint Master Course.'
-      )
+      ),
     },
     {
       title: I18n.t('Student Page History'),
       description: I18n.t(
         'Students can edit and view page history if allowed in the options for an individual page.'
-      )
-    }
+      ),
+    },
   ]
 )

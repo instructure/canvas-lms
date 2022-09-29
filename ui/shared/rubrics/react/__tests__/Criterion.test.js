@@ -35,7 +35,7 @@ _.toPairs(rubrics).forEach(([key, rubric]) => {
       const basicProps = {
         assessment: assessment.data[ix],
         criterion: rubric.criteria[ix],
-        freeForm: key === 'freeForm'
+        freeForm: key === 'freeForm',
       }
 
       const testRenderedSnapshots = props => {
@@ -75,11 +75,11 @@ describe('Criterion', () => {
   it('can open and close the long description dialog', () => {
     const criterion = {
       ...rubrics.freeForm.criteria[1],
-      long_description: '<p> a wild paragraph appears </p>'
+      long_description: '<p> a wild paragraph appears </p>',
     }
 
     const component = (
-      <Criterion assessment={assessments.freeForm.data[1]} criterion={criterion} freeForm />
+      <Criterion assessment={assessments.freeForm.data[1]} criterion={criterion} freeForm={true} />
     )
 
     const render = shallow(component)
@@ -90,12 +90,7 @@ describe('Criterion', () => {
     render.find('LongDescription').prop('showLongDescription')()
     expectState(true)
     const dialog = render.find('LongDescriptionDialog')
-    expect(
-      dialog
-        .shallow()
-        .find('div')
-        .html()
-    ).toMatchSnapshot()
+    expect(dialog.shallow().find('div').html()).toMatchSnapshot()
     dialog.prop('close')()
     expectState(false)
   })
@@ -141,7 +136,7 @@ describe('Criterion', () => {
   it('allows extra credit for outcomes when enabled', () => {
     const el = shallow(
       <Criterion
-        allowExtraCredit
+        allowExtraCredit={true}
         assessment={assessments.points.data[1]}
         criterion={rubrics.points.criteria[1]}
         freeForm={false}
@@ -178,9 +173,9 @@ describe('Criterion', () => {
           {
             description: 'invalid',
             id: '3',
-            points: {text: 'blergh', valid: false, value: undefined}
-          }
-        ]
+            points: {text: 'blergh', valid: false, value: undefined},
+          },
+        ],
       ])
     })
 
@@ -194,7 +189,7 @@ describe('Criterion', () => {
 
       expect(onAssessmentChange.args).toEqual([
         [{description: 'good', id: '1', points: {text: '10', valid: true, value: 10}}],
-        [{points: {text: '', valid: true}}]
+        [{points: {text: '', valid: true}}],
       ])
     })
 
@@ -207,9 +202,9 @@ describe('Criterion', () => {
         points({
           criterion: {
             ...rubrics.points.criteria[1],
-            ignore_for_scoring: true
+            ignore_for_scoring: true,
           },
-          ...props
+          ...props,
         })
 
       it('are not shown by default', () => expect(ignoredPoints()).toHaveLength(0))

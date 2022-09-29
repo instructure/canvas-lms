@@ -27,7 +27,7 @@ const permission = {
   enabled: ENABLED_FOR_ALL,
   locked: false,
   readonly: false,
-  explicit: true
+  explicit: true,
 }
 
 function makeDefaultProps() {
@@ -40,7 +40,7 @@ function makeDefaultProps() {
     open: true,
     hideTray: Function.prototype,
     modifyPermissions: Function.prototype,
-    unassignedRoles: ROLES.filter(r => r.id === '2')
+    unassignedRoles: ROLES.filter(r => r.id === '2'),
   }
 }
 

@@ -21,7 +21,7 @@ import createStore from '@canvas/util/createStore'
 
 const CourseActivitySummaryStore = createStore({streams: {}})
 
-CourseActivitySummaryStore.getStateForCourse = function(courseId) {
+CourseActivitySummaryStore.getStateForCourse = function (courseId) {
   if (typeof courseId === 'undefined') return CourseActivitySummaryStore.getState()
 
   const {streams} = CourseActivitySummaryStore.getState()
@@ -32,7 +32,7 @@ CourseActivitySummaryStore.getStateForCourse = function(courseId) {
   return streams[courseId]
 }
 
-CourseActivitySummaryStore._fetchForCourse = function(courseId) {
+CourseActivitySummaryStore._fetchForCourse = function (courseId) {
   const fetch = window.fetchIgnoredByNewRelic || window.fetch // don't let this count against us in newRelic's SPA load time stats
   return asJson(
     fetch(`/api/v1/courses/${courseId}/activity_stream/summary`, defaultFetchOptions)

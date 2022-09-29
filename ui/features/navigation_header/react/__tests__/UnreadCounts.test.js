@@ -34,14 +34,14 @@ const props = {
   pollIntervalMs: pollInterval,
   allowedAge,
   maxTries,
-  useSessionStorage
+  useSessionStorage,
 }
 
 expect.extend({
   toBeNotLongAfter(received, time, tolerance = 500) {
     const pass = received - time < tolerance
     return {pass}
-  }
+  },
 })
 
 describe('GlobalNavigation::UnreadCounts', () => {
@@ -79,7 +79,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
     it('uses stored value when it is new enough', async () => {
       const last = {
         updatedAt: +new Date() - allowedAge / 2, // within the allowed age
-        unreadCount: 12
+        unreadCount: 12,
       }
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} targetEl={target} />)
@@ -90,7 +90,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
     it('fetches value when stored value is too old', async () => {
       const last = {
         updatedAt: +new Date() - allowedAge * 10, // way past the allowed age
-        unreadCount: 12
+        unreadCount: 12,
       }
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} targetEl={target} />)
@@ -115,7 +115,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
       const age = allowedAge / 2 // within the allowed age
       const last = {
         updatedAt: +new Date() - age,
-        unreadCount: 12
+        unreadCount: 12,
       }
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} targetEl={target} />)
@@ -128,7 +128,7 @@ describe('GlobalNavigation::UnreadCounts', () => {
       const age = allowedAge / 2 // within the allowed age
       const last = {
         updatedAt: +new Date() - age,
-        unreadCount: 12
+        unreadCount: 12,
       }
       window.sessionStorage.setItem(storageKey, JSON.stringify(last))
       render(<UnreadCounts {...props} pollIntervalMs={0} targetEl={target} />)

@@ -29,7 +29,7 @@ const I18n = useI18nScope('MasterCourseLock')
 class MasterCourseLock extends React.Component {
   static propTypes = {
     model: PropTypes.instanceOf(FilesystemObject).isRequired,
-    canManage: PropTypes.bool.isRequired
+    canManage: PropTypes.bool.isRequired,
   }
 
   constructor(props) {
@@ -71,7 +71,7 @@ class MasterCourseLock extends React.Component {
   // returns object
   extractStateFromModel(model) {
     return {
-      locked: !!model.get('restricted_by_master_course')
+      locked: !!model.get('restricted_by_master_course'),
     }
   }
 
@@ -83,7 +83,7 @@ class MasterCourseLock extends React.Component {
       .put(`/api/v1/courses/${ENV.COURSE_ID}/blueprint_templates/default/restrict_item`, {
         content_type: 'attachment',
         content_id: this.props.model.id,
-        restricted: !this.isLocked()
+        restricted: !this.isLocked(),
       })
       .then((/* response */) => {
         this.setLocked(!this.isLocked())
@@ -101,7 +101,7 @@ class MasterCourseLock extends React.Component {
     const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file')
     const wrapperClass = classnames('lock-icon', {
       disabled: !this.canLockUnlock(),
-      'lock-icon-locked': this.isLocked()
+      'lock-icon-locked': this.isLocked(),
     })
     const buttonClass = `btn-link ${locked ? 'locked-status locked' : 'unlocked-status unlocked'}`
     const iconClass = locked ? 'icon-blueprint-lock' : 'icon-blueprint'

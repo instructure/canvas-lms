@@ -63,8 +63,8 @@ describe('ProficiencyCalculation', () => {
     method: {
       calculationMethod: 'decaying_average',
       calculationInt: 75,
-      ...(overrides.method || {})
-    }
+      ...(overrides.method || {}),
+    },
   })
 
   describe('locked', () => {
@@ -79,7 +79,7 @@ describe('ProficiencyCalculation', () => {
         <ProficiencyCalculation
           {...makeProps({
             canManage: false,
-            method: {calculationMethod: 'latest', calculationInt: null}
+            method: {calculationMethod: 'latest', calculationInt: null},
           })}
         />
       )
@@ -91,7 +91,7 @@ describe('ProficiencyCalculation', () => {
       const {getByText} = render(
         <ProficiencyCalculation
           {...makeProps({
-            canManage: false
+            canManage: false,
           })}
         />
       )
@@ -106,7 +106,7 @@ describe('ProficiencyCalculation', () => {
         <ProficiencyCalculation
           {...makeProps({
             canManage: false,
-            method: {calculationMethod: 'latest', calculationInt: null}
+            method: {calculationMethod: 'latest', calculationInt: null},
           })}
         />
       )
@@ -133,7 +133,7 @@ describe('ProficiencyCalculation', () => {
       const {getByDisplayValue, queryByText} = render(
         <ProficiencyCalculation
           {...makeProps({
-            method: {calculationMethod: 'latest', calculationInt: null}
+            method: {calculationMethod: 'latest', calculationInt: null},
           })}
         />
       )
@@ -247,7 +247,7 @@ describe('ProficiencyCalculation', () => {
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
           {
-            outcomeAllowAverageCalculationFF: true
+            outcomeAllowAverageCalculationFF: true,
           }
         )
         const method = getByDisplayValue('Decaying Average')
@@ -374,7 +374,7 @@ describe('ProficiencyCalculation', () => {
 
     it('renders correct text for the Course context', () => {
       const {getByDisplayValue, getByText} = render(<ProficiencyCalculation {...makeProps()} />, {
-        contextType: 'Course'
+        contextType: 'Course',
       })
       const method = getByDisplayValue('Decaying Average')
       fireEvent.click(method)
@@ -401,7 +401,7 @@ describe('ProficiencyCalculation', () => {
           {...makeProps({
             individualOutcome: 'display',
             canManage: false,
-            method: {calculationMethod: 'latest', calculationInt: null}
+            method: {calculationMethod: 'latest', calculationInt: null},
           })}
         />
       )
@@ -442,7 +442,7 @@ describe('ProficiencyCalculation', () => {
         <ProficiencyCalculation
           {...makeProps({
             individualOutcome: 'edit',
-            method: {calculationMethod: 'latest', calculationInt: null}
+            method: {calculationMethod: 'latest', calculationInt: null},
           })}
         />
       )
@@ -480,8 +480,8 @@ describe('ProficiencyCalculation', () => {
               masteryPoints: 3,
               method: {
                 calculationMethod: 'n_mastery',
-                calculationInt: 5
-              }
+                calculationInt: 5,
+              },
             })}
           />
         )
@@ -497,8 +497,8 @@ describe('ProficiencyCalculation', () => {
               individualOutcome: 'edit',
               method: {
                 calculationMethod: 'n_mastery',
-                calculationInt: 5
-              }
+                calculationInt: 5,
+              },
             })}
           />
         )
@@ -513,7 +513,7 @@ describe('ProficiencyCalculation', () => {
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />,
           {
-            outcomeAllowAverageCalculationFF: true
+            outcomeAllowAverageCalculationFF: true,
           }
         )
         const method = getByDisplayValue('Decaying Average')

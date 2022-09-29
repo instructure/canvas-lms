@@ -33,7 +33,7 @@ module1.itemsWithDates = module1.items.map(
     ({
       ...item,
       type: 'assignment' as const,
-      date: moment(dueDates[index])
+      date: moment(dueDates[index]),
     } as CoursePaceItemWithDate)
 )
 
@@ -43,14 +43,12 @@ const defaultProps = {
   coursePace: PRIMARY_PACE,
   responsiveSize: 'large' as const,
   showProjections: true,
-  compression: 0
+  compression: 0,
 }
 
 describe('Module', () => {
   it('is expanded by default, shows the module name always, and only shows column headers when expanded', () => {
-    const {getByRole, queryByText, queryByTestId} = renderConnected(
-      <Module {...defaultProps} />
-    )
+    const {getByRole, queryByText, queryByTestId} = renderConnected(<Module {...defaultProps} />)
     const moduleHeader = getByRole('button', {name: '1. How 2 B A H4CK32'})
     expect(moduleHeader).toBeInTheDocument()
     expect(queryByText(PACE_MODULE_1.items[0].assignment_title)).toBeInTheDocument()
@@ -78,15 +76,17 @@ describe('Module', () => {
 
   it('displays headers and values in stacked format when at small screen sizes', () => {
     const {queryByRole, queryAllByTestId} = renderConnected(
-      <Module {...defaultProps} responsiveSize="small" showProjections />
+      <Module {...defaultProps} responsiveSize="small" showProjections={true} />
     )
     expect(queryByRole('button', {name: '1. How 2 B A H4CK32'})).toBeInTheDocument()
     expect(queryByRole('columnheader')).not.toBeInTheDocument()
-    expect(
-      queryAllByTestId('pp-title-cell')[0].textContent
-    ).toEqual('Item: Basic encryption/decryption100 pts')
+    expect(queryAllByTestId('pp-title-cell')[0].textContent).toEqual(
+      'Item: Basic encryption/decryption100 pts'
+    )
     expect(queryAllByTestId('pp-duration-cell')[0]).toBeInTheDocument()
-    expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual('Due Date: Tue, Mar 22, 2022')
+    expect(queryAllByTestId('pp-due-date-cell')[1].textContent).toEqual(
+      'Due Date: Tue, Mar 22, 2022'
+    )
     expect(queryAllByTestId('pp-status-cell')[0].textContent).toEqual('Status: Published')
   })
 
@@ -94,7 +94,7 @@ describe('Module', () => {
     const {getByRole} = renderConnected(<Module {...defaultProps} compression={1000} />)
     expect(
       getByRole('tooltip', {
-        name: 'Due Dates are being compressed based on your start and end dates.'
+        name: 'Due Dates are being compressed based on your start and end dates.',
       })
     ).toBeInTheDocument()
   })
@@ -103,7 +103,7 @@ describe('Module', () => {
     const {getByRole} = renderConnected(<Module {...defaultProps} />)
     expect(
       getByRole('tooltip', {
-        name: 'Changing course pacing days may modify due dates.'
+        name: 'Changing course pacing days may modify due dates.',
       })
     ).toBeInTheDocument()
   })
@@ -112,18 +112,18 @@ describe('Module', () => {
     const module2 = {
       ...module1,
       items: [...module1.items],
-      itemsWithDates: [...module1.itemsWithDates]
+      itemsWithDates: [...module1.itemsWithDates],
     }
     module2.itemsWithDates.splice(1, 0, {
       type: 'blackout_date' as const,
       date: moment('2022-03-20T00:00:00-06:00'),
       event_title: 'black me out',
       start_date: moment('2022-03-21T00:00:00-06:00'),
-      end_date: moment('2022-03-22T00:00:00-06:00')
+      end_date: moment('2022-03-22T00:00:00-06:00'),
     })
 
     const {queryAllByRole, queryAllByTestId} = renderConnected(
-      <Module {...defaultProps} module={module2} responsiveSize="small" showProjections />
+      <Module {...defaultProps} module={module2} responsiveSize="small" showProjections={true} />
     )
     expect(queryAllByRole('row').length).toEqual(3)
     expect(queryAllByTestId('pp-status-cell').length).toEqual(2)

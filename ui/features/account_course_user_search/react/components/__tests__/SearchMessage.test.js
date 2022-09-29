@@ -27,11 +27,11 @@ function defaultProps() {
       data: [1, 2, 3],
       links: {
         current: {url: 'abc', page: '5'},
-        last: {url: 'abc10', page: '10'}
-      }
+        last: {url: 'abc10', page: '10'},
+      },
     },
     setPage: jest.fn(),
-    noneFoundMessage: 'None found!'
+    noneFoundMessage: 'None found!',
   }
 }
 
@@ -72,7 +72,7 @@ describe('SearchMessage::', () => {
         '6',
         '7',
         '8',
-        '1,000'
+        '1,000',
       ])
     })
 
@@ -98,7 +98,7 @@ describe('SearchMessage::', () => {
         '6',
         '7',
         '8',
-        '15'
+        '15',
       ])
     })
   })

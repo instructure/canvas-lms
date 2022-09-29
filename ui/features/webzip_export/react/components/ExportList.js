@@ -30,9 +30,9 @@ class ExportList extends React.Component {
         date: PropTypes.string.isRequired,
         link: PropTypes.string,
         workflowState: PropTypes.string.isRequired,
-        newExport: PropTypes.bool.isRequired
+        newExport: PropTypes.bool.isRequired,
       })
-    ).isRequired
+    ).isRequired,
   }
 
   renderExportListItems() {

@@ -47,7 +47,7 @@ const module = {
     }
 
     return attrs
-  }
+  },
 }
 
 export default module

@@ -36,11 +36,11 @@ export default class CourseImageSelector extends React.Component {
     courseId: PropTypes.string.isRequired,
     setting: PropTypes.string.isRequired,
     store: PropTypes.object.isRequired,
-    wide: PropTypes.bool
+    wide: PropTypes.bool,
   }
 
   static defaultProps = {
-    wide: false
+    wide: false,
   }
 
   state = this.props.store.getState()

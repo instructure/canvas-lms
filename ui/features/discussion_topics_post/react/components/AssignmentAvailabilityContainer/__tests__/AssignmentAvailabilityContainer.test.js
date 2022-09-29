@@ -33,7 +33,7 @@ const mockOverrides = [
     dueAt: '2021-03-30T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-24T00:00:00-06:00',
-    title: 'assignment override 1'
+    title: 'assignment override 1',
   },
   {
     id: 'ZXMzaWdebTubeC0x',
@@ -41,7 +41,7 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 2'
+    title: 'assignment override 2',
   },
   {
     id: 'BXMzaWdebTVubC0x',
@@ -49,8 +49,8 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 3'
-  }
+    title: 'assignment override 3',
+  },
 ]
 
 beforeAll(() => {
@@ -60,20 +60,23 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
 const setup = (assignmentData = {}) => {
   return render(
-    <AssignmentAvailabilityContainer assignment={Assignment.mock({...assignmentData})} isAdmin />
+    <AssignmentAvailabilityContainer
+      assignment={Assignment.mock({...assignmentData})}
+      isAdmin={true}
+    />
   )
 }
 
@@ -81,7 +84,7 @@ describe('AssignmentAvailabilityContainer', () => {
   describe('desktop', () => {
     it('displays due date when there are no overrides', () => {
       const {queryByText} = setup({
-        assignmentOverrides: {nodes: []}
+        assignmentOverrides: {nodes: []},
       })
       expect(queryByText('Everyone')).toBeTruthy()
       expect(queryByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
@@ -90,14 +93,14 @@ describe('AssignmentAvailabilityContainer', () => {
 
     it('displays "Show due dates" button when there are overrides', () => {
       const {getByText} = setup({
-        assignmentOverrides: {nodes: mockOverrides}
+        assignmentOverrides: {nodes: mockOverrides},
       })
       expect(getByText('Show Due Dates (4)')).toBeTruthy()
     })
 
     it('displays tray and correctly formatted dates', async () => {
       const {queryByText, findByText, findAllByTestId} = setup({
-        assignmentOverrides: {nodes: mockOverrides}
+        assignmentOverrides: {nodes: mockOverrides},
       })
       expect(queryByText('Show Due Dates (4)')).toBeTruthy()
       fireEvent.click(queryByText('Show Due Dates (4)'))
@@ -110,7 +113,7 @@ describe('AssignmentAvailabilityContainer', () => {
       mockOverrides[2].unlockAt = null
       mockOverrides[2].lockAt = null
       const {queryByText, findByText} = setup({
-        assignmentOverrides: {nodes: mockOverrides}
+        assignmentOverrides: {nodes: mockOverrides},
       })
       expect(queryByText('Show Due Dates (4)')).toBeTruthy()
       fireEvent.click(queryByText('Show Due Dates (4)'))
@@ -123,20 +126,20 @@ describe('AssignmentAvailabilityContainer', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '767px'}
+        tablet: {maxWidth: '767px'},
       }))
     })
 
     it('displays "Show due dates" button when there are overrides', () => {
       const {queryByText} = setup({
-        assignmentOverrides: {nodes: mockOverrides}
+        assignmentOverrides: {nodes: mockOverrides},
       })
       expect(queryByText('Due Dates (4)')).toBeTruthy()
     })
 
     it('displays due date when there are no overrides', () => {
       const {getByText} = setup({
-        assignmentOverrides: {nodes: []}
+        assignmentOverrides: {nodes: []},
       })
       expect(getByText('Due Mar 31, 2021')).toBeTruthy()
     })
@@ -144,14 +147,14 @@ describe('AssignmentAvailabilityContainer', () => {
     it('displays no due date when there are no overrides and no due date', () => {
       const {queryByText} = setup({
         assignmentOverrides: {nodes: []},
-        dueAt: ''
+        dueAt: '',
       })
       expect(queryByText('No Due Date')).toBeTruthy()
     })
 
     it('opens due date tray for single due date', () => {
       const {queryByText, getByText, getByTestId} = setup({
-        assignmentOverrides: {nodes: []}
+        assignmentOverrides: {nodes: []},
       })
 
       expect(queryByText('Due Mar 31, 2021')).toBeInTheDocument()
@@ -164,7 +167,7 @@ describe('AssignmentAvailabilityContainer', () => {
     it("due date tray doesn't show assignment context when not admin", () => {
       const {queryByText, getByText, queryByTestId} = setup({
         assignmentOverrides: {nodes: []},
-        isAdmin: false
+        isAdmin: false,
       })
 
       expect(queryByText('Due Mar 31, 2021')).toBeInTheDocument()
@@ -179,8 +182,8 @@ describe('AssignmentAvailabilityContainer', () => {
       const {findByTestId, getByRole} = render(
         <AssignmentAvailabilityContainer
           assignment={Assignment.mock({assignmentOverrides: {nodes: []}})}
-          isAdmin
-          inPacedCourse
+          isAdmin={true}
+          inPacedCourse={true}
           courseId="17"
         />
       )
@@ -198,8 +201,8 @@ describe('AssignmentAvailabilityContainer', () => {
       const {findByTestId, getByRole} = render(
         <AssignmentAvailabilityContainer
           assignment={Assignment.mock({assignmentOverrides: {nodes: mockOverrides}})}
-          isAdmin
-          inPacedCourse
+          isAdmin={true}
+          inPacedCourse={true}
           courseId="17"
         />
       )

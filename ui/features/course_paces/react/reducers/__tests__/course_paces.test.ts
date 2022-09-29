@@ -25,19 +25,19 @@ const newbod1: BlackoutDate = {
   temp_id: 'tmp1',
   event_title: 'new one',
   start_date: moment(),
-  end_date: moment()
+  end_date: moment(),
 }
 const oldbod1: BlackoutDate = {
   id: '1',
   event_title: 'old one',
   start_date: moment(),
-  end_date: moment()
+  end_date: moment(),
 }
 const oldbod2: BlackoutDate = {
   id: '2',
   event_title: 'old two',
   start_date: moment(),
-  end_date: moment()
+  end_date: moment(),
 }
 
 describe('course_paces reducer', () => {
@@ -89,15 +89,15 @@ describe('course_paces reducer', () => {
     it('discards blackout dates before the pace start', () => {
       const thePace = {
         start_date: '2022-04-01T12:00:00',
-        modules: [{items: [{module_item_id: '1'}]}]
+        modules: [{items: [{module_item_id: '1'}]}],
       } as CoursePace
       const dueDates = {1: '2022-05-01T12:00:00-06:00'}
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-01-01'),
-          end_date: moment('2022-01-01')
-        } as BlackoutDate
+          end_date: moment('2022-01-01'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -110,15 +110,15 @@ describe('course_paces reducer', () => {
       const thePace = {
         start_date: '2022-04-01T12:00:00',
         end_date: '2022-05-31T12:00:00',
-        modules: [{items: [{module_item_id: '1'}]}]
+        modules: [{items: [{module_item_id: '1'}]}],
       } as CoursePace
       const dueDates = {1: '2022-05-01T12:00:00-06:00'}
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-06-01'),
-          end_date: moment('2022-06-01')
-        } as BlackoutDate
+          end_date: moment('2022-06-01'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -131,20 +131,20 @@ describe('course_paces reducer', () => {
     it('discards blackout dates after the last due date if pace has no end date', () => {
       const thePace = {
         start_date: '2022-04-01T12:00:00',
-        modules: [{items: [{module_item_id: '1'}]}]
+        modules: [{items: [{module_item_id: '1'}]}],
       } as CoursePace
       const dueDates = {1: '2022-05-01T12:00:00-06:00'}
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-04-15'),
-          end_date: moment('2022-04-15')
+          end_date: moment('2022-04-15'),
         } as BlackoutDate,
         {
           id: '101',
           start_date: moment('2022-06-01'),
-          end_date: moment('2022-06-01')
-        } as BlackoutDate
+          end_date: moment('2022-06-01'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -160,15 +160,15 @@ describe('course_paces reducer', () => {
       const thePace = {
         start_date: '2022-04-01T12:00:00',
         end_date: '2022-05-31T12:00:00',
-        modules: [{items: [{module_item_id: '1'}, {module_item_id: '2'}]}]
+        modules: [{items: [{module_item_id: '1'}, {module_item_id: '2'}]}],
       } as CoursePace
       const dueDates = {1: '2022-04-15T12:00:00-06:00', 2: '2022-05-01T12:00:00-06:00'}
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-04-20'),
-          end_date: moment('2022-04-22')
-        } as BlackoutDate
+          end_date: moment('2022-04-22'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -188,21 +188,21 @@ describe('course_paces reducer', () => {
         end_date: '2022-05-31T12:00:00',
         modules: [
           {items: [{module_item_id: '1'}, {module_item_id: '2'}]},
-          {items: [{module_item_id: '3'}, {module_item_id: '4'}]}
-        ]
+          {items: [{module_item_id: '3'}, {module_item_id: '4'}]},
+        ],
       } as CoursePace
       const dueDates = {
         1: '2022-04-15T12:00:00-06:00',
         2: '2022-04-25T12:00:00-06:00',
         3: '2022-05-01T12:00:00-06:00',
-        4: '2022-05-05T12:00:00-06:00'
+        4: '2022-05-05T12:00:00-06:00',
       }
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-04-26'),
-          end_date: moment('2022-04-27')
-        } as BlackoutDate
+          end_date: moment('2022-04-27'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -227,21 +227,21 @@ describe('course_paces reducer', () => {
         end_date: '2022-05-31T12:00:00',
         modules: [
           {items: [{module_item_id: '1'}, {module_item_id: '2'}]},
-          {items: [{module_item_id: '3'}, {module_item_id: '4'}]}
-        ]
+          {items: [{module_item_id: '3'}, {module_item_id: '4'}]},
+        ],
       } as CoursePace
       const dueDates = {
         1: '2022-04-15T12:00:00-06:00',
         2: '2022-04-25T12:00:00-06:00',
         3: '2022-05-01T12:00:00-06:00',
-        4: '2022-05-05T12:00:00-06:00'
+        4: '2022-05-05T12:00:00-06:00',
       }
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-05-26'),
-          end_date: moment('2022-05-27')
-        } as BlackoutDate
+          end_date: moment('2022-05-27'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)
@@ -267,21 +267,21 @@ describe('course_paces reducer', () => {
         end_date: '2022-05-31T12:00:00',
         modules: [
           {items: [{module_item_id: '1'}, {module_item_id: '2'}]},
-          {items: [{module_item_id: '3'}, {module_item_id: '4'}]}
-        ]
+          {items: [{module_item_id: '3'}, {module_item_id: '4'}]},
+        ],
       } as CoursePace
       const dueDates = {
         1: '2022-04-15T12:00:00-06:00',
         2: '2022-04-25T12:00:00-06:00',
         3: '2022-05-01T12:00:00-06:00',
-        4: '2022-05-05T12:00:00-06:00'
+        4: '2022-05-05T12:00:00-06:00',
       }
       const blackoutDates = [
         {
           id: '100',
           start_date: moment('2022-04-17'),
-          end_date: moment('2022-04-17')
-        } as BlackoutDate
+          end_date: moment('2022-04-17'),
+        } as BlackoutDate,
       ]
 
       const result = mergeAssignmentsAndBlackoutDates(thePace, dueDates, blackoutDates)

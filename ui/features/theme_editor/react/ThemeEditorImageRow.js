@@ -36,13 +36,13 @@ export default class ThemeEditorImageRow extends Component {
     currentValue: PropTypes.string,
     placeholder: PropTypes.string,
     themeState: PropTypes.object,
-    handleThemeStateChange: PropTypes.func
+    handleThemeStateChange: PropTypes.func,
   }
 
   static defaultProps = {
     userInput: {},
     themeState: {},
-    handleThemeStateChange() {}
+    handleThemeStateChange() {},
   }
 
   // valid input: null, '', or an HTMLInputElement
@@ -59,7 +59,7 @@ export default class ThemeEditorImageRow extends Component {
         // In this case, they clicked 'Use Default' so we need to make sure we really do go with the default
         this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {
           resetValue: true,
-          useDefault: true
+          useDefault: true,
         })
       } else {
         this.props.handleThemeStateChange(this.props.varDef.variable_name, null, {resetValue: true})

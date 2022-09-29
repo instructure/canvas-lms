@@ -73,7 +73,7 @@ export default function TimeLateInput(props) {
 
     props.onSecondsLateUpdated({
       latePolicyStatus: 'late',
-      secondsLateOverride: Math.trunc(secondsLateOverride)
+      secondsLateOverride: Math.trunc(secondsLateOverride),
     })
   }
 
@@ -114,10 +114,10 @@ TimeLateInput.propTypes = {
   secondsLate: number.isRequired,
   onSecondsLateUpdated: func.isRequired,
   width: string.isRequired,
-  visible: bool
+  visible: bool,
 }
 
 TimeLateInput.defaultProps = {
   disabled: false,
-  visible: true
+  visible: true,
 }

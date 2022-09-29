@@ -35,7 +35,7 @@ const POPUP_PROPS = [
   'autoFocus',
   'reactivePositioning',
   'onShow',
-  'onHide'
+  'onHide',
 ]
 
 /**
@@ -148,7 +148,7 @@ class Popup extends React.Component {
      */
     onHide: PropTypes.func,
 
-    screenReaderSupport: PropTypes.bool
+    screenReaderSupport: PropTypes.bool,
   }
 
   state = {
@@ -170,7 +170,7 @@ class Popup extends React.Component {
     popupOptions: {},
     anchorSelector: '.popup-anchor',
     reactivePositioning: false,
-    screenReaderSupport: true
+    screenReaderSupport: true,
   }
 
   constructor(props) {
@@ -201,7 +201,7 @@ class Popup extends React.Component {
     )
 
     this.setState({
-      container: $container[0]
+      container: $container[0],
     })
   }
 
@@ -245,7 +245,12 @@ class Popup extends React.Component {
     const Content = this.props.content
 
     return (
-      <div className="inline" ref={node => { this.node = node }}>
+      <div
+        className="inline"
+        ref={node => {
+          this.node = node
+        }}
+      >
         {this.props.children}
         {this.props.screenReaderSupport && (
           <ScreenReaderContent
@@ -321,14 +326,14 @@ class Popup extends React.Component {
           delay: 0,
           target: $buttons,
           effect: false,
-          solo: false
+          solo: false,
         },
 
         hide: {
           event: 'click focusout',
           effect: false,
           fixed: true,
-          target: $buttons
+          target: $buttons,
         },
 
         style: {
@@ -336,8 +341,8 @@ class Popup extends React.Component {
           def: false,
           tip: {
             width: 10,
-            height: 5
-          }
+            height: 5,
+          },
         },
 
         position: {
@@ -346,18 +351,18 @@ class Popup extends React.Component {
           target: false,
           adjust: {
             x: 0,
-            y: 0
-          }
+            y: 0,
+          },
         },
 
         content: {
-          text: $content
+          text: $content,
         },
 
         events: {
           show: this.__onShow.bind(this),
-          hide: this.__onHide.bind(this)
-        }
+          hide: this.__onHide.bind(this),
+        },
       },
       this.props.popupOptions
     )

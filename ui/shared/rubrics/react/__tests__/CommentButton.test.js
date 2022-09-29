@@ -22,7 +22,7 @@ import CommentButton from '../CommentButton'
 
 describe('The CommentButton component', () => {
   const props = {
-    onClick: sinon.spy()
+    onClick: sinon.spy(),
   }
 
   const component = mods => shallow(<CommentButton {...{...props, ...mods}} />)

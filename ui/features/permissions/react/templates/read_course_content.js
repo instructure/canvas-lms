@@ -25,34 +25,34 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Courses'),
-      description: I18n.t('Allows user to view published and unpublished course content.')
-    }
+      description: I18n.t('Allows user to view published and unpublished course content.'),
+    },
   ],
   [
     {
       title: I18n.t('Admin Tools (Undelete Courses)'),
       description: I18n.t(
         'If Courses - manage and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
-      )
+      ),
     },
     {
       title: I18n.t('Courses'),
-      description: I18n.t('If disabled, user will still have access to Course Settings.')
+      description: I18n.t('If disabled, user will still have access to Course Settings.'),
     },
     {
       description: I18n.t(
         'User cannot manage individual course content without the appropriate permission for that content item.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course.'
-      )
+      ),
     },
     {
       title: I18n.t('Gradebook'),
-      description: I18n.t('To view the Gradebook, Grades - view all grades must also be enabled.')
-    }
+      description: I18n.t('To view the Gradebook, Grades - view all grades must also be enabled.'),
+    },
   ],
   [],
   []

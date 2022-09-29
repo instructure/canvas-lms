@@ -39,9 +39,9 @@ describe('Ratings', () => {
     ratings: [createRating('Exceeds Mastery', 4), createRating('Mastery', 3)],
     masteryPoints: {
       value: 3,
-      error: null
+      error: null,
     },
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -85,7 +85,7 @@ describe('Ratings', () => {
     it('call onChangeMasteryPoints with new value of points when mastery points are changed', () => {
       const {getByLabelText} = render(<Ratings {...defaultProps()} />)
       fireEvent.change(getByLabelText('Change mastery points').closest('input'), {
-        target: {value: '5'}
+        target: {value: '5'},
       })
       expect(onChangeMasteryPointsMock).toHaveBeenCalled()
       expect(onChangeMasteryPointsMock).toHaveBeenCalledWith('5')
@@ -97,8 +97,8 @@ describe('Ratings', () => {
           {...defaultProps({
             masteryPoints: {
               value: 11,
-              error: 'Invalid points'
-            }
+              error: 'Invalid points',
+            },
           })}
         />
       )

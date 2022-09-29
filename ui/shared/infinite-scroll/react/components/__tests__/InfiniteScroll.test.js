@@ -26,7 +26,7 @@ describe('InfiniteScroll', () => {
   const defaultProps = (props = {}) => ({
     loadMore,
     hasMore: true,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {

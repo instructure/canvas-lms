@@ -40,11 +40,11 @@ const AvatarLink = ({avatarUrl, name, href}) => {
 AvatarLink.propTypes = {
   avatarUrl: string,
   name: string.isRequired,
-  href: string.isRequired
+  href: string.isRequired,
 }
 
 AvatarLink.defaultProps = {
-  avatarUrl: null
+  avatarUrl: null,
 }
 
 export default AvatarLink

@@ -46,7 +46,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         'keyclick .new_page': 'createNewPage',
         'click .header-row a[data-sort-field]': 'sort',
         'click .header-bar-right .menu_tool_link': 'openExternalTool',
-        'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect'
+        'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect',
       },
 
       els: {
@@ -55,8 +55,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         '.header-row a[data-sort-field]': '$sortHeaders',
         '#external-tool-mount-point': '$externalToolMountPoint',
         '#copy-to-mount-point': '$copyToMountPoint',
-        '#send-to-mount-point': '$sendToMountPoint'
-      }
+        '#send-to-mount-point': '$sendToMountPoint',
+      },
     })
 
     this.prototype.template = template
@@ -167,7 +167,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         $sortHeader.attr(
           'aria-label',
           I18n.t('headers.sort_descending', '%{title}, Sort descending', {
-            title: $sortHeader.text()
+            title: $sortHeader.text(),
           })
         )
       }
@@ -193,7 +193,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       showConfirmDelete({
         pageTitles: titles,
         onConfirm: () => deletePages(this.contextName, this.contextId, urls),
-        onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error)
+        onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error),
       })
     }
   }
@@ -231,8 +231,8 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       PAGE_RIGHTS: {
         update: ENV.WIKI_RIGHTS.update_page,
         update_content: ENV.WIKI_RIGHTS.update_page,
-        read_revisions: ENV.WIKI_RIGHTS.read_revisions
-      }
+        read_revisions: ENV.WIKI_RIGHTS.read_revisions,
+      },
     })
     this.$el.parent().append(this.editView.$el)
 
@@ -335,7 +335,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       CREATE: !!this.WIKI_RIGHTS.create_page,
       MANAGE: !!this.WIKI_RIGHTS.update || !!this.WIKI_RIGHTS.delete_page,
       DELETE: !!this.WIKI_RIGHTS.delete_page,
-      PUBLISH: !!this.WIKI_RIGHTS.publish_page
+      PUBLISH: !!this.WIKI_RIGHTS.publish_page,
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE || json.CAN.DELETE
     // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexItemView.js to match

@@ -58,7 +58,7 @@ export default function OrphanedStrandIndicator({name, type, onComplete}) {
     doFetchApi({
       method: 'PUT',
       path: `/api/v1/jobs2/unstuck`,
-      params: {[type]: name}
+      params: {[type]: name},
     })
       .then(({json}) => {
         if (json.status === 'OK') {

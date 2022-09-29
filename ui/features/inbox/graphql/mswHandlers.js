@@ -50,38 +50,38 @@ export const handlers = [
           nodes: [
             {
               ...ConversationParticipant.mock(),
-              conversation: Conversation.mock()
-            }
+              conversation: Conversation.mock(),
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'ConversationParticipantConnection'
+          __typename: 'ConversationParticipantConnection',
         },
         conversationParticipantsConnection: {
-          nodes: []
+          nodes: [],
         },
-        __typename: 'User'
-      }
+        __typename: 'User',
+      },
     }
 
     if (req.variables.scope === 'sent') {
       data.legacyNode.conversationsConnection.nodes = [
         {
           ...ConversationParticipant.mock(),
-          conversation: Conversation.mock()
+          conversation: Conversation.mock(),
         },
         {
           ...ConversationParticipant.mock({
             _id: '249',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjQ5',
             label: 'starred',
-            workflowState: 'unread'
+            workflowState: 'unread',
           }),
           conversation: Conversation.mock({
             _id: '195',
             id: 'Q29udmVyc2F0aW9uLTE5NQ==',
-            subject: 'h1'
-          })
-        }
+            subject: 'h1',
+          }),
+        },
       ]
       data.legacyNode.conversationsConnection.nodes[1].conversation.conversationMessagesConnection.nodes =
         [
@@ -89,22 +89,22 @@ export const handlers = [
             _id: '2693',
             id: 'Q29udmVyc2F0aW9uTWVzc2FnZS0yNjkz',
             createdAt: '2021-02-01T11:35:35-07:00',
-            body: 'this is the second reply message'
-          })
+            body: 'this is the second reply message',
+          }),
         ]
       data.legacyNode.conversationsConnection.nodes[1].conversation.conversationParticipantsConnection.nodes =
         [
           ConversationParticipant.mock({
             _id: '250',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjUw',
-            user: User.mock({_id: '8', pronouns: 'They/Them', name: 'Scotty Summers'})
+            user: User.mock({_id: '8', pronouns: 'They/Them', name: 'Scotty Summers'}),
           }),
           ConversationParticipant.mock({
             _id: '249',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjQ5',
             label: 'starred',
-            workflowState: 'unread'
-          })
+            workflowState: 'unread',
+          }),
         ]
     } else if (req.variables.course) {
       data.legacyNode.conversationParticipantsConnection.nodes = [
@@ -113,9 +113,9 @@ export const handlers = [
           conversation: Conversation.mock({
             _id: '10',
             id: 'Q29udmVyc2F0aW9uLTEw',
-            subject: 'This is a course scoped conversation'
-          })
-        }
+            subject: 'This is a course scoped conversation',
+          }),
+        },
       ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =
         [ConversationMessage.mock({body: 'Course scoped conversation message'})]
@@ -129,9 +129,9 @@ export const handlers = [
           conversation: Conversation.mock({
             _id: '197',
             id: 'Q29udmVyc2F0aW9uLTE5Nw==',
-            subject: 'This is an inbox conversation'
-          })
-        }
+            subject: 'This is an inbox conversation',
+          }),
+        },
       ]
 
       if (req.variables.scope === 'multipleConversations') {
@@ -144,8 +144,8 @@ export const handlers = [
             conversation: Conversation.mock({
               _id: '197',
               id: 'Q29udmVyc2F0aW9uLTE5Nw==',
-              subject: 'This is an inbox conversation'
-            })
+              subject: 'This is an inbox conversation',
+            }),
           },
           {
             ...ConversationParticipant.mock(
@@ -155,8 +155,8 @@ export const handlers = [
             conversation: Conversation.mock({
               _id: '905',
               id: '905',
-              subject: 'This is an inbox conversation'
-            })
+              subject: 'This is an inbox conversation',
+            }),
           },
           {
             ...ConversationParticipant.mock(
@@ -166,9 +166,9 @@ export const handlers = [
             conversation: Conversation.mock({
               _id: '906',
               id: '906',
-              subject: 'This is an inbox conversation'
-            })
-          }
+              subject: 'This is an inbox conversation',
+            }),
+          },
         ]
       }
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationMessagesConnection.nodes =
@@ -179,7 +179,7 @@ export const handlers = [
             createdAt: '2021-03-16T12:09:23-06:00',
             body: 'this is a message for the inbox',
             author: User.mock({_id: '1', name: 'Charles Xavier'}),
-            recipients: [User.mock({_id: '1', name: 'Charels Xavier'})]
+            recipients: [User.mock({_id: '1', name: 'Charels Xavier'})],
           }),
           ConversationMessage.mock({
             _id: '2800',
@@ -187,7 +187,7 @@ export const handlers = [
             createdAt: '2021-03-16T12:09:23-05:00',
             body: 'Watch out for that Magneto guy',
             author: User.mock({_id: '1', name: 'Charles Xavier'}),
-            recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
+            recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})],
           }),
           ConversationMessage.mock({
             _id: '2801',
@@ -195,8 +195,8 @@ export const handlers = [
             createdAt: '2021-03-16T12:09:23-04:00',
             body: 'Wolverine is not so bad when you get to know him',
             author: User.mock({_id: '1', name: 'Charles Xavier'}),
-            recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})]
-          })
+            recipients: [User.mock(), User.mock({_id: '1', name: 'Charles Xavier'})],
+          }),
         ]
       data.legacyNode.conversationsConnection.nodes[0].conversation.conversationParticipantsConnection.nodes =
         [
@@ -204,19 +204,19 @@ export const handlers = [
             _id: '255',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU1',
             user: User.mock({_id: '1', name: 'Charles Xavier'}),
-            workflowState: 'unread'
+            workflowState: 'unread',
           }),
           ConversationParticipant.mock({
             _id: '256',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU2',
-            workflowState: 'unread'
+            workflowState: 'unread',
           }),
           ConversationParticipant.mock({
             _id: '257',
             id: 'Q29udmVyc2F0aW9uUGFydGljaXBhbnQtMjU4',
             user: User.mock({_id: '1', name: 'Charles Xavier'}),
-            workflowState: 'unread'
-          })
+            workflowState: 'unread',
+          }),
         ]
     }
     return res(ctx.data(data))
@@ -256,23 +256,23 @@ export const handlers = [
                 id: 'QXNzaWdubWVudC0x',
                 _id: '1',
                 name: 'test assignment',
-                __typename: 'Assignment'
+                __typename: 'Assignment',
               },
               comment: 'my student comment',
               course: Course.mock(),
               read: true,
-              __typename: 'SubmissionComment'
-            }
+              __typename: 'SubmissionComment',
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'SubmissionCommentConnection'
+          __typename: 'SubmissionCommentConnection',
         },
         user: {
           _id: '75',
-          __typename: 'User'
+          __typename: 'User',
         },
-        __typename: 'Submission'
-      }
+        __typename: 'Submission',
+      },
     }
 
     return res(ctx.data(data))
@@ -300,17 +300,17 @@ export const handlers = [
                       id: 'QXNzaWdubWVudC0x',
                       _id: '1',
                       name: 'test assignment',
-                      __typename: 'Assignment'
+                      __typename: 'Assignment',
                     },
                     comment: 'my student comment',
                     course: Course.mock(),
                     read: true,
-                    __typename: 'SubmissionComment'
-                  }
+                    __typename: 'SubmissionComment',
+                  },
                 ],
-                __typename: 'SubmissionCommentConnection'
+                __typename: 'SubmissionCommentConnection',
               },
-              __typename: 'Submission'
+              __typename: 'Submission',
             },
             {
               _id: '10',
@@ -327,24 +327,24 @@ export const handlers = [
                       id: 'QXNzaWdubWVudC0x',
                       _id: '1',
                       name: 'test assignment',
-                      __typename: 'Assignment'
+                      __typename: 'Assignment',
                     },
                     comment: 'my student comment',
                     course: Course.mock(),
                     read: true,
-                    __typename: 'SubmissionComment'
-                  }
+                    __typename: 'SubmissionComment',
+                  },
                 ],
-                __typename: 'SubmissionCommentConnection'
+                __typename: 'SubmissionCommentConnection',
               },
-              __typename: 'Submission'
-            }
+              __typename: 'Submission',
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'SubmissionConnection'
+          __typename: 'SubmissionConnection',
         },
-        __typename: 'User'
-      }
+        __typename: 'User',
+      },
     }
 
     return res(ctx.data(data))
@@ -357,11 +357,11 @@ export const handlers = [
         email: 'hmccoy@xavierschool.com',
         favoriteGroupsConnection: {
           nodes: [Group.mock()],
-          __typename: 'GroupConnection'
+          __typename: 'GroupConnection',
         },
         favoriteCoursesConnection: {
           nodes: [Course.mock()],
-          __typename: 'CourseConnection'
+          __typename: 'CourseConnection',
         },
         enrollments: [
           Enrollment.mock(),
@@ -369,26 +369,26 @@ export const handlers = [
             course: Course.mock({
               _id: '196',
               contextName: 'Fighting Magneto 101',
-              assetString: 'course_196'
-            })
+              assetString: 'course_196',
+            }),
           }),
           Enrollment.mock({
             course: Course.mock({
               _id: '197',
               contextName: 'Fighting Magneto 202',
-              assetString: 'course_197'
-            })
+              assetString: 'course_197',
+            }),
           }),
           Enrollment.mock({
             course: Course.mock({
               _id: '198',
               contextName: 'Flying The Blackbird',
-              assetString: 'course_198'
-            })
-          })
+              assetString: 'course_198',
+            }),
+          }),
         ],
-        __typename: 'User'
-      }
+        __typename: 'User',
+      },
     }
     return res(ctx.data(data))
   }),
@@ -397,8 +397,8 @@ export const handlers = [
     const data = {
       legacyNode: {
         id: 'VXNlci0x',
-        __typename: 'User'
-      }
+        __typename: 'User',
+      },
     }
 
     if (req.variables.context) {
@@ -407,7 +407,7 @@ export const handlers = [
         contextsConnection: {
           nodes: [],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableContextConnection'
+          __typename: 'MessageableContextConnection',
         },
         usersConnection: {
           nodes: [
@@ -427,19 +427,19 @@ export const handlers = [
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
                       _id: '196',
-                      __typename: 'Course'
+                      __typename: 'Course',
                     },
-                    __typename: 'Enrollment'
-                  }
+                    __typename: 'Enrollment',
+                  },
                 ],
-                __typename: 'EnrollmentConnection'
-              }
-            }
+                __typename: 'EnrollmentConnection',
+              },
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableUserConnection'
+          __typename: 'MessageableUserConnection',
         },
-        __typename: 'Recipients'
+        __typename: 'Recipients',
       }
       data.legacyNode.recipients = recipients
     } else if (req.variables.search === 'Fred') {
@@ -448,7 +448,7 @@ export const handlers = [
         contextsConnection: {
           nodes: [],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableContextConnection'
+          __typename: 'MessageableContextConnection',
         },
         usersConnection: {
           nodes: [
@@ -468,19 +468,19 @@ export const handlers = [
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
                       _id: '196',
-                      __typename: 'Course'
+                      __typename: 'Course',
                     },
-                    __typename: 'Enrollment'
-                  }
+                    __typename: 'Enrollment',
+                  },
                 ],
-                __typename: 'EnrollmentConnection'
-              }
-            }
+                __typename: 'EnrollmentConnection',
+              },
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableUserConnection'
+          __typename: 'MessageableUserConnection',
         },
-        __typename: 'Recipients'
+        __typename: 'Recipients',
       }
       data.legacyNode.recipients = recipients
     } else {
@@ -491,11 +491,11 @@ export const handlers = [
             {
               id: 'course_FnZW',
               name: 'Testing 101',
-              __typename: 'MessageableUser'
-            }
+              __typename: 'MessageableUser',
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableContextConnection'
+          __typename: 'MessageableContextConnection',
         },
         usersConnection: {
           nodes: [
@@ -515,13 +515,13 @@ export const handlers = [
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
                       _id: '196',
-                      __typename: 'Course'
+                      __typename: 'Course',
                     },
-                    __typename: 'Enrollment'
-                  }
+                    __typename: 'Enrollment',
+                  },
                 ],
-                __typename: 'EnrollmentConnection'
-              }
+                __typename: 'EnrollmentConnection',
+              },
             },
             {
               _id: '2',
@@ -539,13 +539,13 @@ export const handlers = [
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
                       _id: '196',
-                      __typename: 'Course'
+                      __typename: 'Course',
                     },
-                    __typename: 'Enrollment'
-                  }
+                    __typename: 'Enrollment',
+                  },
                 ],
-                __typename: 'EnrollmentConnection'
-              }
+                __typename: 'EnrollmentConnection',
+              },
             },
             {
               _id: '3',
@@ -563,19 +563,19 @@ export const handlers = [
                       name: 'Test course',
                       id: 'Q291cnNlLTE=',
                       _id: '196',
-                      __typename: 'Course'
+                      __typename: 'Course',
                     },
-                    __typename: 'Enrollment'
-                  }
+                    __typename: 'Enrollment',
+                  },
                 ],
-                __typename: 'EnrollmentConnection'
-              }
-            }
+                __typename: 'EnrollmentConnection',
+              },
+            },
           ],
           pageInfo: PageInfo.mock({hasNextPage: false}),
-          __typename: 'MessageableUserConnection'
+          __typename: 'MessageableUserConnection',
         },
-        __typename: 'Recipients'
+        __typename: 'Recipients',
       }
       data.legacyNode.recipients = recipients
     }
@@ -585,8 +585,8 @@ export const handlers = [
   graphql.query('ReplyConversationQuery', (req, res, ctx) => {
     const data = {
       legacyNode: {
-        ...Conversation.mock()
-      }
+        ...Conversation.mock(),
+      },
     }
     // Remove uneeded fields from response that are
     // automatically included through mocks
@@ -605,9 +605,9 @@ export const handlers = [
         errors: {
           attribute: 'message',
           message: 'Invalid recipients',
-          __typename: 'ValidationError'
+          __typename: 'ValidationError',
         },
-        __typename: 'CreateConversationPayload'
+        __typename: 'CreateConversationPayload',
       }
     } else {
       data = {
@@ -615,12 +615,12 @@ export const handlers = [
           conversations: [
             {
               ...ConversationParticipant.mock(),
-              conversation: Conversation.mock({subject: req.variables.subject})
-            }
+              conversation: Conversation.mock({subject: req.variables.subject}),
+            },
           ],
           errors: null,
-          __typename: 'CreateConversationPayload'
-        }
+          __typename: 'CreateConversationPayload',
+        },
       }
     }
 
@@ -633,8 +633,8 @@ export const handlers = [
       addConversationMessage: {
         conversationMessage: ConversationMessage.mock({body: req.variables.body}),
         errors: null,
-        __typename: 'AddConversationMessagePayload'
-      }
+        __typename: 'AddConversationMessagePayload',
+      },
     }
 
     if (req.variables.conversationId === CONV_ID_WITH_CONCLUDED_TEACHER_ERROR) {
@@ -646,11 +646,11 @@ export const handlers = [
               attribute: 'message',
               message:
                 'The following recipients have no active enrollment in the course, ["Student 2"], unable to send messages',
-              __typename: 'ValidationError'
-            }
+              __typename: 'ValidationError',
+            },
           ],
-          __typename: 'AddConversationMessagePayload'
-        }
+          __typename: 'AddConversationMessagePayload',
+        },
       }
     }
 
@@ -663,8 +663,8 @@ export const handlers = [
       createSubmissionComment: {
         submissionComment: SubmissionComment.mock({comment: req.variables.body}),
         errors: null,
-        __typename: 'CreateSubmissionCommentPayload'
-      }
+        __typename: 'CreateSubmissionCommentPayload',
+      },
     }
 
     if (req.variables.submissionId === SUBMISSION_ID_THAT_RETURNS_ERROR) {
@@ -673,8 +673,8 @@ export const handlers = [
         {
           attribute: 'message',
           message: 'Some Generic Submission reply error',
-          __typename: 'ValidationError'
-        }
+          __typename: 'ValidationError',
+        },
       ]
     }
     return res(ctx.data(data))
@@ -689,14 +689,14 @@ export const handlers = [
               {...ConversationParticipant.mock()},
               {
                 id: req.body.variables.conversationId,
-                read: req.body.variables.read
+                read: req.body.variables.read,
               }
-            )
+            ),
           ],
           errors: null,
-          __typename: 'UpdateConversationParticipantsPayload'
-        }
+          __typename: 'UpdateConversationParticipantsPayload',
+        },
       })
     )
-  })
+  }),
 ]

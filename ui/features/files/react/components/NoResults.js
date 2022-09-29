@@ -45,5 +45,5 @@ export default function NoResults({search_term}) {
 }
 
 NoResults.propTypes = {
-  search_term: PropTypes.string
+  search_term: PropTypes.string,
 }

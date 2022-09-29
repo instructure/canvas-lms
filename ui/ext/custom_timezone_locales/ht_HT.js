@@ -21,7 +21,7 @@ module.exports = {
   name: 'ht_HT',
   day: {
     abbrev: ['dim', 'len', 'mad', 'mèk', 'jed', 'van', 'sam'],
-    full: ['dimanch', 'lendi', 'madi', 'mèkredi', 'jedi', 'vandredi', 'samdi']
+    full: ['dimanch', 'lendi', 'madi', 'mèkredi', 'jedi', 'vandredi', 'samdi'],
   },
   month: {
     abbrev: ['jan', 'fev', 'mas', 'avr', 'me', 'jen', 'jiy', 'out', 'sep', 'okt', 'nov', 'des'],
@@ -37,13 +37,13 @@ module.exports = {
       'septanm',
       'oktòb',
       'novanm',
-      'desanm'
-    ]
+      'desanm',
+    ],
   },
   meridiem: ['', ''],
   date: '%d-%m-%Y',
   time24: '%R',
   dateTime: '%a, %d %b %Y %H:%M:%S %z',
   time12: '',
-  full: '%b %-d, %Y %H:%M'
+  full: '%b %-d, %Y %H:%M',
 }

@@ -58,7 +58,7 @@ describe('CanvasRce', () => {
           ref={rceRef}
           textareaId="textarea3"
           editorOptions={{
-            plugins: ['foo', 'bar']
+            plugins: ['foo', 'bar'],
           }}
         />,
         target
@@ -82,9 +82,9 @@ describe('CanvasRce', () => {
             menu: {
               format: {
                 title: 'A new menu',
-                items: 'item1 item2'
-              }
-            }
+                items: 'item1 item2',
+              },
+            },
           }}
         />,
         target
@@ -96,8 +96,8 @@ describe('CanvasRce', () => {
         expect.objectContaining({
           format: expect.objectContaining({
             title: 'Format',
-            items: expect.stringMatching(/\| item1 item2$/)
-          })
+            items: expect.stringMatching(/\| item1 item2$/),
+          }),
         })
       )
     })
@@ -113,9 +113,9 @@ describe('CanvasRce', () => {
             menu: {
               a_new_menu: {
                 title: 'A new menu',
-                items: 'item1 item2'
-              }
-            }
+                items: 'item1 item2',
+              },
+            },
           }}
         />,
         target
@@ -129,8 +129,8 @@ describe('CanvasRce', () => {
         expect.objectContaining({
           a_new_menu: expect.objectContaining({
             title: 'A new menu',
-            items: 'item1 item2'
-          })
+            items: 'item1 item2',
+          }),
         })
       )
     })
@@ -146,9 +146,9 @@ describe('CanvasRce', () => {
             toolbar: [
               {
                 name: 'Styles',
-                items: ['button1', 'button2']
-              }
-            ]
+                items: ['button1', 'button2'],
+              },
+            ],
           }}
         />,
         target
@@ -160,8 +160,8 @@ describe('CanvasRce', () => {
         expect.arrayContaining([
           {
             name: 'Styles',
-            items: expect.arrayContaining(['button1', 'button2'])
-          }
+            items: expect.arrayContaining(['button1', 'button2']),
+          },
         ])
       )
     })
@@ -177,9 +177,9 @@ describe('CanvasRce', () => {
             toolbar: [
               {
                 name: 'New Toolbar',
-                items: ['button1', 'button2']
-              }
-            ]
+                items: ['button1', 'button2'],
+              },
+            ],
           }}
         />,
         target
@@ -192,8 +192,8 @@ describe('CanvasRce', () => {
         expect.arrayContaining([
           {
             name: 'New Toolbar',
-            items: expect.arrayContaining(['button1', 'button2'])
-          }
+            items: expect.arrayContaining(['button1', 'button2']),
+          },
         ])
       )
     })

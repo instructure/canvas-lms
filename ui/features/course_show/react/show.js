@@ -21,7 +21,7 @@ import HomePagePromptContainer from '@canvas/course-homepage/react/Prompt'
 import ObserverOptions from '@canvas/observer-picker'
 import {
   getHandleChangeObservedUser,
-  autoFocusObserverPicker
+  autoFocusObserverPicker,
 } from '@canvas/observer-picker/util/pageReloadHelper'
 import createStore from '@canvas/util/createStore'
 import {View} from '@instructure/ui-view'
@@ -40,16 +40,16 @@ const I18n = useI18nScope('courses_show')
 
 const defaultViewStore = createStore({
   selectedDefaultView: ENV.COURSE.default_view,
-  savedDefaultView: ENV.COURSE.default_view
+  savedDefaultView: ENV.COURSE.default_view,
 })
 
 class ChooseHomePageButton extends React.Component {
   state = {
-    dialogOpen: false
+    dialogOpen: false,
   }
 
   static propTypes = {
-    store: PropTypes.object.isRequired
+    store: PropTypes.object.isRequired,
   }
 
   render() {
@@ -99,9 +99,9 @@ const addToDoSidebar = parent => {
     dateTimeFormatters: {
       dateString: $.dateString,
       timeString: $.timeString,
-      datetimeString: $.datetimeString
+      datetimeString: $.datetimeString,
     },
-    forCourse: ENV.COURSE.id
+    forCourse: ENV.COURSE.id,
   })
     .then(() => {
       renderToDoSidebar(parent)
@@ -126,7 +126,7 @@ $(() => {
           if (defaultView === 'modules' && modules.length === 0) {
             ReactDOM.render(
               <HomePagePromptContainer
-                forceOpen
+                forceOpen={true}
                 store={defaultViewStore}
                 courseId={courseId}
                 wikiFrontPageTitle={ENV.COURSE.front_page_title}

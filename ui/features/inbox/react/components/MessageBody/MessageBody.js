@@ -52,7 +52,7 @@ MessageBody.propTypes = {
   messages: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string,
-      type: PropTypes.string
+      type: PropTypes.string,
     })
-  )
+  ),
 }

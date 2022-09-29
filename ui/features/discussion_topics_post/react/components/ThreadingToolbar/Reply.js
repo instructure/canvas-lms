@@ -40,12 +40,12 @@ export function Reply({...props}) {
       props={{
         mobile: {
           textSize: 'small',
-          itemSpacing: 'none small 0 none'
+          itemSpacing: 'none small 0 none',
         },
         desktop: {
           textSize: undefined,
-          itemSpacing: undefined
-        }
+          itemSpacing: undefined,
+        },
       }}
       render={responsiveProps => (
         <span className="discussion-reply-btn">
@@ -78,7 +78,7 @@ export function Reply({...props}) {
 
 Reply.defaultProps = {
   withBackground: false,
-  isIsolatedView: false
+  isIsolatedView: false,
 }
 
 Reply.propTypes = {
@@ -107,5 +107,5 @@ Reply.propTypes = {
    * True if rendered in isolated view
    */
   isIsolatedView: PropTypes.bool,
-  hasDraftEntry: PropTypes.bool
+  hasDraftEntry: PropTypes.bool,
 }

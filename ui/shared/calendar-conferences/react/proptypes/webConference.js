@@ -26,6 +26,6 @@ const webConference = shape({
   description: string,
   lti_settings: object,
   title: string.isRequired,
-  url: string
+  url: string,
 })
 export default webConference

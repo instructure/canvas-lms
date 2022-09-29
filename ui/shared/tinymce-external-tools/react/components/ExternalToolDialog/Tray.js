@@ -47,5 +47,5 @@ ExternalToolDialogTray.propTypes = {
   onClose: PropTypes.func,
   onCloseButton: PropTypes.func,
   name: PropTypes.string.isRequired,
-  children: PropTypes.node
+  children: PropTypes.node,
 }

@@ -37,15 +37,15 @@ export function AssignmentAvailabilityWindow({...props}) {
   if (props.availableDate && props.untilDate) {
     availabilityWindow = I18n.t('Available from %{availableDate} until %{untilDate}', {
       availableDate: dateFormat(props.availableDate, 'short'),
-      untilDate: dateFormat(props.untilDate, 'short')
+      untilDate: dateFormat(props.untilDate, 'short'),
     })
   } else if (props.availableDate) {
     availabilityWindow = I18n.t('Available from %{availableDate}', {
-      availableDate: dateFormat(props.availableDate, 'short')
+      availableDate: dateFormat(props.availableDate, 'short'),
     })
   } else if (props.untilDate) {
     availabilityWindow = I18n.t('Available until %{untilDate}', {
-      untilDate: dateFormat(props.untilDate, 'short')
+      untilDate: dateFormat(props.untilDate, 'short'),
     })
   }
 
@@ -59,12 +59,12 @@ export function AssignmentAvailabilityWindow({...props}) {
       props={{
         tablet: {
           textSize: 'x-small',
-          displayText: props.showOnMobile ? availabilityWindow : null
+          displayText: props.showOnMobile ? availabilityWindow : null,
         },
         desktop: {
           textSize: 'small',
-          displayText: availabilityWindow
-        }
+          displayText: availabilityWindow,
+        },
       }}
       render={responsiveProps => {
         return responsiveProps.displayText ? (
@@ -85,12 +85,12 @@ AssignmentAvailabilityWindow.prototypes = {
   untilDate: PropTypes.string,
   showOnMobile: PropTypes.bool,
   showDateWithTime: PropTypes.bool,
-  anonymousState: PropTypes.string
+  anonymousState: PropTypes.string,
 }
 
 AssignmentAvailabilityWindow.defaultProps = {
   availabilityWindowName: '',
   showOnMobile: false,
   showDateWithTime: false,
-  anonymousState: null
+  anonymousState: null,
 }

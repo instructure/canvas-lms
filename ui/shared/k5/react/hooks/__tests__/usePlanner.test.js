@@ -41,7 +41,7 @@ const PLANNER_CONFIG_KEYS = [
   'externalFallbackFocusable',
   'env',
   'singleCourse',
-  'observedUserId'
+  'observedUserId',
 ]
 
 const defaults = {plannerEnabled: true, isPlannerActive: () => {}}

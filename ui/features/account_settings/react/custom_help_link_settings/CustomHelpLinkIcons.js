@@ -24,7 +24,7 @@ import {
   IconFolderLine,
   IconInfoLine,
   IconLifePreserverLine,
-  IconQuestionLine
+  IconQuestionLine,
 } from '@instructure/ui-icons'
 import CustomHelpLinkIconInput from './CustomHelpLinkIconInput'
 
@@ -81,9 +81,9 @@ export default function CustomHelpLinkIcons(props) {
 }
 
 CustomHelpLinkIcons.propTypes = {
-  defaultValue: PropTypes.string
+  defaultValue: PropTypes.string,
 }
 
 CustomHelpLinkIcons.defaultProps = {
-  defaultValue: ''
+  defaultValue: '',
 }

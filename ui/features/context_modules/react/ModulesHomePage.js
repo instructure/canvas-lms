@@ -25,11 +25,11 @@ const I18n = useI18nScope('modules_home_page')
 
 export default class ModulesHomePage extends React.Component {
   static propTypes = {
-    onCreateButtonClick: PropTypes.func
+    onCreateButtonClick: PropTypes.func,
   }
 
   static defaultProps = {
-    onCreateButtonClick: () => {}
+    onCreateButtonClick: () => {},
   }
 
   render() {

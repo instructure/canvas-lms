@@ -20,7 +20,7 @@ const ImageSearchInitialState = {
   searching: false,
   searchResults: [],
   searchTerm: '',
-  alert: null
+  alert: null,
 }
 
 export default ImageSearchInitialState

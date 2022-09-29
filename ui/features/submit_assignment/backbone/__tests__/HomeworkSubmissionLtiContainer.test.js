@@ -41,8 +41,8 @@ describe('HomeworkSubmissionLtiContainer', () => {
       beforeEach(() => {
         getEnv.mockReturnValue({
           SUBMIT_ASSIGNMENT: {
-            ALLOWED_EXTENSIONS: []
-          }
+            ALLOWED_EXTENSIONS: [],
+          },
         })
       })
 
@@ -69,8 +69,8 @@ describe('HomeworkSubmissionLtiContainer', () => {
       beforeEach(() => {
         getEnv.mockReturnValue({
           SUBMIT_ASSIGNMENT: {
-            ALLOWED_EXTENSIONS: ['txt']
-          }
+            ALLOWED_EXTENSIONS: ['txt'],
+          },
         })
       })
 

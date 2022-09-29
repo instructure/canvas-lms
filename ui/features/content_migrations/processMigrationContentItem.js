@@ -41,9 +41,9 @@ export default function processMigrationContentItem(event) {
         contentItems: [
           {
             text: result.text,
-            url: result.url
-          }
-        ]
+            url: result.url,
+          },
+        ],
       })
     })
     .catch(error => {

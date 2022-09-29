@@ -101,7 +101,7 @@ export default class ShowEventDetailsDialog {
           }
         },
         delUrl: url,
-        isRepeating: !!event.calendarEvent?.series_uuid
+        isRepeating: !!event.calendarEvent?.series_uuid,
       })
     } else {
       return $('<div />').confirmDelete({
@@ -109,7 +109,7 @@ export default class ShowEventDetailsDialog {
         message: $(
           deleteItemTemplate({
             message: opts.message || event.deleteConfirmation,
-            hide_reason: event.object.workflow_state !== 'locked'
+            hide_reason: event.object.workflow_state !== 'locked',
           })
         ),
         dialog: {title: opts.dialogTitle || I18n.t('Confirm Deletion')},
@@ -120,7 +120,7 @@ export default class ShowEventDetailsDialog {
         },
         success: () => {
           publish('CommonEvent/eventDeleted', event)
-        }
+        },
       })
     }
   }
@@ -145,7 +145,7 @@ export default class ShowEventDetailsDialog {
                   text: I18n.t('Do Nothing'),
                   click() {
                     $dialog.dialog('close')
-                  }
+                  },
                 },
                 {
                   text: I18n.t('Reschedule'),
@@ -156,17 +156,17 @@ export default class ShowEventDetailsDialog {
                         $dialog.dialog('close')
                       )
                     )
-                  }
-                }
+                  },
+                },
               ]
             : [
                 {
                   text: I18n.t('OK'),
                   click() {
                     $dialog.dialog('close')
-                  }
-                }
-              ]
+                  },
+                },
+              ],
         })
       }
     })
@@ -243,7 +243,7 @@ export default class ShowEventDetailsDialog {
       const e = events[i]
       this.deleteEvent(e, {
         dialogTitle: I18n.t('Confirm Reservation Removal'),
-        message: I18n.t('Are you sure you want to delete your reservation to this event?')
+        message: I18n.t('Are you sure you want to delete your reservation to this event?'),
       })
       return
     }
@@ -257,14 +257,14 @@ export default class ShowEventDetailsDialog {
       message: $(
         deleteItemTemplate({
           message: I18n.t('Are you sure you want to cancel your appointment with %{name}?', {
-            name: (event.user && event.user.short_name) || event.group.name
-          })
+            name: (event.user && event.user.short_name) || event.group.name,
+          }),
         })
       ),
       dialog: {
         title: I18n.t('Confirm Removal'),
         width: '400px',
-        resizable: false
+        resizable: false,
       },
       prepareData: $dialog => ({cancel_reason: $dialog.find('#cancel_reason').val()}),
       success: () => {
@@ -282,13 +282,13 @@ export default class ShowEventDetailsDialog {
           publish('CommonEvent/eventDeleted', this.event)
           this.popover.hide()
         }
-      }
+      },
     })
   }
 
   show = jsEvent => {
     const params = $.extend(true, {}, this.event, {
-      can_reserve: this.event.object && this.event.object.reserve_url
+      can_reserve: this.event.object && this.event.object.reserve_url,
     })
 
     // For now used to eliminate the ability of teachers and tas seeing the excess reserveration link
@@ -310,7 +310,7 @@ export default class ShowEventDetailsDialog {
           id: (e.user && e.user.id) || e.group.id,
           name: (e.user && e.user.short_name) || e.group.name,
           event_url: e.url,
-          comments: e.comments
+          comments: e.comments,
         }
         ;(params.reservations ? params.reservations : (params.reservations = [])).push(reservation)
         if (e.user) {

@@ -39,13 +39,13 @@ const defaultProps = {
   loadLatestPaceByContext,
   showLoadingOverlay,
   toggleExcludeWeekends,
-  updateBlackoutDates
+  updateBlackoutDates,
 }
 
 beforeAll(() => {
   window.ENV.VALID_DATE_RANGE = {
     end_at: {date: COURSE.start_at, date_context: 'course'},
-    start_at: {date: COURSE.end_at, date_context: 'course'}
+    start_at: {date: COURSE.end_at, date_context: 'course'},
   }
 })
 afterEach(() => {
@@ -76,7 +76,7 @@ describe('Settings', () => {
   })
 
   it('disables all settings while syncing', () => {
-    const {getByRole} = renderConnected(<Settings {...defaultProps} isSyncing />)
+    const {getByRole} = renderConnected(<Settings {...defaultProps} isSyncing={true} />)
     const settingsButton = getByRole('button', {name: 'Modify Settings'})
     act(() => settingsButton.click())
 

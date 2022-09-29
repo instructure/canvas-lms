@@ -29,8 +29,8 @@ const initializeNewUserTutorials = () => {
   if (
     window.ENV.NEW_USER_TUTORIALS &&
     window.ENV.NEW_USER_TUTORIALS.is_enabled &&
-    (window.ENV.context_asset_string &&
-      splitAssetString(window.ENV.context_asset_string)[0] === 'courses')
+    window.ENV.context_asset_string &&
+    splitAssetString(window.ENV.context_asset_string)[0] === 'courses'
   ) {
     const API_URL = '/api/v1/users/self/new_user_tutorial_statuses'
     axios.get(API_URL).then(response => {
@@ -38,12 +38,12 @@ const initializeNewUserTutorials = () => {
       const trayObj = getProperTray()
       const collapsedStatus = response.data.new_user_tutorial_statuses.collapsed[trayObj.pageName]
       const store = createTutorialStore({
-        isCollapsed: collapsedStatus
+        isCollapsed: collapsedStatus,
       })
 
       store.addChangeListener(() => {
         axios.put(`${API_URL}/${trayObj.pageName}`, {
-          collapsed: store.getState().isCollapsed
+          collapsed: store.getState().isCollapsed,
         })
       })
 

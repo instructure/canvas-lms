@@ -37,7 +37,7 @@ const {
   Row: TableRow,
   ColHeader: TableColHeader,
   Body: TableBody,
-  Cell: TableCell
+  Cell: TableCell,
 } = Table as any
 
 type ContentItemDisplay = {
@@ -95,7 +95,7 @@ const buildContentItems = (items: ContentItem[]) =>
         ([field, message]) =>
           ({
             title: item.title,
-            error: {field, message}
+            error: {field, message},
           } as ContentItemDisplay)
       )
       return [...acc, ...errorItems]
@@ -104,18 +104,18 @@ const buildContentItems = (items: ContentItem[]) =>
     return [
       ...acc,
       {
-        title: item.title
-      } as ContentItemDisplay
+        title: item.title,
+      } as ContentItemDisplay,
     ]
   }, [] as ContentItemDisplay[])
 
-  type RetrievingContentProps = {
-    environment: {
-      deep_link_response: DeepLinkResponse
-      DEEP_LINKING_POST_MESSAGE_ORIGIN: string
-    }
-    parentWindow: Window
+type RetrievingContentProps = {
+  environment: {
+    deep_link_response: DeepLinkResponse
+    DEEP_LINKING_POST_MESSAGE_ORIGIN: string
   }
+  parentWindow: Window
+}
 
 export const RetrievingContent = ({environment, parentWindow}: RetrievingContentProps) => {
   const subject = 'LtiDeepLinkingResponse'
@@ -127,7 +127,7 @@ export const RetrievingContent = ({environment, parentWindow}: RetrievingContent
     parentWindow.postMessage(
       {
         subject,
-        ...deepLinkResponse
+        ...deepLinkResponse,
       },
       environment.DEEP_LINKING_POST_MESSAGE_ORIGIN
     )

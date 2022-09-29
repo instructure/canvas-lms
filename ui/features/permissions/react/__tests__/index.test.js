@@ -23,7 +23,7 @@ let app = null
 const defaultData = () => ({
   contextId: 1,
   permissions: [],
-  roles: []
+  roles: [],
 })
 
 const indexContainer = document.createElement('div')

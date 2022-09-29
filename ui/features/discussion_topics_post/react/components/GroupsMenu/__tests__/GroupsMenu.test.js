@@ -32,7 +32,7 @@ const defaultProps = {
       children: 'Group_Test_1',
       contextName: 'Group_Test_1',
       type: 'button',
-      disabled: false
+      disabled: false,
     },
     {
       _id: 'test_id_2',
@@ -40,9 +40,9 @@ const defaultProps = {
       children: 'Group_Test_2',
       contextName: 'Group_Test_2',
       type: 'button',
-      disabled: false
-    }
-  ]
+      disabled: false,
+    },
+  ],
 }
 
 describe('GroupsMenu', () => {

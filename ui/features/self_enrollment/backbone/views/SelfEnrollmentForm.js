@@ -26,7 +26,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
   static initClass() {
     this.prototype.events = {
       'change input[name=initial_action]': 'changeAction',
-      'click #logout_link': 'logOutAndRefresh'
+      'click #logout_link': 'logOutAndRefresh',
     }
   }
 
@@ -40,7 +40,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
 
     if (ENV.ACCOUNT.recaptcha_key) {
       const that = this
-      $(window).on('load', function() {
+      $(window).on('load', function () {
         that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
           sitekey: ENV.ACCOUNT.recaptcha_key,
           callback: () => {
@@ -50,7 +50,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
           'expired-callback': () => {
             that.recaptchaPassed = false
             that.$el.find('#submit_button').prop('disabled', true)
-          }
+          },
         })
       })
       if (this.action == 'create') {
@@ -62,7 +62,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
       success: data => this.success(data),
       errorFormatter: errors => this.errorFormatter(errors),
       error: () => this.clearCaptcha(),
-      disableWhileLoading: 'spin_on_success'
+      disableWhileLoading: 'spin_on_success',
     })
   }
 

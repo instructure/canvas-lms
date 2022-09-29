@@ -23,14 +23,14 @@ const propTypes = {}
 propTypes.permissions = shape({
   create: bool.isRequired,
   manage_content: bool.isRequired,
-  moderate: bool.isRequired
+  moderate: bool.isRequired,
 })
 
 propTypes.discussionTopicMenuTools = shape({
   base_url: string.isRequired,
   canvas_icon_class: string,
   icon_url: string,
-  title: string.isRequired
+  title: string.isRequired,
 })
 
 propTypes.courseSettings = shape({
@@ -42,12 +42,12 @@ propTypes.courseSettings = shape({
   grading_standard_id: bool,
   hide_distribution_graphs: bool,
   hide_final_grades: bool,
-  home_page_announcement_limit: number
+  home_page_announcement_limit: number,
 })
 
 propTypes.userSettings = shape({
   collapse_global_nav: bool,
-  manual_mark_as_read: bool
+  manual_mark_as_read: bool,
 })
 
 export default propTypes

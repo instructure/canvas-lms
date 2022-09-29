@@ -32,7 +32,7 @@ const useInputFocus = inputEls => {
 
   return {
     inputElRefs,
-    setInputElRef
+    setInputElRef,
   }
 }
 

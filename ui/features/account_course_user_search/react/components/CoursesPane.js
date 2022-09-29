@@ -41,7 +41,7 @@ const defaultFilters = {
   sort: 'sis_course_id',
   order: 'asc',
   search_by: 'course',
-  page: null
+  page: null,
 }
 
 class CoursesPane extends React.Component {
@@ -49,7 +49,7 @@ class CoursesPane extends React.Component {
     roles: arrayOf(shape({id: string.isRequired})).isRequired,
     queryParams: shape().isRequired,
     onUpdateQueryParams: func.isRequired,
-    accountId: string.isRequired
+    accountId: string.isRequired,
   }
 
   constructor() {
@@ -61,9 +61,9 @@ class CoursesPane extends React.Component {
       errors: {},
       previousCourses: {
         data: [],
-        loading: true
+        loading: true,
       },
-      srMessageDisplayed: false
+      srMessageDisplayed: false,
     }
 
     // Doing this here because the class property version didn't work :(
@@ -99,7 +99,7 @@ class CoursesPane extends React.Component {
     this.setState(
       oldState => ({
         filters: {...oldState.filters, page},
-        previousCourses: CoursesStore.get(oldState.filters)
+        previousCourses: CoursesStore.get(oldState.filters),
       }),
       this.fetchCourses
     )
@@ -109,7 +109,7 @@ class CoursesPane extends React.Component {
     this.setState(
       oldState => ({
         errors: {},
-        draftFilters: {...oldState.draftFilters, ...newFilters, page: null}
+        draftFilters: {...oldState.draftFilters, ...newFilters, page: null},
       }),
       this.debouncedApplyFilters
     )
@@ -121,9 +121,9 @@ class CoursesPane extends React.Component {
       this.setState({
         errors: {
           search_term: I18n.t('Search term must be at least %{num} characters', {
-            num: MIN_SEARCH_LENGTH
-          })
-        }
+            num: MIN_SEARCH_LENGTH,
+          }),
+        },
       })
     } else {
       this.setState({knownLastPage: undefined, filters, errors: {}}, this.fetchCourses)
@@ -139,7 +139,7 @@ class CoursesPane extends React.Component {
       return {
         knownLastPage: undefined,
         filters: newFilters,
-        previousCourses: CoursesStore.get(oldState.filters)
+        previousCourses: CoursesStore.get(oldState.filters),
       }
     }, this.fetchCourses)
   }

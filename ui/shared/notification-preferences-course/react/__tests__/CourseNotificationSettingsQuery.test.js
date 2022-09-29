@@ -32,7 +32,7 @@ async function createQueryMocks(queryOverrides) {
   }
   const queryResult = await mockGraphqlQuery(COURSE_NOTIFICATIONS_QUERY, queryOverrides, {
     courseId: 1,
-    userId: 1
+    userId: 1,
   })
 
   return [
@@ -41,11 +41,11 @@ async function createQueryMocks(queryOverrides) {
         query: COURSE_NOTIFICATIONS_QUERY,
         variables: {
           courseId: '1',
-          userId: '1'
-        }
+          userId: '1',
+        },
       },
-      result: queryResult
-    }
+      result: queryResult,
+    },
   ]
 }
 
@@ -61,7 +61,7 @@ async function createMutationMocks(mutationOverrides) {
       courseId: '1',
       channelId: '1',
       category: 'Grading',
-      frequency: 'never'
+      frequency: 'never',
     }
   )
 
@@ -73,11 +73,11 @@ async function createMutationMocks(mutationOverrides) {
           courseId: '1',
           channelId: '1',
           category: 'Grading',
-          frequency: 'never'
-        }
+          frequency: 'never',
+        },
       },
-      result: mutationResult
-    }
+      result: mutationResult,
+    },
   ]
 }
 
@@ -92,9 +92,9 @@ const mockedPrefs = {
         courseActivities: {
           Grading: {
             communicationChannelId: '1',
-            frequency: 'immediately'
-          }
-        }
+            frequency: 'immediately',
+          },
+        },
       },
       notificationPolicies: [
         {
@@ -105,13 +105,13 @@ const mockedPrefs = {
             category: 'Grading',
             categoryDescription: 'Description Text',
             categoryDisplayName: 'Display Name Text',
-            name: 'Assignment Graded'
-          }
-        }
+            name: 'Assignment Graded',
+          },
+        },
       ],
-      notificationPolicyOverrides: []
-    }
-  ]
+      notificationPolicyOverrides: [],
+    },
+  ],
 }
 
 describe('Course Notification Settings', () => {
@@ -156,19 +156,19 @@ describe('Course Notification Settings', () => {
     ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: {
-          label: ''
-        }
-      }
+          label: '',
+        },
+      },
     }
     const mocks = await createMutationMocks([
-      {UpdateNotificationPreferencesPayload: {errors: null}}
+      {UpdateNotificationPreferencesPayload: {errors: null}},
     ])
     const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
 
     const {getByText, getAllByRole} = render(
       <AlertManagerContext.Provider
         value={{
-          setOnSuccess: mockedSetOnSuccess
+          setOnSuccess: mockedSetOnSuccess,
         }}
       >
         <MockedProvider mocks={mocks}>
@@ -176,7 +176,7 @@ describe('Course Notification Settings', () => {
             courseId="1"
             userId="1"
             courseName="Course"
-            enabled
+            enabled={true}
             notificationPreferences={mockedPrefs}
           />
         </MockedProvider>

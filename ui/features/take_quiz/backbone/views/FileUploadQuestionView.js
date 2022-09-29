@@ -32,13 +32,13 @@ export default class FileUploadQuestion extends View {
       '.file-upload-btn': '$fileDialogButton',
       '.attachment-id': '$attachmentID',
       '.file-upload-box': '$fileUploadBox',
-      '#fileupload_in_progress': '$fileUploadInprogress'
+      '#fileupload_in_progress': '$fileUploadInprogress',
     }
 
     this.prototype.events = {
       'change input[type=file]': 'checkForFileChange',
       'click .file-upload-btn': 'openFileBrowser',
-      'click .delete-attachment': 'deleteAttachment'
+      'click .delete-attachment': 'deleteAttachment',
     }
   }
 

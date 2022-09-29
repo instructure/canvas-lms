@@ -25,39 +25,39 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Groups'),
-      description: I18n.t('Allows user to view the group home pages of all student groups.')
+      description: I18n.t('Allows user to view the group home pages of all student groups.'),
     },
     {
       description: I18n.t(
         'Allows students to access other student groups within a group set with a direct link.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Groups'),
       description: I18n.t(
         'By default students are able to create groups; to restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Groups'),
-      description: I18n.t('Allows user to view the group home pages of all student groups.')
+      description: I18n.t('Allows user to view the group home pages of all student groups.'),
     },
     {
       description: I18n.t(
         'Allows students to access other student groups within a group set with a direct link.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Groups'),
       description: I18n.t(
         'By default students are able to create groups; to restrict students from creating groups, do not select the Let students organize their own groups checkbox in Course Settings.'
-      )
-    }
+      ),
+    },
   ]
 )

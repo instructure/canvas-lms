@@ -43,7 +43,7 @@ const fetchStaff = cards =>
             name: instructor.short_name,
             bio: instructor.bio,
             avatarUrl: instructor.avatar_url || undefined,
-            role: instructor.enrollments[0].role
+            role: instructor.enrollments[0].role,
           })
         }
         return acc
@@ -67,7 +67,7 @@ const fetchApps = cards => {
           courses: [course],
           title: app.course_navigation?.text || app.name,
           icon: app.course_navigation?.icon_url || app.icon_url,
-          windowTarget: app.course_navigation?.windowTarget
+          windowTarget: app.course_navigation?.windowTarget,
         })
       }
       return acc
@@ -146,5 +146,5 @@ ResourcesPage.propTypes = {
   cardsSettled: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
   showStaff: PropTypes.bool.isRequired,
-  isSingleCourse: PropTypes.bool.isRequired
+  isSingleCourse: PropTypes.bool.isRequired,
 }

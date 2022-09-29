@@ -33,7 +33,7 @@ export default class BlueprintCourseSidebar extends Component {
     onClose: PropTypes.func,
     children: PropTypes.node,
     detachedChildren: PropTypes.node,
-    contentRef: PropTypes.func // for unit testing
+    contentRef: PropTypes.func, // for unit testing
   }
 
   static defaultProps = {
@@ -41,13 +41,13 @@ export default class BlueprintCourseSidebar extends Component {
     detachedChildren: null,
     onOpen: () => {},
     onClose: () => {},
-    contentRef: null
+    contentRef: null,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      isOpen: false
+      isOpen: false,
     }
   }
 
@@ -94,7 +94,7 @@ export default class BlueprintCourseSidebar extends Component {
         </div>
         <Tray
           label={I18n.t('Blueprint Settings')}
-          shouldContainFocus
+          shouldContainFocus={true}
           open={this.state.isOpen}
           placement="end"
           onEntered={this.handleOpen}

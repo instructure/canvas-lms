@@ -37,7 +37,7 @@ const Focus = ({children, timeout = 0}) => {
 
 Focus.propTypes = {
   children: PropTypes.node.isRequired,
-  timeout: PropTypes.number
+  timeout: PropTypes.number,
 }
 
 export default Focus

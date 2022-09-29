@@ -22,7 +22,7 @@
 import $ from 'jquery'
 import '@canvas/datetime'
 
-$.fn.keycodes = function(options, fn) {
+$.fn.keycodes = function (options, fn) {
   /* Based loosely on Tzury Bar Yochay's js-hotkeys:
   (c) Copyrights 2007 - 2008
 
@@ -70,7 +70,7 @@ $.fn.keycodes = function(options, fn) {
     121: 'f10',
     122: 'f11',
     123: 'f12',
-    191: '/'
+    191: '/',
   }
   if ($.browser.mozilla) {
     specialKeys = $.extend(specialKeys, {
@@ -84,7 +84,7 @@ $.fn.keycodes = function(options, fn) {
       103: '7',
       104: '8',
       105: '9',
-      0: '191' /* with shift, 191 becomes 0 #5200 */
+      0: '191' /* with shift, 191 becomes 0 #5200 */,
     })
   }
   if (typeof options === 'string') {
@@ -100,14 +100,10 @@ $.fn.keycodes = function(options, fn) {
   const codes = options.keyCodes.split(' ')
   $.each(codes, (i, code) => {
     originalCodes.push(code)
-    code = code
-      .split('+')
-      .sort()
-      .join('+')
-      .toLowerCase()
+    code = code.split('+').sort().join('+').toLowerCase()
     keyCodes.push(code)
   })
-  this.bind('keydown', function(event, originalEvent) {
+  this.bind('keydown', function (event, originalEvent) {
     event = originalEvent && originalEvent.keyCode ? originalEvent : event
     if (options.ignore && $(event.target).is(options.ignore)) {
       return
@@ -128,16 +124,9 @@ $.fn.keycodes = function(options, fn) {
     let key = specialKeys[event.keyCode]
     key = key || String.fromCharCode(event.keyCode)
     code.push(key)
-    code = code
-      .sort()
-      .join('+')
-      .toLowerCase()
-    event.keyMatches = function(checkCode) {
-      checkCode = checkCode
-        .split('+')
-        .sort()
-        .join('+')
-        .toLowerCase()
+    code = code.sort().join('+').toLowerCase()
+    event.keyMatches = function (checkCode) {
+      checkCode = checkCode.split('+').sort().join('+').toLowerCase()
       return checkCode == code
     }
     const idx = $.inArray(code, keyCodes)

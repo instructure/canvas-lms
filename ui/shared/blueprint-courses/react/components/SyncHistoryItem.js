@@ -43,7 +43,7 @@ const SyncHistoryItem = ({migration, heading, ChangeComponent}) => {
           {migration.user?.display_name
             ? I18n.t('%{count} changes pushed by %{user}', {
                 count: changes.length,
-                user: migration.user.display_name
+                user: migration.user.display_name,
               })
             : I18n.t('%{count} pushed changes', {count: changes.length})}
         </Text>
@@ -64,12 +64,12 @@ const SyncHistoryItem = ({migration, heading, ChangeComponent}) => {
 SyncHistoryItem.propTypes = {
   migration: propTypes.migration.isRequired,
   ChangeComponent: PropTypes.func,
-  heading: PropTypes.node
+  heading: PropTypes.node,
 }
 
 SyncHistoryItem.defaultProps = {
   ChangeComponent: SyncChange,
-  heading: null
+  heading: null,
 }
 
 export default SyncHistoryItem

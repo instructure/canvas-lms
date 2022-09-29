@@ -46,7 +46,7 @@ const ImportantDateSection = ({date, items, timeZone}) => {
 ImportantDateSection.propTypes = {
   date: PropTypes.string.isRequired,
   items: PropTypes.arrayOf(PropTypes.shape(ImportantDateItemShape)).isRequired,
-  timeZone: PropTypes.string.isRequired
+  timeZone: PropTypes.string.isRequired,
 }
 
 export default ImportantDateSection

@@ -40,14 +40,14 @@ const ENABLED_STATES = [ENABLED_FOR_NONE, ENABLED_FOR_PARTIAL, ENABLED_FOR_ALL]
 
 propTypes.permissionDetails = shape({
   title: string.isRequired,
-  description: string.isRequired
+  description: string.isRequired,
 })
 
 propTypes.permission = shape({
   permission_name: string.isRequired,
   label: string.isRequired,
   contextType: oneOf([COURSE, ACCOUNT]),
-  displayed: bool.isRequired
+  displayed: bool.isRequired,
 })
 
 propTypes.rolePermission = shape({
@@ -56,7 +56,7 @@ propTypes.rolePermission = shape({
   locked: bool.isRequired,
   readonly: bool.isRequired,
   applies_to_descendants: bool,
-  applies_to_self: bool
+  applies_to_self: bool,
 })
 
 propTypes.role = shape({
@@ -65,12 +65,12 @@ propTypes.role = shape({
   base_role_type: string.isRequired,
   contextType: oneOf([COURSE, ACCOUNT]),
   displayed: bool.isRequired,
-  permissions: object.isRequired // eslint-disable-line, shape is indeterminate
+  permissions: object.isRequired, // eslint-disable-line, shape is indeterminate
 })
 
 propTypes.filteredRole = shape({
   label: string.isRequired,
-  value: string.isRequired
+  value: string.isRequired,
 })
 
 export default propTypes

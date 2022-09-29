@@ -29,14 +29,12 @@ const I18n = useI18nScope('gradingCourseTabContainer')
 
 class CourseTabContainer extends React.Component {
   static propTypes = {
-    hasGradingPeriods: PropTypes.bool.isRequired
+    hasGradingPeriods: PropTypes.bool.isRequired,
   }
 
   componentDidMount() {
     if (!this.props.hasGradingPeriods) return
-    $(this.tabContainer)
-      .children('.ui-tabs-minimal')
-      .tabs()
+    $(this.tabContainer).children('.ui-tabs-minimal').tabs()
   }
 
   renderSetsAndStandards() {

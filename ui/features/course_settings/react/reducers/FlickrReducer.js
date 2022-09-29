@@ -41,7 +41,7 @@ const flickrHandlers = {
     state.searchResults = []
     state.searching = false
     return state
-  }
+  },
 }
 
 const flickr = (state = FlickrInitialState, action) => {

@@ -41,7 +41,7 @@ const IntegrationRow = ({
   loading,
   name,
   onChange,
-  onToggle
+  onToggle,
 }) => {
   const summary = () => (
     <Flex justifyItems="space-between">

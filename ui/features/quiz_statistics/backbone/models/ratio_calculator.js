@@ -37,7 +37,7 @@ export default function calculateResponseRatio(answerPool, participantCount, sup
   if (MULTIPLE_ANSWERS === questionType) {
     correctResponseCount = suppl.correctResponseCount || 0
   } else {
-    correctResponseCount = answerPool.reduce(function(sum, answer) {
+    correctResponseCount = answerPool.reduce(function (sum, answer) {
       return answer.correct ? sum + answer.responses : sum
     }, 0)
   }

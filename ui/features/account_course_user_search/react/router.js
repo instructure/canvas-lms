@@ -31,12 +31,12 @@ export default {
         store.dispatch(
           TabActions.selectTab({
             selected: i,
-            queryParams: parse(context.querystring)
+            queryParams: parse(context.querystring),
           })
         )
       })
     })
 
     page.start()
-  }
+  },
 }

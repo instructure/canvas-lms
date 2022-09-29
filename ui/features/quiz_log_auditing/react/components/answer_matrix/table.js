@@ -37,13 +37,13 @@ const I18n = useI18nScope('quiz_log_auditing.table_view')
  */
 class Table extends React.Component {
   state = {
-    activeEventId: null
+    activeEventId: null,
   }
 
   static defaultProps = {
     questions: [],
     events: [],
-    submission: {}
+    submission: {},
   }
 
   render() {
@@ -69,7 +69,7 @@ class Table extends React.Component {
       <th key={'question-' + question.id}>
         <div>
           {I18n.t('headers.question', 'Question %{position}', {
-            position: question.position
+            position: question.position,
           })}
 
           <small>({question.id})</small>
@@ -115,7 +115,7 @@ class Table extends React.Component {
 
   toggleAnswerVisibility(event) {
     this.setState(state => ({
-      activeEventId: event.id === state.activeEventId ? null : event.id
+      activeEventId: event.id === state.activeEventId ? null : event.id,
     }))
   }
 }

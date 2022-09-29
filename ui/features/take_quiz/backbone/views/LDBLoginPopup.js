@@ -61,8 +61,8 @@ export default class LDBLoginPopup extends Backbone.View {
         toolbar: false,
         fullscreen: false,
         width: 480,
-        height: 480
-      }
+        height: 480,
+      },
     }
   }
 
@@ -174,9 +174,7 @@ export default class LDBLoginPopup extends Backbone.View {
     const login = e => {
       const consumptionRc = consume(e)
 
-      const credentials = $(e.target)
-        .closest('form')
-        .toJSON()
+      const credentials = $(e.target).closest('form').toJSON()
 
       const authenticate = this.authenticate(credentials)
 
@@ -247,16 +245,14 @@ export default class LDBLoginPopup extends Backbone.View {
       .compact()
       .value()
 
-    $inputSink = $('<div />')
-      .on('click', bringToFront)
-      .css({
-        'z-index': 1000,
-        position: 'fixed',
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0
-      })
+    $inputSink = $('<div />').on('click', bringToFront).css({
+      'z-index': 1000,
+      position: 'fixed',
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+    })
 
     if (this.options.sticky) {
       let relaunch
@@ -265,7 +261,7 @@ export default class LDBLoginPopup extends Backbone.View {
 
       this.on('login_success.sticky', () => (relaunch = false))
 
-      return this.on('close.sticky', function() {
+      return this.on('close.sticky', function () {
         if (relaunch) {
           setTimeout(this.exec, 1)
         }
@@ -288,8 +284,8 @@ export default class LDBLoginPopup extends Backbone.View {
       global: false,
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'application/json'
-      }
+        Accept: 'application/json',
+      },
     })
   }
 }

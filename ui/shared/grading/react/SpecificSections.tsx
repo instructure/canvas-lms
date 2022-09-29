@@ -71,7 +71,7 @@ export default function SpecificSections(props: Props) {
                         hyphens: 'auto',
                         msHyphens: 'auto',
                         overflowWrap: 'break-word',
-                        WebkitHyphens: 'auto'
+                        WebkitHyphens: 'auto',
                       }}
                     >
                       {section.name}

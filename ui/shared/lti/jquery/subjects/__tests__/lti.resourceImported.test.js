@@ -21,7 +21,7 @@ import {ltiState} from '../../messages'
 
 const resourceImportedMessage = {
   subject: 'lti.resourceImported',
-  data: 'http://localhost/test'
+  data: 'http://localhost/test',
 }
 
 describe('lti.resourceImported', () => {

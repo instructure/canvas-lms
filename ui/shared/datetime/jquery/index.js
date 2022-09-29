@@ -290,7 +290,7 @@ $.fn.timepicker = function () {
           .css({
             left: -1000,
             height: 'auto',
-            width: 'auto'
+            width: 'auto',
           })
           .show()
         const pickerOffset = $picker.offset()
@@ -299,7 +299,7 @@ $.fn.timepicker = function () {
         $picker
           .css({
             top: offset.top + height,
-            left: offset.left
+            left: offset.left,
           })
           .end()
         $('#time_picker .time_slot')
@@ -311,12 +311,12 @@ $.fn.timepicker = function () {
         const scrollTop = $.windowScrollTop()
         if (offset.top + height - scrollTop + pickerHeight > windowHeight) {
           $picker.css({
-            top: offset.top - pickerHeight
+            top: offset.top - pickerHeight,
           })
         }
         if (offset.left + pickerWidth > windowWidth) {
           $picker.css({
-            left: offset.left + width - pickerWidth
+            left: offset.left + width - pickerWidth,
           })
         }
         $('#time_picker').hide().slideDown()
@@ -390,7 +390,7 @@ $._initializeTimepicker = function () {
   const $picker = $(document.createElement('div'))
   $picker.attr('id', 'time_picker').css({
     position: 'absolute',
-    display: 'none'
+    display: 'none',
   })
   let pickerHtml = "<div class='widget_group hour_group'>"
   pickerHtml += "<div class='ui-widget ui-state-default time_slot'>01</div>"

@@ -35,7 +35,7 @@ const textAreaProps = {
   height: '4rem',
   id: 'speed_grader_comment_textarea',
   label: <ScreenReaderContent>{I18n.t('Add a Comment')}</ScreenReaderContent>,
-  placeholder: I18n.t('Add a Comment')
+  placeholder: I18n.t('Add a Comment'),
 }
 
 export default function CommentArea({getTextAreaRef, courseId, userId}) {
@@ -103,5 +103,5 @@ export default function CommentArea({getTextAreaRef, courseId, userId}) {
 CommentArea.propTypes = {
   getTextAreaRef: PropTypes.func.isRequired,
   courseId: PropTypes.string.isRequired,
-  userId: PropTypes.string.isRequired
+  userId: PropTypes.string.isRequired,
 }

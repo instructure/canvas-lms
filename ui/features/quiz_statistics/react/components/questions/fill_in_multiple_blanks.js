@@ -35,12 +35,12 @@ class FillInMultipleBlanks extends React.Component {
   }
 
   static defaultProps = {
-    answerSets: []
+    answerSets: [],
   }
 
   render() {
     const crr = calculateResponseRatio(this.getAnswerPool(), this.props.participantCount, {
-      questionType: this.props.questionType
+      questionType: this.props.questionType,
     })
     const answerPool = this.getAnswerPool()
 
@@ -57,7 +57,7 @@ class FillInMultipleBlanks extends React.Component {
 
             <div
               className="question-text"
-              aria-hidden
+              aria-hidden={true}
               dangerouslySetInnerHTML={{__html: this.props.questionText}}
             />
 
@@ -78,7 +78,7 @@ class FillInMultipleBlanks extends React.Component {
             <CorrectAnswerDonut
               correctResponseRatio={crr}
               label={I18n.t('%{ratio}% responded correctly', {
-                ratio: round(crr * 100.0, 0)
+                ratio: round(crr * 100.0, 0),
               })}
             />
           </div>
@@ -90,7 +90,7 @@ class FillInMultipleBlanks extends React.Component {
   renderAnswerSetTab(answerSet) {
     const id = answerSet.id
     const className = classSet({
-      active: this.getAnswerSetId() === id
+      active: this.getAnswerSetId() === id,
     })
 
     return (
@@ -111,9 +111,8 @@ class FillInMultipleBlanks extends React.Component {
     const answerSet = this.props.answerSets.find(answerSet => answerSet.id === answerSetId)
 
     if (answerSet) {
-      return answerSet.answers.map(answer => ({ ...answer, poolId: answerSetId }))
-    }
-    else {
+      return answerSet.answers.map(answer => ({...answer, poolId: answerSetId}))
+    } else {
       return []
     }
   }
@@ -121,8 +120,7 @@ class FillInMultipleBlanks extends React.Component {
   getAnswerSetId() {
     if (this.props.id === this.state.answerSetQuestionId && this.state.answerSetId) {
       return this.state.answerSetId
-    }
-    else {
+    } else {
       return (this.props.answerSets[0] || {}).id
     }
   }
@@ -132,7 +130,7 @@ class FillInMultipleBlanks extends React.Component {
 
     this.setState({
       answerSetId,
-      answerSetQuestionId: this.props.id
+      answerSetQuestionId: this.props.id,
     })
   }
 }

@@ -48,7 +48,7 @@ SearchResults.displayErrors = function (errors) {
         {I18n.t(
           {
             one: 'Your search encountered the following error:',
-            other: 'Your search encountered the following errors:'
+            other: 'Your search encountered the following errors:',
           },
           {count: errors.length}
         )}
@@ -71,7 +71,7 @@ SearchResults.renderFilePreview = function () {
        * As long as ?preview is present in the url.
        */
       <FilePreview
-        isOpen
+        isOpen={true}
         params={this.props.params}
         query={this.props.query}
         collection={this.state.collection}

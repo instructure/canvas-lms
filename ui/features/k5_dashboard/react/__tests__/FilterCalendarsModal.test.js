@@ -32,7 +32,7 @@ const defaultProps = {
   isOpen: true,
   selectedContextCodes: ['course_2'],
   selectedContextsLimit: 2,
-  updateSelectedContextCodes: jest.fn()
+  updateSelectedContextCodes: jest.fn(),
 }
 
 beforeEach(() => {

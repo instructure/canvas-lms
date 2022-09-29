@@ -41,5 +41,5 @@ export const coursePaceDateFormatter = (locale = ENV.LOCALE) =>
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-    timeZone: coursePaceTimezone
+    timeZone: coursePaceTimezone,
   }).format

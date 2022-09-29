@@ -30,7 +30,7 @@ const I18n = useI18nScope('actions')
 const Actions = {
   uploadingImage() {
     return {
-      type: 'UPLOADING_IMAGE'
+      type: 'UPLOADING_IMAGE',
     }
   },
 
@@ -38,8 +38,8 @@ const Actions = {
     return {
       type: 'GOT_COURSE_IMAGE',
       payload: {
-        imageUrl
-      }
+        imageUrl,
+      },
     }
   },
 
@@ -47,8 +47,8 @@ const Actions = {
     return {
       type: 'MODAL_VISIBILITY',
       payload: {
-        showModal
-      }
+        showModal,
+      },
     }
   },
 
@@ -56,34 +56,34 @@ const Actions = {
     return {
       type: 'REJECTED_UPLOAD',
       payload: {
-        rejectedFiletype: type
-      }
+        rejectedFiletype: type,
+      },
     }
   },
 
   errorUploadingImage() {
     $.flashError(I18n.t('There was an error uploading the image'))
     return {
-      type: 'ERROR_UPLOADING_IMAGE'
+      type: 'ERROR_UPLOADING_IMAGE',
     }
   },
 
   removingImage() {
     return {
-      type: 'REMOVING_IMAGE'
+      type: 'REMOVING_IMAGE',
     }
   },
 
   removedImage() {
     return {
-      type: 'REMOVED_IMAGE'
+      type: 'REMOVED_IMAGE',
     }
   },
 
   errorRemovingImage() {
     $.flashError(I18n.t('There was an error removing the image'))
     return {
-      type: 'ERROR_REMOVING_IMAGE'
+      type: 'ERROR_REMOVING_IMAGE',
     }
   },
 
@@ -105,8 +105,8 @@ const Actions = {
       type: 'SET_COURSE_IMAGE_ID',
       payload: {
         imageUrl,
-        imageId
-      }
+        imageId,
+      },
     }
   },
 
@@ -114,8 +114,8 @@ const Actions = {
     return {
       type: 'SET_COURSE_IMAGE_URL',
       payload: {
-        imageUrl
-      }
+        imageUrl,
+      },
     }
   },
 
@@ -199,7 +199,7 @@ const Actions = {
           size: file.size,
           parent_folder_path: `course_${settingName}`,
           type,
-          no_redirect: true
+          no_redirect: true,
         }
         rawUploadFile(url, data, file, ajaxLib)
           .then(attachment => {
@@ -219,7 +219,7 @@ const Actions = {
 
   ajaxPutFormData(path, data, ajaxLib = axios) {
     return ajaxLib.put(path, qs.stringify(data))
-  }
+  },
 }
 
 export default Actions

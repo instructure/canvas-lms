@@ -34,7 +34,7 @@ describe('Button', () => {
   it('should call onChange when typing occurs', () => {
     const onChangeMock = jest.fn()
     const {subjectInput} = setup({
-      onChange: onChangeMock
+      onChange: onChangeMock,
     })
     fireEvent.change(subjectInput, {target: {value: '42'}})
     expect(onChangeMock.mock.calls.length).toBe(1)
@@ -43,7 +43,7 @@ describe('Button', () => {
   it('should call onBlur when blur event triggered', () => {
     const onBlurMock = jest.fn()
     const {subjectInput} = setup({
-      onBlur: onBlurMock
+      onBlur: onBlurMock,
     })
     fireEvent.focus(subjectInput)
     fireEvent.blur(subjectInput)
@@ -53,7 +53,7 @@ describe('Button', () => {
   it('should call onFocus when focus event triggered', () => {
     const onFocusMock = jest.fn()
     const {subjectInput} = setup({
-      onFocus: onFocusMock
+      onFocus: onFocusMock,
     })
     fireEvent.focus(subjectInput)
     fireEvent.blur(subjectInput)

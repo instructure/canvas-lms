@@ -34,7 +34,7 @@ const DueDateWrapperConsts = {
   MAXIMUM_STUDENTS_TO_SHOW: 7,
   MAXIMUM_GROUPS_TO_SHOW: 5,
   MAXIMUM_SECTIONS_TO_SHOW: 3,
-  MS_TO_DEBOUNCE_SEARCH: 800
+  MS_TO_DEBOUNCE_SEARCH: 800,
 }
 
 class DueDateTokenWrapper extends React.Component {
@@ -47,7 +47,7 @@ class DueDateTokenWrapper extends React.Component {
     defaultSectionNamer: PropTypes.func.isRequired,
     currentlySearching: PropTypes.bool.isRequired,
     allStudentsFetched: PropTypes.bool.isRequired,
-    disabled: PropTypes.bool.isRequired
+    disabled: PropTypes.bool.isRequired,
   }
 
   MINIMUM_SEARCH_LENGTH = DueDateWrapperConsts.MINIMUM_SEARCH_LENGTH
@@ -66,7 +66,7 @@ class DueDateTokenWrapper extends React.Component {
 
   state = {
     userInput: '',
-    currentlyTyping: false
+    currentlyTyping: false,
   }
 
   // This is useful for testing to make it so the debounce is not used
@@ -88,7 +88,7 @@ class DueDateTokenWrapper extends React.Component {
   handleInput = userInput => {
     if (this.props.disabled) return
 
-    this.setState({userInput, currentlyTyping: true}, function() {
+    this.setState({userInput, currentlyTyping: true}, function () {
       if (this.safetiesOff) {
         this.fetchStudents()
       } else {
@@ -258,7 +258,7 @@ class DueDateTokenWrapper extends React.Component {
       },
       get conditional_release() {
         return I18n.t('Mastery Paths')
-      }
+      },
     }[heading]
 
     const canSelect = heading === 'conditional_release'
@@ -280,7 +280,7 @@ class DueDateTokenWrapper extends React.Component {
       {
         student: this.MAXIMUM_STUDENTS_TO_SHOW,
         course_section: this.MAXIMUM_SECTIONS_TO_SHOW,
-        group: this.MAXIMUM_GROUPS_TO_SHOW
+        group: this.MAXIMUM_GROUPS_TO_SHOW,
       }[type] || 0
 
     return _.chain(this.filteredTagsForType(type))
@@ -294,7 +294,8 @@ class DueDateTokenWrapper extends React.Component {
       set.displayName || set.name || this.props.defaultSectionNamer(set.course_section_id)
     return (
       <ComboboxOption key={set.key || `${displayName}-${index}`} value={set.name} set_props={set}>
-        {displayName}{set.pronouns && ` (${set.pronouns})`}
+        {displayName}
+        {set.pronouns && ` (${set.pronouns})`}
       </ComboboxOption>
     )
   }
@@ -372,7 +373,7 @@ class DueDateTokenWrapper extends React.Component {
           tokenAriaFunc={this.overrideTokenAriaLabel}
           onRemove={this.handleTokenRemove}
           combobox-aria-label={ariaLabel}
-          value
+          value={true}
           showListOnFocus={!this.props.disabled}
           ref="TokenInput"
         />

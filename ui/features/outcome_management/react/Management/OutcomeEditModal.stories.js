@@ -30,11 +30,11 @@ export default {
       description: 'Outcome description',
       displayName: 'Friendly outcome name',
       contextType: 'Account',
-      contextId: '1'
+      contextId: '1',
     },
     isOpen: true,
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const withContext = (children, {contextType = 'Account', contextId = '1'} = {}) => (
@@ -54,8 +54,8 @@ withNoName.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: '1'
-  }
+    contextId: '1',
+  },
 }
 
 export const withLongName = Template.bind({})
@@ -66,8 +66,8 @@ withLongName.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: '1'
-  }
+    contextId: '1',
+  },
 }
 
 export const withLongDisplayName = Template.bind({})
@@ -78,8 +78,8 @@ withLongDisplayName.args = {
     description: 'Outcome description',
     displayName: 'Long friendly outcome name. '.repeat(10),
     contextType: 'Account',
-    contextId: '1'
-  }
+    contextId: '1',
+  },
 }
 
 export const withLongDescription = Template.bind({})
@@ -90,8 +90,8 @@ withLongDescription.args = {
     description: 'A very long outcome description. '.repeat(18),
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: '1'
-  }
+    contextId: '1',
+  },
 }
 
 export const withoutEditPermission = Template.bind({})
@@ -102,8 +102,8 @@ withoutEditPermission.args = {
     description: 'Outcome description',
     displayName: 'Friendly outcome name',
     contextType: 'Account',
-    contextId: '2'
-  }
+    contextId: '2',
+  },
 }
 
 export const withFriendlyDescription = Template.bind({})
@@ -113,6 +113,6 @@ withFriendlyDescription.args = {
     title: 'Outcome 1',
     description: 'An outcome description.',
     friendlyDescription: 'A friendly outcome description.',
-    displayName: 'Friendly outcome name'
-  }
+    displayName: 'Friendly outcome name',
+  },
 }

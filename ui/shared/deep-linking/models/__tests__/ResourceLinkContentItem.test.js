@@ -43,7 +43,7 @@ describe('when the iframe property is specified', () => {
   const iframe = {
     src: 'http://www.instructure.com',
     width: 500,
-    height: 200
+    height: 200,
   }
 
   it('returns markup for an iframe', () => {

@@ -40,20 +40,20 @@ afterAll(() => {
 const timezones = [
   {
     name: 'Central',
-    localized_name: 'Central localized'
+    localized_name: 'Central localized',
   },
   {
     name: 'Eastern',
-    localized_name: 'Eastern localized'
+    localized_name: 'Eastern localized',
   },
   {
     name: 'Mountain',
-    localized_name: 'Mountain localized'
+    localized_name: 'Mountain localized',
   },
   {
     name: 'Pacific',
-    localized_name: 'Pacific localized'
-  }
+    localized_name: 'Pacific localized',
+  },
 ]
 const priorityZones = [timezones[0]]
 
@@ -93,7 +93,7 @@ describe('TimeZoneSelect', () => {
     isEqual(
       Array.from(priorityOptions).map(e => ({
         name: e.getAttribute('value'),
-        localized_name: e.textContent
+        localized_name: e.textContent,
       })),
       priorityZones
     )
@@ -104,7 +104,7 @@ describe('TimeZoneSelect', () => {
     isEqual(
       Array.from(allOptions).map(e => ({
         name: e.getAttribute('value'),
-        localized_name: e.textContent
+        localized_name: e.textContent,
       })),
       timezones
     )

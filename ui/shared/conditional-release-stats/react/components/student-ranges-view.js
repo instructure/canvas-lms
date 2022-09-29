@@ -39,7 +39,7 @@ export default class StudentRangesView extends React.Component {
     student: studentShape,
 
     // actions
-    selectStudent: func.isRequired
+    selectStudent: func.isRequired,
   }
 
   constructor(props) {
@@ -81,7 +81,7 @@ export default class StudentRangesView extends React.Component {
 
     const classes = classNames({
       'crs-ranges-view': true,
-      'crs-ranges-view__hidden': isHidden
+      'crs-ranges-view__hidden': isHidden,
     })
     return (
       <div className={classes}>

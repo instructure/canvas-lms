@@ -68,19 +68,19 @@ export default class CourseSidebar extends Component {
     clearAssociations: PropTypes.func.isRequired,
     enableSendNotification: PropTypes.func.isRequired,
     loadUnsyncedChanges: PropTypes.func.isRequired,
-    contentRef: PropTypes.func // to get reference to the content of the Tray facilitates unit testing
+    contentRef: PropTypes.func, // to get reference to the content of the Tray facilitates unit testing
   }
 
   static defaultProps = {
     unsyncedChanges: [],
     contentRef: null,
     migrationStatus: MigrationStates.states.unknown,
-    realRef: () => {}
+    realRef: () => {},
   }
 
   state = {
     isModalOpen: false,
-    modalId: null
+    modalId: null,
   }
 
   componentDidMount() {
@@ -123,7 +123,7 @@ export default class CourseSidebar extends Component {
           this.closeModal(() => {
             this.asscBtn.focus()
             this.props.clearAssociations()
-          })
+          }),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading associations...')}</div>}>
@@ -134,7 +134,7 @@ export default class CourseSidebar extends Component {
         this.closeModal(() => {
           this.asscBtn.focus()
           this.props.clearAssociations()
-        })
+        }),
     }),
     syncHistory: () => ({
       props: {
@@ -142,13 +142,13 @@ export default class CourseSidebar extends Component {
         onCancel: () =>
           this.closeModal(() => {
             if (this.syncHistoryBtn) this.syncHistoryBtn.focus()
-          })
+          }),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading sync history...')}</div>}>
           <SyncHistory />
         </Suspense>
-      )
+      ),
     }),
     unsyncedChanges: () => ({
       props: {
@@ -172,14 +172,14 @@ export default class CourseSidebar extends Component {
               })
             }
           />
-        )
+        ),
       },
       children: (
         <Suspense fallback={<div>{I18n.t('Loading unsynced changes...')}</div>}>
           <UnsyncedChanges />
         </Suspense>
-      )
-    })
+      ),
+    }),
   }
 
   closeModal = cb => {
@@ -190,7 +190,7 @@ export default class CourseSidebar extends Component {
   handleAssociationsClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'associations'
+      modalId: 'associations',
     })
   }
 
@@ -201,7 +201,7 @@ export default class CourseSidebar extends Component {
   handleUnsyncedChangesClick = () => {
     this.setState({
       isModalOpen: true,
-      modalId: 'unsyncedChanges'
+      modalId: 'unsyncedChanges',
     })
   }
 
@@ -217,7 +217,7 @@ export default class CourseSidebar extends Component {
   openHistoryModal() {
     this.setState({
       isModalOpen: true,
-      modalId: 'syncHistory'
+      modalId: 'syncHistory',
     })
   }
 
@@ -401,11 +401,11 @@ const connectState = state =>
       'unsyncedChanges',
       'isLoadingUnsyncedChanges',
       'hasLoadedUnsyncedChanges',
-      'migrationStatus'
+      'migrationStatus',
     ]),
     {
       hasAssociationChanges: state.addedAssociations.length + state.removedAssociations.length > 0,
-      willAddAssociations: state.addedAssociations.length > 0
+      willAddAssociations: state.addedAssociations.length > 0,
     }
   )
 const connectActions = dispatch => bindActionCreators(actions, dispatch)

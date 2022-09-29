@@ -30,7 +30,7 @@ describe('ImportConfirmBox', () => {
     count: 100,
     onCloseHandler: onCloseHandlerMock,
     onImportHandler: onImportHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(async () => {

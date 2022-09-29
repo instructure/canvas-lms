@@ -31,7 +31,7 @@ class LinkValidator extends React.Component {
     results: [],
     displayResults: false,
     error: false,
-    showConfetti: false
+    showConfetti: false,
   }
 
   componentWillMount() {
@@ -56,26 +56,26 @@ class LinkValidator extends React.Component {
             results: data.results.issues,
             displayResults: true,
             error: false,
-            showConfetti: !initial_load && data.results.issues.length === 0
+            showConfetti: !initial_load && data.results.issues.length === 0,
           })
           $('#all-results').show()
         } else {
           this.setState({
             buttonMessage: I18n.t('Start Link Validation'),
-            buttonDisabled: false
+            buttonDisabled: false,
           })
           if (data.workflow_state === 'failed' && !initial_load) {
             this.setState({
-              error: true
+              error: true,
             })
           }
         }
       },
       error: () => {
         this.setState({
-          error: true
+          error: true,
         })
-      }
+      },
     })
   }
 
@@ -84,7 +84,7 @@ class LinkValidator extends React.Component {
       buttonMessage: I18n.t('Loading...'),
       buttonDisabled: true,
       displayResults: false,
-      results: []
+      results: [],
     })
   }
 
@@ -92,7 +92,7 @@ class LinkValidator extends React.Component {
     $('#all-results').hide()
 
     this.setState({
-      showConfetti: false
+      showConfetti: false,
     })
 
     this.setLoadingState()
@@ -111,9 +111,9 @@ class LinkValidator extends React.Component {
       },
       error: () => {
         this.setState({
-          error: true
+          error: true,
         })
-      }
+      },
     })
   }
 
@@ -152,7 +152,7 @@ class LinkValidator extends React.Component {
 
 LinkValidator.propTypes = {
   pollTimeout: number.isRequired,
-  pollTimeoutInitial: number.isRequired
+  pollTimeoutInitial: number.isRequired,
 }
 
 export default LinkValidator

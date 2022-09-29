@@ -28,7 +28,7 @@ import {
   smallOutcomeTree,
   setFriendlyDescriptionOutcomeMock,
   createLearningOutcomeMock,
-  createOutcomeGroupMocks
+  createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
@@ -42,7 +42,7 @@ describe('CreateOutcomeModal', () => {
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onSuccess: onSuccessMock,
-    ...props
+    ...props,
   })
 
   const render = (
@@ -55,7 +55,7 @@ describe('CreateOutcomeModal', () => {
       mocks = accountMocks({childGroupsCount: 0}),
       isMobileView = false,
       renderer = rtlRender,
-      treeBrowserRootGroupId = '1'
+      treeBrowserRootGroupId = '1',
     } = {}
   ) => {
     return renderer(
@@ -67,8 +67,8 @@ describe('CreateOutcomeModal', () => {
             friendlyDescriptionFF,
             accountLevelMasteryScalesFF,
             isMobileView,
-            treeBrowserRootGroupId
-          }
+            treeBrowserRootGroupId,
+          },
         }}
       >
         <MockedProvider cache={cache} mocks={mocks}>
@@ -92,7 +92,7 @@ describe('CreateOutcomeModal', () => {
     const getProps = (props = {}) =>
       defaultProps({
         ...props,
-        ...specProps
+        ...specProps,
       })
 
     describe('CreateOutcomeModal', () => {
@@ -155,13 +155,13 @@ describe('CreateOutcomeModal', () => {
 
       it('shows error message if friendly description > 255 characters', async () => {
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree()]
+          mocks: [...smallOutcomeTree()],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'a'.repeat(256)}
+          target: {value: 'a'.repeat(256)},
         })
         fireEvent.click(getByText('Root account folder'))
         expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
@@ -169,7 +169,7 @@ describe('CreateOutcomeModal', () => {
 
       it('calls onCloseHandler & onSuccess on Create button click', async () => {
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree()]
+          mocks: [...smallOutcomeTree()],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -181,7 +181,7 @@ describe('CreateOutcomeModal', () => {
       it('displays the root group and its subgroups in the group selection drill down', async () => {
         const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [...smallOutcomeTree()],
-          isMobileView: true
+          isMobileView: true,
         })
         await act(async () => jest.runOnlyPendingTimers())
         expect(getByText('Root account folder')).toBeInTheDocument()
@@ -192,7 +192,7 @@ describe('CreateOutcomeModal', () => {
         const starterGroupId = '100'
         const {queryByText} = render(<CreateOutcomeModal {...defaultProps({starterGroupId})} />, {
           mocks: [...smallOutcomeTree()],
-          isMobileView: true
+          isMobileView: true,
         })
         await act(async () => jest.runOnlyPendingTimers())
         expect(queryByText('Root account folder')).not.toBeInTheDocument()
@@ -205,21 +205,21 @@ describe('CreateOutcomeModal', () => {
           mocks: [
             ...smallOutcomeTree('Account'),
             setFriendlyDescriptionOutcomeMock({
-              inputDescription: 'Friendly Description value'
+              inputDescription: 'Friendly Description value',
             }),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
               description: '',
-              groupId: '100'
-            })
-          ]
+              groupId: '100',
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'Friendly Description value'}
+          target: {value: 'Friendly Description value'},
         })
         fireEvent.click(getByText('Account folder 0'))
         fireEvent.click(getByText('Create'))
@@ -227,7 +227,7 @@ describe('CreateOutcomeModal', () => {
         await waitFor(() => {
           expect(onSuccessMock).toHaveBeenCalledTimes(1)
           expect(onSuccessMock).toHaveBeenCalledWith({
-            selectedGroupAncestorIds: ['100', '1']
+            selectedGroupAncestorIds: ['100', '1'],
           })
         })
       })
@@ -238,28 +238,28 @@ describe('CreateOutcomeModal', () => {
           mocks: [
             ...smallOutcomeTree(),
             setFriendlyDescriptionOutcomeMock({
-              inputDescription: 'Friendly Description value'
+              inputDescription: 'Friendly Description value',
             }),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
               description: '',
-              groupId: '1'
-            })
-          ]
+              groupId: '1',
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'Friendly Description value'}
+          target: {value: 'Friendly Description value'},
         })
         fireEvent.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
-            type: 'success'
+            type: 'success',
           })
         })
       })
@@ -274,9 +274,9 @@ describe('CreateOutcomeModal', () => {
               displayName: 'Display name',
               description: '',
               failResponse: true,
-              groupId: '1'
-            })
-          ]
+              groupId: '1',
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -285,7 +285,7 @@ describe('CreateOutcomeModal', () => {
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error'
+            type: 'error',
           })
         })
       })
@@ -300,9 +300,9 @@ describe('CreateOutcomeModal', () => {
               displayName: 'Display name',
               description: '',
               failMutation: true,
-              groupId: '1'
-            })
-          ]
+              groupId: '1',
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -312,7 +312,7 @@ describe('CreateOutcomeModal', () => {
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error'
+            type: 'error',
           })
         })
       })
@@ -326,33 +326,33 @@ describe('CreateOutcomeModal', () => {
               title: 'Outcome 123',
               displayName: 'Display name',
               description: '',
-              groupId: '1'
+              groupId: '1',
             }),
             setFriendlyDescriptionOutcomeMock({
               inputDescription: 'Friendly description',
-              failResponse: true
-            })
-          ]
+              failResponse: true,
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'Friendly description'}
+          target: {value: 'Friendly description'},
         })
         fireEvent.click(getByText('Create'))
         await act(async () => jest.runOnlyPendingTimers())
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: 'An error occurred while creating this outcome. Please try again.',
-            type: 'error'
+            type: 'error',
           })
         })
       })
 
       it('displays an error on failed request for account outcome groups', async () => {
         const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: []
+          mocks: [],
         })
         await act(async () => jest.runOnlyPendingTimers())
         const {getByText} = within(getByTestId('loading-error'))
@@ -363,7 +363,7 @@ describe('CreateOutcomeModal', () => {
         const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
           contextType: 'Course',
           contextId: '2',
-          mocks: []
+          mocks: [],
         })
         await act(async () => jest.runOnlyPendingTimers())
         const {getByText} = within(getByTestId('loading-error'))
@@ -379,18 +379,18 @@ describe('CreateOutcomeModal', () => {
               title: 'Outcome 123',
               displayName: 'Display name',
               description: '',
-              groupId: '1'
+              groupId: '1',
             }),
             setFriendlyDescriptionOutcomeMock({
-              inputDescription: 'Friendly description'
-            })
-          ]
+              inputDescription: 'Friendly description',
+            }),
+          ],
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
         fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Display name'}})
         fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-          target: {value: 'Friendly description'}
+          target: {value: 'Friendly description'},
         })
         fireEvent.click(getByText('Root account folder'))
         fireEvent.click(getByText('Create'))
@@ -398,7 +398,7 @@ describe('CreateOutcomeModal', () => {
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: '"Outcome 123" was successfully created.',
-            type: 'success'
+            type: 'success',
           })
         })
       })
@@ -444,9 +444,9 @@ describe('CreateOutcomeModal', () => {
               ...accountMocks({childGroupsCount: 0}),
               ...createOutcomeGroupMocks({
                 parentOutcomeGroupId: '1',
-                title: 'test'
-              })
-            ]
+                title: 'test',
+              }),
+            ],
           }
         )
         await act(async () => jest.runOnlyPendingTimers())
@@ -460,7 +460,7 @@ describe('CreateOutcomeModal', () => {
       describe('with Friendly Description Feature Flag disabled', () => {
         it('does not display Friendly Description field in modal', async () => {
           const {queryByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-            friendlyDescriptionFF: false
+            friendlyDescriptionFF: false,
           })
           await act(async () => jest.runOnlyPendingTimers())
           expect(
@@ -478,9 +478,9 @@ describe('CreateOutcomeModal', () => {
                 title: 'Outcome 123',
                 displayName: 'Display name',
                 description: '',
-                groupId: '1'
-              })
-            ]
+                groupId: '1',
+              }),
+            ],
           })
           await act(async () => jest.runOnlyPendingTimers())
           fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -491,7 +491,7 @@ describe('CreateOutcomeModal', () => {
           await waitFor(() => {
             expect(showFlashAlertSpy).toHaveBeenCalledWith({
               message: '"Outcome 123" was successfully created.',
-              type: 'success'
+              type: 'success',
             })
           })
         })
@@ -501,7 +501,7 @@ describe('CreateOutcomeModal', () => {
         describe('when feature flag disabled', () => {
           it('displays Calculation Method selection form', async () => {
             const {getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false
+              accountLevelMasteryScalesFF: false,
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByLabelText('Calculation Method')).toBeInTheDocument()
@@ -509,7 +509,7 @@ describe('CreateOutcomeModal', () => {
 
           it('displays Proficiency Ratings selection form', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false
+              accountLevelMasteryScalesFF: false,
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
@@ -531,15 +531,15 @@ describe('CreateOutcomeModal', () => {
                     calculationMethod: 'n_mastery',
                     calculationInt: 5,
                     individualCalculation: true,
-                    individualRatings: true
-                  })
-                ]
+                    individualRatings: true,
+                  }),
+                ],
               }
             )
             await act(async () => jest.runOnlyPendingTimers())
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
             fireEvent.change(getByLabelText('Friendly Name'), {
-              target: {value: 'Display name'}
+              target: {value: 'Display name'},
             })
             fireEvent.click(getByDisplayValue('Decaying Average'))
             fireEvent.click(getByText('n Number of Times'))
@@ -548,14 +548,14 @@ describe('CreateOutcomeModal', () => {
             await waitFor(() => {
               expect(showFlashAlertSpy).toHaveBeenCalledWith({
                 message: '"Outcome 123" was successfully created.',
-                type: 'success'
+                type: 'success',
               })
             })
           })
 
           it('displays horizontal divider between ratings and calculation method which is hidden from screen readers', async () => {
             const {getByTestId} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false
+              accountLevelMasteryScalesFF: false,
             })
             await act(async () => jest.runOnlyPendingTimers())
             expect(getByTestId('outcome-create-modal-horizontal-divider')).toBeInTheDocument()
@@ -563,7 +563,7 @@ describe('CreateOutcomeModal', () => {
 
           it('sets focus on rating description if error in both description and points and click on Create button', () => {
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false
+              accountLevelMasteryScalesFF: false,
             })
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
             const ratingDescription = getByLabelText('Change description for mastery level 2')
@@ -579,7 +579,7 @@ describe('CreateOutcomeModal', () => {
 
           it('sets focus on mastery points if error in mastery points and calculation method and click on Create button', () => {
             const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-              accountLevelMasteryScalesFF: false
+              accountLevelMasteryScalesFF: false,
             })
             fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
             const masteryPoints = getByLabelText('Change mastery points')

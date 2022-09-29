@@ -66,5 +66,5 @@ OverviewPage.propTypes = {
   content: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   canEdit: PropTypes.bool.isRequired,
-  showImmersiveReader: PropTypes.bool.isRequired
+  showImmersiveReader: PropTypes.bool.isRequired,
 }

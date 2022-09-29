@@ -26,7 +26,7 @@ describe('Overview Content', () => {
     url: '/courses/12/pages/thehomepage/edit',
     canEdit: true,
     showImmersiveReader: true,
-    ...overrides
+    ...overrides,
   })
 
   it('renders overview content', () => {

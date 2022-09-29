@@ -27,11 +27,11 @@ export const PeerReviews = {
   `,
 
   shape: shape({
-    dueAt: string
+    dueAt: string,
   }),
 
   mock: ({dueAt = '2021-03-30T23:59:59-06:00'} = {}) => ({
     dueAt,
-    __typename: 'PeerReviews'
-  })
+    __typename: 'PeerReviews',
+  }),
 }

@@ -33,9 +33,7 @@ var authenticationProviders = {
     if (form !== null) {
       form.style.display = ''
       setTimeout(() => {
-        $(form)
-          .find(':focusable:first')
-          .focus()
+        $(form).find(':focusable:first').focus()
         form.scrollIntoView()
       }, 100)
     }
@@ -52,7 +50,7 @@ var authenticationProviders = {
     authenticationProviders.hideNoAuthMessage()
     authenticationProviders.hideAllNewAuthTypeForms()
     authenticationProviders.showFormFor(authType)
-  }
+  },
 }
 
 export default authenticationProviders

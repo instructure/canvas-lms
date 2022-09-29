@@ -54,10 +54,10 @@ export const AnonymousAvatar = ({seedString, size, addFocus}) => {
 AnonymousAvatar.propTypes = {
   seedString: string,
   addFocus: string,
-  size: string
+  size: string,
 }
 
 AnonymousAvatar.defaultProps = {
   size: 'medium',
-  addFocus: null
+  addFocus: null,
 }

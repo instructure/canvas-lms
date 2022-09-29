@@ -38,11 +38,11 @@ function editGroup(group, open = true) {
         id: group.get('id'),
         group_category_id: group.get('group_category_id'),
         join_level: group.get('join_level'),
-        group_limit: group.get('max_membership')
+        group_limit: group.get('max_membership'),
       }}
       label={I18n.t('Edit Group')}
       open={open}
-      nameOnly
+      nameOnly={true}
       requestMethod="PUT"
       onSave={reloadStudentGroup}
       onDismiss={() => {

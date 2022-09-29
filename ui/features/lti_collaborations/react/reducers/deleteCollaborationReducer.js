@@ -21,7 +21,7 @@ import ACTION_NAMES from '../actions'
 const initialState = {
   deleteCollaborationPending: false,
   deleteCollaborationSuccessful: false,
-  deleteCollaborationError: null
+  deleteCollaborationError: null,
 }
 
 const deleteHandlers = {
@@ -30,23 +30,23 @@ const deleteHandlers = {
       ...state,
       deleteCollaborationPending: true,
       deleteCollaborationSuccessful: false,
-      deleteCollaborationError: null
+      deleteCollaborationError: null,
     }
   },
   [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
     return {
       ...state,
       deleteCollaborationPending: false,
-      deleteCollaborationSuccessful: true
+      deleteCollaborationSuccessful: true,
     }
   },
   [ACTION_NAMES.DELETE_COLLABORATION_FAILED]: (state, action) => {
     return {
       ...state,
       deleteCollaborationPending: false,
-      deleteCollaborationError: action.payload
+      deleteCollaborationError: action.payload,
     }
-  }
+  },
 }
 
 export default (state = initialState, action) => {

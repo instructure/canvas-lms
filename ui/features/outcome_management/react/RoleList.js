@@ -50,9 +50,9 @@ RoleList.propTypes = {
       id: string.isRequired,
       role: string.isRequired,
       label: string.isRequired,
-      base_role_type: string.isRequired
+      base_role_type: string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
 }
 
 export default RoleList

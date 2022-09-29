@@ -36,17 +36,17 @@ export default class ExternalToolModalLauncher extends React.Component {
     contextId: PropTypes.number.isRequired,
     launchType: PropTypes.string.isRequired,
     contextModuleId: PropTypes.string,
-    onExternalContentReady: PropTypes.func
+    onExternalContentReady: PropTypes.func,
   }
 
   static defaultProps = {
-    appElement: document.getElementById('application')
+    appElement: document.getElementById('application'),
   }
 
   state = {
     beforeExternalContentAlertClass: 'screenreader-only',
     afterExternalContentAlertClass: 'screenreader-only',
-    modalLaunchStyle: {}
+    modalLaunchStyle: {},
   }
 
   getDimensions = () => {
@@ -55,7 +55,7 @@ export default class ExternalToolModalLauncher extends React.Component {
     return {
       modalStyle: this.getModalStyle(dimensions),
       modalBodyStyle: this.getModalBodyStyle(dimensions),
-      modalLaunchStyle: this.getModalLaunchStyle(dimensions)
+      modalLaunchStyle: this.getModalLaunchStyle(dimensions),
     }
   }
 
@@ -88,7 +88,7 @@ export default class ExternalToolModalLauncher extends React.Component {
         '?display=borderless&launch_type=',
         this.props.launchType,
         this.props.contextModuleId && '&context_module_id=',
-        this.props.contextModuleId
+        this.props.contextModuleId,
       ].join('')
     }
   }
@@ -96,7 +96,7 @@ export default class ExternalToolModalLauncher extends React.Component {
   getLaunchDimensions = () => {
     const dimensions = {
       width: 700,
-      height: 700
+      height: 700,
     }
 
     if (
@@ -122,25 +122,25 @@ export default class ExternalToolModalLauncher extends React.Component {
 
   getModalLaunchStyle = dimensions => ({
     ...dimensions,
-    border: 'none'
+    border: 'none',
   })
 
   getModalBodyStyle = dimensions => ({
     ...dimensions,
     padding: 0,
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
   })
 
   getModalStyle = dimensions => ({
-    width: dimensions.width
+    width: dimensions.width,
   })
 
   handleAlertBlur = event => {
     const newState = {
       modalLaunchStyle: {
-        border: 'none'
-      }
+        border: 'none',
+      },
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -154,8 +154,8 @@ export default class ExternalToolModalLauncher extends React.Component {
     const newState = {
       modalLaunchStyle: {
         width: this.iframe.offsetWidth - 4,
-        border: '2px solid #0374B5'
-      }
+        border: '2px solid #0374B5',
+      },
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''

@@ -35,7 +35,7 @@ export default {
     return {
       editing: this.props.model.isNew(),
       hideKeyboardCheck: true,
-      isSelected: this.props.isSelected
+      isSelected: this.props.isSelected,
     }
   },
 
@@ -94,7 +94,7 @@ export default {
             $.flashError(
               I18n.t('A file named %{itemName} already exists in this folder.', {itemName: newName})
             )
-        }
+        },
       }
     )
   },
@@ -108,7 +108,7 @@ export default {
     const classNameString = classnames({
       'ef-item-row': true,
       'ef-item-selected': this.props.isSelected,
-      activeDragTarget: this.state.isActiveDragTarget
+      activeDragTarget: this.state.isActiveDragTarget,
     })
 
     const attrs = {
@@ -123,7 +123,7 @@ export default {
           this.props.toggleSelected()
         }
         return this.props.dndOptions.onItemDragStart(event)
-      }
+      },
     }
 
     if (this.props.model instanceof Folder && !this.props.model.get('for_submissions')) {
@@ -160,5 +160,5 @@ export default {
   handleFileLinkClick() {
     FocusStore.setItemToFocus(ReactDOM.findDOMNode(this.refs.nameLink))
     return this.props.previewItem()
-  }
+  },
 }

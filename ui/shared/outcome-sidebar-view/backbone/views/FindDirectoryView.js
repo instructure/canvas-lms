@@ -44,7 +44,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
         'account_standards_description',
         "To the left you'll notice the standards your institution has created for you to use in your courses."
       ),
-      directoryClass: AccountDirectoryView
+      directoryClass: AccountDirectoryView,
     })
     if (ENV.STATE_STANDARDS_URL) {
       state = new OutcomeGroup({
@@ -54,7 +54,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
           'state_standards_description',
           "To the left you'll see a folder for each state with their updated state standards. This allows for you to painlessly include state standards for grading within your course."
         ),
-        directoryClass: StateStandardsDirectoryView
+        directoryClass: StateStandardsDirectoryView,
       })
       state.url = ENV.STATE_STANDARDS_URL
     }
@@ -96,7 +96,7 @@ export default class FindDirectoryView extends OutcomesDirectoryView {
     return group.set(
       {
         title: group.previous('title'),
-        description: group.previous('description')
+        description: group.previous('description'),
       },
       {silent: true}
     )

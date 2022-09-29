@@ -22,7 +22,7 @@ import ExpandableLockOptions from './ExpandableLockOptions'
 
 export default {
   title: 'Examples/Course Settings/ExpandableLockOptions',
-  component: ExpandableLockOptions
+  component: ExpandableLockOptions,
 }
 
 const Template = args => (

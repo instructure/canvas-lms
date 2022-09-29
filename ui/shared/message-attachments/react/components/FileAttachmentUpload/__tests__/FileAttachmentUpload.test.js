@@ -59,8 +59,8 @@ describe('FileAttachmentUpload', () => {
     const input = await findByTestId('attachment-input')
     const fileEvent = {
       target: {
-        files: [new File(['FakeFile'], 'FakeFile.pdf', {type: 'application/pdf'})]
-      }
+        files: [new File(['FakeFile'], 'FakeFile.pdf', {type: 'application/pdf'})],
+      },
     }
 
     fireEvent.change(input, fileEvent)

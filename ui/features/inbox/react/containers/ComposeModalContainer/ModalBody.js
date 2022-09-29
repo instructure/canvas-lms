@@ -59,7 +59,7 @@ ModalBody.propTypes = {
   bodyMessages: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string,
-      type: PropTypes.string
+      type: PropTypes.string,
     })
   ),
   children: PropTypes.element,
@@ -67,7 +67,7 @@ ModalBody.propTypes = {
   pastMessages: PropTypes.arrayOf(ConversationMessage.shape),
   removeAttachment: PropTypes.func,
   replaceAttachment: PropTypes.func,
-  modalError: PropTypes.string
+  modalError: PropTypes.string,
 }
 
 export default ModalBody

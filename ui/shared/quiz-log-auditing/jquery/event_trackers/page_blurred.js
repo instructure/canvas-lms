@@ -38,5 +38,5 @@ export default class PageBlurred extends EventTracker {
 }
 PageBlurred.prototype.eventType = K.EVT_PAGE_BLURRED
 PageBlurred.prototype.options = {
-  frequency: 5000
+  frequency: 5000,
 }

@@ -72,9 +72,9 @@ describe('graphqlMockQuery', () => {
       const overrides = [
         {
           SubmissionConnection: {
-            nodes: [{_id: '1'}, {_id: '2'}, {_id: '123'}]
-          }
-        }
+            nodes: [{_id: '1'}, {_id: '2'}, {_id: '123'}],
+          },
+        },
       ]
       const result = await mockGraphqlQuery(query, overrides)
       const ids = result.data.assignment.submissionsConnection.nodes.map(s => s._id)
@@ -128,7 +128,7 @@ describe('graphqlMockQuery', () => {
       `
       const overrides = [
         {Assignment: {rubric: {_id: '1'}}},
-        {Assignment: {rubric: {title: 'foobarbaz'}}}
+        {Assignment: {rubric: {title: 'foobarbaz'}}},
       ]
       const result = await mockGraphqlQuery(query, overrides)
       expect(result.data.assignment.rubric._id).toEqual('1')
@@ -149,7 +149,7 @@ describe('graphqlMockQuery', () => {
       `
       const overrides = [
         {SubmissionConnection: {nodes: [{_id: '1'}]}},
-        {SubmissionConnection: {nodes: []}}
+        {SubmissionConnection: {nodes: []}},
       ]
       const result = await mockGraphqlQuery(query, overrides)
       expect(result.data.assignment.submissionsConnection.nodes).toEqual([])
@@ -169,7 +169,7 @@ describe('graphqlMockQuery', () => {
       `
       const overrides = [
         {SubmissionConnection: {nodes: [{url: 'http://foobarbaz.com'}]}},
-        {SubmissionConnection: {nodes: [{url: null}]}}
+        {SubmissionConnection: {nodes: [{url: null}]}},
       ]
       const result = await mockGraphqlQuery(query, overrides)
       const urls = result.data.assignment.submissionsConnection.nodes.map(s => s.url)
@@ -190,7 +190,7 @@ describe('graphqlMockQuery', () => {
       `
       const overrides = [
         {SubmissionConnection: {nodes: [{url: 'http://foobarbaz.com'}]}},
-        {SubmissionConnection: {nodes: [{url: undefined}]}}
+        {SubmissionConnection: {nodes: [{url: undefined}]}},
       ]
       const result = await mockGraphqlQuery(query, overrides)
       const urls = result.data.assignment.submissionsConnection.nodes.map(s => s.url)

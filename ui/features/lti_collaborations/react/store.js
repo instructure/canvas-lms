@@ -31,7 +31,7 @@ const collaboratorationsReducer = combineReducers({
   listCollaborations: listCollaborationsReducer,
   deleteCollaboration: deleteCollaborationReducer,
   createCollaboration: createCollaborationReducer,
-  updateCollaboration: updateCollaborationReducer
+  updateCollaboration: updateCollaborationReducer,
 })
 
 export default createStoreWithMiddleware(collaboratorationsReducer)

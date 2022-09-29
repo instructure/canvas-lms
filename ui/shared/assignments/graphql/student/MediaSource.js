@@ -32,8 +32,8 @@ export const MediaSource = {
     height: string,
     src: string,
     type: string,
-    width: string
-  })
+    width: string,
+  }),
 }
 
 // NOTE: For the overrides here, they have to be performed on the actual
@@ -42,6 +42,6 @@ export const DefaultMocks = {
   MediaSource: () => ({
     content_type: 'video/mp4',
     height: '360',
-    width: '632'
-  })
+    width: '632',
+  }),
 }

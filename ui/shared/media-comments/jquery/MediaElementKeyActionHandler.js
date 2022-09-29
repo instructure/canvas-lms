@@ -32,7 +32,7 @@ const KeyCodes = {
   F: 70,
   // Google TV
   G_REWIND: 227,
-  G_FORWARD: 228
+  G_FORWARD: 228,
 }
 
 const controlSelectors = {
@@ -42,7 +42,7 @@ const controlSelectors = {
   progress: '.mejs-time-rail',
   source: '.mejs-sourcechooser-button',
   speed: '.mejs-speed-button',
-  volume: '.mejs-volume-button'
+  volume: '.mejs-volume-button',
 }
 
 // helper to find the index of the first checked option
@@ -65,11 +65,11 @@ function MediaElementKeyActionHandler(mejs, player, media, event) {
 
 MediaElementKeyActionHandler.keyCodes = KeyCodes
 
-MediaElementKeyActionHandler.prototype._targetControl = function(selector) {
+MediaElementKeyActionHandler.prototype._targetControl = function (selector) {
   return $(this.event.target).closest(selector)
 }
 
-MediaElementKeyActionHandler.prototype.handlerKey = function() {
+MediaElementKeyActionHandler.prototype.handlerKey = function () {
   // Check whether one of the controls was the event target
   const target = Object.keys(controlSelectors).find(
     key => this._targetControl(controlSelectors[key]).length
@@ -79,13 +79,13 @@ MediaElementKeyActionHandler.prototype.handlerKey = function() {
   return target || 'player'
 }
 
-MediaElementKeyActionHandler.prototype.dispatch = function() {
+MediaElementKeyActionHandler.prototype.dispatch = function () {
   this.event.preventDefault()
   const handler = `${this.handlerKey()}Handler`
   this[handler]()
 }
 
-MediaElementKeyActionHandler.prototype.captionsHandler = function() {
+MediaElementKeyActionHandler.prototype.captionsHandler = function () {
   let newFocusPosition
   const {player, event} = this
   const srcOptions = $(player.captionsButton).find('.mejs-captions-selector input[type=radio]')
@@ -99,20 +99,12 @@ MediaElementKeyActionHandler.prototype.captionsHandler = function() {
   switch (this.keyCode) {
     case KeyCodes.DOWN:
       newFocusPosition = Math.min(currentlyFocused + 1, srcOptions.length - 1)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     case KeyCodes.UP:
       newFocusPosition = Math.max(currentlyFocused - 1, 0)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     case KeyCodes.ENTER:
@@ -125,7 +117,7 @@ MediaElementKeyActionHandler.prototype.captionsHandler = function() {
   }
 }
 
-MediaElementKeyActionHandler.prototype.fullscreenHandler = function() {
+MediaElementKeyActionHandler.prototype.fullscreenHandler = function () {
   const {player, event} = this
 
   switch (this.keyCode) {
@@ -152,7 +144,7 @@ MediaElementKeyActionHandler.prototype.fullscreenHandler = function() {
   }
 }
 
-MediaElementKeyActionHandler.prototype.playpauseHandler = function() {
+MediaElementKeyActionHandler.prototype.playpauseHandler = function () {
   const {player, media} = this
   let newTime
 
@@ -205,9 +197,9 @@ MediaElementKeyActionHandler.prototype.playpauseHandler = function() {
   }
 }
 
-MediaElementKeyActionHandler.prototype.progressHandler = function() {}
+MediaElementKeyActionHandler.prototype.progressHandler = function () {}
 
-MediaElementKeyActionHandler.prototype.sourceHandler = function() {
+MediaElementKeyActionHandler.prototype.sourceHandler = function () {
   let newFocusPosition
   const {player} = this
   const srcOptions = $(player.sourcechooserButton).find(
@@ -218,27 +210,19 @@ MediaElementKeyActionHandler.prototype.sourceHandler = function() {
   switch (this.keyCode) {
     case KeyCodes.DOWN:
       newFocusPosition = Math.min(currentlyFocused + 1, srcOptions.length - 1)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     case KeyCodes.UP:
       newFocusPosition = Math.max(currentlyFocused - 1, 0)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     default:
   }
 }
 
-MediaElementKeyActionHandler.prototype.speedHandler = function() {
+MediaElementKeyActionHandler.prototype.speedHandler = function () {
   let newFocusPosition
   const {player} = this
   const srcOptions = $(player.speedButton).find('.mejs-speed-selector input[type=radio]')
@@ -250,27 +234,19 @@ MediaElementKeyActionHandler.prototype.speedHandler = function() {
   switch (this.keyCode) {
     case KeyCodes.DOWN:
       newFocusPosition = Math.min(currentlyFocused + 1, srcOptions.length - 1)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     case KeyCodes.UP:
       newFocusPosition = Math.max(currentlyFocused - 1, 0)
-      srcOptions
-        .slice(newFocusPosition)
-        .first()
-        .focus()
-        .click()
+      srcOptions.slice(newFocusPosition).first().focus().click()
       break
 
     default:
   }
 }
 
-MediaElementKeyActionHandler.prototype.volumeHandler = function() {
+MediaElementKeyActionHandler.prototype.volumeHandler = function () {
   const {player, media} = this
   let volume
 
@@ -309,7 +285,7 @@ MediaElementKeyActionHandler.prototype.volumeHandler = function() {
   }
 }
 
-MediaElementKeyActionHandler.prototype.playerHandler = function() {
+MediaElementKeyActionHandler.prototype.playerHandler = function () {
   const {player, media, event} = this
   let newTime
   let volume
@@ -347,9 +323,7 @@ MediaElementKeyActionHandler.prototype.playerHandler = function() {
       // IE seems to treat the request for fullscreen differently based on the
       // event type. So instead of calling the function as a keypress handler,
       // we simulate a click on the fullscreen button.
-      $(event.target)
-        .find('.mejs-fullscreen-button > button')[0]
-        .click()
+      $(event.target).find('.mejs-fullscreen-button > button')[0].click()
       break
 
     case KeyCodes.UP:

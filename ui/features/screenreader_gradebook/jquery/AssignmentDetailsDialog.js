@@ -56,14 +56,14 @@ export default class AssignmentDetailsDialog {
       highWidth: widthForValue(locals.max - locals.upperQuartile),
       lowLqWidth: widthForValue(locals.lowerQuartile - locals.min),
       medianLowWidth: widthForValue(locals.median - locals.lowerQuartile) + 1,
-      medianHighWidth: widthForValue(locals.upperQuartile - locals.median)
+      medianHighWidth: widthForValue(locals.upperQuartile - locals.median),
     })
 
     return $(assignmentDetailsDialogTemplate(locals)).dialog({
       width: 500,
       close() {
         $(this).remove()
-      }
+      },
     })
   }
 
@@ -88,7 +88,7 @@ export default class AssignmentDetailsDialog {
       average: this.nonNumericGuard(round(scores.reduce((a, b) => a + b, 0) / scores.length, 2)),
       median: this.nonNumericGuard(this.percentile(scores, 0.5)),
       lowerQuartile: this.nonNumericGuard(this.percentile(scores, 0.25)),
-      upperQuartile: this.nonNumericGuard(this.percentile(scores, 0.75))
+      upperQuartile: this.nonNumericGuard(this.percentile(scores, 0.75)),
     }
 
     return {scores, locals}

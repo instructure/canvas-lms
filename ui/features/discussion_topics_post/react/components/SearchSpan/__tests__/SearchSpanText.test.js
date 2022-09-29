@@ -43,7 +43,7 @@ describe('SearchSpan', () => {
   it('should highlight multiple terms in message', () => {
     const {queryAllByTestId} = setup({
       searchTerm: 'here',
-      text: 'a longer message with multiple highlights here and here'
+      text: 'a longer message with multiple highlights here and here',
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
   })
@@ -51,7 +51,7 @@ describe('SearchSpan', () => {
   it('highlighting should be case-insensitive', () => {
     const {queryAllByTestId} = setup({
       searchTerm: 'here',
-      text: 'here and HeRe'
+      text: 'here and HeRe',
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(2)
   })
@@ -60,7 +60,7 @@ describe('SearchSpan', () => {
     const {queryAllByTestId} = setup({
       searchTerm: 'here',
       text: 'here and HeRe',
-      isIsolatedView: true
+      isIsolatedView: true,
     })
     expect(queryAllByTestId('highlighted-search-item').length).toBe(0)
   })
@@ -68,7 +68,7 @@ describe('SearchSpan', () => {
   it('should remove inner html tags', () => {
     const container = setup({
       searchTerm: 'strong',
-      text: "Around here, however, we don't look backwards for very long. <strong>We keep moving forward</strong>, opening up new doors and doing new things, because we're curious... and curiosity keeps leading us down new paths."
+      text: "Around here, however, we don't look backwards for very long. <strong>We keep moving forward</strong>, opening up new doors and doing new things, because we're curious... and curiosity keeps leading us down new paths.",
     })
     expect(container.queryAllByTestId('highlighted-search-item').length).toBe(0)
     expect(container.queryByText('strong')).toBeNull()

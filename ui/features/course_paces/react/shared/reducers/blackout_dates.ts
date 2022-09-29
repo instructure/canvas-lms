@@ -38,7 +38,7 @@ export const getBlackoutDatesUnsynced = (state: CoursePageStoreState) => {
 export const blackoutDatesReducer = (
   state = {
     syncing: SyncState.SYNCED,
-    blackoutDates: getInitialBlackoutDates()
+    blackoutDates: getInitialBlackoutDates(),
   },
   action: BlackoutDatesAction
 ): BlackoutDateState => {
@@ -46,7 +46,7 @@ export const blackoutDatesReducer = (
     case Constants.UPDATE_BLACKOUT_DATES:
       return {
         syncing: SyncState.UNSYNCED,
-        blackoutDates: action.payload.sort(compareBlackoutDatesByStartDate)
+        blackoutDates: action.payload.sort(compareBlackoutDatesByStartDate),
       }
     case Constants.BLACKOUT_DATES_SYNCING:
       return {...state, syncing: SyncState.SYNCING}
@@ -59,14 +59,14 @@ export const blackoutDatesReducer = (
               if (a.start_date.isAfter(b.start_date)) return 1
               return 0
             })
-          : state.blackoutDates
+          : state.blackoutDates,
       } as BlackoutDateState
     case Constants.BLACKOUT_DATES_SYNC_FAILED:
       return {...state, syncing: SyncState.UNSYNCED}
     case Constants.RESET_BLACKOUT_DATES:
       return {
         syncing: SyncState.SYNCED,
-        blackoutDates: action.payload
+        blackoutDates: action.payload,
       }
     default:
       return state

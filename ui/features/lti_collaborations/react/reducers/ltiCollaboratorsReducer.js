@@ -20,7 +20,7 @@ const initialState = {
   listLTICollaboratorsPending: false,
   listLTICollaboratorsSuccessful: false,
   listLTICollaboratorsError: null,
-  ltiCollaboratorsData: []
+  ltiCollaboratorsData: [],
 }
 const ltiCollaboratorsHandlers = {
   LIST_LTI_COLLABORATIONS_START: (state, action) => {
@@ -40,7 +40,7 @@ const ltiCollaboratorsHandlers = {
     state.listLTICollaboratorsPending = false
     state.listLTICollaboratorsError = action.payload
     return state
-  }
+  },
 }
 
 const ltiCollaborators = (state = initialState, action) => {

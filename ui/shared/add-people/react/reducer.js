@@ -31,7 +31,7 @@ const reducer = combineReducers({
   inputParams,
   userValidationResult,
   usersToBeEnrolled,
-  usersEnrolled
+  usersEnrolled,
 })
 
 export default reducer

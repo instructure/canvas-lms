@@ -49,14 +49,14 @@ const AccountsTreeStore = createStore({
       if (parent) parent.subAccounts.push(account)
     })
     return {loading, accounts: [accounts[0]]}
-  }
+  },
 })
 
 AccountsTreeStore.PropType = shape({
   id: string.isRequired,
   parent_account_id: string,
   name: string.isRequired,
-  subAccounts: arrayOf((...args) => AccountsTreeStore.PropType(...args)).isRequired
+  subAccounts: arrayOf((...args) => AccountsTreeStore.PropType(...args)).isRequired,
 })
 
 export default AccountsTreeStore

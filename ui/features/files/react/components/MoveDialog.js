@@ -28,11 +28,11 @@ import classnames from 'classnames'
 
 const I18n = useI18nScope('react_files')
 
-MoveDialog.renderMoveButton = function() {
+MoveDialog.renderMoveButton = function () {
   const buttonClassNames = classnames({
     disabled: !this.state.destinationFolder,
     btn: true,
-    'btn-primary': true
+    'btn-primary': true,
   })
   if (this.state.isCopyingFile) {
     return (
@@ -59,7 +59,7 @@ MoveDialog.renderMoveButton = function() {
   }
 }
 
-MoveDialog.render = function() {
+MoveDialog.render = function () {
   return (
     <Modal
       className="ReactModal__Content--canvas ReactModal__Content--mini-modal"

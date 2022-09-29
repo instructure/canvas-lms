@@ -25,7 +25,7 @@ const mockProps = ({
   onSubmit = jest.fn(),
   showReportModal = true,
   isLoading = false,
-  errorSubmitting = false
+  errorSubmitting = false,
 } = {}) => ({onCloseReportModal, onSubmit, showReportModal, isLoading, errorSubmitting})
 
 const setup = props => {

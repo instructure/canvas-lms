@@ -41,7 +41,7 @@ function buildPeriod(attr) {
     weight: roundWeight(attr.weight),
     startDate: attr.startDate,
     endDate: attr.endDate,
-    closeDate: attr.closeDate
+    closeDate: attr.closeDate,
   }
 }
 
@@ -53,12 +53,12 @@ class GradingPeriodForm extends React.Component {
       weight: PropTypes.number,
       startDate: PropTypes.instanceOf(Date).isRequired,
       endDate: PropTypes.instanceOf(Date).isRequired,
-      closeDate: PropTypes.instanceOf(Date)
+      closeDate: PropTypes.instanceOf(Date),
     }),
     weighted: PropTypes.bool.isRequired,
     disabled: PropTypes.bool.isRequired,
     onSave: PropTypes.func.isRequired,
-    onCancel: PropTypes.func.isRequired
+    onCancel: PropTypes.func.isRequired,
   }
 
   constructor(props, context) {
@@ -68,7 +68,7 @@ class GradingPeriodForm extends React.Component {
 
     this.state = {
       period,
-      preserveCloseDate: this.hasDistinctCloseDate(period)
+      preserveCloseDate: this.hasDistinctCloseDate(period),
     }
   }
 
@@ -234,8 +234,8 @@ class GradingPeriodForm extends React.Component {
                   handleUpdate={this.changeEndDate}
                   rowKey="end-date"
                   labelledBy="end-date-label"
-                  isFancyMidnight
-                  defaultToEndOfMinute
+                  isFancyMidnight={true}
+                  defaultToEndOfMinute={true}
                   contextLabel={accountLabel}
                 />
               </div>
@@ -252,8 +252,8 @@ class GradingPeriodForm extends React.Component {
                   handleUpdate={this.changeCloseDate}
                   rowKey="close-date"
                   labelledBy="close-date-label"
-                  isFancyMidnight
-                  defaultToEndOfMinute
+                  isFancyMidnight={true}
+                  defaultToEndOfMinute={true}
                   contextLabel={accountLabel}
                 />
               </div>

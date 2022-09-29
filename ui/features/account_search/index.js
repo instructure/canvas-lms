@@ -20,10 +20,8 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 
 ready(() => {
-  $('.account_search_form').submit(function() {
+  $('.account_search_form').submit(function () {
     $(this).loadingImage({horizontal: 'middle'})
-    $(this)
-      .find('button')
-      .prop('disabled', true)
+    $(this).find('button').prop('disabled', true)
   })
 })

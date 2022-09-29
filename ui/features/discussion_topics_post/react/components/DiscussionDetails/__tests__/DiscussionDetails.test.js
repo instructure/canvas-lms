@@ -34,7 +34,7 @@ const mockOverrides = [
     dueAt: '2021-03-30T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-24T00:00:00-06:00',
-    title: 'assignment override 1'
+    title: 'assignment override 1',
   },
   {
     id: 'QXMzaWdebTubeC0x',
@@ -42,7 +42,7 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 2'
+    title: 'assignment override 2',
   },
   {
     id: 'BXMzaWdebTVubC0x',
@@ -50,8 +50,8 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 3'
-  }
+    title: 'assignment override 3',
+  },
 ]
 
 const mockSections = [
@@ -59,14 +59,14 @@ const mockSections = [
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 5,
-    name: 'section 1'
+    name: 'section 1',
   },
   {
     id: 'U2VjdGlvbi00',
     _id: '2',
     userCount: 99,
-    name: 'section 2'
-  }
+    name: 'section 2',
+  },
 ]
 
 beforeAll(() => {
@@ -76,14 +76,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -91,7 +91,7 @@ const setup = (props, overrides = [], pointsPossible = 7) => {
   return render(
     <DiscussionDetails
       discussionTopic={Discussion.mock({
-        assignment: Assignment.mock({assignmentOverrides: {nodes: overrides}, pointsPossible})
+        assignment: Assignment.mock({assignmentOverrides: {nodes: overrides}, pointsPossible}),
       })}
       {...props}
     />
@@ -108,7 +108,7 @@ describe('DiscussionDetails', () => {
         delayedPostAt: '2022-01-12T00:00:00-07:00',
         groupSet: null,
         anonymousState: null,
-        assignment: null
+        assignment: null,
       })
       it('displays "View Availability" button', () => {
         const {getByText} = setup({discussionTopic: mockTopic})
@@ -120,8 +120,8 @@ describe('DiscussionDetails', () => {
           discussionTopic: Discussion.mock({
             courseSections: mockSections,
             userCount: 1,
-            assignment: null
-          })
+            assignment: null,
+          }),
         })
         expect(getByTestId('non-graded-discussion-info')).toBeTruthy()
       })
@@ -179,7 +179,7 @@ describe('DiscussionDetails', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '767px'}
+        tablet: {maxWidth: '767px'},
       }))
     })
     describe('non-graded availability', () => {
@@ -190,7 +190,7 @@ describe('DiscussionDetails', () => {
         delayedPostAt: '2022-01-12T00:00:00-07:00',
         groupSet: null,
         anonymousState: null,
-        assignment: null
+        assignment: null,
       })
       it('displays "View Availability" button', () => {
         const {getByText} = setup({discussionTopic: mockTopic})

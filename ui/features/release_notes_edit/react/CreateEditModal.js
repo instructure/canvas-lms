@@ -40,7 +40,7 @@ function createDefaultState() {
   return {
     target_roles: ['user'],
     langs: {},
-    show_ats: {}
+    show_ats: {},
   }
 }
 
@@ -56,7 +56,7 @@ function editReducer(state, action) {
   } else if (action.action === 'SET_RELEASE_DATE') {
     return {
       ...state,
-      show_ats: {...state.show_ats, [action.payload.env]: action.payload.value}
+      show_ats: {...state.show_ats, [action.payload.env]: action.payload.value},
     }
   } else if (action.action === 'SET_LANG_ATTR') {
     const lang = action.payload.lang
@@ -64,8 +64,8 @@ function editReducer(state, action) {
       ...state,
       langs: {
         ...state.langs,
-        [lang]: {...state.langs[lang], [action.payload.key]: action.payload.value}
-      }
+        [lang]: {...state.langs[lang], [action.payload.key]: action.payload.value},
+      },
     }
   }
   return state
@@ -177,7 +177,7 @@ function CreateEditModal({open, onClose, onSubmit, currentNote, envs, langs}) {
                   onChange={e =>
                     reducer({
                       action: 'SET_LANG_ATTR',
-                      payload: {lang, key: 'description', value: e.target.value}
+                      payload: {lang, key: 'description', value: e.target.value},
                     })
                   }
                   required={isRequired}
@@ -222,7 +222,7 @@ CreateEditModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   currentNote: PropTypes.object,
   envs: PropTypes.array.isRequired,
-  langs: PropTypes.array.isRequired
+  langs: PropTypes.array.isRequired,
 }
 
 export default CreateEditModal

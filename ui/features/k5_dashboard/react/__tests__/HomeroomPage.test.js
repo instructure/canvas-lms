@@ -28,7 +28,7 @@ describe('HomeroomPage', () => {
     loadingAnnouncements: false,
     loadingCards: false,
     homeroomAnnouncements: [],
-    ...overrides
+    ...overrides,
   })
 
   beforeEach(() => {
@@ -45,7 +45,7 @@ describe('HomeroomPage', () => {
 
   it('shows loading skeletons while loading for announcements and cards', () => {
     const {getAllByText, getByText} = render(
-      <HomeroomPage {...getProps()} loadingAnnouncements loadingCards />
+      <HomeroomPage {...getProps()} loadingAnnouncements={true} loadingCards={true} />
     )
     const cards = getAllByText('Loading Card')
     expect(cards[0]).toBeInTheDocument()
@@ -53,7 +53,7 @@ describe('HomeroomPage', () => {
   })
 
   it('shows loading skeletons while loading based off ENV variable', () => {
-    const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards />)
+    const {getAllByText} = render(<HomeroomPage {...getProps()} loadingCards={true} />)
     const cards = getAllByText('Loading Card')
     expect(cards.length).toBe(3)
     expect(cards[0]).toBeInTheDocument()
@@ -71,10 +71,10 @@ describe('HomeroomPage', () => {
           courseCode: 'CS-001',
           isHomeroom: false,
           canManage: false,
-          published: true
-        }
+          published: true,
+        },
       ],
-      loadingCards: false
+      loadingCards: false,
     }
     const {queryAllByText, getByText} = render(<HomeroomPage {...getProps(overrides)} />)
     expect(queryAllByText('Loading Card').length).toBe(0)

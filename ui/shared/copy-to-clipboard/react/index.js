@@ -55,11 +55,11 @@ const CopyToClipboard = props => {
 }
 
 CopyToClipboard.propTypes = {
-  buttonText: PropTypes.string
+  buttonText: PropTypes.string,
 }
 
 CopyToClipboard.defaultProps = {
-  buttonText: I18n.t('Copy')
+  buttonText: I18n.t('Copy'),
 }
 
 export default CopyToClipboard

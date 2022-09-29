@@ -59,7 +59,7 @@ export default class MessageFormDialog extends DialogBaseView {
       '.conversation_body': '$conversationBody',
       '.compose_form': '$form',
       '.user_note': '$userNote',
-      '.user_note_info': '$userNoteInfo'
+      '.user_note_info': '$userNoteInfo',
     }
 
     this.prototype.messages = {flashSuccess: I18n.t('message_sent', 'Message sent!')}
@@ -97,7 +97,7 @@ export default class MessageFormDialog extends DialogBaseView {
       buttons: [
         {
           text: I18n.t('#buttons.cancel', 'Cancel'),
-          click: this.cancel
+          click: this.cancel,
         },
         {
           text: I18n.t('#buttons.send', 'Send'),
@@ -106,9 +106,9 @@ export default class MessageFormDialog extends DialogBaseView {
           'data-track-action': 'Edit',
           'data-track-label': 'Send',
           'data-text-while-loading': I18n.t('Sending...'),
-          click: e => this.sendMessage(e)
-        }
-      ]
+          click: e => this.sendMessage(e),
+        },
+      ],
     }
   }
 
@@ -212,7 +212,7 @@ export default class MessageFormDialog extends DialogBaseView {
     this.prepareTextarea(this.$el)
     this.recipientView = new AutocompleteView({
       el: this.$recipients,
-      disabled: this.model != null ? this.model.get('private') : undefined
+      disabled: this.model != null ? this.model.get('private') : undefined,
     }).render()
     this.recipientView.on('changeToken', this.recipientIdsChanged, this)
     this.recipientView.on('recipientTotalChange', this.recipientTotalChanged, this)
@@ -228,7 +228,7 @@ export default class MessageFormDialog extends DialogBaseView {
       courses: this.options.courses,
       defaultOption: I18n.t('select_course', 'Select course'),
       messageableOnly: true,
-      excludeConcluded: true
+      excludeConcluded: true,
     })
     if (this.model) {
       if (this.model.get('context_code')) {
@@ -260,14 +260,14 @@ export default class MessageFormDialog extends DialogBaseView {
       if (this.options.user_id) {
         const query = {
           user_id: this.options.user_id,
-          from_conversation_id: this.options.from_conversation_id
+          from_conversation_id: this.options.from_conversation_id,
         }
         $.ajaxJSON(this.tokenInput.selector.url, 'GET', query, data => {
           if (data.length) {
             return this.tokenInput.addToken({
               value: data[0].id,
               text: data[0].name,
-              data: data[0]
+              data: data[0],
             })
           }
         })
@@ -316,7 +316,7 @@ export default class MessageFormDialog extends DialogBaseView {
       )
       const contextView = new ContextMessagesView({
         el: this.$contextMessages,
-        collection: includedMessages
+        collection: includedMessages,
       })
       contextView.render()
     }
@@ -359,7 +359,7 @@ export default class MessageFormDialog extends DialogBaseView {
           if (this.recipientView && !this.recipientView.tokens.length) {
             return I18n.t('Invalid recipient name.')
           }
-        }
+        },
       },
       handle_files(attachments, data) {
         data.attachment_ids = attachments.map(a => a.id)
@@ -392,7 +392,7 @@ export default class MessageFormDialog extends DialogBaseView {
             let message = response.messages[0]
             message.author = {
               name: ENV.current_user.display_name,
-              avatar_url: ENV.current_user.avatar_image_url
+              avatar_url: ENV.current_user.avatar_image_url,
             }
             message = new Message(response, {parse: true})
             this.trigger('addMessage', message.toJSON().conversation.messages[0], response)
@@ -403,7 +403,7 @@ export default class MessageFormDialog extends DialogBaseView {
         }) // close after DOM has been updated, so focus is properly restored
         // also don't close the dialog on failure, so the user's typed message isn't lost
         return $.when(this.request).fail(() => dfd.reject())
-      }
+      },
     })
   }
 

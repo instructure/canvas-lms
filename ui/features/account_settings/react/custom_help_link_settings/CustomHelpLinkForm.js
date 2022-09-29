@@ -29,19 +29,19 @@ export default class CustomHelpLinkForm extends React.Component {
   static propTypes = {
     link: CustomHelpLinkPropTypes.link.isRequired,
     onSave: PropTypes.func,
-    onCancel: PropTypes.func
+    onCancel: PropTypes.func,
   }
 
   static defaultProps = {
     onSave: () => {},
-    onCancel: () => {}
+    onCancel: () => {},
   }
 
   state = {
     link: {
-      ...this.props.link
+      ...this.props.link,
     },
-    old_feature_headline: null
+    old_feature_headline: null,
   }
 
   handleKeyDown = (e, field) => {
@@ -68,9 +68,9 @@ export default class CustomHelpLinkForm extends React.Component {
       ...state,
       link: {
         ...state.link,
-        ...linkUpdates
+        ...linkUpdates,
       },
-      ...otherUpdates
+      ...otherUpdates,
     }))
   }
 
@@ -148,7 +148,7 @@ export default class CustomHelpLinkForm extends React.Component {
       id,
       is_featured,
       is_new,
-      feature_headline
+      feature_headline,
     } = this.state.link
 
     const namePrefix = `${CustomHelpLinkConstants.NAME_PREFIX}[${index}]`
@@ -172,7 +172,7 @@ export default class CustomHelpLinkForm extends React.Component {
                 this.textInputRef = c
               }}
               type="text"
-              required
+              required={true}
               aria-required="true"
               name={`${namePrefix}[text]`}
               className="ic-Input"
@@ -197,7 +197,7 @@ export default class CustomHelpLinkForm extends React.Component {
             <input
               type="url"
               id="admin_settings_custom_link_url"
-              required
+              required={true}
               aria-required="true"
               disabled={this.props.link.type === 'default'}
               name={`${namePrefix}[url]`}
@@ -256,7 +256,7 @@ export default class CustomHelpLinkForm extends React.Component {
                       id="admin_settings_custom_link_type_is_featured"
                       name={`${namePrefix}[is_featured]`}
                       checked={is_featured}
-                      value
+                      value={true}
                       onKeyDown={e => this.handleKeyDown(e, 'is_featured')}
                       onChange={e => this.handleIsFeaturedChange(e.target.checked)}
                     />
@@ -271,7 +271,7 @@ export default class CustomHelpLinkForm extends React.Component {
                       id="admin_settings_custom_link_type_is_new"
                       name={`${namePrefix}[is_new]`}
                       checked={is_new}
-                      value
+                      value={true}
                       onKeyDown={e => this.handleKeyDown(e, 'is_new')}
                       onChange={e => this.handleIsNewChange(e.target.checked)}
                     />

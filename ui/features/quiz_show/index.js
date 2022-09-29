@@ -57,7 +57,7 @@ ready(() => {
     courseID: ENV.COURSE_ID,
     assetType: 'Quiz',
     assetID: ENV.QUIZ.id,
-    location: window.location
+    location: window.location,
   })
 })
 

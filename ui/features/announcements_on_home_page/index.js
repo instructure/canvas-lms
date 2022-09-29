@@ -45,7 +45,7 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
       start_date: '1900-01-01',
       end_date: new Date().toISOString(),
       active_only: true,
-      include: ['sections', 'sections_user_count']
+      include: ['sections', 'sections_user_count'],
     }
 
     axios

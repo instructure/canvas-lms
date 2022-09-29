@@ -71,7 +71,7 @@ function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
   $('html, body').animate(
     {
-      scrollTop: $thing.offset().top
+      scrollTop: $thing.offset().top,
     },
     time
   )
@@ -165,7 +165,7 @@ window.modules = (function () {
               for (const idx in data.context_module.content_tags) {
                 const tag = data.context_module.content_tags[idx].content_tag
                 $module.find('#context_module_item_' + tag.id).fillTemplateData({
-                  data: {position: tag.position}
+                  data: {position: tag.position},
                 })
               }
             }
@@ -275,7 +275,7 @@ window.modules = (function () {
               const data = {}
               if (info.points_possible != null) {
                 data.points_possible_display = I18n.t('points_possible_short', '%{points} pts', {
-                  points: I18n.n(info.points_possible)
+                  points: I18n.n(info.points_possible),
                 })
               }
               if (ENV.IN_PACED_COURSE && !ENV.IS_STUDENT) {
@@ -299,7 +299,7 @@ window.modules = (function () {
               }
               $context_module_item.fillTemplateData({
                 data,
-                htmlValues: ['points_possible_display']
+                htmlValues: ['points_possible_display'],
               })
 
               // clean up empty elements so they don't show borders in updated item group design
@@ -370,8 +370,8 @@ window.modules = (function () {
           'unlock_at',
           'require_sequential_progress',
           'publish_final_grade',
-          'requirement_count'
-        ]
+          'requirement_count',
+        ],
       })
       $form.fillFormData(data, {object_name: 'context_module'})
       let isNew = false
@@ -494,7 +494,7 @@ window.modules = (function () {
             if ($contextModules.length) {
               $('#context_modules_sortable_container').removeClass('item-group-container--is-empty')
             }
-          }
+          },
         })
         .dialog('open')
       $module.removeClass('dont_remove')
@@ -518,7 +518,7 @@ window.modules = (function () {
         content_details: content_tag.content_details,
         content_id: content_tag.content_id,
         id: content_tag.id,
-        module_id: content_tag.context_module_id
+        module_id: content_tag.context_module_id,
       }
     },
 
@@ -556,7 +556,7 @@ window.modules = (function () {
       $item.fillTemplateData({
         data,
         id: 'context_module_item_' + data.id,
-        hrefValues: ['id', 'context_module_id', 'content_id']
+        hrefValues: ['id', 'context_module_id', 'content_id'],
       })
       for (let idx = 0; idx < 10; idx++) {
         $item.removeClass('indent_' + idx)
@@ -601,7 +601,7 @@ window.modules = (function () {
         id: $itemData.attr('data-module-item-id'),
         title: $itemData.attr('data-module-item-name'),
         assignment_id: $itemData.attr('data-assignment-id'),
-        is_cyoe_able: $itemData.attr('data-is-cyoeable') === 'true'
+        is_cyoe_able: $itemData.attr('data-is-cyoeable') === 'true',
       }
 
       const cyoe = CyoeHelper.getItemData(data.assignment_id, data.is_cyoe_able)
@@ -694,7 +694,7 @@ window.modules = (function () {
     prerequisites() {
       const result = {
         to_visit: {},
-        visited: {}
+        visited: {},
       }
       $('#context_modules .context_module').each(function () {
         const id = $(this).attr('id').substring('context_module_'.length)
@@ -731,7 +731,7 @@ window.modules = (function () {
       const id = $module.attr('id').substring(15)
       const $progression = $('#current_user_progression_list .progression_' + id)
       const data = $progression.getTemplateData({
-        textValues: ['context_module_id', 'workflow_state', 'collapsed', 'current_position']
+        textValues: ['context_module_id', 'workflow_state', 'collapsed', 'current_position'],
       })
       var $module = $('#context_module_' + data.context_module_id)
       let progression_state = data.workflow_state
@@ -831,7 +831,7 @@ window.modules = (function () {
       placeholder: 'context_module_placeholder',
       forcePlaceholderSize: true,
       axis: 'y',
-      containment: '#content'
+      containment: '#content',
     },
     initMasterCourseLockButton($item, tagRestriction) {
       // add the lock button|icon
@@ -851,7 +851,7 @@ window.modules = (function () {
       const model = new MasterCourseModuleLock({
         is_master_course_master_content: isMasterCourseMasterContent,
         is_master_course_child_content: isMasterCourseChildContent,
-        restricted_by_master_course: restricted
+        restricted_by_master_course: restricted,
       })
 
       const viewOptions = {
@@ -859,12 +859,12 @@ window.modules = (function () {
         el: $lockCell[0],
         course_id: ENV.COURSE_ID,
         content_type: data.moduleType,
-        content_id: data.contentId
+        content_id: data.contentId,
       }
 
       const view = new LockIconView(viewOptions)
       view.render()
-    }
+    },
   }
 })()
 
@@ -885,7 +885,7 @@ var criterionMessage = function ($mod_item) {
     return I18n.t('Must contribute to the page')
   } else if ($mod_item.hasClass('min_score_requirement')) {
     return I18n.t('Must score at least a %{score}', {
-      score: $mod_item.getTemplateData({textValues: ['min_score']}).min_score
+      score: $mod_item.getTemplateData({textValues: ['min_score']}).min_score,
     })
   } else {
     return I18n.t('Not yet completed')
@@ -901,22 +901,22 @@ const updatePrerequisites = function ($module, prereqs) {
     for (const i in prereqs) {
       const $div = $('<div />', {
         class: 'prerequisite_criterion ' + prereqs[i].type + '_criterion',
-        style: 'float: left;'
+        style: 'float: left;',
       })
       const $spanID = $('<span />', {
         text: htmlEscape(prereqs[i].id),
         class: 'id',
-        style: 'display: none;'
+        style: 'display: none;',
       })
       const $spanType = $('<span />', {
         text: htmlEscape(prereqs[i].type),
         class: 'type',
-        style: 'display: none;'
+        style: 'display: none;',
       })
       const $spanName = $('<span />', {
         text: htmlEscape(prereqs[i].name),
         class: 'name',
-        style: 'display: none;'
+        style: 'display: none;',
       })
       $div.append($spanID)
       $div.append($spanType)
@@ -928,7 +928,7 @@ const updatePrerequisites = function ($module, prereqs) {
     prereqsList = prereqsList.slice(0, -2)
     const $prerequisitesMessage = $('<div />', {
       text: prerequisitesMessage(prereqsList),
-      class: 'prerequisites_message'
+      class: 'prerequisites_message',
     })
     $prerequisitesDiv.append($prerequisitesMessage)
   }
@@ -973,7 +973,7 @@ modules.initModuleManagement = function (duplicate) {
   // Create the context modules backbone view to manage the publish button.
   const context_modules_view = new ContextModulesView({
     el: $('#content'),
-    modules
+    modules,
   })
   const relock_modules_dialog = new RelockModulesDialog()
 
@@ -1004,13 +1004,13 @@ modules.initModuleManagement = function (duplicate) {
     $module.attr('aria-label', data.context_module.name)
     $module.find('.header').fillTemplateData({
       data: data.context_module,
-      hrefValues: ['id']
+      hrefValues: ['id'],
     })
 
     $module.find('.header').attr('id', data.context_module.id)
     $module.find('.footer').fillTemplateData({
       data: data.context_module,
-      hrefValues: ['id']
+      hrefValues: ['id'],
     })
 
     $module
@@ -1094,7 +1094,7 @@ modules.initModuleManagement = function (duplicate) {
       const $module = $(this).data('current_module')
       $module.loadingImage()
       $module.find('.header').fillTemplateData({
-        data
+        data,
       })
       $module.addClass('dont_remove')
       modules.hideEditModule()
@@ -1145,7 +1145,7 @@ modules.initModuleManagement = function (duplicate) {
           id: data.context_module.id,
           courseId: data.context_module.context_id,
           published: data.context_module.workflow_state == 'published',
-          publishable: true
+          publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
         overrideModel(view.model, view)
@@ -1177,7 +1177,7 @@ modules.initModuleManagement = function (duplicate) {
     },
     error(data, $module) {
       $module.loadingImage('remove')
-    }
+    },
   })
 
   $('#add_context_module_form .add_prerequisite_link').click(function (event) {
@@ -1274,7 +1274,7 @@ modules.initModuleManagement = function (duplicate) {
   $('#completion_criterion_option .id').change(function () {
     const $option = $(this).parents('.completion_criterion_option')
     const data = $('#context_module_item_' + $(this).val()).getTemplateData({
-      textValues: ['type', 'graded']
+      textValues: ['type', 'graded'],
     })
     $option
       .find('.type option')
@@ -1452,10 +1452,10 @@ modules.initModuleManagement = function (duplicate) {
           })
           $.flashMessage(
             I18n.t('Module %{module_name} was successfully deleted.', {
-              module_name: data.context_module.name
+              module_name: data.context_module.name,
             })
           )
-        }
+        },
       })
   })
   $('.outdent_item_link,.indent_item_link').live('click', function (event, elem, activeElem) {
@@ -1518,7 +1518,7 @@ modules.initModuleManagement = function (duplicate) {
           $('#edit_item_form').hideErrors()
           $cogLink.focus()
         },
-        minWidth: 320
+        minWidth: 320,
       })
       .fixDialogButtons()
   })
@@ -1550,7 +1550,7 @@ modules.initModuleManagement = function (duplicate) {
     error(data) {
       $(this).loadingImage('remove')
       $(this).formErrors(data)
-    }
+    },
   })
 
   $('.delete_item_link').live('click', function (event) {
@@ -1592,13 +1592,13 @@ modules.initModuleManagement = function (duplicate) {
           })
           $.flashMessage(
             I18n.t('Module item %{module_item_name} was successfully deleted.', {
-              module_item_name: data.content_tag.title
+              module_item_name: data.content_tag.title,
             })
           )
         },
         cancelled() {
           $currentCogLink.focus()
-        }
+        },
       })
   })
 
@@ -1613,7 +1613,7 @@ modules.initModuleManagement = function (duplicate) {
       const moduleItems = module.querySelectorAll('.context_module_item')
       const items = Array.prototype.map.call(moduleItems, item => ({
         id: item.getAttribute('id').substring('context_module_item_'.length),
-        title: item.querySelector('.title').textContent.trim()
+        title: item.querySelector('.title').textContent.trim(),
       }))
       return {id, title, items}
     })
@@ -1623,12 +1623,12 @@ modules.initModuleManagement = function (duplicate) {
       items: [
         {
           id: currentItem.getAttribute('id').substring('context_module_item_'.length),
-          title: currentItem.querySelector('.title').textContent.trim()
-        }
+          title: currentItem.querySelector('.title').textContent.trim(),
+        },
       ],
       moveOptions: {
         groupsLabel: I18n.t('Modules'),
-        groups
+        groups,
       },
       formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
       onMoveSuccess: ({data, itemIds, groupId}) => {
@@ -1643,7 +1643,7 @@ modules.initModuleManagement = function (duplicate) {
         reorderElements(order, $container[0], id => `#context_module_item_${id}`)
         $container.sortable('enable').sortable('refresh')
       },
-      focusOnExit: () => currentItem.querySelector('.al-trigger')
+      focusOnExit: () => currentItem.querySelector('.al-trigger'),
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
@@ -1665,8 +1665,8 @@ modules.initModuleManagement = function (duplicate) {
       items: [
         {
           id: currentModule.getAttribute('id').substring('context_module_'.length),
-          title: currentModule.querySelector('.header > .collapse_module_link > .name').textContent
-        }
+          title: currentModule.querySelector('.header > .collapse_module_link > .name').textContent,
+        },
       ],
       moveOptions: {siblings},
       formatSaveUrl: () => `${ENV.CONTEXT_URL_ROOT}/modules/reorder`,
@@ -1679,7 +1679,7 @@ modules.initModuleManagement = function (duplicate) {
         )
         $(container).sortable('refresh')
       },
-      focusOnExit: () => currentModule.querySelector('.al-trigger')
+      focusOnExit: () => currentModule.querySelector('.al-trigger'),
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
@@ -1696,14 +1696,14 @@ modules.initModuleManagement = function (duplicate) {
       const moduleItems = module.querySelectorAll('.context_module_item')
       const items = Array.prototype.map.call(moduleItems, item => ({
         id: item.getAttribute('id').substring('context_module_item_'.length),
-        title: item.querySelector('.title').textContent.trim()
+        title: item.querySelector('.title').textContent.trim(),
       }))
       return {id, title, items}
     })
     const moduleItems = currentModule.querySelectorAll('.context_module_item')
     const items = Array.prototype.map.call(moduleItems, item => ({
       id: item.getAttribute('id').substring('context_module_item_'.length),
-      title: item.querySelector('.title').textContent.trim()
+      title: item.querySelector('.title').textContent.trim(),
     }))
     if (items.length === 0) {
       return
@@ -1716,7 +1716,7 @@ modules.initModuleManagement = function (duplicate) {
       moveOptions: {
         groupsLabel: I18n.t('Modules'),
         groups,
-        excludeCurrent: true
+        excludeCurrent: true,
       },
       formatSaveUrl: ({groupId}) => `${ENV.CONTEXT_URL_ROOT}/modules/${groupId}/reorder`,
       onMoveSuccess: ({data, itemIds, groupId}) => {
@@ -1733,7 +1733,7 @@ modules.initModuleManagement = function (duplicate) {
 
         $container.sortable('enable').sortable('refresh')
       },
-      focusOnExit: () => currentModule.querySelector('.al-trigger')
+      focusOnExit: () => currentModule.querySelector('.al-trigger'),
     }
 
     renderTray(moveTrayProps, document.getElementById('not_right_side'))
@@ -1767,7 +1767,7 @@ modules.initModuleManagement = function (duplicate) {
     const item_data = {
       'item[id]': attachment.id,
       'item[type]': 'attachment',
-      'item[title]': attachment.display_name
+      'item[title]': attachment.display_name,
     }
     generate_submit(moduleId, false)(item_data)
   })
@@ -1833,7 +1833,7 @@ modules.initModuleManagement = function (duplicate) {
           $item.find('.lock-icon').data({
             moduleType: data.content_tag.type,
             contentId: data.content_tag.content_id,
-            moduleItemId: data.content_tag.id
+            moduleItemId: data.content_tag.id,
           })
           modules.loadMasterCourseData(data.content_tag.id)
         }),
@@ -1842,7 +1842,7 @@ modules.initModuleManagement = function (duplicate) {
             if (focusLink) {
               $module.find('.add_module_item_link').focus()
             }
-          }
+          },
         }
       )
     }
@@ -1865,14 +1865,14 @@ modules.initModuleManagement = function (duplicate) {
         $item.find('.lock-icon').data({
           moduleType: data.content_tag.type,
           contentId: data.content_tag.content_id,
-          moduleItemId: data.content_tag.id
+          moduleItemId: data.content_tag.id,
         })
         modules.loadMasterCourseData(data.content_tag.id)
 
         $module.find('.context_module_items.ui-sortable').sortable('disable')
         data.new_positions.forEach(({content_tag}) => {
           $module.find(`#context_module_item_${content_tag.id}`).fillTemplateData({
-            data: {position: content_tag.position}
+            data: {position: content_tag.position},
           })
         })
         $(`#context_module_item_${data.content_tag.id} .item_link`).focus()
@@ -1949,7 +1949,7 @@ modules.initModuleManagement = function (duplicate) {
       .find('.header')
       .getTemplateData({textValues: ['name', 'id']})
     $('#add_module_prerequisite_dialog').fillTemplateData({
-      data: {module_name: module.name, context_module_id: module.id}
+      data: {module_name: module.name, context_module_id: module.id},
     })
     const $module = $(this).parents('.context_module')
     const $select = $('#module_list').clone(true).removeAttr('id')
@@ -1969,9 +1969,9 @@ modules.initModuleManagement = function (duplicate) {
       .append($select.show())
     $('#add_module_prerequisite_dialog').dialog({
       title: I18n.t('titles.add_prerequisite', 'Add Prerequisite to %{module}', {
-        module: module.name
+        module: module.name,
       }),
-      width: 400
+      width: 400,
     })
   })
   $('#add_context_module_form .cancel_button').click(event => {
@@ -2001,7 +2001,7 @@ modules.initModuleManagement = function (duplicate) {
       handle: '.reorder_module_link',
       helper: 'clone',
       axis: 'y',
-      update: modules.updateModulePositions
+      update: modules.updateModulePositions,
     })
     modules.refreshModuleList()
     modules.refreshed = true
@@ -2020,7 +2020,7 @@ modules.initModuleManagement = function (duplicate) {
       unpublishable: data.unpublishable,
       publishAt: data.publish_at,
       content_details: data.content_details,
-      isNew: true
+      isNew: true,
     }
 
     const view = initPublishButton($item.find('.publish-icon'), publishData)
@@ -2068,7 +2068,7 @@ modules.initModuleManagement = function (duplicate) {
         lock_at: moduleItem.content_details.lock_at,
         display_name: moduleItem.content_details.display_name,
         thumbnail_url: moduleItem.content_details.thumbnail_url,
-        usage_rights: moduleItem.content_details.usage_rights
+        usage_rights: moduleItem.content_details.usage_rights,
       })
 
       file.url = function () {
@@ -2080,7 +2080,7 @@ modules.initModuleManagement = function (duplicate) {
         togglePublishClassOn: $el.parents('.ig-row')[0],
         userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files_edit,
         usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
-        fileName: file.displayName()
+        fileName: file.displayName(),
       }
 
       const Cloud = <PublishCloud {...props} />
@@ -2099,13 +2099,13 @@ modules.initModuleManagement = function (duplicate) {
       published: data.published,
       publishable: data.publishable,
       unpublishable: data.unpublishable,
-      publish_at: data.publishAt
+      publish_at: data.publishAt,
     })
 
     const viewOptions = {
       model,
       title: data.publishTitle,
-      el: $el[0]
+      el: $el[0],
     }
 
     const view = new PublishIconView(viewOptions)
@@ -2228,7 +2228,7 @@ const content_type_map = {
   page: 'wiki_page',
   discussion: 'discussion_topic',
   external_tool: 'context_external_tool',
-  sub_header: 'context_module_sub_header'
+  sub_header: 'context_module_sub_header',
 }
 function itemContentKey(model) {
   if (model === null) return null
@@ -2361,7 +2361,7 @@ modules.updateAssignmentData(() => {
         ?.querySelector('.content')
       if (!firstContextModuleContent || moduleContentIsHidden(firstContextModuleContent)) {
         const firstVisibleModuleContent = [
-          ...document.querySelectorAll('.context_module .content')
+          ...document.querySelectorAll('.context_module .content'),
         ].find(el => !moduleContentIsHidden(el))
         if (firstVisibleModuleContent)
           scrollTo($(firstVisibleModuleContent).parents('.context_module'))
@@ -2457,12 +2457,12 @@ $(document).ready(function () {
           item:
             $currentElem &&
             $currentElem.prev('.context_module').find('.context_module_item:visible:last'),
-          fallbackModule: $currentElem && $currentElem.prev('.context_module')
+          fallbackModule: $currentElem && $currentElem.prev('.context_module'),
         },
         selectWhenModuleItemFocused: {
           item: $currentElem && $currentElem.prev('.context_module_item:visible'),
-          fallbackModule: $currentElem && $currentElem.parents('.context_module')
-        }
+          fallbackModule: $currentElem && $currentElem.parents('.context_module'),
+        },
       }
       const $elem = selectItem(params)
       if ($elem.length) $currentElem = $elem
@@ -2473,13 +2473,13 @@ $(document).ready(function () {
       const params = {
         selectWhenModuleFocused: {
           item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
-          fallbackModule: $currentElem && $currentElem.next('.context_module')
+          fallbackModule: $currentElem && $currentElem.next('.context_module'),
         },
         selectWhenModuleItemFocused: {
           item: $currentElem && $currentElem.next('.context_module_item:visible'),
           fallbackModule:
-            $currentElem && $currentElem.parents('.context_module').next('.context_module')
-        }
+            $currentElem && $currentElem.parents('.context_module').next('.context_module'),
+        },
       }
       const $elem = selectItem(params)
       if ($elem.length) $currentElem = $elem
@@ -2611,7 +2611,7 @@ $(document).ready(function () {
         }
         $module.find('.content').slideToggle({
           queue: false,
-          done: callback()
+          done: callback(),
         })
       }
     })
@@ -2643,7 +2643,7 @@ $(document).ready(function () {
           'module',
           'quiz',
           'page',
-          'video'
+          'video',
         ]}
         targetResourceType="module"
         allowItemSelection={selectable}
@@ -2660,7 +2660,7 @@ $(document).ready(function () {
     launchType,
     returnFocusTo,
     isOpen = true,
-    contextModuleId = null
+    contextModuleId = null,
   }) {
     if (isOpen) {
       addDeepLinkingListener(() => {
@@ -2715,7 +2715,7 @@ $(document).ready(function () {
         tool,
         launchType,
         returnFocusTo: $('.al-trigger')[0],
-        contextModuleId: currentModuleId
+        contextModuleId: currentModuleId,
       })
       return
     }
@@ -2725,13 +2725,13 @@ $(document).ready(function () {
       // include all modules
       moduleData.push({
         course_id: ENV.COURSE_ID,
-        type: 'module'
+        type: 'module',
       })
     } else if (launchType == 'module_group_menu') {
       // just include the one module whose menu we're on
       moduleData.push({
         id: currentModuleId,
-        name: currentModule.find('.name').attr('title')
+        name: currentModule.find('.name').attr('title'),
       })
     }
     setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])

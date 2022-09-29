@@ -39,7 +39,7 @@ export const MessageDetailContainer = props => {
     useContext(ConversationContext)
   const [messageRef, setMessageRef] = useState()
   const variables = {
-    conversationID: props.conversation._id
+    conversationID: props.conversation._id,
   }
   const [isLoadingMoreData, setIsLoadingMoreData] = useState(false)
 
@@ -52,7 +52,7 @@ export const MessageDetailContainer = props => {
   const removeConversationMessagesFromCache = (cache, result) => {
     const options = {
       query: CONVERSATION_MESSAGES_QUERY,
-      variables
+      variables,
     }
     const data = JSON.parse(JSON.stringify(cache.readQuery(options)))
 
@@ -83,17 +83,17 @@ export const MessageDetailContainer = props => {
     },
     onError() {
       setOnFailure(I18n.t('There was an unexpected error deleting the conversation message'))
-    }
+    },
   })
 
   const conversationMessagesQuery = useQuery(CONVERSATION_MESSAGES_QUERY, {
     variables,
-    skip: isSubmissionCommentsType
+    skip: isSubmissionCommentsType,
   })
 
   const submissionCommentsQuery = useQuery(SUBMISSION_COMMENTS_QUERY, {
     variables: {submissionID: props.conversation._id, sort: 'desc'},
-    skip: !isSubmissionCommentsType
+    skip: !isSubmissionCommentsType,
   })
 
   // Intial focus on message when loaded
@@ -155,7 +155,7 @@ export const MessageDetailContainer = props => {
     isSubmissionCommentsType,
     props,
     submissionCommentsQuery.data,
-    submissionCommentsQuery.loading
+    submissionCommentsQuery.loading,
   ])
 
   const fetchMoreMenuData = () => {
@@ -167,7 +167,7 @@ export const MessageDetailContainer = props => {
           variables,
           afterMessage:
             conversationMessagesQuery.data?.legacyNode?.conversationMessagesConnection?.pageInfo
-              ?.endCursor
+              ?.endCursor,
         },
         updateQuery: (previousResult, {fetchMoreResult}) => {
           setIsLoadingMoreData(false)
@@ -183,12 +183,12 @@ export const MessageDetailContainer = props => {
               conversationMessagesConnection: {
                 nodes: [...prev_nodes, ...fetchMore_nodes],
                 pageInfo: fetchMore_pageInfo,
-                __typename: 'ConversationMessageConnection'
+                __typename: 'ConversationMessageConnection',
               },
-              __typename: 'Conversation'
-            }
+              __typename: 'Conversation',
+            },
           }
-        }
+        },
       })
     } else {
       submissionCommentsQuery.fetchMore({
@@ -197,7 +197,7 @@ export const MessageDetailContainer = props => {
           submissionID: props.conversation._id,
           sort: 'desc',
           afterComment:
-            submissionCommentsQuery.data?.legacyNode?.commentsConnection?.pageInfo?.endCursor
+            submissionCommentsQuery.data?.legacyNode?.commentsConnection?.pageInfo?.endCursor,
         },
         updateQuery: (previousResult, {fetchMoreResult}) => {
           setIsLoadingMoreData(false)
@@ -212,15 +212,15 @@ export const MessageDetailContainer = props => {
               commentsConnection: {
                 nodes: [...prev_nodes, ...fetchMore_nodes],
                 pageInfo: fetchMore_pageInfo,
-                __typename: 'SubmissionCommentConnection'
+                __typename: 'SubmissionCommentConnection',
               },
               user: {
-                ...fetchMoreResult?.legacyNode?.user
+                ...fetchMoreResult?.legacyNode?.user,
               },
-              __typename: 'Submission'
-            }
+              __typename: 'Submission',
+            },
           }
-        }
+        },
       })
     }
   }
@@ -246,7 +246,7 @@ export const MessageDetailContainer = props => {
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.4,
         }
       )
 
@@ -352,5 +352,5 @@ MessageDetailContainer.propTypes = {
   onUnstar: PropTypes.func,
   onReadStateChange: PropTypes.func,
   setCanReply: PropTypes.func,
-  scope: PropTypes.string
+  scope: PropTypes.string,
 }

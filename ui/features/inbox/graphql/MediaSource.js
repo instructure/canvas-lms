@@ -32,19 +32,19 @@ export const MediaSource = {
     type: string,
     src: string,
     height: string,
-    width: string
+    width: string,
   }),
 
   mock: ({
     type = 'video/mp4',
     src = 'https://nv.instructuremedia.com/fetch/QkFoYkIxc0hhUVRndjZZU01Hd3JCOUd4WEdBPS0tNTU1MTlhMTMyOGI0MTFkMjVjNzkwNmEwZDYzOWJkYzVjM2U0OTBlZQ.mp4',
     height = '720',
-    width = '1280'
+    width = '1280',
   } = {}) => ({
     type,
     src,
     height,
     width,
-    __typename: 'MediaSource'
-  })
+    __typename: 'MediaSource',
+  }),
 }

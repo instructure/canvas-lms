@@ -21,7 +21,7 @@ import {createClient, gql} from '@canvas/apollo'
 import resolveProgress from '@canvas/progress/resolve_progress'
 
 export const HIDE_ASSIGNMENT_GRADES = gql`
-  mutation($assignmentId: ID!) {
+  mutation ($assignmentId: ID!) {
     hideAssignmentGrades(input: {assignmentId: $assignmentId}) {
       progress {
         _id
@@ -32,7 +32,7 @@ export const HIDE_ASSIGNMENT_GRADES = gql`
 `
 
 export const HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS = gql`
-  mutation($assignmentId: ID!, $sectionIds: [ID!]!) {
+  mutation ($assignmentId: ID!, $sectionIds: [ID!]!) {
     hideAssignmentGradesForSections(input: {assignmentId: $assignmentId, sectionIds: $sectionIds}) {
       progress {
         _id
@@ -46,11 +46,11 @@ export function hideAssignmentGrades(assignmentId) {
   return createClient()
     .mutate({
       mutation: HIDE_ASSIGNMENT_GRADES,
-      variables: {assignmentId}
+      variables: {assignmentId},
     })
     .then(({data}) => ({
       id: data.hideAssignmentGrades.progress._id,
-      workflowState: data.hideAssignmentGrades.progress.state
+      workflowState: data.hideAssignmentGrades.progress.state,
     }))
 }
 
@@ -58,17 +58,17 @@ export function hideAssignmentGradesForSections(assignmentId, sectionIds = []) {
   return createClient()
     .mutate({
       mutation: HIDE_ASSIGNMENT_GRADES_FOR_SECTIONS,
-      variables: {assignmentId, sectionIds}
+      variables: {assignmentId, sectionIds},
     })
     .then(({data}) => ({
       id: data.hideAssignmentGradesForSections.progress._id,
-      workflowState: data.hideAssignmentGradesForSections.progress.state
+      workflowState: data.hideAssignmentGradesForSections.progress.state,
     }))
 }
 
 export function resolveHideAssignmentGradesStatus(progress) {
   return resolveProgress({
     url: `/api/v1/progress/${progress.id}`,
-    workflow_state: progress.workflowState
+    workflow_state: progress.workflowState,
   }).then(results => camelize(results))
 }

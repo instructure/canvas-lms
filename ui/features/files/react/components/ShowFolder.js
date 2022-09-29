@@ -39,7 +39,7 @@ const I18n = useI18nScope('react_files')
 
 ShowFolder.getInitialState = function () {
   return {
-    hideToggleAll: true
+    hideToggleAll: true,
   }
 }
 
@@ -55,7 +55,7 @@ ShowFolder.renderFilePreview = function () {
   if (this.props.query.preview != null) {
     return (
       <FilePreview
-        isOpen
+        isOpen={true}
         usageRightsRequiredForContext={this.props.usageRightsRequiredForContext}
         currentFolder={this.props.currentFolder}
         params={this.props.params}
@@ -135,7 +135,7 @@ ShowFolder.render = function () {
     this.props.currentFolder.files.fetchingNextPage
 
   const selectAllLabelClass = classnames({
-    'screenreader-only': this.state.hideToggleAll
+    'screenreader-only': this.state.hideToggleAll,
   })
 
   const hasLoadedAll = !!(

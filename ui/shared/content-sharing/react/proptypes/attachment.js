@@ -21,6 +21,6 @@ import {shape, string} from 'prop-types'
 const attachmentShape = shape({
   id: string,
   display_name: string,
-  url: string
+  url: string,
 })
 export default attachmentShape

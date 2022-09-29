@@ -171,7 +171,7 @@ function handleAnchorsWithImage() {
         $('.user_content a:has(img)').each(function () {
           $(this).addClass(e.className)
         })
-      }
+      },
     },
     // Children prop is required
     React.createElement('img')
@@ -503,7 +503,7 @@ function warnAboutRolesBeingSwitched() {
     $img.attr('src', '/images/warning.png').attr('title', switched_roles_message).css({
       paddingRight: 2,
       width: 12,
-      height: 12
+      height: 12,
     })
     $('#crumb_' + context_class)
       .find('a')
@@ -555,7 +555,7 @@ function previewEquellaContentWhenClicked() {
         title: I18n.t('titles.equella_content_preview', 'Equella Content Preview'),
         close() {
           $dialog.find('iframe').attr('src', 'about:blank')
-        }
+        },
       })
     }
     $dialog.find('.original_link').attr('href', $(this).attr('href'))
@@ -588,7 +588,7 @@ function openDialogsWhenClicked() {
           $.extend(
             {
               autoOpen: false,
-              modal: true
+              modal: true,
             },
             $(link).data('dialogOpts')
           )
@@ -637,7 +637,7 @@ function previewFilesWhenClicked() {
             public_url: attachment.public_url,
             attachment_preview_processing:
               attachment.workflow_state === 'pending_upload' ||
-              attachment.workflow_state === 'processing'
+              attachment.workflow_state === 'processing',
           })
           const $minimizeLink = $(
             '<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' +
@@ -775,7 +775,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
       const $message = $(this).parents('.communication_sub_message')
       if ($(this).hasClass('submission_comment_form')) {
         const user_id = $(this).getTemplateData({
-          textValues: ['submission_user_id']
+          textValues: ['submission_user_id'],
         }).submission_user_id
         let submission = null
         for (const idx in data) {
@@ -792,7 +792,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
           comment.message = comment.formatted_body || comment.comment
           $message.fillTemplateData({
             data: comment,
-            htmlValues: ['message']
+            htmlValues: ['message'],
           })
         }
       } else {
@@ -801,7 +801,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         $message.find('.content > .message_html').val(entry.message)
         $message.fillTemplateData({
           data: entry,
-          htmlValues: ['message']
+          htmlValues: ['message'],
         })
       }
       $message.find('.message').show()
@@ -822,7 +822,7 @@ function doThingsWhenDiscussionTopicSubMessageIsPosted() {
         .find('.submit_button')
         .text(I18n.t('errors.posting_message_failed', 'Post Failed, Try Again'))
       $(this).formErrors(data)
-    }
+    },
   })
 }
 
@@ -885,7 +885,7 @@ function doThingsToModuleSequenceFooter() {
       el.moduleSequenceFooter({
         courseID: el.attr('data-course-id'),
         assetType: el.attr('data-asset-type'),
-        assetID: el.attr('data-asset-id')
+        assetID: el.attr('data-asset-id'),
       })
     })
   }
@@ -933,7 +933,7 @@ function confirmAndDeleteRightSideTodoItemsWhenClicked() {
             $(this).remove()
             toFocus.focus()
           })
-        }
+        },
       })
     }
     remove(url)
@@ -996,7 +996,7 @@ export default function enhanceTheEntireUniverse() {
     doThingsToModuleSequenceFooter,
     showHideRemoveThingsToRightSideMoreLinksWhenClicked,
     confirmAndDeleteRightSideTodoItemsWhenClicked,
-    makeAllExternalLinksExternalLinks
+    makeAllExternalLinksExternalLinks,
   ]
     .map(isolate)
     .map(x => x())

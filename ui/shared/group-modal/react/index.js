@@ -42,10 +42,10 @@ GroupModal.propTypes = {
     join_level: string,
     role: string,
     group_limit: number,
-    members_count: number
+    members_count: number,
   }),
   onSave: func.isRequired,
-  requestMethod: string.isRequired
+  requestMethod: string.isRequired,
 }
 
 export default function GroupModal({groupCategory, group, onSave, requestMethod, ...modalProps}) {
@@ -70,14 +70,14 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
       return {
         group_category_id: groupCategoryId,
         join_level: joinLevel || 'invitation_only',
-        name
+        name,
       }
     } else {
       return {
         group_category_id: groupCategoryId,
         isFull: '',
         max_membership: groupLimit ? groupLimit.toString() : '',
-        name
+        name,
       }
     }
   }
@@ -91,7 +91,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
         type: 'error',
         message: I18n.t(
           'Group membership limit must be equal to or greater than current members count.'
-        )
+        ),
       })
     } else {
       handleSend()
@@ -117,7 +117,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     return doFetchApi({
       method: requestMethod,
       path,
-      body: payload()
+      body: payload(),
     })
   }
 
@@ -157,7 +157,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
 
   const alert = alertMessage ? (
     <Alert variant={status}>
-      <div role="alert" aria-live="assertive" aria-atomic>
+      <div role="alert" aria-live="assertive" aria-atomic={true}>
         {alertMessage}
       </div>
       {status === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
@@ -201,7 +201,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
           placeholder={I18n.t('Name')}
           value={name}
           onChange={(_event, value) => setName(value)}
-          isRequired
+          isRequired={true}
         />
         {isNameOnly ? null : groupOptions}
       </FormFieldGroup>

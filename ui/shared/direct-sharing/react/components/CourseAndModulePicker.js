@@ -27,7 +27,7 @@ import {TruncateText} from '@instructure/ui-truncate-text'
 import SearchItemSelector from '@canvas/search-item-selector/react/SearchItemSelector'
 import useManagedCourseSearchApi, {
   MINIMUM_SEARCH_LENGTH,
-  isSearchableTerm
+  isSearchableTerm,
 } from '../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi from '../effects/useModuleCourseSearchApi'
 import ModulePositionPicker from './ModulePositionPicker'
@@ -42,15 +42,15 @@ CourseAndModulePicker.propTypes = {
   setModuleItemPosition: func,
   disableModuleInsertion: bool,
   moduleFilteringOpts: object,
-  courseFilteringOpts: object
+  courseFilteringOpts: object,
 }
 
 CourseAndModulePicker.defaultProps = {
   moduleFilteringOpts: {per_page: 50},
   courseFilteringOpts: {
     include: '',
-    enforce_manage_grant_requirement: ''
-  }
+    enforce_manage_grant_requirement: '',
+  },
 }
 
 export default function CourseAndModulePicker({
@@ -61,7 +61,7 @@ export default function CourseAndModulePicker({
   setModuleItemPosition,
   disableModuleInsertion,
   moduleFilteringOpts,
-  courseFilteringOpts
+  courseFilteringOpts,
 }) {
   const trayRef = useRef(null)
 

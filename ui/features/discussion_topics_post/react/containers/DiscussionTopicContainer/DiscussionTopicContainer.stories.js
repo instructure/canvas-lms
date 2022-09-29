@@ -20,7 +20,7 @@ import React from 'react'
 
 export default {
   title: 'Examples/Discussion Posts/Containers/Discussion Topic Contaner',
-  component: DiscussionTopicContainer
+  component: DiscussionTopicContainer,
 }
 
 const Template = args => <DiscussionTopicContainer {...args} />
@@ -32,10 +32,10 @@ Default.args = {
     title: 'This is an Example Discussion',
     author: {
       displayName: 'Gunnar Gunderson Gunn',
-      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
     },
-    message: 'Please introduce yourselves.'
-  }
+    message: 'Please introduce yourselves.',
+  },
 }
 
 export const TeacherViewGraded = Template.bind({})
@@ -48,21 +48,21 @@ TeacherViewGraded.args = {
     title: 'Graded Teacher View Discussion',
     author: {
       displayName: 'Mister Teacher',
-      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
     },
     message: '<p> This is the Discussion Topic. It will be graded.</p>',
     postedAt: '2021-04-05T13:40:50Z',
     subscribed: true,
     entryCounts: {
       repliesCount: 24,
-      unreadCount: 4
+      unreadCount: 4,
     },
     assignment: {
       dueAt: '2021-04-05T13:40:50Z',
-      pointsPossible: 5
+      pointsPossible: 5,
     },
     permissions: {
-      readAsAdmin: true
-    }
-  }
+      readAsAdmin: true,
+    },
+  },
 }

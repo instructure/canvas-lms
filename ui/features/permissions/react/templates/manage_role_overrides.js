@@ -25,8 +25,8 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Permissions'),
-      description: I18n.t('Allows user to view and manage permissions.')
-    }
+      description: I18n.t('Allows user to view and manage permissions.'),
+    },
   ],
   [],
   [],

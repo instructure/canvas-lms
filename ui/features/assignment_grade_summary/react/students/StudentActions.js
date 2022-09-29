@@ -49,7 +49,7 @@ export function loadStudents() {
       onPageLoaded({provisionalGrades, students}) {
         dispatch(addStudents(students))
         dispatch(addProvisionalGrades(provisionalGrades))
-      }
+      },
     })
   }
 }

@@ -30,31 +30,31 @@ const HomeTray = () => (
     image="/images/tutorial-tray-images/Panda_Teacher.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the outcomes page in a course?'),
-        href: I18n.t('#community.instructor_use_outcomes')
+        href: I18n.t('#community.instructor_use_outcomes'),
       },
       {
         label: I18n.t('How do I create an outcome for a course?'),
-        href: I18n.t('#community.instructor_create_outcome')
+        href: I18n.t('#community.instructor_create_outcome'),
       },
       {
         label: I18n.t('How do I create outcome groups for a course?'),
-        href: I18n.t('#community.instructor_create_outcome_group')
+        href: I18n.t('#community.instructor_create_outcome_group'),
       },
       {
         label: I18n.t('How do I import outcomes for a course?'),
-        href: I18n.t('#community.instructor_import_outcomes')
+        href: I18n.t('#community.instructor_import_outcomes'),
       },
       {
         label: I18n.t(
           'How do I use the Learning Mastery Gradebook to view outcome results in a course from the Gradebook?'
         ),
-        href: I18n.t('#community.instructor_use_mastery_gradebook')
-      }
+        href: I18n.t('#community.instructor_use_mastery_gradebook'),
+      },
     ]}
   >
     {I18n.t(

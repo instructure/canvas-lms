@@ -49,5 +49,5 @@ export const ThreadPagination = props => (
 ThreadPagination.propTypes = {
   setPage: PropTypes.func.isRequired,
   selectedPage: PropTypes.number.isRequired,
-  totalPages: PropTypes.number.isRequired
+  totalPages: PropTypes.number.isRequired,
 }

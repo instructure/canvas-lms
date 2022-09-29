@@ -24,8 +24,8 @@ const data = {
   attachment: {
     file_state: '0',
     workflow_state: 'to_be_zipped',
-    readable_size: '73 KB'
-  }
+    readable_size: '73 KB',
+  },
 }
 
 const numbers = [1, 2, 3]
@@ -34,7 +34,7 @@ export default {
   create() {
     window.ENV = {
       submission_zip_url: '/courses/1/assignments/1/submissions?zip=1',
-      numbers_url: '/courses/1/numbers'
+      numbers_url: '/courses/1/numbers',
     }
 
     ajax.defineFixture(window.ENV.submission_zip_url, {
@@ -42,9 +42,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     return ajax.defineFixture(window.ENV.numbers_url, {
@@ -52,14 +52,14 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
   },
 
   makeAvailable() {
     data.attachment.file_state = 100
     return (data.attachment.workflow_state = 'available')
-  }
+  },
 }

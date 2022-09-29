@@ -24,7 +24,7 @@ ENV.current_user = {display_name: 'Ronald Weasley'}
 export default {
   title: 'Examples/Discussion Posts/Components/AnonymousPostSelector',
   component: AnonymousPostSelector,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AnonymousPostSelector {...args} />

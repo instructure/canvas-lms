@@ -24,7 +24,7 @@ const I18n = useI18nScope('context_modules')
 
 let ProgressionModuleView
 
-export default ProgressionModuleView = (function() {
+export default ProgressionModuleView = (function () {
   ProgressionModuleView = class ProgressionModuleView extends Backbone.View {
     static initClass() {
       this.prototype.tagName = 'li'
@@ -35,7 +35,7 @@ export default ProgressionModuleView = (function() {
         started: I18n.t('module_started', 'In Progress'),
         completed: I18n.t('module_complete', 'Complete'),
         unlocked: I18n.t('module_unlocked', 'Unlocked'),
-        locked: I18n.t('module_locked', 'Locked')
+        locked: I18n.t('module_locked', 'Locked'),
       }
 
       this.prototype.iconClasses = {
@@ -46,7 +46,7 @@ export default ProgressionModuleView = (function() {
         Assignment: 'icon-assignment',
         Quiz: 'icon-quiz',
         ExternalTool: 'icon-link',
-        'Lti::MessageHandler': 'icon-link'
+        'Lti::MessageHandler': 'icon-link',
       }
     }
 

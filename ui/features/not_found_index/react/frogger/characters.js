@@ -28,7 +28,7 @@ export class Character {
   getPosition() {
     return {
       x: this.x,
-      y: this.y
+      y: this.y,
     }
   }
 

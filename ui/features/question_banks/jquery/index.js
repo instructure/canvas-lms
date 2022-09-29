@@ -19,25 +19,23 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/datetime'/* datetimeString */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, fillFormData, formErrors */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete */
+import '@canvas/datetime' /* datetimeString */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, formErrors */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete */
 import '@canvas/keycodes'
 import '@canvas/loading-image'
 import '@canvas/util/templateData'
 
 const I18n = useI18nScope('question_banks')
 
-$(document).ready(function() {
+$(document).ready(function () {
   $('.add_bank_link').click(event => {
     event.preventDefault()
-    const $bank = $('#question_bank_blank')
-      .clone(true)
-      .attr('id', 'question_bank_new')
+    const $bank = $('#question_bank_blank').clone(true).attr('id', 'question_bank_new')
     $('#questions').prepend($bank.show())
     $bank.find('.edit_bank_link').click()
   })
-  $('.question_bank .delete_bank_link').click(function(event) {
+  $('.question_bank .delete_bank_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.question_bank')
@@ -48,13 +46,13 @@ $(document).ready(function() {
           'Are you sure you want to delete this bank of questions?'
         ),
         success() {
-          $(this).slideUp(function() {
+          $(this).slideUp(function () {
             $(this).remove()
           })
-        }
+        },
       })
   })
-  $('.question_bank .bookmark_bank_link').click(function(event) {
+  $('.question_bank .bookmark_bank_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     const $bank = $link.parents('.question_bank')
@@ -63,7 +61,7 @@ $(document).ready(function() {
       $bank.find('.bookmark_bank_link:visible:first').focus()
     })
   })
-  $('.question_bank .edit_bank_link').click(function(event) {
+  $('.question_bank .edit_bank_link').click(function (event) {
     event.preventDefault()
     const $bank = $(this).parents('.question_bank')
     const data = $bank.getTemplateData({textValues: ['title']})
@@ -77,16 +75,11 @@ $(document).ready(function() {
       $form.attr('method', 'POST')
     }
     $form.fillFormData(data, {object_name: 'assessment_question_bank'})
-    $form
-      .find(':text:visible:first')
-      .focus()
-      .select()
+    $form.find(':text:visible:first').focus().select()
   })
-  $('#edit_bank_form .bank_name_box').keycodes('return esc tab', function(event) {
+  $('#edit_bank_form .bank_name_box').keycodes('return esc tab', function (event) {
     if (event.keyString == 'esc') {
-      $(this)
-        .parents('.question_bank')
-        .addClass('dont_save')
+      $(this).parents('.question_bank').addClass('dont_save')
       $(this).blur()
     } else if (event.keyString == 'return') {
       $('#edit_bank_form').submit()
@@ -95,7 +88,7 @@ $(document).ready(function() {
       event.preventDefault()
     }
   })
-  $('#edit_bank_form .bank_name_box').blur(function() {
+  $('#edit_bank_form .bank_name_box').blur(function () {
     const $bank = $(this).parents('.question_bank')
     if (
       !$bank.hasClass('dont_save') &&
@@ -122,7 +115,7 @@ $(document).ready(function() {
         $bank.find('.bank_name_box').blur()
       } catch (e) {}
       $bank.fillTemplateData({
-        data
+        data,
       })
       $bank.loadingImage()
       return $bank
@@ -134,7 +127,7 @@ $(document).ready(function() {
       bank.last_updated_at = $.datetimeString(bank.updated_at)
       $bank.fillTemplateData({
         data: bank,
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
       // if you can convince fillTemplateData to do this, please be my guest
       $bank.find('.links a').each((_, link) => {
@@ -150,6 +143,6 @@ $(document).ready(function() {
       $bank.removeClass('save_in_progress')
       $bank.find('.edit_bank_link').click()
       $('#edit_bank_form').formErrors(data)
-    }
+    },
   })
 })

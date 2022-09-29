@@ -32,7 +32,7 @@ export default class UploadFileView extends BaseView {
       'change #selected-photo': 'onSelectAvatar',
       'dragover .select-photo-link': 'onDragOver',
       'dragleave .select-photo-link': 'onDragLeave',
-      'drop .select-photo-link': 'onFileDrop'
+      'drop .select-photo-link': 'onFileDrop',
     }
   }
 
@@ -105,7 +105,7 @@ export default class UploadFileView extends BaseView {
   }
 
   revokeURLObjects() {
-    return this.$('img').each(function() {
+    return this.$('img').each(function () {
       const src = $(this).attr('src')
       if (src.match(/^data/)) {
         return typeof window.URL.revokeObjectURL === 'function'
@@ -126,7 +126,7 @@ export default class UploadFileView extends BaseView {
       x: Math.floor(this.currentCoords.x * widthRatio),
       y: Math.floor(this.currentCoords.y * heightRatio),
       w: Math.floor(this.currentCoords.w * widthRatio),
-      h: Math.floor(this.currentCoords.h * heightRatio)
+      h: Math.floor(this.currentCoords.h * heightRatio),
     })
   }
 
@@ -143,7 +143,7 @@ export default class UploadFileView extends BaseView {
         imgFile: this.file,
         onImageLoaded: this.options.onImageLoaded,
         width: this.avatarSize.w,
-        height: this.avatarSize.h
+        height: this.avatarSize.h,
       })
     }
     this.cropper.render()

@@ -33,13 +33,13 @@ const locationRadioInputs = [
   {
     key: 'anywhere',
     value: '1',
-    label: I18n.t('Allow creation anywhere the user has active enrollments')
+    label: I18n.t('Allow creation anywhere the user has active enrollments'),
   },
   {
     key: 'manuallyCreatedCourses',
     value: '0',
-    label: I18n.t('Allow creation only in the Manually-Created Courses sub-account')
-  }
+    label: I18n.t('Allow creation only in the Manually-Created Courses sub-account'),
+  },
 ]
 
 const formatInputName = name => `account[settings][${name}]`
@@ -145,8 +145,8 @@ CourseCreationSettings.propTypes = {
     students_can_create_courses: PropTypes.bool.isRequired,
     no_enrollments_can_create_courses: PropTypes.bool.isRequired,
     teachers_can_create_courses_anywhere: PropTypes.bool.isRequired,
-    students_can_create_courses_anywhere: PropTypes.bool.isRequired
-  }).isRequired
+    students_can_create_courses_anywhere: PropTypes.bool.isRequired,
+  }).isRequired,
 }
 
 export default CourseCreationSettings

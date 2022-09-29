@@ -25,7 +25,7 @@ import {
   ENROLLMENT_1,
   ENROLLMENT_2,
   SORTED_ENROLLMENTS,
-  SORTED_SECTIONS
+  SORTED_SECTIONS,
 } from '../../../__tests__/fixtures'
 
 const selectPaceContextFn = jest.fn()
@@ -38,7 +38,7 @@ const defaultProps = {
   selectedContextType: 'Course' as const,
   setSelectedPaceContext: selectPaceContextFn,
   changeCount: 0,
-  responsiveSize: 'large' as const
+  responsiveSize: 'large' as const,
 }
 
 beforeAll(() => {

@@ -65,8 +65,8 @@ UsersListHeader.propTypes = {
     sort: string,
     order: string,
     search_term: string,
-    fole_filter_id: string
-  }).isRequired
+    fole_filter_id: string,
+  }).isRequired,
 }
 
 UsersListHeader.displayName = 'ColHeader'

@@ -24,7 +24,7 @@ import htmlEscape from 'html-escape'
 const I18n = useI18nScope('instructure')
 
 // Return the first value which passes a truth test
-$.detect = function(collection, callback) {
+$.detect = function (collection, callback) {
   let result
   $.each(collection, (index, value) => {
     if (callback.call(value, value, index, collection)) {
@@ -35,7 +35,7 @@ $.detect = function(collection, callback) {
   return result
 }
 
-$.encodeToHex = function(str) {
+$.encodeToHex = function (str) {
   let hex = ''
   const e = str.length
   const c = 0
@@ -49,7 +49,7 @@ $.encodeToHex = function(str) {
   }
   return hex
 }
-$.decodeFromHex = function(str) {
+$.decodeFromHex = function (str) {
   let r = ''
   let i = 0
   while (i < str.length) {
@@ -62,13 +62,13 @@ $.decodeFromHex = function(str) {
 // useful for i18n, e.g. t('key', 'pick one: %{select}', {select: $.raw('<select><option>...')})
 // note that raw returns a SafeString object, so you may want to call toString
 // if you're using it elsewhere
-$.raw = function(str) {
+$.raw = function (str) {
   return new htmlEscape.SafeString(str)
 }
 // ensure the jquery html setters don't puke if given a SafeString
-$.each(['html', 'append', 'prepend'], function(idx, method) {
+$.each(['html', 'append', 'prepend'], function (idx, method) {
   const orig = $.fn[method]
-  $.fn[method] = function() {
+  $.fn[method] = function () {
     const args = [].slice.call(arguments)
     for (let i = 0, len = args.length; i < len; i++) {
       if (args[i] instanceof htmlEscape.SafeString) args[i] = args[i].toString()
@@ -77,7 +77,7 @@ $.each(['html', 'append', 'prepend'], function(idx, method) {
   }
 })
 
-$.replaceOneTag = function(text, name, value) {
+$.replaceOneTag = function (text, name, value) {
   if (!text) {
     return text
   }
@@ -87,7 +87,7 @@ $.replaceOneTag = function(text, name, value) {
   return text.replace(itemExpression, value)
 }
 // backwards compatible with only one tag
-$.replaceTags = function(text, mapping_or_name, maybe_value) {
+$.replaceTags = function (text, mapping_or_name, maybe_value) {
   if (typeof mapping_or_name === 'object') {
     for (const name in mapping_or_name) {
       text = $.replaceOneTag(text, name, mapping_or_name[name])
@@ -98,23 +98,23 @@ $.replaceTags = function(text, mapping_or_name, maybe_value) {
   }
 }
 
-$.underscore = function(string) {
+$.underscore = function (string) {
   return (string || '')
     .replace(/([A-Z])/g, '_$1')
     .replace(/^_/, '')
-    .toLowerCase();
+    .toLowerCase()
 }
 
-$.titleize = function(string) {
+$.titleize = function (string) {
   const res = (string || '')
     .replace(/([A-Z])/g, ' $1')
     .replace(/_/g, ' ')
     .replace(/\s+/, ' ')
     .replace(/^\s/, '')
-  return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ');
+  return $.map(res.split(/\s/), word => (word[0] || '').toUpperCase() + word.substring(1)).join(' ')
 }
 
-$.fileSize = function(bytes) {
+$.fileSize = function (bytes) {
   const factor = 1024
   if (bytes < factor) {
     return parseInt(bytes, 10) + ' bytes'
@@ -125,13 +125,13 @@ $.fileSize = function(bytes) {
   }
 }
 
-$.toSentence = function(array, options) {
+$.toSentence = function (array, options) {
   if (typeof options === 'undefined') {
     options = {}
   } else if (options == 'or') {
     options = {
       two_words_connector: I18n.t('#support.array.or.two_words_connector'),
-      last_word_connector: I18n.t('#support.array.or.last_word_connector')
+      last_word_connector: I18n.t('#support.array.or.last_word_connector'),
     }
   }
 
@@ -139,7 +139,7 @@ $.toSentence = function(array, options) {
     {
       words_connector: I18n.t('#support.array.words_connector'),
       two_words_connector: I18n.t('#support.array.two_words_connector'),
-      last_word_connector: I18n.t('#support.array.last_word_connector')
+      last_word_connector: I18n.t('#support.array.last_word_connector'),
     },
     options
   )
@@ -162,20 +162,20 @@ $.toSentence = function(array, options) {
 
 // return query string parameter
 // $.queryParam("name") => qs value or null
-$.queryParam = function(name) {
+$.queryParam = function (name) {
   name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]')
   const regex = new RegExp('[\\?&]' + name + '=([^&#]*)')
   const results = regex.exec(window.location.search)
   if (results == null) return results
-  else return decodeURIComponent(results[1].replace(/\+/g, ' '));
+  else return decodeURIComponent(results[1].replace(/\+/g, ' '))
 }
 
-$.capitalize = function(string) {
+$.capitalize = function (string) {
   return string.charAt(0).toUpperCase() + string.substring(1).toLowerCase()
 }
 
 INST.youTubeRegEx = /^https?:\/\/(www\.youtube\.com\/watch.*v(=|\/)|youtu\.be\/)([^&#]*)/
-$.youTubeID = function(path) {
+$.youTubeID = function (path) {
   const match = path.match(INST.youTubeRegEx)
   if (match && match[match.length - 1]) {
     return match[match.length - 1]

@@ -28,7 +28,7 @@ export default {
     currentFolder,
     rootTillCurrentFolder,
     showingSearchResults,
-    searchResultCollection
+    searchResultCollection,
   }) {
     const {updatedModels} = this.state
 
@@ -51,7 +51,7 @@ export default {
       showingSearchResults,
       selectedItems: [],
       searchResultCollection,
-      updatedModels
+      updatedModels,
     })
   },
 
@@ -62,7 +62,7 @@ export default {
       rootTillCurrentFolder: null,
       showingSearchResults: false,
       showingModal: false,
-      modalContents: null // This should be a React Component to render in the modal container.
+      modalContents: null, // This should be a React Component to render in the modal container.
     }
   },
 
@@ -84,7 +84,7 @@ export default {
 
   getPreviewQuery() {
     const retObj = {
-      preview: (this.state.selectedItems[0] && this.state.selectedItems[0].id) || true
+      preview: (this.state.selectedItems[0] && this.state.selectedItems[0].id) || true,
     }
     if (this.state.selectedItems.length > 1) {
       retObj.only_preview = this.state.selectedItems.map(item => item.id).join(',')
@@ -105,11 +105,11 @@ export default {
     this.setState({
       modalContents: contents,
       showingModal: true,
-      afterModalClose: afterClose
+      afterModalClose: afterClose,
     })
   },
 
   closeModal() {
     this.setState({showingModal: false}, () => this.state.afterModalClose())
-  }
+  },
 }

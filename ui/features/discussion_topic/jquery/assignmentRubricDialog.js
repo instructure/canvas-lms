@@ -53,7 +53,7 @@ const assignmentRubricDialog = {
       modal: false,
       resizable: true,
       autoOpen: false,
-      close: () => this.$focusReturnsTo.focus()
+      close: () => this.$focusReturnsTo.focus(),
     })
 
     return $.get(ENV.DISCUSSION.GRADED_RUBRICS_URL, html => {
@@ -74,7 +74,7 @@ const assignmentRubricDialog = {
   openDialog() {
     if (!this.dialogInited) this.initDialog()
     this.$dialog.dialog('open')
-  }
+  },
 }
 
 export default assignmentRubricDialog

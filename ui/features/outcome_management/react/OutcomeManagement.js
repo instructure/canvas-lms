@@ -30,7 +30,7 @@ import OutcomeManagementPanel from './Management/index'
 import AlignmentSummary from './Alignments/index'
 import {
   showOutcomesImporter,
-  showOutcomesImporterIfInProgress
+  showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
@@ -137,7 +137,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
             resetOutcomeViews: resetManageView,
             mount: importRef,
             contextUrlRoot: ENV.CONTEXT_URL_ROOT,
-            onSuccessfulCreateOutcome
+            onSuccessfulCreateOutcome,
           },
           ENV.current_user.id
         )
@@ -167,7 +167,7 @@ export const OutcomeManagementWithoutGraphql = ({breakpoints}) => {
       resetOutcomeViews: resetManageView,
       mount: importRef,
       contextUrlRoot: ENV.CONTEXT_URL_ROOT,
-      onSuccessfulOutcomesImport: onSuccessfulCreateOutcome
+      onSuccessfulOutcomesImport: onSuccessfulCreateOutcome,
     })
   }
 
@@ -263,11 +263,11 @@ const OutcomeManagement = ({breakpoints}) => {
 }
 
 OutcomeManagement.propTypes = {
-  breakpoints: breakpointsShape
+  breakpoints: breakpointsShape,
 }
 
 OutcomeManagementWithoutGraphql.propTypes = {
-  breakpoints: breakpointsShape
+  breakpoints: breakpointsShape,
 }
 
 export default WithBreakpoints(OutcomeManagement)

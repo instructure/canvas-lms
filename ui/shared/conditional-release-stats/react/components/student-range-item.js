@@ -27,7 +27,7 @@ export default class StudentRangeItem extends React.Component {
   static propTypes = {
     student: object.isRequired,
     studentIndex: number.isRequired,
-    selectStudent: func.isRequired
+    selectStudent: func.isRequired,
   }
 
   selectStudent = () => {
@@ -42,7 +42,7 @@ export default class StudentRangeItem extends React.Component {
       'crs-student__trend-icon': true,
       'crs-student__trend-icon__positive': trend === 1,
       'crs-student__trend-icon__neutral': trend === 0,
-      'crs-student__trend-icon__negative': trend === -1
+      'crs-student__trend-icon__negative': trend === -1,
     })
 
     const showTrend = trend !== null && trend !== undefined

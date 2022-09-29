@@ -33,14 +33,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -51,7 +51,7 @@ const mockOverrides = [
     dueAt: '2021-03-30T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-24T00:00:00-06:00',
-    title: 'assignment override 1'
+    title: 'assignment override 1',
   },
   {
     id: 'ZXMzaWdebTubeC0x',
@@ -59,7 +59,7 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-04-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 2'
+    title: 'assignment override 2',
   },
   {
     id: 'BXMzaWdebTVubC0x',
@@ -67,8 +67,8 @@ const mockOverrides = [
     dueAt: '2021-03-27T23:59:59-06:00',
     lockAt: '2021-09-03T23:59:59-06:00',
     unlockAt: '2021-03-21T00:00:00-06:00',
-    title: 'assignment override 3'
-  }
+    title: 'assignment override 3',
+  },
 ]
 
 const mockLockAt = '2022-01-19T23:59:59-07:00'
@@ -78,14 +78,14 @@ const mockAvailabities = [
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 5231,
-    name: 'section 1'
+    name: 'section 1',
   },
   {
     id: 'U2VjdGlvbi00',
     _id: '2',
     userCount: 99,
-    name: 'section 2'
-  }
+    name: 'section 2',
+  },
 ]
 
 const setup = (props = {}) => {
@@ -93,8 +93,8 @@ const setup = (props = {}) => {
     <TrayDisplayer
       setTrayOpen={jest.fn()}
       trayTitle="Due Dates"
-      trayComponent={<DueDateTray assignmentOverrides={mockOverrides} isAdmin />}
-      isTrayOpen
+      trayComponent={<DueDateTray assignmentOverrides={mockOverrides} isAdmin={true} />}
+      isTrayOpen={true}
       {...props}
     />
   )
@@ -128,7 +128,7 @@ describe('TrayDisplayer', () => {
             delayedPostAt={mockDelayedPost}
             availabilities={mockAvailabities}
           />
-        )
+        ),
       })
       expect(container.getAllByText('Availability')[0]).toBeInTheDocument()
       expect(container.getAllByText('Availability')[1]).toBeInTheDocument()
@@ -143,7 +143,7 @@ describe('TrayDisplayer', () => {
             delayedPostAt={mockDelayedPost}
             availabilities={mockAvailabities}
           />
-        )
+        ),
       })
       expect(container.getAllByTestId('availabilities-row').length).toBe(mockAvailabities.length)
       expect(container.getByText('section 1')).toBeInTheDocument()

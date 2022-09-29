@@ -33,14 +33,14 @@ actions.listCollaborationsStart = payload => ({type: actions.LIST_COLLABORATIONS
 actions.LIST_COLLABORATIONS_SUCCESSFUL = 'LIST_COLLABORATIONS_SUCCESSFUL'
 actions.listCollaborationsSuccessful = payload => ({
   type: actions.LIST_COLLABORATIONS_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_COLLABORATIONS_FAILED = 'LIST_COLLABORATIONS_FAILED'
 actions.listCollaborationsFailed = error => ({
   type: actions.LIST_COLLABORATIONS_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.LIST_LTI_COLLABORATIONS_START = 'LIST_LTI_COLLABORATIONS_START'
@@ -49,14 +49,14 @@ actions.listLTICollaborationsStart = () => ({type: actions.LIST_LTI_COLLABORATIO
 actions.LIST_LTI_COLLABORATIONS_SUCCESSFUL = 'LIST_LTI_COLLABORATIONS_SUCCESSFUL'
 actions.listLTICollaborationsSuccessful = tools => ({
   type: actions.LIST_LTI_COLLABORATIONS_SUCCESSFUL,
-  payload: tools
+  payload: tools,
 })
 
 actions.LIST_LTI_COLLABORATIONS_FAILED = 'LIST_LTI_COLLABORATIONS_FAILED'
 actions.listLTICollaborationsFailed = error => ({
   type: actions.LIST_LTI_COLLABORATIONS_FAILED,
   payload: error,
-  error: true
+  error: true,
 })
 
 actions.DELETE_COLLABORATION_START = 'DELETE_COLLABORATION_START'
@@ -65,14 +65,14 @@ actions.deleteCollaborationStart = () => ({type: actions.DELETE_COLLABORATION_ST
 actions.DELETE_COLLABORATION_SUCCESSFUL = 'DELETE_COLLABORATION_SUCCESSFUL'
 actions.deleteCollaborationSuccessful = deletedCollaborationId => ({
   type: actions.DELETE_COLLABORATION_SUCCESSFUL,
-  payload: deletedCollaborationId
+  payload: deletedCollaborationId,
 })
 
 actions.DELETE_COLLABORATION_FAILED = 'DELETE_COLLABORATION_FAILED'
 actions.deleteCollaborationFailed = error => ({
   type: actions.DELETE_COLLABORATION_FAILED,
   payload: error,
-  error: true
+  error: true,
 })
 
 actions.CREATE_COLLABORATION_START = 'CREATE_COLLABORATION_START'
@@ -81,14 +81,14 @@ actions.createCollaborationStart = () => ({type: actions.CREATE_COLLABORATION_ST
 actions.CREATE_COLLABORATION_SUCCESSFUL = 'CREATE_COLLABORATION_SUCCESSFUL'
 actions.createCollaborationSuccessful = collaboration => ({
   type: actions.CREATE_COLLABORATION_SUCCESSFUL,
-  payload: collaboration
+  payload: collaboration,
 })
 
 actions.CREATE_COLLABORATION_FAILED = 'CREATE_COLLABORATION_FAILED'
 actions.createCollaborationFailed = error => ({
   type: actions.CREATE_COLLABORATION_FAILED,
   payload: error,
-  error: true
+  error: true,
 })
 
 actions.UPDATE_COLLABORATION_START = 'UPDATE_COLLABORATION_START'
@@ -97,14 +97,14 @@ actions.updateCollaborationStart = () => ({type: actions.UPDATE_COLLABORATION_ST
 actions.UPDATE_COLLABORATION_SUCCESSFUL = 'UPDATE_COLLABORATION_SUCCESSFUL'
 actions.updateCollaborationSuccessful = collaboration => ({
   type: actions.UPDATE_COLLABORATION_SUCCESSFUL,
-  payload: collaboration
+  payload: collaboration,
 })
 
 actions.UPDATE_COLLABORATION_FAILED = 'UPDATE_COLLABORATION_FAILED'
 actions.updateCollaborationFailed = error => ({
   type: actions.UPDATE_COLLABORATION_FAILED,
   payload: error,
-  error: true
+  error: true,
 })
 
 actions.getCollaborations = (url, newSearch) => {
@@ -165,8 +165,8 @@ actions.createCollaboration = (context, contextId, contentItems) => {
         {contentItems: JSON.stringify(contentItems)},
         {
           headers: {
-            Accept: 'application/json'
-          }
+            Accept: 'application/json',
+          },
         }
       )
       .then(({data}) => {
@@ -189,8 +189,8 @@ actions.updateCollaboration = (context, contextId, contentItems, collaborationId
         {contentItems: JSON.stringify(contentItems)},
         {
           headers: {
-            Accept: 'application/json'
-          }
+            Accept: 'application/json',
+          },
         }
       )
       .then(({collaboration}) => {

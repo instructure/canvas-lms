@@ -37,9 +37,9 @@ const getRatings = () => {
       description,
       points,
       masteryAt,
-      color: '#' + color
+      color: '#' + color,
     })),
-    {points: null, masteryAt, color: null, description: I18n.t('Not Assessed')}
+    {points: null, masteryAt, color: null, description: I18n.t('Not Assessed')},
   ]
 }
 
@@ -55,7 +55,7 @@ const LearningMastery = ({courseId}) => {
 
   const {isLoading, students, outcomes, rollups} = useRollups({
     courseId,
-    accountLevelMasteryScalesFF
+    accountLevelMasteryScalesFF,
   })
   const [visibleRatings, setVisibleRatings] = useState([])
 
@@ -76,7 +76,7 @@ const LearningMastery = ({courseId}) => {
       >
         <GradebookMenu
           courseUrl={options.context_url}
-          learningMasteryEnabled
+          learningMasteryEnabled={true}
           variant="DefaultGradebookLearningMastery"
         />
       </View>
@@ -105,7 +105,7 @@ const LearningMastery = ({courseId}) => {
 }
 
 LearningMastery.propTypes = {
-  courseId: PropTypes.string.isRequired
+  courseId: PropTypes.string.isRequired,
 }
 
 export default LearningMastery

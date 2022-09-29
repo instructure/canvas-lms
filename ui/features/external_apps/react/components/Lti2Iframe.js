@@ -29,13 +29,13 @@ export default class Lti2Iframe extends React.Component {
     registrationUrl: PropTypes.string,
     handleInstall: PropTypes.func.isRequired,
     hideComponent: PropTypes.bool,
-    toolName: PropTypes.string.isRequired
+    toolName: PropTypes.string.isRequired,
   }
 
   state = {
     beforeExternalContentAlertClass: 'screenreader-only',
     afterExternalContentAlertClass: 'screenreader-only',
-    iframeStyle: {}
+    iframeStyle: {},
   }
 
   componentDidMount() {
@@ -59,7 +59,7 @@ export default class Lti2Iframe extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -71,7 +71,7 @@ export default class Lti2Iframe extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'

@@ -28,16 +28,16 @@ export default class DiscussionDeleteModal extends Component {
   static propTypes = {
     onSubmit: func.isRequired,
     selectedCount: number,
-    defaultOpen: bool
+    defaultOpen: bool,
   }
 
   static defaultProps = {
     defaultOpen: true,
-    selectedCount: 1
+    selectedCount: 1,
   }
 
   state = {
-    open: this.props.defaultOpen
+    open: this.props.defaultOpen,
   }
 
   componentWillReceiveProps(props) {
@@ -75,7 +75,7 @@ export default class DiscussionDeleteModal extends Component {
           {I18n.t(
             {
               one: 'You are about to delete 1 discussion. Are you sure?',
-              other: 'You are about to delete %{count} discussions. Are you sure?'
+              other: 'You are about to delete %{count} discussions. Are you sure?',
             },
             {count: this.props.selectedCount}
           )}

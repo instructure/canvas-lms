@@ -21,7 +21,7 @@ import ACTION_NAMES from '../actions/developerKeysActions'
 const initialState = {
   makeInvisibleDeveloperKeyPending: false,
   makeInvisibleDeveloperKeySuccessful: false,
-  makeInvisibleDeveloperKeyError: null
+  makeInvisibleDeveloperKeyError: null,
 }
 
 const developerKeysHandlers = {
@@ -29,18 +29,18 @@ const developerKeysHandlers = {
     ...state,
     makeInvisibleDeveloperKeyPending: true,
     makeInvisibleDeveloperKeySuccessful: false,
-    makeInvisibleDeveloperKeyError: null
+    makeInvisibleDeveloperKeyError: null,
   }),
   [ACTION_NAMES.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL]: (state, _action) => ({
     ...state,
     makeInvisibleDeveloperKeyPending: false,
-    makeInvisibleDeveloperKeySuccessful: true
+    makeInvisibleDeveloperKeySuccessful: true,
   }),
   [ACTION_NAMES.MAKE_INVISIBLE_DEVELOPER_KEY_FAILED]: (state, action) => ({
     ...state,
     makeInvisibleDeveloperKeyPending: false,
-    makeInvisibleDeveloperKeyError: action.payload
-  })
+    makeInvisibleDeveloperKeyError: action.payload,
+  }),
 }
 
 export default (state = initialState, action) => {

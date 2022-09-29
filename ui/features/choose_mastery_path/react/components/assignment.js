@@ -30,7 +30,7 @@ const {bool} = PropTypes
 export default class Assignment extends React.Component {
   static propTypes = {
     assignment: assignmentShape.isRequired,
-    isSelected: bool
+    isSelected: bool,
   }
 
   renderTitle() {
@@ -89,7 +89,7 @@ export default class Assignment extends React.Component {
           <div
             className="ig-description"
             dangerouslySetInnerHTML={{
-              __html: apiUserContent.convert(this.props.assignment.description)
+              __html: apiUserContent.convert(this.props.assignment.description),
             }}
           />
         </div>

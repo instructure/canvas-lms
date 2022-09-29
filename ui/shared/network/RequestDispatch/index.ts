@@ -37,7 +37,7 @@ export default class RequestDispatch {
   constructor(options = {}) {
     this.options = {
       ...options,
-      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit)
+      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit),
     }
     this.requests = []
   }
@@ -78,7 +78,7 @@ export default class RequestDispatch {
   ) {
     const request = {
       deferred: deferPromise(),
-      active: false
+      active: false,
     }
 
     const allEnqueued = deferreds => {
@@ -123,7 +123,7 @@ export default class RequestDispatch {
   getJSON(url: string, params?) {
     const request = {
       deferred: deferPromise(),
-      active: false
+      active: false,
     }
 
     /* eslint-disable promise/catch-or-return */

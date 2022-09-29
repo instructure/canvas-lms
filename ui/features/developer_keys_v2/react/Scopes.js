@@ -40,7 +40,7 @@ export default class Scopes extends React.Component {
 
   handleFilterChange = e => {
     this.setState({
-      filter: e.currentTarget.value
+      filter: e.currentTarget.value,
     })
   }
 
@@ -83,7 +83,7 @@ export default class Scopes extends React.Component {
                 headingAs="h2"
                 headingLevel="h2"
                 margin="xx-large"
-                readOnly
+                readOnly={true}
                 heading={I18n.t(
                   'When scope enforcement is disabled, tokens have access to all endpoints available to the authorizing user.'
                 )}
@@ -135,7 +135,7 @@ export default class Scopes extends React.Component {
           <Grid.Row>
             <Grid.Col>
               <Checkbox
-                inline
+                inline={true}
                 label={<Text>{I18n.t('Allow Include Parameters ')}</Text>}
                 checked={developerKey.allow_includes}
                 onChange={e => {
@@ -164,7 +164,7 @@ Scopes.propTypes = {
     PropTypes.arrayOf(
       PropTypes.shape({
         resource: PropTypes.string,
-        scope: PropTypes.string
+        scope: PropTypes.string,
       })
     )
   ).isRequired,
@@ -179,14 +179,14 @@ Scopes.propTypes = {
     email: PropTypes.string,
     name: PropTypes.string,
     scopes: PropTypes.arrayOf(PropTypes.string),
-    allow_includes: PropTypes.bool
+    allow_includes: PropTypes.bool,
   }),
   requireScopes: PropTypes.bool,
   onRequireScopesChange: PropTypes.func.isRequired,
-  updateDeveloperKey: PropTypes.func.isRequired
+  updateDeveloperKey: PropTypes.func.isRequired,
 }
 
 Scopes.defaultProps = {
   developerKey: undefined,
-  requireScopes: false
+  requireScopes: false,
 }

@@ -123,8 +123,8 @@ AssignmentGroupCollection.optionProperty('courseSubmissionsURL')
 // that type, which we don't need.
 AssignmentGroupCollection.prototype.defaults = {
   params: {
-    include: ['assignments']
-  }
+    include: ['assignments'],
+  },
 }
 
 AssignmentGroupCollection.prototype.comparator = 'position'

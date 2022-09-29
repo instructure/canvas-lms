@@ -87,7 +87,7 @@ export const AccountCalendarSettings: React.FC<ComponentProps> = ({accountId}) =
     doFetchApi({
       path: `/api/v1/accounts/${accountId}/account_calendars`,
       method: 'PUT',
-      body: visibilityChanges
+      body: visibilityChanges,
     })
       .then(({json}) => {
         setVisibilityChanges([])

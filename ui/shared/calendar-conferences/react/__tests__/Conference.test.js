@@ -31,7 +31,7 @@ describe('Conference', () => {
     id: 1,
     title: 'Plugin Conference',
     conference_type: 'PluginConference',
-    url: 'invalid://foo'
+    url: 'invalid://foo',
   }
 
   const ltiConference = {
@@ -41,18 +41,18 @@ describe('Conference', () => {
     url: 'invalid://foo',
     lti_settings: {
       type: 'link',
-      url: 'invalid://bar'
-    }
+      url: 'invalid://bar',
+    },
   }
 
   const bbbConferenceType = {
     type: '',
-    name: 'BigBlueButton'
+    name: 'BigBlueButton',
   }
 
   const msTeamsConferenceType = {
     type: '',
-    name: 'MS Teams'
+    name: 'MS Teams',
   }
 
   describe('Link conferences', () => {
@@ -145,8 +145,8 @@ describe('Conference', () => {
       url: 'invalid://foo',
       lti_settings: {
         type: 'html',
-        html: '<div><a href="/foo">This is some text</a></div>'
-      }
+        html: '<div><a href="/foo">This is some text</a></div>',
+      },
     }
 
     it('shows lti html conferences as html', () => {

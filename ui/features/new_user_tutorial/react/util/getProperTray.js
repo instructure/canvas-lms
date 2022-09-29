@@ -42,7 +42,7 @@ const I18n = useI18nScope('new_user_tutorials')
 const generateObject = (component, label, pageName) => ({
   component,
   label,
-  pageName
+  pageName,
 })
 
 const getProperTray = (path = window.location.pathname) => {

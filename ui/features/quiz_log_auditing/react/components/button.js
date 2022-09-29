@@ -34,12 +34,7 @@ const Button = ({children, onClick, type = 'default'}) => {
   className['btn-success'] = type === 'success'
 
   return (
-    <button
-      data-testid="button"
-      onClick={onClick}
-      type="button"
-      className={classSet(className)}
-    >
+    <button data-testid="button" onClick={onClick} type="button" className={classSet(className)}>
       {children}
     </button>
   )

@@ -34,29 +34,29 @@ const HEADERS = [
       return I18n.t('Blocked Domain Name')
     },
     id: 0,
-    apiName: 'uri'
+    apiName: 'uri',
   },
   {
     get name() {
       return I18n.t('Requested')
     },
     id: 1,
-    apiName: 'count'
+    apiName: 'count',
   },
   {
     get name() {
       return I18n.t('Last Attempt')
     },
     id: 2,
-    apiName: 'latest_hit'
+    apiName: 'latest_hit',
   },
   {
     get name() {
       return I18n.t('Add as Allowed')
     },
     id: 3,
-    apiName: 'add_to_whitelist' // This isn't really an api thing though
-  }
+    apiName: 'add_to_whitelist', // This isn't really an api thing though
+  },
 ]
 
 const getHostname = url => {
@@ -71,7 +71,7 @@ export default function ViolationTable({
   addDomain,
   accountId,
   whitelistedDomains,
-  showAlert = showFlashAlert
+  showAlert = showFlashAlert,
 }) {
   const [sortBy, setSortBy] = useState('count') // Default to the most requested on top
   const [ascending, setAscending] = useState(false)
@@ -157,9 +157,9 @@ export default function ViolationTable({
                     addDomain('account', accountId, hostname, () => {
                       showAlert({
                         message: I18n.t('Success: You added %{hostname} as an allowed domain.', {
-                          hostname
+                          hostname,
                         }),
-                        type: 'success'
+                        type: 'success',
                       })
                     })
                   }}

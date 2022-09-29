@@ -227,7 +227,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                         startDate,
                         endDate,
                         first: pageSize,
-                        after: pageInfo.endCursor
+                        after: pageInfo.endCursor,
                       },
                       updateQuery: (prevData, {fetchMoreResult: newData}) => {
                         return {
@@ -237,13 +237,13 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                               __typename: prevData.auditLogs.mutationLogs.__typename,
                               nodes: [
                                 ...prevData.auditLogs.mutationLogs.nodes,
-                                ...newData.auditLogs.mutationLogs.nodes
+                                ...newData.auditLogs.mutationLogs.nodes,
                               ],
-                              pageInfo: newData.auditLogs.mutationLogs.pageInfo
-                            }
-                          }
+                              pageInfo: newData.auditLogs.mutationLogs.pageInfo,
+                            },
+                          },
                         }
-                      }
+                      },
                     })
                   }}
                 />
@@ -262,7 +262,7 @@ const AuditLogApp = () => {
   const [auditParams, setAuditParams] = useState({
     assetString: null,
     startDate: null,
-    endDate: null
+    endDate: null,
   })
 
   return (

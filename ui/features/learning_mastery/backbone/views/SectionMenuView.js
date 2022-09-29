@@ -26,7 +26,7 @@ import 'jquery-tinypubsub'
 
 const I18n = useI18nScope('gradebookSectionMenuView')
 
-const boundMethodCheck = function(instance, Constructor) {
+const boundMethodCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new Error('Bound instance method accessed before binding')
   }
@@ -50,7 +50,7 @@ class SectionMenuView extends View {
     if (this.sections.length > 1) {
       this.sections.unshift({
         name: this.defaultSection,
-        checked: !options.currentSection
+        checked: !options.currentSection,
       })
     }
     this.updateSections()
@@ -59,9 +59,7 @@ class SectionMenuView extends View {
   render() {
     this.detachEvents()
     super.render()
-    this.$('button')
-      .prop('disabled', this.disabled)
-      .kyleMenu()
+    this.$('button').prop('disabled', this.disabled).kyleMenu()
     return this.attachEvents()
   }
 
@@ -72,7 +70,7 @@ class SectionMenuView extends View {
 
   attachEvents() {
     $.subscribe('currentSection/change', this.onSectionChange)
-    this.$('.section-select-menu').on('click', function(e) {
+    this.$('.section-select-menu').on('click', function (e) {
       return e.preventDefault()
     })
     return this.$('.section-select-menu').on('menuselect', (event, ui) => {
@@ -108,10 +106,10 @@ class SectionMenuView extends View {
       showSections: this.showSections,
       currentSection:
         ((ref = _.findWhere(this.sections, {
-          id: this.currentSection
+          id: this.currentSection,
         })) != null
           ? ref.name
-          : undefined) || this.defaultSection
+          : undefined) || this.defaultSection,
     }
   }
 }

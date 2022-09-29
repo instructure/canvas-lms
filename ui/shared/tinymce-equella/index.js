@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import 'jqueryui/dialog'
 
-export default function(ed) {
+export default function (ed) {
   let $box = $('#equella_dialog')
   const url = $('#equella_endpoint_url').attr('href')
   const action = $.trim($('#equella_action').text() || '') || 'selectOrAdd'
@@ -54,14 +54,14 @@ export default function(ed) {
         resizeStart() {
           $(this)
             .find('iframe')
-            .each(function() {
+            .each(function () {
               $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
                 .css({
                   width: this.offsetWidth + 'px',
                   height: this.offsetHeight + 'px',
                   position: 'absolute',
                   opacity: '0.001',
-                  zIndex: 10000000
+                  zIndex: 10000000,
                 })
                 .css($(this).offset())
                 .appendTo('body')
@@ -80,7 +80,7 @@ export default function(ed) {
         close() {
           $box.find('iframe').attr('src', 'about:blank')
         },
-        title: 'Embed content from Equella'
+        title: 'Embed content from Equella',
       })
       .bind('equella_ready', (event, data) => {
         const clickedEditor = $box.data('editor') || ed
@@ -90,7 +90,7 @@ export default function(ed) {
           ed.execCommand('mceInsertLink', false, {
             title: data.name,
             href: data.url,
-            class: 'equella_content_link'
+            class: 'equella_content_link',
           })
         } else {
           // no selected content
@@ -109,10 +109,7 @@ export default function(ed) {
   const teaserHtml = $('#equella_teaser').html()
   $box.find('.teaser').hide()
   if (teaserHtml) {
-    $box
-      .find('.teaser')
-      .html(teaserHtml)
-      .show()
+    $box.find('.teaser').html(teaserHtml).show()
   }
   let full_url = url
   full_url = full_url + '?method=lms&returnprefix=eq_&action=' + action

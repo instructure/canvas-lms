@@ -36,8 +36,8 @@ export default class BlueprintCourse {
     {
       path: Router.PATHS.singleMigration,
       onEnter: ({params}) => this.app.showChangeLog(params),
-      onExit: () => this.app.hideChangeLog()
-    }
+      onExit: () => this.app.hideChangeLog(),
+    },
   ]
 
   setupRouter() {

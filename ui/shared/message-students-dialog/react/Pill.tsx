@@ -28,8 +28,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const themeOverride = {
   [Tag.theme]: {
-    defaultBackground: 'white'
-  }
+    defaultBackground: 'white',
+  },
 }
 
 const I18n = useI18nScope('pill')

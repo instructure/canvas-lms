@@ -28,11 +28,11 @@ const I18n = useI18nScope('external_tools')
 export default class Lti2ReregistrationUpdateModal extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    returnFocus: PropTypes.func.isRequired
+    returnFocus: PropTypes.func.isRequired,
   }
 
   state = {
-    modalIsOpen: false
+    modalIsOpen: false,
   }
 
   openModal = e => {

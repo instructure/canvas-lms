@@ -60,18 +60,18 @@ export default class ItemView extends Backbone.View {
       'click .migrate-failed-retry': 'onMigrateFailedRetry',
       'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
       'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
-      'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel'
+      'click .migrate-failed-cancel': 'onDuplicateOrImportFailedCancel',
     }
 
     this.prototype.messages = {
       confirm: I18n.t('confirms.delete_quiz', 'Are you sure you want to delete this quiz?'),
       multipleDates: I18n.t('multiple_due_dates', 'Multiple Dates'),
       deleteSuccessful: I18n.t('flash.removed', 'Quiz successfully deleted.'),
-      deleteFail: I18n.t('flash.fail', 'Quiz deletion failed.')
+      deleteFail: I18n.t('flash.fail', 'Quiz deletion failed.'),
     }
 
     this.prototype.els = {
-      '.al-trigger': '$settingsButton'
+      '.al-trigger': '$settingsButton',
     }
   }
 
@@ -90,17 +90,17 @@ export default class ItemView extends Backbone.View {
     if (this.canManage()) {
       this.publishIconView = new PublishIconView({
         model: this.model,
-        title: this.model.get('title')
+        title: this.model.get('title'),
       })
       this.lockIconView = new LockIconView({
         model: this.model,
         unlockedText: I18n.t('%{name} is unlocked. Click to lock.', {
-          name: this.model.get('title')
+          name: this.model.get('title'),
         }),
         lockedText: I18n.t('%{name} is locked. Click to unlock', {name: this.model.get('title')}),
         course_id: ENV.COURSE_ID,
         content_id: this.model.get('id'),
-        content_type: 'quiz'
+        content_type: 'quiz',
       })
       if (
         this.model.postToSISEnabled() &&
@@ -111,7 +111,7 @@ export default class ItemView extends Backbone.View {
           model: this.model,
           sisName: this.model.postToSISName(),
           dueDateRequired: this.model.dueDateRequiredForAccount(),
-          maxNameLengthRequired: this.model.maxNameLengthRequiredForAccount()
+          maxNameLengthRequired: this.model.maxNameLengthRequiredForAccount(),
         })
       }
     }
@@ -192,7 +192,7 @@ export default class ItemView extends Backbone.View {
       error: () => {
         this.$el.show()
         return $.flashError(this.messages.deleteFail)
-      }
+      },
     })
   }
 

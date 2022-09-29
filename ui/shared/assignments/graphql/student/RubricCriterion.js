@@ -49,8 +49,8 @@ export const RubricCriterion = {
     long_description: string,
     mastery_points: number,
     points: number,
-    ratings: arrayOf(RubricRating.shape)
-  })
+    ratings: arrayOf(RubricRating.shape),
+  }),
 }
 
 export const DefaultMocks = {
@@ -61,6 +61,6 @@ export const DefaultMocks = {
     masteryPoints: null,
     outcome: null,
     points: 6,
-    ratings: [{}]
-  })
+    ratings: [{}],
+  }),
 }

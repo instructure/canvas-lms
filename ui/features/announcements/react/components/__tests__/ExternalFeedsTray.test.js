@@ -28,8 +28,8 @@ const defaultProps = () => ({
     create: false,
     manage_course_content_edit: false,
     manage_course_content_delete: false,
-    moderate: false
-  }
+    moderate: false,
+  },
 })
 
 test('renders the ExternalFeedsTray component', () => {
@@ -43,7 +43,7 @@ test('renders the AddExternalFeed component when user has permissions', () => {
     create: true,
     manage_course_content_edit: false,
     manage_course_content_delete: false,
-    moderate: false
+    moderate: false,
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)
   const node = tree.find('.announcements-tray__add-rss-root')
@@ -56,7 +56,7 @@ test('does not render the AddExternalFeed component when user is student', () =>
     create: false,
     manage_course_content_edit: false,
     manage_course_content_delete: false,
-    moderate: false
+    moderate: false,
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)
   const node = tree.find('.announcements-tray__add-rss-root')
@@ -69,7 +69,7 @@ test('does not render the RSSFeedList component when user is student', () => {
     create: false,
     manage_course_content_edit: false,
     manage_course_content_delete: false,
-    moderate: false
+    moderate: false,
   }
   const tree = shallow(<ExternalFeedsTray {...props} />)
   const node = tree.find(ConnectedRSSFeedList)

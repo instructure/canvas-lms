@@ -49,7 +49,7 @@ AttachmentDisplay.propTypes = {
   /**
    * Behavior for deleting an individual attachment
    */
-  onDeleteItem: PropTypes.func.isRequired
+  onDeleteItem: PropTypes.func.isRequired,
 }
 
 export default AttachmentDisplay

@@ -33,7 +33,10 @@ import isSettingsModalOpenReducer from './reducers/isSettingsModalOpenReducer'
 import copyToReducer from './reducers/copyToReducer'
 import sendToReducer from './reducers/sendToReducer'
 
-const identity = (defaultState = null) => state => (state === undefined ? defaultState : state)
+const identity =
+  (defaultState = null) =>
+  state =>
+    state === undefined ? defaultState : state
 
 export default combineReducers({
   allDiscussions: allDiscussionsReducer,
@@ -59,5 +62,5 @@ export default combineReducers({
   copyTo: copyToReducer,
   sendTo: sendToReducer,
   DIRECT_SHARE_ENABLED: identity(false),
-  COURSE_ID: identity(null)
+  COURSE_ID: identity(null),
 })

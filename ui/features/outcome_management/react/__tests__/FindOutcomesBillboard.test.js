@@ -38,7 +38,7 @@ describe('FindOutcomesBillboard', () => {
 
   it('renders correct message and icon when context is Account', () => {
     const {getByText, queryByTestId} = render(<FindOutcomesBillboard />, {
-      contextType: 'Account'
+      contextType: 'Account',
     })
     expect(getByText(/Select a group to reveal outcomes here/)).toBeInTheDocument()
     expect(queryByTestId('outcomes-icon')).toBeInTheDocument()

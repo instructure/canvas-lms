@@ -30,7 +30,7 @@ const I18n = useI18nScope('external_tools')
 
 export default class Configurations extends React.Component {
   static propTypes = {
-    env: PropTypes.object.isRequired
+    env: PropTypes.object.isRequired,
   }
 
   // legacy all-encompassing permission

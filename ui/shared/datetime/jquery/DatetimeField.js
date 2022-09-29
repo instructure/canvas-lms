@@ -29,14 +29,14 @@ const I18n = useI18nScope('datepicker')
 
 const TIME_FORMAT_OPTIONS = {
   hour: 'numeric',
-  minute: 'numeric'
+  minute: 'numeric',
 }
 
 const DATE_FORMAT_OPTIONS = {
   weekday: 'short',
   month: 'short',
   day: 'numeric',
-  year: 'numeric'
+  year: 'numeric',
 }
 
 const DATETIME_FORMAT_OPTIONS = {...DATE_FORMAT_OPTIONS, ...TIME_FORMAT_OPTIONS}
@@ -82,7 +82,7 @@ const computeDatepickerDefaults = () => ({
   }, // first day of the week (Sun = 0)
   get showMonthAfterYear() {
     return I18n.t('#date.formats.medium_month').slice(0, 2) === '%Y'
-  } // "month year" or "year month"
+  }, // "month year" or "year month"
 })
 
 // adds datepicker and suggest functionality to the specified $field
@@ -162,7 +162,7 @@ export default class DatetimeField {
           timePicker: this.allowTime,
           beforeShow: () => this.$field.trigger('detachTooltip'),
           onClose: () => this.$field.trigger('reattachTooltip'),
-          firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek()
+          firstDay: moment.localeData(ENV.MOMENT_LOCALE).firstDayOfWeek(),
         },
         options.datepicker
       )
@@ -313,7 +313,7 @@ export default class DatetimeField {
       date: this.fudged,
       iso8601,
       blank: this.blank,
-      invalid: this.invalid
+      invalid: this.invalid,
     })
 
     if (this.$hiddenInput) {
@@ -327,14 +327,14 @@ export default class DatetimeField {
       this.$field.data({
         'time-hour': null,
         'time-minute': null,
-        'time-ampm': null
+        'time-ampm': null,
       })
     } else {
       const parts = formatter(ENV.TIMEZONE).formatToParts(this.datetime)
       this.$field.data({
         'time-hour': parts.find(e => e.type === 'hour').value,
         'time-minute': parts.find(e => e.type === 'minute').value,
-        'time-ampm': parts.find(e => e.type === 'dayPeriod')?.value || null
+        'time-ampm': parts.find(e => e.type === 'dayPeriod')?.value || null,
       })
     }
   }

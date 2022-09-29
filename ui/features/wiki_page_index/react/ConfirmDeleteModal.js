@@ -48,18 +48,18 @@ export default class ConfirmDeleteModal extends Component {
     onConfirm: func.isRequired,
     onCancel: func,
     onHide: func,
-    parent: instanceOf(Element)
+    parent: instanceOf(Element),
   }
 
   static defaultProps = {
     onCancel: null,
     onHide: null,
-    parent: null
+    parent: null,
   }
 
   state = {
     show: false,
-    inProgress: false
+    inProgress: false,
   }
 
   onCancel = () => {
@@ -105,10 +105,10 @@ export default class ConfirmDeleteModal extends Component {
     const message = I18n.t(
       {
         one: '%{count} page selected for deletion',
-        other: '%{count} pages selected for deletion'
+        other: '%{count} pages selected for deletion',
       },
       {
-        count: this.props.pageTitles.length
+        count: this.props.pageTitles.length,
       }
     )
     return (

@@ -113,11 +113,11 @@ CoursesList.propTypes = {
   onChangeSort: func.isRequired,
   roles: arrayOf(shape({id: string.isRequired})),
   sort: string,
-  order: string
+  order: string,
 }
 
 CoursesList.defaultProps = {
   sort: 'sis_course_id',
   order: 'asc',
-  roles: []
+  roles: [],
 }

@@ -22,7 +22,7 @@ import useOutcomesRemove, {
   REMOVE_FAILED,
   REMOVE_COMPLETED,
   REMOVE_NOT_STARTED,
-  REMOVE_PENDING
+  REMOVE_PENDING,
 } from '../useOutcomesRemove'
 import {createCache} from '@canvas/apollo'
 import OutcomesContext from '../../contexts/OutcomesContext'
@@ -42,8 +42,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
         title: title || `Learning Outcome ${startId + idx}`,
         canUnlink,
         parentGroupId: sameGroup ? 1001 : `${1001 + idx}`,
-        parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`
-      }
+        parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`,
+      },
     }),
     {}
   )
@@ -63,7 +63,7 @@ describe('useOutcomesRemove', () => {
     children,
     mocks = deleteOutcomeMocks(),
     contextType = 'Account',
-    contextId = '1'
+    contextId = '1',
   }) => (
     <MockedProvider cache={cache} mocks={mocks}>
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
@@ -74,7 +74,7 @@ describe('useOutcomesRemove', () => {
 
   it('creates custom hook with proper exports', () => {
     const {result} = renderHook(() => useOutcomesRemove(), {
-      wrapper
+      wrapper,
     })
     expect(typeof result.current.removeOutcomes).toBe('function')
     expect(typeof result.current.setRemoveOutcomesStatus).toBe('function')
@@ -87,8 +87,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks()
-        }
+          mocks: deleteOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -96,7 +96,7 @@ describe('useOutcomesRemove', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'This outcome was successfully removed.',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -105,8 +105,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks({failResponse: true})
-        }
+          mocks: deleteOutcomeMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -114,7 +114,7 @@ describe('useOutcomesRemove', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -123,8 +123,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks({failAlignedContentMutation: true})
-        }
+          mocks: deleteOutcomeMocks({failAlignedContentMutation: true}),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -132,7 +132,7 @@ describe('useOutcomesRemove', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -141,8 +141,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks({failMutation: true})
-        }
+          mocks: deleteOutcomeMocks({failMutation: true}),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -150,7 +150,7 @@ describe('useOutcomesRemove', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -159,8 +159,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks({failMutationNoErrMsg: true})
-        }
+          mocks: deleteOutcomeMocks({failMutationNoErrMsg: true}),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -168,7 +168,7 @@ describe('useOutcomesRemove', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while removing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -177,8 +177,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks()
-        }
+          mocks: deleteOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -193,8 +193,8 @@ describe('useOutcomesRemove', () => {
       const {result} = renderHook(() => useOutcomesRemove(), {
         wrapper,
         initialProps: {
-          mocks: deleteOutcomeMocks({failResponse: true})
-        }
+          mocks: deleteOutcomeMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.removeOutcomes(outcomes)
@@ -210,8 +210,8 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4']})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4']}),
+          },
         })
         act(() => {
           result.current.removeOutcomes(outcomes)
@@ -219,7 +219,7 @@ describe('useOutcomesRemove', () => {
         await act(async () => jest.runAllTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: '4 outcomes were successfully removed.',
-          type: 'success'
+          type: 'success',
         })
       })
 
@@ -228,8 +228,8 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failResponse: true})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failResponse: true}),
+          },
         })
         act(() => {
           result.current.removeOutcomes(outcomes)
@@ -237,7 +237,7 @@ describe('useOutcomesRemove', () => {
         await act(async () => jest.runAllTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
-          type: 'error'
+          type: 'error',
         })
       })
 
@@ -246,8 +246,8 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failMutation: true})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failMutation: true}),
+          },
         })
         act(() => {
           result.current.removeOutcomes(outcomes)
@@ -255,7 +255,7 @@ describe('useOutcomesRemove', () => {
         await act(async () => jest.runAllTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
-          type: 'error'
+          type: 'error',
         })
       })
 
@@ -264,8 +264,8 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failMutationNoErrMsg: true})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], failMutationNoErrMsg: true}),
+          },
         })
         act(() => {
           result.current.removeOutcomes(outcomes)
@@ -273,7 +273,7 @@ describe('useOutcomesRemove', () => {
         await act(async () => jest.runAllTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
-          type: 'error'
+          type: 'error',
         })
       })
 
@@ -282,8 +282,8 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], partialSuccess: true})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '2', '3', '4'], partialSuccess: true}),
+          },
         })
         act(() => {
           result.current.removeOutcomes(outcomes)
@@ -291,7 +291,7 @@ describe('useOutcomesRemove', () => {
         await act(async () => jest.runAllTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: 'An error occurred while removing these outcomes. Please try again.',
-          type: 'error'
+          type: 'error',
         })
       })
 
@@ -300,14 +300,14 @@ describe('useOutcomesRemove', () => {
         const {result} = renderHook(() => useOutcomesRemove(), {
           wrapper,
           initialProps: {
-            mocks: deleteOutcomeMocks({ids: ['1', '3']})
-          }
+            mocks: deleteOutcomeMocks({ids: ['1', '3']}),
+          },
         })
         result.current.setRemoveOutcomesStatus({
           1: REMOVE_NOT_STARTED,
           2: REMOVE_NOT_STARTED,
           3: REMOVE_NOT_STARTED,
-          4: REMOVE_NOT_STARTED
+          4: REMOVE_NOT_STARTED,
         })
         act(() => {
           result.current.removeOutcomes({1: outcomes['1'], 3: outcomes['3']})
@@ -316,14 +316,14 @@ describe('useOutcomesRemove', () => {
           1: REMOVE_PENDING,
           2: REMOVE_NOT_STARTED,
           3: REMOVE_PENDING,
-          4: REMOVE_NOT_STARTED
+          4: REMOVE_NOT_STARTED,
         })
         await act(async () => jest.runAllTimers())
         expect(result.current.removeOutcomesStatus).toEqual({
           1: REMOVE_COMPLETED,
           2: REMOVE_NOT_STARTED,
           3: REMOVE_COMPLETED,
-          4: REMOVE_NOT_STARTED
+          4: REMOVE_NOT_STARTED,
         })
       })
     })

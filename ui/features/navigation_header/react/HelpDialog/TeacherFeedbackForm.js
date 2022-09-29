@@ -28,24 +28,24 @@ const I18n = useI18nScope('TeacherFeedbackForm')
 class TeacherFeedbackForm extends React.Component {
   static propTypes = {
     onCancel: PropTypes.func,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   }
 
   static defaultProps = {
     onCancel() {},
-    onSubmit() {}
+    onSubmit() {},
   }
 
   state = {
     coursesLoaded: false,
-    courses: []
+    courses: [],
   }
 
   componentWillMount() {
     $.getJSON('/api/v1/courses.json?enrollment_state=active&per_page=100', courses => {
       this.setState({
         coursesLoaded: true,
-        courses
+        courses,
       })
     })
   }
@@ -64,7 +64,7 @@ class TeacherFeedbackForm extends React.Component {
       error: response => {
         this.form.formErrors(JSON.parse(response.responseText))
         this.focus()
-      }
+      },
     })
   }
 
@@ -111,7 +111,7 @@ class TeacherFeedbackForm extends React.Component {
             <select
               ref={c => (this.recipients = c)}
               className="ic-Input"
-              required
+              required={true}
               aria-required="true"
               name="recipients[]"
               value={currentSelectValue}
@@ -126,7 +126,7 @@ class TeacherFeedbackForm extends React.Component {
           </label>
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Message')}</span>
-            <textarea className="ic-Input" required aria-required="true" name="body" />
+            <textarea className="ic-Input" required={true} aria-required="true" name="body" />
           </label>
           <div className="ic-HelpDialog__form-actions">
             <button type="button" className="Button" onClick={this.handleCancelClick}>

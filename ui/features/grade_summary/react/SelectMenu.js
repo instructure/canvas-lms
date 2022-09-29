@@ -36,7 +36,7 @@ export default function SelectMenu(props) {
       defaultValue={props.defaultValue}
       interaction={props.disabled ? 'disabled' : 'enabled'}
       id={props.id}
-      isInline
+      isInline={true}
       renderLabel={props.label}
       onChange={props.onChange}
       width="15rem"
@@ -54,5 +54,5 @@ SelectMenu.propTypes = {
   onChange: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.array, PropTypes.object])).isRequired,
   textAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  valueAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired
+  valueAttribute: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
 }

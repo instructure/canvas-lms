@@ -21,7 +21,7 @@ import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from '@canvas/direct-sharing/react/effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
-  useCourseModuleItemApi
+  useCourseModuleItemApi,
 } from '@canvas/direct-sharing/react/effects/useModuleCourseSearchApi'
 import CourseImportPanel from '../CourseImportPanel'
 import {mockShare} from './test-utils'
@@ -47,7 +47,7 @@ describe('CourseImportPanel', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
   })
@@ -101,12 +101,12 @@ describe('CourseImportPanel', () => {
     const onImport = jest.fn()
     fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
       id: '8',
-      workflow_state: 'running'
+      workflow_state: 'running',
     })
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     const {getByText, getAllByText, getByLabelText, queryByText} = render(
@@ -123,7 +123,7 @@ describe('CourseImportPanel', () => {
     expect(fetchOptions.method).toBe('POST')
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
       migration_type: 'canvas_cartridge_importer',
-      settings: {content_export_id: share.content_export.id, insert_into_module_id: '1'}
+      settings: {content_export_id: share.content_export.id, insert_into_module_id: '1'},
     })
     expect(getAllByText(/start/i)).not.toHaveLength(0)
     await act(() => fetchMock.flush(true))
@@ -140,7 +140,7 @@ describe('CourseImportPanel', () => {
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     const {getByText, getByLabelText, queryByText} = render(

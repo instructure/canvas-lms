@@ -31,14 +31,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -105,13 +105,13 @@ describe('RolePillContainer', () => {
   describe('Mobile view is respected', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        tablet: {maxWidth: '767px'}
+        tablet: {maxWidth: '767px'},
       }))
     })
 
     it('Pill will render a single mobile role', () => {
       const {queryByTestId} = setup({
-        discussionRoles: ['TeacherEnrollment']
+        discussionRoles: ['TeacherEnrollment'],
       })
       expect(queryByTestId('mobile-Teacher')).toBeTruthy()
       expect(queryByTestId('pill-Teacher')).toBeFalsy()
@@ -119,7 +119,7 @@ describe('RolePillContainer', () => {
 
     it('Pill will render multiple roles correctly on mobile', () => {
       const {queryByTestId} = setup({
-        discussionRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'Author']
+        discussionRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment', 'Author'],
       })
       expect(
         queryByTestId('mobile-Teacher') &&

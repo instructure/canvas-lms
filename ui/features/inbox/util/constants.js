@@ -28,7 +28,7 @@ const conversationContextDefaultValues = {
   messageOpenEvent: false,
   setMessageOpenEvent: () => {},
   isSubmissionCommentsType: false,
-  setIsSubmissionCommentsType: () => {}
+  setIsSubmissionCommentsType: () => {},
 }
 export const ConversationContext = React.createContext(conversationContextDefaultValues)
 

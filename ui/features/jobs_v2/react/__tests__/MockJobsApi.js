@@ -20,7 +20,7 @@ function fake_link_header(path) {
   return {
     current: {page: '1', url: `${path}?page=1`},
     next: {page: '2', url: `${path}?page=2`},
-    last: {page: '5', url: `${path}?page=5`}
+    last: {page: '5', url: `${path}?page=5`},
   }
 }
 
@@ -47,7 +47,7 @@ const fake_job = {
   strand: 'fake_job_list_strand_value',
   shard_id: '1',
   original_job_id: '2838533',
-  singleton: 'fake_job_list_singleton_value'
+  singleton: 'fake_job_list_singleton_value',
 }
 
 export default function mockJobsApi({path}) {
@@ -56,7 +56,7 @@ export default function mockJobsApi({path}) {
     // search
     const json = {
       fake_group_search_value_1: 106,
-      fake_group_search_value_2: 92
+      fake_group_search_value_2: 92,
     }
     return {json}
   } else if (group) {
@@ -65,8 +65,8 @@ export default function mockJobsApi({path}) {
       {
         count: 1,
         [group.replace('by_', '')]: 'fake_job_list_group_value',
-        info: fake_info(bucket)
-      }
+        info: fake_info(bucket),
+      },
     ]
     return {json, link: fake_link_header(`/api/v1/jobs2/${bucket}/${group}`)}
   } else if (bucket.match(/\d+/)) {
@@ -74,8 +74,8 @@ export default function mockJobsApi({path}) {
     const json = [
       {
         ...fake_job,
-        bucket
-      }
+        bucket,
+      },
     ]
     return {json}
   } else {
@@ -83,8 +83,8 @@ export default function mockJobsApi({path}) {
     const json = [
       {
         ...fake_job,
-        info: fake_info(bucket)
-      }
+        info: fake_info(bucket),
+      },
     ]
     return {json, link: fake_link_header(`/api/v1/jobs2/${bucket}`)}
   }

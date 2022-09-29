@@ -34,7 +34,7 @@ describe('RemoteLookupFieldSelector', () => {
   it('calls the passed in callback on input', () => {
     const callbackMock = jest.fn()
     const container = setup({
-      fieldChangedHandler: callbackMock
+      fieldChangedHandler: callbackMock,
     })
 
     fireEvent.click(
@@ -47,12 +47,12 @@ describe('RemoteLookupFieldSelector', () => {
 
   it('renders the specified lookup field', () => {
     const container = setup({
-      selectedLookupField: 'mailNickname'
+      selectedLookupField: 'mailNickname',
     })
 
     expect(
       container.getByRole('button', {
-        name: /active directory lookup attribute selector/i
+        name: /active directory lookup attribute selector/i,
       }).value
     ).toMatch(/email alias \(mailNickname\)/i)
   })

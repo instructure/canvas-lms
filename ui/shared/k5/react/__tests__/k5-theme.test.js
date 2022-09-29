@@ -63,9 +63,9 @@ describe('K-5 theme', () => {
       overrides: {
         typography: expect.objectContaining({
           fontFamily: expect.stringMatching('Balsamiq Sans'),
-          fontSizeSmall: '1rem'
-        })
-      }
+          fontSizeSmall: '1rem',
+        }),
+      },
     })
   })
 
@@ -78,16 +78,16 @@ describe('K-5 theme', () => {
     expect(defaultThemeSpy).toHaveBeenCalledWith({
       overrides: {
         typography: expect.objectContaining({
-          fontFamily: expect.stringMatching('Balsamiq Sans')
-        })
-      }
+          fontFamily: expect.stringMatching('Balsamiq Sans'),
+        }),
+      },
     })
     expect(defaultThemeSpy).not.toHaveBeenCalledWith({
       overrides: {
         typography: expect.objectContaining({
-          fontSizeSmall: '1rem'
-        })
-      }
+          fontSizeSmall: '1rem',
+        }),
+      },
     })
   })
 })

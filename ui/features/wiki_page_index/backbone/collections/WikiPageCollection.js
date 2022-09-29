@@ -26,7 +26,7 @@ export default class WikiPageCollection extends PaginatedCollection {
       title: 'asc',
       created_at: 'desc',
       updated_at: 'desc',
-      todo_date: 'desc'
+      todo_date: 'desc',
     }
     this.setSortField('title')
 
@@ -59,7 +59,7 @@ export default class WikiPageCollection extends PaginatedCollection {
 
     this.setParams({
       sort: this.currentSortField,
-      order: this.sortOrders[this.currentSortField]
+      order: this.sortOrders[this.currentSortField],
     })
 
     return this.trigger('sortChanged', this.currentSortField, this.sortOrders)

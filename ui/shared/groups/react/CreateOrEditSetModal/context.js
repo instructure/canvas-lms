@@ -20,7 +20,7 @@ import {createContext} from 'react'
 import {pick} from 'lodash'
 
 export const GroupContext = createContext({
-  name: ''
+  name: '',
 })
 
 export function formatMessages(text) {
@@ -37,7 +37,7 @@ const CONTEXT_KEYS = Object.freeze([
   'autoLeaderType',
   'splitGroups',
   'createGroupCount',
-  'createGroupMemberCount'
+  'createGroupMemberCount',
 ])
 
 export const stateToContext = state => pick(state, CONTEXT_KEYS)
@@ -45,11 +45,11 @@ export const stateToContext = state => pick(state, CONTEXT_KEYS)
 export const SPLIT = Object.freeze({
   off: '0',
   byGroupCount: '1',
-  byMemberCount: '2'
+  byMemberCount: '2',
 })
 
 export const API_STATE = Object.freeze({
   inactive: 0, // nothing pending from the back end
   submitting: 1, // API call to create group set is pending
-  assigning: 2 // Polling for assigning to groups is in progress
+  assigning: 2, // Polling for assigning to groups is in progress
 })

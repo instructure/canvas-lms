@@ -28,7 +28,7 @@ describe('The Comments component', () => {
     savedComments: ['I award you no points', 'May god have mercy on your soul'],
     saveLater: false,
     setComments: jest.fn(),
-    setSaveLater: jest.fn()
+    setSaveLater: jest.fn(),
   }
 
   const component = mods => shallow(<Comments {...{...props, ...mods}} />)

@@ -90,7 +90,7 @@ $update_profile_form
         if ($('#default_email_id').length && (!val || val === 'new')) {
           return I18n.t('please_select_an_option', 'Please select an option')
         }
-      }
+      },
     },
     beforeSubmit() {},
     success(data) {
@@ -100,7 +100,7 @@ $update_profile_form
         full_name: user.name,
         sortable_name: user.sortable_name,
         time_zone: user.time_zone,
-        locale: $("#user_locale option[value='" + user.locale + "']").text()
+        locale: $("#user_locale option[value='" + user.locale + "']").text(),
       }
       if (templateData.locale != $update_profile_form.find('.locale').text()) {
         location.reload()
@@ -114,7 +114,7 @@ $update_profile_form
       $('#channel_' + user.communication_channel.id).addClass('default')
       $update_profile_form
         .fillTemplateData({
-          data: templateData
+          data: templateData,
         })
         .find('.cancel_button')
         .click()
@@ -129,7 +129,7 @@ $update_profile_form
       }
       $update_profile_form.loadingImage('remove').formErrors(errors)
       $edit_settings_link.click()
-    }
+    },
   })
   .find('.more_options_link')
   .click(() => {
@@ -150,7 +150,7 @@ $('#unregistered_services li.service').click(function (event) {
     width: 350,
     open() {
       $(this).dialog('widget').find('a').focus()
-    }
+    },
   })
 })
 $('.create_user_service_form').formSubmit({
@@ -159,10 +159,10 @@ $('.create_user_service_form').formSubmit({
     user_name(value) {
       if (value && value.length > maximumStringLength) {
         return I18n.t('Exceeded the maximum length (%{number} characters)', {
-          number: maximumStringLength
+          number: maximumStringLength,
         })
       }
-    }
+    },
   },
   beforeSubmit() {
     $(this).loadingImage()
@@ -180,7 +180,7 @@ $('.create_user_service_form').formSubmit({
           'Registration failed. Check the user name and password, and try again.'
         )
       )
-  }
+  },
 })
 $('#unregistered_services li.service .content form .cancel_button').click(function () {
   $(this).parents('.content').dialog('close')
@@ -201,7 +201,7 @@ $('#registered_services li.service .delete_service_link').click(function (event)
             .find('#unregistered_' + $(this).attr('id'))
             .slideDown()
         })
-      }
+      },
     })
 })
 $('.service').hover(
@@ -236,7 +236,7 @@ $('.delete_pseudonym_link').click(function (event) {
     .parents('.pseudonym')
     .confirmDelete({
       url: $(this).attr('href'),
-      message: I18n.t('confirms.delete_login', 'Are you sure you want to delete this login?')
+      message: I18n.t('confirms.delete_login', 'Are you sure you want to delete this login?'),
     })
 })
 $('.datetime_field').datetime_field()
@@ -264,7 +264,7 @@ $('.delete_key_link').click(function (event) {
         $('#no_approved_integrations,#access_tokens_holder').toggle()
       }
       $to_focus.focus()
-    }
+    },
   })
 })
 $('#add_access_token_dialog .cancel_button').click(() => {
@@ -279,10 +279,10 @@ $('#access_token_form').formSubmit({
       }
       if (value.length > maximumStringLength) {
         return I18n.t('Exceeded the maximum length (%{number} characters)', {
-          number: maximumStringLength
+          number: maximumStringLength,
         })
       }
-    }
+    },
   },
   beforeSubmit() {
     $(this)
@@ -307,7 +307,7 @@ $('#access_token_form').formSubmit({
     data.used = '--'
     $token.fillTemplateData({
       data,
-      hrefValues: ['id']
+      hrefValues: ['id'],
     })
     $token.data('token', data)
     $('#access_tokens > tbody').append($token.show())
@@ -319,7 +319,7 @@ $('#access_token_form').formSubmit({
       .attr('disabled', false)
       .filter('.submit_button')
       .text(I18n.t('errors.generating_token_failed', 'Generating Token Failed'))
-  }
+  },
 })
 $('#token_details_dialog .regenerate_token').click(function () {
   const result = confirm(
@@ -366,7 +366,7 @@ $('.show_token_link').click(function (event) {
   const $dialog = $('#token_details_dialog')
   const url = $(this).attr('rel')
   $dialog.dialog({
-    width: 700
+    width: 700,
   })
   const $token = $(this).parents('.access_token')
   $dialog.data('token', $token)
@@ -429,7 +429,7 @@ $('.add_access_token_link').click(function (event) {
       width: 500,
       open() {
         $(this).closest('.ui-dialog').focus()
-      }
+      },
     })
     .fixDialogButtons()
 })

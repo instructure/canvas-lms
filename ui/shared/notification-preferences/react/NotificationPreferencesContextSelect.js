@@ -51,7 +51,7 @@ export default function NotificationPreferencesContextSelect(props) {
       <SimpleSelect
         renderLabel={[
           I18n.t('Settings for'),
-          <ScreenReaderContent>{props.currentContext.name}</ScreenReaderContent>
+          <ScreenReaderContent>{props.currentContext.name}</ScreenReaderContent>,
         ]}
         value={props.currentContext.value || 'account'}
         onChange={handleChange}
@@ -77,5 +77,5 @@ export default function NotificationPreferencesContextSelect(props) {
 NotificationPreferencesContextSelect.propTypes = {
   currentContext: object,
   enrollments: arrayOf(EnrollmentShape),
-  handleContextChanged: func
+  handleContextChanged: func,
 }

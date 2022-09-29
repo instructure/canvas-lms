@@ -18,10 +18,10 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* fillFormData, getFormData, errorBox */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* fillFormData, getFormData, errorBox */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* .dim, confirmDelete, fragmentChange, showIf */
-import '@canvas/util/templateData'/* getTemplateData */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChange, showIf */
+import '@canvas/util/templateData' /* getTemplateData */
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 import '@canvas/rails-flash-notifications'
 import {addDeepLinkingListener, onExternalContentReady} from '@canvas/deep-linking/collaborations'
@@ -55,7 +55,7 @@ CollaborationsPage.Util = {
         $collaboration.remove()
       })
     }
-  }
+  },
 }
 
 CollaborationsPage.Events = {
@@ -66,7 +66,7 @@ CollaborationsPage.Events = {
     $('#collaboration_collaboration_type').on('change', this.onTypeChange).change()
     $('#collaboration_selection_row').css('display: block;')
     $('#collaboration_selection_label').css([
-      'white-space: nowrap; text-align: left; display: block;'
+      'white-space: nowrap; text-align: left; display: block;',
     ])
     addDeepLinkingListener()
     $(window).on('externalContentReady', onExternalContentReady.bind(this))
@@ -148,7 +148,7 @@ CollaborationsPage.Events = {
       $('.collaboration_authorization').hide()
       $('#collaborate_authorize_' + type).showIf($description.hasClass('unauthorized'))
     }
-  }
+  },
 }
 
 $(document).ready(CollaborationsPage.Events.init.bind(CollaborationsPage.Events))

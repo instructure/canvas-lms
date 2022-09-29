@@ -28,7 +28,7 @@ import {
   IconHomeLine,
   IconMoreLine,
   IconStarLightLine,
-  IconCalendarReservedLine
+  IconCalendarReservedLine,
 } from '@instructure/ui-icons'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {IconButton} from '@instructure/ui-buttons'
@@ -52,7 +52,7 @@ import {
   groupAnnouncementsByHomeroom,
   saveElementaryDashboardPreference,
   TAB_IDS,
-  MOBILE_NAV_BREAKPOINT_PX
+  MOBILE_NAV_BREAKPOINT_PX,
 } from '@canvas/k5/react/utils'
 import {theme} from '@canvas/k5/react/k5-theme'
 import useFetchApi from '@canvas/use-fetch-api-hook'
@@ -70,28 +70,28 @@ const DASHBOARD_TABS = [
   {
     id: TAB_IDS.HOMEROOM,
     icon: IconHomeLine,
-    label: I18n.t('Homeroom')
+    label: I18n.t('Homeroom'),
   },
   {
     id: TAB_IDS.SCHEDULE,
     icon: IconCalendarMonthLine,
-    label: I18n.t('Schedule')
+    label: I18n.t('Schedule'),
   },
   {
     id: TAB_IDS.GRADES,
     icon: IconStarLightLine,
-    label: I18n.t('Grades')
+    label: I18n.t('Grades'),
   },
   {
     id: TAB_IDS.RESOURCES,
     icon: IconBankLine,
-    label: I18n.t('Resources')
+    label: I18n.t('Resources'),
   },
   {
     id: TAB_IDS.TODO,
     icon: IconCheckDarkSolid,
-    label: I18n.t('To Do')
-  }
+    label: I18n.t('To Do'),
+  },
 ]
 
 const K5DashboardOptionsMenu = ({onDisableK5Dashboard}) => {
@@ -138,7 +138,7 @@ const toRenderTabs = (currentUserRoles, hideGradesTabForStudents, selectedSelfUs
 
 const getWindowSize = () => ({
   width: window.innerWidth,
-  height: window.innerHeight
+  height: window.innerHeight,
 })
 
 export const K5Dashboard = ({
@@ -160,7 +160,7 @@ export const K5Dashboard = ({
   canAddObservee,
   openTodosInNewTab,
   loadingOpportunities,
-  observerPickerEnabled
+  observerPickerEnabled,
 }) => {
   const initialObservedId = observedUsersList.find(o => o.id === savedObservedId(currentUser.id))
     ? savedObservedId(currentUser.id)
@@ -184,7 +184,7 @@ export const K5Dashboard = ({
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
     observedUserId: initialObservedId,
-    isObserver: currentUserRoles.includes('observer')
+    isObserver: currentUserRoles.includes('observer'),
   })
   const canDisableElementaryDashboard =
     currentUserRoles.some(r => ['admin', 'teacher'].includes(r)) &&
@@ -280,8 +280,8 @@ export const K5Dashboard = ({
       active_only: true,
       context_codes: cards && cards.map(({id}) => `course_${id}`),
       latest_only: true,
-      per_page: '100'
-    }
+      per_page: '100',
+    },
   })
 
   const handleDisableK5Dashboard = (e, [newView]) => {
@@ -346,7 +346,7 @@ export const K5Dashboard = ({
           </Flex>
         )}
         <Flex alignItems="center">
-          <Flex.Item shouldGrow shouldShrink margin="0 small 0 0">
+          <Flex.Item shouldGrow={true} shouldShrink={true} margin="0 small 0 0">
             <Heading as="h1" aria-hidden={placeAdditionalOptionsAbove} level={sticky ? 'h2' : 'h1'}>
               {welcomeMessage}
             </Heading>
@@ -372,8 +372,8 @@ export const K5Dashboard = ({
     <>
       <Flex as="section" alignItems="start">
         <Flex.Item
-          shouldGrow
-          shouldShrink
+          shouldGrow={true}
+          shouldShrink={true}
           padding="x-small medium medium medium"
           onFocus={scrollElementIntoViewIfCoveredByHeader(tabsRef)}
         >
@@ -386,7 +386,7 @@ export const K5Dashboard = ({
               isStudent: plannerEnabled,
               responsiveSize,
               subjectAnnouncements,
-              loadingOpportunities
+              loadingOpportunities,
             }}
           >
             {currentTab && (
@@ -428,7 +428,7 @@ export const K5Dashboard = ({
                 cards={cards}
                 cardsSettled={cardsSettled}
                 visible={currentTab === TAB_IDS.RESOURCES}
-                showStaff
+                showStaff={true}
                 isSingleCourse={false}
               />
             )}
@@ -453,7 +453,7 @@ export const K5Dashboard = ({
           open={trayOpen}
           placement="end"
           size="large"
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={true}
           onDismiss={() => setTrayOpen(false)}
         >
           <div id="important-dates-sidebar">{importantDates}</div>
@@ -474,7 +474,7 @@ K5Dashboard.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,
-    avatar_image_url: PropTypes.string
+    avatar_image_url: PropTypes.string,
   }).isRequired,
   currentUserRoles: PropTypes.arrayOf(PropTypes.string).isRequired,
   timeZone: PropTypes.string.isRequired,
@@ -487,7 +487,7 @@ K5Dashboard.propTypes = {
   observedUsersList: ObservedUsersListShape.isRequired,
   canAddObservee: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired,
-  observerPickerEnabled: PropTypes.bool.isRequired
+  observerPickerEnabled: PropTypes.bool.isRequired,
 }
 
 const WrappedK5Dashboard = connect(mapStateToProps)(responsiviser()(K5Dashboard))

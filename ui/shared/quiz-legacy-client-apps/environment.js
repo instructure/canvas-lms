@@ -47,7 +47,7 @@ const Environment = {
   parseQueryString(query) {
     const items = query.replace(/^\?/, '').split('&')
 
-    return items.reduce(function(params, item) {
+    return items.reduce(function (params, item) {
       const pair = item.split('=')
       let key = decodeURIComponent(pair[0])
       const value = decodeURIComponent(pair[1])
@@ -99,18 +99,18 @@ const Environment = {
   removeQueryParameters(keys) {
     const query = this.query
 
-    keys.forEach(function(key) {
+    keys.forEach(function (key) {
       delete query[key]
     })
 
     this.updateQueryString({})
-  }
+  },
 }
 
 // Extract the actual query string either from location.search if it's there,
 // or from the hash if we're using hash-based history, or from the href
 // as the last resort.
-const extractQueryString = function() {
+const extractQueryString = function () {
   if (window.location.search.length) {
     return window.location.search
   } else if (window.location.hash.length) {

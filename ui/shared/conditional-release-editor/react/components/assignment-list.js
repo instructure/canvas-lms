@@ -34,14 +34,14 @@ class AssignmentList extends React.Component {
       disabledAssignments: object,
       selectedAssignments: object,
       onSelectAssignment: func.isRequired,
-      onUnselectAssignment: func.isRequired
+      onUnselectAssignment: func.isRequired,
     }
   }
 
   static get defaultProps() {
     return {
       disabledAssignments: List(),
-      selectedAssignments: List()
+      selectedAssignments: List(),
     }
   }
 
@@ -77,7 +77,7 @@ class AssignmentList extends React.Component {
     const itemClasses = {
       'cr-assignments-list__item': true,
       'cr-assignments-list__item__disabled': isDisabled,
-      'cr-assignments-list__item__selected': isSelected
+      'cr-assignments-list__item__selected': isSelected,
     }
 
     return (
@@ -85,7 +85,7 @@ class AssignmentList extends React.Component {
         key={i}
         aria-label={I18n.t('%{item_category} category icon for item name %{item_name}', {
           item_category: item.get('category'),
-          item_name: item.get('name')
+          item_name: item.get('name'),
         })}
         className={classNames(itemClasses)}
       >
@@ -99,7 +99,7 @@ class AssignmentList extends React.Component {
         />
         <label htmlFor={itemId} className="cr-label__cbox">
           <span className="cr-assignments-list__item__icon">
-            <i aria-hidden className={`icon-${this.itemClass(item.get('category'))}`} />
+            <i aria-hidden={true} className={`icon-${this.itemClass(item.get('category'))}`} />
           </span>
           <span className="ic-Label__text">{item.get('name')}</span>
         </label>

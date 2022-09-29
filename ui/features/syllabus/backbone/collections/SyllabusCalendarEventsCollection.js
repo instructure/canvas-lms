@@ -49,7 +49,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
     const eventType = this.type
     switch (eventType) {
       case 'assignment':
-        normalize = function(ev) {
+        normalize = function (ev) {
           ev.related_id = ev.id
 
           let overridden = false
@@ -64,7 +64,7 @@ export default class SyllabusCalendarEventsCollection extends PaginatedCollectio
         break
 
       case 'event':
-        normalize = function(ev) {
+        normalize = function (ev) {
           ev.related_id = ev.id = `${eventType}_${ev.id}`
           if (ev.parent_event_id) {
             ev.related_id = `${eventType}_${ev.parent_event_id}`

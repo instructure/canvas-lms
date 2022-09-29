@@ -37,7 +37,7 @@ export const UploadFormPropTypes = {
   onChange: func,
   onEmptyOrClose: func,
   onRenameFileMessage: func,
-  onLockFileMessage: func
+  onLockFileMessage: func,
 }
 
 class UploadForm extends React.Component {
@@ -52,7 +52,7 @@ class UploadForm extends React.Component {
     onChange: () => {},
     onEmptyOrClose: () => {},
     onRenameFileMessage: () => {},
-    onLockFileMessage: () => {}
+    onLockFileMessage: () => {},
   }
 
   constructor(props) {
@@ -233,7 +233,7 @@ class UploadForm extends React.Component {
             type="file"
             ref={this.addFileInputRef}
             onChange={this.handleFilesInputChange}
-            multiple
+            multiple={true}
             data-testid="file-input"
             disabled={this.props.disabled}
           />

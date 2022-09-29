@@ -20,7 +20,7 @@ import page from 'page'
 
 export default class BlueprintRouter {
   static PATHS = {
-    singleMigration: '/blueprint/:blueprintType/:templateId/:changeId'
+    singleMigration: '/blueprint/:blueprintType/:templateId/:changeId',
   }
 
   static handleEnter(route) {

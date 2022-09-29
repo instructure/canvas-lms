@@ -72,7 +72,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         submissions: Ember.ArrayProxy.create({content: []}),
         sections: Ember.ArrayProxy.create({content: clone(fixtures.sections)}),
         outcomes: Ember.ArrayProxy.create({content: clone(fixtures.outcomes)}),
-        outcome_rollups: Ember.ArrayProxy.create({content: clone(fixtures.outcome_rollups)})
+        outcome_rollups: Ember.ArrayProxy.create({content: clone(fixtures.outcome_rollups)}),
       })
     })
   }
@@ -228,17 +228,17 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
                   assignment_visible: true,
                   cached_due_date: '2015-03-01T12:00:00Z',
                   score: 10,
-                  user_id: '1'
+                  user_id: '1',
                 },
                 {
                   assignment_id: '2',
                   assignment_visible: true,
                   cached_due_date: '2015-05-02T12:00:00Z',
                   score: 9,
-                  user_id: '1'
-                }
+                  user_id: '1',
+                },
               ],
-              user_id: '01'
+              user_id: '01',
             },
             {
               submissions: [
@@ -247,18 +247,18 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
                   assignment_visible: true,
                   cached_due_date: '2015-07-03T12:00:00Z',
                   score: 8,
-                  user_id: '2'
-                }
+                  user_id: '2',
+                },
               ],
-              user_id: '2'
-            }
+              user_id: '2',
+            },
           ],
           jqXHR: {
             getResponseHeader() {
               return {}
-            }
+            },
           },
-          textStatus: 'success'
+          textStatus: 'success',
         })
 
         ENV.GRADEBOOK_OPTIONS.grading_period_set = {
@@ -269,24 +269,24 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
               close_date: '2015-07-08T12:00:00Z',
               end_date: '2015-07-01T12:00:00Z',
               is_closed: false,
-              start_date: '2015-05-01T12:00:00Z'
+              start_date: '2015-05-01T12:00:00Z',
             },
             {
               id: '1401',
               close_date: '2015-03-08T12:00:00Z',
               end_date: '2015-03-01T12:00:00Z',
               is_closed: true,
-              start_date: '2015-01-01T12:00:00Z'
+              start_date: '2015-01-01T12:00:00Z',
             },
             {
               id: '1402',
               close_date: '2015-05-08T12:00:00Z',
               end_date: '2015-05-01T12:00:00Z',
               is_closed: false,
-              start_date: '2015-03-01T12:00:00Z'
-            }
+              start_date: '2015-03-01T12:00:00Z',
+            },
           ],
-          weighted: true
+          weighted: true,
         }
 
         return initializeApp()
@@ -304,7 +304,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         asyncHelper.waitForRequests().then(() => {
           deepEqual(Object.keys(srgb.get('assignments').findBy('id', '1').effectiveDueDates), [
             '1',
-            '2'
+            '2',
           ])
           deepEqual(Object.keys(srgb.get('assignments').findBy('id', '2').effectiveDueDates), ['1'])
         }))
@@ -363,9 +363,9 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         id: '1501',
         gradingPeriods: [
           {id: '701', weight: 50},
-          {id: '702', weight: 50}
+          {id: '702', weight: 50},
         ],
-        weighted: true
+        weighted: true,
       }
     })
 
@@ -448,9 +448,9 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         id: '1501',
         grading_periods: [
           {id: '701', weight: 50},
-          {id: '702', weight: 50}
+          {id: '702', weight: 50},
         ],
-        weighted: true
+        weighted: true,
       }
       return asyncHelper.waitForRequests().then(() => {
         const gradingPeriodSet = srgb.getGradingPeriodSet()
@@ -474,7 +474,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       student = {
         id: '1',
         assignment_1: {assignment_id: '1', user_id: '1', name: 'yolo'},
-        assignment_2: {assignment_id: '2', user_id: '1', name: 'froyo'}
+        assignment_2: {assignment_id: '2', user_id: '1', name: 'froyo'},
       }
       ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.submissions_url, {
         response: [
@@ -485,17 +485,17 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
                 assignment_visible: true,
                 cached_due_date: '2015-03-01T12:00:00Z',
                 score: 10,
-                user_id: '1'
+                user_id: '1',
               },
               {
                 assignment_id: '2',
                 assignment_visible: true,
                 cached_due_date: '2015-05-02T12:00:00Z',
                 score: 9,
-                user_id: '1'
-              }
+                user_id: '1',
+              },
             ],
-            user_id: '1'
+            user_id: '1',
           },
           {
             submissions: [
@@ -504,18 +504,18 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
                 assignment_visible: true,
                 cached_due_date: '2015-07-03T12:00:00Z',
                 score: 8,
-                user_id: '2'
-              }
+                user_id: '2',
+              },
             ],
-            user_id: '2'
-          }
+            user_id: '2',
+          },
         ],
         jqXHR: {
           getResponseHeader() {
             return {}
-          }
+          },
         },
-        textStatus: 'success'
+        textStatus: 'success',
       })
 
       return (ENV.GRADEBOOK_OPTIONS.grading_period_set = {
@@ -526,24 +526,24 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
             close_date: '2015-07-08T12:00:00Z',
             end_date: '2015-07-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-05-01T12:00:00Z'
+            start_date: '2015-05-01T12:00:00Z',
           },
           {
             id: '1401',
             close_date: '2015-03-08T12:00:00Z',
             end_date: '2015-03-01T12:00:00Z',
             is_closed: true,
-            start_date: '2015-01-01T12:00:00Z'
+            start_date: '2015-01-01T12:00:00Z',
           },
           {
             id: '1402',
             close_date: '2015-05-08T12:00:00Z',
             end_date: '2015-05-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-03-01T12:00:00Z'
-          }
+            start_date: '2015-03-01T12:00:00Z',
+          },
         ],
-        weighted: true
+        weighted: true,
       })
     })
 
@@ -726,9 +726,9 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
                 due_at: null,
                 position: 6,
                 assignment_group_id: '4',
-                published: false
-              }
-            ]
+                published: false,
+              },
+            ],
           })
         )
       )
@@ -746,24 +746,24 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       assignmentGroups: {},
       final: {
         possible: 100,
-        score: 90
+        score: 90,
       },
       current: {
         possible: 88,
-        score: 70
-      }
+        score: 70,
+      },
     }
 
     const unpointedCalculation = {
       assignmentGroups: {},
       final: {
         possible: 0,
-        score: 0
+        score: 0,
       },
       current: {
         possible: 0,
-        score: 0
-      }
+        score: 0,
+      },
     }
 
     function initializeWithCalculation(calculation) {
@@ -773,14 +773,14 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         srgb.reopen({
           calculate() {
             return calculation
-          }
+          },
         })
 
         return srgb.set('model', {
           enrollments: Ember.ArrayProxy.create({content: clone(fixtures.students)}),
           assignment_groups: Ember.ArrayProxy.create({content: clone(fixtures.assignment_groups)}),
           submissions: Ember.ArrayProxy.create({content: []}),
-          sections: Ember.ArrayProxy.create({content: clone(fixtures.sections)})
+          sections: Ember.ArrayProxy.create({content: clone(fixtures.sections)}),
         })
       })
     }
@@ -813,24 +813,24 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
             close_date: '2015-07-08T12:00:00Z',
             end_date: '2015-07-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-05-01T12:00:00Z'
+            start_date: '2015-05-01T12:00:00Z',
           },
           {
             id: '1401',
             close_date: '2015-03-08T12:00:00Z',
             end_date: '2015-03-01T12:00:00Z',
             is_closed: true,
-            start_date: '2015-01-01T12:00:00Z'
+            start_date: '2015-01-01T12:00:00Z',
           },
           {
             id: '1402',
             close_date: '2015-05-08T12:00:00Z',
             end_date: '2015-05-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-03-01T12:00:00Z'
-          }
+            start_date: '2015-03-01T12:00:00Z',
+          },
         ],
-        weighted: true
+        weighted: true,
       }
       initializeApp()
       return asyncHelper.waitForRequests().then(() => {
@@ -892,24 +892,24 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
             close_date: '2015-07-08T12:00:00Z',
             end_date: '2015-07-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-05-01T12:00:00Z'
+            start_date: '2015-05-01T12:00:00Z',
           },
           {
             id: '701',
             close_date: '2015-03-08T12:00:00Z',
             end_date: '2015-03-01T12:00:00Z',
             is_closed: true,
-            start_date: '2015-01-01T12:00:00Z'
+            start_date: '2015-01-01T12:00:00Z',
           },
           {
             id: '702',
             close_date: '2015-05-08T12:00:00Z',
             end_date: '2015-05-01T12:00:00Z',
             is_closed: false,
-            start_date: '2015-03-01T12:00:00Z'
-          }
+            start_date: '2015-03-01T12:00:00Z',
+          },
         ],
-        weighted: true
+        weighted: true,
       }
       exampleGrades = createCourseGradesWithGradingPeriods()
       initializeApp()
@@ -961,7 +961,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       Ember.run(() =>
         srgb.reopen({
-          updateOrCreateNotesColumn() {}
+          updateOrCreateNotesColumn() {},
         })
       )
       return asyncHelper.waitForRequests()
@@ -990,7 +990,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       Ember.run(() =>
         srgb.reopen({
-          updateOrCreateNotesColumn() {}
+          updateOrCreateNotesColumn() {},
         })
       )
       return asyncHelper.waitForRequests()
@@ -1028,7 +1028,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       Ember.run(() =>
         srgb.reopen({
-          updateOrCreateNotesColumn() {}
+          updateOrCreateNotesColumn() {},
         })
       )
       return asyncHelper.waitForRequests()
@@ -1050,7 +1050,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       Ember.run(() =>
         srgb.reopen({
-          updateOrCreateNotesColumn() {}
+          updateOrCreateNotesColumn() {},
         })
       )
       return asyncHelper.waitForRequests()
@@ -1077,7 +1077,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         return deepEqual(srgb.get('notesParams'), {
           'column[title]': 'Notes',
           'column[position]': 1,
-          'column[teacher_notes]': true
+          'column[teacher_notes]': true,
         })
       }))
   })
@@ -1087,7 +1087,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       Ember.run(() =>
         srgb.reopen({
-          updateOrCreateNotesColumn() {}
+          updateOrCreateNotesColumn() {},
         })
       )
       return asyncHelper.waitForRequests()
@@ -1169,7 +1169,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`
         ajax.defineFixture(url, {
           response: [],
-          textStatus: 'success'
+          textStatus: 'success',
         })
       })
 
@@ -1185,8 +1185,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         srgb.set('includeUngradedAssignments', false)
         deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
           gradebook_settings: {
-            view_ungraded_as_zero: 'false'
-          }
+            view_ungraded_as_zero: 'false',
+          },
         })
       })
     })
@@ -1245,7 +1245,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       window.ENV.GRADEBOOK_OPTIONS.settings_update_url = 'gradebook_settings'
       ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.settings.settings_update_url, {
         response: [],
-        textStatus: 'success'
+        textStatus: 'success',
       })
       initializeApp()
       fetchCorrectEnrollmentsStub = sinon.stub(srgb, 'fetchCorrectEnrollments')
@@ -1270,7 +1270,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       srgb.set('showConcludedEnrollments', false)
       deepEqual(ajaxRequestSpy.firstCall.args[0].data.gradebook_settings, {
-        show_concluded_enrollments: false
+        show_concluded_enrollments: false,
       })
     })
   })
@@ -1314,7 +1314,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       window.ENV.GRADEBOOK_OPTIONS.course_settings.allow_final_grade_override = true
       ajax.defineFixture(`/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/settings`, {
         response: [],
-        textStatus: 'success'
+        textStatus: 'success',
       })
       initializeApp()
     })
@@ -1336,7 +1336,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       const ajaxRequestSpy = sandbox.stub(ajax, 'request')
       srgb.set('allowFinalGradeOverride', false)
       deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
-        allow_final_grade_override: false
+        allow_final_grade_override: false,
       })
     })
   })
@@ -1364,22 +1364,22 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
             finalGradeOverrides: {
               [student.id]: {
                 courseGrade: {
-                  percentage: 67.1
+                  percentage: 67.1,
                 },
                 gradingPeriodGrades: {
                   1: {
-                    percentage: 93.2
-                  }
-                }
+                    percentage: 93.2,
+                  },
+                },
               },
               [student2.id]: {
                 courseGrade: {
-                  percentage: 1
-                }
-              }
-            }
+                  percentage: 1,
+                },
+              },
+            },
           },
-          isLoaded: true
+          isLoaded: true,
         })
       )
     })
@@ -1442,17 +1442,17 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
             finalGradeOverrides: {
               [student.id]: {
                 courseGrade: {
-                  percentage: 67.1
+                  percentage: 67.1,
                 },
                 gradingPeriodGrades: {
                   1: {
-                    percentage: 93.2
-                  }
-                }
-              }
-            }
+                    percentage: 93.2,
+                  },
+                },
+              },
+            },
           },
-          isLoaded: true
+          isLoaded: true,
         })
       )
 

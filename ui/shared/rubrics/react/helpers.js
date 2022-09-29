@@ -19,7 +19,7 @@ import _ from 'lodash'
 
 export const defaultCriteria = id => ({
   criterion_id: id,
-  points: {text: '', valid: true}
+  points: {text: '', valid: true},
 })
 
 const fillCriteria = criterion => {
@@ -31,9 +31,9 @@ const fillCriteria = criterion => {
     points: {
       text: hasPoints ? null : '--',
       valid: hasPoints,
-      value: points
+      value: points,
     },
-    editComments: hasComments
+    editComments: hasComments,
   }
 }
 
@@ -46,7 +46,7 @@ export const fillAssessment = (rubric, partialAssessment, assessmentDefaults) =>
     ...partialAssessment,
     data: rubric.criteria.map(c =>
       _.has(prior, c.id) ? fillCriteria(prior[c.id]) : defaultCriteria(c.id)
-    )
+    ),
   }
 }
 

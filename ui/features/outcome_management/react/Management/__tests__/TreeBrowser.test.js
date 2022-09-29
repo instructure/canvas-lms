@@ -33,7 +33,7 @@ describe('TreeBrowser', () => {
     defaultExpandedIds: ['1'],
     onCreateGroup,
     loadedGroups: ['1'],
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -46,7 +46,7 @@ describe('TreeBrowser', () => {
         outcomesCount: 2,
         childGroupsCount: 2,
         parentGroupId: '0',
-        loadInfo: 'loaded'
+        loadInfo: 'loaded',
       },
       100: {
         id: '100',
@@ -55,7 +55,7 @@ describe('TreeBrowser', () => {
         collections: [],
         outcomesCount: 2,
         childGroupsCount: 2,
-        parentGroupId: '1'
+        parentGroupId: '1',
       },
       101: {
         id: '101',
@@ -64,8 +64,8 @@ describe('TreeBrowser', () => {
         collections: [],
         outcomesCount: 2,
         childGroupsCount: 0,
-        parentGroupId: '1'
-      }
+        parentGroupId: '1',
+      },
     }
     onCollectionToggle = jest.fn()
     onCreateGroup = jest.fn()
@@ -109,7 +109,7 @@ describe('TreeBrowser', () => {
       const {getByText, getByLabelText} = render(<TreeBrowser {...defaultProps()} />)
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {
-        target: {value: 'new group name'}
+        target: {value: 'new group name'},
       })
       fireEvent.click(getByText('Create new group'))
       expect(onCreateGroup).toHaveBeenCalled()
@@ -159,7 +159,7 @@ describe('TreeBrowser', () => {
       ...collections,
       1: {
         ...collections[1],
-        collections: ['100', '101', '102']
+        collections: ['100', '101', '102'],
       },
       102: {
         id: '102',
@@ -168,8 +168,8 @@ describe('TreeBrowser', () => {
         collections: [],
         outcomesCount: 0,
         childGroupsCount: 0,
-        parentGroupId: '1'
-      }
+        parentGroupId: '1',
+      },
     }
     const {baseElement} = render(<TreeBrowser {...defaultProps()} />)
     const values = [].map.call(baseElement.querySelectorAll('button'), el => el.textContent)
@@ -180,7 +180,7 @@ describe('TreeBrowser', () => {
       'Root account folder2 Groups | 2 Outcomes',
       'Art group0 Groups | 2 Outcomes',
       'Folder with groups2 Groups | 2 Outcomes',
-      'Leaf folder0 Groups | 2 Outcomes'
+      'Leaf folder0 Groups | 2 Outcomes',
     ])
   })
 })

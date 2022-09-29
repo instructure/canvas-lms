@@ -124,10 +124,10 @@ export const Errors = ({errors, responsiveSize, syncUnpublishedChanges}: ErrorsP
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     errors: getErrors(state),
-    responsiveSize: getResponsiveSize(state)
+    responsiveSize: getResponsiveSize(state),
   }
 }
 
 export default connect(mapStateToProps, {
-  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges
+  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges,
 })(Errors)

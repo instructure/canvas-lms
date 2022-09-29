@@ -17,11 +17,11 @@
  */
 
 import Subject from '../quiz_report'
-import fixture from '../../../__tests__/fixtures/quiz_reports.json';
+import fixture from '../../../__tests__/fixtures/quiz_reports.json'
 
 it('parses properly', () => {
-  const subject = new Subject(fixture.quiz_reports[0], { parse: true });
+  const subject = new Subject(fixture.quiz_reports[0], {parse: true})
 
-  expect(subject.get('id')).toEqual('200');
-  expect(subject.get('reportType')).toEqual('student_analysis');
+  expect(subject.get('id')).toEqual('200')
+  expect(subject.get('reportType')).toEqual('student_analysis')
 })

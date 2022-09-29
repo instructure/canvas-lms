@@ -35,7 +35,7 @@ export default function AccountNotificationSettingsManager(props) {
     },
     onError() {
       setOnFailure(I18n.t('Failed to update account notification settings'))
-    }
+    },
   })
 
   const handleUpdateComplete = data => {
@@ -58,8 +58,8 @@ export default function AccountNotificationSettingsManager(props) {
             frequency: data.frequency,
             hasReadPrivacyNotice: data.hasReadPrivacyNotice,
             sendScoresInEmails: data.sendScoresInEmails,
-            sendObservedNamesInNotifications: data.sendObservedNamesInNotifications
-          }
+            sendObservedNamesInNotifications: data.sendObservedNamesInNotifications,
+          },
         })
       }
       notificationPreferences={props.notificationPreferences}
@@ -71,5 +71,5 @@ export default function AccountNotificationSettingsManager(props) {
 AccountNotificationSettingsManager.propTypes = {
   accountId: string.isRequired,
   notificationPreferences: NotificationPreferencesShape,
-  userId: string.isRequired
+  userId: string.isRequired,
 }

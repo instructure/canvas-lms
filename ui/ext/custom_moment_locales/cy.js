@@ -33,5 +33,5 @@ data._monthsShort = [
   'Med',
   'Hyd',
   'Tach',
-  'Rhag'
+  'Rhag',
 ]

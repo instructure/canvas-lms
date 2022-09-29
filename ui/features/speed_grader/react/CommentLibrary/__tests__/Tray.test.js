@@ -35,7 +35,7 @@ describe('Tray', () => {
       setShowSuggestions: setShowSuggestionsMock,
       updateComment: () => {},
       setRemovedItemIndex: setRemovedItemIndexMock,
-      ...props
+      ...props,
     }
   }
 

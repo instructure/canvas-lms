@@ -26,7 +26,7 @@ import 'jquery-scroll-to-visible/jquery.scrollTo'
 
 const I18n = useI18nScope('instructure_misc_plugins')
 
-$.fn.setOptions = function(prompt, options) {
+$.fn.setOptions = function (prompt, options) {
   let result = prompt ? "<option value=''>" + htmlEscape(prompt) + '</option>' : ''
 
   if (options == null) {
@@ -50,13 +50,13 @@ $.fn.setOptions = function(prompt, options) {
 //   // orignalQuery is the same as 'this';
 //   this.slideUp().dialog().show();
 // });
-$.fn.ifExists = function(func) {
+$.fn.ifExists = function (func) {
   this.length && func.call(this, this)
   return this
 }
 
 // Returns the width of the browser's scroll bars.
-$.fn.scrollbarWidth = function() {
+$.fn.scrollbarWidth = function () {
   const $div = $(
       '<div style="width:50px;height:50px;overflow:hidden;position:absolute;top:-200px;left:-200px;"><div style="height:100px;"></div>'
     ).appendTo(this),
@@ -70,11 +70,11 @@ $.fn.scrollbarWidth = function() {
 }
 
 // Simple animation for dimming an element's opacity
-$.fn.dim = function(speed) {
+$.fn.dim = function (speed) {
   return this.animate({opacity: 0.4}, speed)
 }
 
-$.fn.undim = function(speed) {
+$.fn.undim = function (speed) {
   return this.animate({opacity: 1.0}, speed)
 }
 
@@ -89,13 +89,13 @@ $.fn.undim = function(speed) {
 //  error: Error.
 //  dialog: If present, do a jquery.ui.dialog instead of a confirm(). If an
 //    object, it will be merged into the dialog options.
-$.fn.confirmDelete = function(options) {
+$.fn.confirmDelete = function (options) {
   var options = $.extend({}, $.fn.confirmDelete.defaults, options)
   const $object = this
   let $dialog = null
   let result = true
   options.noMessage = options.noMessage || options.no_message
-  const onContinue = function() {
+  const onContinue = function () {
     if (!result) {
       if (options.cancelled && $.isFunction(options.cancelled)) {
         options.cancelled.call($object)
@@ -103,14 +103,14 @@ $.fn.confirmDelete = function(options) {
       return
     }
     if (!options.confirmed) {
-      options.confirmed = function() {
+      options.confirmed = function () {
         $object.dim()
       }
     }
     options.confirmed.call($object)
     if (options.url) {
       if (!options.success) {
-        options.success = function(data) {
+        options.success = function (data) {
           $object.fadeOut('slow', () => {
             $object.remove()
           })
@@ -135,7 +135,7 @@ $.fn.confirmDelete = function(options) {
       )
     } else {
       if (!options.success) {
-        options.success = function() {
+        options.success = function () {
           $object.fadeOut('slow', () => {
             $object.remove()
           })
@@ -160,7 +160,7 @@ $.fn.confirmDelete = function(options) {
                 text: I18n.t('#buttons.cancel', 'Cancel'),
                 click() {
                   $(this).dialog('close')
-                } // ; onContinue();
+                }, // ; onContinue();
               },
               {
                 text: I18n.t('#buttons.delete', 'Delete'),
@@ -168,9 +168,9 @@ $.fn.confirmDelete = function(options) {
                 click() {
                   result = true
                   $(this).dialog('close')
-                }
-              }
-            ]
+                },
+              },
+            ],
           },
           dialog_options
         )
@@ -185,14 +185,14 @@ $.fn.confirmDelete = function(options) {
 $.fn.confirmDelete.defaults = {
   get message() {
     return I18n.t('confirms.default_delete_thing', 'Are you sure you want to delete this?')
-  }
+  },
 }
 
 // Watches the given element's location.href for any changes
 // to the fragment ("#...") and calls the provided function
 // when there are any.
 // $(document).fragmentChange(function(event, hash) { alert(hash); });
-$.fn.fragmentChange = function(fn) {
+$.fn.fragmentChange = function (fn) {
   if (fn && fn !== true) {
     const query = (window.location.search || '').replace(/^\?/, '').split('&')
     // The URL can hard-code a hash regardless of what's
@@ -219,7 +219,7 @@ $.fn.fragmentChange = function(fn) {
     if (!found) {
       $._checkFragments.fragmentList.push({
         doc: $doc,
-        fragment: ''
+        fragment: '',
       })
     }
     $(window).bind('hashchange', $._checkFragments)
@@ -235,7 +235,7 @@ $.fn.fragmentChange = function(fn) {
   }
   return this
 }
-$._checkFragments = function() {
+$._checkFragments = function () {
   const list = $._checkFragments.fragmentList
   for (let idx = 0; idx < list.length; idx++) {
     const obj = list[idx]
@@ -249,7 +249,7 @@ $._checkFragments = function() {
 }
 $._checkFragments.fragmentList = []
 // Triggers a click only if the anchor tag isn't disabled.
-$.fn.clickLink = function() {
+$.fn.clickLink = function () {
   const $obj = this.eq(0)
   if (!$obj.hasClass('disabled_link')) {
     $obj.click()
@@ -258,9 +258,9 @@ $.fn.clickLink = function() {
 
 // jQuery supposedly has this built-in, but I haven't
 // had much success with it.
-$.fn.showIf = function(bool) {
+$.fn.showIf = function (bool) {
   if ($.isFunction(bool)) {
-    return this.each(function(index) {
+    return this.each(function (index) {
       $(this).showIf(bool.call(this))
     })
   }
@@ -272,7 +272,7 @@ $.fn.showIf = function(bool) {
   return this
 }
 
-$.fn.disableIf = function(bool) {
+$.fn.disableIf = function (bool) {
   if ($.isFunction(bool)) {
     bool = bool.call(this)
   }
@@ -280,7 +280,7 @@ $.fn.disableIf = function(bool) {
   return this
 }
 
-$.fn.indicate = function(options) {
+$.fn.indicate = function (options) {
   options = options || {}
   let $indicator
   if (options == 'remove') {
@@ -310,13 +310,13 @@ $.fn.indicate = function(options) {
     '-moz-border-radius': 5,
     opacity: 0.8,
     border: '2px solid #870',
-    backgroundColor: '#fd0'
+    backgroundColor: '#fd0',
   })
   $indicator.addClass('indicator_box')
-  $indicator.mouseover(function() {
+  $indicator.mouseover(function () {
     $(this)
       .stop()
-      .fadeOut('fast', function() {
+      .fadeOut('fast', function () {
         $(this).remove()
       })
   })
@@ -330,7 +330,7 @@ $.fn.indicate = function(options) {
       .hide()
       .fadeIn()
       .animate({opacity: 0.8}, 500)
-      .fadeOut('slow', function() {
+      .fadeOut('slow', function () {
         $(this).remove()
       })
   } else {
@@ -341,7 +341,7 @@ $.fn.indicate = function(options) {
       .fadeOut('slow')
       .fadeIn('slow')
       .animate({opacity: 0.8}, 2500)
-      .fadeOut('slow', function() {
+      .fadeOut('slow', function () {
         $(this).remove()
       })
   }
@@ -350,17 +350,17 @@ $.fn.indicate = function(options) {
   }
 }
 
-$.fn.hasScrollbar = function() {
+$.fn.hasScrollbar = function () {
   return this.length && this[0].clientHeight < this[0].scrollHeight
 }
 
-$.fn.log = function(msg) {
+$.fn.log = function (msg) {
   console.log('%s: %o', msg, this)
   return this
 }
 
 // this is used if you want to fill the browser window with something inside #content but you want to also leave the footer and header on the page.
-$.fn.fillWindowWithMe = function(options) {
+$.fn.fillWindowWithMe = function (options) {
   const opts = $.extend({minHeight: 400}, options),
     $this = $(this),
     $wrapper = $('#wrapper'),
@@ -389,17 +389,17 @@ $.fn.fillWindowWithMe = function(options) {
   return this
 }
 
-$.fn.autoGrowInput = function(o) {
+$.fn.autoGrowInput = function (o) {
   o = $.extend(
     {
       maxWidth: 1000,
       minWidth: 0,
-      comfortZone: 70
+      comfortZone: 70,
     },
     o
   )
 
-  this.filter('input:text').each(function() {
+  this.filter('input:text').each(function () {
     let minWidth = o.minWidth || $(this).width(),
       val = '',
       input = $(this),
@@ -412,9 +412,9 @@ $.fn.autoGrowInput = function(o) {
         fontFamily: input.css('fontFamily'),
         fontWeight: input.css('fontWeight'),
         letterSpacing: input.css('letterSpacing'),
-        whiteSpace: 'nowrap'
+        whiteSpace: 'nowrap',
       }),
-      check = function() {
+      check = function () {
         setTimeout(() => {
           if (val === (val = input.val())) {
             return

@@ -20,14 +20,14 @@ import PropTypes from 'prop-types'
 export const pointShape = {
   text: PropTypes.string,
   value: PropTypes.number,
-  valid: PropTypes.bool
+  valid: PropTypes.bool,
 }
 
 export const tierShape = {
   points: PropTypes.number,
   description: PropTypes.string,
   long_description: PropTypes.string,
-  endOfRangePoints: PropTypes.number
+  endOfRangePoints: PropTypes.number,
 }
 
 export const ratingShape = {
@@ -35,7 +35,7 @@ export const ratingShape = {
   points: PropTypes.number,
   selectedRatingId: PropTypes.string,
   defaultMasteryThreshold: PropTypes.number,
-  useRange: PropTypes.bool.isRequired
+  useRange: PropTypes.bool.isRequired,
 }
 
 export const assessmentShape = {
@@ -43,7 +43,7 @@ export const assessmentShape = {
   comments: PropTypes.string,
   points: PropTypes.shape(pointShape).isRequired,
   focusPoints: PropTypes.number,
-  saveCommentsForLater: PropTypes.bool
+  saveCommentsForLater: PropTypes.bool,
 }
 
 export const criterionShape = {
@@ -53,24 +53,24 @@ export const criterionShape = {
   learning_outcome_id: PropTypes.string,
   points: PropTypes.number,
   ratings: PropTypes.arrayOf(PropTypes.shape(tierShape)),
-  mastery_points: PropTypes.number
+  mastery_points: PropTypes.number,
 }
 
 export const rubricShape = {
   criteria: PropTypes.arrayOf(PropTypes.shape(criterionShape)),
   free_form_criterion_comments: PropTypes.bool,
   points_possible: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 }
 
 export const rubricAssociationShape = {
   hide_score_total: PropTypes.bool,
   summary_data: PropTypes.shape({
-    saved_comments: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string))
-  })
+    saved_comments: PropTypes.objectOf(PropTypes.arrayOf(PropTypes.string)),
+  }),
 }
 
 export const rubricAssessmentShape = {
   data: PropTypes.arrayOf(PropTypes.shape(assessmentShape)).isRequired,
-  score: PropTypes.number
+  score: PropTypes.number,
 }

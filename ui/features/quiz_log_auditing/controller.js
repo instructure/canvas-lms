@@ -36,7 +36,7 @@ const Controller = {
     events: EventStore.getAll(),
     isLoading: EventStore.isLoading(),
     attempt: EventStore.getAttempt(),
-    availableAttempts: EventStore.getAvailableAttempts()
+    availableAttempts: EventStore.getAvailableAttempts(),
   }),
 
   /**
@@ -85,7 +85,7 @@ const Controller = {
       EventStore.removeChangeListener(update)
       update = null
     }
-  }
+  },
 }
 
 export default Controller

@@ -81,7 +81,7 @@ function setupForgotPassword() {
       },
       error() {
         $button.textContent = $button.getAttribute('data-text-on-error')
-      }
+      },
     })
   })
 }

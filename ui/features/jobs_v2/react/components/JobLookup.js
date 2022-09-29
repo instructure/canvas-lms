@@ -35,7 +35,7 @@ function useJobLookupApi(fetchApiOpts) {
     forceResult: (fetchApiOpts.params.term?.length || 0) === 0 ? [] : undefined,
     path: `/api/v1/jobs2/${fetchApiOpts.params.term}`,
     convert: convertResult,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }
 

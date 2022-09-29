@@ -25,7 +25,7 @@ const defaultProps = {
   context_id: '17',
   newPace: false,
   isBlueprintLocked: false,
-  setIsBlueprintLocked: () => {}
+  setIsBlueprintLocked: () => {},
 }
 
 beforeAll(() => {
@@ -43,7 +43,7 @@ describe('Course paces header', () => {
 
   describe('new paces alert', () => {
     it('renders an alert for new course paces', () => {
-      const {getByText} = renderConnected(<Header {...defaultProps} newPace />)
+      const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
       expect(
         getByText(
           'This is a new course pace and all changes are unpublished. Publish to save any changes and create the pace.'
@@ -53,7 +53,7 @@ describe('Course paces header', () => {
 
     it('renders an alert for new section paces', () => {
       const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Section" newPace />
+        <Header {...defaultProps} context_type="Section" newPace={true} />
       )
       expect(
         getByText(
@@ -64,7 +64,7 @@ describe('Course paces header', () => {
 
     it('renders an alert for new student paces', () => {
       const {getByText} = renderConnected(
-        <Header {...defaultProps} context_type="Enrollment" newPace />
+        <Header {...defaultProps} context_type="Enrollment" newPace={true} />
       )
       expect(
         getByText(
@@ -80,7 +80,7 @@ describe('Course paces header', () => {
   })
 
   it('renders the unpublished changes message for a new pace', () => {
-    const {getByText} = renderConnected(<Header {...defaultProps} newPace />)
+    const {getByText} = renderConnected(<Header {...defaultProps} newPace={true} />)
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
   })
   // the other messsages are tested with UnpublishedChangesIndicator

@@ -36,8 +36,8 @@ export default class ChildCourse {
     {
       path: Router.PATHS.singleMigration,
       onEnter: ({params}) => this.app.showChangeLog(params),
-      onExit: () => this.app.hideChangeLog()
-    }
+      onExit: () => this.app.hideChangeLog(),
+    },
   ]
 
   setupRouter() {

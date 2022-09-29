@@ -20,24 +20,24 @@ import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import FileUpload from '../file_upload'
 import assertChange from 'chai-assert-change'
-import { camelize } from '@canvas/quiz-legacy-client-apps/util/convert_case';
+import {camelize} from '@canvas/quiz-legacy-client-apps/util/convert_case'
 
 describe('canvas_quizzes/statistics/views/questions/file_upload', () => {
   it('renders', () => {
     const fixture = camelize({
-      "id": "54",
-      "question_type": "file_upload_question",
-      "question_text": "<p>File Upload: what's that you look like?</p>",
-      "position": 13,
-      "responses": 1,
-      "graded": 0,
-      "full_credit": 0,
-      "point_distribution": [
+      id: '54',
+      question_type: 'file_upload_question',
+      question_text: "<p>File Upload: what's that you look like?</p>",
+      position: 13,
+      responses: 1,
+      graded: 0,
+      full_credit: 0,
+      point_distribution: [
         {
-          "score": 0,
-          "count": 152
-        }
-      ]
+          score: 0,
+          count: 152,
+        },
+      ],
     })
 
     render(<FileUpload {...fixture} />)

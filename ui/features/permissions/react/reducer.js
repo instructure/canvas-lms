@@ -45,7 +45,7 @@ const apiBusy = handleActions(
       const newState = [...state]
       newState.splice(idx, 1)
       return newState
-    }
+    },
   },
   []
 )
@@ -69,7 +69,7 @@ const permissions = handleActions(
         const displayed = permission.contextType === newContextType
         return {...permission, displayed}
       })
-    }
+    },
   },
   []
 )
@@ -130,7 +130,7 @@ const roles = handleActions(
       return state.map(r => (r.id === action.payload.id ? {...r, ...action.payload} : r))
     },
     [actionTypes.DELETE_ROLE_SUCCESS]: (state, action) =>
-      state.filter(role => action.payload.id !== role.id)
+      state.filter(role => action.payload.id !== role.id),
   },
   []
 )
@@ -148,7 +148,7 @@ const selectedRolesReducer = handleActions(
       const result = state.filter(role => role.id !== action.payload.role.id)
 
       return result
-    }
+    },
   },
   []
 )
@@ -162,5 +162,5 @@ export default combineReducers({
   nextFocus: setFocusReducer,
   permissions,
   roles,
-  apiBusy
+  apiBusy,
 })

@@ -69,7 +69,7 @@ ready(() => {
       src: `/media_objects/${media_object.media_id}/media_tracks/${track.id}`,
       label: closedCaptionLanguages[track.locale] || track.locale,
       type: track.kind,
-      language: track.locale
+      language: track.locale,
     }
   })
 

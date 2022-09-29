@@ -18,7 +18,7 @@
 
 import {act, render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import EventStream from '../index'
 import assertChange from 'chai-assert-change'
 import K from '../../../../constants'
@@ -31,10 +31,10 @@ describe('canvas_quizzes/events/views/event_stream', () => {
           events={[
             {
               id: 'e1',
-              createdAt: "2014-11-16T13:39:19Z",
-              startedAt: "2014-11-16T13:37:19Z",
+              createdAt: '2014-11-16T13:39:19Z',
+              startedAt: '2014-11-16T13:37:19Z',
               type: K.EVT_SESSION_STARTED,
-            }
+            },
           ]}
         />
       </MemoryRouter>

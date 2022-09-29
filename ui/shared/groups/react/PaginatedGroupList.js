@@ -47,7 +47,7 @@ const PaginatedGroupList = createReactClass({
         {groups}
       </div>
     )
-  }
+  },
 })
 
 export default PaginatedGroupList

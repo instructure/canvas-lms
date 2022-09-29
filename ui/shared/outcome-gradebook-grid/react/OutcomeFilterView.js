@@ -35,7 +35,7 @@ export default class StudentColumnHeader extends React.Component {
     showUnassessedStudents: bool.isRequired,
     toggleInactiveEnrollments: func.isRequired,
     toggleConcludedEnrollments: func.isRequired,
-    toggleUnassessedStudents: func.isRequired
+    toggleUnassessedStudents: func.isRequired,
   }
 
   toggleInactiveEnrollments = (_e, _menuItem, newValue) => {
@@ -54,16 +54,16 @@ export default class StudentColumnHeader extends React.Component {
     return (
       <View textAlign="end">
         <Flex id="learning-mastery-gradebook-filter">
-          <Flex.Item shouldGrow>
+          <Flex.Item shouldGrow={true}>
             <Text weight="bold" id="lmgb-student-filter-title">
               {I18n.t('Students')}
             </Text>
           </Flex.Item>
-          <Flex.Item shouldShrink id="lmgb-student-filter-trigger">
+          <Flex.Item shouldShrink={true} id="lmgb-student-filter-trigger">
             <Menu
               placement="bottom end"
-              withArrow
-              shouldHideOnSelect
+              withArrow={true}
+              shouldHideOnSelect={true}
               trigger={
                 <IconButton
                   data-component="lmgb-student-filter-trigger"
@@ -76,7 +76,7 @@ export default class StudentColumnHeader extends React.Component {
               }
             >
               <Menu.Group
-                allowMultiple
+                allowMultiple={true}
                 label={I18n.t('Show')}
                 id="learning-mastery-gradebook-dropdown"
               >

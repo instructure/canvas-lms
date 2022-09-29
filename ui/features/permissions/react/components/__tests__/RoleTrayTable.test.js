@@ -61,12 +61,7 @@ it('renders the title', () => {
     </RoleTrayTable>
   )
   const node = tree.find('Text')
-  expect(
-    node
-      .at(0)
-      .children()
-      .text()
-  ).toEqual('fruit')
+  expect(node.at(0).children().text()).toEqual('fruit')
 })
 
 it('sorts the children by title', () => {

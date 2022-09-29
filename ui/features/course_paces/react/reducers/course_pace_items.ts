@@ -19,7 +19,7 @@
 import {CoursePaceItem, Module} from '../types'
 import {
   Constants as CoursePaceItemConstants,
-  CoursePaceItemAction
+  CoursePaceItemAction,
 } from '../actions/course_pace_items'
 
 /* Reducers */

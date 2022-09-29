@@ -69,7 +69,7 @@ export type UnpublishedChangesTrayProps = {
 
 const UnpublishedChangesTrayContents = ({
   changes = [],
-  handleTrayDismiss
+  handleTrayDismiss,
 }: UnpublishedChangesTrayProps) => {
   useEffect(() => {
     styleList()

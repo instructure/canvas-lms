@@ -25,10 +25,10 @@ const props = (overrides = {}) => {
   return {
     toolConfiguration: {},
     validScopes: {
-      test: 'valid_scope'
+      test: 'valid_scope',
     },
     validPlacements: ['aplacement'],
-    ...overrides
+    ...overrides,
   }
 }
 

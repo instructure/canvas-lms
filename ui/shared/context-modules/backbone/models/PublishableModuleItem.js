@@ -32,7 +32,7 @@ export default class PublishableModuleItem extends Model {
       publishable: true,
       unpublishable: true,
       publish_at: null,
-      module_item_name: null
+      module_item_name: null,
     }
 
     this.prototype.urls = {
@@ -43,7 +43,7 @@ export default class PublishableModuleItem extends Model {
       },
       module() {
         return `${this.baseUrl()}/modules/${this.get('id')}`
-      }
+      },
     }
 
     this.prototype.toJSONs = {
@@ -52,14 +52,14 @@ export default class PublishableModuleItem extends Model {
       },
       module() {
         return {module: {published: this.get('published')}}
-      }
+      },
     }
 
     this.prototype.disabledMessages = {
       generic() {
         if (this.get('module_item_name')) {
           return I18n.t('Publishing %{item_name} is disabled', {
-            item_name: this.get('module_item_name')
+            item_name: this.get('module_item_name'),
           })
         } else {
           return I18n.t('Publishing is disabled for this item')
@@ -69,7 +69,7 @@ export default class PublishableModuleItem extends Model {
       assignment() {
         if (this.get('module_item_name')) {
           return I18n.t("Can't unpublish %{item_name} if there are student submissions", {
-            item_name: this.get('module_item_name')
+            item_name: this.get('module_item_name'),
           })
         } else {
           return I18n.t("Can't unpublish if there are student submissions")
@@ -79,7 +79,7 @@ export default class PublishableModuleItem extends Model {
       quiz() {
         if (this.get('module_item_name')) {
           return I18n.t("Can't unpublish %{item_name} if there are student submissions", {
-            item_name: this.get('module_item_name')
+            item_name: this.get('module_item_name'),
           })
         } else {
           return I18n.t("Can't unpublish if there are student submissions")
@@ -88,12 +88,12 @@ export default class PublishableModuleItem extends Model {
       discussion_topic() {
         if (this.get('module_item_name')) {
           return I18n.t("Can't unpublish %{item_name} if there are student submissions", {
-            item_name: this.get('module_item_name')
+            item_name: this.get('module_item_name'),
           })
         } else {
           return I18n.t("Can't unpublish if there are student submissions")
         }
-      }
+      },
     }
   }
 

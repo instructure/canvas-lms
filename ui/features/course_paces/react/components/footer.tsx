@@ -33,7 +33,7 @@ import {
   getUnpublishedChangeCount,
   isNewPace,
   isSectionPace,
-  isStudentPace
+  isStudentPace,
 } from '../reducers/course_paces'
 import {getBlackoutDatesSyncing, getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 
@@ -75,7 +75,7 @@ export const Footer: React.FC<ComponentProps> = ({
   sectionPace,
   newPace,
   unpublishedChanges,
-  blueprintLocked
+  blueprintLocked,
 }) => {
   const handlePublish = useCallback(() => {
     syncUnpublishedChanges()
@@ -156,11 +156,11 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     studentPace: isStudentPace(state),
     sectionPace: isSectionPace(state),
     newPace: isNewPace(state),
-    unpublishedChanges: getUnpublishedChangeCount(state) !== 0
+    unpublishedChanges: getUnpublishedChangeCount(state) !== 0,
   }
 }
 
 export default connect(mapStateToProps, {
   onResetPace: coursePaceActions.onResetPace,
-  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges
+  syncUnpublishedChanges: coursePaceActions.syncUnpublishedChanges,
 })(Footer)

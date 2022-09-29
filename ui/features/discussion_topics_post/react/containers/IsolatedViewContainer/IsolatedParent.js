@@ -36,7 +36,7 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {
   UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT,
   UPDATE_DISCUSSION_THREAD_READ_STATE,
-  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
 import {useMutation, useApolloClient} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -56,7 +56,7 @@ export const IsolatedParent = props => {
   }
 
   const [updateDiscussionThreadReadState] = useMutation(UPDATE_DISCUSSION_THREAD_READ_STATE, {
-    update: resetDiscussionCache
+    update: resetDiscussionCache,
   })
 
   const {setOnSuccess} = useContext(AlertManagerContext)
@@ -81,7 +81,7 @@ export const IsolatedParent = props => {
       setTimeout(() => {
         setReportingError(false)
       }, 3000)
-    }
+    },
   })
 
   if (props.discussionEntry.permissions.reply) {
@@ -142,12 +142,12 @@ export const IsolatedParent = props => {
       props={{
         mobile: {
           textSize: 'small',
-          padding: 'x-small'
+          padding: 'x-small',
         },
         desktop: {
           textSize: 'medium',
-          padding: 'x-small medium'
-        }
+          padding: 'x-small medium',
+        },
       }}
       render={responsiveProps => (
         <>
@@ -172,8 +172,8 @@ export const IsolatedParent = props => {
               onDismiss={() => {
                 updateIsolatedViewDeeplyNestedAlert({
                   variables: {
-                    isolatedViewDeeplyNestedAlert: false
-                  }
+                    isolatedViewDeeplyNestedAlert: false,
+                  },
                 })
 
                 ENV.should_show_deeply_nested_alert = false
@@ -189,7 +189,7 @@ export const IsolatedParent = props => {
           <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
-                <Flex.Item shouldShrink shouldGrow>
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
@@ -219,8 +219,8 @@ export const IsolatedParent = props => {
                               discussionEntryId: props.discussionEntry.rootEntryId
                                 ? props.discussionEntry.rootEntryId
                                 : props.discussionEntry.id,
-                              read: readState
-                            }
+                              read: readState,
+                            },
                           })
                         }
                         onReport={
@@ -244,7 +244,7 @@ export const IsolatedParent = props => {
                       }
                     }}
                     onCancel={() => setIsEditing(false)}
-                    isIsolatedView
+                    isIsolatedView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -267,7 +267,10 @@ export const IsolatedParent = props => {
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
-                        <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>
+                        <ThreadingToolbar
+                          discussionEntry={props.discussionEntry}
+                          isIsolatedView={true}
+                        >
                           {threadActions}
                         </ThreadingToolbar>
                       </View>
@@ -281,8 +284,8 @@ export const IsolatedParent = props => {
                       updateDiscussionEntryReported({
                         variables: {
                           discussionEntryId: props.discussionEntry._id,
-                          reportType
-                        }
+                          reportType,
+                        },
                       })
                       setReportModalIsLoading(true)
                     }}
@@ -315,5 +318,5 @@ IsolatedParent.propTypes = {
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
   goToTopic: PropTypes.func,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }

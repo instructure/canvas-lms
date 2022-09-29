@@ -28,5 +28,5 @@ const updatePositions = (newPositions, userId, ajaxLib = axios) => {
 }
 
 export default {
-  updatePositions
+  updatePositions,
 }

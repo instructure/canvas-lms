@@ -44,15 +44,15 @@ export const MessageDetailParticipants = ({...props}) => {
   const participantCount = uniqueMessageRecipients.length - PARTICIPANT_EXPANSION_THRESHOLD
   const participantExpansionButtonText = participantsExpanded
     ? I18n.t('%{participantCount} less', {
-        participantCount
+        participantCount,
       })
     : I18n.t('%{participantCount} more', {
-        participantCount
+        participantCount,
       })
 
   return (
     <Flex width="100%">
-      <Flex.Item shouldShrink shouldGrow>
+      <Flex.Item shouldShrink={true} shouldGrow={true}>
         <View overflowX="hidden" overflowY="hidden" width="100%" display="block">
           <Text weight="bold" size={props.participantsSize}>
             {props.conversationMessage.author.name}
@@ -81,5 +81,5 @@ export const MessageDetailParticipants = ({...props}) => {
 
 MessageDetailParticipants.propTypes = {
   conversationMessage: PropTypes.object,
-  participantsSize: PropTypes.string
+  participantsSize: PropTypes.string,
 }

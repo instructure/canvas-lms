@@ -17,18 +17,18 @@
  */
 
 import IntlPolyfills from '../IntlPolyfills';
-import type { Capability } from '@instructure/updown';
-import { oncePerPage } from '@instructure/updown';
-import { useTranslations } from '@canvas/i18n';
+import type {Capability} from '@instructure/updown';
+import {oncePerPage} from '@instructure/updown';
+import {useTranslations} from '@canvas/i18n';
 import doFetchApi from '@canvas/do-fetch-api-effect';
 import fallbacks from 'translations/en.json';
 
 declare const ENV: {
-  RAILS_ENVIRONMENT: 'development' | 'test' | 'production';
-  LOCALE?: string;
-  readonly LOCALE_TRANSLATION_FILE: string;
-  readonly LOCALES: string[]; // array of the current locale and then all its fallbacks
-  [propName: string]: unknown;
+  RAILS_ENVIRONMENT: 'development' | 'test' | 'production'
+  LOCALE?: string
+  readonly LOCALE_TRANSLATION_FILE: string
+  readonly LOCALES: string[] // array of the current locale and then all its fallbacks
+  [propName: string]: unknown
 };
 
 // Backfill ENV.LOCALE from ENV.LOCALES[0] if it does not exist
@@ -39,11 +39,11 @@ const LocaleBackfill: Capability = {
       return {
         down: () => {
           delete ENV.LOCALE;
-        }
+        },
       };
     }
   },
-  requires: []
+  requires: [],
 };
 
 // load the string translation file for this locale
@@ -66,15 +66,17 @@ const Translations: Capability = {
       // because none of the front-end code could start.
       useTranslations(ENV.LOCALE, fallbacks);
       // eslint-disable-next-line no-console
-      console.error(`CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`);
+      console.error(
+        `CAUTION could not load translations for "${ENV.LOCALE}", falling back to US English`
+      );
     }
   }),
-  requires: [LocaleBackfill]
+  requires: [LocaleBackfill],
 };
 
 const I18n: Capability = {
   up: () => {},
-  requires: [IntlPolyfills, Translations]
+  requires: [IntlPolyfills, Translations],
 };
 
 export {I18n, Translations};

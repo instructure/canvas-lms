@@ -27,5 +27,5 @@ export default shape({
   grading_scheme: string,
   grading_type: string.isRequired,
   points_possible: number.isRequired,
-  submission_types: arrayOf(string)
+  submission_types: arrayOf(string),
 })

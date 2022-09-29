@@ -32,14 +32,14 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
@@ -78,7 +78,7 @@ describe('PostMessage', () => {
 
   it('displays the children', () => {
     const {queryByText} = setup({
-      children: <span>Smol children</span>
+      children: <span>Smol children</span>,
     })
     expect(queryByText('Smol children')).toBeTruthy()
   })

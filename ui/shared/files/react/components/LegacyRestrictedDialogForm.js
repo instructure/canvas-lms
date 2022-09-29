@@ -34,7 +34,7 @@ export default {
   propTypes: {
     closeDialog: PropTypes.func.isRequired,
     models: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
-    usageRightsRequiredForContext: PropTypes.bool.isRequired
+    usageRightsRequiredForContext: PropTypes.bool.isRequired,
   },
 
   getInitialState() {
@@ -79,7 +79,7 @@ export default {
       const usageRightValue = {
         use_justification: values.use_justification,
         legal_copyright: values.copyright,
-        license: values.cc_license
+        license: values.cc_license,
       }
 
       // We need to first set usage rights before handling the setting of
@@ -146,5 +146,5 @@ export default {
   // for disabling/enabling of the Update Button
   radioStateChange() {
     this.setState({submitable: true})
-  }
+  },
 }

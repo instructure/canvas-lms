@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { configure } from 'datetime'
+import {configure} from 'datetime'
 import timezone from 'timezone'
 import en_US from 'timezone/en_US'
 import I18n from '@canvas/i18n'
@@ -39,8 +39,8 @@ export function up() {
   configure({
     tz: userTZ,
     tzData,
-    momentLocale: window.ENV && ENV.MOMENT_LOCALE || 'en',
-    formats: getI18nFormats()
+    momentLocale: (window.ENV && ENV.MOMENT_LOCALE) || 'en',
+    formats: getI18nFormats(),
   })
 }
 

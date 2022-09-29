@@ -57,14 +57,14 @@ export default class ConfirmOutcomeEditModal extends Component {
     hasUpdateableRubrics: bool.isRequired,
     modifiedFields: shape({
       masteryPoints: bool.isRequired,
-      scoringMethod: bool.isRequired
+      scoringMethod: bool.isRequired,
     }).isRequired,
     onConfirm: func.isRequired,
-    parent: func.isRequired
+    parent: func.isRequired,
   }
 
   state = {
-    show: false
+    show: false,
   }
 
   onConfirm = () => {

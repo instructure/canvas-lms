@@ -25,7 +25,7 @@ const defaultProps = {
   searchValue: '',
   filterValue: FilterType.SHOW_ALL,
   setSearchValue: jest.fn(),
-  setFilterValue: jest.fn()
+  setFilterValue: jest.fn(),
 }
 
 describe('FilterControls', () => {

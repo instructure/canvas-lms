@@ -32,7 +32,7 @@ export default function setupCSP(rootElement) {
         message: I18n.t(
           'Content on this page violates the security policy, contact your admin for assistance.'
         ),
-        type: 'error'
+        type: 'error',
       })
     }
 
@@ -59,7 +59,7 @@ export default function setupCSP(rootElement) {
 
     cspMutationObserver.observe(rootElement, {
       childList: true,
-      subtree: true
+      subtree: true,
     })
   }
 }

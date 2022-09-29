@@ -53,8 +53,8 @@ class GradingStandardCollection extends React.Component {
         permissions: {manage: true},
         title: '',
         data: this.formatStandardData(ENV.DEFAULT_GRADING_STANDARD_DATA),
-        id: -1
-      }
+        id: -1,
+      },
     }
     const newStandards = update(this.state.standards, {$unshift: [newStandard]})
     this.setState({standards: newStandards})
@@ -104,9 +104,9 @@ class GradingStandardCollection extends React.Component {
       dataType: 'json',
       contentType: 'application/json',
       data: JSON.stringify(data),
-      context: this
+      context: this,
     })
-      .success(function(updatedStandard) {
+      .success(function (updatedStandard) {
         updatedStandard.grading_standard.data = this.formatStandardData(
           updatedStandard.grading_standard.data
         )
@@ -115,7 +115,7 @@ class GradingStandardCollection extends React.Component {
           $.flashMessage(I18n.t('Grading scheme saved'))
         })
       })
-      .error(function() {
+      .error(function () {
         newStandards[indexToUpdate].grading_standard.saving = false
         this.setState({standards: newStandards}, () => {
           $.flashError(I18n.t('There was a problem saving the grading scheme'))
@@ -130,7 +130,7 @@ class GradingStandardCollection extends React.Component {
       const value = dataRow[1]
       formattedData.grading_standard.data[i] = [
         name.trim(),
-        this.roundToTwoDecimalPlaces(value) / 100
+        this.roundToTwoDecimalPlaces(value) / 100,
       ]
     })
     return formattedData
@@ -143,7 +143,7 @@ class GradingStandardCollection extends React.Component {
       const value = dataRow[1]
       formattedData.grading_standard.standard_data[`scheme_${i}`] = {
         name: name.trim(),
-        value: this.roundToTwoDecimalPlaces(value)
+        value: this.roundToTwoDecimalPlaces(value),
       }
     })
     return formattedData
@@ -166,7 +166,7 @@ class GradingStandardCollection extends React.Component {
       },
       error() {
         $.flashError(I18n.t('There was a problem deleting the grading scheme'))
-      }
+      },
     })
   }
 
@@ -185,7 +185,7 @@ class GradingStandardCollection extends React.Component {
     } else if (this.state.standards.length === 0) {
       return <h3 ref="noSchemesMessage">{I18n.t('No grading schemes to display')}</h3>
     }
-    return this.state.standards.map(function(s) {
+    return this.state.standards.map(function (s) {
       return (
         <GradingStandard
           ref={`gradingStandard${s.grading_standard.id}`}

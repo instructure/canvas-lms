@@ -34,11 +34,11 @@ export function AssignmentSingleAvailabilityWindow({...props}) {
       query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {
-          dueDateMargin: 'none'
+          dueDateMargin: 'none',
         },
         desktop: {
-          dueDateMargin: '0 0 0 x-small'
-        }
+          dueDateMargin: '0 0 0 x-small',
+        },
       }}
       render={(_responsiveProps, matches) => {
         const group = props.singleOverrideWithNoDefault ? props.assignmentOverrides[0]?.title : ''
@@ -95,5 +95,5 @@ AssignmentSingleAvailabilityWindow.propTypes = {
   isAdmin: PropTypes.bool,
   onSetDueDateTrayOpen: PropTypes.func,
   assignment: PropTypes.object,
-  assignmentOverrides: PropTypes.array
+  assignmentOverrides: PropTypes.array,
 }

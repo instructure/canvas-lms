@@ -30,7 +30,7 @@ import $ from 'jquery'
 
 // Simple dropdown list.  Takes the list of attributes specified in "options" and displays them
 // in a menu anchored to the selected element.
-$.fn.dropdownList = function(options) {
+$.fn.dropdownList = function (options) {
   if (this.length) {
     let $div = $('#instructure_dropdown_list')
     if (
@@ -115,10 +115,7 @@ $.fn.dropdownList = function(options) {
             }
           }
         })
-      $div
-        .find('.option')
-        .removeClass('ui-state-hover ui-state-active')
-        .addClass('minimal')
+      $div.find('.option').removeClass('ui-state-hover ui-state-active').addClass('minimal')
       $div.click(event => {
         $div.hide().data('current_dropdown_initiator', null)
       })
@@ -160,13 +157,13 @@ $.fn.dropdownList = function(options) {
             $option.addClass('ui-state-active').removeClass('minimal')
           },
           mouseup: unhoverOtherOptions,
-          click: callback
+          click: callback,
         })
       } else {
         $option.addClass('ui-state-disabled').bind({
           mousedown(event) {
             event.preventDefault()
-          }
+          },
         })
       }
     })
@@ -180,7 +177,7 @@ $.fn.dropdownList = function(options) {
         position: 'absolute',
         top: offset.top + height,
         left: offset.left + 5,
-        right: ''
+        right: '',
       })
       .hide()
       .show()

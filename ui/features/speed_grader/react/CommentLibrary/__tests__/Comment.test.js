@@ -32,7 +32,7 @@ describe('Comment', () => {
       id: '1',
       updateComment: () => {},
       setRemovedItemIndex: setRemovedItemIndexMock,
-      ...props
+      ...props,
     }
   }
 

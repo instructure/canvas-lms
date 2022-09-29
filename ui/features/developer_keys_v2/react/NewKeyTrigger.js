@@ -67,7 +67,7 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
   developerKeyTrigger() {
     return (
-      <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect>
+      <Menu placement="bottom" trigger={this.triggerButton()} shouldHideOnSelect={true}>
         {this.developerKeyMenuItem(I18n.t('API Key'), this.showCreateDeveloperKey)}
         {this.developerKeyMenuItem(I18n.t('LTI Key'), this.showCreateLtiKey)}
       </Menu>
@@ -85,11 +85,11 @@ export default class DeveloperKeyModalTrigger extends React.Component {
 
 DeveloperKeyModalTrigger.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
     developerKeysModalOpen: PropTypes.func.isRequired,
-    ltiKeysSetLtiKey: PropTypes.func.isRequired
+    ltiKeysSetLtiKey: PropTypes.func.isRequired,
   }).isRequired,
-  setAddKeyButtonRef: PropTypes.func.isRequired
+  setAddKeyButtonRef: PropTypes.func.isRequired,
 }

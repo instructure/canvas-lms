@@ -48,13 +48,13 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
         provisional_grade_id: string.isRequired,
         readonly: bool,
         scorer_id: string,
-        selected: bool
+        selected: bool,
       })
-    ).isRequired
+    ).isRequired,
   }
 
   static defaultProps = {
-    pointsPossible: 0
+    pointsPossible: 0,
   }
 
   constructor(props) {
@@ -86,7 +86,7 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
     // A provisional grade isn't *really* a submission object, but it has the
     // two fields ("score" and "grade") relevant to formatting.
     const formattedScore = GradeFormatHelper.formatSubmissionGrade(grade, {
-      formatType: this.props.gradingType
+      formatType: this.props.gradingType,
     })
 
     return (

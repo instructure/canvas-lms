@@ -36,7 +36,7 @@ export default class DashboardCardMenu extends React.Component {
       nickname: PropTypes.string,
       originalName: PropTypes.string,
       courseId: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-      onNicknameChange: PropTypes.func
+      onNicknameChange: PropTypes.func,
     }).isRequired,
     trigger: PropTypes.node.isRequired,
     assetString: PropTypes.string.isRequired,
@@ -51,8 +51,8 @@ export default class DashboardCardMenu extends React.Component {
       canMoveLeft: PropTypes.bool,
       canMoveRight: PropTypes.bool,
       canMoveToBeginning: PropTypes.bool,
-      canMoveToEnd: PropTypes.bool
-    })
+      canMoveToEnd: PropTypes.bool,
+    }),
   }
 
   static defaultProps = {
@@ -61,7 +61,7 @@ export default class DashboardCardMenu extends React.Component {
     handleMove: () => {},
     currentPosition: 0,
     lastPosition: 0,
-    menuOptions: null
+    menuOptions: null,
   }
 
   constructor(props) {
@@ -69,7 +69,7 @@ export default class DashboardCardMenu extends React.Component {
 
     this.state = {
       show: false,
-      selectedIndex: 0
+      selectedIndex: 0,
     }
   }
 
@@ -93,7 +93,7 @@ export default class DashboardCardMenu extends React.Component {
 
   handleTabChange = (event, {index}) => {
     this.setState({
-      selectedIndex: index
+      selectedIndex: index,
     })
   }
 
@@ -109,7 +109,7 @@ export default class DashboardCardMenu extends React.Component {
       lastPosition,
       assetString,
       menuOptions,
-      trigger
+      trigger,
     } = this.props
 
     const colorPicker = (
@@ -152,7 +152,7 @@ export default class DashboardCardMenu extends React.Component {
     const menuStyles = {
       width: 190,
       height: 310,
-      paddingTop: 0
+      paddingTop: 0,
     }
 
     const selectedIndex = this.state.selectedIndex

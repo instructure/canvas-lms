@@ -29,7 +29,7 @@ describe('AddContentItem', () => {
     textInputInstructions: 'Enter new group name',
     onSaveHandler,
     onHideHandler,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -72,7 +72,7 @@ describe('AddContentItem', () => {
     const props = defaultProps()
     const {getByText, getByLabelText} = render(<AddContentItem {...props} />)
     fireEvent.change(getByLabelText(props.textInputInstructions), {
-      target: {value: 'new group name'}
+      target: {value: 'new group name'},
     })
     fireEvent.click(getByText(props.labelInstructions))
     expect(onSaveHandler).toHaveBeenCalledWith('new group name')

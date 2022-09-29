@@ -30,12 +30,12 @@ export default class GridRow extends Component {
   static propTypes = {
     disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
-      graderId: string.isRequired
+      graderId: string.isRequired,
     }),
     graders: arrayOf(
       shape({
         graderName: string,
-        graderId: string.isRequired
+        graderId: string.isRequired,
       })
     ).isRequired,
     grades: shape({}),
@@ -43,16 +43,16 @@ export default class GridRow extends Component {
     row: shape({
       speedGraderUrl: string.isRequired,
       studentId: string.isRequired,
-      studentName: string.isRequired
+      studentName: string.isRequired,
     }).isRequired,
-    selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS])
+    selectProvisionalGradeStatus: oneOf([FAILURE, STARTED, SUCCESS]),
   }
 
   static defaultProps = {
     finalGrader: null,
     grades: {},
     onGradeSelect: null,
-    selectProvisionalGradeStatus: null
+    selectProvisionalGradeStatus: null,
   }
 
   shouldComponentUpdate(nextProps) {

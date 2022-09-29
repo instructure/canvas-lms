@@ -39,7 +39,7 @@ const I18n = useI18nScope('MasteryScale')
 
 export const defaultProficiencyCalculation = {
   calculationMethod: 'decaying_average',
-  calculationInt: 65
+  calculationInt: 65,
 }
 
 const validInt = (method, value) => {
@@ -56,7 +56,7 @@ const CalculationIntInput = ({
   calculationMethod,
   calculationInt,
   individualOutcomeDisplay,
-  calcIntInputRef
+  calcIntInputRef,
 }) => {
   const handleChange = (_event, data) => {
     if (data === '') {
@@ -82,9 +82,9 @@ const CalculationIntInput = ({
     errorMessages.push({
       text: I18n.t('Must be between %{lower} and %{upper}', {
         lower: calculationMethod.validRange[0],
-        upper: calculationMethod.validRange[1]
+        upper: calculationMethod.validRange[1],
       }),
-      type: 'error'
+      type: 'error',
     })
   }
 
@@ -93,14 +93,14 @@ const CalculationIntInput = ({
       <View as="div" display="flex">
         <View as="div" padding="0" className="points">
           <TextInput
-            isRequired
+            isRequired={true}
             messages={errorMessages}
             onChange={handleChange}
             renderLabel={
               <ScreenReaderContent>{I18n.t('Proficiency Calculation')}</ScreenReaderContent>
             }
             value={I18n.n(calculationInt) || ''}
-            shouldNotWrap
+            shouldNotWrap={true}
             textAlign="center"
             width="3rem"
             data-testid="calculation-int-input"
@@ -192,7 +192,7 @@ const Form = ({
   updateCalculationMethod,
   setCalculationInt,
   individualOutcomeForm,
-  calcIntInputRef
+  calcIntInputRef,
 }) => (
   <FormFieldGroup
     description={
@@ -275,7 +275,7 @@ const ProficiencyCalculation = ({
   masteryPoints,
   individualOutcome,
   setError,
-  calcIntInputRef
+  calcIntInputRef,
 }) => {
   const {contextType, outcomeAllowAverageCalculationFF} = useCanvasContext()
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
@@ -302,7 +302,7 @@ const ProficiencyCalculation = ({
     if (updateError) {
       showFlashAlert({
         message: I18n.t('An error occurred updating the calculation method'),
-        type: 'error'
+        type: 'error',
       })
     }
   }, [updateError])
@@ -323,7 +323,7 @@ const ProficiencyCalculation = ({
     if (displayInvalidCalculationMethod && showAlert) {
       showFlashAlert({
         message: I18n.t('The selected calculation method is no longer available'),
-        type: 'error'
+        type: 'error',
       })
       setShowAlert(false)
     }
@@ -333,7 +333,7 @@ const ProficiencyCalculation = ({
     calculation_method: calculationMethodKey,
     calculation_int: calculationInt,
     is_individual_outcome: true,
-    mastery_points: masteryPoints
+    mastery_points: masteryPoints,
   }).toJSON()
   const currentMethod =
     calculationMethods[calculationMethodKey] ||
@@ -458,7 +458,7 @@ const ProficiencyCalculation = ({
 ProficiencyCalculation.propTypes = {
   method: PropTypes.shape({
     calculationMethod: PropTypes.string.isRequired,
-    calculationInt: PropTypes.number
+    calculationInt: PropTypes.number,
   }),
   canManage: PropTypes.bool,
   update: PropTypes.func,
@@ -467,14 +467,14 @@ ProficiencyCalculation.propTypes = {
   masteryPoints: PropTypes.number,
   individualOutcome: PropTypes.oneOf(['display', 'edit']),
   setError: PropTypes.func,
-  calcIntInputRef: PropTypes.func
+  calcIntInputRef: PropTypes.func,
 }
 
 ProficiencyCalculation.defaultProps = {
   method: defaultProficiencyCalculation,
   updateError: null,
   update: () => {},
-  calcIntInputRef: () => {}
+  calcIntInputRef: () => {},
 }
 
 export default ProficiencyCalculation

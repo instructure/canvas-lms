@@ -25,7 +25,7 @@ import {
   PACE_ITEM_1,
   PACE_ITEM_3,
   PRIMARY_PACE,
-  STUDENT_PACE
+  STUDENT_PACE,
 } from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
 
@@ -48,7 +48,7 @@ const defaultProps = {
   datesVisible: true,
   hover: false,
   isStacked: false,
-  isStudentPace: false
+  isStudentPace: false,
 }
 
 beforeAll(() => {
@@ -74,7 +74,7 @@ describe('AssignmentRow', () => {
   it('renders an input that updates the duration for that module item', () => {
     const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} />)
     const daysInput = getByRole('textbox', {
-      name: 'Duration for module Basic encryption/decryption'
+      name: 'Duration for module Basic encryption/decryption',
     }) as HTMLInputElement
     expect(daysInput).toBeInTheDocument()
     expect(daysInput.value).toBe('2')
@@ -106,7 +106,7 @@ describe('AssignmentRow', () => {
 
     const unpublishedProps = {
       ...defaultProps,
-      coursePaceItem: {...defaultProps.coursePaceItem, published: false}
+      coursePaceItem: {...defaultProps.coursePaceItem, published: false},
     }
     const unpublishedIcon = renderConnected(<AssignmentRow {...unpublishedProps} />).getByText(
       'Unpublished'
@@ -115,9 +115,9 @@ describe('AssignmentRow', () => {
   })
 
   it('disables duration inputs while publishing', () => {
-    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} isSyncing />)
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} isSyncing={true} />)
     const daysInput = getByRole('textbox', {
-      name: 'Duration for module Basic encryption/decryption'
+      name: 'Duration for module Basic encryption/decryption',
     })
     expect(daysInput).toBeDisabled()
   })
@@ -150,11 +150,11 @@ describe('AssignmentRow', () => {
 
   it('shows durations as read-only text when on student paces', () => {
     const {queryByRole, getByText} = renderConnected(
-      <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace />
+      <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />
     )
     expect(
       queryByRole('textbox', {
-        name: 'Duration for module Basic encryption/decryption'
+        name: 'Duration for module Basic encryption/decryption',
       })
     ).not.toBeInTheDocument()
     expect(getByText('2')).toBeInTheDocument()

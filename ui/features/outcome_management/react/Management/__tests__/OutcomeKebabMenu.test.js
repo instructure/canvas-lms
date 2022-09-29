@@ -31,7 +31,7 @@ describe('OutcomeKebabMenu', () => {
         menuTitle: groupMenuTitle,
         onMenuHandler: onMenuHandlerMock,
         canDestroy: true,
-        canEdit: true
+        canEdit: true,
       },
       props
     )
@@ -195,7 +195,7 @@ describe('OutcomeKebabMenu', () => {
         <OutcomeKebabMenu
           {...defaultProps({
             isGroup: true,
-            groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>'
+            groupDescription: '<div><p>&nbsp;&nbsp;&nbsp;</p></div>',
           })}
         />
       )

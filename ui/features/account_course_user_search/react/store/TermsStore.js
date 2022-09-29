@@ -24,7 +24,7 @@ const TermsStore = createStore({
     return `/api/v1/accounts/${this.context.rootAccountId}/terms`
   },
 
-  jsonKey: 'enrollment_terms'
+  jsonKey: 'enrollment_terms',
 })
 
 export const propType = shape({
@@ -33,10 +33,10 @@ export const propType = shape({
       id: string.isRequired,
       name: string.isRequired,
       end_at: string,
-      start_at: string
+      start_at: string,
     })
   ),
-  loading: bool
+  loading: bool,
 }).isRequired
 
 export default TermsStore

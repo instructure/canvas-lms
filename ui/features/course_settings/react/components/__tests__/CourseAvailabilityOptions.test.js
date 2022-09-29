@@ -38,7 +38,7 @@ function createFormField(wrapper, id, value) {
 function setupWindowEnv() {
   window.ENV.STUDENTS_ENROLLMENT_DATES = {
     start_at: '2021-02-10T00:00:00-07:00',
-    end_at: '2021-07-10T00:00:00-07:00'
+    end_at: '2021-07-10T00:00:00-07:00',
   }
   window.ENV.TIMEZONE = 'America/Halifax'
   window.ENV.CONTEXT_TIMEZONE = 'America/Denver'
@@ -54,7 +54,7 @@ function renderComponent(wrapper, overrides = {}) {
     course_restrict_student_past_view: 'false',
     course_restrict_student_future_view: 'false',
     course_restrict_enrollments_to_course_dates: 'false',
-    ...overrides
+    ...overrides,
   }
 
   createFormField(wrapper, 'course_start_at', options.course_start_at)
@@ -106,7 +106,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('shows the date inputs as editable if course is selected in select', () => {
     const {getByLabelText, getByText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const startDate = getByLabelText('Start')
     const endDate = getByLabelText('End')
@@ -117,14 +117,14 @@ describe('CourseAvailabilityOptions', () => {
     expect(endDate).not.toBeDisabled()
     expect(
       getByText('Any section dates created in the course may override course dates.', {
-        exact: false
+        exact: false,
       })
     ).toBeInTheDocument()
   })
 
   it('shows the date inputs as disbaled if term is selected in select', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'false'
+      course_restrict_enrollments_to_course_dates: 'false',
     })
     const startDate = getByLabelText('Start')
     const endDate = getByLabelText('End')
@@ -137,7 +137,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('shows the dates from Student enrollment if Term is selected in select', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'false'
+      course_restrict_enrollments_to_course_dates: 'false',
     })
     const startDate = getByLabelText('Start')
     const endDate = getByLabelText('End')
@@ -148,7 +148,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('disables the restrictBefore checkbox if locked by account', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      viewFutureLocked: true
+      viewFutureLocked: true,
     })
     expect(
       getByLabelText('Restrict students from viewing course before term start date')
@@ -160,7 +160,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('disables the restrictAfter checkbox if locked by account', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      viewPastLocked: true
+      viewPastLocked: true,
     })
     expect(
       getByLabelText('Restrict students from viewing course after term end date')
@@ -173,7 +173,7 @@ describe('CourseAvailabilityOptions', () => {
   it("disables everything if user doesn't have manage permission", () => {
     const {getByLabelText} = renderComponent(wrapper, {
       canManage: false,
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     expect(
       getByLabelText('Limit course participation to term or custom course dates?')
@@ -191,7 +191,7 @@ describe('CourseAvailabilityOptions', () => {
   it('fills start and end inputs with currently set dates on render', () => {
     const {getByLabelText} = renderComponent(wrapper, {
       course_conclude_at: moment('2020-10-16').toISOString(),
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     expect(getByLabelText('Start').value).toContain('Aug 14, 2020')
     expect(getByLabelText('End').value).toContain('Oct 16, 2020')
@@ -200,7 +200,7 @@ describe('CourseAvailabilityOptions', () => {
   it('clears course dates when participation setting is changed to Term', () => {
     const {getByText, getByLabelText} = renderComponent(wrapper, {
       course_conclude_at: moment('2020-10-16').toISOString(),
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const select = getByLabelText('Limit course participation to term or custom course dates?')
     expect(select.value).toBe('Course')
@@ -215,7 +215,7 @@ describe('CourseAvailabilityOptions', () => {
   it('sets the restriction checkboxes to currently set values on render', () => {
     const {getByLabelText} = renderComponent(wrapper, {
       course_restrict_student_future_view: 'false',
-      course_restrict_student_past_view: 'true'
+      course_restrict_student_past_view: 'true',
     })
     expect(
       getByLabelText('Restrict students from viewing course before term start date').checked
@@ -227,7 +227,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('updates course end date when DateInput changes', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const endDate = getByLabelText('End')
     const year = moment().year()
@@ -240,7 +240,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('updates course start date when Enter is hit on the DateInput', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const startDate = getByLabelText('Start')
     const year = moment().year()
@@ -251,7 +251,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('updates course end date when Enter is hit on the DateInput', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const endDate = getByLabelText('End')
     const year = moment().year()
@@ -262,7 +262,7 @@ describe('CourseAvailabilityOptions', () => {
 
   it('can set the course end date for a different year', () => {
     const {getByLabelText} = renderComponent(wrapper, {
-      course_restrict_enrollments_to_course_dates: 'true'
+      course_restrict_enrollments_to_course_dates: 'true',
     })
     const endDate = getByLabelText('End')
     const futureYear = moment().year() + 3
@@ -281,7 +281,7 @@ describe('CourseAvailabilityOptions', () => {
 
     it('is not shown if end date is not set', () => {
       const {queryByText} = renderComponent(wrapper, {
-        course_restrict_enrollments_to_course_dates: 'true'
+        course_restrict_enrollments_to_course_dates: 'true',
       })
       expect(queryByText(warningText)).not.toBeInTheDocument()
     })
@@ -289,7 +289,7 @@ describe('CourseAvailabilityOptions', () => {
     it('is not shown if end date is set to midday', () => {
       const {queryByText} = renderComponent(wrapper, {
         course_conclude_at: moment('2020-10-16T12:00:00Z').toISOString(),
-        course_restrict_enrollments_to_course_dates: 'true'
+        course_restrict_enrollments_to_course_dates: 'true',
       })
       expect(queryByText(warningText)).not.toBeInTheDocument()
     })
@@ -297,7 +297,7 @@ describe('CourseAvailabilityOptions', () => {
     it('is shown if end date is set to midnight', () => {
       const {getByText} = renderComponent(wrapper, {
         course_conclude_at: moment('2020-10-16T00:00:00Z').toISOString(),
-        course_restrict_enrollments_to_course_dates: 'true'
+        course_restrict_enrollments_to_course_dates: 'true',
       })
       expect(getByText(warningText)).toBeInTheDocument()
     })
@@ -306,7 +306,7 @@ describe('CourseAvailabilityOptions', () => {
   describe('shows local and course time', () => {
     it('shows local and course time for the start date', () => {
       const {getByLabelText, getByText} = renderComponent(wrapper, {
-        course_restrict_enrollments_to_course_dates: 'true'
+        course_restrict_enrollments_to_course_dates: 'true',
       })
       const startDate = getByLabelText('Start')
       const year = moment().year()
@@ -319,7 +319,7 @@ describe('CourseAvailabilityOptions', () => {
 
     it('shows local and course time for the end date', () => {
       const {getByLabelText, getByText} = renderComponent(wrapper, {
-        course_restrict_enrollments_to_course_dates: 'true'
+        course_restrict_enrollments_to_course_dates: 'true',
       })
       const endDate = getByLabelText('End')
       const year = moment().year()

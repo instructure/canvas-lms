@@ -17,7 +17,7 @@
 
 const {floor} = Math
 
-const pad = function(duration) {
+const pad = function (duration) {
   const padding = duration >= 0 && duration < 10 ? '0' : ''
   return padding + duration.toFixed()
 }
@@ -29,7 +29,7 @@ const pad = function(duration) {
 //   84 seconds    => 01:24
 //   7230 seconds  => 02:00:30
 //   7530 seconds  => 02:05:30
-export default function(seconds) {
+export default function (seconds) {
   if (seconds > 3600) {
     const hh = floor(seconds / 3600)
     const mm = floor((seconds - hh * 3600) / 60)

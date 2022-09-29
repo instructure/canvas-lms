@@ -45,7 +45,7 @@ TenantInput.propTypes = {
   messages: PropTypes.arrayOf(
     PropTypes.shape({
       text: PropTypes.string,
-      type: PropTypes.oneOf(['error', 'hint', 'success', 'screenreader-only'])
+      type: PropTypes.oneOf(['error', 'hint', 'success', 'screenreader-only']),
     })
-  )
+  ),
 }

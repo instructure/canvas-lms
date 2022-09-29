@@ -36,7 +36,7 @@ const STUDENT_SETTINGS = [
   'allow_student_discussion_editing',
   'allow_student_discussion_topics',
   'allow_student_discussion_reporting',
-  'allow_student_anonymous_discussion_topics'
+  'allow_student_anonymous_discussion_topics',
 ]
 
 export default class DiscussionSettings extends Component {
@@ -47,22 +47,22 @@ export default class DiscussionSettings extends Component {
     permissions: propTypes.permissions.isRequired,
     saveSettings: func.isRequired,
     toggleModalOpen: func.isRequired,
-    userSettings: propTypes.userSettings.isRequired
+    userSettings: propTypes.userSettings.isRequired,
   }
 
   static defaultProps = {
-    courseSettings: {}
+    courseSettings: {},
   }
 
   state = {
     markAsRead: false,
-    studentSettings: []
+    studentSettings: [],
   }
 
   componentWillReceiveProps(props) {
     this.setState({
       markAsRead: props.userSettings.manual_mark_as_read,
-      studentSettings: this.defaultStudentSettingsValues(props)
+      studentSettings: this.defaultStudentSettingsValues(props),
     })
   }
 

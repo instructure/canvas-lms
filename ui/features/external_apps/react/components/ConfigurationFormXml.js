@@ -34,11 +34,11 @@ export default class ConfigurationFormXml extends React.Component {
     sharedSecret: PropTypes.string,
     xml: PropTypes.string,
     allowMembershipServiceAccess: PropTypes.bool,
-    membershipServiceFeatureFlagEnabled: PropTypes.bool
+    membershipServiceFeatureFlagEnabled: PropTypes.bool,
   }
 
   state = {
-    errors: {}
+    errors: {},
   }
 
   isValid = () => {
@@ -72,7 +72,7 @@ export default class ConfigurationFormXml extends React.Component {
       consumerKey: this.refs.consumerKey.state.value,
       sharedSecret: this.refs.sharedSecret.state.value,
       xml: this.refs.xml.state.value,
-      verifyUniqueness: 'true'
+      verifyUniqueness: 'true',
     }
 
     if (this.props.membershipServiceFeatureFlagEnabled) {
@@ -104,7 +104,7 @@ export default class ConfigurationFormXml extends React.Component {
           id="name"
           defaultValue={this.props.name}
           renderLabel={I18n.t('Name')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
         <div className="grid-row">

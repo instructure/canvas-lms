@@ -30,25 +30,25 @@ const DiscussionsTray = () => (
     imageWidth="9rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I create a discussion as an instructor?'),
-        href: I18n.t('#community.instructor_create_discussion')
+        href: I18n.t('#community.instructor_create_discussion'),
       },
       {
         label: I18n.t('How do I publish or unpublish a discussion as an instructor?'),
-        href: I18n.t('#community.instructor_publish_discussion')
+        href: I18n.t('#community.instructor_publish_discussion'),
       },
       {
         label: I18n.t('How do I reply to a discussion as an instructor?'),
-        href: I18n.t('#community.instructor_reply_discussion')
+        href: I18n.t('#community.instructor_reply_discussion'),
       },
       {
         label: I18n.t('How do I view and sort discussion replies as an instructor?'),
-        href: I18n.t('#community.instructor_view_discussion_replies')
-      }
+        href: I18n.t('#community.instructor_view_discussion_replies'),
+      },
     ]}
   >
     {I18n.t(`Discussions allow students and instructors to communicate about

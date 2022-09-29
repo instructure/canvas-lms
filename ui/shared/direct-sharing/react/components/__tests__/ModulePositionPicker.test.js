@@ -28,7 +28,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success, loading}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
       loading(true)
     })
@@ -41,7 +41,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const {getByText, getByTestId, queryByText} = render(
@@ -57,7 +57,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const {getByText, getByTestId} = render(<ModulePositionPicker courseId="1" moduleId="1" />)
@@ -71,7 +71,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const positionSetter = jest.fn()
@@ -85,7 +85,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const positionSetter = jest.fn()
@@ -101,7 +101,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const positionSetter = jest.fn()
@@ -117,7 +117,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '1'},
-        {id: 'cde', title: 'cde', position: '2'}
+        {id: 'cde', title: 'cde', position: '2'},
       ])
     })
     const positionSetter = jest.fn()
@@ -133,7 +133,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '5'},
-        {id: 'cde', title: 'cde', position: '6'}
+        {id: 'cde', title: 'cde', position: '6'},
       ])
     })
     const positionSetter = jest.fn()
@@ -149,7 +149,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '5'},
-        {id: 'cde', title: 'cde', position: '6'}
+        {id: 'cde', title: 'cde', position: '6'},
       ])
     })
     const positionSetter = jest.fn()
@@ -166,7 +166,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '5'},
-        {id: 'cde', title: 'cde', position: '6'}
+        {id: 'cde', title: 'cde', position: '6'},
       ])
     })
     const positionSetter = jest.fn()
@@ -183,7 +183,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', title: 'abc', position: '5'},
-        {id: 'cde', title: 'cde', position: '6'}
+        {id: 'cde', title: 'cde', position: '6'},
       ])
     })
     const positionSetter = jest.fn()
@@ -195,7 +195,7 @@ describe('ModulePositionPicker', () => {
     useCourseModuleItemApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'fgh', title: 'fgh', position: '7'},
-        {id: 'ijk', title: 'ijk', position: '8'}
+        {id: 'ijk', title: 'ijk', position: '8'},
       ])
     })
     rerender(

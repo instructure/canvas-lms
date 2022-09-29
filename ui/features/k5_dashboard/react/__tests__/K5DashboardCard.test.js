@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import K5DashboardCard, {
   DashboardCardHeaderHero,
   LatestAnnouncementLink,
-  AssignmentLinks
+  AssignmentLinks,
 } from '../K5DashboardCard'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 
@@ -32,19 +32,19 @@ const defaultContext = {
   loadingAnnouncements: false,
   loadingOpportunities: false,
   isStudent: true,
-  subjectAnnouncements: []
+  subjectAnnouncements: [],
 }
 
 const defaultProps = {
   id: 'test',
   href: '/courses/test',
-  shortName: 'test course'
+  shortName: 'test course',
 }
 
 describe('DashboardCardHeaderHero', () => {
   const heroProps = {
     backgroundColor: '#FFFFFF',
-    onClick: () => {}
+    onClick: () => {},
   }
   it("doesn't add instFS query params if it doesnt use an inst-fs url", () => {
     const {getByTestId} = render(
@@ -87,8 +87,8 @@ describe('K-5 Dashboard Card', () => {
         id: '55',
         context_code: 'course_test',
         html_url: '/courses/test/discussion_topics/55',
-        title: 'How do you do, fellow kids?'
-      }
+        title: 'How do you do, fellow kids?',
+      },
     ]
     const {findByText} = render(
       <K5DashboardContext.Provider value={{...defaultContext, subjectAnnouncements}}>
@@ -164,7 +164,7 @@ describe('K-5 Dashboard Card', () => {
 
 describe('LatestAnnouncementLink', () => {
   it('renders loading skeleton while loading', () => {
-    const {getByText, queryByText} = render(<LatestAnnouncementLink loading color="red" />)
+    const {getByText, queryByText} = render(<LatestAnnouncementLink loading={true} color="red" />)
     expect(getByText('Loading latest announcement link')).toBeInTheDocument()
     expect(queryByText('New announcement', {exact: false})).not.toBeInTheDocument()
   })
@@ -173,7 +173,7 @@ describe('LatestAnnouncementLink', () => {
 describe('AssignmentLinks', () => {
   it('renders loading skeleton while loading', () => {
     const {getByText, queryByText} = render(
-      <AssignmentLinks id="1" loading color="red" courseName="test" numMissing={2} />
+      <AssignmentLinks id="1" loading={true} color="red" courseName="test" numMissing={2} />
     )
     expect(getByText('Loading missing assignments link')).toBeInTheDocument()
     expect(queryByText('2 missing')).not.toBeInTheDocument()

@@ -39,10 +39,10 @@ RosterCardView.propTypes = {
   data: shape({
     course: shape({
       usersConnection: shape({
-        nodes: arrayOf(object).isRequired
-      }).isRequired
-    }).isRequired
-  }).isRequired
+        nodes: arrayOf(object).isRequired,
+      }).isRequired,
+    }).isRequired,
+  }).isRequired,
 }
 
 RosterCardView.defaultProps = {}

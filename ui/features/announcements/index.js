@@ -28,7 +28,7 @@ ready(() => {
     contextId,
     masterCourseData: ENV.BLUEPRINT_COURSES_DATA,
     permissions: ENV.permissions,
-    announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED
+    announcementsLocked: ENV.ANNOUNCEMENTS_LOCKED,
   })
 
   app.render()

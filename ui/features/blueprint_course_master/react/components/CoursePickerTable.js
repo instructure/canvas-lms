@@ -37,18 +37,18 @@ export default class CoursePickerTable extends React.Component {
   static propTypes = {
     courses: propTypes.courseList.isRequired,
     selectedCourses: arrayOf(string).isRequired,
-    onSelectedChanged: PropTypes.func
+    onSelectedChanged: PropTypes.func,
   }
 
   static defaultProps = {
-    onSelectedChanged: () => {}
+    onSelectedChanged: () => {},
   }
 
   constructor(props) {
     super(props)
     this.state = {
       selected: this.parseSelectedCourses(props.selectedCourses),
-      selectedAll: false
+      selectedAll: false,
     }
     this.tableRef = React.createRef()
     this.tableBody = React.createRef()
@@ -62,7 +62,7 @@ export default class CoursePickerTable extends React.Component {
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
-      selectedAll: nextProps.selectedCourses.length === nextProps.courses.length
+      selectedAll: nextProps.selectedCourses.length === nextProps.courses.length,
     })
   }
 
@@ -190,7 +190,7 @@ export default class CoursePickerTable extends React.Component {
             label={
               <ScreenReaderContent>
                 {I18n.t('Toggle select course %{name}', {
-                  name: course.original_name || course.name
+                  name: course.original_name || course.name,
                 })}
               </ScreenReaderContent>
             }

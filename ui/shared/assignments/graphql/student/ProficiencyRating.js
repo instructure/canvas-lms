@@ -35,10 +35,10 @@ export const ProficiencyRating = {
     color: string,
     description: string,
     mastery: bool,
-    points: number
-  })
+    points: number,
+  }),
 }
 
 export const DefaultMocks = {
-  ProficiencyRating: () => ({})
+  ProficiencyRating: () => ({}),
 }

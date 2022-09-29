@@ -22,7 +22,7 @@ import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 
 const LTI_MIME_TYPES = [
   'application/vnd.ims.lti.v1.ltilink',
-  'application/vnd.ims.lti.v1.launch+json'
+  'application/vnd.ims.lti.v1.launch+json',
 ]
 
 function exportPropsToSelf(properties, keyMethod) {
@@ -33,7 +33,7 @@ function exportPropsToSelf(properties, keyMethod) {
       configurable: true,
       get() {
         return properties[prop]
-      }
+      },
     }
   }
 
@@ -75,16 +75,16 @@ const TinyMCEPayloadGenerators = {
           allowfullscreen: 'true',
           webkitallowfullscreen: 'true',
           mozallowfullscreen: 'true',
-          allow: iframeAllowances()
+          allow: iframeAllowances(),
         })
           .addClass(tinyMCEContentItem.class)
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
-            height: tinyMCEContentItem.placementAdvice.displayHeight
+            height: tinyMCEContentItem.placementAdvice.displayHeight,
           })
           .attr({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
-            height: tinyMCEContentItem.placementAdvice.displayHeight
+            height: tinyMCEContentItem.placementAdvice.displayHeight,
           })
       )
       .html()
@@ -95,10 +95,10 @@ const TinyMCEPayloadGenerators = {
       .append(
         $('<img/>', {
           src: tinyMCEContentItem.url,
-          alt: tinyMCEContentItem.text
+          alt: tinyMCEContentItem.text,
         }).css({
           width: tinyMCEContentItem.placementAdvice.displayWidth,
-          height: tinyMCEContentItem.placementAdvice.displayHeight
+          height: tinyMCEContentItem.placementAdvice.displayHeight,
         })
       )
       .html()
@@ -113,7 +113,7 @@ const TinyMCEPayloadGenerators = {
       $link = $('<a/>', {
         href: tinyMCEContentItem.url,
         title: tinyMCEContentItem.title,
-        target: tinyMCEContentItem.linkTarget
+        target: tinyMCEContentItem.linkTarget,
       })
 
     if (tinyMCEContentItem.linkClassName) {
@@ -127,7 +127,7 @@ const TinyMCEPayloadGenerators = {
           src: tinyMCEContentItem.thumbnail['@id'],
           height: tinyMCEContentItem.thumbnail.height || 48,
           width: tinyMCEContentItem.thumbnail.width || 48,
-          alt: tinyMCEContentItem.text
+          alt: tinyMCEContentItem.text,
         })
       )
     } else if (window.tinyMCE.activeEditor?.selection.getContent()) {
@@ -138,14 +138,14 @@ const TinyMCEPayloadGenerators = {
     }
 
     return $linkContainer.html()
-  }
+  },
 }
 
 function TinyMCEContentItem(contentItem) {
   this.contentItem = contentItem
   const decorate = (prop, getFunc) => {
     Object.defineProperty(this, prop, {
-      get: getFunc.bind(this)
+      get: getFunc.bind(this),
     })
   }
 

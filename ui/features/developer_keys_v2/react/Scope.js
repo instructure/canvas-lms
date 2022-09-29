@@ -61,8 +61,8 @@ DeveloperKeyScope.propTypes = {
     scope: PropTypes.string.isRequired,
     resource: PropTypes.string.isRequired,
     path: PropTypes.string,
-    verb: PropTypes.string.isRequired
-  }).isRequired
+    verb: PropTypes.string.isRequired,
+  }).isRequired,
 }
 
 export default DeveloperKeyScope

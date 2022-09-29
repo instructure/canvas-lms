@@ -22,7 +22,7 @@ import moxios from 'moxios'
 import GeneratePairingCode from '../index'
 
 const defaultProps = {
-  userId: '1'
+  userId: '1',
 }
 
 beforeAll(() => {
@@ -54,8 +54,8 @@ it('Shows the pairing code in the modal after clicking the button', () => {
   moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
     status: 200,
     data: {
-      code: '1234'
-    }
+      code: '1234',
+    },
   })
 
   const tree = shallow(<GeneratePairingCode {...defaultProps} />)
@@ -74,7 +74,7 @@ it('Shows the pairing code in the modal after clicking the button', () => {
 
 it('Show an error in the modal if the pairing code fails to generate', () => {
   moxios.stubRequest('/api/v1/users/1/observer_pairing_codes', {
-    status: 401
+    status: 401,
   })
 
   const tree = shallow(<GeneratePairingCode {...defaultProps} />)

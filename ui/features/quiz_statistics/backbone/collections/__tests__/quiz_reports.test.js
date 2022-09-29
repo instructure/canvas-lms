@@ -18,45 +18,45 @@
 
 import QuizReports from '../quiz_reports'
 
-test('parses properly', function() {
+test('parses properly', function () {
   const fixture = {
-    "quiz_reports": [
+    quiz_reports: [
       {
-        "id": "200",
-        "report_type": "student_analysis",
-        "readable_type": "Student Analysis",
-        "includes_all_versions": false,
-        "generatable": true,
-        "anonymous": false,
-        "url": "http://localhost:3000/api/v1/courses/1/quizzes/8/reports/200",
-        "created_at": "2014-06-17T16:38:25Z",
-        "updated_at": "2014-06-17T16:38:25Z",
-        "links": {
-          "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/8"
-        }
+        id: '200',
+        report_type: 'student_analysis',
+        readable_type: 'Student Analysis',
+        includes_all_versions: false,
+        generatable: true,
+        anonymous: false,
+        url: 'http://localhost:3000/api/v1/courses/1/quizzes/8/reports/200',
+        created_at: '2014-06-17T16:38:25Z',
+        updated_at: '2014-06-17T16:38:25Z',
+        links: {
+          quiz: 'http://localhost:3000/api/v1/courses/1/quizzes/8',
+        },
       },
       {
-        "id": "201",
-        "report_type": "item_analysis",
-        "readable_type": "Item Analysis",
-        "includes_all_versions": true,
-        "generatable": true,
-        "anonymous": false,
-        "url": "http://localhost:3000/api/v1/courses/1/quizzes/8/reports/201",
-        "created_at": "2014-06-17T16:38:25Z",
-        "updated_at": "2014-06-17T16:38:25Z",
-        "links": {
-          "quiz": "http://localhost:3000/api/v1/courses/1/quizzes/8"
-        }
-      }
-    ]
-  };
+        id: '201',
+        report_type: 'item_analysis',
+        readable_type: 'Item Analysis',
+        includes_all_versions: true,
+        generatable: true,
+        anonymous: false,
+        url: 'http://localhost:3000/api/v1/courses/1/quizzes/8/reports/201',
+        created_at: '2014-06-17T16:38:25Z',
+        updated_at: '2014-06-17T16:38:25Z',
+        links: {
+          quiz: 'http://localhost:3000/api/v1/courses/1/quizzes/8',
+        },
+      },
+    ],
+  }
 
-  const subject = new QuizReports();
+  const subject = new QuizReports()
 
-  subject.add(fixture, { parse: true });
+  subject.add(fixture, {parse: true})
 
-  expect(subject.length).toEqual(2);
-  expect(subject.first().get('id')).toEqual('200');
-  expect(subject.first().get('reportType')).toEqual('student_analysis');
-});
+  expect(subject.length).toEqual(2)
+  expect(subject.first().get('id')).toEqual('200')
+  expect(subject.first().get('reportType')).toEqual('student_analysis')
+})

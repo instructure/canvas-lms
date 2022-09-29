@@ -39,7 +39,7 @@ const helpers = {
   fcMomentToString(date = '', i18n_format) {
     if (!date) return ''
     return tz.format(fcUtil.unwrap(date), `time.formats.${i18n_format}`)
-  }
+  },
 }
 
 for (const name in helpers) {

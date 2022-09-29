@@ -43,12 +43,12 @@ const unsplashParams = {
   fit: 'crop',
   fm: 'jpg',
   cs: 'tinysrgb',
-  q: 80
+  q: 80,
 }
 
 export default class ImageSearch extends React.Component {
   static propTypes = {
-    selectImage: PropTypes.func
+    selectImage: PropTypes.func,
   }
 
   state = ImageSearchStore.getState()
@@ -111,12 +111,12 @@ export default class ImageSearch extends React.Component {
     if (!this.state.alert) return null
     const alert = (
       <Alert
-        screenReaderOnly
+        screenReaderOnly={true}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
       >
         {I18n.t('%{count} images found for %{term}', {
           count: this.state.searchResults.length,
-          term: this.state.searchTerm
+          term: this.state.searchTerm,
         })}
       </Alert>
     )

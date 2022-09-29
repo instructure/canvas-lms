@@ -27,22 +27,22 @@ const demoData = [
   {id: '1', name: 'Rob Orton', full_name: 'Rob Orton', pronouns: null},
   {id: '2', name: 'Matthew Lemon', full_name: 'Matthew Lemon', pronouns: null},
   {id: '3', name: 'Drake Harper', full_name: 'Drake Harpert', pronouns: null},
-  {id: '4', name: 'Davis Hyer', full_name: 'Davis Hyer', pronouns: null}
+  {id: '4', name: 'Davis Hyer', full_name: 'Davis Hyer', pronouns: null},
 ]
 
 export default {
   title: 'Examples/Canvas Inbox/AddressBook',
   component: AddressBook,
   argTypes: {
-    onSelect: {action: 'onSelect'}
-  }
+    onSelect: {action: 'onSelect'},
+  },
 }
 
 const Template = args => <AddressBook {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  menuData: demoData
+  menuData: demoData,
 }
 
 export const HasSubMenu = Template.bind({})

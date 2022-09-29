@@ -131,7 +131,7 @@ const HeaderInputs = props => {
                   favoriteCourses: props.courses?.favoriteCoursesConnection.nodes,
                   moreCourses,
                   concludedCourses: [],
-                  groups: props.courses?.favoriteGroupsConnection.nodes
+                  groups: props.courses?.favoriteGroupsConnection.nodes,
                 }}
                 onCourseFilterSelect={onContextSelect}
                 activeCourseFilterID={props.activeCourseFilter?.contextID}
@@ -144,7 +144,7 @@ const HeaderInputs = props => {
       {!props.isReply && !props.isForward && (
         <Flex.Item padding="none none small none">
           <ComposeInputWrapper
-            shouldGrow
+            shouldGrow={true}
             input={
               <IndividualMessageCheckbox
                 onChange={props.onSendIndividualMessagesChange}
@@ -172,19 +172,19 @@ const HeaderInputs = props => {
                 }}
                 onInputValueChange={props.onAddressBookInputValueChange}
                 activeCourseFilter={props.activeCourseFilter}
-                hasSelectAllFilterOption
+                hasSelectAllFilterOption={true}
                 selectedRecipients={props.selectedRecipients}
                 addressBookMessages={props.addressBookMessages}
               />
             }
-            shouldGrow
+            shouldGrow={true}
           />
         </Flex.Item>
       )}
       {canAddUserNote && (
         <Flex.Item>
           <ComposeInputWrapper
-            shouldGrow
+            shouldGrow={true}
             input={
               <FacultyJournalCheckBox onChange={props.onUserNoteChange} checked={props.userNote} />
             }
@@ -206,7 +206,7 @@ const HeaderInputs = props => {
       {props.mediaAttachmentTitle && (
         <Flex.Item data-testid="media-attachment">
           <ComposeInputWrapper
-            shouldGrow
+            shouldGrow={true}
             input={
               <MediaAttachment
                 mediaTitle={props.mediaAttachmentTitle}
@@ -245,7 +245,7 @@ HeaderInputs.propTypes = {
   addressBookContainerOpen: PropTypes.bool,
   addressBookMessages: PropTypes.array,
   courseMessages: PropTypes.array,
-  isPrivateConversation: PropTypes.bool
+  isPrivateConversation: PropTypes.bool,
 }
 
 export default HeaderInputs

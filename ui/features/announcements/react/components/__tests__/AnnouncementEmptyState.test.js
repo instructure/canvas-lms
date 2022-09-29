@@ -22,7 +22,7 @@ import {mount} from 'enzyme'
 import AnnouncementEmptyState from '../AnnouncementEmptyState'
 
 const defaultProps = () => ({
-  canCreate: true
+  canCreate: true,
 })
 
 test('renders the AnnouncementsEmptyState component', () => {

@@ -53,7 +53,7 @@ const Controller = {
         quizStatistics: quizStatistics.get(),
         isLoadingStatistics: quizStatistics.isLoading(),
         canBeLoaded: quizStatistics.canBeLoaded(),
-        quizReports: quizReports.getAll()
+        quizReports: quizReports.getAll(),
       })
     }
 
@@ -93,7 +93,7 @@ const Controller = {
 
       update = null
     }
-  }
+  },
 }
 
 export default Controller

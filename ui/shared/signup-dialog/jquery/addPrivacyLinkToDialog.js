@@ -27,7 +27,7 @@ export default function addPrivacyLinkToDialog($dialog) {
     href: ENV.ACCOUNT.privacy_policy_url,
     style: 'padding-left: 1em; line-height: 3em',
     class: 'privacy_policy_link',
-    target: '_blank'
+    target: '_blank',
   })
   const $buttonPane = $dialog.closest('.ui-dialog').find('.ui-dialog-buttonpane')
   if (!$buttonPane.find('.privacy_policy_link').length) {

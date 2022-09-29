@@ -44,9 +44,9 @@ export default function ConfettiGenerator(opts) {
       [165, 104, 246],
       [230, 61, 135],
       [0, 199, 228],
-      [253, 214, 126]
+      [253, 214, 126],
     ],
-    ...opts
+    ...opts,
   }
 
   const cv = document.getElementById(TARGET_CANVAS)
@@ -71,7 +71,7 @@ export default function ConfettiGenerator(opts) {
       size: prop.size,
       color: options.colors[getRandomInt(options.colors.length, true)], // color
       rotation: (getRandomInt(360, true) * Math.PI) / 180,
-      speed: getRandomInt(PARTICLE_SPEED / 7) + PARTICLE_SPEED / 30
+      speed: getRandomInt(PARTICLE_SPEED / 7) + PARTICLE_SPEED / 30,
     }
   }
 
@@ -171,6 +171,6 @@ export default function ConfettiGenerator(opts) {
 
   return {
     render: _render,
-    clear: _clear
+    clear: _clear,
   }
 }

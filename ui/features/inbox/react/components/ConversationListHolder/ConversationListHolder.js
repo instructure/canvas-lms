@@ -93,7 +93,7 @@ export const ConversationListHolder = ({
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.4,
         }
       )
 
@@ -193,7 +193,7 @@ export const ConversationListHolder = ({
         margin="large 0 0 0"
         data-testid="conversation-list-no-messages"
       >
-        <Flex.Item shouldGrow shouldShrink>
+        <Flex.Item shouldGrow={true} shouldShrink={true}>
           <img src={InboxEmpty} alt="No messages Panda" aria-hidden="true" />
         </Flex.Item>
         <Flex.Item>
@@ -241,7 +241,7 @@ export const ConversationListHolder = ({
           <Flex.Item align="start" margin="0 small 0 0">
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </Flex.Item>
-          <Flex.Item align="center" shouldGrow shouldShrink>
+          <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
             <View>
               <Text>{I18n.t('Loading')}</Text>
             </View>
@@ -315,10 +315,10 @@ ConversationListHolder.propTypes = {
    * Bool to determine if there is a next page
    */
   hasMoreMenuData: PropTypes.bool,
-  isError: PropTypes.bool
+  isError: PropTypes.bool,
 }
 
 ConversationListHolder.defaultProps = {
   onSelect: () => {},
-  onStar: () => {}
+  onStar: () => {},
 }

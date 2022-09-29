@@ -36,7 +36,7 @@ QUnit.module('grading_cell', {
     ENV.GRADEBOOK_OPTIONS.grading_period_set = {
       id: '1',
       weighted: false,
-      display_totals_for_all_grading_periods: false
+      display_totals_for_all_grading_periods: false,
     }
     ENV.current_user_roles = []
 
@@ -44,7 +44,7 @@ QUnit.module('grading_cell', {
     this.component.reopen({
       changeGradeURL() {
         return '/api/v1/assignment/:assignment/:submission'
-      }
+      },
     })
     return run(() => {
       this.submission = Ember.Object.create({
@@ -55,16 +55,16 @@ QUnit.module('grading_cell', {
         points_deducted: 2,
         gradeLocked: false,
         assignment_id: 1,
-        user_id: 1
+        user_id: 1,
       })
       this.assignment = Ember.Object.create({
         due_at: tz.parse('2013-10-01T10:00:00Z'),
         grading_type: 'points',
-        points_possible: 10
+        points_possible: 10,
       })
       this.component.setProperties({
         submission: this.submission,
-        assignment: this.assignment
+        assignment: this.assignment,
       })
       return this.component.append()
     })
@@ -76,7 +76,7 @@ QUnit.module('grading_cell', {
       App.destroy()
       return (window.ENV = {})
     })
-  }
+  },
 })
 
 test('setting value on init', function () {

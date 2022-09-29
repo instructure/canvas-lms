@@ -32,7 +32,7 @@ const CANVAS_HEIGHT = 307
 
 class SpaceInvaders extends React.Component {
   state = {
-    score: 0
+    score: 0,
   }
 
   async componentDidMount() {
@@ -150,7 +150,7 @@ class SpaceInvaders extends React.Component {
       this.player.increasePowerLevel(powerUpIndices.length)
       const points = this.powerUpSpawner.removeGameObjects(powerUpIndices)
       this.setState(prevState => ({
-        score: prevState.score + points
+        score: prevState.score + points,
       }))
     }
   }
@@ -159,7 +159,7 @@ class SpaceInvaders extends React.Component {
     this.player.removeProjectiles(projectileIndices)
     const points = this.enemySpawner.removeGameObjects(enemyIndices)
     this.setState(prevState => ({
-      score: prevState.score + points
+      score: prevState.score + points,
     }))
   }
 
@@ -242,7 +242,7 @@ class SpaceInvaders extends React.Component {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
       >
         <div
@@ -252,7 +252,7 @@ class SpaceInvaders extends React.Component {
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'flex-end',
-            justifyContent: 'flex-end'
+            justifyContent: 'flex-end',
           }}
         >
           <div>{`Score: ${this.state.score}`}</div>
@@ -265,7 +265,7 @@ class SpaceInvaders extends React.Component {
           style={{
             border: '2px',
             borderStyle: 'solid',
-            borderColor: '#394B58'
+            borderColor: '#394B58',
           }}
         />
       </div>

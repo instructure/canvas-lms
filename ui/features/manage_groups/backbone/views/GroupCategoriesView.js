@@ -37,12 +37,12 @@ export default class GroupCategoriesView extends CollectionView {
       '#group_categories_tabs': '$tabs',
       'li.static': '$static',
       '#add-group-set': '$addGroupSetButton',
-      '.empty-groupset-instructions': '$emptyInstructions'
+      '.empty-groupset-instructions': '$emptyInstructions',
     }
 
     this.prototype.events = {
       'click #add-group-set': 'addGroupSet',
-      'tabsactivate #group_categories_tabs': 'activatedTab'
+      'tabsactivate #group_categories_tabs': 'activatedTab',
     }
 
     this.prototype.itemView = View.extend({
@@ -50,9 +50,9 @@ export default class GroupCategoriesView extends CollectionView {
       template() {
         return tabTemplate({
           ...this.model.present(),
-          id: this.model.id != null ? this.model.id : this.model.cid
+          id: this.model.id != null ? this.model.id : this.model.cid,
         })
-      }
+      },
     })
   }
 
@@ -80,7 +80,7 @@ export default class GroupCategoriesView extends CollectionView {
     this.$tabs.tabs({
       beforeActivate(event, ui) {
         return !ui.newTab.hasClass('static')
-      }
+      },
     })
 
     // hide/show the instruction text

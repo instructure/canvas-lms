@@ -33,7 +33,7 @@ const fakePage = {
   created_at: '2022-08-02T18:51:44Z',
   updated_at: '2022-08-09T22:13:35Z',
   publish_at: '2022-11-01T22:00:00Z',
-  body: '<p>Hello</p>'
+  body: '<p>Hello</p>',
 }
 
 function renderDialog(props) {
@@ -82,7 +82,7 @@ describe('DelayedPublishDialog', () => {
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/courses/123/pages/a-page',
       method: 'PUT',
-      params: {wiki_page: {publish_at: null}}
+      params: {wiki_page: {publish_at: null}},
     })
     expect(onUpdatePublishAt).toHaveBeenCalledWith(null)
   })
@@ -99,7 +99,7 @@ describe('DelayedPublishDialog', () => {
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/courses/123/pages/a-page',
       method: 'PUT',
-      params: {wiki_page: {publish_at: '2022-03-03T00:00:00.000Z'}}
+      params: {wiki_page: {publish_at: '2022-03-03T00:00:00.000Z'}},
     })
     expect(onUpdatePublishAt).toHaveBeenCalledWith('2022-03-03T00:00:00.000Z')
   })

@@ -20,7 +20,7 @@ import FileOptionsCollection from '../FileOptionsCollection'
 import {
   TYPE,
   ICON_MAKER_ICONS,
-  SVG_TYPE
+  SVG_TYPE,
 } from '../../../../../../packages/canvas-rce/src/rce/plugins/instructure_icon_maker/svg/constants.js'
 
 describe('applyCategory()', () => {
@@ -28,15 +28,15 @@ describe('applyCategory()', () => {
 
   const file = () => ({
     slice: () => ({
-      text: async () => fileText
+      text: async () => fileText,
     }),
-    type: fileType
+    type: fileType,
   })
 
   const fileOptions = () => [
     {
-      file: file()
-    }
+      file: file(),
+    },
   ]
 
   const subject = () => FileOptionsCollection.applyCategory(fileOptions())
@@ -86,20 +86,20 @@ describe('queueUploads()', () => {
 
   const file = () => ({
     slice: () => ({
-      text: async () => fileText
+      text: async () => fileText,
     }),
-    type: fileType
+    type: fileType,
   })
 
   const fileOptions = () => [
     {
-      file: file()
-    }
+      file: file(),
+    },
   ]
 
   beforeEach(() => {
     FileOptionsCollection.setState({
-      resolvedNames: fileOptions()
+      resolvedNames: fileOptions(),
     })
 
     FileOptionsCollection.applyCategory = jest.fn(() => Promise.resolve([]))

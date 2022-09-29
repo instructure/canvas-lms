@@ -104,5 +104,5 @@ export default {
     }
 
     return this.setState({selectedItems}, () => (typeof cb === 'function' ? cb() : undefined))
-  }
+  },
 }

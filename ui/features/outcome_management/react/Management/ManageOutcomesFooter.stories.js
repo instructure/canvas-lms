@@ -27,8 +27,8 @@ export default {
     selectedCount: 1,
     onRemoveHandler: () => {},
     onMoveHandler: () => {},
-    onClearHandler: () => {}
-  }
+    onClearHandler: () => {},
+  },
 }
 
 const Template = args => <ManageOutcomesFooter {...args} />

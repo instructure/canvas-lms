@@ -34,7 +34,7 @@ export default function GroupsTray({groups, hasLoaded}) {
         {I18n.t('Groups')}
       </Heading>
       <hr role="presentation" />
-      <List isUnstyled margin="small 0" itemSpacing="small">
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           groups
             .map(group => (
@@ -52,7 +52,7 @@ export default function GroupsTray({groups, hasLoaded}) {
                 <Link isWithinText={false} href="/groups">
                   {I18n.t('All Groups')}
                 </Link>
-              </List.Item>
+              </List.Item>,
             ])
         ) : (
           <List.Item>
@@ -68,12 +68,12 @@ GroupsTray.propTypes = {
   groups: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
-  hasLoaded: bool.isRequired
+  hasLoaded: bool.isRequired,
 }
 
 GroupsTray.defaultProps = {
-  groups: []
+  groups: [],
 }

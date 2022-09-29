@@ -20,17 +20,17 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, formErrors */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* showIf, disableIf */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, formErrors */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* showIf, disableIf */
 import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('sis_import')
 
-$(document).ready(function(event) {
+$(document).ready(function (event) {
   let state = 'nothing'
 
   $('#batch_mode')
-    .change(function(event) {
+    .change(function (event) {
       $('#batch_mode_term_id_label').showIf($(this).attr('checked'))
       $('#batch_mode_term_id').showIf($(this).attr('checked'))
     })
@@ -88,7 +88,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.accounts', 'Accounts: %{account_count}', {
-          account_count: batch.data.counts.accounts
+          account_count: batch.data.counts.accounts,
         })
       ) +
       '</li>'
@@ -102,7 +102,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.courses', 'Courses: %{course_count}', {
-          course_count: batch.data.counts.courses
+          course_count: batch.data.counts.courses,
         })
       ) +
       '</li>'
@@ -110,7 +110,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.sections', 'Sections: %{section_count}', {
-          section_count: batch.data.counts.sections
+          section_count: batch.data.counts.sections,
         })
       ) +
       '</li>'
@@ -124,7 +124,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.logins', 'Logins: %{login_count}', {
-          login_count: batch.data.counts.logins
+          login_count: batch.data.counts.logins,
         })
       ) +
       '</li>'
@@ -132,7 +132,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.enrollments', 'Enrollments: %{enrollment_count}', {
-          enrollment_count: batch.data.counts.enrollments
+          enrollment_count: batch.data.counts.enrollments,
         })
       ) +
       '</li>'
@@ -140,7 +140,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.crosslists', 'Crosslists: %{crosslist_count}', {
-          crosslist_count: batch.data.counts.xlists
+          crosslist_count: batch.data.counts.xlists,
         })
       ) +
       '</li>'
@@ -148,7 +148,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.admins', 'Admins: %{admin_count}', {
-          admin_count: batch.data.counts.admins
+          admin_count: batch.data.counts.admins,
         })
       ) +
       '</li>'
@@ -156,7 +156,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.group_categories', 'Group Categories: %{group_categories_count}', {
-          group_categories_count: batch.data.counts.group_categories
+          group_categories_count: batch.data.counts.group_categories,
         })
       ) +
       '</li>'
@@ -164,7 +164,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.groups', 'Groups: %{group_count}', {
-          group_count: batch.data.counts.groups
+          group_count: batch.data.counts.groups,
         })
       ) +
       '</li>'
@@ -172,7 +172,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.group_enrollments', 'Group Enrollments: %{group_enrollments_count}', {
-          group_enrollments_count: batch.data.counts.group_memberships
+          group_enrollments_count: batch.data.counts.group_memberships,
         })
       ) +
       '</li>'
@@ -180,7 +180,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.user_observers', 'User Observers: %{user_observers_count}', {
-          user_observers_count: batch.data.counts.user_observers
+          user_observers_count: batch.data.counts.user_observers,
         })
       ) +
       '</li>'
@@ -188,7 +188,7 @@ $(document).ready(function(event) {
       '<li>' +
       htmlEscape(
         I18n.t('import_counts.change_sis_ids', 'Change SIS IDs: %{change_sis_ids_count}', {
-          change_sis_ids_count: batch.data.counts.change_sis_ids
+          change_sis_ids_count: batch.data.counts.change_sis_ids,
         })
       ) +
       '</li>'
@@ -211,7 +211,7 @@ $(document).ready(function(event) {
     $('.copy_progress').progressbar()
     state = 'nothing'
     let fakeTickCount = 0
-    var tick = function() {
+    var tick = function () {
       if (state == 'nothing') {
         fakeTickCount++
         const progress = ($('.copy_progress').progressbar('option', 'value') || 0) + 0.25
@@ -225,7 +225,7 @@ $(document).ready(function(event) {
         setTimeout(tick, 10000)
       }
     }
-    var checkup = function() {
+    var checkup = function () {
       let lastProgress = null
       let waitTime = 1500
       $.ajaxJSON(
@@ -288,9 +288,7 @@ $(document).ready(function(event) {
             )
             message += createMessageHtml(sis_batch)
             message += createCountsHtml(sis_batch)
-            $('.sis_messages')
-              .show()
-              .html($.raw(message))
+            $('.sis_messages').show().html($.raw(message))
           } else {
             if (progress == lastProgress) {
               waitTime = Math.max(waitTime + 500, 30000)
@@ -330,7 +328,7 @@ $(document).ready(function(event) {
         .attr('disabled', false)
         .text(I18n.t('buttons.process_data', 'Process Data'))
       $(this).formErrors(data)
-    }
+    },
   })
 
   function check_if_importing() {

@@ -69,5 +69,5 @@ export const DiscussionTopicsPost = props => {
 }
 
 DiscussionTopicsPost.propTypes = {
-  discussionTopicId: PropTypes.string
+  discussionTopicId: PropTypes.string,
 }

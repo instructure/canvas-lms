@@ -28,13 +28,13 @@ describe('canvas_quizzes/events/views/question_inspector/answers/essay', () => {
   })
 
   it('toggles between views', () => {
-    const { getByText } = render(<Essay answer="<span id='custom-el'>yea!</span>" />)
+    const {getByText} = render(<Essay answer="<span id='custom-el'>yea!</span>" />)
 
     assertChange({
       fn: () => fireEvent.click(getByText('View HTML')),
       of: () => !!document.getElementById('custom-el'),
       from: false,
-      to: true
+      to: true,
     })
   })
 })

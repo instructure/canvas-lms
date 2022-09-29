@@ -37,7 +37,7 @@ function SpeedGraderLink(props) {
   const className = props.className ? `icon-speed-grader ${props.className}` : 'icon-speed-grader'
   let anchorProps = {
     className,
-    href: props.href
+    href: props.href,
   }
 
   if (props.disabled) {
@@ -49,7 +49,7 @@ function SpeedGraderLink(props) {
         event.preventDefault()
       },
       role: 'button',
-      style: {opacity: 0.5}
+      style: {opacity: 0.5},
     }
   }
 
@@ -66,7 +66,7 @@ SpeedGraderLink.propTypes = {
   className: string,
   disabled: bool.isRequired,
   href: string.isRequired,
-  disabledTip: string
+  disabledTip: string,
 }
 
 export default SpeedGraderLink

@@ -24,7 +24,7 @@ describe('isValidDeepLinkingEvent', () => {
   beforeEach(() => {
     event = {
       data: {subject: 'LtiDeepLinkingResponse', placement: 'not_editor_button'},
-      origin: 'canvas.instructure.com'
+      origin: 'canvas.instructure.com',
     }
     env = {DEEP_LINKING_POST_MESSAGE_ORIGIN: 'canvas.instructure.com'}
     parameters = [event, env]
@@ -73,7 +73,7 @@ describe('isValidDeepLinkingEvent', () => {
     beforeEach(() => {
       event = {
         data: {subject: 'LtiDeepLinkingResponse', placement: 'editor_button'},
-        origin: 'canvas.instructure.com'
+        origin: 'canvas.instructure.com',
       }
       parameters = [event, env]
     })
@@ -89,14 +89,14 @@ describe('handleDeepLinking', () => {
     {
       type: 'link',
       title: 'title',
-      url: 'http://www.tool.com'
-    }
+      url: 'http://www.tool.com',
+    },
   ]
 
   const event = overrides => ({
     origin: 'http://www.test.com',
     data: {subject: 'LtiDeepLinkingResponse', content_items},
-    ...overrides
+    ...overrides,
   })
 
   let env
@@ -105,7 +105,7 @@ describe('handleDeepLinking', () => {
     env = window.ENV
 
     window.ENV = {
-      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com'
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com',
     }
   })
 
@@ -123,7 +123,7 @@ describe('handleDeepLinking', () => {
 
   describe('when the event is invalid', () => {
     const overrides = {
-      origin: 'http://bad.origin.com'
+      origin: 'http://bad.origin.com',
     }
 
     it('does not pass event to callback', async () => {

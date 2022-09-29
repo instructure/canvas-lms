@@ -28,7 +28,7 @@ const I18n = useI18nScope('content_share_preview_overlay')
 PreviewModal.propTypes = {
   open: bool,
   share: contentShareShape,
-  onDismiss: func
+  onDismiss: func,
 }
 
 export default function PreviewModal({open, share, onDismiss}) {

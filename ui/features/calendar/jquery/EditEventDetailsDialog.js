@@ -37,7 +37,7 @@ const dialog = $('<div id="edit_event"><div /></div>')
     autoOpen: false,
     width: 'auto',
     resizable: false,
-    title: I18n.t('titles.edit_event', 'Edit Event')
+    title: I18n.t('titles.edit_event', 'Edit Event'),
   })
 
 export default class EditEventDetailsDialog {
@@ -205,7 +205,7 @@ export default class EditEventDetailsDialog {
       if (this.event.isNewEvent() && this.canManageAppointments()) {
         const group = {
           context_codes: [],
-          sub_context_codes: []
+          sub_context_codes: [],
         }
         this.appointmentGroupDetailsForm = new EditAppointmentGroupDetails(
           $('#edit_appointment_group_form_holder'),

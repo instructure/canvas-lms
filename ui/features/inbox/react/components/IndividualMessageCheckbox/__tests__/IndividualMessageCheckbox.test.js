@@ -23,7 +23,7 @@ import {responsiveQuerySizes} from '../../../../util/utils'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 const setup = props => {
@@ -41,13 +41,13 @@ describe('Button', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      mobile: {maxWidth: '750px'}
+      mobile: {maxWidth: '750px'},
     }))
   })
 
@@ -59,7 +59,7 @@ describe('Button', () => {
   it('should call onChange when typing occurs', () => {
     const onChangeMock = jest.fn()
     const {individualCheckbox} = setup({
-      onChange: onChangeMock
+      onChange: onChangeMock,
     })
     fireEvent.click(individualCheckbox)
     expect(onChangeMock.mock.calls.length).toBe(1)
@@ -67,7 +67,7 @@ describe('Button', () => {
 
   it('should show checkbox as checked when prop is present', () => {
     const {individualCheckbox} = setup({
-      checked: true
+      checked: true,
     })
     expect(individualCheckbox.checked).toBe(true)
   })
@@ -81,7 +81,7 @@ describe('Button', () => {
     describe('Mobile', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'}
+          mobile: {maxWidth: '67'},
         }))
       })
 
@@ -95,7 +95,7 @@ describe('Button', () => {
     describe('Desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {minWidth: '768'}
+          desktop: {minWidth: '768'},
         }))
       })
 

@@ -30,7 +30,7 @@ export default function parseNumber(s) {
 
   const num = parseDecimalNumber(s, {
     thousands: I18n.lookup('number.format.delimiter'),
-    decimal: I18n.lookup('number.format.separator')
+    decimal: I18n.lookup('number.format.separator'),
   })
 
   // fallback to default delimiters if invalid with locale specific ones

@@ -43,7 +43,7 @@ QUnit.module('include ungraded assignments setting:false', {
 
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 // unskip in EVAL-2505
@@ -58,7 +58,7 @@ QUnit.module('include ungraded assignments setting:true', {
 
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 // unskip in EVAL-2505

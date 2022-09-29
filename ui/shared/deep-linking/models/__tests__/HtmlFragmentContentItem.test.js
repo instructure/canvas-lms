@@ -22,7 +22,7 @@ const json = {
   title: 'Title',
   text: 'some text',
   invalidProp: 'banana',
-  html: '<a href="test.com">link</a><p><strong>bold</strong></p>'
+  html: '<a href="test.com">link</a><p><strong>bold</strong></p>',
 }
 
 const htmlContentItem = overrides => {

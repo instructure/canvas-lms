@@ -44,12 +44,12 @@ export default class GenericErrorPage extends React.Component {
     errorSubject: string,
     errorCategory: string,
     imageUrl: string.isRequired,
-    stack: string
+    stack: string,
   }
 
   static defaultProps = {
     errorSubject: 'No Error Subject',
-    errorCategory: 'No Error Category'
+    errorCategory: 'No Error Category',
   }
 
   state = {
@@ -58,7 +58,7 @@ export default class GenericErrorPage extends React.Component {
     commentPostError: false,
     submitLoading: false,
     email: '',
-    textAreaComment: ''
+    textAreaComment: '',
   }
 
   handleOpenCommentBox = () => {
@@ -84,14 +84,14 @@ export default class GenericErrorPage extends React.Component {
         url: window.location.href,
         comments: this.state.textAreaComment,
         email: this.state.email,
-        backtrace: this.props.stack
-      }
+        backtrace: this.props.stack,
+      },
     }
     this.setState({submitLoading: true, showingCommentBox: false})
     try {
       // Returns json of {logged: boolean, id: string}
       const request = await axios.post('/error_reports', postData, {
-        headers: {'content-type': 'application/json'}
+        headers: {'content-type': 'application/json'},
       })
       const logObject = request.data
       if (logObject.logged) {

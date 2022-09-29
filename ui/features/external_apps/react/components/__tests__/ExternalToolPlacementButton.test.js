@@ -27,7 +27,7 @@ jest.mock('../ExternalToolPlacementList', () => ({tool}) => <div>{Object.keys(to
 describe('ExternalToolPlacementButton', () => {
   const tool = {
     name: 'test',
-    app_type: 'ContextExternalTool'
+    app_type: 'ContextExternalTool',
   }
 
   const renderComponent = (overrides = {}) => {

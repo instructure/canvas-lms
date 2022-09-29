@@ -37,7 +37,7 @@ const OutcomeMoveModal = ({
   onCloseHandler,
   onCleanupHandler,
   onSuccess,
-  initialTargetGroup
+  initialTargetGroup,
 }) => {
   const [targetGroup, setTargetGroup] = useState(initialTargetGroup)
   const [targetAncestorsIds, setTargetAncestorsIds] = useState([])
@@ -54,9 +54,9 @@ const OutcomeMoveModal = ({
           variables: {
             input: {
               groupId: targetGroup.id,
-              outcomeLinkIds: Object.keys(outcomes)
-            }
-          }
+              outcomeLinkIds: Object.keys(outcomes),
+            },
+          },
         })
         const movedLinks = result.data?.moveOutcomeLinks?.movedOutcomeLinks
         const errorMessage = result.data?.moveOutcomeLinks?.errors?.[0]?.message
@@ -66,35 +66,35 @@ const OutcomeMoveModal = ({
         onSuccess({
           movedOutcomeLinkIds: movedLinks.map(ct => ct._id),
           groupId: targetGroup.id,
-          targetAncestorsIds
+          targetAncestorsIds,
         })
 
         showFlashAlert({
           message: I18n.t(
             {
               one: '"%{outcomeTitle}" has been moved to "%{newGroupTitle}".',
-              other: '%{count} outcomes have been moved to "%{newGroupTitle}".'
+              other: '%{count} outcomes have been moved to "%{newGroupTitle}".',
             },
             {
               newGroupTitle: targetGroup.name,
               outcomeTitle,
-              count
+              count,
             }
           ),
-          type: 'success'
+          type: 'success',
         })
       } catch (err) {
         showFlashAlert({
           message: I18n.t(
             {
               one: 'An error occurred while moving this outcome. Please try again.',
-              other: 'An error occurred while moving these outcomes. Please try again.'
+              other: 'An error occurred while moving these outcomes. Please try again.',
             },
             {
-              count
+              count,
             }
           ),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -106,18 +106,18 @@ const OutcomeMoveModal = ({
       label={I18n.t(
         {
           one: 'Move "%{outcomeTitle}"?',
-          other: 'Move %{count} Outcomes?'
+          other: 'Move %{count} Outcomes?',
         },
         {
           outcomeTitle,
-          count
+          count,
         }
       )}
       size="medium"
       overflow="scroll"
       open={isOpen}
       onDismiss={onCloseHandler}
-      shouldReturnFocus
+      shouldReturnFocus={true}
       shouldCloseOnDocumentClick={false}
     >
       <Modal.Body>
@@ -126,10 +126,10 @@ const OutcomeMoveModal = ({
             {I18n.t(
               {
                 one: 'Where would you like to move this outcome?',
-                other: 'Where would you like to move these outcomes?'
+                other: 'Where would you like to move these outcomes?',
               },
               {
-                count
+                count,
               }
             )}
           </Text>
@@ -169,13 +169,13 @@ OutcomeMoveModal.propTypes = {
   onCleanupHandler: PropTypes.func.isRequired,
   initialTargetGroup: PropTypes.shape({
     id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired
+    name: PropTypes.string.isRequired,
   }).isRequired,
-  onSuccess: PropTypes.func
+  onSuccess: PropTypes.func,
 }
 
 OutcomeMoveModal.defaultProps = {
-  onSuccess: () => {}
+  onSuccess: () => {},
 }
 
 export default OutcomeMoveModal

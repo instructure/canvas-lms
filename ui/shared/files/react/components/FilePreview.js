@@ -45,12 +45,12 @@ export default class FilePreview extends React.PureComponent {
     isOpen: PropTypes.bool,
     closePreview: PropTypes.func,
     splat: PropTypes.string,
-    usageRightsRequiredForContext: PropTypes.bool
+    usageRightsRequiredForContext: PropTypes.bool,
   }
 
   state = {
     showInfoPanel: false,
-    displayedItem: null
+    displayedItem: null,
   }
 
   componentWillMount() {
@@ -90,7 +90,7 @@ export default class FilePreview extends React.PureComponent {
       search_term: this.props.query.search_term || undefined,
       only_preview: this.props.query.only_preview || undefined,
       sort: this.props.query.sort || undefined,
-      order: this.props.query.order || undefined
+      order: this.props.query.order || undefined,
     }
 
     _.each(obj, (v, k) => {
@@ -148,7 +148,7 @@ export default class FilePreview extends React.PureComponent {
     const newState = {}
     newState[key] = !this.state[key]
     return () => {
-      this.setState(newState, function() {
+      this.setState(newState, function () {
         if (key === 'showInfoPanel' && this.state.showInfoPanel) {
           $.screenReaderFlashMessage(I18n.t('Info panel displayed'))
         } else {
@@ -188,7 +188,7 @@ export default class FilePreview extends React.PureComponent {
   stateProperties = items => ({
     initialItem: items.initialItem,
     displayedItem: items.initialItem,
-    otherItems: items.otherItems
+    otherItems: items.otherItems,
   })
 
   renderArrowLink = direction => {
@@ -226,12 +226,12 @@ export default class FilePreview extends React.PureComponent {
       const iFrameClasses = classnames({
         'ef-file-preview-frame': true,
         'ef-file-preview-frame-html': html,
-        'attachment-html-iframe': html
+        'attachment-html-iframe': html,
       })
 
       return (
         <iframe
-          allowFullScreen
+          allowFullScreen={true}
           title={I18n.t('File Preview')}
           src={this.state.displayedItem.get('preview_url')}
           className={iFrameClasses}
@@ -251,7 +251,7 @@ export default class FilePreview extends React.PureComponent {
     const showInfoPanelClasses = classnames({
       'ef-file-preview-header-info': true,
       'ef-file-preview-button': true,
-      'ef-file-preview-button--active': this.state.showInfoPanel
+      'ef-file-preview-button--active': this.state.showInfoPanel,
     })
 
     return (
@@ -262,9 +262,9 @@ export default class FilePreview extends React.PureComponent {
         onKeyDown={this.handleKeyboardNavigation}
         label={I18n.t('File Preview Overlay')}
         defaultFocusElement={() => this.closeButton}
-        shouldContainFocus
-        shouldReturnFocus
-        unmountOnExit
+        shouldContainFocus={true}
+        shouldReturnFocus={true}
+        unmountOnExit={true}
       >
         <Mask theme={{background: 'rgba(0, 0, 0, 0.75)'}}>
           <div className="ef-file-preview-overlay">
@@ -276,7 +276,7 @@ export default class FilePreview extends React.PureComponent {
                 {this.state.displayedItem && !this.state.displayedItem.get('locked_for_user') && (
                   <a
                     href={this.state.displayedItem.get('url')}
-                    download
+                    download={true}
                     className="ef-file-preview-header-download ef-file-preview-button"
                   >
                     <i className="icon-download" />

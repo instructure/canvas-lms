@@ -28,13 +28,13 @@ export const Error = {
 
   shape: shape({
     attribute: string,
-    message: string.isRequired
-  })
+    message: string.isRequired,
+  }),
 }
 
 export const DefaultMocks = {
   ValidationError: () => ({
     attribute: null,
-    message: ''
-  })
+    message: '',
+  }),
 }

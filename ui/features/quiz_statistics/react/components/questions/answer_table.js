@@ -34,14 +34,14 @@ class AnswerRow extends React.Component {
       special: PropTypes.bool,
       count: PropTypes.number,
       answer: PropTypes.shape({
-        ratio: PropTypes.number
-      })
+        ratio: PropTypes.number,
+      }),
     }).isRequired,
-    globalSettings: PropTypes.object.isRequired
+    globalSettings: PropTypes.object.isRequired,
   }
 
   state = {
-    neverLoaded: true
+    neverLoaded: true,
   }
 
   dialogBuilder(answer) {
@@ -55,16 +55,16 @@ class AnswerRow extends React.Component {
           />
         </div>
       )
-    }
-    else if (answer.responses > 0) {
+    } else if (answer.responses > 0) {
       return (
         <div>
-          {
-            I18n.t({
+          {I18n.t(
+            {
               one: '1 respondent',
               other: '%{count} respondents',
-            }, { count: answer.responses })
-          }
+            },
+            {count: answer.responses}
+          )}
         </div>
       )
     }
@@ -122,7 +122,7 @@ class AnswerRow extends React.Component {
     }
     return {
       width,
-      height: this.props.globalSettings.barHeight - 2 + 'px'
+      height: this.props.globalSettings.barHeight - 2 + 'px',
     }
   }
 
@@ -157,7 +157,7 @@ class AnswerRow extends React.Component {
         </td>
         <td
           className="answer-distribution-cell"
-          aria-hidden
+          aria-hidden={true}
           style={{width: this.props.globalSettings.maxWidth}}
         >
           {this.renderBarPlot()}
@@ -201,23 +201,20 @@ class AnswerTable extends React.Component {
 
     maxWidth: 150,
 
-    useAnswerBuckets: false
+    useAnswerBuckets: false,
   }
 
   render() {
     const data = this.buildParams(this.props.answers)
     const highest = d3.max(data.map(x => x.count))
-    const xScale = d3.scale
-      .linear()
-      .domain([highest, 0])
-      .range([this.props.maxWidth, 0])
+    const xScale = d3.scale.linear().domain([highest, 0]).range([this.props.maxWidth, 0])
     const visibilityThreshold = Math.max(this.props.visibilityThreshold, xScale(highest) / 100.0)
     const globalParams = {
       xScale,
       visibilityThreshold,
       maxWidth: this.props.maxWidth,
       barHeight: this.props.barHeight,
-      useAnswerBuckets: this.props.useAnswerBuckets
+      useAnswerBuckets: this.props.useAnswerBuckets,
     }
 
     return (
@@ -241,7 +238,7 @@ class AnswerTable extends React.Component {
           <th scope="col">{firstColumnLabel}</th>
           <th scope="col">{I18n.t('Number of Respondents')}</th>
           <th scope="col">{I18n.t('Percent of respondents selecting this answer')}</th>
-          <th scope="col" aria-hidden>
+          <th scope="col" aria-hidden={true}>
             {I18n.t('Answer Distribution')}
           </th>
         </tr>
@@ -250,19 +247,19 @@ class AnswerTable extends React.Component {
   }
 
   renderTableRows(data, globalParams) {
-    return data.map(function(datum) {
+    return data.map(function (datum) {
       return <AnswerRow key={datum.id} datum={datum} globalSettings={globalParams} />
     })
   }
 
   buildParams(answers) {
-    return answers.map(function(answer) {
+    return answers.map(function (answer) {
       return {
         id: '' + answer.id,
         count: answer.responses,
         correct: answer.correct || answer.full_credit,
         special: SPECIAL_DATUM_IDS.indexOf(answer.id) > -1,
-        answer
+        answer,
       }
     })
   }

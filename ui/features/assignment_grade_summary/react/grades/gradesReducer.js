@@ -25,7 +25,7 @@ import {
   SET_SELECT_PROVISIONAL_GRADE_STATUS,
   SET_UPDATE_GRADE_STATUS,
   SUCCESS,
-  UPDATE_GRADE
+  UPDATE_GRADE,
 } from './GradeActions'
 
 function addProvisionalGrades(state, grades) {
@@ -113,7 +113,7 @@ function updateBulkSelectionDetails(state) {
   graders.forEach(({graderId}) => {
     bulkSelectionDetails[graderId] = {
       allowed: true,
-      provisionalGradeIds: []
+      provisionalGradeIds: [],
     }
   })
 
@@ -125,7 +125,7 @@ function updateBulkSelectionDetails(state) {
       graderIds.forEach(graderId => {
         bulkSelectionDetails[graderId] = {
           allowed: false,
-          provisionalGradeIds: []
+          provisionalGradeIds: [],
         }
       })
     } else if (!Object.values(studentGradesMap).some(grade => grade.selected)) {
@@ -147,7 +147,11 @@ const handlers = {}
 handlers[ADD_PROVISIONAL_GRADES] = (currentState, {payload}) =>
   pipeState(
     currentState,
-    state => addProvisionalGrades(state, payload.provisionalGrades.filter(pg => pg.grade !== null)),
+    state =>
+      addProvisionalGrades(
+        state,
+        payload.provisionalGrades.filter(pg => pg.grade !== null)
+      ),
     state => updateBulkSelectionDetails(state)
   )
 
@@ -182,6 +186,6 @@ export default buildReducer(handlers, {
     bulkSelectionDetails: {},
     provisionalGrades: {},
     selectProvisionalGradeStatuses: {},
-    updateGradeStatuses: []
-  }
+    updateGradeStatuses: [],
+  },
 })

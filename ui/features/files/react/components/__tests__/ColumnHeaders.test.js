@@ -28,7 +28,7 @@ const defaultProps = newProps => {
     pathname: '/',
     query: {},
     toggleAllSelected: () => {},
-    usageRightsRequiredForContext: false
+    usageRightsRequiredForContext: false,
   }
   return {...originalProps, ...newProps}
 }
@@ -40,7 +40,7 @@ describe('ColumnHeaders', () => {
   it('correctly assigns the appropriate hrefs', () => {
     const props = {
       query: {sort: 'something', order: 'asc'},
-      pathname: '/some/path/to/files'
+      pathname: '/some/path/to/files',
     }
     const {getByRole} = renderComponent(props)
     const nameLink = getByRole('link', {name: /Name/})

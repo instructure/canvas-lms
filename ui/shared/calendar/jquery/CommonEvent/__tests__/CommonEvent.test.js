@@ -28,18 +28,18 @@ describe('isCompleted()', () => {
       data = {
         context_code: 'course_1',
         plannable_type: 'wiki_page',
-        plannable: {url: 'some_title', title: 'some title', todo_date: '2016-12-01T12:30:00Z'}
+        plannable: {url: 'some_title', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
       }
 
       contexts = [
-        {asset_string: 'course_1', can_update_wiki_page: false, can_update_todo_date: false}
+        {asset_string: 'course_1', can_update_wiki_page: false, can_update_todo_date: false},
       ]
     })
 
     describe('and the item is marked complete', () => {
       beforeEach(() => {
         data.planner_override = {
-          marked_complete: true
+          marked_complete: true,
         }
       })
 
@@ -51,7 +51,7 @@ describe('isCompleted()', () => {
     describe('and the item is not marked complete', () => {
       beforeEach(() => {
         data.planner_override = {
-          marked_complete: false
+          marked_complete: false,
         }
       })
 

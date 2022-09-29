@@ -39,7 +39,7 @@ class SelectMenuGroup extends React.Component {
         id: PropTypes.string.isRequired,
         nickname: PropTypes.string.isRequired,
         url: PropTypes.string.isRequired,
-        gradingPeriodSetId: PropTypes.string
+        gradingPeriodSetId: PropTypes.string,
       })
     ).isRequired,
     currentUserID: PropTypes.string.isRequired,
@@ -48,7 +48,7 @@ class SelectMenuGroup extends React.Component {
     gradingPeriods: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-        title: PropTypes.string.isRequired
+        title: PropTypes.string.isRequired,
       })
     ).isRequired,
     saveAssignmentOrder: PropTypes.func.isRequired,
@@ -59,15 +59,15 @@ class SelectMenuGroup extends React.Component {
     students: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired
+        name: PropTypes.string.isRequired,
       })
     ).isRequired,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
   }
 
   static defaultProps = {
     selectedGradingPeriodID: null,
-    breakpoints: {}
+    breakpoints: {},
   }
 
   constructor(props) {
@@ -83,7 +83,7 @@ class SelectMenuGroup extends React.Component {
       courseID: props.selectedCourseID,
       gradingPeriodID: props.selectedGradingPeriodID,
       processing: false,
-      studentID: props.selectedStudentID
+      studentID: props.selectedStudentID,
     }
   }
 
@@ -116,7 +116,7 @@ class SelectMenuGroup extends React.Component {
       assignmentSortOrder: 'selectedAssignmentSortOrder',
       courseID: 'selectedCourseID',
       gradingPeriodID: 'selectedGradingPeriodID',
-      studentID: 'selectedStudentID'
+      studentID: 'selectedStudentID',
     }
 
     return states.some(state => this.state[state] !== this.props[stateToProps[state]])
@@ -131,14 +131,14 @@ class SelectMenuGroup extends React.Component {
       'courseID',
       'studentID',
       'gradingPeriodID',
-      'assignmentSortOrder'
+      'assignmentSortOrder',
     ])
   }
 
   reloadPage = () => {
     const {
       state: {courseID: currentlySelectedCourseId},
-      props: {selectedCourseID: initialCourseId}
+      props: {selectedCourseID: initialCourseId},
     } = this
     const initialCourse = this.props.courses.find(course => course.id === initialCourseId)
     const selectedCourse = this.props.courses.find(
@@ -204,7 +204,7 @@ class SelectMenuGroup extends React.Component {
               disabled={this.anySelectMenuChanged([
                 'studentID',
                 'gradingPeriodID',
-                'assignmentSortOrder'
+                'assignmentSortOrder',
               ])}
               id="course_select_menu"
               label={I18n.t('Course')}

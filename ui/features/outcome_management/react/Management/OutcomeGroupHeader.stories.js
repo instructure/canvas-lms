@@ -24,8 +24,8 @@ export default {
   component: OutcomeGroupHeader,
   args: {
     minWidth: 'auto',
-    canManage: true
-  }
+    canManage: true,
+  },
 }
 
 const Template = args => <OutcomeGroupHeader {...args} />
@@ -33,16 +33,16 @@ const Template = args => <OutcomeGroupHeader {...args} />
 export const Default = Template.bind({})
 Default.args = {
   title: 'Outcome Group Header',
-  description: 'Outcome Group Description'
+  description: 'Outcome Group Description',
 }
 
 export const reallyLongDescription = Template.bind({})
 reallyLongDescription.args = {
   title: 'Outcome Group With a Very Very Very Long Description',
-  description: 'Outcome Group Description '.repeat(100)
+  description: 'Outcome Group Description '.repeat(100),
 }
 
 export const notManageable = Template.bind({})
 notManageable.args = {
-  canManage: false
+  canManage: false,
 }

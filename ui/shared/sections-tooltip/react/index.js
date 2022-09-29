@@ -50,7 +50,7 @@ export default function SectionsTooltip({sections, totalUserCount, prefix, textC
     sectionsCountText = I18n.t(
       {
         one: '1 Section',
-        other: '%{count} Sections'
+        other: '%{count} Sections',
       },
       {count: sections ? sections.length : 0}
     )
@@ -82,10 +82,10 @@ SectionsTooltip.propTypes = {
   totalUserCount: sectionsOrTotalCount,
   sections: sectionsOrTotalCount,
   prefix: string,
-  textColor: string
+  textColor: string,
 }
 
 SectionsTooltip.defaultProps = {
   sections: null,
-  totalUserCount: 0
+  totalUserCount: 0,
 }

@@ -55,5 +55,5 @@ export default {
       window.MSBlobBuilder
     if (typeof window.BlobBuilder === 'undefined') return null
     return new window.BlobBuilder()
-  }
+  },
 }

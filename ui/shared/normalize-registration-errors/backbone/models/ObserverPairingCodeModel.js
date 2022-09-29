@@ -27,6 +27,6 @@ export default class ObserverPairingCode extends Backbone.Model {}
 // with how coffeescript classes were expecting things to work
 ObserverPairingCode.prototype.errorMap = {
   code: {
-    invalid: I18n.t('errors.invalid', 'Invalid pairing code')
-  }
+    invalid: I18n.t('errors.invalid', 'Invalid pairing code'),
+  },
 }

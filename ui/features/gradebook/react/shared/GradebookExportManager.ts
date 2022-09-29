@@ -231,7 +231,7 @@ class GradebookExportManager {
       this.export = {
         progressId,
         attachmentId,
-        filename
+        filename,
       }
 
       this.setExportState(0, filename)

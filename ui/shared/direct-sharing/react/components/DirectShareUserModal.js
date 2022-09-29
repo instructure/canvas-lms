@@ -35,9 +35,9 @@ const DirectShareUserPanel = lazy(() => import('./DirectShareUserPanel'))
 DirectShareUserModal.propTypes = {
   contentShare: shape({
     content_id: string,
-    content_type: oneOf(CONTENT_SHARE_TYPES)
+    content_type: oneOf(CONTENT_SHARE_TYPES),
   }),
-  courseId: string
+  courseId: string,
 }
 
 export default function DirectShareUserModal({contentShare, courseId, ...modalProps}) {
@@ -66,8 +66,8 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
       path: '/api/v1/users/self/content_shares',
       body: {
         ...contentShare,
-        receiver_ids: selectedUsers.map(user => user.id)
-      }
+        receiver_ids: selectedUsers.map(user => user.id),
+      },
     })
   }
 
@@ -122,7 +122,7 @@ export default function DirectShareUserModal({contentShare, courseId, ...modalPr
 
   const alert = alertMessage ? (
     <Alert variant={postStatus}>
-      <div role="alert" aria-live="assertive" aria-atomic>
+      <div role="alert" aria-live="assertive" aria-atomic={true}>
         {alertMessage}
       </div>
       {postStatus === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}

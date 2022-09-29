@@ -29,12 +29,12 @@ import {responsiveQuerySizes} from '../../../../util/utils'
 import {render, fireEvent, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 import {
   ConversationContext,
-  CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE
+  CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE,
 } from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 describe('MessageDetailContainer', () => {
   const server = mswServer(handlers)
@@ -49,12 +49,12 @@ describe('MessageDetailContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -78,7 +78,7 @@ describe('MessageDetailContainer', () => {
     onReadStateChange = jest.fn(),
     setOnSuccess = jest.fn(),
     setCanReply = jest.fn(),
-    overrideProps = {}
+    overrideProps = {},
   } = {}) =>
     render(
       <ApolloProvider client={mswClient}>
@@ -110,7 +110,7 @@ describe('MessageDetailContainer', () => {
 
       it('should not render the reply or reply_all option in header if student lacks permission', async () => {
         const container = setup({
-          conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})}
+          conversation: {...Conversation.mock({_id: CONVERSATION_ID_WHERE_CAN_REPLY_IS_FALSE})},
         })
         await waitForElementToBeRemoved(() => container.queryByTestId('conversation-loader'))
 
@@ -185,9 +185,9 @@ describe('MessageDetailContainer', () => {
         const container = setup({
           conversation: {
             ...Conversation.mock(),
-            workflowState: 'unread'
+            workflowState: 'unread',
           },
-          onReadStateChange: mockReadStateChange
+          onReadStateChange: mockReadStateChange,
         })
         // wait for query to load
         await container.findAllByTestId('message-more-options')
@@ -204,7 +204,7 @@ describe('MessageDetailContainer', () => {
       it('should render', () => {
         const container = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment
+          conversation: mockSubmissionComment,
         })
         expect(container).toBeTruthy()
       })
@@ -212,7 +212,7 @@ describe('MessageDetailContainer', () => {
       it('should render conversation information correctly', async () => {
         const container = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment
+          conversation: mockSubmissionComment,
         })
         expect(container.getByText('Loading Conversation Messages')).toBeInTheDocument()
         await waitForApolloLoading()
@@ -224,7 +224,7 @@ describe('MessageDetailContainer', () => {
       it('should render with link in title', async () => {
         const container = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment
+          conversation: mockSubmissionComment,
         })
         expect(container).toBeTruthy()
         await waitFor(() =>
@@ -235,7 +235,7 @@ describe('MessageDetailContainer', () => {
       it('should not render reply option', async () => {
         const container = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment
+          conversation: mockSubmissionComment,
         })
         await waitForApolloLoading()
         expect(container.queryByTestId('message-reply')).not.toBeInTheDocument()
@@ -244,7 +244,7 @@ describe('MessageDetailContainer', () => {
       it('should not render more options', async () => {
         const container = setup({
           isSubmissionCommentsType: true,
-          conversation: mockSubmissionComment
+          conversation: mockSubmissionComment,
         })
         await waitForApolloLoading()
         expect(container.queryByTestId('message-more-options')).not.toBeInTheDocument()
@@ -254,7 +254,7 @@ describe('MessageDetailContainer', () => {
         const mockReadStateChange = jest.fn()
         const container = setup({
           conversation: mockSubmissionComment,
-          onReadStateChange: mockReadStateChange
+          onReadStateChange: mockReadStateChange,
         })
         // wait for query to load
         await container.findAllByTestId('message-more-options')

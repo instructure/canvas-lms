@@ -76,7 +76,7 @@ export default class AutocompleteView extends Backbone.View {
       private: I18n.t(
         'cannot_add_to_private',
         'You cannot add participants to a private conversation.'
-      )
+      ),
     }
 
     // Internal: Map of key names to codes.
@@ -85,7 +85,7 @@ export default class AutocompleteView extends Backbone.View {
       13: 'enter',
       27: 'escape',
       38: 'up',
-      40: 'down'
+      40: 'down',
     }
 
     // Internal: Cached DOM element references.
@@ -101,7 +101,7 @@ export default class AutocompleteView extends Backbone.View {
       '.ac-clear': '$clearBtn',
       '.ac-search-btn': '$searchBtn',
       '.ac-results-status': '$resultsStatus',
-      '.ac-selected-name': '$selectedName'
+      '.ac-selected-name': '$selectedName',
     }
 
     // Internal: Event map.
@@ -116,7 +116,7 @@ export default class AutocompleteView extends Backbone.View {
       'input     .ac-input': '_onSearchTermChange',
       'keydown   .ac-input': '_onInputAction',
       'mousedown .ac-result': '_onResultClick',
-      'mouseenter .ac-result-list': '_clearSelectedStyles'
+      'mouseenter .ac-result-list': '_clearSelectedStyles',
     }
 
     this.prototype.modelCache = new Backbone.Collection()
@@ -130,7 +130,7 @@ export default class AutocompleteView extends Backbone.View {
       per_page: 20,
       'permissions[]': 'send_messages_all',
       messageable_only: true,
-      synthetic_contexts: true
+      synthetic_contexts: true,
     }
     if (this.currentContext) params.context = this.currentContext.id
 
@@ -172,7 +172,7 @@ export default class AutocompleteView extends Backbone.View {
       collection: new Backbone.Collection(),
       template: null,
       itemView: Backbone.View.extend({
-        template: resultTemplate
+        template: resultTemplate,
       }),
       itemViewOptions: {
         tagName: 'li',
@@ -186,12 +186,12 @@ export default class AutocompleteView extends Backbone.View {
             'data-id': this.model.id,
             'data-people-count': this.model.get('user_count'),
             'aria-label': this.model.get('name'),
-            id: `result-${$.guid++}` // for aria-activedescendant
+            id: `result-${$.guid++}`, // for aria-activedescendant
           }
           attributes['aria-haspopup'] = this.model.get('isContext')
           return attributes
-        }
-      }
+        },
+      },
     }))
   }
 
@@ -252,7 +252,7 @@ export default class AutocompleteView extends Backbone.View {
       .css({
         fontSize: '14px',
         position: 'absolute',
-        top: '-9999px'
+        top: '-9999px',
       })
       .appendTo('body')
   }
@@ -424,7 +424,7 @@ export default class AutocompleteView extends Backbone.View {
         return map
       },
       {}
-    );
+    )
   }
 
   // Internal: Add, if appropriate, an "All in %{context}" result to the
@@ -458,7 +458,7 @@ export default class AutocompleteView extends Backbone.View {
       id: this.currentContext.id,
       name,
       everyone: true,
-      people: this.currentContext.peopleCount
+      people: this.currentContext.peopleCount,
     }
     return results.unshift(new ConversationSearchResult(tag))
   }
@@ -574,7 +574,7 @@ export default class AutocompleteView extends Backbone.View {
       this.currentContext = {
         id: this.selectedModel.id,
         name: this.selectedModel.get('name'),
-        peopleCount: this.selectedModel.get('user_count')
+        peopleCount: this.selectedModel.get('user_count'),
       }
       return this._fetchResults(true)
     } else {
@@ -664,11 +664,7 @@ export default class AutocompleteView extends Backbone.View {
   // Returns nothing.
   _onRemoveToken(e) {
     e.preventDefault()
-    return this._removeToken(
-      $(e.currentTarget)
-        .siblings('input')
-        .val()
-    )
+    return this._removeToken($(e.currentTarget).siblings('input').val())
   }
 
   // Internal: Handle clicks to the search button.
@@ -745,10 +741,7 @@ export default class AutocompleteView extends Backbone.View {
   // Returns nothing.
   _removeToken(id, silent = false) {
     if (this.disabled) return
-    this.$tokenList
-      .find(`input[value=${id}]`)
-      .parent()
-      .remove()
+    this.$tokenList.find(`input[value=${id}]`).parent().remove()
     this.tokens.splice(_.indexOf(this.tokens, id), 1)
     if (!this.tokens.length) this.$clearBtn.hide()
     if (this.options.single && !this.tokens.length) {

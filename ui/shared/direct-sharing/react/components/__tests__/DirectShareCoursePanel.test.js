@@ -21,7 +21,7 @@ import {render, fireEvent, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import useManagedCourseSearchApi from '../../effects/useManagedCourseSearchApi'
 import useModuleCourseSearchApi, {
-  useCourseModuleItemApi
+  useCourseModuleItemApi,
 } from '../../effects/useModuleCourseSearchApi'
 import DirectShareCoursePanel from '../DirectShareCoursePanel'
 
@@ -46,7 +46,7 @@ describe('DirectShareCoursePanel', () => {
     useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: 'abc', name: 'abc'},
-        {id: 'cde', name: 'cde'}
+        {id: 'cde', name: 'cde'},
       ])
     })
   })
@@ -96,7 +96,7 @@ describe('DirectShareCoursePanel', () => {
   it('starts a copy operation and reports status', async () => {
     fetchMock.postOnce('path:/api/v1/courses/abc/content_migrations', {
       id: '8',
-      workflow_state: 'running'
+      workflow_state: 'running',
     })
     fetchMock.getOnce('path:/api/v1/courses/abc/modules', [])
     const {getByText, getAllByText, getByLabelText, queryByText} = render(
@@ -116,7 +116,7 @@ describe('DirectShareCoursePanel', () => {
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
       migration_type: 'course_copy_importer',
       select: {discussion_topics: ['1123']},
-      settings: {source_course_id: '42'}
+      settings: {source_course_id: '42'},
     })
     expect(getAllByText(/start/i)).not.toHaveLength(0)
     await act(() => fetchMock.flush(true))
@@ -129,7 +129,7 @@ describe('DirectShareCoursePanel', () => {
     useModuleCourseSearchApi.mockImplementationOnce(({success}) => {
       success([
         {id: '1', name: 'Module 1'},
-        {id: '2', name: 'Module 2'}
+        {id: '2', name: 'Module 2'},
       ])
     })
     const {getByText, getByLabelText, queryByText} = render(

@@ -86,7 +86,7 @@ const toggleCourseNav = () => {
   $('body').toggleClass('course-menu-expanded')
   updateSubnavMenuToggle()
   $('#left-side').css({
-    display: $('body').hasClass('course-menu-expanded') ? 'block' : 'none'
+    display: $('body').hasClass('course-menu-expanded') ? 'block' : 'none',
   })
 
   resetMenuItemTabIndexes()

@@ -50,7 +50,7 @@ describe('apiClient', () => {
     it('reloads the window after upload', done => {
       moxios.stubRequest('/api/v1/courses/1', {
         status: 200,
-        response: {}
+        response: {},
       })
       apiClient.publishCourse({courseId: 1})
       moxios.wait(() => {
@@ -63,8 +63,8 @@ describe('apiClient', () => {
       moxios.stubRequest('/api/v1/courses/1', {
         status: 401,
         response: {
-          status: 'unverified'
-        }
+          status: 'unverified',
+        },
       })
       apiClient.publishCourse({courseId: 1})
       moxios.wait(() => {
@@ -78,7 +78,7 @@ describe('apiClient', () => {
 
     it('flashes an error on failure', done => {
       moxios.stubRequest('/api/v1/courses/1', {
-        status: 404
+        status: 404,
       })
       apiClient.publishCourse({courseId: 1})
       moxios.wait(() => {

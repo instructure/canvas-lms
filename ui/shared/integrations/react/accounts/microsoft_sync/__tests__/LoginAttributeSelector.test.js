@@ -46,7 +46,7 @@ describe('LoginAttributeSelector', () => {
 
     expect(
       container.getByRole('button', {
-        name: /login attribute selector/i
+        name: /login attribute selector/i,
       }).value
     ).toMatch(/Unique User ID/i)
   })

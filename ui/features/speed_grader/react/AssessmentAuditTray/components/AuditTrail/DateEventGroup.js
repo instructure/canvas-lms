@@ -36,7 +36,7 @@ function dateString(date) {
 
 export default class DateEventGroup extends PureComponent {
   static propTypes = {
-    dateEventGroup: propTypes.dateEventGroup.isRequired
+    dateEventGroup: propTypes.dateEventGroup.isRequired,
   }
 
   render() {
@@ -48,7 +48,7 @@ export default class DateEventGroup extends PureComponent {
           {dateString(startDate)}
         </Text>
 
-        <List isUnstyled>
+        <List isUnstyled={true}>
           {auditEvents.map(({auditEvent, studentAnonymity}) => (
             <List.Item key={auditEvent.id} margin="small none none none">
               <AuditEvent auditEvent={auditEvent} studentAnonymity={studentAnonymity} />

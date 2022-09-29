@@ -25,56 +25,56 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('LTI - add'),
-      description: I18n.t('Allows user to manually add an app in Account Settings.')
+      description: I18n.t('Allows user to manually add an app in Account Settings.'),
     },
     {
       description: I18n.t(
         'Allows user to add external app icons to the Rich Content Editor toolbar.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to manually add an app in Course Settings.')
+      description: I18n.t('Allows user to manually add an app in Course Settings.'),
     },
     {
       title: I18n.t('LTI - delete'),
-      description: I18n.t('Allows user to manually delete an app in Account Settings.')
+      description: I18n.t('Allows user to manually delete an app in Account Settings.'),
     },
     {
-      description: I18n.t('Allows user to manually delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually delete an app in Course Settings.'),
     },
     {
       title: I18n.t('LTI - edit'),
-      description: I18n.t('Allows user to edit configurations for manually added external apps.')
-    }
+      description: I18n.t('Allows user to edit configurations for manually added external apps.'),
+    },
   ],
   [
     {
       title: I18n.t('External Apps'),
       description: I18n.t(
         'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('LTI - add'),
-      description: I18n.t('Allows user to manually add an app in Course Settings.')
+      description: I18n.t('Allows user to manually add an app in Course Settings.'),
     },
     {
       title: I18n.t('LTI - delete'),
-      description: I18n.t('Allows user to manually delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually delete an app in Course Settings.'),
     },
     {
       title: I18n.t('LTI - edit'),
-      description: I18n.t('Allows user to edit configurations for manually added external apps.')
-    }
+      description: I18n.t('Allows user to edit configurations for manually added external apps.'),
+    },
   ],
   [
     {
       title: I18n.t('External Apps'),
       description: I18n.t(
         'If LTI - add is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). However, if LTI - delete is not enabled, they cannot delete manually added external apps.'
-      )
-    }
+      ),
+    },
   ]
 )

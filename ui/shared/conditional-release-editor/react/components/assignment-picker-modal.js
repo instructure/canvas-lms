@@ -37,7 +37,7 @@ class AssignmentPickerModal extends React.Component {
       isOpen: bool.isRequired,
       onRequestClose: func.isRequired,
       addItemsToRange: func.isRequired,
-      triggerAssignment: object
+      triggerAssignment: object,
     }
   }
 
@@ -72,7 +72,7 @@ class AssignmentPickerModal extends React.Component {
       )
       range = I18n.t('%{upper} to %{lower}', {
         upper: upperBound,
-        lower: lowerBound
+        lower: lowerBound,
       })
     }
 
@@ -98,7 +98,7 @@ class AssignmentPickerModal extends React.Component {
                 onClick={this.props.onRequestClose}
                 type="button"
               >
-                <i aria-hidden className="icon-x" />
+                <i aria-hidden={true} className="icon-x" />
                 <ScreenReaderContent>{I18n.t('Close')}</ScreenReaderContent>
               </button>
             </div>

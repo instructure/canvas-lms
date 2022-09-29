@@ -23,7 +23,7 @@ import {PodcastFeed} from './PodcastFeed'
 export default {
   title: 'Examples/Discussion Posts/Components/PodcastFeed',
   component: PodcastFeed,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <PodcastFeed linkUrl="https://instructure.design/" {...args} />

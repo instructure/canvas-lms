@@ -110,5 +110,5 @@ Object.assign(MultipleChoiceToggle.prototype, {
   // @api private
   isEmpty() {
     return $.trim(this.content) === ''
-  }
+  },
 })

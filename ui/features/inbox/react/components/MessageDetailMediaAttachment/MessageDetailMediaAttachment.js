@@ -47,7 +47,7 @@ export const MessageDetailMediaAttachment = props => {
 
   const mediaSources = props.mediaComment.mediaSources.map(source => ({
     ...source,
-    label: `${source.width}x${source.height}`
+    label: `${source.width}x${source.height}`,
   }))
 
   const mediaTracks = props.mediaComment.mediaTracks.map(track => ({
@@ -55,7 +55,7 @@ export const MessageDetailMediaAttachment = props => {
     src: `/media_objects/${props.mediaComment._id}/media_tracks/${track._id}`,
     label: track.locale,
     type: track.kind,
-    language: track.locale
+    language: track.locale,
   }))
 
   return (
@@ -82,5 +82,5 @@ export const MessageDetailMediaAttachment = props => {
 }
 
 MessageDetailMediaAttachment.propTypes = {
-  mediaComment: MediaComment.shape
+  mediaComment: MediaComment.shape,
 }

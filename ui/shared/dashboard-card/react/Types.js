@@ -20,7 +20,7 @@
  * Used for drag and drop stuff
  */
 const TYPES = {
-  CARD: 'card'
+  CARD: 'card',
 }
 
 export default TYPES

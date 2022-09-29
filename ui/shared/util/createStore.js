@@ -80,7 +80,7 @@ function createStore(initialState) {
 
     emitChange() {
       events.trigger('change')
-    }
+    },
   }
 }
 

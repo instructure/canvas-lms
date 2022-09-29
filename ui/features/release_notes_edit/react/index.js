@@ -68,7 +68,7 @@ export default function ReleaseNotesEdit({envs, langs}) {
   const [state, dispatch] = useReducer(notesReducer, {
     notes: [],
     nextPage: null,
-    loading: true
+    loading: true,
   })
   const [page, setPage] = useState(null)
   const [showDialog, setShowDialog] = useState(false)
@@ -97,21 +97,21 @@ export default function ReleaseNotesEdit({envs, langs}) {
     params: {
       includes: ['langs'],
       per_page: 20,
-      page
-    }
+      page,
+    },
   })
 
   const setPublished = useCallback(async (id, publishedState) => {
     await doFetchApi({
       path: `/api/v1/release_notes/${id}/published`,
-      method: publishedState ? 'PUT' : 'DELETE'
+      method: publishedState ? 'PUT' : 'DELETE',
     })
     dispatch({
       type: 'PUBLISHED_STATE',
       payload: {
         id,
-        state: publishedState
-      }
+        state: publishedState,
+      },
     })
   }, [])
 
@@ -119,7 +119,7 @@ export default function ReleaseNotesEdit({envs, langs}) {
     const note = await doFetchApi({
       path: `/api/v1/release_notes${newNote.id ? `/${newNote.id}` : ''}`,
       method: newNote.id ? 'PUT' : 'POST',
-      body: newNote
+      body: newNote,
     })
     dispatch({type: 'UPSERT_NOTE', payload: note.json})
     setShowDialog(false)
@@ -128,7 +128,7 @@ export default function ReleaseNotesEdit({envs, langs}) {
   const deleteNote = useCallback(async id => {
     await doFetchApi({
       path: `/api/v1/release_notes/${id}`,
-      method: 'DELETE'
+      method: 'DELETE',
     })
     dispatch({type: 'REMOVE_NOTE', payload: {id}})
   }, [])

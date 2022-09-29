@@ -26,12 +26,12 @@ const initialState = {
   showModal: false,
   gettingImage: false,
   uploadingImage: false,
-  removingImage: false
+  removingImage: false,
 }
 
 export default {
   title: 'Examples/Course Settings/CourseImageSelector',
-  component: CourseImageSelector
+  component: CourseImageSelector,
 }
 
 const Template = args => (
@@ -41,7 +41,7 @@ const Template = args => (
     store={{
       getState: () => initialState,
       subscribe: cb => setTimeout(cb),
-      dispatch: Function.prototype
+      dispatch: Function.prototype,
     }}
     {...args}
   />

@@ -56,7 +56,7 @@ const imageSearchHandlers = {
     state.alert = 'failure'
     state.pageDirection = action.pageDirection
     return state
-  }
+  },
 }
 
 const imageSearchReducer = (state = ImageSearchInitialState, action) => {

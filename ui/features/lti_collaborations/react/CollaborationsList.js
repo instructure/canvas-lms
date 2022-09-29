@@ -56,7 +56,7 @@ class CollaborationsList extends React.Component {
 CollaborationsList.propTypes = {
   collaborationsState: PropTypes.object.isRequired,
   deleteCollaboration: PropTypes.func.isRequired,
-  getCollaborations: PropTypes.func.isRequired
+  getCollaborations: PropTypes.func.isRequired,
 }
 
 export default CollaborationsList

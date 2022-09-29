@@ -25,63 +25,63 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Grades'),
-      description: I18n.t('Allows user to select final grade for moderated assignments.')
-    }
+      description: I18n.t('Allows user to select final grade for moderated assignments.'),
+    },
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
         'To add students to a moderation set, Grades - view all grades must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
         'To publish final grades for a moderated assignment, Grades - edit must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('SpeedGrader'),
       description: I18n.t(
         'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Grades'),
-      description: I18n.t('Allows user to select final grade for moderated assignments.')
-    }
+      description: I18n.t('Allows user to select final grade for moderated assignments.'),
+    },
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
         'To add students to a moderation set, Grades - view all grades must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('SpeedGrader'),
       description: I18n.t(
         'To review a moderated assignment in SpeedGrader, Grades - edit must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Grades'),
       description: I18n.t(
         'To publish final grades for a moderated assignment, Grades - edit must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To post or hide grades for a moderated assignment, Grades - edit must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

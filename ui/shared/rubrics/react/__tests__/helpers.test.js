@@ -22,7 +22,7 @@ describe('defaultCriteria', () => {
   it('only has an id and valid / blank points', () => {
     expect(defaultCriteria('id')).toEqual({
       criterion_id: 'id',
-      points: {text: '', valid: true}
+      points: {text: '', valid: true},
     })
   })
 })
@@ -31,7 +31,7 @@ describe('fillAssessment', () => {
   it('fills out a totally blank assessment', () => {
     expect(fillAssessment(rubrics.points, {})).toEqual({
       score: 0,
-      data: [defaultCriteria('_1384'), defaultCriteria('7_391')]
+      data: [defaultCriteria('_1384'), defaultCriteria('7_391')],
     })
   })
 
@@ -39,7 +39,7 @@ describe('fillAssessment', () => {
     const a = assessments.server.points
     const oneComment = {
       ...a,
-      data: [a.data[0], {...a.data[1], comments: ''}]
+      data: [a.data[0], {...a.data[1], comments: ''}],
     }
     const filled = fillAssessment(rubrics.points, oneComment)
     expect(filled.data.map(({editComments}) => editComments)).toEqual([true, false])
@@ -49,19 +49,19 @@ describe('fillAssessment', () => {
     const assessment = fillAssessment(rubrics.points, assessments.server.points)
     expect(assessment.data.map(({points}) => points)).toEqual([
       {text: null, valid: true, value: 3.2},
-      {text: null, valid: true, value: 3}
+      {text: null, valid: true, value: 3},
     ])
   })
 
   it('fills in missing values and marks incorrect ones', () => {
     const {data} = assessments.server.points
     const updated = {
-      data: [{...data[0], points: null}]
+      data: [{...data[0], points: null}],
     }
     const assessment = fillAssessment(rubrics.points, updated)
     expect(assessment.data.map(({points}) => points)).toEqual([
       {text: '--', valid: false, value: null},
-      {text: '', valid: true}
+      {text: '', valid: true},
     ])
   })
 })
@@ -74,10 +74,10 @@ describe('updateAssociationData', () => {
         {
           ...defaultCriteria('_1384'),
           comments: 'for later',
-          saveCommentsForLater: true
+          saveCommentsForLater: true,
         },
-        defaultCriteria('7_391')
-      ]
+        defaultCriteria('7_391'),
+      ],
     }
 
     const association = {}

@@ -36,7 +36,7 @@ class FileOptionsCollection {
 
     this.uploadOptions = {
       alwaysRename: false,
-      alwaysUploadZips: false
+      alwaysUploadZips: false,
     }
   }
 
@@ -45,7 +45,7 @@ class FileOptionsCollection {
       resolvedNames: [],
       nameCollisions: [],
       zipOptions: [],
-      newOptions: false
+      newOptions: false,
     }
   }
 
@@ -55,7 +55,7 @@ class FileOptionsCollection {
 
       return {
         ...option,
-        ...category
+        ...category,
       }
     }
 
@@ -174,7 +174,7 @@ class FileOptionsCollection {
       nameCollisions: collisions,
       resolvedNames: resolved,
       zipOptions: zips,
-      newOptions: true
+      newOptions: true,
     })
     if (notifyChange && this.onChange) {
       return this.onChange()

@@ -46,6 +46,6 @@ export default function useManagedCourseSearchApi(fetchApiOpts = {}) {
     path: `/users/self/manageable_courses`,
     convert: convertManageableCoursesToApi,
     forceResult,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }

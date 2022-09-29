@@ -36,7 +36,7 @@ const RosterTableRowMenuButton = ({name}) => {
 }
 
 RosterTableRowMenuButton.propTypes = {
-  name: string.isRequired
+  name: string.isRequired,
 }
 
 RosterTableRowMenuButton.defaultProps = {}

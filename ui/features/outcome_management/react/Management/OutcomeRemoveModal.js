@@ -40,7 +40,7 @@ const OutcomeRemoveModal = ({
   onCloseHandler,
   onCleanupHandler,
   removeOutcomes,
-  onRemoveLearningOutcomesHandler
+  onRemoveLearningOutcomesHandler,
 }) => {
   const {isCourse} = useCanvasContext()
   const removableLinkIds = Object.keys(outcomes).filter(linkId => outcomes[linkId].canUnlink)
@@ -65,12 +65,12 @@ const OutcomeRemoveModal = ({
       groups[groupId] = groups[groupId]
         ? {
             ...groups[groupId],
-            groupOutcomes: [...groups[groupId].groupOutcomes, linkId]
+            groupOutcomes: [...groups[groupId].groupOutcomes, linkId],
           }
         : {
             groupId,
             groupTitle: outcomes[linkId].parentGroupTitle,
-            groupOutcomes: [linkId]
+            groupOutcomes: [linkId],
           }
     }
 
@@ -83,7 +83,7 @@ const OutcomeRemoveModal = ({
               <TruncateText position="middle">
                 {I18n.t('From %{groupTitle}', {groupTitle})}
               </TruncateText>
-              <List as="ul" size="medium" margin="0" isUnstyled>
+              <List as="ul" size="medium" margin="0" isUnstyled={true}>
                 {groupOutcomes
                   .sort((a, b) =>
                     outcomes[a].title.localeCompare(outcomes[b].title, ENV.LOCALE, {numeric: true})
@@ -96,7 +96,7 @@ const OutcomeRemoveModal = ({
                             style={{
                               display: 'inline-block',
                               transform: 'scale(0.75)',
-                              height: '1em'
+                              height: '1em',
                             }}
                           >
                             <IconCheckMarkIndeterminateLine />
@@ -125,10 +125,10 @@ const OutcomeRemoveModal = ({
         {I18n.t(
           {
             one: 'Remove Outcome',
-            other: 'Remove Outcomes'
+            other: 'Remove Outcomes',
           },
           {
-            count: removableCount
+            count: removableCount,
           }
         )}
       </Button>
@@ -139,10 +139,10 @@ const OutcomeRemoveModal = ({
       modalLabel = I18n.t(
         {
           one: 'Unable To Remove Outcome',
-          other: 'Unable To Remove Outcomes'
+          other: 'Unable To Remove Outcomes',
         },
         {
-          count: nonRemovableCount
+          count: nonRemovableCount,
         }
       )
       modalMessage = isCourse
@@ -150,20 +150,20 @@ const OutcomeRemoveModal = ({
             {
               one: 'The outcome that you have selected cannot be removed because it is aligned to content in this course.',
               other:
-                'The outcomes that you have selected cannot be removed because they are aligned to content in this course.'
+                'The outcomes that you have selected cannot be removed because they are aligned to content in this course.',
             },
             {
-              count: nonRemovableCount
+              count: nonRemovableCount,
             }
           )
         : I18n.t(
             {
               one: 'The outcome that you have selected cannot be removed because it is aligned to content in this account.',
               other:
-                'The outcomes that you have selected cannot be removed because they are aligned to content in this account.'
+                'The outcomes that you have selected cannot be removed because they are aligned to content in this account.',
             },
             {
-              count: nonRemovableCount
+              count: nonRemovableCount,
             }
           )
       modalButtons = (
@@ -174,7 +174,7 @@ const OutcomeRemoveModal = ({
     } else {
       modalLabel = I18n.t('Remove %{removableCount} out of %{totalCount} Outcomes?', {
         removableCount,
-        totalCount
+        totalCount,
       })
       modalMessage = isCourse
         ? I18n.t(
@@ -188,29 +188,30 @@ const OutcomeRemoveModal = ({
     modalLabel = I18n.t(
       {
         one: 'Remove Outcome?',
-        other: 'Remove Outcomes?'
+        other: 'Remove Outcomes?',
       },
       {
-        count: removableCount
+        count: removableCount,
       }
     )
     modalMessage = isCourse
       ? I18n.t(
           {
             one: 'Are you sure that you want to remove this outcome from this course?',
-            other: 'Are you sure that you want to remove these %{count} outcomes from this course?'
+            other: 'Are you sure that you want to remove these %{count} outcomes from this course?',
           },
           {
-            count: removableCount
+            count: removableCount,
           }
         )
       : I18n.t(
           {
             one: 'Are you sure that you want to remove this outcome from this account?',
-            other: 'Are you sure that you want to remove these %{count} outcomes from this account?'
+            other:
+              'Are you sure that you want to remove these %{count} outcomes from this account?',
           },
           {
-            count: removableCount
+            count: removableCount,
           }
         )
   }
@@ -220,7 +221,7 @@ const OutcomeRemoveModal = ({
       size="small"
       label={modalLabel}
       open={isOpen}
-      shouldReturnFocus
+      shouldReturnFocus={true}
       onDismiss={onCloseHandler}
       shouldCloseOnDocumentClick={false}
       data-testid="outcome-management-remove-modal"
@@ -259,11 +260,11 @@ OutcomeRemoveModal.propTypes = {
   onCloseHandler: PropTypes.func.isRequired,
   onCleanupHandler: PropTypes.func.isRequired,
   removeOutcomes: PropTypes.func.isRequired,
-  onRemoveLearningOutcomesHandler: PropTypes.func
+  onRemoveLearningOutcomesHandler: PropTypes.func,
 }
 
 OutcomeRemoveModal.defaultProps = {
-  onRemoveLearningOutcomesHandler: () => {}
+  onRemoveLearningOutcomesHandler: () => {},
 }
 
 export default OutcomeRemoveModal

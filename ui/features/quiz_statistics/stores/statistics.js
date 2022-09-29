@@ -35,7 +35,7 @@ const store = new Store(
     getInitialState() {
       return {
         loading: false,
-        stats_can_load: true
+        stats_can_load: true,
       }
     },
 
@@ -56,7 +56,7 @@ const store = new Store(
 
       return quizStats
         .fetch({
-          success: this.checkForStatsNoLoad.bind(this)
+          success: this.checkForStatsNoLoad.bind(this),
         })
         .then(
           function onLoad(payload) {
@@ -129,7 +129,7 @@ const store = new Store(
 
       return quizStats
         .fetch({
-          success: this.checkForStatsNoLoad.bind(this)
+          success: this.checkForStatsNoLoad.bind(this),
         })
         .then(
           function onLoad(payload) {
@@ -142,7 +142,7 @@ const store = new Store(
     __reset__() {
       quizStats.reset()
       return Store.prototype.__reset__.call(this)
-    }
+    },
   },
   Dispatcher
 )

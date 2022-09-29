@@ -31,7 +31,7 @@ describe('#initializeReaderButton', () => {
   describe('ImmersiveReaderButton', () => {
     const fakeContent = {
       title: 'fake title',
-      content: () => '<p>Some fake content yay</p>'
+      content: () => '<p>Some fake content yay</p>',
     }
 
     describe('onClick', () => {
@@ -50,16 +50,16 @@ describe('#initializeReaderButton', () => {
               chunks: [
                 {
                   content: fakeContent.content(),
-                  mimeType: 'text/html'
-                }
-              ]
+                  mimeType: 'text/html',
+                },
+              ],
             },
             {
-              cookiePolicy: 0
-            }
+              cookiePolicy: 0,
+            },
           ])
         const fakeReaderLib = Promise.resolve({
-          launchAsync: fakeLaunchAsync
+          launchAsync: fakeLaunchAsync,
         })
         const {findByText} = render(
           <ImmersiveReaderButton content={fakeContent} readerSDK={fakeReaderLib} />
@@ -80,7 +80,7 @@ describe('#initializeReaderButton', () => {
               />
               Some post math content
             </div>
-          `
+          `,
         }
 
         it('sends the HTML and MathML as chunks', async () => {
@@ -111,7 +111,7 @@ describe('#initializeReaderButton', () => {
           }
 
           const fakeReaderLib = Promise.resolve({
-            launchAsync: fakeLaunchAsync
+            launchAsync: fakeLaunchAsync,
           })
 
           const {findByText} = render(

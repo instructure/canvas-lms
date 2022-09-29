@@ -27,7 +27,7 @@ $(() => {
   let resending = false
 
   $('.re_send_confirmation_link').click(
-    preventDefault(function() {
+    preventDefault(function () {
       const $this = $(this)
       const text = $this.text()
 

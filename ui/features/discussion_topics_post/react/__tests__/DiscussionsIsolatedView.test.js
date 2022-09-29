@@ -21,7 +21,7 @@ import {
   createDiscussionEntryMock,
   getDiscussionQueryMock,
   getDiscussionSubentriesQueryMock,
-  updateDiscussionEntryMock
+  updateDiscussionEntryMock,
 } from '../../graphql/Mocks'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
@@ -31,11 +31,11 @@ import React from 'react'
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 jest.mock('../utils/constants', () => ({
   ...jest.requireActual('../utils/constants'),
-  SEARCH_TERM_DEBOUNCE_DELAY: 0
+  SEARCH_TERM_DEBOUNCE_DELAY: 0,
 }))
 
 describe('DiscussionsIsolatedView', () => {
@@ -54,8 +54,8 @@ describe('DiscussionsIsolatedView', () => {
         id: '2',
         avatar_image_url:
           'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
-        display_name: 'Hank Mccoy'
-      }
+        display_name: 'Hank Mccoy',
+      },
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -64,7 +64,7 @@ describe('DiscussionsIsolatedView', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -89,17 +89,17 @@ describe('DiscussionsIsolatedView', () => {
       ...getDiscussionQueryMock(),
       ...getDiscussionSubentriesQueryMock({
         includeRelativeEntry: false,
-        last: 5
+        last: 5,
       }),
       ...getDiscussionSubentriesQueryMock({
         beforeRelativeEntry: false,
         first: 0,
-        includeRelativeEntry: false
+        includeRelativeEntry: false,
       }),
       ...createDiscussionEntryMock({
         includeReplyPreview: false,
-        replyFromEntryId: '1'
-      })
+        replyFromEntryId: '1',
+      }),
     ]
     const {findByText, findByTestId, queryByTestId} = setup(mocks)
 
@@ -123,14 +123,14 @@ describe('DiscussionsIsolatedView', () => {
       ...getDiscussionQueryMock(),
       ...getDiscussionSubentriesQueryMock({
         includeRelativeEntry: false,
-        last: 5
+        last: 5,
       }),
       ...getDiscussionSubentriesQueryMock({
         beforeRelativeEntry: false,
         first: 0,
-        includeRelativeEntry: false
+        includeRelativeEntry: false,
       }),
-      ...updateDiscussionEntryMock()
+      ...updateDiscussionEntryMock(),
     ]
     const {findByText, findByTestId, findAllByTestId} = setup(mocks)
 
@@ -154,12 +154,12 @@ describe('DiscussionsIsolatedView', () => {
   it('should not render go to reply button with single character search term', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...getDiscussionQueryMock({searchTerm: 'a', rootEntries: false})
+      ...getDiscussionQueryMock({searchTerm: 'a', rootEntries: false}),
     ]
     const container = setup(mocks)
     await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
     fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'a'}
+      target: {value: 'a'},
     })
 
     await waitFor(() => expect(container.queryByTestId('go-to-reply')).toBeNull())
@@ -169,13 +169,13 @@ describe('DiscussionsIsolatedView', () => {
     const mocks = [
       ...getDiscussionQueryMock(),
       ...getDiscussionQueryMock({searchTerm: 'A new Search', rootEntries: false}),
-      ...getDiscussionQueryMock()
+      ...getDiscussionQueryMock(),
     ]
     const container = setup(mocks)
     let searchInput = container.findByTestId('search-filter')
 
     fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'A new Search'}
+      target: {value: 'A new Search'},
     })
     let clearSearchButton = container.queryByTestId('clear-search-button')
     searchInput = container.getByLabelText('Search entries or author')

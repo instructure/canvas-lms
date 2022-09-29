@@ -31,7 +31,7 @@ function populateDialog(data_points, axis, $link) {
     title: I18n.t('%{data_point} Over Time', {data_point: axis}),
     close: () => {
       $link.focus()
-    }
+    },
   })
 
   // google dependencies declared in views/acccounts/statistics since google.load uses document.write :(
@@ -43,7 +43,7 @@ function populateDialog(data_points, axis, $link) {
   data.addColumn('string', 'text1')
 
   const rows = []
-  $.each(data_points, function() {
+  $.each(data_points, function () {
     const date = new Date()
     date.setTime(this[0])
     rows.push(
@@ -59,7 +59,7 @@ function populateDialog(data_points, axis, $link) {
 }
 
 $(document).ready(() => {
-  $('.over_time_link').live('click', function(event) {
+  $('.over_time_link').live('click', function (event) {
     event.preventDefault()
     const $link = $(this)
     const name = $link.attr('data-name')

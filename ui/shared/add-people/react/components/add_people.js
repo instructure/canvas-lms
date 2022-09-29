@@ -30,7 +30,7 @@ import {
   inputParamsShape,
   validateResultShape,
   personReadyToEnrollShape,
-  newUserShape
+  newUserShape,
 } from './shapes'
 import PeopleSearch from './people_search'
 import PeopleReadyList from './people_ready_list'
@@ -94,10 +94,10 @@ export default class AddPeople extends React.Component {
       bool,
       arrayOf(
         shape({
-          enrollment: shape(newUserShape)
+          enrollment: shape(newUserShape),
         })
-      )
-    ]) // it IS used in componentWillReceiveProps.
+      ),
+    ]), // it IS used in componentWillReceiveProps.
   }
   /* eslint-enable */
 
@@ -106,7 +106,7 @@ export default class AddPeople extends React.Component {
 
     this.state = {
       currentPage: PEOPLESEARCH, // the page to render
-      focusToTop: false // move focus to the top of the panel
+      focusToTop: false, // move focus to the top of the panel
     }
     this.content = null
   }
@@ -119,7 +119,7 @@ export default class AddPeople extends React.Component {
     if (nextProps.usersEnrolled) this.close()
     if (nextProps.apiState && nextProps.apiState.error) {
       this.setState({
-        focusToClose: true
+        focusToClose: true,
       })
     }
   }
@@ -141,13 +141,13 @@ export default class AddPeople extends React.Component {
       // our user chose one of the duplicates
       this.props.chooseDuplicate({
         address: newValues.address,
-        user_id: newValues.selectedUserId
+        user_id: newValues.selectedUserId,
       })
     } else if ('newUserInfo' in newValues) {
       // our chose to create a new user instead of choosing a duplicate
       this.props.enqueueNewForDuplicate({
         address: newValues.address,
-        newUserInfo: newValues.newUserInfo
+        newUserInfo: newValues.newUserInfo,
       })
     } else if (newValues.skip) {
       // our user chose to skip these duplicates
@@ -193,7 +193,7 @@ export default class AddPeople extends React.Component {
   close = () => {
     this.setState({
       currentPage: PEOPLESEARCH,
-      focusToTop: true
+      focusToTop: true,
     })
     if (typeof this.props.onClose === 'function') this.props.onClose()
     this.props.reset()

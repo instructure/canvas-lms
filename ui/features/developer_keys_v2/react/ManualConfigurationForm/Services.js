@@ -31,7 +31,7 @@ export default class Services extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      scopes: this.props.scopes
+      scopes: this.props.scopes,
     }
   }
 
@@ -50,7 +50,7 @@ export default class Services extends React.Component {
     const {validScopes} = this.props
 
     return (
-      <ToggleDetails summary={I18n.t('LTI Advantage Services')} fluidWidth>
+      <ToggleDetails summary={I18n.t('LTI Advantage Services')} fluidWidth={true}>
         <View as="div" margin="small">
           <Alert variant="warning" margin="small">
             {I18n.t(
@@ -77,10 +77,10 @@ export default class Services extends React.Component {
 
 Services.propTypes = {
   validScopes: PropTypes.object,
-  scopes: PropTypes.arrayOf(PropTypes.string)
+  scopes: PropTypes.arrayOf(PropTypes.string),
 }
 
 Services.defaultProps = {
   scopes: [],
-  validScopes: {}
+  validScopes: {},
 }

@@ -29,7 +29,7 @@ class ConfigurationFormLti13 extends React.Component {
     super(props)
     this.state = {
       messages: [],
-      clientId: ''
+      clientId: '',
     }
   }
 
@@ -38,20 +38,20 @@ class ConfigurationFormLti13 extends React.Component {
 
     this.setState({
       clientId,
-      messages: this.messages({clientId})
+      messages: this.messages({clientId}),
     })
   }
 
   getFormData() {
     return {
-      client_id: this.state.clientId
+      client_id: this.state.clientId,
     }
   }
 
   isValid() {
     const {clientId} = this.state
     this.setState({
-      messages: this.messages({clientId})
+      messages: this.messages({clientId}),
     })
     return !!this.state.clientId
   }
@@ -76,10 +76,10 @@ class ConfigurationFormLti13 extends React.Component {
               text: I18n.t(
                 'To obtain a client ID, an account admin will need to generate an LTI developer key.'
               ),
-              type: 'hint'
-            }
+              type: 'hint',
+            },
           ].concat(this.state.messages)}
-          isRequired
+          isRequired={true}
         />
       </View>
     )

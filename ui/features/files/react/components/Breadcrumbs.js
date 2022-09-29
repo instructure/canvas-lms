@@ -29,7 +29,7 @@ const I18n = useI18nScope('react_files')
 const MAX_CRUMB_WIDTH = 500
 const MIN_CRUMB_WIDTH = 80
 
-Breadcrumbs.renderSingleCrumb = function(folder, isLastCrumb, isRootCrumb) {
+Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
   const [contextType, contextId] = splitAssetString(this.props.contextAssetString, false)
   const isContextRoot =
     !folder ||
@@ -65,7 +65,7 @@ Breadcrumbs.renderSingleCrumb = function(folder, isLastCrumb, isRootCrumb) {
   )
 }
 
-Breadcrumbs.renderDynamicCrumbs = function() {
+Breadcrumbs.renderDynamicCrumbs = function () {
   if (this.props.showingSearchResults) {
     return [
       this.renderSingleCrumb(null, !'isLastCrumb', !!'isRootCrumb'),
@@ -74,11 +74,11 @@ Breadcrumbs.renderDynamicCrumbs = function() {
           <span className="ellipsis">
             {this.props.query.search_term &&
               I18n.t('search_results_for', 'search results for "%{search_term}"', {
-                search_term: this.props.query.search_term
+                search_term: this.props.query.search_term,
               })}
           </span>
         </a>
-      </li>
+      </li>,
     ]
   } else {
     if (!this.props.rootTillCurrentFolder || !this.props.rootTillCurrentFolder.length) {
@@ -98,13 +98,13 @@ Breadcrumbs.renderDynamicCrumbs = function() {
     } else {
       return [
         <BreadcrumbCollapsedContainer foldersToContain={foldersInMiddle} />,
-        this.renderSingleCrumb(lastFolder, true)
+        this.renderSingleCrumb(lastFolder, true),
       ]
     }
   }
 }
 
-Breadcrumbs.render = function() {
+Breadcrumbs.render = function () {
   return (
     <nav aria-label="breadcrumbs" role="navigation" id="breadcrumbs" ref="breadcrumbs">
       <ul>

@@ -62,7 +62,7 @@ window.addEventListener('canvasReadyStateChange', function ({detail}) {
 })
 
 isolate(enableDTNPI)({
-  endpoint: window.ENV.DATA_COLLECTION_ENDPOINT
+  endpoint: window.ENV.DATA_COLLECTION_ENDPOINT,
 })
 
 // In non-prod environments only, arrange for filtering of "useless" console
@@ -93,9 +93,10 @@ if (ENV.use_high_contrast) {
   canvasHighContrastTheme.use({
     overrides: {
       typography: {
-        fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
-      }
-    }
+        fontFamily:
+          'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      },
+    },
   })
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
@@ -105,8 +106,8 @@ if (ENV.use_high_contrast) {
   if (process.env.NODE_ENV === 'test' || window.INST.environment === 'test') {
     transitionOverride = {
       transitions: {
-        duration: '0ms'
-      }
+        duration: '0ms',
+      },
     }
   }
 
@@ -115,9 +116,10 @@ if (ENV.use_high_contrast) {
       ...transitionOverride,
       ...brandvars,
       typography: {
-        fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
-      }
-    }
+        fontFamily:
+          'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif',
+      },
+    },
   })
 }
 

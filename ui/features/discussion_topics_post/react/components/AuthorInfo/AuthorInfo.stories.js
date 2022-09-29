@@ -23,7 +23,7 @@ import {User} from '../../../graphql/User'
 export default {
   title: 'Examples/Discussion Posts/Components/Author Info',
   component: AuthorInfo,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AuthorInfo {...args} />
@@ -33,7 +33,7 @@ NoEditor.args = {
   author: User.mock({displayName: 'Harry Potter', courseRoles: ['Student', 'TA'], avatarUrl: ''}),
   isUnread: false,
   isForcedRead: false,
-  timingDisplay: 'Jan 21 1:58pm'
+  timingDisplay: 'Jan 21 1:58pm',
 }
 
 export const Unread = Template.bind({})
@@ -41,7 +41,7 @@ Unread.args = {
   author: User.mock({displayName: 'Hagrid', courseRoles: ['Teacher'], avatarUrl: ''}),
   isUnread: true,
   isForcedRead: false,
-  timingDisplay: 'Jan 21 1:58pm'
+  timingDisplay: 'Jan 21 1:58pm',
 }
 
 export const WithEditor = Template.bind({})
@@ -51,7 +51,7 @@ WithEditor.args = {
   isUnread: false,
   isForcedRead: false,
   timingDisplay: 'Jan 21 1:58pm',
-  editedTimingDisplay: 'Feb 22 12:45pm'
+  editedTimingDisplay: 'Feb 22 12:45pm',
 }
 
 export const WithCreatedTooltip = Template.bind({})
@@ -62,7 +62,7 @@ WithCreatedTooltip.args = {
   isForcedRead: false,
   timingDisplay: 'Jan 21 1:58pm',
   editedTimingDisplay: 'Feb 22 12:45pm',
-  showCreatedAsTooltip: true
+  showCreatedAsTooltip: true,
 }
 
 export const WithCreatedTooltipAndNoEdit = Template.bind({})
@@ -71,7 +71,7 @@ WithCreatedTooltipAndNoEdit.args = {
   isUnread: false,
   isForcedRead: false,
   timingDisplay: 'Jan 21 1:58pm',
-  showCreatedAsTooltip: true
+  showCreatedAsTooltip: true,
 }
 
 export const WithLastReplyAt = Template.bind({})
@@ -80,21 +80,21 @@ WithLastReplyAt.args = {
   editor: User.mock({
     _id: '1337',
     displayName: 'Severus Super Duper Crazy Long Name Snape',
-    courseRoles: ['Teacher']
+    courseRoles: ['Teacher'],
   }),
   isUnread: false,
   isForcedRead: false,
   timingDisplay: 'Jan 21 1:58pm',
   editedTimingDisplay: 'Feb 22 12:45pm',
   lastReplyAtDisplay: 'Mar 14 10:20am',
-  showCreatedAsTooltip: false
+  showCreatedAsTooltip: false,
 }
 
 export const WithNoAuthor = Template.bind({})
 WithNoAuthor.args = {
   isUnread: true,
   isForcedRead: false,
-  timingDisplay: 'Jan 21 1:58pm'
+  timingDisplay: 'Jan 21 1:58pm',
 }
 
 export const WithNoRoles = Template.bind({})
@@ -103,5 +103,5 @@ WithNoRoles.args = {
   isUnread: true,
   isForcedRead: false,
   timingDisplay: 'Jan 21 1:58pm',
-  lastReplyAtDisplay: 'Mar 14 10:20am'
+  lastReplyAtDisplay: 'Mar 14 10:20am',
 }

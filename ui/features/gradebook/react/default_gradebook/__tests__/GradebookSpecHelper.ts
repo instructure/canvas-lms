@@ -131,7 +131,7 @@ export const defaultGradebookProps: GradebookProps = {
     extended: 'test',
     late: 'test',
     missing: 'test',
-    resubmitted: 'test'
+    resubmitted: 'test',
   },
   dispatch: new RequestDispatch(),
   gradebookGridNode: document.createElement('div'),

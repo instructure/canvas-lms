@@ -47,7 +47,7 @@ export default class WikiPageView extends Backbone.View {
       '.publish-button': '$publishButton',
       '.header-bar-outer-container': '$headerBarOuterContainer',
       '.page-changed-alert': '$pageChangedAlert',
-      '.al-trigger': '$gearMenu'
+      '.al-trigger': '$gearMenu',
     }
 
     this.prototype.events = {
@@ -55,7 +55,7 @@ export default class WikiPageView extends Backbone.View {
       'click .use-as-front-page-menu-item': 'useAsFrontPage',
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .direct-share-send-to-menu-item': 'openSendTo',
-      'click .direct-share-copy-to-menu-item': 'openCopyTo'
+      'click .direct-share-copy-to-menu-item': 'openCopyTo',
     }
 
     this.optionProperty('modules_path')
@@ -131,7 +131,7 @@ export default class WikiPageView extends Backbone.View {
           if (immersive_reader_mobile_mount_point) {
             ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
               content,
-              title
+              title,
             })
           }
         })
@@ -165,7 +165,7 @@ export default class WikiPageView extends Backbone.View {
         onFetchSuccess: () => {
           $('.module-sequence-footer-content').append($('#mark-as-done-container'))
           $('#mark-as-done-container').css({float: 'right', 'margin-right': '4px'})
-        }
+        },
       })
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
@@ -197,7 +197,7 @@ export default class WikiPageView extends Backbone.View {
         'reload_viewing_page',
         'This page has changed since you started viewing it. *Reload*',
         {wrapper: '<a class="reload" href="#">$1</a>'}
-      )
+      ),
     })
     this.reloadView.on('changed', () => this.$headerBarOuterContainer.addClass('page-changed'))
     this.reloadView.on('reload', () => this.render())
@@ -214,7 +214,7 @@ export default class WikiPageView extends Backbone.View {
 
     const deleteDialog = new WikiPageDeleteDialog({
       model: this.model,
-      wiki_pages_path: this.wiki_pages_path
+      wiki_pages_path: this.wiki_pages_path,
     })
     return deleteDialog.open()
   }
@@ -287,7 +287,7 @@ export default class WikiPageView extends Backbone.View {
       VIEW_UNPUBLISHED: !!this.WIKI_RIGHTS.manage || !!this.WIKI_RIGHTS.view_unpublished_items,
       UPDATE_CONTENT: !!this.PAGE_RIGHTS.update || !!this.PAGE_RIGHTS.update_content,
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
-      READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
+      READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions,
     }
     json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE

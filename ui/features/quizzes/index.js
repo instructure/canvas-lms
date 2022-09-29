@@ -24,7 +24,7 @@ import './jquery/supercalc'
 import '@canvas/quizzes/jquery/quiz_rubric'
 
 ready(() => {
-  $('#show_question_details').on('click', function() {
+  $('#show_question_details').on('click', function () {
     // Create the quiz arrows
     if ($(this).is(':checked')) {
       const arrowApplicator = new QuizArrowApplicator()

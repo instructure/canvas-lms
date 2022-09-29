@@ -26,12 +26,12 @@ export const AssignmentGroup = {
   `,
 
   shape: shape({
-    name: string
-  })
+    name: string,
+  }),
 }
 
 export const DefaultMocks = {
   AssignmentGroup: () => ({
-    name: 'Mocked Assignment Group'
-  })
+    name: 'Mocked Assignment Group',
+  }),
 }

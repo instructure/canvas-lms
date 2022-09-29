@@ -51,13 +51,10 @@ export default class QuestionViewed extends EventTracker {
   }
 
   identifyVisibleQuestions() {
-    return $('.question[id]:visible')
-      .filter(':in_viewport')
-      .toArray()
-      .map(parseQuestionId)
+    return $('.question[id]:visible').filter(':in_viewport').toArray().map(parseQuestionId)
   }
 }
 QuestionViewed.prototype.eventType = K.EVT_QUESTION_VIEWED
 QuestionViewed.prototype.options = {
-  frequency: 2500
+  frequency: 2500,
 }

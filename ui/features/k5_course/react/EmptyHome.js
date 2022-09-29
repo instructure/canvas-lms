@@ -63,6 +63,6 @@ EmptyHome.propTypes = {
   pagesPath: PropTypes.string.isRequired,
   hasWikiPages: PropTypes.bool.isRequired,
   canManage: PropTypes.bool.isRequired,
-  courseName: PropTypes.string.isRequired
+  courseName: PropTypes.string.isRequired,
 }
 export default EmptyHome

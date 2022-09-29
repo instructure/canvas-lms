@@ -30,21 +30,21 @@ export default function deleteStuff(filesAndFolders, args) {
         'confirm_delete_with_contents',
         {
           one: 'Are you sure you want to delete %{name}? It is not empty, anything inside it will be deleted too.',
-          other: 'Are you sure you want to delete these %{count} items and everything inside them?'
+          other: 'Are you sure you want to delete these %{count} items and everything inside them?',
         },
         {
           count: filesAndFolders.length,
-          name: filesAndFolders[0] && filesAndFolders[0].displayName()
+          name: filesAndFolders[0] && filesAndFolders[0].displayName(),
         }
       )
     : I18n.t(
         {
           one: 'Are you sure you want to delete %{name}?',
-          other: 'Are you sure you want to delete these %{count} items?'
+          other: 'Are you sure you want to delete these %{count} items?',
         },
         {
           count: filesAndFolders.length,
-          name: filesAndFolders[0] && filesAndFolders[0].displayName()
+          name: filesAndFolders[0] && filesAndFolders[0].displayName(),
         }
       )
   if (!confirm(message)) return
@@ -54,7 +54,7 @@ export default function deleteStuff(filesAndFolders, args) {
       emulateHTTP: true,
       emulateJSON: true,
       data: {
-        force: 'true'
+        force: 'true',
       },
       wait: true,
       error(model, response, options) {
@@ -68,10 +68,10 @@ export default function deleteStuff(filesAndFolders, args) {
         return $.flashError(
           I18n.t('Error deleting %{name}: %{reason}', {
             name: item.displayName(),
-            reason
+            reason,
           })
         )
-      }
+      },
     })
   )
 
@@ -80,11 +80,11 @@ export default function deleteStuff(filesAndFolders, args) {
       I18n.t(
         {
           one: '%{name} deleted successfully.',
-          other: '%{count} items deleted successfully.'
+          other: '%{count} items deleted successfully.',
         },
         {
           count: filesAndFolders.length,
-          name: filesAndFolders[0] && filesAndFolders[0].displayName()
+          name: filesAndFolders[0] && filesAndFolders[0].displayName(),
         }
       )
     )

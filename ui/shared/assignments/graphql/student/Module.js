@@ -28,8 +28,8 @@ export const Module = {
 
   shape: shape({
     id: string.isRequired,
-    name: string
-  })
+    name: string,
+  }),
 }
 
 export const DefaultMocks = {}

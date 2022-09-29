@@ -24,9 +24,9 @@ const defaultProps = (props = {}) => ({
   description: 'My RoleList',
   roles: [
     {id: '26', role: 'Custom Admin', label: 'Custom Admin', base_role_type: 'AccountMembership'},
-    {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
+    {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'},
   ],
-  ...props
+  ...props,
 })
 
 it('renders the RoleList component', () => {

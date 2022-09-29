@@ -40,7 +40,7 @@ export default function DelayedPublishDialog({
   onPublish,
   onUpdatePublishAt,
   onClose,
-  timeZone
+  timeZone,
 }) {
   const [open, setOpen] = useState(true)
   const [loading, setLoading] = useState(false)
@@ -54,7 +54,7 @@ export default function DelayedPublishDialog({
     doFetchApi({
       method: 'PUT',
       path: `/api/v1/courses/${courseId}/pages/${contentId}`,
-      params: {wiki_page: {publish_at: newDate}}
+      params: {wiki_page: {publish_at: newDate}},
     })
       .then(() => {
         setOpen(false)

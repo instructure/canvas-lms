@@ -40,14 +40,14 @@ class GradebookSummaryRouter extends Backbone.Router {
       this.outcomeView = new IndividualStudentView({
         el: $('#outcomes'),
         course_id,
-        student_id: user_id
+        student_id: user_id,
       })
     } else {
       this.outcomes = new OutcomeSummaryCollection([], {course_id, user_id})
       this.outcomeView = new OutcomeSummaryView({
         el: $('#outcomes'),
         collection: this.outcomes,
-        toggles: $('.outcome-toggles')
+        toggles: $('.outcome-toggles'),
       })
     }
   }
@@ -74,7 +74,7 @@ class GradebookSummaryRouter extends Backbone.Router {
 }
 GradebookSummaryRouter.prototype.routes = {
   '': 'tab',
-  'tab-:route(/*path)': 'tab'
+  'tab-:route(/*path)': 'tab',
 }
 
 let router

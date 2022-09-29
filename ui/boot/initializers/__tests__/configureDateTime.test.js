@@ -16,17 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { parse, format } from 'datetime'
+import {parse, format} from 'datetime'
 import timezone from 'timezone'
 import fr_FR from 'timezone/fr_FR'
 import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'
 import MockDate from 'mockdate'
 import I18nStubber from '../../../../spec/coffeescripts/helpers/I18nStubber'
-import { up as configureDateTime, down as resetDateTime } from '../configureDateTime'
-import { up as configureDateTimeMomentParser, down as resetDateTimeMomentParser } from '../configureDateTimeMomentParser'
+import {up as configureDateTime, down as resetDateTime} from '../configureDateTime'
+import {
+  up as configureDateTimeMomentParser,
+  down as resetDateTimeMomentParser,
+} from '../configureDateTimeMomentParser'
 
-const equal = (a,b,message) => expect(a).toEqual(b)
+const equal = (a, b, message) => expect(a).toEqual(b)
 
 let TIMEZONE, BIGEASY_LOCALE, MOMENT_LOCALE, __PRELOADED_TIMEZONE_DATA__
 
@@ -73,10 +76,10 @@ describe('english tz', () => {
       'time.formats.long': '%B %d, %Y %H:%M',
       'time.formats.short': '%d %b %H:%M',
       'time.formats.tiny': '%l:%M%P',
-      'time.formats.tiny_on_the_hour': '%l%P'
+      'time.formats.tiny_on_the_hour': '%l%P',
     })
 
-    window.__PRELOADED_TIMEZONE_DATA__ = { en_US }
+    window.__PRELOADED_TIMEZONE_DATA__ = {en_US}
     window.ENV.BIGEASY_LOCALE = 'en_US'
     window.ENV.MOMENT_LOCALE = 'en'
 
@@ -104,7 +107,7 @@ describe('english tz', () => {
       'Monday, August 3',
       'Mon Aug 3, 2015',
       'Mon, Aug 3',
-      'Aug 3'
+      'Aug 3',
     ]
 
     engDates.forEach(date => {
@@ -132,7 +135,7 @@ describe('english tz', () => {
       'Mon, Aug 3, 2015 6:06 PM',
       'Aug 3 at 6:06pm',
       'Aug 3, 2015 6:06pm',
-      'Mon Aug 3, 2015 6:06pm'
+      'Mon Aug 3, 2015 6:06pm',
     ]
 
     engDateTimes.forEach(dateTime => {
@@ -172,10 +175,10 @@ describe('french tz', () => {
       'time.formats.long': ' %d %B, %Y %H:%M',
       'time.formats.short': '%d %b %H:%M',
       'time.formats.tiny': '%k:%M',
-      'time.formats.tiny_on_the_hour': '%k:%M'
+      'time.formats.tiny_on_the_hour': '%k:%M',
     })
 
-    window.__PRELOADED_TIMEZONE_DATA__ = { fr_FR }
+    window.__PRELOADED_TIMEZONE_DATA__ = {fr_FR}
     window.ENV.BIGEASY_LOCALE = 'fr_FR'
     window.ENV.MOMENT_LOCALE = 'fr'
 
@@ -201,7 +204,7 @@ describe('french tz', () => {
     '3 août',
     'lun., 3 août',
     '3 août 2015',
-    '3 août'
+    '3 août',
   ]
 
   for (const date of frenchDates) {
@@ -225,7 +228,7 @@ describe('french tz', () => {
     'lun. 3 août 2015 18:06',
     '3 août à 18:06',
     'août 3, 2015 18:06',
-    'lun. 3 août, 2015 18:06'
+    'lun. 3 août, 2015 18:06',
   ]
 
   for (const dateTime of frenchDateTimes) {
@@ -234,7 +237,6 @@ describe('french tz', () => {
     })
   }
 })
-
 
 describe('chinese tz', () => {
   beforeAll(() => {
@@ -261,10 +263,10 @@ describe('chinese tz', () => {
       'time.formats.long': '%Y %B %d %H:%M',
       'time.formats.short': '%b %d %H:%M',
       'time.formats.tiny': '%H:%M',
-      'time.formats.tiny_on_the_hour': '%k:%M'
+      'time.formats.tiny_on_the_hour': '%k:%M',
     })
 
-    window.__PRELOADED_TIMEZONE_DATA__ = { zh_CN }
+    window.__PRELOADED_TIMEZONE_DATA__ = {zh_CN}
     window.ENV.BIGEASY_LOCALE = 'zh_CN'
     window.ENV.MOMENT_LOCALE = 'zh-cn'
 
@@ -288,7 +290,7 @@ describe('chinese tz', () => {
       '星期一, 八月 3',
       '一 2015 8月 3',
       '一, 8月 3',
-      '8月 3'
+      '8月 3',
     ]
 
     chineseDates.forEach(date => {
@@ -303,7 +305,7 @@ describe('chinese tz', () => {
       '2015年8月3日星期一6点06分',
       '8月 3日 于 6:06',
       '20158月3日, 6:06',
-      '一 20158月3日, 6:06' // this is incorrectly parsing as "Fri, 20 Mar 1908 06:06:00 GMT"
+      '一 20158月3日, 6:06', // this is incorrectly parsing as "Fri, 20 Mar 1908 06:06:00 GMT"
     ]
 
     chineseDateTimes.forEach(dateTime => {

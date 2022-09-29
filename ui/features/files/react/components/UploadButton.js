@@ -25,7 +25,7 @@ import UploadQueue from '@canvas/files/react/modules/UploadQueue'
 
 const I18n = useI18nScope('upload_button')
 
-const UploadButton = function(props) {
+const UploadButton = function (props) {
   const formRef = useRef(null)
   const [disabled, setDisabled] = useState(UploadQueue.pendingUploads())
   const handleQueueChange = useCallback(upload_queue => {
@@ -72,7 +72,7 @@ const UploadButton = function(props) {
         onClick={handleUploadClick}
         disabled={disabled}
       >
-        <i className="icon-upload" aria-hidden />
+        <i className="icon-upload" aria-hidden={true} />
         &nbsp;
         <span className={classnames({'hidden-phone': props.showingButtons})}>
           {I18n.t('Upload')}
@@ -84,11 +84,11 @@ const UploadButton = function(props) {
 
 UploadButton.propTypes = {
   ...UploadFormPropTypes,
-  showingButtons: bool
+  showingButtons: bool,
 }
 
 UploadButton.defaultProps = {
-  showingButtons: false
+  showingButtons: false,
 }
 
 export default UploadButton

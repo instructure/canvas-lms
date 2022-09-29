@@ -44,7 +44,7 @@ const AccountCalendarsModal = ({
   getSelectedOtherCalendars,
   onSave,
   calendarsPerRequest = 100,
-  featureSeen
+  featureSeen,
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [isOpen, setIsOpen] = useState(false)
@@ -65,7 +65,7 @@ const AccountCalendarsModal = ({
     isLoading,
     loadNextPage,
     selectedCalendars,
-    setSelectedCalendars
+    setSelectedCalendars,
   }
   let messages = null
   const modalHeight = '500px'
@@ -83,9 +83,9 @@ const AccountCalendarsModal = ({
       {
         type: 'hint',
         text: I18n.t('Type at least %{number} characters to search', {
-          number: MIN_SEARCH_LENGTH
-        })
-      }
+          number: MIN_SEARCH_LENGTH,
+        }),
+      },
     ]
   }
 
@@ -122,7 +122,7 @@ const AccountCalendarsModal = ({
         const {json} = await doFetchApi({
           path: SAVE_PREFERENCES_ENDPOINT,
           params: {mark_feature_as_seen: true},
-          method: 'POST'
+          method: 'POST',
         })
         if (json.status === 'ok') {
           setIsFeatureSeen(true)
@@ -150,7 +150,7 @@ const AccountCalendarsModal = ({
       }
       const {json, link} = await doFetchApi({
         path: SEARCH_ENDPOINT,
-        params: apiParams
+        params: apiParams,
       })
       const newResults = next ? [...results, ...json.account_calendars] : json.account_calendars
 
@@ -163,7 +163,7 @@ const AccountCalendarsModal = ({
     } catch (err) {
       showFlashAlert({
         message: I18n.t('An error occurred while searching accounts calendars'),
-        err
+        err,
       })
     } finally {
       setIsLoading(false)
@@ -183,18 +183,18 @@ const AccountCalendarsModal = ({
     setDisabled(true)
     const payload = {
       enabled_account_calendars:
-        selectedCalendars.length > 0 ? selectedCalendars.map(sC => sC.id) : ''
+        selectedCalendars.length > 0 ? selectedCalendars.map(sC => sC.id) : '',
     }
     try {
       const {json} = await doFetchApi({
         path: SAVE_PREFERENCES_ENDPOINT,
         params: payload,
-        method: 'POST'
+        method: 'POST',
       })
       if (json.status === 'ok') {
         showFlashAlert({
           type: 'success',
-          message: I18n.t('Calendars saved successfully')
+          message: I18n.t('Calendars saved successfully'),
         })
       }
       onSave(selectedCalendars)
@@ -202,7 +202,7 @@ const AccountCalendarsModal = ({
     } catch (err) {
       showFlashAlert({
         err,
-        message: I18n.t('An error occurred while saving changes')
+        message: I18n.t('An error occurred while saving changes'),
       })
       setDisabled(false)
     }
@@ -274,7 +274,7 @@ const AccountCalendarsModal = ({
                 isLoading
                   ? undefined
                   : I18n.t('Search %{totalAccounts} calendars', {
-                      totalAccounts
+                      totalAccounts,
                     })
               }
               onChange={updateSearch}
@@ -308,7 +308,7 @@ AccountCalendarsModal.propTypes = {
   getSelectedOtherCalendars: func.isRequired,
   onSave: func.isRequired,
   calendarsPerRequest: number,
-  featureSeen: bool
+  featureSeen: bool,
 }
 
 export default AccountCalendarsModal

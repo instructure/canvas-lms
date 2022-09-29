@@ -33,7 +33,7 @@ export default class CalculationMethodFormView extends Backbone.View {
     this.prototype.els = {'#calculation_int': '$calculation_int'}
     this.prototype.events = {
       'blur #calculation_int': 'blur',
-      'keyup #calculation_int': 'keyup'
+      'keyup #calculation_int': 'keyup',
     }
   }
 
@@ -60,7 +60,7 @@ export default class CalculationMethodFormView extends Backbone.View {
     const val = parseInt(numberHelper.parse($(e.target).val()))
     if (_.isNaN(val)) return
     this.model.set({
-      calculation_int: val
+      calculation_int: val,
     })
     return this.render()
   }
@@ -102,7 +102,7 @@ export default class CalculationMethodFormView extends Backbone.View {
 
     return _.extend(data, {
       state: this.state,
-      writeStates: ['add', 'edit']
+      writeStates: ['add', 'edit'],
     })
   }
 }

@@ -26,7 +26,7 @@ const cardSource = {
     return {
       assetString: props.assetString,
       originalIndex: props.position,
-      published: props.published
+      published: props.published,
     }
   },
   isDragging(props, monitor) {
@@ -38,7 +38,7 @@ const cardSource = {
       props.moveCard(draggedAssetString, props.position)
     }
     // TODO: Call something to actually move things to the right positions on the server
-  }
+  },
 }
 
 const cardTarget = {
@@ -50,7 +50,7 @@ const cardTarget = {
     const {
       assetString: overAssetString,
       published: overAssetIsPublished,
-      position: overIndex
+      position: overIndex,
     } = props
     if (
       draggedAssetString !== overAssetString &&
@@ -58,15 +58,15 @@ const cardTarget = {
     ) {
       props.moveCard(draggedAssetString, overIndex)
     }
-  }
+  },
 }
 
 export default compose(
   DropTarget(ItemTypes.CARD, cardTarget, connect => ({
-    connectDropTarget: connect.dropTarget()
+    connectDropTarget: connect.dropTarget(),
   })),
   DragSource(ItemTypes.CARD, cardSource, (connect, monitor) => ({
     connectDragSource: connect.dragSource(),
-    isDragging: monitor.isDragging()
+    isDragging: monitor.isDragging(),
   }))
 )(({cardComponent: Card, ...rest}) => <Card {...rest} />)

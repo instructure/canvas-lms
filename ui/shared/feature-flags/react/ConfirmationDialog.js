@@ -33,7 +33,7 @@ export default function ConfirmationDialog({
   confirmColor,
   confirmText,
   onConfirm,
-  onReject
+  onReject,
 }) {
   return (
     <CanvasModal
@@ -43,7 +43,9 @@ export default function ConfirmationDialog({
       size="medium"
       footer={
         <>
-          <Button data-testid="cancel-button" onClick={onReject}>{I18n.t('Cancel')}</Button>
+          <Button data-testid="cancel-button" onClick={onReject}>
+            {I18n.t('Cancel')}
+          </Button>
           <Button
             data-testid="confirm-button"
             margin="0 0 0 small"
@@ -89,7 +91,7 @@ export async function showConfirmationDialog({label, body, confirmText, confirmC
   function renderDialog(parent) {
     ReactDOM.render(
       <ConfirmationDialog
-        open
+        open={true}
         label={label}
         confirmColor={confirmColor}
         confirmText={confirmText}

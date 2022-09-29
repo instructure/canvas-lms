@@ -27,19 +27,19 @@ function buildComponent(props) {
 QUnit.module('ic_submission_download_dialog', {
   setup() {
     return fixtures.create()
-  }
+  },
 })
 
 test('is "finished" if file ready', () => {
   const component = buildComponent({
-    attachment: {workflow_state: 'available'}
+    attachment: {workflow_state: 'available'},
   })
   equal(component.get('status'), 'finished')
 })
 
 test('is "zipping" if percent complete is > 95', () => {
   const component = buildComponent({
-    percentComplete: 95
+    percentComplete: 95,
   })
   equal(component.get('status'), 'zipping')
 })
@@ -57,7 +57,7 @@ test('percentComplete is 100 if file ready', () => {
   // otherwise the test fails because there is no DOM
   const component = buildComponent({
     attachment: {workflow_state: 'available'},
-    percentComplete: 100
+    percentComplete: 100,
   })
   component.progress()
   equal(component.get('percentComplete'), 100)
@@ -65,7 +65,7 @@ test('percentComplete is 100 if file ready', () => {
 
 test('percentComplete is 0 if file_state is a string', () => {
   const component = buildComponent({
-    attachment: {file_state: 'ready_to_download'}
+    attachment: {file_state: 'ready_to_download'},
   })
   component.progress()
   equal(component.get('percentComplete'), 0)
@@ -75,7 +75,7 @@ QUnit.module('keepChecking')
 
 test('is true if open', () => {
   const component = buildComponent({
-    isOpened: true
+    isOpened: true,
   })
   equal(component.get('keepChecking'), true)
 })
@@ -87,7 +87,7 @@ test('is undefined if closed', () => {
 
 test('is undefined if percentComplete is 100', () => {
   const component = buildComponent({
-    percentComplete: 100
+    percentComplete: 100,
   })
   equal(component.get('keepChecking'), undefined)
 })

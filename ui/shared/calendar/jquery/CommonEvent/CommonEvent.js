@@ -26,7 +26,7 @@ import splitAssetString from '@canvas/util/splitAssetString'
 const I18n = useI18nScope('calendar')
 
 const EVENT_TYPES = {
-  todo_item: 'todo_item'
+  todo_item: 'todo_item',
 }
 
 export default function CommonEvent(data, contextInfo, actualContextInfo) {
@@ -48,7 +48,7 @@ Object.assign(CommonEvent.prototype, {
     quiz: I18n.t('Quiz'),
     note: I18n.t('To Do'),
     wiki_page: I18n.t('Page'),
-    discussion_topic: I18n.t('Discussion')
+    discussion_topic: I18n.t('Discussion'),
   },
 
   isNewEvent() {
@@ -280,5 +280,5 @@ Object.assign(CommonEvent.prototype, {
 
   isOnCalendar(context_code) {
     return this.calendarEvent.all_context_codes.match(new RegExp(`\\b${context_code}\\b`))
-  }
+  },
 })

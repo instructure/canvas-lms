@@ -21,7 +21,7 @@ import {
   addDays,
   rawDaysBetweenInclusive,
   inBlackoutDate,
-  daysBetween
+  daysBetween,
 } from '../date_stuff/date_helpers'
 
 moment.tz.setDefault('America/Denver')
@@ -55,8 +55,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-03T00:00:00'), // Tues
-          end_date: moment('2022-05-04T00:00:00') // Wed
-        }
+          end_date: moment('2022-05-04T00:00:00'), // Wed
+        },
       ]
       const start = moment('2022-05-02T00:00:00') // Mon
       const end = addDays(start, 4, false, blackouts)
@@ -68,8 +68,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-03T00:00:00'), // Tues
-          end_date: moment('2022-05-04T00:00:00') // Wed
-        }
+          end_date: moment('2022-05-04T00:00:00'), // Wed
+        },
       ]
       const start = moment('2022-05-02T00:00:00') // Mon
       const end = addDays(start, 4, true, blackouts)
@@ -81,8 +81,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues',
           start_date: moment('2022-05-03T00:00:00'), // Tues
-          end_date: moment('2022-05-03T00:00:00')
-        }
+          end_date: moment('2022-05-03T00:00:00'),
+        },
       ]
       const start = moment('2022-05-02T00:00:00') // Mon
       const end = addDays(start, 4, false, blackouts)
@@ -94,8 +94,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-04-30T00:00:00'), // Sat before
-          end_date: moment('2022-05-04T00:00:00') // Wed after start
-        }
+          end_date: moment('2022-05-04T00:00:00'), // Wed after start
+        },
       ]
       const start = moment('2022-05-02T00:00:00') // Mon
       const end = addDays(start, 4, false, blackouts)
@@ -142,8 +142,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-03T00:00:00').endOf('day'), // Tues
-          end_date: moment('2022-05-04T00:00:00').endOf('day') // Wed
-        }
+          end_date: moment('2022-05-04T00:00:00').endOf('day'), // Wed
+        },
       ]
       const count = daysBetween(
         moment('2022-05-02T00:00:00-06:00'),
@@ -160,8 +160,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-06T00:00:00').endOf('day'), // Fri
-          end_date: moment('2022-05-10T00:00:00').endOf('day') // tues
-        }
+          end_date: moment('2022-05-10T00:00:00').endOf('day'), // tues
+        },
       ]
       const count = daysBetween(
         moment('2022-05-05T00:00:00-06:00'), // thurs
@@ -198,8 +198,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-03T00:00:00'), // Tues
-          end_date: moment('2022-05-04T00:00:00') // Wed
-        }
+          end_date: moment('2022-05-04T00:00:00'), // Wed
+        },
       ]
       expect(inBlackoutDate('2022-05-16T00:00:00-06:00', blackouts)).toBeFalsy()
     })
@@ -209,8 +209,8 @@ describe('date_helpers', () => {
         {
           event_title: 'Tues and Wed',
           start_date: moment('2022-05-03T00:00:00'), // Tues
-          end_date: moment('2022-05-04T00:00:00') // Wed
-        }
+          end_date: moment('2022-05-04T00:00:00'), // Wed
+        },
       ]
       expect(inBlackoutDate('2022-05-03T00:00:00-06:00', blackouts)).toBeTruthy()
     })

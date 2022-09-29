@@ -25,14 +25,14 @@ const scopes = [
     resource: 'account_domain_lookups',
     verb: 'GET',
     path: '/api/v1/accounts/search',
-    scope: 'url:GET|/api/v1/accounts/search'
+    scope: 'url:GET|/api/v1/accounts/search',
   },
   {
     resource: 'account_domain_lookups',
     verb: 'POST',
     path: '/api/v1/accounts/search',
-    scope: 'url:POST|/api/v1/accounts/search'
-  }
+    scope: 'url:POST|/api/v1/accounts/search',
+  },
 ]
 
 const props = {
@@ -40,7 +40,7 @@ const props = {
   setReadOnlySelected: jest.fn(),
   selectedScopes: [scopes[0].scope],
   scopes,
-  name: 'Cool Scope Group'
+  name: 'Cool Scope Group',
 }
 
 it("adds all scopes to 'selected scopes' when the checkbox is checked", () => {
@@ -60,10 +60,7 @@ it("removes all scopes from 'selected scopes' when the checbox is unchecked", ()
 
 it('checks the selected scopes', () => {
   const wrapper = mount(<ScopesGroup {...props} />)
-  wrapper
-    .find('button')
-    .first()
-    .simulate('click')
+  wrapper.find('button').first().simulate('click')
   const checkBox = wrapper.find('input[value="url:GET|/api/v1/accounts/search"]').first()
   expect(checkBox.props().checked).toBe(true)
 })

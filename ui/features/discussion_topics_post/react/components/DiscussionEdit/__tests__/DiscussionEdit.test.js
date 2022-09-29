@@ -32,7 +32,7 @@ const defaultProps = ({
   updateDraft = jest.fn(),
   draftSaved = false,
   canReplyAnonymously = false,
-  discussionAnonymousState = null
+  discussionAnonymousState = null,
 } = {}) => ({
   show,
   value,
@@ -42,7 +42,7 @@ const defaultProps = ({
   onCancel,
   onSubmit,
   canReplyAnonymously,
-  discussionAnonymousState
+  discussionAnonymousState,
 })
 
 describe('DiscussionEdit', () => {
@@ -86,7 +86,7 @@ describe('DiscussionEdit', () => {
   describe('Draft messages', () => {
     beforeAll(() => {
       window.ENV = {
-        draft_discussions: true
+        draft_discussions: true,
       }
     })
 
@@ -142,7 +142,7 @@ describe('DiscussionEdit', () => {
           defaultProps({
             canReplyAnonymously: true,
             discussionAnonymousState: 'partial_anonymity',
-            isEdit: true
+            isEdit: true,
           })
         )
         expect(container.queryByTestId('anonymous-response-selector')).toBeNull()

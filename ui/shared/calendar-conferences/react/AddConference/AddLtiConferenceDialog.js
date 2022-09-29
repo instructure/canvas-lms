@@ -69,7 +69,7 @@ const AddLtiConferenceDialog = ({context, conferenceType, isOpen, onRequestClose
       isOpen={isOpen}
       title={toolName ? I18n.t('Add %{toolName}', {toolName}) : I18n.t('Add Conference')}
       tool={{
-        definition_id: conferenceType?.lti_settings?.tool_id
+        definition_id: conferenceType?.lti_settings?.tool_id,
       }}
       onRequestClose={onRequestClose}
       contextType={contextType}
@@ -84,7 +84,7 @@ AddLtiConferenceDialog.propTypes = {
   conferenceType: webConferenceType.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onRequestClose: PropTypes.func.isRequired,
-  onContent: PropTypes.func.isRequired
+  onContent: PropTypes.func.isRequired,
 }
 
 export default AddLtiConferenceDialog

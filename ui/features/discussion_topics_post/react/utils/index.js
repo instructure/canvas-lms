@@ -49,7 +49,7 @@ export const updateDiscussionTopicEntryCounts = (
   const options = {
     id: discussionTopicGraphQLId,
     fragment: Discussion.fragment,
-    fragmentName: 'Discussion'
+    fragmentName: 'Discussion',
   }
 
   const data = JSON.parse(JSON.stringify(cache.readFragment(options)))
@@ -64,7 +64,7 @@ export const updateDiscussionTopicEntryCounts = (
     }
     cache.writeFragment({
       ...options,
-      data
+      data,
     })
   }
 }
@@ -75,7 +75,7 @@ export const updateDiscussionEntryRootEntryCounts = (cache, result, unreadCountC
       'DiscussionEntry-' + result.data.updateDiscussionEntryParticipant.discussionEntry.rootEntryId
     ),
     fragment: DiscussionEntry.fragment,
-    fragmentName: 'DiscussionEntry'
+    fragmentName: 'DiscussionEntry',
   }
 
   const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
@@ -83,7 +83,7 @@ export const updateDiscussionEntryRootEntryCounts = (cache, result, unreadCountC
 
   cache.writeFragment({
     ...discussionEntryOptions,
-    data
+    data,
   })
 }
 
@@ -94,14 +94,14 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
     const discussionEntryOptions = {
       id: btoa('DiscussionEntry-' + variables.discussionEntryID),
       fragment: DiscussionEntry.fragment,
-      fragmentName: 'DiscussionEntry'
+      fragmentName: 'DiscussionEntry',
     }
     const data = JSON.parse(JSON.stringify(cache.readFragment(discussionEntryOptions)))
     if (data) {
       if (data.rootEntryParticipantCounts) {
         data.lastReply = {
           createdAt: newDiscussionEntry.createdAt,
-          __typename: 'DiscussionEntry'
+          __typename: 'DiscussionEntry',
         }
       }
 
@@ -110,14 +110,14 @@ export const addReplyToDiscussionEntry = (cache, variables, newDiscussionEntry) 
 
       cache.writeFragment({
         ...discussionEntryOptions,
-        data
+        data,
       })
     }
     // The writeQuery creates a subentry query shape using the data from the new discussion entry
     // Using that query object it tries to find the cached subentry query for that reply and add the new reply to the cache
     const subEntriesOptions = {
       query: DISCUSSION_SUBENTRIES_QUERY,
-      variables
+      variables,
     }
 
     const currentSubentriesQueryData = JSON.parse(
@@ -176,7 +176,7 @@ export const getOptimisticResponse = ({
   rootEntryId = null,
   isolatedEntryId = null,
   quotedEntry = null,
-  isAnonymous = false
+  isAnonymous = false,
 } = {}) => {
   if (quotedEntry && Object.keys(quotedEntry).length !== 0) {
     quotedEntry = {
@@ -184,12 +184,12 @@ export const getOptimisticResponse = ({
       previewMessage: quotedEntry.previewMessage,
       author: {
         shortName: quotedEntry.author.shortName,
-        __typename: 'User'
+        __typename: 'User',
       },
       anonymousAuthor: null,
       editor: null,
       deleted: false,
-      __typename: 'DiscussionEntry'
+      __typename: 'DiscussionEntry',
     }
   } else {
     quotedEntry = null
@@ -211,12 +211,12 @@ export const getOptimisticResponse = ({
           read: true,
           forcedReadState: false,
           reportType: null,
-          __typename: 'EntryParticipant'
+          __typename: 'EntryParticipant',
         },
         rootEntryParticipantCounts: {
           unreadCount: 0,
           repliesCount: 0,
-          __typename: 'DiscussionEntryCounts'
+          __typename: 'DiscussionEntryCounts',
         },
         author: !isAnonymous
           ? {
@@ -225,7 +225,7 @@ export const getOptimisticResponse = ({
               avatarUrl: ENV.current_user.avatar_image_url,
               displayName: ENV.current_user.display_name,
               courseRoles: [],
-              __typename: 'User'
+              __typename: 'User',
             }
           : null,
         anonymousAuthor: isAnonymous
@@ -233,7 +233,7 @@ export const getOptimisticResponse = ({
               id: null,
               avatarUrl: null,
               shortName: CURRENT_USER,
-              __typename: 'AnonymousUser'
+              __typename: 'AnonymousUser',
             }
           : null,
         editor: null,
@@ -247,18 +247,18 @@ export const getOptimisticResponse = ({
           reply: false,
           update: false,
           viewRating: false,
-          __typename: 'DiscussionEntryPermissions'
+          __typename: 'DiscussionEntryPermissions',
         },
         parentId,
         rootEntryId,
         isolatedEntryId,
         quotedEntry,
         attachment: null,
-        __typename: 'DiscussionEntry'
+        __typename: 'DiscussionEntry',
       },
       errors: null,
-      __typename: 'CreateDiscussionEntryPayload'
-    }
+      __typename: 'CreateDiscussionEntryPayload',
+    },
   }
 }
 

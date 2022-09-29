@@ -32,7 +32,7 @@ import {
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
-  UPDATE_DISCUSSION_READ_STATE
+  UPDATE_DISCUSSION_READ_STATE,
 } from '../../../graphql/Mutations'
 import {LockedDiscussion} from '../../components/LockedDiscussion/LockedDiscussion'
 import {PodcastFeed} from '../../components/PodcastFeed/PodcastFeed'
@@ -80,7 +80,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error deleting the discussion topic.'))
-    }
+    },
   })
 
   const [updateDiscussionTopic] = useMutation(UPDATE_DISCUSSION_TOPIC, {
@@ -93,7 +93,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
-    }
+    },
   })
 
   const client = useApolloClient()
@@ -117,7 +117,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error marking all as read.'))
-    }
+    },
   })
 
   const [subscribeToDiscussionTopic] = useMutation(SUBSCRIBE_TO_DISCUSSION_TOPIC, {
@@ -134,7 +134,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the discussion topic.'))
-    }
+    },
   })
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
@@ -145,7 +145,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
-    }
+    },
   })
 
   const onDelete = () => {
@@ -153,8 +153,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     if (window.confirm(I18n.t('Are you sure you want to delete this topic'))) {
       deleteDiscussionTopic({
         variables: {
-          id: props.discussionTopic._id
-        }
+          id: props.discussionTopic._id,
+        },
       })
     }
   }
@@ -163,8 +163,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     updateDiscussionTopic({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        published: !props.discussionTopic.published
-      }
+        published: !props.discussionTopic.published,
+      },
     })
   }
 
@@ -172,8 +172,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     updateDiscussionTopic({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        locked
-      }
+        locked,
+      },
     })
   }
 
@@ -182,8 +182,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     updateDiscussionReadState({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        read: true
-      }
+        read: true,
+      },
     })
   }
 
@@ -192,8 +192,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     updateDiscussionReadState({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        read: false
-      }
+        read: false,
+      },
     })
   }
 
@@ -201,8 +201,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     subscribeToDiscussionTopic({
       variables: {
         discussionTopicId: props.discussionTopic._id,
-        subscribed: !props.discussionTopic.subscribed
-      }
+        subscribed: !props.discussionTopic.subscribed,
+      },
     })
   }
 
@@ -227,58 +227,58 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
       props={{
         mobile: {
           alert: {
-            textSize: 'small'
+            textSize: 'small',
           },
           discussionDetails: {
-            margin: '0'
+            margin: '0',
           },
           border: {
             width: 'small 0',
-            radius: 'none'
+            radius: 'none',
           },
           container: {
-            padding: '0 xx-small'
+            padding: '0 xx-small',
           },
           replyButton: {
-            display: 'block'
+            display: 'block',
           },
           podcastButton: {
             display: 'block',
             padding: 'small none none',
-            textSize: 'small'
+            textSize: 'small',
           },
           RCE: {
             paddingClosed: 'none',
-            paddingOpen: 'none none small'
-          }
+            paddingOpen: 'none none small',
+          },
         },
         desktop: {
           alert: {
-            textSize: 'medium'
+            textSize: 'medium',
           },
           discussionDetails: {
-            margin: '0 0 small 0'
+            margin: '0 0 small 0',
           },
           border: {
             width: 'small',
-            radius: 'medium'
+            radius: 'medium',
           },
           container: {
-            padding: '0 medium'
+            padding: '0 medium',
           },
           replyButton: {
-            display: 'inline-block'
+            display: 'inline-block',
           },
           podcastButton: {
             display: 'inline-block',
             padding: 'small none none small',
-            textSize: 'medium'
+            textSize: 'medium',
           },
           RCE: {
             paddingClosed: 'none medium none xx-large',
-            paddingOpen: 'none medium medium xx-large'
-          }
-        }
+            paddingOpen: 'none medium medium xx-large',
+          },
+        },
       }}
       render={responsiveProps => (
         <>
@@ -300,8 +300,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     ) : (
                       <Flex direction="column" padding={responsiveProps.container.padding}>
                         <Flex.Item
-                          shouldShrink
-                          shouldGrow
+                          shouldShrink={true}
+                          shouldGrow={true}
                           margin={responsiveProps.discussionDetails.margin}
                         >
                           <DiscussionDetails
@@ -327,9 +327,9 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             )
                           )}
                         </Flex.Item>
-                        <Flex.Item shouldShrink shouldGrow>
+                        <Flex.Item shouldShrink={true} shouldGrow={true}>
                           <DiscussionEntryContainer
-                            isTopic
+                            isTopic={true}
                             postUtilities={
                               <PostToolbar
                                 onReadAll={
@@ -427,7 +427,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             editedTimingDisplay={DateHelper.formatDatetimeForDiscussions(
                               props.discussionTopic.updatedAt
                             )}
-                            isTopicAuthor
+                            isTopicAuthor={true}
                             attachment={props.discussionTopic.attachment}
                           >
                             {props.discussionTopic.permissions?.reply && !expandedReply && (
@@ -478,8 +478,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           </DiscussionEntryContainer>
                         </Flex.Item>
                         <Flex.Item
-                          shouldShrink
-                          shouldGrow
+                          shouldShrink={true}
+                          shouldGrow={true}
                           padding={
                             expandedReply
                               ? responsiveProps.RCE.paddingOpen
@@ -515,8 +515,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                   variables: {
                                     discussionTopicId: props.discussionTopic._id,
                                     message: newDraftMessage,
-                                    parentId: null
-                                  }
+                                    parentId: null,
+                                  },
                                 })
                               }}
                             />
@@ -582,7 +582,7 @@ DiscussionTopicContainer.propTypes = {
   /**
    * useState Boolean to toggle highlight
    */
-  isHighlighted: PropTypes.bool
+  isHighlighted: PropTypes.bool,
 }
 
 export default DiscussionTopicContainer

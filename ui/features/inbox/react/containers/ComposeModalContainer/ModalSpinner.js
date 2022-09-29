@@ -45,14 +45,14 @@ const ModalSpinner = props => (
 )
 
 ModalSpinner.defaultProps = {
-  open: true
+  open: true,
 }
 
 ModalSpinner.propTypes = {
   label: PropTypes.string,
   message: PropTypes.string,
   onExited: PropTypes.func,
-  open: PropTypes.bool
+  open: PropTypes.bool,
 }
 
 export default ModalSpinner

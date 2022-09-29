@@ -33,7 +33,7 @@ describe('Attachment', () => {
     return {
       index: 0,
       setBlob: jest.fn(),
-      ...override
+      ...override,
     }
   }
 

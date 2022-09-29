@@ -44,14 +44,14 @@ export function PostMessage({...props}) {
           titleMargin: '0',
           titleTextSize: 'medium',
           titleTextWeight: 'bold',
-          messageTextSize: 'fontSizeSmall'
+          messageTextSize: 'fontSizeSmall',
         },
         desktop: {
           titleMargin: '0 0 small 0',
           titleTextSize: 'x-large',
           titleTextWeight: 'normal',
-          messageTextSize: 'fontSizeMedium'
-        }
+          messageTextSize: 'fontSizeMedium',
+        },
       }}
       render={responsiveProps => (
         <View>
@@ -68,7 +68,7 @@ export function PostMessage({...props}) {
               <Text size={responsiveProps.titleTextSize} weight={responsiveProps.titleTextWeight}>
                 <AccessibleContent
                   alt={I18n.t('Reply from %{author}', {
-                    author: getDisplayName(props.discussionEntry)
+                    author: getDisplayName(props.discussionEntry),
                   })}
                 />
               </Text>
@@ -83,7 +83,7 @@ export function PostMessage({...props}) {
                 value={props.draftMessage || props.message}
                 attachment={props.attachment}
                 onSubmit={props.onSave}
-                isEdit
+                isEdit={true}
                 onSetDraftSaved={props.onSetDraftSaved}
                 draftSaved={props.draftSaved}
                 updateDraft={newDraftMessage => {
@@ -95,7 +95,7 @@ export function PostMessage({...props}) {
             <>
               <span
                 style={{
-                  fontSize: theme.variables.typography[responsiveProps.messageTextSize]
+                  fontSize: theme.variables.typography[responsiveProps.messageTextSize],
                 }}
               >
                 <SearchSpan
@@ -152,11 +152,11 @@ PostMessage.propTypes = {
   onSetDraftSaved: PropTypes.func,
   discussionAnonymousState: PropTypes.string,
   canReplyAnonymously: PropTypes.bool,
-  draftSaved: PropTypes.bool
+  draftSaved: PropTypes.bool,
 }
 
 PostMessage.defaultProps = {
-  isIsolatedView: false
+  isIsolatedView: false,
 }
 
 export default PostMessage

@@ -37,14 +37,14 @@ class TutorialTray extends React.Component {
     // The store to control the status of everything
     store: PropTypes.shape(plainStoreShape).isRequired,
     // Should return an element that focus can be set to
-    returnFocusToFunc: PropTypes.func.isRequired
+    returnFocusToFunc: PropTypes.func.isRequired,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       ...props.store.getState(),
-      endUserTutorialShown: false
+      endUserTutorialShown: false,
     }
   }
 
@@ -62,19 +62,19 @@ class TutorialTray extends React.Component {
 
   handleToggleClick = () => {
     this.props.store.setState({
-      isCollapsed: !this.state.isCollapsed
+      isCollapsed: !this.state.isCollapsed,
     })
   }
 
   handleEndTutorialClick = () => {
     this.setState({
-      endUserTutorialShown: true
+      endUserTutorialShown: true,
     })
   }
 
   closeEndTutorialDialog = () => {
     this.setState({
-      endUserTutorialShown: false
+      endUserTutorialShown: false,
     })
     if (this.endTutorialButton) {
       this.endTutorialButton.focus()
@@ -98,7 +98,7 @@ class TutorialTray extends React.Component {
         zIndex="100"
         onExiting={this.handleExiting}
         onEntered={this.handleEntering}
-        shouldContainFocus
+        shouldContainFocus={true}
         size="regular"
       >
         <View as="div" className="NewUserTutorialTray" padding="medium none none">

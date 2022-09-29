@@ -32,8 +32,8 @@ const I18n = useI18nScope('groups')
 GroupCategoryCloneModal.propTypes = {
   groupCategory: shape({
     id: string,
-    name: string
-  })
+    name: string,
+  }),
 }
 
 export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) {
@@ -62,7 +62,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
     return doFetchApi({
       method: 'POST',
       path,
-      body: {name}
+      body: {name},
     })
   }
 
@@ -106,7 +106,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
 
   const alert = alertMessage ? (
     <Alert variant={status}>
-      <div role="alert" aria-live="assertive" aria-atomic>
+      <div role="alert" aria-live="assertive" aria-atomic={true}>
         {alertMessage}
       </div>
       {status === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
@@ -127,7 +127,7 @@ export default function GroupCategoryCloneModal({groupCategory, ...modalProps}) 
         placeholder={I18n.t('Name')}
         value={name}
         onChange={(_event, value) => setName(value)}
-        isRequired
+        isRequired={true}
       />
     </CanvasModal>
   )

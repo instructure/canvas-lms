@@ -31,14 +31,14 @@ export default class SaveThemeButton extends Component {
     brandConfigMd5: customTypes.md5,
     isDefaultConfig: PropTypes.bool.isRequired,
     sharedBrandConfigBeingEdited: customTypes.sharedBrandConfig.isRequired,
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
   }
 
   constructor() {
     super()
     this.state = {
       newThemeName: '',
-      modalIsOpen: false
+      modalIsOpen: false,
     }
   }
 

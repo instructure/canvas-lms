@@ -24,7 +24,7 @@ const getProps = overrides => ({
   selectFile: () => {},
   contentTypes: ['image/*'],
   useContextAssets: true,
-  ...overrides
+  ...overrides,
 })
 
 const courseFolder = overrides => ({
@@ -35,7 +35,7 @@ const courseFolder = overrides => ({
   can_upload: true,
   locked_for_user: false,
   parent_folder_id: null,
-  ...overrides
+  ...overrides,
 })
 
 const userFolder = overrides => ({
@@ -45,7 +45,7 @@ const userFolder = overrides => ({
   context_type: 'user',
   parent_folder_id: null,
   can_upload: true,
-  ...overrides
+  ...overrides,
 })
 
 const testFile = overrides => ({
@@ -53,7 +53,7 @@ const testFile = overrides => ({
   display_name: 'file 1',
   folder_id: 1,
   'content-type': 'image/jpg',
-  ...overrides
+  ...overrides,
 })
 
 describe('FileBrowser', () => {
@@ -79,20 +79,20 @@ describe('FileBrowser', () => {
         display_name: 'file 2',
         folder_id: 4,
         thumbnail_url: 'thumbnail.jpg',
-        'content-type': 'text/html'
-      })
+        'content-type': 'text/html',
+      }),
     ]
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
 
     const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
       0: {id: 0, collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
     }
     wrapper.instance().setState({collections})
     wrapper.update()
@@ -110,14 +110,14 @@ describe('FileBrowser', () => {
     moxios.stubRequest('/api/v1/folders/4/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
 
     const wrapper = mount(<FileBrowser {...getProps()} />)
     const collections = {
       0: {id: 0, collections: [1]},
       1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
+      4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
     }
     wrapper.instance().setState({collections})
     wrapper.update()
@@ -133,24 +133,24 @@ describe('FileBrowser', () => {
     moxios.stubRequest('/api/v1/courses/1/folders/root', {
       status: 200,
       responseText: courseFolder(),
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
     moxios.stubRequest('/api/v1/users/self/folders/root', {
       status: 200,
       responseText: userFolder(),
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
     const subFolders = [userFolder({id: 2, name: 'sub folder 1', parent_folder_id: 1})]
     const files = [testFile()]
     moxios.stubRequest('/api/v1/folders/1/folders', {
       status: 200,
       responseText: subFolders,
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
     moxios.stubRequest('/api/v1/folders/1/files', {
       status: 200,
       responseText: files,
-      headers: {link: 'url; rel="current"'}
+      headers: {link: 'url; rel="current"'},
     })
 
     const wrapper = shallow(<FileBrowser {...getProps()} />)
@@ -167,7 +167,7 @@ describe('FileBrowser', () => {
         locked: false,
         name: 'Course files',
         canUpload: true,
-        context: '/courses/1'
+        context: '/courses/1',
       }
       expect(node.props().collections[1]).toEqual(expected)
       done()
@@ -181,7 +181,7 @@ describe('FileBrowser', () => {
         id: 1,
         name: 'file 1',
         src: '/courses/1/files/1/preview',
-        alt: 'file 1'
+        alt: 'file 1',
       })
       done()
     })
@@ -202,22 +202,22 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders1,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/5/folders', {
         status: 200,
         responseText: subFolders2,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files1,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/5/files', {
         status: 200,
         responseText: files2,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
@@ -226,7 +226,7 @@ describe('FileBrowser', () => {
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
         3: {id: 3, collections: [], items: [], context: '/courses/1'},
         4: {id: 4, collections: [], items: [], context: '/courses/1'},
-        5: {id: 5, collections: [], items: [], context: '/users/1'}
+        5: {id: 5, collections: [], items: [], context: '/users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -250,7 +250,7 @@ describe('FileBrowser', () => {
         1: {id: 1, collections: [4, 5], context: '/courses/1'},
         3: {id: 3, collections: [], items: [], context: '/courses/1'},
         4: {id: 4, collections: [], items: [], context: '/courses/1'},
-        5: {id: 5, collections: [], items: [], context: '/users/1'}
+        5: {id: 5, collections: [], items: [], context: '/users/1'},
       }
       wrapper.instance().setState({collections, openFolders: [1]})
       wrapper.update()
@@ -265,23 +265,23 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/6/folders', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/6/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
-        4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'}
+        4: {id: 4, name: 'folder 4', collections: [], items: [], context: '/users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -307,28 +307,28 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders1,
-        headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'}
+        headers: {link: '</api/v1/folders/4/folders?page=2>; rel="next"'},
       })
       moxios.stubRequest('/api/v1/folders/4/folders?page=2', {
         status: 200,
         responseText: subFolders2,
-        headers: {link: '<url>; rel="current"'}
+        headers: {link: '<url>; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files1,
-        headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'}
+        headers: {link: '</api/v1/folders/4/files?page=2>; rel="next"'},
       })
       moxios.stubRequest('/api/v1/folders/4/files?page=2', {
         status: 200,
         responseText: files2,
-        headers: {link: '<url>; rel="current"'}
+        headers: {link: '<url>; rel="current"'},
       })
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {id: 0, collections: [1]},
         1: {id: 1, collections: [4], context: 'courses/1'},
-        4: {id: 4, collections: [], items: [], context: 'users/1'}
+        4: {id: 4, collections: [], items: [], context: 'users/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -353,12 +353,12 @@ describe('FileBrowser', () => {
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 401,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 401,
         responseText: files,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
@@ -372,8 +372,8 @@ describe('FileBrowser', () => {
           items: [],
           descriptor: 'Locked',
           locked: true,
-          context: '/users/1'
-        }
+          context: '/users/1',
+        },
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -391,17 +391,17 @@ describe('FileBrowser', () => {
       const subFolders = [courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 4})]
       const files = [
         testFile({folder_id: 4}),
-        testFile({id: 2, display_name: 'file 2', folder_id: 4})
+        testFile({id: 2, display_name: 'file 2', folder_id: 4}),
       ]
       moxios.stubRequest('/api/v1/folders/4/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/4/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
@@ -409,7 +409,7 @@ describe('FileBrowser', () => {
         0: {id: 0, collections: [1]},
         1: {id: 1, name: 'folder 1', collections: [4], items: [], context: '/courses/1'},
         4: {id: 4, name: 'folder 4', collections: [5], items: [1], context: '/courses/1'},
-        5: {id: 5, name: 'folder 5', collections: [], items: [], context: '/users/1'}
+        5: {id: 5, name: 'folder 5', collections: [], items: [], context: '/users/1'},
       }
       const items = {1: {id: 1, name: 'old name 1'}}
       wrapper.instance().setState({collections, items})
@@ -431,11 +431,11 @@ describe('FileBrowser', () => {
       const wrapper = mount(<FileBrowser {...getProps({selectFile: spy})} />)
       const collections = {
         0: {id: 0, collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [1, 2]}
+        1: {id: 1, name: 'folder 1', collections: [], items: [1, 2]},
       }
       const items = {
         1: {id: 1, name: 'file 1', alt: 'file 1', src: '/courses/1/files/1/preview'},
-        2: {id: 2, name: 'file 2', alt: 'file 2', src: '/courses/1/files/2/preview'}
+        2: {id: 2, name: 'file 2', alt: 'file 2', src: '/courses/1/files/2/preview'},
       }
       wrapper.instance().setState({collections, items})
       wrapper.update()
@@ -452,23 +452,23 @@ describe('FileBrowser', () => {
       const subFolders = [
         courseFolder({id: 5, name: 'sub folder 1', parent_folder_id: 1}),
         courseFolder({id: 6, name: 'sub folder 10', parent_folder_id: 1}),
-        courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 1})
+        courseFolder({id: 7, name: 'sub folder 2', parent_folder_id: 1}),
       ]
       moxios.stubRequest('/api/v1/folders/1/folders', {
         status: 200,
         responseText: subFolders,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {id: 0, collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -485,23 +485,23 @@ describe('FileBrowser', () => {
       const files = [
         testFile({id: 1, display_name: 'file 1', folder_id: 1}),
         testFile({id: 2, display_name: 'file 10', folder_id: 1}),
-        testFile({id: 3, display_name: 'file 2', folder_id: 1})
+        testFile({id: 3, display_name: 'file 2', folder_id: 1}),
       ]
       moxios.stubRequest('/api/v1/folders/1/folders', {
         status: 200,
         responseText: [],
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 200,
         responseText: files,
-        headers: {link: 'url; rel="current"'}
+        headers: {link: 'url; rel="current"'},
       })
 
       const wrapper = mount(<FileBrowser {...getProps()} />)
       const collections = {
         0: {id: 0, collections: [1]},
-        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'}
+        1: {id: 1, name: 'folder 1', collections: [], items: [], context: '/courses/1'},
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -532,7 +532,7 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
+          context: '/courses/1',
         },
         4: {
           id: 4,
@@ -541,7 +541,7 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: false,
           locked: false,
-          context: '/courses/1'
+          context: '/courses/1',
         },
         5: {
           id: 5,
@@ -550,8 +550,8 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: true,
-          context: '/users/1'
-        }
+          context: '/users/1',
+        },
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -575,8 +575,8 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
-        }
+          context: '/courses/1',
+        },
       }
       const spy = sinon.spy(wrapper.instance(), 'submitFile')
       wrapper.instance().setState({collections})
@@ -584,8 +584,8 @@ describe('FileBrowser', () => {
       wrapper.find('TreeButton').at(0).simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: ['dummyValue.png']
-        }
+          files: ['dummyValue.png'],
+        },
       })
       expect(spy.called).toBeTruthy()
     })
@@ -602,8 +602,8 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
-        }
+          context: '/courses/1',
+        },
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -621,16 +621,16 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
-        }
+          context: '/courses/1',
+        },
       }
       wrapper.instance().setState({collections})
       wrapper.update()
       wrapper.find('TreeButton').at(0).simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: ['dummyValue.png']
-        }
+          files: ['dummyValue.png'],
+        },
       })
       expect(wrapper.find('Mask').exists()).toBeTruthy()
       expect(wrapper.find('Spinner').exists()).toBeTruthy()
@@ -647,8 +647,8 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
-        }
+          context: '/courses/1',
+        },
       }
       wrapper.instance().setState({collections})
       wrapper.update()
@@ -660,20 +660,20 @@ describe('FileBrowser', () => {
           upload_params: {
             Filename: 'file',
             key: 'folder/filename',
-            'content-type': 'image/png'
+            'content-type': 'image/png',
           },
-          file_param: 'attachment[uploaded_data]'
-        }
+          file_param: 'attachment[uploaded_data]',
+        },
       })
       moxios.stubRequest('http://new_url', {
         status: 200,
-        response: {id: 1, display_name: 'file 1', 'content-type': 'image/png', folder_id: 1}
+        response: {id: 1, display_name: 'file 1', 'content-type': 'image/png', folder_id: 1},
       })
       wrapper.find('TreeButton').simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [{name: 'file 1', size: 0}]
-        }
+          files: [{name: 'file 1', size: 0}],
+        },
       })
       moxios.wait(() => {
         moxios.wait(() => {
@@ -698,8 +698,8 @@ describe('FileBrowser', () => {
           items: [],
           canUpload: true,
           locked: false,
-          context: '/courses/1'
-        }
+          context: '/courses/1',
+        },
       }
       const spy = sinon.spy(wrapper.instance(), 'setFailureMessage')
       moxios.stubRequest('/api/v1/folders/1/files', {
@@ -709,18 +709,18 @@ describe('FileBrowser', () => {
           upload_params: {
             Filename: 'file',
             key: 'folder/filename',
-            'content-type': 'image/png'
+            'content-type': 'image/png',
           },
-          file_param: 'attachment[uploaded_data]'
-        }
+          file_param: 'attachment[uploaded_data]',
+        },
       })
       wrapper.instance().setState({collections})
       wrapper.update()
       wrapper.find('TreeButton').simulate('click')
       wrapper.find('input').simulate('change', {
         target: {
-          files: [{name: 'file 1', size: 0}]
-        }
+          files: [{name: 'file 1', size: 0}],
+        },
       })
       moxios.wait(() => {
         expect(spy.calledOnce).toBeTruthy()

@@ -28,7 +28,7 @@ export default class InfiniteScroll extends React.Component {
     pageStart: 0,
     hasMore: false,
     loadMore() {},
-    threshold: 250
+    threshold: 250,
   }
 
   componentDidMount() {

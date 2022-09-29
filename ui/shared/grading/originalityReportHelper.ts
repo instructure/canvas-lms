@@ -66,7 +66,7 @@ export function getOriginalityData(
       reportUrl: data.report_url,
       score: data.similarity_score,
       status: data.status,
-      state: data.state
+      state: data.state,
     }
   }
 }

@@ -93,7 +93,7 @@ describe('replace()', () => {
 describe('insertMentionFor()', () => {
   const user = {
     id: '123',
-    shortName: 'Test User'
+    shortName: 'Test User',
   }
 
   const subject = () => insertMentionFor(user, editor)

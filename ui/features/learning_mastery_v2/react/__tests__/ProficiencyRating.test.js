@@ -30,7 +30,7 @@ describe('ProficiencyRating', () => {
       color: 'green',
       description: 'great',
       onClick: () => {},
-      ...props
+      ...props,
     }
   }
 

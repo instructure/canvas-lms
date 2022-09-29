@@ -44,7 +44,7 @@ export default class AddTray extends Component {
     createNewRole: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
     loading: PropTypes.bool.isRequired,
-    tab: PropTypes.string.isRequired
+    tab: PropTypes.string.isRequired,
   }
 
   constructor(props) {
@@ -52,7 +52,7 @@ export default class AddTray extends Component {
     this.state = {
       selectedRoleName: '',
       selectedBaseType: this.props.allBaseRoles[0] || {label: ''},
-      roleNameErrors: []
+      roleNameErrors: [],
     }
   }
 
@@ -61,7 +61,7 @@ export default class AddTray extends Component {
       this.setState({
         selectedRoleName: '',
         selectedBaseType: newProps.allBaseRoles[0] || {label: ''},
-        roleNameErrors: []
+        roleNameErrors: [],
       })
     }
   }
@@ -76,14 +76,14 @@ export default class AddTray extends Component {
 
     this.setState({
       selectedRoleName: event.target.value,
-      roleNameErrors: errorMessages
+      roleNameErrors: errorMessages,
     })
   }
 
   onChangeBaseType = event => {
     const foundRole = this.props.allBaseRoles.find(element => element.label === event.target.value)
     this.setState({
-      selectedBaseType: foundRole
+      selectedBaseType: foundRole,
     })
   }
 
@@ -91,7 +91,7 @@ export default class AddTray extends Component {
     this.setState({
       selectedRoleName: '',
       selectedBaseType: this.props.allBaseRoles[0] || {label: ''},
-      roleNameErrors: []
+      roleNameErrors: [],
     })
     this.props.hideTray()
   }
@@ -152,7 +152,7 @@ export default class AddTray extends Component {
           onChange={this.onChangeBaseType}
           style={{
             margin: '0',
-            width: '100%'
+            width: '100%',
           }}
           value={this.state.selectedBaseType.label}
         >
@@ -233,7 +233,7 @@ export function mapStateToProps(state, ownProps) {
       allBaseRoles: [],
       open: false,
       loading: false,
-      tab: COURSE
+      tab: COURSE,
     }
     return {...stateProps, ...ownProps}
   }
@@ -250,14 +250,14 @@ export function mapStateToProps(state, ownProps) {
     allLabels: state.roles.map(r => r.label),
     open: true,
     loading: state.activeAddTray && state.activeAddTray.loading,
-    tab: state.roles.find(role => !!role.displayed).contextType
+    tab: state.roles.find(role => !!role.displayed).contextType,
   }
   return {...ownProps, ...stateProps}
 }
 
 const mapDispatchToProps = {
   createNewRole: actions.createNewRole,
-  hideTray: actions.hideAllTrays
+  hideTray: actions.hideAllTrays,
 }
 
 export const ConnectedAddTray = connect(mapStateToProps, mapDispatchToProps)(AddTray)

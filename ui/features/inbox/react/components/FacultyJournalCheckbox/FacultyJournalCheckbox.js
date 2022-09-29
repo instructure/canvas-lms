@@ -33,12 +33,12 @@ export const FacultyJournalCheckBox = props => {
       props={{
         mobile: {
           variant: 'toggle',
-          dataTestId: 'faculty-message-checkbox-mobile'
+          dataTestId: 'faculty-message-checkbox-mobile',
         },
         desktop: {
           variant: 'simple',
-          dataTestId: 'faculty-message-checkbox'
-        }
+          dataTestId: 'faculty-message-checkbox',
+        },
       }}
       render={responsiveProps => (
         <Checkbox
@@ -55,9 +55,9 @@ export const FacultyJournalCheckBox = props => {
 
 FacultyJournalCheckBox.propTypes = {
   onChange: PropTypes.func.isRequired,
-  checked: PropTypes.bool
+  checked: PropTypes.bool,
 }
 
 FacultyJournalCheckBox.defaultProps = {
-  checked: false
+  checked: false,
 }

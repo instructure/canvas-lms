@@ -23,14 +23,14 @@ import INST from 'browser-sniffer'
 const DONE_READY_STATE = 4
 
 const _getJSON = $.getJSON
-$.getJSON = function(url, data, _callback) {
+$.getJSON = function (url, data, _callback) {
   const xhr = _getJSON.apply($, arguments)
   $.ajaxJSON.storeRequest(xhr, url, 'GET', data)
   return xhr
 }
 // Wrapper for default $.ajax behavior.  On error will call
 // the default error method if no error method is provided.
-$.ajaxJSON = function(url, submit_type, data = {}, success, error, options) {
+$.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
   if (!url && error) {
     error(null, null, 'URL required for requests', null)
     return
@@ -46,7 +46,7 @@ $.ajaxJSON = function(url, submit_type, data = {}, success, error, options) {
     submit_type = 'POST'
     data.authenticity_token = authenticity_token()
   }
-  const ajaxError = function(xhr, textStatus, errorThrown) {
+  const ajaxError = function (xhr, textStatus, errorThrown) {
     if (textStatus === 'abort') {
       return // request aborted, do nothing
     }
@@ -104,7 +104,7 @@ $.ajaxJSON = function(url, submit_type, data = {}, success, error, options) {
       ajaxError.apply(this, arguments)
     },
     complete(_xhr) {},
-    data
+    data,
   }
   if (options && options.timeout) {
     params.timeout = options.timeout
@@ -120,7 +120,7 @@ $.ajaxJSON = function(url, submit_type, data = {}, success, error, options) {
 $.ajaxJSON.unhandledXHRs = []
 $.ajaxJSON.ignoredXHRs = []
 $.ajaxJSON.passedRequests = []
-$.ajaxJSON.storeRequest = function(xhr, url, submit_type, data) {
+$.ajaxJSON.storeRequest = function (xhr, url, submit_type, data) {
   $.ajaxJSON.passedRequests.push({xhr, url, submit_type, data})
 }
 
@@ -132,7 +132,7 @@ $.ajaxJSON.abortRequest = xhr => {
   }
 }
 
-$.ajaxJSON.isUnauthenticated = function(xhr) {
+$.ajaxJSON.isUnauthenticated = function (xhr) {
   if (xhr.status !== 401) {
     return false
   }
@@ -148,9 +148,9 @@ $.ajaxJSON.isUnauthenticated = function(xhr) {
 // Defines a default error for all ajax requests.  Will always be called
 // in the development environment, and as a last-ditch error catching
 // otherwise.  See "ajax_errors.js"
-$.fn.defaultAjaxError = function(func) {
+$.fn.defaultAjaxError = function (func) {
   $.fn.defaultAjaxError.object = this
-  $.fn.defaultAjaxError.func = function(event, request, settings, error) {
+  $.fn.defaultAjaxError.func = function (event, request, settings, error) {
     const inProduction = INST.environment === 'production'
     const unhandled = $.inArray(request, $.ajaxJSON.unhandledXHRs) !== -1
     const ignore = $.inArray(request, $.ajaxJSON.ignoredXHRs) !== -1

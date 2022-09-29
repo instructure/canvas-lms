@@ -69,14 +69,14 @@ export const DiscussionTopicAlertManager = props => {
       props={{
         mobile: {
           alert: {
-            textSize: 'small'
-          }
+            textSize: 'small',
+          },
         },
         desktop: {
           alert: {
-            textSize: 'medium'
-          }
-        }
+            textSize: 'medium',
+          },
+        },
       }}
       render={responsiveProps => {
         const applicableAlerts = []
@@ -125,7 +125,7 @@ export const DiscussionTopicAlertManager = props => {
                 {I18n.t('This announcement will not be visible until %{delayedPostAt}.', {
                   delayedPostAt: DateHelper.formatDatetimeForDiscussions(
                     props.discussionTopic.delayedPostAt
-                  )
+                  ),
                 })}
               </Text>
             </Alert>
@@ -141,7 +141,7 @@ export const DiscussionTopicAlertManager = props => {
                     ? DateHelper.formatDatetimeForDiscussions(
                         props.discussionTopic.assignment.unlockAt
                       )
-                    : DateHelper.formatDatetimeForDiscussions(props.discussionTopic.delayedPostAt)
+                    : DateHelper.formatDatetimeForDiscussions(props.discussionTopic.delayedPostAt),
                 })}
               </Text>
             </Alert>
@@ -164,5 +164,5 @@ export const DiscussionTopicAlertManager = props => {
 }
 
 DiscussionTopicAlertManager.propTypes = {
-  discussionTopic: Discussion.shape.isRequired
+  discussionTopic: Discussion.shape.isRequired,
 }

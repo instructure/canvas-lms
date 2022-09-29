@@ -31,8 +31,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
-            _id: '3'
-          }
+            _id: '3',
+          },
         },
         {
           communicationChannelId: '1',
@@ -42,8 +42,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Changed',
-            _id: '36'
-          }
+            _id: '36',
+          },
         },
         {
           communicationChannelId: '1',
@@ -53,8 +53,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Created',
-            _id: '37'
-          }
+            _id: '37',
+          },
         },
         {
           communicationChannelId: '1',
@@ -64,8 +64,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Grading',
             categoryDescription: 'Grading description',
             name: 'Quiz Regrade Finished',
-            _id: '5'
-          }
+            _id: '5',
+          },
         },
         {
           communicationChannelId: '1',
@@ -75,8 +75,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'All Submissions',
             categoryDescription: 'All submissions description',
             name: 'Submission Needs Grading',
-            _id: '4'
-          }
+            _id: '4',
+          },
         },
         {
           communicationChannelId: '1',
@@ -86,9 +86,9 @@ const mockedNotificationPreferences = overrides => ({
             category: 'ReportedReply',
             categoryDescription: 'New reported reply in a Discussion',
             categoryDisplayName: 'Reported Reply',
-            name: 'Reported Reply'
-          }
-        }
+            name: 'Reported Reply',
+          },
+        },
       ],
       notificationPolicyOverrides: [
         {
@@ -99,10 +99,10 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
-            _id: '3'
-          }
-        }
-      ]
+            _id: '3',
+          },
+        },
+      ],
     },
     {
       _id: '17',
@@ -117,8 +117,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
-            _id: '3'
-          }
+            _id: '3',
+          },
         },
         {
           communicationChannelId: '17',
@@ -128,8 +128,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Changed',
-            _id: '36'
-          }
+            _id: '36',
+          },
         },
         {
           communicationChannelId: '17',
@@ -139,8 +139,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Created',
-            _id: '37'
-          }
+            _id: '37',
+          },
         },
         {
           communicationChannelId: '17',
@@ -150,8 +150,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Grading',
             categoryDescription: 'Grading description',
             name: 'Quiz Regrade Finished',
-            _id: '5'
-          }
+            _id: '5',
+          },
         },
         {
           communicationChannelId: '17',
@@ -161,11 +161,11 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'All Submissions',
             categoryDescription: 'All submissions description',
             name: 'Submission Needs Grading',
-            _id: '4'
-          }
-        }
+            _id: '4',
+          },
+        },
       ],
-      notificationPolicyOverrides: null
+      notificationPolicyOverrides: null,
     },
     {
       _id: '27',
@@ -180,8 +180,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Override Changed',
-            _id: '3'
-          }
+            _id: '3',
+          },
         },
         {
           communicationChannelId: '17',
@@ -191,8 +191,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Due Date Changed',
-            _id: '36'
-          }
+            _id: '36',
+          },
         },
         {
           communicationChannelId: '17',
@@ -202,8 +202,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Due Date',
             categoryDescription: 'Due date description',
             name: 'Assignment Created',
-            _id: '37'
-          }
+            _id: '37',
+          },
         },
         {
           communicationChannelId: '17',
@@ -213,8 +213,8 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'Grading',
             categoryDescription: 'Grading description',
             name: 'Quiz Regrade Finished',
-            _id: '5'
-          }
+            _id: '5',
+          },
         },
         {
           communicationChannelId: '17',
@@ -224,14 +224,14 @@ const mockedNotificationPreferences = overrides => ({
             categoryDisplayName: 'All Submissions',
             categoryDescription: 'All submissions description',
             name: 'Submission Needs Grading',
-            _id: '4'
-          }
-        }
+            _id: '4',
+          },
+        },
       ],
-      notificationPolicyOverrides: null
-    }
+      notificationPolicyOverrides: null,
+    },
   ],
-  ...overrides
+  ...overrides,
 })
 
 export default mockedNotificationPreferences

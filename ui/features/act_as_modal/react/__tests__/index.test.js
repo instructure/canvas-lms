@@ -39,15 +39,15 @@ const props = {
       {
         login_id: 'qux',
         sis_id: 555,
-        integration_id: 222
+        integration_id: 222,
       },
       {
         login_id: 'tic',
         sis_id: 777,
-        integration_id: 888
-      }
-    ]
-  }
+        integration_id: 888,
+      },
+    ],
+  },
 }
 describe('ActAsModal', () => {
   it('renders with panda svgs, user avatar, table, and proceed button present', () => {

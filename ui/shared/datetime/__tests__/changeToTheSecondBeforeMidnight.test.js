@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { changeToTheSecondBeforeMidnight as subject } from '../'
-import { epoch } from 'datetime/specHelpers'
+import {changeToTheSecondBeforeMidnight as subject} from '..'
+import {epoch} from 'datetime/specHelpers'
 
 describe('changeToTheSecondBeforeMidnight', () => {
   it('returns null when no argument given.', () => {

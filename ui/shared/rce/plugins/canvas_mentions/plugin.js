@@ -54,7 +54,7 @@ export const pluginDefinition = {
     editor.on('MouseDown', onMouseDown)
     editor.on('Remove', e => onMentionsExit(e.target))
     editor.on('ViewChange', e => onMentionsExit(e.target))
-  }
+  },
 }
 
 tinymce.create('tinymce.plugins.CanvasMentionsPlugin', pluginDefinition)

@@ -28,7 +28,7 @@ beforeEach(() => {
   window.ENV = {
     ...window.ENV,
     validLtiPlacements: [],
-    validLtiScopes: {}
+    validLtiScopes: {},
   }
 })
 
@@ -39,7 +39,7 @@ afterEach(() => {
 
 const selectedScopes = [
   'url:POST|/api/v1/accounts/:account_id/account_notifications',
-  'url:PUT|/api/v1/accounts/:account_id/account_notifications/:id'
+  'url:PUT|/api/v1/accounts/:account_id/account_notifications/:id',
 ]
 
 const fakeActions = {
@@ -50,7 +50,7 @@ const fakeActions = {
   listDeveloperKeyScopesSet: () => {},
   resetLtiState: () => {},
   saveLtiToolConfiguration: () => {},
-  updateLtiKey: () => {}
+  updateLtiKey: () => {},
 }
 
 const developerKey = {
@@ -70,7 +70,7 @@ const developerKey = {
   user_name: 'billy bob',
   vendor_code: 'b3w9w9bf',
   workflow_state: 'active',
-  test_cluster_only: false
+  test_cluster_only: false,
 }
 
 const validToolConfig = {
@@ -80,7 +80,7 @@ const validToolConfig = {
     'https://purl.imsglobal.org/spec/lti-ags/scope/lineitem',
     'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly',
     'https://purl.imsglobal.org/spec/lti-ags/scope/score',
-    'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly'
+    'https://purl.imsglobal.org/spec/lti-nrps/scope/contextmembership.readonly',
   ],
   extensions: [
     {
@@ -101,12 +101,12 @@ const validToolConfig = {
             enabled: true,
             icon_url: 'https://static.test.org/img/default-icon-16x16.png',
             message_type: 'LtiDeepLinkingRequest',
-            canvas_icon_class: 'icon-lti'
-          }
-        ]
+            canvas_icon_class: 'icon-lti',
+          },
+        ],
       },
-      privacy_level: 'public'
-    }
+      privacy_level: 'public',
+    },
   ],
   target_link_uri: 'https://test.testcloud.org/test/lti/oidc_launch',
   oidc_initiation_url: 'https://test.testcloud.org/test/lti/oidc_login',
@@ -116,13 +116,13 @@ const validToolConfig = {
     n: 'vESXFmlzHz-nhZXTkjo29SBpamCzkd7SnpMXgdFEWjLfDeOu0D3JivEEUQ4U67xUBMY9voiJsG2oydMXjgkmGliUIVg-rhyKdBUJu5v6F659FwCj60A8J8qcstIkZfBn3yyOPVwp1FHEUSNvtbDLSRIHFPv-kh8gYyvqz130hE37qAVcaNME7lkbDmH1vbxi3D3A8AxKtiHs8oS41ui2MuSAN9MDb7NjAlFkf2iXlSVxAW5xSek4nHGr4BJKe_13vhLOvRUCTN8h8z-SLORWabxoNIkzuAab0NtfO_Qh0rgoWFC9T69jJPAPsXMDCn5oQ3xh_vhG0vltSSIzHsZ8pw',
     kid: '-1302712033',
     alg: 'RS256',
-    use: 'sig'
-  }
+    use: 'sig',
+  },
 }
 
 const createLtiKeyState = {
   isLtiKey: false,
-  toolConfiguration: {}
+  toolConfiguration: {},
 }
 
 const createDeveloperKeyState = {
@@ -133,24 +133,24 @@ const createDeveloperKeyState = {
   developerKeyCreateOrEditFailed: false,
 
   developerKeyModalOpen: true,
-  developerKey: {id: 22}
+  developerKey: {id: 22},
 }
 
 const editDeveloperKeyState = {
   ...createDeveloperKeyState,
   developerKeyModalOpen: true,
-  developerKey
+  developerKey,
 }
 
 const closedDeveloperKeyState = {
   ...createDeveloperKeyState,
   developerKeyModalOpen: false,
-  developerKey
+  developerKey,
 }
 
 const listDeveloperKeyScopesState = {
   availableScopes: {},
-  listDeveloperKeyScopesPending: true
+  listDeveloperKeyScopesPending: true,
 }
 
 function modalMountNode() {
@@ -177,7 +177,7 @@ describe('isOpen prop', () => {
       modal({
         createLtiKeyState,
         createOrEditDeveloperKeyState,
-        actions: fakeActions
+        actions: fakeActions,
       })
     )
   }
@@ -201,7 +201,7 @@ describe('submitting the form', () => {
         actions: mergedFakeActions,
         createLtiKeyState,
         createOrEditDeveloperKeyState,
-        listDeveloperKeyScopesState
+        listDeveloperKeyScopesState,
       })
     )
 
@@ -218,7 +218,7 @@ describe('submitting the form', () => {
       ...developerKey,
       require_scopes: true,
       scopes: ['test'],
-      test_cluster_only: true
+      test_cluster_only: true,
     }
     const editDeveloperKeyState2 = {...editDeveloperKeyState, developerKey: developerKey2}
 
@@ -227,7 +227,7 @@ describe('submitting the form', () => {
       ...developerKey,
       scopes: selectedScopes,
       require_scopes: true,
-      test_cluster_only: true
+      test_cluster_only: true,
     })
   })
 
@@ -236,7 +236,7 @@ describe('submitting the form', () => {
     expect(sentDevKey).toEqual({
       ...developerKey,
       require_scopes: false,
-      test_cluster_only: false
+      test_cluster_only: false,
     })
   })
 
@@ -269,7 +269,7 @@ describe('scope selection', () => {
         createOrEditDeveloperKeyState: editDeveloperKeyState2,
         listDeveloperKeyScopesState,
         selectedScopes: [],
-        actions: mergedFakeActions
+        actions: mergedFakeActions,
       })
     )
     wrapper.instance().submitForm()
@@ -287,7 +287,7 @@ describe('scope selection', () => {
         createLtiKeyState,
         createOrEditDeveloperKeyState: editKeyWithScopesState,
         listDeveloperKeyScopesState,
-        actions: fakeActions
+        actions: fakeActions,
       })
     )
 
@@ -302,11 +302,11 @@ describe('a11y checks', () => {
     const wrapper = shallow(
       modal({
         createOrEditDeveloperKeyState: {
-          ...createDeveloperKeyState
+          ...createDeveloperKeyState,
         },
         actions: {
-          ...fakeActions
-        }
+          ...fakeActions,
+        },
       })
     )
 
@@ -326,18 +326,18 @@ describe('a11y checks', () => {
     describe('Developer Key gets edited and saved successfully', () => {
       const updateLtiKeyStub = jest.fn().mockResolvedValue({
         developer_key: developerKey,
-        tool_configuration: validToolConfig
+        tool_configuration: validToolConfig,
       })
 
       it('calls the provided success handler function', async () => {
         const wrapper = mount(
           modal({
             createOrEditDeveloperKeyState: {
-              ...createDeveloperKeyState
+              ...createDeveloperKeyState,
             },
             actions: {
               ...fakeActions,
-              updateLtiKey: updateLtiKeyStub
+              updateLtiKey: updateLtiKeyStub,
             },
             handleSuccessfulSave: successfulSaveStub,
           })
@@ -359,14 +359,14 @@ it('clears the lti key state when modal is closed', () => {
   const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
     developerKeysModalClose: () => {},
-    resetLtiState: ltiStub
+    resetLtiState: ltiStub,
   })
 
   const wrapper = mount(
     modal({
       createLtiKeyState,
       createOrEditDeveloperKeyState: createDeveloperKeyState,
-      actions
+      actions,
     })
   )
   wrapper.instance().closeModal()
@@ -386,7 +386,7 @@ it('flashes an error if redirect_uris is empty', () => {
       createOrEditDeveloperKeyState: editDeveloperKeyState2,
       listDeveloperKeyScopesState,
       actions: mergedFakeActions,
-      selectedScopes: []
+      selectedScopes: [],
     })
   )
   wrapper.instance().saveLtiToolConfiguration()
@@ -398,7 +398,7 @@ it('flashes an error if redirect_uris is empty', () => {
 it('renders the saved toolConfiguration if it is present in state', () => {
   const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
-    saveLtiToolConfiguration: () => () => ({then: ltiStub})
+    saveLtiToolConfiguration: () => () => ({then: ltiStub}),
   })
 
   const wrapper = mount(
@@ -406,9 +406,9 @@ it('renders the saved toolConfiguration if it is present in state', () => {
       createLtiKeyState: {...createLtiKeyState, configurationMethod: 'manual'},
       createOrEditDeveloperKeyState: {
         ...createDeveloperKeyState,
-        ...{developerKey: {...developerKey, tool_configuration: validToolConfig}, isLtiKey: true}
+        ...{developerKey: {...developerKey, tool_configuration: validToolConfig}, isLtiKey: true},
       },
-      actions
+      actions,
     })
   )
   wrapper.instance().saveLtiToolConfiguration()
@@ -422,14 +422,14 @@ it('renders the saved toolConfiguration if it is present in state', () => {
 it('clears state on modal close', () => {
   const ltiStub = jest.fn()
   const actions = Object.assign(fakeActions, {
-    updateLtiKey: ltiStub
+    updateLtiKey: ltiStub,
   })
 
   const wrapper = mount(
     modal({
       createLtiKeyState,
       createOrEditDeveloperKeyState: createDeveloperKeyState,
-      actions
+      actions,
     })
   )
   const text = 'I should show up in the text'
@@ -446,11 +446,11 @@ it('hasRedirectUris', () => {
     modal({
       createOrEditDeveloperKeyState: {
         ...createDeveloperKeyState,
-        ...{developerKey: {...developerKey}, isLtiKey: true}
+        ...{developerKey: {...developerKey}, isLtiKey: true},
       },
       // generic required props:
       createLtiKeyState,
-      actions: fakeActions
+      actions: fakeActions,
     })
   )
 
@@ -471,11 +471,11 @@ describe('redirect_uris automatic setting', () => {
       modal({
         createOrEditDeveloperKeyState: {
           ...createDeveloperKeyState,
-          ...{developerKey: {...developerKey}, isLtiKey: true}
+          ...{developerKey: {...developerKey}, isLtiKey: true},
         },
         // generic required props:
         createLtiKeyState,
-        actions: fakeActions
+        actions: fakeActions,
       })
     )
 
@@ -502,7 +502,7 @@ it('does not flash an error if configurationMethod is url', () => {
   const flashStub = jest.spyOn($, 'flashError')
   const saveLtiToolConfigurationSpy = jest.fn()
   const actions = Object.assign(fakeActions, {
-    saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy})
+    saveLtiToolConfiguration: () => () => ({then: saveLtiToolConfigurationSpy}),
   })
   const wrapper = mount(
     modal({
@@ -511,7 +511,7 @@ it('does not flash an error if configurationMethod is url', () => {
       listDeveloperKeyScopesState,
       actions,
       selectedScopes: [],
-      state: {}
+      state: {},
     })
   )
 

@@ -38,7 +38,7 @@ export default class ExternalToolsTable extends React.Component {
     canEdit: PropTypes.bool.isRequired,
     canDelete: PropTypes.bool.isRequired,
     canAddEdit: PropTypes.bool.isRequired,
-    setFocusAbove: PropTypes.func.isRequired
+    setFocusAbove: PropTypes.func.isRequired,
   }
 
   state = store.getState()

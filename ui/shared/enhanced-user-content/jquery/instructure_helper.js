@@ -28,7 +28,7 @@ function getTld(hostname) {
   return (length > 1 ? [parts[length - 2], parts[length - 1]] : parts).join('')
 }
 const locationTld = getTld(window.location.hostname)
-$.expr[':'].external = function(element) {
+$.expr[':'].external = function (element) {
   const href = $(element).attr('href')
   // if a browser doesnt support <a>.hostname then just dont mark anything as external, better to not get false positives.
   return !!(
@@ -46,13 +46,13 @@ window.equella = {
   },
   cancel() {
     $(document).triggerHandler('equella_cancel')
-  }
+  },
 }
 $(document)
-  .bind('equella_ready', function(event, data) {
+  .bind('equella_ready', function (event, data) {
     $('#equella_dialog').triggerHandler('equella_ready', data)
   })
-  .bind('equella_cancel', function() {
+  .bind('equella_cancel', function () {
     $('#equella_dialog').dialog('close')
   })
 
@@ -67,9 +67,9 @@ window.external_tool_dialog = {
     $('#external_tool_button_dialog').dialog('close')
     $('#resource_selection_dialog').dialog('close')
     $('#homework_selection_dialog:visible').dialog('close')
-  }
+  },
 }
 
-window.jsonFlickrApi = function(data) {
+window.jsonFlickrApi = function (data) {
   $('#instructure_image_search').triggerHandler('search_results', data)
 }

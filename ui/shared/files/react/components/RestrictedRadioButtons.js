@@ -42,7 +42,7 @@ const allAreEqual = (models, fields) =>
 class RestrictedRadioButtons extends React.Component {
   static propTypes = {
     models: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
-    radioStateChange: PropTypes.func
+    radioStateChange: PropTypes.func,
   }
 
   constructor(props) {
@@ -75,7 +75,7 @@ class RestrictedRadioButtons extends React.Component {
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'published'})
-      }
+      },
     },
     {
       ref: 'unpublishInput',
@@ -85,7 +85,7 @@ class RestrictedRadioButtons extends React.Component {
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'unpublished'})
-      }
+      },
     },
     {
       ref: 'linkOnly',
@@ -95,7 +95,7 @@ class RestrictedRadioButtons extends React.Component {
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'link_only'})
-      }
+      },
     },
     {
       ref: 'dateRange',
@@ -105,8 +105,8 @@ class RestrictedRadioButtons extends React.Component {
       onChange() {
         this.updateBtnEnable()
         this.setState({selectedOption: 'date_range'})
-      }
-    }
+      },
+    },
   ]
 
   componentDidMount() {
@@ -121,7 +121,7 @@ class RestrictedRadioButtons extends React.Component {
         '',
       lock_at:
         (this.state.selectedOption === 'date_range' && $(this.lock_at).data('unfudged-date')) || '',
-      locked: this.state.selectedOption === 'unpublished'
+      locked: this.state.selectedOption === 'unpublished',
     }
 
     const vis_val = $(this.visibility_field).val()

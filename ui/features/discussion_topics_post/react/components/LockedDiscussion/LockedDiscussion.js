@@ -37,13 +37,13 @@ export const LockedDiscussion = props => {
         mobile: {
           titleMargin: 'x-small',
           titleTextSize: 'medium',
-          titleTextWeight: 'bold'
+          titleTextWeight: 'bold',
         },
         desktop: {
           titleMargin: 'small 0 small large',
           titleTextSize: 'x-large',
-          titleTextWeight: 'normal'
-        }
+          titleTextWeight: 'normal',
+        },
       }}
       render={responsiveProps => (
         <View as="h2" margin={responsiveProps.titleMargin}>
@@ -63,5 +63,5 @@ export const LockedDiscussion = props => {
 }
 
 LockedDiscussion.propTypes = {
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 }

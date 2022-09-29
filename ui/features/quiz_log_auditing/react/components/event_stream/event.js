@@ -28,7 +28,7 @@ const I18n = useI18nScope('quiz_log_auditing.event_stream')
 
 class Event extends React.Component {
   static defaultProps = {
-    startedAt: new Date()
+    startedAt: new Date(),
   }
 
   render() {
@@ -63,7 +63,7 @@ class Event extends React.Component {
     } else if (flag === K.EVT_FLAG_OK) {
       return <IconCompleteLine color="success" />
     } else {
-      return <IconEmptyLine color="secondary"/>
+      return <IconEmptyLine color="secondary" />
     }
   }
 
@@ -73,7 +73,7 @@ class Event extends React.Component {
         return I18n.t('session_started', 'Session started')
 
       case K.EVT_QUESTION_ANSWERED: {
-        const valid_answers = event.data.filter(function(i) {
+        const valid_answers = event.data.filter(function (i) {
           return i.answer != null
         })
 
@@ -87,7 +87,7 @@ class Event extends React.Component {
               'question_answered',
               {
                 one: 'Answered question:',
-                other: 'Answered the following questions:'
+                other: 'Answered the following questions:',
               },
               {count: valid_answers.length}
             )}
@@ -106,7 +106,7 @@ class Event extends React.Component {
               'question_viewed',
               {
                 one: 'Viewed (and possibly read) question',
-                other: 'Viewed (and possibly read) the following questions:'
+                other: 'Viewed (and possibly read) the following questions:',
               },
               {count: event.data.length}
             )}
@@ -170,7 +170,7 @@ class Event extends React.Component {
         key={'question-anchor' + id}
         to={{
           pathname: `/questions/${id}`,
-          search: `?event=${this.props.id}&attempt=${this.props.attempt}`
+          search: `?event=${this.props.id}&attempt=${this.props.attempt}`,
         }}
         className="ic-QuestionAnchors__Anchor"
       >

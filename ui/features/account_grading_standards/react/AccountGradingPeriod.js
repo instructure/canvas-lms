@@ -35,7 +35,7 @@ export default class AccountGradingPeriod extends React.Component {
       weight: PropTypes.number,
       startDate: PropTypes.instanceOf(Date).isRequired,
       endDate: PropTypes.instanceOf(Date).isRequired,
-      closeDate: PropTypes.instanceOf(Date).isRequired
+      closeDate: PropTypes.instanceOf(Date).isRequired,
     }).isRequired,
     weighted: PropTypes.bool,
     onEdit: PropTypes.func.isRequired,
@@ -45,10 +45,10 @@ export default class AccountGradingPeriod extends React.Component {
       read: PropTypes.bool.isRequired,
       create: PropTypes.bool.isRequired,
       update: PropTypes.bool.isRequired,
-      delete: PropTypes.bool.isRequired
+      delete: PropTypes.bool.isRequired,
     }).isRequired,
     onDelete: PropTypes.func.isRequired,
-    deleteGradingPeriodURL: PropTypes.string.isRequired
+    deleteGradingPeriodURL: PropTypes.string.isRequired,
   }
 
   constructor(props) {

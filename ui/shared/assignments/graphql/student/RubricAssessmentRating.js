@@ -44,8 +44,8 @@ export const RubricAssessmentRating = {
     description: string,
     learning_outcome_id: string,
     points: number,
-    artifactAttempt: number
-  })
+    artifactAttempt: number,
+  }),
 }
 
 export const DefaultMocks = {
@@ -53,6 +53,6 @@ export const DefaultMocks = {
     _id: '1',
     outcome: null,
     points: 6,
-    artifactAttempt: '1'
-  })
+    artifactAttempt: '1',
+  }),
 }

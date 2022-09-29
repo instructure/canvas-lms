@@ -32,7 +32,7 @@ const defaultProps = {
   onResetPace,
   showLoadingOverlay: false,
   studentPace: false,
-  unpublishedChanges: true
+  unpublishedChanges: true,
 }
 
 afterEach(() => {
@@ -61,33 +61,33 @@ describe('Footer', () => {
   })
 
   it('shows cannot cancel and publish tooltip while publishing', () => {
-    const {getByText} = render(<Footer {...defaultProps} pacePublishing isSyncing />)
+    const {getByText} = render(<Footer {...defaultProps} pacePublishing={true} isSyncing={true} />)
     expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
     expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
   })
 
   it('shows cannot cancel and publish tooltip while auto saving', () => {
-    const {getByText} = render(<Footer {...defaultProps} autoSaving />)
+    const {getByText} = render(<Footer {...defaultProps} autoSaving={true} />)
     expect(getByText('You cannot cancel while publishing')).toBeInTheDocument()
     expect(getByText('You cannot publish while publishing')).toBeInTheDocument()
   })
 
   it('shows cannot cancel and publish tooltip while loading', () => {
-    const {getByText} = render(<Footer {...defaultProps} showLoadingOverlay />)
+    const {getByText} = render(<Footer {...defaultProps} showLoadingOverlay={true} />)
     expect(getByText('You cannot cancel while loading the pace')).toBeInTheDocument()
     expect(getByText('You cannot publish while loading the pace')).toBeInTheDocument()
   })
 
   it('shows cannot cancel when a new pace', () => {
     const {getByText, queryByText} = render(
-      <Footer {...defaultProps} unpublishedChanges={false} newPace />
+      <Footer {...defaultProps} unpublishedChanges={false} newPace={true} />
     )
     expect(getByText('There are no pending changes to cancel')).toBeInTheDocument()
     expect(queryByText('You cannot publish while loading the pace')).not.toBeInTheDocument()
   })
 
   it('renders a loading spinner inside the publish button when publishing is ongoing', () => {
-    const {getByRole} = render(<Footer {...defaultProps} pacePublishing isSyncing />)
+    const {getByRole} = render(<Footer {...defaultProps} pacePublishing={true} isSyncing={true} />)
 
     const publishButton = getByRole('button', {name: 'Publishing pace...'})
     expect(publishButton).toBeInTheDocument()
@@ -97,7 +97,7 @@ describe('Footer', () => {
   })
 
   it('renders nothing for student paces', () => {
-    const {queryByRole} = render(<Footer {...defaultProps} studentPace />)
+    const {queryByRole} = render(<Footer {...defaultProps} studentPace={true} />)
     expect(queryByRole('button')).not.toBeInTheDocument()
   })
 

@@ -39,7 +39,7 @@ export default class EditToDoItemDetails extends ValidatedFormView {
       title: event.title,
       contexts: event.possibleContexts(),
       date: event.startDate(),
-      details: htmlEscape(event.description)
+      details: htmlEscape(event.description),
     })
 
     this.event = event
@@ -83,9 +83,9 @@ export default class EditToDoItemDetails extends ValidatedFormView {
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(I18n.t('#date.formats.default'))
+        dateFormat: datePickerFormat(I18n.t('#date.formats.default')),
       },
-      dateOnly: true
+      dateOnly: true,
     })
     $time.time_field()
 

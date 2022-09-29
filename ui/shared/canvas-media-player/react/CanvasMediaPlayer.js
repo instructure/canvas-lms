@@ -85,7 +85,7 @@ export default function CanvasMediaPlayer(props) {
     if (document.fullscreenElement || document.webkitFullscreenElement) {
       return {
         width: window.innerWidth,
-        height: window.innerHeight
+        height: window.innerHeight,
       }
     } else if (window.frameElement?.tagName === 'IFRAME' || !containerRef.current) {
       return {width: window.innerWidth, height: window.innerHeight}
@@ -93,7 +93,7 @@ export default function CanvasMediaPlayer(props) {
       // media_player_iframe_content.js includes a 16px top/bottom margin
       return {
         width: containerRef.current.clientWidth,
-        height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32)
+        height: Math.min(containerRef.current.clientHeight, window.innerHeight - 32),
       }
     }
   }
@@ -194,7 +194,7 @@ export default function CanvasMediaPlayer(props) {
     if (retryAttempt >= SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS) {
       return (
         <Flex margin="xx-small" justifyItems="space-between">
-          <Flex.Item margin="0 0 x-small 0" shouldGrow shouldShrink>
+          <Flex.Item margin="0 0 x-small 0" shouldGrow={true} shouldShrink={true}>
             <Alert key="bepatientalert" variant="info" margin="x-small" liveRegion={liveRegion}>
               {I18n.t('Your media has been uploaded and will appear here after processing.')}
             </Alert>
@@ -207,7 +207,7 @@ export default function CanvasMediaPlayer(props) {
     }
     return (
       <>
-        <Alert key="loadingalert" variant="info" liveRegion={liveRegion} screenReaderOnly>
+        <Alert key="loadingalert" variant="info" liveRegion={liveRegion} screenReaderOnly={true}>
           {I18n.t('Loading')}
         </Alert>
         <LoadingIndicator
@@ -288,7 +288,7 @@ export function formatTracksForMediaPlayer(tracks) {
     src: `/media_objects/${track.media_object_id}/media_tracks/${track.id}`,
     label: track.locale,
     type: track.kind,
-    language: track.locale
+    language: track.locale,
   }))
 }
 
@@ -301,7 +301,7 @@ CanvasMediaPlayer.propTypes = {
   type: oneOf(['audio', 'video']),
   MAX_RETRY_ATTEMPTS: number,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: number,
-  aria_label: string
+  aria_label: string,
 }
 
 CanvasMediaPlayer.defaultProps = {
@@ -311,5 +311,5 @@ CanvasMediaPlayer.defaultProps = {
   type: 'video',
   MAX_RETRY_ATTEMPTS: DEFAULT_MAX_RETRY_ATTEMPTS,
   SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS: DEFAULT_SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS,
-  aria_label: ''
+  aria_label: '',
 }

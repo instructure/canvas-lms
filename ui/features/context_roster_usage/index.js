@@ -39,9 +39,7 @@ $(() => {
         }
       }
       for (const idx in data) {
-        const $access = $('#usage_report .access.blank:first')
-          .clone(true)
-          .removeClass('blank')
+        const $access = $('#usage_report .access.blank:first').clone(true).removeClass('blank')
         const access = data[idx].asset_user_access
         $access.addClass(access.asset_class_name)
         $access.find('.icon').addClass(access.icon)
@@ -52,6 +50,6 @@ $(() => {
         $('#usage_report table tbody').append($access.show())
       }
       return ''
-    }
+    },
   })
 })

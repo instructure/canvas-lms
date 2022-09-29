@@ -24,7 +24,7 @@ import React from 'react'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
@@ -34,7 +34,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -56,7 +56,7 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 1'
+        title: 'assignment override 1',
       },
       {
         id: 'BXMzaWdebTVubC2x',
@@ -64,7 +64,7 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 2'
+        title: 'assignment override 2',
       },
       {
         id: 'BXMzaWdebTVubC0x',
@@ -72,8 +72,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}

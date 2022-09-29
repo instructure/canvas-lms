@@ -31,10 +31,10 @@ class Avatar extends React.Component {
       name: PropTypes.string,
       avatar_url: PropTypes.string,
       short_name: PropTypes.string,
-      _id: PropTypes.string
+      _id: PropTypes.string,
     }).isRequired,
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-    canMasquerade: PropTypes.bool.isRequired
+    canMasquerade: PropTypes.bool.isRequired,
   }
 
   render() {
@@ -48,7 +48,7 @@ class Avatar extends React.Component {
             href={`/courses/${this.props.courseId}/users/${user._id}`}
             aria-label={I18n.t("Go to %{name}'s profile", {name})}
           >
-            <InstUIAvatar size="x-large" name={name} src={user.avatar_url} data-fs-exclude />
+            <InstUIAvatar size="x-large" name={name} src={user.avatar_url} data-fs-exclude={true} />
           </Link>
           {canMasquerade && (
             <Text size="x-small" weight="bold" as="div">

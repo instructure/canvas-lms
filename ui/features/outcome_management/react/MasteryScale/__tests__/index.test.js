@@ -36,19 +36,19 @@ describe('MasteryScale', () => {
           role: 'AccountAdmin',
           label: 'Account Admin',
           base_role_type: 'AccountMembership',
-          is_account_role: true
+          is_account_role: true,
         },
         {
           id: '2',
           role: 'TeacherEnrollment',
           label: 'Teacher',
           base_role_type: 'TeacherEnrollment',
-          is_account_role: false
-        }
+          is_account_role: false,
+        },
       ],
       PERMISSIONS: {
-        manage_proficiency_scales: true
-      }
+        manage_proficiency_scales: true,
+      },
     }
   })
 
@@ -108,18 +108,18 @@ describe('MasteryScale', () => {
         request: {
           query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
-            contextId: '11'
-          }
+            contextId: '11',
+          },
         },
         result: {
           data: {
             context: {
               __typename: 'Account',
-              outcomeProficiency: null
-            }
-          }
-        }
-      }
+              outcomeProficiency: null,
+            },
+          },
+        },
+      },
     ]
     const {getByText} = render(<MasteryScale />, {mocks: emptyMocks})
     await waitFor(() => expect(getByText('Mastery')).not.toBeNull())
@@ -151,7 +151,7 @@ describe('MasteryScale', () => {
   describe('can not manage', () => {
     beforeEach(() => {
       window.ENV.PERMISSIONS = {
-        manage_proficiency_scales: false
+        manage_proficiency_scales: false,
       }
     })
 

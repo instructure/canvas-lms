@@ -33,12 +33,12 @@ export default class EditExternalToolButton extends React.Component {
     tool: PropTypes.object.isRequired,
     canEdit: PropTypes.bool.isRequired,
     canAddEdit: PropTypes.bool.isRequired,
-    returnFocus: PropTypes.func.isRequired
+    returnFocus: PropTypes.func.isRequired,
   }
 
   state = {
     tool: this.props.tool,
-    modalIsOpen: false
+    modalIsOpen: false,
   }
 
   editButton = React.createRef()
@@ -47,7 +47,7 @@ export default class EditExternalToolButton extends React.Component {
     const tool = Object.assign(data, this.props.tool)
     this.setState({
       tool,
-      modalIsOpen: true
+      modalIsOpen: true,
     })
   }
 
@@ -60,7 +60,7 @@ export default class EditExternalToolButton extends React.Component {
     } else {
       this.setState({
         tool: this.props.tool,
-        modalIsOpen: true
+        modalIsOpen: true,
       })
     }
   }

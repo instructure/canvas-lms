@@ -56,7 +56,7 @@ export default class OutcomeSummaryCollection extends Collection {
     this.rawCollections = {
       groups: new GroupCollection([], {course_id: this.course_id}),
       links: new LinkCollection([], {course_id: this.course_id}),
-      rollups: new RollupCollection([], {course_id: this.course_id, user_id: this.user_id})
+      rollups: new RollupCollection([], {course_id: this.course_id, user_id: this.user_id}),
     }
     return (this.outcomeCache = new Collection())
   }

@@ -33,7 +33,7 @@ const deserializeTerms = termGroups =>
           startAt: term.start_at ? new Date(term.start_at) : null,
           endAt: term.end_at ? new Date(term.end_at) : null,
           createdAt: term.created_at ? new Date(term.created_at) : null,
-          gradingPeriodGroupId: newGroupID
+          gradingPeriodGroupId: newGroupID,
         }
       })
     )
@@ -50,5 +50,5 @@ export default {
         .fail(error => reject(error))
       /* eslint-enable promise/catch-or-return */
     })
-  }
+  },
 }

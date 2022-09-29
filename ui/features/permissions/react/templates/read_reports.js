@@ -25,60 +25,62 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Reports'),
-      description: I18n.t('Allows user to view and configure reports in Account Settings.')
+      description: I18n.t('Allows user to view and configure reports in Account Settings.'),
     },
     {
-      description: I18n.t('Allows user to view Access Reports.')
+      description: I18n.t('Allows user to view Access Reports.'),
     },
     {
       description: I18n.t(
         'Allows user to view last activity and total activity information on the People page.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
         'To view Last Activity and Total Activity information on the Course People page, Users - view list must also be enabled.'
-      )
+      ),
     },
     {
-      description: I18n.t('To access a Course People page, Users - view list must also be enabled.')
+      description: I18n.t(
+        'To access a Course People page, Users - view list must also be enabled.'
+      ),
     },
     {
       title: I18n.t('Reports (Course)'),
       description: I18n.t(
         'To access the Student Interactions report, Grades - view all grades must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('Allows user to view the Course Statistics button in Course Settings.')
+      description: I18n.t('Allows user to view the Course Statistics button in Course Settings.'),
     },
     {
       title: I18n.t('People'),
       description: I18n.t(
         'Allows user to view Last Activity and Total Activity information on the People page.'
-      )
+      ),
     },
     {
       title: I18n.t('Reports'),
-      description: I18n.t('Allows user to view Last Activity and Total Activity reports.')
-    }
+      description: I18n.t('Allows user to view Last Activity and Total Activity reports.'),
+    },
   ],
   [
     {
       title: I18n.t('People'),
-      description: I18n.t('To access the People Page, Users - view list must be enabled.')
+      description: I18n.t('To access the People Page, Users - view list must be enabled.'),
     },
     {
       title: I18n.t('Reports'),
       description: I18n.t(
         'To access the Student Interactions report, Grades - view all grades must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

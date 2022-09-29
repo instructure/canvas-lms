@@ -42,18 +42,18 @@ class MissingPeopleSection extends React.Component {
     missing: PropTypes.shape(missingsShape).isRequired,
     searchType: PropTypes.string.isRequired,
     inviteUsersURL: PropTypes.string,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    inviteUsersURL: undefined
+    inviteUsersURL: undefined,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      selectAll: false
+      selectAll: false,
     }
     this.tbodyNode = React.createRef()
   }
@@ -96,7 +96,7 @@ class MissingPeopleSection extends React.Component {
     }
     const newUserInfo = {
       name: (missingUser.newUserInfo && missingUser.newUserInfo.name) || '',
-      email: (missingUser.newUserInfo && missingUser.newUserInfo.email) || defaultEmail
+      email: (missingUser.newUserInfo && missingUser.newUserInfo.email) || defaultEmail,
     }
 
     if (typeof this.props.onChange === 'function') {
@@ -168,12 +168,12 @@ class MissingPeopleSection extends React.Component {
             <Table.Cell>
               <Checkbox
                 value={missing.address}
-                checked
+                checked={true}
                 onChange={this.onUncheckUser}
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Check to skip adding a user for %{loginid}', {
-                      loginid: missing.address
+                      loginid: missing.address,
                     })}
                   </ScreenReaderContent>
                 }
@@ -181,7 +181,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}
@@ -193,7 +193,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="email"
                 type="email"
                 placeholder={emailLabel}
@@ -255,12 +255,12 @@ class MissingPeopleSection extends React.Component {
             <Table.Cell>
               <Checkbox
                 value={missing.address}
-                checked
+                checked={true}
                 onChange={this.onUncheckUser}
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Check to skip adding a user for %{loginid}', {
-                      loginid: missing.address
+                      loginid: missing.address,
                     })}
                   </ScreenReaderContent>
                 }
@@ -268,7 +268,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}

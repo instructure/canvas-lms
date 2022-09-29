@@ -154,10 +154,10 @@ export default class DeveloperKeyStateControl extends React.Component {
 
 DeveloperKeyStateControl.propTypes = {
   store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+    dispatch: PropTypes.func.isRequired,
   }).isRequired,
   actions: PropTypes.shape({
-    setBindingWorkflowState: PropTypes.func.isRequired
+    setBindingWorkflowState: PropTypes.func.isRequired,
   }).isRequired,
   developerKey: PropTypes.shape({
     id: PropTypes.string.isRequired,
@@ -166,16 +166,16 @@ DeveloperKeyStateControl.propTypes = {
     name: PropTypes.string,
     developer_key_account_binding: PropTypes.shape({
       workflow_state: PropTypes.string.isRequired,
-      account_owns_binding: PropTypes.bool
-    })
+      account_owns_binding: PropTypes.bool,
+    }),
   }),
   ctx: PropTypes.shape({
     params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
-    })
-  }).isRequired
+      contextId: PropTypes.string.isRequired,
+    }),
+  }).isRequired,
 }
 
 DeveloperKeyStateControl.defaultProps = {
-  developerKey: {}
+  developerKey: {},
 }

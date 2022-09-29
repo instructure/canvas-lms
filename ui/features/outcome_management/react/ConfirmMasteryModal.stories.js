@@ -26,8 +26,8 @@ export default {
     modalText: 'Are you sure you want to change your mastery?',
     isOpen: true,
     title: 'Modal Title',
-    confirmButtonText: 'Confirm Mastery Change'
-  }
+    confirmButtonText: 'Confirm Mastery Change',
+  },
 }
 
 const Template = args => <ConfirmMasteryModal {...args} />

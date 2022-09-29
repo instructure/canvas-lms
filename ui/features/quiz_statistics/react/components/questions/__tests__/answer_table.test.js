@@ -26,8 +26,8 @@ describe('canvas_quizzes/statistics/views/questions/answer_table', () => {
     render(
       <AnswerTable
         answers={[
-          { id: 1, correct: true, responses: 3 },
-          { id: 2, correct: false, responses: 4 }
+          {id: 1, correct: true, responses: 3},
+          {id: 2, correct: false, responses: 4},
         ]}
       />
     )
@@ -37,8 +37,8 @@ describe('canvas_quizzes/statistics/views/questions/answer_table', () => {
     render(
       <AnswerTable
         answers={[
-          { id: 1, correct: true, responses: 3, user_names: ['a', 'b'] },
-          { id: 2, correct: false, responses: 4 }
+          {id: 1, correct: true, responses: 3, user_names: ['a', 'b']},
+          {id: 2, correct: false, responses: 4},
         ]}
       />
     )

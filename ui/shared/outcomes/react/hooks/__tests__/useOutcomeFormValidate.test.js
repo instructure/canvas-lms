@@ -33,7 +33,7 @@ describe('useOutcomeFormValidate', () => {
     friendlyDescriptionError: false,
     displayNameError: false,
     titleError: false,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe('useOutcomeFormValidate', () => {
     const {result} = renderHook(() =>
       useOutcomeFormValidate({
         focusOnRatingsError: focusOnRatingsErrorMock,
-        clearRatingsFocus: clearRatingsFocusMock
+        clearRatingsFocus: clearRatingsFocusMock,
       })
     )
 
@@ -68,7 +68,7 @@ describe('useOutcomeFormValidate', () => {
     const {result} = renderHook(() =>
       useOutcomeFormValidate({
         focusOnRatingsError: focusOnRatingsErrorMock,
-        clearRatingsFocus: clearRatingsFocusMock
+        clearRatingsFocus: clearRatingsFocusMock,
       })
     )
 
@@ -80,7 +80,7 @@ describe('useOutcomeFormValidate', () => {
     const {result} = renderHook(() =>
       useOutcomeFormValidate({
         focusOnRatingsError: focusOnRatingsErrorMock,
-        clearRatingsFocus: clearRatingsFocusMock
+        clearRatingsFocus: clearRatingsFocusMock,
       })
     )
 
@@ -92,18 +92,18 @@ describe('useOutcomeFormValidate', () => {
     const {result} = renderHook(() =>
       useOutcomeFormValidate({
         focusOnRatingsError: focusOnRatingsErrorMock,
-        clearRatingsFocus: clearRatingsFocusMock
+        clearRatingsFocus: clearRatingsFocusMock,
       })
     )
 
     const validateDisplayName = result.current.validateForm({
-      ...defaultProps({displayNameError: true})
+      ...defaultProps({displayNameError: true}),
     })
     expect(validateDisplayName).toBe(false)
     expect(result.current.fieldWithError).toBe('display_name')
 
     const validateTitle = result.current.validateForm({
-      ...defaultProps({titleError: true})
+      ...defaultProps({titleError: true}),
     })
     expect(validateTitle).toBe(false)
     expect(result.current.fieldWithError).toBe('title')
@@ -114,8 +114,8 @@ describe('useOutcomeFormValidate', () => {
       <OutcomesContext.Provider
         value={{
           env: {
-            friendlyDescriptionFF: true
-          }
+            friendlyDescriptionFF: true,
+          },
         }}
       >
         {children}
@@ -125,13 +125,13 @@ describe('useOutcomeFormValidate', () => {
       () =>
         useOutcomeFormValidate({
           focusOnRatingsError: focusOnRatingsErrorMock,
-          clearRatingsFocus: clearRatingsFocusMock
+          clearRatingsFocus: clearRatingsFocusMock,
         }),
       {wrapper}
     )
 
     const validateFriendlyDescriptionError = result.current.validateForm({
-      ...defaultProps({friendlyDescriptionError: true})
+      ...defaultProps({friendlyDescriptionError: true}),
     })
     expect(validateFriendlyDescriptionError).toBe(false)
     expect(result.current.fieldWithError).toBe('friendly_description')
@@ -142,8 +142,8 @@ describe('useOutcomeFormValidate', () => {
       <OutcomesContext.Provider
         value={{
           env: {
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         }}
       >
         {children}
@@ -154,25 +154,25 @@ describe('useOutcomeFormValidate', () => {
       () =>
         useOutcomeFormValidate({
           focusOnRatingsError: focusOnRatingsErrorMock,
-          clearRatingsFocus: clearRatingsFocusMock
+          clearRatingsFocus: clearRatingsFocusMock,
         }),
       {wrapper}
     )
 
     const validateRatingsError = result.current.validateForm({
-      ...defaultProps({ratingsError: true})
+      ...defaultProps({ratingsError: true}),
     })
     expect(validateRatingsError).toBe(false)
     expect(result.current.fieldWithError).toBe('individual_ratings')
 
     const validateMasteryPointsError = result.current.validateForm({
-      ...defaultProps({masteryPointsError: true})
+      ...defaultProps({masteryPointsError: true}),
     })
     expect(validateMasteryPointsError).toBe(false)
     expect(result.current.fieldWithError).toBe('mastery_points')
 
     const validateCalculationMethodError = result.current.validateForm({
-      ...defaultProps({proficiencyCalculationError: true})
+      ...defaultProps({proficiencyCalculationError: true}),
     })
     expect(validateCalculationMethodError).toBe(false)
     expect(result.current.fieldWithError).toBe('individual_calculation_method')
@@ -183,8 +183,8 @@ describe('useOutcomeFormValidate', () => {
       <OutcomesContext.Provider
         value={{
           env: {
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         }}
       >
         {children}
@@ -194,13 +194,13 @@ describe('useOutcomeFormValidate', () => {
       () =>
         useOutcomeFormValidate({
           focusOnRatingsError: focusOnRatingsErrorMock,
-          clearRatingsFocus: clearRatingsFocusMock
+          clearRatingsFocus: clearRatingsFocusMock,
         }),
       {wrapper}
     )
 
     const validateRatingsError = result.current.validateForm({
-      ...defaultProps({ratingsError: true})
+      ...defaultProps({ratingsError: true}),
     })
     expect(validateRatingsError).toBe(false)
     expect(result.current.fieldWithError).toBe('individual_ratings')
@@ -218,13 +218,13 @@ describe('useOutcomeFormValidate', () => {
       () =>
         useOutcomeFormValidate({
           focusOnRatingsError: focusOnRatingsErrorMock,
-          clearRatingsFocus: clearRatingsFocusMock
+          clearRatingsFocus: clearRatingsFocusMock,
         }),
       {wrapper}
     )
 
     const validateTitleError = result.current.validateForm({
-      ...defaultProps({titleError: true})
+      ...defaultProps({titleError: true}),
     })
     const el = {focus: focusMock}
     result.current.setTitleRef(el)

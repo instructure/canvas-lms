@@ -40,14 +40,14 @@ export default class GroupView extends View {
       'click .toggle-group': 'toggleDetails',
       'click .add-user': 'showAddUser',
       'focus .add-user': 'showAddUser',
-      'blur .add-user': 'hideAddUser'
+      'blur .add-user': 'hideAddUser',
     }
 
     this.prototype.dropOptions = {
       accept: '.group-user',
       activeClass: 'droppable',
       hoverClass: 'droppable-hover',
-      tolerance: 'pointer'
+      tolerance: 'pointer',
     }
   }
 
@@ -145,7 +145,7 @@ export default class GroupView extends View {
     if (diffGroupsWithSubmission || unassignedWithSubmission) {
       this.cloneCategoryView = new GroupCategoryCloneView({
         model: this.model.collection.category,
-        openedFromCaution: true
+        openedFromCaution: true,
       })
       this.cloneCategoryView.open()
       return this.cloneCategoryView.on('close', () => {

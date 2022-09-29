@@ -44,20 +44,20 @@ export default {
     if (report.isGenerated) {
       if (type === STUDENT_ANALYSIS) {
         label = I18n.t('Download student analysis report %{statusLabel}', {
-          statusLabel: this.getDetailedStatusLabel(report)
+          statusLabel: this.getDetailedStatusLabel(report),
         })
       } else if (type === ITEM_ANALYSIS) {
         label = I18n.t('Download item analysis report %{statusLabel}', {
-          statusLabel: this.getDetailedStatusLabel(report)
+          statusLabel: this.getDetailedStatusLabel(report),
         })
       }
     } else if (type === STUDENT_ANALYSIS) {
       label = I18n.t('Generate student analysis report %{statusLabel}', {
-        statusLabel: this.getDetailedStatusLabel(report)
+        statusLabel: this.getDetailedStatusLabel(report),
       })
     } else if (type === ITEM_ANALYSIS) {
       label = I18n.t('Generate item analysis report %{statusLabel}', {
-        statusLabel: this.getDetailedStatusLabel(report)
+        statusLabel: this.getDetailedStatusLabel(report),
       })
     }
 
@@ -72,7 +72,7 @@ export default {
       )
     } else if (report.isGenerated) {
       return I18n.t('generated_at', 'Generated: %{date}', {
-        date: friendlyDatetime(fudgeDateForProfileTimezone(report.file.createdAt))
+        date: friendlyDatetime(fudgeDateForProfileTimezone(report.file.createdAt)),
       })
     } else if (report.isGenerating) {
       const completion = report.progress.completion
@@ -87,5 +87,5 @@ export default {
     } else {
       return I18n.t('generatable', 'Report has never been generated.')
     }
-  }
+  },
 }

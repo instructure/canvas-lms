@@ -21,7 +21,7 @@ import {
   roleSortedInsert,
   roleIsCourseBaseRole,
   roleIsBaseRole,
-  groupGranularPermissionsInRole
+  groupGranularPermissionsInRole,
 } from '../util'
 import {ENABLED_FOR_NONE, ENABLED_FOR_PARTIAL, ENABLED_FOR_ALL} from '../react/propTypes'
 import stubEnv from '@canvas/stub-env'
@@ -43,30 +43,30 @@ function makeGroupPermissions() {
         locked: true,
         readonly: true,
         explicit: false,
-        group: 'manage_courses'
+        group: 'manage_courses',
       },
       manage_courses_conclude: {
         enabled: true,
         locked: false,
         readonly: false,
         explicit: false,
-        group: 'manage_courses'
+        group: 'manage_courses',
       },
       manage_courses_delete: {
         enabled: true,
         locked: false,
         readonly: false,
         explicit: false,
-        group: 'manage_courses'
+        group: 'manage_courses',
       },
       manage_courses_publish: {
         enabled: true,
         locked: false,
         readonly: false,
         explicit: false,
-        group: 'manage_courses'
-      }
-    }
+        group: 'manage_courses',
+      },
+    },
   }
 }
 
@@ -76,33 +76,33 @@ describe('permissions::utils', () => {
       {
         group_name: 'Account Permissions',
         group_permissions: [{permission_name: 'manage_courses_add'}],
-        context_type: 'Account'
-      }
+        context_type: 'Account',
+      },
     ],
     ACCOUNT_ROLES: [
       {
         role: 'AccountAdmin',
         label: 'Account Admin',
-        base_role_type: 'AccountMembership'
+        base_role_type: 'AccountMembership',
       },
       {
         role: 'CustomAccountAdmin',
         label: 'Custom Account Admin',
-        base_role_type: 'AccountMembership'
-      }
+        base_role_type: 'AccountMembership',
+      },
     ],
     COURSE_ROLES: [
       {
         role: 'TeacherEnrollment',
         label: 'Teacher',
-        base_role_type: 'TeacherEnrollment'
+        base_role_type: 'TeacherEnrollment',
       },
       {
         role: 'Custom Teacher Role',
         label: 'Custom Teacher Role',
-        base_role_type: 'TeacherEnrollment'
-      }
-    ]
+        base_role_type: 'TeacherEnrollment',
+      },
+    ],
   })
 
   describe('getSortedRoles', () => {
@@ -111,66 +111,66 @@ describe('permissions::utils', () => {
         {
           id: '13',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '10',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_FOUR'
+          base_role_type: 'BASE_TYPE_FOUR',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '4',
           role: 'BASE_TYPE_FOUR',
-          base_role_type: 'BASE_TYPE_FOUR'
-        }
+          base_role_type: 'BASE_TYPE_FOUR',
+        },
       ]
 
       const ORDERED_ROLES = [
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '13',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '4',
           role: 'BASE_TYPE_FOUR',
-          base_role_type: 'BASE_TYPE_FOUR'
+          base_role_type: 'BASE_TYPE_FOUR',
         },
         {
           id: '10',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_FOUR'
-        }
+          base_role_type: 'BASE_TYPE_FOUR',
+        },
       ]
 
       const orderedRoles = getSortedRoles(UNORDERED_ROLES)
@@ -182,66 +182,66 @@ describe('permissions::utils', () => {
         {
           id: '20',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '13',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '11',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
-        }
+          base_role_type: 'BASE_TYPE_ONE',
+        },
       ]
 
       const ORDERED_ROLES = [
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '11',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '20',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '13',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_THREE'
-        }
+          base_role_type: 'BASE_TYPE_THREE',
+        },
       ]
 
       const orderedRoles = getSortedRoles(UNORDERED_ROLES)
@@ -253,56 +253,56 @@ describe('permissions::utils', () => {
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '11',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '20',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
-        }
+          base_role_type: 'BASE_TYPE_THREE',
+        },
       ]
 
       const ORDERED_ROLES = [
         {
           id: '1',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '11',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '20',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
-        }
+          base_role_type: 'BASE_TYPE_THREE',
+        },
       ]
 
       const orderedRoles = getSortedRoles(UNORDERED_ROLES)
@@ -315,30 +315,30 @@ describe('permissions::utils', () => {
       {
         id: '1',
         role: 'BASE_TYPE_ONE',
-        base_role_type: 'BASE_TYPE_ONE'
+        base_role_type: 'BASE_TYPE_ONE',
       },
       {
         id: '11',
         role: 'NON_BASE_TYPE',
-        base_role_type: 'BASE_TYPE_ONE'
+        base_role_type: 'BASE_TYPE_ONE',
       },
       {
         id: '2',
         role: 'BASE_TYPE_TWO',
-        base_role_type: 'BASE_TYPE_TWO'
+        base_role_type: 'BASE_TYPE_TWO',
       },
       {
         id: '3',
         role: 'BASE_TYPE_THREE',
-        base_role_type: 'BASE_TYPE_THREE'
-      }
+        base_role_type: 'BASE_TYPE_THREE',
+      },
     ]
 
     it('sorts roles properly inserts Role into first item', () => {
       const ROLE_TO_INSERT = {
         id: '20',
         role: 'NON_BASE_TYPE',
-        base_role_type: 'BASE_TYPE_ONE'
+        base_role_type: 'BASE_TYPE_ONE',
       }
 
       const ORDERED_ROLES = ALL_ROLES.slice()
@@ -352,7 +352,7 @@ describe('permissions::utils', () => {
       const ROLE_TO_INSERT = {
         id: '20',
         role: 'NON_BASE_TYPE',
-        base_role_type: 'BASE_TYPE_THREE'
+        base_role_type: 'BASE_TYPE_THREE',
       }
 
       const ORDERED_ROLES = ALL_ROLES.slice()
@@ -366,7 +366,7 @@ describe('permissions::utils', () => {
       const ROLE_TO_INSERT = {
         id: '20',
         role: 'NON_BASE_TYPE',
-        base_role_type: 'BASE_TYPE_TWO'
+        base_role_type: 'BASE_TYPE_TWO',
       }
 
       const ORDERED_ROLES = ALL_ROLES.slice()
@@ -380,7 +380,7 @@ describe('permissions::utils', () => {
       const ACCOUNT_ADMIN = {
         id: '1',
         role: 'AccountAdmin',
-        base_role_type: 'AccountMembership'
+        base_role_type: 'AccountMembership',
       }
 
       const orderedRoles = getSortedRoles(ALL_ROLES, ACCOUNT_ADMIN)
@@ -391,45 +391,45 @@ describe('permissions::utils', () => {
       const ACCOUNT_ADMIN = {
         id: '1',
         role: 'AccountAdmin',
-        base_role_type: 'AccountMembership'
+        base_role_type: 'AccountMembership',
       }
 
       const UNORDERED_ROLES = [
         {
           id: '13',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '5',
           role: 'BASE_TYPE_ONE',
-          base_role_type: 'BASE_TYPE_ONE'
+          base_role_type: 'BASE_TYPE_ONE',
         },
         {
           id: '10',
           role: 'NON_BASE_TYPE',
-          base_role_type: 'BASE_TYPE_FOUR'
+          base_role_type: 'BASE_TYPE_FOUR',
         },
         {
           id: '2',
           role: 'BASE_TYPE_TWO',
-          base_role_type: 'BASE_TYPE_TWO'
+          base_role_type: 'BASE_TYPE_TWO',
         },
         {
           id: '3',
           role: 'BASE_TYPE_THREE',
-          base_role_type: 'BASE_TYPE_THREE'
+          base_role_type: 'BASE_TYPE_THREE',
         },
         {
           id: '4',
           role: 'BASE_TYPE_FOUR',
-          base_role_type: 'BASE_TYPE_FOUR'
+          base_role_type: 'BASE_TYPE_FOUR',
         },
         {
           id: '1',
           role: 'AccountAdmin',
-          base_role_type: 'AccountMembership'
-        }
+          base_role_type: 'AccountMembership',
+        },
       ]
 
       const orderedRoles = getSortedRoles(UNORDERED_ROLES, ACCOUNT_ADMIN)
@@ -450,7 +450,7 @@ describe('permissions::utils', () => {
       accountRole = {
         base_role_type: 'AccountMembership',
         contextType: 'Account',
-        ...groupPermissions
+        ...groupPermissions,
       }
       courseRole = {base_role_type: 'TeacherEnrollment', contextType: 'Course', ...groupPermissions}
       customCourseRole = {base_role_type: 'TeacherEnrollment', ...groupPermissions}
@@ -533,7 +533,7 @@ describe('permissions::utils', () => {
     const accountBaserole = {
       id: '1',
       role: 'AccountAdmin',
-      base_role_type: 'AccountMembership'
+      base_role_type: 'AccountMembership',
     }
 
     expect(roleIsCourseBaseRole(accountBaserole)).toBeFalsy()

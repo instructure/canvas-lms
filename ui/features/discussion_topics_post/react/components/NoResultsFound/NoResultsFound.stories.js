@@ -21,7 +21,7 @@ import {NoResultsFound} from './NoResultsFound'
 
 export default {
   title: 'Examples/Discussion Posts/Components/NoResultsFound',
-  component: NoResultsFound
+  component: NoResultsFound,
 }
 
 const Template = () => <NoResultsFound />

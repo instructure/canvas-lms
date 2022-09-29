@@ -45,10 +45,10 @@ $(document).ready(() => {
     $('<div style="padding:0; overflow:hidden;">')
       .dialog({
         title: I18n.t('preview_title', 'Preview of %{title}', {
-          title: $(this).data('dialog-title')
+          title: $(this).data('dialog-title'),
         }),
         width: $(document).width() * 0.95,
-        height: $(document).height() * 0.75
+        height: $(document).height() * 0.75,
       })
       .loadDocPreview($.extend({height: '100%'}, $(this).data()))
     $('.submission_annotation.unread_indicator').hide()

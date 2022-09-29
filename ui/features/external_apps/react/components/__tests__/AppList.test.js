@@ -43,7 +43,7 @@ describe('AppList', () => {
         '7th-12th Grade',
         'Postsecondary',
         'Open Content',
-        'Web 2.0'
+        'Web 2.0',
       ],
       description:
         '\n<p>Acclaim is the easiest way to organize and annotate videos for class.</p>\n\n<p>Instructors and students set up folders, upload recordings or embed relevant web videos, and then securely share access among each other. Moments in each video can then be highlighted and discussed using time-specific comments!</p>\n\n<p>To learn more about how to use Acclaim in your class(es), email Melinda at <a href="mailto:melinda@getacclaim.com">melinda@getacclaim.com</a>.</p>\n\n<p>For general information, please visit <a href="https://getacclaim.com">Acclaim</a>.</p>\n',
@@ -58,7 +58,7 @@ describe('AppList', () => {
       short_description: 'Acclaim is the easiest way to organize and annotate videos.',
       short_name: 'acclaim_app',
       status: 'active',
-      total_ratings: 0
+      total_ratings: 0,
     },
     {
       app_type: null,
@@ -82,7 +82,7 @@ describe('AppList', () => {
         'ALEKS is an artificial intelligent assessment and learning system which uses adaptive questioning to quickly and accurately determine exactly what a student kno...',
       short_name: 'aleks',
       status: 'active',
-      total_ratings: 2
+      total_ratings: 2,
     },
     {
       app_type: 'custom',
@@ -106,8 +106,8 @@ describe('AppList', () => {
         "Integrate hands-on learning exercises into your course. With ApprenNet's LTI APP, you can add exercises to your course in which participants 1) submit video res...",
       short_name: 'apprennet',
       status: 'active',
-      total_ratings: 1
-    }
+      total_ratings: 1,
+    },
   ]
 
   beforeAll(() => {

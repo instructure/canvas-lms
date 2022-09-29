@@ -46,7 +46,7 @@ const helpDialog = {
       resizable: false,
       width: 400,
       title: helpDialog.defaultTitle,
-      close: () => helpDialog.switchTo('#help-dialog-options')
+      close: () => helpDialog.switchTo('#help-dialog-options'),
     })
 
     helpDialog.$dialog.dialog('widget').delegate(
@@ -71,7 +71,7 @@ const helpDialog = {
         helpLinks: links,
         url: window.location,
         contextAssetString: ENV.context_asset_string,
-        userRoles: ENV.current_user_roles
+        userRoles: ENV.current_user_roles,
       }
 
       helpDialog.$dialog.html(helpDialogTemplate(locals))
@@ -97,7 +97,7 @@ const helpDialog = {
       success: () => {
         helpDialog.$dialog.dialog('close')
         $form.find(':input').val('')
-      }
+      },
     })
   },
 
@@ -130,7 +130,7 @@ const helpDialog = {
           if (!toFocus.length) toFocus = newPanel.find(':focusable')
           toFocus.first().focus()
           if (panelId !== homePanel) $(homePanel).hide()
-        }
+        },
       }
     )
 
@@ -177,7 +177,7 @@ const helpDialog = {
           .formSubmit({
             disableWhileLoading: true,
             required: ['recipients[]', 'body'],
-            success: () => helpDialog.$dialog.dialog('close')
+            success: () => helpDialog.$dialog.dialog('close'),
           })
       })
 
@@ -199,6 +199,6 @@ const helpDialog = {
 
   initTriggers() {
     $('.help_dialog_trigger').click(preventDefault(helpDialog.open))
-  }
+  },
 }
 export default helpDialog

@@ -23,7 +23,7 @@ describe('getConferenceType', () => {
     {id: 1, type: 'foo'},
     {id: 2, type: 'bar'},
     {id: 3, type: 'LtiConference', lti_settings: {tool_id: '1'}},
-    {id: 4, type: 'LtiConference', lti_settings: {tool_id: '2'}}
+    {id: 4, type: 'LtiConference', lti_settings: {tool_id: '2'}},
   ]
 
   it('returns the conference type from a list that matches the given conference', () => {

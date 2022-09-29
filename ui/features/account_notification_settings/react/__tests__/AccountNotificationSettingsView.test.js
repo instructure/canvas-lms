@@ -34,7 +34,7 @@ async function mockUserEnrollmentsQuery(queryOverrides) {
     NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY,
     queryOverrides,
     {
-      userId: 1
+      userId: 1,
     }
   )
 
@@ -43,11 +43,11 @@ async function mockUserEnrollmentsQuery(queryOverrides) {
       request: {
         query: NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY,
         variables: {
-          userId: '1'
-        }
+          userId: '1',
+        },
       },
-      result: queryResult
-    }
+      result: queryResult,
+    },
   ]
 }
 
@@ -57,7 +57,7 @@ async function mockAccountNotificationsQuery(queryOverrides) {
   }
   const queryResult = await mockGraphqlQuery(ACCOUNT_NOTIFICATIONS_QUERY, queryOverrides, {
     accountId: 1,
-    userId: 1
+    userId: 1,
   })
 
   return [
@@ -66,11 +66,11 @@ async function mockAccountNotificationsQuery(queryOverrides) {
         query: ACCOUNT_NOTIFICATIONS_QUERY,
         variables: {
           accountId: '1',
-          userId: '1'
-        }
+          userId: '1',
+        },
       },
-      result: queryResult
-    }
+      result: queryResult,
+    },
   ]
 }
 
@@ -80,7 +80,7 @@ async function mockCourseNotificationsQuery(queryOverrides) {
   }
   const queryResult = await mockGraphqlQuery(COURSE_NOTIFICATIONS_QUERY, queryOverrides, {
     courseId: 1,
-    userId: 1
+    userId: 1,
   })
 
   return [
@@ -89,11 +89,11 @@ async function mockCourseNotificationsQuery(queryOverrides) {
         query: COURSE_NOTIFICATIONS_QUERY,
         variables: {
           courseId: '1',
-          userId: '1'
-        }
+          userId: '1',
+        },
       },
-      result: queryResult
-    }
+      result: queryResult,
+    },
   ]
 }
 
@@ -103,7 +103,7 @@ describe('Notification Settings page', () => {
 
     const {findByTestId, findByText} = render(
       <MockedProvider mocks={mocks} cache={createCache()}>
-        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled />
+        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
       </MockedProvider>
     )
 
@@ -124,7 +124,7 @@ describe('Notification Settings page', () => {
 
     const {findByTestId} = render(
       <MockedProvider mocks={accountMocks.concat(enrollmentMocks)} cache={createCache()}>
-        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled />
+        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
       </MockedProvider>
     )
 
@@ -150,7 +150,7 @@ describe('Notification Settings page', () => {
 
     const {findByTestId} = render(
       <MockedProvider mocks={accountMocks.concat(enrollmentMocks)} cache={createCache()}>
-        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled />
+        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
       </MockedProvider>
     )
 
@@ -174,7 +174,7 @@ describe('Notification Settings page', () => {
         mocks={accountMocks.concat(courseMocks, enrollmentMocks)}
         cache={createCache()}
       >
-        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled />
+        <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled={true} />
       </MockedProvider>
     )
 

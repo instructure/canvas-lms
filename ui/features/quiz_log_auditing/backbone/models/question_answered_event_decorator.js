@@ -23,7 +23,7 @@ const findWhere = _.findWhere
 const keys = Object.keys
 const QuestionAnsweredEventDecorator = {}
 
-QuestionAnsweredEventDecorator.decorateAnswerRecord = function(question, record) {
+QuestionAnsweredEventDecorator.decorateAnswerRecord = function (question, record) {
   let answered = false
   const answer = record.answer
   let blank
@@ -54,7 +54,7 @@ QuestionAnsweredEventDecorator.decorateAnswerRecord = function(question, record)
       if (answer instanceof Array && answer.length > 0) {
         // watch out that at this point, the attributes are not normalized
         // and not camelCased:
-        answered = answer.some(function(pair) {
+        answered = answer.some(function (pair) {
           return pair.match_id !== null
         })
       }
@@ -106,12 +106,12 @@ QuestionAnsweredEventDecorator.decorateAnswerRecord = function(question, record)
  *         Nothing is returned as the decoration is done in-place on the model
  *         attributes.
  */
-QuestionAnsweredEventDecorator.run = function(events, questions) {
+QuestionAnsweredEventDecorator.run = function (events, questions) {
   let finalAnswerEvents = {}
 
-  events.forEach(function(event) {
-    event.attributes.data.forEach(function(record) {
-      const question = questions.filter(function(question) {
+  events.forEach(function (event) {
+    event.attributes.data.forEach(function (record) {
+      const question = questions.filter(function (question) {
         return question.id === record.quizQuestionId
       })[0]
 
@@ -121,11 +121,11 @@ QuestionAnsweredEventDecorator.run = function(events, questions) {
     })
   })
 
-  keys(finalAnswerEvents).forEach(function(quizQuestionId) {
+  keys(finalAnswerEvents).forEach(function (quizQuestionId) {
     const event = finalAnswerEvents[quizQuestionId]
 
     findWhere(event.attributes.data, {
-      quizQuestionId
+      quizQuestionId,
     }).last = true
   })
 

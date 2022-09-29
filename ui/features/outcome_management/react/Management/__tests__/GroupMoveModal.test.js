@@ -22,7 +22,7 @@ import {render as realRender, act, fireEvent} from '@testing-library/react'
 import {
   smallOutcomeTree,
   updateOutcomeGroupMock,
-  createOutcomeGroupMocks
+  createOutcomeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
@@ -45,14 +45,14 @@ describe('GroupMoveModal', () => {
     onCloseHandler: onCloseHandlerMock,
     parentGroup: {
       id: '100',
-      title: 'Account folder 0'
+      title: 'Account folder 0',
     },
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
     mocks = smallOutcomeTree({
-      group100childCounts: 2
+      group100childCounts: 2,
     })
     cache = createCache()
     onCloseHandlerMock = jest.fn()
@@ -69,7 +69,7 @@ describe('GroupMoveModal', () => {
       contextType = 'Account',
       contextId = '1',
       rootOutcomeGroup = {id: '100'},
-      treeBrowserRootGroupId = '1'
+      treeBrowserRootGroupId = '1',
     } = {}
   ) => {
     return realRender(
@@ -141,8 +141,8 @@ describe('GroupMoveModal', () => {
         parentOutcomeGroupId: '401',
         title: null,
         description: null,
-        vendorGuid: null
-      })
+        vendorGuid: null,
+      }),
     ]
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
     await act(async () => jest.runOnlyPendingTimers())
@@ -152,7 +152,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: '"Group 100 folder 0" was moved to "Group 100 folder 1".',
-      type: 'success'
+      type: 'success',
     })
   })
 
@@ -165,8 +165,8 @@ describe('GroupMoveModal', () => {
         title: null,
         description: null,
         vendorGuid: null,
-        failResponse: true
-      })
+        failResponse: true,
+      }),
     ]
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
     await act(async () => jest.runOnlyPendingTimers())
@@ -176,7 +176,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -189,8 +189,8 @@ describe('GroupMoveModal', () => {
         title: null,
         description: null,
         vendorGuid: null,
-        failMutation: true
-      })
+        failMutation: true,
+      }),
     ]
 
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
@@ -201,7 +201,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -214,8 +214,8 @@ describe('GroupMoveModal', () => {
         title: null,
         description: null,
         vendorGuid: null,
-        failMutationNoErrMsg: true
-      })
+        failMutationNoErrMsg: true,
+      }),
     ]
 
     const {getByText} = render(<GroupMoveModal {...defaultProps()} />)
@@ -226,7 +226,7 @@ describe('GroupMoveModal', () => {
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'An error occurred while moving this group. Please try again.',
-      type: 'error'
+      type: 'error',
     })
   })
 
@@ -243,8 +243,8 @@ describe('GroupMoveModal', () => {
         parentOutcomeGroupId: '401',
         title: null,
         description: null,
-        vendorGuid: null
-      })
+        vendorGuid: null,
+      }),
     ]
 
     const onSuccess = jest.fn()
@@ -266,32 +266,32 @@ describe('GroupMoveModal', () => {
           parentOutcomeGroupId: '200',
           title: null,
           description: null,
-          vendorGuid: null
+          vendorGuid: null,
         }),
         ...createOutcomeGroupMocks({
           id: '200',
           parentOutcomeGroupId: '100',
-          title: 'new group'
-        })
+          title: 'new group',
+        }),
       ]
       const {getByText, getByLabelText} = render(<GroupMoveModal {...defaultProps()} />)
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.click(getByText('Create New Group'))
       fireEvent.change(getByLabelText('Enter new group name'), {
-        target: {value: 'new group'}
+        target: {value: 'new group'},
       })
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"new group" was successfully created.',
-        type: 'success'
+        type: 'success',
       })
       expect(getByText('Move').closest('button')).toBeEnabled()
       fireEvent.click(getByText('Move'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Group 100 folder 0" was moved to "new group".',
-        type: 'success'
+        type: 'success',
       })
     })
   })

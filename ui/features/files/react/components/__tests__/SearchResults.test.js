@@ -54,7 +54,7 @@ const defaultProps = (props = {}) => {
       selectedItems: [],
       dndOptions: {},
       clearSelectedItems: () => {},
-      onMove: () => {}
+      onMove: () => {},
     },
     props
   )
@@ -68,9 +68,9 @@ describe('SearchResults', () => {
     window.ENV = {
       COURSE_ID: '101',
       FEATURES: {
-        files_dnd: true
+        files_dnd: true,
       },
-      context_asset_string: 'course_17'
+      context_asset_string: 'course_17',
     }
   })
 
@@ -97,7 +97,7 @@ describe('SearchResults', () => {
 
     it('does not render if userCanEditFilesForContext is false', () => {
       wrapper = mount(<SearchResults {...defaultProps({userCanEditFilesForContext: false})} />, {
-        attachTo: document.body.firstChild
+        attachTo: document.body.firstChild,
       })
       const message = document.querySelector('.SearchResults__accessbilityMessage')
       expect(message).toBeNull()

@@ -26,13 +26,13 @@ const mockProps = ({
   createdAt = '2021-08-10T12:10:38-06:00',
   previewMessage = 'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
   author = {
-    shortName: 'Albus Dumbledore'
+    shortName: 'Albus Dumbledore',
   },
   anonymousAuthor = null,
   editor = {
-    shortName: 'Harry Potter'
+    shortName: 'Harry Potter',
   },
-  deleted = false
+  deleted = false,
 } = {}) => ({createdAt, previewMessage, author, anonymousAuthor, editor, deleted})
 
 const setup = props => {
@@ -78,7 +78,7 @@ describe('Reply Preview', () => {
     const container = setup(
       mockProps({
         previewMessage:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus. Phasellus laoreet ante eget augue mollis sollicitudin. Quisque congue'
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus. Phasellus laoreet ante eget augue mollis sollicitudin. Quisque congue',
       })
     )
     expect(container.getByText('Read More')).toBeTruthy()
@@ -88,7 +88,7 @@ describe('Reply Preview', () => {
     const container = setup(
       mockProps({
         previewMessage:
-          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus.'
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras nec lectus neque. Sed eu molestie purus.',
       })
     )
     expect(container.queryByText('Read More')).toBeNull()

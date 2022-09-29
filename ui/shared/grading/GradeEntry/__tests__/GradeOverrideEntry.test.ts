@@ -30,11 +30,11 @@ describe('GradeOverrideEntry', () => {
           ['B', 0.8],
           ['C', 0.7],
           ['D', 0.6],
-          ['F', 0.5]
+          ['F', 0.5],
         ],
         id: '2801',
-        title: 'Default Grading Scheme'
-      }
+        title: 'Default Grading Scheme',
+      },
     }
   })
 
@@ -355,7 +355,7 @@ describe('GradeOverrideEntry', () => {
             ['3.0', 0.8],
             ['2.0', 0.7],
             ['1.0', 0.6],
-            ['0.0', 0.5]
+            ['0.0', 0.5],
           ]
           expect(parseValue('3.0').grade.percentage).toEqual(80.0)
         })
@@ -366,7 +366,7 @@ describe('GradeOverrideEntry', () => {
             ['85%', 0.8],
             ['75%', 0.7],
             ['65%', 0.6],
-            ['0%', 0.5]
+            ['0%', 0.5],
           ]
           expect(parseValue('85%').grade.percentage).toEqual(80.0)
         })
@@ -432,7 +432,7 @@ describe('GradeOverrideEntry', () => {
             ['3.0', 0.8],
             ['2.0', 0.7],
             ['1.0', 0.6],
-            ['0.0', 0.5]
+            ['0.0', 0.5],
           ]
           expect(parseValue('3.0').grade.schemeKey).toEqual('3.0')
         })
@@ -443,7 +443,7 @@ describe('GradeOverrideEntry', () => {
             ['85%', 0.8],
             ['75%', 0.7],
             ['65%', 0.6],
-            ['0%', 0.5]
+            ['0%', 0.5],
           ]
           expect(parseValue('95%').grade.schemeKey).toEqual('95%')
         })
@@ -491,7 +491,7 @@ describe('GradeOverrideEntry', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         expect(parseValue('3.0').enteredAs).toEqual(GRADING_SCHEME)
       })
@@ -502,7 +502,7 @@ describe('GradeOverrideEntry', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         expect(parseValue('85%').enteredAs).toEqual(GRADING_SCHEME)
       })

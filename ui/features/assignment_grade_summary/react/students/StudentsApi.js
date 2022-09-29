@@ -31,7 +31,7 @@ function normalizeStudentPage(data) {
 
     students.push({
       displayName: studentDatum.display_name || null,
-      id: studentId
+      id: studentId,
     })
 
     studentDatum.provisional_grades.forEach(gradeDatum => {
@@ -41,7 +41,7 @@ function normalizeStudentPage(data) {
         id: gradeDatum.provisional_grade_id,
         score: gradeDatum.score,
         selected: studentDatum.selected_provisional_grade_id === gradeDatum.provisional_grade_id,
-        studentId
+        studentId,
       })
     })
   })

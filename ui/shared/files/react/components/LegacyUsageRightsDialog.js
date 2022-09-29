@@ -34,7 +34,7 @@ export default {
   propTypes: {
     isOpen: PropTypes.bool,
     closeModal: PropTypes.func,
-    itemsToManage: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired
+    itemsToManage: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
   },
 
   componentWillMount() {
@@ -64,7 +64,7 @@ export default {
     const usageRightValue = {
       use_justification: values.use_justification,
       legal_copyright: values.copyright,
-      license: values.cc_license
+      license: values.cc_license,
     }
 
     if (deferSaveCallback) {
@@ -136,5 +136,5 @@ export default {
     } else {
       return null
     }
-  }
+  },
 }

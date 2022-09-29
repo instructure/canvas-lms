@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, { forwardRef } from 'react'
+import React, {forwardRef} from 'react'
 import PropTypes from 'prop-types'
 
 /**
@@ -78,11 +78,17 @@ const ScreenReaderContent = forwardRef((props, ref) => {
     tagProps.children = props.children
   }
 
-  return <Tag ref={ref} {...tagProps}>{tagProps.children}</Tag>
+  return (
+    <Tag ref={ref} {...tagProps}>
+      {tagProps.children}
+    </Tag>
+  )
 })
 
 const generateSentenceDelimiter = () => (
-  <em key="sentence-delimiter" role="presentation" aria-hidden>. </em>
+  <em key="sentence-delimiter" role="presentation" aria-hidden={true}>
+    .{' '}
+  </em>
 )
 
 ScreenReaderContent.propTypes = {
@@ -95,7 +101,7 @@ ScreenReaderContent.propTypes = {
    * it will work a trick to make the SR pause after reading this element,
    * just as if it were a proper sentence.
    */
-  forceSentenceDelimiter: PropTypes.bool
+  forceSentenceDelimiter: PropTypes.bool,
 }
 
 export default ScreenReaderContent

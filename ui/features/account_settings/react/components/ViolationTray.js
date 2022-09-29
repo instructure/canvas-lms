@@ -46,7 +46,7 @@ export default function ViolationTray({handleClose, accountId, addDomain, whitel
     isLoading: true,
     isError: false,
     violations: [],
-    error: null
+    error: null,
   })
 
   useFetchApi({
@@ -55,7 +55,7 @@ export default function ViolationTray({handleClose, accountId, addDomain, whitel
       dispatch({type: 'FETCH_SUCCESS', payload: response})
     }, []),
     error: useCallback(error => dispatch({type: 'FETCH_ERROR', payload: error}), []),
-    loading: useCallback(loading => dispatch({type: 'FETCH_INIT', payload: loading}), [])
+    loading: useCallback(loading => dispatch({type: 'FETCH_INIT', payload: loading}), []),
   })
 
   return (

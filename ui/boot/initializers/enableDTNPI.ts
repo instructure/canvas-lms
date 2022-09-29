@@ -17,31 +17,31 @@
  */
 
 import createPersistentArray from 'persistent-array'
-import { configure } from '@canvas/datetime-natural-parsing-instrument'
+import {configure} from '@canvas/datetime-natural-parsing-instrument'
 
 const localStorageKey = 'dtnpi'
 
 let events
 
-export async function up(options = { endpoint: null, throttle: 1000, size: 50 }) {
+export async function up(options = {endpoint: null, throttle: 1000, size: 50}) {
   const throttle = Math.max(1, Math.min(options.throttle, 1000))
   const size = Math.max(1, options.size)
-  const { endpoint } = options
+  const {endpoint} = options
 
   events = createPersistentArray({
     key: localStorageKey,
     throttle,
     size,
-    transform: value => value.map(normalizeEvent)
+    transform: value => value.map(normalizeEvent),
   })
 
-  configure({ events })
+  configure({events})
 
   // submit events that have been collected so far:
   const collected = [].concat(events)
 
   if (endpoint && collected.length) {
-    await postToBackend({ endpoint, events: collected })
+    await postToBackend({endpoint, events: collected})
   }
 
   events.splice(0, collected.length)
@@ -60,7 +60,7 @@ function normalizeEvent(event) {
   return {
     id: event.id,
     type: 'datepicker_usage',
-    locale: window.ENV && window.ENV.LOCALE || null,
+    locale: (window.ENV && window.ENV.LOCALE) || null,
     method: event.method,
     parsed: event.parsed,
     // don't store values that may be too long, 32 feels plenty for what people
@@ -70,14 +70,14 @@ function normalizeEvent(event) {
 }
 
 // TODO: submit to an actual backend
-function postToBackend({ endpoint, events }): Promise<void> {
+function postToBackend({endpoint, events}): Promise<void> {
   return fetch(endpoint, {
     method: 'PUT',
     mode: 'cors',
     credentials: 'omit',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
     },
-    body: JSON.stringify(events)
+    body: JSON.stringify(events),
   })
 }

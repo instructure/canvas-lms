@@ -45,7 +45,7 @@ const HomeroomPage = ({
   homeroomAnnouncements,
   loadingAnnouncements,
   visible,
-  loadingCards
+  loadingCards,
 }) => {
   const [dashboardCards, setDashboardCards] = useState([])
   const [courseModalOpen, setCourseModalOpen] = useState(false)
@@ -55,7 +55,7 @@ const HomeroomPage = ({
       if (cards) {
         setDashboardCards(
           createDashboardCards(cards.filter(c => !c.isHomeroom) || [], K5DashboardCard, {
-            headingLevel: 'h3'
+            headingLevel: 'h3',
           })
         )
       }
@@ -71,7 +71,7 @@ const HomeroomPage = ({
       className="ic-DashboardCard"
       style={{
         height: `${CARD_SIZE_PX}px`,
-        minWidth: `${CARD_SIZE_PX}px`
+        minWidth: `${CARD_SIZE_PX}px`,
       }}
     >
       <LoadingSkeleton screenReaderLabel={I18n.t('Loading Card')} height="100%" width="100%" />
@@ -134,7 +134,7 @@ const HomeroomPage = ({
           setModalOpen={setCourseModalOpen}
           permissions={createPermission}
           restrictToMCCAccount={restrictCourseCreation}
-          isK5User
+          isK5User={true}
         />
       )}
     </section>
@@ -148,7 +148,7 @@ HomeroomPage.propTypes = {
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,
-  loadingCards: PropTypes.bool.isRequired
+  loadingCards: PropTypes.bool.isRequired,
 }
 
 export default HomeroomPage

@@ -35,11 +35,11 @@ ContentShareUserSearchSelector.propTypes = {
   ...(() => {
     const {renderLabel, ...restOfSelectPropTypes} = CanvasAsyncSelect.propTypes
     return restOfSelectPropTypes
-  })()
+  })(),
 }
 
 ContentShareUserSearchSelector.defaultProps = {
-  selectedUsers: []
+  selectedUsers: [],
 }
 
 const MINIMUM_SEARCH_LENGTH = 3
@@ -57,7 +57,7 @@ export default function ContentShareUserSearchSelector({
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
-    isSearchableTerm
+    isSearchableTerm,
   })
 
   const userSearchParams = {}
@@ -67,7 +67,7 @@ export default function ContentShareUserSearchSelector({
     success: setSearchedUsers,
     error: setError,
     loading: setIsLoading,
-    params: userSearchParams
+    params: userSearchParams,
   })
 
   function handleUserSelected(_ev, id) {
@@ -96,7 +96,7 @@ export default function ContentShareUserSearchSelector({
     placeholder: I18n.t('Begin typing to search'),
     noOptionsLabel,
     onInputChange: handleInputChanged,
-    onOptionSelected: handleUserSelected
+    onOptionSelected: handleUserSelected,
   }
 
   let userOptions = []

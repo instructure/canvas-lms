@@ -32,12 +32,12 @@ export default {
     groupTitle: 'Outcome Group 1',
     parentGroup: {
       id: '0',
-      title: 'Root Outcome Group'
-    }
+      title: 'Root Outcome Group',
+    },
   },
   argTypes: {
-    onCloseHandler: {action: 'closed'}
-  }
+    onCloseHandler: {action: 'closed'},
+  },
 }
 
 const Template = args => {
@@ -56,5 +56,5 @@ export const Default = Template.bind({})
 export const withLongGroupTitle = Template.bind({})
 withLongGroupTitle.args = {
   groupId: '100',
-  groupTitle: 'This is a long group title. '.repeat(4)
+  groupTitle: 'This is a long group title. '.repeat(4),
 }

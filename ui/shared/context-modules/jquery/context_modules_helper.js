@@ -20,11 +20,11 @@ import sanitizeUrl from 'sanitize-url'
 
 const Helper = {}
 
-Helper.setWindowLocation = function(url) {
+Helper.setWindowLocation = function (url) {
   window.location = url
 }
 
-Helper.externalUrlLinkClick = function(event, $elt) {
+Helper.externalUrlLinkClick = function (event, $elt) {
   event.preventDefault()
   this.setWindowLocation(sanitizeUrl($elt.attr('data-item-href')))
 }.bind(Helper)

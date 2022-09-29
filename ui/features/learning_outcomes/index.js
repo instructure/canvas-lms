@@ -28,7 +28,7 @@ import instructionsTemplate from './jst/mainInstructions.handlebars'
 import {showImportOutcomesModal} from '@canvas/outcomes/react/ImportOutcomesModal'
 import {
   showOutcomesImporter,
-  showOutcomesImporterIfInProgress
+  showOutcomesImporterIfInProgress,
 } from '@canvas/outcomes/react/OutcomesImporter'
 
 ready(() => {
@@ -38,7 +38,7 @@ ready(() => {
       canManageOutcomes: ENV.PERMISSIONS.manage_outcomes,
       canManageRubrics: ENV.PERMISSIONS.manage_rubrics,
       canImportOutcomes: ENV.PERMISSIONS.import_outcomes,
-      contextUrlRoot: ENV.CONTEXT_URL_ROOT
+      contextUrlRoot: ENV.CONTEXT_URL_ROOT,
     })
   )
 
@@ -49,14 +49,14 @@ ready(() => {
   const sidebar = new SidebarView({
     el: $el.find('.outcomes-sidebar .wrapper'),
     rootOutcomeGroup: new OutcomeGroup(ENV.ROOT_OUTCOME_GROUP),
-    selectFirstItem: !renderInstructions
+    selectFirstItem: !renderInstructions,
   })
   sidebar.$el.data('view', sidebar)
 
   const content = new ContentView({
     el: $el.find('.outcomes-content'),
     instructionsTemplate,
-    renderInstructions
+    renderInstructions,
   })
 
   // events for Outcome sync
@@ -84,7 +84,7 @@ ready(() => {
       disableOutcomeViews,
       resetOutcomeViews,
       mount: content.$el[0],
-      contextUrlRoot: ENV.CONTEXT_URL_ROOT
+      contextUrlRoot: ENV.CONTEXT_URL_ROOT,
     })
   )
 
@@ -94,7 +94,7 @@ ready(() => {
         disableOutcomeViews,
         resetOutcomeViews,
         mount: content.$el[0],
-        contextUrlRoot: ENV.CONTEXT_URL_ROOT
+        contextUrlRoot: ENV.CONTEXT_URL_ROOT,
       },
       ENV.current_user.id
     )

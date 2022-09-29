@@ -27,7 +27,7 @@ describe('SelectPosition', () => {
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
         siblings={[
           {id: '2', title: 'Item 2', groupId: '1'},
-          {id: '3', title: 'Item 3', groupId: '1'}
+          {id: '3', title: 'Item 3', groupId: '1'},
         ]}
       />
     )
@@ -37,10 +37,13 @@ describe('SelectPosition', () => {
   it("doesn't show the title if there is more than one item", () => {
     const {queryByText} = render(
       <SelectPosition
-        items={[{id: '1', title: 'Item 1', groupId: '1'}, {id: '2', title: 'Item 2', groupId: '1'}]}
+        items={[
+          {id: '1', title: 'Item 1', groupId: '1'},
+          {id: '2', title: 'Item 2', groupId: '1'},
+        ]}
         siblings={[
           {id: '2', title: 'Assignments 2', groupId: '2'},
-          {id: '3', title: 'Assignments 3', groupId: '3'}
+          {id: '3', title: 'Assignments 3', groupId: '3'},
         ]}
       />
     )
@@ -53,7 +56,7 @@ describe('SelectPosition', () => {
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
         siblings={[
           {id: '2', title: 'Item 2', groupId: '1'},
-          {id: '3', title: 'Item 3', groupId: '1'}
+          {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'relative'}}
       />
@@ -68,7 +71,7 @@ describe('SelectPosition', () => {
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
         siblings={[
           {id: '2', title: 'Item 2', groupId: '1'},
-          {id: '3', title: 'Item 3', groupId: '1'}
+          {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'absolute'}}
       />
@@ -84,7 +87,7 @@ describe('SelectPosition', () => {
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
         siblings={[
           {id: '2', title: 'Item 2', groupId: '1'},
-          {id: '3', title: 'Item 3', groupId: '1'}
+          {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'absolute'}}
         selectPosition={selectPosition}
@@ -101,7 +104,7 @@ describe('SelectPosition', () => {
         items={[{id: '1', title: 'Item 1', groupId: '1'}]}
         siblings={[
           {id: '2', title: 'Item 2', groupId: '1'},
-          {id: '3', title: 'Item 3', groupId: '1'}
+          {id: '3', title: 'Item 3', groupId: '1'},
         ]}
         selectedPosition={{type: 'relative'}}
         selectSibling={selectSibling}

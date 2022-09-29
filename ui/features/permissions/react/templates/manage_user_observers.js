@@ -27,8 +27,8 @@ export const template = generateActionTemplates(
       title: I18n.t('People'),
       description: I18n.t(
         'Allows user to manage observers associated with students in the account.'
-      )
-    }
+      ),
+    },
   ],
   [],
   [],

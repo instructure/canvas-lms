@@ -49,7 +49,7 @@ QUnit.module('screenreader_gradebook student/assignment navigation: on page load
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('Previous Student button is disabled', () =>
@@ -89,7 +89,7 @@ QUnit.module('screenreader_gradebook student/assignment navigation: with first i
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('Previous buttons are disabled', () => {
@@ -155,7 +155,7 @@ QUnit.module('screenreader_gradebook student/assignment navigation: with second 
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('Previous/Next Student buttons are both active', () => {
@@ -185,7 +185,7 @@ QUnit.module('screenreader_gradebook student/assignment navigation: with last it
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('Previous Student button is active', () =>
@@ -257,7 +257,7 @@ QUnit.module('screenreader_gradebook assignment navigation: display update', {
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('screenreader_gradebook assignment selection: grade for field updates', function () {
@@ -291,7 +291,7 @@ QUnit.module('screenreader_gradebook assignment navigation: assignment sorting',
       )
     )
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('alphabetical', function () {
@@ -395,7 +395,7 @@ QUnit.module('screenreader_gradebook student navigation: section selection', {
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('prev/next still work', function () {
@@ -502,7 +502,7 @@ QUnit.module(
     },
     teardown() {
       return Ember.run(App, 'destroy')
-    }
+    },
   }
 )
 

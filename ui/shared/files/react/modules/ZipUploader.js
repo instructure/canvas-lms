@@ -35,15 +35,15 @@ export default class ZipUploader extends BaseUploader {
     return {
       migration_type: 'zip_file_importer',
       settings: {
-        folder_id: this.folder.id
+        folder_id: this.folder.id,
       },
       pre_attachment: {
         name: this.options.name || this.file.name,
         size: this.file.size,
         content_type: this.file.type,
         on_duplicate: this.options.dup || 'rename',
-        no_redirect: true
-      }
+        no_redirect: true,
+      },
     }
   }
 
@@ -72,14 +72,12 @@ export default class ZipUploader extends BaseUploader {
     return axios({
       url: `/api/v1/${this.contextType}/${this.contextId}/content_migrations/${this.contentMigrationId}`,
       method: 'GET',
-      responseType: 'json'
+      responseType: 'json',
     }).then(({data}) => {
       if (!data.progress_url) {
         return new Promise((resolve, reject) => {
           setTimeout(() => {
-            this.getContentMigration()
-              .then(resolve)
-              .catch(reject)
+            this.getContentMigration().then(resolve).catch(reject)
           }, 500)
         })
       } else {
@@ -92,7 +90,7 @@ export default class ZipUploader extends BaseUploader {
     return axios({
       url,
       method: 'GET',
-      responseType: 'json'
+      responseType: 'json',
     }).then(({data}) => {
       this.trackMigrationProgress(data.completion || 0)
       if (data.workflow_state === 'failed') {
@@ -106,7 +104,7 @@ export default class ZipUploader extends BaseUploader {
         if (data.completion > 0) {
           const progress = {
             loaded: data.completion,
-            total: 100
+            total: 100,
           }
           this.trackProgress(progress)
         }
@@ -114,9 +112,7 @@ export default class ZipUploader extends BaseUploader {
           setTimeout(() => {
             // for the sake of testing, each url has to be
             // unique, so adding a hash that's not sent to canvas
-            this.pullMigrationProgress(`${url}#${data.completion}`)
-              .then(resolve)
-              .catch(reject)
+            this.pullMigrationProgress(`${url}#${data.completion}`).then(resolve).catch(reject)
           }, 1000)
         })
       } else {

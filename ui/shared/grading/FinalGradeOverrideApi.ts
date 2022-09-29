@@ -58,7 +58,7 @@ export function getFinalGradeOverrides(courseId: string) {
       showFlashAlert({
         message: I18n.t('There was a problem loading final grade overrides.'),
         type: 'error',
-        err: null
+        err: null,
       })
     })
 }
@@ -90,7 +90,7 @@ export function updateFinalGradeOverride(enrollmentId, gradingPeriodId, grade) {
       showFlashAlert({
         message: I18n.t('There was a problem overriding the grade.'),
         type: 'error',
-        err: null
+        err: null,
       })
     })
 }

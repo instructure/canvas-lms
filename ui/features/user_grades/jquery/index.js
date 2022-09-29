@@ -22,14 +22,14 @@ import '@canvas/jquery/jquery.ajaxJSON'
 
 const I18n = useI18nScope('user_grades')
 
-$(document).ready(function() {
-  $('.grading_periods_selector').each(function() {
+$(document).ready(function () {
+  $('.grading_periods_selector').each(function () {
     const $selector = $(this),
       selectedOption = $selector.find('option:selected').val()
     $selector.val(selectedOption)
   })
 
-  $('.grading_periods_selector').on('change', function(e) {
+  $('.grading_periods_selector').on('change', function (e) {
     const selector = $(this),
       gradingPeriodId = selector.val(),
       enrollmentId = selector.attr('data-enrollment-id')
@@ -39,12 +39,10 @@ $(document).ready(function() {
       'GET',
       {
         grading_period_id: gradingPeriodId,
-        enrollment_id: enrollmentId
+        enrollment_id: enrollmentId,
       },
       totals => {
-        let $percentDisplay = $(this)
-            .closest('tr')
-            .children('.percent'),
+        let $percentDisplay = $(this).closest('tr').children('.percent'),
           gradeToShow
 
         if (totals.hide_final_grades) {

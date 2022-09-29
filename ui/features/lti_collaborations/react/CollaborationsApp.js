@@ -30,14 +30,12 @@ class CollaborationsApp extends React.Component {
 
   static propTypes = {
     applicationState: PropTypes.object,
-    actions: PropTypes.object
+    actions: PropTypes.object,
   }
 
   componentWillReceiveProps(nextProps) {
-    const {
-      createCollaborationPending,
-      createCollaborationSuccessful
-    } = nextProps.applicationState.createCollaboration
+    const {createCollaborationPending, createCollaborationSuccessful} =
+      nextProps.applicationState.createCollaboration
   }
 
   render() {

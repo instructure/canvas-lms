@@ -67,5 +67,5 @@ DuplicateConfirmationForm.propTypes = {
   forceSaveTool: func,
   toolData: object.isRequired,
   configurationType: string.isRequired,
-  store: object.isRequired
+  store: object.isRequired,
 }

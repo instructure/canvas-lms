@@ -86,7 +86,7 @@ describe('view of received content', () => {
   it('shows pagination when the link header indicates there are multiple pages', () => {
     useFetchApi.mockImplementationOnce(({success, meta}) => {
       const link = {
-        last: {page: '5', url: 'last'}
+        last: {page: '5', url: 'last'},
       }
       meta({link})
       success([assignmentShare])
@@ -103,7 +103,7 @@ describe('view of received content', () => {
   it('updates the current page when a page number is clicked', () => {
     useFetchApi.mockImplementationOnce(({success, meta}) => {
       const link = {
-        last: {page: '5', url: 'last'}
+        last: {page: '5', url: 'last'},
       }
       meta({link})
       success([assignmentShare])
@@ -118,7 +118,7 @@ describe('view of received content', () => {
     const shares = [assignmentShare]
     fetchMock.put(`/api/v1/users/self/content_shares/${assignmentShare.id}`, {
       status: 200,
-      body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id})
+      body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id}),
     })
     useFetchApi.mockImplementationOnce(({loading, success}) => {
       loading(false)
@@ -163,7 +163,7 @@ describe('view of received content', () => {
       })
       fetchMock.put(`/api/v1/users/self/content_shares/${unreadDiscussionShare.id}`, {
         status: 200,
-        body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id})
+        body: JSON.stringify({read_state: 'read', id: unreadDiscussionShare.id}),
       })
     })
 
@@ -200,7 +200,7 @@ describe('view of received content', () => {
         success(shares)
       })
       fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 200, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
       window.confirm.mockImplementation(() => true)
       const {getByText, queryByText} = render(<ReceivedContentView />)
@@ -232,7 +232,7 @@ describe('view of received content', () => {
         success(shares)
       })
       fetchMock.mock(`path:/api/v1/users/self/content_shares/${assignmentShare.id}`, 401, {
-        method: 'DELETE'
+        method: 'DELETE',
       })
       window.confirm.mockImplementation(() => true)
       const {getByText, getAllByText} = render(<ReceivedContentView />)

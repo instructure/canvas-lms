@@ -30,7 +30,7 @@ describe('StudentOutcomeScore', () => {
         id: '1',
         title: 'Title',
         mastery_points: 5,
-        ratings: []
+        ratings: [],
       },
       rollup: {
         outcomeId: '1',
@@ -38,11 +38,11 @@ describe('StudentOutcomeScore', () => {
           color: 'FFFFF',
           points: 3,
           description: 'great!',
-          mastery: false
-        }
+          mastery: false,
+        },
       },
       visibleRatings: [true, true, true, true, true, true],
-      ...props
+      ...props,
     }
   }
 
@@ -71,8 +71,8 @@ describe('StudentOutcomeScore', () => {
         {...defaultProps({
           rollup: {
             outcomeId: '1',
-            rating: {points: 3, color: 'FFFFF', description: '', mastery: false}
-          }
+            rating: {points: 3, color: 'FFFFF', description: '', mastery: false},
+          },
         })}
       />
     )
@@ -83,7 +83,7 @@ describe('StudentOutcomeScore', () => {
     const {queryByText} = render(
       <StudentOutcomeScore
         {...defaultProps({
-          visibleRatings: [true, true, true, true, false, true]
+          visibleRatings: [true, true, true, true, false, true],
         })}
       />
     )

@@ -19,7 +19,7 @@
 import {
   ADD_CONVERSATION_MESSAGE,
   CREATE_CONVERSATION,
-  CREATE_SUBMISSION_COMMENT
+  CREATE_SUBMISSION_COMMENT,
 } from '../../../graphql/Mutations'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import ComposeModalContainer from './ComposeModalContainer'
@@ -30,7 +30,7 @@ import {
   COURSES_QUERY,
   REPLY_CONVERSATION_QUERY,
   SUBMISSION_COMMENTS_QUERY,
-  VIEWABLE_SUBMISSIONS_QUERY
+  VIEWABLE_SUBMISSIONS_QUERY,
 } from '../../../graphql/Queries'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ModalSpinner from './ModalSpinner'
@@ -49,9 +49,9 @@ const ComposeModalManager = props => {
 
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
-      userID: ENV.current_user_id?.toString()
+      userID: ENV.current_user_id?.toString(),
     },
-    skip: props.isReply || props.isReplyAll || props.isForward
+    skip: props.isReply || props.isReplyAll || props.isForward,
   })
 
   const getReplyRecipients = () => {
@@ -81,10 +81,10 @@ const ComposeModalManager = props => {
     variables: {
       conversationID: props.conversation?._id,
       participants: getReplyRecipientIDs(),
-      ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
+      ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
     },
     notifyOnNetworkStatusChange: true,
-    skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType
+    skip: !(props.isReply || props.isReplyAll || props.isForward) || isSubmissionCommentsType,
   })
 
   const updateConversationsCache = (cache, result) => {
@@ -114,7 +114,7 @@ const ComposeModalManager = props => {
 
     cache.writeQuery({
       ...props.conversationsQueryOption,
-      data: {legacyNode}
+      data: {legacyNode},
     })
   }
 
@@ -127,8 +127,10 @@ const ComposeModalManager = props => {
             variables: {
               conversationID: props.conversation?._id,
               participants: getReplyRecipientIDs(),
-              ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
-            }
+              ...(props.conversationMessage && {
+                createdBefore: props.conversationMessage.createdAt,
+              }),
+            },
           })
         )
       )
@@ -142,9 +144,9 @@ const ComposeModalManager = props => {
         variables: {
           conversationID: props.conversation?._id,
           participants: getReplyRecipientIDs(),
-          ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt})
+          ...(props.conversationMessage && {createdBefore: props.conversationMessage.createdAt}),
         },
-        data: {legacyNode: replyQueryResult.legacyNode}
+        data: {legacyNode: replyQueryResult.legacyNode},
       })
     }
   }
@@ -154,14 +156,14 @@ const ComposeModalManager = props => {
       const querytoUpdate = {
         query: CONVERSATION_MESSAGES_QUERY,
         variables: {
-          conversationID: props.conversation._id
-        }
+          conversationID: props.conversation._id,
+        },
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(querytoUpdate)))
 
       data.legacyNode.conversationMessagesConnection.nodes = [
         result.data.addConversationMessage.conversationMessage,
-        ...data.legacyNode.conversationMessagesConnection.nodes
+        ...data.legacyNode.conversationMessagesConnection.nodes,
       ]
 
       cache.writeQuery({...querytoUpdate, data})
@@ -174,8 +176,8 @@ const ComposeModalManager = props => {
         query: SUBMISSION_COMMENTS_QUERY,
         variables: {
           submissionID: props.conversation._id,
-          sort: 'desc'
-        }
+          sort: 'desc',
+        },
       }
       const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
 
@@ -189,8 +191,8 @@ const ComposeModalManager = props => {
       query: VIEWABLE_SUBMISSIONS_QUERY,
       variables: {
         userID: ENV.current_user_id?.toString(),
-        sort: 'desc'
-      }
+        sort: 'desc',
+      },
     }
     const data = JSON.parse(JSON.stringify(cache.readQuery(queryToUpdate)))
     const submissionToUpdate = data.legacyNode.viewableSubmissionsConnection.nodes.find(
@@ -250,19 +252,19 @@ const ComposeModalManager = props => {
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
     onCompleted: data => onConversationCreateComplete(data?.createConversation),
-    onError: () => onConversationCreateComplete(false)
+    onError: () => onConversationCreateComplete(false),
   })
 
   const [addConversationMessage] = useMutation(ADD_CONVERSATION_MESSAGE, {
     update: updateCache,
     onCompleted: data => onConversationCreateComplete(data?.addConversationMessage),
-    onError: () => onConversationCreateComplete(false)
+    onError: () => onConversationCreateComplete(false),
   })
 
   const [createSubmissionComment] = useMutation(CREATE_SUBMISSION_COMMENT, {
     update: updateCache,
     onCompleted: data => onConversationCreateComplete(data?.createSubmissionComment),
-    onError: () => onConversationCreateComplete(false)
+    onError: () => onConversationCreateComplete(false),
   })
 
   // Keep selectedIDs updated with the correct recipients when replying
@@ -274,7 +276,7 @@ const ComposeModalManager = props => {
           _id: u._id,
           id: u.id,
           name: u.name,
-          itemType: 'user'
+          itemType: 'user',
         }
       })
       props.onSelectedIdsChange(selectedUsers)
@@ -310,16 +312,16 @@ const ComposeModalManager = props => {
             conversationId: props.conversation?._id,
             recipients: data.variables.recipients
               ? data.variables.recipients
-              : props.selectedIds.map(rec => rec?._id || rec.id)
-          }
+              : props.selectedIds.map(rec => rec?._id || rec.id),
+          },
         })
       }}
       createSubmissionComment={data => {
         createSubmissionComment({
           variables: {
             ...data.variables,
-            submissionId: props?.conversation?._id
-          }
+            submissionId: props?.conversation?._id,
+          },
         })
       }}
       courses={coursesQuery?.data?.legacyNode}
@@ -350,7 +352,7 @@ ComposeModalManager.propTypes = {
   open: PropTypes.bool,
   conversationsQueryOption: PropTypes.object,
   onSelectedIdsChange: PropTypes.func,
-  selectedIds: PropTypes.array
+  selectedIds: PropTypes.array,
 }
 
 export default ComposeModalManager

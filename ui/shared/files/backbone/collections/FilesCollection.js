@@ -58,7 +58,7 @@ export default class FilesCollection extends PaginatedCollection {
       include: ['user'],
       per_page: 20,
       sort: this.get('sort'),
-      order: this.get('order')
+      order: this.get('order'),
     }
 
     if (this.loadedAll) return

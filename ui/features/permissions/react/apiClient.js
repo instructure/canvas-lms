@@ -28,7 +28,7 @@ import axios from '@canvas/axios'
 export function postNewRole({contextId}, label, role) {
   return axios.post(`/api/v1/accounts/${contextId}/roles`, {
     label,
-    base_role_type: role.base_role_type
+    base_role_type: role.base_role_type,
   })
 }
 

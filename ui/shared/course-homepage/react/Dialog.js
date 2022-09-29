@@ -40,14 +40,14 @@ class CourseHomeDialog extends React.Component {
     courseId: PropTypes.string.isRequired,
     isPublishing: PropTypes.bool.isRequired,
     onSubmit: PropTypes.func,
-    returnFocusTo: PropTypes.instanceOf(Element)
+    returnFocusTo: PropTypes.instanceOf(Element),
   }
 
   static defaultProps = {
     onSubmit: () => {
       window.location.reload()
     },
-    wikiFrontPageTitle: null
+    wikiFrontPageTitle: null,
   }
 
   constructor(props) {
@@ -97,35 +97,35 @@ class CourseHomeDialog extends React.Component {
         get label() {
           return I18n.t('Course Activity Stream')
         },
-        checked: selectedDefaultView === 'feed'
+        checked: selectedDefaultView === 'feed',
       },
       {
         value: 'wiki',
         label: this.renderWikiLabel(),
         checked: selectedDefaultView === 'wiki',
-        disabled: !wikiFrontPageTitle
+        disabled: !wikiFrontPageTitle,
       },
       {
         value: 'modules',
         get label() {
           return I18n.t('Course Modules')
         },
-        checked: selectedDefaultView === 'modules'
+        checked: selectedDefaultView === 'modules',
       },
       {
         value: 'assignments',
         get label() {
           return I18n.t('Assignments List')
         },
-        checked: selectedDefaultView === 'assignments'
+        checked: selectedDefaultView === 'assignments',
       },
       {
         value: 'syllabus',
         get label() {
           return I18n.t('Syllabus')
         },
-        checked: selectedDefaultView === 'syllabus'
-      }
+        checked: selectedDefaultView === 'syllabus',
+      },
     ]
 
     const instructions = this.props.isPublishing
@@ -223,7 +223,7 @@ class CourseHomeDialog extends React.Component {
     if (selectedDefaultView !== savedDefaultView) {
       savingPromise = axios
         .put(`/api/v1/courses/${this.props.courseId}`, {
-          course: {default_view: this.state.selectedDefaultView}
+          course: {default_view: this.state.selectedDefaultView},
         })
         .then(({data: course}) => course.default_view)
     } else {

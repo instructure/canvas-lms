@@ -25,9 +25,13 @@ QUnit.module('FinalGradeOverrideComponent', hooks => {
   hooks.beforeEach(() => {
     App = startApp()
     finalGradeOverride = {
-      percentage: 92.32
+      percentage: 92.32,
     }
-    const gradingStandard = [['A', 0.9], ['B', 0.8], ['C', 0.0]]
+    const gradingStandard = [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.0],
+    ]
     component = App.FinalGradeOverrideComponent.create({finalGradeOverride, gradingStandard})
   })
 
@@ -61,7 +65,10 @@ QUnit.module('FinalGradeOverrideComponent', hooks => {
   })
 
   test('changing the grading standard changes the inputValue', () => {
-    const gradingStandard = [['A', 0.99], ['F', 0.0]]
+    const gradingStandard = [
+      ['A', 0.99],
+      ['F', 0.0],
+    ]
     component.set('gradingStandard', gradingStandard)
     strictEqual(component.get('inputValue'), 'F')
   })
@@ -70,7 +77,7 @@ QUnit.module('FinalGradeOverrideComponent', hooks => {
     const targetObject = {
       onEditFinalGradeOverride(grade) {
         strictEqual(grade, 92.1)
-      }
+      },
     }
 
     component.set('onEditFinalGradeOverride', 'onEditFinalGradeOverride')

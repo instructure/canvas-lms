@@ -68,7 +68,7 @@ const ALL_PLACEMENTS = {
   user_navigation: I18n.t('User Navigation'),
   wiki_page_menu: I18n.t('Page Menu'),
   wiki_index_menu: I18n.t('Pages Index Menu'),
-  default_placements: I18n.t('Assignment and Link Selection')
+  default_placements: I18n.t('Assignment and Link Selection'),
 }
 
 const DEFAULT_1_1_PLACEMENTS = ['assignment_selection', 'link_selection', 'resource_selection']
@@ -78,12 +78,12 @@ const presentDefaultPlacements = tool => DEFAULT_1_1_PLACEMENTS.filter(p => tool
 export default class ExternalToolPlacementList extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    onToggleSuccess: PropTypes.func.isRequired
+    onToggleSuccess: PropTypes.func.isRequired,
   }
 
   state = {
     tool: this.props.tool,
-    currentlyLoadingPlacements: {}
+    currentlyLoadingPlacements: {},
   }
 
   hideLoadingSpinner = placement =>
@@ -162,7 +162,7 @@ export default class ExternalToolPlacementList extends React.Component {
           tool,
           placements: presentDefaultPlacements(tool),
           onSuccess,
-          onError: () => this.toggleDefaultPlacements(onError)
+          onError: () => this.toggleDefaultPlacements(onError),
         })
       })
     } else {
@@ -171,7 +171,7 @@ export default class ExternalToolPlacementList extends React.Component {
           tool,
           placements: [placement],
           onSuccess,
-          onError: () => this.togglePlacement(placement, onError)
+          onError: () => this.togglePlacement(placement, onError),
         })
       })
     }
@@ -277,14 +277,14 @@ export default class ExternalToolPlacementList extends React.Component {
           color: 'success',
           renderIcon: IconCheckMarkSolid,
           screenReaderLabel: I18n.t('Placement active; click to deactivate'),
-          renderTooltipContent: I18n.t('Active')
+          renderTooltipContent: I18n.t('Active'),
         }
       : {
           status: 'pressed',
           color: 'secondary',
           renderIcon: IconEndSolid,
           screenReaderLabel: I18n.t('Placement inactive; click to activate'),
-          renderTooltipContent: I18n.t('Inactive')
+          renderTooltipContent: I18n.t('Inactive'),
         }
 
     return (

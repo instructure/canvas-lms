@@ -38,13 +38,13 @@ class GradebookSelector extends React.Component {
   static propTypes = {
     courseUrl: PropTypes.string.isRequired,
     learningMasteryEnabled: PropTypes.bool.isRequired,
-    navigate: PropTypes.func
+    navigate: PropTypes.func,
   }
 
   static defaultProps = {
     navigate(url) {
       window.location = url
-    }
+    },
   }
 
   constructor(props) {
@@ -84,7 +84,7 @@ class GradebookSelector extends React.Component {
       [INDIVIDUAL_GRADEBOOK]: this.selectIndividualGradebook.bind(this),
       [LEARNING_MASTERY]: this.selectLearningMastery.bind(this),
       'default-gradebook': this.selectDefaultGradebook.bind(this),
-      'gradebook-history': this.selectGradebookHistory.bind(this)
+      'gradebook-history': this.selectGradebookHistory.bind(this),
     }
     valueFunctionMap[value]()
   }
@@ -99,19 +99,19 @@ class GradebookSelector extends React.Component {
         'IndividualGradebook',
         'LearningMastery',
         'DefaultGradebook',
-        'GradebookHistory'
+        'GradebookHistory',
       ],
       IndividualGradebookLearningMastery: [
         'LearningMastery',
         'IndividualGradebook',
         'DefaultGradebook',
-        'GradebookHistory'
-      ]
+        'GradebookHistory',
+      ],
     }
     const options = optionsForGradebook[modifiedVariant]
     return [
       this[`render${head(options)}Option`](true),
-      ...tail(options).map(option => this[`render${option}Option`]())
+      ...tail(options).map(option => this[`render${option}Option`]()),
     ]
   }
 

@@ -79,5 +79,5 @@ export default {
     } else {
       return collection[nextIndex]
     }
-  }
+  },
 }

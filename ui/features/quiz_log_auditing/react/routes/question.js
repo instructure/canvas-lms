@@ -60,7 +60,7 @@ const QuestionRoute = props => {
 }
 
 QuestionRoute.propTypes = {
-  questions: PropTypes.array.isRequired
+  questions: PropTypes.array.isRequired,
 }
 
 export default props => (

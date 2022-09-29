@@ -30,13 +30,13 @@ describe('buttonConfig()', () => {
       description: 'A nifty tool',
       favorite: true,
       canvas_icon_class: 'custom-class',
-      icon_url: 'https://canvas.instructure.com/image'
+      icon_url: 'https://canvas.instructure.com/image',
     }
 
     editor = {
       execCommand: jest.fn(),
       $: jest.fn(),
-      editorContainer: {querySelector: jest.fn()}
+      editorContainer: {querySelector: jest.fn()},
     }
   })
 

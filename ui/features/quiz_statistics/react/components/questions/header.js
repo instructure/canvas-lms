@@ -36,7 +36,7 @@ const QuestionHeader = ({position = 1, responseCount = 0, participantCount = 0, 
     <span className="question-attempts">
       {I18n.t('attempts', 'Attempts: %{count} out of %{total}', {
         count: responseCount,
-        total: participantCount
+        total: participantCount,
       })}
     </span>
   </header>

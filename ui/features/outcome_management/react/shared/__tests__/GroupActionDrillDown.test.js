@@ -22,7 +22,7 @@ import GroupActionDrillDown from '../GroupActionDrillDown'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
-  ROOT_GROUP_ID
+  ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('GroupActionDrillDown', () => {
@@ -33,32 +33,32 @@ describe('GroupActionDrillDown', () => {
       id: ROOT_GROUP_ID,
       name: 'Root folder',
       collections: [ACCOUNT_GROUP_ID, '2'],
-      parentGroupId: null
+      parentGroupId: null,
     },
     [ACCOUNT_GROUP_ID]: {
       id: ACCOUNT_GROUP_ID,
       name: 'Account folder',
       collections: ['100', '101'],
-      parentGroupId: ROOT_GROUP_ID
+      parentGroupId: ROOT_GROUP_ID,
     },
     2: {
       id: '2',
       name: 'State folder',
       collections: [],
-      parentGroupId: ROOT_GROUP_ID
+      parentGroupId: ROOT_GROUP_ID,
     },
     100: {
       id: '100',
       name: 'Folder with groups',
       collections: ['101'],
-      parentGroupId: ACCOUNT_GROUP_ID
+      parentGroupId: ACCOUNT_GROUP_ID,
     },
     101: {
       id: '101',
       name: 'Leaf folder',
       collections: [],
-      parentGroupId: ACCOUNT_GROUP_ID
-    }
+      parentGroupId: ACCOUNT_GROUP_ID,
+    },
   }
 
   const defaultProps = (props = {}) => ({
@@ -70,7 +70,7 @@ describe('GroupActionDrillDown', () => {
     isLoadingGroupDetail: false,
     outcomesCount: 2,
     showActionLinkForRoot: false,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -88,7 +88,7 @@ describe('GroupActionDrillDown', () => {
     {
       renderer = rtlRender,
       globalRootId = '',
-      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
+      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId],
     } = {}
   ) => {
     return renderer(
@@ -120,7 +120,7 @@ describe('GroupActionDrillDown', () => {
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
       message: 'Group "Root folder" entered.',
       srOnly: true,
-      type: 'info'
+      type: 'info',
     })
   })
 
@@ -133,7 +133,7 @@ describe('GroupActionDrillDown', () => {
 
   it('renders a loading spinner while a group is loading', () => {
     const props = defaultProps({
-      loadedGroups: ['0']
+      loadedGroups: ['0'],
     })
     const {getByText} = render(<GroupActionDrillDown {...props} />)
     fireEvent.click(getByText('Groups'))
@@ -155,7 +155,7 @@ describe('GroupActionDrillDown', () => {
   it('focuses on the Select if showOptions is true', () => {
     const {getByPlaceholderText, rerender} = render(<GroupActionDrillDown {...defaultProps()} />)
     render(<GroupActionDrillDown {...defaultProps({showOptions: true})} />, {
-      renderer: rerender
+      renderer: rerender,
     })
     expect(getByPlaceholderText('Select an outcome group')).toHaveFocus()
   })
@@ -170,7 +170,7 @@ describe('GroupActionDrillDown', () => {
 
     it('does not render an action link for the globalRootId folder', () => {
       const {queryByText, getByText} = render(<GroupActionDrillDown {...defaultProps()} />, {
-        globalRootId: '2'
+        globalRootId: '2',
       })
       fireEvent.click(getByText('Groups'))
       fireEvent.click(getByText('State folder'))
@@ -242,7 +242,7 @@ describe('GroupActionDrillDown', () => {
       fireEvent.click(getByText('State folder'))
       expect(getByText('View 2 Outcomes')).toBeInTheDocument()
       render(<GroupActionDrillDown {...defaultProps({isLoadingGroupDetail: true})} />, {
-        renderer: rerender
+        renderer: rerender,
       })
       expect(queryByText('View 2 Outcomes')).not.toBeInTheDocument()
     })

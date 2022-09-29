@@ -41,7 +41,7 @@ export default [
           {I18n.t(`Hello%{name}!`, {
             name: window.ENV?.current_user?.display_name
               ? `, ${window.ENV?.current_user?.display_name}`
-              : ''
+              : '',
           })}
         </Heading>
         <p>
@@ -55,11 +55,11 @@ export default [
           <li>{I18n.t('Set up Video Conferencing and Other Tools')}</li>
           <li>{I18n.t('Find Training Resources and More Help')}</li>
         </ol>
-        <div className="tour-star-image" aria-hidden>
+        <div className="tour-star-image" aria-hidden={true}>
           <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
-    )
+    ),
   },
   {
     selector: '.navigation-tray-container',
@@ -103,7 +103,7 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('accounts')
-    }
+    },
   },
   {
     selector: '.navigation-tray-container',
@@ -126,7 +126,7 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('accounts')
-    }
+    },
   },
   {
     selector: '.navigation-tray-container',
@@ -149,7 +149,7 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('accounts')
-    }
+    },
   },
   {
     selector: '.navigation-tray-container',
@@ -170,6 +170,6 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('help')
-    }
-  }
+    },
+  },
 ]

@@ -95,7 +95,7 @@ export default class CourseSelectionView extends View {
       defaultOption: this.options.defaultOption,
       favorites: this.options.courses.favorites.toJSON(),
       more,
-      groups: group_json
+      groups: group_json,
     }
 
     if (!this.options.excludeConcluded) {
@@ -122,7 +122,7 @@ export default class CourseSelectionView extends View {
 
   createSearchViews() {
     const searchViews = []
-    this.$picker.find('.dropdown-submenu').each(function() {
+    this.$picker.find('.dropdown-submenu').each(function () {
       searchViews.push(new SearchableSubmenuView({el: this}))
     })
     return (this.searchViews = searchViews)
@@ -135,11 +135,9 @@ export default class CourseSelectionView extends View {
     all._loading = true
 
     groups.fetchAll()
-    return this.$picker.find('> .dropdown-menu').append(
-      $('<div />')
-        .attr('class', 'paginatedLoadingIndicator')
-        .css('clear', 'both')
-    )
+    return this.$picker
+      .find('> .dropdown-menu')
+      .append($('<div />').attr('class', 'paginatedLoadingIndicator').css('clear', 'both'))
   }
 
   setValue(value) {
@@ -192,10 +190,7 @@ export default class CourseSelectionView extends View {
   }
 
   focus() {
-    return this.$el
-      .next()
-      .find('.dropdown-toggle')
-      .focus()
+    return this.$el.next().find('.dropdown-toggle').focus()
   }
 
   truncate_course_name_data(course_data) {

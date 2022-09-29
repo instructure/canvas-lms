@@ -76,9 +76,9 @@ export default function ThemeEditorSidebar(props) {
                     __html: I18n.t(
                       'Before implementing custom CSS or Javascript, please refer to *our documentation*.',
                       {
-                        wrappers: ['<a href="' + customCssLink + '" target="_blank">$1</a>']
+                        wrappers: ['<a href="' + customCssLink + '" target="_blank">$1</a>'],
                       }
-                    )
+                    ),
                   }}
                 />
               </div>
@@ -170,10 +170,10 @@ ThemeEditorSidebar.propTypes = {
   changeSomething: func.isRequired,
   changedValues: object,
   themeState: object.isRequired,
-  handleThemeStateChange: func.isRequired
+  handleThemeStateChange: func.isRequired,
 }
 
 ThemeEditorSidebar.defaultProps = {
   allowGlobalIncludes: false,
-  changedValues: {}
+  changedValues: {},
 }

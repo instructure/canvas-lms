@@ -33,7 +33,7 @@ function newProps(overrides = {}) {
     configurationMethod: 'json',
     updateToolConfiguration: Function.prototype,
     updateToolConfigurationUrl: Function.prototype,
-    ...overrides
+    ...overrides,
   }
 }
 

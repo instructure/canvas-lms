@@ -21,7 +21,7 @@ import {
   gradeToScoreLowerBound,
   gradeToScoreUpperBound,
   indexOfGrade,
-  scoreToGrade
+  scoreToGrade,
 } from './GradingSchemeHelper'
 import numberHelper from '@canvas/i18n/numberHelper'
 
@@ -38,7 +38,7 @@ type PassFailResult = {
 
 export const GradingSchemeBounds = Object.freeze({
   LOWER: 'LOWER',
-  UPPER: 'UPPER'
+  UPPER: 'UPPER',
 })
 
 function toNumber(bigValue: Big) {
@@ -59,7 +59,7 @@ function invalid(value) {
     excused: false,
     grade: value,
     score: null,
-    valid: false
+    valid: false,
   }
 }
 
@@ -78,7 +78,7 @@ function parseAsGradingScheme(value: string, options) {
     enteredAs: 'gradingScheme',
     percent: options.pointsPossible ? percentage : 0,
     points: options.pointsPossible ? pointsFromPercentage(percentage, options.pointsPossible) : 0,
-    schemeKey: scoreToGrade(percentage, options.gradingScheme)
+    schemeKey: scoreToGrade(percentage, options.gradingScheme),
   }
 }
 
@@ -105,7 +105,7 @@ function parseAsPercent(value: string, options) {
     enteredAs: 'percent',
     percent,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme)
+    schemeKey: scoreToGrade(percent, options.gradingScheme),
   }
 }
 
@@ -122,7 +122,7 @@ function parseAsPoints(value: string, options) {
     enteredAs: 'points',
     percent: null,
     points,
-    schemeKey: scoreToGrade(percent, options.gradingScheme)
+    schemeKey: scoreToGrade(percent, options.gradingScheme),
   }
 }
 
@@ -138,7 +138,7 @@ function parseForGradingScheme(value, options) {
       excused: false,
       grade: result.schemeKey,
       score: result.points,
-      valid: true
+      valid: true,
     }
   }
 
@@ -154,7 +154,7 @@ function parseForPercent(value, options) {
       excused: false,
       grade: `${result.percent}%`,
       score: result.points,
-      valid: true
+      valid: true,
     }
   }
 
@@ -173,7 +173,7 @@ function parseForPoints(value, options) {
       excused: false,
       grade: `${result.points}`,
       score: result.points,
-      valid: true
+      valid: true,
     }
   }
 
@@ -187,7 +187,7 @@ function parseForPassFail(value: string, options: {pointsPossible: number}): Pas
     excused: false,
     grade: cleanValue,
     valid: true,
-    score: null
+    score: null,
   }
 
   if (cleanValue === 'complete') {
@@ -225,7 +225,7 @@ export function parseEntryValue(value, gradingScheme): ParseResult {
     isPercentage: false,
     isPoints: false,
     isSchemeKey: gradingScheme ? false : null,
-    value: null
+    value: null,
   }
 
   if (PERCENTAGES.test(trimmedValue)) {

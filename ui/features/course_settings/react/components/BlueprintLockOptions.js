@@ -46,7 +46,7 @@ const keys = [
   {objectType: 'wiki_page', lockableAttributes: ['content']},
   {objectType: 'attachment', lockableAttributes: ['content']},
   {objectType: 'quiz'},
-  {objectType: 'course_pace', lockableAttributes: ['content']}
+  {objectType: 'course_pace', lockableAttributes: ['content']},
 ]
 
 export default class BlueprintLockOptions extends React.Component {
@@ -56,12 +56,12 @@ export default class BlueprintLockOptions extends React.Component {
     useRestrictionsbyType: PropTypes.bool.isRequired,
     generalRestrictions: propTypes.itemLocks.isRequired,
     restrictionsByType: propTypes.itemLocksByObject.isRequired,
-    lockableAttributes: propTypes.lockableAttributeList
+    lockableAttributes: propTypes.lockableAttributeList,
   }
 
   static defaultProps = {
     disabledMessage: '',
-    lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates']
+    lockableAttributes: ['content', 'points', 'due_dates', 'availability_dates'],
   }
 
   constructor(props) {
@@ -70,13 +70,13 @@ export default class BlueprintLockOptions extends React.Component {
       lockType: props.useRestrictionsbyType ? granular : general,
       courseEnabled: props.isMasterCourse,
       generalRestrictions: props.generalRestrictions,
-      objectRestrictions: props.restrictionsByType
+      objectRestrictions: props.restrictionsByType,
     }
   }
 
   onChange = e => {
     this.setState({
-      lockType: e.target.value
+      lockType: e.target.value,
     })
   }
 
@@ -87,7 +87,7 @@ export default class BlueprintLockOptions extends React.Component {
   renderGeneralMenu(lock) {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': lock === general
+      'bcs_sub-menu-viewable': lock === general,
     })
     return (
       <div className={viewableClasses}>
@@ -108,7 +108,7 @@ export default class BlueprintLockOptions extends React.Component {
   renderGranularMenu(lock) {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': lock === granular
+      'bcs_sub-menu-viewable': lock === granular,
     })
     return (
       <div className={viewableClasses}>
@@ -130,7 +130,7 @@ export default class BlueprintLockOptions extends React.Component {
   renderOptionMenu() {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': this.state.courseEnabled
+      'bcs_sub-menu-viewable': this.state.courseEnabled,
     })
     return (
       <div className={viewableClasses}>

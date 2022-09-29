@@ -37,7 +37,7 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     state: string
   } = {
     items: [],
-    state: 'none'
+    state: 'none',
   }
   if (submission.attachments && submission.submission_type === 'online_upload') {
     ref = submission.attachments
@@ -69,7 +69,7 @@ export const extractDataTurnitin = function (submission: SubmissionWithOriginali
     'problem',
     'failure',
     'pending',
-    'error'
+    'error',
   ]
   const stateMap = invert(stateList)
   const states = (function () {

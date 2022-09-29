@@ -25,20 +25,20 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Account Settings'),
-      description: I18n.t('Allows user to add and remove other account admins.')
+      description: I18n.t('Allows user to add and remove other account admins.'),
     },
     {
       title: I18n.t('Commons'),
-      description: I18n.t('Allows user to access and edit the Admin settings in Commons.')
+      description: I18n.t('Allows user to access and edit the Admin settings in Commons.'),
     },
     {
       description: I18n.t(
         'Allows user to create and manage Groups. Allows user to manage shared resources in the account.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to manage shared resources in the account.')
-    }
+      description: I18n.t('Allows user to manage shared resources in the account.'),
+    },
   ],
   [],
   [],

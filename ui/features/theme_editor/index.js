@@ -38,7 +38,7 @@ ready(() => {
         sharedBrandConfigs: window.ENV.sharedBrandConfigs,
         allowGlobalIncludes: window.ENV.allowGlobalIncludes,
         accountID: window.ENV.account_id,
-        useHighContrast: window.ENV.use_high_contrast
+        useHighContrast: window.ENV.use_high_contrast,
       }}
     />,
     document.body

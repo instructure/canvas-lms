@@ -30,7 +30,7 @@ export default handleActions(
       // reset to default state, except for canReadSIS, which has to persist across invocations
       const resetState = {...defaultState.inputParams, canReadSIS: state.canReadSIS}
       return !action.payload || action.payload.includes('inputParams') ? resetState : state
-    }
+    },
   },
   defaultState.inputParams
 )

@@ -42,7 +42,7 @@ export default [
           {I18n.t(`Hello%{name}!`, {
             name: window.ENV?.current_user?.display_name
               ? `, ${window.ENV?.current_user?.display_name}`
-              : ''
+              : '',
           })}
         </Heading>
         <Text as="p">
@@ -114,11 +114,11 @@ export default [
             </ul>
           </li>
         </ol>
-        <div className="tour-star-image" aria-hidden>
+        <div className="tour-star-image" aria-hidden={true}>
           <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
-    )
+    ),
   },
   {
     observe: '.profile-tab-notifications',
@@ -147,13 +147,13 @@ export default [
           style={{marginTop: '1rem'}}
           frameBorder="0"
           allow="autoplay; fullscreen"
-          allowFullScreen
+          allowFullScreen={true}
         />
       </section>
     ),
     actionBefore: async () => {
       await handleOpenTray('profile')
-    }
+    },
   },
   {
     selector: '.navigation-tray-container',
@@ -181,13 +181,13 @@ export default [
           style={{marginTop: '1rem'}}
           frameBorder="0"
           allow="autoplay; fullscreen"
-          allowFullScreen
+          allowFullScreen={true}
         />
       </section>
     ),
     actionBefore: async () => {
       await handleOpenTray('courses')
-    }
+    },
   },
   {
     selector: '.navigation-tray-container',
@@ -242,6 +242,6 @@ export default [
     ),
     actionBefore: async () => {
       await handleOpenTray('help')
-    }
-  }
+    },
+  },
 ]

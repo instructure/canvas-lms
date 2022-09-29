@@ -23,9 +23,6 @@ import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/summary/section_select', () => {
   it('renders', () => {
-    render(
-      <SectionSelect
-      />
-    )
+    render(<SectionSelect />)
   })
 })

@@ -24,17 +24,17 @@ describe('AccountsTray', () => {
   const accounts = [
     {
       id: '1',
-      name: 'Account1'
+      name: 'Account1',
     },
     {
       id: '2',
-      name: 'Account2'
-    }
+      name: 'Account2',
+    },
   ]
 
   const props = {
     accounts,
-    hasLoaded: true
+    hasLoaded: true,
   }
 
   it('renders loading spinner', () => {

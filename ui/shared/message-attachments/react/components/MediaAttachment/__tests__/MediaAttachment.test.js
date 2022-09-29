@@ -27,7 +27,7 @@ describe('MediaAttachment', () => {
   beforeEach(() => {
     props = {
       file: {mediaID: '123', title: 'my-awesome-video.mp4', src: 'somesrc.test', type: 'video'},
-      onRemoveMediaComment: jest.fn()
+      onRemoveMediaComment: jest.fn(),
     }
   })
 

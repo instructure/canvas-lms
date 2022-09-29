@@ -62,7 +62,7 @@ export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
   collections,
   handleToggle,
   visibilityChanges,
-  onAccountToggled
+  onAccountToggled,
 }) => {
   if (!accountGroup) return <Spinner renderTitle={I18n.t('Loading accounts')} size="x-small" />
 
@@ -94,7 +94,7 @@ export const AccountCalendarItemToggleGroup: React.FC<ComponentProps> = ({
               summary={acc.heading}
               toggleLabel={I18n.t('%{account_name}, %{number_of_children} accounts', {
                 account_name: acc.name,
-                number_of_children: acc.sub_account_count
+                number_of_children: acc.sub_account_count,
               })}
               iconExpanded={IconMiniArrowDownSolid}
               icon={IconMiniArrowEndSolid}

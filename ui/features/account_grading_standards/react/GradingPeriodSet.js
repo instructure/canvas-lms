@@ -118,21 +118,21 @@ export default class GradingPeriodSet extends React.Component {
       id: string.isRequired,
       title: string.isRequired,
       weighted: bool,
-      displayTotalsForAllGradingPeriods: bool.isRequired
+      displayTotalsForAllGradingPeriods: bool.isRequired,
     }).isRequired,
 
     urls: shape({
       batchUpdateURL: string.isRequired,
       deleteGradingPeriodURL: string.isRequired,
-      gradingPeriodSetsURL: string.isRequired
+      gradingPeriodSetsURL: string.isRequired,
     }).isRequired,
 
     permissions: shape({
       read: bool.isRequired,
       create: bool.isRequired,
       update: bool.isRequired,
-      delete: bool.isRequired
-    }).isRequired
+      delete: bool.isRequired,
+    }).isRequired,
   }
 
   constructor(props) {
@@ -144,12 +144,12 @@ export default class GradingPeriodSet extends React.Component {
       gradingPeriods: sortPeriods(this.props.gradingPeriods),
       newPeriod: {
         period: null,
-        saving: false
+        saving: false,
       },
       editPeriod: {
         id: null,
-        saving: false
-      }
+        saving: false,
+      },
     }
     this._refs = {}
   }
@@ -473,7 +473,7 @@ export default class GradingPeriodSet extends React.Component {
                 className="Button Button--icon-action GradingPeriodSet__toggle"
                 aria-expanded={this.props.expanded}
                 aria-label={I18n.t('Toggle %{title} grading period visibility', {
-                  title: this.props.set.title
+                  title: this.props.set.title,
                 })}
               >
                 <i className={`icon-mini-arrow-${arrow}`} />

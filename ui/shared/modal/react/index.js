@@ -27,7 +27,7 @@ import ModalButtons from './buttons'
 const modalOverrides = {
   overlay: {
     backgroundColor: 'rgba(0,0,0,0.5)',
-    zIndex: '2002'
+    zIndex: '2002',
   },
   content: {
     position: 'static',
@@ -37,18 +37,18 @@ const modalOverrides = {
     bottom: 'auto',
     borderRadius: '0',
     border: 'none',
-    padding: '0'
-  }
+    padding: '0',
+  },
 }
 
 export default class Modal extends React.Component {
   static defaultProps = {
     className: 'ReactModal__Content--canvas', // Override with "ReactModal__Content--canvas ReactModal__Content--mini-modal" for a mini modal
-    style: {}
+    style: {},
   }
 
   state = {
-    modalIsOpen: this.props.isOpen
+    modalIsOpen: this.props.isOpen,
   }
 
   componentWillReceiveProps(props) {

@@ -23,18 +23,18 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 const I18n = useI18nScope('student_context_traySectionInfo')
 
 const sectionShape = PropTypes.shape({
-  name: PropTypes.string.isRequired
+  name: PropTypes.string.isRequired,
 })
 const enrollmentsShape = PropTypes.shape({
-  section: sectionShape.isRequired
+  section: sectionShape.isRequired,
 })
 const userShape = PropTypes.shape({
-  enrollments: PropTypes.arrayOf(enrollmentsShape).isRequired
+  enrollments: PropTypes.arrayOf(enrollmentsShape).isRequired,
 })
 
 class SectionInfo extends React.Component {
   static propTypes = {
-    user: userShape.isRequired
+    user: userShape.isRequired,
   }
 
   render() {

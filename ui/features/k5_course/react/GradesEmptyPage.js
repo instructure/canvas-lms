@@ -57,7 +57,7 @@ const GradesEmptyPage = ({userIsCourseAdmin, courseId, courseName}) => (
 GradesEmptyPage.propTypes = {
   userIsCourseAdmin: PropTypes.bool.isRequired,
   courseId: PropTypes.string.isRequired,
-  courseName: PropTypes.string.isRequired
+  courseName: PropTypes.string.isRequired,
 }
 
 export default GradesEmptyPage

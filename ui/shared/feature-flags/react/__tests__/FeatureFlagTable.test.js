@@ -29,7 +29,7 @@ const rows = [
   sampleData.onFeature,
   sampleData.offFeature,
   sampleData.siteAdminOnFeature,
-  sampleData.siteAdminOffFeature
+  sampleData.siteAdminOffFeature,
 ]
 const title = 'Section 123'
 

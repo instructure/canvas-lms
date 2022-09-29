@@ -25,7 +25,7 @@ import RoleList from '../RoleList'
 import {
   ACCOUNT_OUTCOME_CALCULATION_QUERY,
   COURSE_OUTCOME_CALCULATION_QUERY,
-  SET_OUTCOME_CALCULATION_METHOD
+  SET_OUTCOME_CALCULATION_METHOD,
 } from '@canvas/outcomes/graphql/MasteryCalculation'
 import {useQuery, useMutation} from 'react-apollo'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
@@ -38,7 +38,7 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_CALCULATION_QUERY : ACCOUNT_OUTCOME_CALCULATION_QUERY
   const {loading, error, data} = useQuery(query, {
-    variables: {contextId}
+    variables: {contextId},
   })
 
   const [setCalculationMethodQuery, {error: setCalculationMethodError}] = useMutation(
@@ -48,11 +48,11 @@ const MasteryCalculation = ({onNotifyPendingChanges}) => {
   const setCalculationMethod = useCallback(
     (calculationMethod, calculationInt) => {
       setCalculationMethodQuery({
-        variables: {contextType, contextId, calculationMethod, calculationInt}
+        variables: {contextType, contextId, calculationMethod, calculationInt},
       }).then(() =>
         showFlashAlert({
           message: I18n.t('Mastery calculation saved'),
-          type: 'success'
+          type: 'success',
         })
       )
     },

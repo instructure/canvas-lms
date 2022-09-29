@@ -34,7 +34,7 @@ export const initialState: UIState = {
   editingBlackoutDates: false,
   showLoadingOverlay: false,
   responsiveSize: 'large',
-  showProjections: true
+  showProjections: true,
 }
 
 /* Selectors */
@@ -97,7 +97,7 @@ export default (state = initialState, action: UIAction): UIState => {
       return {
         ...state,
         selectedContextType: action.payload.contextType,
-        selectedContextId: action.payload.contextId
+        selectedContextId: action.payload.contextId,
       }
     case UIConstants.SET_RESPONSIVE_SIZE:
       return {...state, responsiveSize: action.payload}

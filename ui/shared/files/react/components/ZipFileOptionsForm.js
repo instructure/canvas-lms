@@ -29,7 +29,7 @@ class ZipFileOptionsForm extends React.Component {
   static displayName = 'ZipFileOptionsForm'
 
   static propTypes = {
-    onZipOptionsResolved: PropTypes.func.isRequired
+    onZipOptionsResolved: PropTypes.func.isRequired,
   }
 
   handleExpandClick = () => {

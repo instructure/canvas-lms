@@ -149,7 +149,7 @@ const RCELoader = {
     if (height) {
       tinyMCEInitOptions.tinyOptions = {
         height,
-        ...(tinyMCEInitOptions.tinyOptions || {})
+        ...(tinyMCEInitOptions.tinyOptions || {}),
       }
     }
 
@@ -172,7 +172,7 @@ const RCELoader = {
     //       Assignmens2 student view is going to be doing their own autosave
     const autosave = {
       enabled: true,
-      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms
+      maxAge: Number.isNaN(ENV.rce_auto_save_max_age_ms) ? 3600000 : ENV.rce_auto_save_max_age_ms,
     }
 
     return {
@@ -195,9 +195,9 @@ const RCELoader = {
       use_rce_icon_maker: shouldUseFeature(Feature.IconMaker, window.ENV),
       features: ENV?.FEATURES || {},
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
-      timezone: ENV?.TIMEZONE
+      timezone: ENV?.TIMEZONE,
     }
-  }
+  },
 }
 
 export default RCELoader

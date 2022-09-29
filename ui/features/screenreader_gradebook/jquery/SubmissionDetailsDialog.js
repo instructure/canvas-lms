@@ -57,7 +57,7 @@ export default class SubmissionDetailsDialog {
         this.assignment.grading_type !== 'gpa_scale',
       formattedPointsPossible: I18n.n(this.assignment.points_possible),
       shouldShowExcusedOption: true,
-      isInPastGradingPeriodAndNotAdmin: submission.gradeLocked
+      isInPastGradingPeriodAndNotAdmin: submission.gradeLocked,
     })
     this.submission[`assignment_grading_type_is_${this.assignment.grading_type}`] = true
     if (this.submission.excused) this.submission.grade = 'EX'
@@ -67,7 +67,7 @@ export default class SubmissionDetailsDialog {
     this.dialog = this.$el.dialog({
       title: this.student.name,
       width: 600,
-      resizable: false
+      resizable: false,
     })
 
     this.dialog.on('dialogclose', this.options.onClose)

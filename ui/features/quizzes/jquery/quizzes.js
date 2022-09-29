@@ -124,7 +124,7 @@ const renderDueDates = lockedItems => {
       availabilityDatesReadonly: lockedItems.availability_dates,
       inPacedCourse: ENV.QUIZ.in_paced_course,
       isModuleItem: ENV.IS_MODULE_ITEM,
-      courseId: ENV.COURSE_ID
+      courseId: ENV.COURSE_ID,
     })
     overrideView.render()
   }
@@ -349,7 +349,7 @@ export const quiz = (window.quiz = {
     const templateData = {
       answer_text: answer.answer_text,
       id: answer.id,
-      match_id: answer.match_id
+      match_id: answer.match_id,
     }
     templateData.comments_header = I18n.beforeLabel(
       I18n.t('labels.comments_on_answer', 'Comments, if the user chooses this answer')
@@ -414,7 +414,7 @@ export const quiz = (window.quiz = {
 
     $answer.fillTemplateData({
       data: templateData,
-      htmlValues: ['answer_html', 'answer_match_left_html']
+      htmlValues: ['answer_html', 'answer_match_left_html'],
     })
 
     addHTMLFeedback($answer.find('.answer_comments'), answer, 'answer_comment')
@@ -489,8 +489,8 @@ export const quiz = (window.quiz = {
             aria_label: I18n.t(
               'label.question.instructions',
               'Question instructions, rich text area'
-            )
-          }
+            ),
+          },
         },
         () => {
           quiz.rebindMultiChange(questionType, $questionContent[0].id, $select)
@@ -557,7 +557,7 @@ export const quiz = (window.quiz = {
     return {
       question_type,
       answer_type,
-      n_correct
+      n_correct,
     }
   },
 
@@ -616,7 +616,7 @@ export const quiz = (window.quiz = {
     const fillArgs = {
       data: question,
       except: ['answers'],
-      htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html']
+      htmlValues: ['correct_comments_html', 'incorrect_comments_html', 'neutral_comments_html'],
     }
 
     if (escaped) {
@@ -807,7 +807,7 @@ export const quiz = (window.quiz = {
     $question.find('.blank_id_select').change()
     $question.fillTemplateData({
       question_type,
-      answer_selection_type: answer_type
+      answer_selection_type: answer_type,
     })
 
     $question.show()
@@ -837,7 +837,7 @@ export const quiz = (window.quiz = {
       $question.fillTemplateData({
         data: {id: question.id},
         id: 'question_' + question.id,
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
 
       $question.find('.original_question_text').fillFormData(question)
@@ -869,7 +869,7 @@ export const quiz = (window.quiz = {
       'answer_comment',
       'blank_id',
       'id',
-      'match_id'
+      'match_id',
     ]
     result.htmlValues = ['answer_html', 'answer_match_left_html', 'answer_comment_html']
     result.question_type = question_type
@@ -922,7 +922,7 @@ export const quiz = (window.quiz = {
       )
 
     const options = {
-      addable: true
+      addable: true,
     }
 
     limitTextInputFor($formQuestion, question_type)
@@ -935,7 +935,7 @@ export const quiz = (window.quiz = {
         for (var i = 0; i < 2 - $answers.length; i++) {
           const $answer = makeFormAnswer({
             answer_type: 'fixed_answer',
-            question_type: 'true_false_question'
+            question_type: 'true_false_question',
           })
           $formQuestion.find('.form_answers').append($answer)
         }
@@ -947,7 +947,7 @@ export const quiz = (window.quiz = {
       const answerOptions = {
         question_type: 'true_false_question',
         answer_type: 'fixed_answer',
-        answer_text: I18n.t('true', 'True')
+        answer_text: I18n.t('true', 'True'),
       }
       quiz.updateFormAnswer($formQuestion.find('.answer:first'), answerOptions)
       answerOptions.answer_text = I18n.t('false', 'False')
@@ -992,7 +992,7 @@ export const quiz = (window.quiz = {
         'answer_range_start',
         'answer_range_end',
         'answer_approximate',
-        'answer_precision'
+        'answer_precision',
       ]
       result.html_values = []
     } else if (question_type == 'calculated_question') {
@@ -1230,7 +1230,7 @@ export const quiz = (window.quiz = {
     question_text: '',
     question_points: 1,
     question_name: I18n.t('default_question_name', 'Question'),
-    answer_count: 4
+    answer_count: 4,
   },
 
   defaultAnswerData: {
@@ -1243,8 +1243,8 @@ export const quiz = (window.quiz = {
     answer_range_start: '0',
     answer_range_end: '0',
     answer_approximate: '0',
-    answer_precision: '10'
-  }
+    answer_precision: '10',
+  },
 })
 
 scoreValidation = {
@@ -1299,7 +1299,7 @@ scoreValidation = {
       // Prevent $.fn.formErrors from giving error box with cryptic message.
       delete resp.points_possible
     }
-  }
+  },
 }
 
 const ipFilterValidation = {
@@ -1322,7 +1322,7 @@ const ipFilterValidation = {
       // Prevent $.fn.formErrors from giving error box with cryptic message.
       delete resp.invalid_ip_filter
     }
-  }
+  },
 }
 
 correctAnswerVisibility = {
@@ -1508,7 +1508,7 @@ correctAnswerVisibility = {
     correctAnswerVisibility.$options
       .find('input.date_field, button.date_field')
       .prop('disabled', !isEnabled)
-  }
+  },
 }
 
 function makeQuestion(data) {
@@ -1581,7 +1581,7 @@ function makeDisplayAnswer(data, escaped) {
   $answer.fillFormData({answer_text: answer.answer_text})
   $answer.fillTemplateData({
     data: answer,
-    htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']
+    htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html'],
   })
 
   if (
@@ -1629,7 +1629,7 @@ function quizData($question) {
   const $quiz = $('#questions')
   const quiz = {
     questions: [],
-    points_possible: 0
+    points_possible: 0,
   }
   let $list = $quiz.find('.question')
   if ($question) {
@@ -1650,7 +1650,7 @@ function quizData($question) {
         'matching_answer_incorrect_matches',
         'equation_combinations',
         'equation_formulas',
-        'regrade_option'
+        'regrade_option',
       ],
       htmlValues: [
         'question_text',
@@ -1658,8 +1658,8 @@ function quizData($question) {
         'text_after_answers',
         'correct_comments_html',
         'incorrect_comments_html',
-        'neutral_comments_html'
-      ]
+        'neutral_comments_html',
+      ],
     })
     questionData = $.extend(questionData, $question.find('.original_question_text').getFormData())
     questionData.assessment_question_bank_id = $('.question_bank_id').text() || ''
@@ -1694,7 +1694,7 @@ function quizData($question) {
           'answer_range_end',
           'answer_approximate',
           'answer_precision',
-          'answer_weight'
+          'answer_weight',
         ]
         const answerData = $(this).getTemplateData({
           textValues: numberValues.concat([
@@ -1705,9 +1705,9 @@ function quizData($question) {
             'answer_text',
             'answer_match_left',
             'answer_match_right',
-            'answer_comment'
+            'answer_comment',
           ]),
-          htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html']
+          htmlValues: ['answer_html', 'answer_match_left_html', 'answer_comment_html'],
         })
         for (const num in numberValues) {
           answerData[num] = numberHelper.parse(answerData[num])
@@ -1778,7 +1778,7 @@ function generateFormQuizQuestion(formQuiz) {
 function generateFormQuiz(quiz) {
   const data = {
     quiz: {},
-    questions: []
+    questions: [],
   }
 
   if (ENV.ASSIGNMENT_ID) {
@@ -2075,7 +2075,7 @@ ready(function () {
     const $dialog = $('#ip_filters_dialog')
     $dialog.dialog({
       width: 400,
-      title: I18n.t('titles.ip_address_filtering', 'IP Address Filtering')
+      title: I18n.t('titles.ip_address_filtering', 'IP Address Filtering'),
     })
     if (!$dialog.hasClass('loaded')) {
       $dialog.find('.searching_message').text(I18n.t('retrieving_filters', 'Retrieving Filters...'))
@@ -2184,7 +2184,7 @@ ready(function () {
       let valid = true
       const validationData = {
         assignment_overrides: overrideView.getAllDates(),
-        postToSIS: data['quiz[post_to_sis]'] == '1'
+        postToSIS: data['quiz[post_to_sis]'] == '1',
       }
 
       const overrideErrs = overrideView.validateBeforeSave(validationData, {})
@@ -2193,7 +2193,7 @@ ready(function () {
         postToSIS: validationData.postToSIS,
         maxNameLengthRequired: ENV.MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT,
         maxNameLength,
-        name: quiz_title
+        name: quiz_title,
       })
 
       if (_.keys(overrideErrs).length > 0) {
@@ -2259,7 +2259,7 @@ ready(function () {
             missingDateView.remove()
             hasCheckedOverrides = true
             $quiz_options_form.trigger('submit')
-          }
+          },
         })
         missingDateView.cancel = function () {
           missingDateView.$dialog.dialog('close').remove()
@@ -2319,7 +2319,7 @@ ready(function () {
             conditionalRelease.editor.updateAssignment({
               id: promisedData.quiz.assignment_id,
               grading_type: 'points',
-              points_possible: promisedData.quiz.points_possible
+              points_possible: promisedData.quiz.points_possible,
             })
           }
           return conditionalRelease.editor.save().pipe(() => promisedData)
@@ -2379,7 +2379,7 @@ ready(function () {
         $(this).trigger('xhrError', data)
         $(this).formErrors(data)
       }
-    }
+    },
   })
 
   $quiz_edit_wrapper.find('#cancel_button').click(_event => {
@@ -2436,7 +2436,7 @@ ready(function () {
   $('#quiz_assignment_id')
     .change(event => {
       const previousData = $('#quiz_options').getTemplateData({
-        textValues: ['assignment_id', 'title']
+        textValues: ['assignment_id', 'title'],
       })
       const assignment_id = $('#quiz_assignment_id').val()
       let quiz_title = $('#quiz_title_input').val()
@@ -2448,7 +2448,7 @@ ready(function () {
       }
       const data = {
         'quiz[assignment_id]': assignment_id,
-        'quiz[title]': quiz_title
+        'quiz[title]': quiz_title,
       }
       $('#quiz_title').showIf(true)
       const gradedQuiz =
@@ -2540,7 +2540,7 @@ ready(function () {
         success(data) {
           $(this).remove()
           quiz.updateDisplayComments()
-        }
+        },
       })
   })
 
@@ -2561,14 +2561,14 @@ ready(function () {
         'blank_id',
         'matching_answer_incorrect_matches',
         'regrade_option',
-        'regrade_disabled'
+        'regrade_disabled',
       ],
       htmlValues: [
         'question_text',
         'correct_comments_html',
         'incorrect_comments_html',
-        'neutral_comments_html'
-      ]
+        'neutral_comments_html',
+      ],
     })
     question.question_text = $question.find("textarea[name='question_text']").val()
     const matches = []
@@ -2596,7 +2596,7 @@ ready(function () {
       question.question_type == 'missing_word_question'
     ) {
       question = $question.getTemplateData({
-        textValues: ['text_before_answers', 'text_after_answers']
+        textValues: ['text_before_answers', 'text_after_answers'],
       })
       const answer_data = $question.find('.original_question_text').getFormData()
       question.text_before_answers = answer_data.question_text
@@ -2672,7 +2672,7 @@ ready(function () {
       $question.find('.text > .answers .answer').each(function (index) {
         const answer = $(this).getTemplateData({
           textValues: data.textValues,
-          htmlValues: data.htmlValues
+          htmlValues: data.htmlValues,
         })
         answer.answer_type = data.answer_type
         answer.question_type = data.question_type
@@ -2767,7 +2767,7 @@ ready(function () {
     if (!toggler) {
       toggler = new MultipleChoiceToggle($this, {
         editorBoxLabel: I18n.t('label.answer.text', 'Answer text, rich text area'),
-        tinyOptions: {width: rceWidth}
+        tinyOptions: {width: rceWidth},
       })
       $this.data('editorToggle', toggler)
     }
@@ -2788,7 +2788,7 @@ ready(function () {
       const inputColumn = $comment.parents().find('.answer_type:visible')[0]
 
       toggler = new EditorToggle($comment_html, {
-        editorBoxLabel: $link.title
+        editorBoxLabel: $link.title,
       })
 
       toggler.editButton = $comment // focus on the comment box after closing the RCE
@@ -2853,7 +2853,7 @@ ready(function () {
         question: $question,
         regradeDisabled: isDisabled,
         regradeOption: REGRADE_OPTIONS[$question.data('questionID')],
-        multipleAnswer: questionType === 'multiple_answers_question'
+        multipleAnswer: questionType === 'multiple_answers_question',
       })
       regradeOptions.on('update', regradeOption => {
         const newAnswerData = {regradeOption, newAnswer}
@@ -2917,7 +2917,7 @@ ready(function () {
     const regradeTypes = [
       'multiple_choice_question',
       'true_false_question',
-      'multiple_answers_question'
+      'multiple_answers_question',
     ]
     return _.find(regradeTypes, className => $el.hasClass(className))
   }
@@ -3074,7 +3074,7 @@ ready(function () {
       if (questionLimitReached(true)) {
         this.value = $(this).data('prev-value')
       }
-    }
+    },
   })
 
   const $findBankDialog = $('#find_bank_dialog')
@@ -3125,7 +3125,7 @@ ready(function () {
     $dialog.dialog({
       title: I18n.t('titles.find_question_bank', 'Find Question Bank'),
       width: 600,
-      height: 400
+      height: 400,
     })
   })
 
@@ -3209,7 +3209,7 @@ ready(function () {
         }
       },
       width: 600,
-      height: 400
+      height: 400,
     })
   })
 
@@ -3250,7 +3250,7 @@ ready(function () {
         .filter('.submit_button')
         .text(I18n.t('buttons.create_group', 'Create Group'))
       $dialog.dialog({
-        width: 400
+        width: 400,
       })
     }
   })
@@ -3299,7 +3299,7 @@ ready(function () {
         $group_top.fillTemplateData({
           data: group,
           id: 'group_top_' + group.id,
-          hrefValues: ['id']
+          hrefValues: ['id'],
         })
         $group_top.fillFormData(data, {object_name: 'quiz_group'})
         $('#unpublished_changes_message').slideDown()
@@ -3335,7 +3335,7 @@ ready(function () {
     const existingIDs = {}
     $('.display_question:visible').each(function () {
       const id = $(this).getTemplateData({
-        textValues: ['assessment_question_id']
+        textValues: ['assessment_question_id'],
       }).assessment_question_id
       if (id) {
         existingIDs[id] = true
@@ -3468,7 +3468,7 @@ ready(function () {
       $dialog.find('.questions_count').text(question_ids.length)
       $dialog.dialog({
         autoOpen: false,
-        title: I18n.t('titles.add_questions_as_group', 'Add Questions as a Group')
+        title: I18n.t('titles.add_questions_as_group', 'Add Questions as a Group'),
       })
     })
     .delegate('.submit_button', 'click', function (event) {
@@ -3538,8 +3538,11 @@ ready(function () {
     if ($question.hasClass('multiple_choice_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'select_answer'
       question_type = 'multiple_choice_question'
@@ -3548,8 +3551,11 @@ ready(function () {
     } else if ($question.hasClass('short_answer_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'short_answer'
       question_type = 'short_answer_question'
@@ -3560,8 +3566,8 @@ ready(function () {
           comments: I18n.t(
             'default_response_to_essay',
             'Response to show student after they submit an answer'
-          )
-        }
+          ),
+        },
       ]
       answer_type = 'comment'
       question_type = 'essay_question'
@@ -3571,8 +3577,8 @@ ready(function () {
           comments: I18n.t(
             'default_response_to_file_upload',
             'Response to show student after they submit an answer'
-          )
-        }
+          ),
+        },
       ]
       answer_type = 'comment'
       question_type = 'file_upload_question'
@@ -3582,8 +3588,8 @@ ready(function () {
           comments: I18n.t(
             'default_comments_on_wrong_match',
             'Response if the user misses this match'
-          )
-        }
+          ),
+        },
       ]
       answer_type = 'matching_answer'
       question_type = 'matching_question'
@@ -3591,8 +3597,11 @@ ready(function () {
     } else if ($question.hasClass('missing_word_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'short_answer'
       question_type = 'missing_word_question'
@@ -3606,8 +3615,8 @@ ready(function () {
           comments: I18n.t(
             'default_answer_comments_on_match',
             'Response if the student matches this answer'
-          )
-        }
+          ),
+        },
       ]
       answer_type = 'numerical_answer'
       question_type = 'numerical_question'
@@ -3615,8 +3624,11 @@ ready(function () {
     } else if ($question.hasClass('multiple_answers_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'select_answer'
       question_type = 'multiple_answers_question'
@@ -3624,16 +3636,22 @@ ready(function () {
     } else if ($question.hasClass('multiple_dropdowns_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'select_answer'
       question_type = 'multiple_dropdowns_question'
     } else if ($question.hasClass('fill_in_multiple_blanks_question')) {
       var answers = [
         {
-          comments: I18n.t('default_answer_comments', 'Response if the student chooses this answer')
-        }
+          comments: I18n.t(
+            'default_answer_comments',
+            'Response if the student chooses this answer'
+          ),
+        },
       ]
       answer_type = 'short_answer'
       question_type = 'fill_in_multiple_blanks_question'
@@ -3944,7 +3962,7 @@ ready(function () {
           $('#' + id.substring(5)).appendTo($('#questions'))
         }
       }
-    }
+    },
   })
 
   $(document)
@@ -4075,7 +4093,7 @@ ready(function () {
       const $group = $form.parents('.group_top')
       $group
         .fillTemplateData({
-          data: formData
+          data: formData,
         })
         .removeClass('editing')
       $form.loadingImage()
@@ -4091,7 +4109,7 @@ ready(function () {
       $group.fillTemplateData({
         data: group,
         id: 'group_top_' + group.id,
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
       $group.toggleClass('question_bank_top', !!group.assessment_question_bank_id)
 
@@ -4107,7 +4125,7 @@ ready(function () {
           .next('.assessment_question_bank')
           .fillTemplateData({
             data: bank,
-            hrefValues: ['bank_id', 'context_type_string', 'context_id']
+            hrefValues: ['bank_id', 'context_type_string', 'context_id'],
           })
           .find('.bank_name')
           .hide()
@@ -4139,7 +4157,7 @@ ready(function () {
       $group.addClass('editing')
       $form.loadingImage('remove')
       $form.formErrors(data)
-    }
+    },
   })
 
   // accessible sortables
@@ -4167,7 +4185,7 @@ ready(function () {
         id: parent.attr('id').replace(/group_top_|question_/, ''),
         type: group.length > 0 ? 'group' : 'question',
         name: parent.find('.name').text(),
-        sortable: group.length > 0 ? group : holder.parent()
+        sortable: group.length > 0 ? group : holder.parent(),
       }
     },
 
@@ -4196,7 +4214,7 @@ ready(function () {
           name: item.find('.name').text(),
           group: groupId,
           top: !item.parent().hasClass('group'),
-          sortable
+          sortable,
         }
       })
     },
@@ -4285,7 +4303,7 @@ ready(function () {
           width: 400,
           height: displayGroupSelector ? 345 : 265,
           close: this.removeEventListeners.bind(this),
-          open: this.focusDialog.bind(this)
+          open: this.focusDialog.bind(this),
         })
         .dialog('open')
 
@@ -4424,7 +4442,7 @@ ready(function () {
         params.push({type: selected.type, id: selected.id})
       }
       return params
-    }
+    },
   }
   $(document).on('click keydown', '.draggable-handle', event => {
     if (event.type == 'keydown' && event.keyCode != 13 && event.keyCode != 32) {
@@ -4573,7 +4591,7 @@ ready(function () {
         {},
         {contentType: 'application/json'}
       )
-    }
+    },
   })
 
   $(document)
@@ -4616,7 +4634,7 @@ ready(function () {
             $(this).remove()
             quiz.updateDisplayComments()
           })
-        }
+        },
       })
     })
     .delegate('.group_edit.cancel_button', 'click', function (event) {
@@ -4684,8 +4702,8 @@ ready(function () {
       focus: true,
       manageParent: true,
       tinyOptions: {
-        aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area')
-      }
+        aria_label: I18n.t('label.quiz.instructions', 'Quiz instructions, rich text area'),
+      },
     })
   }
 
@@ -4710,7 +4728,7 @@ ready(function () {
         url: $(this).attr('href'),
         success() {
           window.location.replace(ENV.QUIZZES_URL)
-        }
+        },
       })
   })
 
@@ -4734,7 +4752,7 @@ ready(function () {
         conditionalRelease.editor.updateAssignment({
           id,
           grading_type: 'points',
-          points_possible: quiz.calculatePointsPossible()
+          points_possible: quiz.calculatePointsPossible(),
         })
         conditionalRelease.assignmentUpToDate = true
       }
@@ -4860,7 +4878,7 @@ $.fn.formulaQuestion = function () {
       $question.find('.variables .variable').each(function () {
         const data = {
           name: $(this).attr('data-name'),
-          value: $(this).attr('data-value')
+          value: $(this).attr('data-value'),
         }
         result.push(data.name + ' = ' + data.value)
       })
@@ -4868,7 +4886,7 @@ $.fn.formulaQuestion = function () {
     },
     formula_added() {
       $question.triggerHandler('settings_change', true)
-    }
+    },
   })
   $question.find('.compute_combinations').click(function () {
     const $button = $(this)
@@ -4916,7 +4934,7 @@ $.fn.formulaQuestion = function () {
             {
               one: 'The system could only generate 1 valid combination for the parameters given',
               other:
-                'The system could only generate %{count} valid combinations for the parameters given'
+                'The system could only generate %{count} valid combinations for the parameters given',
             },
             {count: succeeded}
           )
@@ -4937,7 +4955,7 @@ $.fn.formulaQuestion = function () {
       $button.text(
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
-          total: cnt
+          total: cnt,
         })
       )
       const fragment = document.createDocumentFragment()
@@ -4986,7 +5004,7 @@ $.fn.formulaQuestion = function () {
       $button.text(
         I18n.t('buttons.generating_combinations_progress', 'Generating... (%{done}/%{total})', {
           done: succeeded,
-          total: cnt
+          total: cnt,
         })
       )
       if (combinationIndex >= cnt || succeeded >= cnt || failedCount >= 25) {
@@ -5075,7 +5093,7 @@ $.fn.formulaQuestion = function () {
     $('#calc_helper_methods').change()
     $('#help_with_equations_dialog').dialog({
       title: I18n.t('titles.help_with_formulas', 'Help with Quiz Question Formulas'),
-      width: 500
+      width: 500,
     })
   })
   $question.find('.combinations_option').attr('disabled', true)

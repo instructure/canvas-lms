@@ -50,7 +50,7 @@ import {
   IconUnlockLine,
   IconUnpublishedLine,
   IconUpdownLine,
-  IconUserLine
+  IconUserLine,
 } from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -77,7 +77,7 @@ const I18n = useI18nScope('discussion_row')
 const dragTarget = {
   beginDrag(props) {
     return props.discussion
-  }
+  },
 }
 
 const dropTarget = {
@@ -105,7 +105,7 @@ const dropTarget = {
       return
     }
     props.moveCard(dragIndex, hoverIndex)
-  }
+  },
 }
 
 class DiscussionRow extends Component {
@@ -141,7 +141,7 @@ class DiscussionRow extends Component {
     toggleSubscriptionState: func.isRequired,
     updateDiscussion: func.isRequired,
     DIRECT_SHARE_ENABLED: bool.isRequired,
-    dateFormatter: func.isRequired
+    dateFormatter: func.isRequired,
   }
 
   static defaultProps = {
@@ -163,7 +163,7 @@ class DiscussionRow extends Component {
     displayMasteryPathsPill: false,
     masteryPathsPillLabel: '',
     moveCard: () => {},
-    onMoveDiscussion: null
+    onMoveDiscussion: null,
   }
 
   componentDidMount = () => {
@@ -223,7 +223,7 @@ class DiscussionRow extends Component {
       case 'copyTo':
         this.props.setCopyTo({
           open: true,
-          selection: {discussion_topics: [this.props.discussion.id]}
+          selection: {discussion_topics: [this.props.discussion.id]},
         })
         break
       case 'sendTo':
@@ -231,8 +231,8 @@ class DiscussionRow extends Component {
           open: true,
           selection: {
             content_type: 'discussion_topic',
-            content_id: this.props.discussion.id
-          }
+            content_id: this.props.discussion.id,
+          },
         })
         break
 
@@ -284,7 +284,7 @@ class DiscussionRow extends Component {
                 <Link href={ENV.FEATURE_FLAGS_URL} key={this.props.discussion.id} target="_blank">
                   {I18n.t('Discussions/Announcements Redesign')}
                 </Link>,
-                I18n.t(' to view anonymous discussion')
+                I18n.t(' to view anonymous discussion'),
               ]
             : I18n.t('Unavailable')}
         </Text>
@@ -301,7 +301,7 @@ class DiscussionRow extends Component {
       !isPassedDelayedPostAt({checkDate: null, delayedDate: availabilityBegin})
     ) {
       return I18n.t('Not available until %{date}', {
-        date: this.props.dateFormatter(availabilityBegin)
+        date: this.props.dateFormatter(availabilityBegin),
       })
     }
     if (availabilityEnd) {
@@ -342,11 +342,11 @@ class DiscussionRow extends Component {
           key={`Badge_${this.props.discussion.id}`}
           unreadCount={this.props.discussion.unread_count}
           unreadLabel={I18n.t('%{count} unread replies', {
-            count: this.props.discussion.unread_count
+            count: this.props.discussion.unread_count,
           })}
           totalCount={this.props.discussion.discussion_subentry_count}
           totalLabel={I18n.t('%{count} replies', {
-            count: this.props.discussion.discussion_subentry_count
+            count: this.props.discussion.discussion_subentry_count,
           })}
         />
       ) : null
@@ -359,15 +359,15 @@ class DiscussionRow extends Component {
       getLockOptions: () => ({
         model: new DiscussionModel(this.props.discussion),
         unlockedText: I18n.t('%{title} is unlocked. Click to lock.', {
-          title: this.props.discussion.title
+          title: this.props.discussion.title,
         }),
         lockedText: I18n.t('%{title} is locked. Click to unlock', {
-          title: this.props.discussion.title
+          title: this.props.discussion.title,
         }),
         course_id: this.props.masterCourseData.masterCourse.id,
         content_id: this.props.discussion.id,
-        content_type: 'discussion_topic'
-      })
+        content_type: 'discussion_topic',
+      }),
     }
     const {courseData = {}, getLockOptions} = masterCourse || {}
     if (container && (courseData.isMasterCourse || courseData.isChildCourse)) {
@@ -597,7 +597,7 @@ class DiscussionRow extends Component {
               action: 'ltiMenuTool',
               id: this.props.discussion.id,
               title: this.props.discussion.title,
-              menuTool
+              menuTool,
             }}
             id="menuTool-discussion-menu-option"
           >
@@ -725,7 +725,7 @@ class DiscussionRow extends Component {
     } else if (this.props.discussion.todo_date) {
       className = 'todo-date'
       dueDateString = I18n.t('To do %{date}', {
-        date: this.props.dateFormatter(this.props.discussion.todo_date)
+        date: this.props.dateFormatter(this.props.discussion.todo_date),
       })
     }
     return <div className={`ic-discussion-row__content ${className}`}>{dueDateString}</div>
@@ -858,7 +858,7 @@ class DiscussionRow extends Component {
 
   renderBlueUnreadBadge() {
     if (this.props.discussion.read_state !== 'read') {
-      return <Badge margin="0 small x-small 0" standalone type="notification" />
+      return <Badge margin="0 small x-small 0" standalone={true} type="notification" />
     } else {
       return (
         <View display="block" margin="0 small x-small 0">
@@ -890,7 +890,7 @@ const mapDispatch = dispatch => {
     'toggleSubscriptionState',
     'updateDiscussion',
     'setCopyTo',
-    'setSendTo'
+    'setSendTo',
   ]
   return bindActionCreators(select(actions, actionKeys), dispatch)
 }
@@ -927,7 +927,7 @@ const mapState = (state, ownProps) => {
     displayPinMenuItem: state.permissions.moderate,
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,
-    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED
+    DIRECT_SHARE_ENABLED: state.DIRECT_SHARE_ENABLED,
   }
   return {...ownProps, ...propsFromState}
 }
@@ -948,12 +948,12 @@ const WrappedDiscussionRow = withDateFormatHook(DiscussionRow)
 
 export const DraggableDiscussionRow = compose(
   DropTarget('Discussion', dropTarget, dConnect => ({
-    connectDropTarget: dConnect.dropTarget()
+    connectDropTarget: dConnect.dropTarget(),
   })),
   DragSource('Discussion', dragTarget, (dConnect, monitor) => ({
     connectDragSource: dConnect.dragSource(),
     isDragging: monitor.isDragging(),
-    connectDragPreview: dConnect.dragPreview()
+    connectDragPreview: dConnect.dragPreview(),
   }))
 )(WrappedDiscussionRow)
 

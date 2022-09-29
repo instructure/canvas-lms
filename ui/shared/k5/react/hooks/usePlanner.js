@@ -52,7 +52,7 @@ export default function usePlanner({
   focusFallback,
   singleCourse = false,
   observedUserId,
-  isObserver = false
+  isObserver = false,
 }) {
   const [plannerInitializing, setPlannerInitializing] = useState(false)
   const [plannerInitialized, setPlannerInitialized] = useState(false)
@@ -75,7 +75,7 @@ export default function usePlanner({
         externalFallbackFocusable: focusFallback,
         env: window.ENV,
         singleCourse,
-        observedUserId
+        observedUserId,
       })
         .then(val => {
           setPlannerInitialized(val)

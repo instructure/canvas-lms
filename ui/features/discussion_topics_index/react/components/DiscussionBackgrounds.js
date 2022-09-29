@@ -41,7 +41,7 @@ const BackgroundSVG = props => (
 )
 
 BackgroundSVG.propTypes = {
-  url: string.isRequired
+  url: string.isRequired,
 }
 
 export const pinnedDiscussionBackground = props => (
@@ -61,7 +61,7 @@ export const pinnedDiscussionBackground = props => (
 )
 
 pinnedDiscussionBackground.propTypes = {
-  permissions: propTypes.permissions.isRequired
+  permissions: propTypes.permissions.isRequired,
 }
 
 export const unpinnedDiscussionsBackground = props => (
@@ -84,7 +84,7 @@ export const unpinnedDiscussionsBackground = props => (
 unpinnedDiscussionsBackground.propTypes = {
   contextType: string.isRequired,
   contextID: string.isRequired,
-  permissions: propTypes.permissions.isRequired
+  permissions: propTypes.permissions.isRequired,
 }
 
 export const closedDiscussionBackground = props => (
@@ -104,5 +104,5 @@ export const closedDiscussionBackground = props => (
 )
 
 closedDiscussionBackground.propTypes = {
-  permissions: propTypes.permissions.isRequired
+  permissions: propTypes.permissions.isRequired,
 }

@@ -31,7 +31,7 @@ class CollaborationsToolLaunch extends React.Component {
       height: 500,
       beforeExternalContentAlertClass: 'screenreader-only',
       afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {}
+      iframeStyle: {},
     }
 
     main = document.querySelector('#main')
@@ -52,13 +52,13 @@ class CollaborationsToolLaunch extends React.Component {
 
   setHeight = () => {
     this.setState({
-      height: main.getBoundingClientRect().height - 48
+      height: main.getBoundingClientRect().height - 48,
     })
   }
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -70,7 +70,7 @@ class CollaborationsToolLaunch extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'

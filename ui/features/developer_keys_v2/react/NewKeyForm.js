@@ -37,7 +37,7 @@ import ToolConfigurationForm from './ToolConfigurationForm'
 const I18n = useI18nScope('react_developer_keys')
 
 const validationMessage = [
-  {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'}
+  {text: I18n.t('Must have at least one redirect_uri defined.'), type: 'error'},
 ]
 
 const clientCredentialsAudienceTooltip = I18n.t(
@@ -84,7 +84,7 @@ export default class NewKeyForm extends React.Component {
       updateToolConfiguration,
       updateToolConfigurationUrl,
       toolConfigurationUrl,
-      updateDeveloperKey
+      updateDeveloperKey,
     } = this.props
 
     return (
@@ -230,7 +230,7 @@ export default class NewKeyForm extends React.Component {
 }
 
 NewKeyForm.defaultProps = {
-  developerKey: {}
+  developerKey: {},
 }
 
 NewKeyForm.propTypes = {
@@ -248,23 +248,23 @@ NewKeyForm.propTypes = {
     name: PropTypes.string,
     require_scopes: PropTypes.bool,
     tool_configuration: PropTypes.shape({
-      oidc_initiation_url: PropTypes.string
+      oidc_initiation_url: PropTypes.string,
     }),
     test_cluster_only: PropTypes.bool,
-    client_credentials_audience: PropTypes.string
+    client_credentials_audience: PropTypes.string,
   }),
   availableScopes: PropTypes.objectOf(
     PropTypes.arrayOf(
       PropTypes.shape({
         resource: PropTypes.string,
-        scope: PropTypes.string
+        scope: PropTypes.string,
       })
     )
   ).isRequired,
   availableScopesPending: PropTypes.bool.isRequired,
   editing: PropTypes.bool.isRequired,
   tool_configuration: PropTypes.shape({
-    oidc_initiation_url: PropTypes.string
+    oidc_initiation_url: PropTypes.string,
   }),
   showRequiredMessages: PropTypes.bool,
   showMissingRedirectUrisMessage: PropTypes.bool,
@@ -273,5 +273,5 @@ NewKeyForm.propTypes = {
   updateDeveloperKey: PropTypes.func.isRequired,
   toolConfigurationUrl: PropTypes.string,
   configurationMethod: PropTypes.string.isRequired,
-  updateConfigurationMethod: PropTypes.func.isRequired
+  updateConfigurationMethod: PropTypes.func.isRequired,
 }

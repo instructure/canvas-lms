@@ -25,51 +25,51 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Account Settings'),
-      description: I18n.t('Allows user to manually add and delete an app in Account Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Account Settings.'),
     },
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.'),
     },
     {
       title: I18n.t('External Apps'),
-      description: I18n.t('Allows user to edit configurations for manually added external apps.')
-    }
+      description: I18n.t('Allows user to edit configurations for manually added external apps.'),
+    },
   ],
   [
     {
       title: I18n.t('External Apps (Account, Course Settings)'),
       description: I18n.t(
         'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).'
-      )
+      ),
     },
     {
       description: I18n.t(
         'Additionally, if this permission is disabled, users cannot delete manually added external apps.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('Allows user to manually add and delete an app in Course Settings.')
+      description: I18n.t('Allows user to manually add and delete an app in Course Settings.'),
     },
     {
       title: I18n.t('External Apps (Course Settings)'),
-      description: I18n.t('Allows user to edit configurations for manually added external apps.')
-    }
+      description: I18n.t('Allows user to edit configurations for manually added external apps.'),
+    },
   ],
   [
     {
       title: I18n.t('External Apps (Course Settings)'),
       description: I18n.t(
         'If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution).'
-      )
+      ),
     },
     {
       description: I18n.t(
         'Additionally, if this permission is disabled, users cannot delete manually added external apps.'
-      )
-    }
+      ),
+    },
   ]
 )

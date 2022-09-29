@@ -87,13 +87,13 @@ export default function speedgraderSelectMenu(optionsArray) {
   // Map of student id to index position
   this.student_id_map = null
 
-  this.buildHtml = function(options) {
+  this.buildHtml = function (options) {
     const optionHtml = optionsToHtml(options)
 
     return `<select id='students_selectmenu'>${optionHtml}</select>`
   }
 
-  this.selectMenuAccessibilityFixes = function(container) {
+  this.selectMenuAccessibilityFixes = function (container) {
     const $select_menu = $(container).find('select#students_selectmenu')
 
     $(container)
@@ -114,16 +114,12 @@ export default function speedgraderSelectMenu(optionsArray) {
       .show()
   }
 
-  this.focusHandlerAccessibilityFixes = function(container) {
-    const focus = function(_e) {
-      $(container)
-        .find('span.ui-selectmenu-icon')
-        .css('background-position', '-17px 0')
+  this.focusHandlerAccessibilityFixes = function (container) {
+    const focus = function (_e) {
+      $(container).find('span.ui-selectmenu-icon').css('background-position', '-17px 0')
     }
-    const focusOut = function(_e) {
-      $(container)
-        .find('span.ui-selectmenu-icon')
-        .css('background-position', '0 0')
+    const focusOut = function (_e) {
+      $(container).find('span.ui-selectmenu-icon').css('background-position', '0 0')
     }
 
     // In case someone mouseovers, let's visual color to match a
@@ -140,7 +136,7 @@ export default function speedgraderSelectMenu(optionsArray) {
     $select_menu.bind('focusout', focusOut)
   }
 
-  this.keyEventAccessibilityFixes = function(container) {
+  this.keyEventAccessibilityFixes = function (container) {
     const self = this
     const $select_menu = $(container).find('select#students_selectmenu')
     // The fake gui menu won't update in firefox until the select is
@@ -155,13 +151,13 @@ export default function speedgraderSelectMenu(optionsArray) {
     })
   }
 
-  this.accessibilityFixes = function(container) {
+  this.accessibilityFixes = function (container) {
     this.focusHandlerAccessibilityFixes(container)
     this.selectMenuAccessibilityFixes(container)
     this.keyEventAccessibilityFixes(container)
   }
 
-  this.appendTo = function(selector, onChange) {
+  this.appendTo = function (selector, onChange) {
     const self = this
     this.student_id_map = buildStudentIdMap(this.options_array)
 
@@ -176,7 +172,7 @@ export default function speedgraderSelectMenu(optionsArray) {
         format: text => self.formatSelectText(text),
         open: event => {
           self.our_open(event)
-        }
+        },
       })
     // Remove the section change optgroup since it'll be replaced by a popout menu
     $('ul#students_selectmenu-menu li.ui-selectmenu-group').remove()
@@ -189,7 +185,7 @@ export default function speedgraderSelectMenu(optionsArray) {
     this.replaceDropdownIcon(this.$el.parent())
   }
 
-  this.replaceDropdownIcon = function(container) {
+  this.replaceDropdownIcon = function (container) {
     const $span = $(container).find('span.ui-selectmenu-icon')
     $span.removeClass('ui-icon')
     $("<i class='icon-mini-arrow-down'></i>").appendTo($span)
@@ -206,7 +202,7 @@ export default function speedgraderSelectMenu(optionsArray) {
   }
 
   // xsslint safeString.function getIcon
-  this.getIconHtml = function(helper_text) {
+  this.getIconHtml = function (helper_text) {
     let icon = "<span class='ui-selectmenu-item-icon speedgrader-selectmenu-icon'>"
     if (helper_text === 'graded') {
       icon += "<i class='icon-check'></i>"
@@ -217,7 +213,7 @@ export default function speedgraderSelectMenu(optionsArray) {
     return icon.concat('</span>')
   }
 
-  this.formatSelectText = function(_text) {
+  this.formatSelectText = function (_text) {
     let option = this.options_array[this.option_index]
     let optgroup
     let html = ''
@@ -264,11 +260,11 @@ export default function speedgraderSelectMenu(optionsArray) {
     `
   }
 
-  this.updateSelectMenuStatus = function({
+  this.updateSelectMenuStatus = function ({
     student,
     isCurrentStudent,
     newStudentInfo,
-    anonymizableId
+    anonymizableId,
   }) {
     if (!student) return
     const optionIndex = this.student_id_map[student[anonymizableId]]
@@ -286,10 +282,7 @@ export default function speedgraderSelectMenu(optionsArray) {
     const $queryIcon = $query.find('.speedgrader-selectmenu-icon')
 
     const option = $(this.option_tag_array[optionIndex])
-    option
-      .text(newStudentInfo)
-      .removeClass(submissionStates)
-      .addClass(className.raw)
+    option.text(newStudentInfo).removeClass(submissionStates).addClass(className.raw)
 
     if (className.raw === 'graded' || className.raw === 'not_gradeable') {
       $queryIcon.text('').append("<i class='icon-check'></i>")
@@ -318,7 +311,7 @@ export default function speedgraderSelectMenu(optionsArray) {
     // $selectmenu.data('selectmenu').newelement when it is graded, we
     // need to also set the data() so that if you skip back to this
     // student it doesnt show the old checkbox status.
-    $.each(submissionStates.split(' '), function() {
+    $.each(submissionStates.split(' '), function () {
       $query.data('optionClasses', $query.data('optionClasses').replace(this, ''))
     })
   }

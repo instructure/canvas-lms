@@ -38,7 +38,7 @@ const assignmentStatuses = [
   AssignmentActions.NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   AssignmentActions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   AssignmentActions.STARTED,
-  AssignmentActions.SUCCESS
+  AssignmentActions.SUCCESS,
 ]
 
 function announceReleaseGradesStatus(status) {
@@ -72,12 +72,12 @@ function announceUnmuteAssignmentStatus(status) {
   if (status === AssignmentActions.SUCCESS) {
     showFlashAlert({
       message: I18n.t('Grades for this assignment are now visible to students.'),
-      type: 'success'
+      type: 'success',
     })
   } else if (status === AssignmentActions.FAILURE) {
     showFlashAlert({
       message: I18n.t('There was a problem updating the assignment.'),
-      type: 'error'
+      type: 'error',
     })
   }
 }
@@ -93,17 +93,17 @@ class FlashMessageHolder extends Component {
       shape({
         gradeInfo: shape({
           studentId: string.isRequired,
-          selected: bool
+          selected: bool,
         }).isRequired,
-        status: oneOf(enumeratedStatuses(StudentActions))
+        status: oneOf(enumeratedStatuses(StudentActions)),
       })
-    ).isRequired
+    ).isRequired,
   }
 
   static defaultProps = {
     loadStudentsStatus: null,
     releaseGradesStatus: null,
-    unmuteAssignmentStatus: null
+    unmuteAssignmentStatus: null,
   }
 
   componentWillReceiveProps(nextProps) {
@@ -116,7 +116,7 @@ class FlashMessageHolder extends Component {
       if (nextProps.loadStudentsStatus === StudentActions.FAILURE) {
         showFlashAlert({
           message: I18n.t('There was a problem loading students.'),
-          type: 'error'
+          type: 'error',
         })
       }
     }
@@ -131,12 +131,12 @@ class FlashMessageHolder extends Component {
           if (status === GradeActions.SUCCESS) {
             showFlashAlert({
               message: I18n.t('Grade saved.'),
-              type: 'success'
+              type: 'success',
             })
           } else if (status === GradeActions.FAILURE) {
             showFlashAlert({
               message: I18n.t('There was a problem saving the grade.'),
-              type: 'error'
+              type: 'error',
             })
           }
         }
@@ -153,12 +153,12 @@ class FlashMessageHolder extends Component {
           if (status === GradeActions.SUCCESS) {
             showFlashAlert({
               message: I18n.t('Grades saved.'),
-              type: 'success'
+              type: 'success',
             })
           } else if (status === GradeActions.FAILURE) {
             showFlashAlert({
               message: I18n.t('There was a problem saving the grades.'),
-              type: 'error'
+              type: 'error',
             })
           }
         }
@@ -173,12 +173,12 @@ class FlashMessageHolder extends Component {
         if (statusInfo.status === GradeActions.SUCCESS && statusInfo.gradeInfo.selected) {
           showFlashAlert({
             message: I18n.t('Grade saved.'),
-            type: 'success'
+            type: 'success',
           })
         } else if (statusInfo.status === GradeActions.FAILURE) {
           showFlashAlert({
             message: I18n.t('There was a problem updating the grade.'),
-            type: 'error'
+            type: 'error',
           })
         }
       })
@@ -205,7 +205,7 @@ function mapStateToProps(state) {
     releaseGradesStatus: state.assignment.releaseGradesStatus,
     selectProvisionalGradeStatuses: state.grades.selectProvisionalGradeStatuses,
     unmuteAssignmentStatus: state.assignment.unmuteAssignmentStatus,
-    updateGradeStatuses: state.grades.updateGradeStatuses
+    updateGradeStatuses: state.grades.updateGradeStatuses,
   }
 }
 

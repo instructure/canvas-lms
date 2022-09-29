@@ -28,12 +28,12 @@ const I18n = useI18nScope('createTicketForm')
 class CreateTicketForm extends React.Component {
   static propTypes = {
     onCancel: PropTypes.func,
-    onSubmit: PropTypes.func
+    onSubmit: PropTypes.func,
   }
 
   static defaultProps = {
     onCancel() {},
-    onSubmit() {}
+    onSubmit() {},
   }
 
   componentDidMount() {
@@ -50,7 +50,7 @@ class CreateTicketForm extends React.Component {
       error: response => {
         this.form.formErrors(JSON.parse(response.responseText))
         this.focus()
-      }
+      },
     })
   }
 
@@ -79,9 +79,9 @@ class CreateTicketForm extends React.Component {
               __html: I18n.t(
                 'For an instant answer, see if your issue is addressed in the *Canvas Guides*.',
                 {
-                  wrappers: ['<a target="_blank" href="' + guidesLink + '">$1</a>']
+                  wrappers: ['<a target="_blank" href="' + guidesLink + '">$1</a>'],
                 }
-              )
+              ),
             }}
           />
 
@@ -90,7 +90,7 @@ class CreateTicketForm extends React.Component {
             <input
               ref={c => (this.subject = c)}
               type="text"
-              required
+              required={true}
               maxLength="200"
               aria-required="true"
               className="ic-Input"
@@ -100,7 +100,12 @@ class CreateTicketForm extends React.Component {
 
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Description')}</span>
-            <textarea className="ic-Input" required aria-required="true" name="error[comments]" />
+            <textarea
+              className="ic-Input"
+              required={true}
+              aria-required="true"
+              name="error[comments]"
+            />
             <span
               className="ic-Form-help-text"
               dangerouslySetInnerHTML={{
@@ -108,10 +113,10 @@ class CreateTicketForm extends React.Component {
                   'Include a link to a screencast/screenshot using something like *Jing*.',
                   {
                     wrappers: [
-                      '<a target="_blank" href="http://www.techsmith.com/download/jing">$1</a>'
-                    ]
+                      '<a target="_blank" href="http://www.techsmith.com/download/jing">$1</a>',
+                    ],
                   }
-                )
+                ),
               }}
             />
           </label>
@@ -120,7 +125,7 @@ class CreateTicketForm extends React.Component {
             <span className="ic-Label">{I18n.t('How is this affecting you?')}</span>
             <select
               className="ic-Input"
-              required
+              required={true}
               aria-required="true"
               name="error[user_perceived_severity]"
             >

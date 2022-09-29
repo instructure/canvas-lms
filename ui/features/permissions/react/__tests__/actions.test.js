@@ -39,8 +39,8 @@ it('searchPermissions dispatches updatePermissionsSearch', done => {
     type: 'UPDATE_PERMISSIONS_SEARCH',
     payload: {
       permissionSearchString: 'add',
-      contextType: COURSE
-    }
+      contextType: COURSE,
+    },
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(1)
@@ -66,13 +66,13 @@ it('setAndOpenRoleTray dispatches hideAllTrays and dispalyRoleTray', () => {
   actions.setAndOpenRoleTray('banana')(dispatchMock, () => {})
 
   const expectedHideDispatch = {
-    type: 'HIDE_ALL_TRAYS'
+    type: 'HIDE_ALL_TRAYS',
   }
   const expectedDisplayRoleDispatch = {
     type: 'DISPLAY_ROLE_TRAY',
     payload: {
-      role: 'banana'
-    }
+      role: 'banana',
+    },
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(2)
@@ -84,10 +84,10 @@ it('setAndOpenAddTray dispatches hideAllTrays and displayAddTray', () => {
   const dispatchMock = jest.fn()
   actions.setAndOpenAddTray()(dispatchMock, () => {})
   const expectedHideDispatch = {
-    type: 'HIDE_ALL_TRAYS'
+    type: 'HIDE_ALL_TRAYS',
   }
   const expectedDisplayAddDispatch = {
-    type: 'DISPLAY_ADD_TRAY'
+    type: 'DISPLAY_ADD_TRAY',
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(2)
@@ -99,13 +99,13 @@ it('setAndOpenPermissionTray dispatches hideAllTrays and dispalyPermissionTray',
   const dispatchMock = jest.fn()
   actions.setAndOpenPermissionTray('banana')(dispatchMock, () => {})
   const expectedHideDispatch = {
-    type: 'HIDE_ALL_TRAYS'
+    type: 'HIDE_ALL_TRAYS',
   }
   const expectedDisplayRoleDispatch = {
     type: 'DISPLAY_PERMISSION_TRAY',
     payload: {
-      permission: 'banana'
-    }
+      permission: 'banana',
+    },
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(2)
@@ -118,20 +118,20 @@ it('filterRoles dispatches updateRoleFilters', () => {
     contextId: 1,
     permissions: PERMISSIONS,
     roles: ROLES,
-    selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}]
+    selectedRoles: [{id: '104', label: 'kitty', children: 'kitty', value: '104'}],
   }
   const dispatchMock = jest.fn()
   actions.filterRoles({selectedRoles: [ROLES[0]], contextType: COURSE})(dispatchMock, () => state)
   const expectedFirstDispatch = {
     type: 'UPDATE_SELECTED_ROLES',
-    payload: [ROLES[0]]
+    payload: [ROLES[0]],
   }
   const expectedSecondDispatch = {
     type: 'UPDATE_ROLE_FILTERS',
     payload: {
       selectedRoles: [ROLES[0]],
-      contextType: COURSE
-    }
+      contextType: COURSE,
+    },
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(2)
@@ -143,8 +143,8 @@ it('filterRemovedRole dispatches updateRoleFilters and filterDeletedRole', () =>
   const state = {
     selectedRoles: [
       {id: '104', label: 'kitty', children: 'kitty', value: '104'},
-      {id: '108', label: 'meow', children: 'meow', value: '108'}
-    ]
+      {id: '108', label: 'meow', children: 'meow', value: '108'},
+    ],
   }
   const dispatchMock = jest.fn()
   actions.filterRemovedRole('Course')(dispatchMock, () => state)
@@ -153,10 +153,10 @@ it('filterRemovedRole dispatches updateRoleFilters and filterDeletedRole', () =>
     payload: {
       selectedRoles: [
         {id: '104', label: 'kitty', children: 'kitty', value: '104'},
-        {id: '108', label: 'meow', children: 'meow', value: '108'}
+        {id: '108', label: 'meow', children: 'meow', value: '108'},
       ],
-      contextType: 'Course'
-    }
+      contextType: 'Course',
+    },
   }
 
   expect(dispatchMock).toHaveBeenCalledTimes(1)
@@ -170,7 +170,7 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledTimes(1)
   const expectedDispatch = {
     type: 'PERMISSIONS_TAB_CHANGED',
-    payload: ACCOUNT
+    payload: ACCOUNT,
   }
   expect(dispatchMock).toHaveBeenCalledTimes(1)
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
@@ -204,8 +204,8 @@ describe('api actions', () => {
             role: 'steven',
             label: 'steven',
             base_role_type: 'StudentEnrollment',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         })
         .then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
@@ -215,8 +215,8 @@ describe('api actions', () => {
               role: 'steven',
               label: 'steven',
               base_role_type: 'StudentEnrollment',
-              workflow_state: 'active'
-            }
+              workflow_state: 'active',
+            },
           })
           done()
         })
@@ -238,8 +238,8 @@ describe('api actions', () => {
             role: 'steven',
             label: 'steven',
             base_role_type: 'StudentEnrollment',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         })
         .then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
@@ -249,8 +249,8 @@ describe('api actions', () => {
               role: 'steven',
               label: 'steven',
               base_role_type: 'StudentEnrollment',
-              workflow_state: 'active'
-            }
+              workflow_state: 'active',
+            },
           })
           expect(mockDispatch).toHaveBeenCalledWith({
             type: 'DISPLAY_ROLE_TRAY',
@@ -260,19 +260,19 @@ describe('api actions', () => {
                 id: '9',
                 label: 'steven',
                 role: 'steven',
-                workflow_state: 'active'
-              }
-            }
+                workflow_state: 'active',
+              },
+            },
           })
           const expectedStartDispatch = {
-            type: 'ADD_TRAY_SAVING_START'
+            type: 'ADD_TRAY_SAVING_START',
           }
           const expectedDisplayAddSuccessDispatch = {
-            type: 'ADD_TRAY_SAVING_SUCCESS'
+            type: 'ADD_TRAY_SAVING_SUCCESS',
           }
 
           const expectedHideDispatch = {
-            type: 'HIDE_ALL_TRAYS'
+            type: 'HIDE_ALL_TRAYS',
           }
 
           expect(mockDispatch).toHaveBeenCalledTimes(6)
@@ -299,12 +299,12 @@ describe('api actions', () => {
             role: 'steven',
             label: 'steven',
             base_role_type: 'StudentEnrollment',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         })
         .then(() => {
           expect(mockDispatch).toHaveBeenCalledWith({
-            type: 'ADD_TRAY_SAVING_FAIL'
+            type: 'ADD_TRAY_SAVING_FAIL',
           })
           done()
         })
@@ -316,8 +316,8 @@ describe('api actions', () => {
       contextId: 1,
       permissions: {},
       roles: [
-        {id: '3', permissions: {delete_course: {enabled: true, locked: true, explicit: true}}}
-      ]
+        {id: '3', permissions: {delete_course: {enabled: true, locked: true, explicit: true}}},
+      ],
     }
     const dispatchMock = jest.fn()
 
@@ -332,29 +332,29 @@ describe('api actions', () => {
             delete_course: {
               enabled: false,
               locked: true,
-              explicit: true
-            }
-          }
-        }
-      }
+              explicit: true,
+            },
+          },
+        },
+      },
     }
     const expectedFixFocusDispatch = {
       type: 'FIX_FOCUS',
       payload: {
         permissionName: 'delete_course',
         roleId: '3',
-        targetArea: 'table'
-      }
+        targetArea: 'table',
+      },
     }
 
     const expectedApiBusyDispatch = {
       type: 'API_PENDING',
-      payload: {id: '3', name: 'delete_course'}
+      payload: {id: '3', name: 'delete_course'},
     }
 
     const expectedApiUnbusyDispatch = {
       type: 'API_COMPLETE',
-      payload: {id: '3', name: 'delete_course'}
+      payload: {id: '3', name: 'delete_course'},
     }
 
     actions.modifyPermissions({
@@ -363,7 +363,7 @@ describe('api actions', () => {
       enabled: false,
       locked: true,
       explicit: true,
-      inTray: false
+      inTray: false,
     })(dispatchMock, () => state)
     moxiosWait(() => {
       const request = moxios.requests.mostRecent()
@@ -372,8 +372,8 @@ describe('api actions', () => {
           status: 200,
           response: {
             id: '3',
-            permissions: {delete_course: {enabled: false, locked: true, explicit: true}}
-          }
+            permissions: {delete_course: {enabled: false, locked: true, explicit: true}},
+          },
         })
         .then(() => {
           expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
@@ -399,7 +399,7 @@ describe('api actions', () => {
         expect(failCallbackMock).toHaveBeenCalledTimes(0)
         const expectedDeleteRoleDispatch = {
           type: 'DELETE_ROLE_SUCCESS',
-          payload: ROLES[1]
+          payload: ROLES[1],
         }
         expect(mockDispatch).toHaveBeenCalledTimes(2)
         expect(mockDispatch).toHaveBeenCalledWith(expectedDeleteRoleDispatch)

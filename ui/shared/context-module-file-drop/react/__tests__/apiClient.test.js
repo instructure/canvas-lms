@@ -30,7 +30,7 @@ afterEach(() => {
 
 it('fetches course root folder', done => {
   moxios.stubRequest('/api/v1/courses/1/folders/root', {
-    response: {files: []}
+    response: {files: []},
   })
   getCourseRootFolder('1')
     .then(rootFolder => {
@@ -44,11 +44,11 @@ it('fetches folder files across pages', done => {
   moxios.stubRequest('/api/v1/folders/1/files?only[]=names', {
     response: [{display_name: 'a.txt'}],
     headers: {
-      link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"'
-    }
+      link: '<http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2>; rel="next"',
+    },
   })
   moxios.stubRequest('http://canvas.example.com/api/v1/folders/1/files?only[]=names&page=2', {
-    response: [{display_name: 'b.txt'}]
+    response: [{display_name: 'b.txt'}],
   })
   getFolderFiles('1')
     .then(files => {

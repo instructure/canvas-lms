@@ -26,18 +26,18 @@ describe('apiClient', () => {
       apiClient.addExternalFeed(
         {
           contextType: 'course',
-          contextId: 1
+          contextId: 1,
         },
         {
           url: 'reddit.com',
           verbosity: 'full',
-          header_match: 'this # should work'
+          header_match: 'this # should work',
         }
       )
       expect(axios.post).toHaveBeenCalledWith('/api/v1/courses/1/external_feeds', {
         url: 'reddit.com',
         verbosity: 'full',
-        header_match: 'this # should work'
+        header_match: 'this # should work',
       })
     })
   })

@@ -32,7 +32,7 @@ function scoreInPoints(score, pointsPossible) {
   const formattedScore = I18n.n(score, {precision: 2, strip_insignificant_zeros: true})
   const formattedPointsPossible = I18n.n(pointsPossible, {
     precision: 2,
-    strip_insignificant_zeros: true
+    strip_insignificant_zeros: true,
   })
   return `${formattedScore}/${formattedPointsPossible}`
 }
@@ -44,14 +44,14 @@ class SubmissionProgressBars extends React.Component {
         id: PropTypes.string.isRequired,
         score: PropTypes.number,
         user: PropTypes.shape({
-          _id: PropTypes.string.isRequired
+          _id: PropTypes.string.isRequired,
         }).isRequired,
         assignment: PropTypes.shape({
           html_url: PropTypes.string.isRequired,
-          points_possible: PropTypes.number
-        })
+          points_possible: PropTypes.number,
+        }),
       }).isRequired
-    ).isRequired
+    ).isRequired,
   }
 
   static displayGrade(submission) {
@@ -96,7 +96,7 @@ class SubmissionProgressBars extends React.Component {
   static renderIcon(grade) {
     const iconClass = classnames({
       'icon-check': grade === 'complete',
-      'icon-x': grade === 'incomplete'
+      'icon-x': grade === 'incomplete',
     })
 
     return (
@@ -130,7 +130,9 @@ class SubmissionProgressBars extends React.Component {
                       label={I18n.t('Grade')}
                       valueMax={submission.assignment.points_possible}
                       valueNow={submission.score || 0}
-                      screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(submission)}
+                      screenReaderLabel={SubmissionProgressBars.displayScreenreaderGrade(
+                        submission
+                      )}
                       renderValue={() => (
                         <Text size="x-small" color="secondary">
                           {SubmissionProgressBars.displayGrade(submission)}

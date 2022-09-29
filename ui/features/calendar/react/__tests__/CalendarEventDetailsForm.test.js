@@ -55,7 +55,7 @@ const testTimezone = (timezone, inputDate, expectedDate, time) => {
 
   expect(defaultProps.event.save).toHaveBeenCalledWith(
     expect.objectContaining({
-      'calendar_event[start_at]': expectedDate
+      'calendar_event[start_at]': expectedDate,
     }),
     expect.anything(),
     expect.anything()
@@ -69,7 +69,7 @@ const testBlackoutDateSuccess = () => {
   select(component, 'button', 'Submit')
   expect(defaultProps.event.save).toHaveBeenCalledWith(
     expect.objectContaining({
-      'calendar_event[blackout_date]': true
+      'calendar_event[blackout_date]': true,
     }),
     expect.anything(),
     expect.anything()
@@ -131,7 +131,7 @@ describe('CalendarEventDetailsForm', () => {
         'calendar_event[web_conference]': '',
         'calendar_event[context_code]': 'course_1',
         'calendar_event[important_dates]': false,
-        'calendar_event[blackout_date]': false
+        'calendar_event[blackout_date]': false,
       }),
       expect.anything(),
       expect.anything()
@@ -151,7 +151,7 @@ describe('CalendarEventDetailsForm', () => {
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z'
+        'calendar_event[start_at]': '2022-07-23T00:00:00.000Z',
       }),
       expect.anything(),
       expect.anything()
@@ -173,7 +173,7 @@ describe('CalendarEventDetailsForm', () => {
 
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z'
+        'calendar_event[start_at]': '2022-07-14T00:00:00.000Z',
       }),
       expect.anything(),
       expect.anything()
@@ -278,7 +278,7 @@ describe('CalendarEventDetailsForm', () => {
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
         'calendar_event[web_conference][conference_type]': 'BigBlueButton',
-        'calendar_event[web_conference][name]': 'BigBlueButton'
+        'calendar_event[web_conference][name]': 'BigBlueButton',
       }),
       expect.anything(),
       expect.anything()
@@ -293,7 +293,7 @@ describe('CalendarEventDetailsForm', () => {
     select(component, 'button', 'Submit')
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[web_conference]': ''
+        'calendar_event[web_conference]': '',
       }),
       expect.anything(),
       expect.anything()
@@ -308,7 +308,7 @@ describe('CalendarEventDetailsForm', () => {
     select(component, 'button', 'Submit')
     expect(defaultProps.event.save).toHaveBeenCalledWith(
       expect.objectContaining({
-        'calendar_event[important_dates]': true
+        'calendar_event[important_dates]': true,
       }),
       expect.anything(),
       expect.anything()
@@ -360,7 +360,7 @@ describe('CalendarEventDetailsForm', () => {
       'To:',
       'Calendar:',
       'More Options',
-      'Submit'
+      'Submit',
     ])
 
     select(component, 'button', 'Calendar:')

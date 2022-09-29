@@ -48,7 +48,7 @@ const parentWindow = {
     if (parentWindow.hasProperty(propName)) {
       return window.parent.INST[propName]
     }
-  }
+  },
 }
 // end parentWindow object
 
@@ -63,7 +63,7 @@ function getScoringSnapshot() {
       version_number: data.version_number,
       last_question_touched: null,
       question_updates: {},
-      fudge_points: 0
+      fudge_points: 0,
     },
 
     $quizBody: null,
@@ -146,7 +146,7 @@ function getScoringSnapshot() {
       scoringSnapshot.snapshot.question_updates[question_id] = submissionData
       scoringSnapshot.snapshot.last_question_touched = question_id
       scoringSnapshot.setSnapshot()
-    }
+    },
   }
   // end of scoringSnapshot object
 
@@ -175,7 +175,7 @@ function getQuizNavBar() {
     navItemWidth: 34,
 
     initialize() {
-      $('.user_points > .question_input').each(function(_index) {
+      $('.user_points > .question_input').each(function (_index) {
         quizNavBar.updateStatusFor($(this))
       })
 
@@ -332,18 +332,18 @@ function getQuizNavBar() {
     onScroll() {
       quizNavBar.activateCorrectLink()
       quizNavBar.toggleDropShadow()
-    }
+    },
   }
   // End of quizNavBar object
 
   return (_quizNavBar = quizNavBar)
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
   const scoringSnapshot = getScoringSnapshot()
   const gradingForm = getGradingForm()
   const quizNavBar = getQuizNavBar()
-  const onInputChange = function(eventObj) {
+  const onInputChange = function (eventObj) {
     const $question = eventObj.parents('.display_question')
     gradingForm.updateSnapshotFor($question)
     if (eventObj.hasClass('question_input')) {
@@ -361,7 +361,7 @@ $(document).ready(function() {
     $(document).scroll(quizNavBar.onScroll)
     gradingForm.onWindowResize()
 
-    $('.question_holder').click(function() {
+    $('.question_holder').click(function () {
       $('.quiz-nav li').removeClass('active')
       $('.question').removeClass('selected_single_question')
 
@@ -392,11 +392,11 @@ $(document).ready(function() {
 
   $(
     '.question_holder .user_points .question_input,.question_holder .question_neutral_comment .question_comment_text textarea'
-  ).change(function() {
+  ).change(function () {
     onInputChange($(this))
   })
 
-  $('#fudge_points_entry').change(function() {
+  $('#fudge_points_entry').change(function () {
     const points = numberHelper.parse($(this).val())
     const parsed = numberHelper.parse($(this).val())
     const hiddenVal = Number.isNaN(parsed) ? '' : parsed
@@ -406,7 +406,7 @@ $(document).ready(function() {
 
   $(document).bind('score_changed', gradingForm.onScoreChanged)
 
-  $('.question-nav-link').click(function(e) {
+  $('.question-nav-link').click(function (e) {
     e.preventDefault()
     const questionId = $(this).attr('data-id')
     scoringSnapshot.jumpToQuestion(questionId)

@@ -22,7 +22,7 @@ import {MessageDetailMediaAttachment} from '../MessageDetailMediaAttachment'
 import React from 'react'
 
 jest.mock('@instructure/ui-media-player', () => ({
-  MediaPlayer: () => <div />
+  MediaPlayer: () => <div />,
 }))
 
 describe('MessageDetailMediaAttachment', () => {

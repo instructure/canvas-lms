@@ -34,7 +34,7 @@ QUnit.module('global settings', {
   },
   teardown() {
     return Ember.run(App, 'destroy')
-  }
+  },
 })
 
 test('student names are hidden', () => {
@@ -54,7 +54,7 @@ QUnit.skip('secondary id says hidden', function () {
     const student = this.controller.get('students.firstObject')
     Ember.setProperties(student, {
       isLoaded: true,
-      isLoading: false
+      isLoading: false,
     })
     return this.controller.set('selectedStudent', student)
   })

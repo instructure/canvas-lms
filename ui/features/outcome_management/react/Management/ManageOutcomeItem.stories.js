@@ -36,8 +36,8 @@ export default {
     outcomeContextType: 'Account',
     outcomeContextId: '1',
     onMenuHandler: () => {},
-    onCheckboxHandler: () => {}
-  }
+    onCheckboxHandler: () => {},
+  },
 }
 
 const Template = args => {
@@ -54,15 +54,15 @@ export const Default = Template.bind({})
 
 export const withoutManagePermission = Template.bind({})
 withoutManagePermission.args = {
-  canManageOutcome: false
+  canManageOutcome: false,
 }
 
 export const withoutDestroyPermission = Template.bind({})
 withoutDestroyPermission.args = {
-  canUnlink: false
+  canUnlink: false,
 }
 
 export const withoutEditPermission = Template.bind({})
 withoutEditPermission.args = {
-  outcomeContextId: 2
+  outcomeContextId: 2,
 }

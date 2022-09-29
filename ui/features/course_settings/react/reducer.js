@@ -64,7 +64,7 @@ const courseImageHandlers = {
   ERROR_REMOVING_IMAGE(state) {
     state.removingImage = false
     return state
-  }
+  },
 }
 
 const courseImage = (state = initialState, action) => {

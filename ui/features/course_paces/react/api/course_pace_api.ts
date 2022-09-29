@@ -21,7 +21,7 @@ import doFetchApi from '@canvas/do-fetch-api-effect'
 
 enum ApiMode {
   PUBLISH,
-  COMPRESS
+  COMPRESS,
 }
 
 /* API helpers */
@@ -61,8 +61,8 @@ export const update = (coursePace: CoursePace, extraSaveParams = {}) =>
     method: 'PUT',
     body: {
       ...extraSaveParams,
-      course_pace: transformCoursePaceForApi(coursePace)
-    }
+      course_pace: transformCoursePaceForApi(coursePace),
+    },
   }).then(({json}) => json)
 
 export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
@@ -71,8 +71,8 @@ export const create = (coursePace: CoursePace, extraSaveParams = {}) =>
     method: 'POST',
     body: {
       ...extraSaveParams,
-      course_pace: transformCoursePaceForApi(coursePace)
-    }
+      course_pace: transformCoursePaceForApi(coursePace),
+    },
   }).then(({json}) => json)
 
 // This is now just a convenience function for creating/update depending on the
@@ -81,7 +81,7 @@ export const publish = (pace: CoursePace) => (pace?.id ? update(pace) : create(p
 
 export const getPublishProgress = (progressId: string) =>
   doFetchApi<Progress>({
-    path: `/api/v1/progress/${progressId}`
+    path: `/api/v1/progress/${progressId}`,
   }).then(({json}) => json)
 
 export const resetToLastPublished = (contextType: PaceContextTypes, contextId: string) =>
@@ -90,8 +90,8 @@ export const resetToLastPublished = (contextType: PaceContextTypes, contextId: s
     method: 'POST',
     body: {
       context_type: contextType,
-      context_id: contextId
-    }
+      context_id: contextId,
+    },
   }).then(({json}) => json?.course_pace)
 
 export const load = (coursePaceId: string) =>
@@ -117,7 +117,7 @@ export const getNewCoursePaceFor = (
 export const relinkToParentPace = (paceId: string) =>
   doFetchApi<{course_pace: CoursePace}>({
     path: `/api/v1/course_pacing/${paceId}/relink_to_parent_pace`,
-    method: 'POST'
+    method: 'POST',
   }).then(({json}) => json?.course_pace)
 
 export const compress = (coursePace: CoursePace, extraSaveParams = {}) =>
@@ -126,8 +126,8 @@ export const compress = (coursePace: CoursePace, extraSaveParams = {}) =>
     method: 'POST',
     body: {
       ...extraSaveParams,
-      course_pace: transformCoursePaceForApi(coursePace, ApiMode.COMPRESS)
-    }
+      course_pace: transformCoursePaceForApi(coursePace, ApiMode.COMPRESS),
+    },
   }).then(({json}) => json)
 
 /* API transformers
@@ -167,7 +167,7 @@ const transformCoursePaceForApi = (
       coursePaceItems.push({
         id: item.id,
         duration: item.duration,
-        module_item_id: item.module_item_id
+        module_item_id: item.module_item_id,
       })
     })
   })
@@ -177,7 +177,7 @@ const transformCoursePaceForApi = (
         start_date: coursePace.start_date,
         end_date: coursePace.end_date,
         exclude_weekends: coursePace.exclude_weekends,
-        course_pace_module_items_attributes: coursePaceItems
+        course_pace_module_items_attributes: coursePaceItems,
       }
     : {
         start_date: coursePace.start_date,
@@ -186,6 +186,6 @@ const transformCoursePaceForApi = (
         exclude_weekends: coursePace.exclude_weekends,
         context_type: coursePace.context_type,
         context_id: coursePace.context_id,
-        course_pace_module_items_attributes: coursePaceItems
+        course_pace_module_items_attributes: coursePaceItems,
       }
 }

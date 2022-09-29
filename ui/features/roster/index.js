@@ -44,14 +44,14 @@ const fetchOptions = {
     'email',
     'observed_users',
     'can_be_removed',
-    'custom_links'
+    'custom_links',
   ],
-  per_page: 50
+  per_page: 50,
 }
 const users = new RosterUserCollection(null, {
   course_id: ENV.context_asset_string.split('_')[1],
   sections: new SectionCollection(ENV.SECTIONS),
-  params: fetchOptions
+  params: fetchOptions,
 })
 const rolesCollection = new RolesCollection(
   Array.from(ENV.ALL_ROLES).map(attributes => new Role(attributes))
@@ -62,17 +62,17 @@ const usersView = new PaginatedCollectionView({
   collection: users,
   itemView: RosterUserView,
   itemViewOptions: {
-    course: ENV.course
+    course: ENV.course,
   },
   canViewLoginIdColumn: ENV.permissions.view_user_logins,
   canViewSisIdColumn: ENV.permissions.read_sis,
   buffer: 1000,
   hideSectionsOnCourseUsersPage: ENV.course.hideSectionsOnCourseUsersPage,
-  template: rosterUsersTemplate
+  template: rosterUsersTemplate,
 })
 const roleSelectView = new RoleSelectView({
   collection: users,
-  rolesCollection
+  rolesCollection,
 })
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
@@ -80,12 +80,13 @@ const resendInvitationsView = new ResendInvitationsView({
   canResend:
     ENV.permissions.manage_students ||
     ENV.permissions.manage_admin_users ||
-    ENV.permissions.can_allow_course_admin_actions
+    ENV.permissions.can_allow_course_admin_actions,
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
-GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${ENV.course &&
-  ENV.course.id}/group_categories?per_page=50`
+GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${
+  ENV.course && ENV.course.id
+}/group_categories?per_page=50`
 
 const groupCategories = new GroupCategoryCollectionForThisCourse()
 
@@ -102,7 +103,7 @@ const app = new RosterView({
   collection: users,
   roles: ENV.ALL_ROLES,
   permissions: ENV.permissions,
-  course: ENV.course
+  course: ENV.course,
 })
 
 users.once('reset', () =>
@@ -115,12 +116,10 @@ users.once('reset', () =>
       msg = I18n.t('filter_one_user_found', '1 user found.')
     } else {
       msg = I18n.t('filter_multiple_users_found', '%{userCount} users found.', {
-        userCount: numUsers
+        userCount: numUsers,
       })
     }
-    return $('#aria_alerts')
-      .empty()
-      .text(msg)
+    return $('#aria_alerts').empty().text(msg)
   })
 )
 

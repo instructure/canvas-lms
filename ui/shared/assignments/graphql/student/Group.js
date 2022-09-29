@@ -31,13 +31,13 @@ export const Group = {
   shape: shape({
     name: string,
     id: string,
-    _id: string
+    _id: string,
   }),
 
   mock: ({name = 'my group', id = 'QXNzaWHGVJBkn0x22', _id = '1'} = {}) => ({
     name,
     id,
     _id,
-    __typename: 'Group'
-  })
+    __typename: 'Group',
+  }),
 }

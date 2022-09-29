@@ -78,7 +78,7 @@ export function uploadFile(preflightUrl, preflightData, file, ajaxLib = axios, o
   } else if (file && preflightData.url) {
     throw new Error("can't upload with both a file object and a url to clone", {
       file,
-      preflightData
+      preflightData,
     })
   }
 
@@ -154,7 +154,7 @@ export function completeUpload(preflightResponse, file, options = {}) {
     responseType: isToS3 ? 'document' : 'json',
     onUploadProgress: options.onProgress,
     withCredentials: !isToS3,
-    ...ajaxLibOptions
+    ...ajaxLibOptions,
   })
 
   // finalize upload
@@ -213,7 +213,7 @@ export function submissionCommentAttachmentsUpload(files, courseId, assignmentId
   const uploadPromises = files.map(currentFile => {
     const preflightFileData = {
       name: currentFile.name,
-      content_type: currentFile.type
+      content_type: currentFile.type,
     }
     return uploadFile(preflightFileUploadUrl, preflightFileData, currentFile)
   })
@@ -242,14 +242,14 @@ export function uploadFiles(files, uploadUrl) {
         url: file.url,
         name: file.text,
         content_type: file.mediaType,
-        submit_assignment: false
+        submit_assignment: false,
       })
     } else {
       return uploadFile(
         uploadUrl,
         {
           name: file.name,
-          content_type: file.type
+          content_type: file.type,
         },
         file
       )

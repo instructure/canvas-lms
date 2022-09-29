@@ -33,12 +33,12 @@ const themeOverride = {
     maxWidth: '340px',
     minWidth: '280px',
     maxHeight: '200px',
-    minHeight: '140px'
+    minHeight: '140px',
   },
   [Menu.Item.theme]: {
     labelPadding: '8px',
-    padding: '8px'
-  }
+    padding: '8px',
+  },
 }
 
 const Suggestions = ({
@@ -46,7 +46,7 @@ const Suggestions = ({
   showResults,
   setComment,
   closeSuggestions,
-  suggestionsRef
+  suggestionsRef,
 }) => {
   const [mountRef, setMountRef] = useState(null)
   useEffect(() => {
@@ -79,8 +79,8 @@ const Suggestions = ({
     <>
       <Popover
         placement="top center"
-        shouldRenderOffscreen
-        isShowingContent
+        shouldRenderOffscreen={true}
+        isShowingContent={true}
         offsetY={suggestionsPosition?.y - inlinePosition?.y || 0}
         mountNode={() => suggestionsRef}
         onHideContent={() => showResults && closeSuggestions()}
@@ -116,13 +116,13 @@ Suggestions.propTypes = {
   searchResults: PropTypes.arrayOf(
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
-      _id: PropTypes.string.isRequired
+      _id: PropTypes.string.isRequired,
     })
   ).isRequired,
   showResults: PropTypes.bool.isRequired,
   setComment: PropTypes.func.isRequired,
   closeSuggestions: PropTypes.func.isRequired,
-  suggestionsRef: PropTypes.object
+  suggestionsRef: PropTypes.object,
 }
 
 export default memo(Suggestions)

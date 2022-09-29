@@ -28,7 +28,7 @@ import {
   IconArrowOpenDownLine,
   IconArrowOpenEndSolid,
   IconArrowOpenDownSolid,
-  IconAddSolid
+  IconAddSolid,
 } from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -55,7 +55,7 @@ const FindOutcomeItem = ({
   sourceContextId,
   sourceContextType,
   importOutcomeHandler,
-  friendlyDescription
+  friendlyDescription,
 }) => {
   const [truncated, setTruncated] = useState(true)
   const {isMobileView, accountLevelMasteryScalesFF} = useCanvasContext()
@@ -76,7 +76,7 @@ const FindOutcomeItem = ({
           padding: isMobileView ? '0' : description ? '1.2815rem 0 0' : '0.313rem 0 0',
           marginRight: isMobileView ? '-0.5rem' : '0',
           display: 'flex',
-          flexFlow: 'row-reverse nowrap'
+          flexFlow: 'row-reverse nowrap',
         }}
       >
         {shouldShowSpinner ? (
@@ -144,12 +144,12 @@ const FindOutcomeItem = ({
             </Flex.Item>
           </Flex>
         </Flex.Item>
-        <Flex.Item size="50%" shouldGrow padding={isMobileView ? '0 0 0 x-small' : '0'}>
+        <Flex.Item size="50%" shouldGrow={true} padding={isMobileView ? '0 0 0 x-small' : '0'}>
           <div
             style={{
               padding: isMobileView ? '0 0 0.5rem 0' : '0.625rem 0',
               display: 'flex',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
             }}
           >
             {isMobileView ? (
@@ -199,7 +199,7 @@ FindOutcomeItem.propTypes = {
   importOutcomeStatus: PropTypes.string,
   sourceContextId: PropTypes.string,
   sourceContextType: PropTypes.string,
-  importOutcomeHandler: PropTypes.func.isRequired
+  importOutcomeHandler: PropTypes.func.isRequired,
 }
 
 export default memo(FindOutcomeItem)

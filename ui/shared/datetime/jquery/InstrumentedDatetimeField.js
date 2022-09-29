@@ -17,7 +17,7 @@
  */
 
 import DatetimeField from './DatetimeField'
-import { log } from '@canvas/datetime-natural-parsing-instrument'
+import {log} from '@canvas/datetime-natural-parsing-instrument'
 
 // inb4 "why not just monkey-patch DatetimeField from here and not have others
 // know about this?", the reason we have it this way is that it's difficult to
@@ -53,18 +53,22 @@ export default class InstrumentedDatetimeField extends DatetimeField {
 function trackPasteEvents(datetimeField, updateQueue) {
   const node = datetimeField.$field[0]
 
-  node.addEventListener('paste', e => {
-    updateQueue.push(() => {
-      const { datetime } = datetimeField
+  node.addEventListener(
+    'paste',
+    e => {
+      updateQueue.push(() => {
+        const {datetime} = datetimeField
 
-      log({
-        id: node.id,
-        method: 'paste',
-        value: e.target.value,
-        parsed: datetime && datetime.toISOString() || null,
+        log({
+          id: node.id,
+          method: 'paste',
+          value: e.target.value,
+          parsed: (datetime && datetime.toISOString()) || null,
+        })
       })
-    })
-  }, false)
+    },
+    false
+  )
 }
 
 function trackTypingEvents(datetimeField) {
@@ -73,43 +77,51 @@ function trackTypingEvents(datetimeField) {
   let value = null
   let typing = false
 
-  node.addEventListener('input', e => {
-    if (e.inputType === 'insertText') {
-      typing = true
-      // we cannot directly inspect the node's value at the time of blur because
-      // it might have been wiped out by DatetimeField during validation
-      value = e.target.value
-    }
-  }, false)
+  node.addEventListener(
+    'input',
+    e => {
+      if (e.inputType === 'insertText') {
+        typing = true
+        // we cannot directly inspect the node's value at the time of blur because
+        // it might have been wiped out by DatetimeField during validation
+        value = e.target.value
+      }
+    },
+    false
+  )
 
-  node.addEventListener('blur', () => {
-    if (typing) {
-      const finalValue = value
-      const { datetime } = datetimeField
+  node.addEventListener(
+    'blur',
+    () => {
+      if (typing) {
+        const finalValue = value
+        const {datetime} = datetimeField
 
-      typing = false
-      value = null
+        typing = false
+        value = null
 
-      log({
-        id: node.id,
-        method: 'type',
-        value: finalValue,
-        parsed: datetime && datetime.toISOString() || null,
-      })
-    }
-  }, false)
+        log({
+          id: node.id,
+          method: 'type',
+          value: finalValue,
+          parsed: (datetime && datetime.toISOString()) || null,
+        })
+      }
+    },
+    false
+  )
 }
 
 function trackPickingEvents(datetimeField, updateQueue) {
   const node = datetimeField.$field[0]
   const picker = datetimeField.$field.data('datepicker')
-  const { onClose = NOOP, onSelect = NOOP } = picker.settings
+  const {onClose = NOOP, onSelect = NOOP} = picker.settings
 
   let didUserPick = false
 
-  picker.settings.onClose = function(inputValue) {
+  picker.settings.onClose = function (inputValue) {
     if (didUserPick) {
-      const { datetime } = datetimeField
+      const {datetime} = datetimeField
 
       didUserPick = false
 
@@ -117,14 +129,14 @@ function trackPickingEvents(datetimeField, updateQueue) {
         id: node.id,
         method: 'pick',
         value: node.value,
-        parsed: datetime && datetime.toISOString() || null,
+        parsed: (datetime && datetime.toISOString()) || null,
       })
     }
 
     return onClose(inputValue)
   }
 
-  picker.settings.onSelect = function(text, picker) {
+  picker.settings.onSelect = function (text, picker) {
     didUserPick = true
     return onSelect(text, picker)
   }

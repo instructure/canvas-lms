@@ -33,7 +33,7 @@ const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
   <Heading level="h4">
     {searchString ? (
       <Flex>
-        <Flex.Item shouldShrink>
+        <Flex.Item shouldShrink={true}>
           <Flex>
             <Flex.Item>
               <bdi>{groupTitle}</bdi>
@@ -43,19 +43,19 @@ const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
                 style={{
                   display: 'inline-block',
                   transform: 'scale(0.6)',
-                  height: '1em'
+                  height: '1em',
                 }}
               >
                 <IconArrowOpenEndSolid title={I18n.t('search results for')} />
               </div>
             </Flex.Item>
-            <Flex.Item shouldShrink>
+            <Flex.Item shouldShrink={true}>
               <div
                 style={{
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
-                  padding: '0.375rem 0'
+                  padding: '0.375rem 0',
                 }}
               >
                 <bdi>{searchString}</bdi>
@@ -78,7 +78,7 @@ const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
       <View as="div" padding="x-small medium x-small 0">
         <Text wrap="break-word">
           {I18n.t('All %{groupTitle} Outcomes', {
-            groupTitle: addZeroWidthSpace(groupTitle)
+            groupTitle: addZeroWidthSpace(groupTitle),
           })}
         </Text>
       </View>
@@ -87,13 +87,13 @@ const SearchBreadcrumb = ({groupTitle, searchString, loading}) => (
 )
 
 SearchBreadcrumb.defaultProps = {
-  searchString: ''
+  searchString: '',
 }
 
 SearchBreadcrumb.propTypes = {
   groupTitle: PropTypes.string.isRequired,
   searchString: PropTypes.string,
-  loading: PropTypes.bool.isRequired
+  loading: PropTypes.bool.isRequired,
 }
 
 export default SearchBreadcrumb

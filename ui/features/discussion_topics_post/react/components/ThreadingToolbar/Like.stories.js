@@ -23,11 +23,17 @@ import {ThreadingToolbar} from './ThreadingToolbar'
 export default {
   title: 'Examples/Discussion Posts/Components/ThreadingToolbar/Like',
   component: ThreadingToolbar.Like,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => (
-  <ThreadingToolbar.Like isLiked likeCount={1} delimiterKey="like" authorName="Rex" {...args} />
+  <ThreadingToolbar.Like
+    isLiked={true}
+    likeCount={1}
+    delimiterKey="like"
+    authorName="Rex"
+    {...args}
+  />
 )
 
 export const Liked = Template.bind({})
@@ -36,5 +42,5 @@ Liked.args = {}
 export const NotLiked = Template.bind({})
 NotLiked.args = {
   isLiked: false,
-  likeCount: 0
+  likeCount: 0,
 }

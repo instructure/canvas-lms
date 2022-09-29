@@ -23,7 +23,7 @@ export default class ModalButtons extends React.Component {
 
   static defaultProps = {
     className: 'ReactModal__Footer',
-    footerClassName: 'ReactModal__Footer-Actions'
+    footerClassName: 'ReactModal__Footer-Actions',
   }
 
   render() {

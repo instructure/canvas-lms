@@ -34,8 +34,8 @@ ready(() => {
     students = new UserCollection(null, {
       params: {
         per_page: 50,
-        enrollment_type: 'student'
-      }
+        enrollment_type: 'student',
+      },
     })
   }
 
@@ -44,7 +44,7 @@ ready(() => {
     itemView: ProgressionStudentView,
     template: progressionsIndexTemplate,
     modules_url: ENV.MODULES_URL,
-    autoFetch: true
+    autoFetch: true,
   })
 
   if (!ENV.RESTRICTED_LIST) {
@@ -55,7 +55,7 @@ ready(() => {
         indexView.resetScrollContainer(
           indexView.$el.find('#progression_students .collectionViewItems')
         )
-      }
+      },
     })
   }
 

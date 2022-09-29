@@ -29,7 +29,7 @@ function newProps(overrides) {
     message: 'Are you sure you want to install the tool?',
     confirmLabel: 'Yes, please',
     cancelLabel: 'Nope!',
-    ...overrides
+    ...overrides,
   }
 }
 

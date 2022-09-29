@@ -25,7 +25,7 @@ describe('LoadingSkeleton', () => {
     screenReaderLabel: 'Loading',
     width: '10em',
     height: '1em',
-    ...overrides
+    ...overrides,
   })
 
   it('renders the screenreader label', () => {

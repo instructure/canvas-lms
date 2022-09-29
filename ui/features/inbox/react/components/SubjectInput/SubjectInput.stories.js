@@ -27,8 +27,8 @@ export default {
     value: {control: 'text'},
     onChange: {action: 'Changed'},
     onBlur: {action: 'Blur'},
-    onFocus: {action: 'Focused'}
-  }
+    onFocus: {action: 'Focused'},
+  },
 }
 
 const Template = args => <SubjectInput {...args} />
@@ -37,5 +37,5 @@ export const NoValue = Template.bind({})
 
 export const WithValue = Template.bind({})
 WithValue.args = {
-  value: 'Test Subject'
+  value: 'Test Subject',
 }

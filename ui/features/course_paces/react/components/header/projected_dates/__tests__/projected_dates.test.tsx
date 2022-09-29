@@ -33,7 +33,7 @@ const defaultProps = {
   compression: 0,
   setStartDate: () => {},
   compressDates: jest.fn(),
-  uncompressDates: jest.fn()
+  uncompressDates: jest.fn(),
 }
 
 afterEach(() => {

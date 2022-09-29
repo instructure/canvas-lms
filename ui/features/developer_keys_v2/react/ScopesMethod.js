@@ -25,13 +25,13 @@ export default class ScopesMethod extends React.Component {
       get: 'primary',
       put: 'default',
       post: 'success',
-      delete: 'danger'
+      delete: 'danger',
     }
   }
 
   themeOverride() {
     return {
-      color: '#6D7883'
+      color: '#6D7883',
     }
   }
 
@@ -52,9 +52,9 @@ export default class ScopesMethod extends React.Component {
 
 ScopesMethod.propTypes = {
   method: PropTypes.string.isRequired,
-  margin: PropTypes.string
+  margin: PropTypes.string,
 }
 
 ScopesMethod.defaultProps = {
-  margin: undefined
+  margin: undefined,
 }

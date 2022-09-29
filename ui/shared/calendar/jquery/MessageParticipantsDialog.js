@@ -64,7 +64,7 @@ export default class MessageParticipantsDialog {
           text: I18n.t('buttons.cancel', 'Cancel'),
           click() {
             $(this).dialog('close')
-          }
+          },
         },
         {
           text: I18n.t('buttons.send_message', 'Send'),
@@ -72,12 +72,12 @@ export default class MessageParticipantsDialog {
           class: 'btn-primary',
           click() {
             $(this).submit()
-          }
-        }
+          },
+        },
       ],
       close() {
         $(this).remove()
-      }
+      },
     })
     return this.loadParticipants()
   }
@@ -105,7 +105,7 @@ export default class MessageParticipantsDialog {
         this.$participantList.html(
           recipientListTemplate({
             recipientType: this.group.participant_type,
-            recipients: data
+            recipients: data,
           })
         )
       } else {
@@ -146,7 +146,7 @@ export default class MessageParticipantsDialog {
       this.messageFailed
     )
     return this.$form.disableWhileLoading(deferred, {
-      buttons: ['[data-text-while-loading] .ui-button-text']
+      buttons: ['[data-text-while-loading] .ui-button-text'],
     })
   }
 

@@ -28,26 +28,26 @@ const createProps = overrides => {
       allCourses: [{_id: ALL_COURSES_ID, contextName: 'All Courses', assetString: 'all_courses'}],
       favoriteCourses: [
         {_id: '1', contextName: 'Charms', assetString: 'course_1'},
-        {_id: '2', contextName: 'Transfiguration', assetString: 'course_2'}
+        {_id: '2', contextName: 'Transfiguration', assetString: 'course_2'},
       ],
       moreCourses: [
         {_id: '3', contextName: 'Potions', assetString: 'course_3'},
         {_id: '4', contextName: 'History of Magic', assetString: 'course_4'},
         {_id: '5', contextName: 'Herbology', assetString: 'course_5'},
-        {_id: '6', contextName: 'Defense Against the Dark Arts', assetString: 'course_6'}
+        {_id: '6', contextName: 'Defense Against the Dark Arts', assetString: 'course_6'},
       ],
       concludedCourses: [
         {_id: '7', contextName: 'Muggle Studies', assetString: 'course_7'},
-        {_id: '8', contextName: 'Astronomy', assetString: 'course_8'}
+        {_id: '8', contextName: 'Astronomy', assetString: 'course_8'},
       ],
       groups: [
         {_id: '1', contextName: 'Gryffindor Bros', assetString: 'group_1'},
         {_id: '2', contextName: 'Quidditch', assetString: 'group_2'},
-        {_id: '3', contextName: "Dumbledore's Army", assetString: 'group_3'}
-      ]
+        {_id: '3', contextName: "Dumbledore's Army", assetString: 'group_3'},
+      ],
     },
     onCourseFilterSelect: () => {},
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -87,7 +87,7 @@ describe('CourseSelect', () => {
   it('reset icon shows and calls onCourseFilterSelect when clicked', () => {
     const mockOnCourseFilterSelect = jest.fn()
     const props = createProps({
-      onCourseFilterSelect: mockOnCourseFilterSelect
+      onCourseFilterSelect: mockOnCourseFilterSelect,
     })
 
     const {getByTestId, getByText} = render(
@@ -140,7 +140,7 @@ describe('CourseSelect', () => {
     it('resets mailbox selections when selected', () => {
       const filterMock = jest.fn()
       const props = createProps({
-        onCourseFilterSelect: filterMock
+        onCourseFilterSelect: filterMock,
       })
       const {getByTestId, getByText} = render(
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>

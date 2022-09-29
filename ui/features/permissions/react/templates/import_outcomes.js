@@ -25,15 +25,15 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Outcomes'),
-      description: I18n.t('Allows user to import account learning outcomes.')
-    }
+      description: I18n.t('Allows user to import account learning outcomes.'),
+    },
   ],
   [],
   [
     {
       title: I18n.t('Outcomes'),
-      description: I18n.t('Allows user to import course learning outcomes.')
-    }
+      description: I18n.t('Allows user to import course learning outcomes.'),
+    },
   ],
   []
 )

@@ -33,25 +33,25 @@ export default class Api {
         payload: auditEvent.payload,
         quizId: auditEvent.quiz_id,
         submissionId: auditEvent.submission_id,
-        userId: auditEvent.user_id
+        userId: auditEvent.user_id,
       }))
 
       const users = response.data.users.map(user => ({
         id: user.id,
         name: user.name,
-        role: user.role
+        role: user.role,
       }))
 
       const externalTools = response.data.tools.map(tool => ({
         id: tool.id,
         name: tool.name,
-        role: tool.role
+        role: tool.role,
       }))
 
       const quizzes = response.data.quizzes.map(quiz => ({
         id: quiz.id,
         name: quiz.name,
-        role: quiz.role
+        role: quiz.role,
       }))
 
       return {auditEvents, users, externalTools, quizzes}

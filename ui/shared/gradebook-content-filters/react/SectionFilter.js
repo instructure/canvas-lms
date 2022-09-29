@@ -35,7 +35,7 @@ export default function SectionFilter(props) {
       items={sections}
       label={I18n.t('Section Filter')}
       selectedItemId={selectedSectionId}
-      sortAlphabetically
+      sortAlphabetically={true}
     />
   )
 }
@@ -44,13 +44,13 @@ SectionFilter.propTypes = {
   sections: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
 
-  selectedSectionId: string
+  selectedSectionId: string,
 }
 
 SectionFilter.defaultProps = {
-  selectedSectionId: null
+  selectedSectionId: null,
 }

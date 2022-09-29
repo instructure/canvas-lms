@@ -36,13 +36,13 @@ const I18n = useI18nScope('blueprint_settingsSyncChange')
 
 class SyncChange extends Component {
   static propTypes = {
-    change: propTypes.migrationChange.isRequired
+    change: propTypes.migrationChange.isRequired,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      isExpanded: false
+      isExpanded: false,
     }
   }
 
@@ -100,7 +100,7 @@ class SyncChange extends Component {
     const hasExceptions = exceptions.length > 0
     const classes = cx({
       'bcs__history-item__change': true,
-      'bcs__history-item__change__expanded': this.state.isExpanded
+      'bcs__history-item__change__expanded': this.state.isExpanded,
     })
 
     return (

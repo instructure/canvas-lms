@@ -17,13 +17,13 @@
  */
 
 import QuizStatistics from '../quiz_statistics'
-import fixture from '../../../__tests__/fixtures/quiz_statistics_all_types.json';
+import fixture from '../../../__tests__/fixtures/quiz_statistics_all_types.json'
 
-test('parses from payload.quiz_statistics', function() {
-  const subject = new QuizStatistics();
+test('parses from payload.quiz_statistics', function () {
+  const subject = new QuizStatistics()
 
-  subject.add(fixture, { parse: true });
+  subject.add(fixture, {parse: true})
 
-  expect(subject.length).toEqual(1);
-  expect(subject.first().get('id')).toEqual('267');
-});
+  expect(subject.length).toEqual(1)
+  expect(subject.first().get('id')).toEqual('267')
+})

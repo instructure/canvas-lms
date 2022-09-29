@@ -38,7 +38,7 @@ const ConversationListContainer = ({
   onReadStateChange,
   commonQueryVariables,
   conversationsQuery,
-  submissionCommentsQuery
+  submissionCommentsQuery,
 }) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {isSubmissionCommentsType} = useContext(ConversationContext)
@@ -61,15 +61,15 @@ const ConversationListContainer = ({
     },
     onError() {
       setOnFailure(I18n.t('There was an unexpected error updating the conversation participants'))
-    }
+    },
   })
 
   const handleStar = (starred, conversationId) => {
     starChangeConversationParticipants({
       variables: {
         conversationIds: [conversationId],
-        starred
-      }
+        starred,
+      },
     })
   }
 
@@ -90,7 +90,7 @@ const ConversationListContainer = ({
           _id: inboxItemData[inboxItemData.length - 1]._node_id,
           scope,
           afterConversation:
-            conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo.endCursor
+            conversationsQuery.data?.legacyNode?.conversationsConnection?.pageInfo.endCursor,
         },
         updateQuery: (previousResult, {fetchMoreResult}) => {
           setIsLoadingMoreData(false)
@@ -105,12 +105,12 @@ const ConversationListContainer = ({
               conversationsConnection: {
                 nodes: [...prev_nodes, ...fetchMore_nodes],
                 pageInfo: fetchMore_pageInfo,
-                __typename: 'ConversationParticipantConnection'
+                __typename: 'ConversationParticipantConnection',
               },
-              __typename: 'User'
-            }
+              __typename: 'User',
+            },
           }
-        }
+        },
       })
     } else {
       submissionCommentsQuery.fetchMore({
@@ -120,7 +120,7 @@ const ConversationListContainer = ({
           sort: 'desc',
           afterSubmission:
             submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.pageInfo
-              .endCursor
+              .endCursor,
         },
         updateQuery: (previousResult, {fetchMoreResult}) => {
           setIsLoadingMoreData(false)
@@ -136,12 +136,12 @@ const ConversationListContainer = ({
               viewableSubmissionsConnection: {
                 nodes: [...prev_nodes, ...fetchMore_nodes],
                 pageInfo: fetchMore_pageInfo,
-                __typename: 'SubmissionConnection'
+                __typename: 'SubmissionConnection',
               },
-              __typename: 'User'
-            }
+              __typename: 'User',
+            },
           }
-        }
+        },
       })
     }
   }
@@ -167,7 +167,7 @@ const ConversationListContainer = ({
     conversationsQuery.data,
     submissionCommentsQuery.loading,
     submissionCommentsQuery.data,
-    isSubmissionCommentsType
+    isSubmissionCommentsType,
   ])
 
   const renderLoading = () => {
@@ -192,16 +192,16 @@ const ConversationListContainer = ({
         props={{
           mobile: {
             textSize: 'x-small',
-            datatestid: 'list-items-mobile'
+            datatestid: 'list-items-mobile',
           },
           tablet: {
             textSize: 'x-small',
-            datatestid: 'list-items-tablet'
+            datatestid: 'list-items-tablet',
           },
           desktop: {
             textSize: 'small',
-            datatestid: 'list-items-desktop'
-          }
+            datatestid: 'list-items-desktop',
+          },
         }}
         render={responsiveProps => (
           <ConversationListHolder
@@ -236,10 +236,10 @@ ConversationListContainer.propTypes = {
   onReadStateChange: PropTypes.func,
   commonQueryVariables: PropTypes.object,
   conversationsQuery: PropTypes.object,
-  submissionCommentsQuery: PropTypes.object
+  submissionCommentsQuery: PropTypes.object,
 }
 
 ConversationListContainer.defaultProps = {
   scope: 'inbox',
-  onSelectConversation: () => {}
+  onSelectConversation: () => {},
 }

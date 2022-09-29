@@ -74,19 +74,19 @@ export default class ConfirmUnfavoriteCourseModal extends React.Component {
     courseName: PropTypes.string.isRequired,
     onConfirm: PropTypes.func.isRequired,
     onClose: PropTypes.func,
-    onEntered: PropTypes.func
+    onEntered: PropTypes.func,
   }
 
   static defaultProps = {
     onConfirm: null,
     onClose() {},
-    onEntered() {}
+    onEntered() {},
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      show: false
+      show: false,
     }
 
     this.hide = this.hide.bind(this)

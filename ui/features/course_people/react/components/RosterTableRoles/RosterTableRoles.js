@@ -62,14 +62,14 @@ RosterTableRoles.propTypes = {
       id: string.isRequired,
       associatedUser: shape({
         id: string.isRequired,
-        name: string.isRequired
-      })
+        name: string.isRequired,
+      }),
     })
-  ).isRequired
+  ).isRequired,
 }
 
 RosterTableRoles.defaultProps = {
-  enrollments: []
+  enrollments: [],
 }
 
 export default RosterTableRoles

@@ -33,5 +33,5 @@ export default {
   EVT_STORAGE_KEY: 'qla_events',
 
   EVT_STORAGE_MEMORY: 'memory',
-  EVT_STORAGE_LOCAL_STORAGE: 'localStorage'
+  EVT_STORAGE_LOCAL_STORAGE: 'localStorage',
 }

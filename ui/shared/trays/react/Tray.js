@@ -61,13 +61,13 @@ CanvasTray.propTypes = {
   errorCategory: string,
   errorImageUrl: string,
 
-  ...Tray.propTypes
+  ...Tray.propTypes,
 }
 
 CanvasTray.defaultProps = {
   padding: 'small',
   contentPadding: '0',
-  errorImageUrl: errorShipUrl
+  errorImageUrl: errorShipUrl,
 }
 
 export default function CanvasTray({

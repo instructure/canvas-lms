@@ -22,13 +22,13 @@ const NotificationShape = shape({
   _id: string,
   category: string,
   categoryDisplayName: string,
-  name: string
+  name: string,
 })
 
 const NotificationPolicyShape = shape({
   communicationChannelId: string,
   frequency: string,
-  notification: NotificationShape
+  notification: NotificationShape,
 })
 
 const ChannelShape = shape({
@@ -36,26 +36,26 @@ const ChannelShape = shape({
   path: string,
   pathType: string,
   notificationPolicies: arrayOf(NotificationPolicyShape),
-  notificationPolicyOverrides: arrayOf(NotificationPolicyShape)
+  notificationPolicyOverrides: arrayOf(NotificationPolicyShape),
 })
 
 export const NotificationPreferencesShape = shape({
   sendScoresInEmails: bool,
-  channels: arrayOf(ChannelShape)
+  channels: arrayOf(ChannelShape),
 })
 
 const TermShape = shape({
   _id: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 
 const CourseShape = shape({
   _id: string.isRequired,
   name: string.isRequired,
-  term: TermShape.isRequired
+  term: TermShape.isRequired,
 })
 
 export const EnrollmentShape = shape({
   course: CourseShape.isRequired,
-  type: string.isRequired
+  type: string.isRequired,
 })

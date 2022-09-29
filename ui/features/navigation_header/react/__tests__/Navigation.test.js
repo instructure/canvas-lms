@@ -44,7 +44,7 @@ describe('GlobalNavigation', () => {
         expect.arrayContaining([
           '/api/v1/users/self/content_shares/unread_count',
           '/api/v1/conversations/unread_count',
-          '/api/v1/release_notes/unread_count'
+          '/api/v1/release_notes/unread_count',
         ])
       )
     })

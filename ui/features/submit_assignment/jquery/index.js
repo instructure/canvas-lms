@@ -28,9 +28,9 @@ import {recordEulaAgreement, verifyPledgeIsChecked} from './helper'
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.ajaxJSON'
 import 'jquery-tree'
-import '@canvas/forms/jquery/jquery.instructure_forms'/* ajaxJSONPreparedFiles, getFormData */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* ajaxJSONPreparedFiles, getFormData */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* fragmentChange, showIf, /\.log\(/ */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* fragmentChange, showIf, /\.log\(/ */
 import '@canvas/util/templateData'
 import '@canvas/media-comments'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -69,7 +69,7 @@ $(document).ready(function () {
 
   if (alertMount()) {
     ReactDOM.render(
-      <Alert screenReaderOnly liveRegion={alertMount} liveRegionPoliteness="assertive">
+      <Alert screenReaderOnly={true} liveRegion={alertMount} liveRegionPoliteness="assertive">
         {accessibilityAlert}
       </Alert>,
       alertMount()
@@ -132,8 +132,8 @@ $(document).ready(function () {
             if (bodyHtml.querySelector(`[data-placeholder-for]`)) {
               return I18n.t('File has not finished uploading')
             }
-          }
-        }
+          },
+        },
       })
     if (!valid) return false
 
@@ -159,7 +159,7 @@ $(document).ready(function () {
             name: 'webcam-picture.png',
             size: blob.size,
             type: blob.type,
-            files: [blob]
+            files: [blob],
           })
         })
 
@@ -279,7 +279,7 @@ $(document).ready(function () {
             .find("button[type='submit']")
             .text(I18n.t('messages.submit_failed', 'Submit Failed, please try again'))
           submissionForm.find('button').attr('disabled', false)
-        }
+        },
       })
     } else {
       submitting = true
@@ -392,7 +392,7 @@ $(document).ready(function () {
         if (ui.tab.attr('aria-controls') === 'submit_google_doc_form') {
           listGoogleDocs()
         }
-      }
+      },
     })
   }
 
@@ -488,7 +488,7 @@ $(document).ready(function () {
       window.opener.postMessage(
         {
           type: 'event',
-          payload: 'done'
+          payload: 'done',
         },
         window.opener.location.toString()
       )
@@ -540,7 +540,7 @@ $(document).ready(function () {
     )
   }
   function getFilename(fileInput) {
-    return fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1');
+    return fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1')
   }
   function updateRemoveLinkAltText(fileInput) {
     let altText = I18n.t('remove empty attachment')
@@ -572,7 +572,7 @@ $(document).ready(function () {
     return axios
       .post('/api/v1/canvadoc_session', {
         submission_attempt: 'draft',
-        submission_id: ENV.SUBMISSION_ID
+        submission_id: ENV.SUBMISSION_ID,
       })
       .then(result => {
         $(annotatedDocumentSubmission).attr('src', result.data.canvadocs_session_url)
@@ -607,8 +607,8 @@ $('#submit_google_doc_form').submit(() => {
     modal: true,
     overlay: {
       backgroundColor: '#000',
-      opacity: 0.7
-    }
+      opacity: 0.7,
+    },
   })
 })
 

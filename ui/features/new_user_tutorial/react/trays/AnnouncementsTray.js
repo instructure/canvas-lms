@@ -29,25 +29,25 @@ const AnnouncementsTray = () => (
     image="/images/tutorial-tray-images/Panda_Announcements.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('What are announcements?'),
-        href: I18n.t('#community.basics_announcements')
+        href: I18n.t('#community.basics_announcements'),
       },
       {
         label: I18n.t('How do I add an announcement in a course?'),
-        href: I18n.t('#community.instructor_add_announcement')
+        href: I18n.t('#community.instructor_add_announcement'),
       },
       {
         label: I18n.t('How do I edit an announcement in a course?'),
-        href: I18n.t('#community.instructor_edit_announcement')
+        href: I18n.t('#community.instructor_edit_announcement'),
       },
       {
         label: I18n.t('How do I use the Announcements Index Page?'),
-        href: I18n.t('#community.instructor_use_announcements_index')
-      }
+        href: I18n.t('#community.instructor_use_announcements_index'),
+      },
     ]}
   >
     {I18n.t(`Share important information about your course with all users.

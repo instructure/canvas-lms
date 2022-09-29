@@ -70,7 +70,7 @@ export const getOriginalBlackoutDates = (state: StoreState): BlackoutDate[] =>
 
 const initialState: OriginalState = {
   coursePace: getInitialCoursePace(),
-  blackoutDates: getInitialBlackoutDates()
+  blackoutDates: getInitialBlackoutDates(),
 }
 
 /* Reducers */

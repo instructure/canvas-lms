@@ -32,11 +32,11 @@ import {
   OBSERVER_1,
   DATETIME_PATTERN,
   STOPWATCH_PATTERN,
-  SITE_ADMIN_ENV
+  SITE_ADMIN_ENV,
 } from '../../../../util/test-constants'
 
 const mockSettingsToProps = mockSettings => ({
-  data: getRosterQueryMock(mockSettings)[0].result.data
+  data: getRosterQueryMock(mockSettings)[0].result.data,
 })
 
 const mockUsers = [DESIGNER_1, TEACHER_1, TA_1, STUDENT_1, STUDENT_2, STUDENT_3, OBSERVER_1].map(

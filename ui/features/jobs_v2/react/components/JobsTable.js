@@ -64,7 +64,7 @@ export default function JobsTable({
   onClickJob,
   onClickHeader,
   onClickFilter,
-  timeZone
+  timeZone,
 }) {
   const renderJobRow = useCallback(
     job => {
@@ -136,11 +136,11 @@ export default function JobsTable({
       <Responsive
         query={{
           small: {maxWidth: '719px'},
-          large: {minWidth: '720px'}
+          large: {minWidth: '720px'},
         }}
         props={{
           small: {layout: 'stacked'},
-          large: {layout: 'fixed'}
+          large: {layout: 'fixed'},
         }}
       >
         {props => (

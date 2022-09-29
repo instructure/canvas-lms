@@ -32,8 +32,8 @@ export const createNewCourse = (
       'course[name]': courseName,
       'course[sync_enrollments_from_homeroom]': syncHomeroomEnrollments,
       'course[homeroom_course_id]': homeroomCourseId,
-      enroll_me: true
-    }
+      enroll_me: true,
+    },
   }).then(data => data.json)
 
 /* Return array of objects containing id and name of accounts associated with each
@@ -45,7 +45,7 @@ export const getAccountsFromEnrollments = enrollments =>
       if (!acc.find(({id}) => id === e.account.id)) {
         acc.push({
           id: e.account.id,
-          name: e.account.name
+          name: e.account.name,
         })
       }
       return acc

@@ -21,7 +21,7 @@ import {Assignment} from '../../../../graphql/Assignment'
 import {
   deleteDiscussionTopicMock,
   updateDiscussionReadStateMock,
-  updateDiscussionTopicMock
+  updateDiscussionTopicMock,
 } from '../../../../graphql/Mocks'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
@@ -38,7 +38,7 @@ jest.mock('../../../../../../shared/direct-sharing/react/effects/useManagedCours
 jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('DiscussionTopicContainer', () => {
@@ -62,9 +62,9 @@ describe('DiscussionTopicContainer', () => {
           base_url: 'example.com',
           canvas_icon_class: 'icon-commons',
           id: '1',
-          title: 'Share to Commons'
-        }
-      ]
+          title: 'Share to Commons',
+        },
+      ],
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -73,7 +73,7 @@ describe('DiscussionTopicContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
@@ -85,13 +85,13 @@ describe('DiscussionTopicContainer', () => {
     }
 
     window.INST = {
-      editorButtons: []
+      editorButtons: [],
     }
   })
 
   beforeEach(() => {
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {maxWidth: '1000px'}
+      desktop: {maxWidth: '1000px'},
     }))
     useManagedCourseSearchApi.mockImplementation(() => {})
   })
@@ -127,8 +127,8 @@ describe('DiscussionTopicContainer', () => {
   it('renders a special alert for differentiated group assignments for readAsAdmin', async () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        assignment: Assignment.mock({onlyVisibleToOverrides: true})
-      })
+        assignment: Assignment.mock({onlyVisibleToOverrides: true}),
+      }),
     })
     expect(
       container.getByText(
@@ -141,8 +141,8 @@ describe('DiscussionTopicContainer', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
         assignment: Assignment.mock({onlyVisibleToOverrides: true}),
-        permissions: DiscussionPermissions.mock({readAsAdmin: false})
-      })
+        permissions: DiscussionPermissions.mock({readAsAdmin: false}),
+      }),
     })
     expect(await container.findByTestId('graded-discussion-info')).toBeTruthy()
     expect(container.queryByTestId('differentiated-alert')).toBeFalsy()
@@ -167,9 +167,9 @@ describe('DiscussionTopicContainer', () => {
       discussionTopic: Discussion.mock({
         entryCounts: {
           repliesCount: 24,
-          unreadCount: 0
-        }
-      })
+          unreadCount: 0,
+        },
+      }),
     })
     const infoText = await container.findByTestId('replies-counter')
     expect(infoText).toHaveTextContent('24 replies')
@@ -178,8 +178,8 @@ describe('DiscussionTopicContainer', () => {
   it('renders Graded info when assignment info exists', async () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        assignment: Assignment.mock({pointsPossible: 5, assignmentOverrides: null})
-      })
+        assignment: Assignment.mock({pointsPossible: 5, assignmentOverrides: null}),
+      }),
     })
     const gradedDiscussionInfo = await container.findByTestId('graded-discussion-info')
     expect(gradedDiscussionInfo).toHaveTextContent('5 points possible')
@@ -224,7 +224,7 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should not be able to delete the topic if does not have permission', async () => {
     const {getByTestId, queryByTestId} = setup({
-      discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({delete: false})})
+      discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({delete: false})}),
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(queryByTestId('delete')).toBeNull()
@@ -243,8 +243,8 @@ describe('DiscussionTopicContainer', () => {
   it('Should find due date text for assignment', async () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({readAsAdmin: false})
-      })
+        permissions: DiscussionPermissions.mock({readAsAdmin: false}),
+      }),
     })
     expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
     expect(await container.findByText('Available from Mar 24, 2021 until Apr 4, 2021')).toBeTruthy()
@@ -268,9 +268,9 @@ describe('DiscussionTopicContainer', () => {
           manageContent: false,
           manageCourseContentAdd: false,
           manageCourseContentEdit: false,
-          manageCourseContentDelete: false
-        })
-      })
+          manageCourseContentDelete: false,
+        }),
+      }),
     })
 
     expect(queryByTestId('discussion-post-menu-trigger')).toBeNull()
@@ -278,7 +278,7 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should show Mark All as Read discussion topic menu if initialPostRequiredForCurrentUser = false', async () => {
     const {getByTestId, getByText} = setup({
-      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})
+      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false}),
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Mark All as Read')).toBeInTheDocument()
@@ -286,7 +286,7 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should show Mark All as Unread discussion topic menu if initialPostRequiredForCurrentUser = false', async () => {
     const {getByTestId, getByText} = setup({
-      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false})
+      discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: false}),
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Mark All as Unread')).toBeInTheDocument()
@@ -328,8 +328,8 @@ describe('DiscussionTopicContainer', () => {
     const {getByTestId, getByText} = setup({
       discussionTopic: Discussion.mock({
         rootTopic: null,
-        permissions: DiscussionPermissions.mock({closeForComments: true})
-      })
+        permissions: DiscussionPermissions.mock({closeForComments: true}),
+      }),
     })
     fireEvent.click(getByTestId('discussion-post-menu-trigger'))
     expect(getByText('Close for Comments')).toBeInTheDocument()
@@ -338,8 +338,8 @@ describe('DiscussionTopicContainer', () => {
   it('does not render Close for Comments even when there is permission if child topic', () => {
     const container = setup({
       discussionTopic: Discussion.mock({
-        permissions: DiscussionPermissions.mock({closeForComments: true})
-      })
+        permissions: DiscussionPermissions.mock({closeForComments: true}),
+      }),
     })
     fireEvent.click(container.getByTestId('discussion-post-menu-trigger'))
     expect(container.queryByText('Close for Comments')).toBeNull()
@@ -400,7 +400,7 @@ describe('DiscussionTopicContainer', () => {
 
   it('does not render a reply button if user has reply permission false', () => {
     const container = setup({
-      discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({reply: false})})
+      discussionTopic: Discussion.mock({permissions: DiscussionPermissions.mock({reply: false})}),
     })
 
     expect(container.queryByTestId('discussion-topic-reply')).toBeNull()
@@ -417,8 +417,8 @@ describe('DiscussionTopicContainer', () => {
       {
         discussionTopic: Discussion.mock({
           rootTopic: null,
-          permissions: DiscussionPermissions.mock({closeForComments: true})
-        })
+          permissions: DiscussionPermissions.mock({closeForComments: true}),
+        }),
       },
       updateDiscussionTopicMock({locked: true})
     )
@@ -449,7 +449,7 @@ describe('DiscussionTopicContainer', () => {
 
   it('Should find due date text', async () => {
     const container = setup({
-      discussionTopic: Discussion.mock({assignment: Assignment.mock({assignmentOverrides: null})})
+      discussionTopic: Discussion.mock({assignment: Assignment.mock({assignmentOverrides: null})}),
     })
     expect(await container.findByText('Everyone')).toBeTruthy()
     expect(await container.findByText('Due Mar 31, 2021 5:59am')).toBeTruthy()
@@ -470,8 +470,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '2021-04-05T13:40:50Z',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}
@@ -493,8 +493,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}
@@ -517,8 +517,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '2021-04-05T13:40:50Z',
         lockAt: '2021-09-03T23:59:59-06:00',
         unlockAt: '',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}
@@ -541,8 +541,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '2021-04-05T13:40:50Z',
         lockAt: '',
         unlockAt: '2021-03-21T00:00:00-06:00',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}
@@ -565,8 +565,8 @@ describe('DiscussionTopicContainer', () => {
         dueAt: '2021-04-05T13:40:50Z',
         lockAt: '',
         unlockAt: '',
-        title: 'assignment override 3'
-      }
+        title: 'assignment override 3',
+      },
     ]
 
     const props = {discussionTopic: Discussion.mock({})}
@@ -586,14 +586,14 @@ describe('DiscussionTopicContainer', () => {
         id: 'U2VjdGlvbi00',
         _id: '1',
         userCount: 5,
-        name: 'section 1'
+        name: 'section 1',
       },
       {
         id: 'U2VjdGlvbi00',
         _id: '2',
         userCount: 99,
-        name: 'section 2'
-      }
+        name: 'section 2',
+      },
     ]
 
     const container = setup({
@@ -602,8 +602,8 @@ describe('DiscussionTopicContainer', () => {
         courseSections: mockSections,
         delayedPostAt: '2021-03-21T00:00:00-06:00',
         lockAt: '2021-09-03T23:59:59-06:00',
-        groupSet: null
-      })
+        groupSet: null,
+      }),
     })
 
     expect(container.getByTestId('view-availability-button')).toBeTruthy()
@@ -621,8 +621,8 @@ describe('DiscussionTopicContainer', () => {
     const props = {
       discussionTopic: Discussion.mock({
         isAnnouncement: true,
-        delayedPostAt: '3000-01-01T13:40:50-06:00'
-      })
+        delayedPostAt: '3000-01-01T13:40:50-06:00',
+      }),
     }
     const container = setup(props)
     expect(
@@ -644,9 +644,9 @@ describe('DiscussionTopicContainer', () => {
           id: 'vfx5000',
           _id: '99',
           displayName: 'Eddy Tor',
-          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-        }
-      })
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        },
+      }),
     }
     const container = setup(props)
     expect(container.getByText(`Edited by Eddy Tor Apr 22, 2021 6:41pm`)).toBeInTheDocument()
@@ -660,9 +660,9 @@ describe('DiscussionTopicContainer', () => {
           id: 'abc3244',
           _id: '1',
           name: 'Charles Xavier',
-          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
-        }
-      })
+          avatarUrl: 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        },
+      }),
     }
     const container = setup(props)
     expect(container.getByText(`Edited Apr 22, 2021 6:41pm`)).toBeInTheDocument()
@@ -672,8 +672,8 @@ describe('DiscussionTopicContainer', () => {
   it('should not render edited info if no editor', async () => {
     const props = {
       discussionTopic: Discussion.mock({
-        editor: null
-      })
+        editor: null,
+      }),
     }
     const container = setup(props)
     expect(container.queryByText(/Edited by/)).toBeFalsy()
@@ -685,8 +685,8 @@ describe('DiscussionTopicContainer', () => {
       const props = {
         discussionTopic: Discussion.mock({
           availableForUser: false,
-          title: 'This topic is unavailable'
-        })
+          title: 'This topic is unavailable',
+        }),
       }
       const container = setup(props)
       expect(container.queryByText('This topic is unavailable')).toBeInTheDocument()
@@ -697,8 +697,8 @@ describe('DiscussionTopicContainer', () => {
       const props = {
         discussionTopic: Discussion.mock({
           availableForUser: true,
-          title: 'This topic is available'
-        })
+          title: 'This topic is available',
+        }),
       }
       const container = setup(props)
       expect(container.queryByText('This topic is available')).toBeInTheDocument()
@@ -718,9 +718,9 @@ describe('DiscussionTopicContainer', () => {
       const props = {
         discussionTopic: Discussion.mock({
           assignment: Assignment.mock({
-            peerReviews: PeerReviews.mock({dueAt: null})
-          })
-        })
+            peerReviews: PeerReviews.mock({dueAt: null}),
+          }),
+        }),
       }
       const {getByText} = setup(props)
 
@@ -731,8 +731,8 @@ describe('DiscussionTopicContainer', () => {
       const props = {
         discussionTopic: Discussion.mock({
           peerReviews: null,
-          assessmentRequestsForCurrentUser: []
-        })
+          assessmentRequestsForCurrentUser: [],
+        }),
       }
       const {queryByText} = setup(props)
 
@@ -769,9 +769,9 @@ describe('DiscussionTopicContainer', () => {
         const {getByTestId, getByText} = setup({
           discussionTopic: Discussion.mock({
             permissions: DiscussionPermissions.mock({
-              addRubric: false
-            })
-          })
+              addRubric: false,
+            }),
+          }),
         })
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(getByText('Show Rubric')).toBeInTheDocument()
@@ -786,9 +786,9 @@ describe('DiscussionTopicContainer', () => {
         const {queryByTestId} = setup({
           discussionTopic: Discussion.mock({
             permissions: DiscussionPermissions.mock({
-              addRubric: false
-            })
-          })
+              addRubric: false,
+            }),
+          }),
         })
         expect(queryByTestId('add_rubric_url')).toBeNull()
       })

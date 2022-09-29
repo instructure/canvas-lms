@@ -28,7 +28,7 @@ function renderAdminSplit() {
       splitUrl="http://example.com/api/v1/users/1/split"
       splitUsers={[
         {id: '2', display_name: 'split1', html_url: 'http://example.com/users/2'},
-        {id: '3', display_name: 'split2', html_url: 'http://example.com/users/3'}
+        {id: '3', display_name: 'split2', html_url: 'http://example.com/users/3'},
       ]}
     />
   )

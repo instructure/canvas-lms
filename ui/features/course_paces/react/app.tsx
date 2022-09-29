@@ -64,7 +64,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   showLoadingOverlay,
   responsiveSize,
   pollForPublishStatus,
-  unpublishedChanges
+  unpublishedChanges,
 }) => {
   const [trayOpen, setTrayOpen] = useState(false)
 
@@ -102,9 +102,9 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           open={trayOpen}
           onDismiss={() => setTrayOpen(false)}
           placement={responsiveSize === 'small' ? 'bottom' : 'end'}
-          shouldContainFocus
-          shouldReturnFocus
-          shouldCloseOnDocumentClick
+          shouldContainFocus={true}
+          shouldReturnFocus={true}
+          shouldCloseOnDocumentClick={true}
         >
           <UnpublishedChangesTrayContents
             handleTrayDismiss={() => setTrayOpen(false)}
@@ -120,11 +120,11 @@ export const ResponsiveApp: React.FC<ComponentProps> = props => (
   <Responsive
     query={{
       small: {maxWidth: '40rem'},
-      large: {minWidth: '40rem'}
+      large: {minWidth: '40rem'},
     }}
     props={{
       small: {responsiveSize: 'small'},
-      large: {responsiveSize: 'large'}
+      large: {responsiveSize: 'large'},
     }}
   >
     {({responsiveSize}) => <App responsiveSize={responsiveSize} {...props} />}
@@ -135,11 +135,11 @@ const mapStateToProps = (state: StoreState): StoreProps => {
   return {
     loadingMessage: getLoadingMessage(state),
     showLoadingOverlay: getShowLoadingOverlay(state),
-    unpublishedChanges: getSummarizedChanges(state)
+    unpublishedChanges: getSummarizedChanges(state),
   }
 }
 
 export default connect(mapStateToProps, {
   pollForPublishStatus: coursePaceActions.pollForPublishStatus,
-  setResponsiveSize: actions.setResponsiveSize
+  setResponsiveSize: actions.setResponsiveSize,
 })(ResponsiveApp)

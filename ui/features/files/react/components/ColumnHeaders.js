@@ -25,7 +25,7 @@ import ColumnHeaders from '../legacy/components/ColumnHeaders'
 
 const I18n = useI18nScope('react_files')
 
-ColumnHeaders.renderColumns = function(sort, order) {
+ColumnHeaders.renderColumns = function (sort, order) {
   return this.columns.map(column => {
     if (column.property === 'usage_rights' && !this.props.usageRightsRequiredForContext) {
       return
@@ -35,7 +35,7 @@ ColumnHeaders.renderColumns = function(sort, order) {
       const direction = order === 'asc' ? 'ascending' : 'descending'
       const message = I18n.t('Sorted %{direction} by %{columnName}', {
         direction,
-        columnName: column.displayName
+        columnName: column.displayName,
       })
       if (message !== this.lastScreenreaderMessage.current) {
         $.screenReaderFlashMessage(message)
@@ -43,13 +43,13 @@ ColumnHeaders.renderColumns = function(sort, order) {
       }
     }
     const columnClassNameObj = {
-      'current-filter': isSortedCol
+      'current-filter': isSortedCol,
     }
     columnClassNameObj[column.className] = true
     const columnClassName = classnames(columnClassNameObj)
     const linkClassName = classnames({
       'visible-desktop': column.displayNameShort,
-      'ef-usage-rights-col-offset': column.property === 'usage_rights'
+      'ef-usage-rights-col-offset': column.property === 'usage_rights',
     })
 
     const encoded_path = this.props.pathname
@@ -61,7 +61,7 @@ ColumnHeaders.renderColumns = function(sort, order) {
     )}`
     const linkProps = {
       className: 'ef-plain-link',
-      href
+      href,
     }
     let linkText
     if (column.property === 'select') {
@@ -108,7 +108,7 @@ ColumnHeaders.renderColumns = function(sort, order) {
   })
 }
 
-ColumnHeaders.render = function() {
+ColumnHeaders.render = function () {
   const sort = this.props.query.sort || 'name'
   const order = this.props.query.order || 'asc'
 

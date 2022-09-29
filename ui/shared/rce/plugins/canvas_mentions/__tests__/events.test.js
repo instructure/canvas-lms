@@ -23,21 +23,21 @@ import {onSetContent, onKeyDown, onMouseDown, onKeyUp, onFocusedUserChange} from
 import ReactDOM from 'react-dom'
 
 jest.mock('../contentEditable', () => ({
-  makeBodyEditable: jest.fn()
+  makeBodyEditable: jest.fn(),
 }))
 
 jest.mock('../edit', () => ({
-  insertMentionFor: jest.fn()
+  insertMentionFor: jest.fn(),
 }))
 
 jest.mock('../constants', () => ({
   ...jest.requireActual('../constants'),
-  TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com'
+  TRUSTED_MESSAGE_ORIGIN: 'https://canvas.instructure.com',
 }))
 
 jest.mock('react-dom', () => ({
   render: jest.fn(),
-  unmountComponentAtNode: jest.fn()
+  unmountComponentAtNode: jest.fn(),
 }))
 
 jest.mock('../components/MentionAutoComplete/MentionDropdown')
@@ -64,7 +64,7 @@ describe('events', () => {
         content: 'hello',
         target: editor,
         paste: false,
-        editor
+        editor,
       }
 
       editor.setContent('<span id="mention-menu"></span><span id="mentions-marker"></span>')
@@ -115,7 +115,7 @@ describe('events', () => {
       event = {
         editor,
         which: 1,
-        preventDefault: () => {}
+        preventDefault: () => {},
       }
 
       editor.setContent(
@@ -252,7 +252,7 @@ describe('events', () => {
           expect(global.postMessage).toHaveBeenCalledWith(
             {
               subject: expectedMessageType,
-              value: expectedValue
+              value: expectedValue,
             },
             'https://canvas.instructure.com'
           )
@@ -301,7 +301,7 @@ describe('events', () => {
             {
               ariaActiveDescendantId: '#foo',
               name: 'Test User',
-              _id: '12345'
+              _id: '12345',
             },
             editor
           )
@@ -332,7 +332,7 @@ describe('events', () => {
             {
               ariaActiveDescendantId: '#foo',
               name: 'Test User',
-              _id: '12345'
+              _id: '12345',
             },
             editor
           )
@@ -387,7 +387,7 @@ describe('events', () => {
     beforeEach(() => {
       event = {
         editor,
-        which: 1
+        which: 1,
       }
 
       global.postMessage = jest.fn()
@@ -410,7 +410,7 @@ describe('events', () => {
       expect(global.postMessage).toHaveBeenCalledWith(
         {
           subject: 'mentions.InputChangeEvent',
-          value: 'wes'
+          value: 'wes',
         },
         'https://canvas.instructure.com'
       )
@@ -457,7 +457,7 @@ describe('events', () => {
     beforeEach(() => {
       event = {
         editor,
-        target: {}
+        target: {},
       }
 
       editor.setContent(
@@ -500,7 +500,7 @@ describe('events', () => {
       focusedUser = {
         ariaActiveDescendantId: '#foo',
         name: 'Test User',
-        _id: '12345'
+        _id: '12345',
       }
 
       editor.setContent(

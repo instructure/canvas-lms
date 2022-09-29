@@ -27,7 +27,7 @@ const I18n = useI18nScope('discussions_v2')
 
 const getDiscussionOpts = {
   fetchAll: true,
-  totalCount: ENV.totalDiscussions
+  totalCount: ENV.totalDiscussions,
 }
 const discussionActions = createPaginationActions(
   'discussions',
@@ -71,7 +71,7 @@ const types = [
   'SET_COPY_TO',
   'SET_COPY_TO_OPEN',
   'SET_SEND_TO',
-  'SET_SEND_TO_OPEN'
+  'SET_SEND_TO_OPEN',
 ]
 
 const actions = Object.assign(createActions(...types), discussionActions.actionCreators)
@@ -90,7 +90,7 @@ function copyAndUpdateDiscussion(discussion, updatedFields, focusOn) {
   return discussionCopy
 }
 
-actions.updateDiscussion = function(
+actions.updateDiscussion = function (
   discussion,
   updatedFields,
   {successMessage, failMessage},
@@ -127,7 +127,7 @@ actions.updateDiscussion = function(
         dispatch(
           actions.updateDiscussionFail({
             message: failMessage || I18n.t('Updating discussion failed'),
-            err
+            err,
           })
         )
       })
@@ -141,7 +141,7 @@ actions.updateDiscussion = function(
 // and setting the order of the pin). Start by updating the store with
 // this information, then rollback based on if either of the API calls
 // failed.
-actions.handleDrop = function(discussion, updatedFields, order) {
+actions.handleDrop = function (discussion, updatedFields, order) {
   return (dispatch, getState) => {
     const originalOrder = order ? getState().pinnedDiscussionIds.slice() : undefined
     const discussionCopy = copyAndUpdateDiscussion(discussion, updatedFields)
@@ -172,7 +172,7 @@ actions.handleDrop = function(discussion, updatedFields, order) {
                 message: I18n.t('Failed to update discussion'),
                 discussion: discussionCopy,
                 order: originalOrder,
-                err
+                err,
               })
             )
           })
@@ -184,7 +184,7 @@ actions.handleDrop = function(discussion, updatedFields, order) {
             message: I18n.t('Failed to update discussion'),
             discussion,
             order: originalOrder,
-            err
+            err,
           })
         )
       })
@@ -255,11 +255,11 @@ function nextFocusableDiscussion(state, discussionId) {
 
   return {
     focusOn,
-    focusId
+    focusId,
   }
 }
 
-actions.deleteDiscussion = function(discussion) {
+actions.deleteDiscussion = function (discussion) {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(actions.deleteDiscussionStart())
@@ -281,18 +281,18 @@ actions.deleteDiscussion = function(discussion) {
           actions.deleteDiscussionFail({
             message: I18n.t('Failed to delete discussion %{title}', {title: discussion.title}),
             discussion,
-            err
+            err,
           })
         )
       })
   }
 }
 
-actions.deleteFocusDone = function() {
+actions.deleteFocusDone = function () {
   return dispatch => dispatch(actions.deleteFocusCleanup())
 }
 
-actions.fetchUserSettings = function() {
+actions.fetchUserSettings = function () {
   return (dispatch, getState) => {
     dispatch(actions.getUserSettingsStart())
     apiClient
@@ -306,7 +306,7 @@ actions.fetchUserSettings = function() {
   }
 }
 
-actions.fetchCourseSettings = function() {
+actions.fetchCourseSettings = function () {
   return (dispatch, getState) => {
     dispatch(actions.getCourseSettingsStart())
     apiClient
@@ -333,7 +333,7 @@ function saveCourseSettings(dispatch, getState, userSettings, courseSettings) {
     })
 }
 
-actions.saveSettings = function(userSettings, courseSettings) {
+actions.saveSettings = function (userSettings, courseSettings) {
   return (dispatch, getState) => {
     dispatch(actions.savingSettingsStart())
     const userSettingsCopy = Object.assign(getState().userSettings, {})
@@ -355,7 +355,7 @@ actions.saveSettings = function(userSettings, courseSettings) {
   }
 }
 
-actions.duplicateDiscussion = function(discussionId) {
+actions.duplicateDiscussion = function (discussionId) {
   return (dispatch, getState) => {
     // This is a no-op, just here to maintain a pattern
     dispatch(actions.duplicateDiscussionStart())
@@ -365,13 +365,13 @@ actions.duplicateDiscussion = function(discussionId) {
         const newDiscussion = response.data
         newDiscussion.focusOn = 'title'
         const successMessage = I18n.t('Duplication of %{title} succeeded', {
-          title: newDiscussion.title
+          title: newDiscussion.title,
         })
         $.screenReaderFlashMessageExclusive(successMessage)
         dispatch(
           actions.duplicateDiscussionSuccess({
             newDiscussion,
-            originalId: discussionId
+            originalId: discussionId,
           })
         )
       })
@@ -381,7 +381,7 @@ actions.duplicateDiscussion = function(discussionId) {
         dispatch(
           actions.duplicateDiscussionFail({
             message: failMessage,
-            err
+            err,
           })
         )
       })
@@ -390,7 +390,7 @@ actions.duplicateDiscussion = function(discussionId) {
 
 // This is a different action then the update discussion because it hits an
 // entirely different endpoint on the backend.
-actions.toggleSubscriptionState = function(discussion) {
+actions.toggleSubscriptionState = function (discussion) {
   return (dispatch, getState) => {
     if (discussion.subscription_hold === undefined) {
       dispatch(actions.toggleSubscribeStart())
@@ -411,7 +411,7 @@ actions.toggleSubscriptionState = function(discussion) {
           dispatch(
             actions.toggleSubscribeFail({
               message: failMessage,
-              err
+              err,
             })
           )
         })

@@ -29,7 +29,7 @@ export default class ToolbarView extends Backbone.View {
       'click .add_outcome_link': 'addOutcome',
       'click .add_outcome_group': 'addGroup',
       'click .import_outcomes': 'importOutcomes',
-      'click .find_outcome': 'findDialog'
+      'click .find_outcome': 'findDialog',
     }
   }
 

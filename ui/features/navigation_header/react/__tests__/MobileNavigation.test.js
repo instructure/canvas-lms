@@ -35,8 +35,8 @@ describe('MobileNavigation', () => {
         profile: [{id: '1', html_url: '/foo', label: 'foo'}],
         helpAreLoaded: false,
         help: [],
-        historyAreLoaded: false
-      }
+        historyAreLoaded: false,
+      },
     }
   }
 

@@ -32,7 +32,7 @@ import PostToStudentsButton from './PostToStudentsButton'
 import ReleaseButton from './ReleaseButton'
 import {
   SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
-  setReleaseGradesStatus
+  setReleaseGradesStatus,
 } from '../assignment/AssignmentActions'
 
 const I18n = useI18nScope('assignment_grade_summary')
@@ -44,7 +44,7 @@ function enumeratedStatuses(actions) {
     actions.SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
     actions.FAILURE,
     actions.STARTED,
-    actions.SUCCESS
+    actions.SUCCESS,
   ]
 }
 
@@ -63,12 +63,12 @@ function validGradersSelected(gradesByStudentId) {
 class Header extends Component {
   static propTypes = {
     assignment: shape({
-      title: string.isRequired
+      title: string.isRequired,
     }).isRequired,
     graders: arrayOf(
       shape({
         graderName: string,
-        graderId: string.isRequired
+        graderId: string.isRequired,
       })
     ).isRequired,
     releaseGrades: func.isRequired,
@@ -83,16 +83,16 @@ class Header extends Component {
           id: string.isRequired,
           score: number,
           selected: bool.isRequired,
-          studentId: string.isRequired
+          studentId: string.isRequired,
         })
       )
     ).isRequired,
-    setReleaseGradesStatus: func.isRequired
+    setReleaseGradesStatus: func.isRequired,
   }
 
   static defaultProps = {
     releaseGradesStatus: null,
-    unmuteAssignmentStatus: null
+    unmuteAssignmentStatus: null,
   }
 
   handleReleaseClick = () => {
@@ -199,7 +199,7 @@ function mapStateToProps(state) {
     graders: state.context.graders,
     releaseGradesStatus,
     unmuteAssignmentStatus,
-    provisionalGrades: state.grades.provisionalGrades
+    provisionalGrades: state.grades.provisionalGrades,
   }
 }
 
@@ -214,7 +214,7 @@ function mapDispatchToProps(dispatch) {
 
     setReleaseGradesStatus(status) {
       dispatch(setReleaseGradesStatus(status))
-    }
+    },
   }
 }
 

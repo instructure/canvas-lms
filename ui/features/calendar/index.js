@@ -37,7 +37,7 @@ const schedulerStore = ENV.CALENDAR.SHOW_SCHEDULER ? configureSchedulerStore() :
 const start = () => {
   const header = new CalendarHeader({
     el: '#calendar_header',
-    calendar2Only: ENV.CALENDAR.CAL2_ONLY
+    calendar2Only: ENV.CALENDAR.CAL2_ONLY,
   })
 
   const calendar = new Calendar(
@@ -64,7 +64,7 @@ const start = () => {
             )
           }
         }
-      }
+      },
     }
   )
   const onContextsChange = additionalContexts => {

@@ -29,43 +29,43 @@ describe('Gradebook', () => {
           display_name: 'Student Test',
           sortable_name: 'Test, Student',
           avatar_url: '/avatar-url',
-          id: '1'
+          id: '1',
         },
         {
           name: 'Student Test 2',
           display_name: 'Student Test 2',
           sortable_name: 'Test 2, Student',
           avatar_url: '/avatar-url-2',
-          id: '2'
-        }
+          id: '2',
+        },
       ],
       outcomes: [
         {
           id: '1',
           title: 'outcome 1',
           mastery_points: 5,
-          ratings: []
+          ratings: [],
         },
         {
           id: '2',
           title: 'outcome 2',
           mastery_points: 5,
-          ratings: []
-        }
+          ratings: [],
+        },
       ],
       rollups: [
         {
           studentId: '1',
-          outcomeRollups: []
+          outcomeRollups: [],
         },
         {
           studentId: '2',
-          outcomeRollups: []
-        }
+          outcomeRollups: [],
+        },
       ],
       courseId: '100',
       visibleRatings: [true, true, true, true, true, true],
-      ...props
+      ...props,
     }
   }
 

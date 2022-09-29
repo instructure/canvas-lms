@@ -29,7 +29,7 @@ export default function newCourseForm() {
 
   const $nameInput = $('#new_course_form [name="course[name]"]')
   $nameInput.bind(changeEvents, showCourseCodeIfNeeded)
-  $('#new_course_form').submit(function() {
+  $('#new_course_form').submit(function () {
     return $(this).disableWhileLoading($.Deferred())
   })
 }

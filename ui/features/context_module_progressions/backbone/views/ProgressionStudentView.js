@@ -43,8 +43,8 @@ export default class ProgressionStudentView extends Backbone.View {
       per_page: 50,
       params: {
         student_id: studentId,
-        include: ['items']
-      }
+        include: ['items'],
+      },
     })
     modules.student_id = studentId
     modules.syncHeight = this.syncHeight
@@ -57,7 +57,7 @@ export default class ProgressionStudentView extends Backbone.View {
       template: collectionTemplate,
       student: this.model.attributes,
       studentUrl,
-      autoFetch: true
+      autoFetch: true,
     })
 
     this.progressions.render()
