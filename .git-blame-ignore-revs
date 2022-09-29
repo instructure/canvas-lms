@@ -111,4 +111,5 @@ b2d5e59698aaa4181bfe0a60f31da49d11eb749e # Style/RedundantParentheses
 b973c7ca270fd7204ae7d2861aac22df21dc4b87 # Style/ParenthesesAroundCondition
 685f1d979108261855322f10185fe29de78d10c4 # Style/Encoding
 dd84f1faed7d028148e429c257af4ad3842f01d0 # Prettier/trailingComma
-
+a78f3fca8ca022a97759234218213e4f8d887989 # Prettier /spec/javascripts/
+86d0e7ced231f1e75b3c2c0e42472d4aa353421c # Prettier /ui
