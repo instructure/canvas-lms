@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
           current_user_types: @current_user.try { |u| u.account_users.active.map { |au| au.role.name } },
           current_user_disabled_inbox: @current_user&.disabled_inbox?,
           current_user_visited_tabs: @current_user&.get_preference(:visited_tabs),
-          discussions_reporting: @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:react_discussions_post),
+          discussions_reporting: react_discussions_post_enabled_for_preferences_use?,
           files_domain: HostUrl.file_host(@domain_root_account || Account.default, request.host_with_port),
           DOMAIN_ROOT_ACCOUNT_ID: @domain_root_account&.global_id,
           k12: k12?,
@@ -3097,4 +3097,13 @@ class ApplicationController < ActionController::Base
     end
   end
   helper_method :k5_user?
+
+  def react_discussions_post_enabled_for_preferences_use?
+    if @context.instance_of?(UserProfile) && Account.default.feature_enabled?(:react_discussions_post)
+      return true
+    end
+
+    @context.respond_to?(:feature_enabled?) && @context.feature_enabled?(:react_discussions_post)
+  end
+  helper_method :react_discussions_post_enabled_for_preferences_use?
 end

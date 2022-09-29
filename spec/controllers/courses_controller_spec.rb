@@ -702,6 +702,20 @@ describe CoursesController do
         expect(response).to be_successful
         expect(assigns[:js_bundles].flatten).to include(:course_notification_settings)
       end
+
+      it "sets discussions_reporting to falsey if react_discussions_post is off" do
+        @course.disable_feature! :react_discussions_post
+        user_session(@user)
+        get "show", params: { id: @course.id, view: "notifications" }
+        expect(assigns[:js_env][:discussions_reporting]).to be_falsey
+      end
+
+      it "sets discussions_reporting to truthy if react_discussions_post is on" do
+        @course.enable_feature! :react_discussions_post
+        user_session(@user)
+        get "show", params: { id: @course.id, view: "notifications" }
+        expect(assigns[:js_env][:discussions_reporting]).to be_truthy
+      end
     end
   end
 
