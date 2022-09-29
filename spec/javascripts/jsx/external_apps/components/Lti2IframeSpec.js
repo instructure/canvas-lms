@@ -38,7 +38,7 @@ QUnit.module('ExternalApps Lti2Iframe', suiteHooks => {
       handleInstall() {},
       registrationUrl: 'http://localhost/register',
       reregistration: false,
-      toolName: 'The best LTI tool ever'
+      toolName: 'The best LTI tool ever',
     }
   })
 

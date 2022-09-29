@@ -31,7 +31,7 @@ const rawDupeList = [
       login_id: 'bob',
       account_id: 1,
       account_name: 'TV Land',
-      user_id: 1
+      user_id: 1,
     },
     {
       address: 'bob',
@@ -40,7 +40,7 @@ const rawDupeList = [
       login: 'bob',
       account_id: 2,
       account_name: 'Grateful Dead',
-      user_id: 2
+      user_id: 2,
     },
     {
       address: 'bob',
@@ -49,8 +49,8 @@ const rawDupeList = [
       login: 'bob',
       account_id: 3,
       account_name: 'PBS',
-      user_id: 3
-    }
+      user_id: 3,
+    },
   ],
   [
     {
@@ -60,7 +60,7 @@ const rawDupeList = [
       login_id: 'sally',
       account_id: 4,
       account_name: 'NASA',
-      user_id: 4
+      user_id: 4,
     },
     {
       address: 'sally',
@@ -69,7 +69,7 @@ const rawDupeList = [
       login_id: 'sally',
       account_id: 5,
       account_name: 'Hollywood',
-      user_id: 5
+      user_id: 5,
     },
     {
       address: 'sally',
@@ -78,9 +78,9 @@ const rawDupeList = [
       login_id: 'sally',
       account_id: 6,
       account_name: null,
-      user_id: 6
-    }
-  ]
+      user_id: 6,
+    },
+  ],
 ]
 // same duplicates after they are transformed by the validate_users_success reducer
 const dupeList = {
@@ -98,7 +98,7 @@ const dupeList = {
         login_id: 'bob',
         account_id: 1,
         account_name: 'TV Land',
-        user_id: 1
+        user_id: 1,
       },
       {
         address: 'bob',
@@ -107,7 +107,7 @@ const dupeList = {
         login: 'bob',
         account_id: 2,
         account_name: 'Grateful Dead',
-        user_id: 2
+        user_id: 2,
       },
       {
         address: 'bob',
@@ -116,9 +116,9 @@ const dupeList = {
         login: 'bob',
         account_id: 3,
         account_name: 'PBS',
-        user_id: 3
-      }
-    ]
+        user_id: 3,
+      },
+    ],
   },
   sally: {
     address: 'sally',
@@ -134,7 +134,7 @@ const dupeList = {
         login_id: 'sally',
         account_id: 4,
         account_name: 'NASA',
-        user_id: 4
+        user_id: 4,
       },
       {
         address: 'sally',
@@ -143,7 +143,7 @@ const dupeList = {
         login_id: 'sally',
         account_id: 5,
         account_name: 'Hollywood',
-        user_id: 5
+        user_id: 5,
       },
       {
         address: 'sally',
@@ -152,16 +152,16 @@ const dupeList = {
         login_id: 'sally',
         account_id: 6,
         account_name: null,
-        user_id: 6
-      }
-    ]
-  }
+        user_id: 6,
+      },
+    ],
+  },
 }
 
 // missing by login, as returned by the api
 const rawMissingList = [
   {address: 'amelia', type: 'unique_id'},
-  {address: 'dbcooper', type: 'unique_id'}
+  {address: 'dbcooper', type: 'unique_id'},
 ]
 // missing by login after transformed by validate_user_success reducer
 const missingList = {
@@ -169,14 +169,14 @@ const missingList = {
     address: 'amelia',
     createNew: false,
     type: 'unique_id',
-    newUserInfo: {email: '', name: ''}
+    newUserInfo: {email: '', name: ''},
   },
   dbcooper: {
     address: 'dbcooper',
     createNew: false,
     type: 'unique_id',
-    newUserInfo: {email: '', name: ''}
-  }
+    newUserInfo: {email: '', name: ''},
+  },
 }
 
 const goodUsers = [
@@ -185,36 +185,36 @@ const goodUsers = [
     user_name: 'John Lennon',
     account_id: 8,
     account_name: 'British Invasion',
-    user_id: 7
+    user_id: 7,
   },
   {
     address: 'paul',
     user_name: 'Paul McCartney',
     account_id: 8,
     account_name: 'British Invasion',
-    user_id: 8
+    user_id: 8,
   },
   {
     address: 'georg',
     user_name: 'George Harrison',
     account_id: 8,
     account_name: 'British Invasion',
-    user_id: 9
+    user_id: 9,
   },
   {
     address: 'ringo',
     user_name: 'Ringo Starr',
     account_id: 8,
     account_name: 'British Invasion',
-    user_id: 10
-  }
+    user_id: 10,
+  },
 ]
 
 const INITIAL_STATE = {
   courseParams: {
     courseId: '1',
     roles: [{id: 1}, {id: 2}, {id: 3}],
-    sections: [{id: 1}, {id: 2}, {id: 3}]
+    sections: [{id: 1}, {id: 2}, {id: 3}],
   },
   inputParams: {
     searchType: 'cc_path',
@@ -222,19 +222,19 @@ const INITIAL_STATE = {
     role: '',
     section: '',
     limitPrivilege: false,
-    canReadSIS: true
+    canReadSIS: true,
   },
   apiState: {
     pendingCount: 0, // >0 while api calls are in-flight
-    error: undefined // api error message
+    error: undefined, // api error message
   },
   userValidationResult: {
     validUsers: [], // the validated users
     duplicates: {}, // key: address, value: instance of duplicateShape
-    missing: {} // key: address, value: instance of missingShape
+    missing: {}, // key: address, value: instance of missingShape
   },
   usersToBeEnrolled: [], // key: user_id, value: {user_id, name, email, ...}
-  usersEnrolled: false // true when students have been enrolled and we're finished
+  usersEnrolled: false, // true when students have been enrolled and we're finished
 }
 
 const USER_BOB = {email: 'bob@npr.org', name: 'Bob Villa'}
@@ -244,12 +244,12 @@ const API_VALIDATION_RESPONSE1 = {
   users: goodUsers,
   duplicates: rawDupeList,
   missing: rawMissingList,
-  errors: []
+  errors: [],
 }
 
 const API_CREATE_RESPONSE1 = {
   invited_users: [{email: 'bob@npr.org', id: 11}],
-  errored_users: []
+  errored_users: [],
 }
 const API_CREATE_RESPONSE2 = {
   invited_users: [{email: 'bob@npr.org', id: 11}],
@@ -263,11 +263,11 @@ const API_CREATE_RESPONSE2 = {
           user_id: 12,
           user_name: 'Who Cares',
           account_id: 1,
-          account_name: 'TV Land'
-        }
-      ]
-    }
-  ]
+          account_name: 'TV Land',
+        },
+      ],
+    },
+  ],
 }
 const API_ENROLL_RESPONSE = [{}, {}]
 
@@ -284,7 +284,7 @@ test('set input paramaters', () => {
     nameList: 'foo, bar, baz',
     role: '2',
     secion: '2',
-    limitPrivilege: true
+    limitPrivilege: true,
   }
   const newState = reduce(actions.setInputParams(newSearchParams))
   deepEqual(newState.courseParams, INITIAL_STATE.courseParams, 'courseParams')

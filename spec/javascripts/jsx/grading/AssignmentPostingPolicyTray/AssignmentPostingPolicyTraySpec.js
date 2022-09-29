@@ -36,11 +36,11 @@ QUnit.module('AssignmentPostingPolicyTray', suiteHooks => {
       assignment: {
         id: '2301',
         name: 'Math 1.1',
-        postManually: false
+        postManually: false,
       },
 
       onAssignmentPostPolicyUpdated: sinon.spy(),
-      onExited: sinon.spy()
+      onExited: sinon.spy(),
     }
 
     const bindRef = ref => {

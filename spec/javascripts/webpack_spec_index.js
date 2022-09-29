@@ -53,9 +53,9 @@ if (!window.ENV) window.ENV = {}
 canvas.use({
   overrides: {
     transitions: {
-      duration: '0ms'
-    }
-  }
+      duration: '0ms',
+    },
+  },
 })
 
 const requireAll = context => {

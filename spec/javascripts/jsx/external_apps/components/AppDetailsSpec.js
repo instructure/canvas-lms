@@ -27,9 +27,9 @@ test('the back to app center link goes to the proper place', () => {
     findAppByShortName() {
       return {
         short_name: 'someApp',
-        config_options: []
+        config_options: [],
       }
-    }
+    },
   }
 
   const component = TestUtils.renderIntoDocument(

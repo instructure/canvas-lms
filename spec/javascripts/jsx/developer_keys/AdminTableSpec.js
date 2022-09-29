@@ -25,14 +25,14 @@ import $ from 'jquery'
 QUnit.module('AdminTable', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 function devKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({
     id: `${n}`,
     api_key: 'abc12345678',
-    created_at: '2012-06-07T20:36:50Z'
+    created_at: '2012-06-07T20:36:50Z',
   }))
 }
 
@@ -44,8 +44,8 @@ function component(keyList, props = {}) {
       developerKeysList={keyList || devKeyList()}
       ctx={{
         params: {
-          contextId: ''
-        }
+          contextId: '',
+        },
       }}
       {...props}
     />

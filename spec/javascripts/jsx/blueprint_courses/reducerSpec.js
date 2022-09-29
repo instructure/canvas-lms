@@ -40,14 +40,14 @@ test('adds associations to existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', (
   const existing = [getSampleData().courses[0]]
   const added = [getSampleData().courses[1]]
   const newState = reduce(actions.saveAssociationsSuccess({added}), {
-    existingAssociations: existing
+    existingAssociations: existing,
   })
   deepEqual(newState.existingAssociations, getSampleData().courses)
 })
 
 test('removes associations froms existingAssociations on SAVE_ASSOCIATIONS_SUCCESS', () => {
   const newState = reduce(actions.saveAssociationsSuccess({removed: [{id: '1'}]}), {
-    existingAssociations: getSampleData().courses
+    existingAssociations: getSampleData().courses,
   })
   deepEqual(newState.existingAssociations, [getSampleData().courses[1]])
 })
@@ -71,7 +71,7 @@ test('adds associations to addedAssociations on ADD_COURSE_ASSOCIATIONS', () => 
 
 test('removes associations from addedAssociations on UNDO_ADD_COURSE_ASSOCIATIONS', () => {
   const newState = reduce(actions.undoAddCourseAssociations(['1']), {
-    addedAssociations: getSampleData().courses
+    addedAssociations: getSampleData().courses,
   })
   deepEqual(newState.addedAssociations, [getSampleData().courses[1]])
 })
@@ -93,7 +93,7 @@ test('adds associations to removedAssociations on REMOVE_COURSE_ASSOCIATIONS', (
 
 test('removes associations from removedAssociations on UNDO_REMOVE_COURSE_ASSOCIATIONS', () => {
   const newState = reduce(actions.undoRemoveCourseAssociations(['1']), {
-    removedAssociations: [{id: '1'}, {id: '2'}]
+    removedAssociations: [{id: '1'}, {id: '2'}],
   })
   deepEqual(newState.removedAssociations, [{id: '2'}])
 })
@@ -275,8 +275,8 @@ test('creates empty change log entry on SELECT_CHANGE_LOG', () => {
     5: {
       changeId: '5',
       status: LoadStates.states.not_loaded,
-      data: null
-    }
+      data: null,
+    },
   })
 })
 
@@ -286,8 +286,8 @@ test('sets change log status to loading on LOAD_CHANGE_START', () => {
     5: {
       changeId: '5',
       status: LoadStates.states.loading,
-      data: null
-    }
+      data: null,
+    },
   })
 })
 
@@ -297,8 +297,8 @@ test('sets change log data and status to loaded on LOAD_CHANGE_SUCCESS', () => {
     5: {
       changeId: '5',
       status: LoadStates.states.loaded,
-      data: {changeId: '5', changes: ['1', '2']}
-    }
+      data: {changeId: '5', changes: ['1', '2']},
+    },
   })
 })
 
@@ -308,15 +308,15 @@ test('sets change log status to not loaded on LOAD_CHANGE_FAILED', () => {
     5: {
       changeId: '5',
       status: LoadStates.states.not_loaded,
-      data: null
-    }
+      data: null,
+    },
   })
 })
 
 test('catches any action with err and message and treats it as an error notification', () => {
   const newState = reduce({
     type: '_NOT_A_REAL_ACTION_',
-    payload: {message: 'hello world', err: 'bad things happened'}
+    payload: {message: 'hello world', err: 'bad things happened'},
   })
   equal(newState.notifications.length, 1)
   equal(newState.notifications[0].type, 'error')
@@ -341,7 +341,7 @@ test('adds new error notification on NOTIFY_ERROR', () => {
 
 test('clear notification on CLEAR_NOTIFICATION', () => {
   const newState = reduce(actions.clearNotification('1'), {
-    notifications: [{id: '1', message: 'hello world', type: 'info'}]
+    notifications: [{id: '1', message: 'hello world', type: 'info'}],
   })
   equal(newState.notifications.length, 0)
 })

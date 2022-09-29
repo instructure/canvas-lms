@@ -37,14 +37,14 @@ QUnit.module('HideAssignmentGradesTray', suiteHooks => {
         anonymousGrading: false,
         gradesPublished: true,
         id: '2301',
-        name: 'Math 1.1'
+        name: 'Math 1.1',
       },
       onExited: sinon.spy(),
       onHidden: sinon.spy(),
       sections: [
         {id: '2001', name: 'Freshmen'},
-        {id: '2002', name: 'Sophomores'}
-      ]
+        {id: '2002', name: 'Sophomores'},
+      ],
     }
 
     const bindRef = ref => {

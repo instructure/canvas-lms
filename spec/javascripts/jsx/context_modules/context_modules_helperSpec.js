@@ -25,15 +25,15 @@ QUnit.module('ContextModulesHelper', {
 
   teardown() {
     Helper.setWindowLocation.restore()
-  }
+  },
 })
 
 test('externalUrlLinkClick', () => {
   const event = {
-    preventDefault: sinon.spy()
+    preventDefault: sinon.spy(),
   }
   const elt = {
-    attr: sinon.stub().returns('http://example.com')
+    attr: sinon.stub().returns('http://example.com'),
   }
   Helper.externalUrlLinkClick(event, elt)
   ok(event.preventDefault.calledOnce, 'preventDefault not called')
@@ -43,11 +43,11 @@ test('externalUrlLinkClick', () => {
 
 test('externalUrlLinkClick sanitizeUrl', () => {
   const event = {
-    preventDefault: sinon.spy()
+    preventDefault: sinon.spy(),
   }
   const elt = {
     // eslint-disable-next-line no-script-url
-    attr: sinon.stub().returns('javascript:alert("hi")')
+    attr: sinon.stub().returns('javascript:alert("hi")'),
   }
   Helper.externalUrlLinkClick(event, elt)
   ok(event.preventDefault.calledOnce, 'preventDefault not called')

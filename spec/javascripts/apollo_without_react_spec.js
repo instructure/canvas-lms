@@ -33,7 +33,7 @@ QUnit.module('Apollo without React demo spec', hooks => {
     createClient()
       .query({
         query: COURSE_INFO_QUERY,
-        variables: {id: courseId}
+        variables: {id: courseId},
       })
       .then(({data}) => {
         const {id, name} = data.course
@@ -46,34 +46,34 @@ QUnit.module('Apollo without React demo spec', hooks => {
       {
         request: {
           query: COURSE_INFO_QUERY,
-          variables: {id: 'GOOD'}
+          variables: {id: 'GOOD'},
         },
         result: {
           data: {
             course: {
               id: 'asdf',
               name: 'First Course',
-              __typename: 'Course'
-            }
-          }
-        }
+              __typename: 'Course',
+            },
+          },
+        },
       },
       {
         request: {
           query: COURSE_INFO_QUERY,
-          variables: {id: 'ERR1'}
+          variables: {id: 'ERR1'},
         },
         result: {
-          errors: [{message: 'uh oh graphql response error'}]
-        }
+          errors: [{message: 'uh oh graphql response error'}],
+        },
       },
       {
         request: {
           query: COURSE_INFO_QUERY,
-          variables: {id: 'ERR2'}
+          variables: {id: 'ERR2'},
         },
-        error: new Error('uh oh transport or other kind of error')
-      }
+        error: new Error('uh oh transport or other kind of error'),
+      },
     ])
   })
 

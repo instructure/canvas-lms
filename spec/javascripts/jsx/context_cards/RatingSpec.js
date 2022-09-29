@@ -44,7 +44,7 @@ QUnit.module('StudentContextTray/Rating', () => {
         <Rating
           label="Participation"
           metric={{
-            level: participationsLevel
+            level: participationsLevel,
           }}
         />
       )

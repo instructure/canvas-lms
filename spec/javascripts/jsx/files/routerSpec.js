@@ -25,7 +25,7 @@ QUnit.module('Files Client-side Router')
 
 test('getFolderSplat returns the proper splat on ctx given uri characters', () => {
   const fakeCtx = {
-    pathname: '/folder/this#could+be bad? maybe'
+    pathname: '/folder/this#could+be bad? maybe',
   }
 
   router.getFolderSplat(fakeCtx, fakeNext)
@@ -35,7 +35,7 @@ test('getFolderSplat returns the proper splat on ctx given uri characters', () =
 
 test('getFolderSplat returns the proper splat on ctx with multiple levels', () => {
   const fakeCtx = {
-    pathname: '/folder/this#could+be bad? maybe/another?bad folder/something else'
+    pathname: '/folder/this#could+be bad? maybe/another?bad folder/something else',
   }
 
   router.getFolderSplat(fakeCtx, fakeNext)

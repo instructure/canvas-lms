@@ -43,11 +43,17 @@ QUnit.module('GradingStandard', suiteHooks => {
         context_id: '1201',
         context_name: 'Calculus 101',
         context_type: 'Course',
-        data: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0]],
+        data: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['C', 0.7],
+          ['D', 0.6],
+          ['F', 0],
+        ],
         id: '5001',
-        title: 'Example Grading Scheme'
+        title: 'Example Grading Scheme',
       },
-      uniqueId: '5001'
+      uniqueId: '5001',
     }
 
     fakeENV.setup({context_asset_string: 'course_1201'})
@@ -507,7 +513,10 @@ QUnit.module('GradingStandard', suiteHooks => {
         removeRow(1)
         save()
         const {data} = getSavedGradingScheme()
-        deepEqual(data.map(datum => datum[0]), ['A', 'C', 'D', 'F'])
+        deepEqual(
+          data.map(datum => datum[0]),
+          ['A', 'C', 'D', 'F']
+        )
       })
     })
   })

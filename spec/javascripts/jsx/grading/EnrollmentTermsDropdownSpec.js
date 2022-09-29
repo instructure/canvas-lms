@@ -29,7 +29,7 @@ QUnit.module('EnrollmentTermsDropdown', {
   renderComponent() {
     const props = {
       terms: this.terms(),
-      changeSelectedEnrollmentTerm: sinon.spy()
+      changeSelectedEnrollmentTerm: sinon.spy(),
     }
     const element = React.createElement(Dropdown, props)
     return ReactDOM.render(element, wrapper)
@@ -44,7 +44,7 @@ QUnit.module('EnrollmentTermsDropdown', {
         endAt: new Date('2013-11-03T02:57:53.000Z'),
         createdAt: new Date('2013-07-27T16:51:41.000Z'),
         gradingPeriodGroupId: '3',
-        displayName: 'Fall 2013 - Art'
+        displayName: 'Fall 2013 - Art',
       },
       {
         id: '21',
@@ -53,7 +53,7 @@ QUnit.module('EnrollmentTermsDropdown', {
         endAt: new Date('2014-01-21T02:57:53.000Z'),
         createdAt: new Date('2013-08-27T16:51:41.000Z'),
         gradingPeriodGroupId: '3',
-        displayName: 'Winter 2013 - Art'
+        displayName: 'Winter 2013 - Art',
       },
       {
         id: '2',
@@ -62,7 +62,7 @@ QUnit.module('EnrollmentTermsDropdown', {
         endAt: new Date('2013-10-21T02:57:53.000Z'),
         createdAt: new Date('2013-08-22T16:51:41.000Z'),
         gradingPeriodGroupId: '2',
-        displayName: 'Term starting Sep 3, 2013'
+        displayName: 'Term starting Sep 3, 2013',
       },
       {
         id: '7',
@@ -71,31 +71,31 @@ QUnit.module('EnrollmentTermsDropdown', {
         endAt: null,
         createdAt: new Date('2013-08-23T16:51:41.000Z'),
         gradingPeriodGroupId: '2',
-        displayName: 'Term created Aug 23, 2013'
-      }
+        displayName: 'Term created Aug 23, 2013',
+      },
     ]
   },
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('includes an option for each term plus an option for "all terms"', function() {
+test('includes an option for each term plus an option for "all terms"', function () {
   const dropdown = this.renderComponent()
   const expectedOptionsCount = this.terms().length + 1
   const node = ReactDOM.findDOMNode(dropdown.refs.termsDropdown)
   equal(node.length, expectedOptionsCount)
 })
 
-test('starts by showing all enrollment terms', function() {
+test('starts by showing all enrollment terms', function () {
   const dropdown = this.renderComponent()
   const node = ReactDOM.findDOMNode(dropdown.refs.termsDropdown)
   const ALL_TERMS_ID = '0'
   equal(node.value, ALL_TERMS_ID)
 })
 
-test('calls changeSelectedEnrollmentTerm when a selection is made', function() {
+test('calls changeSelectedEnrollmentTerm when a selection is made', function () {
   const dropdown = this.renderComponent()
   const node = ReactDOM.findDOMNode(dropdown.refs.termsDropdown)
   node.value = '3'
@@ -103,7 +103,7 @@ test('calls changeSelectedEnrollmentTerm when a selection is made', function() {
   ok(dropdown.props.changeSelectedEnrollmentTerm.calledOnce)
 })
 
-test("displays the terms in descending order by start date then created date if start date doesn't exist", function() {
+test("displays the terms in descending order by start date then created date if start date doesn't exist", function () {
   const dropdown = this.renderComponent()
   const node = ReactDOM.findDOMNode(dropdown.refs.termsDropdown)
   const optionIDs = _.pluck(node.getElementsByTagName('OPTION'), 'value')

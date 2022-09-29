@@ -34,14 +34,14 @@ const applicationState = {
         updated_at: new Date(0).toString(),
         permissions: {
           update: true,
-          delete: true
-        }
-      }
-    ]
+          delete: true,
+        },
+      },
+    ],
   },
   ltiCollaborators: {
-    ltiCollaboratorsData: []
-  }
+    ltiCollaboratorsData: [],
+  },
 }
 
 function setEnvironment() {
@@ -56,8 +56,8 @@ test('renders the getting started component when there are no collaborations', (
   const appState = {
     ...applicationState,
     listCollaborations: {
-      list: []
-    }
+      list: [],
+    },
   }
   const component = TestUtils.renderIntoDocument(
     <CollaborationsApp applicationState={appState} actions={{}} />

@@ -24,9 +24,9 @@ const fakeStore = {
   findAppByShortName() {
     return {
       short_name: 'someApp',
-      config_options: []
+      config_options: [],
     }
-  }
+  },
 }
 
 const component = TestUtils.renderIntoDocument(

@@ -36,7 +36,7 @@ QUnit.module('Move Multiple Question Banks', {
 
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('is an object', () => {

@@ -33,10 +33,10 @@ QUnit.module('SearchGradingPeriodsField', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('onChange trims the search text and sends it to the parent component to filter', function() {
+test('onChange trims the search text and sends it to the parent component to filter', function () {
   const searchField = this.renderComponent()
   sandbox.spy(searchField, 'search')
   const input = ReactDOM.findDOMNode(searchField.refs.input)

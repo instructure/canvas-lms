@@ -53,7 +53,7 @@ const makeProps = (props = {}) =>
           id: '5',
           display_name: 'John Smith',
           html_url: '',
-          avatar_image_url: null
+          avatar_image_url: null,
         },
         read_state: 'unread',
         unread_count: 0,
@@ -61,14 +61,14 @@ const makeProps = (props = {}) =>
         locked: false,
         html_url: '',
         user_count: 10,
-        last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0)
+        last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0),
       },
       canPublish: false,
       masterCourseData: {},
       setCopyTo: () => {},
       setSendToOpen: () => {},
       DIRECT_SHARE_ENABLED: false,
-      dateFormatter
+      dateFormatter,
     },
     props
   )
@@ -296,9 +296,9 @@ test('renders due date if graded with a due date', () => {
   const props = makeProps({
     discussion: {
       assignment: {
-        due_at: '2018-07-01T05:59:00Z'
-      }
-    }
+        due_at: '2018-07-01T05:59:00Z',
+      },
+    },
   })
   const tree = mount(<DiscussionRow {...props} />)
   let node = tree.find('.due-date')
@@ -310,8 +310,8 @@ test('renders due date if graded with a due date', () => {
 test('renders to do date if ungraded with a to do date', () => {
   const props = makeProps({
     discussion: {
-      todo_date: '2018-07-01T05:59:00Z'
-    }
+      todo_date: '2018-07-01T05:59:00Z',
+    },
   })
   const tree = mount(<DiscussionRow {...props} />)
   let node = tree.find('.todo-date')
@@ -339,8 +339,8 @@ test('renders the SectionsTooltip component with sections', () => {
   const discussion = {
     sections: [
       {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
-    ]
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1},
+    ],
   }
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
@@ -353,9 +353,9 @@ test('includes Anonymous Discussion prefix when discussion is anonymous', () => 
   const discussion = {
     sections: [
       {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1},
     ],
-    anonymous_state: 'full_anonymity'
+    anonymous_state: 'full_anonymity',
   }
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   equal(
@@ -372,9 +372,9 @@ test('includes Partially Anonymous Discussion prefix when discussion is anonymou
   const discussion = {
     sections: [
       {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1},
     ],
-    anonymous_state: 'partial_anonymity'
+    anonymous_state: 'partial_anonymity',
   }
   const tree = mount(<DiscussionRow {...makeProps({discussion})} />)
   equal(
@@ -456,7 +456,7 @@ test('does not insert the manage menu list if we have not clicked it yet', () =>
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        onMoveDiscussion: () => {}
+        onMoveDiscussion: () => {},
       })}
     />
   )
@@ -476,7 +476,7 @@ test('manage menu items do appear upon click', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        onMoveDiscussion: () => {}
+        onMoveDiscussion: () => {},
       })}
     />
   )
@@ -513,7 +513,7 @@ test('only leaves pin/unpin open/close for comments, and delete when inaccessibl
         displayDeleteMenuItem: true,
         displayPinMenuItem: true,
         displayLockMenuItem: true,
-        canPublish: true
+        canPublish: true,
       })}
     />
   )
@@ -548,14 +548,14 @@ test('opens the copyTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setCopyTo: copySpy
+    setCopyTo: copySpy,
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree.find('DiscussionManageMenu').find('button').simulate('click')
   document.querySelector('#copyTo-discussion-menu-option').click()
   deepEqual(copySpy.firstCall.args[0], {
     open: true,
-    selection: {discussion_topics: [props.discussion.id]}
+    selection: {discussion_topics: [props.discussion.id]},
   })
   tree.unmount()
 })
@@ -565,7 +565,7 @@ test('opens the sendTo tray when menu item is selected', () => {
   const props = makeProps({
     displayManageMenu: true,
     DIRECT_SHARE_ENABLED: true,
-    setSendTo: sendSpy
+    setSendTo: sendSpy,
   })
   const tree = mount(<DiscussionRow {...props} />)
   tree.find('DiscussionManageMenu').find('button').simulate('click')
@@ -574,8 +574,8 @@ test('opens the sendTo tray when menu item is selected', () => {
     open: true,
     selection: {
       content_type: 'discussion_topic',
-      content_id: props.discussion.id
-    }
+      content_id: props.discussion.id,
+    },
   })
   tree.unmount()
 })
@@ -587,7 +587,7 @@ test('renders available date and delayed date on graded discussions', () => {
         discussion: {
           assignment: {
             lock_at: '2018-07-01T05:59:00Z',
-            unlock_at: '2018-06-21T06:00:00Z'
+            unlock_at: '2018-06-21T06:00:00Z',
           },
           id: '1',
           position: 1,
@@ -600,7 +600,7 @@ test('renders available date and delayed date on graded discussions', () => {
             id: '5',
             display_name: 'John Smith',
             html_url: '',
-            avatar_image_url: null
+            avatar_image_url: null,
           },
           read_state: 'unread',
           unread_count: 0,
@@ -609,8 +609,8 @@ test('renders available date and delayed date on graded discussions', () => {
           html_url: '',
           user_count: 10,
           delayed_post_at: '2018-06-21T06:00:00Z',
-          last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0)
-        }
+          last_reply_at: new Date(2018, 1, 14, 0, 0, 0, 0),
+        },
       })}
     />
   )
@@ -626,7 +626,7 @@ test('renders move-to in manage menu if permitted', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        onMoveDiscussion: () => {}
+        onMoveDiscussion: () => {},
       })}
     />
   )
@@ -645,7 +645,7 @@ test('renders pin item in manage menu if permitted', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        displayPinMenuItem: true
+        displayPinMenuItem: true,
       })}
     />
   )
@@ -664,7 +664,7 @@ test('renders duplicate item in manage menu if permitted', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        displayDuplicateMenuItem: true
+        displayDuplicateMenuItem: true,
       })}
     />
   )
@@ -683,7 +683,7 @@ test('renders delete item in manage menu if permitted', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        displayDeleteMenuItem: true
+        displayDeleteMenuItem: true,
       })}
     />
   )
@@ -702,7 +702,7 @@ test('renders lock item in manage menu if permitted', () => {
     <DiscussionRow
       {...makeProps({
         displayManageMenu: true,
-        displayLockMenuItem: true
+        displayLockMenuItem: true,
       })}
     />
   )
@@ -722,9 +722,9 @@ test('renders mastery paths menu item if permitted', () => {
       {...makeProps({
         displayManageMenu: true,
         discussion: {
-          assignment_id: 2
+          assignment_id: 2,
         },
-        displayMasteryPathsMenuItem: true
+        displayMasteryPathsMenuItem: true,
       })}
     />
   )
@@ -744,9 +744,9 @@ test('renders mastery paths link if permitted', () => {
       {...makeProps({
         displayManageMenu: true,
         discussion: {
-          assignment_id: 2
+          assignment_id: 2,
         },
-        displayMasteryPathsLink: true
+        displayMasteryPathsLink: true,
       })}
     />
   )
@@ -766,9 +766,9 @@ test('renders ltiTool menu if there are some', () => {
             base_url: 'test.com',
             canvas_icon_class: 'icon-lti',
             icon_url: 'iconUrltest.com',
-            title: 'discussion_topic_menu Text'
-          }
-        ]
+            title: 'discussion_topic_menu Text',
+          },
+        ],
       })}
     />
   )
@@ -792,15 +792,15 @@ test('renders multiple ltiTool menu if there are multiple', () => {
             base_url: 'test.com',
             canvas_icon_class: 'icon-lti',
             icon_url: 'iconUrltest.com',
-            title: 'discussion_topic_menu Text'
+            title: 'discussion_topic_menu Text',
           },
           {
             base_url: 'test2.com',
             canvas_icon_class: 'icon-lti',
             icon_url: 'iconUrltest2.com',
-            title: 'discussion_topic_menu otherText'
-          }
-        ]
+            title: 'discussion_topic_menu otherText',
+          },
+        ],
       })}
     />
   )

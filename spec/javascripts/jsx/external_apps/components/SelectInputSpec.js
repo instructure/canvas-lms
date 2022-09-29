@@ -36,7 +36,7 @@ const createElement = data => (
   />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const inputNode = component.refs.input
   const hintNode = component.refs.hintText
@@ -46,7 +46,7 @@ const getDOMNodes = function(data) {
 QUnit.module('ExternalApps.SelectInput', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {
@@ -56,13 +56,13 @@ test('renders', () => {
       WI: 'Wisconsin',
       TX: 'Texas',
       UT: 'Utah',
-      AL: 'Alabama'
+      AL: 'Alabama',
     },
     label: 'State',
     id: 'state',
     required: true,
     hintText: 'Select State',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, data.defaultValue)
@@ -78,13 +78,13 @@ test('renders without hint text and required', () => {
       WI: 'Wisconsin',
       TX: 'Texas',
       UT: 'Utah',
-      AL: 'Alabama'
+      AL: 'Alabama',
     },
     label: 'State',
     id: 'state',
     required: false,
     hintText: null,
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, data.defaultValue)
@@ -101,13 +101,13 @@ test('renders with error hint text', () => {
       WI: 'Wisconsin',
       TX: 'Texas',
       UT: 'Utah',
-      AL: 'Alabama'
+      AL: 'Alabama',
     },
     label: 'State',
     id: 'state',
     required: true,
     hintText: null,
-    errors: {state: 'Must be present'}
+    errors: {state: 'Must be present'},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   equal(inputNode.value, '')
@@ -121,7 +121,7 @@ test('modifies state when text is entered', () => {
     id: 'state',
     required: true,
     hintText: 'Select State',
-    errors: {}
+    errors: {},
   }
   const [component, inputNode, hintNode] = Array.from(getDOMNodes(data))
   Simulate.click(inputNode)

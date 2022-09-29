@@ -30,12 +30,12 @@ QUnit.module('BlueprintCourse app', {
       blueprint = null
     }
     container.innerHTML = ''
-  }
+  },
 })
 
 const defaultData = () =>
   Object.assign(select(getSampleData(), ['terms', 'masterCourse', ['childCourse', 'course']]), {
-    canManageCourse: true
+    canManageCourse: true,
   })
 
 test('mounts BlueprintSidebar to container component', () => {
@@ -63,7 +63,7 @@ test('change log route onEnter calls app showChangeLog with params from URL', ()
   deepEqual(blueprint.app.showChangeLog.getCall(0).args[0], {
     blueprintType: 'template',
     templateId: '2',
-    changeId: '3'
+    changeId: '3',
   })
 
   blueprint.app.hideChangeLog = sinon.spy()

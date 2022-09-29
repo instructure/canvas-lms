@@ -29,7 +29,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
     const assignmentSortOptions = [
       ['Assignment Group', 'assignment_group'],
       ['Due Date', 'due_date'],
-      ['Name', 'title']
+      ['Name', 'title'],
     ]
 
     const courses = [
@@ -38,17 +38,17 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       {id: '21', nickname: 'Airbending', url: '/courses/21/grades', gradingPeriodSetId: '3'},
       {id: '42', nickname: 'Waterbending', url: '/courses/42/grades', gradingPeriodSetId: '3'},
       {id: '51', nickname: 'Earthbending', url: '/courses/51/grades', gradingPeriodSetId: null},
-      {id: '60', nickname: 'Firebending', url: '/courses/60/grades', gradingPeriodSetId: '4'}
+      {id: '60', nickname: 'Firebending', url: '/courses/60/grades', gradingPeriodSetId: '4'},
     ]
 
     const gradingPeriods = [
       {id: '9', title: 'Fall Semester'},
-      {id: '12', title: 'Spring Semester'}
+      {id: '12', title: 'Spring Semester'},
     ]
 
     const students = [
       {id: '7', name: 'Bob Smith'},
-      {id: '11', name: 'Jane Doe'}
+      {id: '11', name: 'Jane Doe'},
     ]
 
     props = {
@@ -63,7 +63,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
       selectedCourseID: '2',
       selectedGradingPeriodID: '9',
       selectedStudentID: '11',
-      students
+      students,
     }
   })
 
@@ -101,7 +101,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
 
   test('does not render a grading period select menu if passed no grading periods', () => {
     wrapper = mount(<SelectMenuGroup {...props} gradingPeriods={[]} />, {
-      attachTo: document.getElementById('fixtures')
+      attachTo: document.getElementById('fixtures'),
     })
     strictEqual(wrapper.find('SelectMenu#grading_period_select_menu').length, 0)
   })
@@ -137,13 +137,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   test('disables the course select menu if the grading period select menu has changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
     makeSelection(wrapper, 'grading_period_select_menu', '12')
-    strictEqual(
-      wrapper
-        .find('#course_select_menu')
-        .last()
-        .getDOMNode().disabled,
-      true
-    )
+    strictEqual(wrapper.find('#course_select_menu').last().getDOMNode().disabled, true)
   })
 
   test('disables the course select menu if the assignment sort order select menu has changed', () => {
@@ -177,10 +171,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
 
   test('enables the submit button if a select menu options is changed', () => {
     wrapper = mount(<SelectMenuGroup {...props} />, {attachTo: document.getElementById('fixtures')})
-    const submitButton = wrapper
-      .find('#apply_select_menus')
-      .hostNodes()
-      .getDOMNode()
+    const submitButton = wrapper.find('#apply_select_menus').hostNodes().getDOMNode()
 
     strictEqual(submitButton.disabled, true)
     makeSelection(wrapper, 'student_select_menu', '7')
@@ -197,7 +188,7 @@ QUnit.module('SelectMenuGroup', suiteHooks => {
   test('calls saveAssignmentOrder when the button is clicked, if assignment order has changed', () => {
     const stub = sinon.stub().resolves()
     wrapper = mount(<SelectMenuGroup {...props} saveAssignmentOrder={stub} />, {
-      attachTo: document.getElementById('fixtures')
+      attachTo: document.getElementById('fixtures'),
     })
     makeSelection(wrapper, 'assignment_sort_order_select_menu', 'title')
     const submitButton = wrapper.find('button#apply_select_menus')

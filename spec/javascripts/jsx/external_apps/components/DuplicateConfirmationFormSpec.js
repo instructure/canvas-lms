@@ -34,13 +34,13 @@ const props = {
   onError: sinon.spy(),
   toolData: {},
   configurationType: '',
-  store: {}
+  store: {},
 }
 
 QUnit.module('DuplicateConfirmationForm', {
   teardown() {
     document.querySelector('#fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('renders the component', () => {

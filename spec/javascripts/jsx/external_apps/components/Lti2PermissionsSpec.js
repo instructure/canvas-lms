@@ -32,7 +32,7 @@ test('renders', () => {
           description: null,
           enabled: false,
           installed_locally: true,
-          name: 'Twitter'
+          name: 'Twitter',
         }}
         handleCancelLti2={() => {}}
         handleActivateLti2={() => {}}

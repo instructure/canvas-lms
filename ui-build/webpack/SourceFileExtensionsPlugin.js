@@ -143,7 +143,7 @@ class SourceFileExtensionsPlugin {
       const extendedModule = generateExtendedModule({
         context: tmpDir,
         sourceFile,
-        extensionFiles
+        extensionFiles,
       })
 
       fs.writeFileSync(extendedFile, extendedModule, 'utf8')

@@ -34,7 +34,7 @@ QUnit.module('RailsFlashNotificationsHelper#holderReady', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('returns false if holder is initilialized without the flash message holder in the DOM', () => {
@@ -62,7 +62,7 @@ test('returns true after the holder is initialized with flash message holder in 
 QUnit.module('RailsFlashNotificationsHelper#getIconType', {
   setup() {
     helper = new NotificationsHelper()
-  }
+  },
 })
 
 test('returns check when given success', () => {
@@ -84,7 +84,7 @@ test('returns info when given any other input', () => {
 QUnit.module('RailsFlashNotificationsHelper#generateNodeHTML', {
   setup() {
     helper = new NotificationsHelper()
-  }
+  },
 })
 
 test('properly injects type, icon, and content into html', () => {
@@ -104,7 +104,7 @@ QUnit.module('RailsFlashNotificationsHelper#createNode', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('does not create a node before the holder is initialized', () => {
@@ -208,7 +208,7 @@ QUnit.module('RailsFlashNotificationsHelper#screenreaderHolderReady', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('returns false if screenreader holder is initialized without the screenreader message holder in the DOM', () => {
@@ -242,7 +242,7 @@ QUnit.module('RailsFlashNotificationsHelper#setScreenreaderAttributes', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('does not apply attributes if screenreader holder is not initialized', () => {
@@ -285,7 +285,7 @@ QUnit.module('RailsFlashNotificationsHelper#resetScreenreaderAttributes', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('does not break when the screen reader holder is not initialized', () => {
@@ -324,7 +324,7 @@ test('does not break when attributes do not exist', () => {
 QUnit.module('RailsFlashNotificationsHelper#generateScreenreaderNodeHTML', {
   setup() {
     helper = new NotificationsHelper()
-  }
+  },
 })
 
 test('properly injects content into html', () => {
@@ -355,7 +355,7 @@ QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNode', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('creates a screenreader node', () => {
@@ -376,7 +376,7 @@ QUnit.module('RailsFlashNotificationsHelper#createScreenreaderNodeExclusive', {
   },
   teardown() {
     fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('properly clears existing screenreader nodes and creates a new one', () => {
@@ -410,7 +410,7 @@ test('optionally toggles polite aria-live', () => {
 QUnit.module('RailsFlashNotificationsHelper#escapeContent', {
   setup() {
     helper = new NotificationsHelper()
-  }
+  },
 })
 
 test('returns html if content has html property', () => {

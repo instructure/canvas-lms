@@ -38,10 +38,10 @@ QUnit.module('CourseTabContainer', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('tabs are present when there are grading periods', function() {
+test('tabs are present when there are grading periods', function () {
   this.renderComponent({hasGradingPeriods: true})
   const $el = this.wrapper.getDOMNode()
   strictEqual($el.querySelectorAll('.ui-tabs').length, 1)
@@ -50,39 +50,39 @@ test('tabs are present when there are grading periods', function() {
   equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
 })
 
-test('tabs are not present when there are no grading periods', function() {
+test('tabs are not present when there are no grading periods', function () {
   this.renderComponent({hasGradingPeriods: false})
   equal(this.wrapper.find('.ui-tabs').length, 0)
 })
 
-test('jquery-ui tabs() is called when there are grading periods', function() {
+test('jquery-ui tabs() is called when there are grading periods', function () {
   const tabsSpy = sandbox.spy($.fn, 'tabs')
   this.renderComponent({hasGradingPeriods: true})
   ok(tabsSpy.calledOnce)
 })
 
-test('jquery-ui tabs() is not called when there are no grading periods', function() {
+test('jquery-ui tabs() is not called when there are no grading periods', function () {
   const tabsSpy = sandbox.spy($.fn, 'tabs')
   this.renderComponent({hasGradingPeriods: false})
   notOk(tabsSpy.called)
 })
 
-test('does not render grading periods if there are no grading periods', function() {
+test('does not render grading periods if there are no grading periods', function () {
   this.renderComponent({hasGradingPeriods: false})
   notOk(this.wrapper.instance().gradingPeriods)
 })
 
-test('renders the grading periods if there are grading periods', function() {
+test('renders the grading periods if there are grading periods', function () {
   this.renderComponent({hasGradingPeriods: true})
   ok(this.wrapper.instance().gradingPeriods)
 })
 
-test('renders the grading standards if there are no grading periods', function() {
+test('renders the grading standards if there are no grading periods', function () {
   this.renderComponent({hasGradingPeriods: false})
   ok(this.wrapper.instance().gradingStandards)
 })
 
-test('renders the grading standards if there are grading periods', function() {
+test('renders the grading standards if there are grading periods', function () {
   this.renderComponent({hasGradingPeriods: true})
   ok(this.wrapper.instance().gradingStandards)
 })

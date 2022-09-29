@@ -32,7 +32,7 @@ QUnit.module('RosterUserViewSpec', {
     existingENV = window.ENV
     window.ENV.permissions = {
       can_allow_course_admin_actions: true,
-      manage_students: true
+      manage_students: true,
     }
     window.ENV.course = {id: 1}
 
@@ -41,10 +41,10 @@ QUnit.module('RosterUserViewSpec', {
         id: 1,
         enrollments: [
           {
-            id: 1
-          }
-        ]
-      })
+            id: 1,
+          },
+        ],
+      }),
     })
 
     rosterViewTwo = new RosterUserView({
@@ -52,10 +52,10 @@ QUnit.module('RosterUserViewSpec', {
         id: 2,
         enrollments: [
           {
-            id: 1
-          }
-        ]
-      })
+            id: 1,
+          },
+        ],
+      }),
     })
 
     server = sinon.fakeServer.create()
@@ -73,7 +73,7 @@ QUnit.module('RosterUserViewSpec', {
     window.ENV = existingENV
     server.restore()
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('moves focus to previous user when deleting a user in the middle', () => {

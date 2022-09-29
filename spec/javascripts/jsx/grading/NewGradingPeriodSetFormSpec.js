@@ -27,12 +27,12 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const wrapper = document.getElementById('fixtures')
 
-const assertDisabled = function(component) {
+const assertDisabled = function (component) {
   const $el = ReactDOM.findDOMNode(component)
   strictEqual($el.getAttribute('disabled'), '')
 }
 
-const assertEnabled = function(component) {
+const assertEnabled = function (component) {
   const $el = ReactDOM.findDOMNode(component)
   strictEqual($el.getAttribute('disabled'), null)
 }
@@ -44,7 +44,7 @@ const exampleSet = {
   displayTotalsForAllGradingPeriods: false,
   gradingPeriods: [],
   permissions: {read: true, update: true, delete: true, create: true},
-  createdAt: '2013-06-03T02:57:42Z'
+  createdAt: '2013-06-03T02:57:42Z',
 }
 
 QUnit.module('NewGradingPeriodSetForm', {
@@ -55,9 +55,9 @@ QUnit.module('NewGradingPeriodSetForm', {
       addGradingPeriodSet() {},
       urls: {
         gradingPeriodSetsURL: 'api/v1/accounts/1/grading_period_sets',
-        enrollmentTermsURL: 'api/v1/accounts/1/enrollment_terms'
+        enrollmentTermsURL: 'api/v1/accounts/1/enrollment_terms',
       },
-      readOnly: false
+      readOnly: false,
     }
     const element = React.createElement(NewSetForm, _.defaults(props, defaultProps))
     return ReactDOM.render(element, wrapper)
@@ -78,25 +78,25 @@ QUnit.module('NewGradingPeriodSetForm', {
   teardown() {
     FlashAlert.destroyContainer()
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('initially renders with the create button not disabled', function() {
+test('initially renders with the create button not disabled', function () {
   const form = this.renderComponent()
   assertEnabled(form.refs.createButton)
 })
 
-test('initially renders with the cancel button not disabled', function() {
+test('initially renders with the cancel button not disabled', function () {
   const form = this.renderComponent()
   assertEnabled(form.refs.cancelButton)
 })
 
-test('initially renders with the "Display totals for All Grading Periods option" checkbox unchecked', function() {
+test('initially renders with the "Display totals for All Grading Periods option" checkbox unchecked', function () {
   const form = this.renderComponent()
   notOk(form.displayTotalsCheckbox._input.checked)
 })
 
-test('disables the create button when it is clicked', function() {
+test('disables the create button when it is clicked', function () {
   const promise = this.stubCreateSuccess()
   const form = this.renderComponent()
   Simulate.change(form.refs.titleInput, {target: {value: 'Cash me ousside'}})
@@ -106,7 +106,7 @@ test('disables the create button when it is clicked', function() {
   })
 })
 
-test('the "Display totals for All Grading Periods option" checkbox state is included when the set is created', function() {
+test('the "Display totals for All Grading Periods option" checkbox state is included when the set is created', function () {
   const promise = this.stubCreateSuccess()
   const addSetStub = sinon.stub()
   const form = this.renderComponent({addGradingPeriodSet: addSetStub})
@@ -119,7 +119,7 @@ test('the "Display totals for All Grading Periods option" checkbox state is incl
   })
 })
 
-test('disables the cancel button when the create button is clicked', function() {
+test('disables the cancel button when the create button is clicked', function () {
   const promise = this.stubCreateSuccess()
   const form = this.renderComponent()
   Simulate.change(form.refs.titleInput, {target: {value: 'Watch me whip'}})
@@ -130,21 +130,21 @@ test('disables the cancel button when the create button is clicked', function() 
   })
 })
 
-test('updates weighted state when checkbox is clicked', function() {
+test('updates weighted state when checkbox is clicked', function () {
   const form = this.renderComponent()
   equal(form.state.weighted, false)
   form.weightedCheckbox.handleChange({target: {checked: true}})
   equal(form.state.weighted, true)
 })
 
-test('re-enables the cancel button when the ajax call fails', function() {
+test('re-enables the cancel button when the ajax call fails', function () {
   const fakePromise = {
     then() {
       return fakePromise
     },
     catch(handler) {
       handler(new Error('FAIL'))
-    }
+    },
   }
   sandbox.stub(setsApi, 'create').returns(fakePromise)
   const form = this.renderComponent()
@@ -153,14 +153,14 @@ test('re-enables the cancel button when the ajax call fails', function() {
   assertEnabled(form.refs.cancelButton)
 })
 
-test('re-enables the create button when the ajax call fails', function() {
+test('re-enables the create button when the ajax call fails', function () {
   const fakePromise = {
     then() {
       return fakePromise
     },
     catch(handler) {
       handler(new Error('FAIL'))
-    }
+    },
   }
   sandbox.stub(setsApi, 'create').returns(fakePromise)
   const form = this.renderComponent()
@@ -169,7 +169,7 @@ test('re-enables the create button when the ajax call fails', function() {
   assertEnabled(form.refs.createButton)
 })
 
-test('showFlashAlert is not called when title is present', function() {
+test('showFlashAlert is not called when title is present', function () {
   const form = this.renderComponent()
   form.setState({title: 'foo'})
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
@@ -177,53 +177,53 @@ test('showFlashAlert is not called when title is present', function() {
   strictEqual(showFlashAlertStub.callCount, 0)
 })
 
-test('showFlashAlert called when title is not present', function() {
+test('showFlashAlert called when title is not present', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.isTitlePresent()
   strictEqual(showFlashAlertStub.callCount, 1)
 })
 
-test('showFlashAlert called with message when title is not present', function() {
+test('showFlashAlert called with message when title is not present', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.isTitlePresent()
   deepEqual(showFlashAlertStub.firstCall.args[0], {
     type: 'error',
-    message: 'A name for this set is required'
+    message: 'A name for this set is required',
   })
 })
 
-test('submitSucceeded calls showFlashAlert once', function() {
+test('submitSucceeded calls showFlashAlert once', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.submitSucceeded({})
   deepEqual(showFlashAlertStub.callCount, 1)
 })
 
-test('submitSucceeded calls showFlashAlert with message', function() {
+test('submitSucceeded calls showFlashAlert with message', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.submitSucceeded()
   deepEqual(showFlashAlertStub.firstCall.args[0], {
     type: 'success',
-    message: 'Successfully created a set'
+    message: 'Successfully created a set',
   })
 })
 
-test('submitFailed calls showFlashAlert once', function() {
+test('submitFailed calls showFlashAlert once', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.submitFailed()
   deepEqual(showFlashAlertStub.callCount, 1)
 })
 
-test('submitFailed calls showFlashAlert with message', function() {
+test('submitFailed calls showFlashAlert with message', function () {
   const form = this.renderComponent()
   const showFlashAlertStub = sandbox.stub(FlashAlert, 'showFlashAlert')
   form.submitFailed()
   deepEqual(showFlashAlertStub.firstCall.args[0], {
     type: 'error',
-    message: 'There was a problem submitting your set'
+    message: 'There was a problem submitting your set',
   })
 })

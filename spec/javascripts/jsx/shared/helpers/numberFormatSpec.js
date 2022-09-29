@@ -25,7 +25,7 @@ QUnit.module('numberFormat _format', {
     if (I18n.n.restore) {
       I18n.n.restore()
     }
-  }
+  },
 })
 
 test('passes through non-numbers', () => {

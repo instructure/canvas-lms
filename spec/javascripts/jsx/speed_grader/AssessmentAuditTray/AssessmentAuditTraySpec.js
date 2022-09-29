@@ -48,13 +48,13 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
       assignment: {
         gradesPublishedAt: '2015-05-04T12:00:00.000Z',
         id: '2301',
-        pointsPossible: 10
+        pointsPossible: 10,
       },
       courseId: '1201',
       submission: {
         id: '2501',
-        score: 9.5
-      }
+        score: 9.5,
+      },
     }
 
     renderTray()
@@ -167,11 +167,11 @@ QUnit.module('AssessmentAuditTray', suiteHooks => {
               eventType: 'grades_posted',
               id: '4901',
               payload: {
-                grades_published_at: [null, '2018-08-28T16:46:43Z']
+                grades_published_at: [null, '2018-08-28T16:46:43Z'],
               },
               submissionId: '2501',
-              userId: '1101'
-            }
+              userId: '1101',
+            },
           ]
           const users = [{id: '1101', name: 'A mildly discomfited grader', role: 'grader'}]
           const externalTools = [{id: '21', name: 'Bulldog Tool', role: 'grader'}]

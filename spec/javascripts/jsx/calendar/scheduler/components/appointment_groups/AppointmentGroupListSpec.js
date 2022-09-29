@@ -28,10 +28,10 @@ test('renders the AppointmentGroupList component', () => {
       {
         child_events: [{user: {sortable_name: 'test'}}],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-18T110:00:00Z'
-      }
+        end_at: '2016-10-18T110:00:00Z',
+      },
     ],
-    appointments_count: 1
+    appointments_count: 1,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -50,19 +50,19 @@ test('renders renders reserved badge when someone is signed up in a slot', () =>
       {
         child_events: [
           {
-            user: {sortable_name: test}
-          }
+            user: {sortable_name: test},
+          },
         ],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-18T110:00:00Z'
+        end_at: '2016-10-18T110:00:00Z',
       },
       {
         child_events: [],
         start_at: '2016-10-18T16:00:00Z',
-        end_at: '2016-10-18T17:00:00Z'
-      }
+        end_at: '2016-10-18T17:00:00Z',
+      },
     ],
-    appointments_count: 2
+    appointments_count: 2,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -81,15 +81,15 @@ test('renders available badge when no one is signed up', () => {
       {
         child_events: [],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-18T110:00:00Z'
+        end_at: '2016-10-18T110:00:00Z',
       },
       {
         child_events: [],
         start_at: '2016-10-18T16:00:00Z',
-        end_at: '2016-10-18T17:00:00Z'
-      }
+        end_at: '2016-10-18T17:00:00Z',
+      },
     ],
-    appointments_count: 2
+    appointments_count: 2,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -108,24 +108,24 @@ test('renders correct user names', () => {
       {
         child_events: [
           {
-            user: {sortable_name: 'test1'}
-          }
+            user: {sortable_name: 'test1'},
+          },
         ],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-18T110:00:00Z'
+        end_at: '2016-10-18T110:00:00Z',
       },
       {
         child_events: [
           {
-            user: {sortable_name: 'test2'}
-          }
+            user: {sortable_name: 'test2'},
+          },
         ],
         start_at: '2016-10-18T16:00:00Z',
-        end_at: '2016-10-18T17:00:00Z'
-      }
+        end_at: '2016-10-18T17:00:00Z',
+      },
     ],
     appointments_count: 2,
-    participants_per_appointment: 1
+    participants_per_appointment: 1,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -146,24 +146,24 @@ test('renders correct group names', () => {
       {
         child_events: [
           {
-            group: {name: 'test1'}
-          }
+            group: {name: 'test1'},
+          },
         ],
         start_at: '2016-10-18T19:00:00Z',
-        end_at: '2016-10-18T110:00:00Z'
+        end_at: '2016-10-18T110:00:00Z',
       },
       {
         child_events: [
           {
-            group: {name: 'test2'}
-          }
+            group: {name: 'test2'},
+          },
         ],
         start_at: '2016-10-18T16:00:00Z',
-        end_at: '2016-10-18T17:00:00Z'
-      }
+        end_at: '2016-10-18T17:00:00Z',
+      },
     ],
     appointments_count: 2,
-    participants_per_appointment: 1
+    participants_per_appointment: 1,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -184,29 +184,29 @@ test('renders "Available" at the end of the user list if more appointments are a
       {
         child_events: [
           {
-            user: {sortable_name: 'test1'}
-          }
+            user: {sortable_name: 'test1'},
+          },
         ],
         start_at: '2016-10-18T19:00:00Z',
         end_at: '2016-10-18T110:00:00Z',
-        child_events_count: 1
+        child_events_count: 1,
       },
       {
         child_events: [
           {
-            user: {sortable_name: 'test2'}
+            user: {sortable_name: 'test2'},
           },
           {
-            user: {sortable_name: 'test3'}
-          }
+            user: {sortable_name: 'test3'},
+          },
         ],
         start_at: '2016-10-18T16:00:00Z',
         end_at: '2016-10-18T17:00:00Z',
-        child_events_count: 2
-      }
+        child_events_count: 2,
+      },
     ],
     appointments_count: 2,
-    participants_per_appointment: 2
+    participants_per_appointment: 2,
   }
 
   const component = TestUtils.renderIntoDocument(
@@ -227,29 +227,29 @@ test('renders date at start of datestring to accommodate multi-date events', () 
       {
         child_events: [
           {
-            user: {sortable_name: 'test1'}
-          }
+            user: {sortable_name: 'test1'},
+          },
         ],
         start_at: '2016-10-18T19:00:00Z',
         end_at: '2016-10-19T00:00:00Z',
-        child_events_count: 1
+        child_events_count: 1,
       },
       {
         child_events: [
           {
-            user: {sortable_name: 'test2'}
+            user: {sortable_name: 'test2'},
           },
           {
-            user: {sortable_name: 'test3'}
-          }
+            user: {sortable_name: 'test3'},
+          },
         ],
         start_at: '2016-10-19T16:00:00Z',
         end_at: '2016-10-19T17:00:00Z',
-        child_events_count: 2
-      }
+        child_events_count: 2,
+      },
     ],
     appointments_count: 2,
-    participants_per_appointment: 2
+    participants_per_appointment: 2,
   }
 
   const component = TestUtils.renderIntoDocument(

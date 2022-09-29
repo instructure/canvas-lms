@@ -29,15 +29,15 @@ const makeProps = (props = {}) =>
       router: {
         on: () => {},
         off: () => {},
-        header: {changeTypeFilter: _newState => {}}
+        header: {changeTypeFilter: _newState => {}},
       },
       defaultFilter: 'foo',
       initialFilter: 'foo',
       filters: {
         foo: 'foo',
         bar: 'bar',
-        baz: 'baz'
-      }
+        baz: 'baz',
+      },
     },
     props
   )

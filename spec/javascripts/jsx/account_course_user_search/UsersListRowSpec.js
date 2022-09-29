@@ -25,18 +25,18 @@ const defaultProps = () => ({
   user: {
     id: '1',
     name: 'foo',
-    avatar_url: 'http://someurl'
+    avatar_url: 'http://someurl',
   },
   handlers: {
     handleOpenEditUserDialog() {},
     handleSubmitEditUserForm() {},
-    handleCloseEditUserDialog() {}
+    handleCloseEditUserDialog() {},
   },
   permissions: {
     can_masquerade: true,
     can_message_users: true,
-    can_edit_users: true
-  }
+    can_edit_users: true,
+  },
 })
 
 test('renders an avatar when needed', () => {
@@ -56,8 +56,8 @@ test('renders no actions if no permissions are present', () => {
     permissions: {
       can_masquerade: false,
       can_message_users: false,
-      can_edit_users: false
-    }
+      can_edit_users: false,
+    },
   }
   const wrapper = shallow(<UsersListRow {...propsWithNoPermissions} />)
   equal(wrapper.find('[data-testid="user-list-row-tooltip"]').length, 0)

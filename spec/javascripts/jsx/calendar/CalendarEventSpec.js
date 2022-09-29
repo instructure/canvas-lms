@@ -31,7 +31,7 @@ QUnit.module('Calendar', () => {
 
         server.for('/sections').respond([
           {status: 200, body: []},
-          {status: 200, body: []}
+          {status: 200, body: []},
         ])
 
         calendarEvent = new CalendarEvent({sections_url: '/sections'})

@@ -27,51 +27,51 @@ const folders = [
   {
     full_name: 'course files',
     id: 112,
-    parent_folder_id: null
+    parent_folder_id: null,
   },
   {
     full_name: 'course files/A',
     id: 113,
-    parent_folder_id: 112
+    parent_folder_id: 112,
   },
   {
     full_name: 'course files/C',
     id: 114,
-    parent_folder_id: 112
+    parent_folder_id: 112,
   },
   {
     full_name: 'course files/B',
     id: 115,
-    parent_folder_id: 112
+    parent_folder_id: 112,
   },
   {
     full_name: 'course files/NoFiles',
     id: 116,
-    parent_folder_id: 112
-  }
+    parent_folder_id: 112,
+  },
 ]
 
 const files = [
   {
     id: 1,
     folder_id: 112,
-    display_name: 'cf-1'
+    display_name: 'cf-1',
   },
   {
     id: 2,
     folder_id: 113,
-    display_name: 'A-1'
+    display_name: 'A-1',
   },
   {
     id: 3,
     folder_id: 114,
-    display_name: 'C-1'
+    display_name: 'C-1',
   },
   {
     id: 4,
     folder_id: 115,
-    display_name: 'B-1'
-  }
+    display_name: 'B-1',
+  },
 ]
 
 const setupServer = () => {
@@ -79,12 +79,12 @@ const setupServer = () => {
   server.respondWith('GET', /\/tests\/3\/files/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(files)
+    JSON.stringify(files),
   ])
   server.respondWith('GET', /\/tests\/3\/folders/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(folders)
+    JSON.stringify(folders),
   ])
   return server
 }
@@ -98,7 +98,7 @@ QUnit.module('FileSelectBox', {
 
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('it renders', function () {
@@ -142,7 +142,7 @@ QUnit.module('FileSelectBox with new_quizzes_modules_support enabled', {
   teardown() {
     window.ENV = this.reset_env
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('it renders Create instead of New', function () {

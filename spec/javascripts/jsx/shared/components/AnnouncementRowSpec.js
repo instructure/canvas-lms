@@ -37,17 +37,17 @@ const makeProps = (props = {}) =>
           id: '5',
           display_name: 'John Smith',
           html_url: '',
-          avatar_image_url: null
+          avatar_image_url: null,
         },
         read_state: 'unread',
         unread_count: 0,
         discussion_subentry_count: 5,
         locked: false,
         html_url: '',
-        user_count: 10
+        user_count: 10,
       },
       canManage: false,
-      masterCourseData: {}
+      masterCourseData: {},
     },
     props
   )
@@ -102,13 +102,7 @@ test('renders "Posted on" date label if announcement is not delayed', () => {
 test('renders the SectionsTooltip component if canHaveSections: true', () => {
   const announcement = {user_count: 200}
   const tree = mount(<AnnouncementRow {...makeProps({announcement, canHaveSections: true})} />)
-  equal(
-    tree
-      .find('SectionsTooltip Text')
-      .at(0)
-      .text(),
-    'All Sections'
-  )
+  equal(tree.find('SectionsTooltip Text').at(0).text(), 'All Sections')
 })
 
 test('does not render the SectionsTooltip component if canHaveSections: false', () => {
@@ -121,17 +115,11 @@ test('renders the SectionsTooltip component with sections', () => {
   const announcement = {
     sections: [
       {id: 6, course_id: 1, name: 'section 4', user_count: 2},
-      {id: 5, course_id: 1, name: 'section 2', user_count: 1}
-    ]
+      {id: 5, course_id: 1, name: 'section 2', user_count: 1},
+    ],
   }
   const tree = mount(<AnnouncementRow {...makeProps({announcement, canHaveSections: true})} />)
-  equal(
-    tree
-      .find('SectionsTooltip Text')
-      .at(0)
-      .text(),
-    '2 Sectionssection 4section 2'
-  )
+  equal(tree.find('SectionsTooltip Text').at(0).text(), '2 Sectionssection 4section 2')
 })
 
 test('does not render master course lock icon if masterCourseData is not provided', assert => {

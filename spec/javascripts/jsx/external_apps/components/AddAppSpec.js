@@ -30,7 +30,7 @@ const createElement = data => (
   <AddApp handleToolInstalled={data.handleToolInstalled} app={data.app} />
 )
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const addToolButtonNode = component.refs.addTool
   const modalNode = component.refs.modal
@@ -48,28 +48,28 @@ QUnit.module('ExternalApps.AddApp', {
       name: 'Acclaim',
       requires_secret: true,
       short_name: 'acclaim_app',
-      status: 'active'
+      status: 'active',
     }
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   const data = {
     handleToolInstalled,
-    app: this.app
+    app: this.app,
   }
   const [component, addToolButtonNode, modalNode] = Array.from(getDOMNodes(data))
   ok(component)
   ok(TestUtils.isCompositeComponentWithType(component, AddApp))
 })
 
-test('configOptions', function() {
+test('configOptions', function () {
   const data = {
     handleToolInstalled,
-    app: this.app
+    app: this.app,
   }
   const [component, addToolButtonNode, modalNode] = Array.from(getDOMNodes(data))
   const options = component.configOptions()
@@ -78,24 +78,24 @@ test('configOptions', function() {
   equal(options[2].props.name, 'shared_secret')
 })
 
-test('configSettings', function() {
+test('configSettings', function () {
   this.app.config_options = [{name: 'param1', param_type: 'text', default_value: 'val1'}]
   const data = {
     handleToolInstalled,
-    app: this.app
+    app: this.app,
   }
   const [component, addToolButtonNode, modalNode] = Array.from(getDOMNodes(data))
   const correctSettings = {
     param1: 'val1',
-    name: 'Acclaim'
+    name: 'Acclaim',
   }
   deepEqual(component.configSettings(), correctSettings)
 })
 
-test('mounting sets fields onto state', function() {
+test('mounting sets fields onto state', function () {
   const data = {
     handleToolInstalled,
-    app: this.app
+    app: this.app,
   }
   const component = renderComponent(data)
   deepEqual(component.state, {
@@ -103,10 +103,10 @@ test('mounting sets fields onto state', function() {
     fields: {
       consumer_key: {description: 'Consumer Key', required: true, type: 'text', value: ''},
       name: {description: 'Name', required: true, type: 'text', value: 'Acclaim'},
-      shared_secret: {description: 'Shared Secret', required: true, type: 'text', value: ''}
+      shared_secret: {description: 'Shared Secret', required: true, type: 'text', value: ''},
     },
     invalidFields: ['consumer_key', 'shared_secret'],
     isValid: false,
-    modalIsOpen: false
+    modalIsOpen: false,
   })
 })

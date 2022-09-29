@@ -36,7 +36,7 @@ const createElement = data => (
 
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   return {
     component,
@@ -46,14 +46,14 @@ const getDOMNodes = function(data) {
     configurationFormLti2: component.refs.configurationFormLti2,
     configurationTypeSelector: component.refs.configurationTypeSelector,
     submitLti2: component.refs.submitLti2,
-    submit: component.refs.submit
+    submit: component.refs.submit,
   }
 }
 
 QUnit.module('ExternalApps.ConfigurationForm', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders manual form with new tool', () => {
@@ -61,7 +61,7 @@ test('renders manual form with new tool', () => {
     configurationType: 'manual',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.component)
@@ -75,7 +75,7 @@ test('renders url form with new tool', () => {
     configurationType: 'url',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.configurationTypeSelector)
@@ -87,7 +87,7 @@ test('renders xml form with new tool', () => {
     configurationType: 'xml',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.configurationTypeSelector)
@@ -99,7 +99,7 @@ test('renders lti2 form with new tool', () => {
     configurationType: 'lti2',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.configurationTypeSelector)
@@ -111,7 +111,7 @@ test('renders correct form when "Lti 1.3" is chosen', () => {
     configurationType: 'byClientId',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.configurationTypeSelector)
@@ -130,9 +130,9 @@ test('renders manual form with existing tool and no selector', () => {
       domain: '',
       privacy_level: 'anonymous',
       customFields: {a: 1, b: 2, c: 3},
-      description: 'My super awesome example app'
+      description: 'My super awesome example app',
     },
-    showConfigurationSelector: false
+    showConfigurationSelector: false,
   }
   const nodes = getDOMNodes(data)
   ok(nodes.configurationFormManual)
@@ -152,14 +152,14 @@ test('saves manual form with trimmed props', () => {
       domain: '',
       privacy_level: 'anonymous',
       custom_fields: {a: 1, b: 2, c: 3},
-      description: '\tMy super awesome example app'
+      description: '\tMy super awesome example app',
     },
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const component = renderComponent(data)
   const e = {
     type: 'click',
-    preventDefault: sinon.stub()
+    preventDefault: sinon.stub(),
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
@@ -181,14 +181,14 @@ test('saves url form with trimmed props', () => {
       name: '  My App',
       consumer_key: 'key  ',
       shared_secret: '  secret',
-      config_url: '\thttp://example.com  '
+      config_url: '\thttp://example.com  ',
     },
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const component = renderComponent(data)
   const e = {
     type: 'click',
-    preventDefault: sinon.stub()
+    preventDefault: sinon.stub(),
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
@@ -208,14 +208,14 @@ test('saves xml form with trimmed props', () => {
       name: '  My App',
       consumer_key: 'key   ',
       shared_secret: '   secret',
-      xml: '\t some xml  '
+      xml: '\t some xml  ',
     },
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const component = renderComponent(data)
   const e = {
     type: 'click',
-    preventDefault: sinon.stub()
+    preventDefault: sinon.stub(),
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
@@ -232,12 +232,12 @@ test('saves lti2 form with trimmed props', () => {
     configurationType: 'lti2',
     handleSubmit: handleSubmitSpy,
     tool: {registration_url: '\thttps://lti-tool-provider-example..com/register '},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const component = renderComponent(data)
   const e = {
     type: 'click',
-    preventDefault: sinon.stub()
+    preventDefault: sinon.stub(),
   }
   component.handleSubmit(e)
   const formData = handleSubmitSpy.getCall(0).args[1]
@@ -250,7 +250,7 @@ test("'iframeTarget' returns null if configuration type is not lti2", () => {
     configurationType: 'manual',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   equal(nodes.component.iframeTarget(), null)
@@ -261,7 +261,7 @@ test("'iframeTarget' returns 'lti2_registration_frame' if configuration type is 
     configurationType: 'lti2',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   equal(nodes.component.iframeTarget(), 'lti2_registration_frame')
@@ -272,7 +272,7 @@ test('sets the target of the form to the iframe for lti2', () => {
     configurationType: 'lti2',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   equal(document.querySelector('form').getAttribute('target'), 'lti2_registration_frame')
@@ -283,7 +283,7 @@ test('sets the form method to post', () => {
     configurationType: 'lti2',
     handleSubmit,
     tool: {},
-    showConfigurationSelector: true
+    showConfigurationSelector: true,
   }
   const nodes = getDOMNodes(data)
   equal(document.querySelector('form').getAttribute('method'), 'post')
@@ -326,7 +326,7 @@ test('resets internal state of component', () => {
     configUrl: '',
     registrationUrl: '',
     xml: '',
-    allow_membership_service_access: false
+    allow_membership_service_access: false,
   })
 })
 
@@ -357,6 +357,6 @@ test('returns a default state', () => {
     configUrl: '',
     registrationUrl: '',
     xml: '',
-    allow_membership_service_access: false
+    allow_membership_service_access: false,
   })
 })

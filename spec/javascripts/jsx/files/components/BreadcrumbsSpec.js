@@ -33,16 +33,16 @@ QUnit.module('Files Breadcrumbs Component', {
   teardown() {
     $('#fixtures').empty()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('generates the home, rootFolder, and other links', () => {
   const sampleProps = {
     rootTillCurrentFolder: [
       new Folder({context_type: 'course', context_id: 1}),
-      new Folder({name: 'test_folder_name', full_name: 'course_files/test_folder_name'})
+      new Folder({name: 'test_folder_name', full_name: 'course_files/test_folder_name'}),
     ],
-    contextAssetString: 'course_1'
+    contextAssetString: 'course_1',
   }
 
   const component = TestUtils.renderIntoDocument(

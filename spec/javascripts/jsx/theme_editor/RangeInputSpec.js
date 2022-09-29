@@ -32,9 +32,9 @@ QUnit.module('RangeInput Component', {
       labelText: 'Input Label',
       name: 'input_name',
       formatValue: sinon.stub(),
-      onChange: sinon.stub()
+      onChange: sinon.stub(),
     }
-  }
+  },
 })
 
 test('renders range input', () => {

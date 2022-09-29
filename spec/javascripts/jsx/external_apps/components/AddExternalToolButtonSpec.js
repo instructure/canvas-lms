@@ -51,7 +51,7 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
       mountComponent()
       const toolData = {
         message: {html: 'Something bad happened'},
-        status: 'failure'
+        status: 'failure',
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
       strictEqual($.flashErrorSafe.callCount, 1)
@@ -61,7 +61,7 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
       mountComponent()
       const toolData = {
         message: 'Something bad happened',
-        status: 'failure'
+        status: 'failure',
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
       const [message] = $.flashErrorSafe.lastCall.args
@@ -71,7 +71,7 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
     test('displays a default flash message when the error does not include a message', () => {
       mountComponent()
       const toolData = {
-        status: 'failure'
+        status: 'failure',
       }
       wrapper.instance().handleLti2ToolInstalled(toolData)
       const [message] = $.flashErrorSafe.lastCall.args
@@ -121,25 +121,25 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
               {
                 attribute: 'url',
                 type: 'Either the url or domain should be set.',
-                message: 'Either the url or domain should be set.'
-              }
+                message: 'Either the url or domain should be set.',
+              },
             ],
             domain: [
               {
                 attribute: 'domain',
                 type: 'Either the url or domain should be set.',
-                message: 'Either the url or domain should be set.'
-              }
+                message: 'Either the url or domain should be set.',
+              },
             ],
             config_url: [
               {
                 attribute: 'config_url',
                 type: 'Invalid Config URL',
-                message: 'Invalid Config URL'
-              }
-            ]
-          }
-        })
+                message: 'Invalid Config URL',
+              },
+            ],
+          },
+        }),
       }
       equal(wrapper.instance()._errorHandler(xhr), 'Invalid Config URL')
     })
@@ -153,18 +153,18 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
               {
                 attribute: 'url',
                 type: 'Either the url or domain should be set.',
-                message: 'Either the url or domain should be set.'
-              }
+                message: 'Either the url or domain should be set.',
+              },
             ],
             config_xml: [
               {
                 attribute: 'config_url',
                 type: 'Invalid XML Configuration',
-                message: 'Invalid XML Configuration'
-              }
-            ]
-          }
-        })
+                message: 'Invalid XML Configuration',
+              },
+            ],
+          },
+        }),
       }
       equal(wrapper.instance()._errorHandler(xhr), 'Invalid XML Configuration')
     })
@@ -178,18 +178,18 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
               {
                 attribute: 'url',
                 type: 'Either the url or domain should be set.',
-                message: 'Either the url or domain should be set.'
-              }
+                message: 'Either the url or domain should be set.',
+              },
             ],
             domain: [
               {
                 attribute: 'domain',
                 type: 'Second error message',
-                message: 'Second error message'
-              }
-            ]
-          }
-        })
+                message: 'Second error message',
+              },
+            ],
+          },
+        }),
       }
       equal(wrapper.instance()._errorHandler(xhr), 'Either the url or domain should be set.')
     })
@@ -199,8 +199,8 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
       const xhr = {
         responseText: JSON.stringify({
           errors: [{message: 'An error occurred.', error_code: 'internal_server_error'}],
-          error_report_id: 8
-        })
+          error_report_id: 8,
+        }),
       }
       equal(wrapper.instance()._errorHandler(xhr), 'We were unable to add the app.')
     })
@@ -213,11 +213,11 @@ QUnit.module('AddExternalToolButton', suiteHooks => {
             tool_currently_installed: [
               {
                 type: 'The tool is already installed in this context.',
-                message: 'The tool is already installed in this context.'
-              }
-            ]
-          }
-        })
+                message: 'The tool is already installed in this context.',
+              },
+            ],
+          },
+        }),
       }
       wrapper.instance()._errorHandler(xhr)
       strictEqual(document.querySelectorAll('#duplicate-confirmation-form').length, 1)

@@ -30,7 +30,7 @@ QUnit.module('ChildCourse class', {
       child = null
     }
     container.innerHTML = ''
-  }
+  },
 })
 
 const defaultData = () =>
@@ -61,7 +61,7 @@ test('change log route onEnter calls app showChangeLog with params from URL', ()
   deepEqual(child.app.showChangeLog.getCall(0).args[0], {
     blueprintType: 'template',
     templateId: '2',
-    changeId: '3'
+    changeId: '3',
   })
 
   child.app.hideChangeLog = sinon.spy()

@@ -43,7 +43,7 @@ QUnit.module('AppointmentGroup EditPage', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 test('renders the EditPage component', () => {
@@ -58,7 +58,7 @@ QUnit.module('Message Users', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 test('mocks editPage axios to appointmentGroups', assert => {
@@ -66,7 +66,7 @@ test('mocks editPage axios to appointmentGroups', assert => {
   const done = assert.async()
   moxios.stubRequest(/appointment_groups/, {
     status: 200,
-    response: {limitUsersPerSlot: 4, limitSlotsPerUser: 6}
+    response: {limitUsersPerSlot: 4, limitSlotsPerUser: 6},
   })
   const component = renderComponent()
   moxios.wait(() => {
@@ -80,7 +80,7 @@ test('mocks editPage axios to calendarEvents', assert => {
   const done = assert.async()
   moxios.stubRequest(/calendar_events/, {
     status: 200,
-    response: {contexts: [{asset_string: 'course_1'}, {asset_string: 'course_2'}]}
+    response: {contexts: [{asset_string: 'course_1'}, {asset_string: 'course_2'}]},
   })
   const component = renderComponent()
   moxios.wait(() => {
@@ -93,7 +93,7 @@ test('set time blocks correctly', assert => {
   const done = assert.async()
   moxios.stubRequest(/appointment_groups/, {
     status: 200,
-    response: {limitUsersPerSlot: 4, limitSlotsPerUser: 6}
+    response: {limitUsersPerSlot: 4, limitSlotsPerUser: 6},
   })
   const component = renderComponent()
   moxios.wait(() => {
@@ -115,8 +115,8 @@ test('clicking message users button opens message students modal', () => {
   // needed by message modal
   component.setState({
     eventDataSource: {
-      getParticipants: (group, status, cb) => cb([])
-    }
+      getParticipants: (group, status, cb) => cb([]),
+    },
   })
 
   button.click()
@@ -136,7 +136,7 @@ QUnit.module('Delete Group', {
     sandbox.restore()
     sandbox = null
     moxios.uninstall()
-  }
+  },
 })
 
 test('fires delete ajax request with the correct id', () => {
@@ -167,7 +167,7 @@ QUnit.module('Change Handlers', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 test('handleChange updates properties based on the name property', () => {
@@ -175,8 +175,8 @@ test('handleChange updates properties based on the name property', () => {
   const fakeEvent = {
     target: {
       name: 'han',
-      value: 'solo'
-    }
+      value: 'solo',
+    },
   }
   component.handleChange(fakeEvent)
   equal(component.state.formValues.han, 'solo')
@@ -187,8 +187,8 @@ test('handleCheckboxChange updates the boolean flag based on the name property',
   const fakeEvent = {
     target: {
       name: 'han',
-      checked: true
-    }
+      checked: true,
+    },
   }
   component.handleCheckboxChange(fakeEvent)
   equal(component.state.formValues.han, true)
@@ -203,7 +203,7 @@ QUnit.module('Save Group', {
     sandbox.restore()
     sandbox = null
     moxios.uninstall()
-  }
+  },
 })
 
 test('handleSave shows error when limit users per slot is empty', () => {
@@ -212,8 +212,8 @@ test('handleSave shows error when limit users per slot is empty', () => {
   sandbox.spy(axios, 'put')
   component.setState({
     formValues: {
-      limitUsersPerSlot: true
-    }
+      limitUsersPerSlot: true,
+    },
   })
 
   component.handleSave()
@@ -228,8 +228,8 @@ test('handleSave shows error when limit users per slot is less than 1', () => {
   sandbox.spy(axios, 'put')
   component.setState({
     formValues: {
-      limitUsersPerSlot: true
-    }
+      limitUsersPerSlot: true,
+    },
   })
   $('.EditPage__Options-LimitUsersPerSlot', component.optionFields).val('0')
 
@@ -245,8 +245,8 @@ test('handleSave shows error when limit slots per user is empty', () => {
   sandbox.spy(axios, 'put')
   component.setState({
     formValues: {
-      limitSlotsPerUser: true
-    }
+      limitSlotsPerUser: true,
+    },
   })
 
   component.handleSave()
@@ -261,8 +261,8 @@ test('handleSave shows error when limit slots per user is less than 1', () => {
   sandbox.spy(axios, 'put')
   component.setState({
     formValues: {
-      limitSlotsPerUser: true
-    }
+      limitSlotsPerUser: true,
+    },
   })
   $('.EditPage__Options-LimitSlotsPerUser', component.optionFields).val('0')
 
@@ -277,8 +277,8 @@ test('handleSave prepares the proper participant_visibility when students are al
   sandbox.spy(axios, 'put')
   component.setState({
     formValues: {
-      allowStudentsToView: true
-    }
+      allowStudentsToView: true,
+    },
   })
 
   component.handleSave()
@@ -304,23 +304,23 @@ test('handleSave prepares the timeblocks appropriately', () => {
           timeData: {
             date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
             startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:00:00.000Z')),
-            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z'))
-          }
+            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
+          },
         },
         {
           slotEventId: 'NEW-2',
           timeData: {
             date: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
             startTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T19:30:00.000Z')),
-            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T20:00:00.000Z'))
-          }
+            endTime: $.fudgeDateForProfileTimezone(new Date('2016-10-28T20:00:00.000Z')),
+          },
         },
         {
           slotEventId: 'NEW-3',
-          timeData: {}
-        }
-      ]
-    }
+          timeData: {},
+        },
+      ],
+    },
   })
 
   component.handleSave()
@@ -330,7 +330,7 @@ test('handleSave prepares the timeblocks appropriately', () => {
   // The expected appointments are not fudged
   const expectedAppointments = [
     [new Date('2016-10-28T19:00:00.000Z'), new Date('2016-10-28T19:30:00.000Z')],
-    [new Date('2016-10-28T19:30:00.000Z'), new Date('2016-10-28T20:00:00.000Z')]
+    [new Date('2016-10-28T19:30:00.000Z'), new Date('2016-10-28T20:00:00.000Z')],
   ]
 
   deepEqual(requestObj.appointment_group.new_appointments, expectedAppointments)

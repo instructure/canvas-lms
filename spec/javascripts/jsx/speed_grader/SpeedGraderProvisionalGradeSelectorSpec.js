@@ -37,7 +37,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
       provisionalGraderDisplayNames: {
         1: 'Gradius',
         2: 'Graderson',
-        3: 'Custom'
+        3: 'Custom',
       },
       provisionalGrades: [
         {
@@ -45,7 +45,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
           score: 11,
           provisional_grade_id: '1',
           readonly: true,
-          scorer_id: '1'
+          scorer_id: '1',
         },
         {
           grade: '22',
@@ -53,24 +53,24 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
           provisional_grade_id: '2',
           readonly: true,
           scorer_id: '2',
-          selected: true
+          selected: true,
         },
         {
           grade: '33',
           score: 33,
           provisional_grade_id: '3',
           readonly: false,
-          scorer_id: '3'
-        }
-      ]
+          scorer_id: '3',
+        },
+      ],
     }
 
     fakeENV.setup({
       instructor_selectable_states: {
         1: false,
         2: true,
-        3: true
-      }
+        3: true,
+      },
     })
 
     document.documentElement.setAttribute('dir', 'ltr')
@@ -129,13 +129,7 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('positions the "Custom" radio button first', () => {
     mountComponent()
-    strictEqual(
-      wrapper
-        .find('input')
-        .first()
-        .prop('value'),
-      '2'
-    )
+    strictEqual(wrapper.find('input').first().prop('value'), '2')
   })
 
   test('prepends a "Custom" radio button if no non-readonly grade is passed', () => {
@@ -144,17 +138,11 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         grade: '11',
         provisional_grade_id: '1',
         scorer_id: '1',
-        readonly: true
-      }
+        readonly: true,
+      },
     ]
     mountComponent({provisionalGrades})
-    strictEqual(
-      wrapper
-        .find('input')
-        .first()
-        .prop('value'),
-      'custom'
-    )
+    strictEqual(wrapper.find('input').first().prop('value'), 'custom')
   })
 
   test('selects the first grade whose "selected" field is true', () => {
@@ -168,8 +156,8 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         grade: '11',
         provisional_grade_id: '1',
         scorer_id: '1',
-        readonly: true
-      }
+        readonly: true,
+      },
     ]
     mountComponent({provisionalGrades})
     strictEqual(wrapper.find('input[value="custom"]').is('[checked]'), true)
@@ -177,52 +165,27 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
 
   test('includes the grader name in the button label', () => {
     mountComponent()
-    strictEqual(
-      getRadioInput({value: '1'})
-        .text()
-        .includes('Gradius'),
-      true
-    )
+    strictEqual(getRadioInput({value: '1'}).text().includes('Gradius'), true)
   })
 
   test('uses a label of "Custom" for the non-readonly button', () => {
     mountComponent()
-    strictEqual(
-      getRadioInput({value: '3'})
-        .text()
-        .includes('Custom'),
-      true
-    )
+    strictEqual(getRadioInput({value: '3'}).text().includes('Custom'), true)
   })
 
   test('includes the score for a provisional grade in the button label', () => {
     mountComponent()
-    strictEqual(
-      getRadioInput({value: '1'})
-        .text()
-        .includes('11'),
-      true
-    )
+    strictEqual(getRadioInput({value: '1'}).text().includes('11'), true)
   })
 
   test('includes the points possible for points-based assignments in the button label', () => {
     mountComponent({gradingType: 'points', pointsPossible: 123})
-    strictEqual(
-      getRadioInput({value: '1'})
-        .text()
-        .includes('out of 123'),
-      true
-    )
+    strictEqual(getRadioInput({value: '1'}).text().includes('out of 123'), true)
   })
 
   test('omits the points possible for non-points-based assignments in the button label', () => {
     mountComponent({gradingType: 'percent', pointsPossible: 123})
-    strictEqual(
-      getRadioInput({value: '1'})
-        .text()
-        .includes('out of 123'),
-      false
-    )
+    strictEqual(getRadioInput({value: '1'}).text().includes('out of 123'), false)
   })
 
   test('enables option when the instructor_state is active', () => {
@@ -241,20 +204,20 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         grade: '33',
         provisional_grade_id: '1',
         readonly: true,
-        anonymous_grader_id: 'ccccc'
+        anonymous_grader_id: 'ccccc',
       },
       {
         grade: '22',
         provisional_grade_id: '2',
         readonly: true,
-        anonymous_grader_id: 'aaaaa'
+        anonymous_grader_id: 'aaaaa',
       },
       {
         grade: '11',
         provisional_grade_id: '3',
         readonly: true,
-        anonymous_grader_id: 'bbbbb'
-      }
+        anonymous_grader_id: 'bbbbb',
+      },
     ]
 
     mountComponent({provisionalGrades})
@@ -270,21 +233,21 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         grade: '33',
         provisional_grade_id: '1',
         readonly: true,
-        scorer_id: '300'
+        scorer_id: '300',
       },
       {
         grade: '22',
         provisional_grade_id: '2',
         readonly: true,
         scorer_id: '200',
-        selected: true
+        selected: true,
       },
       {
         grade: '11',
         provisional_grade_id: '3',
         readonly: true,
-        scorer_id: '100'
-      }
+        scorer_id: '100',
+      },
     ]
 
     mountComponent({provisionalGrades})
@@ -301,8 +264,8 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         score: 123456.78,
         provisional_grade_id: '1',
         readonly: true,
-        scorer_id: '300'
-      }
+        scorer_id: '300',
+      },
     ]
 
     const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')
@@ -321,8 +284,8 @@ QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
         score: 123456.78,
         provisional_grade_id: '1',
         readonly: true,
-        scorer_id: '300'
-      }
+        scorer_id: '300',
+      },
     ]
 
     const formatSpy = sinon.spy(GradeFormatHelper, 'formatSubmissionGrade')

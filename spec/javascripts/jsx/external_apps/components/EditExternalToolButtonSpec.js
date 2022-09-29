@@ -34,14 +34,14 @@ QUnit.module('ExternalApps.EditExternalToolButton', {
     let ENV
     ReactDOM.unmountComponentAtNode(wrapper)
     ENV = prevEnvironment
-  }
+  },
 })
 
 test('allows editing of tools', () => {
   const tool = {name: 'test tool'}
   const component = renderComponent({
     tool,
-    canAddEdit: true
+    canAddEdit: true,
   })
   const disabledMessage = 'This action has been disabled by your admin.'
   const form = JSON.stringify(component.form())
@@ -52,16 +52,16 @@ test('opens modal with expected tool state', () => {
   const tool = {
     name: 'test tool',
     description: 'New tool description',
-    app_type: 'ContextExternalTool'
+    app_type: 'ContextExternalTool',
   }
   const data = {
     name: 'test tool',
     description: 'Old tool description',
-    privacy_level: 'public'
+    privacy_level: 'public',
   }
   const component = renderComponent({
     tool,
-    canAddEdit: true
+    canAddEdit: true,
   })
   component.setContextExternalToolState(data)
   ok(component.state.tool.description, 'New tool description')
@@ -73,16 +73,16 @@ test('sets new state from state store response', () => {
   const data = {
     name: 'New Name',
     description: 'Current State',
-    privacy_level: 'public'
+    privacy_level: 'public',
   }
   const tool = {
     name: 'Old Name',
     description: 'Old State',
-    app_type: 'ContextExternalTool'
+    app_type: 'ContextExternalTool',
   }
   const component = renderComponent({
     tool,
-    canAddEdit: true
+    canAddEdit: true,
   })
   component.saveChanges(configurationType, data)
   ok(component.state.tool.name, 'New Name')
@@ -94,7 +94,7 @@ test('allows editing of tools (granular)', () => {
   const tool = {name: 'test tool'}
   const component = renderComponent({
     tool,
-    canEdit: true
+    canEdit: true,
   })
   const disabledMessage = 'This action has been disabled by your admin.'
   const form = JSON.stringify(component.form())
@@ -105,16 +105,16 @@ test('opens modal with expected tool state (granular)', () => {
   const tool = {
     name: 'test tool',
     description: 'New tool description',
-    app_type: 'ContextExternalTool'
+    app_type: 'ContextExternalTool',
   }
   const data = {
     name: 'test tool',
     description: 'Old tool description',
-    privacy_level: 'public'
+    privacy_level: 'public',
   }
   const component = renderComponent({
     tool,
-    canEdit: true
+    canEdit: true,
   })
   component.setContextExternalToolState(data)
   ok(component.state.tool.description, 'New tool description')
@@ -126,16 +126,16 @@ test('sets new state from state store response (granular)', () => {
   const data = {
     name: 'New Name',
     description: 'Current State',
-    privacy_level: 'public'
+    privacy_level: 'public',
   }
   const tool = {
     name: 'Old Name',
     description: 'Old State',
-    app_type: 'ContextExternalTool'
+    app_type: 'ContextExternalTool',
   }
   const component = renderComponent({
     tool,
-    canEdit: true
+    canEdit: true,
   })
   component.saveChanges(configurationType, data)
   ok(component.state.tool.name, 'New Name')

@@ -55,7 +55,7 @@ QUnit.module('Toolbar', {
     file = new File({id: 1})
     courseFolder = new Folder({context_type: 'Course', context_id: 1})
     userFolder = new Folder({context_type: 'User', context_id: 2})
-  }
+  },
 })
 
 test('renders multi select action items when there is more than one item selected', () => {
@@ -87,7 +87,7 @@ test('renders only view and download buttons for limited users', () => {
     '.btn-restrict': false,
     '.btn-delete': false,
     '.btn-add-folder': false,
-    '.btn-upload': false
+    '.btn-upload': false,
   }
   ok(buttonsEnabled(toolbar, config), 'only view and download buttons are shown')
 })
@@ -114,7 +114,7 @@ test('renders all buttons for users with manage_files permissions', () => {
     '.btn-restrict': true,
     '.btn-delete': true,
     '.btn-add-folder': true,
-    '.btn-upload': true
+    '.btn-upload': true,
   }
   ok(
     buttonsEnabled(toolbar, config),
@@ -143,7 +143,7 @@ test('does not render add/upload button for users without manage_files_add permi
     '.btn-restrict': true,
     '.btn-delete': true,
     '.btn-add-folder': false,
-    '.btn-upload': false
+    '.btn-upload': false,
   }
   ok(buttonsEnabled(toolbar, config))
 })
@@ -168,7 +168,7 @@ test('does not render move/restrict button for users without manage_files_edit p
     '.btn-restrict': false,
     '.btn-delete': true,
     '.btn-add-folder': true,
-    '.btn-upload': true
+    '.btn-upload': true,
   }
   ok(buttonsEnabled(toolbar, config))
 })
@@ -194,7 +194,7 @@ test('does not render delete button for users without manage_files_delete permis
     '.btn-restrict': true,
     '.btn-delete': false,
     '.btn-add-folder': true,
-    '.btn-upload': true
+    '.btn-upload': true,
   }
   ok(buttonsEnabled(toolbar, config))
 })
@@ -221,7 +221,7 @@ test('disables preview button on folder', () => {
     '.btn-restrict': true,
     '.btn-delete': true,
     '.btn-add-folder': true,
-    '.btn-upload': true
+    '.btn-upload': true,
   }
   ok(buttonsEnabled(toolbar, config), 'view button hidden when folder selected')
 })

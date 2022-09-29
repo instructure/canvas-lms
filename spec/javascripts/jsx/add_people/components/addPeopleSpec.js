@@ -26,14 +26,14 @@ const props = {
   isOpen: true,
   courseParams: {
     roles: [],
-    sections: []
+    sections: [],
   },
   apiState: {
-    isPending: 0
+    isPending: 0,
   },
   inputParams: {
-    nameList: ''
-  }
+    nameList: '',
+  },
 }
 
 test('renders the component', () => {

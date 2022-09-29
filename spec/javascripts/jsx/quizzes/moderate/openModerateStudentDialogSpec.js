@@ -34,7 +34,7 @@ QUnit.module('openModerateStudentDialog', {
 
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('focues on close button when opened', () => {

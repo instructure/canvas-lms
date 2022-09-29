@@ -28,7 +28,7 @@ QUnit.module('ImageSearch View', {
   },
   teardown: () => {
     $('#flash_screenreader_holder').remove()
-  }
+  },
 })
 
 const getDummySearchResults = () => {
@@ -37,18 +37,18 @@ const getDummySearchResults = () => {
       id: 'crazy_id_1',
       alt: 'alt desc for photo 1',
       description: 'desc for photo 1',
-      raw_url: 'url1'
+      raw_url: 'url1',
     },
     {
       id: 'crazy_id_2',
       description: 'desc for photo 2',
-      raw_url: 'url2'
+      raw_url: 'url2',
     },
     {
       id: 'crazy_id_3',
       description: null,
-      raw_url: 'url3'
-    }
+      raw_url: 'url3',
+    },
   ]
 
   return photos
@@ -69,7 +69,7 @@ test('it searches for images on input change', () => {
 
   const fakeInputEvent = {
     target: searchInput,
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   imageSearch.handleInput(fakeInputEvent)
@@ -88,7 +88,7 @@ test('it clears search results when input is cleared', () => {
 
   const fakeInputEvent = {
     target: searchInput,
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   imageSearch.handleInput(fakeInputEvent)

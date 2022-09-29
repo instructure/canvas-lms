@@ -33,7 +33,7 @@ QUnit.module('CollaborationsToolLaunch screenreader functionality', {
   teardown() {
     fixtures.empty()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test('shows beginning info alert and adds styles to iframe', () => {

@@ -31,7 +31,7 @@ const makeProps = (props = {}) =>
       OffIcon: <span className="offIcon" />,
       onToggleOn: () => {},
       onToggleOff: () => {},
-      disabled: false
+      disabled: false,
     },
     props
   )

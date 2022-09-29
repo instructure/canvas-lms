@@ -35,9 +35,9 @@ const props = {
     id: 1,
     permissions: {
       update: true,
-      delete: true
-    }
-  }
+      delete: true,
+    },
+  },
 }
 
 test('renders the collaboration', () => {

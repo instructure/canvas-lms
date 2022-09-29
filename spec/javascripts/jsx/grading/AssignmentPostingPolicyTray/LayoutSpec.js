@@ -75,7 +75,7 @@ QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
       onDismiss: () => {},
       onSave: () => {},
       originalPostManually: true,
-      selectedPostManually: false
+      selectedPostManually: false,
     }
   })
 
@@ -89,7 +89,7 @@ QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
     mountComponent()
     getCancelButton().click()
     const {
-      onDismiss: {callCount}
+      onDismiss: {callCount},
     } = context
     strictEqual(callCount, 1)
   })
@@ -112,7 +112,7 @@ QUnit.module('AssignmentPostingPolicyTray Layout', suiteHooks => {
     mountComponent()
     getSaveButton().click()
     const {
-      onSave: {callCount}
+      onSave: {callCount},
     } = context
     strictEqual(callCount, 1)
   })

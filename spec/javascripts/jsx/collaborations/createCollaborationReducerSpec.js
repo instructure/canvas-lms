@@ -33,7 +33,7 @@ test('responds to createCollaborationStart', () => {
   const state = {
     createCollaborationPending: false,
     createCollaborationSuccessful: true,
-    createCollaborationError: {}
+    createCollaborationError: {},
   }
 
   const action = actions.createCollaborationStart()
@@ -47,7 +47,7 @@ test('responds to createCollaborationSuccessful', () => {
   const state = {
     createCollaborationPending: true,
     createCollaborationSuccessful: false,
-    collaborations: []
+    collaborations: [],
   }
   const collaborations = [{}]
 
@@ -60,7 +60,7 @@ test('responds to createCollaborationSuccessful', () => {
 test('responds to createCollaborationFailed', () => {
   const state = {
     createCollaborationPending: true,
-    createCollaborationError: null
+    createCollaborationError: null,
   }
   const error = {}
 

@@ -27,17 +27,17 @@ test('when something has changed it puts tabIndex=-1 and aria-hidden on the prev
   const props = {
     brandConfig: {
       md5: '9e3c6d00c73e0fa989896e63077b45a8',
-      variables: {}
+      variables: {},
     },
     hasUnsavedChanges: true,
     variableSchema: [],
-    accountID: '1'
+    accountID: '1',
   }
   sessionStorage.setItem(
     'sharedBrandConfigBeingEdited',
     JSON.stringify({
       brand_config: {md5: '9e3c6d00c73e0fa989896e63077b45aa', variables: {}},
-      name: 'Fake'
+      name: 'Fake',
     })
   )
   const wrapper = shallow(<ThemeEditor {...props} />)
@@ -54,7 +54,7 @@ const getDefaultFileList = () => {
   return KEYS.map(x => ({
     customFileUpload: true,
     variable_name: x,
-    value: undefined
+    value: undefined,
   }))
 }
 
@@ -65,8 +65,8 @@ QUnit.module('Theme Editor Theme Store', {
         md5: '9e3c6d00c73e0fa989896e63077b45a8',
         variables: {
           'ic-brand-primary': 'green',
-          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef'
-        }
+          'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
+        },
       },
       hasUnsavedChanges: true,
       variableSchema: [
@@ -77,16 +77,16 @@ QUnit.module('Theme Editor Theme Store', {
               variable_name: 'ic-brand-primary',
               type: 'color',
               default: '#0374B5',
-              human_name: 'Primary Brand Color'
+              human_name: 'Primary Brand Color',
             },
             {
               variable_name: 'ic-brand-font-color-dark',
               type: 'color',
               default: '#2D3B45',
-              human_name: 'Main Text Color'
-            }
+              human_name: 'Main Text Color',
+            },
           ],
-          group_name: 'Global Branding'
+          group_name: 'Global Branding',
         },
         {
           group_key: 'global_navigation',
@@ -95,16 +95,16 @@ QUnit.module('Theme Editor Theme Store', {
               variable_name: 'ic-brand-global-nav-bgd',
               type: 'color',
               default: '#394B58',
-              human_name: 'Nav Background'
+              human_name: 'Nav Background',
             },
             {
               variable_name: 'ic-brand-global-nav-ic-icon-svg-fill',
               type: 'color',
               default: '#ffffff',
-              human_name: 'Nav Icon'
-            }
+              human_name: 'Nav Icon',
+            },
           ],
-          group_name: 'Global Navigation'
+          group_name: 'Global Navigation',
         },
         {
           group_key: 'watermarks',
@@ -115,24 +115,24 @@ QUnit.module('Theme Editor Theme Store', {
               accept: 'image/vnd.microsoft.icon,image/x-icon,image/png,image/gif',
               default: '/images/favicon.ico',
               human_name: 'Favicon',
-              helper_text: 'You can use a single 16x16, 32x32, 48x48 ico file.'
-            }
-          ]
-        }
+              helper_text: 'You can use a single 16x16, 32x32, 48x48 ico file.',
+            },
+          ],
+        },
       ],
-      accountID: '1'
+      accountID: '1',
     }
     sessionStorage.setItem(
       'sharedBrandConfigBeingEdited',
       JSON.stringify({
         brand_config: {md5: '9e3c6d00c73e0fa989896e63077b45aa', variables: {}},
-        name: 'Fake'
+        name: 'Fake',
       })
     )
   },
   teardown: () => {
     testProps = null
-  }
+  },
 })
 
 test('constructor sets the theme store state properly using variableSchema and brandConfig props', () => {
@@ -143,9 +143,9 @@ test('constructor sets the theme store state properly using variableSchema and b
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
-    files: getDefaultFileList()
+    files: getDefaultFileList(),
   })
 })
 
@@ -158,9 +158,9 @@ test('handleThemeStateChange updates theme store', () => {
       'ic-brand-font-color-dark': 'black',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
-    files: getDefaultFileList()
+    files: getDefaultFileList(),
   })
 })
 
@@ -176,15 +176,15 @@ test('handleThemeStateChange updates when there is a file', () => {
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
     files: [
       ...getDefaultFileList(),
       {
         value,
-        variable_name: key
-      }
-    ]
+        variable_name: key,
+      },
+    ],
   })
 })
 
@@ -199,16 +199,16 @@ test('handleThemeStateChange sets the file object to have the customFileUpload f
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
     files: [
       ...getDefaultFileList(),
       {
         value,
         variable_name: key,
-        customFileUpload: true
-      }
-    ]
+        customFileUpload: true,
+      },
+    ],
   })
 })
 
@@ -223,9 +223,9 @@ test('handleThemeStateChange resets to default when opts.resetValue is set', () 
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
-    files: getDefaultFileList()
+    files: getDefaultFileList(),
   })
 })
 
@@ -242,9 +242,9 @@ test('handleThemeStateChange sets values to original default values when opts.us
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
-    files: getDefaultFileList()
+    files: getDefaultFileList(),
   })
 })
 
@@ -261,15 +261,15 @@ test('handleThemeStateChange sets file objects in the store to their previous va
       'ic-brand-font-color-dark': '#2D3B45',
       'ic-brand-global-nav-bgd': '#394B58',
       'ic-brand-global-nav-ic-icon-svg-fill': '#efefef',
-      'ic-brand-favicon': '/images/favicon.ico'
+      'ic-brand-favicon': '/images/favicon.ico',
     },
     files: [
       ...getDefaultFileList(),
       {
         value: undefined,
-        variable_name: 'ic-brand-favicon'
-      }
-    ]
+        variable_name: 'ic-brand-favicon',
+      },
+    ],
   })
 })
 
@@ -289,7 +289,7 @@ test('processThemeStoreForSubmit puts the themeStore into a FormData and returns
     css_overrides: '',
     js_overrides: '',
     mobile_css_overrides: '',
-    mobile_js_overrides: ''
+    mobile_js_overrides: '',
   })
 })
 
@@ -306,7 +306,7 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads', () =
     js_overrides: '',
     mobile_css_overrides: '',
     mobile_js_overrides: '',
-    [key]: value
+    [key]: value,
   })
 })
 
@@ -324,6 +324,6 @@ test('processThemeStoreForSubmit sets the correct keys for custom uploads that a
     js_overrides: '/some/path/to/a/file',
     mobile_css_overrides: '',
     mobile_js_overrides: '',
-    [key]: value
+    [key]: value,
   })
 })

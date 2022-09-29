@@ -34,8 +34,8 @@ QUnit.module('AccountTabContainer', {
         gradingPeriodsUpdateURL:
           'api/v1/grading_period_sets/%7B%7B%20set_id%20%7D%7D/grading_periods/batch_update',
         enrollmentTermsURL: 'api/v1/accounts/1/enrollment_terms',
-        deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D'
-      }
+        deleteGradingPeriodURL: 'api/v1/accounts/1/grading_periods/%7B%7B%20id%20%7D%7D',
+      },
     }
     const mergedProps = _.defaults(props, defaults)
 
@@ -51,10 +51,10 @@ QUnit.module('AccountTabContainer', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('tabs are present', function() {
+test('tabs are present', function () {
   this.renderComponent()
   const $el = this.wrapper.getDOMNode()
   strictEqual($el.querySelectorAll('.ui-tabs').length, 1)
@@ -63,18 +63,18 @@ test('tabs are present', function() {
   equal($el.querySelector('#grading-standards-tab').getAttribute('style'), 'display: none;')
 })
 
-test('jquery-ui tabs() is called', function() {
+test('jquery-ui tabs() is called', function () {
   const tabsSpy = sandbox.spy($.fn, 'tabs')
   this.renderComponent()
   ok(tabsSpy.calledOnce)
 })
 
-test('renders the grading periods', function() {
+test('renders the grading periods', function () {
   this.renderComponent()
   ok(this.wrapper.at(0).instance().gradingPeriods)
 })
 
-test('renders the grading standards', function() {
+test('renders the grading standards', function () {
   this.renderComponent()
   ok(this.wrapper.at(0).instance().gradingStandards)
 })

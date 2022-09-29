@@ -33,7 +33,7 @@ test('responds to activateDeveloperKeyStart', () => {
   const state = {
     activateDeveloperKeyPending: false,
     activateDeveloperKeySuccessful: true,
-    activateDeveloperKeyError: {}
+    activateDeveloperKeyError: {},
   }
 
   const action = actions.activateDeveloperKeyStart()
@@ -46,7 +46,7 @@ test('responds to activateDeveloperKeyStart', () => {
 test('responds to activateDeveloperKeySuccessful', () => {
   const state = {
     activateDeveloperKeyPending: true,
-    activateDeveloperKeySuccessful: false
+    activateDeveloperKeySuccessful: false,
   }
   const payload = {}
   const action = actions.activateDeveloperKeySuccessful(payload)
@@ -58,7 +58,7 @@ test('responds to activateDeveloperKeySuccessful', () => {
 test('responds to activateDeveloperKeyFailed', () => {
   const state = {
     activateDeveloperKeyPending: true,
-    activateDeveloperKeyError: null
+    activateDeveloperKeyError: null,
   }
   const error = {}
 

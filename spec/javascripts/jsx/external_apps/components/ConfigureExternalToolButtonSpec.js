@@ -31,18 +31,18 @@ QUnit.module('ConfigureExternalToolButton screenreader functionality', {
     tool = {
       name: 'test tool',
       tool_configuration: {
-        url: 'http://example.com/launch'
-      }
+        url: 'http://example.com/launch',
+      },
     }
 
     event = {
-      preventDefault() {}
+      preventDefault() {},
     }
   },
   teardown() {
     $('.ReactModalPortal').remove()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test('uses the tool configuration "url" when present', () => {

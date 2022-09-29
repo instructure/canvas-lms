@@ -32,7 +32,7 @@ const defaultProps = () => ({
   totalStudents: 100,
   rangeIndex: 0,
   selectRange: () => {},
-  openSidebar: () => {}
+  openSidebar: () => {},
 })
 
 test('renders bar component correctly', () => {

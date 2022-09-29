@@ -23,7 +23,7 @@ QUnit.module('Select function')
 const obj = {
   id: '123',
   name: 'foo bar',
-  points_possible: 30
+  points_possible: 30,
 }
 
 test('select individual properties', () => {

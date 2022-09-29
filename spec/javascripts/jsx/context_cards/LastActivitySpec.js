@@ -52,15 +52,15 @@ QUnit.module('StudentContextTray/LastActivity', hooks => {
           user={{
             enrollments: [
               {
-                last_activity_at: lastActivity
+                last_activity_at: lastActivity,
               },
               {
-                last_activity_at: firstActivity
+                last_activity_at: firstActivity,
               },
               {
-                last_activity_at: middleActivity
-              }
-            ]
+                last_activity_at: middleActivity,
+              },
+            ],
           }}
         />
       )
@@ -83,9 +83,9 @@ QUnit.module('StudentContextTray/LastActivity', hooks => {
         user={{
           enrollments: [
             {
-              last_activity_at: lastActivity
-            }
-          ]
+              last_activity_at: lastActivity,
+            },
+          ],
         }}
       />
     )

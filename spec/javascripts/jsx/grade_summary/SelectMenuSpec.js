@@ -22,7 +22,7 @@ import {
   makeSelection,
   selectedValue,
   getSelectMenuOptions,
-  isSelectDisabled
+  isSelectDisabled,
 } from './SelectMenuHelpers'
 
 QUnit.module('SelectMenu', hooks => {
@@ -37,7 +37,7 @@ QUnit.module('SelectMenu', hooks => {
     const options = [
       {id: '3', name: 'Guy B. Studying', url: '/some/url/3'},
       {id: '14', name: 'Jane Doe', url: '/some/url/14'},
-      {id: '18', name: 'John Doe', url: '/some/url/18'}
+      {id: '18', name: 'John Doe', url: '/some/url/18'},
     ]
 
     props = {
@@ -48,7 +48,7 @@ QUnit.module('SelectMenu', hooks => {
       onChange() {},
       options,
       textAttribute: 'name',
-      valueAttribute: 'id'
+      valueAttribute: 'id',
     }
   })
 
@@ -80,7 +80,7 @@ QUnit.module('SelectMenu', hooks => {
     props.defaultValue = 'due_date'
     props.options = [
       ['Title', 'title'],
-      ['Due Date', 'due_date']
+      ['Due Date', 'due_date'],
     ]
     props.textAttribute = 0
     props.valueAttribute = 1
@@ -105,7 +105,7 @@ QUnit.module('SelectMenu', hooks => {
     props.defaultValue = 'due_date'
     props.options = [
       ['Title', 'title'],
-      ['Due Date', 'due_date']
+      ['Due Date', 'due_date'],
     ]
     props.textAttribute = 0
     props.valueAttribute = 1

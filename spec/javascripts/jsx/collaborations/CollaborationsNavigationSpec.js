@@ -23,7 +23,7 @@ import CollaborationsNavigation from 'ui/features/lti_collaborations/react/Colla
 QUnit.module('CollaborationsNavigation')
 
 const defaultProps = {
-  ltiCollaborators: [{name: 'A name', id: '1'}]
+  ltiCollaborators: [{name: 'A name', id: '1'}],
 }
 
 test('button hidden if create permission is false', () => {

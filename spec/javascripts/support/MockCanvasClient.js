@@ -41,7 +41,7 @@ const MockCanvasClient = {
 
   uninstall: () => {
     delete createClient.mockLink
-  }
+  },
 }
 
 export default MockCanvasClient

@@ -32,7 +32,7 @@ QUnit.module('TutorialTray Spec', {
 
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 let store
@@ -43,11 +43,11 @@ const getDefaultProps = overrides => ({
     return {
       focus() {
         return document.body
-      }
+      },
     }
   },
   store,
-  ...overrides
+  ...overrides,
 })
 
 test('Renders', () => {

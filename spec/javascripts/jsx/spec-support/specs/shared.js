@@ -23,7 +23,7 @@ export const stubbable = {
 
   getOtherValue() {
     return 'really real'
-  }
+  },
 }
 
 export function waitForNextExample(callback) {

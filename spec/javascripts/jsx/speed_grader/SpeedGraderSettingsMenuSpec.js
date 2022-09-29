@@ -41,7 +41,7 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
       openOptionsModal() {},
       openKeyboardShortcutsModal() {},
       showHelpMenuItem: false,
-      showModerationMenuItem: false
+      showModerationMenuItem: false,
     }
 
     $container = document.createElement('div')

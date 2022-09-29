@@ -42,7 +42,7 @@ QUnit.module('SyllabusBehaviors.bindToEditSyllabus', {
     editorUtils.resetRCE()
     fixtures.teardown()
     $('.ui-dialog').remove()
-  }
+  },
 })
 
 test('sets focus to the edit button when hide_edit occurs', () => {

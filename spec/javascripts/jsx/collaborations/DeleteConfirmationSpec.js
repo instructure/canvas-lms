@@ -28,10 +28,10 @@ const props = {
     description: 'Im here to describe stuff',
     user_id: 1,
     user_name: 'Say my name',
-    updated_at: new Date(0).toString()
+    updated_at: new Date(0).toString(),
   },
   onDelete: () => {},
-  onCancel: () => {}
+  onCancel: () => {},
 }
 
 test('renders the message and action buttons', () => {
@@ -54,7 +54,7 @@ test('Clicking on the confirmation button calls onDelete', () => {
     ...props,
     onDelete: () => {
       onDeleteCalled = true
-    }
+    },
   }
 
   const component = TestUtils.renderIntoDocument(<DeleteConfirmation {...newProps} />)
@@ -71,7 +71,7 @@ test('Clicking on the cancel button calls onCancel', () => {
     ...props,
     onCancel: () => {
       onCancelCalled = true
-    }
+    },
   }
 
   const component = TestUtils.renderIntoDocument(<DeleteConfirmation {...newProps} />)

@@ -48,7 +48,7 @@ define(['jquery'], $ => {
   QUnit.module('isChangeMultiFuncBound', {
     setup() {
       sandbox.stub($, '_data')
-    }
+    },
   })
 
   test('gets events from data on first element', assert => {
@@ -65,7 +65,7 @@ define(['jquery'], $ => {
     const done = assert.async()
     const $el = [{}]
     const events = {
-      change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
+      change: [{handler: {origFuncNm: 'changeMultiFunc'}}],
     }
     require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
@@ -78,7 +78,7 @@ define(['jquery'], $ => {
     const done = assert.async()
     const $el = [{}]
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
     require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
@@ -92,14 +92,14 @@ define(['jquery'], $ => {
       sandbox.stub($questionContent, 'bind')
       sandbox.stub($, '_data')
       $questionContent.bind.returns({change() {}})
-    }
+    },
   })
 
   test('rebinds event on questionContent', assert => {
     const done = assert.async()
     const questionType = 'multiple_dropdowns_question'
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
     $._data.returns(events)
     require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
@@ -115,7 +115,7 @@ define(['jquery'], $ => {
     const done = assert.async()
     const questionType = 'multiple_dropdowns_question'
     const events = {
-      change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
+      change: [{handler: {origFuncNm: 'changeMultiFunc'}}],
     }
     $._data.returns(events)
     require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
@@ -131,7 +131,7 @@ define(['jquery'], $ => {
     const done = assert.async()
     const questionType = 'other_question'
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
     $._data.returns(events)
     require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {

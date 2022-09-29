@@ -30,7 +30,7 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
         {
           request: {
             query: Api.SET_ASSIGNMENT_POST_POLICY_MUTATION,
-            variables: {assignmentId: ASSIGNMENT_ID, postManually: true}
+            variables: {assignmentId: ASSIGNMENT_ID, postManually: true},
           },
           result: {
             data: {
@@ -39,16 +39,16 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
                 errors: [],
                 postPolicy: {
                   postManually: true,
-                  __typename: 'PostPolicy'
-                }
-              }
-            }
-          }
+                  __typename: 'PostPolicy',
+                },
+              },
+            },
+          },
         },
         {
           request: {
             query: Api.SET_ASSIGNMENT_POST_POLICY_MUTATION,
-            variables: {assignmentId: BAD_ASSIGNMENT_ID, postManually: true}
+            variables: {assignmentId: BAD_ASSIGNMENT_ID, postManually: true},
           },
           result: {
             data: {
@@ -56,22 +56,22 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
                 __typename: 'SetAssignmentPostPolicy',
                 errors: [
                   {__typename: 'Error', attribute: 'severity', message: 'complete disaster'},
-                  {__typename: 'Error', attribute: 'severity', message: 'another disaster'}
+                  {__typename: 'Error', attribute: 'severity', message: 'another disaster'},
                 ],
-                postPolicy: null
-              }
-            }
-          }
+                postPolicy: null,
+              },
+            },
+          },
         },
         {
           request: {
             query: Api.SET_ASSIGNMENT_POST_POLICY_MUTATION,
-            variables: {assignmentId: BAD_RESPONSE_ASSIGNMENT_ID, postManually: true}
+            variables: {assignmentId: BAD_RESPONSE_ASSIGNMENT_ID, postManually: true},
           },
           result: {
-            data: {}
-          }
-        }
+            data: {},
+          },
+        },
       ])
     })
 
@@ -82,7 +82,7 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
     test('returns the postManually value if the response includes a postPolicy object', async () => {
       const result = await Api.setAssignmentPostPolicy({
         assignmentId: ASSIGNMENT_ID,
-        postManually: true
+        postManually: true,
       })
       deepEqual(result, {postManually: true})
     })
@@ -90,7 +90,7 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
     test('throws an error containing the first error message if the response includes errors', async () => {
       Api.setAssignmentPostPolicy({
         assignmentId: BAD_ASSIGNMENT_ID,
-        postManually: true
+        postManually: true,
       }).catch(error => {
         strictEqual(error.message, 'complete disaster')
       })
@@ -99,7 +99,7 @@ QUnit.module('AssignmentPostingPolicyTray Api', () => {
     test('throws an error if the response provides neither a postPolicy object nor an error', async () => {
       Api.setAssignmentPostPolicy({
         assignmentId: BAD_RESPONSE_ASSIGNMENT_ID,
-        postManually: true
+        postManually: true,
       }).catch(error => {
         strictEqual(error.message, 'no postPolicy or error provided in response')
       })

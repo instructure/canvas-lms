@@ -84,7 +84,7 @@ export function logTrackers(trackers, optionFn) {
     const typeTrackers = behaviorMap[trackerType]
     logCurrentContext(typeTrackers[0].currentContext, {
       ...optionFn(trackerType, typeTrackers),
-      sourceStack: typeTrackers[0].sourceStack
+      sourceStack: typeTrackers[0].sourceStack,
     })
   })
 }

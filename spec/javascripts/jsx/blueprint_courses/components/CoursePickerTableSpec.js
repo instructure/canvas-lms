@@ -26,7 +26,7 @@ QUnit.module('CoursePickerTable component')
 const defaultProps = () => ({
   courses: getSampleData().courses,
   selectedCourses: [],
-  onSelectedChanged: () => {}
+  onSelectedChanged: () => {},
 })
 
 test('renders the CoursePickerTable component', () => {
@@ -49,22 +49,8 @@ test('displays correct table data', () => {
   const rows = tree.find('tr[data-testid="bca-table__course-row"]')
 
   equal(rows.length, props.courses.length)
-  equal(
-    rows
-      .at(0)
-      .find('Cell')
-      .at(1)
-      .text(),
-    props.courses[0].name
-  )
-  equal(
-    rows
-      .at(1)
-      .find('Cell')
-      .at(1)
-      .text(),
-    props.courses[1].name
-  )
+  equal(rows.at(0).find('Cell').at(1).text(), props.courses[0].name)
+  equal(rows.at(1).find('Cell').at(1).text(), props.courses[1].name)
 })
 
 test('calls onSelectedChanged when courses are selected', () => {
@@ -138,10 +124,7 @@ test('handleFocusLoss focuses on select all if no items left', () => {
   const tree = enzyme.mount(<CoursePickerTable {...props} />)
   const instance = tree.instance()
 
-  const check = tree
-    .find('.bca-table__select-all input[type="checkbox"]')
-    .at(0)
-    .instance()
+  const check = tree.find('.bca-table__select-all input[type="checkbox"]').at(0).instance()
   check.focus = sinon.spy()
 
   instance.handleFocusLoss(1)

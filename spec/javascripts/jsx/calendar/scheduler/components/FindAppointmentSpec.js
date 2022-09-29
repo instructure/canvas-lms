@@ -25,15 +25,15 @@ QUnit.module('FindAppointmentApp')
 test('renders the FindAppoint component', () => {
   const courses = [
     {name: 'testCourse1', asset_string: 'thing1'},
-    {name: 'testCourse2', asset_string: 'thing2'}
+    {name: 'testCourse2', asset_string: 'thing2'},
   ]
 
   const store = {
     getState() {
       return {
-        inFindAppointmentMode: false
+        inFindAppointmentMode: false,
       }
-    }
+    },
   }
 
   const wrapper = shallow(<FindAppointmentApp courses={courses} store={store} />)
@@ -43,15 +43,15 @@ test('renders the FindAppoint component', () => {
 test('correct button renders', () => {
   const courses = [
     {name: 'testCourse1', asset_string: 'thing1'},
-    {name: 'testCourse2', asset_string: 'thing2'}
+    {name: 'testCourse2', asset_string: 'thing2'},
   ]
 
   const store = {
     getState() {
       return {
-        inFindAppointmentMode: true
+        inFindAppointmentMode: true,
       }
-    }
+    },
   }
 
   const wrapper = shallow(<FindAppointmentApp courses={courses} store={store} />)
@@ -61,15 +61,15 @@ test('correct button renders', () => {
 test('selectCourse sets the proper selected course', () => {
   const courses = [
     {id: 1, name: 'testCourse1', asset_string: 'thing1'},
-    {id: 2, name: 'testCourse2', asset_string: 'thing2'}
+    {id: 2, name: 'testCourse2', asset_string: 'thing2'},
   ]
 
   const store = {
     getState() {
       return {
-        inFindAppointmentMode: false
+        inFindAppointmentMode: false,
       }
-    }
+    },
   }
 
   const wrapper = mount(<FindAppointmentApp courses={courses} store={store} />)

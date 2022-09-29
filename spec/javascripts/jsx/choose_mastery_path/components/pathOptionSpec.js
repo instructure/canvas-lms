@@ -32,8 +32,8 @@ const defaultProps = () => ({
       itemId: 1,
       category: {
         id: 'other',
-        label: 'Other'
-      }
+        label: 'Other',
+      },
     },
     {
       title: 'Ch 2 Review',
@@ -43,14 +43,14 @@ const defaultProps = () => ({
       itemId: 1,
       category: {
         id: 'other',
-        label: 'Other'
-      }
-    }
+        label: 'Other',
+      },
+    },
   ],
   setId: 1,
   optionIndex: 0,
   selectedOption: null,
-  selectOption: () => {}
+  selectOption: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<PathOption {...props} />)

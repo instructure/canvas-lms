@@ -33,7 +33,7 @@ test('responds to makeVisibleDeveloperKeyStart', () => {
   const state = {
     makeVisibleDeveloperKeyPending: false,
     makeVisibleDeveloperKeySuccessful: true,
-    makeVisibleDeveloperKeyError: {}
+    makeVisibleDeveloperKeyError: {},
   }
 
   const action = actions.makeVisibleDeveloperKeyStart()
@@ -46,7 +46,7 @@ test('responds to makeVisibleDeveloperKeyStart', () => {
 test('responds to makeVisibleDeveloperKeySuccessful', () => {
   const state = {
     makeVisibleDeveloperKeyPending: true,
-    makeVisibleDeveloperKeySuccessful: false
+    makeVisibleDeveloperKeySuccessful: false,
   }
   const payload = {}
   const action = actions.makeVisibleDeveloperKeySuccessful(payload)
@@ -58,7 +58,7 @@ test('responds to makeVisibleDeveloperKeySuccessful', () => {
 test('responds to makeVisibleDeveloperKeyFailed', () => {
   const state = {
     makeVisibleDeveloperKeyPending: true,
-    makeVisibleDeveloperKeyError: null
+    makeVisibleDeveloperKeyError: null,
   }
   const error = {}
 

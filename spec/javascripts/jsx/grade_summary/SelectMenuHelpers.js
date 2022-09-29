@@ -31,10 +31,7 @@ export function getSelect(wrapper, selectId) {
 
 export function getSelectMenu(select) {
   return document.getElementById(
-    select
-      .getDOMNode()
-      .querySelector('[aria-haspopup="listbox"]')
-      .getAttribute('aria-controls')
+    select.getDOMNode().querySelector('[aria-haspopup="listbox"]').getAttribute('aria-controls')
   )
 }
 
@@ -50,14 +47,10 @@ export function getSelectMenuOptions(wrapper, selectId) {
 }
 
 export function selectedValue(wrapper, selectId) {
-  return getSelect(wrapper, selectId)
-    .getDOMNode()
-    .querySelector('[aria-haspopup="listbox"]').value
+  return getSelect(wrapper, selectId).getDOMNode().querySelector('[aria-haspopup="listbox"]').value
 }
 
 export function isSelectDisabled(wrapper, selectId) {
-  return getSelect(wrapper, selectId)
-    .last()
-    .getDOMNode()
-    .querySelector('[aria-haspopup="listbox"]').disabled
+  return getSelect(wrapper, selectId).last().getDOMNode().querySelector('[aria-haspopup="listbox"]')
+    .disabled
 }

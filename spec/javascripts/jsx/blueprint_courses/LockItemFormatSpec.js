@@ -37,7 +37,7 @@ test('takes in an object with all items false and returns "no locks" message', (
     content: false,
     points: false,
     due_dates: false,
-    availability_dates: false
+    availability_dates: false,
   }
   const formattedString = formatLockObject(lockObject)
   deepEqual(formattedString, 'no attributes locked')
@@ -48,7 +48,7 @@ test('takes in an object with multiple items and returns a formatted string', ()
     content: true,
     points: true,
     due_dates: false,
-    availability_dates: true
+    availability_dates: true,
   }
   const formattedString = formatLockObject(lockObject)
   deepEqual(formattedString, 'Content, Points & Availability Dates')

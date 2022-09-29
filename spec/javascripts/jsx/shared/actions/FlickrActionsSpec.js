@@ -26,28 +26,25 @@ test('receiveFlickrResults removes images with needs_interstitial=1', () => {
       photo: [
         {id: 1, needs_interstitial: 0},
         {id: 2, needs_interstitial: 1},
-        {id: 3, needs_interstitial: 0}
-      ]
-    }
+        {id: 3, needs_interstitial: 0},
+      ],
+    },
   }
   const action = FlickrActions.receiveFlickrResults(results)
   deepEqual(action, {
     type: 'RECEIVE_FLICKR_RESULTS',
     results: {
       photos: {
-        photo: [{id: 1, needs_interstitial: 0}, {id: 3, needs_interstitial: 0}]
-      }
-    }
+        photo: [
+          {id: 1, needs_interstitial: 0},
+          {id: 3, needs_interstitial: 0},
+        ],
+      },
+    },
   })
 })
 
 test('composeFlickrUrl includes needs_interstitial in extras', () => {
   const url = new URL(FlickrActions.composeFlickrUrl('fake', 1))
-  notEqual(
-    url.searchParams
-      .get('extras')
-      .split(',')
-      .indexOf('needs_interstitial'),
-    -1
-  )
+  notEqual(url.searchParams.get('extras').split(',').indexOf('needs_interstitial'), -1)
 })

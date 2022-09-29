@@ -32,8 +32,8 @@ const collaborations = [
     updated_at: new Date(0).toString(),
     permissions: {
       update: true,
-      delete: true
-    }
+      delete: true,
+    },
   },
   {
     id: 2,
@@ -44,15 +44,15 @@ const collaborations = [
     updated_at: new Date(0).toString(),
     permissions: {
       update: true,
-      delete: true
-    }
-  }
+      delete: true,
+    },
+  },
 ]
 
 const collaborationsState = {
   nextPage: 'www.testurl.com',
   listCollaborationsPending: 'true',
-  list: collaborations
+  list: collaborations,
 }
 
 test('renders the list of collaborations', () => {

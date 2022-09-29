@@ -28,7 +28,7 @@ const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
 const ScopedHbsExtractor = require('@instructure/i18nliner-canvas/scoped_hbs_extractor')
 const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_pre_processor')
-const { canvasDir } = require('#params')
+const {canvasDir} = require('#params')
 
 function compileHandlebars(data) {
   const {path, source} = data
@@ -55,7 +55,7 @@ function resourceName(path) {
   return path.replace(/^.+?\/templates\//, '').replace(/\.hbs$/, '')
 }
 
-function emitTemplate({ name, template, dependencies }) {
+function emitTemplate({name, template, dependencies}) {
   return `
     import Ember from 'ember';
     ${dependencies.map(d => `import ${JSON.stringify(d)};`).join('\n')}
@@ -66,21 +66,20 @@ function emitTemplate({ name, template, dependencies }) {
   `
 }
 
-const withLeadingDotSlash = x => x.startsWith('.') ? x : `./${x}`
-const emberHelpers = path.resolve(canvasDir, 'ui/features/screenreader_gradebook/ember/helpers/common.js')
+const withLeadingDotSlash = x => (x.startsWith('.') ? x : `./${x}`)
+const emberHelpers = path.resolve(
+  canvasDir,
+  'ui/features/screenreader_gradebook/ember/helpers/common.js'
+)
 const emberJSTRoot = path.resolve(canvasDir, 'ui/features/screenreader_gradebook/jst')
 
-module.exports = function(source) {
+module.exports = function (source) {
   this.cacheable()
 
-  const pathFromMeToEmberHelpers = withLeadingDotSlash(
-    path.relative(this.context, emberHelpers)
-  )
+  const pathFromMeToEmberHelpers = withLeadingDotSlash(path.relative(this.context, emberHelpers))
 
   const name = this.resourcePath.slice(emberJSTRoot.length + 1).replace(/\.hbs$/, '')
-  const dependencies = [
-    pathFromMeToEmberHelpers
-  ]
+  const dependencies = [pathFromMeToEmberHelpers]
 
   const result = compileHandlebars({path: this.resourcePath, source, ember: true})
 
@@ -93,5 +92,5 @@ module.exports = function(source) {
     dependencies.push('@canvas/i18n')
   }
 
-  return emitTemplate({ name, template: result.template, dependencies })
+  return emitTemplate({name, template: result.template, dependencies})
 }

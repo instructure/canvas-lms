@@ -30,7 +30,7 @@ const makeProps = (props = {}) =>
       onHide() {},
       modalRef() {},
       selectedCount: 1,
-      applicationElement: () => document.getElementById('fixtures')
+      applicationElement: () => document.getElementById('fixtures'),
     },
     props
   )

@@ -18,7 +18,9 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import UsersPane, {SEARCH_DEBOUNCE_TIME} from 'ui/features/account_course_user_search/react/components/UsersPane.js'
+import UsersPane, {
+  SEARCH_DEBOUNCE_TIME,
+} from 'ui/features/account_course_user_search/react/components/UsersPane.js'
 import UserActions from 'ui/features/account_course_user_search/react/actions/UserActions.js'
 
 QUnit.module('Account Course User Search UsersPane View')
@@ -32,19 +34,19 @@ const fakeStore = () => ({
       next: undefined,
       searchFilter: {search_term: ''},
       permissions: {},
-      accountId: 1
-    }
+      accountId: 1,
+    },
   },
   dispatch() {},
   getState() {
     return this.state
   },
-  subscribe() {}
+  subscribe() {},
 })
 
 const wrapper = store =>
   shallow(
-    <UsersPane store={store} roles={['a']} queryParams={{}} onUpdateQueryParams={function() {}} />
+    <UsersPane store={store} roles={['a']} queryParams={{}} onUpdateQueryParams={function () {}} />
   )
 
 test('handleUpdateSearchFilter dispatches applySearchFilter action', assert => {
@@ -67,9 +69,5 @@ test('have an h1 on the page', () => {
 test('does not render UserList if loading', () => {
   const store = fakeStore()
   store.state.userList.isLoading = true
-  notOk(
-    wrapper(store)
-      .find('UsersList')
-      .exists()
-  )
+  notOk(wrapper(store).find('UsersList').exists())
 })

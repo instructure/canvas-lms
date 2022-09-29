@@ -27,7 +27,7 @@ const wrapper = document.getElementById('fixtures')
 Modal.setAppElement(wrapper)
 const createElement = tool => <ConfigureExternalToolButton tool={tool} returnFocus={() => {}} />
 const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
-const getDOMNodes = function(data) {
+const getDOMNodes = function (data) {
   const component = renderComponent(data)
   const btnTriggerModal = component.refs.btnTriggerModal
   return [component, btnTriggerModal]
@@ -44,7 +44,7 @@ QUnit.module('ExternalApps.ConfigureExternalToolButton', {
         enabled: true,
         installed_locally: true,
         name: 'Talent',
-        tool_configuration: {url: 'http://example.com'}
+        tool_configuration: {url: 'http://example.com'},
       },
       {
         app_id: 2,
@@ -53,13 +53,13 @@ QUnit.module('ExternalApps.ConfigureExternalToolButton', {
         enabled: true,
         installed_locally: true,
         name: 'Twitter',
-        tool_configuration: null
-      }
+        tool_configuration: null,
+      },
     ]
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('open and close modal', () => {
@@ -71,7 +71,7 @@ test('open and close modal', () => {
     enabled: true,
     installed_locally: true,
     name: 'Talent',
-    tool_configuration: {url: 'http://example.com'}
+    tool_configuration: {url: 'http://example.com'},
   }
   const [component, btnTriggerModal] = Array.from(getDOMNodes(tool))
   Simulate.click(btnTriggerModal)

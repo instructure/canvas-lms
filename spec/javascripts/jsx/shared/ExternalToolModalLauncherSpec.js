@@ -41,7 +41,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
       contextType: 'course',
       contextId: 5,
       launchType: 'course_assignments_menu',
-      ...overrides
+      ...overrides,
     }
   }
 
@@ -72,7 +72,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
       height: defaultHeight,
       padding: 0,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
     })
   })
 
@@ -84,7 +84,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
     deepEqual(component.getDimensions().modalLaunchStyle, {
       width: defaultWidth,
       height: defaultHeight,
-      border: 'none'
+      border: 'none',
     })
   })
 
@@ -94,7 +94,7 @@ QUnit.module('ExternalToolModalLauncher', hooks => {
 
     const overrides = {
       tool: {placements: {course_assignments_menu: {launch_width: width, launch_height: height}}},
-      isOpen: true
+      isOpen: true,
     }
 
     const component = TestUtils.renderIntoDocument(

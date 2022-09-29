@@ -52,17 +52,20 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
       assignment: {
         anonymousGrading: false,
         gradesPublished: true,
-        ...assignment
+        ...assignment,
       },
       dismiss() {},
       hideBySections: true,
       hideBySectionsChanged() {},
       hidingGrades: false,
       onHideClick() {},
-      sections: [{id: '2001', name: 'Freshmen'}, {id: '2002', name: 'Sophomores'}],
+      sections: [
+        {id: '2001', name: 'Freshmen'},
+        {id: '2002', name: 'Sophomores'},
+      ],
       sectionSelectionChanged() {},
       selectedSectionIds: [],
-      ...props
+      ...props,
     }
   }
 
@@ -136,7 +139,7 @@ QUnit.module('HideAssignmentGradesTray Layout', suiteHooks => {
     contextHooks.beforeEach(() => {
       assignment = {
         gradesPublished: true,
-        anonymousGrading: true
+        anonymousGrading: true,
       }
       sections = [{id: '2001', name: 'Freshmen'}]
     })

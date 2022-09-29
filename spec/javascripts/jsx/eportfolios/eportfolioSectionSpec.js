@@ -39,7 +39,7 @@ QUnit.module('EportfolioSection -> fetchContent', {
 
   teardown() {
     fixtures.teardown()
-  }
+  },
 })
 
 test('grabs section content for rich_text type', () => {

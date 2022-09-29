@@ -36,10 +36,10 @@ test('sets options', () => {
           name: 'Ch 2 Quiz',
           type: 'quiz',
           points: 10,
-          due_date: 'Aug 20'
-        }
-      ]
-    }
+          due_date: 'Aug 20',
+        },
+      ],
+    },
   ]
   const newState = reduce(actions.setOptions(options))
   deepEqual(newState.options, options, 'options updated')

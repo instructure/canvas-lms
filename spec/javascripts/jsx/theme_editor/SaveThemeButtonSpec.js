@@ -39,13 +39,13 @@ QUnit.module('SaveThemeButton Component', {
         brand_config: {
           md5: '00112233445566778899aabbccddeeff',
           variables: {
-            'some-var': '#123'
-          }
-        }
+            'some-var': '#123',
+          },
+        },
       },
-      onSave: sinon.stub()
+      onSave: sinon.stub(),
     }
-  }
+  },
 })
 
 test('save', assert => {
@@ -88,7 +88,7 @@ test('modal visibility', () => {
   notOk(modal.props().open, 'modal is closed')
 
   wrapper.setState({
-    modalIsOpen: true
+    modalIsOpen: true,
   })
 
   modal = wrapper.find('CanvasInstUIModal')
@@ -98,24 +98,13 @@ test('modal visibility', () => {
 
 test('disabling button', () => {
   const wrapper = shallow(<SaveThemeButton {...props} />)
-  notOk(
-    wrapper
-      .find('.Button--primary')
-      .first()
-      .prop('disabled'),
-    'not disabled by default'
-  )
+  notOk(wrapper.find('.Button--primary').first().prop('disabled'), 'not disabled by default')
   wrapper.unmount()
 })
 
 test('disabling button: disabled if userNeedsToPreviewFirst', () => {
   const wrapper = shallow(<SaveThemeButton {...props} userNeedsToPreviewFirst />)
-  ok(
-    wrapper
-      .find('.Button--primary')
-      .first()
-      .prop('disabled')
-  )
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
   wrapper.unmount()
 })
 
@@ -126,22 +115,14 @@ test('disabling button: disabled if there are no unsaved changes', () => {
       brandConfigMd5={props.sharedBrandConfigBeingEdited.brand_config_md5}
     />
   )
-  ok(
-    wrapper
-      .find('.Button--primary')
-      .first()
-      .prop('disabled')
-  )
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
   wrapper.unmount()
 })
 
 test('disabling button: disabled if everything is default', () => {
-  const wrapper = shallow(<SaveThemeButton {...props} brandConfigMd5={null} isDefaultConfig={true} />)
-  ok(
-    wrapper
-      .find('.Button--primary')
-      .first()
-      .prop('disabled')
+  const wrapper = shallow(
+    <SaveThemeButton {...props} brandConfigMd5={null} isDefaultConfig={true} />
   )
+  ok(wrapper.find('.Button--primary').first().prop('disabled'))
   wrapper.unmount()
 })

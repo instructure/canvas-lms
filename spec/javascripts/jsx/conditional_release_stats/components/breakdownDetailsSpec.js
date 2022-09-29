@@ -39,7 +39,7 @@ QUnit.module('Breakdown Details', {
     ReactDOM.unmountComponentAtNode(container)
     document.getElementById('fixtures').innerHTML = ''
     clock.restore()
-  }
+  },
 })
 
 // using ReactDOM instead of TestUtils to render because of InstUI
@@ -55,7 +55,7 @@ const defaultProps = () => ({
         upper_bound: 1.0,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 2,
       students: [
@@ -63,17 +63,17 @@ const defaultProps = () => ({
           user: {
             id: 1,
             name: 'foo',
-            login_id: 'student1'
-          }
+            login_id: 'student1',
+          },
         },
         {
           user: {
             id: 2,
             name: 'bar',
-            login_id: 'student2'
-          }
-        }
-      ]
+            login_id: 'student2',
+          },
+        },
+      ],
     },
     {
       scoring_range: {
@@ -83,10 +83,10 @@ const defaultProps = () => ({
         upper_bound: 0.7,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
+      students: [],
     },
     {
       scoring_range: {
@@ -96,11 +96,11 @@ const defaultProps = () => ({
         upper_bound: 0.4,
         created_at: null,
         updated_at: null,
-        position: null
+        position: null,
       },
       size: 0,
-      students: []
-    }
+      students: [],
+    },
   ],
   assignment: {
     id: 7,
@@ -109,21 +109,21 @@ const defaultProps = () => ({
     points_possible: 15,
     grading_type: 'points',
     submission_types: ['on_paper'],
-    grading_scheme: null
+    grading_scheme: null,
   },
   students: {
-    '1': {
+    1: {
       triggerAssignment: {
         assignment: {
           id: '1',
           name: 'hello world',
           points_possible: 100,
-          grading_type: 'percent'
+          grading_type: 'percent',
         },
         submission: {
           submitted_at: '2016-08-22T14:52:43Z',
-          grade: '100'
-        }
+          grade: '100',
+        },
       },
       followOnAssignments: [
         {
@@ -134,23 +134,23 @@ const defaultProps = () => ({
             name: 'hello world',
             grading_type: 'percent',
             points_possible: 100,
-            submission_types: ['online_text_entry']
-          }
-        }
-      ]
+            submission_types: ['online_text_entry'],
+          },
+        },
+      ],
     },
-    '2': {
+    2: {
       triggerAssignment: {
         assignment: {
           id: '1',
           name: 'hello world',
           points_possible: 100,
-          grading_type: 'percent'
+          grading_type: 'percent',
         },
         submission: {
           submitted_at: '2016-08-22T14:52:43Z',
-          grade: '100'
-        }
+          grade: '100',
+        },
       },
       followOnAssignments: [
         {
@@ -161,22 +161,22 @@ const defaultProps = () => ({
             name: 'hello world',
             grading_type: 'percent',
             points_possible: 100,
-            submission_types: ['online_text_entry']
-          }
-        }
-      ]
-    }
+            submission_types: ['online_text_entry'],
+          },
+        },
+      ],
+    },
   },
   selectedPath: {
     range: 0,
-    student: null
+    student: null,
   },
   showDetails: true,
   isStudentDetailsLoading: false,
 
   // actions
   selectRange: () => {},
-  selectStudent: () => {}
+  selectStudent: () => {},
 })
 
 test('renders component correctly', () => {

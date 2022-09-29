@@ -26,21 +26,21 @@ const getDummySearchResults = pageCount => {
   const photo = [
     {
       id: 1,
-      url_m: 'url1'
+      url_m: 'url1',
     },
     {
       id: 2,
-      url_m: 'url2'
+      url_m: 'url2',
     },
     {
       id: 3,
-      url_m: 'url3'
-    }
+      url_m: 'url3',
+    },
   ]
 
   const photos = {
     pages: pageCount,
-    photo
+    photo,
   }
 
   return {photos}
@@ -61,7 +61,7 @@ test('it searches flickr on input change', () => {
 
   const fakeInputEvent = {
     target: flickrInput,
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   flickrSearch.handleInput(fakeInputEvent)
@@ -80,7 +80,7 @@ test('it clears flickr results when input is cleared', () => {
 
   const fakeInputEvent = {
     target: flickrInput,
-    preventDefault: () => {}
+    preventDefault: () => {},
   }
 
   flickrSearch.handleInput(fakeInputEvent)

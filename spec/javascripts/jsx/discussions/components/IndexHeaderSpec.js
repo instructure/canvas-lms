@@ -32,11 +32,11 @@ const makeProps = (props = {}) =>
       permissions: {
         create: true,
         manage_content: true,
-        moderate: true
+        moderate: true,
       },
       isBusy: false,
       selectedCount: 0,
-      applicationElement: () => document.getElementById('fixtures')
+      applicationElement: () => document.getElementById('fixtures'),
     },
     props
   )

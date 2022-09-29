@@ -80,7 +80,7 @@ const defaultProps = {
     user_name: 'billy bob',
     vendor_code: 'b3w9w9bf',
     workflow_state: 'active',
-    visible: false
+    visible: false,
   },
   store: {dispatch: () => {}},
   actions: {
@@ -91,9 +91,9 @@ const defaultProps = {
     deactivateDeveloperKey: () => {},
     deleteDeveloperKey: () => {},
     editDeveloperKey: () => {},
-    developerKeysModalOpen: () => {}
+    developerKeysModalOpen: () => {},
   },
-  ctx: {params: {contextId: 'context'}}
+  ctx: {params: {contextId: 'context'}},
 }
 
 function updateDefaultProps(updates = {}) {
@@ -111,7 +111,7 @@ function updateDefaultProps(updates = {}) {
 QUnit.module('DeveloperKey', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 test('includes developerName', () => {
   testWrapperOk(defaultProps, 'Atomic fireball')

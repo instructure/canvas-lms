@@ -18,7 +18,9 @@
 
 import fakeENV from 'helpers/fakeENV'
 import LearningMastery from 'ui/features/learning_mastery/react/LearningMastery.js'
-import FakeServer, {formBodyFromRequest} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
+import FakeServer, {
+  formBodyFromRequest,
+} from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import ContentFilterDriver from '../gradebook/default_gradebook/components/content-filters/ContentFilterDriver'
 
 QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
@@ -32,8 +34,8 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
         context_id: '1201',
         context_url: '/courses/1201',
         outcome_proficiency: null,
-        settings_update_url: '/courses/1201/gradebook_settings'
-      }
+        settings_update_url: '/courses/1201/gradebook_settings',
+      },
     })
 
     $container = document.createElement('div')
@@ -61,9 +63,9 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
       sections: [],
       settings: {
         filter_rows_by: {
-          section_id: null
-        }
-      }
+          section_id: null,
+        },
+      },
     }
   })
 
@@ -78,7 +80,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
       options.sections = [
         {id: '2003', name: 'Juniors'},
         {id: '2001', name: 'Sophomores'},
-        {id: '2002', name: 'Freshmen'}
+        {id: '2002', name: 'Freshmen'},
       ]
       learningMastery = new LearningMastery(options)
     })
@@ -297,7 +299,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
       contextHooks.beforeEach(() => {
         options.sections = [
           {id: '2002', name: 'Section 2'},
-          {id: '2001', name: 'Section 1'}
+          {id: '2001', name: 'Section 1'},
         ]
       })
 
@@ -344,7 +346,7 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
     hooks.beforeEach(() => {
       options.sections = [
         {id: '2002', name: 'Section 2'},
-        {id: '2001', name: 'Section 1'}
+        {id: '2001', name: 'Section 1'},
       ]
       learningMastery = new LearningMastery(options)
       learningMastery.start()
