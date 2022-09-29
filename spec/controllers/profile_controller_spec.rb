@@ -361,6 +361,20 @@ describe ProfileController do
     end
 
     describe "js_env" do
+      it "sets discussions_reporting to falsey if react_discussions_post is off" do
+        Account.default.disable_feature! :react_discussions_post
+        user_session(@user)
+        get "communication"
+        expect(assigns[:js_env][:discussions_reporting]).to be_falsey
+      end
+
+      it "sets discussions_reporting to truthy if react_discussions_post is on" do
+        Account.default.enable_feature! :react_discussions_post
+        user_session(@user)
+        get "communication"
+        expect(assigns[:js_env][:discussions_reporting]).to be_truthy
+      end
+
       it "sets the weekly_notification_range" do
         allow(@user).to receive(:weekly_notification_bucket).and_return(0)
         user_session(@user)
