@@ -24488,6 +24488,7 @@ nn:
   total_range_45c8549a: "Totalt spenn"
   total_results_outcomedetails_cnt_30ff1f8d: "Totalresultat: %{outcomeDetails.cnt}"
   totalcount_total_replies_b6988c0a: "%{totalCount} svar totalt"
+  totals_are_calculated_based_only_on_graded_assignm_7d1bbf55: "Totalen er kun utregna på basis av vurderte oppgåver"
   totals_be24703: Totalt
   track_individual_student_and_class_progress_c13cf2d1: "Spor progresjon til enkeltstudentar og seksjon"
   track_student_performance_and_activity_a92a2a8b: "Spor studentars prestasjon og aktivitet"
@@ -24606,6 +24607,12 @@ nn:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Kunne ikkje finne spesifikk student. Gå til oppgåva i SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Kan ikkje justere læringsmål til ei side"
   unable_to_align_some_outcomes_to_title_53467231: "Kan ikkje justere læringsmål til \"%{title}\""
+  unable_to_check_for_lock_on_sftp_users_table_pleas_1084e348: |-
+      Ikkje mogleg å sjekke lås på SFTP brukartabell. Ver god og prøv på nytt om eitt minutt.
+      Hvis det fortsatt feilar, ta kontakt i  #canvas-sre i Slack.
+  unable_to_check_if_sftp_user_already_exists_or_is__80e516b1: |-
+      Ikkje mogleg å sjekke om SFTP brukar allereie eksisterar eller er deaktivert. Vær god og prøv på nytt om eitt minutt.
+      Hvis det fortsatt feilar, ta kontakt i #canvas-sre i Slack.
   unable_to_connect_to_google_drive_34886e7a: "Kan ikkje koble til Google Drive"
   unable_to_create_message_without_a_body_b62274be: "Kan ikkje lage melding utan innhald"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikkje normalfordele resultat fordi innleveringsfristen for oppgåva ligg innanfor ein lukka vurderingsperiode for minst ein student"
