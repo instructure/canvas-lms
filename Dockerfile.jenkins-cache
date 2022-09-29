@@ -6,7 +6,7 @@ WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   shopt -s globstar && \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     --exclude='vendor/qti_migration_tool' \
     config/canvas_rails_switcher.rb \
     Gemfile \
@@ -23,7 +23,7 @@ RUN --mount=target=/tmp/src \
     \
     | tee /tmp/dst/ruby-runner.tar | md5sum > /tmp/dst/ruby-runner.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     script/fix_inst_esm.js \
     package.json \
     yarn.lock \
@@ -34,13 +34,13 @@ RUN --mount=target=/tmp/src \
     \
     | tee /tmp/dst/yarn-runner.tar | md5sum > /tmp/dst/yarn-runner.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     ui/engine \
     packages \
     \
     | tee /tmp/dst/webpack-builder.tar | md5sum > /tmp/dst/webpack-builder.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     bin \
     config/environments \
     gems/{autoextend,canvas_color,canvas_text_helper,config_file,i18n_extraction,i18n_tasks,utf8_cleaner}/lib \
@@ -74,7 +74,7 @@ RUN --mount=target=/tmp/src \
     \
     | tee /tmp/dst/webpack-runner-dependencies.tar | md5sum > /tmp/dst/webpack-runner-dependencies.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     --exclude='**/__mocks__' \
     --exclude='**/__tests__' \
     app/stylesheets \
@@ -90,7 +90,7 @@ RUN --mount=target=/tmp/src \
     \
     | tee /tmp/dst/webpack-runner.tar | md5sum > /tmp/dst/webpack-runner.tar.md5 && \
   \
-  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner -cf - \
+  tar --sort=name --mtime='1970-01-01' --owner=0 --group=0 --numeric-owner --mode='a+rwX' -cf - \
     app/stylesheets \
     config/brandable_css.yml \
     config/browsers.yml \
