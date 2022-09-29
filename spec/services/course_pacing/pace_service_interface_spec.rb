@@ -85,6 +85,16 @@ describe CoursePacing::PaceServiceInterface do
           CoursePacing::PaceServiceInterface.create_in_context(context)
         end.to raise_error NotImplementedError
       end
+
+      it "starts off publishing progress" do
+        allow(CoursePacing::PaceServiceInterface).to receive(:course_for).and_return(course_factory)
+
+        expect(Progress).to receive(:create!)
+          .with({ context: instance_of(CoursePace), tag: "course_pace_publish" })
+          .and_return(double(process_job: nil))
+
+        CoursePacing::PaceServiceInterface.create_in_context(context)
+      end
     end
   end
 
@@ -95,6 +105,9 @@ describe CoursePacing::PaceServiceInterface do
       let(:pace) { course_pace_model }
 
       it "returns the updated pace" do
+        expect(Progress).to receive(:create!)
+          .with({ context: pace, tag: "course_pace_publish" })
+          .and_return(double(process_job: nil))
         expect do
           expect(
             CoursePacing::PaceServiceInterface.update_pace(pace, update_params)

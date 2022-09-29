@@ -22,6 +22,8 @@ class CoursePacing::PacesApiController < ApplicationController
   before_action :require_feature_flag
   before_action :authorize_action
 
+  include Api::V1::Progress
+
   def index
     render json: {
       paces: pacing_service.paces_in_course(course).map do |p|
@@ -31,19 +33,18 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def show
+    pace = pacing_service.pace_for(context)
     render json: {
-      pace: pacing_presenter.new(
-        pacing_service.pace_for(context)
-      ).as_json
+      pace: pacing_presenter.new(pace).as_json,
+      progress: pace.id ? progress_json(pacing_service.progress(pace, publish: false), @current_user, session) : nil
     }
   end
 
   def create
+    pace = pacing_service.create_in_context(context)
     render json: {
-      pace: pacing_presenter.new(
-        pacing_service.create_in_context(context)
-      ).as_json,
-      progress: nil # TODO: update when progress taken into account
+      pace: pacing_presenter.new(pace).as_json,
+      progress: progress_json(pacing_service.progress(pace), @current_user, session)
     }, status: :created
   end
 
@@ -52,7 +53,7 @@ class CoursePacing::PacesApiController < ApplicationController
     if pacing_service.update_pace(pace, update_params)
       render json: {
         pace: pacing_presenter.new(pace).as_json,
-        progress: nil # TODO: update when progress taken into account
+        progress: progress_json(pacing_service.progress(pace), @current_user, session)
       }
     else
       render json: { success: false, errors: pace.errors.full_messages }, status: :unprocessable_entity
