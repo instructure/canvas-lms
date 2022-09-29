@@ -1,0 +1,17 @@
+#!/usr/bin/env ruby
+require "rubygems"
+require "bundler/setup"
+require "ruby-debug-ide"
+
+Debugger::QuitCommand.prepend(
+  Module.new {
+    def execute
+      # NOTE: We must ensure that all breakpoints are cleared before disconnecting sessions,
+      # or you'll face a `closed stream` error.
+      Debugger.breakpoints.clear
+      @printer.print_msg("finished")
+    end
+  }
+)
+
+load Gem.bin_path("ruby-debug-ide", "rdebug-ide")
