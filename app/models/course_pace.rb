@@ -40,6 +40,7 @@ class CoursePace < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   after_create :log_pace_counts
+  after_destroy :log_pace_deletes
   after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
   after_save :log_average_item_duration
 
@@ -347,5 +348,15 @@ class CoursePace < ActiveRecord::Base
     paced_course_module_items = all_active_course_module_items.where(id: course_pace_module_items.pluck(:module_item_id))
     InstStatsd::Statsd.count("course.paced.paced_module_item_count", paced_course_module_items.size)
     InstStatsd::Statsd.count("course.paced.all_module_item_count", all_active_course_module_items.size)
+  end
+
+  def log_pace_deletes
+    if course_section_id.present?
+      InstStatsd::Statsd.increment("course_pacing.deleted_section_pace")
+    elsif user_id.present?
+      InstStatsd::Statsd.increment("course_pacing.deleted_user_pace")
+    else
+      InstStatsd::Statsd.increment("course_pacing.deleted_course_pace")
+    end
   end
 end
