@@ -31,13 +31,7 @@ module CanvasRails
   class Application < Rails::Application
     config.autoloader = :zeitwerk
 
-    # TODO: someday we can use this line, which will NOT
-    # add anything on the autoload paths the actual ruby
-    # $LOAD_PATH because zeitwerk will take care of anything
-    # we autolaod.  This will make ACTUAL require statements
-    # that are necessary work faster because they'll have a smaller
-    # load path to scan.
-    # config.add_autoload_paths_to_load_path = false
+    config.add_autoload_paths_to_load_path = false
 
     $LOAD_PATH << config.root.to_s
     config.encoding = "utf-8"

@@ -22,7 +22,7 @@ describe Canvas::Cache::FallbackMemoryCache do
     cache = Canvas::Cache::FallbackMemoryCache.new
     cache.write("role_override_key", teacher_role)
     Object.send(:remove_const, "Role")
-    load("role.rb")
+    load(Rails.root.join("app/models/role.rb"))
     expect { cache.fetch("role_override_key") }.not_to raise_error
   end
 end
