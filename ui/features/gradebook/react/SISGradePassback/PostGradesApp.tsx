@@ -95,15 +95,26 @@ class PostGradesApp extends React.Component {
     })
     if (this.props.renderAsButton) {
       return (
-        <button id="post-grades-button" className={navClass} onClick={this.openDialog}>
+        <button
+          type="button"
+          id="post-grades-button"
+          className={navClass}
+          onClick={this.openDialog}
+        >
           {this.props.labelText}
         </button>
       )
     } else {
       return (
-        <a tabIndex={0} id="post-grades-button" className={navClass} onClick={this.openDialog}>
+        <button
+          type="button"
+          tabIndex={0}
+          id="post-grades-button"
+          className={navClass}
+          onClick={this.openDialog}
+        >
           {this.props.labelText}
-        </a>
+        </button>
       )
     }
   }

@@ -28,11 +28,11 @@ const assignmentUtils = {
     return a
   },
 
-  namesMatch(a, b) {
+  namesMatch(a: {name: string}, b: {name: string}) {
     return a.name === b.name && a !== b
   },
 
-  nameTooLong(a) {
+  nameTooLong(a: {name: string}) {
     if (_.unescape(a.name).length > 30) {
       return true
     } else {
@@ -40,8 +40,8 @@ const assignmentUtils = {
     }
   },
 
-  nameEmpty(a) {
-    if (a.name.length == 0) {
+  nameEmpty(a: {name: string}) {
+    if (a.name.length === 0) {
       return true
     } else {
       return false
@@ -53,8 +53,8 @@ const assignmentUtils = {
   },
 
   noDueDateForEveryoneElseOverride(a) {
-    const has_overrides = a.overrides != undefined ? a.overrides.length > 0 : false
-    if (has_overrides && a.overrides.length != a.sectionCount && !a.due_at) {
+    const has_overrides = a.overrides?.length > 0
+    if (has_overrides && a.overrides.length !== a.sectionCount && !a.due_at) {
       return true
     } else {
       return false
@@ -74,36 +74,34 @@ const assignmentUtils = {
       if (
         a.overrideForThisSection != undefined &&
         a.recentlyUpdated != undefined &&
-        a.recentlyUpdated == true &&
+        a.recentlyUpdated &&
         a.overrideForThisSection.due_at != null
       ) {
         a.original_error = false
       } else if (
         a.overrideForThisSection != undefined &&
         a.recentlyUpdated != undefined &&
-        a.recentlyUpdated == false &&
+        !a.recentlyUpdated &&
         a.overrideForThisSection.due_at == null
       ) {
         a.original_error = true
       }
       // for handling original error detection of a valid override for one section and an invalid override for another section
       else if (
-        a.overrideForThisSection != undefined &&
-        a.overrideForThisSection.due_at != null &&
+        a.overrideForThisSection?.due_at != null &&
         !assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
-        a.recentlyUpdated == false &&
-        a.hadOriginalErrors == false
+        !a.recentlyUpdated &&
+        !a.hadOriginalErrors
       ) {
         a.original_error = false
       }
       // for handling original error detection of a valid override for one section and the EveryoneElse "override" scenario
       else if (
-        a.overrideForThisSection != undefined &&
-        a.overrideForThisSection.due_at != null &&
+        a.overrideForThisSection?.due_at != null &&
         assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
-        a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id &&
-        a.recentlyUpdated == false &&
-        a.hadOriginalErrors == false
+        a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id &&
+        !a.recentlyUpdated &&
+        !a.hadOriginalErrors
       ) {
         a.original_error = false
       }
@@ -112,7 +110,7 @@ const assignmentUtils = {
         a.overrideForThisSection == undefined &&
         assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
         a.due_at == null &&
-        a.currentlySelected.id.toString() == a.selectedSectionForEveryone
+        a.currentlySelected.id.toString() === a.selectedSectionForEveryone
       ) {
         a.original_error = true
       }
@@ -120,8 +118,8 @@ const assignmentUtils = {
       else if (
         a.overrideForThisSection == undefined &&
         a.due_at != null &&
-        a.currentlySelected.id.toString() == a.selectedSectionForEveryone &&
-        a.hadOriginalErrors == false
+        a.currentlySelected.id.toString() === a.selectedSectionForEveryone &&
+        !a.hadOriginalErrors
       ) {
         a.original_error = false
       }
@@ -130,8 +128,8 @@ const assignmentUtils = {
         a.overrideForThisSection == undefined &&
         assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
         a.due_at == null &&
-        a.currentlySelected.type == 'course' &&
-        a.currentlySelected.id.toString() != a.selectedSectionForEveryone
+        a.currentlySelected.type === 'course' &&
+        a.currentlySelected.id.toString() !== a.selectedSectionForEveryone
       ) {
         a.original_error = true
       }
@@ -139,9 +137,9 @@ const assignmentUtils = {
       else if (
         a.overrideForThisSection == undefined &&
         a.due_at != null &&
-        a.currentlySelected.type == 'course' &&
-        a.currentlySelected.id.toString() != a.selectedSectionForEveryone &&
-        a.hadOriginalErrors == false
+        a.currentlySelected.type === 'course' &&
+        a.currentlySelected.id.toString() !== a.selectedSectionForEveryone &&
+        !a.hadOriginalErrors
       ) {
         a.original_error = false
       }
@@ -157,11 +155,11 @@ const assignmentUtils = {
     return _.filter(assignments, a => assignmentUtils.hasError(assignments, a))
   },
 
-  notIgnored(assignments) {
+  notIgnored(assignments: {please_ignore: boolean}[]) {
     return _.filter(assignments, a => !a.please_ignore)
   },
 
-  needsGrading(assignments) {
+  needsGrading(assignments: {needs_grading_count: number}[]) {
     return _.filter(assignments, a => a.needs_grading_count > 0)
   },
 
@@ -179,7 +177,7 @@ const assignmentUtils = {
     if (assignmentUtils.nameEmpty(a)) return true
 
     // //Non-override missing due_at
-    const has_overrides = a.overrides != undefined ? a.overrides.length > 0 : false
+    const has_overrides = a.overrides?.length > 0
     if (!has_overrides && !a.due_at) return true
 
     // //Override missing due_at
@@ -187,7 +185,7 @@ const assignmentUtils = {
     if (
       has_this_override &&
       a.overrideForThisSection.due_at == null &&
-      a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id
+      a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id
     )
       return true
 
@@ -195,7 +193,7 @@ const assignmentUtils = {
     if (
       has_this_override &&
       a.overrideForThisSection.due_at == null &&
-      a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id
+      a.currentlySelected.id.toString() !== a.overrideForThisSection.course_section_id
     )
       return true
 
@@ -205,18 +203,14 @@ const assignmentUtils = {
     // //the assignments actual due_at. So we must check for this behavior
     if (
       assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
-      a.currentlySelected != undefined &&
-      a.overrideForThisSection != undefined &&
-      a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id
+      a.currentlySelected?.id.toString() !== a.overrideForThisSection?.course_section_id
     )
       return true
 
     // //Has only one override but the section that is currently selected does not have an override thus causing the assignment to have due_at that is null making it invalid
     if (
       assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
-      a.overrideForThisSection == undefined &&
-      a.currentlySelected != undefined &&
-      a.currentlySelected.id.toString() == a.selectedSectionForEveryone
+      a.currentlySelected?.id.toString() === a?.selectedSectionForEveryone
     )
       return true
 
@@ -224,9 +218,8 @@ const assignmentUtils = {
     if (
       assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
       a.overrideForThisSection == undefined &&
-      a.currentlySelected != undefined &&
-      a.currentlySelected.type == 'course' &&
-      a.currentlySelected.id.toString() != a.selectedSectionForEveryone
+      a.currentlySelected?.type === 'course' &&
+      a.currentlySelected?.id.toString() !== a.selectedSectionForEveryone
     )
       return true
 
@@ -238,15 +231,12 @@ const assignmentUtils = {
     return assignment.published && assignment.post_to_sis
   },
 
-  saveAssignmentToCanvas(course_id, assignment) {
+  saveAssignmentToCanvas(course_id: string, assignment) {
     // if the date on an override is being updated confirm by checking if the due_at is an object
-    if (
-      assignment.overrideForThisSection != undefined &&
-      typeof assignment.overrideForThisSection.due_at === 'object'
-    ) {
+    if (typeof assignment.overrideForThisSection?.due_at === 'object') {
       // allows the validation process to determine when it has been updated and can display the correct page
       assignment.hadOriginalErrors = false
-      var url =
+      let url =
         '/api/v1/courses/' +
         course_id +
         '/assignments/' +
@@ -270,7 +260,7 @@ const assignmentUtils = {
             'An error occurred saving assignment override, (' +
             assignment.overrideForThisSection.id +
             '). '
-          msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
+          msg += 'HTTP Error ' + err.status + ' : ' + err.statusText
           $.flashError(msg)
         },
       })
@@ -278,7 +268,7 @@ const assignmentUtils = {
       // that was just set AND the naming conflict is fixed we must also update the assignment
       // to mock natural behavior to the user so that the naming conflict does not appear again
       url = '/api/v1/courses/' + course_id + '/assignments/' + assignment.id
-      data = {
+      const data = {
         assignment: {
           name: assignment.name,
           due_at: assignment.due_at,
@@ -290,15 +280,15 @@ const assignmentUtils = {
         contentType: 'application/json; charset=utf-8',
         error: err => {
           let msg = 'An error occurred saving assignment (' + assignment.id + '). '
-          msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
+          msg += 'HTTP Error ' + err.status + ' : ' + err.statusText
           $.flashError(msg)
         },
       })
     } else {
       // allows the validation process to determine when it has been updated and can display the correct page
       assignment.hadOriginalErrors = false
-      var url = '/api/v1/courses/' + course_id + '/assignments/' + assignment.id
-      var data = {
+      const url = '/api/v1/courses/' + course_id + '/assignments/' + assignment.id
+      const data = {
         assignment: {
           name: assignment.name,
           due_at: assignment.due_at,
@@ -310,7 +300,7 @@ const assignmentUtils = {
         contentType: 'application/json; charset=utf-8',
         error: err => {
           let msg = 'An error occurred saving assignment (' + assignment.id + '). '
-          msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
+          msg += 'HTTP Error ' + err.status + ' : ' + err.statusText
           $.flashError(msg)
         },
       })
@@ -337,7 +327,7 @@ const assignmentUtils = {
       error: err => {
         let msg =
           'An error occurred posting grades for (' + selected.type + ' : ' + selected.id + '). '
-        msg += 'HTTP Error ' + data.status + ' : ' + data.statusText
+        msg += 'HTTP Error ' + err.status + ' : ' + err.statusText
         $.flashError(msg)
       },
     })

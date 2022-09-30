@@ -43,9 +43,11 @@ export function fetchLatePolicy(courseId) {
     .catch(error => {
       // if we get a 404 then we know the course does not
       // currently have a late policy set up
-      if (error.response && error.response.status === 404) {
+      if (error.response?.status === 404) {
+        // eslint-disable-next-line promise/no-return-wrap
         return Promise.resolve({data: {latePolicy: DEFAULT_LATE_POLICY_DATA}})
       } else {
+        // eslint-disable-next-line promise/no-return-wrap
         return Promise.reject(error)
       }
     })
