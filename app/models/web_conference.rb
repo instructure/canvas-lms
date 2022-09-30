@@ -23,7 +23,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: %i[course group account]
-  has_one :calendar_event, -> { active.order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
+  has_one :calendar_event, -> { order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user
@@ -457,7 +457,9 @@ class WebConference < ActiveRecord::Base
   end
 
   def has_calendar_event
-    calendar_event.nil? ? 0 : 1
+    return 0 if calendar_event.nil?
+
+    calendar_event.workflow_state == "deleted" ? 0 : 1
   end
 
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }

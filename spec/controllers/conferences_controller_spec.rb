@@ -541,6 +541,24 @@ describe ConferencesController do
       expect(WebConference.exists?(@conference.id)).to eq(false)
       expect(@event.reload.web_conference_id).to be_nil
     end
+
+    it "deletes conference correctly if calendar event was deleted first" do
+      user_session(@teacher)
+      @conference = @course.web_conferences.create!(conference_type: "Wimba", duration: 60, user: @teacher)
+      @conference.users << @student
+      @conference.calendar_event = calendar_event_model
+      @conference.save!
+
+      conference_event_id = @conference.calendar_event.id
+      @conference.calendar_event.destroy!
+      expect(CalendarEvent.find(conference_event_id).web_conference).to eq(nil)
+
+      delete "destroy", params: { course_id: @course.id, id: @conference.id }
+
+      expect(response).to be_redirect
+      expect(WebConference.exists?(@conference.id)).to eq(false)
+      expect(@event.reload.web_conference_id).to be_nil
+    end
   end
 
   context "LTI conferences" do
