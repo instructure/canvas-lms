@@ -402,6 +402,7 @@ class ConferencesController < ApplicationController
               calendar_event&.save
             elsif @conference.calendar_event
               @conference.calendar_event.destroy
+              @conference.calendar_event = nil
             end
           end
 

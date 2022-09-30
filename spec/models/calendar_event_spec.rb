@@ -1202,6 +1202,13 @@ describe CalendarEvent do
       expect(@event).to be_valid
     end
 
+    it "sets the conference to nil when the calendar event is destroyed" do
+      event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
+      expect(event.web_conference.id).to eq WebConference.last.id
+      event.destroy!
+      expect(event.web_conference).to eq nil
+    end
+
     context "after_save callbacks" do
       it "keeps title of conference in sync with event" do
         event = course.calendar_events.create! title: "Foo", web_conference: conference(context: course)
