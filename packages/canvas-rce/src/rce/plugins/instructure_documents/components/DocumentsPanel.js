@@ -28,7 +28,7 @@ import {
   LoadMoreButton,
   LoadingIndicator,
   LoadingStatus,
-  useIncrementalLoading
+  useIncrementalLoading,
 } from '../../../../common/incremental-loading'
 
 function hasFiles(documents) {
@@ -72,7 +72,7 @@ export default function DocumentsPanel(props) {
     records: files,
     contextType,
     sortBy,
-    searchString
+    searchString,
   })
 
   const handleDocClick = file => {
@@ -92,7 +92,7 @@ export default function DocumentsPanel(props) {
       {error && renderLoadingError(error)}
 
       {isEmpty(documents) && (
-        <View as="div" padding="medium">
+        <View as="div" role="alert" padding="medium">
           {formatMessage('No results.')}
         </View>
       )}
@@ -111,12 +111,12 @@ DocumentsPanel.propTypes = {
       bookmark: string,
       hasMore: bool,
       isLoading: bool,
-      error: string
+      error: string,
     })
   ).isRequired,
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
-    order: oneOf(['asc', 'desc']).isRequired
+    order: oneOf(['asc', 'desc']).isRequired,
   }).isRequired,
-  searchString: string
+  searchString: string,
 }
