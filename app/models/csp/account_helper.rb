@@ -122,10 +122,13 @@ module Csp::AccountHelper
     # first, get the allowed domain list from the enabled csp account
     # then get the list of domains extracted from external tools
     domains = ::Csp::Domain.get_cached_domains_for_account(csp_account_id)
+    # This is gross but needed for now for lti 1.3 tools until we transition them to
+    # using the LoginRedirectController.sso_host
+    domains << Account.default.primary_domain&.host_with_test(request&.host_with_port) if include_tools
     domains += Setting.get("csp.global_whitelist", "").split(",").map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
-    domains.uniq.sort
+    domains.compact.uniq.sort
   end
 
   ACCOUNT_TOOL_CACHE_KEY_PREFIX = "account_tool_domains"
