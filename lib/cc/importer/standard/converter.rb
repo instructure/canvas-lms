@@ -101,9 +101,14 @@ module CC::Importer::Standard
                @file_path_migration_id[path.gsub(%r{\$[^$]*\$|\.\./}, "").sub(WEB_RESOURCES_FOLDER + "/", "")]
 
       unless mig_id
-        full_path = @package_root.item_path(path)
+        full_path = begin
+          @package_root.item_path(path)
+        rescue ArgumentError => e
+          ::Canvas::Errors.capture_exception(:content_imports, e)
+          nil
+        end
 
-        if File.exist?(full_path)
+        if full_path && File.exist?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
           file = { path_name: path, migration_id: mig_id,
@@ -116,9 +121,7 @@ module CC::Importer::Standard
     end
 
     def get_canvas_att_replacement_url(path, resource_dir = nil)
-      if path.start_with?("../") && (url = get_canvas_att_replacement_url(path.sub("../", ""), resource_dir))
-        return url
-      end
+      return get_canvas_att_replacement_url(path.sub("../", ""), resource_dir) if path.start_with?("../")
 
       path = path[1..] if path.start_with?("/")
       mig_id = nil

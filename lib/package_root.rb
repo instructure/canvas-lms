@@ -37,7 +37,7 @@ class PackageRoot
   # raises an error if ".." path entries would traverse above the root_path in the file system.
   def item_path(*relative_path_entries)
     path = Pathname(File.join(@prefix, *relative_path_entries)).cleanpath.to_s
-    raise ArgumentError, "invalid relative_path_entries" unless path.start_with?(@prefix)
+    raise ArgumentError, "invalid relative_path_entries: #{relative_path_entries.inspect}" unless path.start_with?(@prefix)
 
     path
   end
