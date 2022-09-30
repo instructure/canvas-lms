@@ -28,7 +28,7 @@ import {
   LoadMoreButton,
   LoadingIndicator,
   LoadingStatus,
-  useIncrementalLoading
+  useIncrementalLoading,
 } from '../../../../common/incremental-loading'
 
 const PENDING_MEDIA_ENTRY_ID = 'maybe'
@@ -83,7 +83,7 @@ export default function MediaPanel(props) {
     records: files,
     contextType,
     sortBy,
-    searchString
+    searchString,
   })
 
   const handleFileClick = file => {
@@ -103,7 +103,7 @@ export default function MediaPanel(props) {
       {error && renderLoadingError(error)}
 
       {isEmpty(media) && (
-        <View as="div" padding="medium">
+        <View as="div" role="alert" padding="medium">
           {formatMessage('No results.')}
         </View>
       )}
@@ -122,12 +122,12 @@ MediaPanel.propTypes = {
       bookmark: string,
       hasMore: bool,
       isLoading: bool,
-      error: string
+      error: string,
     })
   ).isRequired,
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
-    order: oneOf(['asc', 'desc']).isRequired
+    order: oneOf(['asc', 'desc']).isRequired,
   }),
-  searchString: string
+  searchString: string,
 }

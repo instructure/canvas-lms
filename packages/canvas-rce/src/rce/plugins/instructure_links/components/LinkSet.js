@@ -29,7 +29,7 @@ import {
   LoadMoreButton,
   LoadingIndicator,
   LoadingStatus,
-  useIncrementalLoading
+  useIncrementalLoading,
 } from '../../../../common/incremental-loading'
 import Link from './Link'
 
@@ -59,7 +59,7 @@ function IncrementalLoader(props) {
       fetchNextPage()
     },
 
-    records: links
+    records: links,
   })
 
   return children({loader, lastItemRef})
@@ -119,7 +119,7 @@ class LinkSet extends Component {
 
   renderEmptyIndicator() {
     return (
-      <View as="div" padding="medium">
+      <View as="div" role="alert" padding="medium">
         {formatMessage('No results.')}
       </View>
     )
@@ -172,7 +172,7 @@ LinkSet.propTypes = {
   suppressRenderEmpty: bool,
   searchString: string,
   editing: bool,
-  onEditClick: func
+  onEditClick: func,
 }
 
 export default LinkSet
