@@ -387,20 +387,22 @@ class ConferencesController < ApplicationController
       respond_to do |format|
         params[:web_conference].try(:delete, :long_running)
         params[:web_conference].try(:delete, :conference_type)
-        sync_attendees = params[:web_conference].try(:delete, :sync_attendees)
+        sync_attendees = params[:web_conference].try(:delete, :sync_attendees).try(&:to_i)
 
-        @conference.invite_users_from_context if sync_attendees
+        @conference.invite_users_from_context if sync_attendees == 1
 
         calendar_event_param = params[:web_conference].try(:delete, :calendar_event).try(&:to_i)
         if @conference.update(conference_params)
           # TODO: ability to dis-invite people
-          @conference.invite_users_from_context(member_ids) unless sync_attendees
+          @conference.invite_users_from_context(member_ids) unless sync_attendees == 1
 
-          if calendar_event_param && calendar_event_param == 1
-            calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
-            calendar_event&.save
-          elsif @conference.calendar_event
-            @conference.calendar_event.destroy
+          unless sync_attendees == 1
+            if calendar_event_param && calendar_event_param == 1
+              calendar_event = create_or_update_calendar_event_for_conference(@conference, @context)
+              calendar_event&.save
+            elsif @conference.calendar_event
+              @conference.calendar_event.destroy
+            end
           end
 
           @conference.save

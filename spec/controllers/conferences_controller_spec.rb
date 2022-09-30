@@ -377,7 +377,7 @@ describe ConferencesController do
         id: @conference,
         web_conference: {
           title: "Something else",
-          sync_attendees: true,
+          sync_attendees: "0",
           calendar_event: "0"
         },
       }
@@ -388,6 +388,36 @@ describe ConferencesController do
       created_calendar_event = created_conference.calendar_event
 
       expect(created_calendar_event).to be_falsey
+      expect(response).to be_successful
+    end
+
+    it "does NOT delete calendar event when sync_attendees is passed" do
+      user_session(@teacher)
+      allow(WebConference).to receive(:plugins).and_return(
+        [OpenObject.new(id: "big_blue_button", settings: { domain: "bbb.instructure.com", secret_dec: "secret" }, valid_settings?: true, enabled?: true),]
+      )
+
+      @conference = @course.web_conferences.create!(conference_type: "BigBlueButton", duration: 60, user: @teacher)
+      @conference.users << @student
+      @conference.calendar_event = calendar_event_model
+      @conference.save!
+
+      params = {
+        course_id: @course.id,
+        id: @conference,
+        web_conference: {
+          title: "Something else",
+          sync_attendees: "1",
+          calendar_event: "0"
+        },
+      }
+
+      post :update, params: params, format: "json"
+
+      created_conference = WebConference.find(@conference.id)
+      created_calendar_event = created_conference.calendar_event
+
+      expect(created_calendar_event).to be_truthy
       expect(response).to be_successful
     end
 
