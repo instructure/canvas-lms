@@ -415,6 +415,7 @@ class CalendarEvent < ActiveRecord::Base
     transaction do
       self.workflow_state = "deleted"
       self.deleted_at = Time.now.utc
+      self.web_conference = nil
       save!
       child_events.find_each do |e|
         e.cancel_reason = cancel_reason
