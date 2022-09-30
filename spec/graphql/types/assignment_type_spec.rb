@@ -46,6 +46,7 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("createdAt").to_datetime).to eq assignment.created_at.to_s.to_datetime
     expect(assignment_type.resolve("updatedAt").to_datetime).to eq assignment.updated_at.to_s.to_datetime
     expect(assignment_type.resolve("gradeGroupStudentsIndividually")).to eq assignment.grade_group_students_individually
+    expect(assignment_type.resolve("originalityReportVisibility")).to eq assignment.turnitin_settings[:originality_report_visibility]
     expect(assignment_type.resolve("anonymousGrading")).to eq assignment.anonymous_grading
     expect(assignment_type.resolve("omitFromFinalGrade")).to eq assignment.omit_from_final_grade
     expect(assignment_type.resolve("anonymousInstructorAnnotations")).to eq assignment.anonymous_instructor_annotations

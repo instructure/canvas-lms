@@ -16,7 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {getOriginalityData, originalityReportSubmissionKey} from '../originalityReportHelper'
+import {
+  getOriginalityData,
+  isOriginalityReportVisible,
+  originalityReportSubmissionKey
+} from '../originalityReportHelper'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 
 function submission(overrides = {}) {
@@ -55,6 +59,48 @@ describe('originalityReportSubmissionKey', () => {
     it('returns the an empty string', () => {
       expect(originalityReportSubmissionKey(submission(overrides))).toEqual('')
     })
+  })
+})
+
+describe('originalityReportVisibility', () => {
+  it('returns true if visiblity setting not set', () => {
+    expect(isOriginalityReportVisible(null, Date.now.toString(), 'needs_grading')).toBe(true)
+  })
+
+  it('returns true if visiblity setting is set to immediate', () => {
+    expect(isOriginalityReportVisible('immediate', Date.now.toString(), 'needs_grading')).toBe(true)
+  })
+
+  it('returns false if visiblity setting is set to never', () => {
+    expect(isOriginalityReportVisible('never', Date.now.toString(), 'needs_grading')).toBe(false)
+  })
+
+  it('returns false if visiblity setting is set to after_grading and the submisison has not been graded', () => {
+    expect(isOriginalityReportVisible('after_grading', Date.now.toString(), 'needs_grading')).toBe(
+      false
+    )
+  })
+
+  it('returns true if visiblity setting is set to after_grading and the submisison has excused', () => {
+    expect(isOriginalityReportVisible('after_grading', Date.now.toString(), 'excused')).toBe(true)
+  })
+
+  it('returns true if visiblity setting is set to after_grading and the submisison has been graded', () => {
+    expect(isOriginalityReportVisible('after_grading', Date.now.toString(), 'graded')).toBe(true)
+  })
+
+  it('returns false if visiblity setting is set to after_due_date and the due date has not passed', () => {
+    const today = new Date()
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    expect(isOriginalityReportVisible('after_due_date', tomorrow.toString(), 'graded')).toBe(false)
+  })
+
+  it('returns true if visiblity setting is set to after_due_date and the due date has passed', () => {
+    const today = new Date()
+    const yesterday = new Date(today)
+    yesterday.setDate(yesterday.getDate() - 1)
+    expect(isOriginalityReportVisible('after_due_date', yesterday.toString(), 'graded')).toBe(true)
   })
 })
 
