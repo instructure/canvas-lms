@@ -87,22 +87,24 @@ describe "calendar2" do
       @subaccount2 = @root_account.sub_accounts.create!(name: "SA-2", account_calendar_visible: true)
       course_with_student_logged_in(user: @student, account: @subaccount2)
       event_title = "subaccount 1 event"
-      @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+      Timecop.freeze(Time.zone.local(2022, 9, 5, 10, 5, 0)) do
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
 
-      @student.set_preference(:enabled_account_calendars, [@subaccount1, @subaccount2])
-      user_session(@student)
+        @student.set_preference(:enabled_account_calendars, [@subaccount1, @subaccount2])
+        user_session(@student)
 
-      get "/calendar2"
-      expect(other_calendars_container).to contain_css(context_list_item_selector(@subaccount1.id))
-      expect(calendar_body).to contain_css(calendar_event_selector)
-      assert_title(event_title, false)
+        get "/calendar2"
+        expect(other_calendars_container).to contain_css(context_list_item_selector(@subaccount1.id))
+        expect(calendar_body).to contain_css(calendar_event_selector)
+        assert_title(event_title, false)
 
-      @subaccount1.account_calendar_visible = false
-      @subaccount1.save!
+        @subaccount1.account_calendar_visible = false
+        @subaccount1.save!
 
-      driver.navigate.refresh
-      expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
-      expect(calendar_body).not_to contain_css(calendar_event_selector)
+        driver.navigate.refresh
+        expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+        expect(calendar_body).not_to contain_css(calendar_event_selector)
+      end
     end
 
     it "does not show the other calendars section if there are no account calendars available for the user" do
@@ -120,50 +122,56 @@ describe "calendar2" do
         account_admin_user(account: @subaccount1)
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
-        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-        get "/calendar2"
-        open_other_calendars_modal
-        select_other_calendar(@subaccount1.id)
-        click_modal_save_btn
-        wait_for_ajaximations
-        account_calendar = other_calendars_context_labels
-        expect(other_calendars_container).to be_displayed
-        expect(account_calendar.first.text).to eq @subaccount1.name
-        assert_title(event_title, false)
+        Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+          get "/calendar2"
+          open_other_calendars_modal
+          select_other_calendar(@subaccount1.id)
+          click_modal_save_btn
+          wait_for_ajaximations
+          account_calendar = other_calendars_context_labels
+          expect(other_calendars_container).to be_displayed
+          expect(account_calendar.first.text).to eq @subaccount1.name
+          assert_title(event_title, false)
+        end
       end
 
       it "removes an account calendar from the list of other calendars and removes its calendar events" do
         @student.set_preference(:enabled_account_calendars, @subaccount1.id)
         user_session(@student)
         event_title = "event of #{@subaccount1.name}"
-        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-        get "/calendar2"
-        # Confirm the account calendar is active
-        account_calendar = other_calendars_context_labels
-        expect(account_calendar.first.text).to eq @subaccount1.name
-        assert_title(event_title, false)
-        # Removing the account calendar
-        open_other_calendars_modal
-        select_other_calendar(@subaccount1.id)
-        click_modal_save_btn
-        wait_for_ajaximations
-        expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
-        expect(calendar_body).not_to contain_css(calendar_event_selector)
+        Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+          get "/calendar2"
+          # Confirm the account calendar is active
+          account_calendar = other_calendars_context_labels
+          expect(account_calendar.first.text).to eq @subaccount1.name
+          assert_title(event_title, false)
+          # Removing the account calendar
+          open_other_calendars_modal
+          select_other_calendar(@subaccount1.id)
+          click_modal_save_btn
+          wait_for_ajaximations
+          expect(other_calendars_container).not_to contain_css(context_list_item_selector(@subaccount1.id))
+          expect(calendar_body).not_to contain_css(calendar_event_selector)
+        end
       end
 
       it "keeps added account calendars as selected context after refreshing the page" do
         account_admin_user(account: @subaccount1)
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
-        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-        get "/calendar2"
-        open_other_calendars_modal
-        select_other_calendar(@subaccount1.id)
-        click_modal_save_btn
-        driver.navigate.refresh
-        expect(other_calendars_container).to be_displayed
-        expect(other_calendars_context_labels.first.text).to eq @subaccount1.name
-        assert_title(event_title, false)
+        Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+          get "/calendar2"
+          open_other_calendars_modal
+          select_other_calendar(@subaccount1.id)
+          click_modal_save_btn
+          driver.navigate.refresh
+          expect(other_calendars_container).to be_displayed
+          expect(other_calendars_context_labels.first.text).to eq @subaccount1.name
+          assert_title(event_title, false)
+        end
       end
 
       it "adds multiple account calendars at once to the list of other calendars" do
