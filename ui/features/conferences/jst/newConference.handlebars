@@ -54,8 +54,8 @@
       {{/if}}
       {{else}}
       {{#if permissions.initiate}}
-      <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank" {{#unless id}}disabled="disabled"
-        {{/unless}}>
+      <a data-testid="start-button" href="{{ join_url }}" class="btn btn-small start-button" target="_blank" {{#unless
+        id}}disabled="disabled" {{/unless}}>
         {{#t "start"}}Start{{/t}}
       </a>
       {{/if}}
@@ -63,7 +63,7 @@
       {{#if has_actions}}
       <div class="inline-block">
         <a class="al-trigger al-trigger-gray {{#unless id}}ui-state-disabled{{/unless}}" role="button"
-          aria-haspopup="true" aria-owns="{{id}}-content-1" href="#">
+          aria-haspopup="true" aria-owns="{{id}}-content-1" href="#" data-testid="settings-cog">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>

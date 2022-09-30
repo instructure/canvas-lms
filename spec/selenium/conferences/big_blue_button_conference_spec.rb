@@ -202,7 +202,7 @@ describe "BigBlueButton conferences" do
       expect(f("input[value='send_private_chat']").attribute("checked")).to be_falsey
     end
 
-    it "syncs in unadded context users on option select" do
+    it "syncs in unadded context users on option select and able to delete successfully" do
       conf = create_big_blue_button_conference
       conf.add_invitee(@ta)
       expect(conf.invitees.pluck(:id)).to match_array [@ta.id]
@@ -212,6 +212,12 @@ describe "BigBlueButton conferences" do
       f(".sync_conference_link").click
       wait_for_ajaximations
       expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
+
+      fj("li.conference a:contains('Settings')").click
+      f("a[title='Delete']").click
+      accept_alert
+      wait_for_ajaximations
+      expect { conf.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "does not show add to calendar option to users without :manage_calendar permissions" do
