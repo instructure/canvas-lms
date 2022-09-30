@@ -17,8 +17,9 @@
  */
 
 import React, {useCallback} from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {colors} from '@instructure/canvas-theme'
 
 export default function SortColumnHeader({bucket, attr, content, sortColumn, onClickHeader}) {
   const sortIndicator = useCallback(() => {
@@ -49,12 +50,14 @@ export default function SortColumnHeader({bucket, attr, content, sortColumn, onC
     )
   } else {
     return (
-      <CondensedButton
-        theme={{primaryGhostColor: 'licorice', fontWeight: 'bold'}}
+      <Link
+        isWithinText={false}
+        as="button"
         onClick={() => onClickHeader(attr)}
+        theme={{color: colors.textDarkest}}
       >
-        {content}
-      </CondensedButton>
+        <Text weight="bold">{content}</Text>
+      </Link>
     )
   }
 }
