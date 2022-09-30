@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import _ from 'underscore'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
@@ -29,7 +30,7 @@ class AssignmentCorrectionRow extends React.Component {
     this.initDueAtDateTimeField()
   }
 
-  handleDateChanged = e => {
+  handleDateChanged = _e => {
     // send date chosen in jquery date-picker so that
     // the assignment or assignment override due_at is set
     const $picker = $(this.refs.due_at)
@@ -50,17 +51,17 @@ class AssignmentCorrectionRow extends React.Component {
   // but we need to check a couple of things during keypress events to
   // maintain assignment state consistency
   checkDueAtChange = e => {
-    if (this.props.assignment.overrideForThisSection != undefined) {
-      if (e.target.value == '') {
-        $picker = $(this.refs.due_at).data('date', null)
+    if (this.props.assignment.overrideForThisSection) {
+      if (!e.target.value) {
+        $(this.refs.due_at).data('date', null)
         this.props.assignment.due_at = null
       }
       // When a user edits the due_at datetime field, we should reset any
       // previous "please_ignore" request
       this.props.updateAssignment({please_ignore: false})
     } else {
-      if (e.target.value == '') {
-        $picker = $(this.refs.due_at).data('date', null)
+      if (!e.target.value) {
+        $(this.refs.due_at).data('date', null)
         this.props.updateAssignment({due_at: null})
       }
       // When a user edits the due_at datetime field, we should reset any
@@ -76,7 +77,7 @@ class AssignmentCorrectionRow extends React.Component {
   currentSectionforOverride = a => {
     if (
       _.isEmpty(_.where(a.overrides, {course_section_id: a.currentlySelected.id.toString()})) ||
-      a.currentlySelected.type == 'course'
+      a.currentlySelected.type === 'course'
     ) {
       return true
     } else {
@@ -85,12 +86,12 @@ class AssignmentCorrectionRow extends React.Component {
   }
 
   validCheck = a => {
-    if (a.overrideForThisSection != undefined && a.currentlySelected.type == 'course') {
+    if (a.overrideForThisSection && a.currentlySelected.type === 'course') {
       return a.due_at != null
     } else if (
-      a.overrideForThisSection != undefined &&
-      a.currentlySelected.type == 'section' &&
-      a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id
+      a.overrideForThisSection &&
+      a.currentlySelected.type === 'section' &&
+      a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id
     ) {
       return a.overrideForThisSection.due_at != null
     } else {
@@ -117,15 +118,12 @@ class AssignmentCorrectionRow extends React.Component {
 
     // dueAtError will always return true when assignments have overrides so we want to check and see if the
     // assignment override in the section has a due_at date
-    if (
-      assignment.overrideForThisSection != undefined &&
-      assignment.overrideForThisSection.due_at != null
-    ) {
+    if (assignment.overrideForThisSection && assignment.overrideForThisSection.due_at != null) {
       dueAtError = false
     }
 
     // handles data being filled in the inputs if there are name issues on an assignment with an assignment override
-    if (assignment.overrideForThisSection != undefined) {
+    if (assignment.overrideForThisSection) {
       default_value = $.datetimeString(assignment.overrideForThisSection.due_at, {format: 'medium'})
       place_holder = assignment.overrideForThisSection.due_at ? null : I18n.t('No Due Date')
     } else {

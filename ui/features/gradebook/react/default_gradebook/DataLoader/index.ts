@@ -17,7 +17,6 @@
  */
 
 import {difference} from 'lodash'
-
 import AssignmentGroupsLoader from './AssignmentGroupsLoader'
 import CustomColumnsDataLoader from './CustomColumnsDataLoader'
 import SisOverridesLoader from './SisOverridesLoader'

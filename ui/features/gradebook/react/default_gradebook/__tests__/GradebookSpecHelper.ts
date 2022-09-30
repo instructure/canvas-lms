@@ -95,6 +95,14 @@ export const defaultGradebookEnv = {
 export const defaultGradebookProps: GradebookProps = {
   appliedFilters: [],
   applyScoreToUngradedModalNode: document.createElement('div'),
+  colors: {
+    dropped: 'test',
+    excused: 'test',
+    extended: 'test',
+    late: 'test',
+    missing: 'test',
+    resubmitted: 'test',
+  },
   customColumns: [],
   dispatch: new RequestDispatch(),
   fetchGradingPeriodAssignments: () => Promise.resolve({}),
@@ -109,7 +117,6 @@ export const defaultGradebookProps: GradebookProps = {
   gradingPeriodsFilterContainer: document.createElement('div'),
   gridColorNode: document.createElement('div'),
   hideGrid: true,
-  isCustomColumnsLoading: false,
   isFiltersLoading: false,
   isGradingPeriodAssignmentsLoading: false,
   isModulesLoading: false,
@@ -123,21 +130,8 @@ export const defaultGradebookProps: GradebookProps = {
   settingsModalButtonContainer: document.createElement('div'),
   studentIds: [],
   viewOptionsMenuNode: document.createElement('div'),
-  gradingPeriodsFilterContainer: document.createElement('div'),
-  gradebookEnv: defaultGradebookEnv,
-  colors: {
-    dropped: 'test',
-    excused: 'test',
-    extended: 'test',
-    late: 'test',
-    missing: 'test',
-    resubmitted: 'test',
-  },
-  dispatch: new RequestDispatch(),
-  gradebookGridNode: document.createElement('div'),
   performanceControls: new PerformanceControls(),
   isCustomColumnsLoading: false,
-  customColumns: [],
 }
 
 export function createGradebook(
