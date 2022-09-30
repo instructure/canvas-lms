@@ -28,9 +28,9 @@ const topElementStyles = {zIndex: 10000}
 
 function renderJoinedItem(bodyAs, renderBody, renderFooter) {
   return (
-    <Flex.Item height="0" shouldGrow>
+    <Flex.Item height="0" shouldGrow={true}>
       <Flex as={bodyAs} direction="column" margin="0" height="100%">
-        <Flex.Item as="div" overflowX="auto" height="0" shouldGrow>
+        <Flex.Item as="div" overflowX="auto" height="0" shouldGrow={true}>
           {renderBody()}
         </Flex.Item>
         <footer style={topElementStyles}>
@@ -56,14 +56,15 @@ export const FixedContentTray = ({
 }) => {
   return (
     <Tray
-      data-mce-component
+      data-mce-component={true}
       label={title}
       onDismiss={onDismiss}
       onExited={onUnmount}
       open={isOpen}
       placement="end"
-      shouldContainFocus
-      shouldReturnFocus
+      shouldCloseOnDocumentClick={true}
+      shouldContainFocus={true}
+      shouldReturnFocus={true}
       size="regular"
     >
       <Flex direction="column" height={getTrayHeight()}>
@@ -76,7 +77,7 @@ export const FixedContentTray = ({
           renderJoinedItem(bodyAs, renderBody, renderFooter)
         ) : (
           <>
-            <Flex.Item as={bodyAs} overflowX="auto" height="0" shouldGrow>
+            <Flex.Item as={bodyAs} overflowX="auto" height="0" shouldGrow={true}>
               {renderBody()}
             </Flex.Item>
             <footer style={topElementStyles}>
