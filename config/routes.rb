@@ -951,6 +951,7 @@ CanvasRails::Application.routes.draw do
   get "xsd/:version.xsd" => "content_exports#xml_schema"
 
   get "/jobs", to: "jobs_v2#redirect", as: "jobs"
+  get "/job_stats", to: "jobs_v2#job_stats", as: "job_stats"
 
   resources :jobs_v1, controller: :jobs, only: [:index, :show] do
     collection do
@@ -2478,10 +2479,13 @@ CanvasRails::Application.routes.draw do
       get "jobs2/:bucket/by_:group/search", action: :search
       get "jobs2/:bucket/by_:group", action: :grouped_info, as: :jobs_grouped_info
       get "jobs2/:bucket", action: :list, as: :jobs_list, constraints: { bucket: /running|queued|future|failed/ }
+      get "jobs2/clusters", action: :clusters, as: :job_clusters
       get "jobs2/:id", action: :lookup, constraints: { id: /\d+/ }
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
       put "jobs2/unstuck", action: :unstuck
+      get "jobs2/stuck/strands", action: :stuck_strands, as: :jobs_stuck_strands
+      get "jobs2/stuck/singletons", action: :stuck_singletons, as: :jobs_stuck_singletons
     end
   end
 
