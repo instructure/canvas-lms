@@ -23,9 +23,9 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Text} from '@instructure/ui-text'
 import {EditableCodeValue} from './EditableCodeValue'
 import {InternalSettingActionButtons} from './InternalSettingActionButtons'
-import {CondensedButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import exportFromJSON from 'export-from-json'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('internal-settings')
 
@@ -107,7 +107,13 @@ export const InternalSettingsTable = (props: InternalSettingsTableProps) => {
   return (
     <div>
       <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-        <Menu trigger={<CondensedButton>{I18n.t('Download as...')}</CondensedButton>}>
+        <Menu
+          trigger={
+            <Link isWithinText={false} as="button">
+              <Text>{I18n.t('Download as...')}</Text>
+            </Link>
+          }
+        >
           <Item onClick={() => exportFromJSON({...exportParams, exportType: 'json'})}>JSON</Item>
           <Item onClick={() => exportFromJSON({...exportParams, exportType: 'csv'})}>CSV</Item>
         </Menu>
