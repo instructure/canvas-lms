@@ -380,6 +380,11 @@ describe "BigBlueButton conferences" do
         expect(f("button[title='New Conference']")).to be_present
         expect(f("body")).not_to contain_jqcss("span:contains('Edit')")
       end
+
+      it "does not show sync attendees option" do
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(f("body")).not_to contain_jqcss ".sync_conference_link"
+      end
     end
 
     context "when a conference is open", ignore_js_errors: true do
