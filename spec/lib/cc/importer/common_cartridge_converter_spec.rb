@@ -685,6 +685,18 @@ describe "other cc files" do
       expect(tag.content).to eq page
     end
 
+    it "deals with screwy $IMS-CC-FILEBASE$../ links to possibly missing files" do
+      Account.default.enable_feature!(:common_cartridge_page_conversion)
+      import_cc_file("cc_dotdot_madness.zip")
+
+      file = @course.attachments.find_by(migration_id: "101dabe4f8c7b12a49a491e7db2e0830")
+      page = @course.wiki_pages.find_by(migration_id: "ELEMENT_8636_1628897")
+      expect(page.body).to include "/courses/#{@course.id}/files/#{file.id}"
+
+      migration = @course.content_migrations.last
+      expect(migration.migration_issues.map(&:description)).to include "Missing links found in imported content - Wiki Page body"
+    end
+
     it "justs bring them over as files without the feature" do
       import_cc_file("cc_file_to_page_test.zip")
       expect(@course.wiki_pages.count).to eq 0
