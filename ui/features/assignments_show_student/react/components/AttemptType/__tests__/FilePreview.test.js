@@ -121,7 +121,7 @@ describe('FilePreview', () => {
       submission: await mockSubmission({
         Submission: {attachments: files, originalityData, submissionType: 'online_upload'},
       }),
-      originalityReportsForA2: true,
+      isOriginalityReportVisible: true,
     }
     const {getAllByTestId} = render(<FilePreview {...props} />)
     const reports = getAllByTestId('originality_report')
@@ -136,19 +136,19 @@ describe('FilePreview', () => {
       submission: await mockSubmission({
         Submission: {attachments: [files[0]], originalityData, submissionType: 'online_upload'},
       }),
-      originalityReportsForA2: true,
+      isOriginalityReportVisible: true,
     }
     const {queryByTestId} = render(<FilePreview {...props} />)
 
     expect(queryByTestId('originality_report')).not.toBeInTheDocument()
   })
 
-  it('does not render orignality reports if FF prop is not enabled', async () => {
+  it('does not render orignality reports if the reports are not visible to the student', async () => {
     const props = {
       submission: await mockSubmission({
         Submission: {attachments: files, originalityData, submissionType: 'online_upload'},
       }),
-      originalityReportsForA2: false,
+      isOriginalityReportVisible: false,
     }
     const {queryByTestId} = render(<FilePreview {...props} />)
 

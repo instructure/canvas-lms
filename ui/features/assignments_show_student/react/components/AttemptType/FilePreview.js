@@ -41,7 +41,7 @@ const I18n = useI18nScope('assignments_2')
 export default class FilePreview extends Component {
   static propTypes = {
     submission: Submission.shape,
-    originalityReportsForA2: bool,
+    isOriginalityReportVisible: bool,
   }
 
   state = {
@@ -161,7 +161,7 @@ export default class FilePreview extends Component {
               </Table.Cell>
               <Table.Cell theme={cellTheme}>
                 {this.props.submission.originalityData &&
-                  this.props.originalityReportsForA2 &&
+                  this.props.isOriginalityReportVisible &&
                   getOriginalityData(this.props.submission, index) && (
                     <Flex.Item>
                       <OriginalityReport
