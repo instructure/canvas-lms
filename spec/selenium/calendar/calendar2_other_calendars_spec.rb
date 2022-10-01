@@ -88,12 +88,12 @@ describe "calendar2" do
       course_with_student_logged_in(user: @student, account: @subaccount2)
       event_title = "subaccount 1 event"
       Timecop.freeze(Time.zone.local(2022, 9, 5, 10, 5, 0)) do
-        @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
+        @subaccount1.calendar_events.create!(title: event_title, start_at: 0.days.from_now)
 
         @student.set_preference(:enabled_account_calendars, [@subaccount1, @subaccount2])
         user_session(@student)
 
-        get "/calendar2"
+        get "/calendar2#view_name=month&view_start=2022-09-05"
         expect(other_calendars_container).to contain_css(context_list_item_selector(@subaccount1.id))
         expect(calendar_body).to contain_css(calendar_event_selector)
         assert_title(event_title, false)
@@ -123,8 +123,8 @@ describe "calendar2" do
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
         Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
-          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-          get "/calendar2"
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 0.days.from_now)
+          get "/calendar2#view_name=month&view_start=2022-09-05"
           open_other_calendars_modal
           select_other_calendar(@subaccount1.id)
           click_modal_save_btn
@@ -141,8 +141,8 @@ describe "calendar2" do
         user_session(@student)
         event_title = "event of #{@subaccount1.name}"
         Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
-          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-          get "/calendar2"
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 0.days.from_now)
+          get "/calendar2#view_name=month&view_start=2022-09-05"
           # Confirm the account calendar is active
           account_calendar = other_calendars_context_labels
           expect(account_calendar.first.text).to eq @subaccount1.name
@@ -162,8 +162,8 @@ describe "calendar2" do
         user_session(@admin)
         event_title = "event of #{@subaccount1.name}"
         Timecop.freeze(Time.zone.local(2022, 9, 1, 10, 5, 0)) do
-          @subaccount1.calendar_events.create!(title: event_title, start_at: 2.days.from_now)
-          get "/calendar2"
+          @subaccount1.calendar_events.create!(title: event_title, start_at: 0.days.from_now)
+          get "/calendar2#view_name=month&view_start=2022-09-05"
           open_other_calendars_modal
           select_other_calendar(@subaccount1.id)
           click_modal_save_btn
