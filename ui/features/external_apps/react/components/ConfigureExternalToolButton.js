@@ -22,6 +22,7 @@ import {shape, func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('external_tools')
 
@@ -105,15 +106,13 @@ export default class ConfigureExternalToolButton extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
+        <ToolLaunchIframe
           src={this.getLaunchUrl(this.props.tool.tool_configuration)}
           title={I18n.t('Tool Configuration')}
-          className="tool_launch"
           style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

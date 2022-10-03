@@ -19,6 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('collaborations')
 
@@ -99,14 +100,12 @@ class CollaborationsToolLaunch extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
-          className="tool_launch"
+        <ToolLaunchIframe
           src={this.props.launchUrl}
           style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

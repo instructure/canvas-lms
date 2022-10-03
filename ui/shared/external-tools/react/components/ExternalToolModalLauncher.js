@@ -22,6 +22,7 @@ import PropTypes from 'prop-types'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import CanvasModal from '@canvas/instui-bindings/react/Modal'
+import ToolLaunchIframe from './ToolLaunchIframe'
 
 const I18n = useI18nScope('external_toolsModalLauncher')
 
@@ -202,14 +203,13 @@ export default class ExternalToolModalLauncher extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
+        <ToolLaunchIframe
           src={this.getIframeSrc()}
           style={styles.modalLaunchStyle}
           title={this.props.title}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

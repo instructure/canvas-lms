@@ -19,6 +19,7 @@ import React from 'react'
 import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from './Tray'
 import $ from 'jquery'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const toolShape = shape({
   id: string.isRequired,
@@ -87,12 +88,11 @@ export default function ContentTypeExternalToolTray({
       padding="0"
       headerPadding="medium"
     >
-      <iframe
+      <ToolLaunchIframe
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
         src={iframeUrl}
         title={title}
-        data-lti-launch="true"
       />
     </CanvasTray>
   )

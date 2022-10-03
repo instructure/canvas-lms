@@ -20,6 +20,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('external_tools')
 
@@ -119,16 +120,14 @@ export default class Lti2Iframe extends React.Component {
               {I18n.t('The following content is partner provided')}
             </div>
           </div>
-          <iframe
+          <ToolLaunchIframe
             src={this.getLaunchUrl()}
             name="lti2_registration_frame"
-            className="tool_launch"
             title={this.props.toolName}
             style={this.state.iframeStyle}
             ref={e => {
               this.iframe = e
             }}
-            data-lti-launch="true"
           />
           <div
             onFocus={this.handleAlertFocus}

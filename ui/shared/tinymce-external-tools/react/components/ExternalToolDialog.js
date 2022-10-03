@@ -28,6 +28,7 @@ import {send} from '@canvas/rce/RceCommandShim'
 import TinyMCEContentItem from '../../TinyMCEContentItem'
 import processEditorContentItems from '@canvas/deep-linking/processors/processEditorContentItems'
 import {Flex} from '@instructure/ui-flex'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('ExternalToolDialog')
 
@@ -209,7 +210,7 @@ export default class ExternalToolDialog extends React.Component {
             </Flex>
           )}
 
-          <iframe
+          <ToolLaunchIframe
             title={label}
             ref={ref => (this.iframeRef = ref)}
             name="external_tool_launch"
@@ -224,7 +225,6 @@ export default class ExternalToolDialog extends React.Component {
             }}
             allow={iframeAllowances}
             borderstyle="0"
-            data-lti-launch="true"
             onLoad={() => this.setState({iframeLoaded: true})}
           />
           <div
