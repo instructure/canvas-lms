@@ -95,7 +95,7 @@ export default class DeveloperKeyModal extends React.Component {
 
   get hasRedirectUris() {
     const redirect_uris = this.developerKey.redirect_uris
-    return redirect_uris && redirect_uris.trim().length !== 0
+    return Boolean(redirect_uris && redirect_uris.trim().length !== 0)
   }
 
   updateConfigurationMethod = configurationMethod => this.setState({configurationMethod})
@@ -214,16 +214,24 @@ export default class DeveloperKeyModal extends React.Component {
     this.setState({toolConfigurationUrl})
   }
 
-  updateToolConfiguration = (update, field = null) => {
+  updateToolConfiguration = (update, field = null, sync = false) => {
     if (field) {
       this.setState(state => ({toolConfiguration: {...state.toolConfiguration, [field]: update}}))
     } else {
       this.setState({toolConfiguration: update})
     }
 
-    if (!this.state?.developerKey?.redirect_uris?.trim()) {
+    if (sync) {
+      this.updateDeveloperKey('redirect_uris', this.developerKey.tool_configuration.target_link_uri)
+    }
+
+    if (!this.hasRedirectUris) {
       this.updateDeveloperKey('redirect_uris', update.target_link_uri || '')
     }
+  }
+
+  syncRedirectUris = () => {
+    this.updateToolConfiguration(this.toolConfiguration, null, true)
   }
 
   updateDeveloperKey = (field, update) => {
@@ -294,6 +302,8 @@ export default class DeveloperKeyModal extends React.Component {
                 showMissingRedirectUrisMessage={
                   this.state.submitted && isLtiKey && !this.hasRedirectUris && !this.isUrlConfig
                 }
+                hasRedirectUris={this.hasRedirectUris}
+                syncRedirectUris={this.syncRedirectUris}
                 updateToolConfiguration={this.updateToolConfiguration}
                 updateDeveloperKey={this.updateDeveloperKey}
                 updateToolConfigurationUrl={this.updateToolConfigurationUrl}

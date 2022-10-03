@@ -36,13 +36,12 @@ const validationMessageInvalidJson = [
 const validationMessageRequiredField = [{text: I18n.t('Field cannot be blank.'), type: 'error'}]
 
 export default class ToolConfigurationForm extends React.Component {
-  state = {
-    invalidJson: null,
-  }
-
   get toolConfiguration() {
-    if (this.state.invalidJson) {
-      return this.state.invalidJson
+    if (this.props.invalidJson) {
+      return this.props.invalidJson
+    }
+    if (this.props.parsedJson) {
+      return JSON.stringify(this.props.parsedJson, null, 4)
     }
     const {toolConfiguration} = this.props
     return toolConfiguration ? JSON.stringify(toolConfiguration, null, 4) : ''
@@ -56,16 +55,8 @@ export default class ToolConfigurationForm extends React.Component {
     return this.manualConfigRef.valid()
   }
 
-  updatePastedJson = value => {
-    try {
-      const settings = JSON.parse(value.target.value)
-      this.props.updateToolConfiguration(settings)
-      this.setState({invalidJson: null})
-    } catch (e) {
-      if (e instanceof SyntaxError) {
-        this.setState({invalidJson: value.target.value})
-      }
-    }
+  updatePastedJson = e => {
+    this.props.updatePastedJson(e.target.value)
   }
 
   updateToolConfigurationUrl = e => {
@@ -89,7 +80,7 @@ export default class ToolConfigurationForm extends React.Component {
           label={I18n.t('LTI 1.3 Configuration')}
           maxHeight="20rem"
           messages={
-            this.props.showRequiredMessages && this.state.invalidJson
+            this.props.showRequiredMessages && this.props.invalidJson
               ? validationMessageInvalidJson
               : []
           }
@@ -108,7 +99,7 @@ export default class ToolConfigurationForm extends React.Component {
     return (
       <TextInput
         name="tool_configuration_url"
-        value={this.props.toolConfigurationUrl}
+        value={this.props.toolConfigurationUrl || ''}
         onChange={this.updateToolConfigurationUrl}
         renderLabel={I18n.t('JSON URL')}
         messages={this.props.showRequiredMessages ? validationMessageRequiredField : []}
@@ -162,13 +153,15 @@ export default class ToolConfigurationForm extends React.Component {
 
 ToolConfigurationForm.propTypes = {
   toolConfiguration: PropTypes.object.isRequired,
-  toolConfigurationUrl: PropTypes.string.isRequired,
+  toolConfigurationUrl: PropTypes.string,
   validScopes: PropTypes.object.isRequired,
   validPlacements: PropTypes.arrayOf(PropTypes.string).isRequired,
   editing: PropTypes.bool.isRequired,
   showRequiredMessages: PropTypes.bool.isRequired,
-  updateToolConfiguration: PropTypes.func.isRequired,
   updateToolConfigurationUrl: PropTypes.func.isRequired,
   configurationMethod: PropTypes.string.isRequired,
   updateConfigurationMethod: PropTypes.func.isRequired,
+  invalidJson: PropTypes.string,
+  parsedJson: PropTypes.object,
+  updatePastedJson: PropTypes.func,
 }

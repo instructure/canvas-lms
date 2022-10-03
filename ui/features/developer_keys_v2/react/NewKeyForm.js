@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {IconButton} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {TextInput} from '@instructure/ui-text-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -45,6 +45,11 @@ const clientCredentialsAudienceTooltip = I18n.t(
 )
 
 export default class NewKeyForm extends React.Component {
+  state = {
+    invalidJson: null,
+    parsedJson: null,
+  }
+
   generateToolConfiguration = () => {
     return this.toolConfigRef.generateToolConfiguration()
   }
@@ -73,6 +78,31 @@ export default class NewKeyForm extends React.Component {
     this.props.updateDeveloperKey('test_cluster_only', !this.props.developerKey.test_cluster_only)
   }
 
+  updatePastedJson = value => {
+    try {
+      const settings = JSON.parse(value)
+      this.setState({invalidJson: null, parsedJson: settings})
+
+      if (!this.props.hasRedirectUris) {
+        this.props.updateDeveloperKey('redirect_uris', settings.target_link_uri || '')
+      }
+
+      this.updateToolConfiguration(settings)
+    } catch (e) {
+      if (e instanceof SyntaxError) {
+        this.setState({invalidJson: value})
+      }
+    }
+  }
+
+  updateToolConfiguration = update => {
+    this.props.updateToolConfiguration(update)
+  }
+
+  syncRedirectUris = () => {
+    this.props.syncRedirectUris()
+  }
+
   render() {
     const {
       isLtiKey,
@@ -81,7 +111,6 @@ export default class NewKeyForm extends React.Component {
       editing,
       showRequiredMessages,
       showMissingRedirectUrisMessage,
-      updateToolConfiguration,
       updateToolConfigurationUrl,
       toolConfigurationUrl,
       updateDeveloperKey,
@@ -122,6 +151,13 @@ export default class NewKeyForm extends React.Component {
                   resize="both"
                   messages={showMissingRedirectUrisMessage ? validationMessage : []}
                 />
+                {this.props.configurationMethod === 'json' && (
+                  <div>
+                    <Button onClick={this.syncRedirectUris} color="primary">
+                      {I18n.t('Sync URIs')}
+                    </Button>
+                  </div>
+                )}
                 {!isLtiKey && (
                   <div>
                     <TextInput
@@ -201,13 +237,15 @@ export default class NewKeyForm extends React.Component {
                   toolConfiguration={this.props.tool_configuration}
                   editing={editing}
                   showRequiredMessages={showRequiredMessages}
-                  updateToolConfiguration={updateToolConfiguration}
                   updateToolConfigurationUrl={updateToolConfigurationUrl}
                   toolConfigurationUrl={toolConfigurationUrl}
                   configurationMethod={this.props.configurationMethod}
                   updateConfigurationMethod={this.props.updateConfigurationMethod}
                   validScopes={ENV.validLtiScopes}
                   validPlacements={ENV.validLtiPlacements}
+                  invalidJson={this.state.invalidJson}
+                  parsedJson={this.state.parsedJson}
+                  updatePastedJson={this.updatePastedJson}
                 />
               ) : (
                 <Scopes
@@ -274,4 +312,6 @@ NewKeyForm.propTypes = {
   toolConfigurationUrl: PropTypes.string,
   configurationMethod: PropTypes.string.isRequired,
   updateConfigurationMethod: PropTypes.func.isRequired,
+  hasRedirectUris: PropTypes.bool.isRequired,
+  syncRedirectUris: PropTypes.func.isRequired,
 }
