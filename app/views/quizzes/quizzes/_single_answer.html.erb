@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <input type="file" accept="<%= @allowed_filetypes %>" name="" value="<%attachment_id_for(question) %>"
+    <input type="file" <%= @allowed_filetypes.present? ? "accept='#{@allowed_filetypes}'" : nil %> name="" value="<%attachment_id_for(question) %>"
     class="question_input file-upload hidden" <%= 'readonly="readonly"' unless editable %>/>
     <input type="hidden" class="attachment-id question_input"
     name="question_<%= question[:id] %>[]"
