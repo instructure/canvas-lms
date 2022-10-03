@@ -23,9 +23,9 @@ import {CloseButton, Button} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Heading} from '@instructure/ui-heading'
 import {Modal} from '@instructure/ui-modal'
-import {Tooltip} from '@instructure/ui-tooltip'
 import {Flex} from '@instructure/ui-flex'
 import {debounce} from '@instructure/debounce'
+import {ConditionalTooltip} from '../../shared/ConditionalTooltip'
 
 import formatMessage from '../../../../format-message'
 
@@ -49,7 +49,7 @@ export default class EquationEditorModal extends Component {
     onModalClose: PropTypes.func.isRequired,
     onEquationSubmit: PropTypes.func.isRequired,
     title: PropTypes.node,
-    mountNode: PropTypes.string
+    mountNode: PropTypes.string,
   }
 
   // used for inline latex delimited like: \( ... \) OR $$ ... $$
@@ -59,12 +59,12 @@ export default class EquationEditorModal extends Component {
 
   static defaultProps = {
     title: null,
-    mountNode: null
+    mountNode: null,
   }
 
   state = {
     advanced: false,
-    workingFormula: ''
+    workingFormula: '',
   }
 
   hostPageDisablesShortcuts = null
@@ -237,7 +237,7 @@ export default class EquationEditorModal extends Component {
     EquationEditorModal.debounceRate,
     {
       leading: false,
-      trailing: true
+      trailing: true,
     }
   )
 
@@ -334,27 +334,22 @@ export default class EquationEditorModal extends Component {
   renderToggle = () => {
     const lockToggle = this.state.advanced && this.advancedModeOnly(this.state.workingFormula)
 
-    const defaultToggle = (
-      <Checkbox
-        onChange={this.toggleAndUpdatePreference}
-        checked={this.state.advanced}
-        label={formatMessage('Directly Edit LaTeX')}
-        variant="toggle"
-        disabled={lockToggle}
-        data-testid="advanced-toggle"
-      />
-    )
-
-    const tooltipToggle = (
-      <Tooltip
+    return (
+      <ConditionalTooltip
+        condition={lockToggle}
         renderTip={formatMessage('This equation cannot be rendered in Basic View.')}
         on={['hover', 'focus']}
       >
-        {defaultToggle}
-      </Tooltip>
+        <Checkbox
+          onChange={this.toggleAndUpdatePreference}
+          checked={this.state.advanced}
+          label={formatMessage('Directly Edit LaTeX')}
+          variant="toggle"
+          disabled={lockToggle}
+          data-testid="advanced-toggle"
+        />
+      </ConditionalTooltip>
     )
-
-    return lockToggle ? tooltipToggle : defaultToggle
   }
 
   handleRef = node => {
@@ -428,7 +423,7 @@ export default class EquationEditorModal extends Component {
                   padding: '0.5em',
                   overflow: 'auto',
                   border: 'solid 1px',
-                  borderRadius: '4px'
+                  borderRadius: '4px',
                 }}
                 ref={this.handleFieldRef}
                 default-mode="inline-math"
@@ -447,7 +442,7 @@ export default class EquationEditorModal extends Component {
                 style={{
                   height: '5.1rem',
                   overflowY: 'auto',
-                  lineHeight: '1.7rem'
+                  lineHeight: '1.7rem',
                 }}
                 label=""
                 value={this.state.workingFormula}
