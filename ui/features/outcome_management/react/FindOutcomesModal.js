@@ -37,6 +37,7 @@ import useResize from '@canvas/outcomes/react/hooks/useResize'
 import useBoolean from '@canvas/outcomes/react/hooks/useBoolean'
 import {FIND_GROUP_OUTCOMES} from '@canvas/outcomes/graphql/Management'
 import GroupActionDrillDown from './shared/GroupActionDrillDown'
+import {isEmpty} from 'lodash'
 import useOutcomesImport, {
   IMPORT_COMPLETED,
   ROOT_GROUP,
@@ -74,7 +75,7 @@ const FindOutcomesModal = ({
     loadedGroups,
   } = useFindOutcomeModal(open)
 
-  const {group, loading, loadMore} = useGroupDetail({
+  const {group, loading, loadMore, refetchLearningOutcome} = useGroupDetail({
     id: selectedGroupId,
     query: FIND_GROUP_OUTCOMES,
     loadOutcomesIsImported: true,
@@ -173,6 +174,12 @@ const FindOutcomesModal = ({
         ...new Set([...importedOids, ...newlyImportedOutcomesIds]),
       ])
       setTargetGroupIdsToRefetch([...targetGroupIdsToRefetch])
+    }
+    if (
+      !isEmpty(importOutcomesStatus) &&
+      Object.values(importOutcomesStatus).every(importStatus => importStatus === IMPORT_COMPLETED)
+    ) {
+      refetchLearningOutcome()
     }
   }, [importOutcomesStatus]) // eslint-disable-line react-hooks/exhaustive-deps
 
