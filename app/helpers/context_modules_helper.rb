@@ -58,12 +58,14 @@ module ContextModulesHelper
 
   def add_mastery_paths_to_cache_key(cache_key, context, user)
     if user && cyoe_enabled?(context)
-      rules = if context.user_is_student?(user)
-                cyoe_rules(context, user, @session)
-              else
-                ConditionalRelease::Service.active_rules(context, user, @session)
-              end
-      cache_key += "/mastery:" + Digest::MD5.hexdigest(rules.to_s)
+      if context.user_is_student?(user)
+        rules = cyoe_rules(context, user, @session)
+        cache_key += "/mastery:" + Digest::MD5.hexdigest(rules.to_s)
+        cache_key += "/mastery_actions:" + Digest::MD5.hexdigest(assignment_set_action_ids(rules, user).to_s)
+      else
+        rules = ConditionalRelease::Service.active_rules(context, user, @session)
+        cache_key += "/mastery:" + Digest::MD5.hexdigest(rules.to_s)
+      end
     end
     cache_key
   end
