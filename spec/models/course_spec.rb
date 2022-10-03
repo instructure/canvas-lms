@@ -6016,21 +6016,30 @@ describe Course do
         account_model
         # non-concluded
         @c1 = Course.create!(account: @account)
+
         @c2 = Course.create!(account: @account, conclude_at: 1.week.from_now)
+        @c2.enrollment_term = @c2.account.enrollment_terms.create! end_at: 2.weeks.ago
+        @c2.save!
 
         # concluded in various ways
         @c3 = Course.create!(account: @account, conclude_at: 1.week.ago)
+
         @c4 = Course.create!(account: @account)
         term = @c4.account.enrollment_terms.create! end_at: 2.weeks.ago
         @c4.enrollment_term = term
         @c4.save!
+
         @c5 = Course.create!(account: @account)
         @c5.complete!
+
+        @c6 = Course.create!(account: @account, conclude_at: 1.week.ago)
+        @c6.enrollment_term = @c6.account.enrollment_terms.create! end_at: 2.weeks.from_now
+        @c6.save!
       end
 
       describe "#completed" do
         it "includes completed courses" do
-          expect(@account.courses.completed.sort_by(&:id)).to eq [@c3, @c4, @c5]
+          expect(@account.courses.completed.sort_by(&:id)).to eq [@c3, @c4, @c5, @c6]
         end
 
         it "plays nice with other scopes" do

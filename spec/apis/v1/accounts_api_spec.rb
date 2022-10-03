@@ -1274,27 +1274,35 @@ describe "Accounts API", type: :request do
     describe "?completed" do
       before :once do
         @me = @user
-        %i[c1 c2 c3 c4].each do |course|
+        %i[c1 c2 c3 c4 c5].each do |course|
           instance_variable_set("@#{course}".to_sym, course_model(name: course.to_s, account: @a1, conclude_at: 2.days.from_now))
         end
 
+        # c2 -- condluded
         @c2.start_at = 2.weeks.ago
         @c2.conclude_at = 1.week.ago
         @c2.save!
 
+        # c3 -- term concluded, no conclude_at, so concluded
         term = @c3.root_account.enrollment_terms.create! end_at: 2.days.ago
         @c3.enrollment_term = term
+        @c3.conclude_at = nil
         @c3.save!
 
+        # c4 -- condluded via workflow_state
         @c4.complete!
         @user = @me
+
+        # c5 -- expired term, but course term (non-concluded) overrides
+        @c5.enrollment_term = term
+        @c5.save!
       end
 
       it "does not apply if not specified" do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses",
                         { controller: "accounts", action: "courses_api",
                           account_id: @a1.to_param, format: "json" })
-        expect(json.collect { |row| row["name"] }).to eql %w[c1 c2 c3 c4]
+        expect(json.collect { |row| row["name"] }).to eql %w[c1 c2 c3 c4 c5]
       end
 
       it "filters courses on completed state" do
@@ -1308,7 +1316,7 @@ describe "Accounts API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@a1.id}/courses?completed=no",
                         { controller: "accounts", action: "courses_api", account_id: @a1.to_param,
                           format: "json", completed: "no" })
-        expect(json.collect { |row| row["name"] }).to eql ["c1"]
+        expect(json.collect { |row| row["name"] }).to eql %w[c1 c5]
       end
 
       it "filters and sort without asploding" do
