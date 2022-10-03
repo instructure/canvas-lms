@@ -597,20 +597,28 @@ describe DueDateCacher do
     end
 
     describe "re-adding removed students from a quiz" do
+      specs_require_sharding
+
       it "assigns the correct workflow state to the submission" do
-        @quiz = @course.quizzes.create!
-        @quiz.workflow_state = "available"
-        @quiz.quiz_data = [{ correct_comments: "", assessment_question_id: nil, incorrect_comments: "", question_name: "Question 1", points_possible: 1, question_text: "Write an essay!", name: "Question 1", id: 128, answers: [], question_type: "essay_question" }]
-        @quiz.save!
+        @shard2.activate do
+          account = Account.create!
+          course_with_student(active_all: true, account: account)
 
-        @quiz_submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
-        @quiz_submission.update!(workflow_state: "pending_review")
+          @quiz = @course.quizzes.create!
+          @quiz.workflow_state = "available"
+          @quiz.quiz_data = [{ correct_comments: "", assessment_question_id: nil, incorrect_comments: "", question_name: "Question 1", points_possible: 1, question_text: "Write an essay!", name: "Question 1", id: 128, answers: [], question_type: "essay_question" }]
+          @quiz.save!
 
-        submission = @quiz_submission.submission
-        submission.update!(workflow_state: "deleted")
+          @quiz_submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
+          @quiz_submission.update!(workflow_state: "pending_review")
 
-        cacher.recompute
-        expect(submission.workflow_state).to eq "pending_review"
+          submission = @quiz_submission.submission
+          submission.update_columns(grade: "5", workflow_state: "deleted")
+
+          expect { DueDateCacher.new(@course, @quiz.assignment).recompute }.to change {
+            submission.reload.workflow_state
+          }.from("deleted").to("pending_review")
+        end
       end
     end
 
