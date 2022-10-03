@@ -85,7 +85,7 @@ class StudentEnrollment < Enrollment
           .where(user_id: students.map(&:user_id), workflow_state: "deleted", assignments: { context_id: course_id })
           .merge(Assignment.active)
           .in_batches
-          .update_all("workflow_state = #{DueDateCacher::INFER_SUBMISSION_WORKFLOW_STATE_SQL}")
+          .update_all("workflow_state = #{DueDateCacher.infer_submission_workflow_state_sql}")
       end
     end
 
