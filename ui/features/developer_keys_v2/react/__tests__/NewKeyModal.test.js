@@ -454,7 +454,7 @@ it('hasRedirectUris', () => {
     })
   )
 
-  expect(wrapper.instance().hasRedirectUris).toEqual('')
+  expect(wrapper.instance().hasRedirectUris).toEqual(false)
 
   wrapper.instance().updateToolConfiguration(validToolConfig)
 
@@ -492,9 +492,29 @@ describe('redirect_uris automatic setting', () => {
   })
 
   it('does not update `redirect_uris` if already set when updating the tool configuration', () => {
-    wrapper.instance().updateDeveloperKey('redirect_uris', 'already-filled')
+    wrapper.setState({
+      developerKey: {
+        ...developerKey,
+        redirect_uris: 'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com',
+      },
+    })
     wrapper.instance().updateToolConfiguration(validToolConfig)
-    expect(wrapper.state().developerKey.redirect_uris).toEqual('already-filled')
+    expect(wrapper.instance().developerKey.redirect_uris).toEqual(
+      'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com'
+    )
+  })
+
+  it('does update `redirect_uris` if already set when using the `Sync URIs` button', () => {
+    wrapper.instance().updateToolConfiguration(validToolConfig)
+    wrapper.setState({
+      developerKey: {
+        ...developerKey,
+        redirect_uris: 'http://my_redirect_uri.com\nhttp://google.com\nhttp://msn.com',
+        tool_configuration: validToolConfig,
+      },
+    })
+    wrapper.instance().syncRedirectUris()
+    expect(wrapper.instance().developerKey.redirect_uris).toEqual(validToolConfig.target_link_uri)
   })
 })
 
