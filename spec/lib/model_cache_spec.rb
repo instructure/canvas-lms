@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "lib/model_cache"
-
 describe ModelCache do
   before do
     # these classes must be real constants because their name is accessed when cacheable_method is called

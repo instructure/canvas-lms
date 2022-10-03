@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "db/migrate/20180611205754_clean_up_assignment_overrides"
+require_relative "../../db/migrate/20180611205754_clean_up_assignment_overrides"
 
 describe "CleanUpAssignmentOverrides" do
   it "cleans up invalid overrides and orphaned override students" do

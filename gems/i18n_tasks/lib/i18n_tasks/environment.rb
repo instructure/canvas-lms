@@ -24,7 +24,7 @@ module I18nTasks
       Bundler.setup
       # for consistency in how canvas does json ... this way our specs can
       # verify _core_en is up to date
-      require "config/initializers/json"
+      require_relative "../../../../config/initializers/json"
 
       # set up rails i18n paths ... normally rails env does this for us :-/
       require "action_controller"

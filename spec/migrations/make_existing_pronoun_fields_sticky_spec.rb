@@ -19,7 +19,7 @@
 #
 
 require_relative "../spec_helper"
-require "db/migrate/20200511171508_make_existing_pronoun_fields_sticky"
+require_relative "../../db/migrate/20200511171508_make_existing_pronoun_fields_sticky"
 
 describe "MakeExistingPronounFieldsSticky" do
   describe "up" do
