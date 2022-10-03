@@ -54,7 +54,11 @@ export const addAccountsToTree = (
       },
     }
 
-    if (account.parent_account_id && account.parent_account_id != account.id) {
+    if (
+      account.parent_account_id &&
+      allAccounts[account.parent_account_id] &&
+      account.parent_account_id != account.id
+    ) {
       allAccounts[account.parent_account_id].children.push(account.id)
     }
 
