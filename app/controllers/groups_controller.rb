@@ -263,6 +263,18 @@ class GroupsController < ApplicationController
                                    .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
                                    .eager_load(:group_category).preload(:root_account)
 
+    if params[:section_restricted] && @context.is_a?(Course)
+      is_current_user_section_restricted = @context.membership_for_user(@current_user).limit_privileges_to_course_section
+      is_current_user_a_student = @context.user_is_student?(@current_user)
+
+      if is_current_user_section_restricted && is_current_user_a_student
+        group_scope = @context.groups.active.eager_load(:group_category).preload(:root_account)
+        groups_with_restricted_categories_or_teacher_assigned = group_scope.where(group_categories: { self_signup: nil }).or(group_scope.where(group_categories: { self_signup: "restricted" }))
+        groups_with_no_common_section_with_current_user = groups_with_restricted_categories_or_teacher_assigned.reject { |g| g.has_common_section_with_user?(@current_user) }
+        @groups = all_groups -= groups_with_no_common_section_with_current_user
+      end
+    end
+
     unless api_request?
       # The Groups end-point relies on the People's tab configuration since it's a subsection of it.
       return unless tab_enabled?(Course::TAB_PEOPLE)
