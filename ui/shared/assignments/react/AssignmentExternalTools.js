@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-utils'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('moderated_grading')
 
@@ -128,16 +129,14 @@ class AssignmentExternalTools extends React.Component {
       styles.width = tool.placements[this.props.placement].launch_width
     }
     return (
-      <iframe
+      <ToolLaunchIframe
         src={tool.launch}
-        className="tool_launch"
         style={styles}
         key={tool.definition_id}
         title={I18n.t('External Tool %{tool_id}', {tool_id: tool.definition_id})}
         ref={e => {
           this[`tool_iframe_${tool.definition_id}`] = e
         }}
-        data-lti-launch="true"
       />
     )
   }
