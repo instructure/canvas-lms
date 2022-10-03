@@ -1,5 +1,3 @@
-<% require 'lib/token_scopes_helper.rb' %>
-
 <% @routes.each do |route| %>
   <% route_path = route.path.spec.to_s.sub("(.:format)", "")
      next if route_path =~ /\.json$/ %>

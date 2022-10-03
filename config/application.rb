@@ -33,7 +33,6 @@ module CanvasRails
 
     config.add_autoload_paths_to_load_path = false
 
-    $LOAD_PATH << config.root.to_s
     config.encoding = "utf-8"
     require "logging_filter"
     config.filter_parameters.concat LoggingFilter.filtered_parameters

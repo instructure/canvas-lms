@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "spec/views/views_helper"
+require_relative "../views_helper"
 
 describe "/gradebooks/submissions_zip_upload", type: :view do
   before do

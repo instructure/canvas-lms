@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-require_dependency "lib/canvas/oauth/client_credentials_provider"
 
 class Lti::TokenController < ApplicationController
   include SupportHelpers::ControllerHelpers
