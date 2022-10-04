@@ -24,9 +24,10 @@ require "action_controller"
 
 # load the routes
 if CanvasRails::Application.routes_reloader.paths.empty?
-  require "lib/api_route_set"
+  require_relative "../../lib/api_route_set"
+  require_relative "../../lib/token_scopes_helper"
   # we need this for a route constraint
-  require "lib/lti/re_reg_constraint"
+  require_relative "../../lib/lti/re_reg_constraint"
 
   routes_files = CanvasRails::Application.paths["config/routes.rb"].existent +
                  CanvasRails::Application.railties.map do |railtie|
