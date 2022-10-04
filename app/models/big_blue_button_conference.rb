@@ -107,6 +107,29 @@ class BigBlueButtonConference < WebConference
     super
   end
 
+  attr_writer :loaded_recordings
+  # we can use the same API method with multiple meeting ids to load all the recordings up in one go
+  # instead of making a bunch of individual calls
+  def self.preload_recordings(conferences)
+    filtered_conferences = conferences.select{|c| c.conference_key && c.settings[:record]}
+    return unless filtered_conferences.any?
+
+    # have a limit so we don't send a ridiculously long URL over
+    limit = Setting.get("big_blue_button_preloaded_recordings_limit", "50").to_i
+    filtered_conferences.each_slice(limit) do |sliced_conferences|
+      meeting_ids = sliced_conferences.map(&:conference_key).join(",")
+      response = send_request(:getRecordings, {
+        :meetingID => meeting_ids,
+      })
+      result = response[:recordings] if response
+      result = [] if result.is_a?(String)
+      grouped_result = Array(result).group_by{|r| r[:meetingID]}
+      sliced_conferences.each do |c|
+        c.loaded_recordings = grouped_result[c.conference_key] || []
+      end
+    end
+  end
+
   private
 
   def retouch?
@@ -140,13 +163,18 @@ class BigBlueButtonConference < WebConference
   end
 
   def fetch_recordings
-    return [] unless conference_key && settings[:record]
-    response = send_request(:getRecordings, {
-      :meetingID => conference_key,
-      })
-    result = response[:recordings] if response
-    result = [] if result.is_a?(String)
-    Array(result)
+    @loaded_recordings ||= begin
+      if conference_key && settings[:record]
+        response = send_request(:getRecordings, {
+          :meetingID => conference_key,
+          })
+        result = response[:recordings] if response
+        result = [] if result.is_a?(String)
+        Array(result)
+      else
+        []
+      end
+    end
   end
 
   def delete_recording(recording_id)
@@ -156,13 +184,21 @@ class BigBlueButtonConference < WebConference
     response[:deleted] if response
   end
 
-  def generate_request(action, options)
+  def generate_request(*args)
+    self.class.generate_request(*args)
+  end
+
+  def self.generate_request(action, options)
     query_string = options.to_query
     query_string << ("&checksum=" + Digest::SHA1.hexdigest(action.to_s + query_string + config[:secret_dec]))
     "https://#{config[:domain]}/bigbluebutton/api/#{action}?#{query_string}"
   end
 
-  def send_request(action, options)
+  def send_request(*args)
+    self.class.send_request(*args)
+  end
+
+  def self.send_request(action, options)
     url_str = generate_request(action, options)
 
     http_response = nil
@@ -188,13 +224,13 @@ class BigBlueButtonConference < WebConference
     nil
   end
 
-  def xml_to_hash(xml_string)
+  def self.xml_to_hash(xml_string)
     doc = Nokogiri::XML(xml_string)
     # assumes the top level value will be a hash
     xml_to_value(doc.root)
   end
 
-  def xml_to_value(node)
+  def self.xml_to_value(node)
     child_elements = node.element_children
 
     # if there are no children at all, then this is an empty node
