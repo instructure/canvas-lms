@@ -906,6 +906,7 @@ class Quizzes::QuizzesController < ApplicationController
   def take_quiz
     return unless quiz_submission_active?
     @show_embedded_chat = false
+    @allowed_filetypes = SettingsService.get_settings(object: 'school', id: 1)['allowed_filetypes']
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return

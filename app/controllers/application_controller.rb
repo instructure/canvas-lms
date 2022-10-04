@@ -1899,7 +1899,7 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
-    super
+    super if !performed?
   end
 
   # flash is normally only preserved for one redirect; make sure we carry
