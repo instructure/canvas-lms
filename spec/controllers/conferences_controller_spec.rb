@@ -97,6 +97,23 @@ describe ConferencesController do
       get 'index', params: {:course_id => @course.id}
       expect(assigns[:new_conferences]).to be_empty
     end
+
+    it "should preload recordings for BBB conferences" do
+      PluginSetting.create!(name: 'big_blue_button',
+        :settings => {
+          :domain => "bbb.totallyanexampleplzdontcallthis.com",
+          :secret_dec => "secret",
+        })
+      allow(BigBlueButtonConference).to receive(:send_request).and_return('')
+
+      user_session(@teacher)
+      @bbb = BigBlueButtonConference.create!(:title => "my conference", :user => @teacher, :context => @course)
+      @other = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
+
+      expect(BigBlueButtonConference).to receive(:preload_recordings).with([@bbb])
+      get 'index', params: {:course_id => @course.id}
+      expect(response).to be_success
+    end
   end
 
   describe "POST 'create'" do
