@@ -28,6 +28,8 @@ import {
 const I18n = useI18nScope('gradebook')
 
 export default class StudentLastNameCellFormatter {
+  options: ReturnType<typeof getOptions>
+
   constructor(gradebook) {
     this.options = getOptions(gradebook)
   }

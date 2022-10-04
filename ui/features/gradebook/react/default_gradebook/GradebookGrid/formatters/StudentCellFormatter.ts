@@ -23,9 +23,12 @@ import {
   getOptions,
   renderCell,
 } from './StudentCellFormatter.utils'
+import type Gradebook from '../../Gradebook'
 
 export default class StudentCellFormatter {
-  constructor(gradebook) {
+  options: ReturnType<typeof getOptions>
+
+  constructor(gradebook: Gradebook) {
     this.options = getOptions(gradebook)
   }
 
