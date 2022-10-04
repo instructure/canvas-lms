@@ -162,6 +162,16 @@ class Assignment < ActiveRecord::Base
   }
   scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
 
+  scope :exclude_muted_associations_for_user, lambda { |user|
+    joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = #{User.connection.quote(user.id_for_database)} AND submissions.assignment_id = assignments.id")
+      .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  = assignments.id")
+      .where(" assignments.id IS NULL"\
+             " OR submissions.posted_at IS NOT NULL"\
+             " OR assignments.grading_type = 'not_graded'"\
+             " OR pc.id IS NULL"\
+             " OR (pc.id IS NOT NULL AND pc.post_manually = False)")
+  }
+
   validates_associated :external_tool_tag, if: :external_tool?
   validate :group_category_changes_ok?
   validate :turnitin_changes_ok?

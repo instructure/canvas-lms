@@ -17,39 +17,40 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# This helper provides methods to transform JSON data retrieved upon calling
+# This helper provides methods to transform hash data retrieved upon calling
 # OutcomesService (OS) authoritative_results endpoint either into:
 #
 #   - a RollupScores collection via Outcomes::ResultAnalytics
 #   - a LearningOutcomeResult collection
 #
 # It also provides a transformation method for a single OS' AuthoritativeResult
-# JSON object into a LearningOutcomeResult object
+# hash object into a LearningOutcomeResult object
 
 module OutcomesServiceAuthoritativeResultsHelper
   Rollup = Struct.new(:context, :scores)
 
-  # Transforms an OS' JSON AuthoritativeResult collection into a
+  # Transforms an OS' hash of AuthoritativeResult collection into a
   # RollupScore collection
-  def json_to_rollup_scores(authoritative_results)
-    rollup_user_results json_to_outcome_results(authoritative_results)
+  def rollup_scores(authoritative_results)
+    rollup_user_results convert_to_learning_outcome_results(authoritative_results)
   end
 
-  # Transforms an OS' JSON AuthoritativeResult collection into a
+  # Transforms an OS' hash AuthoritativeResult collection into a
   # LearningOutcomeResult collection
-  def json_to_outcome_results(authoritative_results)
-    JSON.parse(authoritative_results).deep_symbolize_keys[:results].map do |r|
-      json_to_outcome_result(r)
+  def convert_to_learning_outcome_results(authoritative_results)
+    authoritative_results.each_with_object([]) do |r, all_results|
+      result = convert_to_learning_outcome_result(r)
+      all_results.push(result) unless result.nil?
     end
   end
 
-  # Transforms an OS' JSON AuthoritativeResult (AR) object into an
+  # Transforms an OS' hash AuthoritativeResult (AR) object into an
   # instance of LearningOutcomeResult
-  def json_to_outcome_result(authoritative_result)
+  def convert_to_learning_outcome_result(authoritative_result)
     outcome = LearningOutcome.find(authoritative_result[:external_outcome_id])
     assignment = Assignment.find(authoritative_result[:associated_asset_id])
-    user = User.find_by(uuid: authoritative_result[:user_uuid])
-    submission = Submission.find_by(user_id: user.id, assignment_id: assignment.id)
+    student_user = User.find_by(uuid: authoritative_result[:user_uuid])
+    submission = Submission.find_by(user_id: student_user.id, assignment_id: assignment.id)
 
     context = assignment.context
     root_account = assignment.root_account
@@ -75,9 +76,9 @@ module OutcomesServiceAuthoritativeResultsHelper
         learning_outcome: outcome,
         associated_asset: assignment,
         artifact: submission,
-        title: "#{user.name}, #{assignment.name}",
-        user: user,
-        user_uuid: user.uuid,
+        title: "#{student_user.name}, #{assignment.name}",
+        user: student_user,
+        user_uuid: student_user.uuid,
         alignment: alignment,
         context: context,
         root_account: root_account,
