@@ -1332,9 +1332,9 @@ class DiscussionTopic < ActiveRecord::Base
                                                   .pluck(:course_section_id)
     user_ids = non_nil_users.pluck(:id)
     # Context is known to be a course here
-    users_in_sections = context.enrollments.active
+    users_in_sections = context.enrollments.active_or_pending
                                .where(user_id: user_ids, course_section_id: section_ids).pluck(:user_id).to_set
-    unlocked_teachers = context.enrollments.active.instructor
+    unlocked_teachers = context.enrollments.active_or_pending.instructor
                                .where(limit_privileges_to_course_section: false, user_id: user_ids)
                                .pluck(:user_id).to_set
     permitted_user_ids = users_in_sections.union(unlocked_teachers)
