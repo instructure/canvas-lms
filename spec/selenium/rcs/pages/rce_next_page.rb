@@ -141,6 +141,26 @@ module RCENextPage
     f(selector)
   end
 
+  def iconmaker_toolbar_button
+    possibly_hidden_toolbar_button('[role="button"][title="Icon Maker Icons"]')
+  end
+
+  def iconmaker_addimage_menu
+    f('[data-position-target="AddImageMenu"]')
+  end
+
+  def iconmaker_singlecolor_option
+    f('[id="SingleColor"]')
+  end
+
+  def iconmaker_singlecolor_articon
+    f('[data-testid="icon-art"]')
+  end
+
+  def iconmaker_image_preview
+    f('[data-testid="selected-image-preview"]')
+  end
+
   def links_toolbar_button
     possibly_hidden_toolbar_button('[role="button"][title="Links"]')
   end

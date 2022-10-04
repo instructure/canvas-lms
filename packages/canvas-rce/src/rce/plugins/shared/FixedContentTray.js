@@ -62,6 +62,7 @@ export const FixedContentTray = ({
       onExited={onUnmount}
       open={isOpen}
       placement="end"
+      shouldCloseOnDocumentClick={true}
       shouldContainFocus={true}
       shouldReturnFocus={true}
       size="regular"
