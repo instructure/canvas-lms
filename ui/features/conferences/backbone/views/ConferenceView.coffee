@@ -52,6 +52,8 @@ export default class ConferenceView extends View
     @model.on('change', @render)
 
   syncAttendees: (e) ->
+    @el.querySelector("a[data-testid='settings-cog']").classList.add('ui-state-disabled')
+    @el.querySelector("a[data-testid='start-button']").setAttribute('disabled', '')
     atag = e.target
     form = atag.parentElement.querySelector('form')
     conference_name = form.querySelector("[name='web_conference[title]']").value || ''
@@ -68,14 +70,18 @@ export default class ConferenceView extends View
         @el.querySelector('.conference-loading-indicator').style.display = "none"
         ReactDOM.unmountComponentAtNode(spinnerDomEl)
         $.flashMessage(conference_name + I18n.t(" Attendees Synced!"))
+        @el.querySelector("a[data-testid='settings-cog']").classList.remove('ui-state-disabled')
+        @el.querySelector("a[data-testid='start-button']").removeAttribute('disabled')
       error: =>
         @show(@model)
         @el.querySelector('.conference-loading-indicator').style.display = "none"
         ReactDOM.unmountComponentAtNode(spinnerDomEl)
         $.flashError(conference_name + I18n.t(" Attendees Failed to Sync."))
+        @el.querySelector("a[data-testid='settings-cog']").classList.remove('ui-state-disabled')
+        @el.querySelector("a[data-testid='start-button']").removeAttribute('disabled')
     )
     @$(form).submit()
-    
+
 
   edit: (e) ->
     # refocus if edit not finalized

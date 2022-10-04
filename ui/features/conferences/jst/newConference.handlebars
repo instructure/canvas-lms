@@ -54,8 +54,8 @@
       {{/if}}
       {{else}}
       {{#if permissions.initiate}}
-      <a href="{{ join_url }}" class="btn btn-small start-button" target="_blank" {{#unless id}}disabled="disabled"
-        {{/unless}}>
+      <a data-testid="start-button" href="{{ join_url }}" class="btn btn-small start-button" target="_blank" {{#unless
+        id}}disabled="disabled" {{/unless}}>
         {{#t "start"}}Start{{/t}}
       </a>
       {{/if}}
@@ -63,7 +63,7 @@
       {{#if has_actions}}
       <div class="inline-block">
         <a class="al-trigger al-trigger-gray {{#unless id}}ui-state-disabled{{/unless}}" role="button"
-          aria-haspopup="true" aria-owns="{{id}}-content-1" href="#">
+          aria-haspopup="true" aria-owns="{{id}}-content-1" href="#" data-testid="settings-cog">
           <i class="icon-settings"></i>
           <i class="icon-mini-arrow-down"></i>
           <span class="screenreader-only">{{#t "settings"}}Settings{{/t}}</span>
@@ -72,20 +72,21 @@
           aria-activedescendant="{{id}}-content-2">
 
           {{#if permissions.update}}
-
+          {{#if ENV.bbb_modal_update}}
           <li role="presentation">
             <a class="icon-reset sync_conference_link" id="{{id}}-content-2" role="menuitem" title="{{#t " sync"}}Sync
               Attendees{{/t}}">{{#t "sync"}}Sync Attendees{{/t}}</a>
             <form action="{{url}}" id="sync_attendees_{{id}}" style="margin:0;padding:0;display:inline" method="POST">
               <input type="hidden" name="_method" value="PUT">
               <input type="hidden" id="web_conference_sync_attendees" name="web_conference[sync_attendees]"
-                value="true">
+                value="1">
               <input type="hidden" id="web_conference_title" name="web_conference[title]" value="{{title}}">
               <div style="margin:0;padding:0;display:inline">
                 <input name="authenticity_token" type="hidden" value="{{auth_token}}">
               </div>
             </form>
           </li>
+          {{/if}}
 
           <li role="presentation">
             <a href="#conference_{{ id }}" class="icon-edit edit_conference_link" id="{{id}}-content-3" role="menuitem"
