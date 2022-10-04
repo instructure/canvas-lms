@@ -70,6 +70,19 @@ describe Lti::ExternalToolTab do
     expect(subject.tabs.first[:id]).to eq tool.asset_string
   end
 
+  context "sharding" do
+    specs_require_sharding
+
+    it "sets the tab id to the tools asset_string relative to the context's shard" do
+      course = @shard1.activate { course_model(account: account_model) }
+      tool = external_tool_model(context: course)
+      tabs = @shard2.activate do
+        described_class.new(course, nil, [tool]).tabs
+      end
+      expect(tabs.first[:id]).to eq(@shard1.activate { tool.asset_string })
+    end
+  end
+
   it "sets the css_class" do
     expect(subject.tabs.first[:css_class]).to eq tool.asset_string
   end
