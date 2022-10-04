@@ -25,7 +25,7 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('add_people_duplicate_section')
 
@@ -207,12 +207,16 @@ class DuplicateSection extends React.Component {
               />
             </Table.RowHeader>
             <Table.Cell colSpan="5">
-              <CondensedButton
+              <Link
+                isWithinText={false}
+                as="button"
                 onClick={this.onSelectNewForDuplicate}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
               >
-                {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
-              </CondensedButton>
+                <Text>
+                  {I18n.t('Create a new user for "%{address}"', {address: duplicateSet.address})}
+                </Text>
+              </Link>
             </Table.Cell>
           </Table.Row>
         )
@@ -235,12 +239,14 @@ class DuplicateSection extends React.Component {
           />
         </Table.RowHeader>
         <Table.Cell colSpan="5">
-          <CondensedButton
+          <Link
+            isWithinText={false}
+            as="button"
             onClick={this.onSkipDuplicate}
             theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
           >
-            {I18n.t('Don’t add this user for now.')}
-          </CondensedButton>
+            <Text>{I18n.t('Don’t add this user for now.')}</Text>
+          </Link>
         </Table.Cell>
       </Table.Row>
     )
