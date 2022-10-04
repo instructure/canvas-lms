@@ -18,13 +18,7 @@
 
 import {camelize, underscore} from 'convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
-import type {
-  PlagiarismData,
-  PlagiarismDataMap,
-  SimilarityEntry,
-  SimilarityType,
-  SubmissionWithOriginalityReport,
-} from '@canvas/grading/grading.d'
+import type {PlagiarismData, SimilarityEntry} from '@canvas/grading/grading.d'
 
 export function isGraded(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
