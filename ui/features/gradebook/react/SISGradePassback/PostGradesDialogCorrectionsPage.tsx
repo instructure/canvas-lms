@@ -21,11 +21,13 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
 import AssignmentCorrectionRow from './AssignmentCorrectionRow'
+import type PostGradesStore from './PostGradesStore'
+import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 const I18n = useI18nScope('modules')
 
 type Props = {
-  store: any
+  store: ReturnType<typeof PostGradesStore>
   advanceToSummaryPage: () => void
 }
 
@@ -55,11 +57,11 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
 
   invalidAssignmentsForCorrection = assignments => {
     const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
-    const invalid_assignments = []
+    const invalid_assignments: AssignmentWithOverride[] = []
     _.each(assignments, a => {
       if (original_error_assignments.length > 0 && this.props.store.validCheck(a)) {
         // no-op
-      } else if (original_error_assignments.length == 0 && this.props.store.validCheck(a)) {
+      } else if (original_error_assignments.length === 0 && this.props.store.validCheck(a)) {
         // no-op
       } else {
         invalid_assignments.push(a)
@@ -72,11 +74,12 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
     const assignments = _.filter(
       this.props.store.getAssignments(),
       a =>
-        a.overrides == undefined ||
-        a.overrides.length == 0 ||
-        a.overrideForThisSection != undefined ||
-        a.selectedSectionForEveryone != undefined ||
-        (a.selectedSectionForEveryone == undefined && a.currentlySelected.type == 'course')
+        typeof a.overrides === 'undefined' ||
+        a.overrides.length === 0 ||
+        typeof a.overrideForThisSection !== 'undefined' ||
+        typeof a.selectedSectionForEveryone !== 'undefined' ||
+        (typeof a.selectedSectionForEveryone === 'undefined' &&
+          a.currentlySelected.type === 'course')
     )
     const errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length
     const store = this.props.store
@@ -84,14 +87,14 @@ class PostGradesDialogCorrectionsPage extends React.Component<Props> {
     const originalErrorAssignments = assignmentUtils.withOriginalErrors(assignments)
 
     let assignmentRow
-    if (originalErrorAssignments.length != 0) {
+    if (originalErrorAssignments.length !== 0) {
       assignmentRow = originalErrorAssignments
-    } else if (correctionRow.length != 0) {
+    } else if (correctionRow.length !== 0) {
       assignmentRow = correctionRow
     } else if (
-      errorCount == 0 &&
-      correctionRow.length == 0 &&
-      originalErrorAssignments.length == 0
+      errorCount === 0 &&
+      correctionRow.length === 0 &&
+      originalErrorAssignments.length === 0
     ) {
       assignmentRow = []
     } else {

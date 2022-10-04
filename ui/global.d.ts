@@ -38,6 +38,7 @@ declare global {
     live: any
     mediaComment: any
     showIf: (boolean) => void
+    datetime_field: () => JQuery<HTMLInputElement>
   }
 
   declare interface JQueryStatic {

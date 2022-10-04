@@ -19,9 +19,22 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import '@canvas/util/createStore'
+import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
+import type {Override} from '../../../../api.d'
+
+type PartialAssignment = {
+  id: string
+  name: string
+  due_at: string
+  needs_grading_count: number
+  overrides: Override[]
+}
 
 const assignmentUtils = {
-  copyFromGradebook(assignment) {
+  copyFromGradebook(assignment: PartialAssignment): PartialAssignment & {
+    please_ignore: boolean
+    original_error: boolean
+  } {
     const a = _.pick(assignment, ['id', 'name', 'due_at', 'needs_grading_count', 'overrides'])
     a.please_ignore = false
     a.original_error = false
@@ -72,17 +85,15 @@ const assignmentUtils = {
     // for the invalid override on the assignment.
     _.each(assignments, a => {
       if (
-        a.overrideForThisSection != undefined &&
-        a.recentlyUpdated != undefined &&
+        typeof a.recentlyUpdated === 'boolean' &&
         a.recentlyUpdated &&
-        a.overrideForThisSection.due_at != null
+        a.overrideForThisSection?.due_at != null
       ) {
         a.original_error = false
       } else if (
-        a.overrideForThisSection != undefined &&
-        a.recentlyUpdated != undefined &&
+        typeof a.recentlyUpdated === 'boolean' &&
         !a.recentlyUpdated &&
-        a.overrideForThisSection.due_at == null
+        a.overrideForThisSection?.due_at == null
       ) {
         a.original_error = true
       }
@@ -107,7 +118,7 @@ const assignmentUtils = {
       }
       // for handling original error detection of an override for one section and the EveryoneElse "override" scenario but the second section is currentlySelected and IS NOT valid
       else if (
-        a.overrideForThisSection == undefined &&
+        typeof a.overrideForThisSection === 'undefined' &&
         assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
         a.due_at == null &&
         a.currentlySelected.id.toString() === a.selectedSectionForEveryone
@@ -116,7 +127,7 @@ const assignmentUtils = {
       }
       // for handling original error detection of an override for one section and the EveryoneElse "override" scenario but the second section is currentlySelected and IS valid
       else if (
-        a.overrideForThisSection == undefined &&
+        typeof a.overrideForThisSection === 'undefined' &&
         a.due_at != null &&
         a.currentlySelected.id.toString() === a.selectedSectionForEveryone &&
         !a.hadOriginalErrors
@@ -125,7 +136,7 @@ const assignmentUtils = {
       }
       // for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS NOT valid
       else if (
-        a.overrideForThisSection == undefined &&
+        typeof a.overrideForThisSection === 'undefined' &&
         assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
         a.due_at == null &&
         a.currentlySelected.type === 'course' &&
@@ -135,7 +146,7 @@ const assignmentUtils = {
       }
       // for handling original error detection of an "override" in the 'EveryoneElse "override" scenario but the course is currentlySelected and IS valid
       else if (
-        a.overrideForThisSection == undefined &&
+        typeof a.overrideForThisSection === 'undefined' &&
         a.due_at != null &&
         a.currentlySelected.type === 'course' &&
         a.currentlySelected.id.toString() !== a.selectedSectionForEveryone &&
@@ -181,7 +192,7 @@ const assignmentUtils = {
     if (!has_overrides && !a.due_at) return true
 
     // //Override missing due_at
-    const has_this_override = a.overrideForThisSection != undefined
+    const has_this_override = Boolean(a.overrideForThisSection)
     if (
       has_this_override &&
       a.overrideForThisSection.due_at == null &&
@@ -217,7 +228,7 @@ const assignmentUtils = {
     // //'Everyone Else' scenario and the course is currentlySelected but due_at is null making it invalid
     if (
       assignmentUtils.noDueDateForEveryoneElseOverride(a) &&
-      a.overrideForThisSection == undefined &&
+      typeof a.overrideForThisSection === 'undefined' &&
       a.currentlySelected?.type === 'course' &&
       a.currentlySelected?.id.toString() !== a.selectedSectionForEveryone
     )
@@ -231,7 +242,7 @@ const assignmentUtils = {
     return assignment.published && assignment.post_to_sis
   },
 
-  saveAssignmentToCanvas(course_id: string, assignment) {
+  saveAssignmentToCanvas(course_id: string, assignment: AssignmentWithOverride) {
     // if the date on an override is being updated confirm by checking if the due_at is an object
     if (typeof assignment.overrideForThisSection?.due_at === 'object') {
       // allows the validation process to determine when it has been updated and can display the correct page
@@ -245,10 +256,12 @@ const assignmentUtils = {
         assignment.overrideForThisSection.id
       // sets up form data to allow a single override to be updated
       const fd = new FormData()
-      fd.append(
-        'assignment_override[due_at]',
-        assignment.overrideForThisSection.due_at.toISOString()
-      )
+      if (assignment.overrideForThisSection.due_at) {
+        fd.append(
+          'assignment_override[due_at]',
+          assignment.overrideForThisSection.due_at.toISOString()
+        )
+      }
 
       $.ajax(url, {
         type: 'PUT',
@@ -310,7 +323,13 @@ const assignmentUtils = {
   // Sends a post-grades request to Canvas that is then forwarded to SIS App.
   // Expects a list of assignments that will later be queried for grades via
   // SIS App's workers
-  postGradesThroughCanvas(selected, assignments) {
+  postGradesThroughCanvas(
+    selected: {
+      id: string
+      type: string
+    },
+    assignments: AssignmentWithOverride[]
+  ) {
     const url = '/api/v1/' + selected.type + 's/' + selected.id + '/post_grades/'
     const data = {assignments: _.map(assignments, assignment => assignment.id)}
     $.ajax(url, {

@@ -189,8 +189,8 @@ function calculateWithGradingPeriods(
     return {
       assignmentGroups: recombinePeriodBasedAssignmentGroupGrades(periodBasedAssignmentGroupGrades),
       gradingPeriods: gradingPeriodGradesByPeriodId,
-      current: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, false, options),
-      final: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, true, options),
+      current: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, false),
+      final: combineGradingPeriodGrades(gradingPeriodGradesByPeriodId, true),
       scoreUnit: 'percentage',
     }
   }

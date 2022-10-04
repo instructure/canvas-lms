@@ -23,6 +23,7 @@ import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PostGradesDialog from './PostGradesDialog'
 import classnames from 'classnames'
+import PostGradesStore from './PostGradesStore'
 
 const I18n = useI18nScope('modules')
 
@@ -45,7 +46,7 @@ class PostGradesApp extends React.Component {
     renderAsButton: false,
   }
 
-  static AppLaunch(store, returnFocusTo) {
+  static AppLaunch(store: ReturnType<typeof PostGradesStore>, returnFocusTo) {
     const $dialog = $('<div class="post-grades-dialog">').dialog({
       title: I18n.t('Sync Grades to SIS'),
       maxWidth: 650,

@@ -22,10 +22,30 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import assignmentUtils from './assignmentUtils'
 import classnames from 'classnames'
+import type PostGradesStore from './PostGradesStore'
+import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
 const I18n = useI18nScope('modules')
 
-class AssignmentCorrectionRow extends React.Component {
+type Props = {
+  store: ReturnType<typeof PostGradesStore>
+  onDateChanged: (date: string) => void
+  assignmentList: any[]
+  assignment: AssignmentWithOverride
+  updateAssignment: (assignment: any) => void
+}
+
+class AssignmentCorrectionRow extends React.Component<Props> {
+  nameRef: React.RefObject<HTMLInputElement>
+
+  dueAtRef: React.RefObject<HTMLInputElement>
+
+  constructor(props) {
+    super(props)
+    this.nameRef = React.createRef<HTMLInputElement>()
+    this.dueAtRef = React.createRef<HTMLInputElement>()
+  }
+
   componentDidMount() {
     this.initDueAtDateTimeField()
   }
@@ -33,13 +53,17 @@ class AssignmentCorrectionRow extends React.Component {
   handleDateChanged = _e => {
     // send date chosen in jquery date-picker so that
     // the assignment or assignment override due_at is set
-    const $picker = $(this.refs.due_at)
-    this.props.onDateChanged($picker.data('date'))
+    if (this.dueAtRef.current) {
+      const $picker = $(this.dueAtRef.current)
+      this.props.onDateChanged($picker.data('date'))
+    }
   }
 
   initDueAtDateTimeField = () => {
-    const $picker = $(this.refs.due_at)
-    $picker.datetime_field().change(this.handleDateChanged)
+    if (this.dueAtRef.current) {
+      const $picker = $(this.dueAtRef.current)
+      $picker.datetime_field().change(this.handleDateChanged)
+    }
   }
 
   ignoreAssignment = e => {
@@ -52,8 +76,8 @@ class AssignmentCorrectionRow extends React.Component {
   // maintain assignment state consistency
   checkDueAtChange = e => {
     if (this.props.assignment.overrideForThisSection) {
-      if (!e.target.value) {
-        $(this.refs.due_at).data('date', null)
+      if (!e.target.value && this.dueAtRef.current) {
+        $(this.dueAtRef.current).data('date', null)
         this.props.assignment.due_at = null
       }
       // When a user edits the due_at datetime field, we should reset any
@@ -61,8 +85,10 @@ class AssignmentCorrectionRow extends React.Component {
       this.props.updateAssignment({please_ignore: false})
     } else {
       if (!e.target.value) {
-        $(this.refs.due_at).data('date', null)
-        this.props.updateAssignment({due_at: null})
+        if (this.dueAtRef.current) {
+          $(this.dueAtRef.current).data('date', null)
+          this.props.updateAssignment({due_at: null})
+        }
       }
       // When a user edits the due_at datetime field, we should reset any
       // previous "please_ignore" request
@@ -150,10 +176,16 @@ class AssignmentCorrectionRow extends React.Component {
               'error-circle': nameError || nameTooLongError || nameEmptyError,
             })}
           >
-            <label className="screenreader-only">{I18n.t('Name Error')}</label>
+            <label
+              htmlFor={`assignment_correction_name_${assignment.id}`}
+              className="screenreader-only"
+            >
+              {I18n.t('Name Error')}
+            </label>
           </div>
           <input
-            ref="name"
+            id={`assignment_correction_name_${assignment.id}`}
+            ref={this.nameRef}
             type="text"
             aria-label={I18n.t('Assignment Name')}
             className="input-mlarge assignment-name"
@@ -176,19 +208,26 @@ class AssignmentCorrectionRow extends React.Component {
               'error-circle': dueAtError,
             })}
           >
-            <label className="screenreader-only">{I18n.t('Date Error')}</label>
+            <label
+              htmlFor={`assignment_correction_due_at_${assignment.id}`}
+              className="screenreader-only"
+            >
+              {I18n.t('Date Error')}
+            </label>
           </div>
           <input
-            ref="due_at"
+            id={`assignment_correction_due_at_${assignment.id}`}
+            ref={this.dueAtRef}
             type="text"
             aria-label={I18n.t('Due Date')}
             className="input-medium assignment-due-at"
-            placeholder={place_holder}
-            defaultValue={default_value}
+            placeholder={place_holder || ''}
+            defaultValue={default_value || ''}
             onChange={this.checkDueAtChange}
           />
           <button
-            style={{visibility: assignment.please_ignore ? 'hidden' : ''}}
+            type="button"
+            style={{visibility: assignment.please_ignore ? 'hidden' : 'visible'}}
             className="btn btn-link btn-ignore assignment_correction_ignore"
             aria-label={I18n.t('Ignore %{name}', {name: assignment.name})}
             title={I18n.t('Ignore Assignment')}
