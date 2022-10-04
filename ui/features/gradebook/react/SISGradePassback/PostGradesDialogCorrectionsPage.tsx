@@ -24,7 +24,12 @@ import AssignmentCorrectionRow from './AssignmentCorrectionRow'
 
 const I18n = useI18nScope('modules')
 
-class PostGradesDialogCorrectionsPage extends React.Component {
+type Props = {
+  store: any
+  advanceToSummaryPage: () => void
+}
+
+class PostGradesDialogCorrectionsPage extends React.Component<Props> {
   componentDidMount() {
     this.props.store.addChangeListener(this.handleStoreChange)
   }
@@ -49,14 +54,13 @@ class PostGradesDialogCorrectionsPage extends React.Component {
   }
 
   invalidAssignmentsForCorrection = assignments => {
-    const original_error_assignments = assignmentUtils.withOriginalErrors(
-      assignments,
-      this.props.store
-    )
+    const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
     const invalid_assignments = []
     _.each(assignments, a => {
       if (original_error_assignments.length > 0 && this.props.store.validCheck(a)) {
+        // no-op
       } else if (original_error_assignments.length == 0 && this.props.store.validCheck(a)) {
+        // no-op
       } else {
         invalid_assignments.push(a)
       }
@@ -77,10 +81,7 @@ class PostGradesDialogCorrectionsPage extends React.Component {
     const errorCount = Object.keys(assignmentUtils.withErrors(assignments)).length
     const store = this.props.store
     const correctionRow = this.invalidAssignmentsForCorrection(assignments)
-    const originalErrorAssignments = assignmentUtils.withOriginalErrors(
-      assignments,
-      this.props.store
-    )
+    const originalErrorAssignments = assignmentUtils.withOriginalErrors(assignments)
 
     let assignmentRow
     if (originalErrorAssignments.length != 0) {

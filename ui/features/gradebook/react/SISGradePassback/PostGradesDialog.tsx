@@ -23,7 +23,14 @@ import PostGradesDialogCorrectionsPage from './PostGradesDialogCorrectionsPage'
 import PostGradesDialogNeedsGradingPage from './PostGradesDialogNeedsGradingPage'
 import PostGradesDialogSummaryPage from './PostGradesDialogSummaryPage'
 
-class PostGradesDialog extends React.Component {
+type Props = {
+  store: any
+  closeDialog: (event) => void
+}
+
+class PostGradesDialog extends React.Component<Props> {
+  boundForceUpdate?: () => void
+
   componentDidMount() {
     this.boundForceUpdate = this.forceUpdate.bind(this)
     this.props.store.addChangeListener(this.boundForceUpdate)
@@ -64,9 +71,7 @@ class PostGradesDialog extends React.Component {
   }
 
   validMultipleOverride = a => {
-    const invalid_overrides = _.filter(a.overrides, o => {
-      o == null
-    })
+    const invalid_overrides = _.filter(a.overrides, o => o == null)
     if (
       invalid_overrides.length == 0 &&
       a.due_at == null &&
@@ -81,10 +86,7 @@ class PostGradesDialog extends React.Component {
   }
 
   invalidAssignments = (assignments, store) => {
-    const original_error_assignments = assignmentUtils.withOriginalErrors(
-      assignments,
-      this.props.store
-    )
+    const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
     const invalid_assignments = []
     _.each(assignments, a => {
       // override for a section is valid but the 'Everyone Else' scenario is still invalid
@@ -94,27 +96,31 @@ class PostGradesDialog extends React.Component {
 
       // for handling an assignment with an override for each section and all of them being valid
       if (this.validMultipleOverride(a)) {
+        // no-op
       }
 
       // assignments that have been ignored
       else if (a.please_ignore) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the section that doesn't have an override
       else if (
         a.currentlySelected.id.toString() == store.overrideForEveryone(a) &&
-        a.currentlySelected.type == 'section' &&
+        a.currentlySelected.type === 'section' &&
         a.due_at != null &&
         (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
       ) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario at the course level with sections that have overrides and other sections that are tied under the course "override"
       else if (
-        a.currentlySelected.type == 'course' &&
+        a.currentlySelected.type === 'course' &&
         a.due_at != null &&
         (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
       ) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the section that does have an override
@@ -123,9 +129,10 @@ class PostGradesDialog extends React.Component {
         store.validCheck(a) &&
         a.overrideForThisSection != undefined &&
         a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id &&
-        a.currentlySelected.type == 'section' &&
+        a.currentlySelected.type === 'section' &&
         (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
       ) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the course
@@ -137,6 +144,7 @@ class PostGradesDialog extends React.Component {
         a.currentlySelected.type != 'section' &&
         (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
       ) {
+        // no-op
       }
 
       // explicitly check for assignment for the entire course and no overrides
@@ -147,6 +155,7 @@ class PostGradesDialog extends React.Component {
         store.validCheck(a) &&
         (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
       ) {
+        // no-op
       }
 
       // is invalid
@@ -157,10 +166,10 @@ class PostGradesDialog extends React.Component {
     return invalid_assignments
   }
 
-  pageSet = (page, errors) => {
-    if (page == 'corrections' && errors.length == 0) {
+  pageSet = (page: string, errors) => {
+    if (page === 'corrections' && errors.length == 0) {
       page = 'summary'
-    } else if (page == 'summary' && errors.length != 0) {
+    } else if (page === 'summary' && errors.length != 0) {
       page = 'corrections'
     }
     return page

@@ -19,7 +19,7 @@
 import {
   getOriginalityData,
   isOriginalityReportVisible,
-  originalityReportSubmissionKey
+  originalityReportSubmissionKey,
 } from '../originalityReportHelper'
 import {mockSubmission} from '@canvas/assignments/graphql/studentMocks'
 
