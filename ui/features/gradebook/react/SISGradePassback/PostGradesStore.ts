@@ -20,6 +20,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import createStore from '@canvas/util/createStore'
 import assignmentUtils from './assignmentUtils'
+import type {Override} from '../../../../api.d'
 
 type State = {
   course: {
@@ -31,6 +32,16 @@ type State = {
     type: string
   }
   sections: {}
+}
+
+type PartialAssignment = {
+  id: string
+  name: string
+  due_at: string
+  needs_grading_count: number
+  overrides: Override[]
+  please_ignore: boolean
+  original_error: boolean
 }
 
 const PostGradesStore = initialState => {
@@ -76,7 +87,7 @@ const PostGradesStore = initialState => {
       const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = _.find(section_ids_with_no_overrides, o => {
-        return initialState.selected.id == o
+        return initialState.selected.id === o
       })
       return section_for_everyone
     },
@@ -86,7 +97,7 @@ const PostGradesStore = initialState => {
     },
 
     setGradeBookAssignments(gradebookAssignments) {
-      const assignments = []
+      const assignments: PartialAssignment[] = []
       for (const id in gradebookAssignments) {
         const gba = gradebookAssignments[id]
         // Only accept assignments suitable to post, e.g. published, post_to_sis
@@ -120,13 +131,13 @@ const PostGradesStore = initialState => {
       }
     }) {
       if (
-        a.overrideForThisSection != undefined &&
+        typeof a.overrideForThisSection !== 'undefined' &&
         a.currentlySelected.type === 'course' &&
         a.currentlySelected.id.toString() === a.overrideForThisSection?.course_section_id
       ) {
         return a.due_at != null
       } else if (
-        a.overrideForThisSection != undefined &&
+        typeof a.overrideForThisSection !== 'undefined' &&
         a.currentlySelected.type === 'section' &&
         a.currentlySelected.id.toString() === a.overrideForThisSection?.course_section_id
       ) {
@@ -156,7 +167,7 @@ const PostGradesStore = initialState => {
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with a section that does not have any overrides
           // cleanup overrideForThisSection logic
-          if (a.overrideForThisSection == undefined) {
+          if (typeof a.overrideForThisSection === 'undefined') {
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
@@ -172,7 +183,7 @@ const PostGradesStore = initialState => {
           })
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with the course currentlySelected
-          if (a.overrideForThisSection == undefined) {
+          if (typeof a.overrideForThisSection === 'undefined') {
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
@@ -182,7 +193,7 @@ const PostGradesStore = initialState => {
 
     getAssignment(assignment_id: string) {
       const assignments = this.getAssignments()
-      return _.find(assignments, a => a.id == assignment_id)
+      return _.find(assignments, a => a.id === assignment_id)
     },
 
     setSelectedSection(section) {
@@ -208,14 +219,14 @@ const PostGradesStore = initialState => {
 
     updateAssignment(assignment_id: string, newAttrs) {
       const assignments = this.getAssignments()
-      const assignment = _.find(assignments, a => a.id == assignment_id)
+      const assignment = _.find(assignments, a => a.id === assignment_id)
       $.extend(assignment, newAttrs)
       this.setState({assignments})
     },
 
     updateAssignmentDate(assignment_id: string, date) {
       const assignments = this.getState().assignments
-      const assignment = _.find(assignments, a => a.id == assignment_id)
+      const assignment = _.find(assignments, a => a.id === assignment_id)
       // the assignment has an override and the override being updated is for the section that is currentlySelected update it
       if (
         assignment.currentlySelected.id.toString() ===
@@ -230,7 +241,7 @@ const PostGradesStore = initialState => {
 
       // the section override being set from the course level of the sction dropdown
       else if (
-        assignment.overrideForThisSection != undefined &&
+        typeof assignment.overrideForThisSection !== 'undefined' &&
         assignment.currentlySelected.id.toString() !==
           assignment.overrideForThisSection?.course_section_id
       ) {
@@ -252,7 +263,7 @@ const PostGradesStore = initialState => {
     },
 
     assignmentOverrideOrigianlErrorCheck(a) {
-      a.hadOriginalErrors = a.hadOriginalErrors == true
+      a.hadOriginalErrors = a.hadOriginalErrors === true
     },
 
     saveAssignments() {
@@ -277,7 +288,7 @@ const PostGradesStore = initialState => {
       } else {
         const originals = assignmentUtils.withOriginalErrors(this.getAssignments())
         const withErrorsCount = _.keys(assignmentUtils.withErrors(this.getAssignments())).length
-        if (withErrorsCount == 0 && (state.pleaseShowSummaryPage || originals.length === 0)) {
+        if (withErrorsCount === 0 && (state.pleaseShowSummaryPage || originals.length === 0)) {
           return 'summary'
         } else {
           return 'corrections'

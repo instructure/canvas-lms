@@ -416,3 +416,16 @@ export type SerializedComment = {
   authorAvatarUrl?: string
   authorUrl?: string
 }
+
+type AssignmentWithOverride = {
+  id: string
+  name: string
+  due_at: string
+  please_ignore: boolean
+  hadOriginalErrors: boolean
+  overrideForThisSection: {
+    id: string
+    course_section_id: string
+    due_at: null | Date
+  }
+}

@@ -21,9 +21,19 @@ import React from 'react'
 
 const I18n = useI18nScope('modules')
 
-class PostGradesDialogNeedsGradingPage extends React.Component {
+type Props = {
+  needsGrading: {
+    id: string
+    name: string
+    due_at: string
+    needs_grading_count: number
+  }[]
+  leaveNeedsGradingPage: () => void
+}
+
+class PostGradesDialogNeedsGradingPage extends React.Component<Props> {
   onClickRow = assignment_id => {
-    window.location = `gradebook/speed_grader?assignment_id=${assignment_id}`
+    window.location.href = `gradebook/speed_grader?assignment_id=${assignment_id}`
   }
 
   render() {
