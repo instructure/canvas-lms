@@ -396,6 +396,45 @@ describe AccountsController do
       expect(@account.settings[:product_name]).to be_nil
     end
 
+    it "clears settings from subaccount that would be inherited with the same value" do
+      account_with_admin_logged_in
+      subaccount = @account.sub_accounts.create!
+
+      post "update", params: { id: subaccount.id, account: { settings: {
+        restrict_student_future_view: { value: true }
+      } } }
+      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
+
+      post "update", params: { id: subaccount.id, account: { settings: {
+        restrict_student_future_view: { value: false }
+      } } }
+      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+    end
+
+    it "allows updating setting in child account after updating from inheritable value" do
+      account_with_admin_logged_in
+      root_account = @account.sub_accounts.create!
+      subaccount = root_account.sub_accounts.create!
+
+      post "update", params: { id: subaccount.id, account: { settings: {} } }
+      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+
+      post "update", params: { id: root_account.id, account: { settings: {
+        restrict_student_future_view: { value: true }
+      } } }
+      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
+
+      post "update", params: { id: subaccount.id, account: { settings: {
+        restrict_student_future_view: { value: false }
+      } } }
+      expect(subaccount.reload.settings[:restrict_student_future_view]).to be_nil
+
+      post "update", params: { id: subaccount.id, account: { settings: {
+        restrict_student_future_view: { value: true }
+      } } }
+      expect(subaccount.reload.settings[:restrict_student_future_view][:value]).to be true
+    end
+
     it "doesn't break I18n by setting the help_link_name unnecessarily" do
       account_with_admin_logged_in
 
