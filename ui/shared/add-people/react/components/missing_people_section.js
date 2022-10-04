@@ -24,7 +24,8 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextInput} from '@instructure/ui-text-input'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('add_people_missing_people_section')
 
@@ -35,6 +36,14 @@ const emailLabel = I18n.t('Required Email Address')
 function eatEvent(event) {
   event.stopPropagation()
   event.preventDefault()
+}
+
+function AddName({address, namePrompt, onClick, theme}) {
+  return (
+    <Link data-address={address} isWithinText={false} as="button" onClick={onClick} theme={theme}>
+      <Text>{namePrompt}</Text>
+    </Link>
+  )
 }
 
 class MissingPeopleSection extends React.Component {
@@ -222,9 +231,11 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell colSpan="2">
-              <CondensedButton onClick={this.onSelectNewForMissing} data-address={missing.address}>
-                {namePrompt}
-              </CondensedButton>
+              <AddName
+                address={missing.address}
+                namePrompt={namePrompt}
+                onClick={this.onSelectNewForMissing}
+              />
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>
@@ -297,13 +308,12 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell>
-              <CondensedButton
+              <AddName
+                address={missing.address}
+                namePrompt={namePrompt}
                 onClick={this.onSelectNewForMissing}
-                data-address={missing.address}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-              >
-                {namePrompt}
-              </CondensedButton>
+              />
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>
