@@ -18,6 +18,7 @@
 
 import _ from 'underscore'
 import GradeOverrideEntry from '@canvas/grading/GradeEntry/GradeOverrideEntry'
+import type Gradebook from '../../Gradebook'
 
 function renderStartContainer(gradeInfo) {
   let content = ''
@@ -44,20 +45,28 @@ function render(formattedGrade, gradeInfo) {
   `
 }
 
+type Getters = {
+  getGradeInfoForUser(studentId: string): any
+  formatGradeInfo(gradeInfo: any): string
+}
+
 export default class TotalGradeOverrideCellFormatter {
-  constructor(gradebook) {
+  options: Getters
+
+  constructor(gradebook: Gradebook) {
     const gradeEntry = new GradeOverrideEntry({
       gradingScheme: gradebook.getCourseGradingScheme(),
     })
 
     this.options = {
-      getGradeInfoForUser(studentId) {
-        const pendingGradeInfo = gradebook.finalGradeOverrides.getPendingGradeInfoForUser(studentId)
+      getGradeInfoForUser(studentId: string) {
+        const pendingGradeInfo =
+          gradebook.finalGradeOverrides?.getPendingGradeInfoForUser(studentId)
         if (pendingGradeInfo) {
           return pendingGradeInfo
         }
 
-        const grade = gradebook.finalGradeOverrides.getGradeForUser(studentId)
+        const grade = gradebook.finalGradeOverrides?.getGradeForUser(studentId)
         return gradeEntry.gradeInfoFromGrade(grade)
       },
 

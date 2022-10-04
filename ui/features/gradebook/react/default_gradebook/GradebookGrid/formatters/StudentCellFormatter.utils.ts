@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import htmlEscape from 'html-escape'
 import {useScope as useI18nScope} from '@canvas/i18n'
+import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
@@ -26,12 +27,12 @@ export function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
     const sectionNames = student.sections
       .filter(options.isVisibleSection)
-      .map(sectionId => options.getSection(sectionId).name)
+      .map((sectionId: string) => options.getSection(sectionId).name)
     return $.toSentence(sectionNames.sort())
   }
 
   if (options.shouldShowGroups() && secondaryInfo === 'group') {
-    const groupNames = student.group_ids.map(groupId => options.getGroup(groupId).name)
+    const groupNames = student.group_ids.map((groupId: string) => options.getGroup(groupId).name)
     return $.toSentence(groupNames.sort())
   }
 
@@ -42,7 +43,7 @@ export function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   }[secondaryInfo]
 }
 
-export function getEnrollmentLabel(student) {
+export function getEnrollmentLabel(student: {isConcluded: boolean; isInactive: boolean}) {
   if (student.isConcluded) {
     return I18n.t('concluded')
   }
@@ -53,13 +54,13 @@ export function getEnrollmentLabel(student) {
   return null
 }
 
-export function getOptions(gradebook) {
+export function getOptions(gradebook: Gradebook) {
   return {
     courseId: gradebook.options.context_id,
-    getSection(sectionId) {
+    getSection(sectionId: string) {
       return gradebook.sections[sectionId]
     },
-    getGroup(groupId) {
+    getGroup(groupId: string) {
       return gradebook.studentGroups[groupId]
     },
     getSelectedPrimaryInfo() {
@@ -68,7 +69,7 @@ export function getOptions(gradebook) {
     getSelectedSecondaryInfo() {
       return gradebook.getSelectedSecondaryInfo()
     },
-    isVisibleSection(sectionId) {
+    isVisibleSection(sectionId: string) {
       return gradebook.sections[sectionId] != null
     },
     shouldShowSections() {
