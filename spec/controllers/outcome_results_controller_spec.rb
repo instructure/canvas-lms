@@ -158,6 +158,55 @@ describe OutcomeResultsController do
     JSON.parse(response.body)
   end
 
+  def mock_os_lor_results(user, outcome, assignment, score, args = {})
+    title = "#{user.name}, #{assignment.name}"
+    mastery = (score || 0) >= outcome.mastery_points
+    submitted_at = args[:submitted_at] || Time.zone.now
+    submission = Submission.find_by(user_id: user.id, assignment_id: assignment.id)
+    alignment = ContentTag.create!(
+      {
+        title: "content",
+        context: outcome_course,
+        learning_outcome: outcome,
+        content_type: "Assignment",
+        content_id: assignment.id
+      }
+    )
+    lor = LearningOutcomeResult.new(
+      learning_outcome: outcome,
+      user: user,
+      context: outcome_course,
+      alignment: alignment,
+      artifact: submission,
+      associated_asset: assignment,
+      title: title,
+      score: score,
+      possible: outcome.points_possible,
+      mastery: mastery,
+      created_at: submitted_at,
+      updated_at: submitted_at,
+      submitted_at: submitted_at,
+      assessed_at: submitted_at
+    )
+    if args[:include_rubric]
+      lor.association_type = "RubricAssociation"
+      lor.association_id = outcome_rubric.id
+    end
+    lor
+  end
+
+  def get_results(params)
+    get "index", params: {
+      context_id: @course.id,
+      course_id: @course.id,
+      context_type: "Course",
+      user_ids: [@student.id],
+      outcome_ids: [@outcome.id],
+      **params
+    },
+                 format: "json"
+  end
+
   describe "retrieving outcome results" do
     it "does not have a false failure if an outcome exists in two places within the same context" do
       user_session(@teacher)
@@ -341,6 +390,93 @@ describe OutcomeResultsController do
       # the pagination count should be 1 for the one student with a rollup
       expect(json["meta"]["pagination"]["count"]).to be 1
     end
+
+    context "with outcome_service_results_to_canvas FF" do
+      shared_examples "outcome results" do
+        before do
+          user_session(user)
+          @assignment = create_outcome_assignment
+          find_or_create_outcome_submission({ student: student, assignment: @assignment })
+          @assignment2 = create_outcome_assignment
+          find_or_create_outcome_submission({ student: student, assignment: @assignment2 })
+        end
+
+        it "FF disabled - only display results for canvas" do
+          user_session(user)
+          @course.disable_feature!(:outcome_service_results_to_canvas)
+          create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+          expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+          json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+          expect(json["outcome_results"].length).to be 1
+          expect(json["linked"]["assignments"].length).to be 1
+        end
+
+        context "FF enabled" do
+          before do
+            @course.enable_feature!(:outcome_service_results_to_canvas)
+            user_session(user)
+          end
+
+          it "no OS results found - display canvas results only" do
+            create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(nil)
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+            expect(json["outcome_results"].length).to be 1
+            expect(json["linked"]["assignments"].length).to be 1
+          end
+
+          it "OS results found - no Canvas results - displays only OS results" do
+            mocked_results = mock_os_lor_results(student, @outcome, @assignment2, 2)
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              [mocked_results]
+            )
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+            expect(json["outcome_results"].length).to be 1
+            expect(json["outcome_results"][0]["links"]["alignment"]).to eq("assignment_" + @assignment2.id.to_s)
+            expect(json["linked"]["assignments"].length).to be 1
+            expect(json["linked"]["assignments"][0]["id"]).to eq("assignment_" + @assignment2.id.to_s)
+          end
+
+          it "OS results found - display both Canvas and OS results" do
+            create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+            mocked_results = mock_os_lor_results(student, @outcome, @assignment2, 2)
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              [mocked_results]
+            )
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+            expect(json["outcome_results"].length).to be 2
+            expect(json["linked"]["assignments"].length).to be 2
+            expect(json["linked"]["assignments"][0]["id"]).to eq("assignment_" + @assignment2.id.to_s)
+            expect(json["linked"]["assignments"][1]["id"]).to eq("assignment_" + @assignment.id.to_s)
+          end
+
+          it "OS results found - assignments are unique when aligned to two outcomes" do
+            outcome2 = @course.created_learning_outcomes.create!(title: "outcome 2")
+            create_result(student.id, @outcome, @assignment, 2, { possible: 5 })
+            mocked_results_1 = mock_os_lor_results(student, @outcome, @assignment2, 2)
+            mocked_results_2 = mock_os_lor_results(student, outcome2, @assignment2, 2)
+            expect(controller).to receive(:find_outcomes_service_results).with(any_args).and_return(
+              [mocked_results_1, mocked_results_2]
+            )
+            json = parse_response(get_results({ user_ids: [student], include: ["assignments"] }))
+            expect(json["outcome_results"].length).to be 3
+            expect(json["linked"]["assignments"].length).to be 2
+          end
+        end
+      end
+
+      describe "for different users" do
+        let(:student) { student_in_course(active_all: true, course: outcome_course, name: "Hello Kitty").user }
+
+        include_examples "outcome results" do
+          let(:user) { student }
+        end
+
+        include_examples "outcome results" do
+          let(:user) { @teacher }
+        end
+      end
+    end
   end
 
   describe "retrieving outcome rollups" do
@@ -372,45 +508,6 @@ describe OutcomeResultsController do
     end
 
     context "with outcome_service_results_to_canvas FF" do
-      let(:time) { Time.zone.now }
-
-      def mock_os_lor_results(user, outcome, assignment, score, args = {})
-        title = "#{user.name}, #{assignment.name}"
-        mastery = (score || 0) >= outcome.mastery_points
-        submitted_at = args[:submitted_at] || time
-        submission = Submission.find_by(user_id: user.id, assignment_id: assignment.id)
-        alignment = ContentTag.create!(
-          {
-            title: "content",
-            context: outcome_course,
-            learning_outcome: outcome,
-            content_type: "Assignment",
-            content_id: assignment.id
-          }
-        )
-        lor = LearningOutcomeResult.new(
-          learning_outcome: outcome,
-          user: user,
-          context: outcome_course,
-          alignment: alignment,
-          artifact: submission,
-          associated_asset: assignment,
-          title: title,
-          score: score,
-          possible: outcome.points_possible,
-          mastery: mastery,
-          created_at: submitted_at,
-          updated_at: submitted_at,
-          submitted_at: submitted_at,
-          assessed_at: submitted_at
-        )
-        if args[:include_rubric]
-          lor.association_type = "RubricAssociation"
-          lor.association_id = outcome_rubric.id
-        end
-        lor
-      end
-
       context "user_rollups" do
         it "disabled - only display rollups for canvas" do
           @course.disable_feature!(:outcome_service_results_to_canvas)

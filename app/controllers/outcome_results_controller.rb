@@ -238,24 +238,18 @@ class OutcomeResultsController < ApplicationController
     @results = find_results(
       include_hidden: include_hidden_value
     )
-    # used in sLMGB.
-    # TODO: implement OS results back in OUT-5297
-    # @outcome_service_results = find_outcomes_service_results(
-    #   include_hidden: include_hidden_value
-    # )
-    # linked_include_collections needs to be updated to include
-    # aligned assessed assignments.  See OUT-5298
-    # json = nil
-    # if @outcome_service_results.nil?
-    #   @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
-    #   json = outcome_results_json(@results)
-    # else
-    #   @outcome_service_results.push(@results).flatten!
-    #   @outcome_service_results = Api.paginate(@outcome_service_results, self, api_v1_course_outcome_results_url)
-    #   json = outcome_results_json(@outcome_service_results)
-    # end
-    @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
-    json = outcome_results_json(@results)
+    @outcome_service_results = find_outcomes_service_results(
+      include_hidden: include_hidden_value
+    )
+    json = nil
+    if @outcome_service_results.nil?
+      @results = Api.paginate(@results, self, api_v1_course_outcome_results_url)
+      json = outcome_results_json(@results)
+    else
+      @outcome_service_results.push(@results).flatten!
+      @outcome_service_results = Api.paginate(@outcome_service_results, self, api_v1_course_outcome_results_url)
+      json = outcome_results_json(@outcome_service_results)
+    end
     json[:linked] = linked_include_collections if params[:include].present?
     render json: json
   end
@@ -563,8 +557,9 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_assignments
-    assignments = @results.map { |result| result.assignment || result.alignment&.content }
-    outcome_results_assignments_json(assignments)
+    results = @outcome_service_results.nil? ? @results : @outcome_service_results
+    assignments = results.map { |result| result.assignment || result.alignment&.content }
+    outcome_results_assignments_json(assignments.uniq)
   end
 
   def require_outcome_context
