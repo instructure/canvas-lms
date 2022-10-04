@@ -302,7 +302,7 @@ module AccountReports
     end
 
     def combine_result(student, authoritative_results)
-      learning_outcome_result = json_to_outcome_result(authoritative_results)
+      learning_outcome_result = convert_to_learning_outcome_result(authoritative_results)
       base_student = student.attributes.merge(
         {
           "learning outcome mastered" => learning_outcome_result.mastery,
