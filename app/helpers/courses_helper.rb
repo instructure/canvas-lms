@@ -152,4 +152,32 @@ module CoursesHelper
       nil
     end
   end
+
+  def tab_is?(tab, const_name)
+    Api::V1::Tab.tab_is?(tab, @context, const_name)
+  end
+
+  def sortable_tabs
+    tabs =
+      @context.tabs_available(
+        @current_user,
+        for_reordering: true,
+        root_account: @domain_root_account,
+        course_subject_tabs: @context.try(:elementary_subject_course?)
+      )
+    tabs.select do |tab|
+      if tab_is?(tab, :TAB_COLLABORATIONS)
+        Collaboration.any_collaborations_configured?(@context) &&
+          !@context.feature_enabled?(:new_collaborations)
+      elsif Lti::ExternalToolTab.tool_for_tab(tab)&.quiz_lti?
+        new_quizzes_navigation_placements_enabled?(@context)
+      elsif tab_is?(tab, :TAB_COLLABORATIONS_NEW)
+        @context.feature_enabled?(:new_collaborations)
+      elsif tab_is?(tab, :TAB_CONFERENCES)
+        feature_enabled?(:web_conferences)
+      else
+        !tab_is?(tab, :TAB_SETTINGS)
+      end
+    end
+  end
 end
