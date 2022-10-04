@@ -337,62 +337,6 @@ module ApplicationHelper
     stylesheet_link_tag css_url_for(:common), media: "all"
   end
 
-  def quiz_lti_tab?(tab)
-    if tab[:id].is_a?(String) && tab[:id].start_with?("context_external_tool_") && tab[:args] &&
-       tab[:args][1]
-      return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
-    end
-
-    false
-  end
-
-  def sortable_tabs
-    tabs =
-      @context.tabs_available(
-        @current_user,
-        for_reordering: true,
-        root_account: @domain_root_account,
-        course_subject_tabs: @context.try(:elementary_subject_course?)
-      )
-    tabs.select do |tab|
-      if begin
-        tab[:id] == @context.class::TAB_COLLABORATIONS
-      rescue
-        false
-      end
-        Collaboration.any_collaborations_configured?(@context) &&
-          !@context.feature_enabled?(:new_collaborations)
-      elsif begin
-        quiz_lti_tab?(tab)
-      rescue
-        false
-      end
-        new_quizzes_navigation_placements_enabled?(@context)
-      elsif begin
-        tab[:id] == @context.class::TAB_COLLABORATIONS_NEW
-      rescue
-        false
-      end
-        @context.feature_enabled?(:new_collaborations)
-      elsif begin
-        tab[:id] == @context.class::TAB_CONFERENCES
-      rescue
-        false
-      end
-        feature_enabled?(:web_conferences)
-      else
-        tab[:id] !=
-          (
-            begin
-              @context.class::TAB_SETTINGS
-            rescue
-              nil
-            end
-          )
-      end
-    end
-  end
-
   def embedded_chat_quicklaunch_params
     {
       user_id: @current_user.id,
