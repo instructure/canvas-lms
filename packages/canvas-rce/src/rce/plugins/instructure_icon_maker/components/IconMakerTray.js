@@ -37,6 +37,7 @@ import addIconMakerAttributes from '../utils/addIconMakerAttributes'
 import {validIcon} from '../utils/iconValidation'
 import {IconMakerFormHasChanges} from '../utils/IconMakerFormHasChanges'
 import bridge from '../../../../bridge'
+import {shouldIgnoreClose} from '../utils/IconMakerClose'
 
 const INVALID_MESSAGE = formatMessage(
   'One of the following styles must be added to save an icon: Icon Color, Outline Size, Icon Text, or Image'
@@ -161,9 +162,9 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
   // initialSettings and settings to behave unexpectedly
   const initialSettingsRef = useRef(initialSettings)
   const settingsRef = useRef(settings)
-
+  const statusRef = useRef(status)
   settingsRef.current = useMemo(() => settings, [settings])
-
+  statusRef.current = useMemo(() => status, [status])
   initialSettingsRef.current = useMemo(() => initialSettings, [initialSettings])
 
   useEffect(() => {
@@ -176,7 +177,9 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
 
   const storeProps = useStoreProps()
 
-  const onClose = () => {
+  const onClose = event => {
+    if (shouldIgnoreClose(event?.target, editor?.id)) return
+    if (statusRef?.current === statuses.LOADING) return
     // RCE already uses browser's confirm dialog for unsaved changes
     // Its use here in the Icon Maker tray keeps that consistency
     // eslint-disable-next-line no-restricted-globals, no-alert

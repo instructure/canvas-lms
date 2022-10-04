@@ -1540,6 +1540,21 @@ describe "RCE next tests", ignore_js_errors: true do
         end
       end
     end
+
+    context "Icon Maker Tray" do
+      before do
+        Account.site_admin.enable_feature!(:buttons_and_icons_root_account)
+      end
+
+      it "can add image" do
+        rce_wysiwyg_state_setup(@course)
+        iconmaker_toolbar_button.click
+        iconmaker_addimage_menu.click
+        iconmaker_singlecolor_option.click
+        iconmaker_singlecolor_articon.click
+        expect(iconmaker_image_preview).to be_displayed
+      end
+    end
   end
 end
 

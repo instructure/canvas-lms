@@ -26,6 +26,7 @@ import FakeEditor from '../../../shared/__tests__/FakeEditor'
 import RceApiSource from '../../../../../rcs/api'
 import bridge from '../../../../../bridge'
 import base64EncodedFont from '../../svg/font'
+import * as shouldIgnoreCloseRef from '../../utils/IconMakerClose'
 
 jest.useFakeTimers()
 jest.mock('../../../../../bridge')
@@ -35,7 +36,6 @@ jest.mock('../../../shared/StoreContext')
 jest.mock('../../utils/useDebouncedValue', () =>
   jest.requireActual('../../utils/__tests__/useMockedDebouncedValue')
 )
-
 const startIconMakerUpload = jest
   .fn()
   .mockResolvedValue({url: 'https://uploaded.url', display_name: 'untitled.svg'})
@@ -58,7 +58,6 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
   }
 
   let rcs
-
   const renderComponent = (componentProps = {}) => {
     return render(<IconMakerTray {...defaults} {...componentProps} />)
   }
@@ -88,6 +87,61 @@ describe('RCE "Icon Maker" Plugin > IconMakerTray', () => {
     await act(async () => {
       jest.runOnlyPendingTimers()
     })
+  })
+
+  it('blocks first onclose event when element in rce clicked', async () => {
+    const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
+    const ed = new FakeEditor()
+    ed.id = 'editorId'
+    ed.on('click', () => document.body.click())
+    const {getByText, findByTestId} = render(
+      <>
+        <div data-id={ed.id}>
+          <button type="button">Outside button</button>
+        </div>
+        <IconMakerTray {...defaults} editor={ed} />
+      </>
+    )
+
+    const addImageButton = getByText('Add Image')
+    act(() => userEvent.click(addImageButton))
+    const singleColorOption = getByText('Single Color Image')
+    act(() => userEvent.click(singleColorOption))
+    const artIcon = await findByTestId('icon-maker-art')
+    act(() => userEvent.click(artIcon))
+
+    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
+    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
+    act(() => userEvent.click(getByText('Outside button')))
+    act(() => ed.fire('click'))
+    await waitFor(() => expect(ignoreSpy.mock.results.length).toBe(2))
+    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(true))
+    await waitFor(() => expect(ignoreSpy.mock.results[1].value).toBe(false))
+    await waitFor(() => expect(window.confirm).toHaveBeenCalledTimes(1))
+  })
+
+  it('closes when outside element clicked', async () => {
+    const ignoreSpy = jest.spyOn(shouldIgnoreCloseRef, 'shouldIgnoreClose')
+    const {getByText, findByTestId} = render(
+      <>
+        <button type="button">Outside button</button>
+        <IconMakerTray {...defaults} />
+      </>
+    )
+
+    const addImageButton = getByText('Add Image')
+    act(() => userEvent.click(addImageButton))
+    const singleColorOption = getByText('Single Color Image')
+    act(() => userEvent.click(singleColorOption))
+    const artIcon = await findByTestId('icon-maker-art')
+    act(() => userEvent.click(artIcon))
+
+    await waitFor(() => expect(ignoreSpy).not.toHaveBeenCalled())
+    await waitFor(() => expect(window.confirm).not.toHaveBeenCalled())
+    act(() => userEvent.click(getByText('Outside button')))
+    await waitFor(() => expect(ignoreSpy).toHaveBeenCalled())
+    await waitFor(() => expect(ignoreSpy.mock.results[0].value).toBe(false))
+    await waitFor(() => expect(window.confirm).toHaveBeenCalled())
   })
 
   it('renders the create view', () => {
