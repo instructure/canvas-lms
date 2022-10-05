@@ -16,8 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ReactElement} from 'react'
-
 export type Collection = {
   [id: number]: Account
 }

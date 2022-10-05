@@ -30,7 +30,7 @@ function moveItem(item, destinationFolder, options = {}) {
     // success
     data => dfd.resolve(data),
     // failure
-    (jqXHR, textStatus, errorThrown) => {
+    (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
         ReactDOM.render(

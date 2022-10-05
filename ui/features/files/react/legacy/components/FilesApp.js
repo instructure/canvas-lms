@@ -19,7 +19,6 @@
 import _ from 'underscore'
 import MultiselectableMixin from '../mixins/MultiselectableMixin'
 import dndMixin from '../mixins/dndMixin'
-import filesEnv from '@canvas/files/react/modules/filesEnv'
 
 export default {
   displayName: 'FilesApp',

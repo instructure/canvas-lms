@@ -25,7 +25,7 @@ const initialState = {
 }
 
 const updateHandlers = {
-  [ACTION_NAMES.UPDATE_COLLABORATION_START]: (state, action) => {
+  [ACTION_NAMES.UPDATE_COLLABORATION_START]: (state, _action) => {
     return {
       ...state,
       updateCollaborationPending: true,
@@ -33,7 +33,7 @@ const updateHandlers = {
       updateCollaborationError: null,
     }
   },
-  [ACTION_NAMES.UPDATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.UPDATE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       updateCollaborationPending: false,

@@ -138,7 +138,7 @@ export default {
         this.props.dndOptions.onItemDragLeaveOrEnd(event, toggleActive(false))
 
       attrs.onDrop = event =>
-        this.props.dndOptions.onItemDrop(event, this.props.model, ({success, event}) => {
+        this.props.dndOptions.onItemDrop(event, this.props.model, ({success}) => {
           toggleActive(false)
           if (success)
             ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.refs.FolderChild).parentNode)

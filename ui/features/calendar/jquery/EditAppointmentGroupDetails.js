@@ -157,7 +157,7 @@ export default class EditAppointmentGroupDetails {
 
     const $perSlotCheckbox = this.form.find('.appointment-blocks-per-slot-option-button')
     const $perSlotInput = this.form.find('[name="participants_per_appointment"]')
-    const slotChangeHandler = e => this.perSlotChange($perSlotCheckbox, $perSlotInput)
+    const slotChangeHandler = _e => this.perSlotChange($perSlotCheckbox, $perSlotInput)
     $.merge($perSlotCheckbox, $perSlotInput).on('change', slotChangeHandler)
     if (this.apptGroup.participants_per_appointment > 0) {
       $perSlotCheckbox.prop('checked', true)
@@ -168,7 +168,7 @@ export default class EditAppointmentGroupDetails {
 
     const $maxPerStudentCheckbox = this.form.find('.max-per-student-option')
     const $maxPerStudentInput = this.form.find('[name="max_appointments_per_participant"]')
-    const maxApptHandler = e =>
+    const maxApptHandler = _e =>
       this.maxStudentAppointmentsChange($maxPerStudentCheckbox, $maxPerStudentInput)
     $.merge($maxPerStudentCheckbox, $maxPerStudentInput).on('change', maxApptHandler)
     const maxAppointmentsPerStudent = this.apptGroup.max_appointments_per_participant
@@ -227,7 +227,7 @@ export default class EditAppointmentGroupDetails {
       })
     return this.helpIconShowIf(
       checkbox,
-      _.some(apptCounts, (count, userId) => count > apptLimit)
+      _.some(apptCounts, (count, _userId) => count > apptLimit)
     )
   }
 
@@ -437,7 +437,7 @@ export default class EditAppointmentGroupDetails {
     this.form.find('.group_select').html(genericSelectTemplate(groupsInfo))
   }
 
-  toggleContextsMenu = jsEvent => {
+  toggleContextsMenu = _jsEvent => {
     const $menu = $('.ag_contexts_menu').toggleClass('hidden')
     // For accessibility: put the user back where they started.
     if ($menu.hasClass('hidden')) $('.ag_contexts_selector').focus()

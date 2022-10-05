@@ -25,7 +25,7 @@ import {
   getCompression,
   getModulesWithItemsMergedWithDueDatesAndBlackoutDates,
 } from '../../reducers/course_paces'
-import {getResponsiveSize, getShowProjections, getSelectedContextType} from '../../reducers/ui'
+import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
 import {Module} from './module'
 
 interface StoreProps {

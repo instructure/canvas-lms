@@ -212,7 +212,7 @@ export default class TopicView extends Backbone.View {
 
   // Update subscribed state without posted. Done when replies are posted and
   // user is auto-subscribed.
-  setSubscribed(newValue) {
+  setSubscribed(_newValue) {
     this.topic.set('subscribed', true)
     return this.subscriptionStatusChanged()
   }

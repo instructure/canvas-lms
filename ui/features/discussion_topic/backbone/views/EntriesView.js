@@ -204,23 +204,21 @@ export default class EntriesView extends Backbone.View {
   }
 
   handleKeyDown(e) {
-    let reverse
     const nodeName = e.target.nodeName.toLowerCase()
     if (nodeName === 'input' || nodeName === 'textarea' || ENV.disable_keyboard_shortcuts) return
     if (e.which !== 74 && e.which !== 75) return // j, k
     const entry = $(e.target).closest('.entry')
-    this.traverse(entry, (reverse = e.which === 75))
+    this.traverse(entry, e.which === 75)
     e.preventDefault()
     return e.stopPropagation()
   }
 
   traverse(el, reverse) {
-    let backward
     const id = el.attr('id').replace('entry-', '')
 
     const json = this.collection.toJSON()
     // sub-collections are displayed in reverse when flat, in imitation of Facebook
-    const list = _.flattenObjects(json, 'replies', (backward = !this.options.threaded))
+    const list = _.flattenObjects(json, 'replies', !this.options.threaded)
     const entry = _.find(list, x => `${x.id}` === id)
     let pos = _.indexOf(list, entry)
     pos += reverse ? -1 : 1

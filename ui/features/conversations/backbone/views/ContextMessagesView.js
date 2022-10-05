@@ -23,7 +23,7 @@ export default class ContextMessagesView extends CollectionView {
     this.prototype.itemView = ContextMessageView
   }
 
-  initialize(options) {
+  initialize(_options) {
     super.initialize(...arguments)
     return this.collection.each(model => model.bind('removeView', this.handleChildViewRemoval))
   }

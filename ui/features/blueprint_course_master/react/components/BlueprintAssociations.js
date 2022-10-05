@@ -41,7 +41,7 @@ import FocusManager from '../focusManager'
 
 const I18n = useI18nScope('BlueprintAssociations')
 
-const {string, arrayOf, func, bool} = PropTypes
+const {func, bool} = PropTypes
 
 export default class BlueprintAssociations extends React.Component {
   static propTypes = {

@@ -43,7 +43,7 @@ export default {
     }
   },
 
-  onFetchError(jqXHR, textStatus, errorThrown) {
+  onFetchError(jqXHR, textStatus, _errorThrown) {
     let responseText
     const message = I18n.t('An unknown server error occurred.  Please try again.')
 

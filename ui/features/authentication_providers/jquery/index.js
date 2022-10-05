@@ -22,7 +22,7 @@ import '@canvas/jquery/jquery.instructure_misc_helpers'
 var authenticationProviders = {
   hideAllNewAuthTypeForms() {
     const newForms = document.querySelectorAll('.auth-form-container--new')
-    Array.prototype.forEach.call(newForms, (el, id) => {
+    Array.prototype.forEach.call(newForms, (el, _id) => {
       el.style.display = 'none'
     })
   },

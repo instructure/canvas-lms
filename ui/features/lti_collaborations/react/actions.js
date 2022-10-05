@@ -147,7 +147,7 @@ actions.deleteCollaboration = (context, contextId, collaborationId) => {
     const url = `/api/v1/${context}/${contextId}/collaborations/${collaborationId}`
     axios
       .delete(url)
-      .then(response => {
+      .then(_response => {
         dispatch(actions.deleteCollaborationSuccessful(collaborationId))
         dispatch(actions.getCollaborations(`/api/v1/${context}/${contextId}/collaborations`))
       })

@@ -84,7 +84,7 @@ function renderCoursePacingNotice() {
 }
 
 ready(() => {
-  const discussionTopicToolbarView = new DiscussionTopicToolbarView({el: '#discussion-managebar'})
+  new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
   if (!window.ENV.disable_keyboard_shortcuts) {
     ReactDOM.render(
@@ -179,7 +179,7 @@ ready(() => {
 
   // catch when an EntryView changes the read_state
   // of a discussion entry and update the materialized view.
-  EntryView.on('readStateChanged', (entry, view) =>
+  EntryView.on('readStateChanged', (entry, _view) =>
     updateMaterializedViewReadState(entry.get('id'), entry.get('read_state'))
   )
 

@@ -31,7 +31,7 @@ export default class RedirectReturnContainer {
     }
   }
 
-  _contentCancel = (event, data) => {
+  _contentCancel = (_event, _data) => {
     location.href = this.cancelUrl
   }
 

@@ -197,7 +197,7 @@ export default class DashboardView extends View {
     )
       return
     const link = $(e.currentTarget)
-    return $.ajaxJSON(link.attr('href'), 'POST', {}, data =>
+    return $.ajaxJSON(link.attr('href'), 'POST', {}, _data =>
       link.parents('.ic-notification.conference').hide()
     )
   }

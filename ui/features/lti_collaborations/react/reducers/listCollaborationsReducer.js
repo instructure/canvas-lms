@@ -53,14 +53,14 @@ const collaborationsHandlers = {
       listCollaborationsError: action.payload,
     }
   },
-  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       list: [],
       nextPage: null,
     }
   },
-  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       list: [],

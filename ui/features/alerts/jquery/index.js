@@ -229,7 +229,7 @@ $(function () {
       const $alert = $(this).parents('.alert')
       if (!$alert.hasClass('new')) {
         $alert.find('input[name="_method"]').attr('value', 'DELETE')
-        $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), data => {
+        $.ajaxJSON($alert.attr('action'), 'POST', $alert.serialize(), _data => {
           $alert.slideUp(() => {
             $alert.remove()
             $list.find('.alert:first').prev('.alert_separator').remove()

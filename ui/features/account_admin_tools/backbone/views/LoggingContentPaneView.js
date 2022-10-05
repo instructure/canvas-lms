@@ -35,7 +35,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     this.prototype.template = template
   }
 
-  constructor(options) {
+  constructor(_options) {
     super(...arguments)
     this.permissions = this.options.permissions
     this.authentication = this.initAuthLogging()

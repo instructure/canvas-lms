@@ -89,7 +89,7 @@ class ItemCog extends React.Component {
     deleteStuff(item, args)
   }
 
-  openUsageRightsDialog = event => {
+  openUsageRightsDialog = _event => {
     const contents = (
       <UsageRightsDialog
         isOpen={true}
@@ -135,7 +135,7 @@ class ItemCog extends React.Component {
     }
 
     const wrap = (fn, params = {}) =>
-      preventDefault(event => {
+      preventDefault(_event => {
         const singularContextType =
           this.props.model.collection && this.props.model.collection.parentFolder
             ? this.props.model.collection.parentFolder.get('context_type').toLowerCase()

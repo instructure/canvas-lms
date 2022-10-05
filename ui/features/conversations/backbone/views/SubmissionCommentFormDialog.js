@@ -139,7 +139,7 @@ export default class SubmissionCommentFormDialog extends DialogBaseView {
       formDataTarget: 'url',
       disableWhileLoading: true,
       required: ['comment[text_comment]'],
-      onSubmit: (request, submitData) => {
+      onSubmit: (request, _submitData) => {
         // close dialog after submitting the message
         this.request = request
         const dfd = $.Deferred()

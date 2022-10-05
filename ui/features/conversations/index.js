@@ -253,7 +253,7 @@ const ConversationsRouter = Backbone.Router.extend({
     $focusNext.focus()
   },
 
-  onCompose(e) {
+  onCompose(_e) {
     this.compose.show(null, {trigger: '#compose-btn'})
   },
 
@@ -416,7 +416,7 @@ const ConversationsRouter = Backbone.Router.extend({
     $(window).keydown(this.onKeyDown)
   },
 
-  onPageLoad(e) {
+  onPageLoad(_e) {
     $('#main').css({display: 'block'})
   },
 
@@ -448,7 +448,7 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onNewConversations(conversations) {},
+  onNewConversations(_conversations) {},
 
   _incrementSending(increment) {
     this.sendingCount += increment

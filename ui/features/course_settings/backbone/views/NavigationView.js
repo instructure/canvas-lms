@@ -89,17 +89,17 @@ export default class NavigationView extends Backbone.View {
     return renderTray(this.moveTrayProps, document.getElementById('not_right_side'))
   }
 
-  resetReadState(e) {
+  resetReadState(_e) {
     $('.drag_and_drop_warning').removeClass('read')
   }
 
-  focusKeyboardHelp(e) {
+  focusKeyboardHelp(_e) {
     if (!$('.drag_and_drop_warning').hasClass('read')) {
       $('.drag_and_drop_warning').removeClass('screenreader-only')
     }
   }
 
-  hideKeyboardHelp(e) {
+  hideKeyboardHelp(_e) {
     $('.drag_and_drop_warning').addClass('screenreader-only read')
   }
 

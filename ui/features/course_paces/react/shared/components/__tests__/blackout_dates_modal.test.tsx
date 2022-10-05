@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, fireEvent, render, within} from '@testing-library/react'
+import {act, render} from '@testing-library/react'
 
 import {BLACKOUT_DATES} from '../../../__tests__/fixtures'
 import BlackoutDatesModal from '../blackout_dates_modal'

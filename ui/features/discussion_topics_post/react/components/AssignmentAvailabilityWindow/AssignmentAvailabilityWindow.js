@@ -49,9 +49,6 @@ export function AssignmentAvailabilityWindow({...props}) {
     })
   }
 
-  const isAnonymous =
-    props.anonymousState === 'full_anonymity' || props.anonymousState === 'partial_anonymity'
-
   return (
     <Responsive
       match="media"

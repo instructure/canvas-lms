@@ -373,7 +373,7 @@ export default class MessageFormDialog extends DialogBaseView {
         }
         return formData
       },
-      onSubmit: (request, submitData) => {
+      onSubmit: (request, _submitData) => {
         this.request = request
         const dfd = $.Deferred()
         $(this.el)

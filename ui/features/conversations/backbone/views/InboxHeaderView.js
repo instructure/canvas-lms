@@ -103,23 +103,23 @@ export default class InboxHeaderView extends View {
     return this.trigger('search', tokens)
   }
 
-  onCompose(e) {
+  onCompose(_e) {
     return this.trigger('compose')
   }
 
-  onReply(e) {
+  onReply(_e) {
     return this.trigger('reply', null, '#reply-btn')
   }
 
-  onReplyAll(e) {
+  onReplyAll(_e) {
     return this.trigger('reply-all', null, '#reply-all-btn')
   }
 
-  onArchive(e) {
+  onArchive(_e) {
     return this.trigger('archive', '#compose-btn', '#archive-btn')
   }
 
-  onDelete(e) {
+  onDelete(_e) {
     return this.trigger('delete', '#compose-btn', '#delete-btn')
   }
 
@@ -144,7 +144,7 @@ export default class InboxHeaderView extends View {
     return this.trigger('star-toggle')
   }
 
-  onSubmissionReply(e) {
+  onSubmissionReply(_e) {
     return this.trigger('submission-reply')
   }
 
@@ -228,7 +228,7 @@ export default class InboxHeaderView extends View {
     }
   }
 
-  onFilterChange(e) {
+  onFilterChange(_e) {
     if (this.searchView != null) {
       this.searchView.autocompleteView.setContext(this.courseView.getCurrentContext())
     }

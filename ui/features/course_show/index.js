@@ -31,7 +31,7 @@ const I18n = useI18nScope('courses.show')
 
 $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
-  $('.self_unenrollment_link').click(event =>
+  $('.self_unenrollment_link').click(_event =>
     $selfUnenrollmentDialog
       .dialog({title: I18n.t('titles.drop_course', 'Drop this Course')})
       .fixDialogButtons()
@@ -50,8 +50,8 @@ $(document).ready(() => {
       $link.attr('href'),
       'POST',
       {},
-      data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
-      data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
+      _data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
+      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
     )
   })
 

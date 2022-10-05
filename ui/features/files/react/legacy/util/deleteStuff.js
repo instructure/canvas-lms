@@ -57,7 +57,7 @@ export default function deleteStuff(filesAndFolders, args) {
         force: 'true',
       },
       wait: true,
-      error(model, response, options) {
+      error(model, response, _options) {
         const reason = (() => {
           try {
             const json = $.parseJSON(response.responseText)

@@ -40,7 +40,6 @@ export default class SearchableSubmenuView extends View {
       .keyup(_.debounce(() => this.search(), 100))
       .keydown(e => this.handleDownArrow(e))
     this.$announce = $('<span class="screenreader-only" aria-live="polite"></span>')
-    const label = this.getMenuRoot().text()
     const $labelledField = $('<label>').append(this.$field).append(this.$announce)
     this.$submenu = this.$el
       .children('.dropdown-menu')

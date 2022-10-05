@@ -307,7 +307,7 @@ export default class GradingPeriodSetCollection extends React.Component {
     return _.union(this.termsNotBelongingToActiveSets(), termsBelongingToThisSet)
   }
 
-  closeEditSetForm = id => {
+  closeEditSetForm = _id => {
     this.setState({editSet: {id: null, saving: false}})
   }
 

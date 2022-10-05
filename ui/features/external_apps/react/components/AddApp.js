@@ -184,7 +184,7 @@ export default createReactClass({
     this.closeModal(this.props.handleToolInstalled)
   },
 
-  onSaveFail(tool) {
+  onSaveFail(_tool) {
     $(this.refs.addButton).removeAttr('disabled')
     this.setState({
       errorMessage: I18n.t('There was an error in processing your request'),

@@ -62,7 +62,7 @@ class UploadDropZone extends React.Component {
     }
   }
 
-  onDragLeave = e => {
+  onDragLeave = _e => {
     this.setState({active: false})
   }
 

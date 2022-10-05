@@ -178,7 +178,7 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [cardDashboardLoader, setCardDashboardLoader] = useState(null)
+  const [, setCardDashboardLoader] = useState(null)
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
