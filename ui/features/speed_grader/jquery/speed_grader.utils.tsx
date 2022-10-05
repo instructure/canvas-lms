@@ -84,6 +84,10 @@ export function extractStudentIdFromHash(hashString: string, anonymizableStudent
 export const configureRecognition = (recognition, messages) => {
   recognition.continuous = true
   recognition.interimResults = true
+  const lang = window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE
+  if (lang) {
+    recognition.lang = lang
+  }
   let final_transcript = ''
 
   recognition.onstart = function () {
