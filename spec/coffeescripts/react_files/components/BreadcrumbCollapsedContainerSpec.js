@@ -20,7 +20,7 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import BreadcrumbCollapsedContainer from 'ui/features/files/react/components/BreadcrumbCollapsedContainer.js'
+import BreadcrumbCollapsedContainer from 'ui/features/files/react/components/BreadcrumbCollapsedContainer'
 import Folder from '@canvas/files/backbone/models/Folder'
 import filesEnv from '@canvas/files/react/modules/filesEnv'
 import mockFilesENV from '../mockFilesENV'
@@ -40,22 +40,22 @@ QUnit.module('BreadcrumbsCollapsedContainer', {
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.bcc).parentNode)
-  }
+  },
 })
 
-test('BCC: opens breadcumbs on mouse enter', function() {
+test('BCC: opens breadcumbs on mouse enter', function () {
   const $node = $(ReactDOM.findDOMNode(this.bcc))
   simulateNative.mouseOver(ReactDOM.findDOMNode(this.bcc))
   equal($node.find('.open').length, 1, 'should have class of open')
 })
 
-test('BCC: opens breadcrumbs on focus', function() {
+test('BCC: opens breadcrumbs on focus', function () {
   const $node = $(ReactDOM.findDOMNode(this.bcc))
   simulate.focus(ReactDOM.findDOMNode(this.bcc))
   equal($node.find('.open').length, 1, 'should have class of open')
 })
 
-test('BCC: closes breadcrumbs on mouse leave', function() {
+test('BCC: closes breadcrumbs on mouse leave', function () {
   const clock = sinon.useFakeTimers()
   const $node = $(ReactDOM.findDOMNode(this.bcc))
   simulateNative.mouseOut(ReactDOM.findDOMNode(this.bcc))
@@ -64,7 +64,7 @@ test('BCC: closes breadcrumbs on mouse leave', function() {
   clock.restore()
 })
 
-test('BCC: closes breadcrumbs on blur', function() {
+test('BCC: closes breadcrumbs on blur', function () {
   const clock = sinon.useFakeTimers()
   simulate.blur(ReactDOM.findDOMNode(this.bcc))
   clock.tick(200)

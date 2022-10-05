@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import ExternalToolPlacementButton from 'ui/features/external_apps/react/components/ExternalToolPlacementButton.js'
+import ExternalToolPlacementButton from 'ui/features/external_apps/react/components/ExternalToolPlacementButton'
 
 QUnit.module('ExternalToolPlacementButton')
 

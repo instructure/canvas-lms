@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ThemeEditorFileUpload from 'ui/features/theme_editor/react/ThemeEditorFileUpload.js'
+import ThemeEditorFileUpload from 'ui/features/theme_editor/react/ThemeEditorFileUpload'
 
 let elem, props
 

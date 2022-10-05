@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import _ from 'underscore'
 import setsApi from '@canvas/grading/jquery/gradingPeriodSetsApi'
-import NewSetForm from 'ui/features/account_grading_standards/react/NewGradingPeriodSetForm.js'
+import NewSetForm from 'ui/features/account_grading_standards/react/NewGradingPeriodSetForm'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 
 const wrapper = document.getElementById('fixtures')

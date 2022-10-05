@@ -38,17 +38,17 @@ QUnit.module('MigrationConverterView', {
       selectOptions: [
         {
           id: 'some_converter',
-          label: 'Some Converter'
-        }
+          label: 'Some Converter',
+        },
       ],
-      progressView: new Backbone.View()
+      progressView: new Backbone.View(),
     })
     return $('#fixtures').append(this.migrationConverterView.render().el)
   },
   teardown() {
     this.clock.restore()
     return this.migrationConverterView.remove()
-  }
+  },
 })
 
 test("renders a backbone view into it's main view container", function () {

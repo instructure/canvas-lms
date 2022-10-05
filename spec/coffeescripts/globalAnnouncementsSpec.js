@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import globalAnnouncements from 'ui/features/account_settings/jquery/global_announcements.js'
+import globalAnnouncements from 'ui/features/account_settings/jquery/global_announcements'
 import serviceRCELoader from '@canvas/rce/serviceRCELoader'
 
 QUnit.module('GlobalAnnouncements', {
@@ -30,10 +30,10 @@ QUnit.module('GlobalAnnouncements', {
     serviceRCELoader.loadOnTarget.restore()
     $('#fixtures').empty()
     fakeENV.teardown()
-  }
+  },
 })
 
-test('loads an editor for every matching node', function() {
+test('loads an editor for every matching node', function () {
   const html =
     "<textarea id='a1' class='edit_notification_form'>Announcement 1</textarea>" +
     "<textarea id='a2' class='edit_notification_form'>Announcement 2</textarea>" +

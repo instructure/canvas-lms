@@ -18,7 +18,7 @@
 
 import React from 'react'
 import enzyme from 'enzyme'
-import Errors from 'ui/features/webzip_export/react/components/Errors.js'
+import Errors from 'ui/features/webzip_export/react/components/Errors'
 
 QUnit.module('Web Zip Export Errors')
 

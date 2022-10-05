@@ -27,10 +27,10 @@ QUnit.module('GroupUser', {
     this.groupUser = new GroupUser({category: new GroupCategory()})
     this.leaveGroupStub = sandbox.stub(this.groupUser, 'leaveGroup')
     this.joinGroupStub = sandbox.stub(this.groupUser, 'joinGroup')
-  }
+  },
 })
 
-test('updates group correctly upon save and fires joinGroup and leaveGroup appropriately', function() {
+test('updates group correctly upon save and fires joinGroup and leaveGroup appropriately', function () {
   const group1 = new Group({id: 777})
   this.groupUser.save({group: group1})
   equal(this.groupUser.get('group'), group1)

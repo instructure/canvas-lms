@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import CalendarEvent from 'ui/features/edit_calendar_event/backbone/models/CalendarEvent.js'
+import CalendarEvent from 'ui/features/edit_calendar_event/backbone/models/CalendarEvent'
 import FakeServer from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {waitFor} from '../support/Waiters'
 

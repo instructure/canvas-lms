@@ -23,16 +23,16 @@ const file1 = {
   name: 'File 1',
   extension: 'tst',
   document_id: '12345',
-  alternate_url: {href: '#'}
+  alternate_url: {href: '#'},
 }
 const fileData = {files: [file1]}
 const folderData = {
   folders: [
     {
       name: 'Folder 1',
-      files: [file1]
-    }
-  ]
+      files: [file1],
+    },
+  ],
 }
 
 QUnit.module('GoogleDocsTreeView')

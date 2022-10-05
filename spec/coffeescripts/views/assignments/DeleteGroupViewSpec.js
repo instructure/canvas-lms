@@ -30,13 +30,13 @@ const group = (assignments = true, id) =>
   new AssignmentGroup({
     id,
     name: `something cool ${id}`,
-    assignments: assignments ? [new Assignment(), new Assignment()] : []
+    assignments: assignments ? [new Assignment(), new Assignment()] : [],
   })
-const assignmentGroups = function(assignments = true, multiple = true) {
+const assignmentGroups = function (assignments = true, multiple = true) {
   const groups = multiple ? [group(assignments, 1), group(assignments, 2)] : [group(assignments, 1)]
   return new AssignmentGroupCollection(groups)
 }
-const createView = function(assignments = true, multiple = true) {
+const createView = function (assignments = true, multiple = true) {
   const ags = assignmentGroups(assignments, multiple)
   const ag_group = ags.first()
   return new DeleteGroupView({model: ag_group})
@@ -47,7 +47,7 @@ QUnit.module('DeleteGroupView', {
   teardown() {
     $('#fixtures').empty()
     return $('form.dialogFormView').remove()
-  }
+  },
 })
 
 test('should be accessible', assert => {

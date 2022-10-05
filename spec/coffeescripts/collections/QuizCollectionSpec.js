@@ -17,7 +17,7 @@
  */
 
 import Quiz from '@canvas/quizzes/backbone/models/Quiz'
-import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection.js'
+import QuizCollection from 'ui/features/quizzes_index/backbone/collections/QuizCollection'
 
 QUnit.module('QuizCollection')
 

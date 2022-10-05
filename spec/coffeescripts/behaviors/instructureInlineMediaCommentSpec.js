@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import inlineMediaComment from '../../../ui/boot/initializers/loadInlineMediaComments.js'
+import inlineMediaComment from '../../../ui/boot/initializers/loadInlineMediaComments'
 
 QUnit.module('inlineMediaComment', {
   setup() {
@@ -29,10 +29,10 @@ QUnit.module('inlineMediaComment', {
   teardown() {
     this.fixtures.innerHTML = ''
     window.INST.kalturaSettings = null
-  }
+  },
 })
 
-test('anchor tag with proper class triggers media load when clicked', function() {
+test('anchor tag with proper class triggers media load when clicked', function () {
   const $link = $(this.fixtures).find('a')
   $link.click()
   ok(
@@ -66,7 +66,7 @@ test('getMediaCommentId can pull from an inner element in an html block', () => 
   equal('24', id)
 })
 
-test('video in td has minimum size of 300', function() {
+test('video in td has minimum size of 300', function () {
   this.fixtures.innerHTML =
     "<table><tbody><tr><td><a data-media_comment_id=42 class='instructure_inline_media_comment' href='42' tabindex=0></a></td></tr></tbody></table>"
   const $link = $(this.fixtures).find('a')

@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 
-import {setup, teardown} from 'ui/features/submissions/jquery/index.js'
+import {setup, teardown} from 'ui/features/submissions/jquery/index'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/jquery/jquery.ajaxJSON'
 

@@ -19,7 +19,7 @@
 import DownloadSubmissionsDialogManager from 'ui/features/gradebook/react/shared/DownloadSubmissionsDialogManager'
 
 import INST from 'browser-sniffer'
-import 'ui/features/submission_download/jquery/index.js'
+import 'ui/features/submission_download/jquery/index'
 
 QUnit.module('DownloadSubmissionsDialogManager#constructor')
 

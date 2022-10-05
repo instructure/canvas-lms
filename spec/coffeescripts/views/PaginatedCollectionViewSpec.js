@@ -31,14 +31,14 @@ const fixtures = $('#fixtures')
 
 function createServer() {
   server = sinon.fakeServer.create()
-  return (server.sendPage = function(page, url) {
+  return (server.sendPage = function (page, url) {
     return this.respond('GET', url, [
       200,
       {
         'Content-Type': 'application/json',
-        Link: page.header
+        Link: page.header,
       },
-      JSON.stringify(page.data)
+      JSON.stringify(page.data),
     ])
   })
 }
@@ -64,7 +64,7 @@ QUnit.module('PaginatedCollectionView', {
     fakeENV.setup()
     fixtures.css({
       height: 500,
-      overflow: 'auto'
+      overflow: 'auto',
     })
     createServer()
     clock = sinon.useFakeTimers()
@@ -72,7 +72,7 @@ QUnit.module('PaginatedCollectionView', {
     view = new PaginatedCollectionView({
       collection,
       itemView: ItemView,
-      scrollContainer: fixtures
+      scrollContainer: fixtures,
     })
     view.$el.appendTo(fixtures)
     view.render()
@@ -83,7 +83,7 @@ QUnit.module('PaginatedCollectionView', {
     clock.restore()
     fixtures.attr('style', '')
     view.remove()
-  }
+  },
 })
 
 function assertItemRendered(id) {
@@ -140,7 +140,7 @@ test('auto-fetches visible pages', () => {
     collection,
     itemView: ItemView,
     scrollContainer: fixtures,
-    autoFetch: true
+    autoFetch: true,
   })
   view.$el.appendTo(fixtures)
   view.render()
@@ -161,7 +161,7 @@ test('fetches every page until it reaches the last when fetchItAll is set', () =
     collection,
     itemView: ItemView,
     scrollContainer: fixtures,
-    fetchItAll: true
+    fetchItAll: true,
   })
   view.$el.appendTo(fixtures)
   view.render()

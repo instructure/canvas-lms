@@ -28,31 +28,31 @@ QUnit.module('OutcomeViewSpec', {
   setup() {
     this.outcomeView = new OutcomeView({
       el: $('<li><a class="more-details"></a></li>'),
-      model: new Outcome()
+      model: new Outcome(),
     })
-    this.e = function(name, options = {}) {
+    this.e = function (name, options = {}) {
       return $.Event(name, {...options, currentTarget: this.outcomeView.$el.find('a.more-details')})
     }
-  }
+  },
 })
 
-test('should be accessible', function(assert) {
+test('should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.outcomeView, done, {a11yReport: true})
 })
 
-test('assign instance of ProgressBarView on init', function() {
+test('assign instance of ProgressBarView on init', function () {
   ok(this.outcomeView.progress instanceof ProgressBarView)
 })
 
-test('have after render behavior', function() {
+test('have after render behavior', function () {
   ok(isUndefined(this.outcomeView.popover, 'precondition'))
   this.outcomeView.render()
   ok(this.outcomeView.popover instanceof OutcomePopoverView)
   ok(this.outcomeView.dialog instanceof OutcomeDialogView)
 })
 
-test('click & keydown .more-details', function() {
+test('click & keydown .more-details', function () {
   this.outcomeView.render()
   const showSpy = sandbox.stub(this.outcomeView.dialog, 'show')
   this.outcomeView.$el.find('a.more-details').trigger(this.e('click'))

@@ -30,7 +30,7 @@ test('#hasRules returns true if group has regular rules', () => {
 test('#hasRules returns true if group has never drop rules', () => {
   const ag = new AssignmentGroup({
     assignments: {id: 1},
-    rules: {never_drop: [1]}
+    rules: {never_drop: [1]},
   })
   strictEqual(ag.hasRules(), true)
 })
@@ -53,7 +53,7 @@ test('#countRules works for regular rules', () => {
 test('#countRules works for never drop rules', () => {
   const ag = new AssignmentGroup({
     assignments: {id: 1},
-    rules: {never_drop: [1]}
+    rules: {never_drop: [1]},
   })
   strictEqual(ag.countRules(), 1)
 })
@@ -61,7 +61,7 @@ test('#countRules works for never drop rules', () => {
 test('#countRules only counts drop rules for assignments it has', () => {
   const ag = new AssignmentGroup({
     assignments: {id: 2},
-    rules: {never_drop: [1]}
+    rules: {never_drop: [1]},
   })
   strictEqual(ag.countRules(), 0)
 })
@@ -109,7 +109,7 @@ test('#hasIntegrationData returns false if sis_source_id is not set', () => {
 test('#hasIntegrationData returns false if sis_source_id and integration_data is empty', () => {
   const ag = new AssignmentGroup({
     sis_source_id: '',
-    integration_data: {}
+    integration_data: {},
   })
   strictEqual(ag.hasIntegrationData(), false)
 })
@@ -120,7 +120,7 @@ QUnit.module('AssignmentGroup#canDelete as admin', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("returns true if AssignmentGroup has frozen assignments and 'any_assignment_in_closed_grading_period' false", () => {
@@ -128,7 +128,7 @@ test("returns true if AssignmentGroup has frozen assignments and 'any_assignment
   assignment.set('frozen', true)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   group.set('any_assignment_in_closed_grading_period', false)
   deepEqual(group.canDelete(), true)
@@ -139,7 +139,7 @@ test("returns true if 'any_assignment_in_closed_grading_period' true and there a
   assignment.set('frozen', false)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: []
+    assignments: [],
   })
   group.set('any_assignment_in_closed_grading_period', true)
   equal(group.canDelete(), true)
@@ -150,7 +150,7 @@ test("returns true if 'frozen' and 'any_assignment_in_closed_grading_period' are
   assignment.set('frozen', true)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   group.set('any_assignment_in_closed_grading_period', true)
   deepEqual(group.canDelete(), true)
@@ -161,7 +161,7 @@ test("returns true if 'frozen' and 'any_assignment_in_closed_grading_period' are
   assignment.set('frozen', false)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   group.set('any_assignment_in_closed_grading_period', false)
   deepEqual(group.canDelete(), true)
@@ -173,7 +173,7 @@ QUnit.module('AssignmentGroup#canDelete as non admin', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("returns false if AssignmentGroup has frozen assignments and 'any_assignment_in_closed_Grading_period is false", () => {
@@ -181,7 +181,7 @@ test("returns false if AssignmentGroup has frozen assignments and 'any_assignmen
   assignment.set('frozen', true)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   group.set('any_assignment_in_closed_grading_period', false)
   deepEqual(group.canDelete(), false)
@@ -192,7 +192,7 @@ test("returns false if 'any_assignment_in_closed_grading_period' is true and the
   assignment.set('frozen', false)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: []
+    assignments: [],
   })
   group.set('any_assignment_in_closed_grading_period', true)
   equal(group.canDelete(), false)
@@ -203,7 +203,7 @@ test("returns true if 'frozen' and 'any_assignment_in_closed_grading_period' are
   assignment.set('frozen', false)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   group.set('any_assignment_in_closed_grading_period', false)
   deepEqual(group.canDelete(), true)
@@ -214,7 +214,7 @@ test("returns false if 'frozen' and 'any_assignment_in_closed_grading_period' ar
   assignment.set('frozen', true)
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: []
+    assignments: [],
   })
   group.set('any_assignment_in_closed_grading_period', true)
   equal(group.canDelete(), false)
@@ -227,7 +227,7 @@ test('returns true if AssignmentGroup has frozen assignments', () => {
   assignment.set('frozen', [true])
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: [assignment]
+    assignments: [assignment],
   })
   deepEqual(group.hasFrozenAssignments(), true)
 })
@@ -237,7 +237,7 @@ QUnit.module('AssignmentGroup#anyAssignmentInClosedGradingPeriod')
 test("returns the value of 'any_assignment_in_closed_grading_period'", () => {
   const group = new AssignmentGroup({
     name: 'taco',
-    assignments: []
+    assignments: [],
   })
   group.set('any_assignment_in_closed_grading_period', true)
   deepEqual(group.anyAssignmentInClosedGradingPeriod(), true)

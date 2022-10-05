@@ -19,7 +19,7 @@
 import React from 'react'
 
 import enzyme from 'enzyme'
-import ExportList from 'ui/features/webzip_export/react/components/ExportList.js'
+import ExportList from 'ui/features/webzip_export/react/components/ExportList'
 
 QUnit.module('ExportList')
 

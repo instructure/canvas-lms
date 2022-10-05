@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import {shallow} from 'enzyme'
-import CoursesToolbar from 'ui/features/account_course_user_search/react/components/CoursesToolbar.js'
+import CoursesToolbar from 'ui/features/account_course_user_search/react/components/CoursesToolbar'
 
 const allTermsProps = {
   can_create_courses: true,

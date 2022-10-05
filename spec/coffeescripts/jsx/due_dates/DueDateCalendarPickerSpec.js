@@ -43,7 +43,7 @@ QUnit.module('DueDateCalendarPicker', suiteHooks => {
       isFancyMidnight: false,
       labelText: 'bar',
       labelledBy: 'foo',
-      rowKey: 'nullnullnull'
+      rowKey: 'nullnullnull',
     }
   })
 

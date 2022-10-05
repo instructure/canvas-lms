@@ -26,9 +26,9 @@ QUnit.module('ExternalTool', {
   },
   teardown() {
     ENV.context_asset_string = this.prevAssetString
-  }
+  },
 })
 
-test('urlRoot', function() {
+test('urlRoot', function () {
   equal(this.tool.urlRoot(), '/api/v1/courses/3/create_tool_with_verification')
 })

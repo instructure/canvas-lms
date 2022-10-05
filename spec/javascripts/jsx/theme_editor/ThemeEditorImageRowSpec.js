@@ -19,7 +19,7 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom'
-import ThemeEditorImageRow from 'ui/features/theme_editor/react/ThemeEditorImageRow.js'
+import ThemeEditorImageRow from 'ui/features/theme_editor/react/ThemeEditorImageRow'
 
 let elem, props
 

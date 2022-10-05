@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import RangeInput from 'ui/features/theme_editor/react/RangeInput.js'
+import RangeInput from 'ui/features/theme_editor/react/RangeInput'
 
 let elem, props
 

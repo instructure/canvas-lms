@@ -22,7 +22,7 @@ import {mount} from 'enzyme'
 import $ from 'jquery'
 import axios from '@canvas/axios'
 import _ from 'underscore'
-import AccountTabContainer from 'ui/features/account_grading_standards/react/AccountTabContainer.js'
+import AccountTabContainer from 'ui/features/account_grading_standards/react/AccountTabContainer'
 import 'jqueryui/tabs'
 
 QUnit.module('AccountTabContainer', {

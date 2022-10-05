@@ -37,11 +37,11 @@ QUnit.module('DueDateCalendars', {
       overrides: [
         {
           get() {},
-          set() {}
-        }
+          set() {},
+        },
       ],
       sections: {},
-      dateValue: this.someDate
+      dateValue: this.someDate,
     }
     const DueDateCalendarsElement = <DueDateCalendars {...props} />
     this.dueDateCalendars = ReactDOM.render(DueDateCalendarsElement, wrapper)
@@ -50,13 +50,13 @@ QUnit.module('DueDateCalendars', {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDateCalendars).parentNode)
     return wrapper.remove()
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   ok(this.dueDateCalendars)
 })
 
-test('can get the date for a datetype', function() {
+test('can get the date for a datetype', function () {
   equal(this.dueDateCalendars.props.dates.due_at, this.someDate)
 })

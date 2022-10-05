@@ -23,7 +23,7 @@ QUnit.module('moment module test')
 test('moment should include the locale mi-nz', () => {
   // webpack does not load up all locales by default.
   // we have to ask for it specifically
-  require('ui/ext/custom_moment_locales/mi_nz.js')
+  require('ui/ext/custom_moment_locales/mi_nz')
 
   notEqual(moment.localeData('mi-nz'), null, 'locale data for mi-nz is not null')
 })

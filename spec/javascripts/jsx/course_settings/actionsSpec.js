@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from 'ui/features/course_settings/react/actions.js'
+import Actions from 'ui/features/course_settings/react/actions'
 
 QUnit.module('Course Settings Actions')
 

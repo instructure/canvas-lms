@@ -30,7 +30,7 @@ QUnit.module('InputView', {
   },
   teardown() {
     view.remove()
-  }
+  },
 })
 const setValue = term => (view.el.value = term)
 

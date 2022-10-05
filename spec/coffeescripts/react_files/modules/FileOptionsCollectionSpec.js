@@ -22,7 +22,7 @@ const mockFile = (name, type = 'application/image') => ({
   get(attr) {
     if (attr === 'display_name') return name
   },
-  type
+  type,
 })
 
 function setupFolderWith(names) {
@@ -56,7 +56,7 @@ QUnit.module(
     },
     teardown() {
       FileOptionsCollection.resetState()
-    }
+    },
   },
 
   test('findMatchingFile correctly finds existing files by display_name', () => {

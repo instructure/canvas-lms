@@ -23,9 +23,9 @@ const mockFileOptions = (name = 'foo', type = 'bar', expandZip = false) => ({
   file: {
     size: 1,
     name,
-    type
+    type,
   },
-  expandZip
+  expandZip,
 })
 const mockFileUploader = (file, error) => ({
   upload() {
@@ -44,9 +44,9 @@ const mockFileUploader = (file, error) => ({
   },
   inFlight: false,
   error,
-  file
+  file,
 })
-const mockAttemptNext = function() {}
+const mockAttemptNext = function () {}
 
 QUnit.module('UploadQueue', {
   setup() {
@@ -55,10 +55,10 @@ QUnit.module('UploadQueue', {
   teardown() {
     this.queue.flush()
     return delete this.queue
-  }
+  },
 })
 
-test('Enqueues uploads, flush clears', function() {
+test('Enqueues uploads, flush clears', function () {
   const original = this.queue.attemptNextUpload
   this.queue.attemptNextUpload = mockAttemptNext
   this.queue.enqueue(mockFileOptions())
@@ -70,7 +70,7 @@ test('Enqueues uploads, flush clears', function() {
   this.queue.attemptNextUpload = original
 })
 
-test('processes one upload at a time', function(assert) {
+test('processes one upload at a time', function (assert) {
   const done = assert.async()
   const original = this.queue.createUploader
   this.queue.createUploader = mockFileUploader
@@ -85,7 +85,7 @@ test('processes one upload at a time', function(assert) {
   this.queue.createUploader = original
 })
 
-test('dequeue removes top of the queue', function() {
+test('dequeue removes top of the queue', function () {
   const original = this.queue.attemptNextUpload
   this.queue.attemptNextUpload = mockAttemptNext
   const foo = mockFileOptions('foo')
@@ -97,7 +97,7 @@ test('dequeue removes top of the queue', function() {
   this.queue.attemptNextUpload = original
 })
 
-test('getAllUploaders includes the current uploader', function() {
+test('getAllUploaders includes the current uploader', function () {
   const original = this.queue.attemptNextUpload
   this.queue.attemptNextUpload = mockAttemptNext
   this.queue.flush()
@@ -115,7 +115,7 @@ test('getAllUploaders includes the current uploader', function() {
   this.queue.attemptNextUpload = original
 })
 
-test('Calls onChange', function() {
+test('Calls onChange', function () {
   const onChangeSpy = sinon.spy(this.queue, 'onChange')
   const callbackSpy = sinon.spy()
   this.queue.addChangeListener(callbackSpy)
@@ -128,7 +128,7 @@ test('Calls onChange', function() {
   ok(callbackSpy.calledOnce)
 })
 
-test('can retry a specific uploader', function(assert) {
+test('can retry a specific uploader', function (assert) {
   const done = assert.async()
   const foo = mockFileUploader('foo', 'whoops')
   const zoo = mockFileUploader('zoo', 'failed')

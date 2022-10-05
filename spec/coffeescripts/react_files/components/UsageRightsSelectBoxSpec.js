@@ -24,7 +24,7 @@ import UsageRightsSelectBox from '@canvas/files/react/components/UsageRightsSele
 QUnit.module('UsageRightsSelectBox', {
   teardown() {
     return $('div.error_box').remove()
-  }
+  },
 })
 
 test('shows alert message if nothing is chosen and component is setup for a message', () => {
@@ -49,9 +49,9 @@ test('fetches license options when component mounts', () => {
     JSON.stringify([
       {
         id: 'cc_some_option',
-        name: 'CreativeCommonsOption'
-      }
-    ])
+        name: 'CreativeCommonsOption',
+      },
+    ]),
   ])
   equal(wrapper.instance().state.licenseOptions[0].id, 'cc_some_option', 'sets data just fine')
   server.restore()
@@ -60,13 +60,7 @@ test('fetches license options when component mounts', () => {
 test('inserts copyright into textbox when passed in', () => {
   const copyright = 'all dogs go to taco bell'
   const wrapper = shallow(<UsageRightsSelectBox copyright={copyright} />)
-  equal(
-    wrapper
-      .find('#copyrightHolder')
-      .find('input')
-      .prop('defaultValue'),
-    copyright
-  )
+  equal(wrapper.find('#copyrightHolder').find('input').prop('defaultValue'), copyright)
 })
 
 test('shows creative commons options when set up', () => {
@@ -74,7 +68,7 @@ test('shows creative commons options when set up', () => {
   const props = {
     copyright: 'loony',
     use_justification: 'creative_commons',
-    cc_value: 'helloooo_nurse'
+    cc_value: 'helloooo_nurse',
   }
   const wrapper = mount(<UsageRightsSelectBox {...props} />)
   server.respond('GET', '', [
@@ -83,9 +77,9 @@ test('shows creative commons options when set up', () => {
     JSON.stringify([
       {
         id: 'cc_some_option',
-        name: 'CreativeCommonsOption'
-      }
-    ])
+        name: 'CreativeCommonsOption',
+      },
+    ]),
   ])
 
   equal(wrapper.instance().creativeCommons.value, 'cc_some_option', 'shows creative commons option')

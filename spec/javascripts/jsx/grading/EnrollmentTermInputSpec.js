@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {findRenderedDOMComponentWithClass} from 'react-dom/test-utils'
 import _ from 'underscore'
-import Input from 'ui/features/account_grading_standards/react/EnrollmentTermInput.js'
+import Input from 'ui/features/account_grading_standards/react/EnrollmentTermInput'
 
 const wrapper = document.getElementById('fixtures')
 

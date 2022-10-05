@@ -32,15 +32,15 @@ QUnit.module('CalendarNavigator', {
     $('#ui-datepicker-div').empty()
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
-  }
+  },
 })
 
-test('should be accessible', function(assert) {
+test('should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.navigator, done, {a11yReport: true})
 })
 
-test('clicking a day in picker navigates to that date', function() {
+test('clicking a day in picker navigates to that date', function () {
   // instrument the callback
   const handler = sinon.spy()
   this.navigator.on('navigateDate', handler)
@@ -69,7 +69,7 @@ test('clicking a day in picker navigates to that date', function() {
   equal(+handler.getCall(0).args[0], +expectedDate)
 })
 
-test('hitting enter in date field navigates to date', function() {
+test('hitting enter in date field navigates to date', function () {
   // instrument the callback
   const handler = sinon.spy()
   this.navigator.on('navigateDate', handler)

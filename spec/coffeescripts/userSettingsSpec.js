@@ -25,13 +25,13 @@ QUnit.module('UserSettings', {
     this._ENV = globalObj.ENV
     globalObj.ENV = {
       current_user_id: 1,
-      context_asset_string: 'course_1'
+      context_asset_string: 'course_1',
     }
     userSettings.globalEnv = globalObj.ENV
   },
   teardown() {
     globalObj.ENV = this._ENV
-  }
+  },
 })
 
 test('`get` should return what was `set`', () => {
@@ -43,7 +43,7 @@ test('it should strigify/parse JSON', () => {
   const testObject = {
     foo: [1, 2, 3],
     bar: 'true',
-    baz: true
+    baz: true,
   }
   userSettings.set('foo', testObject)
   deepEqual(userSettings.get('foo'), testObject)

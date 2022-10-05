@@ -25,21 +25,21 @@ QUnit.module('ConversationCreator', {
   },
   teardown() {
     return this.server.restore()
-  }
+  },
 })
-const respond = function(data) {}
-test('#validate passes through to Conversation', function() {
+const respond = function (data) {}
+test('#validate passes through to Conversation', function () {
   ok(this.cc.validate({body: ''}))
   ok(this.cc.validate({body: null}).body)
   ok(
     this.cc.validate({
       body: 'body',
-      recipients: [{}]
+      recipients: [{}],
     }) === undefined
   )
 })
 
-test('#save calls save in batches', function() {
+test('#save calls save in batches', function () {
   const spy = sinon.spy()
   this.server.respondWith('POST', '/api/v1/conversations', xhr => {
     spy()
@@ -47,7 +47,7 @@ test('#save calls save in batches', function() {
   })
   const dfd = this.cc.save({
     body: 'body',
-    recipients: [1, 2, 3, 4]
+    recipients: [1, 2, 3, 4],
   })
   equal(dfd.state(), 'pending')
   this.server.respond()

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/calendar/react/scheduler/reducer.js'
+import reducer from 'ui/features/calendar/react/scheduler/reducer'
 
 QUnit.module('Scheduler Reducer')
 

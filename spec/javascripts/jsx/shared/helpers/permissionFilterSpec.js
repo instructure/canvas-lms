@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import applyPermissions from 'ui/features/account_course_user_search/react/helpers/permissionFilter.js'
+import applyPermissions from 'ui/features/account_course_user_search/react/helpers/permissionFilter'
 
 QUnit.module('Permissions Filter Helper Function')
 

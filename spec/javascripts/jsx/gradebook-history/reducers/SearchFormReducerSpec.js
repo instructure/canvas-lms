@@ -18,7 +18,7 @@
 
 import Fixtures from '../Fixtures'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import reducer from 'ui/features/gradebook_history/react/reducers/SearchFormReducer.js'
+import reducer from 'ui/features/gradebook_history/react/reducers/SearchFormReducer'
 import {
   CLEAR_RECORDS,
   FETCH_RECORDS_START,
@@ -27,7 +27,7 @@ import {
   FETCH_RECORDS_NEXT_PAGE_START,
   FETCH_RECORDS_NEXT_PAGE_SUCCESS,
   FETCH_RECORDS_NEXT_PAGE_FAILURE,
-} from 'ui/features/gradebook_history/react/actions/SearchFormActions.js'
+} from 'ui/features/gradebook_history/react/actions/SearchFormActions'
 
 const defaultState = () => ({
   records: {

@@ -39,10 +39,10 @@ QUnit.module('Folder', {
   },
   teardown() {
     this.model = null
-  }
+  },
 })
 
-test('sorts children naturally', function() {
+test('sorts children naturally', function () {
   const actualChildren = this.model.children({})
   const expectedChildren = [
     this.folder3,
@@ -51,7 +51,7 @@ test('sorts children naturally', function() {
     this.file2,
     this.file4,
     this.folder2,
-    this.folder1
+    this.folder1,
   ]
   deepEqual(actualChildren, expectedChildren, 'Children did not sort properly')
 })

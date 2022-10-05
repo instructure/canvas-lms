@@ -29,21 +29,21 @@ QUnit.module('DueDateList', {
     this.assignment = new Assignment({
       due_at: this.date,
       unlock_at: this.date,
-      lock_at: this.date
+      lock_at: this.date,
     })
     this.partialOverrides = new AssignmentOverrideCollection([
       new AssignmentOverride({course_section_id: '1'}),
-      new AssignmentOverride({course_section_id: '2'})
+      new AssignmentOverride({course_section_id: '2'}),
     ])
     this.completeOverrides = new AssignmentOverrideCollection([
       new AssignmentOverride({course_section_id: '1'}),
       new AssignmentOverride({course_section_id: '2'}),
-      new AssignmentOverride({course_section_id: '3'})
+      new AssignmentOverride({course_section_id: '3'}),
     ])
     this.sections = new SectionList([
       new Section({id: '1', name: 'CourseSection1'}),
       new Section({id: '2', name: 'CourseSection2'}),
-      new Section({id: '3', name: 'CourseSection3'})
+      new Section({id: '3', name: 'CourseSection3'}),
     ])
     this.partialOverridesList = new DueDateList(
       this.partialOverrides,
@@ -55,15 +55,15 @@ QUnit.module('DueDateList', {
       this.sections,
       this.assignment
     )
-  }
+  },
 })
 
-test(`#containsSectionsWithoutOverrides returns true when a section's id does not belong to an AssignmentOverride and there isn't an override representing a default due date present`, function() {
+test(`#containsSectionsWithoutOverrides returns true when a section's id does not belong to an AssignmentOverride and there isn't an override representing a default due date present`, function () {
   this.partialOverrides.pop() // remove the default that got added in the constructor
   strictEqual(this.partialOverridesList.containsSectionsWithoutOverrides(), true)
 })
 
-test(`#containsSectionsWithoutOverrides returns false when overrides contain an override representing the default due date`, function() {
+test(`#containsSectionsWithoutOverrides returns false when overrides contain an override representing the default due date`, function () {
   const overridesWithDefaultDueDate = new AssignmentOverrideCollection(
     this.partialOverrides.toJSON()
   )
@@ -72,11 +72,11 @@ test(`#containsSectionsWithoutOverrides returns false when overrides contain an 
   strictEqual(dueDateList.containsSectionsWithoutOverrides(), false)
 })
 
-test(`#containsSectionsWithoutOverrides returns false if all sections belong to an assignment override`, function() {
+test(`#containsSectionsWithoutOverrides returns false if all sections belong to an assignment override`, function () {
   strictEqual(this.completeOverridesList.containsSectionsWithoutOverrides(), false)
 })
 
-test(`constructor adds an override representing the default due date using the assignment's due date lock_at, and unlock_at, if an assignment is given and overrides don't already cover all sections`, function() {
+test(`constructor adds an override representing the default due date using the assignment's due date lock_at, and unlock_at, if an assignment is given and overrides don't already cover all sections`, function () {
   strictEqual(this.partialOverridesList.overrides.length, 3)
   const override = this.partialOverridesList.overrides.pop()
   strictEqual(override.get('due_at'), this.date)
@@ -84,17 +84,17 @@ test(`constructor adds an override representing the default due date using the a
   strictEqual(override.get('lock_at'), this.date)
 })
 
-test(`constructor adds a section to the list of sections representing the assignment's default due date if an assignment is given`, function() {
+test(`constructor adds a section to the list of sections representing the assignment's default due date if an assignment is given`, function () {
   strictEqual(this.partialOverridesList.sections.length, 4)
   strictEqual(this.partialOverridesList.sections.shift().id, Section.defaultDueDateSectionID)
 })
 
-test(`constructor adds a section to the list of sections as an option even if all sections are already covered by overrids`, function() {
+test(`constructor adds a section to the list of sections as an option even if all sections are already covered by overrids`, function () {
   strictEqual(this.completeOverridesList.sections.length, 4)
   strictEqual(this.completeOverridesList.sections.shift().id, Section.defaultDueDateSectionID)
 })
 
-test(`constructor adds a default due date section if the section list passed is empty`, function() {
+test(`constructor adds a default due date section if the section list passed is empty`, function () {
   const dueDateList = new DueDateList(this.partialOverrides, new SectionList([]), this.assignment)
   strictEqual(dueDateList.sections.length, 1)
 })

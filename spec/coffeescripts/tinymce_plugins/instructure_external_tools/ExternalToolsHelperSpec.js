@@ -22,10 +22,10 @@ QUnit.module('ExternalToolsHelper:buttonConfig', {
   setup() {
     this.buttonOpts = {
       name: 'SomeName',
-      id: '_SomeId'
+      id: '_SomeId',
     }
   },
-  teardown() {}
+  teardown() {},
 })
 
 test('makes a config as expected', function () {
@@ -37,7 +37,7 @@ test('makes a config as expected', function () {
 test('defaults to image if no icon class', function () {
   const btn = {
     ...this.buttonOpts,
-    icon_url: 'example.com'
+    icon_url: 'example.com',
   }
   const config = ExternalToolsHelper.buttonConfig(btn)
   equal(config.icon, null)
@@ -51,7 +51,7 @@ QUnit.module('ExternalToolsHelper:updateMRUList', {
   teardown() {
     window.localStorage.clear()
     window.console.log.restore()
-  }
+  },
 })
 
 test('creates the mru list if necessary', function () {

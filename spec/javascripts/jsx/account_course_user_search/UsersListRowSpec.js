@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow} from 'enzyme'
-import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow.js'
+import UsersListRow from 'ui/features/account_course_user_search/react/components/UsersListRow'
 
 QUnit.module('Account Course User Search UsersListRow View')
 

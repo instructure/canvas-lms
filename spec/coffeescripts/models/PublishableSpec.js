@@ -22,12 +22,12 @@ const buildModule = published => new Publishable({published}, {url: '/api/1/2/3'
 
 QUnit.module('Publishable:', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('publish updates the state of the model', () => {
   const cModule = buildModule(false)
-  cModule.save = function() {}
+  cModule.save = function () {}
   cModule.publish()
   equal(cModule.get('published'), true)
 })
@@ -41,7 +41,7 @@ test('publish saves to the server', () => {
 
 test('unpublish updates the state of the model', () => {
   const cModule = buildModule(true)
-  cModule.save = function() {}
+  cModule.save = function () {}
   cModule.unpublish()
   equal(cModule.get('published'), false)
 })

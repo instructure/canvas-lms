@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import DeveloperKeyFormFields from 'ui/features/developer_keys_v2/react/NewKeyForm.js'
+import DeveloperKeyFormFields from 'ui/features/developer_keys_v2/react/NewKeyForm'
 import fakeENV from 'helpers/fakeENV'
 import {mount} from 'enzyme'
 

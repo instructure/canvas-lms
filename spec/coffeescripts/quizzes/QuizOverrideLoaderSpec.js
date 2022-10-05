@@ -27,28 +27,28 @@ QUnit.module('QuizOverrideLoader dates selection', {
     this.dates = [
       {due_at: this.latestDate, lock_at: null, unlock_at: this.middleDate},
       {due_at: this.middleDate, lock_at: null, unlock_at: this.earliestDate},
-      {due_at: this.earliestDate, lock_at: null, unlock_at: this.latestDate}
+      {due_at: this.earliestDate, lock_at: null, unlock_at: this.latestDate},
     ]
   },
-  teardown() {}
+  teardown() {},
 })
 
-test('can select the latest date from a group', function() {
+test('can select the latest date from a group', function () {
   equal(this.loader._chooseLatest(this.dates, 'due_at'), this.latestDate)
 })
 
-test('can select the earliest date from a group', function() {
+test('can select the earliest date from a group', function () {
   equal(this.loader._chooseEarliest(this.dates, 'unlock_at'), this.earliestDate)
 })
 
-test('handles null dates and handles empty arrays', function() {
+test('handles null dates and handles empty arrays', function () {
   let dates = [{}, {}]
   equal(this.loader._chooseLatest(dates, 'due_at'), null)
   dates = []
   equal(this.loader._chooseLatest(dates, 'due_at'), null)
 })
 
-test('returns null if any argument is null', function() {
+test('returns null if any argument is null', function () {
   const dates = [...this.dates, {}]
   equal(this.loader._chooseLatest(dates, 'due_at'), null)
   equal(this.loader._chooseEarliest(dates, 'due_at'), null)

@@ -37,7 +37,7 @@ QUnit.module('GroupCategoryEditView', {
     fakeENV.teardown()
     view.remove()
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('it should be accessible', assert => {

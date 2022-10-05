@@ -63,7 +63,7 @@ QUnit.module('ToolLaunchResizer', {
   },
   teardown() {
     this.fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('selects the last iframe when the wrapper id matches', () => {

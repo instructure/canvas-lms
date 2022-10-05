@@ -20,7 +20,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default function stubRouterContext(Component, props, stubs) {
-  const RouterStub = function() {}
+  const RouterStub = function () {}
   Object.assign(
     RouterStub,
     {
@@ -34,20 +34,20 @@ export default function stubRouterContext(Component, props, stubs) {
       getCurrentPathname() {},
       getCurrentParams() {},
       getCurrentQuery() {},
-      isActive() {}
+      isActive() {},
     },
     stubs
   )
   return class extends React.Component {
     static childContextTypes = {
       router: PropTypes.func,
-      routeDepth: PropTypes.number
+      routeDepth: PropTypes.number,
     }
 
     getChildContext() {
       return {
         router: RouterStub,
-        routeDepth: 0
+        routeDepth: 0,
       }
     }
 

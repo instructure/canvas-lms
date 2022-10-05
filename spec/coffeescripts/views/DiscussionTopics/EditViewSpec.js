@@ -41,7 +41,7 @@ const editView = function (opts = {}, discussOpts = {}) {
     const assignmentOpts = extend({}, opts.assignmentOpts, {
       name: 'Test Assignment',
       assignment_overrides: [],
-      graded_submissions_exist: true
+      graded_submissions_exist: true,
     })
     discussOpts.assignment = assignmentOpts
   }
@@ -59,15 +59,15 @@ const editView = function (opts = {}, discussOpts = {}) {
     views: {
       'js-assignment-overrides': new DueDateOverrideView({
         model: dueDateList,
-        views: {}
-      })
+        views: {},
+      }),
     },
     lockedItems: opts.lockedItems || {},
     isEditing: false,
     anonymousState: ENV?.DISCUSSION_TOPIC?.ATTRIBUTES?.anonymous_state,
     react_discussions_post: ENV.REACT_DISCUSSIONS_POST,
     allow_student_anonymous_discussion_topics: ENV.allow_student_anonymous_discussion_topics,
-    context_is_not_group: ENV.context_is_not_group
+    context_is_not_group: ENV.context_is_not_group,
   })
   ;(app.assignmentGroupCollection = new AssignmentGroupCollection()).contextAssetString =
     ENV.context_asset_string
@@ -91,7 +91,7 @@ const nameLengthHelper = function (
     {
       title,
       set_assignment: '1',
-      assignment
+      assignment,
     },
     []
   )
@@ -112,7 +112,7 @@ QUnit.module('EditView', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('it should be accessible', function (assert) {
@@ -128,7 +128,7 @@ test('renders', function () {
 test('shows error message on assignment point change with submissions', function () {
   const view = this.editView({
     withAssignment: true,
-    assignmentOpts: {has_submitted_submissions: true}
+    assignmentOpts: {has_submitted_submissions: true},
   })
   view.renderGroupCategoryOptions()
   ok(view.$el.find('#discussion_point_change_warning'), 'rendered change warning')
@@ -166,7 +166,7 @@ test('validates the group category for non-assignment discussions', function () 
 test('does not render #podcast_has_student_posts_container for non-course contexts', function () {
   const view = this.editView({
     withAssignment: true,
-    permissions: {CAN_MODERATE: true}
+    permissions: {CAN_MODERATE: true},
   })
   equal(view.$el.find('#podcast_enabled').length, 1)
   equal(view.$el.find('#podcast_has_student_posts_container').length, 0)
@@ -294,7 +294,7 @@ test('does not renders anonymous section if is a group discussion', function () 
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = false
   const view = this.editView({
-    permissions: {CAN_MODERATE: true}
+    permissions: {CAN_MODERATE: true},
   })
   equal(view.$el.find('#anonymous_section_header').length, 0)
 })
@@ -303,7 +303,7 @@ test('renders anonymous section if able to moderate', function () {
   ENV.REACT_DISCUSSIONS_POST = true
   ENV.context_is_not_group = true
   const view = this.editView({
-    permissions: {CAN_MODERATE: true}
+    permissions: {CAN_MODERATE: true},
   })
   equal(view.$el.find('#anonymous_section_header').length, 1)
 })
@@ -321,7 +321,7 @@ test('renders anonymous section with anonymous discussions off checked', functio
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: null}}
   const view = this.editView({
-    permissions: {CAN_MODERATE: true}
+    permissions: {CAN_MODERATE: true},
   })
   equal(view.$el.find('input[name=anonymous_state][value=null]:checked').length, 1)
 })
@@ -331,7 +331,7 @@ test('renders anonymous section with full_anonymity checked', function () {
   ENV.context_is_not_group = true
   ENV.DISCUSSION_TOPIC = {ATTRIBUTES: {anonymous_state: 'full_anonymity'}}
   const view = this.editView({
-    permissions: {CAN_MODERATE: true}
+    permissions: {CAN_MODERATE: true},
   })
   equal(view.$el.find('input[name=anonymous_state][value=full_anonymity]:checked').length, 1)
 })
@@ -339,7 +339,7 @@ test('renders anonymous section with full_anonymity checked', function () {
 test("renders 'points' as editable when user has grade-edit permissions", function () {
   const view = this.editView({
     permissions: {CAN_EDIT_GRADES: true},
-    withAssignment: true
+    withAssignment: true,
   })
   notOk(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
 })
@@ -347,7 +347,7 @@ test("renders 'points' as editable when user has grade-edit permissions", functi
 test("renders 'points' as readonly when user has grade-edit permissions", function () {
   const view = this.editView({
     permissions: {CAN_EDIT_GRADES: false},
-    withAssignment: true
+    withAssignment: true,
   })
   ok(view.$el.find('#discussion_topic_assignment_points_possible').attr('readonly'))
 })
@@ -366,7 +366,7 @@ QUnit.module(
         title,
         set_assignment: '1',
         assignment,
-        specific_sections: null
+        specific_sections: null,
       },
       []
     )
@@ -382,7 +382,7 @@ QUnit.module(
     const errors = view.validateBeforeSave(
       {
         title,
-        specific_sections: ['fake_section']
+        specific_sections: ['fake_section'],
       },
       []
     )
@@ -400,7 +400,7 @@ QUnit.module(
     const errors = view.validateBeforeSave(
       {
         title,
-        specific_sections: null
+        specific_sections: null,
       },
       []
     )
@@ -419,7 +419,7 @@ QUnit.module(
     const errors = view.validateBeforeSave(
       {
         title,
-        specific_sections: null
+        specific_sections: null,
       },
       []
     )
@@ -444,7 +444,7 @@ QUnit.module('EditView - Usage Rights', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('renders usage rights control', function () {
@@ -457,7 +457,7 @@ QUnit.module('EditView - ConditionalRelease', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1}
+      assignment: {id: 1},
     }
     $(document).on('submit', () => false)
     this.server = sinon.fakeServer.create({respondImmediately: true})
@@ -470,7 +470,7 @@ QUnit.module('EditView - ConditionalRelease', {
   },
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('does not show conditional release tab when feature not enabled', function () {
@@ -621,7 +621,7 @@ test('switches to conditional tab if save error contains conditional release err
     view.$discussionEditView.tabs('option', 'active', 0)
     view.showErrors({
       foo: {type: 'bar'},
-      conditional_release: {type: 'bat'}
+      conditional_release: {type: 'bat'},
     })
     equal(view.$discussionEditView.tabs('option', 'active'), 1)
     return resolved()
@@ -635,7 +635,7 @@ test('switches to details tab if save error does not contain conditional release
     view.$discussionEditView.tabs('option', 'active', 1)
     view.showErrors({
       foo: {type: 'bar'},
-      baz: {type: 'bat'}
+      baz: {type: 'bat'},
     })
     equal(view.$discussionEditView.tabs('option', 'active'), 0)
     return resolved()
@@ -661,7 +661,7 @@ QUnit.module('EditView: Assignment External Tools', {
 
   editView() {
     return editView.apply(this, arguments)
-  }
+  },
 })
 
 test('it attaches assignment external tools component in course context', function () {

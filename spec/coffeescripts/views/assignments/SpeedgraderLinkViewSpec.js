@@ -29,22 +29,22 @@ QUnit.module('SpeedgraderLinkView', {
 `)
     this.view = new SpeedgraderLinkView({
       model: this.model,
-      el: $('#fixtures').find('#assignment-speedgrader-link')
+      el: $('#fixtures').find('#assignment-speedgrader-link'),
     })
     return this.view.render()
   },
   teardown() {
     this.view.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.view, done, {a11yReport: true})
 })
 
-test('#toggleSpeedgraderLink toggles visibility of speedgrader link on change', function() {
+test('#toggleSpeedgraderLink toggles visibility of speedgrader link on change', function () {
   this.model.set('published', true)
   ok(!this.view.$el.hasClass('hidden'))
   this.model.set('published', false)

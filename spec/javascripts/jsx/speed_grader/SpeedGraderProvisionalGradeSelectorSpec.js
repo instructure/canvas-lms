@@ -20,7 +20,7 @@ import fakeENV from 'helpers/fakeENV'
 import React from 'react'
 import {mount} from 'enzyme'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import SpeedGraderProvisionalGradeSelector from 'ui/features/speed_grader/react/SpeedGraderProvisionalGradeSelector.js'
+import SpeedGraderProvisionalGradeSelector from 'ui/features/speed_grader/react/SpeedGraderProvisionalGradeSelector'
 
 QUnit.module('SpeedGraderProvisionalGradeSelector', hooks => {
   let $container

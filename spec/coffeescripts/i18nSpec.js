@@ -35,7 +35,7 @@ QUnit.module('I18n', {
 
   teardown() {
     return I18nStubber.clear()
-  }
+  },
 })
 
 test('missing placeholders', () => {
@@ -56,7 +56,7 @@ test('html safety: should html-escape translations and interpolations if any int
     t('bar', "only one of these won't get escaped: <input>, %{a}, %{b} & %{c}", {
       a: '<img>',
       b: $.raw('<br>'),
-      c: '<hr>'
+      c: '<hr>',
     }),
     'only one of these won&#39;t get escaped: &lt;input&gt;, &lt;img&gt;, <br> &amp; &lt;hr&gt;'
   )
@@ -128,38 +128,38 @@ QUnit.module('I18n localize number', {
 
   teardown() {
     return I18nStubber.clear()
-  }
+  },
 })
 
-test('uses delimiter from local', function() {
+test('uses delimiter from local', function () {
   equal(I18n.localizeNumber(1000), `1${this.delimiter}000`)
 })
 
-test('uses separator from local', function() {
+test('uses separator from local', function () {
   equal(I18n.localizeNumber(1.2), `1${this.separator}2`)
 })
 
-test('uses precision from number if not specified', function() {
+test('uses precision from number if not specified', function () {
   equal(I18n.localizeNumber(1.2345), `1${this.separator}2345`)
 })
 
-test('uses precision specified', function() {
+test('uses precision specified', function () {
   equal(I18n.localizeNumber(1.2, {precision: 3}), `1${this.separator}200`)
   equal(I18n.localizeNumber(1.2345, {precision: 3}), `1${this.separator}235`)
 })
 
-test('formats as a percentage if set to true', function() {
+test('formats as a percentage if set to true', function () {
   equal(I18n.localizeNumber(1.2, {percentage: true}), `1${this.separator}2%`)
 })
 
-test('allows stripping of 0s to be explicitly toggled along with precision', function() {
+test('allows stripping of 0s to be explicitly toggled along with precision', function () {
   equal(
     I18n.localizeNumber(1.12, {precision: 4, strip_insignificant_zeros: true}),
     `1${this.separator}12`
   )
 })
 
-test('does not have precision errors with large numbers', function() {
+test('does not have precision errors with large numbers', function () {
   equal(
     I18n.localizeNumber(50000000.12),
     `50${this.delimiter}000${this.delimiter}000${this.separator}12`

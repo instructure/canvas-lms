@@ -39,12 +39,12 @@ QUnit.module('Rce Abstraction - integration', {
         const fakeEditor = {
           mceInstance() {
             return {
-              on() {}
+              on() {},
             }
-          }
+          },
         }
         return renderCallback(fakeEditor)
-      }
+      },
     }
     return sandbox.stub(RCELoader, 'loadRCE').callsFake(callback => callback(this.fakeRceModule))
   },
@@ -52,7 +52,7 @@ QUnit.module('Rce Abstraction - integration', {
     fakeENV.teardown()
     $('#fixtures').empty()
     editorUtils.resetRCE()
-  }
+  },
 })
 
 async function loadNewEditor() {
@@ -61,8 +61,8 @@ async function loadNewEditor() {
     const tinyMCEInitOptions = {
       manageParent: true,
       tinyOptions: {
-        init_instance_callback: resolve
-      }
+        init_instance_callback: resolve,
+      },
     }
     RichContentEditor.loadNewEditor($target, tinyMCEInitOptions)
   })

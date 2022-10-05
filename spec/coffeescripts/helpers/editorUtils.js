@@ -27,5 +27,5 @@ export default {
     RCELoader.loadingFlag = false
     RCELoader.loadingCallbacks = []
     Sidebar.reset()
-  }
+  },
 }

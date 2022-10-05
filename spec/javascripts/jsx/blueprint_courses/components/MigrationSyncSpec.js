@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import MigrationSync from 'ui/features/blueprint_course_master/react/components/MigrationSync.js'
+import MigrationSync from 'ui/features/blueprint_course_master/react/components/MigrationSync'
 
 QUnit.module('MigrationSync component')
 

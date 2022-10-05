@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AssessmentAuditButton from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentAuditButton.js'
+import AssessmentAuditButton from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AssessmentAuditButton'
 
 QUnit.module('AssessmentAuditButton', suiteHooks => {
   let $container

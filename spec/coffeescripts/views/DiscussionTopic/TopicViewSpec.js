@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import TopicView from 'ui/features/discussion_topic/backbone/views/TopicView.js'
+import TopicView from 'ui/features/discussion_topic/backbone/views/TopicView'
 import Backbone from '@canvas/backbone'
 import fakeENV from 'helpers/fakeENV'
-import DiscussionFilterState from 'ui/features/discussion_topic/backbone/models/DiscussionFilterState.js'
+import DiscussionFilterState from 'ui/features/discussion_topic/backbone/models/DiscussionFilterState'
 import ReactDOM from 'react-dom'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
@@ -37,11 +37,11 @@ QUnit.module('TopicView', hooks => {
         IS_ASSIGNMENT: false,
         ASSIGNMENT_ID: null,
         CAN_SUBSCRIBE: false,
-        TITLE: 'discussion'
+        TITLE: 'discussion',
       },
       PERMISSIONS: {CAN_ATTACH: false, CAN_REPLY: false},
       ROOT_URL: 'foo',
-      THREADED: false
+      THREADED: false,
     }
     ENV.use_rce_enhancements = true
     ENV.COURSE_ID = '1'
@@ -58,7 +58,7 @@ QUnit.module('TopicView', hooks => {
     test('opens direct share send modal', () => {
       const view = new TopicView({
         model: new Backbone.Model(),
-        filterModel: new DiscussionFilterState()
+        filterModel: new DiscussionFilterState(),
       })
       view.$announcementCog = {focus() {}}
 
@@ -68,7 +68,7 @@ QUnit.module('TopicView', hooks => {
       deepEqual(props, {
         open: true,
         sourceCourseId: '1',
-        contentShare: {content_type: 'discussion_topic', content_id: '42'}
+        contentShare: {content_type: 'discussion_topic', content_id: '42'},
       })
       onDismiss()
       equal(ReactDOM.render.secondCall.args[0].props.open, false)
@@ -77,7 +77,7 @@ QUnit.module('TopicView', hooks => {
     test('opens direct share copy modal', () => {
       const view = new TopicView({
         model: new Backbone.Model(),
-        filterModel: new DiscussionFilterState()
+        filterModel: new DiscussionFilterState(),
       })
       view.$announcementCog = {focus() {}}
 
@@ -87,7 +87,7 @@ QUnit.module('TopicView', hooks => {
       deepEqual(props, {
         open: true,
         sourceCourseId: '1',
-        contentSelection: {discussion_topics: ['42']}
+        contentSelection: {discussion_topics: ['42']},
       })
       onDismiss()
       equal(ReactDOM.render.secondCall.args[0].props.open, false)

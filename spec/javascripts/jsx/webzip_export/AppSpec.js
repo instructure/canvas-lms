@@ -19,7 +19,7 @@
 import React from 'react'
 import enzyme from 'enzyme'
 import moxios from 'moxios'
-import WebZipExportApp from 'ui/features/webzip_export/react/App.js'
+import WebZipExportApp from 'ui/features/webzip_export/react/App'
 
 QUnit.module('WebZip Export App', {
   setup() {

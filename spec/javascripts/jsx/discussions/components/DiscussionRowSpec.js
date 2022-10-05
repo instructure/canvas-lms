@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import {merge} from 'lodash'
 import fakeENV from 'helpers/fakeENV'
-import {DiscussionRow} from 'ui/features/discussion_topics_index/react/components/DiscussionRow.js'
+import {DiscussionRow} from 'ui/features/discussion_topics_index/react/components/DiscussionRow'
 
 // We can't call the wrapped component because a lot of these tests are depending
 // on the class component instances. So we've got to cobble up enough of the date

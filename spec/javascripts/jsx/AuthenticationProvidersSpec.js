@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AuthenticationProviders from 'ui/features/authentication_providers/jquery/index.js'
+import AuthenticationProviders from 'ui/features/authentication_providers/jquery/index'
 
 QUnit.module('AuthenticationProviders', () => {
   QUnit.module('.changedAuthType()', hooks => {

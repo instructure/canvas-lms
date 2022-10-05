@@ -29,54 +29,54 @@ function setupMocks() {
         upload_params: {
           Filename: 'foo',
           success_action_status: '201',
-          'content-type': 'text/plain'
+          'content-type': 'text/plain',
         },
-        file_param: 'file'
+        file_param: 'file',
       },
-      progress_url: '/api/v1/progress/35'
-    }
+      progress_url: '/api/v1/progress/35',
+    },
   })
   moxios.stubRequest('/upload/url', {
     status: 201,
-    response: '<PostResponse></PostResponse>'
+    response: '<PostResponse></PostResponse>',
   })
   moxios.stubRequest('/api/v1/courses/1/content_migrations/17', {
     status: 200,
     response: {
-      progress_url: '/api/v1/progress/35'
-    }
+      progress_url: '/api/v1/progress/35',
+    },
   })
   moxios.stubRequest('/api/v1/progress/35', {
     status: 200,
     response: {
       workflow_state: undefined, // 'failed' if bad things happened
-      completion: 90
-    }
+      completion: 90,
+    },
   })
   moxios.stubRequest('/api/v1/progress/35#90', {
     status: 200,
     response: {
       workflow_state: undefined, // 'failed' if bad things happened
-      completion: 100
-    }
+      completion: 100,
+    },
   })
 }
 
 const folder = {
   id: 1,
   folders: {
-    fetch: () => Promise.resolve()
+    fetch: () => Promise.resolve(),
   },
   files: {
-    fetch: () => Promise.resolve()
-  }
+    fetch: () => Promise.resolve(),
+  },
 }
 
-const mockFileOptions = function() {
+const mockFileOptions = function () {
   // I realize type: 'text/plain' looks wrong for a zipuploader test,
   // but we need a File and we're never really unzipping
   return {
-    file: new File(['hello world'], 'foo', {type: 'text/plain'})
+    file: new File(['hello world'], 'foo', {type: 'text/plain'}),
   }
 }
 
@@ -87,10 +87,10 @@ QUnit.module('ZipUploader', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
-test('posts to the files endpoint to kick off upload', function(assert) {
+test('posts to the files endpoint to kick off upload', function (assert) {
   const done = assert.async()
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
   sinon.stub(zuploader, 'onPreflightComplete')
@@ -103,7 +103,7 @@ test('posts to the files endpoint to kick off upload', function(assert) {
   })
 })
 
-test('stores params from preflight for actual upload', function(assert) {
+test('stores params from preflight for actual upload', function (assert) {
   const done = assert.async()
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
   sinon.stub(zuploader, '_actualUpload')
@@ -117,7 +117,7 @@ test('stores params from preflight for actual upload', function(assert) {
   })
 })
 
-test('completes upload after preflight', function(assert) {
+test('completes upload after preflight', function (assert) {
   const done = assert.async()
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
 
@@ -131,7 +131,7 @@ test('completes upload after preflight', function(assert) {
   })
 })
 
-test('tracks progress', function(assert) {
+test('tracks progress', function (assert) {
   const done = assert.async()
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
   sandbox.stub(zuploader, 'trackProgress')
@@ -144,26 +144,26 @@ test('tracks progress', function(assert) {
   })
 })
 
-test('roundProgress returns back rounded values', function() {
+test('roundProgress returns back rounded values', function () {
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
   sandbox.stub(zuploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
   equal(zuploader.roundProgress(), 18)
 })
 
-test('roundProgress returns back values no greater than 100', function() {
+test('roundProgress returns back values no greater than 100', function () {
   const zuploader = new ZipUploader(mockFileOptions(), folder, '1', 'courses')
   sandbox.stub(zuploader, 'getProgress').returns(1.1) // something greater than 100%
   equal(zuploader.roundProgress(), 100)
 })
 
-test('getFileName returns back the option name if one exists', function() {
+test('getFileName returns back the option name if one exists', function () {
   const options = mockFileOptions()
   options.name = 'use this one'
   const zuploader = new ZipUploader(options, folder, '1', 'courses')
   equal(zuploader.getFileName(), 'use this one')
 })
 
-test('getFileName returns back the actual file if no optinal name is given', function() {
+test('getFileName returns back the actual file if no optinal name is given', function () {
   const options = mockFileOptions()
   const zuploader = new ZipUploader(options, folder, '1', 'courses')
   equal(zuploader.getFileName(), 'foo')

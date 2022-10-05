@@ -18,7 +18,7 @@
 
 import {defer} from 'lodash'
 import $ from 'jquery'
-import LDBLoginPopup from 'ui/features/take_quiz/backbone/views/LDBLoginPopup.js'
+import LDBLoginPopup from 'ui/features/take_quiz/backbone/views/LDBLoginPopup'
 
 let whnd
 let popup
@@ -37,7 +37,7 @@ QUnit.module('LDBLoginPopup', {
     }
 
     if (server) server.restore()
-  }
+  },
 })
 
 test('it should exec', 1, () => {
@@ -73,9 +73,7 @@ test('it should close after a successful login', 1, () => {
 
   popup.on('close', onClose)
   popup.on('open', (e, document) => {
-    $(document)
-      .find('.btn-primary')
-      .click()
+    $(document).find('.btn-primary').click()
     server.respond()
     ok(onClose.called, 'popup should be closed')
   })
@@ -91,9 +89,7 @@ test('it should trigger the @login_success event', 1, () => {
 
   popup.on('login_success', onSuccess)
   popup.on('open', (e, document) => {
-    $(document)
-      .find('.btn-primary')
-      .click()
+    $(document).find('.btn-primary').click()
     server.respond()
     ok(onSuccess.called, '@login_success handler gets called')
   })
@@ -109,9 +105,7 @@ test('it should trigger the @login_failure event', 1, () => {
 
   popup.on('login_failure', onFailure)
   popup.on('open', (e, document) => {
-    $(document)
-      .find('.btn-primary')
-      .click()
+    $(document).find('.btn-primary').click()
     server.respond()
     ok(onFailure.called, '@login_failure handler gets called')
   })
@@ -119,7 +113,7 @@ test('it should trigger the @login_failure event', 1, () => {
   whnd = popup.exec()
 })
 
-test('it should pop back in if student closes it', function(assert) {
+test('it should pop back in if student closes it', function (assert) {
   assert.expect(5)
   const done = assert.async()
   let latestWindow
@@ -129,7 +123,7 @@ test('it should pop back in if student closes it', function(assert) {
   const originalOpen = window.open
 
   // needed for proper cleanup of windows
-  const openStub = sandbox.stub(window, 'open').callsFake(function() {
+  const openStub = sandbox.stub(window, 'open').callsFake(function () {
     return (latestWindow = originalOpen.apply(this, arguments))
   })
 
@@ -142,9 +136,7 @@ test('it should pop back in if student closes it', function(assert) {
   popup.on('open', onOpen)
   popup.on('close', onClose)
   popup.one('open', (e, document) => {
-    $(document)
-      .find('.btn-primary')
-      .click()
+    $(document).find('.btn-primary').click()
     server.respond()
     ok(onFailure.calledOnce, 'logged out by passing in bad credentials')
 

@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import AuthTypePicker from 'ui/features/authentication_providers/react/AuthTypePicker.js'
+import AuthTypePicker from 'ui/features/authentication_providers/react/AuthTypePicker'
 import {mount} from 'enzyme'
 
 const authTypes = [

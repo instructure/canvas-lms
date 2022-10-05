@@ -21,7 +21,7 @@ import jQuery from 'jquery'
 const $fixtures = jQuery('#fixtures')
 const fixtures = {}
 let fixtureId = 1
-export default function(fixture) {
+export default function (fixture) {
   const id = fixture + fixtureId++
   const path = `fixtures/${fixture}.html`
   jQuery.ajax({
@@ -32,12 +32,12 @@ export default function(fixture) {
     success(html) {
       return (fixtures[id] = jQuery('<div/>', {
         html,
-        id
+        id,
       }).appendTo($fixtures))
     },
     error() {
       return console.error('Failed to load fixture', path)
-    }
+    },
   })
   return fixtures[id]
 }

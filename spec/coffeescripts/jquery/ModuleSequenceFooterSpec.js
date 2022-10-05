@@ -25,7 +25,7 @@ const default_course_url =
 const server_200_response = data => [
   200,
   {'Content-Type': 'application/json'},
-  JSON.stringify(data)
+  JSON.stringify(data),
 ]
 
 const nextButton = el => el.find('.module-sequence-footer-button--next').last()
@@ -35,18 +35,18 @@ const moduleData = (args = {}) => ({
     {
       current: {id: 768, module_id: 123, title: 'A lonely page', type: 'Page'},
       next: {id: 111, module_id: 123, title: 'Project 33', type: 'Assignment'},
-      mastery_path: args.mastery_path
-    }
+      mastery_path: args.mastery_path,
+    },
   ],
   modules: [{id: 123, name: 'Module A'}],
-  ...args
+  ...args,
 })
 
 const basePathData = (args = {}) => ({
   is_student: true,
   choose_url: 'chew-z',
   modules_url: 'mod.module.mod',
-  ...args
+  ...args,
 })
 
 QUnit.module('ModuleSequenceFooter: init', {
@@ -58,16 +58,16 @@ QUnit.module('ModuleSequenceFooter: init', {
 
   teardown() {
     this.$testEl.remove()
-  }
+  },
 })
 
-test('returns jquery object of itself', function() {
+test('returns jquery object of itself', function () {
   const jobj = this.$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
   ok(jobj instanceof $, 'returns an jquery instance of itself')
 })
 
 test('throws error if option is not set', () =>
-  throws(function() {
+  throws(function () {
     this.$testEl.moduleSequenceFooter()
   }, 'throws error when no options are passed in'))
 
@@ -75,19 +75,19 @@ test('generates a url based on the course_id', () => {
   const msf = new $.fn.moduleSequenceFooter.MSFClass({
     courseID: 42,
     assetType: 'Assignment',
-    assetID: 42
+    assetID: 42,
   })
   equal(msf.url, '/api/v1/courses/42/module_item_sequence', 'generates a url based on the courseID')
 })
 
-test('attaches msfAnimation function', function() {
+test('attaches msfAnimation function', function () {
   this.$testEl.moduleSequenceFooter({assetType: 'Assignment', assetID: 42})
   notStrictEqual(this.$testEl.msfAnimation, undefined, 'msfAnimation function defined')
 })
 
-test('accepts animation option', function() {
+test('accepts animation option', function () {
   $.fn.moduleSequenceFooter.MSFClass.prototype.fetch.restore()
-  sandbox.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').callsFake(function() {
+  sandbox.stub($.fn.moduleSequenceFooter.MSFClass.prototype, 'fetch').callsFake(function () {
     this.success({
       items: [
         {
@@ -96,22 +96,22 @@ test('accepts animation option', function() {
             id: 42,
             module_id: 73,
             title: 'A lonely page',
-            type: 'Page'
+            type: 'Page',
           },
           next: {
             id: 43,
             module_id: 73,
             title: 'Another lonely page',
-            type: 'Page'
-          }
-        }
+            type: 'Page',
+          },
+        },
       ],
       modules: [
         {
           id: 73,
-          name: 'A lonely module'
-        }
-      ]
+          name: 'A lonely module',
+        },
+      ],
     })
     const d = $.Deferred()
     d.resolve()
@@ -151,7 +151,7 @@ QUnit.module('ModuleSequenceFooter: rendering', {
   teardown() {
     this.server.restore()
     this.$testEl.remove()
-  }
+  },
 })
 
 const nullButtonData = (args = {}) => ({
@@ -162,22 +162,22 @@ const nullButtonData = (args = {}) => ({
         id: 768,
         module_id: 123,
         title: 'A lonely page',
-        type: 'Page'
+        type: 'Page',
       },
       next: null,
-      mastery_path: args.mastery_path
-    }
+      mastery_path: args.mastery_path,
+    },
   ],
   modules: [
     {
       id: 123,
-      name: 'Module A'
-    }
+      name: 'Module A',
+    },
   ],
-  ...args
+  ...args,
 })
 
-test('there is no button when next or prev data is null', function() {
+test('there is no button when next or prev data is null', function () {
   this.server.respondWith('GET', default_course_url, server_200_response(nullButtonData()))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
@@ -192,39 +192,39 @@ const moduleTooltipData = {
         id: 769,
         module_id: 111,
         title: 'Project 1',
-        type: 'Assignment'
+        type: 'Assignment',
       },
       current: {
         id: 768,
         module_id: 123,
         title: 'A lonely page',
-        type: 'Page'
+        type: 'Page',
       },
       next: {
         id: 111,
         module_id: 666,
         title: 'Project 33',
-        type: 'Assignment'
-      }
-    }
+        type: 'Assignment',
+      },
+    },
   ],
 
   modules: [
     {
       id: 123,
-      name: 'Module A'
+      name: 'Module A',
     },
     {
       id: 666,
-      name: 'Module B'
+      name: 'Module B',
     },
     {
       id: 111,
-      name: 'Module C'
-    }
-  ]
+      name: 'Module C',
+    },
+  ],
 }
-test('buttons show modules tooltip when current module id != next or prev module id', function() {
+test('buttons show modules tooltip when current module id != next or prev module id', function () {
   this.server.respondWith('GET', default_course_url, server_200_response(moduleTooltipData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
@@ -238,9 +238,7 @@ test('buttons show modules tooltip when current module id != next or prev module
     'displays previous module tooltip'
   )
   ok(
-    nextButton(this.$testEl)
-      .data('html-tooltip-title')
-      .match('Module B'),
+    nextButton(this.$testEl).data('html-tooltip-title').match('Module B'),
     'displays next module tooltip'
   )
 })
@@ -252,32 +250,32 @@ const itemTooltipData = {
         id: 769,
         module_id: 123,
         title: 'Project 1',
-        type: 'Assignment'
+        type: 'Assignment',
       },
       current: {
         id: 768,
         module_id: 123,
         title: 'A lonely page',
-        type: 'Page'
+        type: 'Page',
       },
       next: {
         id: 111,
         module_id: 123,
         title: 'Project 33',
-        type: 'Assignment'
-      }
-    }
+        type: 'Assignment',
+      },
+    },
   ],
 
   modules: [
     {
       id: 123,
-      name: 'Module A'
-    }
-  ]
+      name: 'Module A',
+    },
+  ],
 }
 
-test('buttons show item tooltip when current module id == next or prev module id', function() {
+test('buttons show item tooltip when current module id == next or prev module id', function () {
   this.server.respondWith('GET', default_course_url, server_200_response(itemTooltipData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
@@ -291,14 +289,12 @@ test('buttons show item tooltip when current module id == next or prev module id
     'displays previous item tooltip'
   )
   ok(
-    nextButton(this.$testEl)
-      .data('html-tooltip-title')
-      .match('Project 33'),
+    nextButton(this.$testEl).data('html-tooltip-title').match('Project 33'),
     'displays next item tooltip'
   )
 })
 
-test('if url has a module_item_id use that as the assetID and ModuleItem as the type instead', function() {
+test('if url has a module_item_id use that as the assetID and ModuleItem as the type instead', function () {
   this.server.respondWith(
     'GET',
     '/api/v1/courses/42/module_item_sequence?asset_type=ModuleItem&asset_id=999&frame_external_urls=true',
@@ -309,13 +305,13 @@ test('if url has a module_item_id use that as the assetID and ModuleItem as the 
     courseID: 42,
     assetType: 'Assignment',
     assetID: 123,
-    location: {search: '?module_item_id=999'}
+    location: {search: '?module_item_id=999'},
   })
   this.server.respond()
   equal(this.server.requests[0].status, '200', 'Request was successful')
 })
 
-test('show gets called when rendering', function() {
+test('show gets called when rendering', function () {
   sandbox.stub(this.$testEl, 'show')
   this.server.respondWith('GET', default_course_url, server_200_response(itemTooltipData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -324,7 +320,7 @@ test('show gets called when rendering', function() {
   ok(this.$testEl.show.called, 'show called')
 })
 
-test('resize event gets triggered', function(assert) {
+test('resize event gets triggered', function (assert) {
   const done = assert.async()
   $(window).resize(() => {
     ok(true, 'resize event triggered')
@@ -336,7 +332,7 @@ test('resize event gets triggered', function(assert) {
   this.server.respond()
 })
 
-test('provides correct tooltip for mastery path when awaiting choice', function() {
+test('provides correct tooltip for mastery path when awaiting choice', function () {
   const pathData = moduleData({mastery_path: basePathData({awaiting_choice: true})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -347,18 +343,12 @@ test('provides correct tooltip for mastery path when awaiting choice', function(
     btn.data('html-tooltip-title').match('Choose the next mastery path'),
     'indicates a user needs to choose the next mastery path'
   )
-  ok(
-    btn
-      .find('a')
-      .attr('href')
-      .match('chew-z'),
-    'displays the correct link'
-  )
+  ok(btn.find('a').attr('href').match('chew-z'), 'displays the correct link')
 })
 
-test('provides correct tooltip for mastery path when awaiting choice and not a student', function() {
+test('provides correct tooltip for mastery path when awaiting choice and not a student', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({awaiting_choice: true, is_student: false})
+    mastery_path: basePathData({awaiting_choice: true, is_student: false}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -371,7 +361,7 @@ test('provides correct tooltip for mastery path when awaiting choice and not a s
   )
 })
 
-test('provides correct tooltip for mastery path when sequence is locked', function() {
+test('provides correct tooltip for mastery path when sequence is locked', function () {
   const pathData = moduleData({mastery_path: basePathData({locked: true})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -382,16 +372,10 @@ test('provides correct tooltip for mastery path when sequence is locked', functi
     btn.data('html-tooltip-title').match('Next mastery path is currently locked'),
     'indicates there are locked mastery path items'
   )
-  ok(
-    btn
-      .find('a')
-      .attr('href')
-      .match('mod.module.mod'),
-    'displays the correct link'
-  )
+  ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
-test('provides correct tooltip for mastery path when sequence is locked and not a student', function() {
+test('provides correct tooltip for mastery path when sequence is locked and not a student', function () {
   const pathData = moduleData({mastery_path: basePathData({locked: true, is_student: false})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -404,7 +388,7 @@ test('provides correct tooltip for mastery path when sequence is locked and not 
   )
 })
 
-test('provides correct tooltip for mastery path when processing', function() {
+test('provides correct tooltip for mastery path when processing', function () {
   const pathData = moduleData({mastery_path: basePathData({still_processing: true})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -415,18 +399,12 @@ test('provides correct tooltip for mastery path when processing', function() {
     btn.data('html-tooltip-title').match('Next mastery path is still processing'),
     'indicates path is processing'
   )
-  ok(
-    btn
-      .find('a')
-      .attr('href')
-      .match('mod.module.mod'),
-    'displays the correct link'
-  )
+  ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
-test('provides correct tooltip for mastery path when path is processing and not a student', function() {
+test('provides correct tooltip for mastery path when path is processing and not a student', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({still_processing: true, is_student: false})
+    mastery_path: basePathData({still_processing: true, is_student: false}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -439,91 +417,66 @@ test('provides correct tooltip for mastery path when path is processing and not 
   )
 })
 
-test('properly disables the next button when path locked and modules tab disabled', function() {
+test('properly disables the next button when path locked and modules tab disabled', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({locked: true, modules_tab_disabled: true})
+    mastery_path: basePathData({locked: true, modules_tab_disabled: true}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    nextButton(this.$testEl)
-      .find('a')
-      .attr('disabled'),
-    'disables the button'
-  )
+  ok(nextButton(this.$testEl).find('a').attr('disabled'), 'disables the button')
 })
 
-test('does not disable the next button when path locked and modules tab disabled and not a student', function() {
+test('does not disable the next button when path locked and modules tab disabled and not a student', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({locked: true, modules_tab_disabled: true, is_student: false})
+    mastery_path: basePathData({locked: true, modules_tab_disabled: true, is_student: false}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    !nextButton(this.$testEl)
-      .find('a')
-      .attr('disabled'),
-    'does not disable the button'
-  )
+  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
 })
 
-test('properly disables the next button when path processing and modules tab disabled', function() {
+test('properly disables the next button when path processing and modules tab disabled', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({still_processing: true, modules_tab_disabled: true})
+    mastery_path: basePathData({still_processing: true, modules_tab_disabled: true}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    nextButton(this.$testEl)
-      .find('a')
-      .attr('disabled'),
-    'disables the button'
-  )
+  ok(nextButton(this.$testEl).find('a').attr('disabled'), 'disables the button')
 })
 
-test('does not disable the next button when path processing and modules tab disabled and not a student', function() {
+test('does not disable the next button when path processing and modules tab disabled and not a student', function () {
   const pathData = moduleData({
     mastery_path: basePathData({
       still_processing: true,
       modules_tab_disabled: true,
-      is_student: false
-    })
+      is_student: false,
+    }),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    !nextButton(this.$testEl)
-      .find('a')
-      .attr('disabled'),
-    'does not disable the button'
-  )
+  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
 })
 
-test('does not disable the next button when awaiting choice and modules tab disabled', function() {
+test('does not disable the next button when awaiting choice and modules tab disabled', function () {
   const pathData = moduleData({
-    mastery_path: basePathData({awaiting_choice: true, modules_tab_disabled: true})
+    mastery_path: basePathData({awaiting_choice: true, modules_tab_disabled: true}),
   })
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()
 
-  ok(
-    !nextButton(this.$testEl)
-      .find('a')
-      .attr('disabled'),
-    'does not disable the button'
-  )
+  ok(!nextButton(this.$testEl).find('a').attr('disabled'), 'does not disable the button')
 })
 
-test('properly shows next button when no next items yet exist and paths are locked', function() {
+test('properly shows next button when no next items yet exist and paths are locked', function () {
   const pathData = nullButtonData({mastery_path: basePathData({locked: true})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -534,16 +487,10 @@ test('properly shows next button when no next items yet exist and paths are lock
     btn.data('html-tooltip-title').match('Next mastery path is currently locked'),
     'indicates there are locked mastery path items'
   )
-  ok(
-    btn
-      .find('a')
-      .attr('href')
-      .match('mod.module.mod'),
-    'displays the correct link'
-  )
+  ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
-test('properly shows next button when no next items yet exist and paths are processing', function() {
+test('properly shows next button when no next items yet exist and paths are processing', function () {
   const pathData = nullButtonData({mastery_path: basePathData({still_processing: true})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -554,16 +501,10 @@ test('properly shows next button when no next items yet exist and paths are proc
     btn.data('html-tooltip-title').match('Next mastery path is still processing'),
     'indicates path is processing'
   )
-  ok(
-    btn
-      .find('a')
-      .attr('href')
-      .match('mod.module.mod'),
-    'displays the correct link'
-  )
+  ok(btn.find('a').attr('href').match('mod.module.mod'), 'displays the correct link')
 })
 
-test('does not show next button when no next items exist and paths are unlocked', function() {
+test('does not show next button when no next items exist and paths are unlocked', function () {
   const pathData = nullButtonData({mastery_path: basePathData({still_processing: false})})
   this.server.respondWith('GET', default_course_url, server_200_response(pathData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
@@ -579,33 +520,33 @@ const externalUrlTypeData = {
         id: 769,
         module_id: 123,
         title: 'Not an external item',
-        type: 'Assignment'
+        type: 'Assignment',
       },
       current: {
         id: 768,
         module_id: 123,
         title: 'A lonely page',
-        type: 'Page'
+        type: 'Page',
       },
       next: {
         id: 111,
         module_id: 123,
         title: 'Rendering of the project',
         type: 'ExternalUrl',
-        new_tab: true
-      }
-    }
+        new_tab: true,
+      },
+    },
   ],
 
   modules: [
     {
       id: 123,
-      name: 'Module A'
-    }
-  ]
+      name: 'Module A',
+    },
+  ],
 }
 
-test('SR reads new window when button linking to ExternalURL type is focused', function() {
+test('SR reads new window when button linking to ExternalURL type is focused', function () {
   this.server.respondWith('GET', default_course_url, server_200_response(externalUrlTypeData))
   this.$testEl.moduleSequenceFooter({courseID: 42, assetType: 'Assignment', assetID: 123})
   this.server.respond()

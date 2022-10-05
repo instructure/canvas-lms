@@ -28,11 +28,11 @@ QUnit.module('Quiz', {
   setup() {
     this.quiz = new Quiz({
       id: 1,
-      html_url: 'http://localhost:3000/courses/1/quizzes/24'
+      html_url: 'http://localhost:3000/courses/1/quizzes/24',
     })
     this.ajaxStub = sandbox.stub($, 'ajaxJSON')
   },
-  teardown() {}
+  teardown() {},
 })
 
 test('#initialize ignores assignment if not given', function () {
@@ -42,7 +42,7 @@ test('#initialize ignores assignment if not given', function () {
 test('#initialize sets assignment', function () {
   const assign = {
     id: 1,
-    title: 'Foo Bar'
+    title: 'Foo Bar',
   }
   this.quiz = new Quiz({assignment: assign})
   equal(this.quiz.get('assignment').constructor, Assignment)
@@ -80,7 +80,7 @@ test('#initialize should set deletion_url from html url', function () {
 test('#initialize should set title_label from title', function () {
   this.quiz = new Quiz({
     title: 'My Quiz!',
-    readable_type: 'Quiz'
+    readable_type: 'Quiz',
   })
   equal(this.quiz.get('title_label'), 'My Quiz!')
 })
@@ -102,7 +102,7 @@ test('#initialize sets unpublishable to false', function () {
 test('#initialize sets publishable from can_unpublish and published', function () {
   this.quiz = new Quiz({
     can_unpublish: false,
-    published: true
+    published: true,
   })
   ok(!this.quiz.get('unpublishable'))
 })
@@ -110,12 +110,12 @@ test('#initialize sets publishable from can_unpublish and published', function (
 test('#initialize sets question count', function () {
   this.quiz = new Quiz({
     question_count: 1,
-    published: true
+    published: true,
   })
   equal(this.quiz.get('question_count_label'), '1 Question')
   this.quiz = new Quiz({
     question_count: 2,
-    published: true
+    published: true,
   })
   equal(this.quiz.get('question_count_label'), '2 Questions')
 })
@@ -148,7 +148,7 @@ test('#initialize sets possible points count with 1.23 points', function () {
 test('#initialize points possible to null if ungraded survey', function () {
   this.quiz = new Quiz({
     points_possible: 5,
-    quiz_type: 'survey'
+    quiz_type: 'survey',
   })
   equal(this.quiz.get('possible_points_label'), '')
 })
@@ -177,7 +177,7 @@ QUnit.module('Quiz#multipleDueDates')
 
 test('checks for multiple due dates from assignment overrides', () => {
   const quiz = new Quiz({
-    all_dates: [{title: 'Winter'}, {title: 'Summer'}]
+    all_dates: [{title: 'Winter'}, {title: 'Summer'}],
   })
   ok(quiz.multipleDueDates())
 })
@@ -193,11 +193,11 @@ QUnit.module('Quiz.Next', {
       id: 7,
       html_url: 'http://localhost:3000/courses/1/assignments/7',
       assignment_id: 7,
-      quiz_type: 'quizzes.next'
+      quiz_type: 'quizzes.next',
     })
     this.ajaxStub = sandbox.stub($, 'ajaxJSON')
   },
-  teardown() {}
+  teardown() {},
 })
 
 test('#initialize model record id', function () {
@@ -235,19 +235,19 @@ QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {
   setup() {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
-      FLAGS: {new_quizzes_modules_support: true}
+      FLAGS: {new_quizzes_modules_support: true},
     })
     this.quiz = new Quiz({
       id: 7,
       html_url: 'http://localhost:3000/courses/1/assignments/7',
       assignment_id: 7,
-      quiz_type: 'quizzes.next'
+      quiz_type: 'quizzes.next',
     })
     this.ajaxStub = sandbox.stub($, 'ajaxJSON')
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('#initialize should set url as edit_url', function () {
@@ -261,8 +261,8 @@ test('gets the due dates from the assignment overrides', () => {
   const dates = [
     new DateGroup({
       due_at: dueAt,
-      title: 'Everyone'
-    })
+      title: 'Everyone',
+    }),
   ]
   const quiz = new Quiz({all_dates: dates})
   const allDates = quiz.allDates()
@@ -282,13 +282,13 @@ test('gets the due date for section instead of null', () => {
     all_dates: [
       {
         due_at: null,
-        title: 'Everyone'
+        title: 'Everyone',
       },
       {
         due_at: dueAt,
-        title: 'Summer'
-      }
-    ]
+        title: 'Summer',
+      },
+    ],
   })
   sandbox.stub(quiz, 'multipleDueDates').returns(false)
   deepEqual(quiz.singleSectionDueDate(), dueAt.toISOString())
@@ -337,7 +337,7 @@ test('includes buildUrl', () => {
   const quiz = new Quiz({
     id: '1',
     url: 'http://example.com/quizzes/1',
-    html_url: 'http://example.com/quizzes/1'
+    html_url: 'http://example.com/quizzes/1',
   })
   const json = quiz.toView()
   deepEqual(json.buildUrl, 'http://example.com/quizzes/1')
@@ -345,7 +345,7 @@ test('includes buildUrl', () => {
 
 test('includes multipleDueDates', () => {
   const quiz = new Quiz({
-    all_dates: [{title: 'Summer'}, {title: 'Winter'}]
+    all_dates: [{title: 'Summer'}, {title: 'Winter'}],
   })
   const json = quiz.toView()
   deepEqual(json.multipleDueDates, true)
@@ -353,7 +353,7 @@ test('includes multipleDueDates', () => {
 
 test('includes allDates', () => {
   const quiz = new Quiz({
-    all_dates: [{title: 'Summer'}, {title: 'Winter'}]
+    all_dates: [{title: 'Summer'}, {title: 'Winter'}],
   })
   const json = quiz.toView()
   equal(json.allDates.length, 2)
@@ -365,13 +365,13 @@ test('includes singleSectionDueDate', () => {
     all_dates: [
       {
         due_at: null,
-        title: 'Everyone'
+        title: 'Everyone',
       },
       {
         due_at: dueAt,
-        title: 'Summer'
-      }
-    ]
+        title: 'Summer',
+      },
+    ],
   })
   sandbox.stub(quiz, 'multipleDueDates').returns(false)
   const json = quiz.toView()
@@ -386,7 +386,7 @@ test('make ajax call with right url when duplicate is called', () => {
   const quiz = new Quiz({
     name: 'foo',
     id: assignmentID,
-    course_id: courseID
+    course_id: courseID,
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   quiz.duplicate()
@@ -405,7 +405,7 @@ test('make ajax call with right url when duplicate_failed is called', () => {
     id: assignmentID,
     original_assignment_id: originalAssignmentID,
     course_id: courseID,
-    original_course_id: originalCourseID
+    original_course_id: originalCourseID,
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   quiz.duplicate_failed()
@@ -426,7 +426,7 @@ test('make ajax call with right url when retry_migration is called', () => {
     name: 'foo',
     id: assignmentID,
     original_quiz_id: originalQuizID,
-    course_id: courseID
+    course_id: courseID,
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   quiz.retry_migration()
@@ -445,7 +445,7 @@ QUnit.module('Assignment#pollUntilFinishedLoading (duplicate)', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test('polls for updates (duplicate)', function () {
@@ -473,7 +473,7 @@ QUnit.module('Assignment#pollUntilFinishedLoading (migration)', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test('polls for updates (migration)', function () {

@@ -28,16 +28,16 @@ const setUp = function () {
     addButton: sinon.spy(),
     getContent() {},
     selection: {
-      getContent() {}
+      getContent() {},
     },
     ui: {
       registry: {
         addButton: sinon.spy(),
         addMenuButton: sinon.spy(),
         addIcon: sinon.spy(),
-        addNestedMenuItem: sinon.spy()
-      }
-    }
+        addNestedMenuItem: sinon.spy(),
+      },
+    },
   }
   this.INST = INST
 }
@@ -48,7 +48,7 @@ QUnit.module('initializeExternalTools', {
   },
   teardown() {
     return $(window).off('beforeunload')
-  }
+  },
 })
 
 test('adds MRU menu button to the toolbar', function () {

@@ -27,46 +27,46 @@ QUnit.module('ExternalToolLaunchView', {
     this.mockReturnView = new Backbone.View()
     this.launchView = new ExternalToolLaunchView({
       contentReturnView: this.mockReturnView,
-      model: this.mockMigration
+      model: this.mockMigration,
     })
     return $('#fixtures').html(this.launchView.render().el)
   },
   teardown() {
     return this.launchView.remove()
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.launchView, done, {a11yReport: true})
 })
 
-test('calls render on return view when launch button clicked', function() {
+test('calls render on return view when launch button clicked', function () {
   sandbox.stub(this.mockReturnView, 'render').returns(this)
   this.launchView.$el.find('#externalToolLaunch').click()
   ok(this.mockReturnView.render.calledOnce, 'render not called on return view')
 })
 
-test("displays file name on 'ready'", function() {
+test("displays file name on 'ready'", function () {
   this.mockReturnView.trigger('ready', {
     contentItems: [
       {
         text: 'data text',
-        url: 'data url'
-      }
-    ]
+        url: 'data url',
+      },
+    ],
   })
   strictEqual(this.launchView.$fileName.text(), 'data text')
 })
 
-test("sets settings.data_url on migration on 'ready'", function() {
+test("sets settings.data_url on migration on 'ready'", function () {
   this.mockReturnView.trigger('ready', {
     contentItems: [
       {
         text: 'data text',
-        url: 'data url'
-      }
-    ]
+        url: 'data url',
+      },
+    ],
   })
   deepEqual(this.mockMigration.get('settings'), {file_url: 'data url'})
 })

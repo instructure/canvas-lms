@@ -29,7 +29,7 @@ QUnit.module('SelectView', {
       template: () => `
         <option>foo</option>
         <option>bar</option>
-      `
+      `,
     })
     view.render()
     view.$el.appendTo($('#fixtures'))
@@ -37,7 +37,7 @@ QUnit.module('SelectView', {
   teardown() {
     view.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('onChange it updates the model', () => {

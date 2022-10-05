@@ -20,13 +20,13 @@ import Course from '@canvas/courses/backbone/models/Course.coffee'
 import AssignmentSyncSettingsView from 'ui/features/assignment_index/backbone/views/AssignmentSyncSettingsView.coffee'
 import fakeENV from 'helpers/fakeENV'
 
-const createView = function(opts = {}) {
+const createView = function (opts = {}) {
   const course = new Course()
   course.urlRoot = '/courses/1'
   const view = new AssignmentSyncSettingsView({
     model: course,
     userIsAdmin: opts.userIsAdmin,
-    sisName: 'PowerSchool'
+    sisName: 'PowerSchool',
   })
   view.open()
   return view
@@ -38,7 +38,7 @@ QUnit.module('AssignmentSyncSettingsView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('openDisableSync sets viewToggle to true', () => {

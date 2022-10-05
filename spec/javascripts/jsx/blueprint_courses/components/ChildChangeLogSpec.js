@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import ChildChangeLog from 'ui/features/blueprint_course_child/react/components/ChildChangeLog.js'
+import ChildChangeLog from 'ui/features/blueprint_course_child/react/components/ChildChangeLog'
 import loadStates from '@canvas/blueprint-courses/react/loadStates'
 import getSampleData from '../getSampleData'
 

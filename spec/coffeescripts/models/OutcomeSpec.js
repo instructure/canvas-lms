@@ -29,8 +29,8 @@ QUnit.module('Course Outcomes', {
         context_type: 'Course',
         context_id: 1,
         calculation_method: 'decaying_average',
-        calculation_int: 65
-      }
+        calculation_int: 65,
+      },
     }
     this.courseOutcome = {
       context_type: 'Course',
@@ -38,8 +38,8 @@ QUnit.module('Course Outcomes', {
       outcome: {
         title: 'Course Outcome',
         context_type: 'Course',
-        context_id: 2
-      }
+        context_id: 2,
+      },
     }
     fakeENV.setup()
     ENV.PERMISSIONS = {manage_outcomes: true}
@@ -47,7 +47,7 @@ QUnit.module('Course Outcomes', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('isNative returns false for an outcome imported from the account level', function () {
@@ -85,8 +85,8 @@ QUnit.module('Account Outcomes', {
       outcome: {
         title: 'Account Outcome',
         context_type: 'Account',
-        context_id: 1
-      }
+        context_id: 1,
+      },
     }
     fakeENV.setup()
     ENV.PERMISSIONS = {manage_outcomes: true}
@@ -94,7 +94,7 @@ QUnit.module('Account Outcomes', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('isNative is true for an account level outcome when viewed on the account', function () {
@@ -110,8 +110,8 @@ QUnit.module('Global Outcomes in a course', {
       outcome: {
         title: 'Account Outcome',
         context_type: undefined,
-        context_id: undefined
-      }
+        context_id: undefined,
+      },
     }
     fakeENV.setup()
     ENV.PERMISSIONS = {manage_outcomes: true}
@@ -119,7 +119,7 @@ QUnit.module('Global Outcomes in a course', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('CanManage returns true for a global outcome on the course level', function () {
@@ -137,8 +137,8 @@ QUnit.module('With the account_level_mastery_scales FF enabled', {
         context_type: 'Course',
         context_id: 1,
         calculation_method: 'decaying_average',
-        calculation_int: 65
-      }
+        calculation_int: 65,
+      },
     }
     fakeENV.setup()
     this.ratings = [
@@ -146,18 +146,18 @@ QUnit.module('With the account_level_mastery_scales FF enabled', {
       {description: 'Mastery', points: 3.0, mastery: true, color: '0B874B'},
       {description: 'Near Mastery', points: 2.0, mastery: false, color: 'FAB901'},
       {description: 'Below Mastery', points: 1.0, mastery: false, color: 'FD5D10'},
-      {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'E0061F'}
+      {description: 'Well Below Mastery', points: 0.0, mastery: false, color: 'E0061F'},
     ]
     ENV.PERMISSIONS = {manage_outcomes: true}
     ENV.ROOT_OUTCOME_GROUP = {context_type: 'Course'}
     ENV.MASTERY_SCALE = {
-      outcome_proficiency: {ratings: this.ratings}
+      outcome_proficiency: {ratings: this.ratings},
     }
     ENV.ACCOUNT_LEVEL_MASTERY_SCALES = true
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('it uses the ENV.MASTERY_SCALES ratings', function () {

@@ -27,7 +27,7 @@ QUnit.module('ExternalContentLtiLinkSubmissionView', {
       '@type': 'LtiLinkItem',
       url: 'http://lti.example.com/content/launch/42',
       comment: 'Foo all the bars!',
-      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
     }
 
     fakeENV.setup()
@@ -36,31 +36,31 @@ QUnit.module('ExternalContentLtiLinkSubmissionView', {
     this.model = new Backbone.Model(contentItem)
     this.view = new ExternalContentLtiLinkSubmissionView({
       externalTool: {},
-      model: this.model
+      model: this.model,
     })
   },
   teardown() {
     fakeENV.teardown()
     $('#fixtures').empty()
-  }
+  },
 })
 
-test("buildSubmission must return an object with submission_type set to 'basic_lti_launch'", function() {
+test("buildSubmission must return an object with submission_type set to 'basic_lti_launch'", function () {
   equal(this.view.buildSubmission().submission_type, 'basic_lti_launch')
 })
 
-test('buildSubmission must return an object with url set to the value from the supplied model', function() {
+test('buildSubmission must return an object with url set to the value from the supplied model', function () {
   equal(this.view.buildSubmission().url, this.model.get('url'))
 })
 
-test('buildSubmission must return an object with resource_link_lookup_uuid set to the value from the supplied model.', function() {
+test('buildSubmission must return an object with resource_link_lookup_uuid set to the value from the supplied model.', function () {
   equal(this.view.buildSubmission().resource_link_lookup_uuid, this.model.get('lookup_uuid'))
 })
 
-test("extractComment must return an object with the model's comment field", function() {
+test("extractComment must return an object with the model's comment field", function () {
   equal(this.view.extractComment().text_comment, this.model.get('comment'))
 })
 
-test('submissionURL() must return a url with the correct shape', function() {
+test('submissionURL() must return a url with the correct shape', function () {
   equal(this.view.submissionURL(), '/api/v1/courses/42/assignments/24/submissions')
 })

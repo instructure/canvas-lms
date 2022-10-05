@@ -31,44 +31,44 @@ QUnit.module('CourseFindSelectView: #setSourceCourseId', {
         id: 5,
         term: 'Default Term',
         label: 'A',
-        enrollment_start: null
+        enrollment_start: null,
       },
       {
         id: 4,
         term: 'Spring 2016',
         label: 'B',
-        enrollment_start: '2016-01-01T07:00:00Z'
+        enrollment_start: '2016-01-01T07:00:00Z',
       },
       {
         id: 3,
         term: 'Spring 2016',
         label: 'A',
-        enrollment_start: '2016-01-01T07:00:00Z'
+        enrollment_start: '2016-01-01T07:00:00Z',
       },
       {
         id: 2,
         term: 'Fall 2016',
         label: 'B',
-        enrollment_start: '2016-10-01T09:00:00Z'
+        enrollment_start: '2016-10-01T09:00:00Z',
       },
       {
         id: 1,
         term: 'Fall 2016',
         label: 'A',
-        enrollment_start: '2016-10-01T09:00:00Z'
-      }
+        enrollment_start: '2016-10-01T09:00:00Z',
+      },
     ]
     return this.server.respondWith('GET', this.urlPattern, [
       200,
       {'Content-Type': 'application/json'},
-      JSON.stringify(this.courses)
+      JSON.stringify(this.courses),
     ])
   },
 
   teardown() {
     fakeENV.teardown()
     return this.server.restore()
-  }
+  },
 })
 
 test('it should be accessible', assert => {
@@ -88,11 +88,11 @@ test('Triggers "course_changed" when course is found by its id', () => {
   ok(sinonSpy.calledWith('course_changed', course), 'Triggered course_changed with a course')
 })
 
-test('Sorts courses by most recent term to least, then alphabetically', function() {
+test('Sorts courses by most recent term to least, then alphabetically', function () {
   const courseFindSelectView = new CourseFindSelectView({
     model: new Backbone.Model(),
     current_user_id: 101,
-    show_select: true
+    show_select: true,
   })
 
   courseFindSelectView.courses = this.courses

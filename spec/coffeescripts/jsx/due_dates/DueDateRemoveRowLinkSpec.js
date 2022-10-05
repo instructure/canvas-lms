@@ -25,7 +25,7 @@ import DueDateRemoveRowLink from '@canvas/due-dates/react/DueDateRemoveRowLink'
 QUnit.module('DueDateRemoveRowLink', {
   setup() {
     const props = {
-      handleClick() {}
+      handleClick() {},
     }
     this.handleClick = sandbox.stub(props, 'handleClick')
     const DueDateRemoveRowLinkElement = <DueDateRemoveRowLink {...props} />
@@ -36,14 +36,14 @@ QUnit.module('DueDateRemoveRowLink', {
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateRemoveRowLink).parentNode)
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   ok(this.DueDateRemoveRowLink)
 })
 
-test('calls handleClick prop when clicked', function() {
+test('calls handleClick prop when clicked', function () {
   Simulate.click(this.DueDateRemoveRowLink.refs.removeRowIcon)
   ok(this.handleClick.calledOnce)
 })

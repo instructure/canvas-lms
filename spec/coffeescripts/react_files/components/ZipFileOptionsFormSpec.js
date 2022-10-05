@@ -27,7 +27,7 @@ QUnit.module('ZipFileOptionsForm')
 test('creates a display message based on fileOptions ', () => {
   const props = {
     fileOptions: {file: {name: 'neat_file'}},
-    onZipOptionsResolved() {}
+    onZipOptionsResolved() {},
   }
   const zFOF = TestUtils.renderIntoDocument(<ZipFileOptionsForm {...props} />)
   equal(
@@ -42,14 +42,14 @@ test('handleExpandClick expands zip', () => {
   const zipOptionsResolvedStub = sinon.stub()
   const props = {
     fileOptions: {file: 'the_file_obj'},
-    onZipOptionsResolved: zipOptionsResolvedStub
+    onZipOptionsResolved: zipOptionsResolvedStub,
   }
   const zFOF = TestUtils.renderIntoDocument(<ZipFileOptionsForm {...props} />)
   TestUtils.Simulate.click($('.btn-primary:contains("Upload It")')[0])
   ok(
     zipOptionsResolvedStub.calledWithMatch({
       file: 'the_file_obj',
-      expandZip: false
+      expandZip: false,
     }),
     'resolves with correct options'
   )
@@ -65,14 +65,14 @@ if (window.hasOwnProperty('define')) {
       fileOptions: {file: 'the_file_obj'},
       onZipOptionsResolved(options) {
         return zipOptionsResolvedStub(options)
-      }
+      },
     }
     const zFOF = TestUtils.renderIntoDocument(<ZipFileOptionsForm {...props} />)
     TestUtils.Simulate.click($('.btn')[0])
     ok(
       zipOptionsResolvedStub.calledWithMatch({
         file: 'the_file_obj',
-        expandZip: true
+        expandZip: true,
       }),
       'resolves with correct options'
     )

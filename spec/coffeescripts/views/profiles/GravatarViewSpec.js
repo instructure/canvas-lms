@@ -26,8 +26,8 @@ QUnit.module('GravatarView', {
     this.view = new GravatarView({
       avatarSize: {
         h: 42,
-        w: 42
-      }
+        w: 42,
+      },
     })
     this.view.$el.appendTo('#fixtures')
     this.view.render()
@@ -40,27 +40,27 @@ QUnit.module('GravatarView', {
     window.ENV = this.oldEnv
     this.view.remove()
     if (this.server) this.server.restore()
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.view, done, {a11yReport: true})
 })
 
-test('pre-populates preview with default', function() {
+test('pre-populates preview with default', function () {
   const md5 = 'b48def645758b95537d4424c84d1a9ff'
   equal(this.$preview.attr('src'), `https://secure.gravatar.com/avatar/${md5}?s=200&d=identicon`)
 })
 
-test('updates preview', function() {
+test('updates preview', function () {
   const md5 = 'e8da7df89c8bcbfec59336b4e0d5e76d'
   this.$input.val('bar@example.com')
   this.$previewButton.click()
   equal(this.$preview.attr('src'), `https://secure.gravatar.com/avatar/${md5}?s=200&d=identicon`)
 })
 
-test('calls avatar url with specified size', function() {
+test('calls avatar url with specified size', function () {
   this.server = sinon.fakeServer.create()
   this.server.respond(request => {
     const url_match = request.url.match(/api\/v1\/users\/self/)

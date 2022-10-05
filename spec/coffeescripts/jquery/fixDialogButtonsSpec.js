@@ -28,10 +28,10 @@ QUnit.module('fixDialogButtons', {
   teardown() {
     this.clock.restore()
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('handles buttons', function() {
+test('handles buttons', function () {
   const $dialog = $(`
 <form style="display:none">
   when this gets turned into a dialog, it should
@@ -53,7 +53,7 @@ test('handles buttons', function() {
   ok($dialog.is(':ui-dialog:visible'), 'pops up dialog')
   equal($dialog.dialog('option', 'buttons').length, 2, 'converts both buttons in .button-pane only')
   let msg = 'hides the original .buttons in the .button-container only'
-  $dialog.find('.btn').each(function() {
+  $dialog.find('.btn').each(function () {
     equal($(this).is(':hidden'), $(this).text() !== 'Should NOT be converted', msg)
   })
   msg =

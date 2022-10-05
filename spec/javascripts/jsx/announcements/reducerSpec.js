@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/announcements/react/actions.js'
-import reducer from 'ui/features/announcements/react/reducer.js'
+import actions from 'ui/features/announcements/react/actions'
+import reducer from 'ui/features/announcements/react/reducer'
 
 QUnit.module('Announcements reducer')
 

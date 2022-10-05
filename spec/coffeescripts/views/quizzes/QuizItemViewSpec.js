@@ -29,11 +29,11 @@ import ReactDOM from 'react-dom'
 const createQuiz = function (options = {}) {
   const permissions = {
     delete: true,
-    ...options.permissions
+    ...options.permissions,
   }
   return new Quiz({
     permissions,
-    ...options
+    ...options,
   })
 }
 
@@ -41,7 +41,7 @@ const createView = function (quiz, options = {}) {
   if (quiz == null) {
     quiz = createQuiz({
       id: 1,
-      title: 'Foo'
+      title: 'Foo',
     })
   }
 
@@ -49,7 +49,7 @@ const createView = function (quiz, options = {}) {
 
   ENV.PERMISSIONS = {
     manage: options.canManage,
-    create: options.canCreate || options.canManage
+    create: options.canCreate || options.canManage,
   }
 
   ENV.FLAGS = {
@@ -57,7 +57,7 @@ const createView = function (quiz, options = {}) {
     migrate_quiz_enabled: options.migrate_quiz_enabled,
     DIRECT_SHARE_ENABLED: options.DIRECT_SHARE_ENABLED || false,
     new_quizzes_skip_to_build_module_button: options.new_quizzes_skip_to_build_module_button,
-    quiz_lti_enabled: !!options.quiz_lti_enabled
+    quiz_lti_enabled: !!options.quiz_lti_enabled,
   }
 
   const view = new QuizItemView({model: quiz, publishIconView: icon})
@@ -75,18 +75,18 @@ QUnit.module('QuizItemView', {
             trigger_assignment_id: '1',
             scoring_ranges: [
               {
-                assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]
-              }
-            ]
-          }
-        ]
-      }
+                assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}],
+              },
+            ],
+          },
+        ],
+      },
     })
     CyoeHelper.reloadEnv()
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 // eslint-disable-next-line qunit/resolve-async
@@ -283,7 +283,7 @@ test('renders lockAt/unlockAt for multiple due dates', () => {
   const quiz = createQuiz({
     id: 1,
     title: 'mdd',
-    all_dates: [{due_at: new Date()}, {due_at: new Date()}]
+    all_dates: [{due_at: new Date()}, {due_at: new Date()}],
   })
   const view = createView(quiz)
   const json = view.toJSON()
@@ -308,7 +308,7 @@ test('renders lockAt/unlockAt when locking in future', () => {
     id: 1,
     title: 'unlock later',
     unlock_at: past.toISOString(),
-    lock_at: future.toISOString()
+    lock_at: future.toISOString(),
   })
   const view = createView(quiz)
   const json = view.toJSON()
@@ -338,7 +338,7 @@ test('renders mastery paths menu option for assignment quiz if cyoe on', () => {
     title: 'Foo',
     can_update: true,
     quiz_type: 'assignment',
-    assignment_id: '2'
+    assignment_id: '2',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
@@ -372,7 +372,7 @@ test('does not render mastery paths link for quiz if cyoe off', () => {
     assignment_id: '1',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
@@ -385,7 +385,7 @@ test('does not render mastery paths link for quiz if quiz does not have a rule',
     assignment_id: '2',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
@@ -398,7 +398,7 @@ test('renders mastery paths link for quiz if quiz has a rule', () => {
     assignment_id: '1',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1)
@@ -411,7 +411,7 @@ test('does not render mastery paths icon for quiz if cyoe off', () => {
     assignment_id: '1',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
@@ -424,7 +424,7 @@ test('does not render mastery paths icon for quiz if quiz is not released by a r
     assignment_id: '1',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
@@ -437,7 +437,7 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', ()
     assignment_id: '2',
     title: 'Foo',
     can_update: true,
-    quiz_type: 'assignment'
+    quiz_type: 'assignment',
   })
   const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 1)
@@ -448,7 +448,7 @@ test('can duplicate when a quiz can be duplicated', () => {
     id: 1,
     title: 'Foo',
     can_duplicate: true,
-    can_update: true
+    can_update: true,
   })
   Object.assign(window.ENV, {current_user_roles: ['admin']})
   const view = createView(quiz, {canManage: true})
@@ -461,7 +461,7 @@ test('duplicate option is not available when a quiz can not be duplicated (old q
   const quiz = createQuiz({
     id: 1,
     title: 'Foo',
-    can_update: true
+    can_update: true,
   })
   Object.assign(window.ENV, {current_user_roles: ['admin']})
   const view = createView(quiz, {})
@@ -476,13 +476,13 @@ test('can skip to build when the flag is enabled', () => {
     title: 'Foo',
     can_duplicate: true,
     can_update: true,
-    quiz_type: 'quizzes.next'
+    quiz_type: 'quizzes.next',
   })
   Object.assign(window.ENV, {current_user_roles: ['admin']})
   const view = createView(quiz, {
     canManage: true,
     new_quizzes_skip_to_build_module_button: true,
-    quiz_lti_enabled: true
+    quiz_lti_enabled: true,
   })
   const json = view.toJSON()
   ok(json.canShowQuizBuildShortCut)
@@ -494,7 +494,7 @@ test('cannot skip to build when the flag is disabled', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    quiz_type: 'quizzes.next'
+    quiz_type: 'quizzes.next',
   })
   Object.assign(window.ENV, {current_user_roles: ['admin']})
   const view = createView(quiz, {quiz_lti_enabled: true})
@@ -508,7 +508,7 @@ test('clicks on Retry button to trigger another duplicating request', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const dfd = $.Deferred()
   const view = createView(quiz)
@@ -522,7 +522,7 @@ test('clicks on Retry button to trigger another migrating request', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_migrate'
+    workflow_state: 'failed_to_migrate',
   })
   const dfd = $.Deferred()
   const view = createView(quiz)
@@ -536,7 +536,7 @@ test('can duplicate when a user has permissons to create quizzes', () => {
     id: 1,
     title: 'Foo',
     can_duplicate: true,
-    can_update: true
+    can_update: true,
   })
   Object.assign(window.ENV, {current_user_roles: ['teacher']})
   const view = createView(quiz, {canManage: true})
@@ -550,7 +550,7 @@ test('cannot duplicate when user is not admin', () => {
     id: 1,
     title: 'Foo',
     can_duplicate: true,
-    can_update: true
+    can_update: true,
   })
   Object.assign(window.ENV, {current_user_roles: ['user']})
   const view = createView(quiz, {})
@@ -564,7 +564,7 @@ test('displays duplicating message when assignment is duplicating', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'duplicating'
+    workflow_state: 'duplicating',
   })
   const view = createView(quiz)
   ok(view.$el.text().includes('Making a copy of "Foo"'))
@@ -575,7 +575,7 @@ test('displays failed to duplicate message when assignment failed to duplicate',
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(quiz)
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
@@ -679,7 +679,7 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
     const quiz = createQuiz({
       id: 1,
       quiz_type: 'quizzes.next',
-      require_lockdown_browser: false
+      require_lockdown_browser: false,
     })
     const view = createView(quiz)
     const json = view.toJSON()
@@ -691,7 +691,7 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
     const quiz = createQuiz({
       id: 1,
       quiz_type: 'practice',
-      require_lockdown_browser: true
+      require_lockdown_browser: true,
     })
     const view = createView(quiz)
     const json = view.toJSON()
@@ -703,7 +703,7 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
     const quiz = createQuiz({
       id: 1,
       quiz_type: 'quizzes.next',
-      require_lockdown_browser: true
+      require_lockdown_browser: true,
     })
     const view = createView(quiz)
     const json = view.toJSON()
@@ -715,7 +715,7 @@ QUnit.module('Quiz#quizzesRespondusEnabled', hooks => {
     const quiz = createQuiz({
       id: 1,
       quiz_type: 'quizzes.next',
-      require_lockdown_browser: true
+      require_lockdown_browser: true,
     })
     const view = createView(quiz)
     const json = view.toJSON()

@@ -20,14 +20,14 @@ import Backbone from '@canvas/backbone'
 import DateGroup from '@canvas/date-group/backbone/models/DateGroup'
 
 QUnit.module('DateGroup', {
-  setup() {}
+  setup() {},
 })
 
 test('default title is set', () => {
   const dueAt = new Date('2013-08-20 11:13:00')
   let model = new DateGroup({
     due_at: dueAt,
-    title: 'Summer session'
+    title: 'Summer session',
   })
   equal(model.get('title'), 'Summer session')
   model = new DateGroup({due_at: dueAt})
@@ -57,7 +57,7 @@ test("#unlockAt doesn't parse null date", () => {
 test('#unlockAt parses the single_section_unlock_at property when unlock_at is null', () => {
   const model = new DateGroup({
     unlock_at: null,
-    single_section_unlock_at: '2013-08-20 11:13:00'
+    single_section_unlock_at: '2013-08-20 11:13:00',
   })
   equal(model.unlockAt().constructor, Date)
 })
@@ -75,7 +75,7 @@ test("#lockAt doesn't parse null date", () => {
 test('#lockAt parses the single_section_lock_at property when lock_at is null', () => {
   const model = new DateGroup({
     lock_at: null,
-    single_section_lock_at: '2013-08-20 11:13:00'
+    single_section_lock_at: '2013-08-20 11:13:00',
   })
   equal(model.lockAt().constructor, Date)
 })
@@ -83,7 +83,7 @@ test('#lockAt parses the single_section_lock_at property when lock_at is null', 
 test("#alwaysAvailable if both unlock and lock dates aren't set", () => {
   const model = new DateGroup({
     unlock_at: null,
-    lock_at: null
+    lock_at: null,
   })
   ok(model.alwaysAvailable())
 })
@@ -91,7 +91,7 @@ test("#alwaysAvailable if both unlock and lock dates aren't set", () => {
 test('#alwaysAvailable is false if unlock date is set', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    lock_at: null
+    lock_at: null,
   })
   ok(!model.alwaysAvailable())
 })
@@ -99,7 +99,7 @@ test('#alwaysAvailable is false if unlock date is set', () => {
 test('#alwaysAvailable is false if lock date is set', () => {
   const model = new DateGroup({
     unlock_at: null,
-    lock_at: '2013-08-20 11:13:00'
+    lock_at: '2013-08-20 11:13:00',
   })
   ok(!model.alwaysAvailable())
 })
@@ -107,7 +107,7 @@ test('#alwaysAvailable is false if lock date is set', () => {
 test('#available is true if always available', () => {
   const model = new DateGroup({
     unlock_at: null,
-    lock_at: null
+    lock_at: null,
   })
   ok(model.available())
 })
@@ -115,7 +115,7 @@ test('#available is true if always available', () => {
 test('#available is true if no lock date and unlock date has passed', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-30 00:00:00'
+    now: '2013-08-30 00:00:00',
   })
   ok(model.available())
 })
@@ -123,7 +123,7 @@ test('#available is true if no lock date and unlock date has passed', () => {
 test('#available is false if not unlocked yet', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-19 00:00:00'
+    now: '2013-08-19 00:00:00',
   })
   ok(!model.available())
 })
@@ -131,7 +131,7 @@ test('#available is false if not unlocked yet', () => {
 test('#available is false if locked', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-30 00:00:00'
+    now: '2013-08-30 00:00:00',
   })
   ok(!model.available())
 })
@@ -139,7 +139,7 @@ test('#available is false if locked', () => {
 test('#pending is true if not unlocked yet', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-19 00:00:00'
+    now: '2013-08-19 00:00:00',
   })
   ok(model.pending())
 })
@@ -152,7 +152,7 @@ test('#pending is false if no unlock date', () => {
 test('#pending is false if unlocked', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-30 00:00:00'
+    now: '2013-08-30 00:00:00',
   })
   ok(!model.pending())
 })
@@ -160,7 +160,7 @@ test('#pending is false if unlocked', () => {
 test('#open is true if has a lock date but not locked yet', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-10 00:00:00'
+    now: '2013-08-10 00:00:00',
   })
   ok(model.open())
 })
@@ -173,7 +173,7 @@ test('#open is false without an unlock date', () => {
 test('#open is false if not unlocked yet', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-19 00:00:00'
+    now: '2013-08-19 00:00:00',
   })
   ok(!model.open())
 })
@@ -181,7 +181,7 @@ test('#open is false if not unlocked yet', () => {
 test('#closed is true if not locked', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-30 00:00:00'
+    now: '2013-08-30 00:00:00',
   })
   ok(model.closed())
 })
@@ -194,7 +194,7 @@ test('#closed is false if no lock date', () => {
 test('#closed is false if unlocked has passed', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-19 00:00:00'
+    now: '2013-08-19 00:00:00',
   })
   ok(!model.closed())
 })
@@ -232,7 +232,7 @@ test('#toJSON includes available', () => {
 test('#toJSON includes pending', () => {
   const model = new DateGroup({
     unlock_at: '2013-08-20 11:13:00',
-    now: '2013-08-19 00:00:00'
+    now: '2013-08-19 00:00:00',
   })
   const json = model.toJSON()
   equal(json.pending, true)
@@ -241,7 +241,7 @@ test('#toJSON includes pending', () => {
 test('#toJSON includes open', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-10 00:00:00'
+    now: '2013-08-10 00:00:00',
   })
   const json = model.toJSON()
   equal(json.open, true)
@@ -250,7 +250,7 @@ test('#toJSON includes open', () => {
 test('#toJSON includes closed', () => {
   const model = new DateGroup({
     lock_at: '2013-08-20 11:13:00',
-    now: '2013-08-30 00:00:00'
+    now: '2013-08-30 00:00:00',
   })
   const json = model.toJSON()
   equal(json.closed, true)

@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import MoveToDialog from 'ui/features/eportfolio/react/MoveToDialog.js'
+import MoveToDialog from 'ui/features/eportfolio/react/MoveToDialog'
 
 let root
 let appRoot

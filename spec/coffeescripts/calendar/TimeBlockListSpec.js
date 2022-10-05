@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList.js'
+import TimeBlockList from 'ui/features/calendar/jquery/TimeBlockList'
 import moment from 'moment'
 import fcUtil from '@canvas/calendar/jquery/fcUtil.coffee'
 
@@ -33,7 +33,7 @@ QUnit.module('TimeBlockList', {
       [wrappedDate(`2/3/${nextYear} 5:32`), wrappedDate(`2/3/${nextYear} 10:32`)],
       // a locked one
       [wrappedDate(`2/3/${nextYear} 11:15`), wrappedDate(`2/3/${nextYear} 15:01`), true],
-      [wrappedDate(`2/3/${nextYear} 16:00`), wrappedDate(`2/3/${nextYear} 19:00`)]
+      [wrappedDate(`2/3/${nextYear} 16:00`), wrappedDate(`2/3/${nextYear} 19:00`)],
     ]
     this.blankRow = {date: fcUtil.wrap(new Date(2017, 2, 3))}
     this.me = new TimeBlockList(this.$holder, this.$splitter, this.blocks, this.blankRow)
@@ -44,27 +44,27 @@ QUnit.module('TimeBlockList', {
     this.$splitter.detach()
     $('#fixtures').empty()
     $('.ui-tooltip').remove()
-  }
+  },
 })
 
-test('should init properly', function() {
+test('should init properly', function () {
   equal(this.me.rows.length, 3 + 1, 'three rows + 1 blank')
 })
 
-test('should not include locked or blank rows in .blocks()', function() {
+test('should not include locked or blank rows in .blocks()', function () {
   deepEqual(this.me.blocks(), [this.blocks[0], this.blocks[2]])
 })
 
-test('should not render custom date in blank row if more than one time block already', function() {
+test('should not render custom date in blank row if more than one time block already', function () {
   equal(this.me.rows[3].$date.val(), '')
 })
 
-test('should handle intialization of locked / unlocked rows', function() {
+test('should handle intialization of locked / unlocked rows', function () {
   ok(!this.me.rows[0].locked, 'first row should not be locked')
   ok(this.me.rows[1].locked, 'second row should be locked')
 })
 
-test('should remove rows correctly', function() {
+test('should remove rows correctly', function () {
   for (const row of this.me.rows) {
     // get rid of every row
     row.remove()
@@ -76,7 +76,7 @@ test('should remove rows correctly', function() {
   ok(this.me.rows[0].blank())
 })
 
-test('should add rows correctly', function() {
+test('should add rows correctly', function () {
   const rowsBefore = this.me.rows.length
   const data = [Date.parse('next tuesday at 7pm'), Date.parse('next tuesday at 8pm')]
   const row = this.me.addRow(data)
@@ -84,28 +84,28 @@ test('should add rows correctly', function() {
   ok($.contains(this.me.element, row.$row), 'make sure the element got appended to my <tbody>')
 })
 
-test('should validate if all rows are valid and complete or blank', function() {
+test('should validate if all rows are valid and complete or blank', function () {
   ok(this.me.validate(), 'should validate')
 })
 
-test('should not not validate if all rows are not valid', function() {
+test('should not not validate if all rows are not valid', function () {
   const row = this.me.addRow()
   row.$date.val('asdfasdf').change()
   ok(!this.me.validate(), 'should not validate')
 })
 
-test('should not validate if a row is incomplete', function() {
+test('should not validate if a row is incomplete', function () {
   const row = this.me.addRow()
   row.$start_time.val('7pm').change()
   ok(!this.me.validate(), 'should not validate')
 })
 
-test('should still validate if a row is fully blank', function() {
+test('should still validate if a row is fully blank', function () {
   const row = this.me.addRow()
   ok(this.me.validate(), 'should validate')
 })
 
-test('should alert when invalid', function() {
+test('should alert when invalid', function () {
   const row = this.me.addRow()
   row.$date.val('asdfasdf').change()
   const spy = sandbox.spy(window, 'alert')
@@ -113,7 +113,7 @@ test('should alert when invalid', function() {
   ok(spy.called, 'should `alert` a message')
 })
 
-test('should split correctly', function() {
+test('should split correctly', function () {
   this.me.rows[2].remove()
   this.me.split('30')
   equal(this.me.rows.length, 12)
@@ -135,9 +135,9 @@ QUnit.module('TimeBlockList with no time blocks', {
     this.$splitter.detach()
     $('#fixtures').empty()
     $('.ui-tooltip').remove()
-  }
+  },
 })
 
-test('should render custom date in blank row if provided', function() {
+test('should render custom date in blank row if provided', function () {
   equal(this.me.rows[0].$date.val(), '2050-03-03')
 })

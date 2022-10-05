@@ -21,7 +21,7 @@ import {mount, shallow} from 'enzyme'
 import {Provider} from 'react-redux'
 import _ from 'lodash'
 
-import AnnouncementsIndex from 'ui/features/announcements/react/components/AnnouncementsIndex.js'
+import AnnouncementsIndex from 'ui/features/announcements/react/components/AnnouncementsIndex'
 import sampleData from '../sampleData'
 
 const makeProps = (props = {}) =>

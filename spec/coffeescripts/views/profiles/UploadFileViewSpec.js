@@ -26,21 +26,21 @@ QUnit.module('UploadFileView', {
     this.view = new UploadFileView({
       avatarSize: {
         h: 128,
-        w: 128
+        w: 128,
       },
-      onImageLoaded: this.resolveImageLoaded
+      onImageLoaded: this.resolveImageLoaded,
     })
     this.view.$el.appendTo('#fixtures')
 
     // This spec currently depends on a real XHR request to the file system.
     // Restoring the network will allow this spec to function correctly.
     sandbox.server.restore()
-    this.file = (function() {
+    this.file = (function () {
       const dfd = $.Deferred()
       const xhr = new XMLHttpRequest()
       xhr.open('GET', '/base/spec/javascripts/fixtures/pug.jpg')
       xhr.responseType = 'blob'
-      xhr.onload = function(e) {
+      xhr.onload = function (e) {
         const response = BlobFactory.fromXHR(this.response, 'image/jpeg')
         return dfd.resolve(response)
       }
@@ -53,10 +53,10 @@ QUnit.module('UploadFileView', {
     delete this.blob
     this.view.remove()
     $('.ui-dialog').remove()
-  }
+  },
 })
 
-test('loads given file', function(assert) {
+test('loads given file', function (assert) {
   assert.expect(3)
   const start = assert.async()
   ok(this.view.$el.find('.avatar-preview').length === 0, 'picker begins without preview image')
@@ -70,7 +70,7 @@ test('loads given file', function(assert) {
   })
 })
 
-test('getImage returns cropped image object', function(assert) {
+test('getImage returns cropped image object', function (assert) {
   assert.expect(1)
   const start = assert.async()
   $.when(this.file).pipe(this.view.loadPreview)

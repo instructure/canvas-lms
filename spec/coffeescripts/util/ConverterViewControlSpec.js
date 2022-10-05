@@ -33,13 +33,13 @@ class ParentView extends Backbone.View {
 QUnit.module('ConverterViewControlSpec', {
   teardown() {
     return ConverterViewControl.resetControl()
-  }
+  },
 })
 
 test('registering a view adds the view to the register list', () => {
   ConverterViewControl.register({
     value: 'backbone_view',
-    view: new BackboneSubView()
+    view: new BackboneSubView(),
   })
   equal(ConverterViewControl.registeredViews.length, 1, 'Register the view in the register list')
 })
@@ -50,7 +50,7 @@ test('before registering a view subscribed is false', () =>
 test('after registering a view subscribed is true', () => {
   ConverterViewControl.register({
     value: 'backbone_view',
-    view: new BackboneSubView()
+    view: new BackboneSubView(),
   })
   equal(ConverterViewControl.subscribed, true, 'Subscribed is set to true after registering a view')
 })
@@ -64,7 +64,7 @@ test('resetControl sets subscribed to false if it was true', () => {
 test('resetControl empties registeredViews list', () => {
   ConverterViewControl.register({
     value: 'backbone_view',
-    view: new BackboneSubView()
+    view: new BackboneSubView(),
   })
   equal(ConverterViewControl.registeredViews.length, 1)
   ConverterViewControl.resetControl()

@@ -35,5 +35,5 @@ export default {
   },
   teardown() {
     return $fixtures.empty()
-  }
+  },
 }
