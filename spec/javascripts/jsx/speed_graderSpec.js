@@ -1819,6 +1819,59 @@ QUnit.module('SpeedGrader', rootHooks => {
         strictEqual(document.getElementById('submission_word_count').children.length, 1)
         strictEqual($('#submission_word_count').text(), 'Word Count: 24 words')
       })
+
+      test('refreshes word count when user changes', () => {
+        finishSetup()
+        SpeedGrader.EG.currentStudent.submission.submission_type = 'online_text_entry'
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 1)
+        strictEqual($('#submission_word_count').text(), 'Word Count: 24 words')
+        SpeedGrader.EG.currentStudent = {
+          id: 5,
+          name: 'Johnny B Goode',
+          enrollments: [
+            {
+              workflow_state: 'active',
+            },
+          ],
+          submission_state: 'not_graded',
+          submission: {
+            currentSelectedIndex: 1,
+            score: 7,
+            grade: 70,
+            grading_period_id: 8,
+            submission_type: 'online_text_entry',
+            workflow_state: 'submitted',
+            submission_history: [
+              {
+                submission: {
+                  external_tool_url: 'foo',
+                  id: 1113,
+                  user_id: 4,
+                  submission_type: 'basic_lti_launch',
+                },
+              },
+              {
+                submission: {
+                  external_tool_url: 'bar',
+                  id: 1114,
+                  user_id: 4,
+                  submission_type: 'basic_lti_launch',
+                  versioned_attachments: [
+                    {
+                      attachment: {viewed_at: new Date('Jan 1, 2011').toISOString()},
+                    },
+                  ],
+                  word_count: 50,
+                },
+              },
+            ],
+          },
+        }
+        SpeedGrader.EG.handleSubmissionSelectionChange()
+        strictEqual(document.getElementById('submission_word_count').children.length, 1)
+        strictEqual($('#submission_word_count').text(), 'Word Count: 50 words')
+      })
     })
 
     test('should use submission history lti launch url', () => {
