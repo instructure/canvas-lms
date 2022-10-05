@@ -109,7 +109,7 @@ CollaborationsPage.Events = {
   onFragmentChange(e, hash) {
     if (hash !== '#add_collaboration') return
 
-    if ($('#collaborations .collaboration').length == 0) {
+    if ($('#collaborations .collaboration').length === 0) {
       $('.add_collaboration_link').click()
     }
   },

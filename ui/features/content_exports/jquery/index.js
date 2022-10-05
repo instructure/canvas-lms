@@ -46,7 +46,7 @@ $(document).ready(function (event) {
     state = 'nothing'
     let fakeTickCount = 0
     var tick = function () {
-      if (state == 'nothing') {
+      if (state === 'nothing') {
         fakeTickCount++
         const progress = ($('.export_progress').progressbar('option', 'value') || 0) + 0.25
         if (fakeTickCount < 10) {
@@ -77,7 +77,7 @@ $(document).ready(function (event) {
             )
             $('.export_progress').progressbar('option', 'value', progress)
           }
-          if (content_export.workflow_state == 'exported') {
+          if (content_export.workflow_state === 'exported') {
             $exporter_form.hide()
             $('.export_progress').progressbar('option', 'value', 100)
             $('.progress_message').text(I18n.t('Your content has been exported.'))
@@ -88,7 +88,7 @@ $(document).ready(function (event) {
                 htmlEscape(I18n.t('New Export')) +
                 '</a></p>'
             )
-          } else if (content_export.workflow_state == 'failed') {
+          } else if (content_export.workflow_state === 'failed') {
             const code = 'content_export_' + content_export.id
             $('.progress_bar_holder').hide()
             $exporter_form.hide()

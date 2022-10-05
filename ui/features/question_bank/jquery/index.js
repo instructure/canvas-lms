@@ -44,7 +44,7 @@ export function updateAlignments(alignments) {
     const alignment = alignments[idx]
     params['assessment_question_bank[alignments][' + alignment[0] + ']'] = alignment[1]
   }
-  if (alignments.length == 0) {
+  if (alignments.length === 0) {
     params['assessment_question_bank[alignments]'] = ''
   }
   const url = $('.edit_bank_link:last').attr('href')
@@ -234,9 +234,9 @@ export function attachPageEvents(e) {
       .select()
   })
   $('#edit_bank_form .bank_name_box').keycodes('return esc', function (event) {
-    if (event.keyString == 'esc') {
+    if (event.keyString === 'esc') {
       $(this).blur()
-    } else if (event.keyString == 'return') {
+    } else if (event.keyString === 'return') {
       $('#edit_bank_form').submit()
     }
   })
@@ -297,8 +297,8 @@ export function attachPageEvents(e) {
   $('#move_question_dialog .submit_button').click(function () {
     const $dialog = $('#move_question_dialog')
     const data = $dialog.getFormData()
-    const multiple_questions = data.multiple_questions == '1'
-    const move = data.copy != '1'
+    const multiple_questions = data.multiple_questions === '1'
+    const move = data.copy !== '1'
     let submitText = null
     if (move) {
       submitText = I18n.t(
@@ -375,7 +375,7 @@ export function attachPageEvents(e) {
         }
       )
     }
-    if (data.assessment_question_bank_id == 'new') {
+    if (data.assessment_question_bank_id === 'new') {
       const create_url = $('#bank_urls .assessment_question_banks_url').attr('href')
       $.ajaxJSON(
         create_url,
@@ -413,7 +413,7 @@ export function attachPageEvents(e) {
   })
   $('#move_question_dialog :radio').change(function () {
     $('#move_question_dialog .new_question_bank_name').showIf(
-      $(this).attr('checked') && $(this).val() == 'new'
+      $(this).attr('checked') && $(this).val() === 'new'
     )
   })
 }

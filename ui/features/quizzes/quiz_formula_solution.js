@@ -39,7 +39,7 @@ export default class QuizFormulaSolution {
 
   _wellFormedString() {
     const result = this.result
-    return !!(result.match(/^=/) && result != '= NaN' && result != '= Infinity')
+    return !!(result.match(/^=/) && result !== '= NaN' && result !== '= Infinity')
   }
 
   _appropriateSolutionValue() {

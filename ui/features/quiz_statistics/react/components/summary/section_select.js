@@ -57,7 +57,7 @@ class SectionSelect extends React.Component {
 
   render() {
     let sectionTitle = I18n.t('Section Filter')
-    if (config.section_ids && config.section_ids != 'all') {
+    if (config.section_ids && config.section_ids !== 'all') {
       sectionTitle = $.grep(this.state.sections, function (e) {
         return e.id == config.section_ids
       })[0].name

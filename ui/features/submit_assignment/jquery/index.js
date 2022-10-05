@@ -144,7 +144,7 @@ $(document).ready(function () {
       .text(I18n.t('messages.submitting', 'Submitting...'))
       .attr('disabled', true)
 
-    if ($(this).attr('id') == 'submit_online_upload_form') {
+    if ($(this).attr('id') === 'submit_online_upload_form') {
       event.preventDefault() && event.stopPropagation()
       const fileElements = $(this)
         .find('input[type=file]:visible')
@@ -299,7 +299,7 @@ $(document).ready(function () {
   $(document).fragmentChange((event, hash) => {
     if (hash && hash.indexOf('#submit') == 0) {
       $('.submit_assignment_link').triggerHandler('click', true)
-      if (hash == '#submit_google_doc') {
+      if (hash === '#submit_google_doc') {
         $('#submit_assignment_tabs').tabs('select', '.google_doc_form')
       }
     }
@@ -512,7 +512,7 @@ $(document).ready(function () {
       )
         return
 
-      if (event.data.type == 'event' && event.data.payload == 'done') {
+      if (event.data.type === 'event' && event.data.payload === 'done') {
         if (modal) modal.close()
 
         reloadGoogleDrive()

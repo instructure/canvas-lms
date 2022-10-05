@@ -251,7 +251,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
     }
 
     const disabledByBlueprintLock =
-      this.props.blueprintLocked && this.props.context_type == 'Course'
+      this.props.blueprintLocked && this.props.context_type === 'Course'
     return (
       <Tooltip
         placement="top"

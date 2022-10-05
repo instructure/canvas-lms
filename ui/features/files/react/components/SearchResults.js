@@ -86,7 +86,7 @@ SearchResults.renderFilePreview = function () {
 SearchResults.render = function () {
   if (this.state.errors) {
     return this.displayErrors(this.state.errors)
-  } else if (this.state.collection.loadedAll && this.state.collection.length == 0) {
+  } else if (this.state.collection.loadedAll && this.state.collection.length === 0) {
     return <NoResults search_term={this.props.query.search_term} />
   } else {
     return (

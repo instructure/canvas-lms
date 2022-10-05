@@ -203,14 +203,14 @@ const quizSubmission = (function () {
 
             // has the user logged out?
             // TODO: support this redirect in LDB, by getting out of high security mode.
-            if (ec.status === 401 || resp.status == 'unauthorized') {
+            if (ec.status === 401 || resp.status === 'unauthorized') {
               showDeauthorizedDialog()
               // since we popped up our own "not logged in" modal, skip the default error handler
               // see jquery.ajaxJSON.js defaultAjaxError
               if ($.inArray(ec, $.ajaxJSON.ignoredXHRs) === -1) {
                 $.ajaxJSON.ignoredXHRs.push(ec)
               }
-            } else if (ec.status === 403 || resp.status == 'forbidden') {
+            } else if (ec.status === 403 || resp.status === 'forbidden') {
               // Something has been malaligned and we now need ruby to figure out where we should be
               window.location.reload()
             } else {
@@ -488,7 +488,7 @@ const quizSubmission = (function () {
     },
 
     updateFinalSubmitButtonState() {
-      const allQuestionsAnswered = $('#question_list li:not(.answered, .text_only)').length == 0
+      const allQuestionsAnswered = $('#question_list li:not(.answered, .text_only)').length === 0
       const lastQuizPage = $('#submit_quiz_form').hasClass('last_page')
       const thisQuestionAnswered = $('div.question.answered').length > 0
       const oneAtATime = quizSubmission.oneAtATime
@@ -558,7 +558,7 @@ $("a[href^='#']")
 $(function () {
   autoBlurActiveInput()
 
-  if ($('#preview_mode_link').length == 0) {
+  if ($('#preview_mode_link').length === 0) {
     let unloadWarned = false
 
     window.addEventListener('beforeunload', e => {
@@ -775,14 +775,14 @@ $(function () {
         tagName = this.tagName.toUpperCase(),
         id = $this.parents('.question').attr('id'),
         val = ''
-      if (tagName == 'A') return
+      if (tagName === 'A') return
       if (changedMap) {
         // reduce redundant jquery lookups and other calls
         if (changedMap[id]) return
         changedMap[id] = true
       }
 
-      if (tagName == 'TEXTAREA') {
+      if (tagName === 'TEXTAREA') {
         val = RichContentEditor.callOnRCE($this, 'get_code')
         const $tagInstance = $this
         $this
@@ -794,9 +794,9 @@ $(function () {
             //  todo: replace .andSelf with .addBack when JQuery is upgraded.
             $(this).siblings('.toggle_question_content_views_link').andSelf().toggle()
           })
-      } else if ($this.attr('type') == 'text' || $this.attr('type') == 'hidden') {
+      } else if ($this.attr('type') === 'text' || $this.attr('type') === 'hidden') {
         val = $this.val()
-      } else if (tagName == 'SELECT') {
+      } else if (tagName === 'SELECT') {
         const $selects = $this.parents('.question').find('select.question_input')
         val = !$selects.filter(function () {
           return !$(this).val()
@@ -841,7 +841,7 @@ $(function () {
   setTimeout(function () {
     $('#question_list .list_question').each(function () {
       const $this = $(this)
-      if ($this.find('.jump_to_question_link').text() == 'Spacer') {
+      if ($this.find('.jump_to_question_link').text() === 'Spacer') {
         $this.remove()
       }
     })
@@ -849,7 +849,7 @@ $(function () {
 
   // Suppress "<ENTER>" key from submitting a form when clicked inside a text input.
   $('#submit_quiz_form input[type=text]').keypress(e => {
-    if (e.keyCode == 13) return false
+    if (e.keyCode === 13) return false
   })
 
   $('.quiz_submit').click(event => {

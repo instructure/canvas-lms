@@ -55,18 +55,18 @@ var GradePublishing = {
   update(messages, requestInProgress) {
     const $publish_grades_link = $('#publish_grades_link'),
       $publish_grades_error = $('#publish_grades_error')
-    if (GradePublishing.status == 'published') {
+    if (GradePublishing.status === 'published') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Resync grades to SIS'))
       $publish_grades_link.removeClass('disabled')
-    } else if (GradePublishing.status == 'publishing' || GradePublishing.status == 'pending') {
+    } else if (GradePublishing.status === 'publishing' || GradePublishing.status === 'pending') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Syncing grades to SIS...'))
       if (!requestInProgress) {
         setTimeout(GradePublishing.checkup, 5000)
       }
       $publish_grades_link.addClass('disabled')
-    } else if (GradePublishing.status == 'unpublished') {
+    } else if (GradePublishing.status === 'unpublished') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Sync grades to SIS'))
       $publish_grades_link.removeClass('disabled')
@@ -89,8 +89,8 @@ var GradePublishing = {
   publish() {
     let confirmMessage
     if (
-      GradePublishing.status == 'publishing' ||
-      GradePublishing.status == 'pending' ||
+      GradePublishing.status === 'publishing' ||
+      GradePublishing.status === 'pending' ||
       GradePublishing.status == null
     ) {
       return
@@ -268,7 +268,7 @@ $(document).ready(function () {
       $edit_section_form.submit()
     })
     .keycodes('return esc', function (event) {
-      if (event.keyString == 'return') {
+      if (event.keyString === 'return') {
         $edit_section_form.submit()
       } else {
         $(this).parents('.section').find('.name').show()
@@ -348,11 +348,11 @@ $(document).ready(function () {
       $('.add_users_link:visible').click()
       $("#enroll_users_form select[name='enrollment_type']").val(val)
     }
-    if (hash == '#add_students') {
+    if (hash === '#add_students') {
       handleFragmentType('StudentEnrollment')
-    } else if (hash == '#add_tas') {
+    } else if (hash === '#add_tas') {
       handleFragmentType('TaEnrollment')
-    } else if (hash == '#add_teacher') {
+    } else if (hash === '#add_teacher') {
       handleFragmentType('TeacherEnrollment')
     }
   })
@@ -441,7 +441,7 @@ $(document).ready(function () {
   $('.course_info')
     .not('.uneditable')
     .click(function (event) {
-      if (event.target.nodeName == 'INPUT') {
+      if (event.target.nodeName === 'INPUT') {
         return
       }
       const $obj = $(this).parents('td').find('.course_form')

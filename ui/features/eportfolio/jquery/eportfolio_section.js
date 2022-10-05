@@ -18,21 +18,21 @@
 
 export function fetchContent($section, section_type, name) {
   const data = {}
-  if (section_type == 'rich_text') {
+  if (section_type === 'rich_text') {
     data[name + '[section_type]'] = 'rich_text'
     const editorContent = $section.find('.section_content').html()
     if (editorContent) {
       data[name + '[content]'] = editorContent
     }
-  } else if (section_type == 'html') {
+  } else if (section_type === 'html') {
     data[name + '[section_type]'] = 'html'
     data[name + '[content]'] = $section.find('.edit_section').val()
-  } else if (section_type == 'submission') {
+  } else if (section_type === 'submission') {
     data[name + '[section_type]'] = 'submission'
     data[name + '[submission_id]'] = $section.getTemplateData({
       textValues: ['submission_id'],
     }).submission_id
-  } else if (section_type == 'attachment') {
+  } else if (section_type === 'attachment') {
     data[name + '[section_type]'] = 'attachment'
     data[name + '[attachment_id]'] = $section.getTemplateData({
       textValues: ['attachment_id'],

@@ -44,7 +44,7 @@ $(function () {
       recipients.push($(this).data('value'))
     })
     let repetition = $alert.find('input[name="repetition"]:checked').attr('value')
-    if (repetition == 'value') {
+    if (repetition === 'value') {
       repetition = $alert.find('input[name="alert[repetition]"]').attr('value')
     } else {
       repetition = null
@@ -68,7 +68,7 @@ $(function () {
       "<span class='displaying' /><input type='text' name='alert[criteria][][threshold]' class='editing' size='2' />"
     )
     $element.html(contentHtml)
-    if (element == 'li') {
+    if (element === 'li') {
       $element.append(' ')
       $element.append($list.find('>.delete_item_link').clone().toggle())
     } else {
@@ -80,7 +80,7 @@ $(function () {
   // xsslint jqueryObject.function createRecipient createCriterion
   const createRecipient = function (recipient, element) {
     const $element = createElement(recipient, element, 'label', ENV.ALERTS.POSSIBLE_RECIPIENTS)
-    if (element == 'li') {
+    if (element === 'li') {
       $element.prepend(
         $("<input type='hidden' name='alert[recipients][]' />").attr('value', recipient)
       )
@@ -100,10 +100,10 @@ $(function () {
     const $element = createElement(
       criterion_type,
       element,
-      element == 'li' ? 'label' : 'option',
+      element === 'li' ? 'label' : 'option',
       ENV.ALERTS.POSSIBLE_CRITERIA
     )
-    if (element == 'li') {
+    if (element === 'li') {
       if (!threshold) {
         threshold = ENV.ALERTS.POSSIBLE_CRITERIA[criterion_type].default_threshold
       }
@@ -272,7 +272,7 @@ $(function () {
       // Validation (validateForm doesn't support arrays, and formErrors
       // wouldn't be able to locate the correct elements)
       const errors = []
-      if ($alert.find('.criteria li').length == 0) {
+      if ($alert.find('.criteria li').length === 0) {
         errors.push([
           $alert.find('.add_criterion_link').prev(),
           I18n.t('errors.criteria_required', 'At least one trigger is required'),
@@ -287,13 +287,13 @@ $(function () {
           ])
         }
       })
-      if ($alert.find('.recipients li').length == 0) {
+      if ($alert.find('.recipients li').length === 0) {
         errors.push([
           $alert.find('.add_recipient_link').prev(),
           I18n.t('errors.recipients_required', 'At least one recipient is required'),
         ])
       }
-      if ($alert.find('input[name="repetition"]:checked').attr('value') == 'none') {
+      if ($alert.find('input[name="repetition"]:checked').attr('value') === 'none') {
         $alert.find('input[name="alert[repetition]"]').attr('value', '')
       } else {
         const $repetition = $alert.find('input[name="alert[repetition]"]')
@@ -318,7 +318,7 @@ $(function () {
           $alert.removeClass('new')
           $alert.attr('action', xhr.getResponseHeader('Location'))
           const $method = $alert.find('input[name="_method"]')
-          if ($method.length == 0) {
+          if ($method.length === 0) {
             $alert.append($('<input type="hidden" name="_method" value="put" />'))
           }
           $alert.toggleClass('editing', false)
@@ -358,7 +358,7 @@ $(function () {
 
       $select.find('option[value="' + recipient + '"]').remove()
 
-      if ($select.find('*').length == 0) {
+      if ($select.find('*').length === 0) {
         $(this).parent().slideUp()
       }
       return false
@@ -390,7 +390,7 @@ $(function () {
 
       $select.find('option[value="' + criterion + '"]').remove()
 
-      if ($select.find('*').length == 0) {
+      if ($select.find('*').length === 0) {
         $(this).parent().slideUp()
       }
       return false

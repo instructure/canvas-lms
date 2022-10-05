@@ -113,7 +113,10 @@ window.moderation = {
       )
     }
     let state_text = ''
-    if (submission.workflow_state == 'complete' || submission.workflow_state == 'pending_review') {
+    if (
+      submission.workflow_state === 'complete' ||
+      submission.workflow_state === 'pending_review'
+    ) {
       state_text = I18n.t('finished_in_duration', 'finished in %{duration}', {
         duration: submission.finished_in_words,
       })
@@ -129,13 +132,13 @@ window.moderation = {
     } else if (submission.attempts_left) {
       data.attempts_left = submission.attempts_left
     }
-    if (submission.workflow_state != 'untaken') {
+    if (submission.workflow_state !== 'untaken') {
       data.time = state_text
     }
     $student
       .fillTemplateData({data})
       .toggleClass('extendable', submission['extendable?'])
-      .toggleClass('in_progress', submission.workflow_state == 'untaken')
+      .toggleClass('in_progress', submission.workflow_state === 'untaken')
       .toggleClass('manually_unlocked', !!submission.manually_unlocked)
       .attr('data-started-at', submission.started_at || '')
       .attr('data-end-at', submission.end_at || '')
@@ -357,7 +360,7 @@ $(document).ready(function (event) {
     event.preventDefault()
     event.stopPropagation()
     const ids = $(this).data('ids')
-    if (ids.length == 0) {
+    if (ids.length === 0) {
       return
     }
     const $form = $(this)
@@ -502,7 +505,7 @@ $(document).ready(function (event) {
         return
       }
       if (
-        data.time_type == 'extend_from_now' &&
+        data.time_type === 'extend_from_now' &&
         data.time < $dialog.data('row').data('minutes_left')
       ) {
         const result = confirm(

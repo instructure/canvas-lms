@@ -71,7 +71,7 @@ $(document).ready(function () {
     })
     .find(':text')
     .keycodes('return esc', function (event) {
-      if (event.keyString == 'return') {
+      if (event.keyString === 'return') {
         $edit_section_form.submit()
       } else {
         $(this).parents('.section').find('.name').show()

@@ -79,7 +79,8 @@ const calcCmd = {}
       case 'subtract':
         if (
           syntax[syntaxIndex + 1] &&
-          (syntax[syntaxIndex + 1].token == 'number' || syntax[syntaxIndex + 1].token == 'variable')
+          (syntax[syntaxIndex + 1].token === 'number' ||
+            syntax[syntaxIndex + 1].token === 'variable')
         ) {
           syntax[syntaxIndex + 1].value = '-' + syntax[syntaxIndex + 1].value
           syntaxIndex++
@@ -89,23 +90,23 @@ const calcCmd = {}
         }
         break
       case 'variable':
-        if (syntax[syntaxIndex + 1] && syntax[syntaxIndex + 1].token == 'open_paren') {
+        if (syntax[syntaxIndex + 1] && syntax[syntaxIndex + 1].token === 'open_paren') {
           result = syntax[syntaxIndex]
           result.token = 'method'
           result.arguments = []
           let ender = 'comma'
           syntaxIndex += 2
-          if (syntax[syntaxIndex].token == 'close_paren') {
+          if (syntax[syntaxIndex].token === 'close_paren') {
             ender = 'close_paren'
             syntaxIndex++
           }
-          while (ender == 'comma') {
+          while (ender === 'comma') {
             result.arguments.push(parseExpression(syntax, ['comma', 'close_paren']))
             ender = syntax[syntaxIndex].token
             syntaxIndex++
           }
           syntaxIndex--
-          if (ender != 'close_paren') {
+          if (ender !== 'close_paren') {
             throw 'expecting close parenthesis at ' + syntax[syntaxIndex].newIndex
           }
         } else {
@@ -177,7 +178,7 @@ const calcCmd = {}
   const parseFullExpression = function (syntax) {
     const newSyntax = []
     for (const idx in syntax) {
-      if (syntax[idx].token != 'whitespace') {
+      if (syntax[idx].token !== 'whitespace') {
         newSyntax.push(syntax[idx])
       }
     }
@@ -185,9 +186,9 @@ const calcCmd = {}
     let result = null
     syntaxIndex = 0
     if (
-      syntax[syntaxIndex].token == 'variable' &&
+      syntax[syntaxIndex].token === 'variable' &&
       syntax.length > 1 &&
-      syntax[syntaxIndex + 1].token == 'equals'
+      syntax[syntaxIndex + 1].token === 'equals'
     ) {
       result = {
         token: 'variable_assignment',
@@ -210,7 +211,7 @@ const calcCmd = {}
     const round1 = [round0[0]]
     for (var idx = 1; idx < round0.length; idx += 2) {
       var item = round0[idx]
-      if (item.token == 'power') {
+      if (item.token === 'power') {
         var left = round1.pop()
         var right = round0[idx + 1]
         round1.push(numberItem(Math.pow(compute(left), compute(right))))
@@ -222,11 +223,11 @@ const calcCmd = {}
     const round2 = [round1[0]]
     for (var idx = 1; idx < round1.length; idx += 2) {
       var item = round1[idx]
-      if (item.token == 'multiply') {
+      if (item.token === 'multiply') {
         var left = round2.pop()
         var right = round1[idx + 1]
         round2.push(numberItem(compute(left) * compute(right)))
-      } else if (item.token == 'divide') {
+      } else if (item.token === 'divide') {
         var left = round2.pop()
         var right = round1[idx + 1]
         round2.push(numberItem(compute(left) / compute(right)))
@@ -238,11 +239,11 @@ const calcCmd = {}
     const round3 = [round2[0]]
     for (var idx = 1; idx < round2.length; idx += 2) {
       var item = round2[idx]
-      if (item.token == 'add') {
+      if (item.token === 'add') {
         var left = round3.pop()
         var right = round2[idx + 1]
         round3.push(numberItem(compute(left) + compute(right)))
-      } else if (item.token == 'subtract') {
+      } else if (item.token === 'subtract') {
         var left = round3.pop()
         var right = round2[idx + 1]
         round3.push(numberItem(compute(left) - compute(right)))
@@ -278,14 +279,14 @@ const calcCmd = {}
         return compute(tree.expression)
         break
       case 'variable_assignment':
-        if (tree.variable.value == '_') {
+        if (tree.variable.value === '_') {
           throw "the variable '_' is reserved"
         }
         variables[tree.variable.value] = compute(tree.assignmentExpression)
         return variables[tree.variable.value]
         break
       case 'variable':
-        if (tree.value == '_') {
+        if (tree.value === '_') {
           return lastComputedResult || 0
         }
         if (tree.value.indexOf('-') == 0) {

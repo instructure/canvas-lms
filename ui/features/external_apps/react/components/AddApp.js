@@ -132,7 +132,7 @@ export default createReactClass({
   configSettings() {
     const queryParams = {}
     _.map(this.state.fields, (v, k) => {
-      if (v.type == 'checkbox') {
+      if (v.type === 'checkbox') {
         if (!v.value) return
         queryParams[k] = '1'
       } else queryParams[k] = encodeURIComponent(v.value)
