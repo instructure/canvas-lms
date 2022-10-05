@@ -53,7 +53,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
           },
         })
       })
-      if (this.action == 'create') {
+      if (this.action === 'create') {
         this.$el.find('#submit_button').prop('disabled', true)
       }
     }

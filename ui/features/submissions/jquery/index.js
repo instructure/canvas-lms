@@ -141,19 +141,19 @@ function makeRubricAccessible($rubric) {
     27: 'esc',
   }
   $('.hide_rubric_link').keydown(function (e) {
-    if (keyCodes[e.which] == 'enter') {
+    if (keyCodes[e.which] === 'enter') {
       e.preventDefault()
       $(this).click()
     }
   })
   $tabs.each(function () {
     $(this).bind('keydown', e => {
-      if (keyCodes[e.which] == 'esc') $('.hide_rubric_link').click()
+      if (keyCodes[e.which] === 'esc') $('.hide_rubric_link').click()
     })
   })
   $(tabBounds).each(function (e) {
     $(this).bind('keydown', function (e) {
-      if (keyCodes[e.which] == 'tab') {
+      if (keyCodes[e.which] === 'tab') {
         const isLeavingHolder = $(this).is($(tabBounds).first()) ? e.shiftKey : !e.shiftKey
         if (isLeavingHolder) {
           e.preventDefault()
@@ -508,7 +508,7 @@ export function teardown() {
   $(document).unbind('grading_change')
 }
 $(document).fragmentChange((event, hash) => {
-  if (hash == '#rubric') {
+  if (hash === '#rubric') {
     $('.assess_submission_link:visible:first').click()
   } else if (hash.match(/^#comment/)) {
     let params = null

@@ -70,7 +70,7 @@ $(document).ready(function () {
     $bank.find('.header').prepend($form.show())
     $form.attr('action', $(this).attr('href'))
     $form.attr('method', 'PUT')
-    if ($bank.attr('id') == 'question_bank_new') {
+    if ($bank.attr('id') === 'question_bank_new') {
       $form.attr('action', $('#bank_urls .add_bank_url').attr('href'))
       $form.attr('method', 'POST')
     }
@@ -78,12 +78,12 @@ $(document).ready(function () {
     $form.find(':text:visible:first').focus().select()
   })
   $('#edit_bank_form .bank_name_box').keycodes('return esc tab', function (event) {
-    if (event.keyString == 'esc') {
+    if (event.keyString === 'esc') {
       $(this).parents('.question_bank').addClass('dont_save')
       $(this).blur()
-    } else if (event.keyString == 'return') {
+    } else if (event.keyString === 'return') {
       $('#edit_bank_form').submit()
-    } else if (event.keyString == 'tab') {
+    } else if (event.keyString === 'tab') {
       $('nav#breadcrumbs a:visible:first').focus()
       event.preventDefault()
     }
@@ -93,7 +93,7 @@ $(document).ready(function () {
     if (
       !$bank.hasClass('dont_save') &&
       !$bank.hasClass('save_in_progress') &&
-      $bank.attr('id') != 'question_bank_new'
+      $bank.attr('id') !== 'question_bank_new'
     ) {
       $('#edit_bank_form').submit()
       return
@@ -101,7 +101,7 @@ $(document).ready(function () {
     $bank.removeClass('dont_save')
     $bank.find('.header_content').show()
     $('body').append($('#edit_bank_form').hide())
-    if ($bank.attr('id') == 'question_bank_new') {
+    if ($bank.attr('id') === 'question_bank_new') {
       $bank.remove()
     }
   })

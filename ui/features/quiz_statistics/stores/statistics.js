@@ -118,7 +118,7 @@ const store = new Store(
     },
 
     filterForSection(sectionId) {
-      if (sectionId == 'all') {
+      if (sectionId === 'all') {
         quizStats.url = config.quizStatisticsUrl
       } else {
         quizStats.url = config.quizStatisticsUrl + '?section_ids=' + sectionId

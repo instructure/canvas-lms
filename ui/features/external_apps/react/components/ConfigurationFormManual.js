@@ -61,12 +61,12 @@ export default class ConfigurationFormManual extends React.Component {
       url = this.refs.url.state.value || '',
       domain = this.refs.domain.state.value || ''
 
-    if (name.length == 0) {
+    if (name.length === 0) {
       errors.name = I18n.t('This field is required')
       formErrors.push(I18n.t('This field "name" is required.'))
     }
 
-    if (url.length == 0 && domain.length == 0) {
+    if (url.length === 0 && domain.length === 0) {
       errors.url = I18n.t('Either the url or domain should be set.')
       errors.domain = I18n.t('Either the url or domain should be set.')
       formErrors.push(I18n.t('Either the url or domain should be set.'))

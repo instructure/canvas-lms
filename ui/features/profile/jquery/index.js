@@ -247,7 +247,7 @@ $('.delete_key_link').click(function (event) {
   event.preventDefault()
   const $key_row = $(this).closest('.access_token')
   let $focus_row = $key_row.prevAll(':not(.blank)').first()
-  if ($focus_row.length == 0) {
+  if ($focus_row.length === 0) {
     $focus_row = $key_row.nextAll(':not(.blank)').first()
   }
   const $to_focus =

@@ -66,7 +66,7 @@ ColumnHeaders.renderColumns = function (sort, order) {
     let linkText
     if (column.property === 'select') {
       linkText = <span className="screenreader-only">{column.displayName}</span>
-    } else if (column.property == 'usage_rights') {
+    } else if (column.property === 'usage_rights') {
       linkText = (
         <i className="icon-files-copyright">
           <span className="screenreader-only">{column.displayName}</span>

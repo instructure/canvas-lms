@@ -212,7 +212,7 @@ $(document).ready(function (event) {
     state = 'nothing'
     let fakeTickCount = 0
     var tick = function () {
-      if (state == 'nothing') {
+      if (state === 'nothing') {
         fakeTickCount++
         const progress = ($('.copy_progress').progressbar('option', 'value') || 0) + 0.25
         if (fakeTickCount < 10) {
@@ -244,7 +244,7 @@ $(document).ready(function (event) {
             $('.copy_progress').progressbar('option', 'value', progress)
             $('#import_log').empty()
           }
-          if (!sis_batch || sis_batch.workflow_state == 'imported') {
+          if (!sis_batch || sis_batch.workflow_state === 'imported') {
             $('#sis_importer').hide()
             $('.copy_progress').progressbar('option', 'value', 100)
             $('.progress_message').html(
@@ -257,7 +257,7 @@ $(document).ready(function (event) {
                 ) + createCountsHtml(sis_batch)
               )
             )
-          } else if (sis_batch.workflow_state == 'failed') {
+          } else if (sis_batch.workflow_state === 'failed') {
             const code = 'sis_batch_' + sis_batch.id
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
@@ -268,7 +268,7 @@ $(document).ready(function (event) {
             )
             $('.sis_messages .sis_error_message').text(message)
             $('.sis_messages').show()
-          } else if (sis_batch.workflow_state == 'failed_with_messages') {
+          } else if (sis_batch.workflow_state === 'failed_with_messages') {
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
             var message = htmlEscape(
@@ -277,7 +277,7 @@ $(document).ready(function (event) {
             message += createMessageHtml(sis_batch)
             $('.sis_messages .sis_error_message').html($.raw(message))
             $('.sis_messages').show()
-          } else if (sis_batch.workflow_state == 'imported_with_messages') {
+          } else if (sis_batch.workflow_state === 'imported_with_messages') {
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
             var message = htmlEscape(
@@ -339,7 +339,7 @@ $(document).ready(function (event) {
       const progress = 0
       if (
         sis_batch &&
-        (sis_batch.workflow_state == 'importing' || sis_batch.workflow_state == 'created')
+        (sis_batch.workflow_state === 'importing' || sis_batch.workflow_state === 'created')
       ) {
         state = 'nothing'
         startPoll()

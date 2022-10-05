@@ -175,7 +175,7 @@ export default class AddExternalToolButton extends React.Component {
   }
 
   createTool = (configurationType, data, e) => {
-    if (configurationType == 'lti2') {
+    if (configurationType === 'lti2') {
       this.setState({
         isLti2: true,
         lti2RegistrationUrl: data.registrationUrl,

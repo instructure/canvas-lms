@@ -34,7 +34,7 @@ $(document).ready(function () {
   $('#communication_channels').tabs()
   $('#communication_channels').bind('tabsshow', function (event) {
     let channelInputField
-    if ($(this).css('display') != 'none') {
+    if ($(this).css('display') !== 'none') {
       // TODO: This is always undefined - where did this come from?
       const idx = $(this).data('selected.tabs')
       if (idx == 0) {
@@ -109,8 +109,8 @@ $(document).ready(function () {
     if (useEmail) {
       $form.find('.sms_email_group').show()
       let email = $form.find('.carrier').val()
-      $form.find('.sms_email').attr('disabled', email != 'other')
-      if (email == 'other') {
+      $form.find('.sms_email').attr('disabled', email !== 'other')
+      if (email === 'other') {
         return
       }
       email = email.replace('#', sms_number)
@@ -171,7 +171,7 @@ $(document).ready(function () {
           // Not a valid email address. Show a message on the relevant field, then bail.
           var errorMessage =
             address === '' ? I18n.t('Email is required') : I18n.t('Email is invalid!')
-          if (type == 'email') {
+          if (type === 'email') {
             $(this).formErrors({communication_channel_email: errorMessage})
           } else {
             $(this).formErrors({communication_channel_sms_email: errorMessage})
@@ -247,7 +247,7 @@ $(document).ready(function () {
 
       channel.channel_id = channel.id
       let select_type = 'email_select'
-      if ($(this).attr('id') == 'register_sms_number') {
+      if ($(this).attr('id') === 'register_sms_number') {
         select_type = 'sms_select'
       }
       const $select = $('#select_templates .' + select_type)
@@ -257,7 +257,7 @@ $(document).ready(function () {
       $select.find('option.blank_option').remove()
       $('.' + select_type).each(function () {
         let val = $(this).val()
-        if (val == 'new') {
+        if (val === 'new') {
           val = channel.id
         }
         $(this).after($select.clone(true).val(val)).remove()
@@ -349,7 +349,7 @@ $(document).ready(function () {
         _ => {}
       )
 
-      if (type == 'sms number') {
+      if (type === 'sms number') {
         path = path.split('@')[0]
       }
       data.code = ''

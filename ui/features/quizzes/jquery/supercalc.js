@@ -41,13 +41,13 @@ const generateFinds = function ($table) {
   return finds
 }
 $.fn.superCalc = function (options, more_options) {
-  if (options == 'recalculate') {
+  if (options === 'recalculate') {
     $(this).triggerHandler('calculate', more_options)
-  } else if (options == 'clear') {
+  } else if (options === 'clear') {
     calcCmd.clearMemory()
-  } else if (options == 'cache_finds') {
+  } else if (options === 'cache_finds') {
     $(this).data('cached_finds', generateFinds($(this).data('table')))
-  } else if (options == 'clear_cached_finds') {
+  } else if (options === 'clear_cached_finds') {
     $(this).data('cached_finds', null)
   } else {
     options = options || {}
