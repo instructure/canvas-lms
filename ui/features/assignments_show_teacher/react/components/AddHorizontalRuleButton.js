@@ -18,9 +18,7 @@
 
 import React from 'react'
 import {func, string} from 'prop-types'
-
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import theme from '@instructure/canvas-theme'
 

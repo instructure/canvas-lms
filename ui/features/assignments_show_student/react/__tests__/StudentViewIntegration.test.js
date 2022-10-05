@@ -20,7 +20,7 @@ import * as uploadFileModule from '@canvas/upload-file'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_SUBMISSION_DRAFT} from '@canvas/assignments/graphql/student/Mutations'
 import {createCache} from '@canvas/apollo'
-import {fireEvent, render, screen, waitFor} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,

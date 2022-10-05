@@ -86,14 +86,13 @@ class AssignmentConfigurationTools extends React.Component {
             }
           }
         }
-        const currentToolType = this.state.toolType
         this.setState({
           tools: data,
           toolType: this.props.selectedToolType || '',
           toolLaunchUrl: prevToolLaunch || 'about:blank',
         })
       }, self),
-      error(xhr) {
+      error(_xhr) {
         $.flashError(I18n.t('Error retrieving similarity detection tools'))
       },
     })
