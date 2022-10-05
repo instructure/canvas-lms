@@ -31,7 +31,7 @@ export default class CourseSearchResultsView extends Backbone.View {
     this.prototype.els = {'#restoreCourseBtn': '$restoreCourseBtn'}
   }
 
-  initialize(options) {
+  initialize(_options) {
     this.disableResults = this.disableResults.bind(this)
     this.enableResults = this.enableResults.bind(this)
     this.resultsFound = this.resultsFound.bind(this)

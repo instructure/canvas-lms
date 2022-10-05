@@ -212,7 +212,7 @@ window.Jobs = class Jobs extends FlavorGrid {
     })
   }
 
-  id_formatter(r, c, d) {
+  id_formatter(r, _c, _d) {
     if (this.data[r].id) {
       return this.data[r].id
     } else {
@@ -276,7 +276,6 @@ window.Jobs = class Jobs extends FlavorGrid {
     this.grid.onSelectedRowsChanged.subscribe(() => {
       if (this.restoringSelection) return
       const rows = this.grid.getSelectedRows()
-      const row = (rows != null ? rows.length : undefined) === 1 ? rows[0] : -1
       selected_job = this.data[rows[0]] || {}
       return fillin_job_data(selected_job)
     })

@@ -23,7 +23,7 @@ const initialState = {
   ltiCollaboratorsData: [],
 }
 const ltiCollaboratorsHandlers = {
-  LIST_LTI_COLLABORATIONS_START: (state, action) => {
+  LIST_LTI_COLLABORATIONS_START: (state, _action) => {
     state.listLTICollaboratorsPending = true
     state.listLTICollaboratorsSuccessful = false
     state.listLTICollaboratorsError = null

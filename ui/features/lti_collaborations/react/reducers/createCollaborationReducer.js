@@ -25,7 +25,7 @@ const initialState = {
 }
 
 const createHandlers = {
-  [ACTION_NAMES.CREATE_COLLABORATION_START]: (state, action) => {
+  [ACTION_NAMES.CREATE_COLLABORATION_START]: (state, _action) => {
     return {
       ...state,
       createCollaborationPending: true,
@@ -33,7 +33,7 @@ const createHandlers = {
       createCollaborationError: null,
     }
   },
-  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.CREATE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       createCollaborationPending: false,

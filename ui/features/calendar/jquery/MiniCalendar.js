@@ -101,7 +101,7 @@ export default class MiniCalendar {
     return false // don't render the event
   }
 
-  visibleContextListChanged = list => this.refetchEvents()
+  visibleContextListChanged = _list => this.refetchEvents()
 
   eventSaved = () => this.refetchEvents()
 

@@ -71,21 +71,21 @@ CollaborationsPage.Events = {
     addDeepLinkingListener()
     $(window).on('externalContentReady', onExternalContentReady.bind(this))
     $('.before_external_content_info_alert, .after_external_content_info_alert')
-      .on('focus', function (e) {
+      .on('focus', function (_e) {
         $(this).removeClass('screenreader-only')
         $('#lti_new_collaboration_iframe').addClass('info_alert_outline')
       })
-      .on('blur', function (e) {
+      .on('blur', function (_e) {
         $(this).addClass('screenreader-only')
         $('#lti_new_collaboration_iframe').removeClass('info_alert_outline')
       })
   },
 
-  onClose(e) {
+  onClose(_e) {
     $('#delete_collaboration_dialog').dialog('close')
   },
 
-  onDelete(e) {
+  onDelete(_e) {
     const deleteDocument = $(this).hasClass('delete_document_button'),
       data = {delete_doc: deleteDocument},
       $collaboration = $('#delete_collaboration_dialog').data('collaboration'),
@@ -98,7 +98,7 @@ CollaborationsPage.Events = {
       url,
       'DELETE',
       data,
-      data => {
+      _data => {
         CollaborationsPage.Util.removeCollaboration($collaboration)
         $.screenReaderFlashMessage(I18n.t('Collaboration was deleted'))
       },
@@ -114,7 +114,7 @@ CollaborationsPage.Events = {
     }
   },
 
-  onTypeChange(e) {
+  onTypeChange(_e) {
     let name = $(this).val(),
       type = name,
       launch_url = $(this).find('option:selected').data('launch-url'),

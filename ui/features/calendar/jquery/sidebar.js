@@ -231,7 +231,6 @@ function convertAccountCalendars(accountCalendars) {
 
 export default function sidebar(contexts, selectedContexts, dataSource, onContextsChange) {
   const $skipLink = $('.skip-to-calendar')
-  const $colorPickerBtn = $('.ContextList__MoreBtn')
   const $calendarHolder = $('#calendar-list-holder')
   const $otherCalendarsHolder = $('#other-calendars-list-holder')
   const $combineHolder = $($calendarHolder).add($otherCalendarsHolder)
@@ -299,12 +298,12 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange)
   }
 
-  $combineHolder.on('click keyclick', '.context-list-toggle-box', function (event) {
+  $combineHolder.on('click keyclick', '.context-list-toggle-box', function (_event) {
     const parent = $(this).closest('.context_list_context')
     visibleContexts.toggle($(parent).data('context'))
   })
 
-  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', async function (event) {
+  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', async function (_event) {
     const parent = $(this).closest('.context_list_context')
     const toRemove = $(parent).data('context')
     const calendarToRemoveIndex = otherCalendars.findIndex(oC => oC.asset_string === toRemove)
@@ -325,7 +324,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     }
   })
 
-  $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
+  $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (_event) {
     const positions = {
       top: $(this).offset().top - $(window).scrollTop(),
       left: $(this).offset().left - $(window).scrollLeft(),

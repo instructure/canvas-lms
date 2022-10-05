@@ -17,10 +17,8 @@
  */
 
 import {combineReducers} from 'redux'
-import {handleAction} from 'redux-actions'
 import {reduceNotifications} from '@canvas/notifications/redux/actions'
 import {createPaginatedReducer} from '@canvas/pagination/redux/actions'
-import {actionTypes} from './actions'
 import allDiscussionsReducer from './reducers/allDiscussionsReducer'
 import pinnedDiscussionReducer from './reducers/pinnedDiscussionReducer'
 import unpinnedDiscussionReducer from './reducers/unpinnedDiscussionReducer'

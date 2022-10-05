@@ -23,7 +23,7 @@ const courseImageHandlers = {
     state.showModal = action.payload.showModal
     return state
   },
-  UPLOADING_IMAGE(state, action) {
+  UPLOADING_IMAGE(state, _action) {
     state.uploadingImage = true
     return state
   },

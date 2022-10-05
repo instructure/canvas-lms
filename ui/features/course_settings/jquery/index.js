@@ -18,10 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import {tabIdFromElement} from './course_settings_helper'
 import tz from '@canvas/timezone'
-import forceScreenReaderToReparse from 'force-screenreader-to-reparse'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime' /* datetimeString, date_field */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
@@ -111,7 +109,7 @@ var GradePublishing = {
     GradePublishing.status = 'publishing'
     GradePublishing.update({}, true)
     const successful_statuses = {published: 1, publishing: 1, pending: 1}
-    const error = function (data, xhr, status, error) {
+    const error = function (_data, _xhr, _status, _error) {
       GradePublishing.status = 'unknown'
       $.flashError(
         I18n.t(
@@ -197,7 +195,7 @@ $(document).ready(function () {
 
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $add_section_form
         .find('button')
         .attr('disabled', true)
@@ -238,7 +236,7 @@ $(document).ready(function () {
         .text(I18n.t('errors.section', 'Add Section Failed, Please Try Again'))
     },
   })
-  $('.cant_delete_section_link').click(function (event) {
+  $('.cant_delete_section_link').click(function (_event) {
     alert($(this).attr('title'))
     return false
   })
@@ -291,7 +289,7 @@ $(document).ready(function () {
       .confirmDelete({
         url: $(this).attr('href'),
         message: I18n.t('confirm.delete_section', 'Are you sure you want to delete this section?'),
-        success(data) {
+        success(_data) {
           const $prevItem = $(this).prev()
           const $toFocus = $prevItem.length
             ? $prevItem.find('.delete_section_link,.cant_delete_section_link')
@@ -305,8 +303,6 @@ $(document).ready(function () {
     return false
   })
   $('#nav_form').submit(function () {
-    const tab_id_regex = /(\d+)$/
-
     const tabs = []
     $('#nav_enabled_list li').each(function () {
       const tab_id = tabIdFromElement(this)
@@ -405,10 +401,10 @@ $(document).ready(function () {
       $(this).find('.storage_quota_mb').text(data['course[storage_quota_mb]'])
       $('.course_form_more_options').hide()
     },
-    success(data) {
+    success(_data) {
       $('#course_reload_form').submit()
     },
-    error(data) {
+    error(_data) {
       $(this).loadingImage('remove')
     },
     disableWhileLoading: 'spin_on_success',
@@ -481,7 +477,7 @@ $(document).ready(function () {
       url,
       'POST',
       {},
-      data => {
+      _data => {
         $enrollment_dialog.fillTemplateData({
           data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
         })
@@ -493,7 +489,7 @@ $(document).ready(function () {
           })
         }
       },
-      data => {
+      _data => {
         $link.text(I18n.t('errors.invitation', 'Invitation Failed.  Please try again.'))
       }
     )
@@ -525,7 +521,7 @@ $(document).ready(function () {
       $button.attr('href'),
       'POST',
       {},
-      function (data) {
+      function (_data) {
         $button
           .text(I18n.t('buttons.re_sent_all', 'Re-Sent All Unaccepted Invitations!'))
           .attr('disabled', false)
@@ -576,11 +572,11 @@ $(document).ready(function () {
     $('#reset_course_content_dialog').dialog('close')
   })
 
-  $('#course_custom_course_visibility').click(function (event) {
+  $('#course_custom_course_visibility').click(function (_event) {
     $('#customize_course_visibility').toggle(this.checked)
   })
 
-  $('#course_custom_course_visibility').ready(event => {
+  $('#course_custom_course_visibility').ready(_event => {
     if ($('#course_custom_course_visibility').prop('checked')) {
       $('#customize_course_visibility').toggle(true)
     } else {
@@ -615,16 +611,16 @@ $(document).ready(function () {
     })
   }
 
-  $('#course_course_visibility').change(function (event) {
+  $('#course_course_visibility').change(function (_event) {
     refresh_visibility_options()
     $('#customize_course_visibility select').val($('#course_course_visibility').val())
   })
 
-  $('#course_custom_course_visibility').ready(event => {
+  $('#course_custom_course_visibility').ready(_event => {
     refresh_visibility_options()
   })
 
-  $('#course_show_announcements_on_home_page').change(function (event) {
+  $('#course_show_announcements_on_home_page').change(function (_event) {
     $('#course_home_page_announcement_limit').prop('disabled', !$(this).prop('checked'))
   })
 

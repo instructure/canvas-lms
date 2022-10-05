@@ -89,7 +89,7 @@ export default {
     }
   },
 
-  hrefFor(folder) {},
+  hrefFor(_folder) {},
   // @makeHref (if folder.urlPath() then 'folder' else 'rootFolder'), splat: folder.urlPath()
 
   focusStyleClass: 'FolderTree__folderItem--focused',

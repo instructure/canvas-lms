@@ -37,7 +37,7 @@ const flickrHandlers = {
     state.searchTerm = ''
     return state
   },
-  FAIL_FLICKR_SEARCH(state, action) {
+  FAIL_FLICKR_SEARCH(state, _action) {
     state.searchResults = []
     state.searching = false
     return state

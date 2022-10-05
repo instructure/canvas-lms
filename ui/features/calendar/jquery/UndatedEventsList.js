@@ -93,7 +93,7 @@ export default class UndatedEventsList {
           this.calendar.closeEventPopups()
           $(this).hide()
         },
-        stop(e, ui) {
+        stop(_e, _ui) {
           // Only show the element after the drag stops if it doesn't have a start date now
           // (meaning it wasn't dropped on the calendar)
           if (!$(this).data('calendarEvent').start) $(this).show()
@@ -103,7 +103,7 @@ export default class UndatedEventsList {
       this.div.droppable({
         hoverClass: 'droppable-hover',
         accept: '.fc-event',
-        drop: (e, ui) => {
+        drop: (_e, _ui) => {
           let event
           if (!(event = this.calendar.lastEventDragged)) return
           event.start = null
@@ -126,7 +126,7 @@ export default class UndatedEventsList {
     this.load()
   }
 
-  toggle = e => {
+  toggle = _e => {
     // defer this until after the section toggles
     setTimeout(() => {
       this.hidden = !this.div.is(':visible')

@@ -24,18 +24,9 @@ import CollaborationsList from './CollaborationsList'
 import LoadingSpinner from './LoadingSpinner'
 
 class CollaborationsApp extends React.Component {
-  constructor(props) {
-    super(props)
-  }
-
   static propTypes = {
     applicationState: PropTypes.object,
     actions: PropTypes.object,
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const {createCollaborationPending, createCollaborationSuccessful} =
-      nextProps.applicationState.createCollaboration
   }
 
   render() {

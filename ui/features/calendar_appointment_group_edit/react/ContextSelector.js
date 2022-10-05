@@ -56,7 +56,7 @@ class ContextSelector extends React.Component {
     })
   }
 
-  componentDidUpdate(previousProps) {
+  componentDidUpdate(_previousProps) {
     this.setIndeterminates()
   }
 

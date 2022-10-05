@@ -36,15 +36,15 @@ $(document).ready(() => {
       $('.profile_url').attr('href'),
       'PUT',
       {'user[show_user_services]': $(this).prop('checked')},
-      data => {},
-      data => {}
+      _data => {},
+      _data => {}
     )
   })
 
   $('.unconclude_enrollment_link').click(function (event) {
     event.preventDefault()
     const $enrollment = $(this).parents('.enrollment')
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, _data => {
       $enrollment.find('.conclude_enrollment_link_holder').show()
       $enrollment.find('.unconclude_enrollment_link_holder').hide()
       $enrollment.find('.completed_at_holder').hide()
@@ -78,11 +78,11 @@ $(document).ready(() => {
       $(this).attr('href'),
       'POST',
       {limit},
-      data => {
+      _data => {
         $user.loadingImage('remove')
         $('.elevate_enrollment_link_holder,.restrict_enrollment_link_holder').slideToggle()
       },
-      data => {
+      _data => {
         $.flashError(
           I18n.t('enrollment_change_failed', 'Enrollment privilege change failed, please try again')
         )
@@ -102,7 +102,7 @@ $(document).ready(() => {
           'Are you sure you want to delete this enrollment?'
         ),
         url: $(this).attr('href'),
-        success(data) {
+        success(_data) {
           $(this).closest('.enrollment').hide()
         },
       })

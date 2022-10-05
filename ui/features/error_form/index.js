@@ -39,17 +39,17 @@ $(document).ready(() => {
   $('#submit_error_form').formSubmit({
     formErrors: false,
     required: requiredFields,
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this).loadingImage()
     },
 
-    success(data) {
+    success(_data) {
       $(this).loadingImage('remove')
       $.flashMessage(I18n.t('message_sent', "Thank you for your help!  We'll get right on this."))
       $('#submit_error_form').slideToggle()
     },
 
-    error(data) {
+    error(_data) {
       $(this).loadingImage('remove')
       $(this).errorBox(I18n.t('message_failed', "Report didn't send.  Please try again."))
     },

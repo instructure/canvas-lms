@@ -170,13 +170,13 @@ export default class CourseSelectionView extends View {
   }
 
   getCurrentContext() {
-    let course
     const matches = this._value.match(/(\w+)_(\d+)/)
     if (!matches) return {}
-    const [match, type, id] = Array.from(matches)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_match, type, id] = Array.from(matches)
     const context =
       type === 'course'
-        ? (course = this.options.courses.favorites.get(id) || this.options.courses.all.get(id))
+        ? this.options.courses.favorites.get(id) || this.options.courses.all.get(id)
         : this.options.courses.groups.get(id)
     if (context) {
       return {name: context.get('name'), id: this._value}

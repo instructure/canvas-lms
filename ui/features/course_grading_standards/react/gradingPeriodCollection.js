@@ -198,7 +198,7 @@ class GradingPeriodCollection extends React.Component {
             $.flashMessage(I18n.t('All changes were saved'))
             this.setState({disabled: false, periods: this.deserializePeriods(response)})
           })
-          .error(function (error) {
+          .error(function (_error) {
             this.setState({disabled: false})
             $.flashError(I18n.t('There was a problem saving the grading period'))
           })

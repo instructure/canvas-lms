@@ -24,7 +24,7 @@ const imageSearchHandlers = {
     state.alert = null
     return state
   },
-  START_IMAGE_SEARCH(state, action) {
+  START_IMAGE_SEARCH(state, _action) {
     state.searching = true
     state.prevUrl = null
     state.nextUrl = null

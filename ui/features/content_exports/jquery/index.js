@@ -25,7 +25,7 @@ import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('content_exports')
 
-$(document).ready(function (event) {
+$(document).ready(function (_event) {
   let state = 'nothing'
   let current_id = null
   const $quiz_selection = $('#quiz_selection'),
@@ -129,7 +129,7 @@ $(document).ready(function (event) {
         $('.export_messages').show()
       }
     },
-    error(data) {
+    error(_data) {
       $(this)
         .find('.submit_button')
         .attr('disabled', false)

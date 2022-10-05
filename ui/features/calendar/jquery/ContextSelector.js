@@ -45,7 +45,7 @@ class ContextSelectorItem {
     this.$sectionCheckboxes.change(this.sectionChange)
   }
 
-  toggleSections = e => {
+  toggleSections = _e => {
     this.$sectionsList.toggleClass('hidden')
     const $toggle = this.$listItem.find('.ag_sections_toggle')
     $toggle.toggleClass('ag-sections-expanded')

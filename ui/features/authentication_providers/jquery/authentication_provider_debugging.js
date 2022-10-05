@@ -74,6 +74,6 @@ $(document).ready(() => {
     stop_debugging($link)
 
     const url = $link.attr('href')
-    $.ajaxJSON(url, 'DELETE', {}, data => {})
+    $.ajaxJSON(url, 'DELETE', {}, _data => {})
   })
 })

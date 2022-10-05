@@ -25,7 +25,7 @@ const initialState = {
 }
 
 const deleteHandlers = {
-  [ACTION_NAMES.DELETE_COLLABORATION_START]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_START]: (state, _action) => {
     return {
       ...state,
       deleteCollaborationPending: true,
@@ -33,7 +33,7 @@ const deleteHandlers = {
       deleteCollaborationError: null,
     }
   },
-  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, action) => {
+  [ACTION_NAMES.DELETE_COLLABORATION_SUCCESSFUL]: (state, _action) => {
     return {
       ...state,
       deleteCollaborationPending: false,

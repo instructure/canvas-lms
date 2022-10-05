@@ -51,7 +51,7 @@ export default combineReducers({
     },
     null
   ),
-  courseId: (state = '', action) => state,
-  moduleId: (state = '', action) => state,
-  itemId: (state = '', action) => state,
+  courseId: (state = '', _action) => state,
+  moduleId: (state = '', _action) => state,
+  itemId: (state = '', _action) => state,
 })

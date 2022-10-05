@@ -271,9 +271,8 @@ export default class AutocompleteView extends Backbone.View {
   //
   // Returns a model object.
   _getModel(id) {
-    let result
     id = id && String(id)
-    return (result = this.modelCache.get(id))
+    return this.modelCache.get(id)
   }
 
   // Internal: Remove the "selected" class from result list items.
@@ -281,7 +280,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _clearSelectedStyles(e) {
+  _clearSelectedStyles(_e) {
     this.$resultList.find('.selected').removeClass('selected')
     return (this.selectedModel = null)
   }
@@ -291,7 +290,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _onWidgetClick(e) {
+  _onWidgetClick(_e) {
     return this.$input.focus()
   }
 
@@ -332,7 +331,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _onInputBlur(e) {
+  _onInputBlur(_e) {
     if (this._shouldPreventBlur) {
       this._shouldPreventBlur = false
       this.$input.focus()
@@ -365,7 +364,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _onSearchTermChange(e) {
+  _onSearchTermChange(_e) {
     if (!this.$input.val()) {
       this.toggleResultList(false)
     } else {
@@ -535,7 +534,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _onBackspaceKey(e) {
+  _onBackspaceKey(_e) {
     if (!this.$input.val()) {
       return this._removeToken(_.last(this.tokens))
     }
@@ -672,7 +671,7 @@ export default class AutocompleteView extends Backbone.View {
   // e - Event object.
   //
   // Returns nothing.
-  _onSearch(e) {
+  _onSearch(_e) {
     if (this.$searchBtn.attr('disabled')) return
     this._fetchResults(true)
     return this.$input.focus()

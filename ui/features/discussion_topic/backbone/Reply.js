@@ -54,7 +54,7 @@ class Reply {
       .find('form.discussion-reply-form:first')
       .submit(preventDefault(this.submit))
     this.textArea = this.getEditingElement()
-    this.form.find('.cancel_button').click(e => {
+    this.form.find('.cancel_button').click(_e => {
       RichContentEditor.closeRCE(this.textArea)
       this.hide()
     })
@@ -236,7 +236,7 @@ class Reply {
 
   // #
   // Adds an attachment
-  addAttachment($el) {
+  addAttachment(_$el) {
     this.form.find('ul.discussion-reply-attachments').append(replyAttachmentTemplate())
     this.form.find('ul.discussion-reply-attachments input').focus()
     return this.form.find('a.discussion-reply-add-attachment').hide() // TODO: when the data model allows it, tweak this to support multiple in the UI

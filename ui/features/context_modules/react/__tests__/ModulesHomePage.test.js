@@ -22,7 +22,6 @@ import ModulesHomePage from '../ModulesHomePage'
 
 describe('Modules Home Page', () => {
   const createButtonText = 'Create a new Module'
-  const importExistingButtonText = 'Add existing content'
 
   it('renders the create button', () => {
     const {queryByText} = render(<ModulesHomePage />)

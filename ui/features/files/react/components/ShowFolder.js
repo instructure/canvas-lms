@@ -123,13 +123,6 @@ ShowFolder.render = function () {
     return <div ref="emptyDiv" />
   }
 
-  let folderOrRootFolder
-  if (this.props.params.splat) {
-    folderOrRootFolder = 'folder'
-  } else {
-    folderOrRootFolder = 'rootFolder'
-  }
-
   const foldersNextPageOrFilesNextPage =
     this.props.currentFolder.folders.fetchingNextPage ||
     this.props.currentFolder.files.fetchingNextPage
@@ -153,8 +146,8 @@ ShowFolder.render = function () {
         id="selectAllCheckbox"
         className={selectAllLabelClass}
         type="checkbox"
-        onFocus={event => this.setState({hideToggleAll: false})}
-        onBlur={event => this.setState({hideToggleAll: true})}
+        onFocus={_event => this.setState({hideToggleAll: false})}
+        onBlur={_event => this.setState({hideToggleAll: true})}
         checked={this.props.areAllItemsSelected()}
         onChange={event => this.props.toggleAllSelected(event.target.checked)}
       />

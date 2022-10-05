@@ -69,7 +69,6 @@ class GradingPeriodSetForm extends React.Component {
 
   constructor(props) {
     super(props)
-    const setId = parseInt(props.set.id, 10)
     const associatedEnrollmentTerms = _.where(props.enrollmentTerms, {
       gradingPeriodGroupId: props.set.id,
     })

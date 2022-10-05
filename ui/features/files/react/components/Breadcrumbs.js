@@ -26,7 +26,6 @@ import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = useI18nScope('react_files')
 
-const MAX_CRUMB_WIDTH = 500
 const MIN_CRUMB_WIDTH = 80
 
 Breadcrumbs.renderSingleCrumb = function (folder, isLastCrumb, isRootCrumb) {
