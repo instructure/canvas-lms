@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import {MemoryRouter} from 'react-router-dom'
 import EventStream from '../index'
-import assertChange from 'chai-assert-change'
 import K from '../../../../constants'
 
 describe('canvas_quizzes/events/views/event_stream', () => {

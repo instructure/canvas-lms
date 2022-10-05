@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import FillInMultipleBlanks from '../fill_in_multiple_blanks'
 import assertChange from 'chai-assert-change'
@@ -102,7 +102,7 @@ describe('canvas_quizzes/statistics/views/questions/fill_in_multiple_blanks', ()
   })
 
   it('can switch answer sets', () => {
-    const {getByText, getByTestId} = render(<FillInMultipleBlanks {...fixture} />)
+    const {getByTestId} = render(<FillInMultipleBlanks {...fixture} />)
 
     assertChange({
       fn: () => {

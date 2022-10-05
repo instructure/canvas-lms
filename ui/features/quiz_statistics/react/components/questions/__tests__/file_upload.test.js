@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import FileUpload from '../file_upload'
-import assertChange from 'chai-assert-change'
 import {camelize} from '@canvas/quiz-legacy-client-apps/util/convert_case'
 
 describe('canvas_quizzes/statistics/views/questions/file_upload', () => {

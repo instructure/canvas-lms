@@ -47,7 +47,7 @@ export default function loadBanks() {
       $dialog.find('li.bank.blank').show()
       $dialog.find('li.message').hide()
     },
-    data => {
+    _data => {
       $dialog.find('li.message').text(I18n.t('error_loading_banks', 'Error loading banks'))
     }
   )
