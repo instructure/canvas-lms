@@ -135,7 +135,7 @@ class AssignmentModulesUI extends React.Component {
           onChangeSelection={this.handleChangeSelection}
           renderView={this.renderModulesView}
           size="medium"
-          multiple
+          multiple={true}
           options={allOptions}
           readOnly={this.props.readOnly}
           loadingText={this.props.isLoading ? I18n.t('Loading...') : null}

@@ -43,7 +43,7 @@ const GroupCategoryProgress = props => {
                 </Text>
               )}
               valueNow={props.progressPercent}
-              animateOnMount
+              animateOnMount={true}
             />
           </Flex.Item>
           <Flex.Item>

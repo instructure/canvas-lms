@@ -42,7 +42,9 @@ describe('EditableCodeValue', () => {
   })
 
   it('obscures secret values', () => {
-    const {getByText} = render(<EditableCodeValue onValueChange={callback} value="value" secret />)
+    const {getByText} = render(
+      <EditableCodeValue onValueChange={callback} value="value" secret={true} />
+    )
 
     expect(getByText('*'.repeat(24))).toBeInTheDocument()
   })

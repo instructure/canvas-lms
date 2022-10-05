@@ -64,7 +64,7 @@ describe('CourseTemplateDetails::', () => {
     })
 
     it('renders a spinner while loading, then the result div', async () => {
-      const {getByTestId} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId} = render(<CourseTemplateDetails isEditable={true} />)
       expect(getByTestId('loading-spinner')).toBeInTheDocument()
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
     })
@@ -81,7 +81,7 @@ describe('CourseTemplateDetails::', () => {
 
     it('renders an enabled control if editable, unchecked if not a template', async () => {
       setRoute(route1)
-      const {getByTestId} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId} = render(<CourseTemplateDetails isEditable={true} />)
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
       expect(checkbox.disabled).toBe(false)
@@ -90,7 +90,9 @@ describe('CourseTemplateDetails::', () => {
 
     it('renders a checked box if a template, with the right message for zero associations', async () => {
       setRoute(route2)
-      const {getByTestId, getByText, container} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId, getByText, container} = render(
+        <CourseTemplateDetails isEditable={true} />
+      )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
       expect(checkbox.disabled).toBe(false)
@@ -102,7 +104,9 @@ describe('CourseTemplateDetails::', () => {
 
     it('renders the right message for multiple associations', async () => {
       setRoute(route3)
-      const {getByTestId, getByText, container} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId, getByText, container} = render(
+        <CourseTemplateDetails isEditable={true} />
+      )
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const checkbox = getByTestId('result-checkbox')
       expect(checkbox.disabled).toBe(false)
@@ -114,7 +118,7 @@ describe('CourseTemplateDetails::', () => {
 
     it('renders the right message for more than ten associations', async () => {
       setRoute(route4)
-      const {getByTestId, getByText} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId, getByText} = render(<CourseTemplateDetails isEditable={true} />)
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       expect(getByText('Associated with 10+ accounts')).toBeInTheDocument()
     })
@@ -123,7 +127,7 @@ describe('CourseTemplateDetails::', () => {
   describe('the modal', () => {
     it('displays the modal only when the link is clicked on', async () => {
       setRoute(route3)
-      const {queryByTestId} = render(<CourseTemplateDetails isEditable />)
+      const {queryByTestId} = render(<CourseTemplateDetails isEditable={true} />)
       await waitFor(() => expect(queryByTestId('result-div')).toBeInTheDocument())
       expect(queryByTestId('result-modal')).toBeNull()
       const link = queryByTestId('result-n-assoc')
@@ -133,7 +137,7 @@ describe('CourseTemplateDetails::', () => {
 
     it('shows the right number of associated accounts in the modal', async () => {
       setRoute(route3)
-      const {getByTestId} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId} = render(<CourseTemplateDetails isEditable={true} />)
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const link = getByTestId('result-n-assoc')
       fireEvent.click(link)
@@ -145,7 +149,7 @@ describe('CourseTemplateDetails::', () => {
 
     it('shows the right overflow text if more than ten associated accounts', async () => {
       setRoute(route4)
-      const {getByTestId} = render(<CourseTemplateDetails isEditable />)
+      const {getByTestId} = render(<CourseTemplateDetails isEditable={true} />)
       await waitFor(() => expect(getByTestId('result-div')).toBeInTheDocument())
       const link = getByTestId('result-n-assoc')
       fireEvent.click(link)

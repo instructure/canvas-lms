@@ -59,7 +59,7 @@ export default class AssignmentDescription extends React.Component {
     return (
       <View as="div" margin="0 0 small" data-testid="AssignmentDescription">
         <ToggleDetails
-          defaultExpanded
+          defaultExpanded={true}
           summary={
             <>
               <Text>{I18n.t('Description')}</Text>

@@ -354,14 +354,14 @@ class SearchFormComponent extends Component {
                       formatDate={formatDate}
                       selectedDate={this.state.selected.from.value}
                       onSelectedDateChange={this.setSelectedFrom}
-                      withRunningValue
+                      withRunningValue={true}
                     />
                     <CanvasDateInput
                       renderLabel={I18n.t('End Date')}
                       formatDate={formatDate}
                       selectedDate={this.state.selected.to.value}
                       onSelectedDateChange={this.setSelectedTo}
-                      withRunningValue
+                      withRunningValue={true}
                     />
                   </FormFieldGroup>
                 </FormFieldGroup>

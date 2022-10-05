@@ -288,7 +288,7 @@ export default class CommentTextArea extends Component {
                 <FileList
                   files={this.state.currentFiles}
                   removeFileHandler={this.handleRemoveFile}
-                  canRemove
+                  canRemove={true}
                 />
               </div>
             )}
@@ -303,7 +303,7 @@ export default class CommentTextArea extends Component {
                     ref={element => {
                       this.fileInput = element
                     }}
-                    multiple
+                    multiple={true}
                     onChange={this.onFileSelected}
                     style={{
                       display: 'none',
@@ -352,7 +352,7 @@ export default class CommentTextArea extends Component {
                     }}
                     tabs={{embed: false, record: true, upload: true}}
                     uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
-                    disableSubmitWhileUploading
+                    disableSubmitWhileUploading={true}
                   />
                   <Button
                     disabled={

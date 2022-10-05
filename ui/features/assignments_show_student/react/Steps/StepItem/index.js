@@ -138,10 +138,10 @@ class StepItem extends Component {
             }}
             className="step-item-pin"
           >
-            <span aria-hidden>{this.selectIcon(this.props.icon, this.props.status)}</span>
+            <span aria-hidden={true}>{this.selectIcon(this.props.icon, this.props.status)}</span>
           </span>
         </span>
-        <span className="step-item-label" aria-hidden>
+        <span className="step-item-label" aria-hidden={true}>
           {this.props.label}
         </span>
         <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>

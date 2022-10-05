@@ -174,7 +174,7 @@ export default class IndexMenu extends React.Component {
         placement="assignment_index_menu"
         acceptedResourceTypes={['assignment']}
         targetResourceType="assignment"
-        allowItemSelection
+        allowItemSelection={true}
         selectableItems={groupData}
         onDismiss={handleDismiss}
         open={tool !== null}

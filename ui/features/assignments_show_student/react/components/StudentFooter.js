@@ -70,12 +70,12 @@ const PreviousItem = ({compact, tooltipText, url}) => (
 const DefaultFooterLayout = ({buttons, previousItem, nextItem}) => (
   <Flex alignItems="center" height="100%" margin="x-small" justifyItems="space-between">
     {previousItem && (
-      <Flex.Item shouldShrink>
+      <Flex.Item shouldShrink={true}>
         <PreviousItem {...previousItem} />
       </Flex.Item>
     )}
 
-    <Flex.Item shouldGrow margin="0 small">
+    <Flex.Item shouldGrow={true} margin="0 small">
       <Flex justifyItems="end">
         {buttons.map(button => (
           <Flex.Item key={button.key} margin="auto 0 auto x-small">
@@ -86,7 +86,7 @@ const DefaultFooterLayout = ({buttons, previousItem, nextItem}) => (
     </Flex.Item>
 
     {nextItem && (
-      <Flex.Item shouldShrink>
+      <Flex.Item shouldShrink={true}>
         <NextItem {...nextItem} />
       </Flex.Item>
     )}
@@ -97,9 +97,9 @@ const VerticalFooterLayout = ({buttons, previousItem, nextItem}) => (
   <View as="div" width="100%">
     <Flex alignItems="center" width="100%" justifyItems="space-between">
       <Flex.Item margin="x-small">
-        {previousItem && <PreviousItem compact {...previousItem} />}
+        {previousItem && <PreviousItem compact={true} {...previousItem} />}
       </Flex.Item>
-      <Flex.Item shouldGrow shouldShrink>
+      <Flex.Item shouldGrow={true} shouldShrink={true}>
         <Flex alignItems="center" direction="column">
           {buttons.map(button => (
             <Flex.Item
@@ -113,7 +113,9 @@ const VerticalFooterLayout = ({buttons, previousItem, nextItem}) => (
           ))}
         </Flex>
       </Flex.Item>
-      <Flex.Item margin="x-small">{nextItem && <NextItem compact {...nextItem} />}</Flex.Item>
+      <Flex.Item margin="x-small">
+        {nextItem && <NextItem compact={true} {...nextItem} />}
+      </Flex.Item>
     </Flex>
   </View>
 )

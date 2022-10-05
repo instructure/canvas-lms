@@ -61,7 +61,7 @@ it('does not render edit button when readOnly', () => {
       onChange={() => {}}
       onChangeMode={() => {}}
       label="The Label"
-      readOnly
+      readOnly={true}
     />
   )
   expect(queryByText('The Label')).toBeNull()
@@ -90,7 +90,7 @@ it('shows the content and not the placeholder when value is all whitespace and r
       onChangeMode={() => {}}
       label="The Label"
       placeholder="the placeholder"
-      readOnly
+      readOnly={true}
     />
   )
   expect(queryByText('the placeholder')).toBeNull()
