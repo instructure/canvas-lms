@@ -68,30 +68,32 @@ class DueDateCacher
     self.executing_users.last
   end
 
-  INFER_SUBMISSION_WORKFLOW_STATE_SQL = <<~SQL_FRAGMENT
-    CASE
-    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL AND (
-      SELECT EXISTS (
-        SELECT
-          *
-        FROM
-          #{Quizzes::QuizSubmission.quoted_table_name} qs
-        WHERE
-          quiz_submission_id = qs.id
-        AND workflow_state = 'pending_review'
-      )
-    ) THEN
-      'pending_review'
-    WHEN grade IS NOT NULL OR excused IS TRUE THEN
-      'graded'
-    WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
-      'pending_review'
-    WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
-      'submitted'
-    ELSE
-      'unsubmitted'
-    END
-  SQL_FRAGMENT
+  def self.infer_submission_workflow_state_sql
+    <<~SQL_FRAGMENT
+      CASE
+      WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL AND (
+        SELECT EXISTS (
+          SELECT
+            *
+          FROM
+            #{Quizzes::QuizSubmission.quoted_table_name} qs
+          WHERE
+            quiz_submission_id = qs.id
+          AND workflow_state = 'pending_review'
+        )
+      ) THEN
+        'pending_review'
+      WHEN grade IS NOT NULL OR excused IS TRUE THEN
+        'graded'
+      WHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN
+        'pending_review'
+      WHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN
+        'submitted'
+      ELSE
+        'unsubmitted'
+      END
+    SQL_FRAGMENT
+  end
 
   def self.recompute(assignment, update_grades: false, executing_user: nil)
     current_caller = caller(1..1).first
@@ -434,7 +436,7 @@ class DueDateCacher
           cached_due_date = vals.due_date::timestamptz,
           grading_period_id = vals.grading_period_id::integer,
           workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
-            #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
+            #{self.class.infer_submission_workflow_state_sql}
           )),
           anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
           cached_quiz_lti = vals.cached_quiz_lti,
@@ -447,7 +449,7 @@ class DueDateCacher
                 (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
                 (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
                 (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
-                  (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
+                  (#{self.class.infer_submission_workflow_state_sql})
                 )) OR
                 (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR
                 (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)
