@@ -290,6 +290,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.deleted_at = Time.now.utc
     res = save!
     if for_assignment? && !assignment.deleted?
+      assignment.skip_downstream_changes! if @skip_downstream_changes
       assignment.destroy
     end
     res

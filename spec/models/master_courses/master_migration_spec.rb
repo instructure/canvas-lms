@@ -405,6 +405,35 @@ describe MasterCourses::MasterMigration do
       end
     end
 
+    it "doesn't cause spurious sync exceptions when deleting graded quizzes and discussions from the blueprint" do
+      @copy_to = course_factory
+      @template.add_child_course!(@copy_to)
+
+      topic = @copy_from.assignments.create!(submission_types: "discussion_topic").discussion_topic
+      quiz = @copy_from.quizzes.create!(quiz_type: "assignment")
+
+      run_master_migration
+
+      topic_to = @copy_to.discussion_topics.where(migration_id: mig_id(topic)).first
+      quiz_to = @copy_to.quizzes.where(migration_id: mig_id(quiz)).first
+
+      Timecop.freeze(10.minutes.from_now) do
+        topic.destroy
+        quiz.destroy
+      end
+
+      Timecop.travel(20.minutes.from_now) do
+        run_master_migration
+      end
+
+      expect(topic_to.reload).to be_deleted
+      expect(quiz_to.reload).to be_deleted
+
+      child_sub = @copy_to.master_course_subscriptions.take
+      expect(child_sub.content_tag_for(topic_to).downstream_changes).to be_empty
+      expect(child_sub.content_tag_for(quiz_to).downstream_changes).to be_empty
+    end
+
     it "deletes associated pages before importing new ones" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)

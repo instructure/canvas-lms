@@ -1099,6 +1099,7 @@ class DiscussionTopic < ActiveRecord::Base
     save
 
     if for_assignment? && root_topic_id.blank? && !assignment.deleted?
+      assignment.skip_downstream_changes! if @skip_downstream_changes
       assignment.destroy
     end
 
