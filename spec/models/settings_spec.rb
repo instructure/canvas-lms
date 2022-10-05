@@ -83,5 +83,34 @@ describe Setting do
 
       expect(Setting.find_by(name: "new_nonsecret_setting").secret).to be_truthy
     end
+
+    context "when in a Rails console" do
+      before do
+        stub_const("Console", {})
+      end
+
+      it "logs a notice about SIGHUP" do
+        expect(Rails.logger).to receive(:info).with(a_string_including("SIGHUP"))
+        Setting.set("test_setting", "test_value")
+      end
+
+      it "logs a customized notice about SIGHUP" do
+        Setting.set("setting_set_sighup_required_message", "Custom message 🍕")
+
+        expect(Rails.logger).to receive(:info).with("Custom message 🍕")
+        Setting.set("test_setting", "test_value")
+      end
+    end
+
+    context "when not in a Rails console" do
+      before do
+        hide_const("Console")
+      end
+
+      it "does not log a notice about SIGHUP" do
+        expect(Rails.logger).not_to receive(:info).with(a_string_including("SIGHUP"))
+        Setting.set("test_setting", "test_value")
+      end
+    end
   end
 end
