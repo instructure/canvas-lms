@@ -32,7 +32,7 @@ test('captures contextAssetString, page, pageUrl, latest, and summary as constru
       page,
       pageUrl: 'page-url',
       latest: true,
-      summary: true
+      summary: true,
     }
   )
   strictEqual(revision.contextAssetString, 'course_73', 'contextAssetString')
@@ -47,7 +47,7 @@ test('urlRoot uses the context path and pageUrl', () => {
     {},
     {
       contextAssetString: 'course_73',
-      pageUrl: 'page-url'
+      pageUrl: 'page-url',
     }
   )
   strictEqual(revision.urlRoot(), '/api/v1/courses/73/pages/page-url/revisions', 'base url')
@@ -58,7 +58,7 @@ test('url returns urlRoot if latest and id are not specified', () => {
     {},
     {
       contextAssetString: 'course_73',
-      pageUrl: 'page-url'
+      pageUrl: 'page-url',
     }
   )
   strictEqual(revision.url(), '/api/v1/courses/73/pages/page-url/revisions', 'base url')
@@ -69,7 +69,7 @@ test('url is affected by the revision_id attribute', () => {
     {revision_id: 42},
     {
       contextAssetString: 'course_73',
-      pageUrl: 'page-url'
+      pageUrl: 'page-url',
     }
   )
   strictEqual(revision.url(), '/api/v1/courses/73/pages/page-url/revisions/42', 'revision 42')
@@ -81,7 +81,7 @@ test('url is affected by the latest flag', () => {
     {
       contextAssetString: 'course_73',
       pageUrl: 'page-url',
-      latest: true
+      latest: true,
     }
   )
   strictEqual(revision.url(), '/api/v1/courses/73/pages/page-url/revisions/latest', 'latest')
@@ -104,7 +104,7 @@ test('restore POSTs to the revision', () => {
     {revision_id: 42},
     {
       contextAssetString: 'course_73',
-      pageUrl: 'page-url'
+      pageUrl: 'page-url',
     }
   )
   const mock = sandbox.mock($)
@@ -125,7 +125,7 @@ test('the summary flag is passed to the server', () => {
     {
       contextAssetString: 'course_73',
       pageUrl: 'page-url',
-      summary: true
+      summary: true,
     }
   )
   revision.fetch()

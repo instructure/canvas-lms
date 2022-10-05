@@ -25,7 +25,7 @@ QUnit.module('AssignmentOverride', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test("#representsDefaultDueDate returns true if course_section_id == '0'", () => {
@@ -46,7 +46,7 @@ test('#AssignmentOverride.defaultDueDate class method returns an AssignmentOverr
 test('updates id to undefined if course_section_changes', () => {
   const override = new AssignmentOverride({
     id: 1,
-    course_section_id: 1
+    course_section_id: 1,
   })
   override.set('course_section_id', 3)
   strictEqual(override.toJSON().assignment_override.id, undefined)
@@ -56,11 +56,11 @@ test('#combinedDates returns unique values for overrides with the same due date'
   const due_date = new Date()
   const override1 = new AssignmentOverride({
     id: 1,
-    due_at: due_date.toISOString()
+    due_at: due_date.toISOString(),
   })
   const override2 = new AssignmentOverride({
     id: 2,
-    due_at: due_date.toISOString()
+    due_at: due_date.toISOString(),
   })
   notEqual(override1.combinedDates(), override2.combinedDates())
 })

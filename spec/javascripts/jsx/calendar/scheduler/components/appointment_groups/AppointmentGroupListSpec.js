@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import AppointmentGroupList from 'ui/features/calendar_appointment_group_edit/react/AppointmentGroupList.js'
+import AppointmentGroupList from 'ui/features/calendar_appointment_group_edit/react/AppointmentGroupList'
 
 QUnit.module('AppointmentGroupList')
 

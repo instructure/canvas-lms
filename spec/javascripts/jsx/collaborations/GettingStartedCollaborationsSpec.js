@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GettingStartedCollaborations from 'ui/features/lti_collaborations/react/GettingStartedCollaborations.js'
+import GettingStartedCollaborations from 'ui/features/lti_collaborations/react/GettingStartedCollaborations'
 
 QUnit.module('GettingStartedCollaborations')
 

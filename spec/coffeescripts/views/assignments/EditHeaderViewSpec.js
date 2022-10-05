@@ -26,15 +26,15 @@ import assertions from 'helpers/assertions'
 
 const defaultAssignmentOpts = {
   name: 'Test Assignment',
-  assignment_overrides: []
+  assignment_overrides: [],
 }
-const editHeaderView = function(assignmentOptions = {}, viewOptions = {}, beforeRender) {
+const editHeaderView = function (assignmentOptions = {}, viewOptions = {}, beforeRender) {
   Object.assign(assignmentOptions, defaultAssignmentOpts)
   const assignment = new Assignment(assignmentOptions)
   const app = new EditHeaderView({
     model: assignment,
     views: {edit_assignment_form: new Backbone.View({template: editViewTemplate})},
-    userIsAdmin: viewOptions.userIsAdmin
+    userIsAdmin: viewOptions.userIsAdmin,
   })
   if (beforeRender) beforeRender(app)
   return app.render()
@@ -48,7 +48,7 @@ QUnit.module('EditHeaderView', {
   teardown() {
     fakeENV.teardown()
     return $(document).off('submit')
-  }
+  },
 })
 
 test('should be accessible', assert => {
@@ -82,7 +82,7 @@ test('disallows deleting assignments due in closed grading periods', () => {
 test('allows deleting non-frozen assignments not due in closed grading periods', () => {
   const view = editHeaderView({
     frozen: false,
-    in_closed_grading_period: false
+    in_closed_grading_period: false,
   })
   ok(view.$('.delete_assignment_link:not(.disabled)').length)
 })
@@ -111,13 +111,13 @@ QUnit.module('EditHeaderView - try deleting assignment', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1}
+      assignment: {id: 1},
     }
   },
   teardown() {
     fakeENV.teardown()
     return window.$.restore()
-  }
+  },
 })
 
 test('attempt to delete an assignment, but clicked Cancel on confirmation box', () => {
@@ -140,12 +140,12 @@ QUnit.module('EditHeaderView - ConditionalRelease', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1}
+      assignment: {id: 1},
     }
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('disables conditional release tab on load when grading type is not_graded', () => {
@@ -171,7 +171,7 @@ test('switches to conditional release tab if save error contains conditional rel
   view.$headerTabsCr.tabs('option', 'active', 0)
   view.onShowErrors({
     foo: 'bar',
-    conditional_release: 'baz'
+    conditional_release: 'baz',
   })
   equal(1, view.$headerTabsCr.tabs('option', 'active'))
 })
@@ -182,7 +182,7 @@ test('switches to details tab if save error does not contain conditional release
   view.$headerTabsCr.tabs('option', 'active', 1)
   view.onShowErrors({
     foo: 'bar',
-    baz: 'bat'
+    baz: 'bat',
   })
   equal(0, view.$headerTabsCr.tabs('option', 'active'))
 })

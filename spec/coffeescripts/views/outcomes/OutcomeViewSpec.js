@@ -36,7 +36,7 @@ const outcome1 = () => new Outcome(buildOutcome1(), {parse: true})
 const buildOutcome1 = () =>
   buildOutcome({
     calculation_method: 'decaying_average',
-    calculation_int: '65'
+    calculation_int: '65',
   })
 
 function buildOutcome(outcomeOptions, outcomeLinkOptions) {
@@ -56,8 +56,8 @@ function buildOutcome(outcomeOptions, outcomeLinkOptions) {
       calculation_method: 'decaying_average',
       calculation_int: 65,
       assessed: false,
-      can_edit: true
-    }
+      can_edit: true,
+    },
   }
   if (outcomeOptions) {
     Object.assign(base.outcome, outcomeOptions)
@@ -98,7 +98,7 @@ function commonTests() {
   test('placeholder text is rendered properly for new outcomes', () => {
     const view = createView({
       model: newOutcome(),
-      state: 'add'
+      state: 'add',
     })
     equal(view.$('input[name="title"]').attr('placeholder'), 'New Outcome')
     view.remove()
@@ -111,14 +111,14 @@ function commonTests() {
           assessed: true,
           native: true,
           can_edit: true,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: true,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
     ok(view.$('.delete_button').attr('disabled'))
@@ -132,14 +132,14 @@ function commonTests() {
           assessed: false,
           native: true,
           can_edit: true,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: false,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
     notOk(view.$('.delete_button').attr('disabled'))
@@ -153,14 +153,14 @@ function commonTests() {
           assessed: true,
           native: true,
           can_edit: true,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: false,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$('.edit_button').length > 0)
     notOk(view.$('.edit_button').attr('disabled'))
@@ -174,14 +174,14 @@ function commonTests() {
           assessed: false,
           native: true,
           can_edit: true,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: false,
-          can_unlink: false
+          can_unlink: false,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$('.edit_button').length > 0)
     strictEqual(view.$('.delete_button').length, 0)
@@ -197,14 +197,14 @@ function commonTests() {
           assessed: false,
           native: false,
           can_edit: false,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: false,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$('.delete_button').length > 0)
     ok(view.$('.move_button').length > 0)
@@ -222,14 +222,14 @@ function commonTests() {
           assessed: false,
           native: false,
           can_edit: false,
-          can_unlink: true
+          can_unlink: true,
         },
         {
           assessed: false,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     strictEqual(view.$('.delete_button').length, 0)
     strictEqual(view.$('.move_button').length, 0)
@@ -244,7 +244,7 @@ function commonTests() {
         {assessed: true, native: true, has_updateable_rubrics: true},
         {can_unlink: true}
       ),
-      state: 'edit'
+      state: 'edit',
     })
     view.edit($.Event())
     view.$('#title').val('this is a brand new title')
@@ -265,7 +265,7 @@ function commonTests() {
         {assessed: true, native: true, has_updateable_rubrics: true},
         {can_unlink: true}
       ),
-      state: 'edit'
+      state: 'edit',
     })
     view.edit($.Event())
     view.$('form').trigger('submit')
@@ -285,7 +285,7 @@ function commonTests() {
         {assessed: true, native: true, has_updateable_rubrics: false},
         {can_unlink: true}
       ),
-      state: 'edit'
+      state: 'edit',
     })
     view.edit($.Event())
     view.$('form').trigger('submit')
@@ -305,14 +305,14 @@ function commonTests() {
           assessed: true,
           native: false,
           can_edit: true,
-          context_type: 'Account'
+          context_type: 'Account',
         },
         {
           assessed: true,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
     ok(view.$el.find('.delete_button').attr('disabled'))
@@ -326,14 +326,14 @@ function commonTests() {
           assessed: true,
           native: false,
           can_edit: true,
-          context_type: 'Account'
+          context_type: 'Account',
         },
         {
           assessed: false,
-          can_unlink: true
+          can_unlink: true,
         }
       ),
-      state: 'show'
+      state: 'show',
     })
     ok(view.$el.find('.delete_button').length > 0)
     ok(!view.$el.find('.delete_button').attr('disabled'))
@@ -343,7 +343,7 @@ function commonTests() {
   test('validates title is present', function () {
     const view = createView({
       model: this.outcome1,
-      state: 'edit'
+      state: 'edit',
     })
     view.$('#title').val('')
     view.$('#dtitle').trigger('change')
@@ -356,7 +356,7 @@ function commonTests() {
     const long_name = 'X'.repeat(260)
     const view = createView({
       model: this.outcome1,
-      state: 'edit'
+      state: 'edit',
     })
     view.$('#title').val(long_name)
     ok(!view.isValid())
@@ -368,7 +368,7 @@ function commonTests() {
     const long_name = 'X'.repeat(260)
     const view = createView({
       model: this.outcome1,
-      state: 'edit'
+      state: 'edit',
     })
     view.$('#display_name').val(long_name)
     ok(!view.isValid())
@@ -391,7 +391,7 @@ QUnit.module('OutcomeView', {
     fakeENV.teardown()
     window.tinymce?.remove() // Don't leave anything hanging around
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 commonTests()
@@ -399,7 +399,7 @@ commonTests()
 test('dropdown includes available calculation methods', function () {
   const view = createView({
     model: this.outcome1,
-    state: 'edit'
+    state: 'edit',
   })
   const methods = $.map($('#calculation_method option'), option => option.value)
   deepEqual(['decaying_average', 'n_mastery', 'latest', 'highest', 'average'], methods)
@@ -409,7 +409,7 @@ test('dropdown includes available calculation methods', function () {
 test('calculation method of decaying_average is rendered properly on show', function () {
   const view = createView({
     model: this.outcome1,
-    state: 'show'
+    state: 'show',
   })
   ok(view.$('#calculation_method').length)
   equal(view.$('#calculation_method').data('calculation-method'), 'decaying_average')
@@ -422,9 +422,9 @@ test('calculation method of n mastery is rendered properly on show', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'n_mastery',
-      calculation_int: 2
+      calculation_int: 2,
     }),
-    state: 'show'
+    state: 'show',
   })
   equal(view.$('#calculation_method').data('calculation-method'), 'n_mastery')
   equal(view.$('#calculation_int').text(), '2')
@@ -439,9 +439,9 @@ test('calculation method of highest is rendered properly on show', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'highest',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'show'
+    state: 'show',
   })
   equal(view.$('#calculation_method').data('calculation-method'), 'highest')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -452,9 +452,9 @@ test('calculation method of latest is rendered properly on show', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'latest',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'show'
+    state: 'show',
   })
   equal(view.$('#calculation_method').data('calculation-method'), 'latest')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -465,9 +465,9 @@ test('calculation method of average is rendered properly on show', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'average',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'show'
+    state: 'show',
   })
   equal(view.$('#calculation_method').data('calculation-method'), 'average')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -478,9 +478,9 @@ test('calculation method of decaying_average is rendered properly on edit', () =
   const view = createView({
     model: newOutcome({
       calculation_method: 'decaying_average',
-      calculation_int: 65
+      calculation_int: 65,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'decaying_average')
   equal(view.$('#calculation_int').val(), '65')
@@ -492,9 +492,9 @@ test('calculation method of n mastery is rendered properly on edit', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'n_mastery',
-      calculation_int: 2
+      calculation_int: 2,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'n_mastery')
   equal(view.$('#calculation_int').val(), '2')
@@ -506,9 +506,9 @@ test('calculation method of highest is rendered properly on edit', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'highest',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'highest')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -519,9 +519,9 @@ test('calculation method of latest is rendered properly on edit', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'latest',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'latest')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -532,9 +532,9 @@ test('calculation method of average is rendered properly on edit', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'average',
-      calculation_int: null
+      calculation_int: null,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'average')
   ok(!view.$('#calculation_int_left_side').is(':visible'))
@@ -544,7 +544,7 @@ test('calculation method of average is rendered properly on edit', () => {
 test('calculation method is rendered properly on add', () => {
   const view = createView({
     model: newOutcome(),
-    state: 'add'
+    state: 'add',
   })
   equal(view.$('#calculation_method').val(), 'decaying_average')
   equal(view.$('#calculation_int').val(), '65')
@@ -556,9 +556,9 @@ test('calculation int updates when the calculation method is changed', () => {
   const view = createView({
     model: newOutcome({
       calculation_method: 'decaying_average',
-      calculation_int: 75
+      calculation_int: 75,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   equal(view.$('#calculation_method').val(), 'decaying_average')
   equal(view.$('#calculation_int').val(), '75')
@@ -611,14 +611,14 @@ test('warning text present when viewing an assessed account outcome in its nativ
         assessed: true,
         native: true,
         can_edit: true,
-        can_unlink: true
+        can_unlink: true,
       },
       {
         assessed: false,
-        can_unlink: true
+        can_unlink: true,
       }
     ),
-    state: 'show'
+    state: 'show',
   })
   ok(view.$('.outcome-assessed-info-banner').length > 0)
   view.remove()
@@ -635,14 +635,14 @@ test('an informative banner is displayed when outcome has been assessed', () => 
     model: newOutcome(
       {
         assessed: true,
-        native: true
+        native: true,
       },
       {
         assessed: true,
-        can_unlink: true
+        can_unlink: true,
       }
     ),
-    state: 'show'
+    state: 'show',
   })
   ok(view.$('#assessed_info_banner').length > 0)
   view.remove()
@@ -653,11 +653,11 @@ test('the banner is not displayed when the outcome is not assessed', () => {
     model: newOutcome(
       {
         assessed: false,
-        native: true
+        native: true,
       },
       {can_unlink: true}
     ),
-    state: 'show'
+    state: 'show',
   })
   ok(!view.$('#assessed_info_banner').length > 0)
 })
@@ -669,7 +669,7 @@ test('it attempts a confirmation dialog when calculation is modified', assert =>
       {assessed: true, native: true, has_updateable_rubrics: true},
       {can_unlink: true}
     ),
-    state: 'edit'
+    state: 'edit',
   })
   view.edit($.Event())
   changeSelectedCalcMethod(view, 'latest')
@@ -686,7 +686,7 @@ test('it attempts a confirmation dialog when calculation is modified', assert =>
 test('validates mastery points', function () {
   const view = createView({
     model: this.outcome1,
-    state: 'edit'
+    state: 'edit',
   })
   view.$('input[name="mastery_points"]').val('-1')
   ok(!view.isValid())
@@ -697,13 +697,13 @@ test('validates mastery points', function () {
 test('validates i18n mastery points', function () {
   const view = createView({
     model: this.outcome1,
-    state: 'edit'
+    state: 'edit',
   })
   I18nStubber.pushFrame()
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'number.format.delimiter': ' ',
-    'number.format.separator': ','
+    'number.format.separator': ',',
   })
   view.$('input[name="mastery_points"]').val('1 234,5')
   ok(view.isValid())
@@ -738,7 +738,7 @@ test('getModifiedFields returns true for calculationInt when modified', () => {
 test('getModifiedFields returns false when calculationInt changed but not used', () => {
   const view = createView({
     model: newOutcome({calculation_method: 'latest', calculation_int: null}),
-    state: 'edit'
+    state: 'edit',
   })
   view.edit($.Event())
   changeSelectedCalcMethod(view, 'decaying_average')
@@ -759,7 +759,7 @@ test('getModifiedFields returns true mastery points when modified', () => {
 test('calculation int gets set intelligently when the calc method is changed', () => {
   const view = createView({
     model: newOutcome({calculation_method: 'highest'}),
-    state: 'edit'
+    state: 'edit',
   })
   changeSelectedCalcMethod(view, 'n_mastery')
   equal(view.$('#calculation_int').val(), '5')
@@ -781,9 +781,9 @@ test('calc int is not incorrectly changed to 65 when starting as n mastery and 5
   const view = createView({
     model: newOutcome({
       calculation_method: 'n_mastery',
-      calculation_int: 5
+      calculation_int: 5,
     }),
-    state: 'edit'
+    state: 'edit',
   })
   changeSelectedCalcMethod(view, 'n_mastery')
   equal(view.$('#calculation_int').val(), '5')
@@ -797,7 +797,7 @@ test('it attempts a confirmation dialog when outcome calculation is modified', a
       {assessed: true, native: true, has_updateable_rubrics: true},
       {can_unlink: true}
     ),
-    state: 'edit'
+    state: 'edit',
   })
   view.edit($.Event())
   changeSelectedCalcMethod(view, 'latest')
@@ -819,7 +819,7 @@ test('it saves without dialog when outcome calculation is changed but no rubrics
       {assessed: false, native: true, has_updateable_rubrics: false},
       {can_unlink: true}
     ),
-    state: 'edit'
+    state: 'edit',
   })
   view.edit($.Event())
   view.$('form').trigger('submit')
@@ -846,7 +846,7 @@ QUnit.module('OutcomeView with mastery scales', {
     fakeENV.teardown()
     window.tinymce?.remove() // Don't leave anything hanging around
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 commonTests()

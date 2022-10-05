@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import createAnnIndex from 'ui/features/announcements/react/index.js'
+import createAnnIndex from 'ui/features/announcements/react/index'
 
 let app = null
 const container = document.getElementById('fixtures')

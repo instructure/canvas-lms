@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import InvitationsView from 'ui/features/roster/backbone/views/InvitationsView.js'
+import InvitationsView from 'ui/features/roster/backbone/views/InvitationsView'
 import RosterUser from 'ui/features/roster/backbone/models/RosterUser.coffee'
 import assertions from 'helpers/assertions'
 
@@ -26,9 +26,9 @@ QUnit.module('InvitationsView', {
   teardown() {
     $('.ui-tooltip').remove()
     return $('.ui-dialog').remove()
-  }
+  },
 })
-const buildView = function(enrollment) {
+const buildView = function (enrollment) {
   const model = new RosterUser({enrollments: [enrollment]})
   model.currentRole = 'student'
   return new InvitationsView({model})
@@ -37,7 +37,7 @@ test('it should be accessible', assert => {
   const enrollment = {
     id: 1,
     role: 'student',
-    enrollment_state: 'invited'
+    enrollment_state: 'invited',
   }
   const view = buildView(enrollment)
   const done = assert.async()
@@ -48,7 +48,7 @@ test('knows when invitation is pending', () => {
   const enrollment = {
     id: 1,
     role: 'student',
-    enrollment_state: 'invited'
+    enrollment_state: 'invited',
   }
   const view = buildView(enrollment)
   equal(view.invitationIsPending(), true)
@@ -58,7 +58,7 @@ test('knows when invitation is not pending', () => {
   const enrollment = {
     id: 1,
     role: 'student',
-    enrollment_state: 'accepted'
+    enrollment_state: 'accepted',
   }
   const view = buildView(enrollment)
   equal(view.invitationIsPending(), false)

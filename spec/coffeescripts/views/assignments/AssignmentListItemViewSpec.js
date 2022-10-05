@@ -44,11 +44,11 @@ AssignmentCollection.initClass()
 const assignment1 = function () {
   const date1 = {
     due_at: '2013-08-28T23:59:00-06:00',
-    title: 'Summer Session'
+    title: 'Summer Session',
   }
   const date2 = {
     due_at: '2013-08-28T23:59:00-06:00',
-    title: 'Winter Session'
+    title: 'Winter Session',
   }
   return buildAssignment({
     id: 1,
@@ -57,32 +57,32 @@ const assignment1 = function () {
     due_at: '2013-08-21T23:59:00-06:00',
     points_possible: 2,
     position: 1,
-    all_dates: [date1, date2]
+    all_dates: [date1, date2],
   })
 }
 const assignment_grade_percent = () =>
   buildAssignment({
     id: 2,
     name: 'Science Quiz',
-    grading_type: 'percent'
+    grading_type: 'percent',
   })
 const assignment_grade_pass_fail = () =>
   buildAssignment({
     id: 2,
     name: 'Science Quiz',
-    grading_type: 'pass_fail'
+    grading_type: 'pass_fail',
   })
 const assignment_grade_letter_grade = () =>
   buildAssignment({
     id: 2,
     name: 'Science Quiz',
-    grading_type: 'letter_grade'
+    grading_type: 'letter_grade',
   })
 const assignment_grade_not_graded = () =>
   buildAssignment({
     id: 2,
     name: 'Science Quiz',
-    grading_type: 'not_graded'
+    grading_type: 'not_graded',
   })
 const buildAssignment = function (options) {
   if (options == null) {
@@ -100,7 +100,7 @@ const buildAssignment = function (options) {
     html_url: `http://localhost:3000/courses/1/assignments/${options.id}`,
     needs_grading_count: 0,
     all_dates: [],
-    published: true
+    published: true,
   }
   Object.assign(base, options)
   const ac = new AssignmentCollection([base])
@@ -112,13 +112,13 @@ const createView = function (model, options) {
     canManage: true,
     canReadGrades: false,
     courseId: '42',
-    ...options
+    ...options,
   }
   ENV.PERMISSIONS = {
     manage: options.canManage,
     manage_assignments_add: options.canAdd || options.canManage,
     manage_assignments_delete: options.canDelete || options.canManage,
-    read_grades: options.canReadGrades
+    read_grades: options.canReadGrades,
   }
 
   if (options.individualAssignmentPermissions) {
@@ -132,7 +132,7 @@ const createView = function (model, options) {
 
   const view = new AssignmentListItemView({
     model,
-    userIsAdmin: options.userIsAdmin
+    userIsAdmin: options.userIsAdmin,
   })
   view.$el.appendTo($('#fixtures'))
   view.render()
@@ -149,7 +149,7 @@ const genSetup = function (model = assignment1()) {
   fakeENV.setup({
     current_user_roles: ['teacher'],
     PERMISSIONS: {manage: false},
-    URLS: {assignment_sort_base_url: 'test'}
+    URLS: {assignment_sort_base_url: 'test'},
   })
   this.model = model
   this.submission = new Submission()
@@ -168,7 +168,7 @@ QUnit.module('AssignmentListItemViewSpec', {
   setup() {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
     genSetup.call(this)
     return I18nStubber.pushFrame()
@@ -178,7 +178,7 @@ QUnit.module('AssignmentListItemViewSpec', {
     genTeardown.call(this)
     tzInTest.restore()
     return I18nStubber.clear()
-  }
+  },
 })
 
 // eslint-disable-next-line qunit/resolve-async
@@ -207,7 +207,7 @@ test('initializes sis toggle if post to sis enabled', function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: true,
-    post_to_sis: true
+    post_to_sis: true,
   })
   ok(view.sisButtonView)
 })
@@ -216,7 +216,7 @@ test('does not initialize sis toggle if post to sis disabled', function () {
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: true,
-    post_to_sis: false
+    post_to_sis: false,
   })
   ok(!view.sisButtonView)
 })
@@ -225,7 +225,7 @@ test('does not initialize sis toggle if assignment is not graded', function () {
   this.model.set('submission_types', ['not_graded'])
   const view = createView(this.model, {
     canManage: true,
-    post_to_sis: true
+    post_to_sis: true,
   })
   ok(!view.sisButtonView)
 })
@@ -234,7 +234,7 @@ test("does not initialize sis toggle if post to sis disabled but can't manage", 
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: false,
-    post_to_sis: false
+    post_to_sis: false,
   })
   ok(!view.sisButtonView)
 })
@@ -243,7 +243,7 @@ test("does not initialize sis toggle if sis enabled but can't manage", function 
   this.model.set('published', true)
   const view = createView(this.model, {
     canManage: false,
-    post_to_sis: true
+    post_to_sis: true,
   })
   ok(!view.sisButtonView)
 })
@@ -252,7 +252,7 @@ test("does not initialize sis toggle if post to sis disabled, can't manage and i
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: false,
-    post_to_sis: false
+    post_to_sis: false,
   })
   ok(!view.sisButtonView)
 })
@@ -261,7 +261,7 @@ test("does not initialize sis toggle if sis enabled, can't manage and is unpubli
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: false,
-    post_to_sis: true
+    post_to_sis: true,
   })
   ok(!view.sisButtonView)
 })
@@ -270,7 +270,7 @@ test('does not initialize sis toggle if post to sis disabled, can manage and is 
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: true,
-    post_to_sis: false
+    post_to_sis: false,
   })
   ok(!view.sisButtonView)
 })
@@ -279,7 +279,7 @@ test('does not initialize sis toggle if sis enabled, can manage and is unpublish
   this.model.set('published', false)
   const view = createView(this.model, {
     canManage: true,
-    post_to_sis: true
+    post_to_sis: true,
   })
   ok(!view.sisButtonView)
 })
@@ -311,7 +311,7 @@ QUnit.skip(
 
 test('does not show sharing and copying menu items if not DIRECT_SHARE_ENABLED', function () {
   const view = createView(this.model, {
-    directShareEnabled: false
+    directShareEnabled: false,
   })
   strictEqual(view.$('.send_assignment_to').length, 0)
   strictEqual(view.$('.copy_assignment_to').length, 0)
@@ -371,8 +371,8 @@ test('delete calls screenreader message', function () {
       id: '1',
       unpublishable: true,
       only_visible_to_overrides: false,
-      locked_for_user: false
-    })
+      locked_for_user: false,
+    }),
   ])
   const view = createView(this.model)
   view.delete()
@@ -385,7 +385,7 @@ test('delete calls screenreader message', function () {
 test('show score if score is set', function () {
   this.submission.set({
     score: 1.5555,
-    grade: '1.5555'
+    grade: '1.5555',
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -415,7 +415,7 @@ test('show no submission if none exists', function () {
 test('show score if 0 correctly', function () {
   this.submission.set({
     score: 0,
-    grade: '0'
+    grade: '0',
   })
   this.model.set('submission', this.submission)
   equal(screenreaderText(), 'Score: 0 out of 2 points.', 'sets screenreader text for 0 points')
@@ -436,7 +436,7 @@ test('show no submission if submission object with no submission type', function
 test('show not yet graded if submission type but no grade', function () {
   this.submission.set({
     submission_type: 'online',
-    notYetGraded: true
+    notYetGraded: true,
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -498,7 +498,7 @@ test('allows publishing', function () {
   this.server.respondWith('PUT', '/api/v1/users/1/assignments/1', [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify('')
+    JSON.stringify(''),
   ])
   this.model.set('published', false)
   const view = createView(this.model)
@@ -528,7 +528,7 @@ test('render score template with permission', function () {
   const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
-    canReadGrades: true
+    canReadGrades: true,
   })
   ok(spy.called)
 })
@@ -537,7 +537,7 @@ test('does not render score template without permission', function () {
   const spy = sandbox.spy(AssignmentListItemView.prototype, 'updateScore')
   createView(this.model, {
     canManage: false,
-    canReadGrades: false
+    canReadGrades: false,
   })
   equal(spy.callCount, 0)
 })
@@ -545,12 +545,12 @@ test('does not render score template without permission', function () {
 test('renders lockAt/unlockAt with locale-appropriate format string', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(french, 'fr_FR'),
-    momentLocale: 'fr'
+    momentLocale: 'fr',
   })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'août',9,10,11,12],
+    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'août', 9, 10, 11, 12],
     'date.formats.date_at_time': '%-d %b à %k:%M',
   })
   const model = buildAssignment({
@@ -559,13 +559,13 @@ test('renders lockAt/unlockAt with locale-appropriate format string', function (
     all_dates: [
       {
         lock_at: '2113-08-28T04:00:00Z',
-        title: 'Summer Session'
+        title: 'Summer Session',
       },
       {
         unlock_at: '2113-08-28T04:00:00Z',
-        title: 'Winter Session'
-      }
-    ]
+        title: 'Winter Session',
+      },
+    ],
   })
   const view = createView(model, {canManage: true})
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
@@ -577,13 +577,13 @@ test('renders lockAt/unlockAt in appropriate time zone', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(juneau, 'America/Juneau'),
     tzData: {
-      'America/Juneau': juneau
-    }
+      'America/Juneau': juneau,
+    },
   })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
     'date.formats.date_at_time': '%b %-d at %l:%M%P',
-    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'Aug',9,10,11,12],
+    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'Aug', 9, 10, 11, 12],
   })
   const model = buildAssignment({
     id: 1,
@@ -591,13 +591,13 @@ test('renders lockAt/unlockAt in appropriate time zone', function () {
     all_dates: [
       {
         lock_at: '2113-08-28T04:00:00Z',
-        title: 'Summer Session'
+        title: 'Summer Session',
       },
       {
         unlock_at: '2113-08-28T04:00:00Z',
-        title: 'Winter Session'
-      }
-    ]
+        title: 'Winter Session',
+      },
+    ],
   })
   const view = createView(model, {canManage: true})
   const $dds = view.dateAvailableColumnView.$(`#vdd_tooltip_${this.model.id}_lock div`)
@@ -608,7 +608,7 @@ test('renders lockAt/unlockAt in appropriate time zone', function () {
 test('renders lockAt/unlockAt for multiple due dates', () => {
   const model = buildAssignment({
     id: 1,
-    all_dates: [{due_at: new Date().toISOString()}, {due_at: new Date().toISOString()}]
+    all_dates: [{due_at: new Date().toISOString()}, {due_at: new Date().toISOString()}],
   })
   const view = createView(model)
   const json = view.toJSON()
@@ -620,7 +620,7 @@ test('renders lockAt/unlockAt when locked', () => {
   future.setDate(future.getDate() + 10)
   const model = buildAssignment({
     id: 1,
-    unlock_at: future.toISOString()
+    unlock_at: future.toISOString(),
   })
   const view = createView(model)
   const json = view.toJSON()
@@ -635,7 +635,7 @@ test('renders lockAt/unlockAt when locking in future', () => {
   const model = buildAssignment({
     id: 1,
     unlock_at: past,
-    lock_at: future.toISOString()
+    lock_at: future.toISOString(),
   })
   const view = createView(model)
   const json = view.toJSON()
@@ -647,7 +647,7 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
   past.setDate(past.getDate() - 10)
   const model = buildAssignment({
     id: 1,
-    unlock_at: past.toISOString()
+    unlock_at: past.toISOString(),
   })
   const view = createView(model)
   const json = view.toJSON()
@@ -657,12 +657,12 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
 test('renders due date column with locale-appropriate format string', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(french, 'fr_FR'),
-    momentLocale: 'fr'
+    momentLocale: 'fr',
   })
   I18nStubber.setLocale('fr_FR')
   I18nStubber.stub('fr_FR', {
     'date.formats.short': '%-d %b',
-    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'août',9,10,11,12],
+    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'août', 9, 10, 11, 12],
   })
   const view = createView(this.model, {canManage: true})
   equal(
@@ -675,12 +675,12 @@ test('renders due date column in appropriate time zone', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(juneau, 'America/Juneau'),
     tzData: {
-      'America/Juneau': juneau
-    }
+      'America/Juneau': juneau,
+    },
   })
   I18nStubber.stub('en', {
     'date.formats.short': '%b %-d',
-    'date.abbr_month_names': [0,1,2,3,4,5,6,7,'Aug',9,10,11,12],
+    'date.abbr_month_names': [0, 1, 2, 3, 4, 5, 6, 7, 'Aug', 9, 10, 11, 12],
   })
   const view = createView(this.model, {canManage: true})
   equal(
@@ -693,11 +693,11 @@ test('can duplicate when assignment can be duplicated', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    can_duplicate: true
+    can_duplicate: true,
   })
   const view = createView(model, {
     userIsAdmin: true,
-    canManage: true
+    canManage: true,
   })
   const json = view.toJSON()
   ok(json.canDuplicate)
@@ -709,7 +709,7 @@ test('clicks on Retry button to trigger another duplicating request', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(model)
   sandbox.spy(model, 'duplicate_failed')
@@ -722,7 +722,7 @@ test('clicks on Retry button to trigger another migrating request', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_migrate'
+    workflow_state: 'failed_to_migrate',
   })
   const view = createView(model)
   sandbox.spy(model, 'retry_migration')
@@ -734,11 +734,11 @@ test('cannot duplicate when user is not admin', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    can_duplicate: true
+    can_duplicate: true,
   })
   const view = createView(model, {
     userIsAdmin: false,
-    canManage: false
+    canManage: false,
   })
   const json = view.toJSON()
   notOk(json.canDuplicate)
@@ -750,7 +750,7 @@ test('displays duplicating message when assignment is duplicating', () => {
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'duplicating'
+    workflow_state: 'duplicating',
   })
   const view = createView(model)
   ok(view.$el.text().includes('Making a copy of "Foo"'))
@@ -761,7 +761,7 @@ test('displays failed to duplicate message when assignment failed to duplicate',
     id: 2,
     title: 'Foo Copy',
     original_assignment_name: 'Foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   const view = createView(model)
   ok(view.$el.text().includes('Something went wrong with making a copy of "Foo"'))
@@ -770,7 +770,7 @@ test('displays failed to duplicate message when assignment failed to duplicate',
 test('can move when userIsAdmin is true', function () {
   const view = createView(this.model, {
     userIsAdmin: true,
-    canManage: false
+    canManage: false,
   })
   const json = view.toJSON()
   ok(json.canMove)
@@ -781,7 +781,7 @@ test('can move when canManage is true and the assignment group id is not locked'
   sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
-    canManage: true
+    canManage: true,
   })
   const json = view.toJSON()
   ok(json.canMove)
@@ -792,7 +792,7 @@ test('cannot move when canManage is true but the assignment group id is locked',
   sandbox.stub(this.model, 'canMove').returns(false)
   const view = createView(this.model, {
     userIsAdmin: false,
-    canManage: true
+    canManage: true,
   })
   const json = view.toJSON()
   notOk(json.canMove)
@@ -803,7 +803,7 @@ test('cannot move when canManage is false but the assignment group id is not loc
   sandbox.stub(this.model, 'canMove').returns(true)
   const view = createView(this.model, {
     userIsAdmin: false,
-    canManage: false
+    canManage: false,
   })
   const json = view.toJSON()
   notOk(json.canMove)
@@ -835,7 +835,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
 
     genSetup.call(this)
@@ -849,7 +849,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is true if no individual permissions are set and canManage is true', function () {
     const view = createView(this.model, {
       userIsAdmin: false,
-      canManage: true
+      canManage: true,
     })
 
     const json = view.toJSON()
@@ -859,7 +859,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is false if no individual permissions are set and canManage is false', function () {
     const view = createView(this.model, {
       userIsAdmin: false,
-      canManage: false
+      canManage: false,
     })
 
     const json = view.toJSON()
@@ -869,7 +869,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
       userIsAdmin: true,
-      canManage: false
+      canManage: false,
     })
 
     const json = view.toJSON()
@@ -879,7 +879,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is false if canManage is true and the individual assignment cannot be updated', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {update: false},
     })
 
     const json = view.toJSON()
@@ -889,7 +889,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is true if canManage is true and the individual assignment can be updated', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {update: true},
     })
 
     const json = view.toJSON()
@@ -899,7 +899,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
   test('canEdit is false if canManage is true and the update parameter does not exist', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {}
+      individualAssignmentPermissions: {},
     })
 
     const json = view.toJSON()
@@ -908,7 +908,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
 
   test('edit link is enabled when the individual assignment is editable', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {update: true},
     })
 
     strictEqual(view.$('.edit_assignment').hasClass('disabled'), false)
@@ -916,7 +916,7 @@ QUnit.module('AssignmentListItemViewSpec - editing assignments', function (hooks
 
   test('edit link is disabled when the individual assignment is not editable', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {update: false},
     })
 
     strictEqual(view.$('.edit_assignment').hasClass('disabled'), true)
@@ -930,8 +930,8 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
       URLS: {assignment_sort_base_url: 'test'},
       QUIZ_LTI_ENABLED: true,
       FLAGS: {
-        new_quizzes_skip_to_build_module_button: true
-      }
+        new_quizzes_skip_to_build_module_button: true,
+      },
     })
   })
 
@@ -945,7 +945,7 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
       buildAssignment({
         id: 1,
         title: 'Foo',
-        is_quiz_lti_assignment: true
+        is_quiz_lti_assignment: true,
       })
     )
 
@@ -955,13 +955,13 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
 
   test('canShowBuildLink is false if new_quizzes_skip_to_build_module_button is false', function () {
     ENV.FLAGS = {
-      new_quizzes_skip_to_build_module_button: false
+      new_quizzes_skip_to_build_module_button: false,
     }
     const view = createView(
       buildAssignment({
         id: 1,
         title: 'Foo',
-        is_quiz_lti_assignment: true
+        is_quiz_lti_assignment: true,
       })
     )
 
@@ -974,7 +974,7 @@ QUnit.module('AssignmentListItemViewSpec - skip to build screen button', functio
       buildAssignment({
         id: 1,
         title: 'Foo',
-        is_quiz_lti_assignment: false
+        is_quiz_lti_assignment: false,
       })
     )
 
@@ -987,7 +987,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
   hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
     genSetup.call(this)
   })
@@ -999,7 +999,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('canDelete is true if no individual permissions are set and userIsAdmin is true', function () {
     const view = createView(this.model, {
-      userIsAdmin: true
+      userIsAdmin: true,
     })
 
     const json = view.toJSON()
@@ -1009,7 +1009,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
   test('canDelete is false if canManage is true and the individual assignment cannot be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {delete: false}
+      individualAssignmentPermissions: {delete: false},
     })
 
     const json = view.toJSON()
@@ -1019,7 +1019,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
   test('canDelete is true if canManage is true and the individual assignment can be deleted', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {delete: true}
+      individualAssignmentPermissions: {delete: true},
     })
 
     const json = view.toJSON()
@@ -1028,7 +1028,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is enabled when canDelete returns true', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {delete: true}
+      individualAssignmentPermissions: {delete: true},
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), false)
@@ -1036,7 +1036,7 @@ QUnit.module('AssignmentListItemViewSpec - deleting assignments', function (hook
 
   test('delete link is disabled when canDelete returns false', function () {
     const view = createView(this.model, {
-      individualAssignmentPermissions: {delete: false}
+      individualAssignmentPermissions: {delete: false},
     })
 
     strictEqual(view.$('.delete_assignment').hasClass('disabled'), true)
@@ -1047,7 +1047,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function (ho
   hooks.beforeEach(function () {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
     genSetup.call(this)
   })
@@ -1060,7 +1060,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function (ho
   test('publish icon is enabled if the user is an admin', function () {
     const view = createView(this.model, {
       userIsAdmin: true,
-      canManage: false
+      canManage: false,
     })
 
     strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
@@ -1069,7 +1069,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function (ho
   test('publish icon is enabled if canManage is true and the individual assignment can be updated', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: true}
+      individualAssignmentPermissions: {update: true},
     })
 
     strictEqual(view.$('.publish-icon').hasClass('disabled'), false)
@@ -1078,7 +1078,7 @@ QUnit.module('AssignmentListItemViewSpec - publish/unpublish icon', function (ho
   test('publish icon is disabled if canManage is true and the individual assignment cannot be updated', function () {
     const view = createView(this.model, {
       canManage: true,
-      individualAssignmentPermissions: {update: false}
+      individualAssignmentPermissions: {update: false},
     })
 
     strictEqual(view.$('.publish-icon').hasClass('disabled'), true)
@@ -1091,13 +1091,13 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: percent', 
   },
   teardown() {
     return genTeardown.call(this)
-  }
+  },
 })
 
 test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
-    grade: 90
+    grade: 90,
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -1121,13 +1121,13 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: pass_fail'
   },
   teardown() {
     return genTeardown.call(this)
-  }
+  },
 })
 
 test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
-    grade: 'complete'
+    grade: 'complete',
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -1143,13 +1143,13 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: letter_gra
   },
   teardown() {
     return genTeardown.call(this)
-  }
+  },
 })
 
 test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
-    grade: 'B'
+    grade: 'B',
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -1165,13 +1165,13 @@ QUnit.module('AssignmentListItemViewSpec\u2014alternate grading type: not_graded
   },
   teardown() {
     return genTeardown.call(this)
-  }
+  },
 })
 
 test('score and grade outputs', function () {
   this.submission.set({
     score: 1.5555,
-    grade: 'complete'
+    grade: 'complete',
   })
   this.model.set('submission', this.submission)
   this.model.trigger('change:submission')
@@ -1188,12 +1188,12 @@ QUnit.module('AssignListItemViewSpec - mastery paths menu option', {
     fakeENV.setup({
       current_user_roles: ['teacher'],
       CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('does not render for assignment if cyoe off', () => {
@@ -1202,7 +1202,7 @@ test('does not render for assignment if cyoe off', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
@@ -1213,7 +1213,7 @@ test('renders for assignment if cyoe on', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
@@ -1224,7 +1224,7 @@ test('does not render for ungraded assignment if cyoe on', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    submission_types: ['not_graded']
+    submission_types: ['not_graded'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
@@ -1236,7 +1236,7 @@ test('renders for assignment quiz if cyoe on', () => {
     title: 'Foo',
     can_update: true,
     is_quiz_assignment: true,
-    submission_types: ['online_quiz']
+    submission_types: ['online_quiz'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
@@ -1248,7 +1248,7 @@ test('does not render for non-assignment quiz if cyoe on', () => {
     title: 'Foo',
     can_update: true,
     is_quiz_assignment: false,
-    submission_types: ['online_quiz']
+    submission_types: ['online_quiz'],
   })
   const view = createView(model)
   equal(view.$('.icon-mastery-path').length, 0)
@@ -1259,7 +1259,7 @@ test('renders for graded discussion if cyoe on', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    submission_types: ['discussion_topic']
+    submission_types: ['discussion_topic'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
@@ -1270,7 +1270,7 @@ test('does not render for graded page if cyoe on', () => {
     id: 1,
     title: 'Foo',
     can_update: true,
-    submission_types: ['wiki_page']
+    submission_types: ['wiki_page'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
@@ -1286,18 +1286,18 @@ QUnit.module('AssignListItemViewSpec - mastery paths link', {
           {
             trigger_assignment_id: '1',
             scoring_ranges: [
-              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]}
-            ]
-          }
-        ]
+              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]},
+            ],
+          },
+        ],
       },
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
     return CyoeHelper.reloadEnv()
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('does not render for assignment if cyoe off', () => {
@@ -1306,7 +1306,7 @@ test('does not render for assignment if cyoe off', () => {
     id: '1',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
@@ -1317,7 +1317,7 @@ test('does not render for assignment if assignment does not have a rule', () => 
     id: '2',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
@@ -1328,7 +1328,7 @@ test('renders for assignment if assignment has a rule', () => {
     id: '1',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1)
@@ -1344,18 +1344,18 @@ QUnit.module('AssignListItemViewSpec - mastery paths icon', {
           {
             trigger_assignment_id: '1',
             scoring_ranges: [
-              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]}
-            ]
-          }
-        ]
+              {assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]},
+            ],
+          },
+        ],
       },
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
     return CyoeHelper.reloadEnv()
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('does not render for assignment if cyoe off', () => {
@@ -1364,7 +1364,7 @@ test('does not render for assignment if cyoe off', () => {
     id: '2',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.mastery-path-icon').length, 0)
@@ -1375,7 +1375,7 @@ test('does not render for assignment if assignment is not released by a rule', (
     id: '1',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.mastery-path-icon').length, 0)
@@ -1386,7 +1386,7 @@ test('renders for assignment if assignment is released by a rule', () => {
     id: '2',
     title: 'Foo',
     can_update: true,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   })
   const view = createView(model)
   equal(view.$('.mastery-path-icon').length, 1)
@@ -1396,19 +1396,19 @@ QUnit.module('AssignListItemViewSpec - assignment icons', {
   setup() {
     fakeENV.setup({
       current_user_roles: ['teacher', 'student'],
-      URLS: {assignment_sort_base_url: 'test'}
+      URLS: {assignment_sort_base_url: 'test'},
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('renders discussion icon for discussion topic', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    submission_types: ['discussion_topic']
+    submission_types: ['discussion_topic'],
   })
   const view = createView(model)
   equal(view.$('i.icon-discussion').length, 1)
@@ -1418,7 +1418,7 @@ test('renders quiz icon for old quizzes', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    submission_types: ['online_quiz']
+    submission_types: ['online_quiz'],
   })
   const view = createView(model)
   equal(view.$('i.icon-quiz').length, 1)
@@ -1428,7 +1428,7 @@ test('renders page icon for wiki page', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    submission_types: ['wiki_page']
+    submission_types: ['wiki_page'],
   })
   const view = createView(model)
   equal(view.$('i.icon-document').length, 1)
@@ -1439,7 +1439,7 @@ test('renders solid quiz icon for new quizzes', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   const view = createView(model)
   equal(view.$('i.icon-quiz.icon-Solid').length, 1)
@@ -1450,7 +1450,7 @@ test('renders assignment icon for new quizzes if FF is off', () => {
   const model = buildAssignment({
     id: 1,
     title: 'Foo',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   const view = createView(model)
   equal(view.$('i.icon-quiz.icon-Solid').length, 0)
@@ -1460,7 +1460,7 @@ test('renders assignment icon for new quizzes if FF is off', () => {
 test('renders assignment icon for other assignments', () => {
   const model = buildAssignment({
     id: 1,
-    title: 'Foo'
+    title: 'Foo',
   })
   const view = createView(model)
   equal(view.$('i.icon-assignment').length, 1)
@@ -1480,7 +1480,7 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
     const model = buildAssignment({
       id: 1,
       require_lockdown_browser: false,
-      is_quiz_lti_assignment: true
+      is_quiz_lti_assignment: true,
     })
     const view = createView(model)
     const json = view.toJSON()
@@ -1492,7 +1492,7 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
     const model = buildAssignment({
       id: 1,
       require_lockdown_browser: true,
-      is_quiz_lti_assignment: false
+      is_quiz_lti_assignment: false,
     })
     const view = createView(model)
     const json = view.toJSON()
@@ -1504,7 +1504,7 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
     const model = buildAssignment({
       id: 1,
       require_lockdown_browser: true,
-      is_quiz_lti_assignment: true
+      is_quiz_lti_assignment: true,
     })
     const view = createView(model)
     const json = view.toJSON()
@@ -1516,7 +1516,7 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
     const model = buildAssignment({
       id: 1,
       require_lockdown_browser: true,
-      is_quiz_lti_assignment: true
+      is_quiz_lti_assignment: true,
     })
     const view = createView(model, {canManage: false})
     const json = view.toJSON()

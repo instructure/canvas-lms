@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import elementToggler from '../../../ui/boot/initializers/activateElementToggler.js'
+import elementToggler from '../../../ui/boot/initializers/activateElementToggler'
 
 QUnit.module('elementToggler', {
   teardown() {
@@ -25,10 +25,10 @@ QUnit.module('elementToggler', {
       if (el) el.remove()
     })
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('handles data-text-while-target-shown', function() {
+test('handles data-text-while-target-shown', function () {
   this.$trigger = $(`
     <a
       href="#"
@@ -69,7 +69,7 @@ test('handles data-text-while-target-shown', function() {
   equal(this.$otherTrigger.text(), 'while hidden', msg)
 })
 
-test('handles data-hide-while-target-shown', function() {
+test('handles data-hide-while-target-shown', function () {
   this.$trigger = $(`
     <a
       href="#"
@@ -113,7 +113,7 @@ test('handles data-hide-while-target-shown', function() {
   ok(this.$otherTrigger.is(':visible'), msg)
 })
 
-test('handles dialogs', function() {
+test('handles dialogs', function () {
   this.$trigger = $(`<button class="element_toggler" \
 aria-controls="thing">Show Thing Dialog</button>`).appendTo('#fixtures')
   this.$target = $(`
@@ -161,7 +161,7 @@ aria-controls="thing">Show Thing Dialog</button>`).appendTo('#fixtures')
   equal(this.$target.dialog('isOpen'), false)
 })
 
-test('checkboxes can be used as trigger', function() {
+test('checkboxes can be used as trigger', function () {
   this.$trigger = $(
     '<input type="checkbox" class="element_toggler" aria-controls="thing">'
   ).appendTo('#fixtures')
@@ -172,7 +172,7 @@ test('checkboxes can be used as trigger', function() {
   ok(this.$target.is(':hidden'), 'target is hidden')
 })
 
-test('toggles multiple elements separated by spaces', function() {
+test('toggles multiple elements separated by spaces', function () {
   this.$trigger = $(
     '<input type="checkbox" class="element_toggler" aria-controls="one two" />'
   ).appendTo('#fixtures')

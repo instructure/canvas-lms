@@ -28,7 +28,7 @@ QUnit.module('mediaCommentThumbnail', {
     sandbox.stub(_, 'defer').callsFake((func, ...args) => func(...Array.from(args || [])))
     window.INST.kalturaSettings = {
       resource_domain: 'example.com',
-      partner_id: '12345'
+      partner_id: '12345',
     }
     const mediaComment = $(`
       <a
@@ -48,10 +48,10 @@ QUnit.module('mediaCommentThumbnail', {
   teardown() {
     window.INST.kalturaSettings = null
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('creates a thumbnail span with a background image URL generated from kaltura settings and media id', function() {
+test('creates a thumbnail span with a background image URL generated from kaltura settings and media id', function () {
   // emulating the call from enhanceUserContent() in instructure.js
   $('.instructure_inline_media_comment', this.$fixtures).mediaCommentThumbnail('normal')
   equal($('.media_comment_thumbnail', this.$fixtures).length, 1)
@@ -65,14 +65,15 @@ test('creates a thumbnail span with a background image URL generated from kaltur
   )
 })
 
-test('creates screenreader text describing media comment', function() {
+test('creates screenreader text describing media comment', function () {
   $('.instructure_inline_media_comment', this.$fixtures).mediaCommentThumbnail('normal')
-  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only')
-    .innerText
+  const screenreaderText = document.querySelector(
+    '.media_comment_thumbnail .screenreader-only'
+  ).innerText
   strictEqual(screenreaderText, 'Play media comment by Tom from Oct 22 at 7:10pm.')
 })
 
-test('creates generic screenreader text if no authoring info provided', function() {
+test('creates generic screenreader text if no authoring info provided', function () {
   this.$fixtures.html('')
   this.$fixtures.append(
     $(`
@@ -86,7 +87,8 @@ test('creates generic screenreader text if no authoring info provided', function
   `)
   )
   $('.instructure_inline_media_comment', this.$fixtures).mediaCommentThumbnail('normal')
-  const screenreaderText = document.querySelector('.media_comment_thumbnail .screenreader-only')
-    .innerText
+  const screenreaderText = document.querySelector(
+    '.media_comment_thumbnail .screenreader-only'
+  ).innerText
   strictEqual(screenreaderText, 'Play media comment.')
 })

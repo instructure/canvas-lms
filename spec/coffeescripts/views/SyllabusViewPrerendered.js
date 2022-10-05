@@ -79,9 +79,9 @@ export default {
           due_at: '2012-01-31T20:00:00-07:00',
           id: '5',
           title: 'Assignment One Override Five',
-          student_ids: [6]
-        }
-      ]
+          student_ids: [6],
+        },
+      ],
     },
     {
       id: 'assignment_2',
@@ -92,7 +92,7 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/assignment_2',
       html_url: 'http://localhost/courses/1/assignments/2',
       submission_types: 'discussion_topic',
-      type: 'assignment'
+      type: 'assignment',
     },
     {
       id: 'assignment_1',
@@ -112,9 +112,9 @@ export default {
           due_at: '2012-01-23T10:00:00-07:00',
           id: '2',
           title: 'Assignment One Override Two',
-          student_ids: [3]
-        }
-      ]
+          student_ids: [3],
+        },
+      ],
     },
     {
       id: 'assignment_4',
@@ -125,7 +125,7 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/assignment_4',
       html_url: 'http://localhost/courses/1/assignments/4',
       submission_types: 'none',
-      type: 'assignment'
+      type: 'assignment',
     },
     {
       id: 'assignment_1',
@@ -145,9 +145,9 @@ export default {
           due_at: '2012-01-30T10:00:00-07:00',
           id: '4',
           title: 'Assignment One Override Four',
-          student_ids: [5]
-        }
-      ]
+          student_ids: [5],
+        },
+      ],
     },
     {
       id: 'assignment_5',
@@ -158,7 +158,7 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/assignment_5',
       html_url: 'http://localhost/courses/1/assignments/5',
       submission_types: 'none',
-      type: 'assignment'
+      type: 'assignment',
     },
     {
       id: 'assignment_1',
@@ -178,9 +178,9 @@ export default {
           due_at: '2012-01-31T10:00:00-07:00',
           id: '3',
           title: 'Assignment One Override Three',
-          student_ids: [4]
-        }
-      ]
+          student_ids: [4],
+        },
+      ],
     },
     {
       id: 'assignment_3',
@@ -191,7 +191,7 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/assignment_3',
       html_url: 'http://localhost/courses/1/assignments/3',
       submission_types: 'none',
-      type: 'assignment'
+      type: 'assignment',
     },
     {
       id: 'assignment_1',
@@ -211,9 +211,9 @@ export default {
           due_at: '2012-01-11T10:00:00-07:00',
           id: '1',
           title: 'Assignment One Override One',
-          student_ids: [2]
-        }
-      ]
+          student_ids: [2],
+        },
+      ],
     },
     {
       id: 'assignment_1',
@@ -224,8 +224,8 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/assignment_1',
       html_url: 'http://localhost/courses/1/assignments/1',
       submission_types: 'none',
-      type: 'assignment'
-    }
+      type: 'assignment',
+    },
   ],
 
   appointment_groups: [
@@ -245,7 +245,7 @@ export default {
       requiring_action: false,
       appointments_count: 10,
       participant_type: 'User',
-      type: 'event'
+      type: 'event',
     },
     {
       id: '2',
@@ -263,7 +263,7 @@ export default {
       requiring_action: false,
       appointments_count: 8,
       participant_type: 'Group',
-      type: 'event'
+      type: 'event',
     },
     {
       id: '1',
@@ -281,8 +281,8 @@ export default {
       requiring_action: false,
       appointments_count: 8,
       participant_type: 'User',
-      type: 'event'
-    }
+      type: 'event',
+    },
   ],
 
   events: [
@@ -294,7 +294,7 @@ export default {
       end_at: '2012-01-01T19:30:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/2',
       html_url: 'http://localhost/calendar?event_id=2&include_contexts=course_1',
-      type: 'event'
+      type: 'event',
     },
     {
       id: '3',
@@ -304,7 +304,7 @@ export default {
       end_at: '2012-01-30T19:30:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/3',
       html_url: 'http://localhost/calendar?event_id=3&include_contexts=course_1',
-      type: 'event'
+      type: 'event',
     },
     {
       id: '1',
@@ -314,7 +314,7 @@ export default {
       end_at: '2012-01-01T13:30:00-07:00',
       url: 'http://localhost/api/v1/calendar_events/1',
       html_url: 'http://localhost/calendar?event_id=1&include_contexts=course_1',
-      type: 'event'
+      type: 'event',
     },
     {
       id: '4',
@@ -325,8 +325,8 @@ export default {
       url: 'http://localhost/api/v1/calendar_events/4',
       html_url: 'http://localhost/calendar?event_id=4&include_contexts=course_1',
       hidden: true,
-      type: 'event'
-    }
+      type: 'event',
+    },
   ],
 
   planner_items: [
@@ -336,8 +336,8 @@ export default {
       html_url: 'http://localhost/courses/1/discussion_topics/1',
       plannable: {
         title: 'discussion 1',
-        todo_date: '2012-01-01T13:30:00-07:00'
-      }
+        todo_date: '2012-01-01T13:30:00-07:00',
+      },
     },
     {
       plannable_type: 'discussion_topic',
@@ -345,8 +345,8 @@ export default {
       html_url: 'http://localhost/courses/1/discussion_topics/2',
       plannable: {
         title: 'discussion 2',
-        todo_date: '2012-01-01T13:30:00-07:00'
-      }
+        todo_date: '2012-01-01T13:30:00-07:00',
+      },
     },
     {
       plannable_type: 'discussion_topic',
@@ -354,8 +354,8 @@ export default {
       html_url: 'http://localhost/courses/1/discussion_topics/3',
       plannable: {
         title: 'discussion 3',
-        todo_date: '2012-01-30T13:30:00-07:00'
-      }
+        todo_date: '2012-01-30T13:30:00-07:00',
+      },
     },
     {
       plannable_type: 'wiki_page',
@@ -363,8 +363,8 @@ export default {
       html_url: 'http://localhost/courses/1/pages/1',
       plannable: {
         title: 'page 1',
-        todo_date: '2012-01-01T13:30:00-07:00'
-      }
+        todo_date: '2012-01-01T13:30:00-07:00',
+      },
     },
     {
       plannable_type: 'wiki_page',
@@ -372,8 +372,8 @@ export default {
       html_url: 'http://localhost/courses/1/pages/2',
       plannable: {
         title: 'page 2',
-        todo_date: '2012-01-01T13:30:00-07:00'
-      }
+        todo_date: '2012-01-01T13:30:00-07:00',
+      },
     },
     {
       plannable_type: 'wiki_page',
@@ -381,9 +381,9 @@ export default {
       html_url: 'http://localhost/courses/1/pages/3',
       plannable: {
         title: 'page 3',
-        todo_date: '2012-01-30T13:30:00-07:00'
-      }
-    }
+        todo_date: '2012-01-30T13:30:00-07:00',
+      },
+    },
   ],
 
   /* HTML */
@@ -553,5 +553,5 @@ export default {
   </tbody></table>
 </div>\
 `
-  }
+  },
 }

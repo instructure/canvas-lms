@@ -52,7 +52,7 @@ test('#status should accurately reflect the scaled aggregate score on question b
     score: 0,
     mastery_points: 3,
     points_possible: 5,
-    question_bank_result: true
+    question_bank_result: true,
   })
   equal(outcome.status(), 'mastery')
 })
@@ -68,7 +68,7 @@ test('#scaledScore should fall back to mastery score if points possible is zero'
     score: 0,
     mastery_points: 3,
     points_possible: 0,
-    question_bank_result: true
+    question_bank_result: true,
   })
   equal(outcome.roundedScore(), '2.1')
 })
@@ -79,7 +79,7 @@ test('#scaledScore should fall back to mastery score if points possible is less 
     score: 0,
     mastery_points: 3,
     points_possible: -1,
-    question_bank_result: true
+    question_bank_result: true,
   })
   equal(outcome.roundedScore(), '2.1')
 })

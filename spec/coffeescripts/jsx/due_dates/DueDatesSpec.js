@@ -38,27 +38,27 @@ QUnit.module('DueDates', {
     this.override1 = new AssignmentOverride({
       name: 'Plebs',
       course_section_id: '1',
-      due_at: null
+      due_at: null,
     })
     this.override2 = new AssignmentOverride({
       name: 'Patricians',
       course_section_id: '2',
-      due_at: '2015-04-05'
+      due_at: '2015-04-05',
     })
     this.override3 = new AssignmentOverride({
       name: 'Students',
       student_ids: ['1', '3'],
-      due_at: null
+      due_at: null,
     })
     this.override4 = new AssignmentOverride({
       name: 'Reading Group One',
       group_id: '1',
-      due_at: null
+      due_at: null,
     })
     this.override5 = new AssignmentOverride({
       name: 'Reading Group Two',
       group_id: '2',
-      due_at: '2015-05-05'
+      due_at: '2015-05-05',
     })
     const props = {
       overrides: [this.override1, this.override2, this.override3, this.override4, this.override5],
@@ -67,7 +67,7 @@ QUnit.module('DueDates', {
       students: {
         1: {id: '1', name: 'Scipio Africanus'},
         2: {id: '2', name: 'Cato The Elder'},
-        3: {id: 3, name: 'Publius Publicoa'}
+        3: {id: 3, name: 'Publius Publicoa'},
       },
       groups: {1: {id: '1', name: 'Reading Group One'}, 2: {id: '2', name: 'Reading Group Two'}},
       overrideModel: AssignmentOverride,
@@ -75,7 +75,7 @@ QUnit.module('DueDates', {
       hasGradingPeriods: false,
       gradingPeriods: [],
       isOnlyVisibleToOverrides: false,
-      dueAt: null
+      dueAt: null,
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
@@ -85,7 +85,7 @@ QUnit.module('DueDates', {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDates).parentNode)
     this.server.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('renders', function () {
@@ -139,8 +139,8 @@ test('properly removes a row', function () {
   this.dueDates.setState({
     rows: {
       1: {},
-      2: {}
-    }
+      2: {},
+    },
   })
   equal(this.dueDates.sortedRowKeys().length, 2)
   equal(this.dueDates.removeRow('2'))
@@ -151,8 +151,8 @@ test('will not allow removing the last row', function () {
   this.dueDates.setState({
     rows: {
       1: {},
-      2: {}
-    }
+      2: {},
+    },
   })
   equal(this.dueDates.sortedRowKeys().length, 2)
   ok(this.dueDates.canRemoveRow())
@@ -190,12 +190,12 @@ test('filters available groups based on selected group category', function () {
   const groups = [
     {
       id: '3',
-      group_category_id: '1'
+      group_category_id: '1',
     },
     {
       id: '4',
-      group_category_id: '2'
-    }
+      group_category_id: '2',
+    },
   ]
   StudentGroupStore.setSelectedGroupSet(null)
   StudentGroupStore.addGroups(groups)
@@ -263,7 +263,7 @@ QUnit.module('DueDates with grading periods', {
         course_section_id: '19',
         due_at_overridden: true,
         unlock_at_overridden: true,
-        lock_at_overridden: true
+        lock_at_overridden: true,
       }),
       new AssignmentOverride({
         id: '71',
@@ -277,7 +277,7 @@ QUnit.module('DueDates with grading periods', {
         student_ids: ['2'],
         due_at_overridden: true,
         unlock_at_overridden: true,
-        lock_at_overridden: true
+        lock_at_overridden: true,
       }),
       new AssignmentOverride({
         id: '72',
@@ -291,8 +291,8 @@ QUnit.module('DueDates with grading periods', {
         student_ids: ['4'],
         due_at_overridden: true,
         unlock_at_overridden: true,
-        lock_at_overridden: true
-      })
+        lock_at_overridden: true,
+      }),
     ]
     const sections = [
       {attributes: {id: '0', name: 'Everyone'}},
@@ -302,8 +302,8 @@ QUnit.module('DueDates with grading periods', {
           name: 'Section 1',
           start_at: null,
           end_at: null,
-          override_course_and_term_dates: null
-        }
+          override_course_and_term_dates: null,
+        },
       },
       {
         attributes: {
@@ -311,8 +311,8 @@ QUnit.module('DueDates with grading periods', {
           name: 'Section 2',
           start_at: null,
           end_at: null,
-          override_course_and_term_dates: null
-        }
+          override_course_and_term_dates: null,
+        },
       },
       {
         attributes: {
@@ -320,8 +320,8 @@ QUnit.module('DueDates with grading periods', {
           name: 'Section 3',
           start_at: null,
           end_at: null,
-          override_course_and_term_dates: null
-        }
+          override_course_and_term_dates: null,
+        },
       },
       {
         attributes: {
@@ -329,9 +329,9 @@ QUnit.module('DueDates with grading periods', {
           name: 'Section 4',
           start_at: null,
           end_at: null,
-          override_course_and_term_dates: null
-        }
-      }
+          override_course_and_term_dates: null,
+        },
+      },
     ]
     const gradingPeriods = [
       {
@@ -341,7 +341,7 @@ QUnit.module('DueDates with grading periods', {
         endDate: new Date('2014-08-31T06:00:00.000Z'),
         closeDate: new Date('2014-08-31T06:00:00.000Z'),
         isLast: false,
-        isClosed: true
+        isClosed: true,
       },
       {
         id: '127',
@@ -350,34 +350,34 @@ QUnit.module('DueDates with grading periods', {
         endDate: new Date('2014-12-15T07:00:00.000Z'),
         closeDate: new Date('2014-12-15T07:00:00.000Z'),
         isLast: true,
-        isClosed: false
-      }
+        isClosed: false,
+      },
     ]
     const students = {
       1: {
         id: '1',
         name: 'Scipio Africanus',
         sections: ['19'],
-        group_ids: []
+        group_ids: [],
       },
       2: {
         id: '2',
         name: 'Cato The Elder',
         sections: ['4'],
-        group_ids: []
+        group_ids: [],
       },
       3: {
         id: '3',
         name: 'Publius Publicoa',
         sections: ['4'],
-        group_ids: []
+        group_ids: [],
       },
       4: {
         id: '4',
         name: 'Louie Anderson',
         sections: ['8'],
-        group_ids: []
-      }
+        group_ids: [],
+      },
     }
     sandbox.stub(OverrideStudentStore, 'getStudents').returns(students)
     sandbox.stub(OverrideStudentStore, 'currentlySearching').returns(false)
@@ -390,18 +390,18 @@ QUnit.module('DueDates with grading periods', {
       groups: {
         1: {
           id: '1',
-          name: 'Reading Group One'
+          name: 'Reading Group One',
         },
         2: {
           id: '2',
-          name: 'Reading Group Two'
-        }
+          name: 'Reading Group Two',
+        },
       },
       syncWithBackbone() {},
       hasGradingPeriods: true,
       gradingPeriods,
       isOnlyVisibleToOverrides: true,
-      dueAt: null
+      dueAt: null,
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
@@ -413,7 +413,7 @@ QUnit.module('DueDates with grading periods', {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDates).parentNode)
     this.server.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('sets inputs to readonly for overrides in closed grading periods', function () {
@@ -458,7 +458,7 @@ QUnit.module('DueDates render callbacks', {
     this.override = new AssignmentOverride({
       name: 'Students',
       student_ids: ['1', '3'],
-      due_at: null
+      due_at: null,
     })
 
     this.dueDates
@@ -470,25 +470,25 @@ QUnit.module('DueDates render callbacks', {
       students: {
         1: {
           id: '1',
-          name: 'Scipio Africanus'
+          name: 'Scipio Africanus',
         },
         3: {
           id: 3,
-          name: 'Publius Publicoa'
-        }
+          name: 'Publius Publicoa',
+        },
       },
       overrideModel: AssignmentOverride,
       syncWithBackbone() {},
       hasGradingPeriods: false,
       gradingPeriods: [],
       isOnlyVisibleToOverrides: false,
-      dueAt: null
+      dueAt: null,
     }
   },
   teardown() {
     this.server.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('fetchAdhocStudents does not fire until state is set', function () {
@@ -502,12 +502,12 @@ test('fetchAdhocStudents does not fire until state is set', function () {
       {
         1: {
           overrides: {
-            student_ids: ['18', '22']
-          }
-        }
-      }
+            student_ids: ['18', '22'],
+          },
+        },
+      },
     ],
-    students: {}
+    students: {},
   })
 
   notOk(fetchAdhocStudentsStub.calledWith(['18', '22']))
@@ -525,7 +525,7 @@ QUnit.module('DueDates important dates', {
     this.override1 = new AssignmentOverride({
       name: 'Plebs',
       course_section_id: '1',
-      due_at: null
+      due_at: null,
     })
     const props = {
       overrides: [this.override1],
@@ -534,7 +534,7 @@ QUnit.module('DueDates important dates', {
       students: {
         1: {id: '1', name: 'Scipio Africanus'},
         2: {id: '2', name: 'Cato The Elder'},
-        3: {id: 3, name: 'Publius Publicoa'}
+        3: {id: 3, name: 'Publius Publicoa'},
       },
       groups: {1: {id: '1', name: 'Reading Group One'}, 2: {id: '2', name: 'Reading Group Two'}},
       overrideModel: AssignmentOverride,
@@ -543,7 +543,7 @@ QUnit.module('DueDates important dates', {
       gradingPeriods: [],
       isOnlyVisibleToOverrides: false,
       dueAt: null,
-      importantDates: false
+      importantDates: false,
     }
     this.syncWithBackboneStub = sandbox.stub(props, 'syncWithBackbone')
     const DueDatesElement = <DueDates {...props} />
@@ -553,7 +553,7 @@ QUnit.module('DueDates important dates', {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDates).parentNode)
     this.server.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 test('enables important dates if a date is added', function () {

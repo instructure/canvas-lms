@@ -21,14 +21,11 @@ import EquationToolbarView from '@canvas/rce/backbone/views/EquationToolbarView'
 
 QUnit.module('EquationToolbarView MathJax', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('mathjax is loaded properly', () => {
   const equationToolbarView = new EquationToolbarView()
-  sandbox
-    .mock(mathml, 'loadMathJax')
-    .expects('loadMathJax')
-    .withArgs(undefined)
+  sandbox.mock(mathml, 'loadMathJax').expects('loadMathJax').withArgs(undefined)
   equationToolbarView.render()
 })

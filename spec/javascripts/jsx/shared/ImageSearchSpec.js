@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ImageSearch from 'ui/features/course_settings/react/components/ImageSearch.js'
+import ImageSearch from 'ui/features/course_settings/react/components/ImageSearch'
 import $ from 'jquery'
 
 QUnit.module('ImageSearch View', {

@@ -37,7 +37,7 @@ QUnit.module('loadRCE', {
     window.tinyMCE = this.originalTinyMCE
     fakeENV.teardown()
     return editorUtils.resetRCE()
-  }
+  },
 })
 
 // loading RCE
@@ -74,12 +74,12 @@ QUnit.module('loadOnTarget', {
         return {
           on(eventType, callback) {
             callback()
-          }
+          },
         }
       },
       tinymceOn(eventType, callback) {
         callback()
-      }
+      },
     }
     this.rce = {renderIntoDiv: sinon.stub().callsArgWith(2, this.editor)}
     sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, this.rce)
@@ -91,7 +91,7 @@ QUnit.module('loadOnTarget', {
     fixtures.teardown()
     RCELoader.loadRCE.restore()
     fakeENV.teardown()
-  }
+  },
 })
 
 // target finding
@@ -149,7 +149,7 @@ test('adds the elements name attribute to mirroredAttrs', function () {
 
 test('adds onFocus to props', function () {
   const opts = {
-    onFocus() {}
+    onFocus() {},
   }
   const props = RCELoader.createRCEProps(this.$textarea.get(0), opts)
   equal(props.onFocus, opts.onFocus)

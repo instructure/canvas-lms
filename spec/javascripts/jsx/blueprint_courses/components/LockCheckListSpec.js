@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import LockCheckList from 'ui/features/course_settings/react/components/LockCheckList.js'
+import LockCheckList from 'ui/features/course_settings/react/components/LockCheckList'
 
 QUnit.module('LockCheckList component')
 

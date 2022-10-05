@@ -30,16 +30,16 @@ QUnit.module('GroupCategorySelector selection', {
     this.groupCategories = [
       {
         id: '1',
-        name: 'GS1'
+        name: 'GS1',
       },
       {
         id: '2',
-        name: 'GS2'
-      }
+        name: 'GS2',
+      },
     ]
     this.groupCategorySelector = new GroupCategorySelector({
       parentModel: this.assignment,
-      groupCategories: this.groupCategories
+      groupCategories: this.groupCategories,
     })
     this.groupCategorySelector.render()
     return $('#fixtures').append(this.groupCategorySelector.$el)
@@ -47,7 +47,7 @@ QUnit.module('GroupCategorySelector selection', {
   afterEach: function () {
     this.groupCategorySelector.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
 QUnit.test("groupCategorySelected should set StudentGroupStore's group set", function () {
@@ -68,7 +68,7 @@ QUnit.module('GroupCategorySelector, no groups', {
     this.assignment = new Assignment()
     this.groupCategorySelector = new GroupCategorySelector({
       parentModel: this.assignment,
-      groupCategories: []
+      groupCategories: [],
     })
     this.groupCategorySelector.render()
     return $('#fixtures').append(this.groupCategorySelector.$el)
@@ -77,7 +77,7 @@ QUnit.module('GroupCategorySelector, no groups', {
     fakeENV.teardown()
     this.groupCategorySelector.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
 QUnit.test('group category select is hidden when there are no group sets', () => {

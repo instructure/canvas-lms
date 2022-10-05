@@ -58,7 +58,7 @@ test("works with '0' and '1' as well", () => {
     internet_check: '1',
     exclude_biblio: '0',
     exclude_quoted: '1',
-    journal_check: '0'
+    journal_check: '0',
   })
   strictEqual(ts.sPaperCheck, false)
   strictEqual(ts.internetCheck, true)
@@ -80,12 +80,12 @@ test('assigns excludeSmallMatchesValue', () => {
 test('assigns correct percent', () => {
   let ts = new TurnitinSettings({
     exclude_small_matches_type: 'words',
-    exclude_small_matches_value: 100
+    exclude_small_matches_value: 100,
   })
   strictEqual(ts.percent(), '')
   ts = new TurnitinSettings({
     exclude_small_matches_type: 'percent',
-    exclude_small_matches_value: 100
+    exclude_small_matches_value: 100,
   })
   strictEqual(ts.percent(), 100)
 })
@@ -93,12 +93,12 @@ test('assigns correct percent', () => {
 test('assigns correct words', () => {
   let ts = new TurnitinSettings({
     exclude_small_matches_type: 'words',
-    exclude_small_matches_value: 100
+    exclude_small_matches_value: 100,
   })
   strictEqual(ts.words(), 100)
   ts = new TurnitinSettings({
     exclude_small_matches_type: 'percent',
-    exclude_small_matches_value: 100
+    exclude_small_matches_value: 100,
   })
   strictEqual(ts.words(), '')
 })
@@ -115,7 +115,7 @@ test('it converts back to snake_case', () => {
     internet_check: true,
     originality_report_visibility: 'after_grading',
     s_paper_check: true,
-    submit_papers_to: false
+    submit_papers_to: false,
   }
   const ts = new TurnitinSettings(options)
   deepEqual(ts.toJSON(), options)
@@ -143,18 +143,18 @@ QUnit.module('TurnitinSettings#present', {
       exclude_biblio: true,
       internet_check: true,
       originality_report_visibility: 'after_grading',
-      s_paper_check: true
+      s_paper_check: true,
     }
     this.ts = new TurnitinSettings(this.options)
     this.view = this.ts.present()
-  }
+  },
 })
 
-test('includes excludesSmallMatches', function() {
+test('includes excludesSmallMatches', function () {
   strictEqual(this.view.excludesSmallMatches, this.ts.excludesSmallMatches())
 })
 
-test('includes all the default fields', function() {
+test('includes all the default fields', function () {
   Object.keys(this.view || {}).forEach(key => {
     const value = this.view[key]
     if (key !== 'excludesSmallMatches' && key !== 'words' && key !== 'percent') {

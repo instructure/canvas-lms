@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import 'ui/features/wiki_page_index/jquery/redirectClickTo.js'
+import 'ui/features/wiki_page_index/jquery/redirectClickTo'
 
 QUnit.module('redirectClickTo')
-const createClick = function() {
+const createClick = function () {
   const e = document.createEvent('MouseEvents')
   e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, true, false, false, false, 2, null)
   return e

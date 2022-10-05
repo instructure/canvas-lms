@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api.js'
+import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api'
 import FakeServer, {
   pathFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'

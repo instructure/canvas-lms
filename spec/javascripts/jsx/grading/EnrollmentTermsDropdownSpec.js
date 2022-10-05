@@ -21,7 +21,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import _ from 'underscore'
-import Dropdown from 'ui/features/account_grading_standards/react/EnrollmentTermsDropdown.js'
+import Dropdown from 'ui/features/account_grading_standards/react/EnrollmentTermsDropdown'
 
 const wrapper = document.getElementById('fixtures')
 

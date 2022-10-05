@@ -17,7 +17,7 @@
  */
 
 import fakeENV from 'helpers/fakeENV'
-import LearningMastery from 'ui/features/learning_mastery/react/LearningMastery.js'
+import LearningMastery from 'ui/features/learning_mastery/react/LearningMastery'
 import FakeServer, {
   formBodyFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
@@ -134,11 +134,6 @@ QUnit.module('Learning Mastery > LearningMastery', suiteHooks => {
       QUnit.module('when the current section id is null', contextHooks => {
         contextHooks.beforeEach(() => {
           learningMastery._setCurrentSectionId(null)
-        })
-
-        test('sets the current section id to the given id', () => {
-          learningMastery.updateCurrentSectionId('2001')
-          strictEqual()
         })
 
         test('saves settings', () => {

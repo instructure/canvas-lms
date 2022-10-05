@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import secondsToTime from 'ui/features/roster/util/secondsToTime.js'
+import secondsToTime from 'ui/features/roster/util/secondsToTime'
 
 QUnit.module('secondsToTime')
 

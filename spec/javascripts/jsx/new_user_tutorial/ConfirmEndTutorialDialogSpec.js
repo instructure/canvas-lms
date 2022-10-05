@@ -20,7 +20,7 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import axios from '@canvas/axios'
 import moxios from 'moxios'
-import ConfirmEndTutorialDialog from 'ui/features/new_user_tutorial/react/ConfirmEndTutorialDialog.js'
+import ConfirmEndTutorialDialog from 'ui/features/new_user_tutorial/react/ConfirmEndTutorialDialog'
 
 QUnit.module('ConfirmEndTutorialDialog Spec', {
   setup() {

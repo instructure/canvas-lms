@@ -31,7 +31,7 @@ QUnit.module('ValidatedMixin', {
   teardown() {
     textarea.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('it can find tinymce instances as fields', assert => {
@@ -41,7 +41,7 @@ test('it can find tinymce instances as fields', assert => {
     // eslint-disable-next-line promise/catch-or-return
     tinymce
       .init({
-        selector: '#fixtures textarea#a42'
+        selector: '#fixtures textarea#a42',
       })
       .then(() => {
         const element = ValidatedMixin.findField('message')

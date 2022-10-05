@@ -20,7 +20,7 @@ import React from 'react'
 import {Provider} from 'react-redux'
 import {mount} from 'enzyme'
 import createStore from '@canvas/blueprint-courses/react/store'
-import {ConnectedUnsyncedChanges} from 'ui/features/blueprint_course_master/react/components/UnsyncedChanges.js'
+import {ConnectedUnsyncedChanges} from 'ui/features/blueprint_course_master/react/components/UnsyncedChanges'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 const noop = () => {}

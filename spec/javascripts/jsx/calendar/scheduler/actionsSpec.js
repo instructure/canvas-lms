@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from 'ui/features/calendar/react/scheduler/actions.js'
+import Actions from 'ui/features/calendar/react/scheduler/actions'
 
 QUnit.module('Scheduler Actions')
 

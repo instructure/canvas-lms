@@ -29,16 +29,16 @@ QUnit.module('CopyCourseView: Initializer', {
       courseFindSelect: new Backbone.View(),
       dateShift: new DateShiftView({
         collection: new Backbone.Collection(),
-        model: new ContentMigration()
-      })
+        model: new ContentMigration(),
+      }),
     })
   },
   teardown() {
     return this.copyCourseView.remove()
-  }
+  },
 })
 
-test('it should be accessible', function(assert) {
+test('it should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.copyCourseView, done, {a11yReport: true})
 })
@@ -48,7 +48,7 @@ test('after init, calls updateNewDates when @courseFindSelect.triggers "course_c
   const sinonSpy = sandbox.spy(this.copyCourseView.dateShift, 'updateNewDates')
   const course = {
     start_at: 'foo',
-    end_at: 'bar'
+    end_at: 'bar',
   }
   this.copyCourseView.courseFindSelect.trigger('course_changed', course)
   ok(sinonSpy.calledWith(course), 'Called updateNewDates with passed in object')

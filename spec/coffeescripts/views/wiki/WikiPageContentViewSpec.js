@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView.js'
+import WikiPageContentView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageContentView'
 import {subscribe} from 'jquery-tinypubsub'
 
 QUnit.module('WikiPageContentView')
@@ -26,10 +26,7 @@ QUnit.module('WikiPageContentView')
 test('setModel causes a re-render', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
-  sandbox
-    .mock(contentView)
-    .expects('render')
-    .atLeast(1)
+  sandbox.mock(contentView).expects('render').atLeast(1)
   contentView.setModel(wikiPage)
 })
 
@@ -37,10 +34,7 @@ test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
-  sandbox
-    .mock(contentView)
-    .expects('render')
-    .atLeast(1)
+  sandbox.mock(contentView).expects('render').atLeast(1)
   wikiPage.set('title', 'A New Title')
 })
 
@@ -48,10 +42,7 @@ test('setModel binds to the model change:title trigger', () => {
   const wikiPage = new WikiPage()
   const contentView = new WikiPageContentView()
   contentView.setModel(wikiPage)
-  sandbox
-    .mock(contentView)
-    .expects('render')
-    .atLeast(1)
+  sandbox.mock(contentView).expects('render').atLeast(1)
   wikiPage.set('body', 'A New Body')
 })
 

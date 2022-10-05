@@ -32,7 +32,7 @@ QUnit.module('CollectionView', {
     this.contentView = new ContentView({
       el: viewEl,
       instructionsTemplate,
-      renderengInstructions: false
+      renderengInstructions: false,
     })
     this.contentView.$el.appendTo($('#fixtures'))
     this.contentView.render()
@@ -40,15 +40,15 @@ QUnit.module('CollectionView', {
   teardown() {
     fakeENV.teardown()
     this.contentView.remove()
-  }
+  },
 })
 
-test('should be accessible', function(assert) {
+test('should be accessible', function (assert) {
   const done = assert.async()
   assertions.isAccessible(this.contentView, done, {a11yReport: true})
 })
 
-test('collectionView replaces text with warning and link on renderNoOutcomeWarning event', function() {
+test('collectionView replaces text with warning and link on renderNoOutcomeWarning event', function () {
   ok(this.contentView.$el.text().match(/original_text/))
   publish('renderNoOutcomeWarning')
   ok(this.contentView.$el.text().match(/You have no outcomes/))

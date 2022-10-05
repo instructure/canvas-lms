@@ -18,24 +18,24 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import CourseList from 'ui/features/epub_exports/react/CourseList.js'
+import CourseList from 'ui/features/epub_exports/react/CourseList'
 
 QUnit.module('CourseListSpec', {
   setup() {
     this.props = {
       1: {
         name: 'Maths 101',
-        id: 1
+        id: 1,
       },
       2: {
         name: 'Physics 101',
-        id: 2
-      }
+        id: 2,
+      },
     }
-  }
+  },
 })
 
-test('render', function() {
+test('render', function () {
   let component = mount(<CourseList courses={{}} />)
   equal(component.find('li').length, 0, 'should not render list items')
   component.unmount()

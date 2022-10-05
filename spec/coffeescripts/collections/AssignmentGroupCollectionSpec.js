@@ -32,13 +32,13 @@ QUnit.module('AssignmentGroupCollection', {
     this.assignments = [1, 2, 3, 4].map(id => new Assignment({id}))
     this.group = new AssignmentGroup({assignments: this.assignments})
     this.collection = new AssignmentGroupCollection([this.group], {
-      courseSubmissionsURL: COURSE_SUBMISSIONS_URL
+      courseSubmissionsURL: COURSE_SUBMISSIONS_URL,
     })
   },
   teardown() {
     fakeENV.teardown()
     this.server.restore()
-  }
+  },
 })
 
 test('::model is AssignmentGroup', () =>
@@ -53,7 +53,7 @@ test('optionProperties', () => {
   const course = new Course()
   const collection = new AssignmentGroupCollection([], {
     course,
-    courseSubmissionsURL: COURSE_SUBMISSIONS_URL
+    courseSubmissionsURL: COURSE_SUBMISSIONS_URL,
   })
   strictEqual(
     collection.courseSubmissionsURL,
@@ -70,12 +70,12 @@ test('(#getGrades) loading grades from the server', function () {
   const submissions = [1, 2, 3].map(id => ({
     id,
     assignment_id: id,
-    grade: id
+    grade: id,
   }))
   this.server.respondWith('GET', `${COURSE_SUBMISSIONS_URL}?per_page=50`, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(submissions)
+    JSON.stringify(submissions),
   ])
   const lastAssignment = this.assignments[3]
   lastAssignment.on(

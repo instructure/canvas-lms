@@ -42,7 +42,7 @@ QUnit.module('EditAssignmentDetails', {
             concluded: false,
             k5_course: true,
             can_create_assignments: true,
-            assignment_groups: [{id: '9', name: 'Assignments'}]
+            assignment_groups: [{id: '9', name: 'Assignments'}],
           },
           {
             name: 'Normal Course',
@@ -51,7 +51,7 @@ QUnit.module('EditAssignmentDetails', {
             concluded: false,
             k5_course: false,
             can_create_assignments: true,
-            assignment_groups: [{id: '9', name: 'Assignments'}]
+            assignment_groups: [{id: '9', name: 'Assignments'}],
           },
           {
             name: 'Course Pacing',
@@ -61,8 +61,8 @@ QUnit.module('EditAssignmentDetails', {
             course_pacing_enabled: true,
             k5_course: false,
             can_create_assignments: true,
-            assignment_groups: [{id: '9', name: 'Assignments'}]
-          }
+            assignment_groups: [{id: '9', name: 'Assignments'}],
+          },
         ]
       },
       isNewEvent() {
@@ -71,7 +71,7 @@ QUnit.module('EditAssignmentDetails', {
       startDate() {
         return fcUtil.wrap('2015-08-07T17:00:00Z')
       },
-      allDay: false
+      allDay: false,
     }
     fakeENV.setup()
   },
@@ -80,7 +80,7 @@ QUnit.module('EditAssignmentDetails', {
     document.getElementById('fixtures').innerHTML = ''
     fakeENV.teardown()
     tzInTest.restore()
-  }
+  },
 })
 const createView = function (model, event) {
   const view = new EditAssignmentDetails(fixtures, event, null, null)
@@ -103,8 +103,8 @@ const nameLengthHelper = function (
     {
       assignment: {
         name,
-        post_to_sis: postToSis
-      }
+        post_to_sis: postToSis,
+      },
     },
     []
   )
@@ -130,9 +130,9 @@ test('should treat start date as fudged', function () {
   tzInTest.configureAndRestoreLater({
     tz: timezone(detroit, 'America/Detroit'),
     tzData: {
-      'America/Detroit': detroit
+      'America/Detroit': detroit,
     },
-    formats: getI18nFormats()
+    formats: getI18nFormats(),
   })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'Fri Aug 7, 2015')
@@ -146,8 +146,8 @@ test('should localize start date', function () {
       'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
       'date.formats.medium_with_weekday': '%a %-d %b %Y',
       'date.month_names': ['août'],
-      'date.abbr_month_names': ['août']
-    }
+      'date.abbr_month_names': ['août'],
+    },
   })
   const view = createView(commonEvent(), this.event)
   equal(view.$('.datetime_field').val(), 'ven. 7 août 2015')
@@ -158,8 +158,8 @@ test('requires name to save assignment event', function () {
   const data = {
     assignment: {
       name: '',
-      post_to_sis: ''
-    }
+      post_to_sis: '',
+    },
   }
   const errors = view.validateBeforeSave(data, [])
   ok(errors['assignment[name]'])
@@ -218,8 +218,8 @@ test('requires due_at to save assignment event if there is no date and post_to_s
     assignment: {
       name: 'Too much tuna',
       post_to_sis: '1',
-      due_at: ''
-    }
+      due_at: '',
+    },
   }
   const errors = view.validateBeforeSave(data, [])
   ok(errors['assignment[due_at]'])
@@ -233,8 +233,8 @@ test('allows assignment event to save if there is no date and post_to_sis is fal
     assignment: {
       name: 'Too much tuna',
       post_to_sis: '0',
-      due_at: ''
-    }
+      due_at: '',
+    },
   }
   const errors = view.validateBeforeSave(data, [])
   equal(errors.length, 0)

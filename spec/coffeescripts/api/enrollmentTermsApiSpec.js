@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import api from 'ui/features/account_grading_standards/enrollmentTermsApi.js'
+import api from 'ui/features/account_grading_standards/enrollmentTermsApi'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 const deserializedTerms = [
@@ -28,7 +28,7 @@ const deserializedTerms = [
     startAt: new Date('2013-06-03T02:57:42Z'),
     endAt: new Date('2013-12-03T02:57:53Z'),
     createdAt: new Date('2015-10-27T16:51:41Z'),
-    gradingPeriodGroupId: '2'
+    gradingPeriodGroupId: '2',
   },
   {
     id: '3',
@@ -36,7 +36,7 @@ const deserializedTerms = [
     startAt: new Date('2014-01-03T02:58:36Z'),
     endAt: new Date('2014-03-03T02:58:42Z'),
     createdAt: new Date('2013-06-02T17:29:19Z'),
-    gradingPeriodGroupId: '2'
+    gradingPeriodGroupId: '2',
   },
   {
     id: '4',
@@ -44,8 +44,8 @@ const deserializedTerms = [
     startAt: null,
     endAt: null,
     createdAt: new Date('2014-05-02T17:29:19Z'),
-    gradingPeriodGroupId: '1'
-  }
+    gradingPeriodGroupId: '1',
+  },
 ]
 const serializedTerms = {
   enrollment_terms: [
@@ -55,7 +55,7 @@ const serializedTerms = {
       start_at: '2013-06-03T02:57:42Z',
       end_at: '2013-12-03T02:57:53Z',
       created_at: '2015-10-27T16:51:41Z',
-      grading_period_group_id: 2
+      grading_period_group_id: 2,
     },
     {
       id: 3,
@@ -63,7 +63,7 @@ const serializedTerms = {
       start_at: '2014-01-03T02:58:36Z',
       end_at: '2014-03-03T02:58:42Z',
       created_at: '2013-06-02T17:29:19Z',
-      grading_period_group_id: 2
+      grading_period_group_id: 2,
     },
     {
       id: 4,
@@ -71,9 +71,9 @@ const serializedTerms = {
       start_at: null,
       end_at: null,
       created_at: '2014-05-02T17:29:19Z',
-      grading_period_group_id: 1
-    }
-  ]
+      grading_period_group_id: 1,
+    },
+  ],
 }
 
 QUnit.module('list', {
@@ -86,7 +86,7 @@ QUnit.module('list', {
   teardown() {
     fakeENV.teardown()
     this.server.restore()
-  }
+  },
 })
 
 test('calls the resolved endpoint', () => {
@@ -95,15 +95,15 @@ test('calls the resolved endpoint', () => {
   ok($.ajaxJSON.calledWith('api/enrollment_terms'))
 })
 
-test('deserializes returned enrollment terms', function(assert) {
+test('deserializes returned enrollment terms', function (assert) {
   const start = assert.async()
   this.server.respondWith('GET', /enrollment_terms/, [
     200,
     {
       'Content-Type': 'application/json',
-      Link: this.fakeHeaders
+      Link: this.fakeHeaders,
     },
-    JSON.stringify(serializedTerms)
+    JSON.stringify(serializedTerms),
   ])
   api.list().then(terms => {
     deepEqual(terms, deserializedTerms)
@@ -112,12 +112,12 @@ test('deserializes returned enrollment terms', function(assert) {
   this.server.respond()
 })
 
-test('rejects the promise upon errors', function(assert) {
+test('rejects the promise upon errors', function (assert) {
   const start = assert.async()
   this.server.respondWith('GET', /enrollment_terms/, [
     404,
     {'Content-Type': 'application/json'},
-    'FAIL'
+    'FAIL',
   ])
   api.list().catch(error => {
     ok('we got here')

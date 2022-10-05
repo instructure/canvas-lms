@@ -19,8 +19,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 
-import AssessmentAuditTray from 'ui/features/speed_grader/react/AssessmentAuditTray/index.js'
-import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api.js'
+import AssessmentAuditTray from 'ui/features/speed_grader/react/AssessmentAuditTray/index'
+import Api from 'ui/features/speed_grader/react/AssessmentAuditTray/Api'
 
 QUnit.module('AssessmentAuditTray', suiteHooks => {
   let $container

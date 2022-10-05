@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {shallow} from 'enzyme'
 import jQuery from 'jquery'
-import SaveThemeButton from 'ui/features/theme_editor/react/SaveThemeButton.js'
+import SaveThemeButton from 'ui/features/theme_editor/react/SaveThemeButton'
 import '@canvas/jquery/jquery.ajaxJSON'
 
 let elem, props

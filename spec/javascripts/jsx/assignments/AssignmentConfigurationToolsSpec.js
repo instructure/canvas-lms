@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import AssignmentConfigurationTools from 'ui/features/assignment_edit/react/AssignmentConfigurationTools.js'
+import AssignmentConfigurationTools from 'ui/features/assignment_edit/react/AssignmentConfigurationTools'
 
 let toolDefinitions = null
 let secureParams = null

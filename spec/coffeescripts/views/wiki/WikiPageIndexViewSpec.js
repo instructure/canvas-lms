@@ -17,13 +17,13 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection.js'
-import WikiPageIndexView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexView.js'
+import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection'
+import WikiPageIndexView from 'ui/features/wiki_page_index/backbone/views/WikiPageIndexView'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
 import {ltiState} from '@canvas/lti/jquery/messages'
-import * as ConfirmDeleteModal from 'ui/features/wiki_page_index/react/ConfirmDeleteModal.js'
+import * as ConfirmDeleteModal from 'ui/features/wiki_page_index/react/ConfirmDeleteModal'
 
 const indexMenuLtiTool = {
   id: '18',
@@ -31,7 +31,7 @@ const indexMenuLtiTool = {
   base_url: 'http://localhost/courses/1/external_tools/18?launch_type=wiki_index_menu',
   tool_id: 'named_lti_tool',
   icon_url: 'http://localhost:3001/icon.png',
-  canvas_icon_class: null
+  canvas_icon_class: null,
 }
 
 let prevHtml
@@ -43,14 +43,14 @@ QUnit.module('WikiPageIndexView:confirmDeletePages not checked', {
     this.model = new WikiPage({page_id: '42'})
     this.collection = new WikiPageCollection([this.model])
     this.view = new WikiPageIndexView({
-      collection: this.collection
+      collection: this.collection,
     })
   },
 
   teardown() {
     document.body.innerHTML = prevHtml
     fakeENV.teardown()
-  }
+  },
 })
 
 test('does not call showConfirmDelete when no pages are checked', function () {
@@ -67,21 +67,21 @@ QUnit.module('WikiPageIndexView:confirmDeletePages checked', {
     this.collection = new WikiPageCollection([this.model])
     this.view = new WikiPageIndexView({
       collection: this.collection,
-      selectedPages: {42: this.model}
+      selectedPages: {42: this.model},
     })
   },
 
   teardown() {
     document.body.innerHTML = prevHtml
     fakeENV.teardown()
-  }
+  },
 })
 test('calls showConfirmDelete when pages are checked', function () {
   const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
   this.view.confirmDeletePages(null)
   ok(
     showConfirmDelete.firstCall.calledWithMatch({
-      pageTitles: ['page 42']
+      pageTitles: ['page 42'],
     })
   )
 })
@@ -97,14 +97,14 @@ QUnit.module('WikiPageIndexView:direct_share', {
       collection: this.collection,
       WIKI_RIGHTS: {
         create_page: true,
-        manage: true
-      }
+        manage: true,
+      },
     })
   },
 
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('opens and closes the direct share course tray', function () {
@@ -115,7 +115,7 @@ test('opens and closes the direct share course tray', function () {
     trayComponent.firstCall.calledWithMatch({
       open: true,
       sourceCourseId: 'a course',
-      contentSelection: {pages: ['42']}
+      contentSelection: {pages: ['42']},
     })
   )
   trayComponent.firstCall.args[0].onDismiss()
@@ -132,8 +132,8 @@ test('opens and closes the direct share user modal', function () {
       courseId: 'a course',
       contentShare: {
         content_id: '42',
-        content_type: 'page'
-      }
+        content_type: 'page',
+      },
     })
   )
   userModal.firstCall.args[0].onDismiss()
@@ -150,16 +150,16 @@ QUnit.module('WikiPageIndexView:open_external_tool', {
       collection: this.collection,
       WIKI_RIGHTS: {
         create_page: true,
-        manage: true
+        manage: true,
       },
-      wikiIndexPlacements: indexMenuLtiTool
+      wikiIndexPlacements: indexMenuLtiTool,
     })
   },
 
   teardown() {
     fakeENV.teardown()
     delete window.ltiTrayState
-  }
+  },
 })
 
 test('opens and closes the lti tray and returns focus', function () {
@@ -175,7 +175,7 @@ test('opens and closes the lti tray and returns focus', function () {
       targetResourceType: 'page',
       allowItemSelection: false,
       selectableItems: [],
-      open: true
+      open: true,
     })
   )
   trayComponent.firstCall.args[0].onDismiss()
@@ -196,7 +196,7 @@ test('reloads page when closing tray if needed', function () {
       targetResourceType: 'page',
       allowItemSelection: false,
       selectableItems: [],
-      open: true
+      open: true,
     })
   )
   ltiState.tray = {refreshOnClose: true}
@@ -213,7 +213,7 @@ QUnit.module('WikiPageIndexView:sort', {
     this.$a.data('sort-field', 'created_at')
     this.ev = $.Event('click')
     this.ev.currentTarget = this.$a.get(0)
-  }
+  },
 })
 
 test('sort delegates to the collection sortByField', function () {
@@ -261,7 +261,7 @@ const testRights = (subject, options) =>
     const view = new WikiPageIndexView({
       collection,
       contextAssetString: options.contextAssetString,
-      WIKI_RIGHTS: options.WIKI_RIGHTS
+      WIKI_RIGHTS: options.WIKI_RIGHTS,
     })
     const json = view.toJSON()
     for (const key in options.CAN) {
@@ -276,13 +276,13 @@ testRights('CAN (manage course)', {
     create_page: true,
     publish_page: true,
     update: true,
-    manage: true
+    manage: true,
   },
   CAN: {
     CREATE: true,
     MANAGE: true,
-    PUBLISH: true
-  }
+    PUBLISH: true,
+  },
 })
 
 testRights('CAN (manage group)', {
@@ -291,13 +291,13 @@ testRights('CAN (manage group)', {
     read: true,
     create_page: true,
     update: true,
-    manage: true
+    manage: true,
   },
   CAN: {
     CREATE: true,
     MANAGE: true,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 testRights('CAN (read)', {
@@ -306,16 +306,16 @@ testRights('CAN (read)', {
   CAN: {
     CREATE: false,
     MANAGE: false,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 testRights('CAN (null)', {
   CAN: {
     CREATE: false,
     MANAGE: false,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 // Granular permissions tests
@@ -326,8 +326,8 @@ testRights('CAN (read)', {
   CAN: {
     CREATE: false,
     MANAGE: true,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 testRights('CAN (read)', {
@@ -336,8 +336,8 @@ testRights('CAN (read)', {
   CAN: {
     CREATE: false,
     MANAGE: true,
-    PUBLISH: false
-  }
+    PUBLISH: false,
+  },
 })
 
 testRights('CAN (view toolbar)', {
@@ -347,6 +347,6 @@ testRights('CAN (view toolbar)', {
     CREATE: false,
     MANAGE: true,
     PUBLISH: false,
-    VIEW_TOOLBAR: true
-  }
+    VIEW_TOOLBAR: true,
+  },
 })

@@ -38,24 +38,24 @@ QUnit.module('GroupUserCollection', {
         id: 1,
         name: 'bob',
         sortable_name: 'bob',
-        group: null
+        group: null,
       }),
       new GroupUser({
         id: 2,
         name: 'joe',
         sortable_name: 'joe',
-        group: null
-      })
+        group: null,
+      }),
     ]
     source = new UnassignedGroupUserCollection(users, {category})
     category._unassignedUsers = source
     target = new GroupUserCollection(null, {
       group,
-      category
+      category,
     })
     target.loaded = true
     group._users = target
-  }
+  },
 })
 
 test("moves user to target group's collection when group changes", () => {

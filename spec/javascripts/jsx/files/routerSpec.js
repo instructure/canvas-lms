@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import router from 'ui/features/files/router.js'
+import router from 'ui/features/files/router'
 
 // No op for next().
 const fakeNext = () => {}

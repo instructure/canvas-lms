@@ -29,7 +29,7 @@ QUnit.module('Assignment#initialize with ENV.POST_TO_SIS set to false', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('must not alter the post_to_sis field', () => {
@@ -41,12 +41,12 @@ QUnit.module('Assignment#initalize with ENV.POST_TO_SIS set to true', {
   setup() {
     fakeENV.setup({
       POST_TO_SIS: true,
-      POST_TO_SIS_DEFAULT: true
+      POST_TO_SIS_DEFAULT: true,
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('must default post_to_sis to true for a new assignment', () => {
@@ -62,7 +62,7 @@ test('must leave a false value as is', () => {
 test('must leave a null value as is for an existing assignment', () => {
   const assignment = new Assignment({
     id: '1234',
-    post_to_sis: null
+    post_to_sis: null,
   })
   strictEqual(assignment.get('post_to_sis'), null)
 })
@@ -99,12 +99,12 @@ QUnit.module('default submission types', {
   setup() {
     fakeENV.setup({
       DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
-      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti',
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('defaultToNone returns true if submission type is "none"', () => {
@@ -144,20 +144,20 @@ QUnit.module('Assignment#isDefaultTool', {
   setup() {
     fakeENV.setup({
       DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
-      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti',
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns true if submissionType is "external_tool" and default tool is selected', () => {
   const assignment = new Assignment({
     name: 'foo',
     external_tool_tag_attributes: {
-      url: 'https://www.test.com/blti?foo'
-    }
+      url: 'https://www.test.com/blti?foo',
+    },
   })
   assignment.submissionTypes(['external_tool'])
   equal(assignment.isDefaultTool(), true)
@@ -167,12 +167,12 @@ QUnit.module('Assignment#isGenericExternalTool', {
   setup() {
     fakeENV.setup({
       DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool',
-      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti'
+      DEFAULT_ASSIGNMENT_TOOL_URL: 'https://www.test.com/blti',
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns true if submissionType is "default_external_tool"', () => {
@@ -185,8 +185,8 @@ test('returns true when submissionType is "external_tool" and non default tool i
   const assignment = new Assignment({
     name: 'foo',
     external_tool_tag_attributes: {
-      url: 'https://www.non-default.com/blti?foo'
-    }
+      url: 'https://www.non-default.com/blti?foo',
+    },
   })
   assignment.submissionTypes(['external_tool'])
   equal(assignment.isGenericExternalTool(), true)
@@ -209,12 +209,12 @@ test('returns true if record is external tool', () => {
 QUnit.module('Assignment#defaultToolName', {
   setup() {
     fakeENV.setup({
-      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool <a href="https://www.somethingbad.com">'
+      DEFAULT_ASSIGNMENT_TOOL_NAME: 'Default Tool <a href="https://www.somethingbad.com">',
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('escapes the name retrieved from the js env', () => {
@@ -228,12 +228,12 @@ test('escapes the name retrieved from the js env', () => {
 QUnit.module('Assignment#defaultToolName is undefined', {
   setup() {
     fakeENV.setup({
-      DEFAULT_ASSIGNMENT_TOOL_NAME: undefined
+      DEFAULT_ASSIGNMENT_TOOL_NAME: undefined,
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('does not convert undefined to string', () => {
@@ -475,7 +475,7 @@ QUnit.module('Assignment#canDelete', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("returns false if 'frozen' is true", () => {
@@ -503,7 +503,7 @@ QUnit.module('Assignment#canMove as teacher', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns false if grading period is closed', () => {
@@ -531,7 +531,7 @@ QUnit.module('Assignment#canMove as admin', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns true if grading period is closed', () => {
@@ -559,7 +559,7 @@ QUnit.module('Assignment#inClosedGradingPeriod as a non admin', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("returns the value of 'in_closed_grading_period' when isAdmin is false", () => {
@@ -576,7 +576,7 @@ QUnit.module('Assignment#inClosedGradingPeriod as an admin', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns true when isAdmin is true', () => {
@@ -602,7 +602,7 @@ QUnit.module('Assignment#submissionType')
 test("returns 'none' if record's submission_types is ['none']", () => {
   const assignment = new Assignment({
     name: 'foo',
-    id: '12'
+    id: '12',
   })
   assignment.set('submission_types', ['none'])
   equal(assignment.submissionType(), 'none')
@@ -611,7 +611,7 @@ test("returns 'none' if record's submission_types is ['none']", () => {
 test("returns 'on_paper' if record's submission_types includes on_paper", () => {
   const assignment = new Assignment({
     name: 'foo',
-    id: '13'
+    id: '13',
   })
   assignment.set('submission_types', ['on_paper'])
   equal(assignment.submissionType(), 'on_paper')
@@ -620,7 +620,7 @@ test("returns 'on_paper' if record's submission_types includes on_paper", () => 
 test('returns online submission otherwise', () => {
   const assignment = new Assignment({
     name: 'foo',
-    id: '14'
+    id: '14',
   })
   assignment.set('submission_types', ['online_upload'])
   equal(assignment.submissionType(), 'online')
@@ -631,7 +631,7 @@ QUnit.module('Assignment#expectsSubmission')
 test('returns false if assignment submission type is not online', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.set({
-    submission_types: ['external_tool', 'on_paper']
+    submission_types: ['external_tool', 'on_paper'],
   })
   equal(assignment.expectsSubmission(), false)
 })
@@ -661,7 +661,7 @@ test('returns true if an assignment is not locked', () => {
 test('returns false if a submission is not expected', () => {
   const assignment = new Assignment({name: 'foo'})
   assignment.set({
-    submission_types: ['external_tool', 'on_paper', 'attendance']
+    submission_types: ['external_tool', 'on_paper', 'attendance'],
   })
   equal(assignment.allowedToSubmit(), false)
 })
@@ -784,7 +784,7 @@ QUnit.module('Assignment#multipleDueDates')
 
 test('checks for multiple due dates from assignment overrides', () => {
   const assignment = new Assignment({
-    all_dates: [{title: 'Winter'}, {title: 'Summer'}]
+    all_dates: [{title: 'Winter'}, {title: 'Summer'}],
   })
   ok(assignment.multipleDueDates())
 })
@@ -801,8 +801,8 @@ test('gets the due dates from the assignment overrides', () => {
   const dates = [
     new DateGroup({
       due_at: dueAt,
-      title: 'Everyone'
-    })
+      title: 'Everyone',
+    }),
   ]
   const assignment = new Assignment({all_dates: dates})
   const allDates = assignment.allDates()
@@ -825,11 +825,11 @@ QUnit.module('Assignment#inGradingPeriod', {
       endDate: new Date('2013-10-01T11:13:00'),
       closeDate: new Date('2013-10-05T11:13:00'),
       isLast: true,
-      isClosed: true
+      isClosed: true,
     }
     this.dateInPeriod = new Date('2013-08-20T11:13:00')
     this.dateOutsidePeriod = new Date('2013-01-20T11:13:00')
-  }
+  },
 })
 
 test('returns true if the assignment has a due_at in the given period', function () {
@@ -848,8 +848,8 @@ test('returns true if the assignment has a date group in the given period', func
   const dates = [
     new DateGroup({
       due_at: this.dateInPeriod,
-      title: 'Everyone'
-    })
+      title: 'Everyone',
+    }),
   ]
   const assignment = new Assignment({all_dates: dates})
   equal(assignment.inGradingPeriod(this.gradingPeriod), true)
@@ -859,8 +859,8 @@ test('returns false if the assignment does not have a date group in the given pe
   const dates = [
     new DateGroup({
       due_at: this.dateOutsidePeriod,
-      title: 'Everyone'
-    })
+      title: 'Everyone',
+    }),
   ]
   const assignment = new Assignment({all_dates: dates})
   equal(assignment.inGradingPeriod(this.gradingPeriod), false)
@@ -872,7 +872,7 @@ QUnit.module('Assignment#singleSectionDueDate', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('gets the due date for section instead of null', () => {
@@ -881,13 +881,13 @@ test('gets the due date for section instead of null', () => {
     all_dates: [
       {
         due_at: null,
-        title: 'Everyone'
+        title: 'Everyone',
       },
       {
         due_at: dueAt,
-        title: 'Summer'
-      }
-    ]
+        title: 'Summer',
+      },
+    ],
   })
   sandbox.stub(assignment, 'multipleDueDates').returns(false)
   equal(assignment.singleSectionDueDate(), dueAt.toISOString())
@@ -923,7 +923,7 @@ QUnit.module('Assignment#toView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("returns the assignment's name", () => {
@@ -1030,7 +1030,7 @@ test('includes whether or not assignment accepts media recordings', () => {
 test('includes submissionType', () => {
   const assignment = new Assignment({
     name: 'foo',
-    id: '16'
+    id: '16',
   })
   assignment.set('submission_types', ['on_paper'])
   const json = assignment.toView()
@@ -1067,7 +1067,7 @@ test('includes htmlUrl', () => {
 test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support enabled', () => {
   const assignment = new Assignment({
     html_url: 'http://example.com/assignments/1',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   ENV.PERMISSIONS = {manage: true}
   ENV.FLAGS = {new_quizzes_modules_support: true}
@@ -1080,7 +1080,7 @@ test('uses edit url for htmlUrl when managing a quiz_lti assignment and new_quiz
 test('uses htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_support disabled', () => {
   const assignment = new Assignment({
     html_url: 'http://example.com/assignments/1',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   ENV.PERMISSIONS = {manage: true}
   ENV.FLAGS = {new_quizzes_modules_support: false}
@@ -1093,7 +1093,7 @@ test('uses htmlUrl when managing a quiz_lti assignment and new_quizzes_modules_s
 test('uses htmlUrl when not managing a quiz_lti assignment', () => {
   const assignment = new Assignment({
     html_url: 'http://example.com/assignments/1',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   ENV.PERMISSIONS = {manage: false}
   ENV.FLAGS = {new_quizzes_modules_support: true}
@@ -1117,7 +1117,7 @@ test('includes htmlBuildUrl', () => {
 
 test('includes multipleDueDates', () => {
   const assignment = new Assignment({
-    all_dates: [{title: 'Summer'}, {title: 'Winter'}]
+    all_dates: [{title: 'Summer'}, {title: 'Winter'}],
   })
   const json = assignment.toView()
   equal(json.multipleDueDates, true)
@@ -1125,7 +1125,7 @@ test('includes multipleDueDates', () => {
 
 test('includes allDates', () => {
   const assignment = new Assignment({
-    all_dates: [{title: 'Summer'}, {title: 'Winter'}]
+    all_dates: [{title: 'Summer'}, {title: 'Winter'}],
   })
   const json = assignment.toView()
   equal(json.allDates.length, 2)
@@ -1137,13 +1137,13 @@ test('includes singleSectionDueDate', () => {
     all_dates: [
       {
         due_at: null,
-        title: 'Everyone'
+        title: 'Everyone',
       },
       {
         due_at: dueAt,
-        title: 'Summer'
-      }
-    ]
+        title: 'Summer',
+      },
+    ],
   })
   sandbox.stub(assignment, 'multipleDueDates').returns(false)
   const json = assignment.toView()
@@ -1189,7 +1189,7 @@ QUnit.module('Assignment#singleSection', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('returns null when all_dates is null', () => {
@@ -1206,28 +1206,28 @@ test('returns null when there are multiple all_dates records', () => {
         lock_at: date,
         unlock_at: date,
         due_at: null,
-        title: 'Section A'
+        title: 'Section A',
       },
       {
         lock_at: date,
         unlock_at: date,
         due_at: null,
-        title: 'Section B'
+        title: 'Section B',
       },
       {
         lock_at: date,
         unlock_at: date,
         due_at: null,
-        title: 'Section C'
-      }
-    ]
+        title: 'Section C',
+      },
+    ],
   })
   equal(assignment.singleSection(), null)
 })
 
 test('returns null when there are no records in all_dates', () => {
   const assignment = new Assignment({
-    all_dates: []
+    all_dates: [],
   })
   equal(assignment.singleSection(), null)
 })
@@ -1239,9 +1239,9 @@ test('returns the first element in all_dates when the length is 1', () => {
         lock_at: new Date('2022-02-15T11:13:00'),
         unlock_at: new Date('2022-02-16T11:13:00'),
         due_at: new Date('2022-02-17T11:13:00'),
-        title: 'Section A'
-      }
-    ]
+        title: 'Section A',
+      },
+    ],
   })
   deepEqual(assignment.singleSection(), assignment.allDates()[0])
 })
@@ -1251,7 +1251,7 @@ QUnit.module('Assignment#canDuplicate')
 test('returns true if record can be duplicated', () => {
   const assignment = new Assignment({
     name: 'foo',
-    can_duplicate: true
+    can_duplicate: true,
   })
   equal(assignment.canDuplicate(), true)
 })
@@ -1259,7 +1259,7 @@ test('returns true if record can be duplicated', () => {
 test('returns false if record cannot be duplicated', () => {
   const assignment = new Assignment({
     name: 'foo',
-    can_duplicate: false
+    can_duplicate: false,
   })
   equal(assignment.canDuplicate(), false)
 })
@@ -1269,7 +1269,7 @@ QUnit.module('Assignment#isDuplicating')
 test('returns true if record is duplicating', () => {
   const assignment = new Assignment({
     name: 'foo',
-    workflow_state: 'duplicating'
+    workflow_state: 'duplicating',
   })
   equal(assignment.isDuplicating(), true)
 })
@@ -1277,7 +1277,7 @@ test('returns true if record is duplicating', () => {
 test('returns false if record is not duplicating', () => {
   const assignment = new Assignment({
     name: 'foo',
-    workflow_state: 'published'
+    workflow_state: 'published',
   })
   equal(assignment.isDuplicating(), false)
 })
@@ -1287,7 +1287,7 @@ QUnit.module('Assignment#failedToDuplicate')
 test('returns true if record failed to duplicate', () => {
   const assignment = new Assignment({
     name: 'foo',
-    workflow_state: 'failed_to_duplicate'
+    workflow_state: 'failed_to_duplicate',
   })
   equal(assignment.failedToDuplicate(), true)
 })
@@ -1295,7 +1295,7 @@ test('returns true if record failed to duplicate', () => {
 test('returns false if record did not fail to duplicate', () => {
   const assignment = new Assignment({
     name: 'foo',
-    workflow_state: 'published'
+    workflow_state: 'published',
   })
   equal(assignment.failedToDuplicate(), false)
 })
@@ -1306,7 +1306,7 @@ test('returns the original assignment id', () => {
   const originalAssignmentID = '42'
   const assignment = new Assignment({
     name: 'foo',
-    original_assignment_id: originalAssignmentID
+    original_assignment_id: originalAssignmentID,
   })
   equal(assignment.originalAssignmentID(), originalAssignmentID)
 })
@@ -1317,7 +1317,7 @@ test('returns the original assignment id', () => {
   const originalCourseID = '42'
   const assignment = new Assignment({
     name: 'foo',
-    original_course_id: originalCourseID
+    original_course_id: originalCourseID,
   })
   equal(assignment.originalCourseID(), originalCourseID)
 })
@@ -1328,7 +1328,7 @@ test('returns the original assignment name', () => {
   const originalAssignmentName = 'Original Assignment'
   const assignment = new Assignment({
     name: 'foo',
-    original_assignment_name: originalAssignmentName
+    original_assignment_name: originalAssignmentName,
   })
   equal(assignment.originalAssignmentName(), originalAssignmentName)
 })
@@ -1338,7 +1338,7 @@ QUnit.module('Assignment#isQuizLTIAssignment')
 test('returns true if record uses quizzes 2', () => {
   const assignment = new Assignment({
     name: 'foo',
-    is_quiz_lti_assignment: true
+    is_quiz_lti_assignment: true,
   })
   equal(assignment.isQuizLTIAssignment(), true)
 })
@@ -1346,7 +1346,7 @@ test('returns true if record uses quizzes 2', () => {
 test('returns false if record does not use quizzes 2', () => {
   const assignment = new Assignment({
     name: 'foo',
-    is_quiz_lti_assignment: false
+    is_quiz_lti_assignment: false,
   })
   equal(assignment.isQuizLTIAssignment(), false)
 })
@@ -1356,7 +1356,7 @@ QUnit.module('Assignment#canFreeze')
 test('returns true if record is not frozen', () => {
   const assignment = new Assignment({
     name: 'foo',
-    frozen_attributes: []
+    frozen_attributes: [],
   })
   equal(assignment.canFreeze(), true)
 })
@@ -1365,7 +1365,7 @@ test('returns false if record is frozen', () => {
   const assignment = new Assignment({
     name: 'foo',
     frozen_attributes: [],
-    frozen: true
+    frozen: true,
   })
   equal(assignment.canFreeze(), false)
 })
@@ -1373,7 +1373,7 @@ test('returns false if record is frozen', () => {
 test('returns false if record uses quizzes 2', () => {
   const assignment = new Assignment({
     name: 'foo',
-    frozen_attributes: []
+    frozen_attributes: [],
   })
   sandbox.stub(assignment, 'isQuizLTIAssignment').returns(true)
   equal(assignment.canFreeze(), false)
@@ -1403,7 +1403,7 @@ test('make ajax call with right url when duplicate_failed is called', () => {
     id: assignmentID,
     original_assignment_id: originalAssignmentID,
     course_id: courseID,
-    original_course_id: originalCourseID
+    original_course_id: originalCourseID,
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   assignment.duplicate_failed()
@@ -1424,7 +1424,7 @@ test('make ajax call with right url when retry_migration is called', () => {
     name: 'foo',
     id: assignmentID,
     original_quiz_id: originalQuizID,
-    course_id: courseID
+    course_id: courseID,
   })
   const spy = sandbox.spy($, 'ajaxJSON')
   assignment.retry_migration()
@@ -1443,7 +1443,7 @@ QUnit.module('Assignment#pollUntilFinishedDuplicating', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test('polls for updates', function () {
@@ -1471,7 +1471,7 @@ QUnit.module('Assignment#pollUntilFinishedImporting', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test('polls for updates', function () {
@@ -1499,7 +1499,7 @@ QUnit.module('Assignment#pollUntilFinishedMigrating', {
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
 test('polls for updates', function () {
@@ -1636,11 +1636,11 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
 
 QUnit.module('Assignment#externalToolTagAttributes', hooks => {
   const externalData = {
-    key1: 'val1'
+    key1: 'val1',
   }
   const customParams = {
     root_account_id: '$Canvas.rootAccount.id',
-    referer: 'LTI test tool example'
+    referer: 'LTI test tool example',
   }
   let assignment
 
@@ -1653,8 +1653,8 @@ QUnit.module('Assignment#externalToolTagAttributes', hooks => {
         custom_params: customParams,
         new_tab: '0',
         url: 'http://lti13testtool.docker/launch',
-        external_data: externalData
-      }
+        external_data: externalData,
+      },
     })
     fakeENV.setup({current_user_roles: []})
   })

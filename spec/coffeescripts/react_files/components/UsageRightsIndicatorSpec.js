@@ -30,9 +30,9 @@ test('returns null for folders', () => {
     model: new Folder({id: 3}),
     usageRightsRequiredForContext: true,
     modalOptions: {
-      openModal() {}
+      openModal() {},
     },
-    userCanEditFilesForContext: false
+    userCanEditFilesForContext: false,
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   equal(ReactDOM.findDOMNode(uRI), null, 'returns null')
@@ -44,8 +44,8 @@ test('returns null if no usageRightsRequiredForContext and the model has no usag
     usageRightsRequiredForContext: true,
     userCanEditFilesForContext: false,
     modalOptions: {
-      openModal() {}
-    }
+      openModal() {},
+    },
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   equal(ReactDOM.findDOMNode(uRI), null, 'returns null')
@@ -57,8 +57,8 @@ test('returns button if usageRightsRequiredForContext, userCanEditFilesForContex
     usageRightsRequiredForContext: true,
     userCanEditFilesForContext: true,
     modalOptions: {
-      openModal() {}
-    }
+      openModal() {},
+    },
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   equal(ReactDOM.findDOMNode(uRI).type, 'submit', 'submit type')
@@ -75,8 +75,8 @@ test('handleClick opens a modal with UsageRightsDialog', () => {
     modalOptions: {
       openModal() {
         return (openedModal = true)
-      }
-    }
+      },
+    },
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   TestUtils.Simulate.click(ReactDOM.findDOMNode(uRI))
@@ -90,9 +90,9 @@ test('displays publish warning', () => {
     usageRightsRequiredForContext: true,
     userCanEditFilesForContext: true,
     modalOptions: {
-      openModal() {}
+      openModal() {},
     },
-    suppressWarning: false
+    suppressWarning: false,
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   equal(
@@ -114,9 +114,9 @@ test('suppresses publish warning', () => {
     usageRightsRequiredForContext: true,
     userCanEditFilesForContext: true,
     modalOptions: {
-      openModal() {}
+      openModal() {},
     },
-    suppressWarning: true
+    suppressWarning: true,
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   notEqual(
@@ -143,57 +143,57 @@ QUnit.module('UsageRightsIndicator: Icon Classess & Screenreader text', {
       usageRightsRequiredForContext: false,
       userCanEditFilesForContext: true,
       modalOptions: {
-        openModal() {}
-      }
+        openModal() {},
+      },
     }
     return (this.uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />))
-  }
+  },
 })
 
-test('own_copyright class and screenreader text', function() {
+test('own_copyright class and screenreader text', function () {
   const usage_rights = {
     use_justification: 'own_copyright',
-    license_name: 'best license ever'
+    license_name: 'best license ever',
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-copyright', 'has correct class')
   equal(uRI.refs.screenreaderText.innerHTML, 'Own Copyright', 'has correct screenreader text')
 })
 
-test('public_domain class', function() {
+test('public_domain class', function () {
   const usage_rights = {
     use_justification: 'public_domain',
-    license_name: 'best license ever'
+    license_name: 'best license ever',
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-public-domain', 'has correct class')
   equal(uRI.refs.screenreaderText.innerHTML, 'Public Domain', 'has correct screenreader text')
 })
 
-test('used_by_permission class', function() {
+test('used_by_permission class', function () {
   const usage_rights = {
     use_justification: 'used_by_permission',
-    license_name: 'best license ever'
+    license_name: 'best license ever',
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-obtained-permission', 'has correct class')
   equal(uRI.refs.screenreaderText.innerHTML, 'Used by Permission', 'has correct screenreader text')
 })
 
-test('fair_use class', function() {
+test('fair_use class', function () {
   const usage_rights = {
     use_justification: 'fair_use',
-    license_name: 'best license ever'
+    license_name: 'best license ever',
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-fair-use', 'has correct class')
   equal(uRI.refs.screenreaderText.innerHTML, 'Fair Use', 'has correct screenreader text')
 })
 
-test('creative_commons class', function() {
+test('creative_commons class', function () {
   const usage_rights = {
     use_justification: 'creative_commons',
-    license_name: 'best license ever'
+    license_name: 'best license ever',
   }
   const uRI = this.renderIndicator(usage_rights)
   equal(uRI.refs.icon.className, 'icon-files-creative-commons', 'has correct class')

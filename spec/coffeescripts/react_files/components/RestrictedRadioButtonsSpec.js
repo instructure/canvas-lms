@@ -27,7 +27,7 @@ QUnit.module('RestrictedRadioButtons', {
   setup() {
     const props = {
       models: [new Folder({id: 999})],
-      radioStateChange: sinon.stub()
+      radioStateChange: sinon.stub(),
     }
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
@@ -36,22 +36,22 @@ QUnit.module('RestrictedRadioButtons', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('renders a publish input field', function() {
+test('renders a publish input field', function () {
   ok(this.RestrictedRadioButtons.publishInput, 'should have a publish input field')
 })
 
-test('renders an unpublish input field', function() {
+test('renders an unpublish input field', function () {
   ok(this.RestrictedRadioButtons.unpublishInput, 'should have an unpublish input field')
 })
 
-test('renders a not-visible-in-student-files field', function() {
+test('renders a not-visible-in-student-files field', function () {
   ok(this.RestrictedRadioButtons.linkOnly, 'should have an link-only input field')
 })
 
-test('renders a calendar option input field', function() {
+test('renders a calendar option input field', function () {
   ok(this.RestrictedRadioButtons.dateRange, 'should have a calendar input field')
 })
 
@@ -61,14 +61,14 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
       models: [
         new Folder({
           id: 1000,
-          hidden: false
+          hidden: false,
         }),
         new Folder({
           id: 999,
-          hidden: true
-        })
+          hidden: true,
+        }),
       ],
-      radioStateChange: sinon.stub()
+      radioStateChange: sinon.stub(),
     }
     this.RestrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
@@ -77,10 +77,10 @@ QUnit.module('RestrictedRadioButtons Multiple Selected Items', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('defaults to having nothing selected when non common items are selected', function() {
+test('defaults to having nothing selected when non common items are selected', function () {
   equal(this.RestrictedRadioButtons.publishInput.checked, false, 'not selected')
   equal(this.RestrictedRadioButtons.unpublishInput.checked, false, 'not selected')
   equal(this.RestrictedRadioButtons.linkOnly.checked, false, 'not selected')
@@ -91,7 +91,7 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
   setup() {
     const props = {
       models: [new Folder({id: 999})],
-      radioStateChange: sinon.stub()
+      radioStateChange: sinon.stub(),
     }
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
@@ -100,17 +100,17 @@ QUnit.module('RestrictedRadioButtons#extractFormValues', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('returns the correct object to publish an item', function() {
+test('returns the correct object to publish an item', function () {
   this.restrictedRadioButtons.publishInput.checked = true
   Simulate.change(this.restrictedRadioButtons.publishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
     lock_at: '',
-    locked: false
+    locked: false,
   }
   deepEqual(
     this.restrictedRadioButtons.extractFormValues(),
@@ -119,14 +119,14 @@ test('returns the correct object to publish an item', function() {
   )
 })
 
-test('returns the correct object to unpublish an item', function() {
+test('returns the correct object to unpublish an item', function () {
   this.restrictedRadioButtons.unpublishInput.checked = true
   Simulate.change(this.restrictedRadioButtons.unpublishInput)
   const expectedObject = {
     hidden: false,
     unlock_at: '',
     lock_at: '',
-    locked: true
+    locked: true,
   }
   deepEqual(
     this.restrictedRadioButtons.extractFormValues(),
@@ -135,13 +135,13 @@ test('returns the correct object to unpublish an item', function() {
   )
 })
 
-test('returns the correct object to hide an item', function() {
+test('returns the correct object to hide an item', function () {
   Simulate.change(this.restrictedRadioButtons.linkOnly)
   const expectedObject = {
     hidden: true,
     unlock_at: '',
     lock_at: '',
-    locked: false
+    locked: false,
   }
   deepEqual(
     this.restrictedRadioButtons.extractFormValues(),
@@ -150,7 +150,7 @@ test('returns the correct object to hide an item', function() {
   )
 })
 
-test('returns the correct object to restrict an item based on dates', function() {
+test('returns the correct object to restrict an item based on dates', function () {
   Simulate.change(this.restrictedRadioButtons.dateRange)
   this.restrictedRadioButtons.dateRange.checked = true
   $(this.restrictedRadioButtons.unlock_at).data('unfudged-date', 'something else')
@@ -159,7 +159,7 @@ test('returns the correct object to restrict an item based on dates', function()
     hidden: false,
     unlock_at: 'something else',
     lock_at: 'something',
-    locked: false
+    locked: false,
   }
   deepEqual(
     this.restrictedRadioButtons.extractFormValues(),
@@ -176,16 +176,16 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
           id: 999,
           hidden: true,
           lock_at: undefined,
-          unlock_at: undefined
+          unlock_at: undefined,
         }),
         new Folder({
           id: 1000,
           hidden: true,
           lock_at: undefined,
-          unlock_at: undefined
-        })
+          unlock_at: undefined,
+        }),
       ],
-      radioStateChange: sinon.stub()
+      radioStateChange: sinon.stub(),
     }
     this.restrictedRadioButtons = ReactDOM.render(
       <RestrictedRadioButtons {...props} />,
@@ -194,10 +194,10 @@ QUnit.module('RestrictedRadioButtons Multiple Items', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('commonly selected items will open the same defaulted options', function() {
+test('commonly selected items will open the same defaulted options', function () {
   equal(
     this.restrictedRadioButtons.linkOnly.checked,
     true,

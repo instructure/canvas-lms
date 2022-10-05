@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintLockOptions from 'ui/features/course_settings/react/components/BlueprintLockOptions.js'
+import BlueprintLockOptions from 'ui/features/course_settings/react/components/BlueprintLockOptions'
 
 QUnit.module('BlueprintLockOptions component')
 

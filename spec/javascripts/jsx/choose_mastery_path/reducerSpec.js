@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/choose_mastery_path/react/actions.js'
-import reducer from 'ui/features/choose_mastery_path/react/reducer.js'
+import actions from 'ui/features/choose_mastery_path/react/actions'
+import reducer from 'ui/features/choose_mastery_path/react/reducer'
 
 QUnit.module('Choose Mastery Path Reducer')
 

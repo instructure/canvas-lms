@@ -27,7 +27,7 @@ QUnit.module('PublishIconView', {
     class Publishable extends Backbone.Model {
       defaults = {
         published: false,
-        publishable: true
+        publishable: true,
       }
 
       publish() {
@@ -53,9 +53,9 @@ QUnit.module('PublishIconView', {
     this.scheduled_publish = new Publishable({
       published: false,
       unpublishable: true,
-      publish_at: '2022-02-22T22:22:22Z'
+      publish_at: '2022-02-22T22:22:22Z',
     })
-  }
+  },
 })
 
 test('initialize publish', function () {

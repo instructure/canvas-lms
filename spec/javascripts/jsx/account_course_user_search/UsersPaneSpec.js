@@ -20,8 +20,8 @@ import React from 'react'
 import {shallow} from 'enzyme'
 import UsersPane, {
   SEARCH_DEBOUNCE_TIME,
-} from 'ui/features/account_course_user_search/react/components/UsersPane.js'
-import UserActions from 'ui/features/account_course_user_search/react/actions/UserActions.js'
+} from 'ui/features/account_course_user_search/react/components/UsersPane'
+import UserActions from 'ui/features/account_course_user_search/react/actions/UserActions'
 
 QUnit.module('Account Course User Search UsersPane View')
 

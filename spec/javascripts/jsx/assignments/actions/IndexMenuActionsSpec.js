@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions.js'
+import Actions from 'ui/features/assignment_index/react/actions/IndexMenuActions'
 
 QUnit.module('AssignmentsIndexMenuActions')
 

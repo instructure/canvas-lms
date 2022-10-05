@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 
-import ProcessGradebookUpload from 'ui/features/gradebook_uploads/jquery/process_gradebook_upload.js'
+import ProcessGradebookUpload from 'ui/features/gradebook_uploads/jquery/process_gradebook_upload'
 import fakeENV from 'helpers/fakeENV'
 import '@canvas/timezone'
 

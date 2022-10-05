@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/account_course_user_search/react/actions/UserActions.js'
+import actions from 'ui/features/account_course_user_search/react/actions/UserActions'
 
 const STUDENTS = [
   {

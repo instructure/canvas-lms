@@ -21,8 +21,8 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import {mount, shallow} from 'enzyme'
-import TimeBlockSelector from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelector.js'
-import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelectRow.js'
+import TimeBlockSelector from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelector'
+import TimeBlockSelectRow from 'ui/features/calendar_appointment_group_edit/react/TimeBlockSelectRow'
 
 let props
 

@@ -18,7 +18,7 @@
 
 import axios from '@canvas/axios'
 import Fixtures from '../Fixtures'
-import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi.js'
+import HistoryApi from 'ui/features/gradebook_history/react/api/HistoryApi'
 
 QUnit.module('HistoryApi', {
   setup() {

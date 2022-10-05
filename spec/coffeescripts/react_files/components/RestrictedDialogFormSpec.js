@@ -30,13 +30,13 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
       models: [
         new Folder({
           id: 1000,
-          hidden: false
+          hidden: false,
         }),
         new Folder({
           id: 999,
-          hidden: true
-        })
-      ]
+          hidden: true,
+        }),
+      ],
     }
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
@@ -45,10 +45,10 @@ QUnit.module('RestrictedDialogForm Multiple Selected Items', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('button is disabled but becomes enabled when you select an item', function() {
+test('button is disabled but becomes enabled when you select an item', function () {
   equal(this.restrictedDialogForm.updateBtn.disabled, true, 'starts off as disabled')
   this.restrictedDialogForm.restrictedSelection.publishInput.checked = true
   Simulate.change(this.restrictedDialogForm.restrictedSelection.publishInput)
@@ -67,9 +67,9 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
           id: 999,
           hidden: true,
           lock_at: undefined,
-          unlock_at: undefined
-        })
-      ]
+          unlock_at: undefined,
+        }),
+      ],
     }
     this.restrictedDialogForm = ReactDOM.render(
       <RestrictedDialogForm {...props} />,
@@ -78,10 +78,10 @@ QUnit.module('RestrictedDialogForm#handleSubmit', {
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('calls save on the model with only hidden if calendarOption is false', function() {
+test('calls save on the model with only hidden if calendarOption is false', function () {
   const stubbedSave = sandbox.spy(this.restrictedDialogForm.props.models[0], 'save')
   Simulate.submit(this.restrictedDialogForm.dialogForm)
   ok(
@@ -93,7 +93,7 @@ test('calls save on the model with only hidden if calendarOption is false', func
 test(
   'calls save on the model with calendar should update hidden, unlock_at, lock_at and locked',
   1,
-  function() {
+  function () {
     const refs = this.restrictedDialogForm
     this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
     const startDate = new Date(2016, 5, 1)
@@ -110,8 +110,8 @@ test(
             hidden: false,
             lock_at: endDate,
             unlock_at: startDate,
-            locked: false
-          }
+            locked: false,
+          },
         }
       ),
       'Called save with lock_at, unlock_at and locked attributes'
@@ -119,7 +119,7 @@ test(
   }
 )
 
-test('accepts blank unlock_at date', function() {
+test('accepts blank unlock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const endDate = new Date(2016, 5, 4)
@@ -135,15 +135,15 @@ test('accepts blank unlock_at date', function() {
           hidden: false,
           lock_at: endDate,
           unlock_at: '',
-          locked: false
-        }
+          locked: false,
+        },
       }
     ),
     'Accepts blank unlock_at date'
   )
 })
 
-test('accepts blank lock_at date', function() {
+test('accepts blank lock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)
@@ -159,15 +159,15 @@ test('accepts blank lock_at date', function() {
           hidden: false,
           lock_at: '',
           unlock_at: startDate,
-          locked: false
-        }
+          locked: false,
+        },
       }
     ),
     'Accepts blank lock_at date'
   )
 })
 
-test('rejects unlock_at date after lock_at date', function() {
+test('rejects unlock_at date after lock_at date', function () {
   const refs = this.restrictedDialogForm
   this.restrictedDialogForm.restrictedSelection.setState({selectedOption: 'date_range'})
   const startDate = new Date(2016, 5, 4)

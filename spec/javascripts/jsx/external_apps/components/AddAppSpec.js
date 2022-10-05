@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
 import Modal from '@canvas/react-modal'
-import AddApp from 'ui/features/external_apps/react/components/AddApp.js'
+import AddApp from 'ui/features/external_apps/react/components/AddApp'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')

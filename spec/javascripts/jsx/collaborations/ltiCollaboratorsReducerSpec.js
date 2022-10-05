@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/lti_collaborations/react/reducers/ltiCollaboratorsReducer.js'
+import reducer from 'ui/features/lti_collaborations/react/reducers/ltiCollaboratorsReducer'
 
-import actions from 'ui/features/lti_collaborations/react/actions.js'
+import actions from 'ui/features/lti_collaborations/react/actions'
 
 QUnit.module('ltiCollaboratorsReducer')
 

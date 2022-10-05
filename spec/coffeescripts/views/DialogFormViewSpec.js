@@ -33,7 +33,7 @@ const sendResponse = (method, json) =>
   server.respond(method, model.url, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(json)
+    JSON.stringify(json),
   ])
 
 QUnit.module('DialogFormView', {
@@ -42,7 +42,7 @@ QUnit.module('DialogFormView', {
     server = sinon.fakeServer.create()
     model = new Backbone.Model({
       id: 1,
-      is_awesome: true
+      is_awesome: true,
     })
     model.url = '/test'
     trigger = $('<button title="Edit Stuff" />').appendTo($('#fixtures'))
@@ -57,14 +57,14 @@ QUnit.module('DialogFormView', {
             ${is_awesome ? 'checked' : undefined}
           > is awesome</label>
         `
-      }
+      },
     })
   },
   teardown() {
     trigger.remove()
     server.restore()
     view.remove()
-  }
+  },
 })
 
 test('opening and closing the dialog with the trigger', () => {
@@ -82,12 +82,12 @@ test('submitting the form', () => {
   view.$('button[type=submit]').simulate('click')
   sendResponse('PUT', {
     id: 1,
-    is_awesome: false
+    is_awesome: false,
   })
   equal(view.model.get('is_awesome'), false, 'is_awesome is updated to false')
   return assert.isHidden(view.$el, 'when form submission is complete')
 })
-const assertDialogTitle = function(expected, message) {
+const assertDialogTitle = function (expected, message) {
   const dialogTitle = $('.ui-dialog-title:last').html()
   equal(dialogTitle, expected, message)
 }
@@ -106,7 +106,7 @@ test('gets dialog title from trigger aria-describedby', () => {
   trigger.removeAttr('title')
   const describer = $('<div/>', {
     html: 'aria title',
-    id: 'aria-describer'
+    id: 'aria-describer',
   }).appendTo($('#fixtures'))
   trigger.attr('aria-describedby', 'aria-describer')
   openDialog()
@@ -124,7 +124,7 @@ test('rendering', () => {
   equal(view.$el.find('.outlet').html(), 'hello', 'renders template into outlet')
 })
 
-test('closing the dialog calls view#close', function() {
+test('closing the dialog calls view#close', function () {
   openDialog()
   closeDialog()
   ok(this.closeSpy.called)

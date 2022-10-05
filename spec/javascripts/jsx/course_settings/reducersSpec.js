@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/course_settings/react/reducer.js'
+import reducer from 'ui/features/course_settings/react/reducer'
 
 QUnit.module('Course Settings Reducer')
 

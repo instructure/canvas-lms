@@ -19,9 +19,9 @@
 import $ from 'jquery'
 import {useOldDebounce, useNormalDebounce} from 'helpers/util'
 import fakeENV from 'helpers/fakeENV'
-import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog.js'
-import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection.js'
-import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection.js'
+import MessageFormDialog from 'ui/features/conversations/backbone/views/MessageFormDialog'
+import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'
+import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 
 const recipients = [
@@ -30,15 +30,15 @@ const recipients = [
     common_courses: [{0: 'FakeEnrollment'}],
     avatar_url: 'http://example.com',
     common_groups: {},
-    name: 'first person'
+    name: 'first person',
   },
   {
     id: '9010000000000003', // rounds to 9010000000000004
     common_courses: [{0: 'FakeEnrollment'}],
     avatar_url: 'http://example.com',
     common_groups: {},
-    name: 'second person'
-  }
+    name: 'second person',
+  },
 ]
 let dialog = null
 
@@ -56,16 +56,16 @@ QUnit.module('MessageFormDialog', {
     this.server.restore()
     dialog.recipientView.remove()
     dialog.remove()
-  }
+  },
 })
 
-test('recipient ids are not parsed as numbers', function() {
+test('recipient ids are not parsed as numbers', function () {
   dialog = new MessageFormDialog({
     courses: {
       favorites: new FavoriteCourseCollection(),
       all: new CourseCollection(),
-      groups: new GroupCollection()
-    }
+      groups: new GroupCollection(),
+    },
   })
 
   dialog.show(null, {})
@@ -75,7 +75,7 @@ test('recipient ids are not parsed as numbers', function() {
   this.server.respond('GET', /recipients/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(recipients)
+    JSON.stringify(recipients),
   ])
 
   equal(dialog.recipientView.selectedModel.id, '9010000000000001')
@@ -85,21 +85,21 @@ test('recipient ids are not parsed as numbers', function() {
   document.body.removeChild(parent)
 })
 
-test('fires a SR event on file attachment', function() {
+test('fires a SR event on file attachment', function () {
   dialog = new MessageFormDialog({
     courses: {
       favorites: new FavoriteCourseCollection(),
       all: new CourseCollection(),
-      groups: new GroupCollection()
-    }
+      groups: new GroupCollection(),
+    },
   })
 
   const spy = sandbox.spy($, 'screenReaderFlashMessageExclusive')
   const e = {
     currentTarget: {
       value: dialog.$el.find('.file_input'),
-      files: [new File(['foo'], 'foo.txt', {type: 'text/plain'})]
-    }
+      files: [new File(['foo'], 'foo.txt', {type: 'text/plain'})],
+    },
   }
   dialog.show(null, {})
   dialog.handleAttachment(e)

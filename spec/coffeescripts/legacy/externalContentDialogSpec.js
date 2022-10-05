@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import ExternalContentSuccess from 'ui/features/external_content_success/index.js'
+import ExternalContentSuccess from 'ui/features/external_content_success/index'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -26,13 +26,13 @@ QUnit.module('ExternalContentSuccess', {
   setup() {
     window.$ = window.parent.$ = $
     fakeENV.setup({
-      service: 'external_tool_redirect'
+      service: 'external_tool_redirect',
     })
   },
   teardown() {
     fakeENV.teardown()
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('without iframe should return `undefined` to getIFrameSrc', () => {
@@ -86,7 +86,7 @@ test('with iframe should return the `launch_type` to getLaunchType', () => {
 QUnit.module('ExternalContentSuccess: lti_errormsg', {
   setup() {
     fakeENV.setup({
-      service: 'external_tool_redirect'
+      service: 'external_tool_redirect',
     })
     ENV.lti_errormsg = 'this is a LTI error message'
   },
@@ -94,7 +94,7 @@ QUnit.module('ExternalContentSuccess: lti_errormsg', {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('show the "lti_errormsg" message', () => {
@@ -107,7 +107,7 @@ test('show the "lti_errormsg" message', () => {
 QUnit.module('ExternalContentSuccess: lti_msg', {
   setup() {
     fakeENV.setup({
-      service: 'external_tool_redirect'
+      service: 'external_tool_redirect',
     })
     ENV.lti_msg = 'this is a LTI message'
   },
@@ -115,7 +115,7 @@ QUnit.module('ExternalContentSuccess: lti_msg', {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('show the "lti_msg" message', () => {
@@ -128,7 +128,7 @@ test('show the "lti_msg" message', () => {
 QUnit.module('ExternalContentSuccess: lti_msg and lti_errormsg', {
   setup() {
     fakeENV.setup({
-      service: 'external_tool_redirect'
+      service: 'external_tool_redirect',
     })
     ENV.lti_msg = 'this is a LTI message'
     ENV.lti_errormsg = 'this is a LTI error message'
@@ -137,7 +137,7 @@ QUnit.module('ExternalContentSuccess: lti_msg and lti_errormsg', {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(document.querySelector('#lti_messages_wrapper'))
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('show "lti_msg" and "lti_errormsg" messages', () => {

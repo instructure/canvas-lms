@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ChildCourse from 'ui/features/blueprint_course_child/react/apps/ChildCourse.js'
+import ChildCourse from 'ui/features/blueprint_course_child/react/apps/ChildCourse'
 import select from 'obj-select'
 import getSampleData from '../getSampleData'
 

@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/discussion_topics_index/react/actions.js'
-import * as apiClient from 'ui/features/discussion_topics_index/react/apiClient.js'
+import actions from 'ui/features/discussion_topics_index/react/actions'
+import * as apiClient from 'ui/features/discussion_topics_index/react/apiClient'
 import $ from 'jquery'
 import '@canvas/rails-flash-notifications'
 

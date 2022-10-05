@@ -21,9 +21,9 @@ import ReactDOM from 'react-dom'
 import timezone from '@canvas/timezone'
 import newYork from 'timezone/America/New_York'
 
-import DateEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/DateEventGroup.js'
-import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers.js'
-import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail.js'
+import DateEventGroup from 'ui/features/speed_grader/react/AssessmentAuditTray/components/AuditTrail/DateEventGroup'
+import {buildEvent} from 'ui/features/speed_grader/react/AssessmentAuditTray/__tests__/AuditTrailSpecHelpers'
+import buildAuditTrail from 'ui/features/speed_grader/react/AssessmentAuditTray/buildAuditTrail'
 
 QUnit.module('AssessmentAuditTray DateEventGroup', suiteHooks => {
   let $container

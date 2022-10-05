@@ -17,7 +17,7 @@
  */
 
 import EditConferenceView from 'ui/features/conferences/backbone/views/EditConferenceView.coffee'
-import Conference from 'ui/features/conferences/backbone/models/Conference.js'
+import Conference from 'ui/features/conferences/backbone/models/Conference'
 import timezone from 'timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
 import french from 'timezone/fr_FR'

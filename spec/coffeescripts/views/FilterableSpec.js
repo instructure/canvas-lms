@@ -42,22 +42,22 @@ QUnit.module('Filterable', {
     const collection = new Collection([
       {
         id: 1,
-        name: 'bob'
+        name: 'bob',
       },
       {
         id: 2,
-        name: 'joe'
-      }
+        name: 'joe',
+      },
     ])
     view = new MyCollectionView({
       collection,
-      itemView: View
+      itemView: View,
     })
     return view.render()
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test("hides items that don't match the filter", () => {

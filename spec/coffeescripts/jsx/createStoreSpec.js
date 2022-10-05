@@ -26,16 +26,16 @@ test('sets initial state', () => {
 test('merges data on setState', () => {
   const store = createStore({
     foo: 'bar',
-    baz: null
+    baz: null,
   })
   deepEqual(store.getState(), {
     foo: 'bar',
-    baz: null
+    baz: null,
   })
   store.setState({baz: 'qux'})
   deepEqual(store.getState(), {
     foo: 'bar',
-    baz: 'qux'
+    baz: 'qux',
   })
 })
 

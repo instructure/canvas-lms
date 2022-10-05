@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import {addUsersLink, openReportDescriptionLink} from 'ui/features/account_settings/jquery/index.js'
+import {addUsersLink, openReportDescriptionLink} from 'ui/features/account_settings/jquery/index'
 
 QUnit.module('AccountSettings.openReportDescriptionLink', {
   setup() {

@@ -20,7 +20,7 @@ import React from 'react'
 import {mount} from 'enzyme'
 import merge from 'lodash/merge'
 
-import IndexHeader from 'ui/features/discussion_topics_index/react/components/IndexHeader.js'
+import IndexHeader from 'ui/features/discussion_topics_index/react/components/IndexHeader'
 
 const makeProps = (props = {}) =>
   merge(

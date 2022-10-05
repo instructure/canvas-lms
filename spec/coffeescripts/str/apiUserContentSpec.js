@@ -33,7 +33,7 @@ QUnit.module('apiUserContent.convert', {
   },
   teardown() {
     ENV.FEATURES = FEATURES
-  }
+  },
 })
 
 test('moves mathml into a screenreader element', () => {

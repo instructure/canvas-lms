@@ -19,9 +19,9 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import {speedGraderUrl} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi.js'
-import GridRow from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GridRow.js'
-import {STARTED} from 'ui/features/assignment_grade_summary/react/grades/GradeActions.js'
+import {speedGraderUrl} from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi'
+import GridRow from 'ui/features/assignment_grade_summary/react/components/GradesGrid/GridRow'
+import {STARTED} from 'ui/features/assignment_grade_summary/react/grades/GradeActions'
 
 QUnit.module('GradeSummary GridRow', suiteHooks => {
   let props

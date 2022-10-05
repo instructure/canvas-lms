@@ -17,7 +17,7 @@
  */
 
 import axios from '@canvas/axios'
-import UserApi from 'ui/features/gradebook_history/react/api/UserApi.js'
+import UserApi from 'ui/features/gradebook_history/react/api/UserApi'
 
 QUnit.module('UserApi', {
   setup() {

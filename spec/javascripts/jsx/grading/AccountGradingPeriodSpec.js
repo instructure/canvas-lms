@@ -22,7 +22,7 @@ import ReactDOM from 'react-dom'
 import {Simulate} from 'react-dom/test-utils'
 import axios from '@canvas/axios'
 import _ from 'underscore'
-import GradingPeriod from 'ui/features/account_grading_standards/react/AccountGradingPeriod.js'
+import GradingPeriod from 'ui/features/account_grading_standards/react/AccountGradingPeriod'
 
 const wrapper = document.getElementById('fixtures')
 

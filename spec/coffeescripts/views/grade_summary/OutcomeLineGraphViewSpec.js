@@ -34,17 +34,17 @@ QUnit.module('OutcomeLineGraphViewSpec', {
       outcome_results: [
         {
           submitted_or_assessed_at: tz.parse('2015-04-24T19:27:54Z'),
-          links: {alignment: 'alignment_1'}
-        }
+          links: {alignment: 'alignment_1'},
+        },
       ],
       linked: {
         alignments: [
           {
             id: 'alignment_1',
-            name: 'Alignment Name'
-          }
-        ]
-      }
+            name: 'Alignment Name',
+          },
+        ],
+      },
     }
     this.outcomeLineGraphView = new OutcomeLineGraphView({
       el: $('<div class="line-graph"></div>')[0],
@@ -52,17 +52,17 @@ QUnit.module('OutcomeLineGraphViewSpec', {
         id: 2,
         friendly_name: 'Friendly Outcome Name',
         mastery_points: 3,
-        points_possible: 5
-      })
+        points_possible: 5,
+      }),
     })
   },
   teardown() {
     fakeENV.teardown()
     return this.server.restore()
-  }
+  },
 })
 
-test('#initialize', function() {
+test('#initialize', function () {
   ok(
     this.outcomeLineGraphView.collection instanceof OutcomeResultCollection,
     'should have an OutcomeResultCollection'
@@ -72,7 +72,7 @@ test('#initialize', function() {
   ok(this.outcomeLineGraphView.deferred.isResolved(), 'should resolve promise on fetched:last')
 })
 
-test('render', function() {
+test('render', function () {
   const renderSpy = sandbox.spy(this.outcomeLineGraphView, 'render')
   ok(!this.outcomeLineGraphView.deferred.isResolved(), 'precondition')
   ok(this.outcomeLineGraphView.render())

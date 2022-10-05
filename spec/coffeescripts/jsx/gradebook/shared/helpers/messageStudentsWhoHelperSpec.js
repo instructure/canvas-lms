@@ -193,7 +193,7 @@ QUnit.module('messageStudentsWhoHelper#callbackFn')
 
 test('returns the student ids filtered by the correct criteria', () => {
   const option = {
-    criteriaFn: (student, cutoff) => student.score > cutoff
+    criteriaFn: (student, cutoff) => student.score > cutoff,
   }
   sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const students = [{user_data: {id: '1', score: 8}}, {user_data: {id: '2', score: 4}}]
@@ -208,7 +208,7 @@ QUnit.module('messageStudentsWhoHelper#generateSubjectCallbackFn')
 
 test('generates a function that returns the subject string', () => {
   const option = {
-    subjectFn: (assignment, cutoff) => `name: ${assignment.name}, cutoff: ${cutoff}`
+    subjectFn: (assignment, cutoff) => `name: ${assignment.name}, cutoff: ${cutoff}`,
   }
   sandbox.stub(MessageStudentsWhoHelper, 'findOptionByText').returns(option)
   const assignment = {id: '1', name: 'Shootbags'}
@@ -225,7 +225,7 @@ test('returns an object with the expected settings', () => {
   const self = {
     options: () => 'stuff',
     callbackFn: () => 'call me back!',
-    generateSubjectCallbackFn: () => () => 'function inception'
+    generateSubjectCallbackFn: () => () => 'function inception',
   }
   const settingsFn = MessageStudentsWhoHelper.settings.bind(self)
   const settings = settingsFn(assignment, students)
@@ -237,7 +237,7 @@ test('returns an object with the expected settings', () => {
     'students',
     'context_code',
     'callback',
-    'subjectCallback'
+    'subjectCallback',
   ]
   deepEqual(settingsKeys, expectedKeys)
 })
@@ -248,7 +248,7 @@ test('returns an object with the expected settings and courseId is camelCase', (
   const self = {
     options: () => 'stuff',
     callbackFn: () => 'call me back!',
-    generateSubjectCallbackFn: () => () => 'function inception'
+    generateSubjectCallbackFn: () => () => 'function inception',
   }
   const settingsFn = MessageStudentsWhoHelper.settings.bind(self)
   const settings = settingsFn(assignment, students)
@@ -260,7 +260,7 @@ test('returns an object with the expected settings and courseId is camelCase', (
     'students',
     'context_code',
     'callback',
-    'subjectCallback'
+    'subjectCallback',
   ]
   deepEqual(settingsKeys, expectedKeys)
 })
@@ -280,7 +280,7 @@ QUnit.module('messageStudentsWhoHelper#messageStudentsWho', hooks => {
     server.respondWith('POST', sendMessageStudentsWhoUrl, [
       200,
       {'Content-Type': 'application/json'},
-      responseBody
+      responseBody,
     ])
   })
 
@@ -329,7 +329,7 @@ QUnit.module('messageStudentsWhoHelper#messageStudentsWho', hooks => {
   test('includes media comment params if passed a media file', () =>
     MessageStudentsWhoHelper.sendMessageStudentsWho(recipientsIds, subject, body, contextCode, {
       id: '123',
-      type: 'video'
+      type: 'video',
     }).then(() => {
       const bodyData = JSON.parse(getRequest().requestBody)
       strictEqual(bodyData.media_comment_id, '123')

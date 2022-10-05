@@ -35,10 +35,10 @@ QUnit.module('jquery.toJSON', {
       <input type="text" name="nested[arr][]"     value="1">
       <input type="text" name="nested[arr][]"     value="2">
     `)
-  }
+  },
 })
 
-test('serializes to a JSON string correctly', function() {
+test('serializes to a JSON string correctly', function () {
   const expected = {
     foo: 'foo',
     arr: ['1', '2'],
@@ -46,20 +46,20 @@ test('serializes to a JSON string correctly', function() {
       foo: 'nested[foo]',
       bar: 'nested[bar]',
       baz: {
-        qux: 'nested[baz][qux]'
+        qux: 'nested[baz][qux]',
       },
-      arr: ['1', '2']
-    }
+      arr: ['1', '2'],
+    },
   }
   equal(JSON.stringify(expected), JSON.stringify(this.form))
 })
 
-test(`returns null if element with datetime_field enabled class has undefined for $.data( 'date' )`, function() {
+test(`returns null if element with datetime_field enabled class has undefined for $.data( 'date' )`, function () {
   this.form.prepend($datepickerEl())
   strictEqual(this.form.toJSON().date, null)
 })
 
-test('returns date object for form element with datetime_field_enabled', function() {
+test('returns date object for form element with datetime_field_enabled', function () {
   const $dateEl = $datepickerEl()
   this.form.prepend($dateEl)
   const date = Date.now()

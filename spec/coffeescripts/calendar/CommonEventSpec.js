@@ -22,7 +22,7 @@ import fakeENV from 'helpers/fakeENV'
 
 QUnit.module('CommonEvent', {
   setup() {},
-  teardown() {}
+  teardown() {},
 })
 
 test('CommonEvent: should prevent assignment-due events from wrapping to the next day', () => {
@@ -47,7 +47,7 @@ test('CommonEvent: should leave events with defined end times alone', () => {
     {
       title: 'Not an assignment',
       start_at: '2016-02-25T23:30:00Z',
-      end_at: '2016-02-26T00:30:00Z'
+      end_at: '2016-02-26T00:30:00Z',
     },
     ['course_1']
   )
@@ -61,7 +61,7 @@ test('CommonEvent: isOnCalendar', () => {
     {
       title: 'blah',
       start_at: '2016-02-25T23:30:00Z',
-      all_context_codes: 'course_1,course_23'
+      all_context_codes: 'course_1,course_23',
     },
     ['course_1', 'course_23']
   )
@@ -82,7 +82,7 @@ test('commonEventFactory: finds a context for multi-context events', () => {
       parent_event_id: '172',
       appointment_group_id: '2',
       appointment_group_url: 'http://localhost:3000/api/v1/appointment_groups/2',
-      own_reservation: true
+      own_reservation: true,
     },
     [{asset_string: 'course_2'}]
   )
@@ -95,7 +95,7 @@ QUnit.module('CommonEvent#iconType', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('Returns "calendar-add" for non-filled groups', () => {
@@ -103,7 +103,7 @@ test('Returns "calendar-add" for non-filled groups', () => {
     {
       title: 'some title',
       start_at: '2016-12-01T12:30:00Z',
-      appointment_group_url: 'http://some_url'
+      appointment_group_url: 'http://some_url',
     },
     ['course_1']
   )
@@ -116,7 +116,7 @@ test('Returns "calendar-reserved" for filled groups', () => {
       title: 'some title',
       start_at: '2016-12-01T12:30:00Z',
       appointment_group_url: 'http://some_url',
-      child_events: [{}]
+      child_events: [{}],
     },
     ['course_1']
   )
@@ -128,7 +128,7 @@ test('Returns "calendar-reserved" when the appointmentGroupEventStatus is "Reser
     {
       title: 'some title',
       start_at: '2016-12-01T12:30:00Z',
-      appointment_group_url: 'http://some_url'
+      appointment_group_url: 'http://some_url',
     },
     ['course_1']
   )
@@ -140,7 +140,7 @@ test('Returns "calendar-month" for other situations', () => {
   const event = commonEventFactory(
     {
       title: 'some title',
-      start_at: '2016-12-01T12:30:00Z'
+      start_at: '2016-12-01T12:30:00Z',
     },
     ['course_1']
   )
@@ -152,7 +152,7 @@ test('Returns "discussion" for ungraded discussion objects with todo dates', () 
     {
       context_code: 'course_1',
       plannable_type: 'discussion_topic',
-      plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'}
+      plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
     },
     [{asset_string: 'course_1', can_update_discussion_topic: false, can_update_todo_date: false}]
   )
@@ -167,7 +167,7 @@ test('Returns "document" for wiki pages with todo dates', () => {
     {
       context_code: 'course_1',
       plannable_type: 'wiki_page',
-      plannable: {url: 'some_title', title: 'some title', todo_date: '2016-12-01T12:30:00Z'}
+      plannable: {url: 'some_title', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
     },
     [{asset_string: 'course_1', can_update_wiki_page: false, can_update_todo_date: false}]
   )
@@ -183,7 +183,7 @@ test('sets can_edit/can_delete/fullDetailsURL/readableType on discussion_topics'
       context_code: 'course_1',
       plannable_type: 'discussion_topic',
       html_url: 'http://example.org/courses/1/discussion_topics/123',
-      plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'}
+      plannable: {id: '123', title: 'some title', todo_date: '2016-12-01T12:30:00Z'},
     },
     [{asset_string: 'course_1', can_update_discussion_topic: true, can_update_todo_date: true}]
   )
@@ -200,7 +200,7 @@ test('sets can_edit/can_delete/fullDetailsURL/readableType on wiki pages', () =>
       context_code: 'course_1',
       plannable_type: 'wiki_page',
       html_url: 'http://example.org/courses/1/pages/some-page',
-      plannable: {url: 'some_page', title: 'some page', todo_date: '2016-12-01T12:30:00Z'}
+      plannable: {url: 'some_page', title: 'some page', todo_date: '2016-12-01T12:30:00Z'},
     },
     [{asset_string: 'course_1', can_update_wiki_page: true, can_update_todo_date: true}]
   )

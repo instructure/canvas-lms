@@ -30,13 +30,13 @@ const createView = function (collection) {
       {
         id: 1,
         title: 'Foo',
-        permissions: {delete: true}
+        permissions: {delete: true},
       },
       {
         id: 2,
         title: 'Bar',
-        permissions: {delete: true}
-      }
+        permissions: {delete: true},
+      },
     ])
   }
   const view = new QuizItemGroupView({collection, listId: 'assignment-quizzes'})
@@ -50,7 +50,7 @@ QUnit.module('QuizItemGroupView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 // eslint-disable-next-line qunit/resolve-async
@@ -74,7 +74,7 @@ test('#isEmpty is true if collection is empty', () => {
 test('#isEmpty is true if all items are hidden', () => {
   const collection = new QuizCollection([
     {id: 1, hidden: true},
-    {id: 2, hidden: true}
+    {id: 2, hidden: true},
   ])
   const view = createView(collection)
   ok(view.isEmpty())

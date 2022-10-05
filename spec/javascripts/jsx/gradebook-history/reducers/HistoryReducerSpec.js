@@ -24,9 +24,9 @@ import {
   FETCH_HISTORY_NEXT_PAGE_START,
   FETCH_HISTORY_NEXT_PAGE_SUCCESS,
   FETCH_HISTORY_NEXT_PAGE_FAILURE,
-} from 'ui/features/gradebook_history/react/actions/HistoryActions.js'
+} from 'ui/features/gradebook_history/react/actions/HistoryActions'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeader'
-import reducer from 'ui/features/gradebook_history/react/reducers/HistoryReducer.js'
+import reducer from 'ui/features/gradebook_history/react/reducers/HistoryReducer'
 
 QUnit.module('HistoryReducer')
 

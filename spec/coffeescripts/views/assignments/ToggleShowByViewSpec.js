@@ -19,14 +19,14 @@ import _ from 'underscore'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
 import Course from '@canvas/courses/backbone/models/Course.coffee'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
-import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView.js'
+import ToggleShowByView from 'ui/features/assignment_index/backbone/views/ToggleShowByView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
 const COURSE_SUBMISSIONS_URL = '/courses/1/submissions'
 
-const createView = function() {
+const createView = function () {
   ENV.PERMISSIONS = {manage: false, read_grades: true}
   const course = new Course({id: 1})
   // the dates are in opposite order of what they will be sorted into
@@ -36,66 +36,66 @@ const createView = function() {
       name: 'Past Assignments',
       due_at: new Date(2013, 8, 20),
       position: 1,
-      submission_types: ['online']
+      submission_types: ['online'],
     },
     {
       id: 2,
       name: 'Past Assignments',
       due_at: new Date(2013, 8, 21),
       position: 2,
-      submission_types: ['on_paper']
+      submission_types: ['on_paper'],
     },
     {
       id: 3,
       name: 'Upcoming Assignments',
       due_at: new Date(3013, 8, 21),
-      position: 1
+      position: 1,
     },
     {
       id: 4,
       name: 'Overdue Assignments',
       due_at: new Date(2013, 8, 21),
       position: 1,
-      submission_types: ['online']
+      submission_types: ['online'],
     },
     {
       id: 5,
       name: 'Past Assignments',
       due_at: new Date(2013, 8, 22),
       position: 3,
-      submission_types: ['online']
+      submission_types: ['online'],
     },
     {
       id: 6,
       name: 'Overdue Assignments',
       due_at: new Date(2013, 8, 20),
       position: 2,
-      submission_types: ['online']
+      submission_types: ['online'],
     },
     {
       id: 7,
-      name: 'Undated Assignments'
+      name: 'Undated Assignments',
     },
     {
       id: 8,
       name: 'Upcoming Assignments',
       due_at: new Date(3013, 8, 20),
-      position: 2
-    }
+      position: 2,
+    },
   ]
   const group = new AssignmentGroup({assignments})
   const collection = new AssignmentGroupCollection([group], {
     courseSubmissionsURL: COURSE_SUBMISSIONS_URL,
-    course
+    course,
   })
   return new ToggleShowByView({course, assignmentGroups: collection})
 }
 
-const getGrades = function(collection, server) {
+const getGrades = function (collection, server) {
   const submissions = [
     {id: 1, assignment_id: 1, grade: 305},
     {id: 2, assignment_id: 4},
-    {id: 3, assignment_id: 5, submission_type: 'online'}
+    {id: 3, assignment_id: 5, submission_type: 'online'},
   ]
   let url = `${COURSE_SUBMISSIONS_URL}?`
   if (ENV.observed_student_ids.length === 1) {
@@ -106,7 +106,7 @@ const getGrades = function(collection, server) {
   server.respondWith('GET', url, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(submissions)
+    JSON.stringify(submissions),
   ])
 
   collection.getGrades()
@@ -125,7 +125,7 @@ QUnit.module('ToggleShowByView', {
     this.server.restore()
     $('.ui-dialog').remove()
     $('ul[id^=ui-id-]').remove()
-  }
+  },
 })
 
 test('should be accessible', assert => {
@@ -134,7 +134,7 @@ test('should be accessible', assert => {
   assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('should sort assignments into groups correctly', function() {
+test('should sort assignments into groups correctly', function () {
   const view = createView()
   getGrades(view.assignmentGroups, this.server)
 
@@ -145,7 +145,7 @@ test('should sort assignments into groups correctly', function() {
   })
 })
 
-test('should sort assignments by date correctly', function() {
+test('should sort assignments by date correctly', function () {
   const view = createView(true)
   getGrades(view.assignmentGroups, this.server)
 
@@ -169,7 +169,7 @@ test('should sort assignments by date correctly', function() {
   equal(assignments[1].get('due_at'), new Date(3013, 8, 21).toString())
 })
 
-test('observer view who are not observing a student', function() {
+test('observer view who are not observing a student', function () {
   // Regular observer view
   ENV.current_user_has_been_observer_in_this_course = true
   const view = createView()
@@ -187,7 +187,7 @@ test('observer view who are not observing a student', function() {
   equal(assignments.length, 2)
 })
 
-test('observer view who are observing a student', function() {
+test('observer view who are observing a student', function () {
   ENV.current_user_has_been_observer_in_this_course = true
   ENV.observed_student_ids = ['1']
   const view = createView()
@@ -208,7 +208,7 @@ test('observer view who are observing a student', function() {
 
 // This will change in the future from a basic observer with no observing students to
 // way of selecting which student to observer for now though it defaults to a standard observer
-test('observer view who are observing multiple students', function() {
+test('observer view who are observing multiple students', function () {
   ENV.observed_student_ids = ['1', '2']
   ENV.current_user_has_been_observer_in_this_course = true
   const view = createView()

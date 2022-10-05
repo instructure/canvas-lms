@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'ui/features/external_apps/react/lib/AppCenterStore.js'
+import store from 'ui/features/external_apps/react/lib/AppCenterStore'
 
 const defaultApps = () => [
   {

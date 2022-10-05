@@ -29,36 +29,36 @@ function setupMocks() {
         Filename: 'foo',
         success_action_status: '201',
         'content-type': 'text/plain',
-        success_url: '/create_success'
-      }
-    }
+        success_url: '/create_success',
+      },
+    },
   })
   moxios.stubRequest('/upload/url', {
     status: 201,
-    response: {}
+    response: {},
   })
   moxios.stubRequest('/create_success', {
     status: 200,
     response: {
       id: '17',
-      'content-type': 'text/plain'
-    }
+      'content-type': 'text/plain',
+    },
   })
 }
 
 const folder = {
   id: 1,
   folders: {
-    fetch: () => Promise.resolve()
+    fetch: () => Promise.resolve(),
   },
   files: {
-    fetch: () => Promise.resolve()
-  }
+    fetch: () => Promise.resolve(),
+  },
 }
 
-const mockFileOptions = function() {
+const mockFileOptions = function () {
   return {
-    file: new File(['hello world'], 'foo', {type: 'text/plain'})
+    file: new File(['hello world'], 'foo', {type: 'text/plain'}),
   }
 }
 
@@ -69,10 +69,10 @@ QUnit.module('FileUploader', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
-test('posts to the files endpoint to kick off upload', function(assert) {
+test('posts to the files endpoint to kick off upload', function (assert) {
   const done = assert.async()
   const fuploader = new FileUploader(mockFileOptions(), folder)
   sinon.stub(fuploader, 'onPreflightComplete')
@@ -85,7 +85,7 @@ test('posts to the files endpoint to kick off upload', function(assert) {
   })
 })
 
-test('stores params from preflight for actual upload', function(assert) {
+test('stores params from preflight for actual upload', function (assert) {
   const done = assert.async()
   const fuploader = new FileUploader(mockFileOptions(), folder)
   sinon.stub(fuploader, '_actualUpload')
@@ -99,7 +99,7 @@ test('stores params from preflight for actual upload', function(assert) {
   })
 })
 
-test('completes upload after preflight', function(assert) {
+test('completes upload after preflight', function (assert) {
   const done = assert.async()
   const fuploader = new FileUploader(mockFileOptions(), folder)
 
@@ -116,26 +116,26 @@ test('completes upload after preflight', function(assert) {
   })
 })
 
-test('roundProgress returns back rounded values', function() {
+test('roundProgress returns back rounded values', function () {
   const fuploader = new FileUploader(mockFileOptions(), folder)
   sandbox.stub(fuploader, 'getProgress').returns(0.18) // progress is [0 .. 1]
   equal(fuploader.roundProgress(), 18)
 })
 
-test('roundProgress returns back values no greater than 100', function() {
+test('roundProgress returns back values no greater than 100', function () {
   const fuploader = new FileUploader(mockFileOptions(), folder)
   sandbox.stub(fuploader, 'getProgress').returns(1.1) // something greater than 100%
   equal(fuploader.roundProgress(), 100)
 })
 
-test('getFileName returns back the option name if one exists', function() {
+test('getFileName returns back the option name if one exists', function () {
   const options = mockFileOptions()
   options.name = 'use this one'
   const fuploader = new FileUploader(options, folder)
   equal(fuploader.getFileName(), 'use this one')
 })
 
-test('getFileName returns back the actual file if no optinal name is given', function() {
+test('getFileName returns back the actual file if no optinal name is given', function () {
   const options = mockFileOptions()
   const fuploader = new FileUploader(options, folder)
   equal(fuploader.getFileName(), 'foo')

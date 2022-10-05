@@ -34,7 +34,7 @@ QUnit.module('GradebookHeaderMenu#menuPopupOpenHandler', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls @hideMenuActionsWithUnmetDependencies when isAdmin', function () {
@@ -62,10 +62,10 @@ QUnit.module('GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies', {
       points_possible: 10,
       submission_types: 'online_upload',
       has_submitted_submissions: true,
-      submissions_downloads: 1
+      submissions_downloads: 1,
     }
     this.gradebook = {
-      options: {gradebook_is_editable: true, currentUserId: '123'}
+      options: {gradebook_is_editable: true, currentUserId: '123'},
     }
     this.menuElement = document.createElement('ul')
     this.createMenu(this.menuElement)
@@ -82,7 +82,7 @@ QUnit.module('GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies', {
       'curveGrades',
       'downloadSubmissions',
       'reuploadSubmissions',
-      'toggleMuting'
+      'toggleMuting',
     ]
     menuItems.forEach(item => {
       const menuItem = document.createElement('li')
@@ -95,7 +95,7 @@ QUnit.module('GradebookHeaderMenu#hideMenuActionsWithUnmetDependencies', {
   },
   visibleMenuItemNames(root) {
     return Array.from(this.visibleMenuItems(root)).map(item => item.getAttribute('data-action'))
-  }
+  },
 })
 
 test('hides 0 menu items given optimal conditions', function () {
@@ -175,7 +175,7 @@ QUnit.module('GradebookHeaderMenu#disableUnavailableMenuActions', {
   setup() {
     fakeENV.setup({
       current_user_roles: ['teacher'],
-      GRADEBOOK_OPTIONS: {has_grading_periods: true}
+      GRADEBOOK_OPTIONS: {has_grading_periods: true},
     })
     this.disableUnavailableMenuActions = GradebookHeaderMenu.prototype.disableUnavailableMenuActions
     this.menuElement = document.createElement('ul')
@@ -183,7 +183,7 @@ QUnit.module('GradebookHeaderMenu#disableUnavailableMenuActions', {
     this.createMenu(this.menuElement)
     this.menu = $(this.menuElement)
     this.gradebook = {
-      options: {gradebook_is_editable: true, currentUserId: '123'}
+      options: {gradebook_is_editable: true, currentUserId: '123'},
     }
   },
   teardown() {
@@ -199,7 +199,7 @@ QUnit.module('GradebookHeaderMenu#disableUnavailableMenuActions', {
   },
   disabledMenuItems(root) {
     return root.find('.ui-state-disabled')
-  }
+  },
 })
 
 test('disables 0 menu items when given a menu but @assignment does not exist', function () {
@@ -252,7 +252,7 @@ test('disables "Unmute Assignment" when the assignment is moderated and grades h
     moderated_grading: true,
     grades_published: false,
     inClosedGradingPeriod: false,
-    muted: true
+    muted: true,
   }
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(
@@ -266,7 +266,7 @@ test('does not disable "Unmute Assignment" when grades are published', function 
     moderated_grading: true,
     grades_published: true,
     inClosedGradingPeriod: false,
-    muted: true
+    muted: true,
   }
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), null)
@@ -277,7 +277,7 @@ test('does not disable "Mute Assignment" when the assignment can be muted', func
     moderated_grading: true,
     grades_published: false,
     inClosedGradingPeriod: false,
-    muted: false
+    muted: false,
   }
   this.disableUnavailableMenuActions(this.menu)
   strictEqual(this.menu.find('[data-action="toggleMuting"]')[0].getAttribute('aria-disabled'), null)
@@ -287,7 +287,7 @@ QUnit.module('GradebookHeaderMenu#setDefaultGrade', {
   setup() {
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {has_grading_periods: true},
-      current_user_roles: ['admin']
+      current_user_roles: ['admin'],
     })
     this.setDefaultGrade = GradebookHeaderMenu.prototype.setDefaultGrade
     this.options = {assignment: {inClosedGradingPeriod: false}}
@@ -296,7 +296,7 @@ QUnit.module('GradebookHeaderMenu#setDefaultGrade', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls the SetDefaultGradeDialog when isAdmin is true and assignment has no due date in a closed grading period', function () {
@@ -328,7 +328,7 @@ QUnit.module('GradebookHeaderMenu#curveGrades', {
   setup() {
     fakeENV.setup({
       GRADEBOOK_OPTIONS: {has_grading_periods: true},
-      current_user_roles: ['admin']
+      current_user_roles: ['admin'],
     })
     this.curveGrades = GradebookHeaderMenu.prototype.curveGrades
     this.options = {assignment: {inClosedGradingPeriod: false}}
@@ -337,7 +337,7 @@ QUnit.module('GradebookHeaderMenu#curveGrades', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls the CurveGradesDialog when isAdmin is true and assignment has no due date in a closed grading period', function () {
@@ -385,7 +385,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           grading_type: 'points',
           id: '1',
           name: 'some assignment',
-          submission_types: 'online_text_entry'
+          submission_types: 'online_text_entry',
         },
         show_message_students_with_observers_dialog: true,
         students: [
@@ -393,52 +393,52 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
             assignment_1: {
               score: 1,
               redo_request: false,
-              grade: '1'
+              grade: '1',
             },
             id: '100',
             name: 'Adam Jones',
             sortable_name: 'Jones, Adam',
             score: 1,
-            submittedAt: undefined
+            submittedAt: undefined,
           },
           {
             assignment_1: {
               score: 2,
               redo_request: false,
-              grade: '2'
+              grade: '2',
             },
             id: '101',
             name: 'Betty Ford',
             sortable_name: 'Ford, Betty',
             score: 2,
-            submittedAt: undefined
+            submittedAt: undefined,
           },
           {
             assignment_1: {
               score: 3,
               redo_request: false,
-              grade: '3'
+              grade: '3',
             },
             id: '102',
             name: 'Charlie Xi',
             sortable_name: 'Xi, Charlie',
             score: 3,
-            submittedAt: undefined
+            submittedAt: undefined,
           },
           {
             assignment_1: {
               score: 4,
               redo_request: false,
-              grade: '4'
+              grade: '4',
             },
             id: '103',
             name: 'Dana Smith',
             sortable_name: 'Smith, Dana',
             score: 4,
-            submittedAt: undefined
-          }
+            submittedAt: undefined,
+          },
         ],
-        userId: '1'
+        userId: '1',
       }
     })
 
@@ -468,7 +468,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
         pointsPossible: undefined,
         postManually: undefined,
         published: undefined,
-        submissionTypes: 'online_text_entry'
+        submissionTypes: 'online_text_entry',
       })
       deepEqual(elementProps.students, [
         {
@@ -480,7 +480,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           score: 1,
           redoRequest: false,
           sortableName: 'Jones, Adam',
-          submittedAt: undefined
+          submittedAt: undefined,
         },
         {
           excused: undefined,
@@ -491,7 +491,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           score: 2,
           redoRequest: false,
           sortableName: 'Ford, Betty',
-          submittedAt: undefined
+          submittedAt: undefined,
         },
         {
           excused: undefined,
@@ -502,7 +502,7 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           score: 3,
           redoRequest: false,
           sortableName: 'Xi, Charlie',
-          submittedAt: undefined
+          submittedAt: undefined,
         },
         {
           excused: undefined,
@@ -513,8 +513,8 @@ QUnit.module('GradebookHeaderMenu#messageStudentsWho', () => {
           score: 4,
           redoRequest: false,
           sortableName: 'Smith, Dana',
-          submittedAt: undefined
-        }
+          submittedAt: undefined,
+        },
       ])
     })
 

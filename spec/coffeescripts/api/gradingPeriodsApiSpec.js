@@ -29,7 +29,7 @@ const deserializedPeriods = [
     closeDate: new Date('2015-11-07T12:00:00Z'),
     isClosed: true,
     isLast: false,
-    weight: 40
+    weight: 40,
   },
   {
     id: '2',
@@ -39,8 +39,8 @@ const deserializedPeriods = [
     closeDate: new Date('2016-01-07T12:00:00Z'),
     isClosed: true,
     isLast: true,
-    weight: 60
-  }
+    weight: 60,
+  },
 ]
 const serializedPeriods = {
   grading_periods: [
@@ -50,7 +50,7 @@ const serializedPeriods = {
       start_date: new Date('2015-09-01T12:00:00Z'),
       end_date: new Date('2015-10-31T12:00:00Z'),
       close_date: new Date('2015-11-07T12:00:00Z'),
-      weight: 40
+      weight: 40,
     },
     {
       id: '2',
@@ -58,9 +58,9 @@ const serializedPeriods = {
       start_date: new Date('2015-11-01T12:00:00Z'),
       end_date: new Date('2015-12-31T12:00:00Z'),
       close_date: new Date('2016-01-07T12:00:00Z'),
-      weight: 60
-    }
-  ]
+      weight: 60,
+    },
+  ],
 }
 const periodsData = {
   grading_periods: [
@@ -72,7 +72,7 @@ const periodsData = {
       close_date: '2015-11-07T12:00:00Z',
       is_closed: true,
       is_last: false,
-      weight: 40
+      weight: 40,
     },
     {
       id: '2',
@@ -82,9 +82,9 @@ const periodsData = {
       close_date: '2016-01-07T12:00:00Z',
       is_closed: true,
       is_last: true,
-      weight: 60
-    }
-  ]
+      weight: 60,
+    },
+  ],
 }
 
 QUnit.module('batchUpdate', {
@@ -94,7 +94,7 @@ QUnit.module('batchUpdate', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('calls the resolved endpoint with serialized grading periods', () => {

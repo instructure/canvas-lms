@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import walk from 'ui/features/discussion_topic/array-walk.js'
+import walk from 'ui/features/discussion_topic/array-walk'
 
 QUnit.module('arr/walk')
 
@@ -39,25 +39,25 @@ test('walks a tree object', () => {
               a: [
                 // 3
                 {}, // 4
-                {} // 5
-              ]
+                {}, // 5
+              ],
             },
             {
               a: [
                 // 6
                 {}, // 7
-                {} // 8
-              ]
-            }
-          ]
+                {}, // 8
+              ],
+            },
+          ],
         },
         {}, // 9
-        {} // 10
-      ]
+        {}, // 10
+      ],
     },
     {
-      a: [] // empty
-    } // 11
+      a: [], // empty
+    }, // 11
   ]
 
   let c = 0

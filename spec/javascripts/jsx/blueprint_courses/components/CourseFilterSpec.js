@@ -19,7 +19,7 @@
 import React from 'react'
 import {render} from '@testing-library/react'
 import * as enzyme from 'enzyme'
-import CourseFilter from 'ui/features/blueprint_course_master/react/components/CourseFilter.js'
+import CourseFilter from 'ui/features/blueprint_course_master/react/components/CourseFilter'
 import getSampleData from '../getSampleData'
 
 const defaultProps = () => ({

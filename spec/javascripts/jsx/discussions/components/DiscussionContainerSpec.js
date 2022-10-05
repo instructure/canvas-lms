@@ -24,7 +24,7 @@ import {
   DiscussionsContainer,
   mapState,
   discussionTarget,
-} from 'ui/features/discussion_topics_index/react/components/DiscussionContainer.js'
+} from 'ui/features/discussion_topics_index/react/components/DiscussionContainer'
 
 const defaultProps = () => ({
   title: 'discussions',

@@ -24,23 +24,23 @@ test('merges objects without blowing away events or defaults', 4, () => {
   const mixin1 = {
     events: {'click .foo': 'foo'},
     defaults: {foo: 'bar'},
-    foo: sinon.spy()
+    foo: sinon.spy(),
   }
   const mixin2 = {
     events: {'click .bar': 'bar'},
     defaults: {baz: 'qux'},
-    bar: sinon.spy()
+    bar: sinon.spy(),
   }
   const obj = mixin({}, mixin1, mixin2)
   // events are expected to all be merged together
   // rather than getting blown away by the last mixin
   const expectedEvents = {
     'click .foo': 'foo',
-    'click .bar': 'bar'
+    'click .bar': 'bar',
   }
   const expectedDefaults = {
     foo: 'bar',
-    baz: 'qux'
+    baz: 'qux',
   }
   deepEqual(obj.events, expectedEvents, 'events merged properly')
   deepEqual(obj.defaults, expectedDefaults, 'defaults merged properly')

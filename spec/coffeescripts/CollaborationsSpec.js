@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import collaborations from 'ui/features/collaborations/jquery/index.js'
+import collaborations from 'ui/features/collaborations/jquery/index'
 import $ from 'jquery'
 import '@canvas/jquery/jquery.ajaxJSON'
 
@@ -32,7 +32,7 @@ QUnit.module('Collaborations', {
     dialog.dialog({
       width: 550,
       height: 500,
-      resizable: false
+      resizable: false,
     })
     const dom = $('<div></div>')
     dom.append(dialog)
@@ -42,7 +42,7 @@ QUnit.module('Collaborations', {
     $('#delete_collaboration_dialog').remove()
     $('#fixtures').empty()
     $.ajaxJSON = oldAjaxJSON
-  }
+  },
 })
 
 test('shows a flash message when deletion is complete', () => {
@@ -51,9 +51,9 @@ test('shows a flash message when deletion is complete', () => {
     originalEvent: MouseEvent,
     type: 'click',
     timeStamp: 1433863761376,
-    jQuery17209791898143012077: true
+    jQuery17209791898143012077: true,
   }
-  $.ajaxJSON = function(url, method, data, callback) {
+  $.ajaxJSON = function (url, method, data, callback) {
     const responseData = {}
     return callback.call(responseData)
   }

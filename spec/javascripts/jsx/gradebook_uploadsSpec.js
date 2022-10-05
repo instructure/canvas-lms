@@ -17,9 +17,9 @@
  */
 
 import $ from 'jquery'
-import gradebook_uploads from 'ui/features/gradebook_uploads/jquery/index.js'
+import gradebook_uploads from 'ui/features/gradebook_uploads/jquery/index'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
-import * as waitForProcessing from 'ui/features/gradebook_uploads/jquery/wait_for_processing.js'
+import * as waitForProcessing from 'ui/features/gradebook_uploads/jquery/wait_for_processing'
 
 const fixtures = document.getElementById('fixtures')
 

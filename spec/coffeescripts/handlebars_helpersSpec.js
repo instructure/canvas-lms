@@ -40,13 +40,13 @@ QUnit.module('checkbox')
 
 const context = {
   likes: {
-    tacos: true
+    tacos: true,
   },
   human: true,
-  alien: false
+  alien: false,
 }
 
-const testCheckbox = function(context, prop, hash = {}) {
+const testCheckbox = function (context, prop, hash = {}) {
   const $input = $(`<span>${helpers.checkbox.call(context, prop, {hash}).string}</span>`)
     .find('input')
     .eq(1)
@@ -57,7 +57,7 @@ const testCheckbox = function(context, prop, hash = {}) {
     type: 'checkbox',
     name: prop,
     checked: context[prop],
-    id: prop
+    id: prop,
   })
 
   return (() => {
@@ -75,7 +75,7 @@ test('simple case', () => testCheckbox(context, 'human'))
 test('custom hash attributes', () => {
   const hash = {
     class: 'foo bar baz',
-    id: 'custom_id'
+    id: 'custom_id',
   }
   return testCheckbox(context, 'human', hash, hash)
 })
@@ -84,11 +84,11 @@ test('nested property', () =>
   testCheckbox(context, 'likes.tacos', {
     id: 'likes_tacos',
     name: 'likes[tacos]',
-    checked: context.likes.tacos
+    checked: context.likes.tacos,
   }))
 
 test('checkboxes - hidden input values', () => {
-  const hiddenInput = function({disabled}) {
+  const hiddenInput = function ({disabled}) {
     const inputs = helpers.checkbox.call(context, 'blah', {hash: {disabled}})
     const div = $(`<div>${inputs}</div>`)
     return div.find('[type=hidden]')
@@ -131,7 +131,7 @@ QUnit.module('friendlyDatetime', {
     tzInTest.configureAndRestoreLater({
       tz: timezone(detroit, 'America/Detroit'),
       tzData: {
-        'America/Detroit': detroit
+        'America/Detroit': detroit,
       },
       formats: getI18nFormats(),
     })
@@ -139,7 +139,7 @@ QUnit.module('friendlyDatetime', {
 
   teardown() {
     tzInTest.restore()
-  }
+  },
 })
 
 test('can take an ISO string', () =>
@@ -182,19 +182,19 @@ QUnit.module('contextSensitive FriendlyDatetime', {
         'America/Chicago': chicago,
         'America/Detroit': detroit,
       },
-      formats: getI18nFormats()
+      formats: getI18nFormats(),
     })
   },
 
   teardown() {
     fakeENV.teardown()
     tzInTest.restore()
-  }
+  },
 })
 
 test('displays both zones data from an ISO string', () => {
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', {
-    hash: {pubDate: false, contextSensitive: true}
+    hash: {pubDate: false, contextSensitive: true},
   }).string
   contains(timeTag, 'Local: Dec 31, 1969 at 7pm')
   return contains(timeTag, 'Course: Dec 31, 1969 at 6pm')
@@ -202,7 +202,7 @@ test('displays both zones data from an ISO string', () => {
 
 test('displays both zones data from a date object', () => {
   const timeTag = helpers.friendlyDatetime(new Date(0), {
-    hash: {pubDate: false, contextSensitive: true}
+    hash: {pubDate: false, contextSensitive: true},
   }).string
   contains(timeTag, 'Local: Dec 31, 1969 at 7pm')
   return contains(timeTag, 'Course: Dec 31, 1969 at 6pm')
@@ -210,7 +210,7 @@ test('displays both zones data from a date object', () => {
 
 test('should parse non-qualified string relative to both timezones', () => {
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00', {
-    hash: {pubDate: false, contextSensitive: true}
+    hash: {pubDate: false, contextSensitive: true},
   }).string
   contains(timeTag, 'Local: Jan 1, 1970 at 12am')
   return contains(timeTag, 'Course: Dec 31, 1969 at 11pm')
@@ -219,7 +219,7 @@ test('should parse non-qualified string relative to both timezones', () => {
 test('reverts to friendly display when there is no contextual timezone', () => {
   ENV.CONTEXT_TIMEZONE = null
   const timeTag = helpers.friendlyDatetime('1970-01-01 00:00:00Z', {
-    hash: {pubDate: false, contextSensitive: true}
+    hash: {pubDate: false, contextSensitive: true},
   }).string
   return contains(timeTag, "<span aria-hidden='true'>Dec 31, 1969</span>")
 })
@@ -233,7 +233,7 @@ QUnit.module('contextSensitiveDatetimeTitle', {
       tzData: {
         'America/Chicago': chicago,
         'America/Detroit': detroit,
-        'America/New_York': newYork
+        'America/New_York': newYork,
       },
       formats: getI18nFormats(),
     })
@@ -242,20 +242,20 @@ QUnit.module('contextSensitiveDatetimeTitle', {
   teardown() {
     fakeENV.teardown()
     tzInTest.restore()
-  }
+  },
 })
 
 test('just passes through to datetime string if there is no contextual timezone', () => {
   ENV.CONTEXT_TIMEZONE = null
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
-    hash: {justText: true}
+    hash: {justText: true},
   })
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
 
 test('splits title text to both zones', () => {
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
-    hash: {justText: true}
+    hash: {justText: true},
   })
   equal(titleText, 'Local: Dec 31, 1969 at 7pm<br>Course: Dec 31, 1969 at 6pm')
 })
@@ -266,13 +266,13 @@ test('properly spans day boundaries', () => {
     tz: timezone(chicago, 'America/Chicago'),
     tzData: {
       'America/Chicago': chicago,
-      'America/New_York': newYork
+      'America/New_York': newYork,
     },
     formats: getI18nFormats(),
   })
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 05:30:00Z', {
-    hash: {justText: true}
+    hash: {justText: true},
   })
   equal(titleText, 'Local: Dec 31, 1969 at 11:30pm<br>Course: Jan 1, 1970 at 12:30am')
 })
@@ -281,7 +281,7 @@ test('stays as one title when the timezone is no different', () => {
   ENV.TIMEZONE = 'America/Detroit'
   ENV.CONTEXT_TIMEZONE = 'America/Detroit'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
-    hash: {justText: true}
+    hash: {justText: true},
   })
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
@@ -290,7 +290,7 @@ test('stays as one title when the time is no different even if timezone names di
   ENV.TIMEZONE = 'America/Detroit'
   ENV.CONTEXT_TIMEZONE = 'America/New_York'
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
-    hash: {justText: true}
+    hash: {justText: true},
   })
   equal(titleText, 'Dec 31, 1969 at 7pm')
 })
@@ -298,7 +298,7 @@ test('stays as one title when the time is no different even if timezone names di
 test('produces the html attributes if you dont specify just_text', () => {
   ENV.CONTEXT_TIMEZONE = null
   const titleText = helpers.contextSensitiveDatetimeTitle('1970-01-01 00:00:00Z', {
-    hash: {justText: undefined}
+    hash: {justText: undefined},
   })
   equal(titleText, 'data-tooltip data-html-tooltip-title="Dec 31, 1969 at 7pm"')
 })
@@ -306,16 +306,16 @@ test('produces the html attributes if you dont specify just_text', () => {
 QUnit.module('datetimeFormatted', {
   teardown() {
     tzInTest.restore()
-  }
+  },
 })
 
 test('should parse and format relative to profile timezone', () => {
   tzInTest.configureAndRestoreLater({
     tz: timezone(detroit, 'America/Detroit'),
     tzData: {
-      'America/Detroit': detroit
+      'America/Detroit': detroit,
     },
-    formats: getI18nFormats()
+    formats: getI18nFormats(),
   })
 
   equal(helpers.datetimeFormatted('1970-01-01 00:00:00'), 'Jan 1, 1970 at 12am')
@@ -332,7 +332,7 @@ test('it runs primary case if setting matches', () => {
     },
     inverse() {
       throw new Error('Dont call this!')
-    }
+    },
   }
   helpers.ifSettingIs('key', 'value', funcs)
   equal(semaphore, true)
@@ -347,7 +347,7 @@ test('it runs inverse case if setting does not match', () => {
     },
     fn() {
       throw new Error('Dont call this!')
-    }
+    },
   }
   helpers.ifSettingIs('key', 'value', funcs)
   equal(semaphore, true)
@@ -362,7 +362,7 @@ test('it runs inverse case if setting does not exist', () => {
     },
     fn() {
       throw new Error('Dont call this!')
-    }
+    },
   }
   helpers.ifSettingIs('key', 'value', funcs)
   equal(semaphore, true)
@@ -399,10 +399,10 @@ QUnit.module('i18n number helper', {
   setup() {
     this.ret = '47.00%'
     sandbox.stub(I18n, 'n').returns(this.ret)
-  }
+  },
 })
 
-test('proxies to I18n.localizeNumber', function() {
+test('proxies to I18n.localizeNumber', function () {
   const num = 47
   const precision = 2
   const percentage = true
@@ -414,10 +414,10 @@ QUnit.module('i18n number format helper', {
   setup() {
     this.ret = '2,34'
     sandbox.stub(numberFormat, 'outcomeScore').returns(this.ret)
-  }
+  },
 })
 
-test('proxies to numberFormat', function() {
+test('proxies to numberFormat', function () {
   const num = 2.34
   const format = 'outcomeScore'
   equal(helpers.nf(num, {hash: {format}}), this.ret)
@@ -448,7 +448,7 @@ QUnit.module('eachWithIndex', hooks => {
 
 QUnit.module('linkify helper')
 
-test('linkifies plaintext links into html links', function() {
+test('linkifies plaintext links into html links', function () {
   const text = 'Make a reservation at http://google.com/reserve'
   const html =
     "Make a reservation at <a href='http:&#x2F;&#x2F;google.com&#x2F;reserve'>http:&#x2F;&#x2F;google.com&#x2F;reserve</a>"

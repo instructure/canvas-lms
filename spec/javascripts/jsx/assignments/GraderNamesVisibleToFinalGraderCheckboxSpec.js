@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import GraderNamesVisibleToFinalGraderCheckbox from 'ui/features/assignment_edit/react/GraderNamesVisibleToFinalGraderCheckbox.js'
+import GraderNamesVisibleToFinalGraderCheckbox from 'ui/features/assignment_edit/react/GraderNamesVisibleToFinalGraderCheckbox'
 
 QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
   let props

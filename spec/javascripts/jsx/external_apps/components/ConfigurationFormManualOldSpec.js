@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormManual from 'ui/features/external_apps/react/components/ConfigurationFormManual.js'
+import ConfigurationFormManual from 'ui/features/external_apps/react/components/ConfigurationFormManual'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')

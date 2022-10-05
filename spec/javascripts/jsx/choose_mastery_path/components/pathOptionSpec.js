@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import PathOption from 'ui/features/choose_mastery_path/react/components/path-option.js'
+import PathOption from 'ui/features/choose_mastery_path/react/components/path-option'
 
 QUnit.module('Path Option')
 
