@@ -83,7 +83,7 @@ export default class PopoverMenuView extends View {
     const parentBound = parent.offset().top + parent.height()
     const popoverOffset = popover.offset().top
     const popoverHeader = popover.find('.popover-title').outerHeight()
-    const defaultHeight = parseInt(content.css('maxHeight'))
+    const defaultHeight = parseInt(content.css('maxHeight'), 10)
     const newHeight = parentBound - popoverOffset - popoverHeader
     return content.css({maxHeight: Math.min(defaultHeight, newHeight)})
   }

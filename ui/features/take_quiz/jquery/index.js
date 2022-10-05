@@ -85,7 +85,7 @@ const quizSubmission = (function () {
       endAtWithoutTimeLimitParsed && endAtWithoutTimeLimitParsed - new Date(),
     startedAt,
     hasTimeLimit: !!ENV.QUIZ.time_limit,
-    timeLeft: parseInt($('.time_left').text()) * 1000,
+    timeLeft: parseInt($('.time_left').text(), 10) * 1000,
     timeToDueDate: dueAtParsed - new Date(),
     oneAtATime: $('#submit_quiz_form').hasClass('one_question_at_a_time'),
     cantGoBack: $('#submit_quiz_form').hasClass('cant_go_back'),

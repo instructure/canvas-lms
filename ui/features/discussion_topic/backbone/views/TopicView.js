@@ -119,8 +119,8 @@ export default class TopicView extends Backbone.View {
         this.AssignmentExternalTools = AssignmentExternalTools.attach(
           elementToRenderInto,
           'assignment_view',
-          parseInt(context_id),
-          ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID) : undefined
+          parseInt(context_id, 10),
+          ENV.DISCUSSION.IS_ASSIGNMENT ? parseInt(ENV.DISCUSSION.ASSIGNMENT_ID, 10) : undefined
         )
       }
     }

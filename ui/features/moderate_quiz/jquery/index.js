@@ -371,8 +371,8 @@ $(document).ready(function (event) {
     const formData = $(this).getFormData()
 
     function valid(data) {
-      let extraAttempts = parseInt(data.extra_attempts),
-        extraTime = parseInt(data.extra_time),
+      let extraAttempts = parseInt(data.extra_attempts, 10),
+        extraTime = parseInt(data.extra_time, 10),
         valid = true
 
       if (data.extra_attempts && isNaN(extraAttempts)) {

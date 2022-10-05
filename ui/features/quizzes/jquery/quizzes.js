@@ -1833,7 +1833,7 @@ function questionLimitReached(inclusiveLimit) {
   $('#questions .group_top')
     .find('input[name="quiz_group[pick_count]"]')
     .each(function () {
-      numQuestions += parseInt(this.value)
+      numQuestions += parseInt(this.value, 10)
     })
   if (inclusiveLimit ? numQuestions > QUESTION_LIMIT : numQuestions >= QUESTION_LIMIT) {
     setTimeout(() => {
@@ -5187,7 +5187,7 @@ $(() => {
       }
 
       // Only allow students to see answers on last attempt if the quiz has more than one attempt
-      const showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val()) > 0
+      const showCorrectAnswersLastAttempt = parseInt($('#quiz_allowed_attempts').val(), 10) > 0
       $('#quiz_show_correct_answers_last_attempt_container').toggle(showCorrectAnswersLastAttempt)
       if (!showCorrectAnswersLastAttempt) {
         $('#quiz_show_correct_answers_last_attempt').prop('checked', false)

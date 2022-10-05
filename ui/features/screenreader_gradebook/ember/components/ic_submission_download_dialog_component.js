@@ -75,7 +75,7 @@ export default register(
         if (this.get('percentComplete') < 95) {
           new_val += 5
         }
-        const state = parseInt(this.get('attachment.file_state'))
+        const state = parseInt(this.get('attachment.file_state'), 10)
         if (isNaN(state)) {
           new_val = 0
         }
