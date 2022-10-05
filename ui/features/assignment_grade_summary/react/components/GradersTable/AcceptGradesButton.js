@@ -56,7 +56,6 @@ function startedButton(props) {
 }
 
 function successButton(props) {
-  /* eslint-disable react/prop-types */
   return (
     <Button
       {...buttonProps(props)}

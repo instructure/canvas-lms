@@ -29,7 +29,6 @@ import Filters from '../Filters'
  *  resumes on A2.
  */
 
-// eslint-disable-next-line jest/no-disabled-tests
 describe.skip('choosing filter options', () => {
   const onChangeFunc = jest.fn()
   const override = mockOverride()

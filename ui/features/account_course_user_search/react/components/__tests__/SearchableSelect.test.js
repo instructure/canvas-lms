@@ -22,7 +22,6 @@ import Subject from '../SearchableSelect'
 
 const LABEL = 'Start typing, fool'
 
-/* eslint-disable react/jsx-curly-brace-presence */
 const options = [
   <Subject.Option key="1" id="1" value="1">
     one is lonely

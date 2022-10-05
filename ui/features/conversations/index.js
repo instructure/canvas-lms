@@ -197,7 +197,6 @@ const ConversationsRouter = Backbone.Router.extend({
             {count: this.list.selectedMessages.length}
           )
     if (!confirm(confirmMessage)) {
-      // eslint-disable-line no-alert
       $(trigger).focus()
       return
     }

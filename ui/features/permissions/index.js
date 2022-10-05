@@ -37,7 +37,7 @@ ready(() => {
   function groupGranularPermissions(permissions) {
     const [permissionsList, groups] = permissions.reduce(
       (acc, p) => {
-        const [permissionsList, groups] = acc // eslint-disable-line no-shadow
+        const [permissionsList, groups] = acc
 
         if (p.granular_permission_group) {
           if (!groups[p.granular_permission_group]) {

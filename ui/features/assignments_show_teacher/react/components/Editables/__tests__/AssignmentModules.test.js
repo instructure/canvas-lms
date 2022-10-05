@@ -53,7 +53,6 @@ describe('AssignmentModulesUI', () => {
     expect(getByText('Module 1 | Module 2')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders the given assignment modules in edit mode', () => {
     const moduleList = makeModuleList()
 
@@ -102,7 +101,6 @@ describe('AssignmentModulesUI', () => {
     expect(container.querySelectorAll('button')).toHaveLength(0)
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('calls onChange when the selection changes', () => {
     const onchange = jest.fn()
     const onchangemode = jest.fn()

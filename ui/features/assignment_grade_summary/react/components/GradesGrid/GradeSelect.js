@@ -47,7 +47,6 @@ const INITIAL_STATE = {
   customGradeOption: undefined,
 }
 
-/* eslint-disable prettier/prettier */
 function reducer(prevState, action) {
   let state
   switch (action.event) {

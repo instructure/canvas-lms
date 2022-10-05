@@ -137,7 +137,6 @@ describe('Assignment Details', () => {
    *  resumes on A2.
    */
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders override details when expand button is clicked', () => {
     const assignment = mockAssignment({
       dueAt: '2019-09-01T23:59:59-06:00',

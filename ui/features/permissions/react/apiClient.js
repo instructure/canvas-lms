@@ -44,7 +44,7 @@ export function deleteRole(contextId, role) {
 //      reasons we cannot just change the individual permissions to be
 //      the same as the base role. This will need to be fixed on endpoint
 //      before we can do anything with it here.
-// eslint-disable-next-line no-unused-vars
+
 export function updateBaseRole({contextId}, role, baseRole) {
   throw new Error('API does not currently support updating the base role')
 }
