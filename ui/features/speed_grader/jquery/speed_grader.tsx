@@ -2190,21 +2190,20 @@ EG = {
   },
 
   updateWordCount(wordCount) {
+    let wordCountHTML = ''
     if (
-      this.currentStudent.submission?.submission_type &&
+      wordCount &&
       !['basic_lti_launch', 'external_tool'].includes(
-        this.currentStudent.submission.submission_type
+        this.currentStudent.submission?.submission_type
       )
     ) {
       // xsslint safeString.method toLocaleString
       // xsslint safeString.method t
-      const wordCountHTML = wordCount
-        ? `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
-            count: wordCount,
-          })}`
-        : ''
-      $word_count.html($.raw(wordCountHTML))
+      wordCountHTML = `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
+        count: wordCount,
+      })}`
     }
+    $word_count.html($.raw(wordCountHTML))
   },
 
   handleSubmissionSelectionChange() {
