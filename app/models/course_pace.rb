@@ -40,6 +40,7 @@ class CoursePace < ActiveRecord::Base
   belongs_to :root_account, class_name: "Account"
 
   after_create :log_pace_counts
+  after_create :log_course_blackout_dates
   after_destroy :log_pace_deletes
   after_save :log_exclude_weekends_counts, if: :logging_for_weekends_required?
   after_save :log_average_item_duration
@@ -358,5 +359,10 @@ class CoursePace < ActiveRecord::Base
     else
       InstStatsd::Statsd.increment("course_pacing.deleted_course_pace")
     end
+  end
+
+  def log_course_blackout_dates
+    calendar_event_blackout_dates_count = CalendarEvent.with_blackout_date.active.where(context: course).size
+    InstStatsd::Statsd.count("course_pacing.course_blackout_dates.count", calendar_event_blackout_dates_count)
   end
 end
