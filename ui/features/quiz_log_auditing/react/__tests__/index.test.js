@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import sinon from 'sinon'
 import {configure, mount, unmount} from '../index'
-import {waitFor, fireEvent, findByTestId} from '@testing-library/dom'
+import {fireEvent, findByTestId} from '@testing-library/dom'
 
 const fixture = {
   '/api/v1/quizzes/1/submissions/2': {

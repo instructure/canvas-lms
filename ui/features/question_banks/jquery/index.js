@@ -56,7 +56,7 @@ $(document).ready(function () {
     event.preventDefault()
     const $link = $(this)
     const $bank = $link.parents('.question_bank')
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, _data => {
       $bank.find('.bookmark_bank_link').toggle()
       $bank.find('.bookmark_bank_link:visible:first').focus()
     })

@@ -18,7 +18,6 @@
 
 import Subject from '../question_answered_event_decorator'
 import Backbone from '@canvas/backbone'
-import {findWhere} from 'lodash'
 
 describe('Models.QuestionAnsweredEventDecorator', () => {
   describe('#decorateAnswerRecord', () => {

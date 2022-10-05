@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import ScorePercentileChart from '../score_percentile_chart'
-import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/summary/score_percentile_chart', () => {
   it('renders', () => {
