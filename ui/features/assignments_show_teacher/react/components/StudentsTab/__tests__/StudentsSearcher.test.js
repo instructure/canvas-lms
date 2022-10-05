@@ -191,7 +191,6 @@ describe('StudentsSearcher', () => {
     ])
     jest.runOnlyPendingTimers()
     const searchInput = getByLabelText('Search by student name')
-    const startNow = Date.now()
     fireEvent.change(searchInput, {target: {value: 'search'}})
 
     // initially hasn't searched yet
@@ -208,7 +207,6 @@ describe('StudentsSearcher', () => {
     const {getByText, getByLabelText} = renderStudentsSearcher()
     jest.runOnlyPendingTimers()
     const searchInput = getByLabelText('Search by student name')
-    const startNow = Date.now()
     fireEvent.change(searchInput, {target: {value: '12'}})
     jest.advanceTimersByTime(1000)
     expect(getByText(/at least 3 characters/)).toBeInTheDocument()

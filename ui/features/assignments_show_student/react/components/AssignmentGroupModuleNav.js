@@ -18,8 +18,6 @@
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
-
-import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 
 import {Link} from '@instructure/ui-link'
