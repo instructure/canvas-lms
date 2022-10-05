@@ -25,7 +25,7 @@ function renderUploadButton(overrides) {
   return render(
     <UploadButton
       currentFolder={{files: {models: []}}}
-      showingButtons
+      showingButtons={true}
       contextId="1"
       contextType="user"
       {...overrides}

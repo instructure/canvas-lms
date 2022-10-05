@@ -79,7 +79,7 @@ export default function BulkEditHeader({
     <>
       <Heading level="h2">{I18n.t('Edit Assignment Dates')}</Heading>
       <Flex as="div" padding="0 0 medium 0">
-        <Flex.Item shouldGrow>
+        <Flex.Item shouldGrow={true}>
           {jobRunning && (
             <View as="div" maxWidth="500px">
               <ProgressBar
@@ -87,7 +87,7 @@ export default function BulkEditHeader({
                 valueNow={jobCompletion}
                 renderValue={renderProgressValue}
               />
-              <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
+              <CanvasInlineAlert liveAlert={true} screenReaderOnly={true} variant="info">
                 {I18n.t('Saving assignment dates progress: %{percent}%', {
                   percent: jobCompletion,
                 })}

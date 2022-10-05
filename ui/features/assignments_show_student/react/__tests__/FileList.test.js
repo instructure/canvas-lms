@@ -61,7 +61,7 @@ describe('FileList', () => {
   it('renders a trash-can icon if able to remove files', () => {
     const {container} = render(
       <MockedProvider>
-        <FileList canRemove files={files.slice(0, 1)} removeFileHandler={jest.fn()} />
+        <FileList canRemove={true} files={files.slice(0, 1)} removeFileHandler={jest.fn()} />
       </MockedProvider>
     )
     expect(container.querySelector('svg[name="IconTrash"]')).toBeInTheDocument()

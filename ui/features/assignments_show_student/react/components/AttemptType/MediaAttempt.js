@@ -166,7 +166,7 @@ class MediaAttempt extends React.Component {
           )}
         </Flex.Item>
         <Flex.Item overflowY="visible" margin="medium 0">
-          <span aria-hidden title={mediaObject.title}>
+          <span aria-hidden={true} title={mediaObject.title}>
             {elideString(mediaObject.title)}
           </span>
           <ScreenReaderContent>{mediaObject.title}</ScreenReaderContent>
@@ -232,7 +232,7 @@ class MediaAttempt extends React.Component {
                     alignItems="center"
                     justifyItems="space-around"
                     height="100%"
-                    shouldShrink
+                    shouldShrink={true}
                   >
                     <Flex.Item>
                       <Img
@@ -305,7 +305,7 @@ class MediaAttempt extends React.Component {
                     alignItems="center"
                     justifyItems="space-around"
                     height="100%"
-                    shouldShrink
+                    shouldShrink={true}
                   >
                     <Flex.Item>
                       <Img

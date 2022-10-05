@@ -48,7 +48,7 @@ it('should not render collapsed class when not collapsed', () => {
 })
 
 it('should render collapsed class when collapsed', () => {
-  ReactDOM.render(<Steps isCollapsed />, document.getElementById('fixtures'))
+  ReactDOM.render(<Steps isCollapsed={true} />, document.getElementById('fixtures'))
   const element = $('[data-test-id="steps-container-collapsed"]')
   expect(element).toHaveLength(1)
 })

@@ -238,7 +238,7 @@ export default class OverrideSubmissionTypes extends React.Component {
           <Menu.Item key="or" value="or">
             <div>{I18n.t('Or')}</div>
           </Menu.Item>
-          <Menu.Item key="and" value="and" disabled>
+          <Menu.Item key="and" value="and" disabled={true}>
             <div>
               {I18n.t('And')}
               <View margin="0 0 0 small">

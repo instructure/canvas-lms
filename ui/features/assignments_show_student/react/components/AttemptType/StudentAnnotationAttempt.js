@@ -67,7 +67,7 @@ export default function StudentAnnotationAttempt(props) {
           <iframe
             src={iframeURL}
             data-testid="canvadocs-iframe"
-            allowFullScreen
+            allowFullScreen={true}
             title={I18n.t('Document to annotate')}
             className="ef-file-preview-frame annotated-document-submission"
             style={{width: '100%'}}

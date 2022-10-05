@@ -42,7 +42,7 @@ describe('LoginActionPrompt', () => {
   })
 
   it('displays a message if the student has not accepted their enrollment', async () => {
-    const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment />)
+    const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment={true} />)
     const text = await waitFor(() => getByTestId('login-action-text').textContent)
     expect(text).toEqual('Accept course invitation to participate in this assignment')
   })
@@ -59,7 +59,7 @@ describe('LoginActionPrompt', () => {
   })
 
   it('displays an invitation button if the student has not accepted their enrollment', async () => {
-    const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment />)
+    const {getByTestId} = render(<LoginActionPrompt nonAcceptedEnrollment={true} />)
     const text = await waitFor(() => getByTestId('login-action-button').textContent)
     expect(text).toEqual('Accept course invitation')
   })

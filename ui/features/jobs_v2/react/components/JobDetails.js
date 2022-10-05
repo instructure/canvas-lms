@@ -84,7 +84,7 @@ export default function JobDetails({job, timeZone, onRequeue}) {
                 open={openModal === attr}
                 onDismiss={() => setOpenModal('')}
                 label={title}
-                shouldCloseOnDocumentClick
+                shouldCloseOnDocumentClick={true}
               >
                 <Modal.Header>
                   <CloseButton

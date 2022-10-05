@@ -34,7 +34,7 @@ const AbstractTextQuestion = props => (
 
         <div
           className="question-text"
-          aria-hidden
+          aria-hidden={true}
           dangerouslySetInnerHTML={{__html: props.questionText}}
         />
       </div>
@@ -42,7 +42,7 @@ const AbstractTextQuestion = props => (
     </div>
     <div className="grid-row">
       <div className="col-sm-8 question-bottom-left">
-        <AnswerTable answers={props.answers} useAnswerBuckets />
+        <AnswerTable answers={props.answers} useAnswerBuckets={true} />
         {props.linkButtonComponent || null}
       </div>
       <div className="col-sm-4 question-bottom-right" />

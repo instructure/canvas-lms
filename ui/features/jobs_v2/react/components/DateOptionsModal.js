@@ -54,7 +54,7 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
   }, [onSave, onClose, newStartDate, newEndDate, newTimeZone])
 
   return (
-    <Modal open={open} onDismiss={onClose} label={title} shouldCloseOnDocumentClick>
+    <Modal open={open} onDismiss={onClose} label={title} shouldCloseOnDocumentClick={true}>
       <Modal.Header>
         <CloseButton
           placement="end"
@@ -91,14 +91,14 @@ export default function DateOptionsModal({open, startDate, endDate, timeZone, on
             selectedDate={newStartDate}
             renderLabel={I18n.t('After')}
             formatDate={formatDate}
-            withRunningValue
+            withRunningValue={true}
             onSelectedDateChange={date => setNewStartDate(date?.toISOString() || '')}
           />
           <CanvasDateInput
             selectedDate={newEndDate}
             renderLabel={I18n.t('Before')}
             formatDate={formatDate}
-            withRunningValue
+            withRunningValue={true}
             onSelectedDateChange={date => setNewEndDate(date?.toISOString() || '')}
           />
         </FormFieldGroup>

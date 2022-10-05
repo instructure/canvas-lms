@@ -287,7 +287,7 @@ class FileUpload extends Component {
                     handleWebcamPhotoUpload={
                       allowWebcamUploads ? this.handleWebcamPhotoUpload : null
                     }
-                    renderCanvasFiles
+                    renderCanvasFiles={true}
                     userID={this.props.assignment.env.currentUser.id}
                   />
                 </Flex.Item>
@@ -315,8 +315,8 @@ class FileUpload extends Component {
                   onDropAccepted={files => this.handleDropAccepted(files)}
                   onDropRejected={this.handleDropRejected}
                   renderLabel={fileDropLabel}
-                  shouldAllowMultiple
-                  shouldEnablePreview
+                  shouldAllowMultiple={true}
+                  shouldEnablePreview={true}
                 />
               </Flex.Item>
             </Flex>
@@ -360,7 +360,7 @@ class FileUpload extends Component {
         <Table.Cell theme={cellTheme}>
           {displayName && (
             <>
-              <span aria-hidden title={displayName}>
+              <span aria-hidden={true} title={displayName}>
                 {elideString(displayName)}
               </span>
               <ScreenReaderContent>{displayName}</ScreenReaderContent>

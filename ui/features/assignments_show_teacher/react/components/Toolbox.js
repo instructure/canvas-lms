@@ -68,7 +68,7 @@ export default class Toolbox extends React.Component {
         label={I18n.t('Published')}
         variant="toggle"
         size="medium"
-        inline
+        inline={true}
         checked={this.props.assignment.state === 'published'}
         onChange={this.handlePublishChange}
       />

@@ -50,10 +50,10 @@ const StudentHeader = () => (
           <Menu.Item>{I18n.t('Sort By')}</Menu.Item>
           <Menu.Item>{I18n.t('Display as')}</Menu.Item>
           <Menu.Item>{I18n.t('Secondary info')}</Menu.Item>
-          <Menu.Group label={I18n.t('Show')} allowMultiple>
-            <Menu.Item defaultSelected>{I18n.t('Students without assessments')}</Menu.Item>
-            <Menu.Item defaultSelected>{I18n.t('Inactive Enrollments')}</Menu.Item>
-            <Menu.Item defaultSelected>{I18n.t('Concluded Enrollments')}</Menu.Item>
+          <Menu.Group label={I18n.t('Show')} allowMultiple={true}>
+            <Menu.Item defaultSelected={true}>{I18n.t('Students without assessments')}</Menu.Item>
+            <Menu.Item defaultSelected={true}>{I18n.t('Inactive Enrollments')}</Menu.Item>
+            <Menu.Item defaultSelected={true}>{I18n.t('Concluded Enrollments')}</Menu.Item>
           </Menu.Group>
         </Menu>
       </Flex.Item>

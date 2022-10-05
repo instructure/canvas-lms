@@ -90,7 +90,7 @@ export default class AssignmentName extends React.Component {
           onChangeMode={this.props.onChangeMode}
           placeholder={namePlaceholder}
           label={nameLabel}
-          required
+          required={true}
           readOnly={this.props.readOnly}
         />
         {msg}

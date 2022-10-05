@@ -128,7 +128,7 @@ function BulkDateInput({
       interaction={interaction}
       messages={messages}
       width={width}
-      withRunningValue
+      withRunningValue={true}
     />
   )
 }

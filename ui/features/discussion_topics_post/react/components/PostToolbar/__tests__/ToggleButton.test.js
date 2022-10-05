@@ -23,7 +23,7 @@ import {ToggleButton} from '../ToggleButton'
 const setup = props => {
   return render(
     <ToggleButton
-      isEnabled
+      isEnabled={true}
       enabledIcon={<div data-testid="enabled-icon" />}
       disabledIcon={<div data-testid="disabled-icon" />}
       enabledTooltipText="enabled tooltip"

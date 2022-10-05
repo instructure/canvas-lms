@@ -57,13 +57,13 @@ export default function CommentRow(props) {
             margin="0 xx-small 0 0"
             theme={read ? {colorPrimary: 'white'} : undefined}
             type="notification"
-            standalone
+            standalone={true}
           />
           <Avatar
             name={author ? author.shortName : I18n.t('Anonymous')}
             src={author ? author.avatarUrl : ''}
             margin="0 small 0 0"
-            data-fs-exclude
+            data-fs-exclude={true}
           />
         </div>
       </div>
