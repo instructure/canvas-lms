@@ -61,7 +61,6 @@ describe('AssignmentDate', () => {
     expect(getByTestId('EditableDateTime-editor')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('shows error message with invalid value when in edit mode', () => {
     // because the error message is rendered by the instui DateTimeInput
     const {getAllByText} = renderAssignmentDate({mode: 'edit', onValidate: () => false})
@@ -82,7 +81,6 @@ describe('AssignmentDate', () => {
     expect(getByText('No Due Date')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('handles jibberish date input', () => {
     const value = '2108-03-13T15:15:00-07:00'
     const invalidMessage = jest.fn()
@@ -104,7 +102,6 @@ describe('AssignmentDate', () => {
     expect(invalidMessage).toHaveBeenCalled()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('handles input', () => {
     function validator(value) {
       const d = new Date(value)

@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON' // eslint-disable-line no-unused-vars
+import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import 'spin.js/jquery.spin'
 

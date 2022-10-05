@@ -132,7 +132,6 @@ export default function factory(spec) {
         this.previousLoadRequest = xhr
 
         return xhr.then(
-          // eslint-disable-next-line no-shadow
           (data, _textStatus, xhr) => {
             if (this.jsonKey) data = data[this.jsonKey]
             if (options.wrap) data = [data]

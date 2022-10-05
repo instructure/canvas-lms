@@ -52,7 +52,6 @@ describe('AssignmenGroupUI', () => {
     expect(getByText(groupList[1].name)).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders the given assignment group in edit mode', () => {
     const groupList = makeGroupList()
     const {getByTestId} = render(
@@ -76,7 +75,6 @@ describe('AssignmenGroupUI', () => {
     expect(getByText('No Assignment Group Assigned')).toBeInTheDocument()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('calls onChange when the selection changes', () => {
     const onchange = jest.fn()
     const onchangemode = jest.fn()
