@@ -36,7 +36,7 @@ export default class OutcomeSummaryView extends CollectionView {
   show(path) {
     this.fetch()
     if (path) {
-      const outcome_id = parseInt(path)
+      const outcome_id = parseInt(path, 10)
       const outcome = this.collection.outcomeCache.get(outcome_id)
       if (outcome) return this.outcomeDetailView.show(outcome)
     } else {

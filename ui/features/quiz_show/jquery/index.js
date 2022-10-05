@@ -91,7 +91,7 @@ $(document).ready(function () {
       'confirms.delete_quiz',
       'Are you sure you want to delete this quiz?'
     )
-    const submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'))
+    const submittedCount = parseInt($('#quiz_details_wrapper').data('submitted-count'), 10)
     if (submittedCount > 0) {
       deleteConfirmMessage +=
         '\n\n' +

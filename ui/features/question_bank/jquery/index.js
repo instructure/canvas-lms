@@ -153,8 +153,8 @@ export function attachPageEvents(e) {
     }
     const $link = $(this)
     const $more_questions = $('#more_questions')
-    const currentPage = parseInt($more_questions.attr('data-current-page'))
-    const totalPages = parseInt($more_questions.attr('data-total-pages'))
+    const currentPage = parseInt($more_questions.attr('data-current-page'), 10)
+    const totalPages = parseInt($more_questions.attr('data-total-pages'), 10)
     let url = $(this).attr('href')
     url = $.replaceTags(url, 'page', currentPage + 1)
     $link.text('loading more questions...').addClass('loading')

@@ -207,7 +207,7 @@ export default class EditAppointmentGroupDetails {
 
   perSlotChange(checkbox, input) {
     this.checkBoxInputChange(checkbox, input)
-    const slotLimit = parseInt(input.val())
+    const slotLimit = parseInt(input.val(), 10)
     return this.helpIconShowIf(
       checkbox,
       _.some(this.apptGroup.appointments, a => a.child_events_count > slotLimit)
@@ -216,7 +216,7 @@ export default class EditAppointmentGroupDetails {
 
   maxStudentAppointmentsChange(checkbox, input) {
     this.checkBoxInputChange(checkbox, input)
-    const apptLimit = parseInt(input.val())
+    const apptLimit = parseInt(input.val(), 10)
     const apptCounts = {}
     this.apptGroup.appointments &&
       this.apptGroup.appointments.forEach(a => {

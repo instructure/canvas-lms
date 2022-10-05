@@ -738,7 +738,7 @@ const calcCmd = {}
   )
   const factorials = {}
   var fact = function (n) {
-    n = Math.max(parseInt(n), 0)
+    n = Math.max(parseInt(n, 10), 0)
     if (n == 0 || n == 1) {
       return 1
     } else if (n > 170) {

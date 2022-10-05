@@ -62,7 +62,7 @@ export default class TokenInput {
     })
 
     this.$tokens.maxTokenWidth = () =>
-      parseInt(this.$tokens.css('width').replace('px', '')) -
+      parseInt(this.$tokens.css('width').replace('px', ''), 10) -
       (this.options.tokenWrapBuffer != null ? this.options.tokenWrapBuffer : 150) +
       'px'
     this.$tokens.resizeTokens = tokens =>
