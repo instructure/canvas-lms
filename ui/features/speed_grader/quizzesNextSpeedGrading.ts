@@ -60,7 +60,7 @@ function quizzesNextSpeedGrading(
     originalSubmission: Submission,
     numRequests: number
   ) {
-    const maxRequests = 5
+    const maxRequests = speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts || 20
     if (numRequests >= maxRequests) return false
     if (!originalSubmission.graded_at) return !submission.graded_at
     if (!submission.graded_at) return true

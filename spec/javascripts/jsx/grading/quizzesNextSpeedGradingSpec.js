@@ -32,9 +32,6 @@ const fakeIframeHolder = {
 const registerCbStub = sinon.stub()
 const refreshGradesCbStub = sinon.stub()
 const addEventListenerStub = sinon.stub()
-const speedGraderWindow = {
-  addEventListener: addEventListenerStub,
-}
 
 const refreshSubmissionsToViewStub = sinon.stub()
 const showGradeStub = sinon.stub()
@@ -71,6 +68,15 @@ const resetStubs = function () {
 }
 
 QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
+  let speedGraderWindow
+
+  suiteHooks.beforeEach(() => {
+    speedGraderWindow = {
+      addEventListener: addEventListenerStub,
+      ENV: {speedgrader_grade_sync_max_attempts: 10},
+    }
+  })
+
   suiteHooks.afterEach(() => {
     resetStubs()
   })
@@ -223,9 +229,21 @@ QUnit.module('quizzesNextSpeedGrading', suiteHooks => {
     test('does not re-poll if max requests have been made (even if graded_at has not been updated)', () => {
       originalSubmission.graded_at = '2016-07-11T19:22:14Z'
       submission.graded_at = '2016-07-11T19:22:14Z'
-      numRequests = 5
+      numRequests = speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
       refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, numRequests)
       const refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+      notOk(refreshGrades)
+    })
+
+    test('defaults to 20 max requests', () => {
+      originalSubmission.graded_at = '2016-07-11T19:22:14Z'
+      submission.graded_at = '2016-07-11T19:22:14Z'
+      delete speedGraderWindow.ENV.speedgrader_grade_sync_max_attempts
+      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 19)
+      let refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
+      ok(refreshGrades)
+      refreshGradesCbStub.callsArgWith(1, submission, originalSubmission, 20)
+      refreshGrades = onMessage({data: {subject: 'quizzesNext.submissionUpdate'}})
       notOk(refreshGrades)
     })
   })

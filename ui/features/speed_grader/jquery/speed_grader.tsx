@@ -41,6 +41,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import AssessmentAuditButton from '../react/AssessmentAuditTray/components/AssessmentAuditButton'
 import AssessmentAuditTray from '../react/AssessmentAuditTray/index'
 import CommentArea from '../react/CommentArea'
+import GradeLoadingSpinner from '../react/GradeLoadingSpinner'
 import {originalityReportSubmissionKey} from '@canvas/grading/originalityReportHelper'
 import PostPolicies from '../react/PostPolicies/index'
 import SpeedGraderProvisionalGradeSelector from '../react/SpeedGraderProvisionalGradeSelector'
@@ -56,6 +57,7 @@ import submissionsDropdownTemplate from '../jst/submissions_dropdown.handlebars'
 import speechRecognitionTemplate from '../jst/speech_recognition.handlebars'
 // @ts-ignore
 import unsubmittedCommentsTemplate from '../jst/unsubmitted_comment.handlebars'
+import useStore from '../stores/index'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {
   IconUploadLine,
@@ -235,6 +237,13 @@ const anonymousAssignmentDetailedReportTooltip = I18n.t(
 const HISTORY_PUSH = 'push'
 const HISTORY_REPLACE = 'replace'
 
+function setGradeLoading(studentId: string, loading: boolean) {
+  useStore.setState(state => {
+    const gradesLoading = {...state.gradesLoading, [studentId]: loading}
+    return {...state, gradesLoading}
+  })
+}
+
 function setupHandleStatePopped() {
   window.addEventListener('popstate', EG.handleStatePopped)
 }
@@ -253,6 +262,15 @@ function teardownBeforeLeavingSpeedgrader() {
 
 function unexcuseSubmission(grade, submission, assignment) {
   return grade === '' && submission.excused && assignment.grading_type === 'pass_fail'
+}
+
+function toggleGradeVisibility(show: boolean): void {
+  const gradeInput = $('#grading')
+  if (show) {
+    gradeInput.show().height('auto')
+  } else {
+    gradeInput.hide()
+  }
 }
 
 // anonymous_name is preferred and will be available for all anonymous
@@ -1083,8 +1101,10 @@ function refreshGrades(
     numRequests += 1
     $.getJSON(url, params, submission => {
       if (retry?.(submission, originalSubmission, numRequests)) {
+        setGradeLoading(currentStudentIDAsOfAjaxCall, true)
         retryDelay ? setTimeout(fetchSubmission, retryDelay) : fetchSubmission()
       } else {
+        setGradeLoading(currentStudentIDAsOfAjaxCall, false)
         onSuccess(submission)
       }
     })
@@ -1445,6 +1465,18 @@ EG = {
     EG.goToStudent(resolvedId, HISTORY_REPLACE)
   },
 
+  setupGradeLoadingSpinner() {
+    ReactDOM.render(
+      <GradeLoadingSpinner onLoadingChange={loading => toggleGradeVisibility(!loading)} />,
+      document.getElementById('grades-loading-spinner')
+    )
+  },
+
+  // Exists for testing purposes only
+  setState(state) {
+    useStore.setState(state)
+  },
+
   anyUnpostedComment() {
     return !!(
       $.trim($add_a_comment_textarea.val()).length ||
@@ -1559,12 +1591,12 @@ EG = {
     }
 
     if (rubricFull.filter(':visible').length || force === 'close') {
-      $('#grading').show().height('auto')
+      toggleGradeVisibility(true)
       rubricFull.fadeOut()
       $('.toggle_full_rubric').focus()
     } else {
       rubricFull.fadeIn()
-      $('#grading').hide()
+      toggleGradeVisibility(false)
       this.refreshFullRubric()
       originalRubric = EG.getOriginalRubricInfo()
       rubricFull.find('.rubric_title .title').focus()
@@ -1691,6 +1723,7 @@ EG = {
       window.jsonData.studentMap[selectMenuValue] ||
       _.values(window.jsonData.studentsWithSubmissions)[0]
 
+    useStore.setState({currentStudentId: this.currentStudent[anonymizableId]})
     EG.resetReassignButton()
 
     if (historyBehavior) {
@@ -4015,6 +4048,7 @@ function setupSpeedGrader(gradingPeriods, speedGraderJsonResponse) {
   window.jsonData = speedGraderJSON
   EG.jsonReady()
   EG.setInitiallyLoadedStudent()
+  EG.setupGradeLoadingSpinner()
 }
 
 function buildAlertMessage() {
