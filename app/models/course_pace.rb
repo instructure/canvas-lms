@@ -362,7 +362,8 @@ class CoursePace < ActiveRecord::Base
   end
 
   def log_course_blackout_dates
-    calendar_event_blackout_dates_count = CalendarEvent.with_blackout_date.active.where(context: course).size
-    InstStatsd::Statsd.count("course_pacing.course_blackout_dates.count", calendar_event_blackout_dates_count)
+    InstStatsd::Statsd.count("course_pacing.course_blackout_dates.count", CalendarEvent.with_blackout_date.active.where(context: course).size)
+    account_blackout_dates = Account.multi_account_chain_ids([course.account.id]).sum { |id| CalendarEvent.with_blackout_date.active.where(context: Account.find(id)).size }
+    InstStatsd::Statsd.count("course_pacing.account_blackout_dates.count", account_blackout_dates)
   end
 end

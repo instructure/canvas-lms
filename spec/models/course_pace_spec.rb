@@ -727,7 +727,7 @@ describe CoursePace do
       expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1)
     end
 
-    it "does not log account blackout dates when pace is created" do
+    it "logs course and account logs separately when course pace is created" do
       allow(InstStatsd::Statsd).to receive(:count)
       CalendarEvent.create!({
                               title: "calendar event blackout event",
@@ -744,14 +744,72 @@ describe CoursePace do
                               blackout_date: true
                             })
       @course.course_paces.create!(workflow_state: "active")
-      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1)
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1).once
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 1).once
     end
 
-    it "logs a zero value if no blackout dates" do
+    it "logs a zero value if no course blackout dates" do
       allow(InstStatsd::Statsd).to receive(:count)
 
       @course.course_paces.create!(workflow_state: "active")
       expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 0)
+    end
+
+    it "logs the count of account blackout dates when pace is created" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: Account.find(@course.root_account.id),
+                              blackout_date: true
+                            })
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 1)
+    end
+
+    it "logs a zero value if no account blackout dates" do
+      allow(InstStatsd::Statsd).to receive(:count)
+
+      @course.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 0)
+    end
+
+    it "creates a course in a subaccount with its own calendar events and counts all the account calendar events" do
+      allow(InstStatsd::Statsd).to receive(:count)
+      @subaccount1 = Account.find((@course.root_account.id)).sub_accounts.create!
+      @subaccount1.enable_feature!(:course_paces)
+      @course1 = course_factory(account: @subaccount1, active_all: true)
+      @course1.enable_course_paces = true
+      @course1.save!
+      @module1 = @course1.context_modules.create!
+      @assignment1 = @course1.assignments.create!
+      @tag = @assignment1.context_module_tags.create! context_module: @module1, context: @course1, tag_type: "context_module"
+
+      CalendarEvent.create!({
+                              title: "calendar event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @course1,
+                              blackout_date: true
+                            })
+      CalendarEvent.create!({
+                              title: "account event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: Account.find(@course1.root_account.id),
+                              blackout_date: true
+                            })
+      CalendarEvent.create!({
+                              title: "subaccount event blackout event",
+                              start_at: Time.zone.now.beginning_of_day,
+                              end_at: Time.zone.now.beginning_of_day,
+                              context: @subaccount1,
+                              blackout_date: true
+                            })
+      @course1.course_paces.create!(workflow_state: "active")
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.course_blackout_dates.count", 1).once
+      expect(InstStatsd::Statsd).to have_received(:count).with("course_pacing.account_blackout_dates.count", 2).once
     end
   end
 
