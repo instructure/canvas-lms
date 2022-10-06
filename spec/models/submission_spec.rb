@@ -4358,6 +4358,23 @@ describe Submission do
       @another_submission.reload
       expect(@another_submission).to be_missing
     end
+
+    it "returns true for missing quiz_lti submissions when cached_quiz_lti is false but assignment.quiz_lti is true" do
+      @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+
+      @another_assignment.quiz_lti!
+      @another_assignment.save!
+
+      @another_submission.reload
+      @another_submission.update!(cached_quiz_lti: false)
+      expect(@another_submission).to be_missing
+    end
   end
 
   describe "update_attachment_associations" do
