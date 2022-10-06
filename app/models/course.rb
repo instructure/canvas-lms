@@ -1690,7 +1690,7 @@ class Course < ActiveRecord::Base
 
     CUSTOMIZABLE_PERMISSIONS.each_key do |type|
       given do |user|
-        available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?) || grants_right?(user, :read_as_member))
+        grants_right?(user, :read_as_member) || (available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?)))
       end
       can :"read_#{type}"
     end
