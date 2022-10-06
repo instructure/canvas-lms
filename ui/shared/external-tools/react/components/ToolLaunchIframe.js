@@ -22,12 +22,34 @@ import React from 'react'
  * Provide an iframe for launching an LTI tool directly from the frontend.
  * Works just like all existing usages of the LTI \<iframe\> element, including
  * extracting a ref of the \<iframe\> directly and setting things on it later.
+ * Also renders an invisible iframe used for postMessage forwarding when the
+ * lti_platform_storage flag is enabled.
  *
  * TODO: include more common usages in this instead of in callers, including:
  * - allow: iframeAllowances
  * - "the following content is partner provided" - both visible and SR-only types
  */
 const ToolLaunchIframe = React.forwardRef((props, ref) => {
-  return <iframe ref={ref} className="tool_launch" {...props} data-lti-launch="true" />
+  const id = 'post_message_forwarding'
+  const src = '/post_message_forwarding'
+  const sandbox = 'allow-scripts allow-same-origin'
+  const style = {display: 'none'}
+  const flagEnabled = !!window.ENV?.FEATURES?.lti_platform_storage
+
+  const postMessageForwardingFrame = () => {
+    if (!flagEnabled) {
+      return null
+    }
+
+    return <iframe id={id} name={id} title={id} src={src} sandbox={sandbox} style={style} />
+  }
+
+  return (
+    <>
+      <iframe ref={ref} className="tool_launch" {...props} data-lti-launch="true" />
+      {postMessageForwardingFrame()}
+    </>
+  )
 })
+
 export default ToolLaunchIframe

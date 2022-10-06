@@ -15,6 +15,16 @@
   data-lti-launch="true"
 >
 </iframe>
+{{#if shouldRenderForwardingIframe}}
+<iframe
+  src="/post_message_forwarding"
+  id="post_message_forwarding"
+  name="post_message_forwarding"
+  title="post_message_forwarding"
+  sandbox="allow-scripts allow-same-origin"
+  style="display: none;"
+/>
+{{/if}}
 <div class="after_external_content_info_alert screenreader-only" tabindex="0">
   <div class="ic-flash-info">
     <div class="ic-flash__icon" aria-hidden="true">

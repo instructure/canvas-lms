@@ -236,6 +236,18 @@ SelectContentDialog.Events = {
             'data-lti-launch': 'true',
           })
         )
+        if (window.ENV && window.ENV.FEATURES && window.ENV.FEATURES.lti_platform_storage) {
+          $dialog.append(
+            $('<iframe/>', {
+              id: 'post_message_forwarding',
+              name: 'post_message_forwarding',
+              title: 'post_message_forwarding',
+              src: '/post_message_forwarding',
+              sandbox: 'allow-scripts allow-same-origin',
+              style: 'display: none;',
+            })
+          )
+        }
         $dialog.append(`<div class="after_external_content_info_alert screenreader-only" tabindex="0">
             <div class="ic-flash-info">
               <div class="ic-flash__icon" aria-hidden="true">
@@ -249,7 +261,7 @@ SelectContentDialog.Events = {
           '.before_external_content_info_alert, .after_external_content_info_alert'
         )
 
-        const $iframe = $dialog.find('iframe')
+        const $iframe = $dialog.find('#resource_selection_iframe')
 
         $external_content_info_alerts.on('focus', function () {
           const iframeWidth = $iframe.outerWidth(true)
@@ -267,7 +279,7 @@ SelectContentDialog.Events = {
           const iframeWidth = $iframe.outerWidth(true)
           const iframeHeight = $iframe.outerHeight(true)
           const alertHeight = $(this).outerHeight(true)
-          $dialog.find('iframe').css('border', 'none')
+          $dialog.find('#resource_selection_iframe').css('border', 'none')
           $(this).addClass('screenreader-only')
           $iframe.css('height', `${iframeHeight + alertHeight}px`).css('width', `${iframeWidth}px`)
           $dialog.scrollLeft(0).scrollTop(0)
@@ -283,7 +295,9 @@ SelectContentDialog.Events = {
             close() {
               SelectContentDialog.detachDeepLinkingListener()
               $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
-              $dialog.find('iframe').attr('src', '/images/ajax-loader-medium-444.gif')
+              $dialog
+                .find('#resource_selection_iframe')
+                .attr('src', '/images/ajax-loader-medium-444.gif')
             },
             open: () => {
               SelectContentDialog.attachDeepLinkingListner()
@@ -292,7 +306,7 @@ SelectContentDialog.Events = {
           })
           .bind('dialogresize', function () {
             $(this)
-              .find('iframe')
+              .find('#resource_selection_iframe')
               .add('.fix_for_resizing_over_iframe')
               .height($(this).height())
               .width($(this).width())
@@ -302,7 +316,7 @@ SelectContentDialog.Events = {
           })
           .bind('dialogresizestart', function () {
             $(this)
-              .find('iframe')
+              .find('#resource_selection_iframe')
               .each(function () {
                 $('<div class="fix_for_resizing_over_iframe" style="background: #fff;"></div>')
                   .css({
@@ -325,7 +339,7 @@ SelectContentDialog.Events = {
 
               SelectContentDialog.resetExternalToolFields()
             }
-            $('#resource_selection_dialog iframe').attr('src', 'about:blank')
+            $('#resource_selection_dialog #resource_selection_iframe').attr('src', 'about:blank')
             $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
             $('#resource_selection_dialog').dialog('close')
 
@@ -349,7 +363,7 @@ SelectContentDialog.Events = {
       if ($('#select_context_content_dialog').data('context_module_id')) {
         url += '&context_module_id=' + $('#select_context_content_dialog').data('context_module_id')
       }
-      $dialog.find('iframe').attr({src: url, title: tool.name})
+      $dialog.find('#resource_selection_iframe').attr({src: url, title: tool.name})
       $(window).on('beforeunload', SelectContentDialog.beforeUnloadHandler)
     } else {
       const placements = $tool.data('tool').placements

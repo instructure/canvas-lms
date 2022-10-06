@@ -61,6 +61,19 @@ describe('response_messages', () => {
       })
     })
 
+    describe('when toolOrigin is present', () => {
+      const toolOrigin = 'some_tool_origin'
+
+      beforeEach(() => {
+        resetBuilder({toolOrigin})
+      })
+
+      it('includes toolOrigin in response', () => {
+        builder.sendResponse()
+        expectPostMessageContents({toolOrigin})
+      })
+    })
+
     describe('when targetWindow does not exist', () => {
       beforeEach(() => {
         resetBuilder({targetWindow: null})
