@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {act, render} from '@testing-library/react'
+import {act, fireEvent, render} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
 import userEvent from '@testing-library/user-event'
 import GroupModal from '../index'
@@ -390,6 +390,25 @@ describe('GroupModal', () => {
       const errors = await findAllByText(
         'Group membership limit must be equal to or greater than current members count.'
       )
+      expect(errors[0]).toBeInTheDocument()
+    })
+
+    it('errors on attempting to save membership limit that is 1', async () => {
+      const {getByText, findAllByText, getByPlaceholderText, getByLabelText} = render(
+        <GroupModal
+          group={{...group, members_count: 0}}
+          label="Edit Group"
+          open={open}
+          requestMethod="PUT"
+          onSave={onSave}
+          onDismiss={onDismiss}
+        />
+      )
+      userEvent.type(getByPlaceholderText('Name'), 'foo')
+      const input = getByLabelText(/Group Membership/i)
+      fireEvent.input(input, {target: {value: '1'}})
+      userEvent.click(getByText('Save'))
+      const errors = await findAllByText('Group membership limit must be greater than 1.')
       expect(errors[0]).toBeInTheDocument()
     })
   })

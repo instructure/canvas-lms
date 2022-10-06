@@ -93,6 +93,11 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
           'Group membership limit must be equal to or greater than current members count.'
         ),
       })
+    } else if (groupMembershipLimit === 1) {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t('Group membership limit must be greater than 1.'),
+      })
     } else {
       handleSend()
     }
