@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
-import {IconButton, CondensedButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -30,6 +30,8 @@ import {
   IconStatsLine,
   IconPublishLine,
 } from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import axios from '@canvas/axios'
 import {uniqBy} from 'lodash'
 import $ from '@canvas/rails-flash-notifications'
@@ -237,9 +239,9 @@ export default class CoursesListRow extends React.Component {
             </div>
           ))}
           {teachers && teachers.length > 2 && teachersToShow.length === 2 && (
-            <CondensedButton size="small" onClick={this.showMoreTeachers}>
-              {I18n.t('Show More')}
-            </CondensedButton>
+            <Link isWithinText={false} as="button" onClick={this.showMoreTeachers}>
+              <Text size="small">{I18n.t('Show More')}</Text>
+            </Link>
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>
