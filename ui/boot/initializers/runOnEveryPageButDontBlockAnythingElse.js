@@ -29,7 +29,6 @@ import {isolate} from '@canvas/sentry'
 // modules that do their own thing on every page that simply need to be required
 import '@canvas/media-comments'
 import './activateReminderControls'
-import './ujsLinks'
 import './expandAdminLinkMenusOnClick'
 import './activateElementToggler'
 import './toggleICSuperToggleWidgetsOnEnterKeyEvent'
