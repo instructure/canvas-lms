@@ -47,6 +47,8 @@ const requiredDOMFixtures = `
   <div id="speed_grader_assessment_audit_button_mount_point"></div>
   <div id="speed_grader_submission_comments_download_mount_point"></div>
   <div id="speed_grader_hidden_submission_pill_mount_point"></div>
+  <div id="grades-loading-spinner"></div>
+  <div id="grading"></div>
 `
 
 let $div
@@ -537,11 +539,11 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
   })
 
-  QUnit.module('#refreshGrades()', hooks => {
+  QUnit.module('#refreshGrades()', contextHooks => {
     let originalWindowJSONData
     let originalStudent
 
-    hooks.beforeEach(() => {
+    contextHooks.beforeEach(() => {
       fakeENV.setup()
       sandbox.spy($.fn, 'append')
       originalWindowJSONData = window.jsonData
@@ -612,13 +614,41 @@ QUnit.module('SpeedGrader', rootHooks => {
       sinon.stub(SpeedGrader.EG, 'showGrade')
     })
 
-    hooks.afterEach(() => {
+    contextHooks.afterEach(() => {
       window.jsonData = originalWindowJSONData
       SpeedGrader.EG.currentStudent = originalStudent
       fakeENV.teardown()
       SpeedGrader.EG.showGrade.restore()
       SpeedGrader.EG.updateSelectMenuStatus.restore()
       $.getJSON.restore()
+    })
+
+    QUnit.module('"Grades Syncing" Spinner', hooks => {
+      hooks.beforeEach(() => {
+        SpeedGrader.EG.setState({currentStudentId: '4'})
+        SpeedGrader.EG.setupGradeLoadingSpinner()
+      })
+
+      const spinnerShown = () =>
+        document.getElementById('grades-loading-spinner').children.length > 0
+
+      test('shows a spinner while polling', () => {
+        const retry = () => true
+        SpeedGrader.EG.refreshGrades(null, retry)
+        ok(spinnerShown())
+      })
+
+      test('hides the spinner when polling completes', () => {
+        const retry = (_sub, _originalSub, numRequests) => numRequests <= 1
+        SpeedGrader.EG.refreshGrades(null, retry)
+        notOk(spinnerShown())
+      })
+
+      test('does not show a spinner when no retries are made', () => {
+        const retry = () => false
+        SpeedGrader.EG.refreshGrades(null, retry)
+        notOk(spinnerShown())
+      })
     })
 
     test('makes request to API', () => {
@@ -1495,6 +1525,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
       test('goToStudent is not called on clicking cancel', () => {
         SpeedGrader.EG.skipRelativeToCurrentIndex(-1)
+        SpeedGrader.EG.goToStudent.resetHistory()
         $(document).find('#unposted_comment_cancel').click()
         ok(SpeedGrader.EG.goToStudent.notCalled)
       })
@@ -1571,7 +1602,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     equal(result, 'Student 2 - graded')
   })
 
-  QUnit.module('handleSubmissionSelectionChange', hooks => {
+  QUnit.module('handleSubmissionSelectionChange', contextHooks => {
     let closedGradingPeriodNotice
     let getFromCache
     let originalWindowJSONData
@@ -1583,7 +1614,7 @@ QUnit.module('SpeedGrader', rootHooks => {
     let finishSetup
     let gradedStudentWithNoSubmission
 
-    hooks.beforeEach(() => {
+    contextHooks.beforeEach(() => {
       fakeENV.setup({
         assignment_id: '17',
         course_id: '29',
@@ -1765,7 +1796,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       }
     })
 
-    hooks.afterEach(() => {
+    contextHooks.afterEach(() => {
       getFromCache.restore()
       window.jsonData = originalWindowJSONData
       SpeedGrader.EG.currentStudent = originalStudent
