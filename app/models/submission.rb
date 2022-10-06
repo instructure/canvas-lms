@@ -2420,7 +2420,7 @@ class Submission < ActiveRecord::Base
       return false if submitted_at.present?
       return false unless past_due?
 
-      cached_quiz_lti? || assignment.expects_submission?
+      cached_quiz_lti? || assignment.expects_submission? || assignment.quiz_lti?
     end
     alias_method :missing, :missing?
 
