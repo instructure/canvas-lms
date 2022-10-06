@@ -105,6 +105,33 @@ describe "Web conferences" do
       wait_for_ajaximations
       expect(WebConference.count).to be > initial_conference_count
     end
+
+    it "invites specific course members" do
+      get conferences_index_page
+      stub_request(:get, /wimba\.instructure\.com/)
+      f("button[title='New Conference']").click
+      fj("label:contains('Invite all course members')").click
+      f("[data-testid='address-input']").click
+      wait_for_ajaximations
+      f("[data-testid='user-#{@student.id}']").click
+      fj("button:contains('Create')").click
+      wait_for_ajaximations
+      expect(WebConference.last.invitees.pluck(:id)).to eq [@student.id]
+    end
+
+    it "can exclude observers on creation" do
+      my_observer = user_factory(name: "Cogsworth", active_all: true)
+      @course.enroll_user(my_observer, "ObserverEnrollment", { associated_user_id: @student.id })
+      get conferences_index_page
+      stub_request(:get, /wimba\.instructure\.com/)
+      f("button[title='New Conference']").click
+      fj("label:contains('Remove all course observer members')").click
+      fj("button:contains('Create')").click
+      wait_for_ajaximations
+      my_conf = WimbaConference.last
+      expect(my_conf.invitees.pluck(:id)).to include(@ta.id)
+      expect(my_conf.invitees.pluck(:id)).not_to include(my_observer.id)
+    end
   end
 
   context "when bbb_modal_update is OFF", ignore_js_errors: true do
