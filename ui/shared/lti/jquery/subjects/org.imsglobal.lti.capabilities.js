@@ -19,7 +19,18 @@
 import {SUBJECT_ALLOW_LIST} from '../messages'
 
 export default ({responseMessages}) => {
-  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => ({subject}))
+  const useFrame = ENV?.FEATURES?.lti_platform_storage
+  const imsSubjects = ['org.imsglobal.lti.get_data', 'org.imsglobal.lti.put_data']
+  const supported_messages = SUBJECT_ALLOW_LIST.map(subject => {
+    if (imsSubjects.includes(subject) && useFrame) {
+      return {
+        subject,
+        frame: 'post_message_forwarding'
+      }
+    }
+
+    return {subject}
+  })
   responseMessages.sendResponse({supported_messages})
   return true
 }

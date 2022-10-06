@@ -50,4 +50,19 @@ describe('ToolLaunchIframe', () => {
     render(<ToolLaunchIframe title={title} ref={ref} />)
     expect(ref.current instanceof HTMLIFrameElement).toBe(true)
   })
+
+  it('does not render postMessage forwarding iframe by default', () => {
+    const {queryByTitle} = renderIframe()
+    expect(queryByTitle('post_message_forwarding')).not.toBeInTheDocument()
+  })
+
+  it('renders postMessage forwarding iframe with flag on', () => {
+    global.ENV = {
+      FEATURES: {
+        lti_platform_storage: true,
+      },
+    }
+    const {getByTitle} = renderIframe()
+    expect(getByTitle('post_message_forwarding')).toBeInTheDocument()
+  })
 })
