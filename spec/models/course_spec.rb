@@ -5827,6 +5827,25 @@ describe Course do
       expect(@course.check_policy(nil)).to eq []
     end
 
+    describe "when course is unpublished" do
+      before do
+        @course.write_attribute(:workflow_state, "claimed")
+        @course.write_attribute(:is_public, false)
+      end
+
+      let_once(:user) { user_model }
+
+      it "does not allow students to read files" do
+        user.student_enrollments.create!(workflow_state: "active", course: @course)
+        expect(@course.check_policy(user)).to_not include :read_files
+      end
+
+      it "allows teachers to read files" do
+        user.teacher_enrollments.create!(workflow_state: "active", course: @course)
+        expect(@course.check_policy(user)).to include :read_files
+      end
+    end
+
     describe "when course is not public" do
       before do
         @course.write_attribute(:is_public, false)
