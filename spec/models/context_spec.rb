@@ -193,6 +193,23 @@ describe Context do
       user = @course.enroll_student(User.create!).user
       expect(Context.find_asset_by_url("/courses/#{@course.id}/users/#{user.id}")).to eq user
     end
+
+    it "finds external tools by url" do
+      tool = external_tool_model(context: @course)
+      url = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
+      expect(Context.find_asset_by_url(url)).to eq tool
+    end
+
+    it "finds external tools by resource link lookup uuid" do
+      tool = external_tool_1_3_model(context: @course)
+      resource_link = Lti::ResourceLink.create!(
+        context: @course,
+        lookup_uuid: "90abc684-0f4f-11ed-861d-0242ac120002",
+        context_external_tool: tool
+      )
+      url = "/courses/#{@course.id}/external_tools/retrieve?display=borderless&resource_link_lookup_uuid=#{resource_link.lookup_uuid}"
+      expect(Context.find_asset_by_url(url)).to eq tool
+    end
   end
 
   context "self.names_by_context_types_and_ids" do

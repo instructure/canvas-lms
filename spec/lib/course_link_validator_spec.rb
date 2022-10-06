@@ -195,15 +195,25 @@ describe CourseLinkValidator do
 
   it "works more betterer with external_tools/retrieve" do
     course_factory
-    tool = @course.context_external_tools.create!(name: "blah",
-                                                  url: "https://blah.example.com", shared_secret: "123", consumer_key: "456")
 
-    active_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
+    tool_1_1 = @course.context_external_tools.create!(name: "blah1",
+                                                      url: "https://blah1.example.com", shared_secret: "123", consumer_key: "456")
+    tool_1_3 = @course.context_external_tools.create!(name: "blah2",
+                                                      url: "https://blah1.example.com", shared_secret: "123", consumer_key: "456", lti_version: "1.3")
+    resource_link = Lti::ResourceLink.create!(
+      context: @course,
+      lookup_uuid: "90abc684-0f4f-11ed-861d-0242ac120002",
+      context_external_tool: tool_1_3
+    )
+
+    active_link_1_1 = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool_1_1.url)}"
+    active_link_1_3 = "/courses/#{@course.id}/external_tools/retrieve?display=borderless&resource_link_lookup_uuid=#{resource_link.lookup_uuid}"
     nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
 
     message = <<~HTML
-      <a href='#{active_link}'>link</a>
-      <a href='#{nonsense_link}'>linkk</a>
+      <a href='#{active_link_1_1}'>link</a>
+      <a href='#{active_link_1_3}'>link</a>
+      <a href='#{nonsense_link}'>link</a>
     HTML
     @course.syllabus_body = message
     @course.save!

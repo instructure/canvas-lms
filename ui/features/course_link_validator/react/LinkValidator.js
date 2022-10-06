@@ -23,6 +23,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import ValidatorResults from './ValidatorResults'
 import {number} from 'prop-types'
 import {Confetti} from '@canvas/confetti'
+import {Spinner} from '@instructure/ui-spinner'
 
 const I18n = useI18nScope('link_validator')
 
@@ -118,13 +119,6 @@ class LinkValidator extends React.Component {
   }
 
   render() {
-    let loadingImage
-    if (this.state.buttonDisabled) {
-      loadingImage = (
-        <img src="/images/ajax-loader.gif" alt={I18n.t('Link validation is running')} />
-      )
-    }
-
     return (
       <div>
         <button
@@ -138,7 +132,13 @@ class LinkValidator extends React.Component {
         >
           {this.state.buttonMessage}
         </button>
-        {loadingImage}
+        {this.state.buttonDisabled && (
+          <Spinner
+            renderTitle={I18n.t('Link validation is running')}
+            size="x-small"
+            margin="0 0 0 x-small"
+          />
+        )}
         {window.ENV.VALIDATION_CONFETTI_ENABLED && this.state.showConfetti && <Confetti />}
         <ValidatorResults
           results={this.state.results}
