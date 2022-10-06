@@ -260,9 +260,13 @@ export default function K5Announcement({
       <Flex wrap="wrap" alignItems="end">
         <Flex.Item align="start" shouldGrow={true} shoulShrink={true} margin="x-small x-small 0 0">
           <Heading level="h3">
-            <Link href={currentAnnouncement.url} isWithinText={false}>
-              {currentAnnouncement.title}
-            </Link>
+            {canEdit || !showCourseDetails ? (
+              <Link href={currentAnnouncement.url} isWithinText={false}>
+                {currentAnnouncement.title}
+              </Link>
+            ) : (
+              currentAnnouncement.title
+            )}
           </Heading>
         </Flex.Item>
         {currentAnnouncement.postedDate && (
