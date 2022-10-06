@@ -12578,6 +12578,7 @@ nn:
   ignore_91750df8: Ignorer
   ignore_assignment_738b3c99: "Ignorer oppgåve"
   ignore_assignment_a4837cb3: "Ignorer %{assignment}"
+  ignore_assignment_until_new_submission_424f8f01: "Ignorer %{assignment} fram til ny innlevering"
   ignore_item_46c066f3: "Ignorer %{item}"
   ignore_item_until_new_mark_68518bf0: "Sjå bort frå %{item} fram til ny karakter"
   ignore_item_until_new_submission_58246b15: "Sjå bort frå %{item} fram til ny innlevering"
@@ -12622,6 +12623,7 @@ nn:
   import_status_b147bd27: Importstatus
   import_tutorial_tray_8b92e956: "Importer opplæringsmeny"
   important_dates_304e306a: "Viktige datoar"
+  important_dates_tray_fa41a025: "Skuff med viktige datoar"
   important_info_3bda6406: "Viktig informasjon"
   important_info_for_course_baa4bce1: "Viktig informasjon for %{course}"
   important_note_educational_institutions_have_an_ob_c9350304: "*Viktig merknad: Utdanningsinstitusjonar har ei plikt til å gjere eige innhald så tilgjengeleg som mogleg. Instructure anbefaler minimum 3:1-forhold for tekst over bakgrunnsfarge for at teksta skal vere så god å lese som mogleg. Du kan enkelt teste kontrastforholdet med **WebAIM Color Contrast Checker***."
@@ -12700,7 +12702,10 @@ nn:
   include_fullstory_recording_of_the_user_s_session_656d131e: "Inkluder FullStory opptak av brukar sin arbeidsøkt"
   include_integration_ids_in_the_gradebook_exports_1b48bbdc: "Inkluder integrasjons-ID'ar i vurderingsoversikt eksportar"
   include_integration_ids_in_the_gradebook_exports_4b94c795: "Inkluder integrasjons-ID i eksportar av vurderingsoversikta."
+  include_last_activity_dates_4eb97ed5: "Inkluder siste aktivitetsdatoar;"
+  include_last_activity_dates_ee2d3de0: "Inkluder siste aktivitetsdatoar"
   include_needs_grading_count_b8106ff7: "Inkluder treng vurderingsteljing"
+  include_quoted_reply_in_message_d0c8af8a: "Inkluder sitert svar i melding"
   include_scores_when_alerting_about_grades_89728ae1: "Inkluder resultat når du varslar om karakterar."
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultat i varsel om vurdering.
@@ -12715,6 +12720,7 @@ nn:
   include_unsubmitted_deleted_submissions_99fc2aad: "Inkluder usendte og sletta innleveringar"
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inkluderer tilpassing av læringsmål-lenesta ved eksport og import av emneinnhald"
   includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderer overstyrte emnevurderingar i vurderingshistorikken."
+  includes_the_equation_editor_in_the_instructure_ca_19a4be71: "Inkluderer likningseditoren i @instructure/canvas-rce pakken"
   incomplete_95612d72: "ikkje fullført"
   incomplete_da3c2ea2: "Ikkje fullført"
   incompleteregistration: 
@@ -12731,7 +12737,10 @@ nn:
   individual_gradebook_c7de9821: "Individuell vurderingsoversikt..."
   individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Verdiar for berekning av individuelle læringsmål kan ikkje endrast."
   individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Kan ikkje endre poeng for individuelle meistringsmål."
+  individual_outcome_rating_and_calculation_method_o_f0eae85f: "Alternativer for individuell resultatvurdering og berekningsmetode"
   individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Individuelle resultatvurderingar kan ikkje endrast."
+  individual_ratings_data_input_with_acount_level_ma_2c23f844: "Individuelle inndata for vurderingar med acount_level_mastery_scale FF aktivert"
+  individual_ratings_data_input_with_invidual_outcom_1152d59e: "Individuelle inndata for vurderingar med invidual_outcome_rating_and_calculation FF deaktivert"
   individual_view_81c2f124: "Individuell vising"
   individual_view_d60b9132: "Individuell vising..."
   indonesia_62_4c35bd62: "Indonesia (+62)"
@@ -12886,6 +12895,9 @@ nn:
     confirms: 
       default_delete_thing: "Er du sikker på at du vil slette dette?"
   instructure_report_bundle_course_usage_report_6bb7075d: "Instructure rapport for emnebruk for rapporteringspakke"
+  instructure_report_bundle_external_tool_usage_repo_69cdb23a: "Instructure Rapporteringspakke Bruk av eksterne verktøy - rapport"
+  instructure_report_bundle_last_user_activity_repor_3aa5f44b: "Instructure Rapporteringspakke siste brukaraktivitetsrapport"
+  instructure_report_bundle_submissions_report_5a5d856e: "Instructure Rapporteringspakke Innleveringsrapport"
   insufficient_permission_1d6a17a6: "Utilstrekkeleg løyve"
   insufficient_permission_1f8f1b3e: "Utilstrekkeleg løyve"
   insufficient_permissions_2b3269d: "Utilstrekkelege løyver"
@@ -12912,6 +12924,7 @@ nn:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ugyldig CSV-fil. Kan ikkje oppdatere vurderingane."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ugyldig CSV-fil, kan ikkje oppdatere karakterane."
   invalid_custom_fields_c66dcdb6: "Ugyldige eigendefinerte felt."
+  invalid_custom_parameters_please_ensure_they_match_b35cd355: "Ugyldige eigendefinerte parameter. Sørg for at dei samsvarar med LTI 1.3-spesifikasjonen."
   invalid_date_2a10bb7b: "Ugyldig dato"
   invalid_date_and_time_1a42d206: "Ugyldig dato og tid"
   invalid_date_or_datetime_for_field_b38fe386: "Ugyldig dato eller tidspunkt for %{field}"
@@ -12933,6 +12946,9 @@ nn:
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ugyldig hex-kode. Oppgi ei hex-kode slik at du kan bruke eigendefinert farge."
   invalid_hexcode_provided_522ba223: "Ugyldig hex-kode"
   invalid_microsoft_sync_tenant_given_please_validat_d8dc1631: "Ugyldig Microsoft sync tenant. Bekreft tenanten din."
+  invalid_microsoft_team_sync_remote_attribute_valid_4d3015a7: "Ugyldig Microsoft Teams Sync ekstern attributt. Gyldig eksterne attributtar: %{VALID_SYNC_REMOTE_ATTRIBUTES}"
+  invalid_microsoft_teams_sync_login_attribute_suffi_3c6eb0e6: "Ugyldig Microsoft Teams Sync login attributt-suffiks. Eit suffiks må innehalde mindre enn 255  teikn og kan ikkje innehalde mellomrom."
+  invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Ugyldig Microsoft Teams Syn login attributt. Gyldege login attributtar: %{valid_attributes}"
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Ugyldig eller manglande \"login attributt\"-konfigurasjon i kontoen"
   invalid_or_missing_session_for_oauth_3ce4b605: "Ugyldig eller manglande arbeidsøkt for oauth"
   invalid_pairing_code_dde8d40a: "ugyldig paringskode."
@@ -12972,6 +12988,8 @@ nn:
   irish_567e109f: Irsk
   is_an_lti_1_3_tool_770480a1: "Er eit LTI 1.3-verktøy."
   is_public_ca8561e8: is_public
+  isolated_entry_post_error_page_2a447d08: "Isolert Entry Post feilside"
+  isolated_entry_query_error_f0bfae18: "Isolert Entry spørringsfeil"
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Det ser ut som om du har ei ugyldig e-postadresse: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som innhaldet ditt ikkje lastar. Du kan bruke denne knappen og prøve å sende det til ei ny fane."
@@ -13529,6 +13547,7 @@ nn:
   loading_grading_periods_c635d96: "Lastar vurderingsperiodar..."
   loading_grading_periods_for_coursename_bbe46919: "Lastar vurderingsperiodar for %{courseName}"
   loading_grouptitle_dba362d2: "Lastar %{groupTitle}"
+  loading_homeroom_course_name_9f63923d: "Lastar namn til heim-emne"
   loading_important_date_2d3a29ce: "Lastar viktig dato"
   loading_important_date_details_1b2d2b85: "Lastar viktige datodetaljar"
   loading_important_info_217bf805: "Lastar viktig informasjon"
@@ -13688,6 +13707,7 @@ nn:
   login_6f3d6249: Pålogging
   login_attribute_731a8181: Påloggingsattributt
   login_attribute_selector_9a106f9c: "Lastar attributtveljar"
+  login_attribute_suffix_input_area_18f7c7f7: "Felt for Login attributt suffiks"
   login_button_661b410a: Påloggingsknapp
   login_button_text_c958250f: "Tekst påloggingsknapp"
   login_footer_link_badb3898: "Pålogging botntekstlenke"
@@ -13743,12 +13763,17 @@ nn:
   lti_add_e3bc0049: "LTI - legg til"
   lti_add_edit_delete_15905170: "LTI - legg til / rediger / slett"
   lti_advantage_services_c1746cb4: "LTI Advantages-tenester"
+  lti_deep_linking_for_module_index_menu_881feeee: "LTI djup kopling for modulens indeksmeny"
+  lti_deep_linking_line_items_5e0079f7: "LTI djup kopling linjeelement"
   lti_delete_ee5f1bef: "LTI - slett"
   lti_edit_83a27850: "LTI - rediger"
   lti_key_14ad02b1: LTI-nøkkel
   lti_launch_af082dc3: LTI-lansering
   lti_launch_error_41eac9a: "Feil under oppstart av LTI-verktøy"
+  lti_multiple_assignment_deep_linking_b7d641d7: "LTI fleire oppgåver djup lenking"
+  lti_platform_storage_9d11dc60: "LTI plattformlagring"
   lti_report_2b6193ab: LTI-rapport
+  lti_submissions_require_a_url_to_submit_85ca9988: "LTI-innleveringar krev ein URL for å levere"
   lti_tool_report_f13213b3: "LTI verktøyrapport"
   lti_tool_report_slcc_c98a3902: "LTI verktøyrapport - SLCC"
   lti_usage_report_7f8b11e2: LTI-bruksrapport
@@ -13761,6 +13786,7 @@ nn:
   mailbox_selection_92d9cbf: Meldingsboksutval
   main_navigation_3f080c80: Hovednavigasjon
   main_text_color_7d65ab1b: Hovudtekstfarge
+  maintenance_windows_days_weekday_of_the_month_from_e0113bb1: "Vedlikehaldsvindauge: %{days} %{weekday} i månaden frå %{time_range} (%{utc_time_range} UTC)"
   make_key_developername_invisible_212ecf72: "Gjer nøkkel %{developerName} usynleg"
   make_key_developername_visible_97c404bf: "Gjer nøkkel %{developerName} synleg"
   make_key_invisible_e66af89: "Gjer nøkkel usynleg"
@@ -14012,6 +14038,7 @@ nn:
   members_are_free_to_join_defa5929: "Medlemmar kan delta"
   membership_by_invitation_only_9bc27199: "Medlemskap berre etter invitasjon"
   membership_service_configuration_d8ba5a74: "Oppsett av medlemskaptenesta"
+  mentions_error_page_fd84c53c: "Feilside for nemningar"
   menu: 
     current_groups: "Gjeldande grupper"
     customize: Tilpass
@@ -15917,6 +15944,8 @@ nn:
   modules_group_menu_4aae0d5f: Modulgruppemeny
   modules_home_page_568c6bb9: Modulstartside
   modules_index_menu_c8748e7c: Moduloversikt
+  modules_index_menu_modal_79123a19: "Modular indeksmeny (Modal)"
+  modules_index_menu_tray_3f9975d9: "Modular indexmeny (Sidemeny)"
   modules_settings_a7066f13: Modulinnstillingar
   modules_tutorial_tray_d58ac3cb: "Modular opplæringsmeny"
   month_s_5c17590e: Månad(er)
@@ -16229,6 +16258,7 @@ nn:
   new_question_group_d9306280: "Ny spørsmålsgruppe"
   new_quiz_34aacba6: "Ny quiz"
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes Konto og Spørsmålsbank på emnenivå"
+  new_quizzes_assignment_build_button_72b6531a: "Nye quizar-oppgåver bygg-knapp"
   new_quizzes_banks_migrations_9ab4de4a: "Nye quizar migrering av bankar"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_importing_c167dce0: "New Quizzes importerer"
@@ -16981,6 +17011,7 @@ nn:
   open_in_theme_editor_156028e2: "Opne i temaredigeringsprogrammet"
   open_message_d7b12975: "Opne melding"
   open_name_color_picker_a2646a33: "Opne %{name} fargeveljar"
+  open_new_subject_modal_c9049e1d: "Åpne ny tittelmodal"
   open_sidebar_2852e8c8: "Opne sidestolpe"
   open_speedgrader_11604608: "Opne SpeedGrader"
   open_student_context_tray_24c1b1d6: "Opne studentkontekstmeny"
@@ -17376,6 +17407,7 @@ nn:
   parent_references_not_found_prior_to_this_row_miss_31723438: "Ingen overordna referanser funne før denne raden: %{missing}"
   parent_signup_b7c6bf0a: "Registrering for foreldre"
   parents_sign_up_here_f0aa8f4f: "Foreldre kan registrere seg på her"
+  partial_students_can_choose_to_reveal_their_name_a_baa936d4: "Delvis: studentar kan velje å vise namn og profilbilde"
   partially_anonymous_483a892d: "Delvis anonym"
   partially_anonymous_discussion_13ceb585: "Delvis anonym diskusjon i"
   partially_anonymous_discussion_e821cf85: "Delvis anonym diskusjon"
@@ -17457,6 +17489,7 @@ nn:
   permissions_manage_9eea4f8f: "Løyve - administrer"
   permit_usage_of_all_includes_parameters_for_this_d_4f8318f4: "Tillèt bruk av alle “inkluder” parameter for denne utviklarnøkkelen. “inkluderer” parameter kan gi tilgang til tilleggsdata som ikkje er inkludert i omfanget vald nedanfor."
   persian_a8cadb95: Persisk
+  persists_the_used_authentication_provider_when_log_15113afc: "Den brukte autentiseringsleverandøren vedvarar når du loggar inn, og sett nye innloggingar til standardleverandøren. "
   personal_pronouns_7d271f52: "Personlege pronomen"
   peru_51_d3d38d1f: "Peru (+51)"
   peru_7dcfdc91: Peru
@@ -17520,6 +17553,10 @@ nn:
   please_note_fbb62e4c: "Legg merke til:"
   please_provide_a_field_e5a7d0b3: "Legg til %{field}"
   please_provide_a_pairing_code_530d1e9d: "Oppgi ein paringskode."
+  please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Oppgi gyldig tenant-domene. Se Azure Active Directory innstillingane dine for å finne det."
+  please_reach_out_in_slack_at_canvas_sre_if_this_ke_bfa853d7: "Gi beskjed på Slack i #canvas-sre dersom dette skjer igjen."
+  please_reach_out_in_slack_at_canvas_sre_the_region_85440d71: "Gi beskjed på Slack i #canvas-sre. Kundens Canvas-instans støttar ikkje SFTP."
+  please_reach_out_in_slack_at_canvas_sre_to_create__7ae1850c: "Bi beskjed på Slack i #canvas-sre for å opprette SFTP for denne kontoen."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Vel ei gruppe som er oppgitt for denne oppgåva"
   please_select_a_reason_for_reporting_this_reply_51719e8d: "Vel årsak for rapportering av dette svaret"
   please_select_a_user_role_for_this_link_9fb4e655: "Vel ei brukarrolle for denne lenka."
@@ -17902,6 +17939,7 @@ nn:
       name: Arbeidsøkter
     sessions_timeout: 
       labels: 
+        mobile_timeout: "Tid etter innlogging før sesjonen utløpar om minutt (2880 [2 dagar] minimum) for mobile applikasjonar"
         session_timeout: "Tid før arbeidsøkter går ut i minutt (20 minimum)"
     settings_header: 
       prompt_change_for_all_line1: "Dette endrar innstillingane for ALLE KONTOANE."
@@ -19927,6 +19965,7 @@ nn:
   rating_selected_85c31e4c: "Nivå valt"
   rating_tier_index_threshold_3f02a6d7: "Terskelverdi for poengsjikt %{index} "
   rating_title_3b60881e: "Rangering tittel"
+  rating_unselected_7eb0ab52: "Vurdering ikkje vald"
   rating_updated_7aff90ea: "Ragnering oppdatert"
   ratings_2433172b: Vurderingar
   ratio_answered_correctly_b0c1e7d: "%{ratio}% korrekte svar"
@@ -19937,6 +19976,8 @@ nn:
   rce_contents_replace_display_name: "Erstatt innahald i redigeringsprogram"
   rce_enhancements_5701e06: "Forbedringar i redigeringsprogrammet"
   rce_icon_maker_2114f87: "Teksteditor ikondesignar"
+  rce_mentions_in_discussions_82cd11e3: "Rik teksteditor nemningar i diskusjonar"
+  rce_s_new_and_improved_equation_editor_dialog_380653be: "Rik teksteditor sin nye og forbetra likningseditor"
   re_activate_user_f7d77c9a: "Aktiver brukar på nytt"
   re_reported_b9671073: "Rapportert på nytt"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Send varsel på nytt direkte til brukar når kunngjeringa startar"
@@ -19985,12 +20026,19 @@ nn:
     this_folder_is_empty: "Mappa er tom"
     updated_at: "Dato endra"
     updated_at_short: Endra
+  reactivate_user_e058db8b: "Reaktiver brukar"
+  reactivation_will_allow_all_logins_for_name_to_log_455df70: "Reaktivering vil tillate alle innloggingar for %{name} å logge på Canvas og få tilbake tilgang til tidlegare autoriserte API-integrasjonar."
   read_7cabda44: les
   read_comments_3fcc7590: "Les kommentarar"
   read_dc99757a: Les
   read_less_ae7bd04f: "Les mindre"
   read_more_f69fb6ec: "Les meir"
   read_only_3d26d8fe: Lesemodus
+  read_state_change_failed_859eeaa1: "Endring av lesestatus mislukkast"
+  read_state_change_operation_failed_86710e1: "Endring av lesestatus-operasjonen mislukkast"
+  read_states_changed_45d9cba: 
+    one: "Lesestatus endra!"
+    other: "Lesestatusar endra!"
   ready_for_sync_16eaf713: "Klar for synkronisering"
   ready_to_enroll_panel_46f45abb: "Klar til å melde på brukarpanel"
   reassign_assignment_e3a70bcb: "Tilordne oppgåve på nytt"
@@ -20001,6 +20049,7 @@ nn:
   received_callback_from_identity_provider_80d999f5: "Tilbakekall frå identitetstilbydar motteke"
   received_cas_ticket_ea1bbeb: "CAS-informasjon motteke"
   received_content_53049822: "Fått innhald"
+  received_throttled_response_from_microsoft_api_whi_f0e664bd: "Mottok strupa respons frå Microsoft API under oppretting av batch-spørring"
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
   recent_f19e8c64: Siste
@@ -20276,6 +20325,7 @@ nn:
   reports_course_f09b7d9e: "Rapportar (Emne)"
   request_id_1499afb0: Førespurnads-ID
   request_successfully_sent_note_that_applying_score_ee8665b6: "Ynskje vart sent inn. Merk at å gje vurdering kan ta litt tid, og endringar vil ikkje synast før du lastar sida på nytt."
+  request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Be om at DocViewer brukar CloudFront for levering av pdf-dokumenter."
   request_values_89976f2c: "Be om verdiar"
   requested_bbdb5b26: Førespurt
   require_an_access_code_600e06e8: "Krev ein tilgangskode"
@@ -20313,6 +20363,7 @@ nn:
   reset_quiz_engine_choice_323a40e6: "Reset quizval"
   reset_this_contact_method_s_bounce_count_3845ecf4: "Tilbakestill retur av kontaktmetoden"
   reset_this_email_address_s_bounce_count_d81d8fd9: "Tilbakestill retur av e-postadressa"
+  resource_link_not_found_for_given_resource_link_lo_43f5183a: "Kunne ikkje finne ressurs-lenka for gjeven `resource_link_lookup_uuid`"
   resource_url_must_match_the_resource_handler_s_dom_b768cf: "ressurs-URL må samsvare med ressursen sitt leverandørdomene"
   resources_ccefab27: Ressursar
   respondus_lockdown_browser_support_413352eb: "Støtte for Respondus LockDown Browser"
@@ -20519,6 +20570,7 @@ nn:
   root_account_3fb3aacf: root_account
   root_account_id_e8d75734: Rotkonto-ID
   root_accounts_cc035dcf: Rotkontoar
+  root_learning_outcome_groups_4eb5a030: "Rot for læringsmålgrupper"
   roster: 
     delete_confirm: "Er du sikker på at du vil fjerne denne brukaren?"
     error_sending_invitations: "Det oppstod feil under sending av invitasjonen. Prøv på nytt seinare."
@@ -20600,8 +20652,11 @@ nn:
         other: "%{count} moglege poeng"
       remove_rubric: "Fjern vurderingsskjemaet frå lista"
   rubrics_add_edit_delete_8299eff7: "Vurderingsskjema - legg til / endre / slett"
+  rubrics_assessments_export_report_6e639a7b: "Eksporter rapport for Vurderingsskjemavurderingar"
+  rubrics_associations_export_report_77da1b31: "Eksporter rapport for vurderingsskjema-assosiasjonar"
   rubrics_b5ef369b: Vurderingsskjema
   rubrics_can_show_students_your_expectations_for_as_3382da64: "Vurderingsskjema kan vise studentane kva forventingar du har til svar på oppgåver, og korleis dei vert vurdert. Vurderingsskjema kan bli knytt til oppgåver, diskusjonar eller quizar. Vurderingsskjema kan bli brukt til å gi poeng, eller du kan opprette vurderingsskjema for å måle oppnping av læringsmål. Læringsmål kan bli satt inn som kriterier i eit vurderingsskjema."
+  rubrics_export_report_76d30288: "Eksporter rapport for vurderingsskjema"
   rubrics_speedgrader_a6ebec57: "Vurderingsskjema, SpeedGrader"
   rubrics_tutorial_tray_be65d10d: "Vurderingsskjema opplæringsmeny"
   run_at_759b47d: Køyr
@@ -22062,6 +22117,7 @@ nn:
   show_final_grade_overrides_only_c3017aaa: "Vis kun overstyrt sluttvurdering"
   show_groups_navigation_menu_1521d38d: "Vis meny for gruppenavigasjon"
   show_inactive_enrollments_8f4c4824: "Vis inaktive påmeldingar"
+  show_instructure_provided_release_notes_filtered_b_f3c285c9: "Vis versjonsnotat frå Instructure filtrert på brukar-rolle i hjelp menyen. Tilgjengeleg for brukarar med administrator, lærar (emneansvarlig), og observatørroller. Funksjonar for studentroller er inkludert i observatør-notata."
   show_key_1fbf0c64: "Vis nøkkel"
   show_less_d5bbf728: "Vis mindre"
   show_links_to_unpublished_content_30c0450d: "Vis lenker til upublisert innhald"
@@ -22414,6 +22470,7 @@ nn:
     online_url: "Oppkopla URL"
     previous_object: "Førre %{type}"
     student_hidden_name: "Student %{position}"
+  srsd_student_outcome_results_rollups_3cf58a5c: "SRSD samling av resultat for studentar"
   sso_settings_ebf98263: SSO-innstillingar
   staff_contact_info_2f7a6603: "Kontaktinformasjon til dei ansatte"
   star_2d27c137: stjerne
@@ -22529,6 +22586,7 @@ nn:
   student_enrollment_date_71424bea: "Dato for studentpåmelding"
   student_enrollment_report_798b715e: Studentpåmeldingsrapport
   student_extensions_d35a907: "Utvidingar for studentar"
+  student_feedback_required_in_comments_above_to_rea_2f5dafbf: "Tilbakemelding til student krevjast i kommentarfelt over for å tildele på ny."
   student_first_name_aaa42cbc: "Studentens fornamn"
   student_grades_4cbc59a1: "Vurderingar for student"
   student_group_75b86a9f: Studentgruppe
@@ -22764,6 +22822,7 @@ nn:
       assignment_submit_fail: "Kan ikkje levere oppgåve"
       can_not_submit_locked_assignment: "Du kan ikkje levere ei oppgåve når ho er låst"
       googld_drive_timeout: "Google drive brukte for lang tid på å svare"
+      google_drive_workflow: "Google Drive oppføringa kunne ikkje lastast ned"
       invalid_file_type: "Ugyldig filtype"
       invalid_google_docs_domain: "Du kan ikkje levere oppgåver frå dette google_docs-domenet"
       media_file_attached: "Det var ingen medieopptak i innleveringa"
@@ -23074,13 +23133,17 @@ nn:
   take_the_quiz_again_8ea51a6c: "Ta quizen på nytt"
   take_the_survey_ada59508: "Ta undersøkinga"
   take_the_survey_again_24ce22c2: "Ta undersøkinga på nytt"
+  talladega_grade_and_last_date_of_attendance_be39b0c7: "Talladega-vurdering og siste oppmøtedato"
   target_link_uri_bbed67d1: "* Mållenke-URI"
   target_link_uri_d166858: Mållenke-URL
+  targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId krevst dersom targetContextType oppgjeve"
+  targetcontexttype_required_if_targetcontextid_prov_2f6e77ad: "targetContextType krevst dersom targetContextId oppgjeve"
   tas_add_ccec2573: "Undervisningsassistentar - Legg til"
   tas_add_f4a16393: "Undervisningsassistentar - Legg til"
   tas_observers_designers_b705118a: "Undervisningsassistentar / Observatørar / Designarar"
   tas_remove_11059e14: "Undervisningsassistentar - Fjern"
   tas_remove_16a99b22: "Undervisningsassistentar - Fjern"
+  tea_provisional_graders_d4f19c26: "TEA provisoriske vurderar"
   teacher_5a73b637: Faglærar
   teacher_count_teachers_a92f7199: "%{teacher_count} faglærarar"
   teacher_dashboard_custom_report_6d20bef2: "Lærardashbord eigendefinert rapport"
@@ -23102,6 +23165,7 @@ nn:
   tenant_d2a41f78: Tenant
   tenant_missing_or_sync_disabled_check_the_microsof_7ac198e5: "Tenanten manglar, eller synkroniseringa er slått av. Sjekk integrasjonen for Microsoftsynkroniseringa for emne og kontoen. "
   tenant_name_e174f404: "Namn på tenanten"
+  tenant_name_input_area_283dfcde: "Felt for tenant namn"
   term_41f37cae: semester
   term_42976f1c: "Semester:"
   term_created_27d27c2b: "Semester oppretta"
