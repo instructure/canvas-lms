@@ -65,11 +65,36 @@ describe('K5Announcement', () => {
     expect(courseName.href).toBeUndefined()
   })
 
-  it('shows announcement title with a link to the announcement', () => {
-    const {getByText} = render(<K5Announcement {...getProps()} />)
-    const announcementTitle = getByText('20 minutes of weekly reading')
-    expect(announcementTitle).toBeInTheDocument()
-    expect(announcementTitle.href).toBe('http://google.com/url')
+  describe('announcement title', () => {
+    it('includes a link to the announcement for teachers on dashboard', () => {
+      const {getByText} = render(<K5Announcement {...getProps()} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('includes a link to the announcement for teachers in a subject', () => {
+      const {getByText} = render(<K5Announcement {...getProps({showCourseDetails: false})} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('includes a link to the announcement for students in a subject', () => {
+      const {getByText} = render(
+        <K5Announcement {...getProps({canEdit: false, showCourseDetails: false})} />
+      )
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('does not include link to the announcement for students on the dashboard', () => {
+      const {getByText} = render(<K5Announcement {...getProps({canEdit: false})} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBeUndefined()
+    })
   })
 
   it('shows announcement body with rich content', () => {
