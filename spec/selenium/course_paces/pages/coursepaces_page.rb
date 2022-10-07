@@ -82,7 +82,7 @@ module CoursePacesPageObject
   end
 
   def duration_field_selector
-    "[data-testid='duration-number-input']"
+    "[data-testid='flaggable-number-input']"
   end
 
   def duration_readonly_selector
