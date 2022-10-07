@@ -9050,7 +9050,7 @@ de:
           count: "Richtige Anzahl niedrig beurteilter Studierende"
       middle: 
         student: 
-          count: "Richtige Studierendendenanzahl im Mittelfeld"
+          count: "Richtige Studierendenanzahl im Mittelfeld"
       student: 
         count: "Richtige Anzahl Studierender"
         ratio: "Richtiges Studierendenverhältnis"
@@ -13462,7 +13462,7 @@ de:
       group_structure_group_limit: "*Gruppen auf* %{group_limit} Mitglieder beschränken"
       restricted_self_signup: "Gruppenmitglieder müssen demselben Kursabschnitt angehören"
       self_signup_help_tooltip: "Was sind Selbstregistrierungsgruppen?"
-    edit_group_set: "Gruppens bearbeiten"
+    edit_group_set: "Gruppenset bearbeiten"
     errors: 
       category_in_use: "\"%{category_name}\" wird bereits verwendet"
       creating_category_failed: "Erstellung der Kategorie fehlgeschlagen, bitte erneut versuchen"
@@ -25726,7 +25726,7 @@ de:
     student_summary_table_ascending: "Zusammenfassungstabelle für Studenten aufsteigend sortiert nach %{sortText}"
     student_summary_table_descending: "Zusammenfassungstabelle für Studenten absteigend sortiert nach %{sortText}"
   student_tour_38b735c8: Studierendentour
-  student_view_ac9b672f: Studierendendenansicht
+  student_view_ac9b672f: Studierendenansicht
   student_viewed_document_9065adb8: "Von der/dem Studierenden angesehenes Dokument"
   studentcount_student_scores_updated_232ad7b7: 
     one: "1 Punktestand aktualisiert"
