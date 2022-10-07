@@ -49,6 +49,7 @@ const defaultProps = {
   hover: false,
   isStacked: false,
   isStudentPace: false,
+  coursePaceItemChanges: [],
 }
 
 beforeAll(() => {
@@ -74,7 +75,7 @@ describe('AssignmentRow', () => {
   it('renders an input that updates the duration for that module item', () => {
     const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} />)
     const daysInput = getByRole('textbox', {
-      name: 'Duration for module Basic encryption/decryption',
+      name: 'Duration for assignment Basic encryption/decryption',
     }) as HTMLInputElement
     expect(daysInput).toBeInTheDocument()
     expect(daysInput.value).toBe('2')
@@ -117,7 +118,7 @@ describe('AssignmentRow', () => {
   it('disables duration inputs while publishing', () => {
     const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} isSyncing={true} />)
     const daysInput = getByRole('textbox', {
-      name: 'Duration for module Basic encryption/decryption',
+      name: 'Duration for assignment Basic encryption/decryption',
     })
     expect(daysInput).toBeDisabled()
   })
@@ -154,10 +155,26 @@ describe('AssignmentRow', () => {
     )
     expect(
       queryByRole('textbox', {
-        name: 'Duration for module Basic encryption/decryption',
+        name: 'Duration for assignment Basic encryption/decryption',
       })
     ).not.toBeInTheDocument()
     expect(getByText('2')).toBeInTheDocument()
+  })
+
+  it("renders an indicator next to duration picker when there's unsaved changes", () => {
+    const unsavedChangeText = 'Unsaved change'
+    const {queryByText, getByText, rerender} = renderConnected(<AssignmentRow {...defaultProps} />)
+    const daysInput = getByText(
+      'Duration for assignment Basic encryption/decryption'
+    ) as HTMLInputElement
+    expect(daysInput).toBeInTheDocument()
+    expect(queryByText(unsavedChangeText)).not.toBeInTheDocument()
+
+    const coursePaceItemChanges = [
+      {id: PACE_ITEM_1.id, oldValue: PACE_ITEM_1, newValue: {...PACE_ITEM_1, duration: 3}},
+    ]
+    rerender(<AssignmentRow {...defaultProps} coursePaceItemChanges={coursePaceItemChanges} />)
+    expect(getByText(unsavedChangeText)).toBeInTheDocument()
   })
 
   describe('localized', () => {

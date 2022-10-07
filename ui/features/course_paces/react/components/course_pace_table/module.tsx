@@ -214,9 +214,8 @@ export const Module: React.FC<ComponentProps> = props => {
                       as="div"
                       aria-labelledby="days-column-title"
                       alignItems="end"
-                      justifyItems={isStudentPace ? 'center' : 'start'}
+                      justifyItems="center"
                       padding={headerPadding}
-                      margin={`0 0 0 ${isStudentPace || isTableStacked ? '0' : 'xx-small'}`}
                     >
                       <View id="days-column-title">{I18n.t('Days')}</View>
                       <Tooltip

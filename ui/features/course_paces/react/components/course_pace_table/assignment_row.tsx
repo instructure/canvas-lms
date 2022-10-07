@@ -23,6 +23,7 @@ import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
+import {FlaggableNumberInput} from './flaggable_number_input'
 import {Flex} from '@instructure/ui-flex'
 import {
   IconAssignmentLine,
@@ -31,8 +32,6 @@ import {
   IconQuizLine,
   IconUnpublishedLine,
 } from '@instructure/ui-icons'
-import {Tooltip} from '@instructure/ui-tooltip'
-import {NumberInput} from '@instructure/ui-number-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
@@ -46,11 +45,13 @@ import {
   getExcludeWeekends,
   getCoursePaceItemPosition,
   isStudentPace,
+  getCoursePaceItemChanges,
 } from '../../reducers/course_paces'
 import {actions} from '../../actions/course_pace_items'
 import * as DateHelpers from '../../utils/date_stuff/date_helpers'
 import {getShowProjections, getSyncing, getSelectedContextType} from '../../reducers/ui'
 import {getBlackoutDates} from '../../shared/reducers/blackout_dates'
+import {Change} from '../../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_assignment_row')
 
@@ -76,6 +77,7 @@ interface StoreProps {
   readonly showProjections: boolean
   readonly isStudentPace: boolean
   readonly context_type: string
+  readonly coursePaceItemChanges: Change<CoursePaceItem>[]
 }
 
 interface DispatchProps {
@@ -121,7 +123,8 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         nextProps.coursePace.context_id !== this.props.coursePace.context_id) ||
       nextProps.isSyncing !== this.props.isSyncing ||
       nextProps.showProjections !== this.props.showProjections ||
-      nextProps.datesVisible !== this.props.datesVisible
+      nextProps.datesVisible !== this.props.datesVisible ||
+      nextProps.coursePaceItemChanges !== this.props.coursePaceItemChanges
     )
   }
 
@@ -252,30 +255,29 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
     const disabledByBlueprintLock =
       this.props.blueprintLocked && this.props.context_type === 'Course'
+    const itemChange = this.props.coursePaceItemChanges.find(
+      c => c.newValue.module_item_id === this.props.coursePaceItem.module_item_id
+    )
+    const durationHasChanged = itemChange?.oldValue?.duration !== itemChange?.newValue.duration
+
     return (
-      <Tooltip
-        placement="top"
-        color="primary"
-        renderTip={I18n.t('You cannot edit a locked pace')}
-        on={disabledByBlueprintLock ? ['hover', 'focus'] : []}
-      >
-        <NumberInput
-          interaction={this.props.isSyncing || disabledByBlueprintLock ? 'disabled' : 'enabled'}
-          renderLabel={
-            <ScreenReaderContent>
-              Duration for module {this.props.coursePaceItem.assignment_title}
-            </ScreenReaderContent>
-          }
-          data-testid="duration-number-input"
-          display="inline-block"
-          width="5.5rem"
-          value={this.state.duration}
-          onChange={this.onChangeItemDuration}
-          onBlur={this.onBlur}
-          onDecrement={e => this.onDecrementOrIncrement(e, -1)}
-          onIncrement={e => this.onDecrementOrIncrement(e, 1)}
-        />
-      </Tooltip>
+      <FlaggableNumberInput
+        label={
+          <ScreenReaderContent>
+            {I18n.t('Duration for assignment %{name}', {
+              name: this.props.coursePaceItem.assignment_title,
+            })}
+          </ScreenReaderContent>
+        }
+        interaction={this.props.isSyncing || disabledByBlueprintLock ? 'disabled' : 'enabled'}
+        value={this.state.duration}
+        onChange={this.onChangeItemDuration}
+        onBlur={this.onBlur}
+        onDecrement={e => this.onDecrementOrIncrement(e, -1)}
+        onIncrement={e => this.onDecrementOrIncrement(e, 1)}
+        showTooltipOn={disabledByBlueprintLock ? ['hover', 'focus'] : []}
+        showFlag={durationHasChanged}
+      />
     )
   }
 
@@ -364,6 +366,7 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     showProjections: getShowProjections(state),
     isStudentPace: isStudentPace(state),
     context_type: getSelectedContextType(state),
+    coursePaceItemChanges: getCoursePaceItemChanges(state),
   }
 }
 
