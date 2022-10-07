@@ -104,17 +104,27 @@ class ContentParticipation < ActiveRecord::Base
 
       participant ||= add_participation_item(participations, content, user, workflow_state, content_item)
 
-      participant.save! if participant.new_record? || participant.changed?
+      participant.save! if save_participant?(participant, content)
     end
 
     participant
   end
 
+  def self.save_participant?(participant, content)
+    return true if participant.new_record?
+
+    # skip changing the read state if the submission is not posted
+    return false if !content.posted? && participant.workflow_state_changed?
+
+    participant.changed?
+  end
+  private_class_method :save_participant?
+
   def self.create_first_participation_item(participations, content, user, workflow_state, content_item)
     return if participations.any?
 
     participant = build_item(content, user, workflow_state, content_item)
-    participant.unread_count_offset = workflow_state == "unread" ? 1 : 0
+    participant.unread_count_offset = (workflow_state == "unread") ? 1 : 0
 
     participant
   end
@@ -128,7 +138,7 @@ class ContentParticipation < ActiveRecord::Base
     participations -= [participant]
 
     participant.unread_count_offset = if participations.empty? || all_read?(participations)
-                                        workflow_state == "unread" ? 1 : -1
+                                        (workflow_state == "unread") ? 1 : -1
                                       else
                                         0
                                       end

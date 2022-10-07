@@ -754,125 +754,109 @@ describe "/gradebooks/grade_summary" do
   end
 
   describe "visibility feedback student grades page" do
-    let(:course) { Course.create! }
-    let(:teacher) { course.enroll_teacher(User.create!, active_all: true).user }
-    let(:student) { course.enroll_student(User.create!, active_all: true).user }
-    let(:assignment) { course.assignments.create!(peer_reviews: true) }
-    let(:submission) { assignment.submission_for_student(student) }
-
-    before do
-      view_context(course, student)
-      assign(:presenter, GradeSummaryPresenter.new(course, student, nil))
-    end
-
-    context "when the feature flag is enabled" do
-      before do
+    context "with the feature flag on" do
+      before(:once) do
         Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+
+        course_with_student({ active_all: true })
+        @a1 = @course.assignments.create!(submission_types: "online_text_entry")
+        @a2 = @course.assignments.create!(submission_types: "online_text_entry")
+
+        view_context(@course, @student)
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
+
+        @a1.submit_homework(@student, body: "done!")
+        @a2.submit_homework(@student, body: "done!")
       end
 
-      context "submission has unread comments" do
-        before do
-          submission.add_comment(author: teacher, comment: "hello")
-        end
+      it "has no blue dot if no comment, grade or rubric" do
+        render "gradebooks/grade_summary"
 
-        it "displays the region surrounding the icon" do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .toggle_comments_link")
-        end
-
-        it "displays the number of comments" do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .comment_count")
-        end
-
-        it "displays the blue dot" do
-          render "gradebooks/grade_summary"
-          expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_comment_dot")
-        end
+        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+        expect(response).not_to have_tag("#submission_#{@a1.id} td .comment_dot")
+        expect(response).not_to have_tag("#submission_#{@a1.id} td .rubric_dot")
       end
 
-      context "rubric comments" do
-        before do
-          rubric = rubric_model(
-            user: teacher,
-            context: course,
-            data: larger_rubric_data
-          )
-          assignment.create_rubric_association(
-            rubric: rubric,
-            purpose: "grading",
-            use_for_grading: true,
-            context: course
-          )
-        end
+      it "has a blue dot on unread grade" do
+        @a1.grade_student(@student, grader: @teacher, grade: 1)
 
-        context "when rubric has comments" do
-          before do
-            assignment.rubric_association.assess(
-              assessor: teacher,
-              user: student,
-              artifact: submission,
-              assessment: {
-                assessment_type: "grading",
-                criterion_crit1: { comments: "Hmm" }
-              }
-            )
-            student.reload
-          end
+        render "gradebooks/grade_summary"
 
-          it "shows a blue dot" do
-            render "gradebooks/grade_summary"
-            expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
-          end
-        end
+        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+      end
 
-        context "when rubric has been graded" do
-          before do
-            assignment.rubric_association.assess(
-              assessor: teacher,
-              user: student,
-              artifact: submission,
-              assessment: {
-                assessment_type: "grading",
-                criterion_crit1: { points: 5 }
-              }
-            )
-            student.reload
-          end
+      it "has a blue dot on unread grade and comments" do
+        @a1.grade_student(@student, grader: @teacher, grade: 1)
+        @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
 
-          it "shows a blue dot" do
-            render "gradebooks/grade_summary"
-            expect(response).to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
-          end
-        end
+        render "gradebooks/grade_summary"
 
-        context "when rubric has no comment or has not been graded" do
-          before do
-            assignment.rubric_association.assess(
-              assessor: teacher,
-              user: student,
-              artifact: submission,
-              assessment: { assessment_type: "grading" }
-            )
-            student.reload
-          end
+        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+      end
 
-          it "does not show a blue dot" do
-            render "gradebooks/grade_summary"
-            expect(response).not_to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff .unread_rubric_dot")
-          end
-        end
+      it "has a blue dot on unread grade, comments and rubric" do
+        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+        @a1.submissions.first.add_comment(author: @teacher, comment: "Good!")
+
+        rubric_model
+        association = @rubric.associate_with(@a1, @course, purpose: "grading", use_for_grading: true)
+        association.assess({
+                             user: @student,
+                             assessor: @teacher,
+                             artifact: submission,
+                             assessment: { assessment_type: "grading", criterion_crit1: { points: 5, comments: "comments" } }
+                           })
+
+        render "gradebooks/grade_summary"
+
+        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+        expect(response).to have_tag("#submission_#{@a1.id} td .rubric_dot")
+      end
+
+      it "doesn't have blue dot on grade after it has been read" do
+        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+
+        submission.mark_item_read("grade")
+
+        render "gradebooks/grade_summary"
+
+        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+      end
+
+      it "has a blue dot on comment if only grade is marked as read" do
+        submission = @a1.grade_student(@student, grader: @teacher, grade: 1).first
+        submission.add_comment(author: @teacher, comment: "Good!")
+        submission.mark_item_read("grade")
+
+        render "gradebooks/grade_summary"
+
+        expect(response).not_to have_tag("#submission_#{@a1.id} td .grade_dot")
+        expect(response).to have_tag("#submission_#{@a1.id} td .comment_dot")
+      end
+
+      it "has a blue dot for unread grades on each submission" do
+        @a1.grade_student(@student, grader: @teacher, grade: 1)
+        @a2.grade_student(@student, grader: @teacher, grade: 1)
+
+        render "gradebooks/grade_summary"
+
+        expect(response).to have_tag("#submission_#{@a1.id} td .grade_dot")
+        expect(response).to have_tag("#submission_#{@a2.id} td .grade_dot")
       end
     end
 
     context "when the feature flag is disabled" do
-      before do
-        Account.site_admin.disable_feature!(:visibility_feedback_student_grades_page)
-        submission.add_comment(author: teacher, comment: "hello")
+      before(:once) do
+        course_with_student({ active_all: true })
+
+        view_context(@course, @student)
+        assign(:presenter, GradeSummaryPresenter.new(@course, @student, nil))
       end
 
       it "does not have the visibility_feedback_ff class" do
-        expect(response).not_to have_tag("#submission_#{submission.assignment_id} .visibility_feedback_ff")
+        expect(response).not_to have_tag("#grades_summary .visibility_feedback_ff")
       end
     end
   end

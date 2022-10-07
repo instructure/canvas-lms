@@ -153,6 +153,7 @@ class GradeSummaryAssignmentPresenter
     classes << special_class
     classes << "excused" if excused?
     classes << "extended" if extended?
+    classes << "feedback_visibility_ff" if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
     classes.join(" ")
   end
 
