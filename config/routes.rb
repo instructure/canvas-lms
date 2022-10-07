@@ -2456,6 +2456,10 @@ CanvasRails::Application.routes.draw do
       patch "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :update, as: :patch_student_enrollment_pace
       delete "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :delete, as: :delete_student_enrollment_pace
     end
+
+    scope(controller: "course_pacing/pace_contexts_api") do
+      get "courses/:course_id/pace_contexts", action: :index, as: :pace_contexts
+    end
   end
 
   # this is not a "normal" api endpoint in the sense that it is not documented or
