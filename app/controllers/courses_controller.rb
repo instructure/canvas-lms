@@ -508,11 +508,14 @@ class CoursesController < ApplicationController
           css_bundle :context_list, :course_list
           js_bundle :course_list
 
+          create_permission_root_account = @current_user.create_courses_right(@domain_root_account)
+          create_permission_mcc_account = @current_user.create_courses_right(@domain_root_account.manually_created_courses_account)
+
           js_env({
                    CREATE_COURSES_PERMISSIONS: {
-                     PERMISSION: ccr = @current_user.create_courses_right(@current_user.sub_account_for_course_creation(@domain_root_account)),
-                     RESTRICT_TO_MCC_ACCOUNT: ccr && !@domain_root_account.grants_any_right?(@current_user, session, :manage_courses, :create_courses)
-                   },
+                     PERMISSION: create_permission_root_account || create_permission_mcc_account,
+                     RESTRICT_TO_MCC_ACCOUNT: !!(!create_permission_root_account && create_permission_mcc_account)
+                   }
                  })
 
           set_k5_mode(require_k5_theme: true)
@@ -822,7 +825,8 @@ class CoursesController < ApplicationController
   #
   # @returns Course
   def create
-    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @current_user.sub_account_for_course_creation(@domain_root_account)
+    @account = params[:account_id] ? api_find(Account, params[:account_id]) : @domain_root_account.manually_created_courses_account
+
     if authorized_action(@account, @current_user, [:manage_courses, :create_courses])
       params[:course] ||= {}
       params_for_create = course_params
