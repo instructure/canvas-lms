@@ -96,15 +96,6 @@ describe ApplicationHelper do
       account_admin_user
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
-
-    it "works for a sub-account admin" do
-      @sub_account = Account.create!(parent_account: @domain_root_account)
-      @sub_sub_account = Account.create!(parent_account: @sub_account)
-      @sub_admin = account_admin_user(account: @sub_account)
-      @sub_sub_admin = account_admin_user(account: @sub_sub_account)
-      expect(show_user_create_course_button(@sub_admin)).to be_truthy
-      expect(show_user_create_course_button(@sub_sub_admin)).to be_truthy
-    end
   end
 
   describe "tomorrow_at_midnight" do
