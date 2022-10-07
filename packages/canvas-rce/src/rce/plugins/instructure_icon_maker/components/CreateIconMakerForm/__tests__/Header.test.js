@@ -57,8 +57,8 @@ describe('<Header />', () => {
 
     it('disables the alt text input', () => {
       const header = <Header settings={settings} onChange={jest.fn()} />
-      const {getByRole} = render(header)
-      const textArea = getByRole('textbox', {name: /Alt Text/})
+      const {container} = render(header)
+      const textArea = container.querySelector('#icon-alt-text')
       expect(textArea).toBeDisabled()
     })
   })
