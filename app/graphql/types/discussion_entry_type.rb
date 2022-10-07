@@ -42,7 +42,7 @@ module Types
     def message
       if object.deleted?
         nil
-      elsif object.message.include?("instructure_inline_media_comment")
+      elsif object.message&.include?("instructure_inline_media_comment")
         load_association(:discussion_topic).then do |topic|
           Loaders::ApiContentAttachmentLoader.for(topic.context).load(object.message).then do |preloaded_attachments|
             GraphQLHelpers::UserContent.process(

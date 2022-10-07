@@ -62,6 +62,23 @@ describe Types::DiscussionEntryType do
     expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
   end
 
+  it "returns successfully on nil messages" do
+    parent_entry = discussion_entry.discussion_topic.discussion_entries.create!(message: "sub entry", user: @teacher, parent_id: discussion_entry.id, editor: @teacher)
+    parent_entry.message = nil
+    parent_entry.save!
+    type = GraphQLTypeTester.new(parent_entry, current_user: @teacher)
+    expect(type.resolve("discussionTopicId")).to eq parent_entry.discussion_topic_id.to_s
+    expect(type.resolve("parentId")).to eq parent_entry.parent_id.to_s
+    expect(type.resolve("rootEntryId")).to eq parent_entry.root_entry_id.to_s
+    expect(type.resolve("message")).to be_nil
+    expect(type.resolve("ratingSum")).to eq parent_entry.rating_sum
+    expect(type.resolve("ratingCount")).to eq parent_entry.rating_count
+    expect(type.resolve("deleted")).to eq parent_entry.deleted?
+    expect(type.resolve("author { _id }")).to eq parent_entry.user_id.to_s
+    expect(type.resolve("editor { _id }")).to eq parent_entry.editor_id.to_s
+    expect(type.resolve("discussionTopic { _id }")).to eq parent_entry.discussion_topic.id.to_s
+  end
+
   it "has an attachment" do
     a = attachment_model
     discussion_entry.attachment = a
