@@ -3130,7 +3130,11 @@ class CoursesController < ApplicationController
 
       @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
+      # Saving master course setting for statsd logging later
+      @old_save_master_course = false
+      @new_save_master_course = false
       if params[:course].key?(:blueprint)
+        @old_save_master_course = MasterCourses::MasterTemplate.is_master_course?(@course)
         master_course = value_to_boolean(params[:course].delete(:blueprint))
         if master_course != MasterCourses::MasterTemplate.is_master_course?(@course)
           return unless authorized_action(@course.account, @current_user, :manage_master_courses)
@@ -3141,6 +3145,7 @@ class CoursesController < ApplicationController
           else
             action = master_course ? "set" : "remove"
             MasterCourses::MasterTemplate.send("#{action}_as_master_course", @course)
+            @new_save_master_course = master_course
           end
         end
       end
@@ -3210,6 +3215,18 @@ class CoursesController < ApplicationController
           # force the user to refresh the page after the job finishes to see the changes
           @course.sync_homeroom_participation
         end
+
+        # Increment a log if both master course and course pacing are on
+        if @old_save_master_course == @new_save_master_course
+          if !changes[:enable_course_paces].nil? && (changes[:enable_course_paces][1] && MasterCourses::MasterTemplate.is_master_course?(@course))
+            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+          end
+        elsif @old_save_master_course == false && @new_save_master_course == true
+          if @course.enable_course_paces == true
+            InstStatsd::Statsd.increment("course.paced.blueprint_course")
+          end
+        end
+
         render_update_success
       else
         render_update_failure
