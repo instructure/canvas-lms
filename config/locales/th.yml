@@ -308,6 +308,7 @@ th:
   account_name_7f63a13: ชื่อบัญชี
   account_name_analytics_62bf60ae: "ข้อมูลวิเคราะห์ของ %{account.name}"
   account_name_bff54ed5: ชื่อบัญชี
+  account_name_number_of_children_accounts_775badf2: "บัญชีผู้ใช้ %{account_name}, %{number_of_children}"
   account_navigation_80bbefd4: การสืบค้นบัญชี
   account_navigation_menu_10c05bf9: เมนูการสืบค้นบัญชี
   account_notification: 
@@ -1528,6 +1529,7 @@ th:
   add_8523c19b: เพิ่ม
   add_a_build_button_on_the_assignment_edit_page_for_6b895561: "เพิ่มปุ่ม จัดทำ ในหน้าแก้ไขภารกิจสำหรับ ภารกิจแบบทดสอบใหม่"
   add_a_comment_872470ac: เพิ่มความเห็น
+  add_a_comment_to_complete_your_peer_review_you_wil_65fbaabb: "เพิ่มความเห็นเพื่อจัดทำความคิดเห็นจากผู้เกี่ยวข้องของคุณ คุณจะเห็นเฉพาะความเห็นที่คุณเขียนเท่านั้น"
   add_a_course_b72b18d7: เพิ่มบทเรียน
   add_a_message_4fee743f: "เพิ่มข้อความ "
   add_a_new_course_4a041207: เพิ่มบทเรียนใหม่
@@ -1872,6 +1874,7 @@ th:
   allow_migration_of_quizzes_during_course_copy_and__35d80756: อนุญาตการโอนย้ายแบบทดสอบระหว่างการคัดลอกและนำเข้าบทเรียน
   allow_moderator_to_review_multiple_independent_gra_c59d64f6: "อนุญาตให้ผู้ควบคุมพิจารณาเกรดหลาย ๆ รายการสำหรับผลงานจัดส่งที่เลือกแบบเป็นอิสระ"
   allow_multiple_attempts_e67a0a37: อนุญาตให้ดำเนินการได้หลายครั้ง
+  allow_multiple_file_ags_submissions_to_count_as_on_6e24aa34: "อนุญาตให้มีผลงานจัดส่ง AGS เป็นไฟล์ข้อมูลหลายชุดเป็นผลงานจัดเสียงเดียว"
   allow_opt_out_of_inbox: "อนุญาตให้ผู้ใช้สามารถถอนตัวจากการรับเมลการพูดคุย รายการนี้จะทำให้ข้อความการพูดคุยและการแจ้งข้อมูลทั้งหมดถูกจัดส่งเป็นการแจ้งข้อมูลแบบเร่งด่วนไปยังอีเมลหลักของผู้ใช้ ปิดซ่อนตราสัญลักษณ์ข้อความที่ไม่ได้อ่านในกล่องจดหมายสำหรับการพูดคุยในกล่องจดหมายและซ่อนค่าปรับแต่งการแจ้งข้อมูลการพูดคุย"
   allow_outcome_extra_credit_57c1e84e: อนุญาตเครดิตพิเศษสำหรับผลลัพธ์
   allow_passive_acceptance_of_terms_of_service_63ef5994: อนุญาตการตอบรับโดยปริยายสำหรับเงื่อนไขการให้บริการ
@@ -3499,6 +3502,7 @@ th:
   availability_8942cde6: ความพร้อม
   availability_dates_438d71e0: วันที่พร้อมใช้งาน
   availability_dates_changed_exceptions_465ba375: "ข้อยกเว้นในการแก้ไขวันที่พร้อมใช้งาน:"
+  availability_e415e857: "ความพร้อม:"
   available_2ed9f226: "พร้อมใช้:"
   available_8606e40c: พร้อมใช้
   available_after_3416802b: พร้อมใช้หลังจาก
@@ -4439,6 +4443,7 @@ th:
   click_to_edit_drag_to_reorder_ab725681: "คลิกเพื่อแก้ไข ให้ลากเพื่อเรียงลำดับใหม่"
   click_to_enter_comments_if_the_student_chooses_thi_507c20f6: "คลิกเพื่อกรอกความเห็น หากผู้เรียนเลือกคำตอบนี้"
   click_to_expand_outcome_details_74a2a967: คลิกเพื่อขยายรายละเอียดผลลัพธ์
+  click_to_fix_4f5a9a9c: คลิกเพื่อแก้ไข
   click_to_hide_details_f7d353d9: คลิกเพื่อซ่อนรายละเอียด
   click_to_launch_assessment_9434b1fd: คลิกเพื่อเรียกใช้ส่วนการประเมิน
   click_to_load_a020891b: (คลิกเพื่อโหลด)
@@ -4885,6 +4890,7 @@ th:
   conference_name_fdb7e091: ชื่อการประชุม
   conference_participant_count_87e86c5c: จำนวนผู้เข้าร่วมการประชุม
   conference_recorded_7e776ec2: บันทึกการประชุมแล้ว
+  conference_saved_7dad9c3e: บันทึกการประชุมแล้ว
   conference_saved_8895cfbc: บันทึกการประชุมแล้ว!
   conference_selection_ea4050bb: การเลือกการประชุม
   conference_type_2f4ac9be: ประเภทการประชุม
@@ -4943,6 +4949,7 @@ th:
       settings: ค่าปรับตั้ง
       start: เริ่ม
       sync: ซิงค์ผู้เข้าร่วม
+      to: เป็น
       type: "%{type}"
     no_concluded_conferences: ไม่มีการประชุมที่สรุปแล้ว
     no_new_conferences: ไม่มีการประชุมใหม่
@@ -5953,6 +5960,7 @@ th:
     errors: 
       sis_in_use: "SIS ID \"%{sis_id}\" ถูกใช้งานอยู่"
     file_copy_error: "ไม่สามารถคัดลอกไฟล์ \"%{name}\""
+    files: ไฟล์
     grade_export_types: 
       instructure_csv: "CSV ที่กำหนดรูปแบบโดย Instructure"
     institution: สถาบัน
@@ -6182,6 +6190,7 @@ th:
   course_pacing_blackout_dates_1dfc8b61: "วันที่ไม่พร้อมใช้งานของ Course Pacing"
   course_pacing_d3025ecf: "เส้นทางบทเรียน:"
   course_pacing_is_in_active_development_348e33cf: "Course Pacing อยู่ระหว่างการพัฒนา"
+  course_pacing_redesign_38edfc1c: การปรับรูปแบบโครงสร้างศึกษาเนื้อหาบทเรียน
   course_pages_449f1dd4: หน้าบทเรียน
   course_participation_and_access_settings_7a3d6297: ค่าปรับตั้งการเข้าร่วมบทเรียนและการสืบค้น
   course_participation_is_limited_to_course_start_an_7315866d: "การเข้าร่วมบทเรียนจำกัดเฉพาะระหว่างวันที่เริ่มต้นและสิ้นสุดของ*บทเรียน* วันที่สำหรับกลุ่มย่อยที่จัดทำในบทเรียนจะเป็นการบอกล้างวันที่ของบทเรียน"
@@ -6562,6 +6571,7 @@ th:
         cannot_unpublish_course: คุณไม่สามารถยกเลิกการเผยแพร่บทเรียนนี้ได้หากมีผลงานจัดส่งของผู้เรียนที่ให้เกรดแล้ว
       turnitin: "ความเห็นเหล่านี้จะจัดแสดงให้แก่ผู้เรียนขณะจัดส่งภารกิจที่เปิดใช้งานโดย Turnitin"
       view_grading_scheme: ดูรูปแบบการให้เกรด
+      visibility_option: "ตัวเลือกการแสดงผล %{type}"
       wiki_editing_roles_change_existing: "ปรับเปลี่ยนเพจที่แก้ไขได้ในปัจจุบันโดย \"%{current_setting}\" เป็น \"%{new_setting}\""
     settings_sidebar: 
       buttons: 
@@ -7786,6 +7796,7 @@ th:
   duration_hours_hours_and_minutes_minutes_d5da8c3: "ระยะเวลา: %{hours} ชั่วโมงและ %{minutes} นาที"
   duration_in_minutes_8959f63e: ระยะเวลาเป็นนาที
   duration_minutes_minutes_d7b9182b: "ระยะเวลา: %{minutes} นาที"
+  duration_must_be_less_than_99_999_999_minutes_ec7b116d: "ระยะเวลาต้องยาวน้อยกว่า 99,999,999 นาที"
   dutch_6d05cee5: เนเธอร์แลนด์
   dynamic_concurrency_231dbdc5: ความสอดพ้องแบบแปรผัน
   e_c2991d1b: e
@@ -7979,14 +7990,18 @@ th:
   enable_individual_learning_paths_for_students_base_5236d3bb: เปิดใช้งานเส้นทางการเรียนรู้แยกเฉพาะสำหรับผู้เรียนตามการประเมิน
   enable_migrating_item_banks_to_new_quizzes_during__af6ca020: เปิดใช้งานการโอนย้ายแถวรายการไปยังแบบทดสอบใหม่ระหว่างการนำเข้า/คัดลอกบทเรียน
   enable_moderated_grading_bacd20d8: เปิดใช้งานการให้เกรดแบบมีการปรับประสาน
+  enable_new_quizzes_to_refresh_service_jwts_used_by_af54fd97: "เปิดใช้งานแบบทดสอบใหม่ (New Quizzes) เพื่อรีเฟรช Service JWTs ที่ใช้โดย RCE"
   enable_new_sis_integration_settings_ab6780a4: "เปิดใช้งานค่าปรับตั้งการผสานรวม SIS ใหม่"
   enable_notifications_for_contextname_b5b4440e: "เปิดใช้งานการแจ้งข้อมูลสำหรับ %{contextName}"
   enable_recaptcha_by_default_for_self_registration_af9d50bd: "เปิดใช้งาน Recaptcha เป็นค่าเริ่มต้นสำหรับการลงทะเบียนด้วยตัวเอง"
   enable_recording_for_this_conference_b8adff6: เปิดใช้งานการบันทึกสำหรับการประชุมนี้
   enable_reregistration_for_lti_2_b2a10444: "เปิดใช้งานการลงทะเบียนซ้ำสำหรับ LTI 2"
   enable_scope_ac28b832: เปิดใช้งานขอบเขต
+  enable_the_deprecation_of_the_faculty_journal_func_78b3344d: เปิดใช้งานการคัดค้านฟังก์ชั่นบันทึกสำหรับภาควิชา
+  enable_the_redesigned_course_pacing_user_experienc_21618a38: เปิดใช้งานโครงสร้างศึกษาเนื้อหาที่ปรับรูปแบบใหม่สำหรับผู้ใช้
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "เปิดใช้งานแท็บ การรักษาความปลอดภัย ในหน้าค่าปรับตั้งเพื่อปรับค่าปรับตั้ง CSP"
   enable_unique_course_paces_for_course_sections_adebf96f: "รองรับรูปแบบการศึกษาบทเรียนในรูปแบบเฉพาะสำหรับหัวข้อต่าง ๆ ในบทเรียน"
+  enable_unique_course_paces_for_students_7beac4f3: เปิดใช้งานโครงสร้างศึกษาเนื้อหาบทเรียนสำหรับผู้เรียน
   enable_waiting_room_fcbcac93: เปิดใช้งานห้องรอ
   enabled_and_locked_49ff3de4: เปิดใช้งานและล็อคแล้ว
   enabled_ba7cab66: เปิดใช้งานแล้ว
@@ -8008,12 +8023,14 @@ th:
   encourage_student_discourse_7836b9f7: สนับสนุนการพูดคุยเชิงลึกของผู้เรียน
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedids แบบเข้ารหัสสำหรับผลลัพธ์พื้นฐาน"
   end_78c581cd: สิ้นสุด
+  end_at_544d7d4: "สิ้นสุดเมื่อ: "
   end_at_must_be_later_than_start_at_3b673851: สิ้นสุดเมื่อจะต้องอยู่หลังจากเริ่มเมื่อ
   end_course_set_up_tutorial_f358b85d: สิ้นสุดข้อมูลแนะนำการตั้งค่าบทเรียน
   end_date_cannot_be_before_start_date_eb62ed6d: วันที่สิ้นสุดจะอยู่ก่อนวันที่เริ่มต้นไม่ได้
   end_date_e0093ed7: วันที่สิ้นสุด
   end_date_for_conference_eaff0807: วันที่สิ้นสุดสำหรับการประชุม
   end_date_from_cdd9d90: "วันที่สิ้นสุด จาก:"
+  end_date_time_must_be_later_than_start_date_time_aecc88f4: วันที่/เวลาสิ้นสุดจะต้องอยู่หลังจากวันที่/เวลาเริ่มต้น
   end_date_to_8b17929d: "วันที่สิ้นสุด ถึง:"
   end_date_value_3d3e8906: "วันที่สิ้นสุด %{value}"
   end_dates_249d8dbb: "วันที่สิ้นสุด:"
@@ -8634,6 +8651,7 @@ th:
   export_pairing_codes_5749f6f1: ส่งออกรหัสเข้าคู่
   export_report_7c5899e: ส่งออกรายงาน
   exported_package_history_bfca44b9: ส่งออกประวัติแพคเกจแล้ว
+  exporting_filename_ea2441ad: "กำลังส่งออก %{filename}"
   extend_assignment_due_dates_in_course_pacing_5ab23f52: "ขยายวันครบกำหนดของภารกิจใน Course Pacing"
   extend_due_date_20651e76: ขยายวันครบกำหนด
   extended_632ebee0: เพิ่มเติม
@@ -8694,6 +8712,7 @@ th:
   extract_error_error_file_names_a4989ed0: "คัดแยกข้อผิดพลาด, %{error}: %{file_names}"
   extreme_critical_emergency_80b3dbda: กรณีฉุกเฉินอย่างยิ่ง!
   faculty_journal_5634938e: บันทึกสำหรับภาควิชา
+  faculty_journal_deprecation_1f18f7ab: การคัดค้านบันทึกสำหรับภาควิชา
   faculty_journal_manage_entries_efc09599: "บันทึกสำหรับภาควิชา - จัดการรายการ"
   fail_62dbb06a: ล้มเหลว
   failed_276786d: ล้มเหลว
@@ -8772,6 +8791,7 @@ th:
   failed_to_save_selected_calendars_210b5e8f: ไม่สามารถบันทึกปฏิทินที่เลือก
   failed_to_split_users_d9759007: ไม่สามารถแยกผู้ใช้
   failed_to_submit_draft_comment_1de83451: ไม่สามารถแยกความเห็นร่าง
+  failed_to_unblock_strand_singleton_b33324c1: ไม่สามารถปลดบล็อคชุดกระบวนงาน/งานแยกเดี่ยวได้
   failed_to_update_account_notification_settings_194c1cd4: ไม่สามารถอัพเดตค่าปรับตั้งการแจ้งข้อมูลทางบัญชี
   failed_to_update_course_notification_settings_cbf0eb18: ไม่สามารถอัพเดตค่าปรับการแจ้งข้อมูลบทเรียน
   failed_to_update_discussion_23cc229a: ไม่สามารถอัพเดตการพูดคุย
@@ -9270,7 +9290,10 @@ th:
   gradebook_csv_export_assignment_order_matches_the__9044f08e: "คำสั่งสำหรับภารกิจการส่งออก CSV สมุดบันทึกเกรดตรงกับตารางสมุดบันทึกเกรด"
   gradebook_csvs: 
     grades_filename: เกรด
+  gradebook_export_failed_error_57442a4c: "ส่งออกสมุดบันทึกเกรดล้มเหลว: %{error}"
   gradebook_export_failed_reason_2b0f6c53: "ส่งออกสมุดบันทึกเกรดล้มเหลว: %{reason}"
+  gradebook_export_has_completed_5d535028: ส่งออกสมุดบันทึกเกรดเสร็จสิ้น
+  gradebook_export_has_started_this_may_take_a_few_m_11b5b7a8: "เริ่มส่งออกสมุดบันทึกเกรดแล้ว อาจต้องใช้เวลาสักครู่"
   gradebook_export_started_723461b9: เริ่มส่งออกสมุดบันทึกเกรดแล้ว
   gradebook_filters_fc25f772: ตัวกรองสมุดบันทึกเกรด
   gradebook_history_a3e8e0b4: ประวัติสมุดบันทึกเกรด
@@ -10038,6 +10061,7 @@ th:
   hide_name_and_profile_picture_d18eed70: ซ่อนชื่อและภาพโพรไฟล์
   hide_name_details_23814c37: "ซ่อน %{name} รายละเอียด"
   hide_navigation_menu_f0b3e90: ซ่อนเมนูการสืบค้นเนื้อหา
+  hide_outcomes_statistics_7d3bac45: ซ่อนสถิติผลลัพธ์
   hide_outcomes_with_no_results_7e4ce06f: ซ่อนผลลัพธ์ที่ไม่มีผลลัพธ์
   hide_params_eadf0961: ซ่อนพารามิเตอร์
   hide_projections_9d4ed1e1: ซ่อนข้อมูลคาดการณ์
@@ -10265,6 +10289,9 @@ th:
   if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
       หากเปิดใช้งานไว้ การสืบค้นของ GraphQL จะไม่กำหนดให้
       ผู้ใช้ต้องลงชื่อเข้าใช้หรือใช้ชุดข้อมูลการใช้งาน
+  if_enabled_lti_tools_installed_in_federated_parent_a2d3afe8: |-
+      หากเปิดใช้งาน เครื่องมือ LTI ที่ติดตั้งในบัญชีต้นทางแบบพ่วงกันจะ
+      พร้อมใช้งาน/แสดงผลในบัญชีเชื่อมโยง
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "หากเปิดใช้งานไว้ สามารถใช้การลงชื่อสำหรับ OAuth 1.0a โดยเครื่องมือ LTI เพื่อใช้งาน API บริการสำหรับสมาชิกภาพ"
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       หากเปิดใช้งานไว้ ปลายทาง oEmbed จะร้องขอ
@@ -10531,6 +10558,7 @@ th:
   information_icon_8a514faa: ไอคอนข้อมูล
   inherit_content_security_policy_94aff861: นโยบายความปลอดภัยสำหรับเนื้อหา
   inherit_course_name_b40df46: "รับต่อ (%{course_name})"
+  inherit_from_course_ed8bde8c: "รับช่วงจากบทเรียน (Course)"
   inherited_d4d0bc33: รับต่อแล้ว
   inherited_developer_keys_table_e4a65b67: ตารางคีย์สำหรับผู้พัฒนาที่รับต่อเข้ามา
   initial_sync_incomplete_ec74fe8e: ซิงค์เบื้องต้นเสร็จสิ้น
@@ -10552,6 +10580,7 @@ th:
   installed_7b284a91: ติดตั้งแล้ว
   institution_14179014: สถาบัน
   institution_announcement_announcement_title_f017c1e0: "ประกาศของสถาบัน: \"%{announcement_title}\""
+  institution_members_325dcad8: สมาชิกของสถาบัน
   instructions: 
     authorize_google_drive: "ก่อนสามารถทำความร่วมมือสำหรับเอกสาร คุณจะต้องให้อนุญาต Canvas ในการใช้งานบัญชี Google Drive ของคุณ:"
   instructions_2f88ee72: คำแนะนำ
@@ -10850,6 +10879,7 @@ th:
   k12_description: "อัพเดตไอคอนในเมนูสืบค้นเนื้อหาส่วนกลางที่สมเหตุสมผลมากกว่า โดยเฉพาะในกลุ่ม K-12"
   k_2521301c: k
   kazakhstan_7_8fe892c: "คาซัคสถาน (+7)"
+  keep_8f3e7c16: เก็บไว้
   keep_editing_11ff42e5: แก้ไขต่อไป
   keep_in_mind_this_submission_will_count_for_everyo_9b18472c: "ผลงานจัดส่งนี้จะพิจารณาสำหรับทุกคนในกลุ่ม %{groupName} ของคุณ"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "ผลงานจัดส่งนี้จะพิจารณาสำหรับทุกคนในกลุ่ม %{groupType} ของคุณ"
@@ -13536,8 +13566,10 @@ th:
   more_modules_d9a9f003: หน่วยการเรียนเพิ่มเติม
   more_options_272b4953: ตัวเลือกเพิ่มเติม
   more_options_e89670cf: ตัวเลือกเพิ่มเติม
+  more_outcomes_have_been_loaded_9acafe9c: โหลดผลลัพธ์เพิ่มเติมแล้ว
   more_people_options_730e9686: "ตัวเลือก บุคคล เพิ่มเติม"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: ผลลัพธ์เพิ่มเติมถูกเพิ่มไปยังด้านล่างของเพจ
+  more_search_results_have_been_loaded_13f3872a: โหลดผลการค้นหาเพิ่มเติมแล้ว
   more_submission_options_c8d50818: ตัวเลือกการจัดส่งเพิ่มเติม
   more_than_999_submissions_need_grading_bc087dd0: "ผลงานจัดส่งมากกว่า 999 รายการจะต้องมีการให้เกรด"
   more_than_a19b440: "%{more_than}+"
@@ -13811,6 +13843,7 @@ th:
   new_quizzes_migration_enabled_by_default_5f9bcc81: การโอนย้ายแบบทดสอบใหม่ถูกเปิดใช้งานเป็นค่าเริ่มต้น
   new_quizzes_migration_required_7854aa1a: ต้องโอนย้ายแบบทดสอบใหม่
   new_quizzes_on_the_quizzes_page_b21f338d: แบบทดสอบใหม่ในเพจแบบทดสอบ
+  new_quizzes_service_jwt_refresh_ca28ca8: "รีเฟรช JWT บริการสำหรับแบบทดสอบใหม่"
   new_quizzes_site_admin_service_user_a331233a: ผู้ใช้บริการผู้ดูแลไซต์สำหรับแบบทดสอบใหม่
   new_quizzes_submission_274b5c57: ผลงานการจัดส่งแบบทดสอบใหม่
   new_quizzes_submission_history_d81b477b: ประวัติการจัดส่งแบบทดสอบใหม่
@@ -13955,6 +13988,7 @@ th:
   no_results_found_for_searchterm_7ee9b03e: "ไม่พบผลลัพธ์สำหรับ %{searchTerm}"
   no_results_match_searchterm_f28e50e0: "ไม่พบผลลัพธ์ที่ตรงกับ \"%{searchTerm}\""
   no_score_yet_c94e919b: ยังไม่มีคะแนน
+  no_search_results_found_5f156ff9: ไม่พบผลการค้นหา
   no_start_date_6e81c22b: ไม่มีวันที่เริ่มต้น
   no_student_is_being_observed_to_select_a_student_r_73301db2: "ไม่มีผู้เรียนที่กำลังสังเกตการณ์ เลือกผู้เรียนโดยกลับไปที่แผงข้อมูล"
   no_students_being_observed_42e11732: ไม่มีผู้เรียนที่ถูกสังเกตการณ์อยู่
@@ -14466,6 +14500,7 @@ th:
   only_add_posts_with_a_specific_phrase_in_the_title_b8b7b04e: เพิ่มโพสต์ที่มีวลีเฉพาะในชื่อเท่านั้น
   only_after_their_last_attempt_3593d101: หลังจากการดำเนินการล่าสุดสำหรับคนเหล่านี้เท่านั้น
   only_available_to_students_with_link_107e2468: เฉพาะผู้เรียนที่มีลิงค์เท่านั้น
+  only_available_with_link_5ffb9492: จัดไว้ให้พร้อมลิงค์เท่านั้น
   only_collect_grades_that_have_been_graded_since_th_96baed94: "รวบรวมเฉพาะเกรดที่คำนวณแล้วนับตั้งแต่เวลา start_at"
   only_course_announcements_and_discussions_can_be_s_924d4386: เฉพาะประกาศสำหรับบทเรียนและการพูดคุยที่สามารถกำหนดเฉพาะสำหรับกลุ่มย่อย
   only_csv_files_are_supported_e1ad5270: "รองรับเฉพาะไฟล์ CSV"
@@ -14854,6 +14889,7 @@ th:
   peer_632472b7: "เพื่อนร่วมงาน:"
   peer_review_74f26a13: ความคิดเห็นจากผู้เกี่ยวข้อง
   peer_review_assignment_7d314c59: ภารกิจความคิดเห็นจากผู้เกี่ยวข้อง
+  peer_review_comments_71cb4605: ความเห็นจากผู้เกี่ยวข้อง
   peer_review_due_dueattext_20987412: "ความคิดเห็นจากผู้เกี่ยวข้องที่ครบกำหนด %{dueAtText}"
   peer_review_due_eb63af38: ความคิดเห็นจากผู้เกี่ยวข้องที่ครบกำหนด
   peer_review_for_assignment_ce72fc52: "ความคิดเห็นจากผู้เกี่ยวข้องสำหรับ %{assignment}"
@@ -14881,6 +14917,7 @@ th:
   people_tutorial_tray_a87a6c48: ถาดข้อมูลแนะนำบุคคล
   people_will_see_this_name_in_discussions_messages__fca9ebb2: "บุคคลจะเห็นชื่อนี้ในส่วนการพูดคุย ข้อความและความเห็น"
   per_section_course_paces_4ce20ab7: ตามโครงสร้างศึกษาเนื้อหาบทเรียนเป็นหัวข้อ
+  per_student_course_paces_159026d2: โครงสร้างศึกษาเนื้อหาบทเรียนสำหรับผู้เรียนแต่ละราย
   percent_448ea947: เปอร์เซ็นต์
   percent_af88d1b1: "%{percent}%"
   percent_complete_3a7edc20: "%{percent} เสร็จสิ้น"
@@ -14891,6 +14928,7 @@ th:
   percent_of_students_scored_score_53d2c4d5: "%{percent} ของผู้เรียนได้คะแนน %{score}"
   percent_of_students_scoring_1239d948: เปอร์เซ็นต์ที่ทำคะแนน
   percentage_34ab7c2c: เปอร์เซ็นต์
+  percentdone_percent_edd66f1b: "%{percentDone} เปอร์เซ็นต์"
   percentused_of_bytesavailable_used_a859a40d: "ใช้ไป %{percentUsed} จาก %{bytesAvailable}"
   performance_ac5f9e70: ประสิทธิภาพ
   performed_by_70b3ce96: ดำเนินการโดย
@@ -17789,6 +17827,7 @@ th:
   saving_the_csp_status_failed_please_try_again_8275aaa4: "การบันทึกสถานะ CSP ล้มเหลว กรุณาลองใหม่อีกครั้ง"
   scale_mathman_equation_images_to_match_the_size_of_2bca4e2e: "กำหนดสัดส่วนภาพสมการ mathman ให้ตรงกับขนาดของแบบอักษรล้อมรอบ"
   scantron_quiz_4a97a17a: "แบบทดสอบ Scantron"
+  schedule_availability_ad09a2e5: นัดหมายเวลาที่พร้อม
   schedule_e5dd4c32: กำหนดเวลา
   schedule_student_availability_332154a: กำหนดเวลาความพร้อมของผู้เรียน
   scheduled_date_5b0aedb6: "วันที่ที่กำหนด: "
@@ -18862,6 +18901,7 @@ th:
   show_key_1fbf0c64: แสดงคีย์
   show_less_d5bbf728: แสดงน้อยลง
   show_links_to_unpublished_content_30c0450d: แสดงลิงค์ไปยังเนื้อหาที่ไม่ได้เผยแพร่
+  show_lti_tools_from_federated_parent_accounts_47135c98: "แสดงเครื่องมือ LTI จากบัญชีต้นทางแบบองค์รวม"
   show_more_8d5f918b: แสดงเพิ่ม
   show_more_af9cbc16: แสดงเพิ่มเติม
   show_more_fae1328: แสดงเพิ่มเติม
@@ -18878,6 +18918,7 @@ th:
   show_only_blueprint_courses_9fb37b41: แสดงเฉพาะบทเรียนพิมพ์เขียว
   show_only_disabled_calendars_cb8e2bdc: แสดงเฉพาะปฏิทินที่ปิดใช้งาน
   show_only_enabled_calendars_8caef0df: แสดงเฉพาะปฏิทินที่เปิดใช้งาน
+  show_outcomes_statistics_3c2b34eb: แสดงสถิติผลลัพธ์
   show_params_3401895b: แสดงพารามิเตอร์
   show_projections_32a3756: แสดงข้อมูลคาดการณ์
   show_quartiles_for_grades_and_use_them_for_box_and_e9be0a23: "แสดงควอร์ไทล์สำหรับเกรดและใช้สำหรับ Box และ Whisker"
@@ -18898,6 +18939,7 @@ th:
   showing_count_outcomes_for_grouptitle_32d7988b: 
     one: "กำลังแสดง %{count} ผลลัพธ์สำหรับ %{groupTitle}"
     other: "กำลังแสดง %{count} ผลลัพธ์สำหรับ %{groupTitle}"
+  showing_search_results_below_4c9a63d9: กำลังแสดงผลการค้นหาด้านล่าง
   shrink_permission_74b01aed: "ย่อ %{permission}"
   shuffle_answers_edb602b7: สลับคำตอบ
   sign_up_dafdee18: สมัคร
@@ -18911,6 +18953,7 @@ th:
   simple_tls_45df2648: "TLS อย่างง่าย"
   singapore_65_b4927585: "สิงคโปร์ (+65)"
   singleton_46df7e3b: รายการเดี่ยว
+  singleton_name_has_no_next_in_strand_653b83b8: "งานแยกเดี่ยว \"%{name}\" ไม่มี next_in_strand"
   singletons_99a47787: รายการเดี่ยว
   sioux_city_outcomes_report_710baf47: "รายงานผลลัพธ์ของเมือง Sioux"
   sis_2164965: SIS
@@ -19199,12 +19242,14 @@ th:
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "เริ่มการพูดคุยกับผู้สอนของคุณในกล่องจดหมาย Canvas"
   start_a_new_subject_7271b3ec: เริ่มวิชาใหม่
   start_assignment_d56256d3: เริ่มภารกิจ
+  start_at_c7a5789: "เริ่มเมื่อ: "
   start_auto_refresh_e2feafb2: เริ่มรีเฟรชอัตโนมัติ
   start_date_e937be8a: วันที่เริ่มต้น
   start_date_end_date_d809dd93: "%{start_date} - %{end_date}"
   start_date_for_conference_1936e809: วันที่เริ่มต้นสำหรับการประชุม
   start_date_from_20503757: "วันที่เริ่มต้น จาก:"
   start_date_start_time_to_end_time_dc676ce1: "%{start_date}, %{start_time} ถึง %{end_time}"
+  start_date_time_must_be_before_the_end_date_time_6be0c57f: "วันที่/เวลาเริ่มต้น (Start Date/Time) จะต้องอยู่ก่อนวันที่/เวลาสิ้นสุด (End Date/Time)"
   start_date_to_1e6e6bbe: "วันที่เริ่มต้น ถึง:"
   start_date_value_817cab96: "วันที่เริ่มต้น %{value}"
   start_dates_8f1c22a8: "วันที่เริ่มต้น:"
@@ -19264,6 +19309,8 @@ th:
   storage_used_in_mb_c75fbd9c: "พื้นที่จัดเก็บที่ใช้เป็น MB"
   store_and_share_course_assets_82a9967c: จัดเก็บและแชร์ทรัพยากรข้อมูลสำหรับบทเรียน
   strand_955969b1: ชุดกระบวนงาน
+  strand_name_has_no_next_in_strand_db0992db: "ชุดกระบวนงาน \"%{name}\" ไม่มี next_in_strand"
+  strand_or_singleton_is_blocked_by_the_shard_migrat_58f8d7b1: ชุดกระบวนงานหรืองานแยกเดี่ยวถูกบล็อคโดยระบบโอนย้ายส่วนแบ่งฐานข้อมูล
   strand_singleton_2d7d7be7: "ชุดงาน / งานแยกเดี่ยว"
   strands_b086013b: ชุดกระบวนงาน
   stream_items_api: 
@@ -20247,6 +20294,7 @@ th:
   there_was_an_error_fetching_gradebook_filters_3b4607ac: มีข้อผิดพลาดในการสืบค้นตัวกรองสมุดบันทึกเกรด
   there_was_an_error_fetching_modules_8ee451bb: มีข้อผิดพลาดในการสืบค้นหน่วยการเรียน
   there_was_an_error_fetching_outcome_results_45c57590: มีข้อผิดพลาดในการสืบค้นผลลัพธ์
+  there_was_an_error_fetching_student_data_87463510: มีข้อผิดพลาดในการสืบค้นข้อมูลผู้เรียน
   there_was_an_error_fetching_submission_comments_ce153077: มีข้อผิดพลาดในการสืบค้นความเห็นสำหรับผลงานจัดส่ง
   there_was_an_error_generating_the_pairing_code_9edd639b: มีข้อผิดพลาดในการจัดทำรหัสเข้าคู่
   there_was_an_error_generating_the_tool_launch_fb3f47ac: มีข้อผิดพลาดในการจัดทำส่วนการเรียกใช้เครื่องมือ
@@ -20282,6 +20330,7 @@ th:
   there_was_an_error_uploading_the_image_932fc4ce: มีข้อผิดพลาดในการอัพโหลดภาพ
   there_was_an_error_uploading_the_media_6841a37b: มีข้อผิดพลาดในการอัพโหลดสื่อ
   there_was_an_error_uploading_your_file_please_try__ce458566: "มีข้อผิดพลาดในการอัพโหลดไฟล์ของคุณ กรุณาลองใหม่อีกครั้งในภายหลัง"
+  there_was_an_error_upon_saving_your_conference_65e6b175: มีข้อผิดพลาดขณะบันทึกการประชุมของคุณ
   there_was_an_error_with_your_import_please_examine_7b42f29d: "มีข้อผิดพลาดกับข้อมูลนำเข้าของคุณ กรุณาตรวจสอบไฟล์และลองอัพโหลดใหม่อีกครั้ง ตรวจสอบรายละเอียดเพิ่มเติมจากอีเมลของคุณ"
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "มีข้อผิดพลาดกับการสืบค้นของคุณ กรุณาลองทำการค้นหาอื่น"
   there_was_an_unexpected_error_creating_the_discuss_8811a868: มีข้อผิดพลาดที่ไม่คาดคิดในการจัดทำรายการพูดคุย
@@ -20381,6 +20430,10 @@ th:
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       หมายเหตุกำกับคุณสมบัตินี้จะช่วยให้สามารถใช้ฟังก์ชั่น
       จัดทำส่วนการพูดคุย/แก้ไขเพจเวอร์ชั่นอัพเดต
+  this_feature_makes_it_so_that_when_multiple_files__1973ed91: |-
+      คุณสมบัตินี้มีไว้เพื่อเวลาที่มีการจัดส่งหลาย ๆ ไฟล์พร้อมกันผ่าน
+      เครื่องมือจากภายนอกโดยใช้ API ภารกิจและบริการเกี่ยวกับเกรดจะมี
+      การจัดกลุ่มเป็นผลงานจัดส่งเดียวแทนที่จะเป็นผลงานจัดส่งแยกกันหลายชุด
   this_feature_option_is_only_visible_to_users_with__d5e21cee: |-
       ตัวเลือกคุณสมบัตินี้จะแสดงเฉพาะกับผู้ใช้ที่มีสิทธิ์เป็นผู้ดูแลไซต์ (Site Admin)
                                   ผู้ใช้ปลายทางจะไม่เห็นข้อมูลนี้จนกว่าผู้ดูแลไซต์ (Site Admin) จะเปิดใช้งาน
@@ -20560,6 +20613,7 @@ th:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "กรณีนี้จะทำให้คุณสามารถตรวจรับรอง Canvas สำหรับการแจ้งเกรดไปยัง SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "กรณีนี้จะเป็นการปรับใช้ธีมนี้กับบัญชีผู้ใช้ทั้งหมดของคุณ ต้องการดำเนินการต่อหรือไม่"
   this_will_remove_the_mastery_level_from_your_maste_1f4130ea: นี่จะเป็นการลบระดับความเชี่ยวชาญจากคะแนนประเมินความเชี่ยวชาญของคุณ
+  this_will_set_next_in_strand_on_the_appropriate_nu_42be1d07: "นี่จะเป็นการกำหนดให้ next_in_strand ในจำนวนงานที่เหมาะสมปลดบล็อคชุดกระบวนงานหรืองานแยกเดี่ยว"
   this_will_update_all_account_and_course_level_rubr_3438121e: นี่จะเป็นการอัพเดตบัญชีผู้ใช้และเกณฑ์การให้คะแนนระดับบทเรียนทั้งหมดที่เชื่อมโยงกับคะแนนประเมินความเชี่ยวชาญระดับบัญชีและยังไม่ได้รับการประเมิน
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: นี่เป็นการอัพเดตเกณฑ์การให้คะแนนทั้งหมดที่เชื่อมโยงกับผลลัพธ์ภายในบทเรียนนี้ซึ่งยังไม่ได้ประเมิน
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: นี่เป็นการอัพเดตเกณฑ์การให้คะแนนทั้งหมดโดยใช้ผลลัพธ์นี้ซึ่งยังไม่มีการประเมิน
@@ -21257,6 +21311,9 @@ th:
   unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "ไม่ได้รับอนุญาต ไม่สามารถเพิ่มข้อความไปยังการพูดคุย"
   unavailable_46d2c344: ไม่มีให้บริการ
   unavailable_c04e4c93: ไม่มีให้บริการ
+  unblock_be7e3e05: ปลดบล็อค
+  unblock_singleton_name_92b94e79: "ปลดบล็อคงานแยกเดี่ยว \"%{name}\""
+  unblock_strand_name_d307edb8: "ปลดบล็อคชุดกระบวนงาน \"%{name}\""
   unbookmark_bank_70569249: "เลิกทำบุ๊กมาร์ก %{bank}"
   unchanged_aca18e02: "[ยกเลิกการเปลี่ยนแปลงแล้ว]"
   undated_15c2e5fe: ไม่ได้กำกับวันที่
@@ -21449,6 +21506,7 @@ th:
   upload_image_6120b609: อัพโหลดภาพ
   upload_media_ce31135a: อัพโหลดสื่อ
   upload_not_available_for_this_folder_8f8623c6: ไม่สามารถอัพโหลดได้สำหรับโฟลเดอร์นี้
+  upload_percent_complete_d533d3e2: อัพโหลดเปอร์เซ็นต์ที่เสร็จสิ้น
   upload_progress_for_name_39f03acf: "สถานะการอัพโหลดสำหรับ %{name}"
   upload_successful_ca47465f: อัพโหลดเสร็จสิ้น
   upload_your_outcomes_bceeadbe: อัพโหลดผลลัพธ์ของคุณ!
@@ -22046,6 +22104,7 @@ th:
       publish: เผยแพร่
   violation_log_491edd84: บันทึกประวัติการละเมิด
   violation_log_tray_d4eff9f4: ถาดข้อมูลบันทึกประวัติการละเมิด
+  visibility_3ad7b08d: "การแสดงผล:"
   visible_assignments_scope_change_dbb84ebb: การเปลี่ยนแปลงขอบเขตภารกิจที่มีจัดแสดง
   visit_864b4060: เยี่ยมชม
   visit_canvas_guides_to_learn_more_8c7361ad: "ดูรายละเอียดเพิ่มเติมได้จาก*คู่มือ Canvas*"
@@ -22386,6 +22445,7 @@ th:
   word_count_c77fe3a6: จำนวนคำ
   work_and_create_together_c65f358b: ทำงานและสร้างสรรค์ไปด้วยกัน
   workflow_state_3a5c99d2: workflow_state
+  working_a71f1d66: กำลังปฏิบัติงาน
   working_b1f63edf: กำลังดำเนินการ...
   would_you_like_to_accept_or_dismiss_this_update_9009d696: ต้องการตอบรับหรือล้มเลิกการอัพเดตหรือไม่
   would_you_like_to_enable_this_app_ccdf735d: ต้องการเปิดใช้งานแอพนี้หรือไม่
@@ -22429,6 +22489,7 @@ th:
   you_are_logged_out_of_canvas_8b5fc59a: "คุณไม่ได้อยู่ในระบบ Canvas"
   you_are_not_allowed_to_create_an_anonymous_graded__3eeb1382: คุณไม่ได้รับอนุญาตให้จัดทำส่วนการพูดคุยที่ให้เกรดแบบไม่เปิดเผยตัว
   you_are_not_enrolled_in_any_courses_a5c63286: "คุณไม่ได้ลงทะเบียนในบทเรียนใด ๆ"
+  you_are_now_able_to_submit_your_peer_review_4ae84901: ตอนนี้คุณสามารถส่งความคิดเห็นจากผู้เกี่ยวข้องได้
   you_are_observing_observeduser_afd2f245: "คุณกำลังสังเกตการณ์ %{observedUser}"
   you_are_ready_to_sync_count_assignments_525eb8b1: 
     one: "คุณพร้อมสำหรับซิงค์ 1 ภารกิจ"
@@ -22480,8 +22541,10 @@ th:
   you_cannot_cancel_while_loading_the_pace_c6ccf2cc: คุณไม่สามารถยกเลิกขณะโหลดความคืบหน้า
   you_cannot_cancel_while_loading_the_plan_6bf0da95: คุณไม่สามารถยกเลิกขณะโหลดแผน
   you_cannot_cancel_while_publishing_5a920ae1: คุณไม่สามารถยกเลิกขณะเผยแพร่
+  you_cannot_delete_the_default_course_pace_ee7bede4: คุณไม่สามารถลบโครงสร้างการศึกษาบทเรียนเริ่มต้น
   you_cannot_edit_a_locked_pace_41b5f6d7: คุณไม่สามารถแก้ไขแผนเนื้อหาที่ล็อคไว้ได้
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: คุณไม่สามารถแก้ไขธีมในบัญชีย่อยนี้
+  you_cannot_leave_comments_until_reviewer_and_revie_4c158058: คุณไม่สามารถแสดงความเห็นจนกว่าผู้พิจารณาและผู้ถูกพิจารณาจะส่งภารกิจ
   you_cannot_leave_comments_until_you_submit_the_ass_de0f2024: คุณไม่สามารถแสดงความเห็นได้จนกว่าจะส่งภารกิจนี้
   you_cannot_publish_this_assignment_while_there_are_e3dee69a: คุณไม่สามารถเผยแพร่ภารกิจนี้ได้ขณะที่มีข้อผิดพลาด
   you_cannot_publish_while_loading_the_pace_c5682dbc: คุณไม่สามารถเผยแพร่ขณะโหลดความคืบหน้า
@@ -22581,6 +22644,7 @@ th:
   you_must_select_a_course_to_copy_content_from_e7bd9e09: คุณจะต้องเลือกบทเรียนที่จะคัดลอกเนื้อหา
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: คุณจะต้องเลือกโฟลเดอร์ที่จะอัพโหลดการโอนย้ายของคุณ
   you_must_select_an_assignment_group_c16a2168: คุณจะต้องเลือกกลุ่มภารกิจ
+  you_must_select_at_least_one_calendar_to_create_an_29e6769c: คุณจะต้องเลือกอย่างน้อยหนึ่งรายการปฏิทินเพื่อจัดทำกิจกรรม
   you_must_set_document_usage_rights_b4afa1e9: คุณจะต้องกำหนดสิทธิ์ใช้งานเอกสาร
   you_must_set_usage_rights_87fc1382: คุณจะต้องกำหนดสิทธิ์การใช้งาน
   you_must_specify_a_usage_right_5eb57f87: คุณจะต้องระบุสิทธิ์การใช้งาน
@@ -22664,6 +22728,7 @@ th:
   your_email_address_844297ea: อีเมลแอดเดรสของคุณ
   your_email_address_f881e583: อีเมลแอดเดรสของคุณ
   your_email_b5364bee: อีเมลของคุณ
+  your_gradebook_export_has_been_cancelled_c1b99ca1: การส่งออกสมุดบันทึกเกรดของคุณถูกยกเลิกแล้ว
   your_groups_are_being_created_50156e34: กำลังจัดทำกลุ่มของคุณ
   your_homeroom_is_currently_unpublished_93c14f4f: โฮมรูมของคุณเลิกการเผยแพร่แล้วในปัจจุบัน
   your_instructor_has_not_posted_the_grade_while_you_c5cd731c: "ผู้สอนของคุณไม่ได้แจ้งเกรด ขณะที่ผู้สอนของคุณไม่มีการแจ้งเกรด เกรดและความเห็นจะไม่มีแสดงให้เห็น"
