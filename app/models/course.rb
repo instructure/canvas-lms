@@ -1688,7 +1688,7 @@ class Course < ActiveRecord::Base
 
     CUSTOMIZABLE_PERMISSIONS.each_key do |type|
       given do |user|
-        available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?) || grants_right?(user, :read_as_member))
+        grants_right?(user, :read_as_member) || (available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?)))
       end
       can :"read_#{type}"
     end
@@ -4037,8 +4037,8 @@ class Course < ActiveRecord::Base
 
   CUSTOMIZABLE_PERMISSIONS.each do |key, cfg|
     if cfg[:as_bools]
-      add_setting :"public_#{key}", boolean: true, default: ->(c) { c.is_public }
-      add_setting :"public_#{key}_to_auth", boolean: true, default: ->(c) { c.is_public_to_auth_users }
+      add_setting :"public_#{key}", boolean: true, default: ->(c) { c.is_public || false }
+      add_setting :"public_#{key}_to_auth", boolean: true, default: ->(c) { c.is_public_to_auth_users || false }
     else
       add_setting :"#{key}_visibility", default: ->(c) { c.course_visibility }
     end

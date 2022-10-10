@@ -492,6 +492,12 @@ describe Course do
       expect(@course.syllabus_visibility_option).to eq("public")
     end
 
+    it "defaults public_syllabus to false" do
+      @course.update_attribute(:is_public, nil)
+      @course.update_attribute(:settings, @course.settings.except(:public_syllabus))
+      expect(@course.public_syllabus).to be false
+    end
+
     it "returns offline web export flag" do
       expect(@course.enable_offline_web_export?).to eq false
       account = Account.default
@@ -5825,6 +5831,25 @@ describe Course do
     it "cannot be read by a nil user if public but not available" do
       @course.write_attribute(:workflow_state, "created")
       expect(@course.check_policy(nil)).to eq []
+    end
+
+    describe "when course is unpublished" do
+      before do
+        @course.write_attribute(:workflow_state, "claimed")
+        @course.write_attribute(:is_public, false)
+      end
+
+      let_once(:user) { user_model }
+
+      it "does not allow students to read files" do
+        user.student_enrollments.create!(workflow_state: "active", course: @course)
+        expect(@course.check_policy(user)).to_not include :read_files
+      end
+
+      it "allows teachers to read files" do
+        user.teacher_enrollments.create!(workflow_state: "active", course: @course)
+        expect(@course.check_policy(user)).to include :read_files
+      end
     end
 
     describe "when course is not public" do
