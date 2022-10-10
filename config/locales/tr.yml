@@ -2401,6 +2401,8 @@ tr:
   assessment_type_81a73b9c: "değerlendirme türü"
   assign_eedf72bb: Ata
   assign_reviews_on_date_7e48ec50: "Şu Tarihte Gözden Geçirme Ata"
+  assign_to_6b806cd9: "Şuna Ata"
+  assign_to_95404a83: "Şuna Ata"
   assign_to_c46e21: "Şuna Ata"
   assignment: 
     assignment_group_must_have_group: "Lütfen ödev için bir ödev grubu seçiniz"
