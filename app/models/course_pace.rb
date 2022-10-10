@@ -74,6 +74,30 @@ class CoursePace < ActiveRecord::Base
     I18n.t("Course Pace")
   end
 
+  def effective_name
+    if user_id.present?
+      user.name
+    elsif course_section_id.present?
+      course_section.name
+    else
+      course.name
+    end
+  end
+
+  def type
+    if user_id.present?
+      "StudentEnrollment"
+    elsif course_section_id.present?
+      "Section"
+    else
+      "Course"
+    end
+  end
+
+  def duration
+    course_pace_module_items.sum(:duration)
+  end
+
   def valid_secondary_context
     if course_section_id.present? && user_id.present?
       errors.add(:base, "Only one of course_section_id and user_id can be given")

@@ -121,6 +121,62 @@ describe CoursePace do
     end
   end
 
+  describe "#effective_name" do
+    before :once do
+      @section_plan = @course.course_paces.create! course_section: @course_section
+      @student_plan = @course.course_paces.create! user: @student
+    end
+
+    it "returns the user's name for a student pace" do
+      expect(@student_plan.effective_name).to eq @student.name
+    end
+
+    it "returns the section's name for a section pace" do
+      expect(@section_plan.effective_name).to eq @course_section.name
+    end
+
+    it "returns the course's name for a course pace" do
+      expect(@course_pace.effective_name).to eq @course.name
+    end
+  end
+
+  describe "#type" do
+    before :once do
+      @section_plan = @course.course_paces.create! course_section: @course_section
+      @student_plan = @course.course_paces.create! user: @student
+    end
+
+    it "returns 'StudentEnrollment' for a student pace" do
+      expect(@student_plan.type).to eq "StudentEnrollment"
+    end
+
+    it "returns 'Section' for a section pace" do
+      expect(@section_plan.type).to eq "Section"
+    end
+
+    it "returns 'Course' for a course pace" do
+      expect(@course_pace.type).to eq "Course"
+    end
+  end
+
+  describe "#duration" do
+    it "returns 0 if there are no module items" do
+      expect(@course_pace.duration).to eq 0
+    end
+
+    context "multiple paced module items exist" do
+      before do
+        @course.context_module_tags.each do |tag|
+          @course_pace.course_pace_module_items.create! module_item: tag, duration: 1
+        end
+      end
+
+      it "returns the sum of all item durations" do
+        expect(@course_pace.duration).to eq 2
+      end
+    end
+  end
+
   context "duplicate" do
     it "returns an initialized duplicate of the course pace" do
       duplicate_course_pace = @course_pace.duplicate
