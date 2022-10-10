@@ -131,4 +131,20 @@ describe SIS::CSV::AdminImporter do
     admin = @account.account_users.where(user_id: user).take
     expect(admin.workflow_state).to eq "active"
   end
+
+  describe "SIS::AdminImporter::Work#process_admin" do
+    specs_require_cache
+
+    it "invalidates adminable accounts cache on successful process" do
+      admin = user_with_managed_pseudonym(account: @account, sis_user_id: "U001")
+      role = @sub_account.available_account_roles.first
+      Rails.cache.fetch(admin.adminable_accounts_cache_key) { "stuff" }
+      expect(Rails.cache.fetch(admin.adminable_accounts_cache_key)).to eq "stuff"
+      process_csv_data_cleanly(
+        "user_id,account_id,role_id,status",
+        "U001,sub1,#{role.id},active"
+      )
+      expect(Rails.cache.fetch(admin.adminable_accounts_cache_key)).to be_nil
+    end
+  end
 end

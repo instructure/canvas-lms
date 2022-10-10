@@ -3045,6 +3045,14 @@ class User < ActiveRecord::Base
     associated_shards.select { |shard| shard.in_current_region? || shard.default? }
   end
 
+  def adminable_accounts_cache_key
+    ["adminable_accounts_1", self, ApplicationController.region].cache_key
+  end
+
+  def clear_adminable_accounts_cache!
+    Rails.cache.delete(adminable_accounts_cache_key)
+  end
+
   def adminable_accounts_scope
     # i couldn't get EXISTS (?) to work multi-shard, so this is happening instead
     account_ids = account_users.active.shard(in_region_associated_shards).distinct.pluck(:account_id)
@@ -3053,7 +3061,7 @@ class User < ActiveRecord::Base
 
   def adminable_accounts
     @adminable_accounts ||= shard.activate do
-      Rails.cache.fetch(["adminable_accounts_1", self, ApplicationController.region].cache_key) do
+      Rails.cache.fetch(adminable_accounts_cache_key) do
         adminable_accounts_scope.order(:id).to_a
       end
     end
