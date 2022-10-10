@@ -65,7 +65,7 @@ export const GradeRow = ({
   const renderStatus = () => {
     if (late) {
       return (
-        <Text color="warning" size="small">
+        <Text color="brand" size="small">
           {submissionDate
             ? I18n.t('Late %{date}', {
                 date: dateFormatter(submissionDate),
