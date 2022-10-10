@@ -12727,6 +12727,7 @@ nn:
     get_started: "Kom i gang"
     welcome_to_canvas: "Velkomen til Canvas!"
   incorrect_answer_7c17e63b: "Feil svar"
+  increase_calendar_context_limit_575ad9ff: "Auk grense for kalenderkontekst"
   increase_indent_6af90f7c: "Auk innrykk"
   increase_indent_6d550a4a: "Auk innrykk"
   incremental_update_successfully_generated_against__db3f3f06: "Trinnvis oppdatering er generert mot ein tidlegare SIS-import."
@@ -17455,6 +17456,7 @@ nn:
   people_account_course_305043bb: "Personar (Konto/Emne)"
   people_account_course_97b2bbb6: "Personar (konto, emne)"
   people_b4ebb13c: Personar
+  people_body_3ce556e3: "Folk & kropp"
   people_course_ddd9a66: "Personar (Emne)"
   people_groups_tab_b245a614: "Personar (gruppefane)"
   people_options_cfb419a6: Personval
@@ -23134,6 +23136,7 @@ nn:
   take_the_survey_ada59508: "Ta undersøkinga"
   take_the_survey_again_24ce22c2: "Ta undersøkinga på nytt"
   talladega_grade_and_last_date_of_attendance_be39b0c7: "Talladega-vurdering og siste oppmøtedato"
+  target_course_course_id_is_not_a_child_of_current__185cb2f6: "Emnet %{course_id} tilhøyrer ikke gjeldande konto (%{name})"
   target_link_uri_bbed67d1: "* Mållenke-URI"
   target_link_uri_d166858: Mållenke-URL
   targetcontextid_required_if_targetcontexttype_prov_723fce49: "targetContextId krevst dersom targetContextType oppgjeve"
@@ -23268,6 +23271,7 @@ nn:
   the_app_was_added_successfully_3f785a23: "Appen er lagd til"
   the_app_was_deactivated_573520ab: "Appen er deaktivert"
   the_app_was_updated_successfully_3d71cd1b: "Appen er oppdatert"
+  the_argument_provided_is_expected_to_be_of_type_bo_b24d456: "Argumentet som vert gitt er forventa å være av typen boolean."
   the_assignment_group_id_to_report_on_83880208: "oppgåvegruppe-id rapporten gjeld for"
   the_assignment_group_named_major_9d349037: "Oppgåvegruppa namngitte hovudfag"
   the_assignment_group_named_papers_e1cb6a34: "Oppgåvegruppa namngitte artiklar"
@@ -24352,11 +24356,15 @@ nn:
       For å moderere ein quiz, må 'Oppgåver og quizar - legg til / endre / slett òg vere slått på.
       For å sjå kolonna for brukar-SIS-ID i CSV-fila for analyse av quizelement, må 'SIS-data - les' òg vere slått på.
       For å sjå innleveringsloggen, må 'Quizar - vis innleveringslogg' òg vere slått på.
+  to_moderate_a_quiz_assignments_and_quizzes_manage__b96b1937: "For å moderere ein quiz, Oppgåver og quizar - administrer / rediger må også være skrudd på."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "For å moderere ein quiz må 'Vurderingar - endre' òg vere slått på."
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_eae38da2: "For å moderere ein quiz, Vurderingar - rediger må også være skrudd på."
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "For å redigere vurderingar må 'Vurderingar - vel moderering av sluttresultat' òg vere slått på. For å legge inn eller skjule vurderingar må 'Vurderingar - Endre' òg vere slått på."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å få ein klient-ID, må kontoadministrator generere ein LTI-utviklarnøkkel."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
+  to_post_or_hide_grades_for_a_moderated_assignment__bf929e0c: "For å publisere eller gøyme vurderingar for ei moderert oppgåve, Vurderingar - rediger må også være skrudd på."
+  to_post_or_hide_grades_for_an_assignment_grades_ed_974f6de4: "For å publisere eller gøyme vurderingar til ei oppgåve, Vurderingar - rediger må også være skrudd på."
   to_post_or_hide_grades_grades_edit_must_also_be_en_c58f5efe: "For å publisere eller skjule vurderingar må 'Vurderingar - endre' òg vere slått på."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "For å førehandvise endringar i temaredigeringsprogrammet, må du *slå av høgkontrast-UI*."
   to_publish_and_unpublish_module_content_courses_ad_2b1d0c46: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slette' og 'Emneinnhald - sjå' òg vere slått på. Modulelement kan ikkje vere avpublisert dersom det finnst studentinnleveringar. "
@@ -24365,8 +24373,12 @@ nn:
       Modulelement kan ikkje vere avpublisert dersom det finnst studentinnleveringar.
   to_publish_and_unpublish_module_content_courses_ad_ae996413: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
   to_publish_and_unpublish_module_content_courses_ad_fd53792f: "For å publisere og avpublisere modulinnhald, må 'Emne - legg til / endre / slett' og 'Emneinnhald - vis' òg vere slått av."
+  to_publish_and_unpublish_module_content_courses_ma_4a203bea: "For å publisere og avpublisere modulinnhald, Emner - administrer og Emneinnhald - Sjå må også være skrudd på. Modulelement kan ikkje verte avpublisert dersom det finnst studentinnleveringar."
   to_publish_unpublish_module_content_course_content_efc294d4: "For å publisere/avpublisere modulinnhald, må 'Emneinnhald - legg til / endre / slett' vere slått på"
+  to_remove_a_user_via_sis_id_sis_data_manage_must_a_5d0f4839: "For å fjerne ein brukar med SIS ID, SIS Data - administrer må være skrudd på."
   to_reply_to_a_discussion_discussions_post_must_als_c9654a9b: "For å svare i ein diskusjon må \"Diskusjonar - kommenter\" òg vere slått på."
+  to_reply_to_a_discussion_discussions_post_must_be__a4cf502a: "For å svare på ein diskusjon, Diskusjonar - lag innlegg må være skrudd på."
+  to_restore_a_deleted_course_courses_delete_courses_83c7e64f: "For å gjenopprette eit sletta emne, Emner - slett, Emner - gjenopprett. og Emneinnhald - sjå må også være skrudd på."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "For å gjenopprette eit sletta emne, må 'Emne - omgjer sletting' og 'Emneinnhald - vis' begge vere slått på."
   to_restore_a_deleted_course_in_an_account_manage_c_3ad933ee: "For å gjenopprette eit sletta emne, må 'Administrer Emne - slett' og 'Emneinnhald - vis' begge vere slått på."
   to_restrict_students_from_creating_groups_deselect_6269c8cb: "For å hindre studentar i å opprette grupper, fjern merke frå avhakingsboksen 'La studentar organisere eigne grupper' i emneinnstillingar."
@@ -24399,14 +24411,20 @@ nn:
   to_share_a_discussion_to_commons_courses_manage_mu_addad8ba: "For å dele ein diskusjon til Commons, må 'Emne - administrer' óg vere slått på."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "For å dele ein diskusjon til Commons, må 'Diskusjonar - vis' óg vere slått på."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "For å dele ein diskusjon til Commons, må 'Diskusjonar - vis' òg vere slått på."
+  to_toggle_microsoft_teams_sync_you_need_to_input_a_d32476b0: "For å skru på Microsoft Teams Sync, må du oppgi eit tenant-domene."
   to_upload_some_submissions_for_this_assignment_cli_22368328: "For å laste opp innleveringar for denne oppgåva, klikk på \"Tilbake til oppgåve\"-knappen over."
   to_view_a_course_outcomes_page_as_read_only_course_5bb7241f: |-
       For å sjå læringsmål på eit emne i lesemodus, må 'Emneinnhald - vis' vere slått på.
       For å importere læringsmål frå læringsmålsida, må 'Vurderingsskjema - legg til / endre / slett' òg vere slått på.
       Brukarar kan sjå og opprette (men ikkje endre) vurderingsskjema for individuelle innleveringar frå Oppgåver så lenge 'Emneinnhald - vis' og 'Oppgåver og quizer - legg til / endre / slett' er slått på.
+  to_view_a_user_s_integration_id_sis_data_manage_mu_99438830: "For å sjå ein brukar sin integrasjons-ID, SIS Data - Administrer må også være skrudd på."
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "For å sjå innlogingsdetaljane til ein bruker, må 'Brukarar - vis liste' og 'Modifiser innloggingsdetaljar for brukarar' òg vere slått på. "
+  to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "For å sjå ein brukar sin SIS ID, SIS Data - administrer eller SIS Data - les må også være skrudd på."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "For å sjå grupper på kontonivå, må 'Grupper - legg til / endre / slett' òg vere slått på."
+  to_view_account_level_groups_groups_manage_must_al_ca16b035: "For å sjå grupper på kontonivå, Grupper - administrer må også være skrudd på."
+  to_view_account_level_groups_users_view_list_must__3e933ddf: "For å sjå grupper på kontonivå. Brukarar - sjå liste må også være skrudd på."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "Dersom du vil sjå alle varslingane som er sende til ein Canvas-brukar, må du markere brukaren og datointervallet for søket."
+  to_view_all_student_groups_in_a_course_groups_view_7a16b659: "For å sjå alle grupper i eit emne, Grupper - sjå alle grupper må også være skrudd på."
   to_view_announcements_announcements_view_must_also_75f652df: "For å sjå kunngjeringar, må 'Kunngjeringar - vis' òg vere slått på."
   to_view_anonymous_discussion_c11482a3: "for å sjå anonym diskusjon"
   to_view_discussions_in_a_course_discussions_view_m_18c3fa0b: |-
@@ -24505,6 +24523,7 @@ nn:
   toggle_course_card_color_overlays_b5b8137a: "Slå av/på fargelag på emnekort"
   toggle_editing_answer_text_as_html_9a93fe6: "Bytt tekst for redigeringssvar til HTML"
   toggle_module_visibility_781a2f6c: "Vis/skjul modulsynlegheit"
+  toggle_name_c0ab332b: "Bytt %{name}"
   toggle_option_cfd8b95a: "Vis/skjul alternativ"
   toggle_outcomes_for_title_6994b198: "Vis/skjul læringsmål for %{title}"
   toggle_select_course_name_310fdee4: "Brytar for emneval %{name}"
@@ -24665,6 +24684,7 @@ nn:
   type_to_search_de63ad38: "Skriv for å søke"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Skriv for å søkje, bruk piltastane for å navigere mellom alternativa."
   type_your_message_here_3551e252: "Skriv di melding her . . ."
+  uc_merced_student_activity_report_4a9a1eb8: "UC Merced aktivitetsrapport for student"
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uff. Kontakt ein Catalog-utviklar. Feilmelding: %{message}"
   ukrainian_945b00b7: Ukrainsk
   unable_to_accept_update_fd53a7e2: "Kan ikkje oppdatere"
@@ -24682,8 +24702,16 @@ nn:
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikkje normalfordele resultat fordi innleveringsfristen for oppgåva ligg innanfor ein lukka vurderingsperiode for minst ein student"
   unable_to_delete_assignment_abcf8d62: "Kan ikkje slette oppgåve"
   unable_to_delete_commentbankitem_3a23dc24: "Kan ikkje slette element i kommenteringsbank"
+  unable_to_delete_lock_on_sftp_users_table_please_t_1c5e6b97: |-
+      Kunne ikkje slette lås på tabell over SFTP-brukarar. Prøv på nytt om ei stund.
+      Ta kontakt i #canvas-sre på Slack dersom det held fram.
+  unable_to_determine_an_sftp_username_for_this_acco_e31e8a90: "Kunne ikkje bestemme eit SFTP-brukarnamn for denne kontoen. Finn ikkje det opphaveleg .instructure.com domenet."
+  unable_to_determine_next_sftp_user_uid_please_try__be9d612d: |-
+      Kunne ikkje bestemme neste sftp bruker uid. Prøv på nytt om ei stund.
+      Ta kontakt i #canvas-rse på Slack dersom det held fram.
   unable_to_dismiss_update_df1e32eb: "Kan ikkje avvise oppdatering"
   unable_to_drop_the_subject_d7d55ba1: "Kunne ikkje fjerne emnet"
+  unable_to_fetch_current_microsoft_teams_sync_setti_3ad2f08b: "Kunne ikkje hente gjeldande innstillingar for Microsoft Teams Sync. Sjekk internettilkoplinga di. Ta kontakt med brukarstøtte om problemet er vedvarande."
   unable_to_find_a_sftp_user_for_this_account_b6d0b69a: "Kunne ikkje finne ein SFTP-brukar for denne kontoen"
   unable_to_find_clever_district_district_id_61deb1cb: "Finn ikkje Clever-distriktet %{district_id}"
   unable_to_find_commentbankitem_49a37a60: "Kan ikkje finne element i kommenteringsbank"
@@ -24691,15 +24719,26 @@ nn:
   unable_to_find_filetype_7b620f02: "kunne ikkje finne filtype"
   unable_to_find_learningoutcome_for_id_id_49541314: "Kan ikkje finne Læringsutbytte for id %{id}"
   unable_to_get_accounts_cb825c43: "Kunne ikkje finne kontoar"
+  unable_to_get_homerooms_959dfe67: "Kunne ikkje hente heimerom"
   unable_to_get_observed_students_ff62d801: "Kunne ikkje hente observerte studentar"
   unable_to_load_courses_menu_7074ea04: "Kan ikkje laste emnemeny"
   unable_to_load_lti_1_3_tools_cf169f9: "Kunne ikkje laste LTI 1.3-verktøy"
   unable_to_load_messages_49a2942b: "Kan ikkje laste meldingar"
+  unable_to_load_this_control_543a8271: "Kunne ikkje laste inn denne kontrollen"
+  unable_to_locate_sftp_key_selected_if_it_continues_c5768e01: |-
+      Kunne ikkje finne vald SFTP nøkkel
+      Ta kontakt i #canvas-sre på Slack dersom det held fram.
+  unable_to_obtain_lock_on_sftp_users_table_please_t_69df409d: |-
+      Henting av lås på tabell over SFTP brukarar mislukkast. Prøv på nytt om eitt minutt.
+      Ta kontakt i #canvas-sre på Slack dersom det held fram.
   unable_to_read_file_2d04b0c: "Kunne ikkje lese fil"
   unable_to_remove_app_4293cb53: "Kan ikkje fjerne app"
   unable_to_remove_outcomes_f682e68f: 
     one: "Kan ikkje fjerne Læringsmål"
     other: "Kan ikkje fjerne Læringsmål"
+  unable_to_remove_sftp_key_selected_if_it_continues_f99a7a22: |-
+      Kunne ikkje fjerne vald SFTP nøkkel
+      Ta kontakt i #canvas-sre på Slack dersom det held fram.
   unable_to_save_draft_message_db49a89d: "Ikkje i stand til å lagre utkast"
   unable_to_save_new_discussion_topic_99239f3f: "kan ikkje lagre nytt diskusjonsemne"
   unable_to_send_messages_to_users_in_context_name_7d6997b6: "Kan ikkje sende meldingar til brukarar in %{context_name}"
@@ -24738,6 +24777,8 @@ nn:
   unenrolled_bc89d5e3: "Meldt av"
   unenrolled_users_e7632d24: "Brukarar utan emnepåmeldingar"
   unexpected_error_while_performing_export_1e6b4207: "Uventa feil under eksport"
+  unexpected_response_from_microsoft_api_got_status__86f7a95e: "Uventa respons frå Microsoft API: Fekk %{status_code} status kode"
+  unexpected_response_from_microsoft_api_this_is_lik_fc892bab: "Uventa respons frå Microsoft API. Dette skuldast sannsynlegvis ein feil. Kontakt brukarsøtte."
   unfavorite_cd0c113e: "Fjern favorittmerking"
   unfavorite_coursename_32f77231: "Avfavoriser %{courseName}"
   ungraded_147a0dce: "ikkje vurdert"
@@ -24818,6 +24859,7 @@ nn:
   unpublished_8b6107d6: "Ikkje publisert"
   unpublished_assignments_9cdbcc87: "Upubliserte oppgåver"
   unpublished_changes_cb1cf6ff: "Upubliserte endringar"
+  unpublished_changes_tray_9e9b2ac2: "Upubliserte endringar meny"
   unpublished_click_to_modify_60f9051: "Ikkje publisert – klikk for å endre"
   unpublished_click_to_publish_6a6d12e1: "Ikkje publisert. Klikk for å publisere. "
   unpublished_click_to_publish_c073631a: "Ikkje publisert. Klikk for å publisere."
@@ -24896,6 +24938,7 @@ nn:
   updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Oppdaterer brukargrensesnittet til innstillingar for kontovarsel for å være ein betre
       og meir oppdatert brukaropplevelse
+  updates_to_json_api_auth_error_http_code_and_json__5936d452: "Oppdateringar ved JSON API auth error HTTP kode og JSON status felt"
   updating_6edbab78: Oppdaterer
   updating_discussion_failed_aadb2d35: "Oppdatering av diskusjon mislukkast"
   updating_the_catalog_url_will_make_your_old_url_in_b2030b: "Oppdatering av Catalog URL vil gjere den gamle URL-en utilgjengeleg for brukarar med ein gong! Dersom det er konfigurert ein eksisterande betalingsbehandlar, vil endringar kreve hjelp frå en Catalog-ingeniør."
@@ -24935,6 +24978,7 @@ nn:
   uploading_ee585874: "Lastar opp..."
   uploading_files_5ff8f4fd: "Lastar opp filer"
   uploading_files_9e39dbf9: "Lastar opp filer"
+  uploading_media_progress_c23a953b: "Framgang ved opplasting av media"
   uploading_progress_2f5dd4bf: "Opplasting i gang"
   uploading_progress_d62bb6e9: "Opplasting i gang"
   uploading_submission_4c8d944b: "Lastar opp innlevering"
@@ -24962,6 +25006,7 @@ nn:
   use_as_front_page_274a488b: "Bruk som startside"
   use_as_frontpagetext_fa88bbb2: "Bruk som %{frontPageText}"
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Bruk bokmerking for API sidenummerering i påmeldingsindeks"
+  use_cloudfront_for_docviewer_f21b96db: "Bruk CloudFront for DocViewer"
   use_comment_comment_136b5cb3: "Bruk kommentar %{comment}"
   use_default_890939b7: "Bruk standard"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Ta i bruk eksperimentelle funksjonar før dei er produksjonssett"
@@ -25181,6 +25226,7 @@ nn:
   user_observees_40cec795: Observatørar
   user_observer_csv_3592a9cf: "CSV-fil over observatørar"
   user_observers_454d4303: Observatørar
+  user_observers_csv_100a9c26: "CSV-fil over observatørar"
   user_option_links_66090987: Brukarval-lenker
   user_principal_name_upn_fbf59a08: "Brukar sitt hovudnavn (UPN)"
   user_profile: 
@@ -25489,6 +25535,7 @@ nn:
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Brukarar og semester er knytta til konto, så eit SIS-sluttpunkt vil alltid samanstille ein brukar sine løyve og konto. Underkonto har kun eigarskap til emne og seksjonar, og eig ikkje data om brukarar.
       Ein admin for underkonto kan ikkje sjå SIS-informasjon utan at dei er tilordna ei faglærarrolle i eit emne. Ein admin for underkonto kan ikkje sjå SIS-informasjon utan emnetilknytting, fordi faglærarrolla gir løyve til å lese SIS-data på kontonivå.
+  users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Brukarar og semester er tilknytta kontoen, SIS endepunkt vil derfor alltid bekrefte brukaren sine løyve i samsvar med kontoen."
   users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Brukarar kan sjå og opprette (men ikkje endre) individuelle vurderingsskjema i Oppgåver når 'Oppgåver og quizar - legg til / rediger / slett' er slått på."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Brukarar kan bruke og opprette (men ikkje redigere) individuelle oppgåvevurderingsskjema via oppgåver når 'Emneinnhald - vis' og 'Oppgåver og quizar- legg til / rediger / slett' er aktiverte."
   users_can_access_and_create_but_not_edit_individua_a0b26adf: "Brukarar kan bruke og opprette (men ikkje redigere) individuelle oppgåvevurderingsskjema via oppgåver når 'Emneinnhald - vis' og 'Oppgåver og quizar- legg til / rediger / slett' er aktiverte."
@@ -25700,6 +25747,7 @@ nn:
   webct_file_description: "Blackboard Vista/CE, WebCT 6+ Course"
   webct_name: "Blackboard Vista/CE (WebCT)"
   webhooks_subscriptions_ed524e73: "Webhooks Subscriptions"
+  webhooks_subscriptions_for_plagiarism_platform_84bdd5a9: "Webhook-abonnement for Plagiat Platform"
   website_url_177fc1dc: URL
   website_url_b995c5b6: Nettstad-URL
   website_url_input_1a3eab25: "Innputt til nettstad-URL"
@@ -25743,10 +25791,22 @@ nn:
       diskusjonar og lagre filer.
   what_should_the_csv_file_look_like_985a59ac: "Korleis vil du at CSV-fila skal sjå ut?"
   what_storage_options_do_i_have_in_zoom_b79c738e: "Kva lagringsalternativ har eg i Zoom?"
+  when_adding_external_links_to_a_module_users_can_s_1f893718: |-
+      Når ein legg til eksterne lenker til ein modul, kan ein velje om desse skal
+      laste i ei ny fane. Når dette flagget er skrudd på, vil den haka være vald som standard
+      dersom brukaren huka den av førre gong.
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Når du skal leggje til fleire brukarar på ein gong, bruk komma eller linjeskift for å skilja brukarane."
   when_creating_a_reply_students_will_have_the_optio_716eb2f4: "Studentar kan velje om dei vil svare anonymt. Ditt namn og profilbilde vil alltid vere synleg."
   when_creating_a_reply_you_will_have_the_option_to__8607ac10: "Når du svarer kan du velje om namnet og profilbildet ditt skal vere synleg for andre studentar, eller om du vil vere anonym."
+  when_disabled_students_can_still_send_individual_m_3bf396f2: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
   when_disabled_students_can_still_send_individual_m_567a911c: "Sjølv om den er slått av, kan studentar framleis sende individuelle meldingar til faglærarar på emna, undervisingsassistentar og andre studentar som tilhøyrer grupper på same kontonivå."
+  when_enabled_this_flag_displays_a_word_count_in_th_a75163d6: |-
+      Dette flagget viser ei ordtelling i speed grader for innleveringar
+      som er tekst basert, dersom skrudd på.
+  when_enabled_this_flag_shows_a_join_button_on_canv_c6f162ea: |-
+      Dette flagget viser ein "Bli med"-knapp på Canvas
+      kalenderhendingar i studentplanleggaren, dersom skrudd på
+  when_enabled_this_flag_shows_a_student_picker_for__5353b8e2: "Dette flagget viser ein studentveljar på dashbordet til observatørar, dersom skrudd på."
   when_enabled_this_setting_automatically_opens_teac_f93c16f0: "Når aktivert vil faglærars gjeremålsliste åpnast automatisk i eit nytt vindu"
   when_enabled_turns_on_mention_functionality_in_cou_ae490b21: "Når aktivert vil fuksjonen med \"@mention\" i diskusjonar bli slått på"
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Når vurderingsresultat vert skjult for anonyme oppgåver, vil resultata bli skjult for alle i emnet. Anonymitet innførast på nytt."
@@ -25935,6 +25995,9 @@ nn:
     cannot_update_published: "Du har ikkje løyve til å oppdatere publiseringsstatusen for denne wiki-sida"
     cannot_update_title: "Du har ikkje løyve til å oppdatere tittelen på denne wiki-sida"
     invalid_editing_roles: "Redigeringsrollene er ugyldige"
+  will_allow_for_saving_drafts_as_students_type_thei_aa08586: |-
+      Gjer det mogeleg å lagre utkast etter som studentane skriv svara sine i eit diskusjonsemne
+      i redesigna diskusjonar
   will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Kjem legitimasjon utsend av denne nøkkelen til å verte vist til Canvas eller ein peer teneste (t.d. Canvas Data)?"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Held gjennomsnittet av alle resultata dine"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Held dei høgaste av alle resultata dine"
@@ -26172,6 +26235,7 @@ nn:
   you_must_post_before_seeing_replies_24f8bcd4: "Du må poste innlegg før du kan sjå svar"
   you_must_provide_a_date_with_a_time_ec369ff4: "Du må oppgi ein dato og eit tidspunkt"
   you_must_provide_a_value_or_unselect_the_option_3b28b754: "Du må oppgi ein verdi eller fjerne valet av dette alternativet"
+  you_must_provide_targetgroupid_or_targetcontextid__dd2bf92: "Du må oppgi targetGroupId eller targetContextId og targetContextType"
   you_must_select_a_course_to_copy_content_from_e7bd9e09: "Du må velje eit emne å kopiere innhald frå"
   you_must_select_a_folder_to_upload_your_migration__ac7bc7c0: "Du må velje ei mappe å laste opp migrert innhald til"
   you_must_select_an_assignment_group_c16a2168: "Du må velje ei oppgåvegruppe."
