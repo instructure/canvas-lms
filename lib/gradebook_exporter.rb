@@ -111,7 +111,6 @@ class GradebookExporter
       ignore_muted: false,
       grading_period: grading_period
     )
-    grades = calc.compute_scores
 
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
@@ -307,10 +306,8 @@ class GradebookExporter
           row.concat(student_submissions)
 
           if should_show_totals
-            student_grades = grades.shift
-
-            row += show_group_totals(student_enrollment, student_grades, groups)
-            row += show_overall_totals(student_enrollment, student_grades)
+            row += show_group_totals(student_enrollment, groups)
+            row += show_overall_totals(student_enrollment)
           end
 
           csv << row
@@ -367,13 +364,13 @@ class GradebookExporter
     I18n.n(number, precision: 2)
   end
 
-  def show_group_totals(student_enrollment, grade, groups)
+  def show_group_totals(student_enrollment, groups)
     result = []
 
     groups.each do |group|
       if include_points?
-        result << format_numbers(grade[:current_groups][group.id][:score])
-        result << format_numbers(grade[:final_groups][group.id][:score])
+        result << format_numbers(student_enrollment.computed_current_points(assignment_group_id: group.id))
+        result << format_numbers(student_enrollment.computed_final_points(assignment_group_id: group.id))
       end
 
       result << format_numbers(student_enrollment.computed_current_score(assignment_group_id: group.id))
@@ -385,15 +382,15 @@ class GradebookExporter
     result
   end
 
-  def show_overall_totals(student_enrollment, grade)
+  def show_overall_totals(student_enrollment)
     result = []
+    score_opts = grading_period ? { grading_period_id: grading_period.id } : Score.params_for_course
 
     if include_points?
-      result << format_numbers(grade[:current][:total])
-      result << format_numbers(grade[:final][:total])
+      result << format_numbers(student_enrollment.computed_current_points(score_opts))
+      result << format_numbers(student_enrollment.computed_final_points(score_opts))
     end
 
-    score_opts = grading_period ? { grading_period_id: grading_period.id } : Score.params_for_course
     result << format_numbers(student_enrollment.computed_current_score(score_opts))
     result << format_numbers(student_enrollment.unposted_current_score(score_opts))
     result << format_numbers(student_enrollment.computed_final_score(score_opts))
