@@ -43,6 +43,10 @@ export default function HelpLinks({links, hasLoaded, onClick}) {
       event.preventDefault()
       onClick(link.url)
     }
+    if (link.no_new_window) {
+      event.preventDefault()
+      window.location.replace(link.url)
+    }
   }
 
   return !hasLoaded ? (
