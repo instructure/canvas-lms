@@ -58,14 +58,28 @@
   </div>
   <legend>{{#t "members"}}Members{{/t}}</legend>
   <div class="web_conference_member_user_settings"></div>
-  <label class="checkbox" for="user_all">
-    {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
-    {{#if context_is_group }}
-      {{#t "invite_all.group"}}Invite All Group Members{{/t}}
-    {{else}}
-      {{#t "invite_all.course"}}Invite All Course Members{{/t}}
-    {{/if}}
-  </label>
+    <div id="filter_div">
+    <h4 style="font-weight: bold;">Filter by Role:</h4>
+    <ul style="list-style-type: none;" id="role_select_filter" multiple="multiple">
+      {{# each roles}}
+        <li>
+          <label class="checkbox">
+            <input id="role_id_{{uid}}" name="role[{{id}}]" type="checkbox" value="1">
+            {{name}}            
+          </label>
+        </li>
+      {{/each}}
+    </ul>
+    <label class="checkbox" for="user_all">
+      {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
+      {{#if context_is_group }}
+        {{#t "invite_all.group"}}Invite All Group Members{{/t}}
+      {{else}}
+        {{#t "invite_all.course"}}Invite All Course Members{{/t}}
+      {{/if}}
+    </label>
+    <hr>
+  </div>
   <div>
     <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
       {{# each users}}

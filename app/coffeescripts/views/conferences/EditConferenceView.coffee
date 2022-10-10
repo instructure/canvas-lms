@@ -114,6 +114,7 @@ define [
           auth_token: authenticity_token()
         conferenceData: conferenceData
         users: ENV.users
+        roles: ENV.roles
         context_is_group: ENV.context_asset_string.split("_")[0] == "group"
         conferenceTypes: ENV.conference_type_details.map((type) ->
           {name: type.name, type: type.type, selected: (conferenceData.conference_type == type.type)}
