@@ -29,6 +29,7 @@ describe "Pace Contexts API" do
     course
   end
   let(:teacher) { teacher_enrollment.user }
+  let!(:default_pace) { course_pace_model(course: course) }
 
   before do
     Account.site_admin.enable_feature!(:course_paces_redesign)
@@ -37,11 +38,35 @@ describe "Pace Contexts API" do
 
   describe "index" do
     context "when the course type is specified" do
-      it "returns an empty array" do
+      it "returns an array containing only the course" do
         get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
         expect(response.status).to eq 200
         json = JSON.parse(response.body)
-        expect(json["pace_contexts"]).to match_array([])
+        expect(json["pace_contexts"].length).to eq 1
+
+        course_json = json["pace_contexts"][0]
+        expect(course_json["name"]).to eq course.name
+        expect(course_json["type"]).to eq "Course"
+        expect(course_json["item_id"]).to eq course.id
+        expect(course_json["associated_section_count"]).to eq 1
+        expect(course_json["associated_student_count"]).to eq 0
+
+        applied_pace_json = course_json["applied_pace"]
+        expect(applied_pace_json["name"]).to eq course.name
+        expect(applied_pace_json["type"]).to eq "Course"
+        expect(applied_pace_json["duration"]).to eq 0
+        expect(Time.parse(applied_pace_json["last_modified"])).to be_within(1.second).of(default_pace.published_at)
+      end
+
+      context "when the course does not have a default pace" do
+        before { default_pace.destroy! }
+
+        it "returns nil for the applied_pace" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"][0]["applied_pace"]).to eq nil
+        end
       end
     end
 
