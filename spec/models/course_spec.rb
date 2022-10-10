@@ -492,6 +492,12 @@ describe Course do
       expect(@course.syllabus_visibility_option).to eq("public")
     end
 
+    it "defaults public_syllabus to false" do
+      @course.update_attribute(:is_public, nil)
+      @course.update_attribute(:settings, @course.settings.except(:public_syllabus))
+      expect(@course.public_syllabus).to be false
+    end
+
     it "returns offline web export flag" do
       expect(@course.enable_offline_web_export?).to eq false
       account = Account.default
