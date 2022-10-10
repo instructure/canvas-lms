@@ -36,7 +36,7 @@
   <div class="section_content">
     <% if page_section %>
       <% if !page_section["section_type"] || page_section["section_type"] == "rich_text" || page_section["section_type"] == "html" %>
-        <%= page_section["content"] ? raw(page_section["content"]) : t('rich_text.default_content', "Nothing Entered Yet") %>
+        <%= page_section["content"] ? raw(Sanitize.clean(page_section["content"], CanvasSanitize::SANITIZE)) : t('rich_text.default_content', "Nothing Entered Yet") %>
       <% elsif page_section["section_type"] == "attachment" %>
         <div style="text-align: center;" class="attachment">
           <% attachment = @portfolio.shard.activate { @portfolio.user.attachments.find(page_section["attachment_id"]) } %>
