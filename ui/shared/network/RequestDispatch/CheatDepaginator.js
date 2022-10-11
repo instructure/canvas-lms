@@ -67,7 +67,13 @@ function consumePagesInOrder(callback, data) {
  * @param pageCallback - called for each page of data
  * @returns a Promise that will be resolved when all pages have been fetched
  */
-function cheaterDepaginate(url, params, pageCallback, pagesEnqueuedCallback = () => {}, dispatch) {
+function cheaterDepaginate(
+  url,
+  params,
+  pageCallback,
+  pagesEnqueuedCallback = _deferred => {},
+  dispatch
+) {
   const gotAllPagesDeferred = deferPromise()
   const data = []
   const errHandler = () => {

@@ -18,8 +18,8 @@
 
 type Deferred<T> = {
   state: 'pending' | 'resolved' | 'rejected'
-  promise: Promise<T | undefined>
-  resolve: (value?: T | undefined) => void
+  promise: Promise<T>
+  resolve: (value: T) => void
   reject: (error?: Error) => void
 }
 
@@ -32,7 +32,7 @@ export default function deferPromise<T>(): Deferred<T> {
   }
 
   deferred.promise = new Promise((resolve, reject) => {
-    deferred.resolve = (value?) => {
+    deferred.resolve = (value: T) => {
       if (deferred.state === 'pending') {
         deferred.state = 'resolved'
         resolve(value)

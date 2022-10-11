@@ -41,7 +41,8 @@ export type FiltersState = {
   addFilters: (filters: Filter[]) => void
   applyFilters: (filters: Filter[]) => void
   toggleFilter: (filter: Filter) => void
-  initializeStagedFilter: (InitialColumnFilterSettings, InitialRowFilterSettings) => void
+  initializeAppliedFilters: (InitialColumnFilterSettings, InitialRowFilterSettings) => void
+  initializeStagedFilters: () => void
   fetchFilters: () => Promise<void>
   saveStagedFilter: (filterPreset: PartialFilterPreset) => Promise<void>
   updateStagedFilterPreset: (filters: Filter[]) => void
@@ -95,14 +96,14 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     })
   },
 
-  initializeStagedFilter: (
+  initializeAppliedFilters: (
     initialRowFilterSettings: InitialRowFilterSettings,
     initialColumnFilterSettings: InitialColumnFilterSettings
   ) => {
-    const filters: Filter[] = []
+    const appliedFilters: Filter[] = []
 
     if (typeof initialRowFilterSettings.section_id === 'string') {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.section_id,
         type: 'section',
@@ -111,7 +112,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (typeof initialRowFilterSettings.student_group_id === 'string') {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialRowFilterSettings.student_group_id,
         type: 'student-group',
@@ -123,7 +124,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       typeof initialColumnFilterSettings.assignment_group_id === 'string' &&
       initialColumnFilterSettings.assignment_group_id !== '0'
     ) {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.assignment_group_id,
         type: 'assignment-group',
@@ -136,7 +137,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
         initialColumnFilterSettings.submissions || ''
       )
     ) {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.submissions || undefined,
         type: 'submissions',
@@ -148,7 +149,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       typeof initialColumnFilterSettings.context_module_id === 'string' &&
       initialColumnFilterSettings.context_module_id !== '0'
     ) {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.context_module_id,
         type: 'module',
@@ -157,7 +158,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (initialColumnFilterSettings.start_date && initialColumnFilterSettings.start_date !== '0') {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.start_date,
         type: 'start-date',
@@ -166,7 +167,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
     }
 
     if (initialColumnFilterSettings.end_date && initialColumnFilterSettings.end_date !== '0') {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.end_date,
         type: 'end-date',
@@ -178,7 +179,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       typeof initialColumnFilterSettings.grading_period_id === 'string' &&
       initialColumnFilterSettings.grading_period_id !== '0'
     ) {
-      filters.push({
+      appliedFilters.push({
         id: uuid.v4(),
         value: initialColumnFilterSettings.grading_period_id,
         type: 'grading-period',
@@ -186,13 +187,18 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
       })
     }
 
+    set({appliedFilters})
+  },
+
+  initializeStagedFilters: () => {
+    const appliedFilters = get().appliedFilters
+
     const savedFilterAlreadyMatches = get().filterPresets.some(filterPreset =>
-      doFiltersMatch(filterPreset.filters, filters)
+      doFiltersMatch(filterPreset.filters, appliedFilters)
     )
 
     set({
-      appliedFilters: filters,
-      stagedFilters: !savedFilterAlreadyMatches ? filters : [],
+      stagedFilters: !savedFilterAlreadyMatches ? appliedFilters : [],
     })
   },
 
@@ -205,6 +211,7 @@ export default (set: SetState<GradebookStore>, get: GetState<GradebookStore>): F
           filterPresets: response.json.map(deserializeFilter).sort(compareFilterSetByUpdatedDate),
           isFiltersLoading: false,
         })
+        get().initializeStagedFilters()
       })
       .catch(() => {
         set({
