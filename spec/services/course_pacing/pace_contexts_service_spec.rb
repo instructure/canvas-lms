@@ -30,10 +30,14 @@ describe CoursePacing::PaceContextsService do
     end
 
     context "for type 'section'" do
-      it "requires implementation" do
-        expect do
-          subject.contexts_of_type("section")
-        end.to raise_error(NotImplementedError)
+      let!(:default_section) { course.default_section }
+      let!(:section_one) { add_section("Section One", course: course) }
+      let!(:inactive_section) { add_section("Section Two", course: course) }
+
+      before { inactive_section.destroy! }
+
+      it "returns an array of the active sections" do
+        expect(subject.contexts_of_type("section")).to match_array [default_section, section_one]
       end
     end
 

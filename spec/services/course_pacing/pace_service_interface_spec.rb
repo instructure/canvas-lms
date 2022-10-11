@@ -52,9 +52,15 @@ describe CoursePacing::PaceServiceInterface do
 
         before { allow(CoursePacing::PaceServiceInterface).to receive(:template_pace_for).and_return(template) }
 
-        it "duplicates the template within the context" do
-          expect(template).to receive(:duplicate)
-          CoursePacing::PaceServiceInterface.pace_for(double)
+        it "returns the existing template" do
+          expect(CoursePacing::PaceServiceInterface.pace_for(double)).to eq template
+        end
+
+        context "when the should_duplicate option is set to true" do
+          it "duplicates the template within the context" do
+            expect(template).to receive(:duplicate)
+            CoursePacing::PaceServiceInterface.pace_for(double, should_duplicate: true)
+          end
         end
       end
     end

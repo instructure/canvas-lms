@@ -33,7 +33,7 @@ class CoursePacing::PacesApiController < ApplicationController
   end
 
   def show
-    pace = pacing_service.pace_for(context)
+    pace = pacing_service.pace_for(context, should_duplicate: true)
     render json: {
       pace: pacing_presenter.new(pace).as_json,
       progress: pace.id ? progress_json(pacing_service.progress(pace, publish: false), @current_user, session) : nil

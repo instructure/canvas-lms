@@ -23,15 +23,18 @@ class CoursePacing::PaceContextsPresenter
       name: pace_context.name,
       type: pace_context.class_name,
       item_id: pace_context.id,
-      associated_section_count: pace_context.course_sections.count,
+      associated_section_count: pace_context.try(:course_sections).try(:count),
       associated_student_count: pace_context.student_enrollments.count,
       applied_pace: applied_pace_for(pace_context)
     }
   end
 
   def self.applied_pace_for(pace_context)
-    applied_pace = pace_context.course_paces.primary.take
-    return nil if applied_pace.nil?
+    begin
+      applied_pace = CoursePacing::PaceServiceFactory.for(pace_context).pace_for(pace_context)
+    rescue ActiveRecord::RecordNotFound
+      return nil
+    end
 
     {
       name: applied_pace.effective_name,
