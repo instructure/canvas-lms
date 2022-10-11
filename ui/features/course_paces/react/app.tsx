@@ -31,11 +31,12 @@ import Footer from './components/footer'
 import Header from './components/header/header'
 import PaceModal from './components/pace_modal'
 import PacePicker from './components/header/pace_picker'
-import {ResponsiveSizes, StoreState} from './types'
+import CoursePaceEmpty from './components/course_pace_table/course_pace_empty'
+import {ResponsiveSizes, StoreState, CoursePace} from './types'
 import {getLoadingMessage, getShowLoadingOverlay, getShowPaceModal} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {getSummarizedChanges} from './reducers/course_paces'
+import {getSummarizedChanges, getCoursePace} from './reducers/course_paces'
 import {coursePaceActions} from './actions/course_paces'
 import {SummarizedChange} from './utils/change_tracking'
 import {Tray} from '@instructure/ui-tray'
@@ -50,6 +51,7 @@ interface StoreProps {
   readonly showLoadingOverlay: boolean
   readonly modalOpen: boolean
   readonly unpublishedChanges: SummarizedChange[]
+  readonly coursePace: CoursePace
 }
 
 interface DispatchProps {
@@ -73,6 +75,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   responsiveSize,
   pollForPublishStatus,
   unpublishedChanges,
+  coursePace,
 }) => {
   const [trayOpen, setTrayOpen] = useState(false)
 
@@ -97,7 +100,18 @@ export const App: React.FC<ResponsiveComponentProps> = ({
         <>
           <Flex as="section" alignItems="end" wrap="wrap">
             <FlexItem margin="0 0 small">
-              <PacePicker />
+              <Header
+                coursePace={coursePace}
+                isBlueprintLocked={isBlueprintLocked}
+                setIsBlueprintLocked={setIsBlueprintLocked}
+                handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+                responsiveSize={responsiveSize}
+              />
+              {!coursePace.id && coursePace.context_type == 'Course' ? (
+                <CoursePaceEmpty responsiveSize={responsiveSize} />
+              ) : (
+                <PacePicker />
+              )}
             </FlexItem>
           </Flex>
           <PaceModal
@@ -177,6 +191,7 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     showLoadingOverlay: getShowLoadingOverlay(state),
     modalOpen: getShowPaceModal(state),
     unpublishedChanges: getSummarizedChanges(state),
+    coursePace: getCoursePace(state),
   }
 }
 
