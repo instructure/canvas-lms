@@ -666,7 +666,12 @@
                   <%= settings.label     :enable_push_notifications, :en => "Enable push notifications to mobile devices" %>
                 </div>
               <% end %>
-
+              <% unless @account.site_admin? %>
+                <div>
+                  <%= settings.check_box :kill_joy, :checked => @account.kill_joy? %>
+                  <%= settings.label     :kill_joy, :en => "Remove hidden game from 404 page" %>
+                </div>
+              <% end %>
             <% end %>
             <% unless @account.site_admin? %>
               <div>
