@@ -162,11 +162,12 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
           contextType={props.coursePace.context_type}
         />
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer theme={{padding: '0'}}>
         <Footer
           blueprintLocked={isBlueprintLocked}
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}
+          responsiveSize={props.responsiveSize}
         />
       </Modal.Footer>
     </Modal>
