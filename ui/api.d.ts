@@ -205,11 +205,14 @@ export type AssignmentMap = {
 }
 
 export type AssignmentGroup = {
+  assignments: Assignment[]
+  group_weight: number
   id: string
+  integration_data: any
   name: string
   position: number
-  group_weight: number
-  assignments: Assignment[]
+  rules: any
+  sis_source_id: null | string
 }
 
 export type AssignmentGroupMap = {

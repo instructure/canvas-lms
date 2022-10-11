@@ -48,9 +48,7 @@ export default class SisOverridesLoader {
 
     // eslint-disable-next-line promise/catch-or-return
     this._dispatch.getDepaginated<AssignmentGroup[]>(url, params).then(data => {
-      if (data) {
-        this._gradebook.addOverridesToPostGradesStore(data)
-      }
+      this._gradebook.addOverridesToPostGradesStore(data)
     })
   }
 }

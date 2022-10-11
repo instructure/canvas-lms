@@ -192,7 +192,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
   })
 
@@ -211,7 +212,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
     expect(store.getState().stagedFilters).toMatchObject([
       {
@@ -237,7 +239,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
     expect(store.getState().stagedFilters).toMatchObject([
       {
@@ -263,7 +266,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
     expect(store.getState().stagedFilters).toMatchObject([
       {
@@ -289,7 +293,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
     expect(store.getState().stagedFilters).toMatchObject([
       {
@@ -315,7 +320,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
   })
 
@@ -334,7 +340,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).not.toBeNull()
     expect(store.getState().stagedFilters).toMatchObject([
       {
@@ -360,7 +367,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters).toMatchObject([
       {
         id: expect.any(String),
@@ -385,7 +393,8 @@ describe('filtersState', () => {
       start_date: null,
       end_date: null,
     }
-    store.getState().initializeStagedFilter(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeAppliedFilters(initialRowFilterSettings, initialColumnFilterSettings)
+    store.getState().initializeStagedFilters()
     expect(store.getState().stagedFilters.length).toStrictEqual(0)
   })
 

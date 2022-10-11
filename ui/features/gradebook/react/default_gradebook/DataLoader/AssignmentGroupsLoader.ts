@@ -19,6 +19,17 @@
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
 import type PerformanceControls from '../PerformanceControls'
+import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
+import type {AssignmentGroup, SubmissionType} from '../../../../../api.d'
+
+type AssignmentLoaderParams = {
+  include: string[]
+  override_assignment_dates: boolean
+  exclude_response_fields: string[]
+  exclude_assignment_submission_types: SubmissionType[]
+  per_page: number
+  assignment_ids?: string
+}
 
 export default class AssignmentGroupsLoader {
   _gradebook: Gradebook
@@ -27,9 +38,7 @@ export default class AssignmentGroupsLoader {
 
   _performanceControls: PerformanceControls
 
-  pathName: string
-
-  requestCharacterLimit: number
+  requestCharacterLimit?: number
 
   constructor({
     dispatch,
@@ -40,13 +49,14 @@ export default class AssignmentGroupsLoader {
     dispatch: RequestDispatch
     gradebook: Gradebook
     performanceControls: PerformanceControls
-    requestCharacterLimit: number
+    requestCharacterLimit?: number
   }) {
     this._dispatch = dispatch
     this._gradebook = gradebook
     this._performanceControls = performanceControls
-    this.requestCharacterLimit = requestCharacterLimit
-    this.pathName = `/api/v1/courses/${this._gradebook.course.id}/assignment_groups`
+    if (requestCharacterLimit) {
+      this.requestCharacterLimit = requestCharacterLimit
+    }
   }
 
   loadAssignmentGroups() {
@@ -64,7 +74,7 @@ export default class AssignmentGroupsLoader {
 
     // Careful when adding new params here. If the param content is too long,
     // you can end up triggering a '414 Request URI Too Long' from Apache.
-    const params = {
+    const params: AssignmentLoaderParams = {
       exclude_assignment_submission_types: ['wiki_page'],
       exclude_response_fields: [
         'description',
@@ -85,79 +95,61 @@ export default class AssignmentGroupsLoader {
     return this._getAssignmentGroups(params)
   }
 
-  _maxAssignmentCount(params) {
-    const createQueryString = ([key, val]) => {
-      if (Array.isArray(val)) {
-        return val.map(v => createQueryString([`${key}[]`, v])).join('&')
-      }
-
-      return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`
-    }
-
-    const queryString = Object.entries(params).map(createQueryString).join('&')
-    const currentURI = `${window.location.hostname}${this.pathName}?${queryString}`
-    const charsAvailable = this.requestCharacterLimit - `${currentURI}&assignment_ids=`.length
-    const globalIdLength = 8
-    const assignmentParam = encodeURIComponent(`${'0'.repeat(globalIdLength)},`)
-
-    return Math.floor(charsAvailable / assignmentParam.length)
-  }
-
   // If we're filtering by grading period in Gradebook, send two requests for assignments:
   // one for assignments in the selected grading period, and one for the rest.
-  _loadAssignmentGroupsForGradingPeriods(params, periodId: string) {
-    const assignmentIdsByGradingPeriod = this._gradingPeriodAssignmentIds(periodId)
-    const maxAssignments = this._maxAssignmentCount(params)
+  _loadAssignmentGroupsForGradingPeriods(params: AssignmentLoaderParams, selectedPeriodId: string) {
+    const gradingPeriodAssignments = this._gradebook.courseContent.gradingPeriodAssignments
+    const selectedAssignmentIds = this._gradebook.getGradingPeriodAssignments(selectedPeriodId)
+
+    const {otherAssignmentIds, otherGradingPeriodIds} = otherGradingPeriodAssignmentIds(
+      gradingPeriodAssignments,
+      selectedAssignmentIds,
+      selectedPeriodId
+    )
+
+    const maxAssignments = maxAssignmentCount(
+      params,
+      `/api/v1/courses/${this._gradebook.course.id}/assignment_groups`,
+      this.requestCharacterLimit
+    )
 
     // If our assignment_ids param is going to put us over Apache's max URI length,
     // we fall back to requesting all assignments in one query, excluding the
     // assignment_ids param entirely
     if (
-      assignmentIdsByGradingPeriod.selected.length > maxAssignments ||
-      assignmentIdsByGradingPeriod.rest.ids.length > maxAssignments
+      selectedAssignmentIds.length > maxAssignments ||
+      otherAssignmentIds.length > maxAssignments
     ) {
       return this._getAssignmentGroups(params)
     }
 
     // If there are no assignments in the selected grading period, request all
     // assignments in a single query
-    if (assignmentIdsByGradingPeriod.selected.length === 0) {
+    if (selectedAssignmentIds.length === 0) {
       return this._getAssignmentGroups(params)
     }
 
     const gotGroups = this._getAssignmentGroups(
-      {...params, assignment_ids: assignmentIdsByGradingPeriod.selected.join()},
-      [periodId]
+      {...params, assignment_ids: selectedAssignmentIds.join()},
+      [selectedPeriodId]
     )
 
     this._getAssignmentGroups(
-      {...params, assignment_ids: assignmentIdsByGradingPeriod.rest.ids.join()},
-      assignmentIdsByGradingPeriod.rest.gradingPeriodIds
+      {...params, assignment_ids: otherAssignmentIds.join()},
+      otherGradingPeriodIds
     )
 
     return gotGroups
   }
 
-  _getAssignmentGroups(params, gradingPeriodIds?: string[]) {
-    return this._dispatch.getDepaginated(this.pathName, params).then(assignmentGroups => {
-      this._gradebook.updateAssignmentGroups(assignmentGroups, gradingPeriodIds)
-    })
-  }
+  _getAssignmentGroups(params: AssignmentLoaderParams, gradingPeriodIds?: string[]) {
+    const pathName = `/api/v1/courses/${this._gradebook.course.id}/assignment_groups`
 
-  _gradingPeriodAssignmentIds(selectedPeriodId: string) {
-    const gpAssignments = this._gradebook.courseContent.gradingPeriodAssignments
-    const selectedIds = this._gradebook.getGradingPeriodAssignments(selectedPeriodId)
-    const restIds = Object.values(gpAssignments)
-      .flat()
-      .filter(id => !selectedIds.includes(id))
-
-    return {
-      selected: selectedIds,
-      rest: {
-        ids: [...new Set(restIds)],
-        gradingPeriodIds: Object.keys(gpAssignments).filter(gpId => gpId !== selectedPeriodId),
-      },
-    }
+    return this._dispatch
+      .getDepaginated<AssignmentGroup[]>(pathName, params)
+      .then(assignmentGroups => {
+        this._gradebook.updateAssignmentGroups(assignmentGroups, gradingPeriodIds)
+      })
   }
 
   _gradingPeriodId() {

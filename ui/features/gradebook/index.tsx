@@ -19,6 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import GradebookData from './react/default_gradebook/GradebookData'
+import type {GradebookOptions} from './react/default_gradebook/gradebook.d'
 import ready from '@instructure/ready'
 
 import('@canvas/context-cards/react/StudentContextCardTrigger')
@@ -51,7 +52,7 @@ ready(() => {
       currentUserId={ENV.current_user_id as string}
       filterNavNode={filterNavNode}
       flashMessageContainer={flashMessageContainer}
-      gradebookEnv={ENV.GRADEBOOK_OPTIONS}
+      gradebookEnv={ENV.GRADEBOOK_OPTIONS as GradebookOptions}
       gradebookGridNode={gradebookGridNode}
       gradebookMenuNode={gradebookMenuNode}
       gradingPeriodsFilterContainer={gradingPeriodsFilterContainer}

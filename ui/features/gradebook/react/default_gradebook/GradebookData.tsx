@@ -20,11 +20,28 @@ import React, {useRef, useEffect} from 'react'
 import shallow from 'zustand/shallow'
 import {camelize} from 'convert-case'
 import Gradebook from './Gradebook'
+import type {GradebookOptions} from './gradebook.d'
 import PerformanceControls from './PerformanceControls'
 import {RequestDispatch} from '@canvas/network'
 import useStore from './stores/index'
 
-export default function GradebookData(props) {
+type Props = {
+  applyScoreToUngradedModalNode: HTMLElement
+  currentUserId: string
+  filterNavNode: HTMLElement
+  flashMessageContainer: HTMLElement
+  gradebookEnv: GradebookOptions
+  gradebookGridNode: HTMLElement
+  gradebookMenuNode: HTMLElement
+  gradingPeriodsFilterContainer: HTMLElement
+  gridColorNode: HTMLElement
+  hideGrid?: false
+  locale: string
+  settingsModalButtonContainer: HTMLElement
+  viewOptionsMenuNode: HTMLElement
+}
+
+export default function GradebookData(props: Props) {
   const performanceControls = useRef(
     new PerformanceControls(camelize(props.gradebookEnv.performance_controls))
   )
@@ -38,7 +55,8 @@ export default function GradebookData(props) {
 
   const appliedFilters = useStore(state => state.appliedFilters, shallow)
   const isFiltersLoading = useStore(state => state.isFiltersLoading)
-  const initializeStagedFilter = useStore(state => state.initializeStagedFilter)
+  const initializeAppliedFilters = useStore(state => state.initializeAppliedFilters)
+  const initializeStagedFilters = useStore(state => state.initializeStagedFilters)
   const fetchFilters = useStore(state => state.fetchFilters)
 
   const modules = useStore(state => state.modules)
@@ -66,23 +84,25 @@ export default function GradebookData(props) {
       courseId,
       dispatch: dispatch.current,
       performanceControls: performanceControls.current,
+      hasModules: props.gradebookEnv.has_modules,
     })
-  }, [courseId, props.gradebookEnv.enhanced_gradebook_filters])
+    initializeAppliedFilters(
+      props.gradebookEnv.settings.filter_rows_by || {},
+      props.gradebookEnv.settings.filter_columns_by || {}
+    )
+  }, [
+    courseId,
+    props.gradebookEnv.enhanced_gradebook_filters,
+    props.gradebookEnv.settings.filter_rows_by,
+    props.gradebookEnv.settings.filter_columns_by,
+    props.gradebookEnv.has_modules,
+    initializeAppliedFilters,
+  ])
 
   // Data loading logic goes here
   useEffect(() => {
     if (props.gradebookEnv.enhanced_gradebook_filters) {
       fetchFilters()
-        .then(() => {
-          initializeStagedFilter(
-            props.gradebookEnv.settings.filter_rows_by || {},
-            props.gradebookEnv.settings.filter_columns_by || {}
-          )
-        })
-        .catch(error => {
-          // eslint-disable-next-line no-console
-          console.error(error)
-        })
     }
     if (props.gradebookEnv.has_modules) {
       fetchModules()
@@ -94,7 +114,7 @@ export default function GradebookData(props) {
     fetchCustomColumns,
     props.gradebookEnv.enhanced_gradebook_filters,
     props.gradebookEnv.has_modules,
-    initializeStagedFilter,
+    initializeStagedFilters,
     props.gradebookEnv.settings.filter_rows_by,
     props.gradebookEnv.settings.filter_columns_by,
   ])

@@ -230,7 +230,7 @@ export function Portal({node, children}) {
 export type GradebookProps = {
   appliedFilters: Filter[]
   applyScoreToUngradedModalNode: HTMLElement
-  colors: StatusColors
+  currentUserId: string
   customColumns: CustomColumn[]
   dispatch: RequestDispatch
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
@@ -238,7 +238,7 @@ export type GradebookProps = {
   filterNavNode: HTMLElement
   flashAlerts: FlashAlertType[]
   flashMessageContainer: HTMLElement
-  gradebookEnv: any
+  gradebookEnv: GradebookOptions
   gradebookGridNode: HTMLElement
   gradebookMenuNode: HTMLElement
   gradingPeriodAssignments: GradingPeriodAssignmentMap
@@ -323,8 +323,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   course: Course
 
   filteredAssignmentIds: string[] = []
-
-  gradebookEnv: any
 
   gradebookSettingsModal?: React.RefObject<HTMLElement & {open: () => void}>
 
@@ -418,14 +416,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       : null
     this.gridDisplaySettings = getInitialGridDisplaySettings(
       this.options.settings,
-      this.props.colors
+      this.props.gradebookEnv.colors
     )
     this.gradingPeriodId = this.getCurrentGradingPeriod()
 
     this.state = {
       assignmentGroups: [],
       gradingPeriodId: this.getCurrentGradingPeriod(),
-      gridColors: statusColors(this.options.colors),
+      gridColors: statusColors(this.props.gradebookEnv.colors),
       isEssentialDataLoaded: false,
       isGridLoaded: false,
       modules: [],
@@ -1959,7 +1957,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       contextAllowsGradebookUploads: this.options.context_allows_gradebook_uploads,
       gradebookImportUrl: this.options.gradebook_import_url,
       showStudentFirstLastName: this.gridDisplaySettings.showSeparateFirstLastNames,
-      currentUserId: this.options.currentUserId,
+      currentUserId: this.props.currentUserId,
       gradebookExportUrl: this.options.export_gradebook_csv_url,
       postGradesLtis: this.postGradesLtis,
       postGradesFeature: {
@@ -2047,7 +2045,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       courseFeatures: this.courseFeatures,
       courseSettings: this.courseSettings,
       gradedLateSubmissionsExist: this.options.graded_late_submissions_exist,
-      locale: this.options.locale,
+      locale: this.props.locale,
       gradebookIsEditable: this.options.gradebook_is_editable,
       onClose: () => {
         return this.gradebookSettingsModalButton.current?.focus()
@@ -3376,11 +3374,11 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       assignment: camelize(assignment),
       colors: this.state.gridColors,
       courseId: this.options.context_id,
-      currentUserId: this.options.currentUserId,
+      currentUserId: this.props.currentUserId,
       enterGradesAs: this.getEnterGradesAsSetting(assignmentId),
       gradingDisabled:
         !!(submissionState != null ? submissionState.locked : undefined) || student.isConcluded,
-      gradingScheme: this.getAssignmentGradingScheme(assignmentId)?.data,
+      gradingScheme: this.getAssignmentGradingScheme(assignmentId)?.data || null,
       isFirstAssignment,
       isInOtherGradingPeriod: !!(submissionState != null
         ? submissionState.inOtherGradingPeriod
@@ -3399,7 +3397,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         (this.options.group_weighting_scheme === 'percent' && isGroupWeightZero),
       isOpen: open,
       latePolicy: this.courseContent.latePolicy,
-      locale: this.options.locale,
+      locale: this.props.locale,
       onAnonymousSpeedGraderClick: this.showAnonymousSpeedGraderAlertForURL,
       onClose: () => this.gradebookGrid?.gridSupport?.helper.focus(),
       onGradeSubmission: this.gradeSubmission,

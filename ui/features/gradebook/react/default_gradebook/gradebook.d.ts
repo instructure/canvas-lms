@@ -417,7 +417,7 @@ export type SerializedComment = {
   authorUrl?: string
 }
 
-type AssignmentWithOverride = {
+export type AssignmentWithOverride = {
   id: string
   name: string
   due_at: string

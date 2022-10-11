@@ -28,7 +28,9 @@ import {
   getDefaultSettingKeyForColumnType,
   getGradeAsPercent,
   getStudentGradeForColumn,
+  maxAssignmentCount,
   onGridKeyDown,
+  otherGradingPeriodAssignmentIds,
   sectionList,
 } from '../Gradebook.utils'
 import {isDefaultSortOrder, localeSort} from '../Gradebook.sorting'
@@ -454,5 +456,44 @@ describe('assignmentSearchMatcher', () => {
   test('does not treat the search term as a regular expression', () => {
     const option = {id: '122', label: 'Science Lab II'}
     expect(assignmentSearchMatcher(option, 'Science.*II')).toStrictEqual(false)
+  })
+})
+
+describe('maxAssignmentCount', () => {
+  it('computes max number of assignments that can be made in a request', () => {
+    expect(
+      maxAssignmentCount(
+        {
+          include: ['a', 'b'],
+          override_assignment_dates: true,
+          exclude_response_fields: ['c', 'd'],
+          exclude_assignment_submission_types: ['on_paper', 'discussion_topic'],
+          per_page: 10,
+          assignment_ids: '1,2,3',
+        },
+        'courses/1/long/1/url'
+      )
+    ).toStrictEqual(698)
+  })
+})
+
+describe('otherGradingPeriodAssignmentIds', () => {
+  it('computes max number of assignments that can be made in a request', () => {
+    const gradingPeriodAssignments = {
+      1: ['1', '2', '3', '4', '5'],
+      2: ['6', '7', '8', '9', '10'],
+    }
+    const selectedAssignmentIds = ['1', '2']
+    const selectedPeriodId = '1'
+    expect(
+      otherGradingPeriodAssignmentIds(
+        gradingPeriodAssignments,
+        selectedAssignmentIds,
+        selectedPeriodId
+      )
+    ).toStrictEqual({
+      otherGradingPeriodIds: ['2'],
+      otherAssignmentIds: ['3', '4', '5', '6', '7', '8', '9', '10'],
+    })
   })
 })
