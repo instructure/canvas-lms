@@ -55,6 +55,14 @@ isolated_view:
     Discussions Redesign work.
   applies_to: SiteAdmin
 
+split_screen_view:
+  state: hidden
+  display_name: Discussions Redesign - Split Screen View
+  description: |-
+    This feature flag enables the Split Screen View inside the new
+    Discussions Redesign work.
+  applies_to: SiteAdmin
+
 discussion_create:
   state: hidden
   display_name: Discussion Create/Edit Page React Update
