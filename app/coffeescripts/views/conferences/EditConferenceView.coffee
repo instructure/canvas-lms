@@ -208,11 +208,8 @@ define [
         url: url_string,
         data: {role_ids: ids },
         success: (data) ->
-          console.log(data)
-        error: {},
+          $('#members_list').html(data)
       })
-
-      # console.log($(e.currentTarget).val())
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->

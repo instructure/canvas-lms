@@ -363,13 +363,7 @@ class ConferencesController < ApplicationController
     else
       @users = @context.users.joins(enrollments: :role).where("users.id<>?", @current_user).where(enrollments: {role_id: @roles.pluck(:id)}).order(User.sortable_name_order_by_clause).to_a.uniq
     end
-    # respond_to do |format|
-    #   format.json { render json: @users.map { |u| {:id => u.id, :name => u.last_name_first} } }
-    # end
-    # js_env(
-    #   users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
-    #   # roles: @roles.map { |r| {id: r.id, name: (r.name.match?(/Ta/) ? r.name.gsub(/Enrollment/, '').upcase! : r.name.gsub(/Enrollment/, '')) }}
-    # )
+    render partial: 'members_list', locals: {users: @users}
   end
 
   protected
