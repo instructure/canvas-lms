@@ -130,6 +130,12 @@ export const compress = (coursePace: CoursePace, extraSaveParams = {}) =>
     },
   }).then(({json}) => json)
 
+export const removePace = (coursePace: CoursePace) =>
+  doFetchApi<{course_pace: CoursePace}>({
+    path: `/api/v1/courses/${coursePace.course_id}/course_pacing/${coursePace.id}`,
+    method: 'DELETE',
+  }).then(({json}) => json)
+
 /* API transformers
  * functions and interfaces to transform the frontend formatted objects
  * to the format required for backend consumption

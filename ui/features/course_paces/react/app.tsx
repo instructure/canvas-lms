@@ -122,7 +122,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
             />
           </View>
           <Body blueprintLocked={isBlueprintLocked} />
-          <Footer blueprintLocked={isBlueprintLocked} />
+          <Footer blueprintLocked={isBlueprintLocked} responsiveSize={responsiveSize} />
           <Tray
             label={I18n.t('Unpublished Changes tray')}
             open={trayOpen}
@@ -145,7 +145,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
   return (
     <View>
       <Overlay open={showLoadingOverlay} transition="fade" label={loadingMessage}>
-        <Mask>
+        <Mask theme={{zIndex: 10001 /* to appear over the fullscreen modal */}}>
           <Spinner renderTitle="Loading" size="large" margin="0 0 0 medium" />
         </Mask>
       </Overlay>

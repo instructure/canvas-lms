@@ -36,6 +36,7 @@ const CREATE_API = `/api/v1/courses/${COURSE.id}/course_pacing`
 const UPDATE_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 const PROGRESS_API = `/api/v1/progress/${PROGRESS_RUNNING.id}`
 const COMPRESS_API = `/api/v1/courses/${COURSE.id}/course_pacing/compress_dates`
+const DESTROY_API = `/api/v1/courses/${COURSE.id}/course_pacing/${PRIMARY_PACE.id}`
 
 const dispatch = jest.fn()
 
@@ -291,6 +292,59 @@ describe('Course paces actions', () => {
       await thunkedAction(asyncDispatch, getState)
 
       expect(asyncDispatch.mock.calls.length).toBe(2)
+    })
+  })
+
+  describe('removePace', () => {
+    it('shows and hides loading overlay properly', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls[0]).toEqual([
+        uiActions.showLoadingOverlay('Removing pace...'),
+      ])
+      expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('removePace')])
+      expect(asyncDispatch.mock.calls[2]).toEqual([uiActions.hidePaceModal()])
+      expect(asyncDispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
+    })
+
+    it('calls the destroy pace API', async () => {
+      fetchMock.delete(DESTROY_API, {course_pace: {...PRIMARY_PACE}})
+      const updatedPace = {...PRIMARY_PACE}
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(dispatch, getState)
+
+      expect(fetchMock.called(DESTROY_API, 'DELETE')).toBe(true)
+    })
+
+    it('sets an error if the request fails', async () => {
+      const asyncDispatch = jest.fn(() => Promise.resolve())
+      const updatedPace = {...PRIMARY_PACE}
+      const error = new Error('Bad!')
+      const getState = mockGetState(updatedPace, PRIMARY_PACE)
+      fetchMock.delete(DESTROY_API, {
+        throws: error,
+      })
+
+      const thunkedAction = coursePaceActions.removePace()
+      await thunkedAction(asyncDispatch, getState)
+
+      expect(asyncDispatch.mock.calls.length).toBe(4)
+      expect(asyncDispatch.mock.calls[0]).toEqual([
+        uiActions.showLoadingOverlay('Removing pace...'),
+      ])
+      expect(asyncDispatch.mock.calls[1]).toEqual([uiActions.clearCategoryError('removePace')])
+      expect(asyncDispatch.mock.calls[2]).toEqual([
+        uiActions.setCategoryError('removePace', error.toString()),
+      ])
+      expect(asyncDispatch.mock.calls[3]).toEqual([uiActions.hideLoadingOverlay()])
     })
   })
 })

@@ -18,7 +18,7 @@
 
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
@@ -260,6 +260,24 @@ const thunkActions = {
           dispatch(uiActions.hideLoadingOverlay())
           dispatch(uiActions.setCategoryError('compress', error?.toString()))
           console.log(error) // eslint-disable-line no-console
+        })
+    }
+  },
+  removePace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      dispatch(uiActions.showLoadingOverlay(I18n.t('Removing pace...')))
+      dispatch(uiActions.clearCategoryError('removePace'))
+
+      return Api.removePace(getState().coursePace)
+        .then(() => {
+          dispatch(uiActions.hidePaceModal())
+          showFlashSuccess(I18n.t('Pace removed'))()
+        })
+        .catch(error => {
+          dispatch(uiActions.setCategoryError('removePace', error?.toString()))
+        })
+        .finally(() => {
+          dispatch(uiActions.hideLoadingOverlay())
         })
     }
   },
