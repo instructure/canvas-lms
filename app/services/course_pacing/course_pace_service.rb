@@ -17,26 +17,20 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class CoursePacing::PaceContextsService
-  attr_reader :course
-
-  def initialize(course)
-    @course = course
+class CoursePacing::CoursePaceService < CoursePacing::PaceServiceInterface
+  def self.paces_in_course(course)
+    course.course_paces.primary
   end
 
-  def contexts_of_type(type)
-    case type
-    when "course"
-      [course]
-    when "section"
-      course.active_course_sections
-    when "student_enrollment"
-      raise NotImplementedError
-    else
-      Canvas::Errors.capture_exception(
-        :pace_contexts_service,
-        "Expected a value of 'course', 'section', or 'student_enrollment', got '#{type}'"
-      )
-    end
+  def self.pace_in_context(course)
+    paces_in_course(course).first!
+  end
+
+  def self.template_pace_for(_)
+    nil
+  end
+
+  def self.course_for(course)
+    course
   end
 end

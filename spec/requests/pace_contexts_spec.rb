@@ -71,11 +71,57 @@ describe "Pace Contexts API" do
     end
 
     context "when the section type is specified" do
-      it "returns an empty array" do
+      let!(:section_one) { add_section("Section One", course: course) }
+
+      it "returns an array containing the sections" do
         get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
         expect(response.status).to eq 200
         json = JSON.parse(response.body)
-        expect(json["pace_contexts"]).to match_array([])
+        course.course_sections.each do |section|
+          context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == section.id }
+          expect(context_json["name"]).to eq section.name
+          expect(context_json["applied_pace"]["type"]).to eq "Course"
+        end
+      end
+
+      it "paginates results" do
+        get api_v1_pace_contexts_path(course.id), params: { type: "section", per_page: 1, format: :json }
+        expect(response.status).to eq 200
+        json = JSON.parse(response.body)
+        expect(json["pace_contexts"].count).to eq 1
+        expect(json["pace_contexts"][0]["item_id"]).to eq course.default_section.id
+
+        get api_v1_pace_contexts_path(course.id), params: { type: "section", per_page: 1, page: 2, format: :json }
+        expect(response.status).to eq 200
+        json = JSON.parse(response.body)
+        expect(json["pace_contexts"].count).to eq 1
+        expect(json["pace_contexts"][0]["item_id"]).to eq section_one.id
+      end
+
+      context "when a section has its own pace" do
+        before { section_pace_model(section: section_one) }
+
+        it "specifies the correct applied_pace" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          course.course_sections.each do |section|
+            context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == section.id }
+            expected_pace_type = section.course_paces.count > 0 ? "Section" : "Course"
+            expect(context_json["applied_pace"]["type"]).to eq expected_pace_type
+          end
+        end
+      end
+
+      context "when the default pace doesn't exist" do
+        before { default_pace.destroy! }
+
+        it "returns nil for the applied_pace" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].map { |pc| pc["applied_pace"] }).to match_array [nil, nil]
+        end
       end
     end
 
