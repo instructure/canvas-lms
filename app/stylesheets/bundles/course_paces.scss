@@ -89,3 +89,7 @@
 .course-paces-assignment-row-points-possible {
   color: $ic-color-medium-darker;
 }
+
+.course-paces-metrics-heading [data-cid="Metric"] {
+  flex-direction: column;
+}

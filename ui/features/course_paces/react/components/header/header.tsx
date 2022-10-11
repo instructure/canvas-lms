@@ -16,15 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
+import {Metric, MetricGroup} from '@instructure/ui-metric'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Heading} from '@instructure/ui-heading'
+import {IconCoursesLine} from '@instructure/ui-icons'
 import PacePicker from './pace_picker'
 import ProjectedDates from './projected_dates/projected_dates'
 import Settings from './settings/settings'
@@ -32,11 +36,17 @@ import BlueprintLock from './blueprint_lock'
 import UnpublishedChangesIndicator from '../unpublished_changes_indicator'
 import {getSelectedContextId, getSelectedContextType} from '../../reducers/ui'
 import {isNewPace} from '../../reducers/course_paces'
-import {StoreState} from '../../types'
+import {CoursePace, StoreState, ResponsiveSizes} from '../../types'
+import {actions} from '../../actions/ui'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 const I18n = useI18nScope('course_paces_header')
 
 const {Item: FlexItem} = Flex as any
+
+interface DispatchProps {
+  readonly setSelectedPaceContext: typeof actions.setSelectedPaceContext
+}
 
 type StoreProps = {
   readonly context_type: string
@@ -45,12 +55,14 @@ type StoreProps = {
 }
 
 type PassedProps = {
+  coursePace: CoursePace
   handleDrawerToggle?: () => void
   setIsBlueprintLocked: (arg) => void
+  readonly responsiveSize: ResponsiveSizes
   readonly isBlueprintLocked: boolean
 }
 
-export type HeaderProps = PassedProps & StoreProps
+export type HeaderProps = PassedProps & StoreProps & DispatchProps
 
 const NEW_PACE_ALERT_MESSAGES = {
   Course: I18n.t(
@@ -66,7 +78,126 @@ const NEW_PACE_ALERT_MESSAGES = {
 
 export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
   const [newPaceAlertDismissed, setNewPaceAlertDismissed] = useState(false)
+  const [paceContext, setPaceContext] = useState({})
   const handleNewPaceAlertDismissed = useCallback(() => setNewPaceAlertDismissed(true), [])
+
+  if (window.ENV.FEATURES.course_paces_redesign) {
+    // Get the info for the heading, which pertains
+    // to the default pace / course context
+
+    // TODO: alter hook usage when contexts have their own actions and reducers
+    useEffect(() => {
+      doFetchApi({
+        path: `/api/v1/courses/${window.ENV?.COURSE_ID}/pace_contexts?type=course`,
+      })
+        .then(({json}) => {
+          setPaceContext(json?.pace_contexts?.[0])
+        })
+        .catch(console.log)
+    }, [props.coursePace.updated_at])
+
+    const metricTheme = {
+      valueFontSize: '1.125rem',
+      labelFontSize: '0.875rem',
+      padding: '0 0.75rem',
+    }
+
+    const getDurationLabel = planDays => {
+      if (!planDays) return false
+      let weeks,
+        durations = []
+      if (planDays > 7) {
+        weeks = Math.floor(planDays / 7)
+        durations.push(I18n.t({one: '1 Week', other: '%{count} Weeks'}, {count: weeks}))
+        planDays -= weeks * 7
+      }
+      if (planDays > 0)
+        durations.push(I18n.t({one: '1 Day', other: '%{count} Days', zero: ''}, {count: planDays}))
+      return durations.join(', ')
+    }
+
+    return (
+      <View as="div" margin="0 0 small 0">
+        {paceContext?.name ? (
+          <Heading
+            level="h1"
+            theme={{h1FontWeight: 700, h1FontSize: '1.75rem'}}
+            margin="0 0 small 0"
+          >
+            {paceContext?.name}
+          </Heading>
+        ) : null}
+        <Text>
+          {I18n.t(
+            'Course Pacing is an automated tool ' +
+              'that creates a student schedule by combining' +
+              ' suggested hours per chapter, in-class school ' +
+              'days, and total hours to generate a date estimator.'
+          )}
+        </Text>
+        <View as="div" margin="small 0" borderRadius="medium" borderWidth="small" padding="medium">
+          <Flex
+            justifyItems="space-between"
+            direction={props.responsiveSize == 'large' ? 'row' : 'column'}
+          >
+            <FlexItem>
+              <Flex justifyItems={props.responsiveSize == 'large' ? 'start' : 'center'}>
+                {props.responsiveSize == 'large' ? (
+                  <FlexItem padding="0 medium 0 0">
+                    <IconCoursesLine size="small" />
+                  </FlexItem>
+                ) : null}
+                <FlexItem>
+                  <span className="course-paces-metrics-heading">
+                    <MetricGroup>
+                      <Metric
+                        theme={metricTheme}
+                        textAlign="start"
+                        renderLabel={I18n.t('Students')}
+                        renderValue={paceContext?.associated_student_count}
+                        isGroupChild={true}
+                      />
+                      <Metric
+                        theme={metricTheme}
+                        textAlign="start"
+                        renderLabel={I18n.t('Sections')}
+                        renderValue={paceContext?.associated_section_count}
+                        isGroupChild={true}
+                      />
+                      <Metric
+                        theme={metricTheme}
+                        textAlign="start"
+                        renderLabel={I18n.t('Duration')}
+                        renderValue={getDurationLabel(paceContext?.applied_pace?.duration) || '--'}
+                        isGroupChild={true}
+                      />
+                    </MetricGroup>
+                  </span>
+                </FlexItem>
+              </Flex>
+            </FlexItem>
+            <FlexItem
+              fontSize="0.875rem"
+              textAlign="center"
+              margin={props.responsiveSize == 'large' ? '0' : 'small 0 0'}
+            >
+              <Link
+                isWithinText={false}
+                onClick={() => {
+                  props.setSelectedPaceContext('Course', window.ENV.COURSE_ID)
+                }}
+              >
+                {!props.coursePace.id && props.coursePace.context_type == 'Course'
+                  ? I18n.t('Create Default Pace')
+                  : I18n.t('Edit Default Pace')}
+              </Link>
+            </FlexItem>
+          </Flex>
+        </View>
+      </View>
+    )
+  }
+
   return (
     <View as="div">
       <ScreenReaderContent>
@@ -120,4 +251,7 @@ const mapStateToProps = (state: StoreState) => {
     newPace: isNewPace(state),
   }
 }
-export default connect(mapStateToProps)(Header)
+
+export default connect(mapStateToProps, {
+  setSelectedPaceContext: actions.setSelectedPaceContext,
+})(Header)

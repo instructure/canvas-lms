@@ -46,12 +46,15 @@ import {SummarizedChange} from '../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_modal')
 
+interface StoreProps {
+  readonly coursePace: CoursePace
+}
+
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace
 }
 
 interface PassedProps {
-  readonly coursePace: CoursePace
   readonly changes?: SummarizedChange[]
   readonly isBlueprintLocked: boolean
   readonly responsiveSize: ResponsiveSizes
@@ -133,7 +136,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
             />
           </Flex>
           <ProjectedDates key={`${props.coursePace.context_type}-${props.coursePace.context_id}`} />
-          <Body blueprintLocked={isBlueprintLocked} />
+          <Body coursePace={props.coursePace} blueprintLocked={isBlueprintLocked} />
           <Tray
             label={I18n.t('Unpublished Changes tray')}
             open={trayOpen}

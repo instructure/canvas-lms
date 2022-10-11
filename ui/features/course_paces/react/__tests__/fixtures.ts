@@ -178,6 +178,17 @@ export const PRIMARY_PACE: CoursePace = {
   updated_at: '',
 }
 
+export const HEADING_STATS_API_RESPONSE = {
+  pace_contexts: [
+    {
+      name: 'Defense Against the Dark Arts',
+      associated_section_count: 3,
+      associated_student_count: 30,
+      applied_pace: {duration: 65},
+    },
+  ],
+}
+
 export const SECTION_PACE: CoursePace = {
   id: '2',
   course_id: COURSE.id,
