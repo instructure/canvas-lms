@@ -40,6 +40,7 @@ define [
       'click .all_users_checkbox': 'toggleAllUsers'
       'change #web_conference_long_running': 'changeLongRunning'
       'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
+      'change .role_checkbox': 'filterUsersByRole'
 
     render: ->
       super
@@ -194,6 +195,9 @@ define [
         $("#members_list").hide()
       else
         $("#members_list").slideDown()
+
+    filterUsersByRole: (e) ->
+      console.log($(e.currentTarget).val())
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->
