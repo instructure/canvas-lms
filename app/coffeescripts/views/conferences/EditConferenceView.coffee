@@ -197,7 +197,22 @@ define [
         $("#members_list").slideDown()
 
     filterUsersByRole: (e) ->
-      console.log($(e.currentTarget).val())
+      context_data = ENV.default_conference
+      context_type = context_data.context_type.toLowerCase() + 's'
+      context_id = context_data.context_id
+      url_string = '/' + context_type + '/' + context_id + '/conferences/filter_users_by_role'
+      checkboxes = Array.from($('.role_checkbox:checked'))
+      ids = checkboxes.map((checkbox) -> checkbox.value)
+      $.ajax({
+        type: "POST",
+        url: url_string,
+        data: {role_ids: ids },
+        success: (data) ->
+          console.log(data)
+        error: {},
+      })
+
+      # console.log($(e.currentTarget).val())
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->

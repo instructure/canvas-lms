@@ -143,7 +143,7 @@ class ConferencesController < ApplicationController
   before_action { |c| c.active_tab = "conferences" }
   before_action :require_config
   before_action :reject_student_view_student
-  before_action :get_conference, :except => [:index, :create]
+  before_action :get_conference, :except => [:index, :create, :filter_users_by_role]
 
   # @API List conferences
   # Retrieve the list of conferences for this context
@@ -350,6 +350,26 @@ class ConferencesController < ApplicationController
         format.json { render :json => @conference }
       end
     end
+  end
+
+  def filter_users_by_role
+    @roles = params[:role_ids].present? ? Role.where(id: params[:role_ids]) : Role.where(name: ['TaEnrollment', 'StudentEnrollment', 'TeacherEnrollment', 'ObserverEnrollment' ])
+    case @context
+    when Course
+      @users = User.joins(enrollments: :role).where(:id => @context.current_enrollments.not_fake.active_by_date.where(role_id: @roles.pluck(:id)).where.not(:user_id => @current_user).select(:user_id)).
+        order(User.sortable_name_order_by_clause).to_a
+    when Group
+      @users = @context.participating_users_in_context.joins(enrollments: :role).where("users.id<>?", @current_user).where(enrollments: {role_id: @roles.pluck(:id)}).order(User.sortable_name_order_by_clause).to_a.uniq
+    else
+      @users = @context.users.joins(enrollments: :role).where("users.id<>?", @current_user).where(enrollments: {role_id: @roles.pluck(:id)}).order(User.sortable_name_order_by_clause).to_a.uniq
+    end
+    # respond_to do |format|
+    #   format.json { render json: @users.map { |u| {:id => u.id, :name => u.last_name_first} } }
+    # end
+    # js_env(
+    #   users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+    #   # roles: @roles.map { |r| {id: r.id, name: (r.name.match?(/Ta/) ? r.name.gsub(/Enrollment/, '').upcase! : r.name.gsub(/Enrollment/, '')) }}
+    # )
   end
 
   protected

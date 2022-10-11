@@ -179,6 +179,7 @@ CanvasRails::Application.routes.draw do
       match :close, via: [:get, :post]
       get :settings
     end
+    post 'conferences/filter_users_by_role', action: :filter_users_by_role, controller: :conferences
   end
 
   get '/courses/:course_id/gradebook2', to: redirect('/courses/%{course_id}/gradebook')
