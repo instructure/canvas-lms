@@ -106,4 +106,43 @@ describe DiscussionTopicsApiController do
       expect(@student.attachments.first.instfs_uuid).to eq(uuid)
     end
   end
+
+  context "cross-sharding" do
+    specs_require_sharding
+
+    before do
+      course_with_student active_all: true
+      allow(controller).to receive_messages(form_authenticity_token: "abc", form_authenticity_param: "abc")
+      @topic = @course.discussion_topics.create!(title: "student topic", message: "Hello", user: @student)
+      @entry = @topic.discussion_entries.create!(message: "first message", user: @student)
+      @entry2 = @topic.discussion_entries.create!(message: "second message", user: @student)
+      @reply = @entry.discussion_subentries.create!(discussion_topic: @topic, message: "reply to first message", user: @student)
+    end
+
+    it "returns the entries across shards" do
+      user_session(@student)
+      @shard1.activate do
+        post "entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id }, format: "json"
+        expect(JSON.parse(response.body).count).to eq(2)
+      end
+
+      @shard2.activate do
+        post "entries", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id }, format: "json"
+        expect(JSON.parse(response.body).count).to eq(2)
+      end
+    end
+
+    it "returns the entry replies across shards" do
+      user_session(@student)
+      @shard1.activate do
+        post "replies", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id, entry_id: @entry.id }, format: "json"
+        expect(JSON.parse(response.body).count).to eq(1)
+      end
+
+      @shard2.activate do
+        post "replies", params: { topic_id: @topic.id, course_id: @course.id, user_id: @student.id, entry_id: @entry.id }, format: "json"
+        expect(JSON.parse(response.body).count).to eq(1)
+      end
+    end
+  end
 end

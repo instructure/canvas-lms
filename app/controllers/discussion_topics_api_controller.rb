@@ -755,11 +755,15 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   def all_entries(topic)
-    DiscussionEntry.all_for_topics(visible_topics(topic)).active
+    topic.shard.activate do
+      DiscussionEntry.all_for_topics(visible_topics(topic)).active
+    end
   end
 
   def root_entries(topic)
-    DiscussionEntry.top_level_for_topics(visible_topics(topic)).active
+    topic.shard.activate do
+      DiscussionEntry.top_level_for_topics(visible_topics(topic)).active
+    end
   end
 
   def reply_entries(entry)
