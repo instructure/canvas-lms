@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const addrPromise = new Promise((resolve, reject) => {
-  require('dns').lookup(require('os').hostname(), function (_, addr, _) {
+const addrPromise = new Promise(resolve => {
+  require('dns').lookup(require('os').hostname(), function (_1, addr, _2) {
     resolve(addr)
   })
 })
@@ -29,7 +29,7 @@ const karmaConfig = {
 
   proxies: {
     '/dist/brandable_css/': '/base/public/dist/brandable_css/',
-    '/images/': '/base/public/images/'
+    '/images/': '/base/public/images/',
   },
 
   exclude: [],
@@ -43,12 +43,12 @@ const karmaConfig = {
   junitReporter: {
     outputDir: process.env.TEST_RESULT_OUTPUT_DIR || 'coverage-js/junit-reports',
     outputFile: `karma-${process.env.JSPEC_GROUP || 'all'}.xml`,
-    useBrowserName: false // don't add browser name to report and classes names
+    useBrowserName: false, // don't add browser name to report and classes names
   },
   specReporter: {
     maxLogLines: 50, // limit number of lines logged per test
     suppressErrorSummary: false, // print error summary
-    showSpecTiming: true // print the time elapsed for each spec
+    showSpecTiming: true, // print the time elapsed for each spec
   },
 
   port: process.env.KARMA_PORT || 9876,
@@ -75,21 +75,21 @@ const karmaConfig = {
     // Chrome.
     ChromeWithoutBackground: {
       base: 'Chrome',
-      flags: ['--disable-renderer-backgrounding']
+      flags: ['--disable-renderer-backgrounding'],
     },
 
     // Run headless chrome with `karma start --browsers ChromeHeadlessNoSandbox`
     ChromeHeadlessNoSandbox: {
       base: 'ChromeHeadless',
-      flags: ['--no-sandbox', '--disable-renderer-backgrounding'] // needed for running tests in local docker
+      flags: ['--no-sandbox', '--disable-renderer-backgrounding'], // needed for running tests in local docker
     },
 
     ChromeSeleniumGridHeadless: {
       base: 'SeleniumGrid',
       gridUrl: 'http://selenium-hub:4444/wd/hub',
       browserName: 'chrome',
-      arguments: ['--no-sandbox', '--headless', '--disable-renderer-backgrounding']
-    }
+      arguments: ['--no-sandbox', '--headless', '--disable-renderer-backgrounding'],
+    },
   },
 
   // If browser does not capture in given timeout [ms], kill it
@@ -113,14 +113,14 @@ const karmaConfig = {
   files: [
     {pattern: 'spec/javascripts/webpack_spec_index.js', included: true, served: true},
     {pattern: 'spec/javascripts/fixtures/*', included: false, served: true},
-    {pattern: 'public/dist/brandable_css/**/*.css', included: false, served: true}
-  ],
+  ].concat(process.env.JSPEC_PATH ? process.env.JSPEC_PATH.split(' ') : []),
 
   preprocessors: {
-    'spec/javascripts/webpack_spec_index.js': ['webpack']
+    'spec/javascripts/webpack_spec_index.js': ['webpack'],
+    '**/*Spec.js': ['webpack'],
   },
 
-  webpack: require('./ui-build/webpack-for-karma')
+  webpack: require('./ui-build/webpack-for-karma'),
 }
 
 // For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable
@@ -129,22 +129,22 @@ if (process.env.COVERAGE === '1') {
   karmaConfig.coverageIstanbulReporter = {
     reports: ['html', 'json'],
     dir: 'coverage-karma/',
-    fixWebpackSourcePaths: true
+    fixWebpackSourcePaths: true,
   }
   karmaConfig.webpack.module.rules.unshift({
     test: /\.(js|coffee)$/,
     use: {
       loader: 'coverage-istanbul-loader',
-      options: {esModules: true, produceSourceMap: true}
+      options: {esModules: true, produceSourceMap: true},
     },
     enforce: 'post',
     exclude:
-      /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/
+      /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/,
   })
 }
 
-module.exports = async (config) => {
-  karmaConfig.hostname = await addrPromise;
+module.exports = async config => {
+  karmaConfig.hostname = await addrPromise
 
   // config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
   karmaConfig.logLevel = config.LOG_INFO
@@ -152,7 +152,7 @@ module.exports = async (config) => {
   // Allow passing in FORCED_FAILURE=true env variable to force failures in karma specs
   config.set({
     client: {
-      args: process.env.FORCE_FAILURE === '1' ? ['FORCE_FAILURE'] : []
-    }
+      args: process.env.FORCE_FAILURE === '1' ? ['FORCE_FAILURE'] : [],
+    },
   })
 }

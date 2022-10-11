@@ -69,22 +69,7 @@ const requireAll = context => {
   keys.map(context)
 }
 
-if (process.env.JSPEC_PATH) {
-  let isFile = false
-  try {
-    isFile = __webpack_modules__[require.resolveWeak(`../../${process.env.JSPEC_PATH}`)]
-  } catch (e) {
-    // ignore
-  }
-  if (isFile) {
-    // eslint-disable-next-line import/no-dynamic-require
-    require(`../../${process.env.JSPEC_PATH}`)
-  } else {
-    requireAll(
-      require.context(`../../${process.env.JSPEC_PATH}`, process.env.JSPEC_RECURSE !== '0', /\.js$/)
-    )
-  }
-} else {
+if (!process.env.JSPEC_PATH) {
   requireAll(
     require.context(
       CONTEXT_COFFEESCRIPT_SPEC,
@@ -99,9 +84,11 @@ if (process.env.JSPEC_PATH) {
       RESOURCE_EMBER_GRADEBOOK_SPEC
     )
   )
+
   requireAll(
     require.context(CONTEXT_JSX_SPEC, process.env.JSPEC_RECURSE !== '0', RESOURCE_JSX_SPEC)
   )
+
   // eslint-disable-next-line import/no-dynamic-require
   require(WEBPACK_PLUGIN_SPECS)
 }
