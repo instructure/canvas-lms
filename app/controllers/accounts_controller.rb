@@ -1768,7 +1768,7 @@ class AccountsController < ApplicationController
                                    :equella_teaser, :external_notification_warning, :global_includes,
                                    :google_docs_domain, :help_link_icon, :help_link_name,
                                    :include_integration_ids_in_gradebook_exports,
-                                   :include_students_in_global_survey, :license_type,
+                                   :include_students_in_global_survey, :kill_joy, :license_type,
                                    { lock_all_announcements: [:value, :locked] }.freeze,
                                    :login_handle_name, :mfa_settings, :no_enrollments_can_create_courses,
                                    :mobile_qr_login_is_enabled,
