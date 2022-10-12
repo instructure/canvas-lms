@@ -23,7 +23,7 @@ import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import select from 'obj-select'
 
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -266,7 +266,7 @@ export default class CourseSidebar extends Component {
     if (this.props.hasLoadedUnsyncedChanges && this.props.unsyncedChanges.length > 0) {
       return (
         <div className="bcs__row">
-          <Button
+          <Link
             aria-label={I18n.t(
               {one: 'There is 1 Unsynced Change', other: 'There are %{count} Unsynced Changes'},
               {count: this.props.unsyncedChanges.length}
@@ -275,11 +275,12 @@ export default class CourseSidebar extends Component {
             ref={c => {
               this.unsyncedChangesBtn = c
             }}
-            variant="link"
             onClick={this.handleUnsyncedChangesClick}
+            isWithinText={false}
+            margin="x-small 0"
           >
             <Text>{I18n.t('Unsynced Changes')}</Text>
-          </Button>
+          </Link>
           <PresentationContent>
             <Text>
               <span className="bcs__row-right-content">{this.props.unsyncedChanges.length}</span>
@@ -301,7 +302,7 @@ export default class CourseSidebar extends Component {
     const length = this.props.associations.length
     const button = (
       <div className="bcs__row bcs__row__associations">
-        <Button
+        <Link
           aria-label={I18n.t(
             {one: 'There is 1 Association', other: 'There are %{count} Associations'},
             {count: length}
@@ -311,11 +312,12 @@ export default class CourseSidebar extends Component {
           ref={c => {
             this.asscBtn = c
           }}
-          variant="link"
           onClick={this.handleAssociationsClick}
+          isWithinText={false}
+          margin="x-small 0"
         >
           <Text>{I18n.t('Associations')}</Text>
-        </Button>
+        </Link>
         <PresentationContent>
           <Text>
             <span className="bcs__row-right-content">{length}</span>
@@ -369,16 +371,17 @@ export default class CourseSidebar extends Component {
         <div>
           {this.maybeRenderAssociations()}
           <div className="bcs__row">
-            <Button
+            <Link
               id="mcSyncHistoryBtn"
               ref={c => {
                 this.syncHistoryBtn = c
               }}
-              variant="link"
               onClick={this.handleSyncHistoryClick}
+              isWithinText={false}
+              margin="x-small 0"
             >
               <Text>{I18n.t('Sync History')}</Text>
-            </Button>
+            </Link>
           </div>
           {this.maybeRenderUnsyncedChanges()}
           {this.maybeRenderSyncButton()}

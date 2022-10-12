@@ -20,10 +20,10 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Tray} from '@instructure/ui-tray'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
-import {Text} from '@instructure/ui-text'
-import {IconBlueprintSolid, IconXSolid} from '@instructure/ui-icons'
+import {View} from '@instructure/ui-view'
+import {IconBlueprintSolid} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('BlueprintCourseSidebar')
 
@@ -80,17 +80,17 @@ export default class BlueprintCourseSidebar extends Component {
     return (
       <div className="bcs__wrapper">
         <div className="bcs__trigger">
-          <Button
+          <IconButton
+            renderIcon={IconBlueprintSolid}
+            screenReaderLabel={I18n.t('Open sidebar')}
+            onClick={this.open}
             elementRef={c => {
               this.openBtn = c
             }}
-            variant="icon-inverse"
-            onClick={this.open}
-          >
-            <Text color="primary-inverse" size="large">
-              <IconBlueprintSolid title={I18n.t('Open sidebar')} />
-            </Text>
-          </Button>
+            color="primary-inverse"
+            withBorder={false}
+            withBackground={false}
+          />
         </div>
         <Tray
           label={I18n.t('Blueprint Settings')}
@@ -103,23 +103,22 @@ export default class BlueprintCourseSidebar extends Component {
         >
           <div className="bcs__content">
             <header className="bcs__header">
-              <div className="bcs__close-wrapper">
-                <Button
-                  variant="icon-inverse"
+              <View as="div" padding="medium" textAlign="center">
+                <CloseButton
+                  screenReaderLabel={I18n.t('Close sidebar')}
                   onClick={this.close}
                   elementRef={c => {
                     this.closeBtn = c
                   }}
-                >
-                  <Text color="primary-inverse" size="small">
-                    <IconXSolid title={I18n.t('Close sidebar')} />
-                  </Text>
-                </Button>
-              </div>
-              <Heading color="primary-inverse" level="h3">
-                <IconBlueprintSolid />
-                <span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
-              </Heading>
+                  color="primary-inverse"
+                  placement="start"
+                  offset="medium"
+                />
+                <Heading color="primary-inverse" level="h3">
+                  <IconBlueprintSolid />
+                  <span style={{marginLeft: '10px'}}>{I18n.t('Blueprint')}</span>
+                </Heading>
+              </View>
             </header>
             <div className="bcs__body">{this.props.children}</div>
           </div>
