@@ -19,7 +19,7 @@
 import React from 'react'
 import {arrayOf, bool, func, shape, string} from 'prop-types'
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
@@ -32,11 +32,11 @@ const {Item: MenuItem, Group: MenuGroup, Separator: MenuSeparator} = Menu as any
 
 function renderTriggerButton(bindButton) {
   return (
-    <Button ref={bindButton} variant="link">
+    <Link ref={bindButton} as="button">
       <Text color="primary">
         {I18n.t('View')} <IconMiniArrowDownSolid />
       </Text>
-    </Button>
+    </Link>
   )
 }
 

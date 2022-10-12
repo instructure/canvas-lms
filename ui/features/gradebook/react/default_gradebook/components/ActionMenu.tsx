@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Menu} from '@instructure/ui-menu'
 import {Text} from '@instructure/ui-text'
 import GradebookExportManager from '../../shared/GradebookExportManager'
@@ -350,12 +350,12 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
     return (
       <Menu
         trigger={
-          <Button variant="link">
+          <Link as="button">
             <Text {...buttonTypographyProps}>
               {I18n.t('Actions')}
               <IconMiniArrowDownSolid />
             </Text>
-          </Button>
+          </Link>
         }
       >
         {this.renderPostGradesTools()}
