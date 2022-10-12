@@ -39,7 +39,7 @@ type Props = {
   loginHandleName?: string
   onMenuDismiss: any
   onSelectPrimaryInfo: any
-  onToggleEnrollmentFilter: any
+  onToggleEnrollmentFilter: (enrollmentFilter: string, skipApply?: boolean) => void
   sectionsEnabled: boolean
   selectedEnrollmentFilters: any
   selectedPrimaryInfo: any

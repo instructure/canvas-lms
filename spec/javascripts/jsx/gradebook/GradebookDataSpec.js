@@ -162,7 +162,7 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook()
-    sinon.stub(gradebook.dataLoader, 'reloadStudentDataForEnrollmentFilterChange')
+    sinon.stub(gradebook.dataLoader, 'reloadStudentData')
   })
 
   test('makes a call to update column headers', () => {
@@ -182,23 +182,6 @@ QUnit.module('Gradebook#updateStudentHeadersAndReloadData', hooks => {
     gradebook.updateStudentHeadersAndReloadData()
     const [columnHeadersToUpdate] = updateColumnHeaders.lastCall.args
     deepEqual(columnHeadersToUpdate, ['student'])
-  })
-
-  test('reloads student data', () => {
-    gradebook.updateStudentHeadersAndReloadData()
-    strictEqual(gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange.callCount, 1)
-  })
-
-  test('reloads the student data after the column headers have been updated', () => {
-    const updateColumnHeaders = sinon.stub(
-      gradebook.gradebookGrid.gridSupport.columns,
-      'updateColumnHeaders'
-    )
-    gradebook.updateStudentHeadersAndReloadData()
-    sinon.assert.callOrder(
-      updateColumnHeaders,
-      gradebook.dataLoader.reloadStudentDataForEnrollmentFilterChange
-    )
   })
 })
 

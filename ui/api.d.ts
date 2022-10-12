@@ -134,7 +134,7 @@ export type Assignment = {
   anonymous_peer_reviews: boolean
   assessment_requests: AssessmentRequest[]
   assignment_group_id: string
-  assignment_group: AssignmentGroup
+  assignment_group: AssignmentGroup // assigned after fetch?
   assignment_id: string
   assignment_visibility: string[]
   automatic_peer_reviews: boolean

@@ -18,17 +18,44 @@
 
 import {SetState, GetState} from 'zustand'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import type {GradebookStore} from './index'
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+import {maxAssignmentCount, otherGradingPeriodAssignmentIds} from '../Gradebook.utils'
+import type {GradebookStore} from './index'
 import type {GradingPeriodAssignmentMap} from '../gradebook.d'
+import type {AssignmentGroup, SubmissionType} from '../../../../../api.d'
 
 const I18n = useI18nScope('gradebook')
 
 export type AssignmentsState = {
   gradingPeriodAssignments: GradingPeriodAssignmentMap
   isGradingPeriodAssignmentsLoading: boolean
+  isAssignmentGroupsLoading: boolean
   fetchGradingPeriodAssignments: () => Promise<GradingPeriodAssignmentMap>
+  loadAssignmentGroupsForGradingPeriods: (
+    params: AssignmentLoaderParams,
+    selectedPeriodId: string
+  ) => Promise<AssignmentGroup[] | undefined>
+  loadAssignmentGroups: (currentGradingPeriodId?: string) => Promise<AssignmentGroup[] | undefined>
+  fetchAssignmentGroups: (
+    params: AssignmentLoaderParams,
+    gradingPeriodIds?: string[]
+  ) => Promise<AssignmentGroup[] | undefined>
+  recentlyLoadedAssignmentGroups: {
+    assignmentGroups: AssignmentGroup[]
+    gradingPeriodIds?: string[]
+  }
 }
+
+type AssignmentLoaderParams = {
+  include: string[]
+  override_assignment_dates: boolean
+  exclude_response_fields: string[]
+  exclude_assignment_submission_types: SubmissionType[]
+  per_page: number
+  assignment_ids?: string
+}
+
+export const normalizeGradingPeriodId = (id?: string) => (id === '0' ? null : id)
 
 export default (
   set: SetState<GradebookStore>,
@@ -37,6 +64,13 @@ export default (
   gradingPeriodAssignments: {},
 
   isGradingPeriodAssignmentsLoading: false,
+
+  isAssignmentGroupsLoading: false,
+
+  recentlyLoadedAssignmentGroups: {
+    assignmentGroups: [],
+    gradingPeriodIds: [],
+  },
 
   fetchGradingPeriodAssignments: () => {
     const dispatch = get().dispatch
@@ -76,6 +110,117 @@ export default (
             },
           ]),
         })
+      })
+  },
+
+  loadAssignmentGroups: (selectedGradingPeriodId?: string) => {
+    const include = [
+      'assignment_group_id',
+      'assignment_visibility',
+      'assignments',
+      'grades_published',
+      'post_manually',
+    ]
+
+    if (get().hasModules) {
+      include.push('module_ids')
+    }
+
+    const params: AssignmentLoaderParams = {
+      exclude_assignment_submission_types: ['wiki_page'],
+      exclude_response_fields: [
+        'description',
+        'in_closed_grading_period',
+        'needs_grading_count',
+        'rubric',
+      ],
+      include,
+      override_assignment_dates: false,
+      per_page: get().performanceControls.assignmentGroupsPerPage,
+    }
+
+    const normalizeGradingdPeriodId = normalizeGradingPeriodId(selectedGradingPeriodId)
+    if (normalizeGradingdPeriodId) {
+      return get().loadAssignmentGroupsForGradingPeriods(params, normalizeGradingdPeriodId)
+    }
+
+    return get().fetchAssignmentGroups(params)
+  },
+
+  loadAssignmentGroupsForGradingPeriods(params: AssignmentLoaderParams, selectedPeriodId: string) {
+    const selectedAssignmentIds: string[] = get().gradingPeriodAssignments[selectedPeriodId] || []
+
+    const {otherAssignmentIds, otherGradingPeriodIds} = otherGradingPeriodAssignmentIds(
+      get().gradingPeriodAssignments,
+      selectedAssignmentIds,
+      selectedPeriodId
+    )
+
+    const path = `/api/v1/courses/${get().courseId}/assignment_groups`
+    const maxAssignments = maxAssignmentCount(params, path)
+
+    // If our assignment_ids param is going to put us over Apache's max URI length,
+    // we fall back to requesting all assignments in one query, excluding the
+    // assignment_ids param entirely
+    if (
+      selectedAssignmentIds.length > maxAssignments ||
+      otherAssignmentIds.length > maxAssignments
+    ) {
+      return get().fetchAssignmentGroups(params)
+    }
+
+    // If there are no assignments in the selected grading period, request all
+    // assignments in a single query
+    if (selectedAssignmentIds.length === 0) {
+      return get().fetchAssignmentGroups(params)
+    }
+
+    const ids1 = selectedAssignmentIds.join()
+    const gotGroups = get().fetchAssignmentGroups({...params, assignment_ids: ids1}, [
+      selectedPeriodId,
+    ])
+
+    const ids2 = otherAssignmentIds.join()
+    get().fetchAssignmentGroups({...params, assignment_ids: ids2}, otherGradingPeriodIds)
+
+    return gotGroups
+  },
+
+  fetchAssignmentGroups: (
+    params: AssignmentLoaderParams,
+    gradingPeriodIds?: string[]
+  ): Promise<undefined | AssignmentGroup[]> => {
+    set({isAssignmentGroupsLoading: true})
+
+    const path = `/api/v1/courses/${get().courseId}/assignment_groups`
+
+    return get()
+      .dispatch.getDepaginated<AssignmentGroup[]>(path, params)
+      .then((assignmentGroups: undefined | AssignmentGroup[]) => {
+        if (assignmentGroups) {
+          set({
+            recentlyLoadedAssignmentGroups: {
+              assignmentGroups,
+              gradingPeriodIds,
+            },
+          })
+        }
+        return assignmentGroups
+      })
+      .catch(() => {
+        set({
+          flashMessages: get().flashMessages.concat([
+            {
+              key: 'assignments-groups-loading-error',
+              message: I18n.t('There was an error fetching assignment groups data.'),
+              variant: 'error',
+            },
+          ]),
+        })
+        return undefined
+      })
+      .finally(() => {
+        set({isAssignmentGroupsLoading: false})
       })
   },
 })
