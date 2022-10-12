@@ -17,7 +17,6 @@
  */
 
 import tz from 'timezone'
-import timezone from '@canvas/timezone'
 import tzInTest from 'datetime/specHelpers'
 import newYork from 'timezone/America/New_York'
 

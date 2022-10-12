@@ -115,6 +115,7 @@ export default class ConfirmDeleteModal extends Component {
       <>
         <div className="delete-wiki-pages-header">{message}</div>
         {this.props.pageTitles.map((title, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <div className="wiki-page-title" key={index}>
             {title}
           </div>

@@ -46,16 +46,15 @@ let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
 const quizSubmission = (function () {
-  let timeMod = 0,
-    endAt = $('.end_at'),
-    endAtParsed = endAt.text() && new Date(endAt.text()),
-    dueAt = $('.due_at'),
-    dueAtParsed = dueAt.text() && new Date(dueAt.text()),
-    startedAt = $('.started_at'),
-    inBackground = false,
-    $countdownSeconds = $('.countdown_seconds'),
-    $timeRunningTimeRemaining = $('.time_running,.time_remaining'),
-    $lastSaved = $('#last_saved_indicator')
+  let timeMod = 0
+  const endAt = $('.end_at')
+  const endAtParsed = endAt.text() && new Date(endAt.text())
+  const dueAt = $('.due_at')
+  const dueAtParsed = dueAt.text() && new Date(dueAt.text())
+  const startedAt = $('.started_at')
+  const $countdownSeconds = $('.countdown_seconds')
+  const $timeRunningTimeRemaining = $('.time_running,.time_remaining')
+  const $lastSaved = $('#last_saved_indicator')
   const $timerAutosubmitDisabled = $('.timer_autosubmit_disabled'),
     timerAutosubmitDisabledParsed = $timerAutosubmitDisabled.text() === 'true',
     $endAtWithoutTimeLimit = $('.end_at_without_time_limit'),
@@ -652,7 +651,7 @@ $(function () {
     })
     .find('.list_question')
     .bind({
-      mouseenter(event) {
+      mouseenter(_event) {
         const $this = $(this),
           data = $this.data()
 
@@ -661,22 +660,22 @@ $(function () {
           data.relatedQuestion.addClass('related')
         }
       },
-      mouseleave(event) {
+      mouseleave(_event) {
         if (!quizSubmission.oneAtATime) {
           const relatedQuestion = $(this).data('relatedQuestion')
           relatedQuestion && relatedQuestion.removeClass('related')
         }
       },
-      click(event) {
+      click(_event) {
         quizSubmission.clearAccessCode = false
       },
     })
 
   $questions.find('.group_top,.answer_select').bind({
-    mouseenter(event) {
+    mouseenter(_event) {
       $(this).addClass('hover')
     },
-    mouseleave(event) {
+    mouseleave(_event) {
       $(this).removeClass('hover')
     },
   })
@@ -699,7 +698,7 @@ $(function () {
   })
 
   $questions
-    .delegate(':checkbox,:radio', 'change', function (event) {
+    .delegate(':checkbox,:radio', 'change', function (_event) {
       const $answer = $(this).parents('.answer')
       if (lastAnswerSelected == $answer[0]) {
         quizSubmission.updateSubmission()
@@ -732,7 +731,7 @@ $(function () {
       }
     })
     .delegate('.numerical_question_input', {
-      keyup(event) {
+      keyup(_event) {
         const $this = $(this)
         const val = $this.val() + ''
         const $errorBox = $this.data('associated_error_box')

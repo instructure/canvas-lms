@@ -35,13 +35,11 @@ export default class ThemeEditorImageRow extends Component {
     onChange: PropTypes.func.isRequired,
     currentValue: PropTypes.string,
     placeholder: PropTypes.string,
-    themeState: PropTypes.object,
     handleThemeStateChange: PropTypes.func,
   }
 
   static defaultProps = {
     userInput: {},
-    themeState: {},
     handleThemeStateChange() {},
   }
 

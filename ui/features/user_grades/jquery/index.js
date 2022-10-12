@@ -29,7 +29,7 @@ $(document).ready(function () {
     $selector.val(selectedOption)
   })
 
-  $('.grading_periods_selector').on('change', function (e) {
+  $('.grading_periods_selector').on('change', function (_e) {
     const selector = $(this),
       gradingPeriodId = selector.val(),
       enrollmentId = selector.attr('data-enrollment-id')
@@ -42,8 +42,8 @@ $(document).ready(function () {
         enrollment_id: enrollmentId,
       },
       totals => {
-        let $percentDisplay = $(this).closest('tr').children('.percent'),
-          gradeToShow
+        const $percentDisplay = $(this).closest('tr').children('.percent')
+        let gradeToShow
 
         if (totals.hide_final_grades) {
           gradeToShow = '--'
