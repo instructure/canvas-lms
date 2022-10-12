@@ -180,8 +180,10 @@ test('focusOut', function (assert) {
     return this.component.send('focusOut', {target: {id: 'student_and_assignment_grade'}})
   })
 
+  // eslint-disable-next-line promise/catch-or-return
   Promise.resolve().then(() => {
     ok(stub.called)
+    // eslint-disable-next-line promise/no-callback-in-promise
     done()
   })
 })

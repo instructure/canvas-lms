@@ -19,7 +19,7 @@ import Ember from 'ember'
 import startApp from '../start_app'
 import fixtures from '../ajax_fixtures'
 
-const {ContainerView, run} = Ember
+const {run} = Ember
 
 let mutedAssignment = null
 let unmutedAssignment = null
@@ -30,7 +30,7 @@ function compareIdentity(assignment, fixture) {
 }
 
 QUnit.module('screenreader_gradebook assignment_muter_component', hooks => {
-  hooks.beforeEach(function (assert) {
+  hooks.beforeEach(function (_assert) {
     fixtures.create()
     mutedAssignment = fixtures.assignment_groups[0].assignments[1]
     unmutedAssignment = fixtures.assignment_groups[0].assignments[0]
@@ -41,7 +41,7 @@ QUnit.module('screenreader_gradebook assignment_muter_component', hooks => {
     })
   })
 
-  hooks.afterEach(function (assert) {
+  hooks.afterEach(function (_assert) {
     return run(() => {
       this.component.destroy()
       return (this.component = null)
@@ -61,7 +61,7 @@ QUnit.module('screenreader_gradebook assignment_muter_component', hooks => {
     compareIdentity(this.component.get('assignment'), unmutedAssignment)
   })
 
-  QUnit.module('moderated grading', hooks => {
+  QUnit.module('moderated grading', _hooks => {
     QUnit.test('it is not disabled if assignment is not muted', function () {
       unmutedAssignment = fixtures.assignment_groups[4].assignments[1]
       Ember.run(() => {

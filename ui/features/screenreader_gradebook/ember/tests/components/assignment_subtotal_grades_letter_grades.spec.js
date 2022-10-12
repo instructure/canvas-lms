@@ -17,13 +17,10 @@
 
 import Ember from 'ember'
 import startApp from '../start_app'
-import AGGrades from '../../components/assignment_subtotal_grades_component'
 import fixtures from '../ajax_fixtures'
 
 const {run} = Ember
 
-let originalWeightingScheme = null
-let originalGradingStandard = null
 const groupScores = {
   assignment_group_1: {
     possible: 100,
@@ -41,7 +38,6 @@ QUnit.module('assignment_subtotal_grades_component_letter_grade', {
     this.component = App.AssignmentSubtotalGradesComponent.create()
     this.component.reopen({
       gradingStandard: function () {
-        originalGradingStandard = this._super
         return [
           ['A', 0.8],
           ['B+', 55.5],
@@ -51,7 +47,6 @@ QUnit.module('assignment_subtotal_grades_component_letter_grade', {
         ]
       }.property(),
       weightingScheme: function () {
-        originalWeightingScheme = this._super
         return 'percent'
       }.property(),
     })
