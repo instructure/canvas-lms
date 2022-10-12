@@ -8,12 +8,14 @@ set -x -o errexit -o errtrace -o nounset -o pipefail
 # to the repo.
 ##
 
-export AWS_ROLE_ARN="arn:aws:iam::307761260553:role/translations-jenkins"
-export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -l $SSH_USERNAME"
+if [ ! -z "${SSH_USERNAME-}" ]; then
+  export AWS_ROLE_ARN="arn:aws:iam::307761260553:role/translations-jenkins"
+  export GIT_SSH_COMMAND="ssh -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -l $SSH_USERNAME"
 
-"$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config.json
+  "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config.json
 
-"$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config-crowd.json
+  "$(yarn bin)/sync-translations" --ignore-jira --config ./package-translations/sync-config-crowd.json
+fi
 
 # Remove empty/missing strings from catalogs.
 for file in packages/translations/lib/*.json; do
@@ -22,7 +24,8 @@ for file in packages/translations/lib/*.json; do
 done
 
 # If there are no changes to commit, bail out
-if [[ -z $(git status --porcelain | grep 'packages/translations/lib') ]]; then
+GIT_STATUS=$(git status --porcelain)
+if [[ -z $(echo $GIT_STATUS | grep 'packages/translations/lib') ]]; then
   echo "No new translations to commit"
   exit 0
 fi
@@ -37,16 +40,18 @@ popd
 
 yarn wsrun --exclude-missing installTranslations
 
-git config --global user.name "Jenkins"
-git config --global user.email "svc.cloudjenkins@instructure.com"
+if [ ! -z "${SSH_USERNAME-}" ]; then
+  git config --global user.name "Jenkins"
+  git config --global user.email "svc.cloudjenkins@instructure.com"
 
-gitdir=$(git rev-parse --git-dir); scp -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -p -P 29418 "${SSH_USERNAME}@gerrit.instructure.com:hooks/commit-msg" "${gitdir}/hooks/"
-# Commit any changes into a temp branch then push to gerrit
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-git checkout -B sync-translations-tmp && \
-  git add -A packages/translations/lib && \
-  git commit -m "[i18n] Update package translations" && \
-  git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
-  git checkout "$CURRENT_BRANCH"
+  gitdir=$(git rev-parse --git-dir); scp -o StrictHostKeyChecking=no -i /usr/src/sshkeyfile -p -P 29418 "${SSH_USERNAME}@gerrit.instructure.com:hooks/commit-msg" "${gitdir}/hooks/"
+  # Commit any changes into a temp branch then push to gerrit
+  CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  git checkout -B sync-translations-tmp && \
+    git add -A packages/translations/lib && \
+    git commit -m "[i18n] Update package translations" && \
+    git push origin sync-translations-tmp:refs/for/master%submit,l=Verified+1 && \
+    git checkout "$CURRENT_BRANCH"
 
-yarn wsrun --exclude-missing commitTranslations
+  yarn wsrun --exclude-missing commitTranslations
+fi
