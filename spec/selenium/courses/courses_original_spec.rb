@@ -366,14 +366,15 @@ describe "courses" do
 
   it "does not cache unauth permissions for semi-public courses from sessionless permission checks" do
     course_factory(active_all: true)
-    @course.update_attribute(:is_public_to_auth_users, true)
 
     user_factory(active_all: true)
     user_session(@user)
 
     enable_cache do
       # previously was cached by visiting "/courses/#{@course.id}/assignments/syllabus"
-      expect(@course.grants_right?(@user, :read)).to be_falsey # requires session[:user_id] - caches a false value
+      expect(@course.grants_right?(@user, :read)).to be_falsey # Store a false value in the cache
+
+      @course.update_attribute(:is_public_to_auth_users, true)
 
       get "/courses/#{@course.id}"
 

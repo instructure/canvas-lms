@@ -1279,9 +1279,7 @@ class Attachment < ActiveRecord::Base
     return true if context.is_a?(AssessmentQuestion) && context.user_can_see_through_quiz_question?(user, session)
 
     if supports_visibility?
-      (computed_visibility_level == "public") ||
-        (computed_visibility_level == "institution" && user&.persisted?) ||
-        (computed_visibility_level == "context" && context&.grants_right?(user, session, :read_as_member))
+      context&.grants_right?(user, session, :read_as_member) || context.try(:unenrolled_user_can_read?, user, computed_visibility_level)
     else
       context&.grants_right?(user, session, :read)
     end
@@ -1483,9 +1481,7 @@ class Attachment < ActiveRecord::Base
     vlevels << "institution" if user&.persisted?
     vlevels << "public"
 
-    context_setting = context.files_visibility_option
-    context_setting = "context" if context_setting == context.class.name.downcase
-    vlevels << "inherit" if vlevels.include?(context_setting)
+    vlevels << "inherit" if context.grants_right?(user, nil, :read_files)
 
     where(visibility_level: vlevels)
   }

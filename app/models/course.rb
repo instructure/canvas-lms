@@ -1680,17 +1680,19 @@ class Course < ActiveRecord::Base
     end
   end
 
-  def unenrolled_user_can_read?(_user, session)
-    is_public || (is_public_to_auth_users && session.present? && session.key?(:user_id))
+  def unenrolled_user_can_read?(user, setting)
+    return false unless available?
+
+    setting == "public" || (setting == "institution" && user&.persisted?)
   end
 
   set_policy do
-    given { |user, session| available? && unenrolled_user_can_read?(user, session) }
+    given { |user| unenrolled_user_can_read?(user, course_visibility) }
     can :read and can :read_outcomes and can :read_syllabus
 
     CUSTOMIZABLE_PERMISSIONS.each_key do |type|
       given do |user|
-        grants_right?(user, :read_as_member) || (available? && (custom_visibility_option(type) == "public" || (custom_visibility_option(type) == "institution" && user&.persisted?)))
+        grants_right?(user, :read_as_member) || unenrolled_user_can_read?(user, custom_visibility_option(type))
       end
       can :"read_#{type}"
     end
