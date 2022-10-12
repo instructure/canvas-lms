@@ -23,3 +23,4 @@ rake db:schema:dump
 RAILS_ENV=test rails db:migrate
 rspec spec/models/context_module_progression_spec.rb:101
 ContextModuleProgression.update_all collapsed: true
+
