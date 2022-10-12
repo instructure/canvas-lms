@@ -23,7 +23,7 @@ import {ImageCropperSettingsPropTypes} from './propTypes'
 import {buildSvg} from './svg'
 import {PREVIEW_WIDTH, PREVIEW_HEIGHT, BACKGROUND_SQUARE_SIZE} from './constants'
 import {useMouseWheel} from './useMouseWheel'
-import {useKeyMouseEvents} from './useKeyMouseEvents'
+import {useKeyMouseTouchEvents} from './useKeyMouseEvents'
 import checkerboardStyle from '../../../../shared/CheckerboardStyling'
 import {View} from '@instructure/ui-view'
 import {getBrowser} from '../../../../../getBrowser'
@@ -54,12 +54,8 @@ export const Preview = ({settings, dispatch}) => {
   const imgRef = createRef()
   const {image, shape, rotation, scaleRatio, translateX, translateY} = settings
   const [tempScaleRatio, onWheelCallback] = useMouseWheel(scaleRatio, dispatch)
-  const [tempTranslateX, tempTranslateY, onMouseDownCallback] = useKeyMouseEvents(
-    translateX,
-    translateY,
-    dispatch,
-    imgRef
-  )
+  const [tempTranslateX, tempTranslateY, onMouseDownCallback, onTouchStartCallback] =
+    useKeyMouseTouchEvents(translateX, translateY, dispatch, imgRef)
 
   useEffect(() => {
     imgRef.current.ondragstart = () => false
@@ -121,6 +117,7 @@ export const Preview = ({settings, dispatch}) => {
             transform: transformValue,
           }}
           onMouseDown={onMouseDownCallback}
+          onTouchStart={onTouchStartCallback}
         />
         <div
           id="cropShapeContainer"
