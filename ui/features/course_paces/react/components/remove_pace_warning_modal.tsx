@@ -48,7 +48,7 @@ const MODAL_BODY_TEXT = {
     'This section pace will be removed and the pace will revert back to the default pace.'
   ),
   Enrollment: I18n.t(
-    "This student pace will be removed and the pace will revert back to the student's section pace or course default pace."
+    'This student pace will be removed and the pace will revert back to the previously assigned pace.'
   ),
 }
 
