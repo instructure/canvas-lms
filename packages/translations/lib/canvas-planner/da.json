@@ -109,8 +109,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spændende diskussion" },
   "excused_cf8792eb": { "message": "Undskyldt" },
+  "extended_9a58dcb6": { "message": "Udvidet" },
   "failed_getting_course_list_49846a93": {
     "message": "Kunne ikke hente fagliste"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Kunne ikke hente opgavelisten"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Mislykkedes at kigge ind i din fremtid"
@@ -132,6 +136,9 @@
     "message": "Kunne ikke indlæse muligheder"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Kunne ikke gemme opgave" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Fejl ved indlæsning af opgavelisten"
+  },
   "feedback_6dcc1991": { "message": "Feedback" },
   "fun_quiz_47ab0b0": { "message": "Sjov test" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -248,6 +255,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } til { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Studerende - opgaveliste" },
   "submitted_318fad53": { "message": "Afleveret" },
   "success_to_do_created_e34ed395": {
     "message": "Succes: Opgaveliste oprettet"

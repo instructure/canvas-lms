@@ -111,8 +111,12 @@
     "message": "エキサイティングなディスカッション"
   },
   "excused_cf8792eb": { "message": "免除" },
+  "extended_9a58dcb6": { "message": "拡大された" },
   "failed_getting_course_list_49846a93": {
     "message": "コースリストの取得に失敗"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "To Doリストの取得に失敗"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "あなたの未来を覗くことに失敗しました"
@@ -136,6 +140,9 @@
     "message": "機会が読み込めませんでした"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "タスクの保存に失敗しました" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "To Doリストの読み込みに失敗"
+  },
   "feedback_6dcc1991": { "message": "フィードバック" },
   "fun_quiz_47ab0b0": { "message": "楽しい小テスト" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -246,6 +253,7 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": { "message": "{ startTime } - { endTime }" },
+  "student_to_do_c018c835": { "message": "受講者 To Do" },
   "submitted_318fad53": { "message": "タスクの評定を送信" },
   "success_to_do_created_e34ed395": { "message": "成功：タスクが作成" },
   "task_16b0ef38": { "message": "タスク" },

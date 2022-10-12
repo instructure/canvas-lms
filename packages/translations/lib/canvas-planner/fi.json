@@ -107,8 +107,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Olemassa oleva keskustelu" },
   "excused_cf8792eb": { "message": "Annettu anteeksi" },
+  "extended_9a58dcb6": { "message": "Laajennettu" },
   "failed_getting_course_list_49846a93": {
     "message": "Kurssiluettelon haku epäonnistui"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Tehtäväluettelon saaminen epäonnistui"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Tulevaisuuteesi katsominen epäonnistui"
@@ -133,6 +137,9 @@
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "Tehtävän tallentaminen epäonnistui"
+  },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Tehtäväluettelon lataus epäonnistui"
   },
   "feedback_6dcc1991": { "message": "Palaute" },
   "fun_quiz_47ab0b0": { "message": "Hauska testi" },
@@ -250,6 +257,7 @@
     "message": "{ startDateTime } - { endTime }"
   },
   "starttime_to_endtime_d7cc249d": { "message": "{ startTime } - { endTime }" },
+  "student_to_do_c018c835": { "message": "Opiskelijoiden tehtävälista" },
   "submitted_318fad53": { "message": "Lähetetty" },
   "success_to_do_created_e34ed395": {
     "message": "Onnistuminen: Tehtävä luotu"

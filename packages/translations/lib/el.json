@@ -8,6 +8,9 @@
     "all_4321c3a1": {
         "message": "Όλα"
     },
+    "alpha_15d59033": {
+        "message": "Alpha"
+    },
     "announcement_fb4cb645": {
         "message": "Ανακοίνωση"
     },
@@ -116,7 +119,7 @@
     "date_ee500367": {
         "message": "Ημερομηνία"
     },
-    "decrease_indent_de6343ab": {
+    "decrease_indent_d9cf469d": {
         "message": "Μείωση Εσοχής Κειμένου"
     },
     "deep_purple_bb3e2907": {
@@ -209,13 +212,16 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "Έχω τα πνευματικά δικαιώματα"
     },
+    "icon_215a1dc6": {
+        "message": "Εικονίδιο"
+    },
     "image_8ad06": {
         "message": "Εικόνα"
     },
     "images_7ce26570": {
         "message": "Εικόνες"
     },
-    "increase_indent_6d550a4a": {
+    "increase_indent_6af90f7c": {
         "message": "Αύξηση Εσοχής Κειμένου"
     },
     "indigo_2035fc55": {
@@ -262,9 +268,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "Φόρτωση περισσότερων"
-    },
-    "load_more_results_460f49a9": {
-        "message": "Φόρτωση περισσότερων αποτελεσμάτων"
     },
     "loading_25990131": {
         "message": "Φόρτωση..."
@@ -374,8 +377,14 @@
     "relationships_6602af70": {
         "message": "Σχέσεις"
     },
+    "replace_e61834a7": {
+        "message": "Αντικατάσταση"
+    },
     "replies_4a8577c8": {
         "message": "Απαντήσεις"
+    },
+    "reset_95a81614": {
+        "message": "Επαναφορά"
     },
     "rich_content_editor_2708ef21": {
         "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
@@ -460,5 +469,8 @@
     },
     "yesterday_c6bd6abf": {
         "message": "Χτες"
+    },
+    "zoom_f3e54d69": {
+        "message": "Μεγένθυνση"
     }
 }
