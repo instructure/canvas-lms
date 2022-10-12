@@ -25,7 +25,7 @@ describe('<ColorInput />', () => {
     color: '#212121',
     onChange: jest.fn(),
     label: 'Some color input',
-    name: 'some-color'
+    name: 'some-color',
   }
 
   beforeEach(() => jest.clearAllMocks())
@@ -46,7 +46,7 @@ describe('<ColorInput />', () => {
   it('changes the color by typing', () => {
     render(<ColorInput {...defaults} />)
     const input = screen.getByRole('textbox', {
-      name: /some color input/i
+      name: /some color input/i,
     })
     fireEvent.change(input, {target: {value: ''}})
     expect(defaults.onChange).toHaveBeenCalledWith(null)
@@ -56,11 +56,30 @@ describe('<ColorInput />', () => {
 
   it('changes the color using the predefined colors', () => {
     render(<ColorInput {...defaults} />)
-    fireEvent.click(screen.getByText(/view predefined colors/i))
+    fireEvent.click(screen.getByText(/color picker/i))
     fireEvent.click(screen.getByTestId('colorPreview-#06A3B7'))
     expect(defaults.onChange).toHaveBeenCalledWith('#06A3B7')
-    fireEvent.click(screen.getByText(/view predefined colors/i))
+    fireEvent.click(screen.getByText(/color picker/i))
     fireEvent.click(screen.getByTestId('colorPreview-none'))
     expect(defaults.onChange).toHaveBeenCalledWith(null)
+  })
+
+  describe('screenreader label', () => {
+    it('just says color picker if nothing is selected', () => {
+      render(<ColorInput {...defaults} color={null} />) // signifies 'None' is selected
+      expect(screen.getByText(/color picker/i)).toBeInTheDocument()
+      expect(screen.queryByText(/selected/i)).not.toBeInTheDocument()
+    })
+
+    it('just says color picker if a non-named color is selected', () => {
+      render(<ColorInput {...defaults} color="#654321" />) // not one of our named colors
+      expect(screen.getByText(/color picker/i)).toBeInTheDocument()
+      expect(screen.queryByText(/selected/i)).not.toBeInTheDocument()
+    })
+
+    it('includes the named color if a named color is selected', () => {
+      render(<ColorInput {...defaults} color="#FFFFFF" />) // white
+      expect(screen.getByText(/color picker \(white selected\)/i)).toBeInTheDocument()
+    })
   })
 })
