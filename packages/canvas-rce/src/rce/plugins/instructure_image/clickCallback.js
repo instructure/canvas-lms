@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import formatMessage from '../../../format-message'
 
-export default function(ed, document, trayProps) {
+export default function (ed, document, trayProps) {
   return import('../shared/Upload/UploadFile').then(({UploadFile}) => {
     let container = document.querySelector('.canvas-rce-upload-container')
     if (!container) {
@@ -33,13 +33,14 @@ export default function(ed, document, trayProps) {
       ReactDOM.unmountComponentAtNode(container)
       ed.focus(false)
     }
-
+    const unsplashEnabled = ed.getParam('unsplash_enabled')
+    const panels = unsplashEnabled ? ['COMPUTER', 'UNSPLASH', 'URL'] : ['COMPUTER', 'URL']
     ReactDOM.render(
       <UploadFile
         accept="image/*"
         editor={ed}
         label={formatMessage('Upload Image')}
-        panels={['COMPUTER', 'UNSPLASH', 'URL']}
+        panels={panels}
         onDismiss={handleDismiss}
         trayProps={trayProps}
       />,
