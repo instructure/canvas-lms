@@ -50,7 +50,7 @@ ready(function () {
 
   $('#add_entry_form').formSubmit({
     resetForm: true,
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $('#create_entry').slideUp()
       $('#proccessing').loadingImage()
       return true
@@ -80,7 +80,7 @@ ready(function () {
         .end()
         .slideDown()
     },
-    error(data) {
+    error(_data) {
       $('#proccessing').loadingImage('remove')
       $('#create_entry').slideDown()
     },

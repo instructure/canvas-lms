@@ -31,13 +31,11 @@ export default class ThemeEditorFileUpload extends Component {
     onChange: PropTypes.func.isRequired,
     currentValue: PropTypes.string,
     userInput: customTypes.userVariableInput,
-    themeState: PropTypes.object,
     handleThemeStateChange: PropTypes.func,
   }
 
   static defaultProps = {
     userInput: {},
-    themeState: {},
     handleThemeStateChange() {},
   }
 

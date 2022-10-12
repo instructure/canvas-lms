@@ -56,7 +56,7 @@ export default class WikiPageIndexEditDialog extends DialogFormView {
     const form = this
 
     // Add a close event for focus handling
-    form.$el.on('dialogclose', (event, ui) => {
+    form.$el.on('dialogclose', (_event, _ui) => {
       return this.returnFocusTo != null ? this.returnFocusTo.focus() : undefined
     })
 

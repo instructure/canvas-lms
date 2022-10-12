@@ -45,10 +45,9 @@ export default class FileUploadQuestion extends View {
   checkForFileChange(event) {
     // Stop the bubbling of the event so the question doesn't
     // get marked as read before the file is uploaded.
-    let val
     event.preventDefault()
     event.stopPropagation()
-    if ((val = this.$fileUpload.val())) {
+    if (this.$fileUpload.val()) {
       this.removeFileStatusMessage()
       this.model.set('file', this.$fileUpload[0])
       this.$fileUploadInprogress.val(true)
@@ -80,7 +79,7 @@ export default class FileUploadQuestion extends View {
   }
 
   // For now we'll just process the first one.
-  processAttachment(attachment) {
+  processAttachment(_attachment) {
     this.$attachmentID.val(this.model.id).trigger('change')
     this.$fileUploadInprogress.val(false)
     this.$fileUploadBox.addClass('file-upload-box-with-file')

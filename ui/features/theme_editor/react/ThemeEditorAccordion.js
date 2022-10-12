@@ -75,7 +75,7 @@ export default class ThemeEditorAccordion extends React.Component {
         return <ThemeEditorColorRow {...props} />
       case 'image':
         return <ThemeEditorImageRow {...props} />
-      case 'percentage':
+      case 'percentage': {
         const defaultValue = props.currentValue || props.placeholder
         return (
           <RangeInput
@@ -93,6 +93,7 @@ export default class ThemeEditorAccordion extends React.Component {
             formatValue={value => I18n.toPercentage(value * 100, {precision: 0})}
           />
         )
+      }
       default:
         return null
     }

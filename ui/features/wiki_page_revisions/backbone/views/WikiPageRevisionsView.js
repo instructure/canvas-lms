@@ -44,7 +44,7 @@ export default class WikiPageRevisionsView extends CollectionView {
     this.optionProperty('pages_path')
   }
 
-  initialize(options) {
+  initialize(_options) {
     super.initialize(...arguments)
     this.selectedRevision = null
 

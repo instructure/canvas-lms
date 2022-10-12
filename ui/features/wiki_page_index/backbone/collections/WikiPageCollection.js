@@ -35,7 +35,7 @@ export default class WikiPageCollection extends PaginatedCollection {
       // only change other models if one of the models is being set to true
       if (!value) return
 
-      for (const m of this.filter(m => !!m.get('front_page'))) {
+      for (const m of this.filter(m_ => !!m_.get('front_page'))) {
         if (m !== model) m.set('front_page', false)
       }
     })
