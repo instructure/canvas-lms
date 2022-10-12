@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -x -o errexit -o errtrace -o nounset -o pipefail
+git config --global --add safe.directory /usr/src/app
 
 ##
 # This script takes an en.json file for package translations, and sends it
