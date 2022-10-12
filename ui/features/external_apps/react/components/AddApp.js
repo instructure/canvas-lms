@@ -89,10 +89,10 @@ export default createReactClass({
   },
 
   handleChange(e) {
-    let target = e.target,
-      value = target.value,
-      name = $(target).data('rel'),
-      fields = this.state.fields
+    const target = e.target
+    let value = target.value
+    const name = $(target).data('rel')
+    const fields = this.state.fields
 
     if (target.type === 'checkbox') {
       value = target.checked

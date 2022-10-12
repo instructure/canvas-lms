@@ -172,7 +172,8 @@ export default class ThemeEditor extends React.Component {
   }
 
   handleThemeStateChange = (key, value, opts = {}) => {
-    let {files, properties} = this.state.themeStore
+    const {files} = this.state.themeStore
+    let {properties} = this.state.themeStore
     if (value instanceof File) {
       const fileStorageObject = {
         variable_name: key,
