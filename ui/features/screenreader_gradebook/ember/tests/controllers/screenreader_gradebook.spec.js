@@ -634,7 +634,6 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('outcomeDetails is computed properly', () =>
       asyncHelper.waitForRequests().then(() => {
         const od = srgb.get('outcomeDetails')
-        const selectedOutcome = srgb.get('selectedOutcome')
         strictEqual(od.cnt, 1)
       }))
 
@@ -741,7 +740,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       }))
   })
 
-  QUnit.module('Grade Calculation', hooks => {
+  QUnit.module('Grade Calculation', _hooks => {
     const pointedCalculation = {
       assignmentGroups: {},
       final: {
@@ -920,14 +919,14 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     })
 
     test('stores the current grade on the student when not including ungraded assignments', () => {
-      const grades = srgb.calculateStudentGrade(student)
+      srgb.calculateStudentGrade(student)
       equal(student.total_grade, exampleGrades.current)
     })
 
     test('stores the final grade on the student when including ungraded assignments', () =>
       Ember.run(() => {
         srgb.set('includeUngradedAssignments', true)
-        const grades = srgb.calculateStudentGrade(student)
+        srgb.calculateStudentGrade(student)
         equal(student.total_grade, exampleGrades.final)
       }))
 
@@ -937,18 +936,18 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         return srgb.set('selectedGradingPeriod', {id: '701'})
       })
       return asyncHelper.waitForRequests().then(() => {
-        const grades = srgb.calculateStudentGrade(student)
+        srgb.calculateStudentGrade(student)
         equal(student.total_grade, exampleGrades.gradingPeriods[701].current)
       })
     })
 
-    test('stores the current grade from the selected grading period when not including ungraded assignments', () => {
+    test('stores the current grade from the selected grading period when not including ungraded assignments (2)', () => {
       Ember.run(() => {
         srgb.set('includeUngradedAssignments', true)
         return srgb.set('selectedGradingPeriod', {id: '701'})
       })
       return asyncHelper.waitForRequests().then(() => {
-        const grades = srgb.calculateStudentGrade(student)
+        srgb.calculateStudentGrade(student)
         equal(student.total_grade, exampleGrades.gradingPeriods[701].final)
       })
     })
@@ -1191,7 +1190,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       })
     })
 
-    QUnit.module('when storing settings locally', () => {
+    QUnit.module('when storing settings locally (2)', () => {
       test('updateIncludeUngradedAssignmentsSetting does not call the Gradebook settings endpoint', () => {
         const ajaxRequestSpy = sandbox.stub(ajax, 'request')
         srgb.set('includeUngradedAssignments', false)
@@ -1237,8 +1236,6 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
   })
 
   QUnit.module('updateShowConcludedEnrollmentsSetting', hooks => {
-    let fetchCorrectEnrollmentsStub
-
     hooks.beforeEach(() => {
       window.ENV.GRADEBOOK_OPTIONS.settings = {}
       window.ENV.GRADEBOOK_OPTIONS.settings.show_concluded_enrollments = 'true'
@@ -1248,7 +1245,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
         textStatus: 'success',
       })
       initializeApp()
-      fetchCorrectEnrollmentsStub = sinon.stub(srgb, 'fetchCorrectEnrollments')
+      sinon.stub(srgb, 'fetchCorrectEnrollments')
     })
 
     test('changing showConcludedEnrollments calls updateShowConcludedEnrollmentsSetting', () => {

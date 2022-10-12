@@ -410,6 +410,7 @@ test('prev/next still work', function () {
     studentSectionAssertions(first, index, 0)
 
     // second in section
+    // eslint-disable-next-line promise/catch-or-return
     click('.student_navigation .next_object:first').then(() => {
       const second = this.controller.get('selectedStudent')
       index = this.controller.get('studentIndex')
@@ -510,11 +511,13 @@ QUnit.module(
 QUnit.skip('aria-announcer', function () {
   equal(Ember.$.trim(find('.aria-announcer').text()), '')
 
+  // eslint-disable-next-line promise/catch-or-return
   click('.student_navigation .next_object:first').then(() => {
     const expected = this.controller.get('selectedStudent.name')
     equal(Ember.$.trim(find('.aria-announcer').text()), expected)
   })
 
+  // eslint-disable-next-line promise/catch-or-return
   click('.assignment_navigation .next_object').then(() => {
     const expected = this.controller.get('selectedAssignment.name')
     equal(Ember.$.trim(find('.aria-announcer').text()), expected)

@@ -24,8 +24,6 @@ import GradebookConstants from '../../../constants'
 
 const {run} = Ember
 
-const setType = null
-
 QUnit.module('custom_column_cell', {
   setup() {
     fixtures.create()
