@@ -24,7 +24,19 @@ ActiveSupport::SafeBuffer.class_eval do
   end
 end
 
+module ActiveSupportCacheOverrides
+  def retrieve_store_class(store)
+    return ActiveSupport::Cache.const_get(store.to_s.camelize) if ActiveSupport::Cache.const_defined?(store.to_s.camelize)
+
+    super
+  end
+end
+
 module ActiveSupport::Cache
+  class << self
+    prepend(ActiveSupportCacheOverrides)
+  end
+
   Store.prepend(ActiveSupport::CacheRegister::Cache::Store)
 
   module AllowMocksInStore
