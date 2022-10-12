@@ -292,7 +292,7 @@ const AccountCalendarsModal = ({
           <Button
             data-testid="save-calendars-button"
             disabled={disabled}
-            variant="primary"
+            color="primary"
             margin="none none none small"
             onClick={onSubmit}
           >
