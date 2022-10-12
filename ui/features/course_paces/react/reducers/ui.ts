@@ -65,6 +65,7 @@ export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
 export const getShowPaceModal = (state: StoreState) => state.ui.showPaceModal
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
+export const getIsSyncing = (state: StoreState) => state.ui.syncing
 
 export const getShowProjections = createSelector(
   state => state.ui.showProjections,
@@ -111,6 +112,8 @@ export default (state = initialState, action: UIAction): UIState => {
       return {...state, showPaceModal: false}
     case UIConstants.SHOW_PACE_MODAL:
       return {...state, showPaceModal: true}
+    case UIConstants.SET_SELECTED_PACE_CONTEXT_TYPE:
+      return {...state, selectedContextType: action.payload}
     default:
       return state
   }

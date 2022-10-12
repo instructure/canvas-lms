@@ -39,15 +39,16 @@ import UnpublishedChangesTrayContents from './unpublished_changes_tray_contents'
 import UnpublishedWarningModal from './header/unpublished_warning_modal'
 
 import {coursePaceActions} from '../actions/course_paces'
-import {ResponsiveSizes, StoreState} from '../types'
+import {CoursePacesState, ResponsiveSizes, StoreState} from '../types'
 import {getCoursePace} from '../reducers/course_paces'
-import {getResponsiveSize, getShowPaceModal} from '../reducers/ui'
+import {getResponsiveSize} from '../reducers/ui'
 import {SummarizedChange} from '../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_modal')
 
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace
+  coursePace: CoursePacesState
 }
 
 interface PassedProps {
@@ -132,7 +133,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
             />
           </Flex>
           <ProjectedDates key={`${props.coursePace.context_type}-${props.coursePace.context_id}`} />
-          <Body coursePace={props.coursePace} blueprintLocked={isBlueprintLocked} />
+          <Body blueprintLocked={isBlueprintLocked} />
           <Tray
             label={I18n.t('Unpublished Changes tray')}
             open={trayOpen}
@@ -177,7 +178,6 @@ const mapStateToProps = (state: StoreState) => {
   return {
     coursePace: getCoursePace(state),
     responsiveSize: getResponsiveSize(state),
-    showPaceModal: getShowPaceModal(state),
   }
 }
 

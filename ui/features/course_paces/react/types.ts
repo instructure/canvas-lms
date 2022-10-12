@@ -82,6 +82,7 @@ export interface ModuleWithDueDates extends Module {
 }
 
 export type PaceContextTypes = 'Course' | 'Section' | 'Enrollment'
+export type APIPaceContextTypes = 'course' | 'section' | 'student_enrollment'
 export type WorkflowStates = 'unpublished' | 'active' | 'deleted'
 export type ProgressStates = 'queued' | 'running' | 'completed' | 'failed'
 export type ContextTypes = 'user' | 'course' | 'term' | 'hypothetical'
@@ -151,6 +152,15 @@ export interface UIState {
   readonly editingBlackoutDates: boolean
 }
 
+export interface PaceContextsState {
+  readonly selectedContextType: APIPaceContextTypes
+  readonly entries: PaceContext[]
+  readonly page: number
+  readonly pageCount: number
+  readonly entriesPerRequest: number
+  readonly isLoading: boolean
+}
+
 export interface StoreState {
   readonly original: OriginalState
   readonly coursePace: CoursePacesState
@@ -159,6 +169,28 @@ export interface StoreState {
   readonly ui: UIState
   readonly course: Course
   readonly blackoutDates: BlackoutDateState
+  readonly paceContexts: PaceContextsState
+}
+
+export interface Pace {
+  name: string
+  type: string
+  last_modified: string
+  duration: number
+}
+
+export interface PaceContext {
+  name: string
+  type: string
+  item_id: string
+  associated_section_count: number
+  associated_student_count: number
+  applied_pace: Pace | null
+}
+
+export interface PaceContextApiresponse {
+  pace_contexts: PaceContext[]
+  total_entries: number
 }
 
 /* Random types  */
