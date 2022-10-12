@@ -19,7 +19,6 @@ COPY --chown=docker:docker package.json yarn.lock /usr/src/app/
 COPY --chown=docker:docker packages/ /usr/src/app/packages/
 COPY --chown=docker:docker script/install_hooks /usr/src/app/script/
 COPY --chown=docker:docker script/fix_inst_esm.js /usr/src/app/script/fix_inst_esm.js
-COPY --chown=docker:docker build/new-jenkins/package-translations/ /usr/src/app/package-translations
 
 USER docker
 
@@ -27,5 +26,7 @@ RUN yarn install --network-concurrency 1 \
       && DISABLE_POSTINSTALL=1 \
         yarn-private --network-concurrency 1 -W \
         add @inst/sync-format-message-translations
+
+COPY --chown=docker:docker build/new-jenkins/package-translations/ /usr/src/app/package-translations
 
 CMD ["tail", "-f", "/dev/null"]
