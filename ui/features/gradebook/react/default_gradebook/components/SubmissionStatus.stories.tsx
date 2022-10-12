@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ComponentMeta, ComponentStory} from '@storybook/react'
 import React from 'react'
 import SubmissionStatus from './SubmissionStatus'
 
@@ -42,9 +43,9 @@ export default {
       workflowState: 'graded',
     },
   },
-}
+} as ComponentMeta<typeof SubmissionStatus>
 
-const Template = args => <SubmissionStatus {...args} />
+const Template: ComponentStory<typeof SubmissionStatus> = args => <SubmissionStatus {...args} />
 
 export const Default = Template.bind({})
 export const Excused = Template.bind({})

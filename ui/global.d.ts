@@ -31,14 +31,24 @@ declare global {
   const ENV: any
 
   declare interface JQuery {
+    capitalize: (str: string) => string
     confirmDelete: any
+    datetime_field: () => JQuery<HTMLInputElement>
+    decodeFromHex: (str: string) => string
+    encodeToHex: (str: string) => string
+    fileSize: (size: number) => string
     fillWindowWithMe: (options?: {onResize: () => void}) => JQuery<HTMLElement>
     fixDialogButtons: () => void
     keycodes: any
     live: any
     mediaComment: any
+    queryParam: (name: string) => string
+    raw: (str: string) => string
     showIf: (boolean) => void
-    datetime_field: () => JQuery<HTMLInputElement>
+    titleize: (str: string) => string
+    toSentence: (array: string[], options: any) => string
+    underscore: (str: string) => string
+    youTubeID: (path: string) => string
   }
 
   declare interface JQueryStatic {

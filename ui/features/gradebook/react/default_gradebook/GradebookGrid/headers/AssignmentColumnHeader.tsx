@@ -201,7 +201,7 @@ export default class AssignmentColumnHeader extends ColumnHeader<
     this.assignmentLink?.focus()
   }
 
-  handleKeyDown = event => {
+  handleKeyDown = (event: KeyboardEvent) => {
     if (event.which === 9) {
       if (this.assignmentLink.focused && !event.shiftKey) {
         event.preventDefault()
