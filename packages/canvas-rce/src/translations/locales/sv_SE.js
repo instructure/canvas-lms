@@ -17,13 +17,12 @@
  */
 
 import formatMessage from '../../format-message'
-import '../tinymce/th'
 
 const locale = {
   "count_plural_one_item_loaded_other_items_loaded_857023b7": {
-    "message": "{ count, plural,\n  other {}\n}"
+    "message": "{ count, plural,\n    one {}\n  other {}\n}"
   }
 }
 
 
-formatMessage.addLocale({th: locale})
+formatMessage.addLocale({'sv-SE': locale})

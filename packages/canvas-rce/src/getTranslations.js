@@ -77,6 +77,9 @@ export default function getTranslations(locale) {
           case 'es-ES':
             p = import('./translations/locales/es_ES')
             break
+          case 'es-GT':
+            p = import('./translations/locales/es_GT')
+            break
           case 'fa-IR':
             p = import('./translations/locales/fa_IR')
             break
@@ -152,8 +155,17 @@ export default function getTranslations(locale) {
           case 'sv-x-k12':
             p = import('./translations/locales/sv-x-k12')
             break
+          case 'sv-SE':
+            p = import('./translations/locales/sv_SE')
+            break
+          case 'tg':
+            p = import('./translations/locales/tg')
+            break
           case 'th':
             p = import('./translations/locales/th')
+            break
+          case 'th-TH':
+            p = import('./translations/locales/th_TH')
             break
           case 'tr':
             p = import('./translations/locales/tr')
@@ -163,6 +175,9 @@ export default function getTranslations(locale) {
             break
           case 'vi':
             p = import('./translations/locales/vi')
+            break
+          case 'vi-VN':
+            p = import('./translations/locales/vi_VN')
             break
           case 'zh':
             p = import('./translations/locales/zh')
@@ -206,6 +221,7 @@ export function getLocaleList() {
     'en-GB',
     'es',
     'es-ES',
+    'es-GT',
     'fa-IR',
     'fi',
     'fr',
@@ -231,10 +247,14 @@ export function getLocaleList() {
     'sl',
     'sv',
     'sv-x-k12',
+    'sv-SE',
+    'tg',
     'th',
+    'th-TH',
     'tr',
     'uk-UA',
     'vi',
+    'vi-VN',
     'zh',
     'zh-Hans',
     'zh-Hant',
