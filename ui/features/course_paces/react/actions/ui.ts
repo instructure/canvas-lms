@@ -42,6 +42,7 @@ export enum Constants {
   HIDE_PACE_MODAL = 'UI/HIDE_PACE_MODAL',
   START_SYNCING = 'UI/START_SYNCING',
   SYNCING_COMPLETED = 'UI/SYNCING_COMPLETED',
+  SET_SELECTED_PACE_CONTEXT_TYPE = 'UI/SET_SELECTED_PACE_CONTEXT_TYPE',
 }
 
 /* Action creators */
@@ -65,6 +66,8 @@ export const regularActions = {
     createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
   startSyncing: () => createAction(Constants.START_SYNCING),
   syncingCompleted: () => createAction(Constants.SYNCING_COMPLETED),
+  setSelectedContextType: (selectedContextType: PaceContextTypes) =>
+    createAction(Constants.SET_SELECTED_PACE_CONTEXT_TYPE, selectedContextType),
 }
 
 export const thunkActions = {

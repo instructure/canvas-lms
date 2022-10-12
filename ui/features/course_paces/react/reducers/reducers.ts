@@ -26,6 +26,7 @@ import {enrollmentsReducer} from './enrollments'
 import {blackoutDatesReducer} from '../shared/reducers/blackout_dates'
 import {originalReducer} from './original'
 import uiReducer from './ui'
+import {paceContextsReducer} from './pace_contexts'
 
 export default combineReducers<StoreState>({
   coursePace: coursePacesReducer,
@@ -35,4 +36,5 @@ export default combineReducers<StoreState>({
   course: courseReducer,
   blackoutDates: blackoutDatesReducer,
   original: originalReducer,
+  paceContexts: paceContextsReducer,
 })

@@ -30,6 +30,7 @@ const defaultProps = {
   isBlueprintLocked: false,
   isOpen: true,
   onClose,
+  onResetPace: jest.fn(),
   responsiveSize: 'large' as const,
 }
 

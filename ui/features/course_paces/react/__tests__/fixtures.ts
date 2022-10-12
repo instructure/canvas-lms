@@ -33,6 +33,8 @@ import {
   SectionsState,
   UIState,
   OriginalState,
+  PaceContextsState,
+  PaceContextApiresponse,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
@@ -189,6 +191,109 @@ export const HEADING_STATS_API_RESPONSE = {
   ],
 }
 
+export const PACE_CONTEXTS_SECTIONS_RESPONSE: PaceContextApiresponse = {
+  pace_contexts: [
+    {
+      name: 'A-C',
+      type: 'CourseSection',
+      item_id: '78',
+      associated_section_count: 1,
+      associated_student_count: 21,
+      applied_pace: {
+        name: 'Main',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+    {
+      name: 'D-F',
+      type: 'CourseSection',
+      item_id: '79',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'LS3432',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+    {
+      name: 'G-K',
+      type: 'CourseSection',
+      item_id: '80',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'LS3432',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+  ],
+  total_entries: 3,
+}
+
+export const PACE_CONTEXTS_STUDENTS_RESPONSE: PaceContextApiresponse = {
+  pace_contexts: [
+    {
+      name: 'Jon',
+      type: 'StudentEnrollment',
+      item_id: '788',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'J-M',
+        type: 'StudentEnrollment',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+    {
+      name: 'Peter',
+      type: 'StudentEnrollment',
+      item_id: '789',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'LS3432',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+    {
+      name: 'Mike',
+      type: 'StudentEnrollment',
+      item_id: '790',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'LS3432',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+    {
+      name: 'Alex',
+      type: 'StudentEnrollment',
+      item_id: '791',
+      associated_section_count: 1,
+      associated_student_count: 1,
+      applied_pace: {
+        name: 'LS3432',
+        type: 'Course',
+        duration: 6,
+        last_modified: '2022-10-17T23:12:24Z',
+      },
+    },
+  ],
+  total_entries: 4,
+}
+
 export const SECTION_PACE: CoursePace = {
   id: '2',
   course_id: COURSE.id,
@@ -229,6 +334,15 @@ export const STUDENT_PACE: CoursePace = {
   updated_at: '',
 }
 
+export const PACE_CONTEXTS_DEFAULT_STATE: PaceContextsState = {
+  selectedContextType: 'section',
+  entries: PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts,
+  pageCount: 1,
+  page: 1,
+  entriesPerRequest: 10,
+  isLoading: true,
+}
+
 export const PROGRESS_RUNNING = {
   id: '900',
   completion: 25,
@@ -253,6 +367,7 @@ export interface DefaultStoreState {
   readonly course?: Course
   readonly blackoutDates: BlackoutDateState
   readonly original: OriginalState
+  readonly paceContexts: PaceContextsState
 }
 
 export const DEFAULT_STORE_STATE: DefaultStoreState = {
@@ -262,4 +377,5 @@ export const DEFAULT_STORE_STATE: DefaultStoreState = {
   coursePace: {...PRIMARY_PACE},
   sections: SECTIONS,
   original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES},
+  paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
 }
