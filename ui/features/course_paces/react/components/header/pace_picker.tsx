@@ -186,13 +186,12 @@ export const PacePicker: React.FC<ComponentProps> = ({
         onSelect={handleSelect}
       >
         {renderOption(createContextKey('Course', course.id), I18n.t('Course'))}
-        {ENV.FEATURES.course_paces_for_sections &&
-          sections.length > 0 &&
+        {sections.length > 0 &&
           renderSubMenu(
             sections.map(s =>
               renderOption(createContextKey('Section', s.id), s.name, `section-${s.id}`)
             ),
-            'course_paces_for_sections',
+            'course-pace-section-menu',
             I18n.t('Sections')
           )}
         {enrollments.length > 0 &&

@@ -28,11 +28,6 @@ const defaultProps = {
   setIsBlueprintLocked: () => {},
 }
 
-beforeAll(() => {
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_for_sections = true
-})
-
 describe('Course paces header', () => {
   it('renders', () => {
     const {getByRole, getByText} = renderConnected(<Header {...defaultProps} />)

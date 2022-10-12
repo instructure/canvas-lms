@@ -138,7 +138,7 @@ module CoursePacesPageObject
   end
 
   def course_pace_section_option_selector
-    "button[data-position-target='course_paces_for_sections']"
+    "button[data-position-target='course-pace-section-menu']"
   end
 
   def course_pace_option_selector(option_type:)
