@@ -41,11 +41,6 @@ const defaultProps = {
   responsiveSize: 'large' as const,
 }
 
-beforeAll(() => {
-  window.ENV.FEATURES ||= {}
-  window.ENV.FEATURES.course_paces_for_sections = true
-})
-
 afterEach(() => {
   jest.clearAllMocks()
 })
