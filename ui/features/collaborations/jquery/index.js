@@ -115,10 +115,10 @@ CollaborationsPage.Events = {
   },
 
   onTypeChange(_e) {
-    let name = $(this).val(),
-      type = name,
-      launch_url = $(this).find('option:selected').data('launch-url'),
-      $description
+    const name = $(this).val()
+    let type = name
+    const launch_url = $(this).find('option:selected').data('launch-url')
+    let $description
 
     if (launch_url) {
       $('.collaborate_data, #google_docs_description').hide()

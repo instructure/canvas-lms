@@ -85,7 +85,6 @@ var GradePublishing = {
     })
   },
   publish() {
-    let confirmMessage
     if (
       GradePublishing.status === 'publishing' ||
       GradePublishing.status === 'pending' ||
@@ -94,7 +93,7 @@ var GradePublishing = {
       return
     }
 
-    confirmMessage =
+    const confirmMessage =
       GradePublishing.status === 'published'
         ? I18n.t('Are you sure you want to resync these grades to the student information system?')
         : I18n.t(

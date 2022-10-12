@@ -74,8 +74,8 @@ class SectionMenuView extends View {
       return e.preventDefault()
     })
     return this.$('.section-select-menu').on('menuselect', (event, ui) => {
-      let section
-      section = this.$('[aria-checked=true] input[name=section_to_show_radio]').val() || undefined
+      const section =
+        this.$('[aria-checked=true] input[name=section_to_show_radio]').val() || undefined
       $.publish('currentSection/change', [section, this.cid])
       return this.trigger('menuselect', event, ui, this.currentSection)
     })
