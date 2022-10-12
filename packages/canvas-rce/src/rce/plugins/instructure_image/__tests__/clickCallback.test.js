@@ -17,10 +17,14 @@
  */
 
 import clickCallback from '../clickCallback'
-import {getAllByLabelText} from '@testing-library/react'
+import {getAllByLabelText, queryByRole, getByRole} from '@testing-library/react'
 
 describe('Instructure Image Plugin: clickCallback', () => {
   let trayProps
+  const editor = {
+    getParam: () => {},
+  }
+
   beforeEach(() => {
     trayProps = {
       source: {
@@ -29,8 +33,8 @@ describe('Instructure Image Plugin: clickCallback', () => {
         initializeFlickr() {},
         initializeImages() {},
         initializeDocuments() {},
-        initializeMedia() {}
-      }
+        initializeMedia() {},
+      },
     }
   })
   afterEach(() => {
@@ -38,7 +42,7 @@ describe('Instructure Image Plugin: clickCallback', () => {
   })
 
   it('adds the canvas-rce-upload-container element when opened', async () => {
-    await clickCallback({}, document, trayProps)
+    await clickCallback(editor, document, trayProps)
     expect(document.querySelector('.canvas-rce-upload-container')).toBeTruthy()
   })
 
@@ -46,16 +50,32 @@ describe('Instructure Image Plugin: clickCallback', () => {
     const container = document.createElement('div')
     container.className = 'canvas-rce-upload-container'
     document.body.appendChild(container)
-    await clickCallback({}, document, trayProps)
+    await clickCallback(editor, document, trayProps)
     expect(document.querySelectorAll('.canvas-rce-upload-container').length).toEqual(1)
   })
 
   it('opens the UploadImage modal when called', async () => {
-    await clickCallback({}, document, trayProps)
+    await clickCallback(editor, document, trayProps)
     expect(
       getAllByLabelText(document, 'Upload Image', {
-        selector: 'form'
+        selector: 'form',
       })[0]
     ).toBeVisible()
+  })
+
+  it('does not display Unsplash Panel when disabled', async () => {
+    editor.getParam = () => {
+      return false
+    }
+    await clickCallback(editor, document, trayProps)
+    expect(queryByRole(document, 'tab', {name: /unsplash/i})).not.toBeInTheDocument()
+  })
+
+  it('does display Unsplash Panel when enabled', async () => {
+    editor.getParam = () => {
+      return true
+    }
+    await clickCallback(editor, document, trayProps)
+    expect(getByRole(document, 'tab', {name: /unsplash/i})).toBeInTheDocument()
   })
 })

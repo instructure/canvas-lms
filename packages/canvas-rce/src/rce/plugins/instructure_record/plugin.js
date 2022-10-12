@@ -38,23 +38,23 @@ function getMenuItems(ed) {
     // test if it's ok
     items.push({
       text: formatMessage('Upload/Record Media'),
-      value: 'instructure_upload_media'
+      value: 'instructure_upload_media',
     })
   }
   if (contextType === 'course') {
     items.push({
       text: formatMessage('Course Media'),
-      value: 'instructure_course_media'
+      value: 'instructure_course_media',
     })
   } else if (contextType === 'group') {
     items.push({
       text: formatMessage('Group Media'),
-      value: 'instructure_group_media'
+      value: 'instructure_group_media',
     })
   }
   items.push({
     text: formatMessage('User Media'),
-    value: 'instructure_user_media'
+    value: 'instructure_user_media',
   })
   return items
 }
@@ -99,9 +99,9 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
             onSetup: api => {
               api.setDisabled(!isOKToLink(ed.selection.getContent()))
               return () => {}
-            }
+            },
           }
-        })
+        }),
     })
 
     // Register buttons
@@ -113,7 +113,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
           return {
             type: 'choiceitem',
             text: item.text,
-            value: item.value
+            value: item.value,
           }
         })
         callback(items)
@@ -134,7 +134,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         return () => {
           ed.off('NodeChange', handleNodeChange)
         }
-      }
+      },
     })
 
     /*
@@ -149,14 +149,14 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
       },
 
       text: formatMessage('Video Options'),
-      tooltip: buttonAriaLabel
+      tooltip: buttonAriaLabel,
     })
 
     ed.ui.registry.addContextToolbar('instructure-video-toolbar', {
       items: 'instructure-video-options',
       position: 'node',
       predicate: isVideoElement,
-      scope: 'node'
+      scope: 'node',
     })
 
     ed.ui.registry.addButton('instructure-audio-options', {
@@ -164,20 +164,20 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         audioTrayController.showTrayForEditor(ed)
       },
       text: formatMessage('Audio Options'),
-      tooltip: formatMessage('Show audio options')
+      tooltip: formatMessage('Show audio options'),
     })
 
     ed.ui.registry.addContextToolbar('instructure-audio-toolbar', {
       items: 'instructure-audio-options',
       position: 'node',
       predicate: isAudioElement,
-      scope: 'node'
+      scope: 'node',
     })
   },
   remove(editor) {
     audioTrayController.hideTrayForEditor(editor)
     videoTrayController.hideTrayForEditor(editor)
-  }
+  },
 })
 
 // Register plugin
