@@ -125,8 +125,7 @@ describe('student view integration tests', () => {
     // This cannot be tested at the <AttemptTab> because the new file being
     // displayed happens as a result of a cache write and these higher level
     // components re-rendering
-    it.skip('displays the new file after it has been uploaded', async () => {
-      // unskip in EVAL-2503
+    it('displays the new file after it has been uploaded', async () => {
       window.URL.createObjectURL = jest.fn()
       uploadFileModule.uploadFile = jest.fn()
       uploadFileModule.uploadFile.mockReturnValueOnce({id: '1', name: 'test.jpg'})
@@ -189,55 +188,7 @@ describe('student view integration tests', () => {
     })
   })
 
-  describe('the submission is a text entry', () => {
-    function createTextMocks(overrides = {}) {
-      const mocks = [
-        {
-          query: STUDENT_VIEW_QUERY,
-          variables: {assignmentLid: '1', submissionID: '1'},
-        },
-        {
-          query: CREATE_SUBMISSION_DRAFT,
-          variables: {id: '1', attempt: 1, body: ''},
-        },
-      ]
-
-      const mockResults = Promise.all(
-        mocks.map(async ({query, variables}) => {
-          const result = await mockQuery(query, overrides, variables)
-          return {
-            request: {query, variables},
-            result,
-          }
-        })
-      )
-      return mockResults
-    }
-
-    it.skip('opens the RCE when the Start Entry button is clicked', async () => {
-      // TODO: get this to work with latest @testing-library
-      const mocks = await createTextMocks({
-        Assignment: {submissionTypes: ['online_text_entry']},
-        SubmissionDraft: {body: ''},
-      })
-
-      const {findByTestId} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>
-      )
-
-      const startButton = await findByTestId('start-text-entry')
-      fireEvent.click(startButton)
-
-      expect(await findByTestId('text-editor')).toBeInTheDocument()
-    })
-  })
-
-  // Skipping these tests as logged out user is not currently handled
-  // properly in Assignments2 due to graphql issues
-  describe.skip('logged out user on a public assignment', () => {
-    // unskip in EVAL-2503
+  describe('logged out user on a public assignment', () => {
     async function createPublicAssignmentMocks(overrides = {}) {
       const query = LOGGED_OUT_STUDENT_VIEW_QUERY
       const variables = {assignmentLid: '1'}
@@ -261,8 +212,8 @@ describe('student view integration tests', () => {
 
     it('renders the rubric panel if a rubric if present', async () => {
       const overrides = [
-        {Assignment: {name: 'Test Assignment', rubric: {}}},
-        {Rubric: {title: 'Test Rubric'}},
+        {Assignment: {name: 'Test Assignment', rubric: {id: '123', criteria: []}}},
+        {Rubric: {title: 'Test Rubric', id: '123'}},
       ]
       const mocks = [await createPublicAssignmentMocks(overrides)]
       const {findByRole} = render(
