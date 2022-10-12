@@ -27,6 +27,9 @@ const EVENT_EXCEPTION_ELEMENT_IDS = [
   'imageCropperControls',
 ]
 
+const TOUCH_EVENTS = ['ontouchmove', 'ontouchend', 'ontouchcancel']
+const MOUSE_EVENTS = ['onmousemove', 'onmouseup', 'onmouseout']
+
 function useKeysEvents(
   tempTranslateXRef,
   tempTranslateYRef,
@@ -42,7 +45,7 @@ function useKeysEvents(
   const direction = useRef(0)
   const initialTime = useRef(null)
 
-  const onKeyDownCallback = event => {
+  const onKeyDown = event => {
     // 37 = Left, 38 = Up, 39 = Right, 40 = Down
     const {keyCode} = event
     if (![37, 38, 39, 40].includes(keyCode)) {
@@ -77,7 +80,7 @@ function useKeysEvents(
     }
   }
 
-  const stopMovementCallback = useCallback(
+  const stopMovement = useCallback(
     debounce(
       () => {
         direction.current = 0
@@ -91,7 +94,7 @@ function useKeysEvents(
   )
 
   useEffect(() => {
-    const onKeyDownCallbackWrapper = event => {
+    const onKeyDownWrapper = event => {
       // If the active element is in the modal header, footer or controls.
       if (
         EVENT_EXCEPTION_ELEMENT_IDS.some(id =>
@@ -100,26 +103,26 @@ function useKeysEvents(
       ) {
         return
       }
-      onKeyDownCallback(event)
+      onKeyDown(event)
     }
     // Adds the event listener when component did mount
-    document.addEventListener('keydown', onKeyDownCallbackWrapper)
+    document.addEventListener('keydown', onKeyDownWrapper)
     return () => {
       // Removes the event listener when component will unmount
-      document.removeEventListener('keydown', onKeyDownCallbackWrapper)
+      document.removeEventListener('keydown', onKeyDownWrapper)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (isMoving && direction.current !== 0) {
-      stopMovementCallback()
+      stopMovement()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempTranslateX, tempTranslateY])
 }
 
-function useMouseEvents(
+function useMouseAndTouchEvents(
   tempTranslateX,
   tempTranslateY,
   setTempTranslateX,
@@ -128,50 +131,56 @@ function useMouseEvents(
 ) {
   const initialPageX = useRef(0)
   const initialPageY = useRef(0)
-  const mouseDown = useRef(false)
+  const isDragging = useRef(false)
   const imgElement = useRef(null)
 
-  const stoppedMovingCallback = () => {
-    mouseDown.current = false
+  const onStopMove = isMouseEvent => () => {
+    isDragging.current = false
     initialPageX.current = 0
     initialPageY.current = 0
 
     if (imgElement.current) {
-      imgElement.current.onmousemove = null
-      imgElement.current.onmouseup = null
+      const [move, end, cancel] = isMouseEvent ? MOUSE_EVENTS : TOUCH_EVENTS
+      imgElement.current[move] = null
+      imgElement.current[end] = null
+      imgElement.current[cancel] = null
       imgElement.current = null
     }
 
     setIsMoving(false)
   }
 
-  const startedMovingCallback = (target, clientX, clientY) => {
-    mouseDown.current = true
+  const onMove = isMouseEvent => e => {
+    if (!isDragging.current) {
+      return onStopMove()
+    }
+    const {clientX, clientY} = isMouseEvent ? e : e.touches[0]
+    setTempTranslateX(tempTranslateX + clientX - initialPageX.current)
+    setTempTranslateY(tempTranslateY + clientY - initialPageY.current)
+  }
+
+  const onStartMove = (e, isMouseEvent) => {
+    isDragging.current = true
+    const {target} = e
+    const {clientX, clientY} = isMouseEvent ? e : e.touches[0]
     initialPageX.current = clientX
     initialPageY.current = clientY
 
-    target.onmousemove = onMouseMoveCallback
-    target.onmouseup = stoppedMovingCallback
-    // Should stop the movement when mouse leaves the preview
-    target.onmouseout = stoppedMovingCallback
+    const [move, end, cancel] = isMouseEvent ? MOUSE_EVENTS : TOUCH_EVENTS
+    target[move] = onMove(isMouseEvent)
+    target[end] = onStopMove(isMouseEvent)
+    // Should stop the movement when touch/mouse leaves the preview
+    target[cancel] = onStopMove(isMouseEvent)
 
     imgElement.current = target
 
     setIsMoving(true)
   }
 
-  const onMouseMoveCallback = e => {
-    if (!mouseDown.current) {
-      return stoppedMovingCallback()
-    }
-    setTempTranslateX(tempTranslateX + e.clientX - initialPageX.current)
-    setTempTranslateY(tempTranslateY + e.clientY - initialPageY.current)
-  }
-
-  return e => startedMovingCallback(e.target, e.clientX, e.clientY)
+  return [e => onStartMove(e, true), e => onStartMove(e, false)]
 }
 
-export function useKeyMouseEvents(translateX, translateY, dispatch) {
+export function useKeyMouseTouchEvents(translateX, translateY, dispatch) {
   const [tempTranslateX, _setTempTranslateX] = useState(translateX)
   const [tempTranslateY, _setTempTranslateY] = useState(translateY)
   const [isMoving, setIsMoving] = useState(false)
@@ -203,7 +212,8 @@ export function useKeyMouseEvents(translateX, translateY, dispatch) {
     setIsMoving,
     dispatch
   )
-  const onMouseDownCallback = useMouseEvents(
+
+  const [onMouseDown, onTouchStart] = useMouseAndTouchEvents(
     tempTranslateX,
     tempTranslateY,
     setTempTranslateX,
@@ -241,5 +251,5 @@ export function useKeyMouseEvents(translateX, translateY, dispatch) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [translateX, translateY])
 
-  return [tempTranslateX, tempTranslateY, onMouseDownCallback]
+  return [tempTranslateX, tempTranslateY, onMouseDown, onTouchStart]
 }
