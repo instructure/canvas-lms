@@ -107,8 +107,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spannende discussie" },
   "excused_cf8792eb": { "message": "Vrijgesteld" },
+  "extended_9a58dcb6": { "message": "Uitgebreid" },
   "failed_getting_course_list_49846a93": {
     "message": "Cursuslijst kan niet worden opgehaald"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Ophalen Takenlijst mislukt"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Gluren in de toekomst is mislukt"
@@ -133,6 +137,9 @@
   },
   "failed_to_save_to_do_ddc7503b": {
     "message": "Kan To Do-lijst niet opslaan"
+  },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Laden Takenlijst mislukt"
   },
   "feedback_6dcc1991": { "message": "Feedback" },
   "fun_quiz_47ab0b0": { "message": "Leuke toets" },
@@ -250,6 +257,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } tot { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Takenlijst cursist" },
   "submitted_318fad53": { "message": "Ingediend" },
   "success_to_do_created_e34ed395": { "message": "Gelukt: To Do gemaakt" },
   "task_16b0ef38": { "message": "Taak" },

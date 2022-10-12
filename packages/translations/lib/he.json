@@ -20,6 +20,9 @@
     "all_items_loaded_aa256183": {
         "message": "כל הפריטים נטענו"
     },
+    "alpha_15d59033": {
+        "message": "אלפא"
+    },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "אירעה שגיאה בעת נסיון לוותר על ההזדמנות"
     },
@@ -94,6 +97,9 @@
     },
     "blue_daf8fea9": {
         "message": "כחול"
+    },
+    "bottom_15a2a9be": {
+        "message": "תחתית"
     },
     "c_2001_acme_inc_283f7f80": {
         "message": "(c) 2001 Acme Inc."
@@ -194,8 +200,8 @@
     "date_time_d9fbf2d7": {
         "message": "תאריך וזמן:"
     },
-    "decrease_indent_de6343ab": {
-        "message": "הצרת עימוד"
+    "decrease_indent_d9cf469d": {
+        "message": "צמצום עימוד"
     },
     "deep_purple_bb3e2907": {
         "message": "סגול כהה"
@@ -338,6 +344,9 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "זכויות היוצרים הן שלי"
     },
+    "icon_215a1dc6": {
+        "message": "צלמית"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "אם לא תבחר/י את סוג זכויות השימוש כעת, קובץ זה לא יפורסם בתום העלאתו"
     },
@@ -347,7 +356,7 @@
     "images_7ce26570": {
         "message": "תמונות"
     },
-    "increase_indent_6d550a4a": {
+    "increase_indent_6af90f7c": {
         "message": "הרחבת עימוד"
     },
     "indigo_2035fc55": {
@@ -397,9 +406,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "טענו עוד"
-    },
-    "load_more_results_460f49a9": {
-        "message": "טעינת תוצאות נוספות"
     },
     "load_prior_dates_f2b0f6f0": {
         "message": "טעינת מועדים קודמים"
@@ -593,8 +599,14 @@
     "reminder_date_4564d12d": {
         "message": "תזכורת: { date }"
     },
+    "replace_e61834a7": {
+        "message": "החלפה"
+    },
     "replies_4a8577c8": {
         "message": "תשובות"
+    },
+    "reset_95a81614": {
+        "message": "חזרה למצב ברירת מחדל"
     },
     "rich_content_editor_2708ef21": {
         "message": "עורך תוכן עשיר"
@@ -748,5 +760,8 @@
     },
     "you_ve_scrolled_back_to_your_very_first_to_do_29374681": {
         "message": "גללת אחורה למטלה לביצוע הראשונה שלך!"
+    },
+    "zoom_f3e54d69": {
+        "message": "תקריב"
     }
 }

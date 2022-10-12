@@ -8,6 +8,9 @@
     "all_4321c3a1": {
         "message": "Բոլորը"
     },
+    "alpha_15d59033": {
+        "message": "Alpha"
+    },
     "announcement_fb4cb645": {
         "message": "Հայտարարություն"
     },
@@ -116,8 +119,8 @@
     "date_ee500367": {
         "message": "Ամսաթիվ"
     },
-    "decrease_indent_de6343ab": {
-        "message": "Նվազեցնել ներսի տողագլուխը"
+    "decrease_indent_d9cf469d": {
+        "message": "Փոքրացնել Ներսի Տողագլուխը"
     },
     "deep_purple_bb3e2907": {
         "message": "Մուգ մանուշակագույն"
@@ -209,14 +212,17 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "Ես հեղինակային իրավունք ունեմ"
     },
+    "icon_215a1dc6": {
+        "message": "Նշան"
+    },
     "image_8ad06": {
         "message": "Պատկեր"
     },
     "images_7ce26570": {
         "message": "Պատկերներ"
     },
-    "increase_indent_6d550a4a": {
-        "message": "Ավելացնել ներսի տողագլուխը"
+    "increase_indent_6af90f7c": {
+        "message": "Մեծացնել ներսի տողագլուխը"
     },
     "indigo_2035fc55": {
         "message": "Indigo"
@@ -259,9 +265,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "Բեռնել լրացուցիչ"
-    },
-    "load_more_results_460f49a9": {
-        "message": "Load more results"
     },
     "loading_25990131": {
         "message": "Բեռնում է..."
@@ -361,6 +364,12 @@
     },
     "relationships_6602af70": {
         "message": "Հարաբերություններ"
+    },
+    "replace_e61834a7": {
+        "message": "Փոխարինել"
+    },
+    "reset_95a81614": {
+        "message": "Սկզբնական Վիճակին Բերել"
     },
     "rich_content_editor_2708ef21": {
         "message": "Ֆորմատավորված տեքստի խմբագիր"
