@@ -43,6 +43,7 @@ class NewCollaborationsDropDown extends React.Component {
         ) : (
           <div>
             <button
+              type="button"
               className="al-trigger Button Button--primary"
               aria-label={I18n.t('Add Collaboration')}
               role="button"

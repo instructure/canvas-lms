@@ -70,7 +70,7 @@ class GenerateLink extends React.Component {
       )
     } else {
       return (
-        <button className="Button Button--link" onClick={this._onClick}>
+        <button type="button" className="Button Button--link" onClick={this._onClick}>
           <i className="icon-refresh" aria-hidden="true" />
           {classnames(text)}
         </button>

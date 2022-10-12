@@ -48,7 +48,7 @@ const renderActions = ({props, onDeleteGradingPeriod}) => {
       <div className="GradingPeriod__Actions content-box">
         <button
           ref="deleteButton"
-          role="button"
+          type="button"
           className={cssClasses}
           aria-disabled={props.disabled}
           onClick={onDeleteGradingPeriod}

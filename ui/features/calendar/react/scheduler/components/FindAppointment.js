@@ -72,6 +72,7 @@ export default class FindAppointment extends React.Component {
         <h2>{I18n.t('Appointments')}</h2>
         {this.props.store.getState().inFindAppointmentMode ? (
           <button
+            type="button"
             onClick={() => this.endAppointmentMode()}
             id="FindAppointmentButton"
             className="Button"
@@ -79,7 +80,12 @@ export default class FindAppointment extends React.Component {
             {I18n.t('Close')}
           </button>
         ) : (
-          <button onClick={() => this.openModal()} id="FindAppointmentButton" className="Button">
+          <button
+            type="button"
+            onClick={() => this.openModal()}
+            id="FindAppointmentButton"
+            className="Button"
+          >
             {I18n.t('Find Appointment')}
           </button>
         )}

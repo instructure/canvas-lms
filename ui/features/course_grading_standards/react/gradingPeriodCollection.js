@@ -218,6 +218,7 @@ class GradingPeriodCollection extends React.Component {
         <div className="form-actions">
           <button
             className="Button btn-primary btn save_button"
+            type="button"
             id="update-button"
             disabled={this.state.disabled || this.state.saveDisabled}
             onClick={this.batchUpdatePeriods}
