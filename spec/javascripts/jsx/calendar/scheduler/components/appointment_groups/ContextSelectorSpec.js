@@ -305,7 +305,7 @@ test('toggle course expanded', () => {
   const wrapper = mount(<ContextSelector {...props} />)
   equal(wrapper.find('.CourseListItem svg').prop('name'), 'IconMiniArrowEnd')
 
-  wrapper.find('.CourseListItem Button').simulate('click')
+  wrapper.find('.CourseListItem IconButton').simulate('click')
   equal(wrapper.find('.CourseListItem svg').prop('name'), 'IconMiniArrowDown')
 })
 

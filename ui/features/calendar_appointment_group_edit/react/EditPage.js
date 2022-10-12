@@ -161,7 +161,7 @@ class EditPage extends React.Component {
             window.location = '/calendar'
           })
           .catch(() => {
-            $.flashError(I18n.t('An error ocurred while deleting the appointment group'))
+            $.flashError(I18n.t('An error occurred while deleting the appointment group'))
             this.setState({isDeleting: false})
           })
       })
@@ -227,7 +227,7 @@ class EditPage extends React.Component {
         window.location.href = '/calendar?edit_appointment_group_success=1'
       })
       .catch(() => {
-        $.flashError(I18n.t('An error ocurred while saving the appointment group'))
+        $.flashError(I18n.t('An error occurred while saving the appointment group'))
       })
   }
 
