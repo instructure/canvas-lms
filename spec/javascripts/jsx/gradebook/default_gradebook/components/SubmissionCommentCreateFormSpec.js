@@ -49,7 +49,7 @@ QUnit.module('SubmissionCommentCreateForm', hooks => {
       cancelCommenting() {},
       createSubmissionComment() {},
       processing: false,
-      setProcessing() {}
+      setProcessing() {},
     }
   })
 
@@ -134,7 +134,7 @@ QUnit.module('SubmissionCommentCreateForm', hooks => {
     props.createSubmissionComment = sinon.stub().resolves()
     wrapper = mountComponent()
     const event = {
-      preventDefault: sinon.stub()
+      preventDefault: sinon.stub(),
     }
     wrapper.find('textarea').simulate('change', {target: {value: 'some message'}})
     submitButton().simulate('click', event)

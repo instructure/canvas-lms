@@ -37,41 +37,43 @@ const workingMenuProps = () => ({
     {
       id: '1',
       name: 'Pinnacle',
-      onSelect() {}
-    }
+      onSelect() {},
+    },
   ],
 
   postGradesFeature: {
     enabled: false,
     label: '',
     store: {},
-    returnFocusTo: {focus() {}}
+    returnFocusTo: {focus() {}},
   },
 
   publishGradesToSis: {
-    isEnabled: false
+    isEnabled: false,
   },
 
-  gradingPeriodId: '1234'
+  gradingPeriodId: '1234',
+  updateExportState: () => {},
+  setExportManager: () => {},
 })
 const previousExportProps = () => ({
   lastExport: {
     progressId: '9000',
-    workflowState: 'completed'
+    workflowState: 'completed',
   },
   attachment: {
     id: '691',
     downloadUrl: 'http://downloadUrl',
     updatedAt: '2009-01-20T17:00:00Z',
-    createdAt: '2009-01-20T17:00:00Z'
-  }
+    createdAt: '2009-01-20T17:00:00Z',
+  },
 })
 
 QUnit.module('ActionMenu - Basic Rendering', {
   setup() {
     const propsWithPreviousExport = {
       ...workingMenuProps(),
-      ...previousExportProps()
+      ...previousExportProps(),
     }
     this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
     this.wrapper.find('button').simulate('click')
@@ -79,7 +81,7 @@ QUnit.module('ActionMenu - Basic Rendering', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('renders the Import menu item', () => {
@@ -113,7 +115,7 @@ test('renders the Previous export menu item', () => {
 test('previous export date stays the same after updatedAt is changed', function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   propsWithPreviousExport.attachment.updatedAt = '2021-05-12T13:00:00Z'
@@ -179,18 +181,18 @@ QUnit.module('ActionMenu - getExistingExport', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('returns an export hash with workflowState when progressId and attachment.id are present', function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
   const expectedExport = {
     attachmentId: '691',
     progressId: '9000',
-    workflowState: 'completed'
+    workflowState: 'completed',
   }
 
   this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
@@ -205,7 +207,7 @@ test('returns undefined when lastExport is undefined', function () {
 test("returns undefined when lastExport's attachment is undefined", function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   delete propsWithPreviousExport.attachment
@@ -217,7 +219,7 @@ test("returns undefined when lastExport's attachment is undefined", function () 
 test('returns undefined when lastExport is missing progressId', function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   propsWithPreviousExport.lastExport.progressId = ''
@@ -229,7 +231,7 @@ test('returns undefined when lastExport is missing progressId', function () {
 test("returns undefined when lastExport's attachment is missing its id", function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   propsWithPreviousExport.attachment.id = ''
@@ -243,7 +245,7 @@ QUnit.module('ActionMenu - handleExport', {
     if (type === 'resolved') {
       return Promise.resolve({
         attachmentUrl: 'http://attachmentUrl',
-        updatedAt: '2009-01-20T17:00:00Z'
+        updatedAt: '2009-01-20T17:00:00Z',
       })
     }
 
@@ -253,19 +255,21 @@ QUnit.module('ActionMenu - handleExport', {
   setup() {
     this.expectedPreviousExport = {
       attachmentUrl: 'http://attachmentUrl',
-      label: 'New Export (Jan 20, 2009 at 5pm)'
+      label: 'New Export (Jan 20, 2009 at 5pm)',
     }
     this.successfulExport = {
       attachmentUrl: 'http://attachmentUrl',
-      updatedAt: '2009-01-20T17:00:00Z'
+      updatedAt: '2009-01-20T17:00:00Z',
     }
 
     this.spies = {}
     this.spies.gotoUrl = sandbox.stub(ActionMenu, 'gotoUrl')
     this.spies.startExport = sandbox.stub(GradebookExportManager.prototype, 'startExport')
+    this.spies.monitorExport = sandbox.stub(GradebookExportManager.prototype, 'monitorExport')
+    this.spies.monitorExport.returns({attachmentUrl: '', updatedAt: ''})
 
     this.wrapper = mount(<ActionMenu {...workingMenuProps()} />, {
-      attachTo: document.querySelector('#fixture')
+      attachTo: document.querySelector('#fixture'),
     })
 
     this.trigger = this.wrapper.find('button')
@@ -279,7 +283,7 @@ QUnit.module('ActionMenu - handleExport', {
     this.wrapper.unmount()
 
     this.spies = {}
-  }
+  },
 })
 
 test('clicking on the export menu option calls the handleExport function', function () {
@@ -298,7 +302,10 @@ test('shows a message to the user indicating the export is in progress', functio
   this.menuItem.click()
 
   equal(this.spies.flashMessage.callCount, 1)
-  equal(this.spies.flashMessage.getCall(0).args[0], 'Gradebook export started')
+  equal(
+    this.spies.flashMessage.getCall(0).args[0],
+    'Gradebook export has started. This may take a few minutes.'
+  )
 
   return exportResult
 })
@@ -406,6 +413,42 @@ test('on success, shows the "New Export" menu item', function () {
     })
 })
 
+test('on success, shows a message that the export has completed', function () {
+  const exportResult = this.getPromise('resolved')
+  this.spies.startExport.returns(exportResult)
+  this.spies.flashMessage = sandbox.stub(window.$, 'flashMessage')
+  const handleUpdateExportState = sandbox.stub(ActionMenu.prototype, 'handleUpdateExportState')
+
+  this.trigger.simulate('click')
+
+  return this.wrapper
+    .instance()
+    .handleExport()
+    .then(() => {
+      equal(this.spies.flashMessage.callCount, 2)
+      equal(this.spies.flashMessage.getCall(1).args[0], 'Gradebook export has completed')
+      equal(handleUpdateExportState.callCount, 1)
+    })
+})
+
+test('handleResumeExport will resume the export with success', function () {
+  const exportResult = 'resolved'
+  this.spies.monitorExport.returns(exportResult)
+
+  this.spies.flashMessage = sandbox.stub(window.$, 'flashMessage')
+  const handleResumeExport = sandbox.stub(ActionMenu.prototype, 'handleResumeExport')
+
+  const propsWithPreviousExport = {
+    ...workingMenuProps(),
+    lastExport: {
+      progressId: '9000',
+      workflowState: 'queued',
+    },
+  }
+  this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
+  equal(handleResumeExport.callCount, 1)
+})
+
 test('on failure, shows a message to the user indicating the export failed', function () {
   const exportResult = this.getPromise('rejected')
   this.spies.startExport.returns(exportResult)
@@ -461,7 +504,7 @@ QUnit.module('ActionMenu - handleImport', {
   teardown() {
     this.menuItem = undefined
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('clicking on the import menu option calls the handleImport function', function () {
@@ -481,7 +524,7 @@ test('it takes you to the new imports page', function () {
 QUnit.module('ActionMenu - disableImports', {
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('is called once when the component renders', function () {
@@ -501,7 +544,7 @@ test('returns false when gradebook is editable and context allows gradebook uplo
 test('returns true when gradebook is not editable and context allows gradebook uploads', function () {
   const newImportProps = {
     ...workingMenuProps(),
-    gradebookIsEditable: false
+    gradebookIsEditable: false,
   }
 
   this.wrapper = mount(<ActionMenu {...newImportProps} />)
@@ -511,7 +554,7 @@ test('returns true when gradebook is not editable and context allows gradebook u
 test('returns true when gradebook is editable but context does not allow gradebook uploads', function () {
   const newImportProps = {
     ...workingMenuProps(),
-    contextAllowsGradebookUploads: false
+    contextAllowsGradebookUploads: false,
   }
 
   this.wrapper = mount(<ActionMenu {...newImportProps} />)
@@ -525,13 +568,13 @@ QUnit.module('ActionMenu - lastExportFromProps', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('returns the lastExport hash if props have a completed last export', function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   this.wrapper = mount(<ActionMenu {...propsWithPreviousExport} />)
@@ -546,7 +589,7 @@ test('returns undefined if props have no lastExport', function () {
 test('returns undefined if props have a lastExport but it is not completed', function () {
   const propsWithPreviousExport = {
     ...workingMenuProps(),
-    ...previousExportProps()
+    ...previousExportProps(),
   }
 
   propsWithPreviousExport.lastExport.workflowState = 'discombobulated'
@@ -562,13 +605,13 @@ QUnit.module('ActionMenu - lastExportFromState', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('returns the previous export if state has a previousExport defined', function () {
   const expectedPreviousExport = {
     label: 'previous export label',
-    attachmentUrl: 'http://attachmentUrl'
+    attachmentUrl: 'http://attachmentUrl',
   }
 
   this.wrapper.instance().setState({previousExport: expectedPreviousExport})
@@ -592,7 +635,7 @@ QUnit.module('ActionMenu - previousExport', {
   setup() {
     const neededProps = {
       ...workingMenuProps(),
-      attachment: previousExportProps().attachment
+      attachment: previousExportProps().attachment,
     }
 
     this.wrapper = mount(<ActionMenu {...neededProps} />)
@@ -600,13 +643,13 @@ QUnit.module('ActionMenu - previousExport', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('returns the previous export stored in the state if it is available', function () {
   const stateExport = {
     label: 'previous export label',
-    attachmentUrl: 'http://attachmentUrl'
+    attachmentUrl: 'http://attachmentUrl',
   }
   const lastExportFromState = sandbox
     .stub(ActionMenu.prototype, 'lastExportFromState')
@@ -619,7 +662,7 @@ test('returns the previous export stored in the state if it is available', funct
 test('returns the previous export stored in the props if nothing is available in state', function () {
   const expectedPreviousExport = {
     attachmentUrl: 'http://downloadUrl',
-    label: 'Previous Export (Jan 20, 2009 at 5pm)'
+    label: 'Previous Export (Jan 20, 2009 at 5pm)',
   }
 
   const lastExportFromState = sandbox
@@ -654,7 +697,7 @@ QUnit.module('ActionMenu - exportInProgress', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('returns true if exportInProgress is set', function () {
@@ -680,7 +723,7 @@ QUnit.module('ActionMenu - Post Grade Ltis', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('Invokes the onSelect prop when selected', function () {
@@ -706,7 +749,7 @@ QUnit.module('ActionMenu - Post Grade Feature', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('launches the PostGrades App when selected', assert => {
@@ -729,7 +772,7 @@ QUnit.module('ActionMenu - Publish grades to SIS', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('Does not render menu item when isEnabled is false and publishToSisUrl is undefined', () => {
@@ -742,8 +785,8 @@ test('Does not render menu item when isEnabled is false and publishToSisUrl is u
 test('Does not render menu item when isEnabled is true and publishToSisUrl is undefined', function () {
   this.wrapper.setProps({
     publishGradesToSis: {
-      isEnabled: true
-    }
+      isEnabled: true,
+    },
   })
 
   const menuItem = document.querySelector(
@@ -756,8 +799,8 @@ test('Renders menu item when isEnabled is true and publishToSisUrl is defined', 
   this.wrapper.setProps({
     publishGradesToSis: {
       isEnabled: true,
-      publishToSisUrl: 'http://example.com'
-    }
+      publishToSisUrl: 'http://example.com',
+    },
   })
 
   const menuItem = document.querySelector(
@@ -770,8 +813,8 @@ test('Calls gotoUrl with publishToSisUrl when clicked', function () {
   this.wrapper.setProps({
     publishGradesToSis: {
       isEnabled: true,
-      publishToSisUrl: 'http://example.com'
-    }
+      publishToSisUrl: 'http://example.com',
+    },
   })
   sandbox.stub(ActionMenu, 'gotoUrl')
 

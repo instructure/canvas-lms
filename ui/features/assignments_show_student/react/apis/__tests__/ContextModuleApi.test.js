@@ -38,7 +38,7 @@ describe('ContextModuleApi', () => {
       expect(ModuleSequenceFooter).toHaveBeenCalledWith(
         expect.objectContaining({
           assetID: '3456',
-          courseID: '1234'
+          courseID: '1234',
         })
       )
     })

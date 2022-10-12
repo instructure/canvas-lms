@@ -58,13 +58,15 @@ describe CourseForMenuPresenter do
     end
 
     it "only shows the tabs a student has access to to students" do
+      course.offer
       course.enroll_student(user).accept
       course.assignments.create!
       course.attachments.create! filename: "blah", uploaded_data: StringIO.new("blah")
 
       expect(presenter.to_h[:links]).to match_array([
                                                       a_hash_including({ css_class: "assignments", icon: "icon-assignment", label: "Assignments" }),
-                                                      a_hash_including({ css_class: "files", icon: "icon-folder", label: "Files" })
+                                                      a_hash_including({ css_class: "files", icon: "icon-folder", label: "Files" }),
+                                                      a_hash_including({ css_class: "discussions", icon: "icon-discussion", label: "Discussions" }),
                                                     ])
     end
 

@@ -25,7 +25,7 @@ import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
   SUBMISSION_HISTORIES_QUERY,
-  USER_GROUPS_QUERY
+  USER_GROUPS_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '@canvas/assignments/graphql/studentMocks'
@@ -42,7 +42,7 @@ describe('student view integration tests', () => {
       COURSE_ID: '1',
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url', id: '1'},
       PREREQS: {},
-      current_user_roles: ['user', 'student']
+      current_user_roles: ['user', 'student'],
     }
   })
 
@@ -51,29 +51,29 @@ describe('student view integration tests', () => {
       const mocks = [
         {
           query: STUDENT_VIEW_QUERY,
-          variables: {assignmentLid: '1', submissionID: '1'}
+          variables: {assignmentLid: '1', submissionID: '1'},
         },
         {
           query: CREATE_SUBMISSION_DRAFT,
           variables: {id: '1', activeSubmissionType: 'online_upload', attempt: 1, fileIds: ['1']},
-          overrides: createSubmissionDraftOverrides
+          overrides: createSubmissionDraftOverrides,
         },
         {
           query: SUBMISSION_HISTORIES_QUERY,
           variables: {submissionID: '1'},
           overrides: {
             Node: {__typename: 'Submission'},
-            SubmissionHistoryConnection: {nodes: [{attempt: 3}, {attempt: 4}]}
-          }
+            SubmissionHistoryConnection: {nodes: [{attempt: 3}, {attempt: 4}]},
+          },
         },
         {
           query: USER_GROUPS_QUERY,
           variables: {userID: '1'},
           overrides: {
             Node: {__typename: 'User'},
-            User: {groups: []}
-          }
-        }
+            User: {groups: []},
+          },
+        },
       ]
 
       const mockResults = Promise.all(
@@ -81,7 +81,7 @@ describe('student view integration tests', () => {
           const result = await mockQuery(query, overrides, variables)
           return {
             request: {query, variables},
-            result
+            result,
           }
         })
       )
@@ -134,8 +134,8 @@ describe('student view integration tests', () => {
 
       const mocks = await createGraphqlMocks({
         CreateSubmissionDraftPayload: {
-          submissionDraft: {attachments: [{displayName: 'test.jpg'}]}
-        }
+          submissionDraft: {attachments: [{displayName: 'test.jpg'}]},
+        },
       })
 
       const {findByRole, findByTestId} = render(
@@ -160,14 +160,14 @@ describe('student view integration tests', () => {
       uploadFileModule.uploadFiles = jest.fn()
       uploadFileModule.uploadFiles.mockReturnValueOnce([
         {id: '1', name: 'file1.jpg'},
-        {id: '2', name: 'file2.jpg'}
+        {id: '2', name: 'file2.jpg'},
       ])
       $('body').append('<div role="alert" id="flash_screenreader_holder" />')
 
       const mocks = await createGraphqlMocks({
         CreateSubmissionDraftPayload: {
-          submissionDraft: {attachments: [{}, {}]}
-        }
+          submissionDraft: {attachments: [{}, {}]},
+        },
       })
 
       const {findByTestId, findAllByRole} = render(
@@ -180,7 +180,7 @@ describe('student view integration tests', () => {
 
       const files = [
         new File(['foo'], 'file1.jpg', {type: 'image/jpg'}),
-        new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
+        new File(['foo'], 'file2.pdf', {type: 'application/pdf'}),
       ]
       const fileInput = await findByTestId('input-file-drop')
       fireEvent.change(fileInput, {target: {files}})
@@ -194,12 +194,12 @@ describe('student view integration tests', () => {
       const mocks = [
         {
           query: STUDENT_VIEW_QUERY,
-          variables: {assignmentLid: '1', submissionID: '1'}
+          variables: {assignmentLid: '1', submissionID: '1'},
         },
         {
           query: CREATE_SUBMISSION_DRAFT,
-          variables: {id: '1', attempt: 1, body: ''}
-        }
+          variables: {id: '1', attempt: 1, body: ''},
+        },
       ]
 
       const mockResults = Promise.all(
@@ -207,7 +207,7 @@ describe('student view integration tests', () => {
           const result = await mockQuery(query, overrides, variables)
           return {
             request: {query, variables},
-            result
+            result,
           }
         })
       )
@@ -218,7 +218,7 @@ describe('student view integration tests', () => {
       // TODO: get this to work with latest @testing-library
       const mocks = await createTextMocks({
         Assignment: {submissionTypes: ['online_text_entry']},
-        SubmissionDraft: {body: ''}
+        SubmissionDraft: {body: ''},
       })
 
       const {findByTestId} = render(
@@ -244,7 +244,7 @@ describe('student view integration tests', () => {
       const result = await mockQuery(query, overrides, variables)
       return {
         request: {query, variables},
-        result
+        result,
       }
     }
 
@@ -262,7 +262,7 @@ describe('student view integration tests', () => {
     it('renders the rubric panel if a rubric if present', async () => {
       const overrides = [
         {Assignment: {name: 'Test Assignment', rubric: {}}},
-        {Rubric: {title: 'Test Rubric'}}
+        {Rubric: {title: 'Test Rubric'}},
       ]
       const mocks = [await createPublicAssignmentMocks(overrides)]
       const {findByRole} = render(

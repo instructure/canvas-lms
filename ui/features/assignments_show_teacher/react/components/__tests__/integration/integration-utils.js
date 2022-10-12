@@ -33,14 +33,14 @@ export function renderTeacherQuery(assignment, additionalApolloMocks = []) {
       request: {
         query: TEACHER_QUERY,
         variables: {
-          assignmentLid: assignment.lid
-        }
+          assignmentLid: assignment.lid,
+        },
       },
       result: {
-        data: {assignment}
-      }
+        data: {assignment},
+      },
     },
-    ...additionalApolloMocks
+    ...additionalApolloMocks,
   ]
   const fns = render(
     <CanvasValidatedMockedProvider mocks={mocks} addTypename={false}>

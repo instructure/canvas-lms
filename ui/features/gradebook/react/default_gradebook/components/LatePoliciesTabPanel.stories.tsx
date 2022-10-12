@@ -30,12 +30,12 @@ export default {
         lateSubmissionDeductionEnabled: true,
         lateSubmissionDeduction: 2,
         lateSubmissionInterval: 'day',
-        lateSubmissionMinimumPercent: 20
+        lateSubmissionMinimumPercent: 20,
       },
       validationErrors: {
         missingSubmissionDeduction: '',
         lateSubmissionDeduction: '',
-        lateSubmissionMinimumPercent: ''
+        lateSubmissionMinimumPercent: '',
       },
       data: {
         missingSubmissionDeductionEnabled: true,
@@ -44,14 +44,14 @@ export default {
         lateSubmissionDeduction: 2,
         lateSubmissionInterval: 'day',
         lateSubmissionMinimumPercentEnabled: true,
-        lateSubmissionMinimumPercent: 20
-      }
+        lateSubmissionMinimumPercent: 20,
+      },
     },
     changeLatePolicy: () => {},
     gradebookIsEditable: true,
     locale: '',
-    showAlert: false
-  }
+    showAlert: false,
+  },
 }
 
 const Template = args => <LatePoliciesTabPanel {...args} />

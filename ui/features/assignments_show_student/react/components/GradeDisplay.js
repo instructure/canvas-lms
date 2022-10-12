@@ -33,14 +33,14 @@ export default function PointsDisplay(props) {
     if (props.gradingType === 'points' && props.pointsPossible != null) {
       const formattedPoints = numberFormat._format(props.pointsPossible, {
         precision: 2,
-        strip_insignificant_zeros: true
+        strip_insignificant_zeros: true,
       })
       return I18n.t(
         {one: '*1* Possible Point', other: '*%{formattedPoints}* Possible Points'},
         {
           count: props.pointsPossible,
           formattedPoints,
-          wrappers: ['<span class="points-value">$1</span>']
+          wrappers: ['<span class="points-value">$1</span>'],
         }
       )
     }
@@ -52,13 +52,13 @@ export default function PointsDisplay(props) {
     if (props.gradingType === 'points' && props.pointsPossible != null) {
       const formattedPoints = numberFormat._format(props.pointsPossible, {
         precision: 2,
-        strip_insignificant_zeros: true
+        strip_insignificant_zeros: true,
       })
       return I18n.t(
         {one: 'Ungraded, 1 Possible Point', other: 'Ungraded, %{formattedPoints} Possible Points'},
         {
           count: props.pointsPossible,
-          formattedPoints
+          formattedPoints,
         }
       )
     }
@@ -75,13 +75,13 @@ export default function PointsDisplay(props) {
       gradingType: props.gradingType,
       pointsPossible: props.pointsPossible,
       defaultValue: forScreenReader ? ungradedScreenreaderString() : ungradedVisualString(),
-      formatType: 'points_out_of_fraction'
+      formatType: 'points_out_of_fraction',
     })
 
     if (props.gradingType === 'points' && props.receivedGrade != null) {
       return I18n.t('%{formattedGrade} *Points*', {
         formattedGrade,
-        wrappers: [forScreenReader ? '$1' : '<span class="points-text">$1</span>']
+        wrappers: [forScreenReader ? '$1' : '<span class="points-text">$1</span>'],
       }).string
     } else {
       return formattedGrade
@@ -110,10 +110,10 @@ PointsDisplay.propTypes = {
   gradingStatus: PropTypes.oneOf(['needs_grading', 'excused', 'needs_review', 'graded']),
   gradingType: PropTypes.string.isRequired,
   pointsPossible: PropTypes.number,
-  receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string])
+  receivedGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 }
 
 PointsDisplay.defaultProps = {
   gradingStatus: null,
-  gradingType: 'points'
+  gradingType: 'points',
 }

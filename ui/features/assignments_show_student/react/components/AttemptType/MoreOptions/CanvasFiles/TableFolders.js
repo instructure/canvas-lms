@@ -27,7 +27,7 @@ import {
   IconCheckMarkIndeterminateLine,
   IconFolderLine,
   IconPublishSolid,
-  IconUnpublishedLine
+  IconUnpublishedLine,
 } from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {TruncateText} from '@instructure/ui-truncate-text'
@@ -189,11 +189,11 @@ TableFolders.propTypes = {
     dateModifiedWidth: string,
     modifiedByWidth: string,
     fileSizeWidth: string,
-    publishedWidth: string
+    publishedWidth: string,
   }),
   folders: object,
   handleFolderSelect: func,
-  selectedFolderID: string
+  selectedFolderID: string,
 }
 
 export default TableFolders

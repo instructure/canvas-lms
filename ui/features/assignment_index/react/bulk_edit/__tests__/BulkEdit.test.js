@@ -43,7 +43,7 @@ function standardAssignmentResponse() {
           unlock_at: '2020-03-19T00:00:00Z',
           due_at: '2020-03-20T03:00:00Z',
           lock_at: '2020-04-11T00:00:00Z',
-          can_edit: true
+          can_edit: true,
         },
         {
           id: 'override_1',
@@ -51,16 +51,16 @@ function standardAssignmentResponse() {
           unlock_at: '2020-03-29T00:00:00Z',
           due_at: '2020-03-30T00:00:00Z',
           lock_at: '2020-04-21T00:00:00Z',
-          can_edit: true
-        }
-      ]
+          can_edit: true,
+        },
+      ],
     },
     {
       id: 'assignment_2',
       name: 'second assignment',
       can_edit: true,
-      all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}]
-    }
+      all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}],
+    },
   ]
 }
 
@@ -74,7 +74,7 @@ function restrictedAssignmentResponse() {
     unlock_at: '2020-03-20T00:00:00Z',
     due_at: '2020-03-21T00:00:00Z',
     lock_at: '2020-03-22T00:00:00Z',
-    can_edit: false
+    can_edit: false,
   })
   data[1].can_edit = false
   data[1].all_dates[0].can_edit = false
@@ -104,7 +104,7 @@ function renderBulkEdit(overrides = {}) {
     courseId: '42',
     onCancel: jest.fn(),
     onSave: jest.fn(),
-    ...overrides
+    ...overrides,
   }
   const result = {...render(<BulkEdit {...props} />), ...props}
   return result
@@ -134,13 +134,13 @@ describe('Assignment Bulk Edit Dates', () => {
     oldEnv = window.ENV
     window.ENV = {
       TIMEZONE: 'Asia/Tokyo',
-      FEATURES: {}
+      FEATURES: {},
     }
     tzInTest.configureAndRestoreLater({
       tz: tz(tokyo, 'Asia/Tokyo'),
       tzData: {
-        'Asia/Tokyo': tokyo
-      }
+        'Asia/Tokyo': tokyo,
+      },
     })
   })
 
@@ -198,7 +198,7 @@ describe('Assignment Bulk Edit Dates', () => {
         is_closed: true,
         is_last: false,
         permissions: {read: true, create: false, update: false, delete: false},
-        title: 'Closed'
+        title: 'Closed',
       },
       {
         start_date: '2020-03-01T23:59:59-06:00',
@@ -208,8 +208,8 @@ describe('Assignment Bulk Edit Dates', () => {
         is_closed: false,
         is_last: true,
         permissions: {read: true, create: false, update: false, delete: false},
-        title: '5ever'
-      }
+        title: '5ever',
+      },
     ]
     const {queryByText, getAllByLabelText} = await renderBulkEditAndWait()
     changeAndBlurInput(getAllByLabelText('Available From')[0], '2020-01-01')
@@ -231,19 +231,19 @@ describe('Assignment Bulk Edit Dates', () => {
     expect(dueDateInputs.map(i => i.value)).toEqual([
       'Fri, Mar 20, 2020, 12:00 PM',
       'Mon, Mar 30, 2020, 9:00 AM',
-      ''
+      '',
     ])
     const unlockAtInputs = getAllByLabelText('Available From')
     expect(unlockAtInputs.map(i => i.value)).toEqual([
       'Thu, Mar 19, 2020, 9:00 AM',
       'Sun, Mar 29, 2020, 9:00 AM',
-      ''
+      '',
     ])
     const lockAtInputs = getAllByLabelText('Available Until')
     expect(lockAtInputs.map(i => i.value)).toEqual([
       'Sat, Apr 11, 2020, 9:00 AM',
       'Tue, Apr 21, 2020, 9:00 AM',
-      ''
+      '',
     ])
   })
 
@@ -364,7 +364,7 @@ describe('Assignment Bulk Edit Dates', () => {
       expect(fetch).toHaveBeenCalledWith(
         '/api/v1/courses/42/assignments/bulk_update',
         expect.objectContaining({
-          method: 'PUT'
+          method: 'PUT',
         })
       )
       const body = JSON.parse(fetch.mock.calls[1][1].body)
@@ -375,10 +375,10 @@ describe('Assignment Bulk Edit Dates', () => {
             {
               due_at: '2020-04-01T00:00:00.000Z', // Time of day was preserved, which was UTC 00:00:00
               unlock_at: assignments[0].all_dates[1].unlock_at,
-              lock_at: assignments[0].all_dates[1].lock_at
-            }
-          ]
-        }
+              lock_at: assignments[0].all_dates[1].lock_at,
+            },
+          ],
+        },
       ])
     })
 
@@ -398,13 +398,13 @@ describe('Assignment Bulk Edit Dates', () => {
           all_dates: [
             {
               base: true,
-              due_at: '2020-04-01T03:00:00.000Z' // The UTC time of day was preserved
+              due_at: '2020-04-01T03:00:00.000Z', // The UTC time of day was preserved
             },
             {
               id: 'override_1',
-              due_at: '2020-04-01T00:00:00.000Z'
-            }
-          ]
+              due_at: '2020-04-01T00:00:00.000Z',
+            },
+          ],
         },
         {
           id: 'assignment_2',
@@ -414,10 +414,10 @@ describe('Assignment Bulk Edit Dates', () => {
               due_at: dueAtMoment
                 .clone()
                 .endOf('day') // new due date gets end of day in the specified TZ
-                .toISOString()
-            }
-          ]
-        }
+                .toISOString(),
+            },
+          ],
+        },
       ])
     })
 
@@ -448,10 +448,10 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               due_at: null,
               unlock_at: assignments[0].all_dates[0].unlock_at,
-              lock_at: assignments[0].all_dates[0].lock_at
-            }
-          ]
-        }
+              lock_at: assignments[0].all_dates[0].lock_at,
+            },
+          ],
+        },
       ])
     })
 
@@ -475,10 +475,10 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               due_at: moment.tz(dueAtDate, 'Asia/Tokyo').endOf('day').toISOString(),
               lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').endOf('day').toISOString(),
-              unlock_at: null
-            }
-          ]
-        }
+              unlock_at: null,
+            },
+          ],
+        },
       ])
     })
 
@@ -508,16 +508,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: moment.tz(unlockDate, 'Asia/Tokyo').startOf('day').toISOString(),
               due_at: null,
-              lock_at: null
-            }
-          ]
-        }
+              lock_at: null,
+            },
+          ],
+        },
       ])
     })
 
     it('invokes defaultDueTime on new dates for due_at', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait({
-        defaultDueTime: '16:00:00'
+        defaultDueTime: '16:00:00',
       })
       const dueAtInput = getAllByLabelText('Due At')[2]
       const lockAtInput = getAllByLabelText('Available Until')[2]
@@ -537,16 +537,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               due_at: '2020-04-01T07:00:00.000Z', // 16:00 in Tokyo is 07:00 UTC
               lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').endOf('day').toISOString(),
-              unlock_at: null
-            }
-          ]
-        }
+              unlock_at: null,
+            },
+          ],
+        },
       ])
     })
 
     it('maintains defaultDueTime on new dates for due_at on blur', async () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait({
-        defaultDueTime: '16:00:00'
+        defaultDueTime: '16:00:00',
       })
       const dueAtInput = getAllByLabelText('Due At')[2]
       const dueAtDate = '2020-04-01'
@@ -564,10 +564,10 @@ describe('Assignment Bulk Edit Dates', () => {
             {
               base: true,
               due_at: '2020-04-01T07:00:00.000Z', // 16:00 in Tokyo is 07:00 UTC
-              unlock_at: null
-            }
-          ]
-        }
+              unlock_at: null,
+            },
+          ],
+        },
       ])
     })
 
@@ -587,10 +587,10 @@ describe('Assignment Bulk Edit Dates', () => {
           all_dates: [
             {
               base: true,
-              lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString()
-            }
-          ]
-        }
+              lock_at: moment.tz(lockAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString(),
+            },
+          ],
+        },
       ])
     })
 
@@ -610,10 +610,10 @@ describe('Assignment Bulk Edit Dates', () => {
           all_dates: [
             {
               base: true,
-              due_at: moment.tz(dueAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString()
-            }
-          ]
-        }
+              due_at: moment.tz(dueAtDate, 'Asia/Tokyo').add(localTimeOffset, 'ms').toISOString(),
+            },
+          ],
+        },
       ])
     })
 
@@ -621,7 +621,7 @@ describe('Assignment Bulk Edit Dates', () => {
       const {getByText, getAllByLabelText} = await renderBulkEditAndWait()
       changeAndBlurInput(getAllByLabelText('Due At')[0], '2020-04-01')
       fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'something bad happened'}]}), {
-        status: 401
+        status: 401,
       })
       fireEvent.click(getByText('Save'))
       await flushPromises()
@@ -671,7 +671,7 @@ describe('Assignment Bulk Edit Dates', () => {
     it('displays an error if the progress fetch fails', async () => {
       const {getByText} = await renderBulkEditAndSave()
       fetch.mockResponseOnce(JSON.stringify({errors: [{message: 'could not get progress'}]}), {
-        status: 401
+        status: 401,
       })
       act(jest.runAllTimers)
       await flushPromises()
@@ -686,8 +686,8 @@ describe('Assignment Bulk Edit Dates', () => {
           completion: 42,
           workflow_state: 'failed',
           results: [
-            {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}}
-          ]
+            {assignment_id: 'assignment_1', errors: {due_at: [{message: 'some bad dates'}]}},
+          ],
         })
       )
       act(jest.runAllTimers)
@@ -752,7 +752,7 @@ describe('Assignment Bulk Edit Dates', () => {
         id: 'assignment_3',
         name: 'third assignment',
         can_edit: true,
-        all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}]
+        all_dates: [{base: true, unlock_at: null, due_at: null, lock_at: null, can_edit: true}],
       })
       const {getByText, getByLabelText, getAllByLabelText} = await renderBulkEditAndWait(
         {},
@@ -788,7 +788,7 @@ describe('Assignment Bulk Edit Dates', () => {
               unlock_at: moment.tz('2020-03-19T00:00:00', 'Asia/Tokyo').toISOString(),
               due_at: moment.tz('2020-03-20T11:59:59', 'Asia/Tokyo').toISOString(),
               lock_at: moment.tz('2020-04-11T11:59:59', 'Asia/Tokyo').toISOString(),
-              can_edit: true
+              can_edit: true,
             },
             {
               id: 'override_1',
@@ -796,9 +796,9 @@ describe('Assignment Bulk Edit Dates', () => {
               unlock_at: moment.tz('2020-03-29T00:00:00', 'Asia/Tokyo').toISOString(),
               due_at: moment.tz('2020-03-30T11:59:59', 'Asia/Tokyo').toISOString(),
               lock_at: moment.tz('2020-04-21T11:59:59', 'Asia/Tokyo').toISOString(),
-              can_edit: true
-            }
-          ]
+              can_edit: true,
+            },
+          ],
         },
         {
           id: 'assignment_2',
@@ -810,9 +810,9 @@ describe('Assignment Bulk Edit Dates', () => {
               unlock_at: moment.tz('2020-03-22T00:00:00', 'Asia/Tokyo').toISOString(),
               due_at: moment.tz('2020-03-23T11:59:59', 'Asia/Tokyo').toISOString(),
               lock_at: null,
-              can_edit: true
-            }
-          ]
+              can_edit: true,
+            },
+          ],
         },
         {
           id: 'assignment_3',
@@ -824,9 +824,9 @@ describe('Assignment Bulk Edit Dates', () => {
               unlock_at: moment.tz('2020-03-24T00:00:00', 'Asia/Tokyo').toISOString(),
               due_at: moment.tz('2020-03-25T11:59:59', 'Asia/Tokyo').toISOString(),
               lock_at: null,
-              can_edit: true
-            }
-          ]
+              can_edit: true,
+            },
+          ],
         },
         {
           id: 'assignment_4',
@@ -838,10 +838,10 @@ describe('Assignment Bulk Edit Dates', () => {
               unlock_at: null,
               due_at: null,
               lock_at: null,
-              can_edit: true
-            }
-          ]
-        }
+              can_edit: true,
+            },
+          ],
+        },
       ]
     }
 
@@ -992,16 +992,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: '2020-03-21T00:00:00.000Z',
               due_at: '2020-03-22T03:00:00.000Z', // time preservation
-              lock_at: '2020-04-13T00:00:00.000Z'
+              lock_at: '2020-04-13T00:00:00.000Z',
             },
             {
               id: 'override_1',
               unlock_at: '2020-03-31T00:00:00.000Z',
               due_at: '2020-04-01T00:00:00.000Z',
-              lock_at: '2020-04-23T00:00:00.000Z'
-            }
-          ]
-        }
+              lock_at: '2020-04-23T00:00:00.000Z',
+            },
+          ],
+        },
       ])
     })
 
@@ -1037,16 +1037,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: assignments[0].all_dates[0].unlock_at,
               due_at: null,
-              lock_at: assignments[0].all_dates[0].lock_at
+              lock_at: assignments[0].all_dates[0].lock_at,
             },
             {
               id: 'override_1',
               unlock_at: assignments[0].all_dates[1].unlock_at,
               due_at: null,
-              lock_at: assignments[0].all_dates[1].lock_at
-            }
-          ]
-        }
+              lock_at: assignments[0].all_dates[1].lock_at,
+            },
+          ],
+        },
       ])
     })
 
@@ -1069,16 +1069,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: null,
               due_at: assignments[0].all_dates[0].due_at,
-              lock_at: null
+              lock_at: null,
             },
             {
               id: 'override_1',
               unlock_at: null,
               due_at: assignments[0].all_dates[1].due_at,
-              lock_at: null
-            }
-          ]
-        }
+              lock_at: null,
+            },
+          ],
+        },
       ])
     })
 
@@ -1100,16 +1100,16 @@ describe('Assignment Bulk Edit Dates', () => {
               base: true,
               unlock_at: null,
               due_at: null,
-              lock_at: null
+              lock_at: null,
             },
             {
               id: 'override_1',
               unlock_at: null,
               due_at: null,
-              lock_at: null
-            }
-          ]
-        }
+              lock_at: null,
+            },
+          ],
+        },
       ])
     })
 
@@ -1128,14 +1128,14 @@ describe('in a timezone that does DST', () => {
     tzInTest.configureAndRestoreLater({
       tz: tz(anchorage, 'America/Anchorage'),
       tzData: {
-        'America/Anchorage': anchorage
-      }
+        'America/Anchorage': anchorage,
+      },
     })
 
     oldEnv = window.ENV
     window.ENV = {
       TIMEZONE: 'America/Anchorage',
-      FEATURES: {}
+      FEATURES: {},
     }
   })
 
@@ -1157,10 +1157,10 @@ describe('in a timezone that does DST', () => {
             unlock_at: '2021-11-01T00:00:00Z',
             due_at: '2021-11-02T13:37:14.5Z',
             lock_at: '2022-01-01T00:00:00Z',
-            can_edit: true
-          }
-        ]
-      }
+            can_edit: true,
+          },
+        ],
+      },
     ]
     const {assignments, getByText, getAllByLabelText} = await renderBulkEditAndWait({}, af)
     const originalDueAtMoment = moment.tz(assignments[0].all_dates[0].due_at, 'America/Anchorage')

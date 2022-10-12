@@ -47,6 +47,11 @@ class Progress < ActiveRecord::Base
     state :failed
   end
 
+  set_policy do
+    given { |user| self.user.present? && self.user == user }
+    can :cancel
+  end
+
   def reset!
     self.results = nil
     self.workflow_state = "queued"
@@ -69,7 +74,7 @@ class Progress < ActiveRecord::Base
     update_completion!(100.0 * @current_value / @total)
   end
 
-  def increment_completion!(increment)
+  def increment_completion!(increment = 1)
     raise "`increment_completion!` can only be invoked after a total has been set with `calculate_completion!`" if @total.nil?
 
     @current_value += increment

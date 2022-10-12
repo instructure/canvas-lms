@@ -30,30 +30,30 @@ function gradedOverrides() {
           {
             _id: 1,
             score: 5,
-            assessor: {name: 'assessor1', enrollments: []}
+            assessor: {name: 'assessor1', enrollments: []},
           },
           {
             _id: 2,
             score: 10,
-            assessor: null
+            assessor: null,
           },
           {
             _id: 3,
             score: 8,
-            assessor: {name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]}
-          }
-        ]
-      }
+            assessor: {name: 'assessor2', enrollments: [{type: 'TaEnrollment'}]},
+          },
+        ],
+      },
     },
     Course: {
       account: {
         outcomeProficiency: {
           proficiencyRatingsConnection: {
-            nodes: [{}]
-          }
-        }
-      }
-    }
+            nodes: [{}],
+          },
+        },
+      },
+    },
   }
 }
 
@@ -63,10 +63,10 @@ function ungradedOverrides() {
     Course: {
       account: {
         outcomeProficiency: {
-          proficiencyRatingsConnection: null
-        }
-      }
-    }
+          proficiencyRatingsConnection: null,
+        },
+      },
+    },
   }
 }
 
@@ -75,7 +75,7 @@ async function makeProps(opts = {}) {
     courseID: '1',
     assignmentLid: '1',
     submissionID: '1',
-    submissionAttempt: 0
+    submissionAttempt: 0,
   }
 
   const overrides = opts.graded ? gradedOverrides() : ungradedOverrides()
@@ -84,10 +84,10 @@ async function makeProps(opts = {}) {
       Node: {__typename: 'Assignment'},
       Assignment: {rubric: {}},
       Rubric: {
-        criteria: [{}]
+        criteria: [{}],
       },
-      ...overrides
-    }
+      ...overrides,
+    },
   ]
 
   const result = await mockQuery(RUBRIC_QUERY, allOverrides, variables)
@@ -96,7 +96,7 @@ async function makeProps(opts = {}) {
     assessments: assessments?.map(assessment => transformRubricAssessmentData(assessment)),
     proficiencyRatings:
       result.data.course.account.outcomeProficiency?.proficiencyRatingsConnection?.nodes,
-    rubric: transformRubricData(result.data.assignment.rubric)
+    rubric: transformRubricData(result.data.assignment.rubric),
   }
 }
 
@@ -151,7 +151,7 @@ describe('RubricTab', () => {
         _id: '1',
         hide_score_total: false,
         use_for_grading: false,
-        hide_points: true
+        hide_points: true,
       }
 
       const {queryByText} = render(<RubricTab {...props} />)
@@ -179,7 +179,7 @@ describe('RubricTab', () => {
         _id: '1',
         hide_score_total: false,
         use_for_grading: false,
-        hide_points: true
+        hide_points: true,
       }
 
       const {queryByText} = render(<RubricTab {...props} />)

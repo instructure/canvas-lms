@@ -36,8 +36,8 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
 
     gridSupport = {
       events: {
-        onKeyDown: new GridEvent()
-      }
+        onKeyDown: new GridEvent(),
+      },
     }
 
     gradebook = createGradebook({final_grade_override_enabled: true})
@@ -50,11 +50,11 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellEditor', suiteHooks => {
           return gridSupport
         },
 
-        propFactory: new TotalGradeOverrideCellPropFactory(gradebook)
+        propFactory: new TotalGradeOverrideCellPropFactory(gradebook),
       },
 
       container: $container,
-      item: {id: '1101'}
+      item: {id: '1101'},
     }
   })
 

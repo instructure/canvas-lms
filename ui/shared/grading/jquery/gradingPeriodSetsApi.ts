@@ -20,11 +20,12 @@ import _ from 'underscore'
 import axios from '@canvas/axios'
 
 import '@canvas/jquery/jquery.instructure_misc_helpers'
-// @ts-ignore
 import {useScope as useI18nScope} from '@canvas/i18n'
 import DateHelper from '@canvas/datetime/dateHelper'
 import NaiveRequestDispatch from '@canvas/network/NaiveRequestDispatch/index'
 import gradingPeriodsApi from './gradingPeriodsApi'
+import type {CamelizedGradingPeriodSet} from '@canvas/grading/grading.d'
+import type {GradingPeriodSet} from 'api.d'
 
 const I18n = useI18nScope('gradingPeriodSetsApi')
 
@@ -34,7 +35,7 @@ const createUrl = () => ENV.GRADING_PERIOD_SETS_URL
 
 const updateUrl = id => $.replaceTags(ENV.GRADING_PERIOD_SET_UPDATE_URL, 'id', id)
 
-const serializeSet = set => {
+const serializeSet = (set: CamelizedGradingPeriodSet) => {
   const gradingPeriodSetAttrs = {
     title: set.title,
     weighted: set.weighted,
@@ -46,13 +47,13 @@ const serializeSet = set => {
   }
 }
 
-const baseDeserializeSet = set => ({
+const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet => ({
   id: set.id.toString(),
   title: gradingPeriodSetTitle(set),
   weighted: !!set.weighted,
   displayTotalsForAllGradingPeriods: set.display_totals_for_all_grading_periods,
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
-  permissions: set.permissions,
+  permissions: set.permissions, // TODO: investigate if this is needed
   createdAt: new Date(set.created_at),
   enrollmentTermIDs: undefined
 })
@@ -66,9 +67,9 @@ const gradingPeriodSetTitle = set => {
   }
 }
 
-const deserializeSet = function (set) {
+const deserializeSet = function (set: GradingPeriodSet): CamelizedGradingPeriodSet {
   const newSet = baseDeserializeSet(set)
-  newSet.enrollmentTermIDs = set.enrollment_term_ids
+  newSet.enrollmentTermIDs = set.enrollment_term_ids // TODO: investigate if this is needed
   return newSet
 }
 

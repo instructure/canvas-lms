@@ -28,10 +28,10 @@ import type {
   ModuleMap,
   Section,
   Student,
-  StudentGroupCategoryMap,
+  StudentGroupCategory,
   StudentMap,
   SubmissionType,
-  WorkflowState
+  WorkflowState,
 } from '../api.d'
 
 export type CourseSettingsType = {
@@ -40,13 +40,45 @@ export type CourseSettingsType = {
 }
 
 export type GradebookSettings = {
-  hide_assignment_group_totals: string
-  show_separate_first_last_names: string
-  show_unpublished_assignments: string
-  show_concluded_enrollments: string
-  show_inactive_enrollments: string
-  hide_assignment_group_totals: string
-  hide_total: string
+  enter_grades_as: any
+  filter_columns_by: {
+    assignment_group_id: string | null
+    grading_period_id: string | null
+    context_module_id: string | null
+    end_date: string | null
+    start_date: string | null
+    submissions: 'has-ungraded-submissions' | 'has-submissions' | null
+  }
+  filter_rows_by: {
+    section_id: string | null
+    student_group_id: string | null
+  }
+  hide_assignment_group_totals: 'false' | 'true'
+  hide_total: 'false' | 'true'
+  selected_view_options_filters: string[]
+  show_concluded_enrollments: 'false' | 'true'
+  show_inactive_enrollments: 'false' | 'true'
+  show_separate_first_last_names: 'false' | 'true'
+  show_unpublished_assignments: 'false' | 'true'
+  sort_rows_by_column_id: string
+  sort_rows_by_direction: 'ascending' | 'descending'
+  sort_rows_by_setting_key: string
+  student_column_display_as: 'last_first' | 'first_last'
+  student_column_secondary_info: string
+  view_ungraded_as_zero: 'false' | 'true'
+  colors?: StatusColors
+}
+
+export type PerformanceControlValues = {
+  active_request_limit?: number
+  api_max_per_page?: number
+  assignment_groups_per_page?: number
+  context_modules_per_page?: number
+  custom_column_data_per_page?: number
+  custom_columns_per_page?: number
+  students_chunk_size?: number
+  submissions_chunk_size?: number
+  submissions_per_page?: number
 }
 
 export type GradebookOptions = {
@@ -54,47 +86,51 @@ export type GradebookOptions = {
   allow_apply_score_to_ungraded: boolean
   allow_separate_first_last_names: boolean
   allow_view_ungraded_as_zero: boolean
-  applyScoreToUngradedModalNode: HTMLElement
-  attachment_url: string
-  attachment: AttachmentData
+  attachment_url: null | string
+  attachment: null | AttachmentData
   change_gradebook_version_url: string
   colors: StatusColors
   context_allows_gradebook_uploads: boolean
   context_code: string
   context_id: string
-  context_sis_id?: string
+  context_sis_id: null | string
   context_url: string
   course_is_concluded: boolean
   course_name: string
   course_settings: CourseSettingsType
   course_url: string
   current_grading_period_id: string
-  currentUserId: string
   custom_column_datum_url: string
-  default_grading_standard: string
+  default_grading_standard: GradingStandard[]
   download_assignment_submissions_url: string
   enhanced_gradebook_filters: boolean
+  enrollments_url: string
+  enrollments_with_concluded_url: string
   export_gradebook_csv_url: string
-  filterNavNode: HTMLElement
+  final_grade_override_enabled: boolean
+  grade_calc_ignore_unposted_anonymous_enabled: boolean
   grade_calc_ignore_unposted_anonymous_enabled: boolean
   gradebook_column_order_settings_url: string
   gradebook_column_order_settings: ColumnOrderSettings
   gradebook_column_size_settings_url: string
   gradebook_column_size_settings: ColumnSizeSettings
-  gradebook_csv_progress: ProgressData
+  gradebook_csv_progress: null | ProgressData
   gradebook_import_url: string
-  gradebook_score_to_ungraded_progress: ProgressData
   gradebook_is_editable: boolean
-  gradebook_score_to_ungraded_progress: ProgressData
+  gradebook_score_to_ungraded_progress: null | ProgressData
   graded_late_submissions_exist: boolean
   grading_period_set: GradingPeriodSet
   grading_schemes: GradingScheme[]
   grading_standard: boolean
-  group_weighting_scheme: string
-  late_policy: LatePolicy
-  locale: string
+  group_weighting_scheme: null | string
+  has_modules: boolean
+  late_policy: LatePolicy | null
+  login_handle_name: null | string
+  message_attachment_upload_folder_id: string
+  new_gradebook_development_enabled: boolean
   outcome_gradebook_enabled: boolean
-  post_grades_feature: string
+  performance_controls: PerformanceControlValues
+  post_grades_feature: boolean
   post_grades_ltis: Lti[]
   post_manually: boolean
   publish_to_sis_enabled: boolean
@@ -105,19 +141,34 @@ export type GradebookOptions = {
   setting_update_url: string
   settings_update_url: string
   settings: GradebookSettings
-  show_concluded_enrollments: string
-  show_inactive_enrollments: string
+  show_message_students_with_observers_dialog: boolean
+  show_message_students_with_observers_dialog: boolean
   show_similarity_score: boolean
   show_total_grade_as_points: boolean
+  sis_app_token: null | string
+  sis_app_url: null | string
+  sis_name: null | string
   sis_name: string
   speed_grader_enabled: boolean
-  student_groups: StudentGroupCategoryMap
+  student_groups: StudentGroupCategory[]
   user_asset_string: string
+  teacher_notes: {
+    hidden: boolean
+    id: string
+    position: number
+    read_only: boolean
+    teacher_notes: boolean
+    title: string
+  }
+  version: null | string
 }
+
+export type GradingStandard = [string, number]
 
 export type GradingScheme = {
   id?: string
-  data: any
+  title?: string
+  data: GradingStandard[]
 }
 
 export type LatePolicy = {
@@ -129,14 +180,19 @@ export type LatePolicy = {
 export type LatePolicyCamelized = {
   missingSubmissionDeductionEnabled: boolean
   missingSubmissionDeduction: number
+  lateSubmissionInterval: string
+}
+
+export type GradingPeriodAssignmentMap = {
+  [gradingPeriodId: string]: string[]
 }
 
 export type CourseContent = {
   contextModules: Module[]
-  courseGradingScheme: GradingScheme | null
+  courseGradingScheme: {data: boolean} | null
   defaultGradingScheme: GradingScheme | null
   gradingSchemes: GradingScheme[]
-  gradingPeriodAssignments: any
+  gradingPeriodAssignments: GradingPeriodAssignmentMap
   assignmentStudentVisibility: {[assignmentId: string]: null | StudentMap}
   latePolicy: LatePolicyCamelized
   students: StudentDatastore
@@ -148,7 +204,9 @@ export type ContentLoadStates = {
   contextModulesLoaded: boolean
   assignmentsLoaded: {
     all: boolean
-    gradingPeriod: any
+    gradingPeriod: {
+      [gradingPeriodId: string]: boolean
+    }
   }
   customColumnsLoaded: boolean
   gradingPeriodAssignmentsLoaded: boolean
@@ -162,7 +220,9 @@ export type ContentLoadStates = {
 export type PendingGradeInfo = {
   userId: string
   assignmentId: string
+  excused: boolean
   valid: boolean
+  grade?: string
 }
 
 export type InitialActionStates = {
@@ -252,7 +312,10 @@ export type Lti = {
 }
 
 export type ColumnOrderSettings = {
-  freezeTotalGrade: boolean | 'true'
+  customOrder?: string[]
+  direction: 'ascending' | 'descending'
+  freezeTotalGrade?: boolean | 'true'
+  sortType: string
 }
 
 export type Progress = {
@@ -341,4 +404,15 @@ export type CustomColumn = {
   read_only: boolean
   teacher_notes: boolean
   title: string
+}
+
+export type SerializedComment = {
+  id: string
+  comment: string
+  createdAt: Date
+  editedAt: null | Date
+  authorId?: string
+  author?: string
+  authorAvatarUrl?: string
+  authorUrl?: string
 }

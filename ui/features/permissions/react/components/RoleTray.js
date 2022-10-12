@@ -23,7 +23,7 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 
 import {Alert} from '@instructure/ui-alerts'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -76,9 +76,9 @@ export default class RoleTray extends Component {
   }
 
   state = {
-    deleteAlertVisable: false,
-    editBaseRoleAlertVisable: false,
-    editTrayVisable: false,
+    deleteAlertVisible: false,
+    editBaseRoleAlertVisible: false,
+    editTrayVisible: false,
     newTargetBaseRole: null,
     editRoleLabelErrorMessages: [],
     roleDeleted: false
@@ -132,9 +132,9 @@ export default class RoleTray extends Component {
   showEditTray = () => {
     this.setState(
       {
-        deleteAlertVisable: false,
-        editTrayVisable: true,
-        editBaseRoleAlertVisable: false,
+        deleteAlertVisible: false,
+        editTrayVisible: true,
+        editBaseRoleAlertVisible: false,
         newTargetBaseRole: null,
         editRoleLabelInput: this.props.role.label,
         editRoleLabelErrorMessages: []
@@ -146,9 +146,9 @@ export default class RoleTray extends Component {
   clearState(callback) {
     this.setState(
       {
-        deleteAlertVisable: false,
-        editTrayVisable: false,
-        editBaseRoleAlertVisable: false,
+        deleteAlertVisible: false,
+        editTrayVisible: false,
+        editBaseRoleAlertVisible: false,
         newTargetBaseRole: null,
         editRoleLabelInput: '',
         editRoleLabelErrorMessages: [],
@@ -190,9 +190,9 @@ export default class RoleTray extends Component {
 
   showDeleteAlert = () => {
     this.setState({
-      deleteAlertVisable: true,
-      editTrayVisable: false,
-      editBaseRoleAlertVisable: false,
+      deleteAlertVisible: true,
+      editTrayVisible: false,
+      editBaseRoleAlertVisible: false,
       newTargetBaseRole: null
     })
   }
@@ -203,9 +203,9 @@ export default class RoleTray extends Component {
 
   showEditBaseRoleAlert = baseRoleLabel => {
     this.setState({
-      deleteAlertVisable: false,
-      editTrayVisable: true,
-      editBaseRoleAlertVisable: true,
+      deleteAlertVisible: false,
+      editTrayVisible: true,
+      editBaseRoleAlertVisible: true,
       newTargetBaseRole: baseRoleLabel
     })
   }
@@ -213,9 +213,9 @@ export default class RoleTray extends Component {
   hideEditBaseRoleAlert = () => {
     this.setState(
       {
-        deleteAlertVisable: false,
-        editTrayVisable: true,
-        editBaseRoleAlertVisable: false,
+        deleteAlertVisible: false,
+        editTrayVisible: true,
+        editBaseRoleAlertVisible: false,
         newTargetBaseRole: null
       },
       () => this.editRoleInput.focus()
@@ -241,7 +241,7 @@ export default class RoleTray extends Component {
   // TODO maybe make this a whole other component we can use/reuse?
   renderConfirmationAlert = (children, onOk, onCancel) => (
     <div style={{zIndex: 10, position: 'absolute'}}>
-      <Dialog open shouldContainFocus>
+      <Dialog open={true} shouldContainFocus={true}>
         <Alert variant="warning" margin="small">
           <View as="block">
             {children}
@@ -288,20 +288,18 @@ export default class RoleTray extends Component {
   }
 
   renderCloseButton = () => (
-    <Button
+    <IconButton
       id="close-role-tray-button"
-      variant="icon"
+      withBorder={false}
+      withBackground={false}
       size="small"
       margin="small 0 0 xx-small"
-      onClick={this.state.editTrayVisable ? this.hideEditTray : this.hideTray}
+      onClick={this.state.editTrayVisible ? this.hideEditTray : this.hideTray}
       elementRef={c => (this.closeButton = c)}
+      screenReaderLabel={this.state.editTrayVisible ? I18n.t('Back') : I18n.t('Close')}
     >
-      {this.state.editTrayVisable ? (
-        <IconArrowStartSolid title={I18n.t('Back')} />
-      ) : (
-        <IconXSolid title={I18n.t('Close')} />
-      )}
-    </Button>
+      {this.state.editTrayVisible ? <IconArrowStartSolid /> : <IconXSolid />}
+    </IconButton>
   )
 
   renderPermissions = () => (
@@ -343,31 +341,33 @@ export default class RoleTray extends Component {
   )
 
   renderEditButton = () => (
-    <Button
-      variant="icon"
-      size="medium"
+    <IconButton
       id="edit_button"
-      onClick={this.showEditTray}
+      withBorder={false}
+      withBackground={false}
+      size="medium"
+      color="primary"
       elementRef={c => (this.editButton = c)}
+      onClick={this.showEditTray}
+      screenReaderLabel={I18n.t('Edit')}
     >
-      <Text color="brand">
-        <IconEditLine title={I18n.t('Edit')} />
-      </Text>
-    </Button>
+      <IconEditLine />
+    </IconButton>
   )
 
   renderDeleteButton = () => (
-    <Button
+    <IconButton
       id="delete-role-button"
-      variant="icon"
+      withBorder={false}
+      withBackground={false}
       size="medium"
-      onClick={this.showDeleteAlert}
+      color="primary"
       elementRef={c => (this.deleteButton = c)}
+      onClick={this.showDeleteAlert}
+      screenReaderLabel={I18n.t('Delete')}
     >
-      <Text color="brand">
-        <IconTrashLine title={I18n.t('Delete')} />
-      </Text>
-    </Button>
+      <IconTrashLine />
+    </IconButton>
   )
 
   renderTrayHeader = () => (
@@ -466,11 +466,11 @@ export default class RoleTray extends Component {
         {/* TODO Once INSTUI-1269 is fixed and in canvas, use shouldReturnFocus
                  open, and defaultFocusElement dialog props instead of the &&
                  we are currently using to complete destroy this component */}
-        {this.state.deleteAlertVisable && this.renderDeleteAlert()}
-        {this.state.editBaseRoleAlertVisable && this.renderEditBaseRoleAlert()}
+        {this.state.deleteAlertVisible && this.renderDeleteAlert()}
+        {this.state.editBaseRoleAlertVisible && this.renderEditBaseRoleAlert()}
         {this.renderCloseButton()}
         <View as="div" padding="small small x-large small">
-          {this.state.editTrayVisable ? this.renderEditHeader() : this.renderTrayHeader()}
+          {this.state.editTrayVisible ? this.renderEditHeader() : this.renderTrayHeader()}
           {this.renderPermissions()}
         </View>
       </Tray>

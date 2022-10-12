@@ -32,38 +32,38 @@ describe('ViewOptionsTabPanel', () => {
       columnSort: {
         currentValue: {criterion: 'points', direction: 'descending'},
         modulesEnabled: true,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       hideAssignmentGroupTotals: {
         checked: false,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       hideTotal: {
         checked: false,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       showNotes: {
         checked: true,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       showUnpublishedAssignments: {
         checked: true,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       statusColors: {
         currentValues: statusColors(),
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       viewUngradedAsZero: {
         allowed: true,
         checked: true,
-        onChange: jest.fn()
+        onChange: jest.fn(),
       },
       showSeparateFirstLastNames: {
         allowed: true,
         checked: false,
-        onChange: jest.fn()
-      }
+        onChange: jest.fn(),
+      },
     }
   })
 
@@ -78,7 +78,7 @@ describe('ViewOptionsTabPanel', () => {
 
     it('omits options for module sorting if .modulesEnabled is false', () => {
       const {getByText, queryByText} = renderPanel({
-        columnSort: {...props.columnSort, modulesEnabled: false}
+        columnSort: {...props.columnSort, modulesEnabled: false},
       })
       const selectButton = getByText(/Arrange By/)
       fireEvent.click(selectButton)
@@ -90,8 +90,8 @@ describe('ViewOptionsTabPanel', () => {
       const {getByLabelText} = renderPanel({
         columnSort: {
           ...props.columnSort,
-          currentValue: {criterion: 'points', direction: 'ascending'}
-        }
+          currentValue: {criterion: 'points', direction: 'ascending'},
+        },
       })
       const selectButton = getByLabelText(/Arrange By/)
       expect(selectButton).toHaveValue('Points - Lowest to Highest')
@@ -102,8 +102,8 @@ describe('ViewOptionsTabPanel', () => {
         columnSort: {
           ...props.columnSort,
           currentValue: {criterion: 'module_position', direction: 'ascending'},
-          modulesEnabled: false
-        }
+          modulesEnabled: false,
+        },
       })
       const selectButton = getByLabelText(/Arrange By/)
       expect(selectButton).toHaveValue('Default Order')
@@ -112,7 +112,7 @@ describe('ViewOptionsTabPanel', () => {
     it('calls .onChange when the user selects a new setting', () => {
       const onChange = jest.fn()
       const {getByText} = renderPanel({
-        columnSort: {...props.columnSort, onChange}
+        columnSort: {...props.columnSort, onChange},
       })
 
       const selectButton = getByText(/Arrange By/)
@@ -121,7 +121,7 @@ describe('ViewOptionsTabPanel', () => {
       fireEvent.click(defaultOrder)
       expect(onChange).toHaveBeenCalledWith({
         criterion: 'default',
-        direction: 'ascending'
+        direction: 'ascending',
       })
     })
   })
@@ -149,14 +149,14 @@ describe('ViewOptionsTabPanel', () => {
   describe('.showUnpublishedAssignments', () => {
     it('is checked if .checked is true', () => {
       const {getByLabelText} = renderPanel({
-        showUnpublishedAssignments: {checked: true, onChange: () => {}}
+        showUnpublishedAssignments: {checked: true, onChange: () => {}},
       })
       expect(getByLabelText('Unpublished Assignments')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
       const {getByLabelText} = renderPanel({
-        showUnpublishedAssignments: {checked: false, onChange: () => {}}
+        showUnpublishedAssignments: {checked: false, onChange: () => {}},
       })
       expect(getByLabelText('Unpublished Assignments')).not.toBeChecked()
     })
@@ -174,14 +174,14 @@ describe('ViewOptionsTabPanel', () => {
     describe('when .allowed is true', () => {
       it('is checked if .checked is true', () => {
         const {getByLabelText} = renderPanel({
-          viewUngradedAsZero: {allowed: true, checked: true, onChange: () => {}}
+          viewUngradedAsZero: {allowed: true, checked: true, onChange: () => {}},
         })
         expect(getByLabelText('View ungraded as 0')).toBeChecked()
       })
 
       it('is unchecked if .checked is false', () => {
         const {getByLabelText} = renderPanel({
-          viewUngradedAsZero: {allowed: true, checked: false, onChange: () => {}}
+          viewUngradedAsZero: {allowed: true, checked: false, onChange: () => {}},
         })
         expect(getByLabelText('View ungraded as 0')).not.toBeChecked()
       })
@@ -189,7 +189,7 @@ describe('ViewOptionsTabPanel', () => {
       it('calls .onChange when the user toggles the item', () => {
         const onChange = jest.fn()
         const {getByLabelText} = renderPanel({
-          viewUngradedAsZero: {allowed: true, checked: false, onChange}
+          viewUngradedAsZero: {allowed: true, checked: false, onChange},
         })
 
         fireEvent.click(getByLabelText('View ungraded as 0'))
@@ -199,7 +199,7 @@ describe('ViewOptionsTabPanel', () => {
 
     it('is not present when .allowed is false', () => {
       const {queryByText} = renderPanel({
-        viewUngradedAsZero: {allowed: false, checked: true, onChange: () => {}}
+        viewUngradedAsZero: {allowed: false, checked: true, onChange: () => {}},
       })
       expect(queryByText('View ungraded as 0')).not.toBeInTheDocument()
     })
@@ -208,14 +208,14 @@ describe('ViewOptionsTabPanel', () => {
   describe('.hideAssignmentGroupTotals', () => {
     it('is checked if .checked is true', () => {
       const {getByLabelText} = renderPanel({
-        hideAssignmentGroupTotals: {checked: true, onChange: () => {}}
+        hideAssignmentGroupTotals: {checked: true, onChange: () => {}},
       })
       expect(getByLabelText('Hide Assignment Group Totals')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
       const {getByLabelText} = renderPanel({
-        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange: () => {}}
+        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange: () => {}},
       })
       expect(getByLabelText('Hide Assignment Group Totals')).not.toBeChecked()
     })
@@ -223,7 +223,7 @@ describe('ViewOptionsTabPanel', () => {
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
       const {getByLabelText} = renderPanel({
-        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange}
+        hideAssignmentGroupTotals: {allowed: true, checked: false, onChange},
       })
 
       fireEvent.click(getByLabelText('Hide Assignment Group Totals'))
@@ -234,14 +234,14 @@ describe('ViewOptionsTabPanel', () => {
   describe('.hideTotal', () => {
     it('is checked if .checked is true', () => {
       const {getByLabelText} = renderPanel({
-        hideTotal: {checked: true, onChange: () => {}}
+        hideTotal: {checked: true, onChange: () => {}},
       })
       expect(getByLabelText('Hide Total and Override Columns')).toBeChecked()
     })
 
     it('is unchecked if .checked is false', () => {
       const {getByLabelText} = renderPanel({
-        hideTotal: {allowed: true, checked: false, onChange: () => {}}
+        hideTotal: {allowed: true, checked: false, onChange: () => {}},
       })
       expect(getByLabelText('Hide Total and Override Columns')).not.toBeChecked()
     })
@@ -249,7 +249,7 @@ describe('ViewOptionsTabPanel', () => {
     it('calls .onChange when the user toggles the item', () => {
       const onChange = jest.fn()
       const {getByLabelText} = renderPanel({
-        hideTotal: {allowed: true, checked: false, onChange}
+        hideTotal: {allowed: true, checked: false, onChange},
       })
 
       fireEvent.click(getByLabelText('Hide Total and Override Columns'))
@@ -261,14 +261,14 @@ describe('ViewOptionsTabPanel', () => {
     describe('when .allowed is true', () => {
       it('is checked if .checked is true', () => {
         const {getByLabelText} = renderPanel({
-          showSeparateFirstLastNames: {allowed: true, checked: true, onChange: () => {}}
+          showSeparateFirstLastNames: {allowed: true, checked: true, onChange: () => {}},
         })
         expect(getByLabelText('Split Student Names')).toBeChecked()
       })
 
       it('is unchecked if .checked is false', () => {
         const {getByLabelText} = renderPanel({
-          showSeparateFirstLastNames: {allowed: true, checked: false, onChange: () => {}}
+          showSeparateFirstLastNames: {allowed: true, checked: false, onChange: () => {}},
         })
         expect(getByLabelText('Split Student Names')).not.toBeChecked()
       })
@@ -276,7 +276,7 @@ describe('ViewOptionsTabPanel', () => {
       it('calls .onChange when the user toggles the item', () => {
         const onChange = jest.fn()
         const {getByLabelText} = renderPanel({
-          showSeparateFirstLastNames: {allowed: true, checked: false, onChange}
+          showSeparateFirstLastNames: {allowed: true, checked: false, onChange},
         })
 
         fireEvent.click(getByLabelText('Split Student Names'))
@@ -286,7 +286,7 @@ describe('ViewOptionsTabPanel', () => {
 
     it('is not present when .allowed is false', () => {
       const {queryByText} = renderPanel({
-        showSeparateFirstLastNames: {allowed: false, checked: true, onChange: () => {}}
+        showSeparateFirstLastNames: {allowed: false, checked: true, onChange: () => {}},
       })
       expect(queryByText('Split Student Names')).not.toBeInTheDocument()
     })
@@ -297,8 +297,8 @@ describe('ViewOptionsTabPanel', () => {
       const {getByText, getByLabelText} = renderPanel({
         statusColors: {
           currentValues: {...statusColors(), excused: '#ffffff'},
-          onChange: () => {}
-        }
+          onChange: () => {},
+        },
       })
 
       fireEvent.click(getByText(/Excused Color Picker/i))
@@ -311,8 +311,8 @@ describe('ViewOptionsTabPanel', () => {
       const {getByText} = renderPanel({
         statusColors: {
           currentValues: {...statusColors(), excused: '#ffffff'},
-          onChange
-        }
+          onChange,
+        },
       })
 
       fireEvent.click(getByText(/Excused Color Picker/i))

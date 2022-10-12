@@ -26,13 +26,13 @@ import GradebookApi from 'ui/features/gradebook/react/default_gradebook/apis/Gra
 import {
   createGradebook,
   setFixtureHtml,
-  defaultGradebookProps
+  defaultGradebookProps,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import AsyncComponents from 'ui/features/gradebook/react/default_gradebook/AsyncComponents'
 import {getAssignmentColumnId} from 'ui/features/gradebook/react/default_gradebook/Gradebook.utils'
 
 const performance_controls = {
-  students_chunk_size: 2 // students per page,
+  students_chunk_size: 2, // students per page,
 }
 const $fixtures = document.getElementById('fixtures')
 
@@ -46,7 +46,7 @@ QUnit.module('Gradebook#saveSettings', () => {
 
     enhancedFilterHooks.beforeEach(() => {
       gradebook = createGradebook({
-        enhanced_gradebook_filters: true
+        enhanced_gradebook_filters: true,
       })
 
       errorFn = sinon.stub()
@@ -180,12 +180,12 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
           id: '101',
           name: 'Anonymous',
           points_possible: 10,
-          published: true
-        }
+          published: true,
+        },
       ],
       group_weight: 1,
       id: '10001',
-      name: 'An anonymous assignment group'
+      name: 'An anonymous assignment group',
     }
 
     const nonAnonymousAssignmentGroup = {
@@ -196,12 +196,12 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
           id: '102',
           name: 'Not-Anonymous',
           points_possible: 10,
-          published: true
-        }
+          published: true,
+        },
       ],
       group_weight: 1,
       id: '10002',
-      name: 'An anonymous assignment group'
+      name: 'An anonymous assignment group',
     }
 
     test('is passed as true if the course has at least one anonymous assignment', () => {
@@ -240,7 +240,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
     test('sets allowViewUngradedAsZero to true if view ungraded as zero is enabled', () => {
       gradebook = createGradebook({
         allow_view_ungraded_as_zero: true,
-        enhanced_gradebook_filters: true
+        enhanced_gradebook_filters: true,
       })
       gradebook.renderGradebookSettingsModal()
 
@@ -264,7 +264,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
 
         deepEqual(viewOptions().columnSortSettings, {
           criterion: 'due_date',
-          direction: 'descending'
+          direction: 'descending',
         })
       })
 
@@ -276,8 +276,8 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
             title: 'Notes',
             position: 1,
             teacher_notes: true,
-            hidden: false
-          }
+            hidden: false,
+          },
         })
         gradebook.renderGradebookSettingsModal()
 
@@ -292,8 +292,8 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
             title: 'Notes',
             position: 1,
             teacher_notes: true,
-            hidden: true
-          }
+            hidden: true,
+          },
         })
         gradebook.renderGradebookSettingsModal()
 
@@ -323,7 +323,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       test('sets viewUngradedAsZero to true if view ungraded as 0 is active', () => {
         gradebook = createGradebook({
           allow_view_ungraded_as_zero: true,
-          enhanced_gradebook_filters: true
+          enhanced_gradebook_filters: true,
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = true
         gradebook.renderGradebookSettingsModal()
@@ -333,7 +333,7 @@ QUnit.module('#renderGradebookSettingsModal', hooks => {
       test('sets viewUngradedAsZero to true if view ungraded as 0 is not active', () => {
         gradebook = createGradebook({
           allow_view_ungraded_as_zero: true,
-          enhanced_gradebook_filters: true
+          enhanced_gradebook_filters: true,
         })
         gradebook.gridDisplaySettings.viewUngradedAsZero = false
         gradebook.renderGradebookSettingsModal()
@@ -374,20 +374,20 @@ QUnit.module('Gradebook "Enter Grades as" Setting', suiteHooks => {
     server.respondWith('POST', options.settings_update_url, [
       200,
       {'Content-Type': 'application/json'},
-      '{}'
+      '{}',
     ])
     gradebook = createGradebook(options)
     gradebook.setAssignments({
       2301: {id: '2301', grading_type: 'points', name: 'Math Assignment', published: true},
-      2302: {id: '2302', grading_type: 'points', name: 'English Assignment', published: false}
+      2302: {id: '2302', grading_type: 'points', name: 'English Assignment', published: false},
     })
     gradebook.gradebookGrid.grid = {
-      invalidate() {}
+      invalidate() {},
     }
     gradebook.gradebookGrid.gridSupport = {
       columns: {
-        updateColumnHeaders() {}
-      }
+        updateColumnHeaders() {},
+      },
     }
   })
 
@@ -557,7 +557,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   hooks.beforeEach(() => {
     const performanceControls = new PerformanceControls(performance_controls)
     const dispatch = new RequestDispatch({
-      activeRequestLimit: performanceControls.activeRequestLimit
+      activeRequestLimit: performanceControls.activeRequestLimit,
     })
 
     // We need to actually mount and render the Gradebook component here to
@@ -567,7 +567,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     const component = React.createElement(Gradebook, {
       ...defaultGradebookProps,
       course_settings: {
-        allow_final_grade_override: true
+        allow_final_grade_override: true,
       },
       allow_view_ungraded_as_zero: true,
       context_id: '100',
@@ -576,11 +576,11 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         gradebook = el
       },
       settings: {
-        show_unpublished_assignments: false
+        show_unpublished_assignments: false,
       },
       view_ungraded_as_zero: false,
       performanceControls,
-      dispatch
+      dispatch,
     })
     ReactDOM.render(component, container2)
 
@@ -592,9 +592,9 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         assignments: [
           {id: '2301', name: 'assignment1', points_possible: 100, published: true},
           {id: '2302', name: 'assignment2', points_possible: 50, published: true},
-          {id: '2303', name: 'unpublished', points_possible: 1500, published: false}
-        ]
-      }
+          {id: '2303', name: 'unpublished', points_possible: 1500, published: false},
+        ],
+      },
     ])
 
     sinon.stub(gradebook, 'createGrid')
@@ -611,8 +611,8 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         hidden: false,
         name: 'Notes',
         position: 1,
-        teacher_notes: true
-      }
+        teacher_notes: true,
+      },
     })
     sinon.stub(GradebookApi, 'saveUserSettings').resolves()
     sinon.stub(GradebookApi, 'updateColumnOrder').resolves()
@@ -640,7 +640,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
   QUnit.module('when updating column sort settings', () => {
     test('calls the updateColumnOrder API function with the updated settings', async () => {
       await gradebook.handleViewOptionsUpdated({
-        columnSortSettings: {criterion: 'points', direction: 'ascending'}
+        columnSortSettings: {criterion: 'points', direction: 'ascending'},
       })
 
       strictEqual(GradebookApi.updateColumnOrder.callCount, 1)
@@ -649,15 +649,15 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         {
           direction: 'ascending',
           sortType: 'points',
-          freezeTotalGrade: false
-        }
+          freezeTotalGrade: false,
+        },
       ])
     })
 
     test('does not call updateColumnOrder if the column settings have not changed', async () => {
       gradebook.setColumnOrder({sortType: 'due_date', direction: 'ascending'})
       await gradebook.handleViewOptionsUpdated({
-        columnSortSettings: {criterion: 'due_date', direction: 'ascending'}
+        columnSortSettings: {criterion: 'due_date', direction: 'ascending'},
       })
 
       strictEqual(GradebookApi.updateColumnOrder.callCount, 0)
@@ -665,14 +665,14 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
 
     test('sorts the grid columns when the API call completes', async () => {
       await gradebook.handleViewOptionsUpdated({
-        columnSortSettings: {criterion: 'points', direction: 'ascending'}
+        columnSortSettings: {criterion: 'points', direction: 'ascending'},
       })
       deepEqual(gradebook.gridData.columns.scrollable, [
         'assignment_2302',
         'assignment_2301',
         'assignment_group_2201',
         'total_grade',
-        'total_grade_override'
+        'total_grade_override',
       ])
     })
 
@@ -682,7 +682,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
 
       try {
         await gradebook.handleViewOptionsUpdated({
-          columnSortSettings: {criterion: 'points', direction: 'ascending'}
+          columnSortSettings: {criterion: 'points', direction: 'ascending'},
         })
       } catch {
         deepEqual(gradebook.gridData.columns.scrollable, [
@@ -690,7 +690,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
           'assignment_2302',
           'assignment_group_2201',
           'total_grade',
-          'total_grade_override'
+          'total_grade_override',
         ])
       }
     })
@@ -729,7 +729,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
     QUnit.module('when the notes column already exists', createColumnHooks => {
       createColumnHooks.beforeEach(() => {
         gradebook.gotCustomColumns([
-          {id: '9999', teacher_notes: true, hidden: false, title: 'Notes'}
+          {id: '9999', teacher_notes: true, hidden: false, title: 'Notes'},
         ])
       })
 
@@ -739,7 +739,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         deepEqual(GradebookApi.updateTeacherNotesColumn.lastCall.args, [
           '100',
           '9999',
-          {hidden: true}
+          {hidden: true},
         ])
       })
 
@@ -784,7 +784,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         showSeparateFirstLastNames: false,
         statusColors: gradebook.state.gridColors,
         viewUngradedAsZero: false,
-        ...overrides
+        ...overrides,
       })
 
       test('calls the saveUserSettings API function with the changed values', async () => {
@@ -792,7 +792,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
           updateParams({
             showUnpublishedAssignments: true,
             statusColors: {...gradebook.state.gridColors, dropped: '#000000'},
-            viewUngradedAsZero: true
+            viewUngradedAsZero: true,
           })
         )
 
@@ -977,7 +977,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
       const promise = gradebook.handleViewOptionsUpdated({
         columnSortSettings: {criterion: 'points', direction: 'ascending'},
         showNotes: true,
-        showUnpublishedAssignments: true
+        showUnpublishedAssignments: true,
       })
 
       strictEqual(gradebook.updateGrid.callCount, 0)
@@ -1001,7 +1001,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
             await gradebook.handleViewOptionsUpdated({
               columnSortSettings: {criterion: 'points', direction: 'ascending'},
               showNotes: true,
-              showUnpublishedAssignments: true
+              showUnpublishedAssignments: true,
             })
           } catch {
             strictEqual(FlashAlert.showFlashError.callCount, 1)
@@ -1015,7 +1015,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
             await gradebook.handleViewOptionsUpdated({
               columnSortSettings: {criterion: 'points', direction: 'ascending'},
               showNotes: true,
-              showUnpublishedAssignments: true
+              showUnpublishedAssignments: true,
             })
           } catch {
             ok(gradebook.updateGrid.called)
@@ -1027,7 +1027,7 @@ QUnit.module('Gradebook#handleViewOptionsUpdated', hooks => {
         await gradebook.handleViewOptionsUpdated({
           columnSortSettings: {criterion: 'points', direction: 'ascending'},
           showNotes: true,
-          showUnpublishedAssignments: true
+          showUnpublishedAssignments: true,
         })
         ok(gradebook.updateGrid.called)
       })
@@ -1043,11 +1043,11 @@ QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
     gradebook = createGradebook({
       grid: {
         getColumns: () => [],
-        updateCell: sinon.stub()
+        updateCell: sinon.stub(),
       },
       settings: {
-        allow_separate_first_last_names: 'true'
-      }
+        allow_separate_first_last_names: 'true',
+      },
     })
 
     sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
@@ -1088,7 +1088,7 @@ QUnit.module('Gradebook#toggleShowSeparateFirstLastNames', hooks => {
     gradebook.toggleShowSeparateFirstLastNames()
 
     deepEqual(gradebook.saveSettings.firstCall.args[0], {
-      showSeparateFirstLastNames: true
+      showSeparateFirstLastNames: true,
     })
   })
 })
@@ -1101,8 +1101,8 @@ QUnit.module('Gradebook#toggleHideAssignmentGroupTotals', hooks => {
     gradebook = createGradebook({
       grid: {
         getColumns: () => [],
-        updateCell: sinon.stub()
-      }
+        updateCell: sinon.stub(),
+      },
     })
 
     sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
@@ -1143,7 +1143,7 @@ QUnit.module('Gradebook#toggleHideAssignmentGroupTotals', hooks => {
     gradebook.toggleHideAssignmentGroupTotals()
 
     deepEqual(gradebook.saveSettings.firstCall.args[0], {
-      hideAssignmentGroupTotals: true
+      hideAssignmentGroupTotals: true,
     })
   })
 })
@@ -1156,8 +1156,8 @@ QUnit.module('Gradebook#toggleHideTotal', hooks => {
     gradebook = createGradebook({
       grid: {
         getColumns: () => [],
-        updateCell: sinon.stub()
-      }
+        updateCell: sinon.stub(),
+      },
     })
 
     sandbox.stub(gradebook, 'saveSettings').callsFake(() => Promise.resolve())
@@ -1197,7 +1197,7 @@ QUnit.module('Gradebook#toggleHideTotal', hooks => {
     gradebook.toggleHideTotal()
 
     deepEqual(gradebook.saveSettings.firstCall.args[0], {
-      hideTotal: true
+      hideTotal: true,
     })
   })
 })

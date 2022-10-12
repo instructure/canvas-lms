@@ -37,7 +37,7 @@ QUnit.module('FinalGraderSelectMenu', hooks => {
           hidden: $option.hidden,
           selected: $option.selected,
           text: $option.innerText,
-          value: $option.value
+          value: $option.value,
         }
       })
   }
@@ -48,8 +48,11 @@ QUnit.module('FinalGraderSelectMenu', hooks => {
 
   hooks.beforeEach(() => {
     props = {
-      availableModerators: [{name: 'John Doe', id: '923'}, {name: 'Jane Doe', id: '492'}],
-      finalGraderID: undefined
+      availableModerators: [
+        {name: 'John Doe', id: '923'},
+        {name: 'Jane Doe', id: '492'},
+      ],
+      finalGraderID: undefined,
     }
   })
 
@@ -62,14 +65,20 @@ QUnit.module('FinalGraderSelectMenu', hooks => {
     mountComponent()
     const moderatorNames = props.availableModerators.map(user => user.name)
     const options = selectMenuOptions().map(option => option.text)
-    strictEqual(moderatorNames.every(name => options.indexOf(name) >= 0), true)
+    strictEqual(
+      moderatorNames.every(name => options.indexOf(name) >= 0),
+      true
+    )
   })
 
   test('the corresponding value for the moderator menuitems is the user id', () => {
     mountComponent()
     const moderatorIDs = props.availableModerators.map(user => user.id)
     const optionValues = selectMenuOptions().map(option => option.value)
-    strictEqual(moderatorIDs.every(id => optionValues.indexOf(id) >= 0), true)
+    strictEqual(
+      moderatorIDs.every(id => optionValues.indexOf(id) >= 0),
+      true
+    )
   })
 
   test('excludes the "Select Grader" menuitem if passed a finalGraderID', () => {

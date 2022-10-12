@@ -29,7 +29,7 @@ const I18n = useI18nScope(
 function normalizeGradingPeriods(gradingPeriods) {
   return gradingPeriods.map(gradingPeriod => ({
     id: gradingPeriod.id,
-    name: gradingPeriod.title
+    name: gradingPeriod.title,
   }))
 }
 
@@ -56,13 +56,13 @@ GradingPeriodFilter.propTypes = {
   gradingPeriods: arrayOf(
     shape({
       id: string.isRequired,
-      title: string.isRequired
+      title: string.isRequired,
     })
   ).isRequired,
 
-  selectedGradingPeriodId: string
+  selectedGradingPeriodId: string,
 }
 
 GradingPeriodFilter.defaultProps = {
-  selectedGradingPeriodId: null
+  selectedGradingPeriodId: null,
 }

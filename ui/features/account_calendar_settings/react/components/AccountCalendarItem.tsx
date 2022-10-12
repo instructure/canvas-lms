@@ -29,14 +29,14 @@ import {View} from '@instructure/ui-view'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {accountListTheme} from '../theme'
-import {VisibilityChange, CollectionChild} from '../types'
+import {Account, VisibilityChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings_account_calendar_item')
 
 const CALENDAR_ICON_SIZE = '1.25rem'
 
 type ComponentProps = {
-  readonly item: CollectionChild
+  readonly item: Account
   readonly visibilityChanges: VisibilityChange[]
   readonly onAccountToggled: (id: number, visible: boolean) => void
   readonly padding?: string

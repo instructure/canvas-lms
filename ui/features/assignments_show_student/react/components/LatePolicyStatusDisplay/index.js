@@ -85,9 +85,9 @@ LatePolicyStatusDisplay.propTypes = {
   gradingType: PropTypes.string.isRequired,
   originalGrade: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
   pointsDeducted: PropTypes.number,
-  pointsPossible: PropTypes.number.isRequired
+  pointsPossible: PropTypes.number.isRequired,
 }
 
 LatePolicyStatusDisplay.defaultProps = {
-  pointsDeducted: 0
+  pointsDeducted: 0,
 }

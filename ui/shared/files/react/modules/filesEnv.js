@@ -47,6 +47,8 @@ const filesEnv = {
   })
 }
 
+filesEnv.enableVisibility = filesEnv.contextType === 'courses'
+
 filesEnv.contextFor = function(folderOrFile) {
   let assetString
   if (folderOrFile.collection && folderOrFile.collection.parentFolder) {

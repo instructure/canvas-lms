@@ -52,7 +52,7 @@ export const stepLabels = {
   },
   get uploaded() {
     return I18n.t('Uploaded')
-  }
+  },
 }
 
 class StepItem extends Component {
@@ -61,11 +61,11 @@ class StepItem extends Component {
     label: string.isRequired,
     icon: element,
     pinSize: string,
-    placement: oneOf(['first', 'last', 'interior'])
+    placement: oneOf(['first', 'last', 'interior']),
   }
 
   static defaultProps = {
-    placement: 'interior'
+    placement: 'interior',
   }
 
   getStatusI18n() {
@@ -116,7 +116,7 @@ class StepItem extends Component {
     const classes = {
       'step-item-step': true,
       [this.props.status]: true,
-      [`placement--${this.props.placement}`]: true
+      [`placement--${this.props.placement}`]: true,
     }
 
     return (
@@ -128,13 +128,13 @@ class StepItem extends Component {
         <span
           className="pinLayout"
           style={{
-            height: px(this.props.pinSize)
+            height: px(this.props.pinSize),
           }}
         >
           <span
             style={{
               width: `${this.pinSize()}px`,
-              height: `${this.pinSize()}px`
+              height: `${this.pinSize()}px`,
             }}
             className="step-item-pin"
           >

@@ -23,7 +23,7 @@ class WebConference < ActiveRecord::Base
   include TextHelper
   attr_readonly :context_id, :context_type
   belongs_to :context, polymorphic: %i[course group account]
-  has_one :calendar_event, -> { active.order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
+  has_one :calendar_event, -> { order("updated_at desc") }, inverse_of: :web_conference, dependent: :nullify
   has_many :web_conference_participants
   has_many :users, through: :web_conference_participants
   has_many :invitees, -> { where(web_conference_participants: { participation_type: "invitee" }) }, through: :web_conference_participants, source: :user
@@ -456,6 +456,12 @@ class WebConference < ActiveRecord::Base
     has_advanced_settings? ? 1 : 0
   end
 
+  def has_calendar_event
+    return 0 if calendar_event.nil?
+
+    calendar_event.workflow_state == "deleted" ? 0 : 1
+  end
+
   scope :after, ->(date) { where("web_conferences.start_at IS NULL OR web_conferences.start_at>?", date) }
 
   set_policy do
@@ -536,7 +542,7 @@ class WebConference < ActiveRecord::Base
     url = options.delete(:url)
     join_url = options.delete(:join_url)
     options.reverse_merge!(only: %w[id title description conference_type duration started_at ended_at user_ids context_id context_type context_code start_at end_at])
-    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings long_running user_settings recordings]))
+    result = super(options.merge(include_root: false, methods: %i[has_advanced_settings has_calendar_event long_running user_settings recordings]))
     result["url"] = url
     result["join_url"] = join_url
     result
@@ -565,7 +571,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.lti_tools(context)
-    ContextExternalTool.all_tools_for(context, placements: :conference_selection) || []
+    Lti::ContextToolFinder.new(context, placements: :conference_selection).all_tools_sorted_array
   end
 
   def self.plugins

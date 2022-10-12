@@ -35,7 +35,7 @@ describe('"Mark as Done" button', () => {
       itemId: '123',
       moduleId: '456',
       onError,
-      onToggle
+      onToggle,
     }
   })
 
@@ -45,24 +45,24 @@ describe('"Mark as Done" button', () => {
         setModuleItemCompletion: {
           moduleItem: {
             _id: 'a',
-            __typename: 'ModuleItem'
+            __typename: 'ModuleItem',
           },
           __typename: 'SetModuleItemCompletionPayload',
-          errors: null
-        }
-      }
+          errors: null,
+        },
+      },
     }
     const failedResponse = {
       data: null,
-      errors: 'sure, why not'
+      errors: 'sure, why not',
     }
 
     const variables = {done: false, itemId: '123', moduleId: '456'}
     const mocks = [
       {
         request: {query: SET_MODULE_ITEM_COMPLETION, variables},
-        result: fail ? failedResponse : successfulResponse
-      }
+        result: fail ? failedResponse : successfulResponse,
+      },
     ]
 
     const propsToRender = {...props, ...overrides}

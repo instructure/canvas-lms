@@ -22,7 +22,7 @@ import range from 'lodash/range'
 import React from 'react'
 import {
   STUDENT_VIEW_QUERY,
-  SUBMISSION_HISTORIES_QUERY
+  SUBMISSION_HISTORIES_QUERY,
 } from '@canvas/assignments/graphql/student/Queries'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 import ViewManager from '../ViewManager'
@@ -35,7 +35,7 @@ async function mockStudentViewResult(overrides = {}) {
     courseId: '1',
     currentUser: {id: '1', display_name: 'bob', avatar_image_url: 'awesome.avatar.url'},
     modulePrereq: null,
-    moduleUrl: 'mocked-module-url'
+    moduleUrl: 'mocked-module-url',
   }
   return result.data
 }
@@ -59,13 +59,13 @@ async function makeProps(opts = {}) {
     {
       Submission: {
         ...submittedStateOverrides,
-        attempt: currentAttempt
-      }
-    }
+        attempt: currentAttempt,
+      },
+    },
   ]
   if (withDraft) {
     studentViewOverrides.push({
-      Submission: SubmissionMocks.onlineUploadReadyToSubmit
+      Submission: SubmissionMocks.onlineUploadReadyToSubmit,
     })
   }
   const studentViewResult = await mockStudentViewResult(studentViewOverrides)
@@ -75,17 +75,17 @@ async function makeProps(opts = {}) {
   if (numSubmissionHistories > 0) {
     const mockedNodeResults = range(0, numSubmissionHistories).map(attempt => ({
       ...SubmissionMocks.graded,
-      attempt
+      attempt,
     }))
 
     submissionHistoriesResult = await mockSubmissionHistoriesResult({
-      SubmissionHistoryConnection: {nodes: mockedNodeResults}
+      SubmissionHistoryConnection: {nodes: mockedNodeResults},
     })
   }
 
   return {
     initialQueryData: studentViewResult,
-    submissionHistoriesQueryData: submissionHistoriesResult
+    submissionHistoriesQueryData: submissionHistoriesResult,
   }
 }
 
@@ -97,7 +97,7 @@ describe('ViewManager', () => {
       current_user: {display_name: 'bob', avatar_url: 'awesome.avatar.url'},
       enrollment_state: 'active',
       PREREQS: {},
-      current_user_roles: ['user', 'student']
+      current_user_roles: ['user', 'student'],
     }
   })
 
@@ -170,7 +170,7 @@ describe('ViewManager', () => {
         )
 
         const mockElement = {
-          focus: jest.fn()
+          focus: jest.fn(),
         }
         document.querySelector = jest.fn().mockReturnValue(mockElement)
 

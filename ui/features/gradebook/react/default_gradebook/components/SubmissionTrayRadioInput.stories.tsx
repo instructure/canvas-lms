@@ -24,16 +24,16 @@ export default {
   component: SubmissionTrayRadioInput,
   args: {
     submission: {
-      secondsLate: 0
+      secondsLate: 0,
     },
     latePolicy: {
-      lateSubmissionInterval: 'day'
+      lateSubmissionInterval: 'day',
     },
     onChange: () => {},
     text: 'Late',
     checked: true,
-    value: 'late'
-  }
+    value: 'late',
+  },
 }
 
 const Template = args => <SubmissionTrayRadioInput {...args} />

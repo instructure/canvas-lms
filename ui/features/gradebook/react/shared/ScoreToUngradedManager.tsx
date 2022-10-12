@@ -100,7 +100,7 @@ class ScoreToUngradedManager {
     }, this.pollingInterval)
   }
 
-  startProcess(courseId, options) {
+  startProcess(courseId: string, options) {
     if (this.process) {
       return Promise.reject(I18n.t('A process is already in progress.'))
     }
@@ -109,7 +109,7 @@ class ScoreToUngradedManager {
       .then(response => {
         this.process = {
           progressId: response.data.id,
-          workflowState: response.data.workflow_state
+          workflowState: response.data.workflow_state,
         }
 
         return new Promise(this.monitorProcess.bind(this))

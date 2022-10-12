@@ -95,7 +95,7 @@ describe('Preview', () => {
     it('when zoom in', async () => {
       const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
       const event = {deltaY: -25}
-      fireEvent.wheel(container.firstChild, event)
+      fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
         expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.13})
       })
@@ -105,7 +105,7 @@ describe('Preview', () => {
       settings.scaleRatio = 2
       const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
       const event = {deltaY: 25}
-      fireEvent.wheel(container.firstChild, event)
+      fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
         expect(dispatch).toHaveBeenCalledWith({type: 'SetScaleRatio', payload: 1.88})
       })
@@ -116,7 +116,7 @@ describe('Preview', () => {
     it('when zoom in', async () => {
       const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
       const event = {deltaY: -25}
-      fireEvent.wheel(container.firstChild, event)
+      fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
         const img = container.querySelector('img')
         expect(img.style.transform).toEqual('scale(1.13)')
@@ -127,7 +127,7 @@ describe('Preview', () => {
       settings.scaleRatio = 2
       const {container} = render(<Preview settings={settings} dispatch={dispatch} />)
       const event = {deltaY: 25}
-      fireEvent.wheel(container.firstChild, event)
+      fireEvent.wheel(container.firstChild.firstChild, event)
       await waitFor(() => {
         const img = container.querySelector('img')
         expect(img.style.transform).toEqual('scale(1.88)')

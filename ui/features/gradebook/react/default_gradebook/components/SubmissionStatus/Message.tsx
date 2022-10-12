@@ -24,7 +24,7 @@ import {IconInfoLine, IconWarningLine} from '@instructure/ui-icons'
 
 const VARIANT_MAP = {
   info: {color: 'primary', Icon: IconInfoLine},
-  warning: {color: 'warning', Icon: IconWarningLine}
+  warning: {color: 'warning', Icon: IconWarningLine},
 }
 
 const Message = ({message, variant}) => {
@@ -49,7 +49,7 @@ const Message = ({message, variant}) => {
 
 Message.propTypes = {
   message: string.isRequired,
-  variant: oneOf(['info', 'warning']).isRequired
+  variant: oneOf(['info', 'warning']).isRequired,
 }
 
 export default Message

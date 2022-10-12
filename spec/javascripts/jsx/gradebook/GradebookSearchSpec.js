@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 const $fixtures = document.getElementById('fixtures')
@@ -45,8 +45,8 @@ QUnit.module('Gradebook', suiteHooks => {
           id: '1303',
           name: 'Joe Dirt',
           sis_user_id: 'meteor',
-          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
-        }
+          enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+        },
       ]
       gradebook.courseContent.students.setStudentIds(['1303'])
       gradebook.gotChunkOfStudents(students)
@@ -75,27 +75,6 @@ QUnit.module('Gradebook', suiteHooks => {
     test('does not treat the search term as a regular expression', () => {
       const option = {id: '1303', label: 'Joe Dirt'}
       notOk(gradebook.studentSearchMatcher(option, 'Joe.*rt'))
-    })
-  })
-
-  QUnit.module('Gradebook#assignmentSearchMatcher', hooks => {
-    hooks.beforeEach(() => {
-      gradebook = createGradebook()
-    })
-
-    test('returns true if the search term is a substring of the assignment name (case insensitive)', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      ok(gradebook.assignmentSearchMatcher(option, 'lab'))
-    })
-
-    test('returns false if the search term is not a substring of the assignment name', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      notOk(gradebook.assignmentSearchMatcher(option, 'Lib'))
-    })
-
-    test('does not treat the search term as a regular expression', () => {
-      const option = {id: '122', label: 'Science Lab II'}
-      notOk(gradebook.assignmentSearchMatcher(option, 'Science.*II'))
     })
   })
 
@@ -152,11 +131,11 @@ QUnit.module('Gradebook', suiteHooks => {
           grading_period_set: {
             grading_periods: [
               {id: '1501', weight: 50},
-              {id: '1502', weight: 50}
+              {id: '1502', weight: 50},
             ],
             id: '1401',
-            weighted: true
-          }
+            weighted: true,
+          },
         })
       })
 
@@ -180,7 +159,7 @@ QUnit.module('Gradebook#renderAssignmentSearchFilter)', {
 
   teardown() {
     $fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('renders Assignment Names label', function () {
@@ -232,7 +211,7 @@ QUnit.module('Gradebook#rowFilter', contextHooks => {
       name: 'Charlie Xi',
       short_name: 'Chuck Xi',
       sortable_name: 'Xi, Charlie',
-      sis_user_id: '123456789'
+      sis_user_id: '123456789',
     }
   })
 

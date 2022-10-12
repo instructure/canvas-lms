@@ -167,7 +167,7 @@ it('renders the close button when edit mode is not set', () => {
 it('renders the back button when edit mode is set', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  tree.setState({editTrayVisable: true})
+  tree.setState({editTrayVisible: true})
   expect(tree.find('IconXSolid').exists()).toBeFalsy()
   expect(tree.find('IconArrowStartSolid').exists()).toBeTruthy()
 })
@@ -179,18 +179,18 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
 
   const tree = shallow(<RoleTray {...props} />)
   tree.setState({
-    deleteAlertVisable: true,
-    editBaseRoleAlertVisable: true,
-    editTrayVisable: true,
+    deleteAlertVisible: true,
+    editBaseRoleAlertVisible: true,
+    editTrayVisible: true,
     editRoleLabelErrorMessages: [{text: 'ERROR', type: 'error'}],
     newTargetBaseRole: 'banana'
   })
   tree.instance().hideTray() // components hideTray, not props.hideTray method
 
   const expectedState = {
-    deleteAlertVisable: false,
-    editBaseRoleAlertVisable: false,
-    editTrayVisable: false,
+    deleteAlertVisible: false,
+    editBaseRoleAlertVisible: false,
+    editTrayVisible: false,
     newTargetBaseRole: null,
     editRoleLabelInput: '',
     editRoleLabelErrorMessages: [],
@@ -200,30 +200,30 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
   expect(hideTrayMock).toHaveBeenCalled()
 })
 
-it('renders the delete confirmation alert if deleteAlertVisable state is true', () => {
+it('renders the delete confirmation alert if deleteAlertVisible state is true', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  tree.setState({deleteAlertVisable: true})
+  tree.setState({deleteAlertVisible: true})
   const node = tree.find('.role-tray-delete-alert-confirm')
   expect(node.exists()).toBeTruthy()
 })
 
-it('does not render the delete confirmation alert if deleteAlertVisable state is false', () => {
+it('does not render the delete confirmation alert if deleteAlertVisible state is false', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-delete-alert-confirm')
   expect(node.exists()).toBeFalsy()
 })
 
-it('renders the edit confirmation alert if editBaseRoleAlertVisable state is true', () => {
+it('renders the edit confirmation alert if editBaseRoleAlertVisible state is true', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
-  tree.setState({editBaseRoleAlertVisable: true})
+  tree.setState({editBaseRoleAlertVisible: true})
   const node = tree.find('.role-tray-edit-base-role-confirm')
   expect(node.exists()).toBeTruthy()
 })
 
-it('does not render the edit confirmation alert if editBaseRoleAlertVisable state is false', () => {
+it('does not render the edit confirmation alert if editBaseRoleAlertVisible state is false', () => {
   const props = makeDefaultProps()
   const tree = shallow(<RoleTray {...props} />)
   const node = tree.find('.role-tray-edit-base-role-confirm')

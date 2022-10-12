@@ -538,7 +538,7 @@ describe DeveloperKey do
 
       error_message = <<~TEXT
         These routes are used by developer key scopes, and have been changed:
-        #{modified_scopes.map { |scope| "- #{scope[:verb]}: #{scope[:path]}" }.join("\n")}
+        #{modified_scopes.map { |scope| "- #{scope[0]}: #{scope[1]}" }.join("\n")}
 
         If these routes must be changed, it will require a data fixup to change
         the scope attribute of any developer keys that refer to those routes.

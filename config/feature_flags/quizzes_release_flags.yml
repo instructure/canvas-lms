@@ -70,3 +70,11 @@ new_quizzes_by_default:
   description: Use New Quizzes as the default quizzing engine. Removes the ability to create classic quizzes.
   applies_to: Course
   visible_on: quizzes_next_visible_on_hook
+new_quizzes_allow_service_jwt_refresh:
+  state: hidden
+  display_name: New Quizzes Service JWT Refresh
+  description: Enable New Quizzes to refresh Service JWTs used by RCE
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: allowed_on

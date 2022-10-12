@@ -50,23 +50,13 @@ QUnit.module('GraderNamesVisibleToFinalGraderCheckbox', hooks => {
 
   test('renders an unchecked checkbox when passed checked: false', () => {
     mountComponent()
-    strictEqual(
-      checkbox()
-        .at(0)
-        .instance().checked,
-      false
-    )
+    strictEqual(checkbox().at(0).instance().checked, false)
   })
 
   test('renders a checked checkbox when passed checked: true', () => {
     props.checked = true
     mountComponent()
-    strictEqual(
-      checkbox()
-        .at(0)
-        .instance().checked,
-      true
-    )
+    strictEqual(checkbox().at(0).instance().checked, true)
   })
 
   test('sets the value of the form input to "false" when passed checked: false', () => {

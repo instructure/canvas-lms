@@ -32,15 +32,15 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
         courseId: '1201',
         finalGraderId: '1105',
         id: '2301',
-        title: 'Example Assignment'
+        title: 'Example Assignment',
       },
       currentUser: {
         canViewStudentIdentities: false,
         canViewGraderIdentities: true,
         graderId: 'teach',
-        id: '1105'
+        id: '1105',
       },
-      graders: [{graderId: '1101'}, {graderId: '1102'}]
+      graders: [{graderId: '1101'}, {graderId: '1102'}],
     }
   })
 
@@ -72,7 +72,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
       reject(...args) {
         rejectPromise(...args)
         return promise
-      }
+      },
     }
 
     return wrappedPromise
@@ -88,7 +88,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4601',
           score: 10,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         },
         {
           grade: 'B',
@@ -96,8 +96,8 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4602',
           score: 9,
           selected: false,
-          studentId: '1112'
-        }
+          studentId: '1112',
+        },
       ]
       store.dispatch(GradeActions.addProvisionalGrades(provisionalGrades))
       const grades = store.getState().grades.provisionalGrades
@@ -121,7 +121,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4601',
           score: 9.5,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         },
         {
           grade: 'B',
@@ -129,7 +129,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4602',
           score: 8.5,
           selected: false,
-          studentId: '1112'
+          studentId: '1112',
         },
         {
           grade: 'C',
@@ -137,8 +137,8 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4603',
           score: 7.5,
           selected: false,
-          studentId: '1113'
-        }
+          studentId: '1113',
+        },
       ]
     })
 
@@ -219,7 +219,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4601',
           score: 10,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         },
         {
           grade: 'B',
@@ -227,8 +227,8 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4602',
           score: 9,
           selected: false,
-          studentId: '1111'
-        }
+          studentId: '1111',
+        },
       ]
     })
 
@@ -306,7 +306,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           graderId: '1105',
           score: 9,
           selected: false,
-          studentId: '1111'
+          studentId: '1111',
         }
 
         sinon.stub(GradesApi, 'updateProvisionalGrade').returns(updateProvisionalGradePromise)
@@ -410,7 +410,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           await updateProvisionalGradePromise.resolve({
             grade: 'B',
             provisionalGradeId: '4603',
-            score: 9
+            score: 9,
           })
         }
 
@@ -501,7 +501,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           await updateProvisionalGradePromise.resolve({
             grade: 'B',
             provisionalGradeId: '4603',
-            score: 9
+            score: 9,
           })
         }
 
@@ -552,7 +552,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           id: '4603',
           score: 9,
           selected: true,
-          studentId: '1111'
+          studentId: '1111',
         }
 
         sinon.stub(GradesApi, 'updateProvisionalGrade').returns(updateProvisionalGradePromise)
@@ -656,7 +656,7 @@ QUnit.module('GradeSummary GradeActions', suiteHooks => {
           await updateProvisionalGradePromise.resolve({
             grade: 'B',
             provisionalGradeId: '4603',
-            score: 9
+            score: 9,
           })
         }
 

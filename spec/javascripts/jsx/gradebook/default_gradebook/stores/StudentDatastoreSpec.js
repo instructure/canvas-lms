@@ -123,7 +123,7 @@ QUnit.module('StudentDatastore', contextHooks => {
     hooks.beforeEach(() => {
       studentDatastore.addUserStudents([
         {id: '1103', name: 'John Doe'},
-        {id: '1101', name: 'Jane Doe'}
+        {id: '1101', name: 'Jane Doe'},
       ])
     })
 

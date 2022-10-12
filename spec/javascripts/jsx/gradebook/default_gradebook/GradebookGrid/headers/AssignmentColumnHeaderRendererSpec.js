@@ -41,7 +41,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       {
         ref(ref) {
           component = ref
-        }
+        },
       }
     )
   }
@@ -72,7 +72,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       only_visible_to_overrides: false,
       post_manually: false,
       published: true,
-      submission_types: ['online_text_entry']
+      submission_types: ['online_text_entry'],
     }
 
     submission = {
@@ -85,7 +85,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       score: null,
       submitted_at: null,
       user_id: '441',
-      workflow_state: 'unsubmitted'
+      workflow_state: 'unsubmitted',
     }
 
     student = {
@@ -94,11 +94,11 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       isInactive: false,
       name: 'Guy B. Studying',
       enrollments: [{type: 'StudentEnrollment', user_id: '441', course_section_id: '1'}],
-      sortable_name: 'Studying, Guy B.'
+      sortable_name: 'Studying, Guy B.',
     }
 
     gradebook.gotAllAssignmentGroups([
-      {id: '2201', position: 1, name: 'Assignments', assignments: [assignment]}
+      {id: '2201', position: 1, name: 'Assignments', assignments: [assignment]},
     ])
 
     column = {id: getAssignmentColumnId('2301'), assignmentId: '2301'}

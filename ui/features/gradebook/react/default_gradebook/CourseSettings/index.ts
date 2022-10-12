@@ -36,7 +36,7 @@ export default class CourseSettings {
     const previousSettings = {...this._settings}
     this._settings = {
       ...this._settings,
-      ...settings
+      ...settings,
     }
 
     if (this._settings.allowFinalGradeOverride !== previousSettings.allowFinalGradeOverride) {

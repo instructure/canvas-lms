@@ -26,7 +26,7 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   static propTypes = {
     ...SubmissionCommentForm.propTypes,
     id: string.isRequired,
-    updateSubmissionComment: func.isRequired
+    updateSubmissionComment: func.isRequired,
   }
 
   componentDidMount() {
@@ -45,7 +45,7 @@ export default class SubmissionCommentUpdateForm extends SubmissionCommentForm {
   buttonLabels() {
     return {
       cancelButtonLabel: I18n.t('Cancel Updating Comment'),
-      submitButtonLabel: I18n.t('Update Comment')
+      submitButtonLabel: I18n.t('Update Comment'),
     }
   }
 

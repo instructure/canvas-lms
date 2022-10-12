@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/TotalGradeCellFormatter'
 
@@ -38,9 +38,9 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
         ['B', 0.8],
         ['C', 0.7],
         ['D', 0.6],
-        ['<b>F</b>', 0.0]
+        ['<b>F</b>', 0.0],
       ],
-      show_total_grade_as_points: true
+      show_total_grade_as_points: true,
     })
     sinon.stub(gradebook, 'getTotalPointsPossible').returns(10)
     sinon.stub(gradebook, 'listInvalidAssignmentGroups').returns([])
@@ -172,7 +172,7 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   test('renders a warning when there are multiple invalid assignment groups', () => {
     gradebook.listInvalidAssignmentGroups.returns([
       {id: '2401', name: 'Math'},
-      {id: '2402', name: '<English>'}
+      {id: '2402', name: '<English>'},
     ])
     equal(
       getTooltip(),

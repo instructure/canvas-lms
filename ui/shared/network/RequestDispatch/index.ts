@@ -70,7 +70,12 @@ export default class RequestDispatch {
     }
   }
 
-  getDepaginated(url, params, pageCallback = () => {}, pagesEnqueuedCallback = () => {}) {
+  getDepaginated(
+    url: string,
+    params,
+    pageCallback: (data?) => void = () => {},
+    pagesEnqueuedCallback = () => {}
+  ) {
     const request = {
       deferred: deferPromise(),
       active: false
@@ -115,7 +120,7 @@ export default class RequestDispatch {
     return request.deferred.promise
   }
 
-  getJSON(url, params) {
+  getJSON(url: string, params?) {
     const request = {
       deferred: deferPromise(),
       active: false

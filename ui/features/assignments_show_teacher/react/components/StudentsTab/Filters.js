@@ -38,11 +38,11 @@ export default class Filters extends React.Component {
   static propTypes = {
     onChange: func,
     overrides: arrayOf(OverrideShape).isRequired,
-    numAttempts: number.isRequired
+    numAttempts: number.isRequired,
   }
 
   static defaultProps = {
-    onChange: () => {}
+    onChange: () => {},
   }
 
   overrideName(assignedTo) {
@@ -73,7 +73,7 @@ export default class Filters extends React.Component {
     const everyone = [
       <option key="all" value="all">
         {I18n.t('Everyone')}
-      </option>
+      </option>,
     ]
     const others = this.props.overrides.map(override => {
       const pieces =
@@ -92,7 +92,7 @@ export default class Filters extends React.Component {
     const options = [
       <option key="all" value="all">
         {I18n.t('All')}
-      </option>
+      </option>,
     ]
     for (let i = 1; i <= this.props.numAttempts; i++) {
       options.push(
@@ -117,7 +117,7 @@ export default class Filters extends React.Component {
       </option>,
       <option key="missing" value="missing">
         {I18n.t('Missing')}
-      </option>
+      </option>,
     ]
   }
 

@@ -17,21 +17,41 @@
  */
 
 import type {GradebookStudent} from './gradebook.d'
+import type {SubmissionComment} from '@canvas/grading.grading.d'
 import type {StatusColors} from './constants/colors'
+import type LongTextEditor from '../../jquery/slickgrid.long_text_editor'
 
-type GridColumn = {
-  id: string
-  type: string
-  field?: string
-  width: number
-  hidden?: boolean
+export type GridColumn = {id: string} & Partial<{
+  assignmentGroupId: string
+  autoEdit: boolean
   cssClass: string
+  customColumnId: string
+  editor: LongTextEditor
+  field: string
   headerCssClass: string
-  customColumnId?: string
-  teacher_notes?: string
-  resizable?: boolean
-  postAssignmentGradesTrayOpenForAssignmentId?: string
-}
+  hidden: boolean
+  maxLength: number
+  maxWidth: number
+  minWidth: number
+  postAssignmentGradesTrayOpenForAssignmentId: string
+  resizable: boolean
+  teacher_notes: string
+  toolTip: string
+  type: string
+  width: number
+  object: Partial<{
+    id: string
+    due_at: string | null
+    name: string
+    position: number
+    points_possible: number
+    module_ids: string[]
+    module_positions: number[]
+    assignment_group: {
+      position: number
+    }
+  }>
+}>
 
 export type GridData = {
   columns: {
@@ -60,7 +80,7 @@ export type FilterColumnsOptions = {
   assignmentGroupId: null | string
   contextModuleId: null | string
   gradingPeriodId: null | string
-  submissions: null | string // 'has-ungraded-submissions' | 'has-submissions'
+  submissions: null | 'has-ungraded-submissions' | 'has-submissions'
   startDate: null | string
   endDate: null | string
 }
@@ -71,7 +91,7 @@ export type GridDisplaySettings = {
   filterColumnsBy: FilterColumnsOptions
   filterRowsBy: {sectionId: string | null; studentGroupId: string | null}
   hideTotal: boolean
-  selectedPrimaryInfo: string
+  selectedPrimaryInfo: 'last_first' | 'first_last'
   selectedSecondaryInfo: string
   selectedViewOptionsFilters: string[]
   showEnrollments: {concluded: boolean; inactive: boolean}
@@ -84,7 +104,7 @@ export type GridDisplaySettings = {
     open: boolean
     studentId: string
     assignmentId: string
-    comments: any[]
+    comments: SubmissionComment[]
     commentsLoaded: boolean
     commentsUpdating: boolean
     editedCommentId: string | null

@@ -39,8 +39,8 @@ function MarkAsDoneButton({done: initialDone, itemId, moduleId, onError, onToggl
     variables: {
       done: !done,
       itemId,
-      moduleId
-    }
+      moduleId,
+    },
   })
 
   return (
@@ -61,12 +61,12 @@ MarkAsDoneButton.propTypes = {
   itemId: string.isRequired,
   moduleId: string.isRequired,
   onError: func,
-  onToggle: func
+  onToggle: func,
 }
 
 MarkAsDoneButton.defaultProps = {
   onError: () => {},
-  onToggle: () => {}
+  onToggle: () => {},
 }
 
 export default MarkAsDoneButton

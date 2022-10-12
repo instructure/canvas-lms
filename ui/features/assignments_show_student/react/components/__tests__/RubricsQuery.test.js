@@ -28,7 +28,7 @@ async function makeMocks() {
     courseID: '1',
     assignmentLid: '1',
     submissionID: '1',
-    submissionAttempt: 0
+    submissionAttempt: 0,
   }
 
   const overrides = {
@@ -36,7 +36,7 @@ async function makeMocks() {
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
     Submission: {rubricAssessmentsConnection: null},
-    Account: {outcomeProficiency: {proficiencyRatingsConnection: null}}
+    Account: {outcomeProficiency: {proficiencyRatingsConnection: null}},
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)
@@ -44,18 +44,18 @@ async function makeMocks() {
     {
       request: {
         query: RUBRIC_QUERY,
-        variables
+        variables,
       },
-      result
-    }
+      result,
+    },
   ]
 }
 
 async function makeProps() {
   const props = await mockAssignmentAndSubmission({
     Assignment: {
-      rubric: {}
-    }
+      rubric: {},
+    },
   })
   return props
 }

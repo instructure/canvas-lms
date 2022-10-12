@@ -31,7 +31,7 @@ const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
   passFail: 'Grid__GradeCell__CompleteIncompleteInput',
   percent: 'Grid__GradeCell__PercentInput',
-  points: 'Grid__GradeCell__PointsInput'
+  points: 'Grid__GradeCell__PointsInput',
 }
 
 function inputComponentFor(enterGradesAs) {
@@ -51,7 +51,7 @@ function inputComponentFor(enterGradesAs) {
 export default class AssignmentGradeInput extends Component {
   static propTypes = {
     assignment: shape({
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     disabled: bool,
     enterGradesAs: oneOf(['gradingScheme', 'passFail', 'percent', 'points']).isRequired,
@@ -59,19 +59,19 @@ export default class AssignmentGradeInput extends Component {
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
-      valid: bool.isRequired
+      valid: bool.isRequired,
     }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
-      excused: bool.isRequired
-    }).isRequired
+      excused: bool.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
     disabled: false,
     gradingScheme: null,
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {

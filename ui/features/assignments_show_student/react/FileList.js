@@ -108,10 +108,10 @@ FileList.propTypes = {
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       name: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired
+      type: PropTypes.string.isRequired,
     })
   ).isRequired,
-  removeFileHandler: PropTypes.func
+  removeFileHandler: PropTypes.func,
 }
 
 export default FileList

@@ -18,13 +18,15 @@
 
 import axios from '@canvas/axios'
 import timezone from '@canvas/timezone'
+import type {SubmissionComment, SubmissionCommentData} from '../../../../../api.d'
+import type {SerializedComment} from '../gradebook.d'
 
-function deserializeComment(comment) {
+function deserializeComment(comment: SubmissionComment): SerializedComment {
   const baseComment = {
     id: comment.id,
     createdAt: timezone.parse(comment.created_at),
     comment: comment.comment,
-    editedAt: comment.edited_at && timezone.parse(comment.edited_at)
+    editedAt: comment.edited_at && timezone.parse(comment.edited_at),
   }
 
   if (!comment.author) {
@@ -36,15 +38,15 @@ function deserializeComment(comment) {
     authorId: comment.author.id,
     author: comment.author.display_name,
     authorAvatarUrl: comment.author.avatar_image_url,
-    authorUrl: comment.author.html_url
+    authorUrl: comment.author.html_url,
   }
 }
 
-function deserializeComments(comments) {
+function deserializeComments(comments: SubmissionComment[]) {
   return comments.map(deserializeComment)
 }
 
-function getSubmissionComments(courseId, assignmentId, studentId) {
+function getSubmissionComments(courseId: string, assignmentId: string, studentId: string) {
   const commentOptions = {params: {include: 'submission_comments'}}
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   return axios
@@ -52,7 +54,12 @@ function getSubmissionComments(courseId, assignmentId, studentId) {
     .then(response => deserializeComments(response.data.submission_comments))
 }
 
-function createSubmissionComment(courseId, assignmentId, studentId, commentData) {
+function createSubmissionComment(
+  courseId: string,
+  assignmentId: string,
+  studentId: string,
+  commentData: SubmissionCommentData
+) {
   const url = `/api/v1/courses/${courseId}/assignments/${assignmentId}/submissions/${studentId}`
   const data = {comment: commentData}
   return axios
@@ -60,12 +67,12 @@ function createSubmissionComment(courseId, assignmentId, studentId, commentData)
     .then(response => deserializeComments(response.data.submission_comments))
 }
 
-function deleteSubmissionComment(commentId) {
+function deleteSubmissionComment(commentId: string) {
   const url = `/submission_comments/${commentId}`
   return axios.delete(url)
 }
 
-function updateSubmissionComment(commentId, comment) {
+function updateSubmissionComment(commentId: string, comment: string) {
   const url = `/submission_comments/${commentId}`
   const data = {id: commentId, submission_comment: {comment}}
   return axios
@@ -77,5 +84,5 @@ export default {
   createSubmissionComment,
   deleteSubmissionComment,
   getSubmissionComments,
-  updateSubmissionComment
+  updateSubmissionComment,
 }

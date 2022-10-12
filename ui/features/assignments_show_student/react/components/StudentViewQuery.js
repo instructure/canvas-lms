@@ -22,7 +22,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {
   LOGGED_OUT_STUDENT_VIEW_QUERY,
   STUDENT_VIEW_QUERY,
-  STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION
+  STUDENT_VIEW_QUERY_WITH_REVIEWER_SUBMISSION,
 } from '@canvas/assignments/graphql/student/Queries'
 import LoadingIndicator from '@canvas/loading-indicator'
 import {useQuery} from 'react-apollo'
@@ -53,7 +53,7 @@ function getAssignmentEnvVariables() {
     peerReviewAvailable: ENV.peer_review_available,
     peerDisplayName: ENV.peer_display_name,
     revieweeId: ENV.reviewee_id,
-    anonymousAssetId: ENV.anonymous_asset_id
+    anonymousAssetId: ENV.anonymous_asset_id,
   }
 
   if (ENV.PREREQS?.items?.[0]?.prev) {
@@ -61,7 +61,7 @@ function getAssignmentEnvVariables() {
     env.modulePrereq = {
       title: prereq.title,
       link: prereq.html_url,
-      __typename: 'modulePrereq'
+      __typename: 'modulePrereq',
     }
   } else if (ENV.PREREQS?.unlock_at) {
     env.unlockDate = ENV.PREREQS.unlock_at
@@ -89,8 +89,8 @@ const LoggedInStudentViewQuery = props => {
     variables: {
       assignmentLid: props.assignmentLid,
       submissionID: props.submissionID,
-      reviewerSubmissionID: props.reviewerSubmissionID
-    }
+      reviewerSubmissionID: props.reviewerSubmissionID,
+    },
   })
 
   if (loading) return <LoadingIndicator />
@@ -105,7 +105,7 @@ const LoggedInStudentViewQuery = props => {
 
 const LoggedOutStudentViewQuery = props => {
   const {loading, error, data} = useQuery(LOGGED_OUT_STUDENT_VIEW_QUERY, {
-    variables: {assignmentLid: props.assignmentLid}
+    variables: {assignmentLid: props.assignmentLid},
   })
 
   if (loading) return <LoadingIndicator />
@@ -127,7 +127,7 @@ const StudentViewQuery = props => {
 
 StudentViewQuery.propTypes = {
   assignmentLid: string.isRequired,
-  submissionID: string
+  submissionID: string,
 }
 
 export default StudentViewQuery

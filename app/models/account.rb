@@ -1378,7 +1378,7 @@ class Account < ActiveRecord::Base
     end
 
     given { |user| !cached_account_users_for(user).empty? }
-    can :read and can :read_as_admin and can :manage and can :update and can :delete and can :read_outcomes and can :read_terms
+    can %i[read read_as_admin manage update delete read_outcomes read_terms read_files]
 
     given { |user| root_account? && cached_all_account_users_for(user).any? }
     can :read_terms
@@ -1400,7 +1400,7 @@ class Account < ActiveRecord::Base
 
     # any user with an admin enrollment in one of the courses can read
     given { |user| user && courses.where(id: user.enrollments.active.admin.pluck(:course_id)).exists? }
-    can :read
+    can [:read, :read_files]
 
     given { |user| !site_admin? && primary_settings_root_account? && grants_right?(user, :manage_site_settings) }
     can :manage_privacy_settings
@@ -1814,8 +1814,8 @@ class Account < ActiveRecord::Base
   TAB_RELEASE_NOTES = 17
 
   def external_tool_tabs(opts, user)
-    tools = ContextExternalTool.active.find_all_for(self, :account_navigation)
-                               .select { |t| t.permission_given?(:account_navigation, user, self) }
+    tools = Lti::ContextToolFinder.new(self, type: :account_navigation).all_tools_scope_union.to_unsorted_array
+                                  .select { |t| t.permission_given?(:account_navigation, user, self) }
     Lti::ExternalToolTab.new(self, :account_navigation, tools, opts[:language]).tabs
   end
 
@@ -2302,8 +2302,8 @@ class Account < ActiveRecord::Base
 
   def get_rce_favorite_tool_ids
     rce_favorite_tool_ids[:value] ||
-      ContextExternalTool.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
-                         .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
+      Lti::ContextToolFinder.all_tools_for(self, placements: [:editor_button]) # TODO: remove after datafixup and the is_rce_favorite column is removed
+                            .where(is_rce_favorite: true).pluck(:id).map { |id| Shard.global_id_for(id) }
   end
 
   def effective_course_template

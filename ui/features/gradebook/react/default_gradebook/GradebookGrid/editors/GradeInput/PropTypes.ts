@@ -23,13 +23,13 @@ import GradeOverrideInfo from '@canvas/grading/GradeEntry/GradeOverrideInfo'
 import GradeOverride from '@canvas/grading/GradeOverride'
 
 export const gradingScheme = shape({
-  data: instanceOf(Array)
+  data: instanceOf(Array),
 })
 
 export const messages = arrayOf(
   shape({
     text: string.isRequired,
-    type: string.isRequired
+    type: string.isRequired,
   })
 )
 

@@ -24,20 +24,20 @@ QUnit.module('AssignmentApi', {
     this.courseId = 23
     this.getStub = sandbox.stub(axios, 'get').returns(
       Promise.resolve({
-        response: {}
+        response: {},
       })
     )
-  }
+  },
 })
 
-test('getAssignmentsByName makes a request with a search term', function() {
+test('getAssignmentsByName makes a request with a search term', function () {
   const courseId = 23
   const url = `/api/v1/courses/${courseId}/assignments`
   const searchTerm = "Gary's late assignment"
   const params = {
     params: {
-      search_term: searchTerm
-    }
+      search_term: searchTerm,
+    },
   }
   const promise = AssignmentApi.getAssignmentsByName(courseId, searchTerm)
 
@@ -48,7 +48,7 @@ test('getAssignmentsByName makes a request with a search term', function() {
   })
 })
 
-test('getAssignmentsNextPage makes a request with given url', function() {
+test('getAssignmentsNextPage makes a request with given url', function () {
   const url = 'https://example.com/assignments?page=2'
   const promise = AssignmentApi.getAssignmentsNextPage(url)
 

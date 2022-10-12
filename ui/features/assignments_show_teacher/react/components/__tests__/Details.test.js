@@ -30,8 +30,8 @@ const override1 = {
   set: {
     lid: '2',
     sectionName: 'Section A',
-    __typename: 'Section'
-  }
+    __typename: 'Section',
+  },
 }
 const override2 = {
   lid: '19',
@@ -42,8 +42,8 @@ const override2 = {
   set: {
     lid: '3',
     sectionName: 'Section B',
-    __typename: 'Section'
-  }
+    __typename: 'Section',
+  },
 }
 
 function renderDetails(assignment, props = {}) {
@@ -71,8 +71,8 @@ describe('Assignment Details', () => {
   it('renders an override', () => {
     const assignment = mockAssignment({
       assignmentOverrides: {
-        nodes: [mockOverride()]
-      }
+        nodes: [mockOverride()],
+      },
     })
     const {getByText} = renderDetails(assignment)
     expect(getByText('Section A')).toBeInTheDocument()
@@ -83,8 +83,8 @@ describe('Assignment Details', () => {
     const assignment = mockAssignment({
       dueAt: null,
       assignmentOverrides: {
-        nodes: [mockOverride(override1), mockOverride(override2)]
-      }
+        nodes: [mockOverride(override1), mockOverride(override2)],
+      },
     })
     const {getByText, queryAllByText} = renderDetails(assignment)
 
@@ -99,8 +99,8 @@ describe('Assignment Details', () => {
       lockAt: '2019-08-03T23:59:59-06:00',
       unlockAt: '2019-07-28T00:00:00-06:00',
       assignmentOverrides: {
-        nodes: [mockOverride(override1), mockOverride(override2)]
-      }
+        nodes: [mockOverride(override1), mockOverride(override2)],
+      },
     })
     const {getByText} = renderDetails(assignment)
 
@@ -144,9 +144,9 @@ describe('Assignment Details', () => {
       lockAt: '2019-09-03T23:59:59-06:00',
       unlockAt: '2019-08-28T00:00:00-06:00',
       assignmentOverrides: {
-        nodes: [mockOverride(override1)]
+        nodes: [mockOverride(override1)],
       },
-      submissionTypes: ['online_text_entry', 'online_url', 'online_upload']
+      submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],
     })
     const {getByText, getByTestId, getAllByTestId} = renderDetails(assignment)
     const everyoneOverrideDetailButton = getByText('Everyone else')
@@ -194,8 +194,8 @@ describe('Assignment Details', () => {
     const assignment = mockAssignment({
       dueAt: null,
       assignmentOverrides: {
-        nodes: [mockOverride(override1), mockOverride(override2)]
-      }
+        nodes: [mockOverride(override1), mockOverride(override2)],
+      },
     })
     const {getByTestId} = renderDetails(assignment)
 
@@ -206,8 +206,8 @@ describe('Assignment Details', () => {
     const assignment = mockAssignment({
       dueAt: null,
       assignmentOverrides: {
-        nodes: [mockOverride(override1), mockOverride(override2)]
-      }
+        nodes: [mockOverride(override1), mockOverride(override2)],
+      },
     })
     const {queryByTestId} = renderDetails(assignment, {readOnly: true})
 

@@ -113,11 +113,10 @@ const BaseModalOptions = props => {
           <Flex.Item padding="medium">
             <ConferenceAddressBook
               data-testid="conference-address-book"
-              selectedIds={props.selectedAttendees}
-              savedAttendees={props.savedAttendees}
+              selectedItems={props.selectedAttendees}
               menuItemList={props.availableAttendeesList}
-              onChange={userList => {
-                props.onAttendeesChange(userList.map(u => u.id))
+              onChange={menuItemList => {
+                props.onAttendeesChange(menuItemList)
               }}
               isEditing={props.isEditing}
             />
@@ -154,7 +153,6 @@ BaseModalOptions.propTypes = {
   onAttendeesChange: PropTypes.func,
   availableAttendeesList: PropTypes.arrayOf(PropTypes.object),
   selectedAttendees: PropTypes.arrayOf(PropTypes.string),
-  savedAttendees: PropTypes.arrayOf(PropTypes.string),
   nameValidationMessages: PropTypes.array,
   descriptionValidationMessages: PropTypes.array,
   hasBegun: PropTypes.bool,

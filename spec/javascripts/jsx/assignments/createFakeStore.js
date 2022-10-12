@@ -20,7 +20,7 @@ export default function createFakeStore(initialState) {
   const store = {
     dispatchedActions: [],
     subscribe() {
-      return function() {}
+      return function () {}
     },
     getState() {
       return initialState
@@ -30,7 +30,7 @@ export default function createFakeStore(initialState) {
         return action(store.dispatch)
       }
       store.dispatchedActions.push(action)
-    }
+    },
   }
   return store
 }

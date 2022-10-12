@@ -24,7 +24,7 @@ import {render} from '@testing-library/react'
 describe('AssignmentGroupModuleNav', () => {
   it('renders module and assignment group links correctly', async () => {
     const assignment = await mockAssignment({
-      Assignment: {modules: [{}]}
+      Assignment: {modules: [{}]},
     })
     const {container, getByTestId} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -41,8 +41,8 @@ describe('AssignmentGroupModuleNav', () => {
     const assignment = await mockAssignment({
       Assignment: {
         modules: [{name: 'Test Module'}],
-        assignmentGroup: {name: 'Test assignmentGroup'}
-      }
+        assignmentGroup: {name: 'Test assignmentGroup'},
+      },
     })
     const {getByTestId, getByText} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -57,8 +57,8 @@ describe('AssignmentGroupModuleNav', () => {
     const assignment = await mockAssignment({
       Assignment: {
         modules: [],
-        assignmentGroup: {name: 'Test assignmentGroup'}
-      }
+        assignmentGroup: {name: 'Test assignmentGroup'},
+      },
     })
     const {getByTestId, getByText, queryByTestId} = render(
       <AssignmentGroupModuleNav assignment={assignment} />
@@ -75,8 +75,8 @@ describe('AssignmentGroupModuleNav', () => {
     const assignment = await mockAssignment({
       Assignment: {
         modules: [{name: 'Test Module'}],
-        assignmentGroup: null
-      }
+        assignmentGroup: null,
+      },
     })
     const {getByTestId, getByText, queryByTestId} = render(
       <AssignmentGroupModuleNav assignment={assignment} />
@@ -91,7 +91,7 @@ describe('AssignmentGroupModuleNav', () => {
 
   it('will render nothing if null props provided', async () => {
     const assignment = await mockAssignment({
-      Assignment: {modules: [], assignmentGroup: null}
+      Assignment: {modules: [], assignmentGroup: null},
     })
     const {queryByTestId} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -102,8 +102,8 @@ describe('AssignmentGroupModuleNav', () => {
   it('renders multiple modules', async () => {
     const assignment = await mockAssignment({
       Assignment: {
-        modules: [{name: 'Test Module 1'}, {name: 'Test Module 2'}]
-      }
+        modules: [{name: 'Test Module 1'}, {name: 'Test Module 2'}],
+      },
     })
     const {getAllByTestId, getByText} = render(<AssignmentGroupModuleNav assignment={assignment} />)
 
@@ -116,8 +116,8 @@ describe('AssignmentGroupModuleNav', () => {
   it('limits the maximum number of modules rendered', async () => {
     const assignment = await mockAssignment({
       Assignment: {
-        modules: [{}, {}, {}, {}]
-      }
+        modules: [{}, {}, {}, {}],
+      },
     })
     const {getAllByTestId, getByTestId, getByText} = render(
       <AssignmentGroupModuleNav assignment={assignment} />

@@ -36,6 +36,7 @@ import {
   getTotalGradeStringFromEnrollments
 } from '@canvas/k5/react/utils'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import {GradeRow} from './GradeRow'
 import GradesEmptyPage from './GradesEmptyPage'
 
@@ -60,6 +61,11 @@ const GradeDetails = ({
   const [isStacked, setIsStacked] = useState(mqList.matches)
   const [enrollments, setEnrollments] = useState([])
   const [assignmentGroups, setAssignmentGroups] = useState([])
+
+  // This hook has to get called here even though it's used only in GradeRow
+  // because GradeRow isn't a "real" React component so can't call a hook itself
+  const dateFormatter = useDateTimeFormat('date.formats.full_with_weekday')
+
   const gradingPeriodParam = {}
   const assignmentGroupTotals = getAssignmentGroupTotals(
     assignmentGroups,
@@ -230,6 +236,7 @@ const GradeDetails = ({
       >
         {grades.map(assignment =>
           GradeRow({
+            dateFormatter,
             isStacked,
             currentUserId: observedUserId || currentUser.id,
             ...assignment

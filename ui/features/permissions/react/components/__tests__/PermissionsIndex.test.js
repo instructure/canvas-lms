@@ -35,7 +35,7 @@ it('displays course roles initially', () => {
   const data = DEFAULT_PROPS()
   const {getAllByText, queryByText} = renderWithRedux(<Subject />, {data})
   data.roles.forEach(role => {
-    if (role.contextType === COURSE) expect(getAllByText(role.label)).toHaveLength(2) // Text label + tooltip
+    if (role.contextType === COURSE) expect(getAllByText(role.label)).toHaveLength(1)
     if (role.contextType === ACCOUNT) expect(queryByText(role.label)).toBeNull()
   })
 })
@@ -45,7 +45,7 @@ it('switches to account roles when tab is clicked on', () => {
   const {getAllByText, getByText, queryByText} = renderWithRedux(<Subject />, {data})
   fireEvent.click(getByText('Account Roles'))
   data.roles.forEach(role => {
-    if (role.contextType === ACCOUNT) expect(getAllByText(role.label)).toHaveLength(2) // Text label + tooltip
+    if (role.contextType === ACCOUNT) expect(getAllByText(role.label)).toHaveLength(1)
     if (role.contextType === COURSE) expect(queryByText(role.label)).toBeNull()
   })
 })
@@ -57,7 +57,7 @@ it('switches back to course roles tab with proper context from account roles tab
   fireEvent.click(getByText('Course Roles'))
   data.roles.forEach(role => {
     if (role.contextType === ACCOUNT) expect(queryByText(role.label)).toBeNull()
-    if (role.contextType === COURSE) expect(getAllByText(role.label)).toHaveLength(2) // Text label + tooltip
+    if (role.contextType === COURSE) expect(getAllByText(role.label)).toHaveLength(1)
   })
 })
 
@@ -70,7 +70,7 @@ it('filters roles properly', () => {
   fireEvent.blur(multiSelect)
   data.roles.forEach(role => {
     if (role.id === roleSelect.id) {
-      expect(getAllByText(role.label)).toHaveLength(3) // one more because of the multiselect selection
+      expect(getAllByText(role.label)).toHaveLength(2)
     } else {
       expect(queryByText(role.label)).toBeNull()
     }

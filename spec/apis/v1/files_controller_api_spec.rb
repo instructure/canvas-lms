@@ -248,7 +248,8 @@ describe "Files API", type: :request do
                            "media_entry_id" => @attachment.media_entry_id,
                            "canvadoc_session_url" => nil,
                            "crocodoc_session_url" => nil,
-                           "category" => "uncategorized"
+                           "category" => "uncategorized",
+                           "visibility_level" => @attachment.visibility_level
                          })
       expect(@attachment.file_state).to eq "available"
     end
@@ -288,7 +289,8 @@ describe "Files API", type: :request do
                            "media_entry_id" => @attachment.media_entry_id,
                            "canvadoc_session_url" => nil,
                            "crocodoc_session_url" => nil,
-                           "category" => "uncategorized"
+                           "category" => "uncategorized",
+                           "visibility_level" => @attachment.visibility_level
                          })
       expect(@attachment.reload.file_state).to eq "available"
     end
@@ -1048,6 +1050,7 @@ describe "Files API", type: :request do
                            "canvadoc_session_url" => nil,
                            "crocodoc_session_url" => nil,
                            "category" => "uncategorized",
+                           "visibility_level" => @att.visibility_level
                          })
     end
 

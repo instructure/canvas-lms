@@ -33,10 +33,10 @@ async function createGraphqlMocks(overrides = {}) {
     {
       request: {
         query: USER_GROUPS_QUERY,
-        variables: {userID: '1'}
+        variables: {userID: '1'},
       },
-      result: userGroupsResult
-    }
+      result: userGroupsResult,
+    },
   ]
 }
 
@@ -48,14 +48,14 @@ beforeEach(() => {
         context_type: 'user',
         id: '1',
         name: 'my files',
-        created_at: '2019-08-13T16:38:42Z'
+        created_at: '2019-08-13T16:38:42Z',
       }
     } else if (input === '/api/v1/groups/1/folders/root') {
       resp.data = {
         context_type: 'group',
         id: '3',
         name: 'group files',
-        created_at: '2019-08-13T16:38:42Z'
+        created_at: '2019-08-13T16:38:42Z',
       }
     } else if (input === '/api/v1/folders/1/folders?include=user') {
       resp.data = {
@@ -63,7 +63,7 @@ beforeEach(() => {
         name: 'dank memes',
         created_at: '2019-08-13T16:38:42Z',
         locked: false,
-        parent_folder_id: '1'
+        parent_folder_id: '1',
       }
     } else if (input === '/api/v1/folders/4/files?include=user') {
       resp.data = {
@@ -73,11 +73,11 @@ beforeEach(() => {
         created_at: '2019-05-14T18:14:05Z',
         updated_at: '2019-08-14T22:26:07Z',
         user: {
-          display_name: 'Mr. Norton'
+          display_name: 'Mr. Norton',
         },
         size: 1122994,
         locked: false,
-        folder_id: '4'
+        folder_id: '4',
       }
     } else if (input === '/api/v1/folders/1/files?include=user') {
       resp.data = {
@@ -87,11 +87,11 @@ beforeEach(() => {
         created_at: '2019-05-14T20:00:00Z',
         updated_at: '2019-08-14T22:00:00Z',
         user: {
-          display_name: 'Creed Bratton'
+          display_name: 'Creed Bratton',
         },
         size: 1122994,
         locked: false,
-        folder_id: '1'
+        folder_id: '1',
       }
     }
     return Promise.resolve(resp)
@@ -334,8 +334,8 @@ describe('MoreOptions', () => {
 
       navigator.mediaDevices = {
         getUserMedia: jest.fn().mockResolvedValue({
-          getTracks: () => [{stop: jest.fn()}]
-        })
+          getTracks: () => [{stop: jest.fn()}],
+        }),
       }
     })
 
@@ -363,7 +363,8 @@ describe('MoreOptions', () => {
       expect(modal).toContainHTML('Take a Photo via Webcam')
     })
 
-    it('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
+    it.skip('calls the handleWebcamPhotoUpload when the user has taken a photo and saved it', async () => {
+      // unskip in EVAL-2661 (9/27/22)
       const {findByRole} = await renderComponent()
 
       const webcamButton = await findByRole('button', {name: /Webcam/})

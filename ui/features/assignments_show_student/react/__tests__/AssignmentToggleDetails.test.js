@@ -39,7 +39,7 @@ it('renders normally', () => {
     name: 'an assignment',
     pointsPossible: 42,
     dueAt: 'some time',
-    description: 'an assignment'
+    description: 'an assignment',
   }
   ReactDOM.render(
     <AssignmentToggleDetails description={assignment.description} />,
@@ -53,7 +53,7 @@ it('renders normally an assignment with no content', () => {
   const assignment = {
     name: 'an assignment',
     pointsPossible: 42,
-    dueAt: 'some time'
+    dueAt: 'some time',
   }
   ReactDOM.render(
     <AssignmentToggleDetails description={assignment.description} />,

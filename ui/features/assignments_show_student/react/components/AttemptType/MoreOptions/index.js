@@ -67,7 +67,7 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
   const modalContentsStyle = {
     height: '0',
     paddingBottom: '55%',
-    position: 'relative'
+    position: 'relative',
   }
 
   useEffect(() => {
@@ -174,7 +174,7 @@ BaseUploadTool.propTypes = {
   icon: element,
   label: string.isRequired,
   renderFooter: func,
-  title: string
+  title: string,
 }
 
 const iconDimensions = {height: '24px', width: '24px'}
@@ -183,7 +183,7 @@ function CanvasFileChooser({allowedExtensions, courseID, onFileSelect, userID}) 
   const [selectedCanvasFileID, setSelectedCanvasFileId] = useState(null)
 
   const {loading, error, data} = useQuery(USER_GROUPS_QUERY, {
-    variables: {userID}
+    variables: {userID},
   })
 
   let contents
@@ -252,7 +252,7 @@ function ExternalTool({launchUrl, tool}) {
     border: 'none',
     width: '100%',
     height: '100%',
-    position: 'absolute'
+    position: 'absolute',
   }
 
   return (
@@ -268,10 +268,10 @@ ExternalTool.propTypes = {
   tool: shape({
     name: string.isRequired,
     settings: shape({
-      iconUrl: string
-    })
+      iconUrl: string,
+    }),
   }).isRequired,
-  launchUrl: string.isRequired
+  launchUrl: string.isRequired,
 }
 
 function WebcamPhotoUpload({onPhotoTaken}) {
@@ -300,7 +300,7 @@ function MoreOptions({
   courseID,
   handleCanvasFiles,
   handleWebcamPhotoUpload,
-  userID
+  userID,
 }) {
   if (handleCanvasFiles == null && handleWebcamPhotoUpload == null) {
     return null
@@ -335,7 +335,7 @@ MoreOptions.propTypes = {
   courseID: string.isRequired,
   handleCanvasFiles: func,
   handleWebcamPhotoUpload: func,
-  userID: string
+  userID: string,
 }
 
 export default WithBreakpoints(MoreOptions)

@@ -32,7 +32,7 @@ const CurveGradesDialogManager = {
     {
       isAdmin,
       contextUrl,
-      submissionsLoaded
+      submissionsLoaded,
     }: {
       isAdmin?: boolean
       contextUrl?: string
@@ -61,9 +61,9 @@ const CurveGradesDialogManager = {
         const CurveGradesDialog = await AsyncComponents.loadCurveGradesDialog()
         const dialog = new CurveGradesDialog({assignment, students, context_url: contextUrl})
         dialog.show(onClose)
-      }
+      },
     }
-  }
+  },
 }
 
 export default CurveGradesDialogManager

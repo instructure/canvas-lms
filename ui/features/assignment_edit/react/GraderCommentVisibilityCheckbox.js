@@ -25,7 +25,7 @@ const I18n = useI18nScope('GraderCommentVisibilityCheckbox')
 export default class GraderCommentVisibilityCheckbox extends React.Component {
   static propTypes = {
     checked: bool.isRequired,
-    onChange: func.isRequired
+    onChange: func.isRequired,
   }
 
   constructor(props) {

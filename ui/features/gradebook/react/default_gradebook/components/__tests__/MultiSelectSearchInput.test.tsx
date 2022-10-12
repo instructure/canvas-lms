@@ -31,9 +31,9 @@ describe('MultiSelectSearchInput', () => {
       onChange: jest.fn(),
       options: [
         {id: '1', text: 'Broccoli'},
-        {id: '2', text: 'Cucumber'}
+        {id: '2', text: 'Cucumber'},
       ],
-      placeholder: 'Select a veggie'
+      placeholder: 'Select a veggie',
     }
   })
 

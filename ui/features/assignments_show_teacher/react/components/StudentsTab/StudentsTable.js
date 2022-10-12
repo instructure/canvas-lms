@@ -44,7 +44,7 @@ const HEADERS = [
   {id: 'score', label: I18n.t('Score')},
   {id: 'submitted_at', label: I18n.t('Submission Date')},
   {id: 'status', label: I18n.t('Status')},
-  {id: 'more', label: I18n.t('More')}
+  {id: 'more', label: I18n.t('More')},
 ]
 
 export default class StudentsTable extends React.Component {
@@ -57,14 +57,14 @@ export default class StudentsTable extends React.Component {
     sortDirection: string, // 'ascending', 'descending', or 'none'
     assignToFilter: string,
     attemptFilter: number,
-    statusFilter: string
+    statusFilter: string,
   }
 
   static defaultProps = {
     sortableColumns: [],
     sortId: '',
     sortDirection: 'none',
-    onRequestSort: () => {}
+    onRequestSort: () => {},
   }
 
   constructor(props) {
@@ -72,7 +72,7 @@ export default class StudentsTable extends React.Component {
     this.state = {
       trayOpen: false,
       trayStudentIndex: null,
-      studentData: StudentsTable.prepareStudentData(props)
+      studentData: StudentsTable.prepareStudentData(props),
     }
   }
 
@@ -101,7 +101,7 @@ export default class StudentsTable extends React.Component {
 
     return submissions.map(submission => ({
       ...submission.user,
-      ...{submission}
+      ...{submission},
     }))
   }
 
@@ -157,7 +157,7 @@ export default class StudentsTable extends React.Component {
         <View as="div" margin="0 0 x-small" key={attempt.attempt}>
           {I18n.t('{{student_points}}/{{possible_points}}', {
             student_points: validScore ? attempt.score : '\u2013',
-            possible_points: this.props.assignment.pointsPossible
+            possible_points: this.props.assignment.pointsPossible,
           })}
         </View>
       )
@@ -227,7 +227,7 @@ export default class StudentsTable extends React.Component {
       )
       return {
         trayOpen: true,
-        trayStudentIndex: selectedStudentIndex
+        trayStudentIndex: selectedStudentIndex,
       }
     })
   }
@@ -237,7 +237,7 @@ export default class StudentsTable extends React.Component {
       trayStudentIndex:
         prevState.trayStudentIndex > 0
           ? prevState.trayStudentIndex - 1
-          : prevState.studentData.length - 1
+          : prevState.studentData.length - 1,
     }))
   }
 
@@ -246,7 +246,7 @@ export default class StudentsTable extends React.Component {
       trayStudentIndex:
         prevState.trayStudentIndex === prevState.studentData.length - 1
           ? 0
-          : prevState.trayStudentIndex + 1
+          : prevState.trayStudentIndex + 1,
     }))
   }
 

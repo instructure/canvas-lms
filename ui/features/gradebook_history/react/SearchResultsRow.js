@@ -55,7 +55,7 @@ function displayGrade(grade, possible, displayAsPoints) {
   // "points" and the grade can be parsed as a number
   if (displayAsPoints && NumberHelper.validate(grade)) {
     return `${GradeFormatHelper.formatGrade(grade, {
-      defaultValue: '–'
+      defaultValue: '–',
     })}/${GradeFormatHelper.formatGrade(possible)}`
   }
 
@@ -96,7 +96,7 @@ function SearchResultsRow(props) {
     pointsPossibleAfter,
     pointsPossibleBefore,
     pointsPossibleCurrent,
-    student
+    student,
   } = props.item
 
   return (
@@ -120,7 +120,7 @@ SearchResultsRow.propTypes = {
     assignment: shape({
       anonymousGrading: bool.isRequired,
       muted: bool.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     }),
     courseOverrideGrade: bool.isRequired,
     date: string.isRequired,
@@ -133,8 +133,8 @@ SearchResultsRow.propTypes = {
     pointsPossibleAfter: string.isRequired,
     pointsPossibleBefore: string.isRequired,
     pointsPossibleCurrent: string.isRequired,
-    student: string.isRequired
-  }).isRequired
+    student: string.isRequired,
+  }).isRequired,
 }
 
 SearchResultsRow.displayName = 'Row'

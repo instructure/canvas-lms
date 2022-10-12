@@ -18,6 +18,13 @@
 
 import {camelize, underscore} from 'convert-case'
 import {originalityReportSubmissionKey} from './originalityReportHelper'
+import type {
+  PlagiarismData,
+  PlagiarismDataMap,
+  SimilarityEntry,
+  SimilarityType,
+  SubmissionWithOriginalityReport
+} from '@canvas/grading/grading.d'
 
 export function isGraded(submission) {
   // TODO: remove when we no longer camelize data in Gradebook
@@ -79,7 +86,13 @@ export function extractSimilarityInfo(submission) {
 }
 
 function getSimilarityEntries(submission, plagiarismData) {
-  const entries = []
+  const entries: {
+    id: string
+    data: {
+      status: string
+      similarity_score: number
+    }
+  }[] = []
 
   if (submission.submissionType === 'online_upload' && submission.attachments != null) {
     // A submission with attachments may have a plagiarism report for each
@@ -115,7 +128,7 @@ function getSimilarityEntries(submission, plagiarismData) {
   return entries
 }
 
-function similarityEntryComparator(a, b) {
+function similarityEntryComparator(a: SimilarityEntry, b: SimilarityEntry): number {
   const orderedStatuses = ['error', 'pending', 'scored', 'none']
 
   // We only display a single plagiarism report in New Gradebook. If a
@@ -135,7 +148,7 @@ function similarityEntryComparator(a, b) {
   return orderedStatuses.indexOf(aStatus || 'none') - orderedStatuses.indexOf(bStatus || 'none')
 }
 
-export function similarityIcon(similarityData) {
+export function similarityIcon(similarityData: PlagiarismData): string {
   const {status, similarity_score} = similarityData
 
   let iconClass

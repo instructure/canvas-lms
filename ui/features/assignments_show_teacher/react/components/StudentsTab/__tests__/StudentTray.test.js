@@ -28,8 +28,8 @@ describe('student tray data', () => {
     const assignment = mockAssignment({
       name: 'Egypt Economy Research',
       submissions: {
-        nodes: [submission]
-      }
+        nodes: [submission],
+      },
     })
 
     user.submission = submission
@@ -55,8 +55,8 @@ describe('student tray data', () => {
     const submission = mockSubmission({score: null, nodes: [user]})
     const assignment = mockAssignment({
       submissions: {
-        nodes: [submission]
-      }
+        nodes: [submission],
+      },
     })
     user.submission = submission
 
@@ -74,8 +74,8 @@ describe('student tray actions options', () => {
     const submission = mockSubmission({score: null, nodes: [user]})
     const assignment = mockAssignment({
       submissions: {
-        nodes: [submission]
-      }
+        nodes: [submission],
+      },
     })
     user.submission = submission
 
@@ -89,8 +89,8 @@ describe('student tray actions options', () => {
     const submission = mockSubmission({score: null, nodes: [user]})
     const assignment = mockAssignment({
       submissions: {
-        nodes: [submission]
-      }
+        nodes: [submission],
+      },
     })
     user.submission = submission
 

@@ -43,7 +43,7 @@ QUnit.module('SubmissionTray', hooks => {
       colors: {
         late: '#FEF7E5',
         missing: '#F99',
-        excused: '#E5F3FC'
+        excused: '#E5F3FC',
       },
       editedCommentId: null,
       editSubmissionComment() {},
@@ -53,7 +53,7 @@ QUnit.module('SubmissionTray', hooks => {
         ['A', 0.9],
         ['B+', 0.85],
         ['B', 0.8],
-        ['B-', 0.75]
+        ['B-', 0.75],
       ],
       locale: 'en',
       onAnonymousSpeedGraderClick() {},
@@ -70,7 +70,7 @@ QUnit.module('SubmissionTray', hooks => {
         id: '27',
         name: 'Jane Doe',
         gradesUrl: 'http://gradeUrl/',
-        isConcluded: false
+        isConcluded: false,
       },
       submission: {
         assignmentId: '30',
@@ -89,7 +89,7 @@ QUnit.module('SubmissionTray', hooks => {
         secondsLate: 0,
         submissionType: 'online_text_entry',
         userId: '27',
-        workflowState: 'graded'
+        workflowState: 'graded',
       },
       updateSubmission() {},
       updateSubmissionComment() {},
@@ -104,7 +104,7 @@ QUnit.module('SubmissionTray', hooks => {
         muted: false,
         pointsPossible: 10,
         postManually: false,
-        published: true
+        published: true,
       },
       isFirstAssignment: false,
       isLastAssignment: false,
@@ -123,7 +123,7 @@ QUnit.module('SubmissionTray', hooks => {
       isInOtherGradingPeriod: false,
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
-      isNotCountedForScore: false
+      isNotCountedForScore: false,
     }
   })
 
@@ -264,9 +264,9 @@ QUnit.module('SubmissionTray', hooks => {
         name: 'Book Report',
         gradingType: 'points',
         htmlUrl: 'http://htmlUrl/',
-        published: true
+        published: true,
       },
-      onAnonymousSpeedGraderClick: sinon.stub()
+      onAnonymousSpeedGraderClick: sinon.stub(),
     }
     mountComponent(props)
     speedGraderLink().click()
@@ -324,7 +324,7 @@ QUnit.module('SubmissionTray', hooks => {
 
   test('shows no avatar if avatar is null', () => {
     mountComponent({
-      student: {id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/', isConcluded: false}
+      student: {id: '27', name: 'Joe', gradesUrl: 'http://gradesUrl/', isConcluded: false},
     })
     notOk(avatarDiv())
   })
@@ -355,7 +355,7 @@ QUnit.module('SubmissionTray', hooks => {
 
   test('shows student name', () => {
     mountComponent({
-      student: {id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/', isConcluded: false}
+      student: {id: '27', name: 'Sara', gradesUrl: 'http://gradeUrl/', isConcluded: false},
     })
     strictEqual(studentNameDiv().innerText, 'Sara')
   })
@@ -381,8 +381,8 @@ QUnit.module('SubmissionTray', hooks => {
           missing: false,
           pointsDeducted: 0,
           secondsLate: 0,
-          assignmentId: '30'
-        }
+          assignmentId: '30',
+        },
       })
       notOk(content.querySelector('#late-penalty-value'))
     })
@@ -396,8 +396,8 @@ QUnit.module('SubmissionTray', hooks => {
           missing: false,
           pointsDeducted: null,
           secondsLate: 0,
-          assignmentId: '30'
-        }
+          assignmentId: '30',
+        },
       })
       notOk(content.querySelector('#late-penalty-value'))
     })
@@ -414,7 +414,7 @@ QUnit.module('SubmissionTray', hooks => {
         ['B+', 0.85],
         ['B', 0.8],
         ['B-', 0.75],
-        ['C+', 0.7]
+        ['C+', 0.7],
       ]
       mountComponent({enterGradesAs: 'gradingScheme', gradingScheme})
       const $el = content.querySelector('#final-grade-value')
@@ -533,7 +533,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with no left arrow when isFirstStudent and isLastStudent are true', function () {
     mountComponent({
       isFirstStudent: true,
-      isLastStudent: true
+      isLastStudent: true,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -544,7 +544,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with no right arrow when isFirstStudent and isLastStudent are true', function () {
     mountComponent({
       isFirstStudent: true,
-      isLastStudent: true
+      isLastStudent: true,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -555,7 +555,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with left arrow when isFirstStudent and isLastStudent are false', function () {
     mountComponent({
       isFirstStudent: false,
-      isLastStudent: false
+      isLastStudent: false,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -566,7 +566,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with right arrow when isFirstStudent and isLastStudent are false', function () {
     mountComponent({
       isFirstStudent: false,
-      isLastStudent: false
+      isLastStudent: false,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -577,7 +577,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with left arrow when isFirstStudent is false', function () {
     mountComponent({
       isFirstStudent: false,
-      isLastStudent: true
+      isLastStudent: true,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -588,7 +588,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with no right arrow when isFirstStudent is false', function () {
     mountComponent({
       isFirstStudent: false,
-      isLastStudent: true
+      isLastStudent: true,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -599,7 +599,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with right arrow when isLastStudent is false', function () {
     mountComponent({
       isFirstStudent: true,
-      isLastStudent: false
+      isLastStudent: false,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .right-arrow-button-container button').length,
@@ -610,7 +610,7 @@ QUnit.module('SubmissionTray', hooks => {
   test('shows student carousel with no left arrow when isLastStudent is false', function () {
     mountComponent({
       isFirstStudent: true,
-      isLastStudent: false
+      isLastStudent: false,
     })
     strictEqual(
       content.querySelectorAll('#student-carousel .left-arrow-button-container button').length,
@@ -632,7 +632,7 @@ QUnit.module('SubmissionTray', hooks => {
         muted: false,
         name: 'Book Report',
         pointsPossible: 10,
-        published: true
+        published: true,
       }
       mountComponent({assignment})
       equal(findGradeInput().labelText, 'Grade out of 10')
@@ -678,7 +678,7 @@ QUnit.module('SubmissionTray', hooks => {
         ['B+', 0.85],
         ['B', 0.8],
         ['B-', 0.75],
-        ['C+', 0.7]
+        ['C+', 0.7],
       ]
       mountComponent({enterGradesAs: 'gradingScheme', gradingScheme})
       equal(findGradeInput().labelText, 'Letter Grade')
@@ -688,7 +688,7 @@ QUnit.module('SubmissionTray', hooks => {
       const pendingGradeInfo = {
         excused: false,
         grade: '15',
-        valid: true
+        valid: true,
       }
       mountComponent({pendingGradeInfo})
       strictEqual(findGradeInput().value, '15')
@@ -736,7 +736,7 @@ QUnit.module('SubmissionTray', hooks => {
         submission.attachments = [{id: '1001'}, {id: '1002'}]
         submission.turnitinData = {
           attachment_1001: {status: 'pending'},
-          attachment_1002: {status: 'error'}
+          attachment_1002: {status: 'error'},
         }
         mountComponent()
         ok(
@@ -770,7 +770,7 @@ QUnit.module('SubmissionTray', hooks => {
       moderatedGrading: true,
       muted: false,
       name: 'foo',
-      published: false
+      published: false,
     }
     mountComponent({assignment})
     ok(content.querySelector('textarea[placeholder="Leave a comment"]'))
@@ -784,7 +784,7 @@ QUnit.module('SubmissionTray', hooks => {
       moderatedGrading: false,
       muted: true,
       name: 'foo',
-      published: false
+      published: false,
     }
     mountComponent({assignment})
     ok(content.querySelector('textarea[placeholder="Leave a comment"]'))
@@ -798,7 +798,7 @@ QUnit.module('SubmissionTray', hooks => {
       moderatedGrading: false,
       muted: true,
       name: 'foo',
-      published: false
+      published: false,
     }
     mountComponent({assignment})
     notOk(content.querySelector('textarea[placeholder="Leave a comment"]'))
@@ -812,7 +812,7 @@ QUnit.module('SubmissionTray', hooks => {
       moderatedGrading: true,
       muted: true,
       name: 'foo',
-      published: false
+      published: false,
     }
     mountComponent({assignment})
     notOk(content.querySelector('textarea[placeholder="Leave a comment"]'))

@@ -25,7 +25,7 @@ const item = {
     anonymousGrading: false,
     gradingType: 'points',
     muted: false,
-    name: 'Rustic Rubber Duck'
+    name: 'Rustic Rubber Duck',
   },
   courseOverrideGrade: false,
   date: '2017-05-30T23:16:59Z',
@@ -40,7 +40,7 @@ const item = {
   pointsPossibleCurrent: '30',
   student: 'Norval Abbott',
   time: '11:16pm',
-  gradedAnonymously: false
+  gradedAnonymously: false,
 }
 
 function WrappedComponent(props) {

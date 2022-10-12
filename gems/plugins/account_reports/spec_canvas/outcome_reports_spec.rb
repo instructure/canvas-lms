@@ -289,14 +289,20 @@ describe "Outcome Reports" do
       # create result that is invalid because
       # it has an artifact type of submission, instead of
       # a rubric assessment or assessment question
-      ct = @assignment.learning_outcome_alignments.last
-      lor = ct.learning_outcome_results.for_association(@assignment).build
-      lor.user = @user1
-      lor.artifact = @submission
-      lor.context = ct.context
-      lor.possible = @assignment.points_possible
-      lor.score = @submission.score
-      lor.save!
+      LearningOutcomeResult.create(
+        alignment: ContentTag.create!({
+                                        title: "content",
+                                        context: @course1,
+                                        learning_outcome: @outcopme,
+                                        content_id: @assignment.id
+                                      }),
+        user: @user1,
+        artifact: @submission,
+        context: @course1,
+        possible: @assignment.points_possible,
+        score: @submission.score,
+        learning_outcome_id: @outcome.id
+      )
       verify_all(report, all_values)
     end
 

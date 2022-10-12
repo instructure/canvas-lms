@@ -19,7 +19,7 @@
 import * as GradesApi from 'ui/features/assignment_grade_summary/react/grades/GradesApi.js'
 import FakeServer, {
   jsonBodyFromRequest,
-  pathFromRequest
+  pathFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('GradeSummary GradesApi', suiteHooks => {
@@ -108,7 +108,7 @@ QUnit.module('GradeSummary GradesApi', suiteHooks => {
         assignmentId: '2301',
         final: true,
         grade: 10,
-        gradedAnonymously: false
+        gradedAnonymously: false,
       }
     })
 

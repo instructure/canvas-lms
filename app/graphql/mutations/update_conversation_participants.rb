@@ -45,7 +45,11 @@ class Mutations::UpdateConversationParticipants < Mutations::BaseMutation
     # update_all cannot be used as the ConversationParticipant model
     # extends the methods used for updating attributes due to the
     # storage of data differing from what ActiveRecord expects
-    conversation_participants.map { |cp| cp.update(update_params) }
+    unarchivable_states = ["unread", "read"]
+    conversation_participants.map do |cp|
+      InstStatsd::Statsd.increment("inbox.conversation.unarchived.react") if cp.workflow_state == "archived" && unarchivable_states.include?(update_params[:workflow_state])
+      cp.update(update_params)
+    end
     InstStatsd::Statsd.count("inbox.conversation.archived.react", conversation_participants.count) if update_params[:workflow_state] == "archived"
     InstStatsd::Statsd.count("inbox.conversation.starred.react", conversation_participants.count) if update_params[:starred] == true
     InstStatsd::Statsd.count("inbox.conversation.unstarred.react", conversation_participants.count) if update_params[:starred] == false

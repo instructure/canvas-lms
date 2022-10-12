@@ -22,23 +22,25 @@
  * dangerously large.
  */
 
+import type {PerformanceControlValues} from './gradebook.d'
+
 const DEFAULTS = {
   activeRequestLimit: 12,
   apiMaxPerPage: 100,
-  submissionsChunkSize: 10
+  submissionsChunkSize: 10,
 }
 
 const MINIMUMS = {
   activeRequestLimit: 1,
-  perPage: 1
+  perPage: 1,
 }
 
 const MAXIMUMS = {
   activeRequestLimit: 100,
-  apiMaxPerPage: 500
+  apiMaxPerPage: 500,
 }
 
-function integerBetween(value, min, max, defaultValue) {
+function integerBetween(value, min: number, max: number, defaultValue: number) {
   const integer = Number.parseInt(value, 10)
   const assuredValue = Number.isNaN(integer) ? defaultValue : integer
   const atMostMax = Math.min(max, assuredValue)
@@ -46,7 +48,12 @@ function integerBetween(value, min, max, defaultValue) {
 }
 
 export default class PerformanceControls {
-  constructor(values = {}) {
+  _values: PerformanceControlValues
+
+  constructor(values: PerformanceControlValues = {}) {
+    if (!values) {
+      throw new Error('PerformanceControls requires a values object')
+    }
     this._values = values
   }
 
@@ -88,7 +95,7 @@ export default class PerformanceControls {
 
   // PRIVATE
 
-  __getInteger(name) {
+  __getInteger(name: string): number {
     return integerBetween(
       this._values[name],
       MINIMUMS[name] || MINIMUMS.perPage,

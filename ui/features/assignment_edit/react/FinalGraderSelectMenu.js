@@ -26,11 +26,11 @@ export default class FinalGraderSelectMenu extends React.Component {
   static propTypes = {
     availableModerators: arrayOf(shape({name: string.isRequired, id: string.isRequired}))
       .isRequired,
-    finalGraderID: string
+    finalGraderID: string,
   }
 
   static defaultProps = {
-    finalGraderID: null
+    finalGraderID: null,
   }
 
   constructor(props) {

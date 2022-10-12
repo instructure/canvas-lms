@@ -18,27 +18,39 @@
 
 import React, {useEffect} from 'react'
 import GradebookGrid from '../GradebookGrid/index'
+import type {GradebookGridOptions} from '../GradebookGrid/index'
 import CellFormatterFactory from '../GradebookGrid/formatters/CellFormatterFactory'
 import ColumnHeaderRenderer from '../GradebookGrid/headers/ColumnHeaderRenderer'
+import type Gradebook from '../Gradebook'
+import type {GridData} from '../grid.d'
+
+type Props = {
+  gradebook: Gradebook
+  gridData: GridData
+  gradebookGridNode: HTMLElement
+  gradebookIsEditable: boolean
+  onLoad: (grid: GradebookGrid) => void
+}
 
 export default function GradebookGridComponent({
   gradebook,
   gridData,
   gradebookGridNode,
   gradebookIsEditable,
-  onLoad
-}) {
+  onLoad,
+}: Props) {
   useEffect(() => {
     const formatterFactory = new CellFormatterFactory(gradebook)
     const columnHeaderRenderer = new ColumnHeaderRenderer(gradebook)
-    const gradebookGrid = new GradebookGrid({
+    const options: GradebookGridOptions = {
       $container: gradebookGridNode,
       activeBorderColor: '#1790DF', // $active-border-color
       data: gridData,
       editable: gradebookIsEditable,
       formatterFactory,
-      columnHeaderRenderer
-    })
+      columnHeaderRenderer,
+    }
+    const gradebookGrid = new GradebookGrid(options)
     onLoad(gradebookGrid)
   }, [gradebook, gridData, gradebookGridNode, gradebookIsEditable, onLoad])
 

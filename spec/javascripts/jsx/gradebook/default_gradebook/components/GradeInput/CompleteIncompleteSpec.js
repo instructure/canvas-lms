@@ -32,14 +32,14 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
     const assignment = {
       anonymizeStudents: false,
       gradingType: 'pass_fail',
-      pointsPossible: 10
+      pointsPossible: 10,
     }
 
     const submission = {
       enteredGrade: null,
       enteredScore: 0,
       excused: false,
-      id: '2501'
+      id: '2501',
     }
 
     props = {
@@ -48,7 +48,7 @@ QUnit.module('Gradebook > Default Gradebook > Components > GradeInput', suiteHoo
       enterGradesAs: 'passFail',
       onSubmissionUpdate: sinon.stub(),
       pendingGradeInfo: null,
-      submission
+      submission,
     }
 
     $container = document.body.appendChild(document.createElement('div'))

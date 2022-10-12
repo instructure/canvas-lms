@@ -82,6 +82,52 @@ describe "BigBlueButton conferences" do
       end
     end
 
+    context "attendee selection" do
+      before do
+        @section = @course.course_sections.create!(name: "test section")
+        student_in_section(@section, user: @student)
+
+        @group_category = @course.group_categories.create!(name: "Group Category")
+        @group = @course.groups.create!(group_category: @group_category, name: "Group 1")
+        @group.add_user(@student, "accepted")
+      end
+
+      context "on create" do
+        it "successfully invites a section to the conference" do
+          get "/courses/#{@course.id}/conferences"
+          new_conference_button.click
+          wait_for_ajaximations
+          f("div#tab-attendees").click
+          fj("label:contains('Invite all course members')").click
+          f("[data-testid='address-input']").click
+          f("[data-testid='section-#{@section.id}']").click
+          expect(@section.participants.count).to eq ff("[data-testid='address-tag']").count
+
+          wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+          new_conference = WebConference.last
+          expect(@section.participants.count).to eq new_conference.users.count
+        end
+
+        it "successfully invites a group to the conference" do
+          get "/courses/#{@course.id}/conferences"
+          # Since the teacher isn't a participating user, we have to add 1 to this count
+          group_participant_and_group_tag_count = @group.participating_users_in_context.count + 1
+
+          new_conference_button.click
+          wait_for_ajaximations
+          f("div#tab-attendees").click
+          fj("label:contains('Invite all course members')").click
+          f("[data-testid='address-input']").click
+          f("[data-testid='group-#{@group.id}']").click
+          expect(group_participant_and_group_tag_count).to eq ff("[data-testid='address-tag']").count
+
+          wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+          new_conference = WebConference.last
+          expect(group_participant_and_group_tag_count).to eq new_conference.users.count
+        end
+      end
+    end
+
     it "validates name length" do
       initial_conference_count = WebConference.count
       get conferences_index_page
@@ -156,7 +202,7 @@ describe "BigBlueButton conferences" do
       expect(f("input[value='send_private_chat']").attribute("checked")).to be_falsey
     end
 
-    it "syncs in unadded context users on option select" do
+    it "syncs in unadded context users on option select and able to delete successfully" do
       conf = create_big_blue_button_conference
       conf.add_invitee(@ta)
       expect(conf.invitees.pluck(:id)).to match_array [@ta.id]
@@ -166,6 +212,12 @@ describe "BigBlueButton conferences" do
       f(".sync_conference_link").click
       wait_for_ajaximations
       expect(conf.invitees.pluck(:id)).to include(@ta.id, @student.id)
+
+      fj("li.conference a:contains('Settings')").click
+      f("a[title='Delete']").click
+      accept_alert
+      wait_for_ajaximations
+      expect { conf.reload }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
     it "does not show add to calendar option to users without :manage_calendar permissions" do
@@ -284,6 +336,24 @@ describe "BigBlueButton conferences" do
       expect(wc_before_start_at).to be < wc_after_start_at
       expect(wc_before_end_at).to be < wc_after_end_at
     end
+
+    it "do not check Add to Calendar when the conference without calendar starts" do
+      get "/courses/#{@course.id}/conferences"
+      new_conference_button.click
+      wait_for_ajaximations
+
+      wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+
+      f("a.start-button").click
+      wait_for_ajaximations
+
+      fj("li.conference a:contains('Settings')").click
+      fj("a:contains('Edit')").click
+
+      expect(f("input[value='add_to_calendar']").attribute("checked")).to be_falsey
+      new_conference = WebConference.last
+      expect(new_conference.has_calendar_event).to eq 0
+    end
   end
 
   context "when bbb_modal_update is OFF" do
@@ -309,6 +379,11 @@ describe "BigBlueButton conferences" do
         get "/courses/#{@course.id}/conferences/#{@conf.id}"
         expect(f("button[title='New Conference']")).to be_present
         expect(f("body")).not_to contain_jqcss("span:contains('Edit')")
+      end
+
+      it "does not show sync attendees option" do
+        get "/courses/#{@course.id}/conferences/#{@conf.id}"
+        expect(f("body")).not_to contain_jqcss ".sync_conference_link"
       end
     end
 

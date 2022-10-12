@@ -41,11 +41,11 @@ BulkEdit.propTypes = {
   courseId: string.isRequired,
   onCancel: func.isRequired,
   onSave: func, // for now, this is just informational that save has been clicked
-  defaultDueTime: string
+  defaultDueTime: string,
 }
 
 BulkEdit.defaultProps = {
-  onSave: () => {}
+  onSave: () => {},
 }
 
 export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
@@ -54,11 +54,11 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
       new DateValidator({
         date_range: ENV.VALID_DATE_RANGE || {
           start_at: {date: null, date_context: 'term'},
-          end_at: {date: null, date_context: 'term'}
+          end_at: {date: null, date_context: 'term'},
         },
         hasGradingPeriods: !!ENV.HAS_GRADING_PERIODS,
         gradingPeriods: GradingPeriodsAPI.deserializePeriods(ENV.active_grading_periods || []),
-        userIsAdmin: (ENV.current_user_roles || []).includes('admin')
+        userIsAdmin: (ENV.current_user_roles || []).includes('admin'),
       }),
     []
   )
@@ -70,7 +70,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     useSaveAssignments(courseId)
   const {jobCompletion, jobRunning, jobSuccess, jobErrors, setJobSuccess} = useMonitorJobCompletion(
     {
-      progressUrl
+      progressUrl,
     }
   )
 
@@ -94,8 +94,8 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     params: {
       per_page: 50,
       include: ['all_dates', 'can_edit'],
-      order_by: 'due_at'
-    }
+      order_by: 'due_at',
+    },
   })
 
   useEffect(() => {
@@ -317,7 +317,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
       jobSuccess,
       onSave: handleSave,
       onCancel,
-      onOpenBatchEdit: handleOpenBatchEdit
+      onOpenBatchEdit: handleOpenBatchEdit,
     }
     return <BulkEditHeader {...headerProps} />
   }

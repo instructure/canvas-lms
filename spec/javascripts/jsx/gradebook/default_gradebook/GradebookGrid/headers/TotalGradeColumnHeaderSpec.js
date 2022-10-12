@@ -43,7 +43,7 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         currentDisplay: 'points',
         disabled: false,
         hidden: false,
-        onSelect() {}
+        onSelect() {},
       },
 
       onMenuDismiss() {},
@@ -52,7 +52,7 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         isInBack: false,
         isInFront: false,
         onMoveToBack() {},
-        onMoveToFront() {}
+        onMoveToFront() {},
       },
 
       removeGradebookElement($el) {
@@ -65,12 +65,12 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         isSortColumn: true,
         onSortByGradeAscending() {},
         onSortByGradeDescending() {},
-        settingKey: 'grade'
+        settingKey: 'grade',
       },
 
       isRunningScoreToUngraded: false,
 
-      viewUngradedAsZero: false
+      viewUngradedAsZero: false,
     }
   })
 

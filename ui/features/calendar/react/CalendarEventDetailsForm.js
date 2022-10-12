@@ -49,7 +49,7 @@ const CalendarEventDetailsForm = ({
   closeCB,
   contextChangeCB,
   setSetContextCB,
-  timezone
+  timezone,
 }) => {
   timezone = timezone || ENV?.TIMEZONE || DateTime.browserTimeZone()
 
@@ -112,7 +112,7 @@ const CalendarEventDetailsForm = ({
       event.contextInfo,
       shouldShowBlackoutDateCheckbox,
       contextChangeCB,
-      getMoreOptionsHref
+      getMoreOptionsHref,
     ]
   )
 
@@ -208,7 +208,7 @@ const CalendarEventDetailsForm = ({
     jsEvent.preventDefault()
     const params = {return_to: window.location.href}
 
-    if (title) params.title = title
+    if (title && !event.lockedTitle) params.title = title
     if (context) params.new_context_code = context.asset_string
     if (location) params.location_name = location
     if (date) params.start_date = $.unfudgeDateForProfileTimezone(date).toISOString()
@@ -257,7 +257,7 @@ const CalendarEventDetailsForm = ({
         endAt && shouldEnableTimeFields() ? endAt.toISOString() : date.toISOString(),
       'calendar_event[location_name]': location && shouldEnableLocationField() ? location : '',
       'calendar_event[important_dates]': isImportant,
-      'calendar_event[blackout_date]': isBlackout
+      'calendar_event[blackout_date]': isBlackout,
     }
     if (canUpdateConference()) {
       if (webConference && shouldEnableConferenceField()) {
@@ -269,14 +269,14 @@ const CalendarEventDetailsForm = ({
               : webConference.title,
           user_settings: {
             ...webConference.user_settings,
-            scheduled_date: params['calendar_event[start_at]']
-          }
+            scheduled_date: params['calendar_event[start_at]'],
+          },
         }
         const conferenceParams = new URLSearchParams(
           $.param({
             calendar_event: {
-              web_conference: webConf
-            }
+              web_conference: webConf,
+            },
           })
         )
         for (const [key, value] of conferenceParams.entries()) {
@@ -298,8 +298,8 @@ const CalendarEventDetailsForm = ({
           context_code: context.asset_string,
           webConference: shouldEnableConferenceField() ? webConference : null,
           important_info: isImportant,
-          blackout_date: isBlackout
-        }
+          blackout_date: isBlackout,
+        },
       }
       const newEvent = commonEventFactory(objectData, event.possibleContexts())
       newEvent.save(

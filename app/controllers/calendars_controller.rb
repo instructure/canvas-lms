@@ -88,6 +88,7 @@ class CalendarsController < ApplicationController
         course_pacing_enabled: context.is_a?(Course) && @domain_root_account.feature_enabled?(:course_paces) && context.enable_course_paces,
         user_is_observer: context.is_a?(Course) && context.enrollments.where(user_id: @current_user).first&.observer?,
         default_due_time: context.is_a?(Course) && context.default_due_time,
+        can_view_context: context.grants_right?(@current_user, session, :read)
       }
       if context.respond_to?("course_sections")
         info[:course_sections] = context.course_sections.active.pluck(:id, :name).map do |id, name|

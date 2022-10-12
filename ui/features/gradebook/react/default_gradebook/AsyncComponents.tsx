@@ -75,8 +75,8 @@ const AsyncComponents = {
 
   async renderGradebookSettingsModal(props, $container) {
     const GradebookSettingsModal = await loadGradebookSettingsModal()
-    render(<GradebookSettingsModal {...props} />, $container)
-  }
+    render(<GradebookSettingsModal key="grade_details_tray" {...props} />, $container)
+  },
 }
 
 export default AsyncComponents

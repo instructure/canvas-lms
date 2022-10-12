@@ -46,7 +46,7 @@ function LongTextEditor(args) {
         padding: '5px',
         border: '3px solid gray',
         '-moz-border-radius': '10px',
-        'border-radius': '10px'
+        'border-radius': '10px',
       })
       .appendTo($container)
     $input = $('<textarea hidefocus rows="5"/>')
@@ -56,13 +56,13 @@ function LongTextEditor(args) {
         width: '250px',
         height: '80px',
         border: 0,
-        outline: 0
+        outline: 0,
       })
       .appendTo($wrapper)
 
     const buttonContainer = $('<div/>')
       .css({
-        'text-align': 'right'
+        'text-align': 'right',
       })
       .appendTo($wrapper)
     const saveText = I18n.t('save', 'Save')
@@ -139,7 +139,7 @@ function LongTextEditor(args) {
     $wrapper.position({
       my: 'center top',
       at: 'center top',
-      of: args.container
+      of: args.container,
     })
   }
 
@@ -171,7 +171,7 @@ function LongTextEditor(args) {
   this.validate = function () {
     return {
       valid: true,
-      msg: null
+      msg: null,
     }
   }
 

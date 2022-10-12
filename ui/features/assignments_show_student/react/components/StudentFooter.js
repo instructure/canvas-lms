@@ -37,7 +37,7 @@ const I18n = useI18nScope('assignments_2_file_upload')
 function buildFooterStyle() {
   const footerStyle = {
     backgroundColor: theme.variables.colors.white,
-    borderColor: theme.variables.colors.borderMedium
+    borderColor: theme.variables.colors.borderMedium,
   }
 
   if (document.querySelector('.with-embedded-chat')) {
@@ -127,7 +127,7 @@ const StudentFooter = ({assignmentID, buttons, breakpoints, courseID}) => {
     if (data?.url != null) {
       return {
         url: data.url,
-        tooltipText: data.tooltipText.string
+        tooltipText: data.tooltipText.string,
       }
     }
   }
@@ -166,18 +166,18 @@ const StudentFooter = ({assignmentID, buttons, breakpoints, courseID}) => {
 
 const buttonPropType = PropTypes.shape({
   element: PropTypes.element,
-  key: PropTypes.string
+  key: PropTypes.string,
 })
 
 StudentFooter.propTypes = {
   assignmentID: PropTypes.string,
   breakpoints: breakpointsShape,
   buttons: PropTypes.arrayOf(buttonPropType),
-  courseID: PropTypes.string
+  courseID: PropTypes.string,
 }
 
 StudentFooter.defaultProps = {
-  buttons: []
+  buttons: [],
 }
 
 export default WithBreakpoints(StudentFooter)

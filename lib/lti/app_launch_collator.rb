@@ -38,7 +38,7 @@ module Lti
           tools_options[:visibility_placements] = placements
         end
 
-        ContextExternalTool.all_tools_for(context, tools_options).placements(*placements)
+        Lti::ContextToolFinder.all_tools_for(context, tools_options).placements(*placements)
       end
 
       def message_handlers_for(context, placements)

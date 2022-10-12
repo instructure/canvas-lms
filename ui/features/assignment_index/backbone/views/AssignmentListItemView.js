@@ -99,7 +99,7 @@ export default AssignmentListItemView = (function () {
       this.prototype.els = {
         '.al-trigger': '$settingsButton',
         '.edit_assignment': '$editAssignmentButton',
-        '.move_assignment': '$moveAssignmentButton'
+        '.move_assignment': '$moveAssignmentButton',
       }
 
       this.prototype.events = {
@@ -116,7 +116,7 @@ export default AssignmentListItemView = (function () {
         'click .duplicate-failed-retry': 'onDuplicateFailedRetry',
         'click .migrate-failed-retry': 'onMigrateFailedRetry',
         'click .duplicate-failed-cancel': 'onDuplicateOrImportFailedCancel',
-        'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel'
+        'click .import-failed-cancel': 'onDuplicateOrImportFailedCancel',
       }
 
       this.prototype.messages = shimGetterShorthand(
@@ -127,7 +127,7 @@ export default AssignmentListItemView = (function () {
           },
           ag_move_label() {
             return I18n.beforeLabel(I18n.t('Assignment Group'))
-          }
+          },
         }
       )
     }
@@ -160,7 +160,7 @@ export default AssignmentListItemView = (function () {
           'modules',
           'published',
           'workflow_state',
-          'assessment_requests'
+          'assessment_requests',
         ]
         const observe = attrs.map(attr => `change:${attr}`).join(' ')
         this.model.on(observe, this.render)
@@ -182,17 +182,17 @@ export default AssignmentListItemView = (function () {
       if (this.canManage()) {
         this.publishIconView = new PublishIconView({
           model: this.model,
-          title: this.model.get('name')
+          title: this.model.get('name'),
         })
         this.lockIconView = new LockIconView({
           model: this.model,
           unlockedText: I18n.t('%{name} is unlocked. Click to lock.', {
-            name: this.model.get('name')
+            name: this.model.get('name'),
           }),
           lockedText: I18n.t('%{name} is locked. Click to unlock', {name: this.model.get('name')}),
           course_id: this.model.get('course_id'),
           content_id: this.model.get('id'),
-          content_type: 'assignment'
+          content_type: 'assignment',
         })
         this.editAssignmentView = new CreateAssignmentView({model: this.model})
       }
@@ -214,7 +214,7 @@ export default AssignmentListItemView = (function () {
           model: this.model,
           sisName: this.model.postToSISName(),
           dueDateRequired: this.model.dueDateRequiredForAccount(),
-          maxNameLengthRequired: this.model.maxNameLengthRequiredForAccount()
+          maxNameLengthRequired: this.model.maxNameLengthRequiredForAccount(),
         }))
       } else if (this.sisButtonView) {
         this.sisButtonView.remove()
@@ -230,8 +230,8 @@ export default AssignmentListItemView = (function () {
         items: [
           {
             id: this.model.get('id'),
-            title: this.model.get('name')
-          }
+            title: this.model.get('name'),
+          },
         ],
         moveOptions: {
           groupsLabel: this.messages.ag_move_label,
@@ -240,12 +240,12 @@ export default AssignmentListItemView = (function () {
               ? this.model.collection.view.parentCollection
               : undefined,
             col => col.get('assignments')
-          )
+          ),
         },
         onMoveSuccess: res => {
           const keys = {
             model: 'assignments',
-            parent: 'assignment_group_id'
+            parent: 'assignment_group_id',
           }
           return MoveItem.backbone.reorderAcrossCollections(
             res.data.order,
@@ -259,7 +259,7 @@ export default AssignmentListItemView = (function () {
         },
         formatSaveUrl({groupId}) {
           return `${ENV.URLS.assignment_sort_base_url}/${groupId}/reorder`
-        }
+        },
       }
 
       return MoveItem.renderTray(this.moveTrayProps, document.getElementById('not_right_side'))
@@ -317,7 +317,7 @@ export default AssignmentListItemView = (function () {
         if (mountPoint) {
           ReactDOM.render(
             React.createElement(StudentViewPeerReviews, {
-              assignment: attributes
+              assignment: attributes,
             }),
             mountPoint
           )
@@ -347,12 +347,12 @@ export default AssignmentListItemView = (function () {
           position: {
             my: 'center bottom',
             at: 'center top-10',
-            collision: 'fit fit'
+            collision: 'fit fit',
           },
           tooltipClass: 'center bottom vertical',
           content() {
             return $(link.data('tooltipSelector')).html()
-          }
+          },
         })
       }
     }
@@ -425,7 +425,7 @@ export default AssignmentListItemView = (function () {
           module_count: modules.length,
           module_name: moduleName,
           has_modules,
-          joined_names: joinedNames
+          joined_names: joinedNames,
         })
       } else {
         return data
@@ -528,7 +528,7 @@ export default AssignmentListItemView = (function () {
             courseId: ENV.COURSE_ID || ENV.COURSE.id,
             contentShare: {content_type: 'assignment', content_id: this.model.id},
             shouldReturnFocus: false,
-            onDismiss: dismissModal
+            onDismiss: dismissModal,
           }),
           mountPoint
         )
@@ -556,7 +556,7 @@ export default AssignmentListItemView = (function () {
             sourceCourseId: ENV.COURSE_ID || ENV.COURSE.id,
             contentSelection: {assignments: [this.model.id]},
             shouldReturnFocus: false,
-            onDismiss: dismissTray
+            onDismiss: dismissTray,
           }),
           mountPoint
         )
@@ -660,7 +660,7 @@ export default AssignmentListItemView = (function () {
     gradeStrings(grade) {
       const pass_fail_map = {
         incomplete: I18n.t('incomplete', 'Incomplete'),
-        complete: I18n.t('complete', 'Complete')
+        complete: I18n.t('complete', 'Complete'),
       }
 
       grade = pass_fail_map[grade] || grade
@@ -668,20 +668,20 @@ export default AssignmentListItemView = (function () {
       return {
         percent: {
           nonscreenreader: I18n.t('grade_percent', '%{grade}%', {grade}),
-          screenreader: I18n.t('grade_percent_screenreader', 'Grade: %{grade}%', {grade})
+          screenreader: I18n.t('grade_percent_screenreader', 'Grade: %{grade}%', {grade}),
         },
         pass_fail: {
           nonscreenreader: `${grade}`,
-          screenreader: I18n.t('grade_pass_fail_screenreader', 'Grade: %{grade}', {grade})
+          screenreader: I18n.t('grade_pass_fail_screenreader', 'Grade: %{grade}', {grade}),
         },
         letter_grade: {
           nonscreenreader: `${grade}`,
-          screenreader: I18n.t('grade_letter_grade_screenreader', 'Grade: %{grade}', {grade})
+          screenreader: I18n.t('grade_letter_grade_screenreader', 'Grade: %{grade}', {grade}),
         },
         gpa_scale: {
           nonscreenreader: `${grade}`,
-          screenreader: I18n.t('grade_gpa_scale_screenreader', 'Grade: %{grade}', {grade})
-        }
+          screenreader: I18n.t('grade_gpa_scale_screenreader', 'Grade: %{grade}', {grade}),
+        },
       }
     }
 

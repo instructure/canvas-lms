@@ -29,7 +29,7 @@ describe('FileList', () => {
 
   const files = [
     new File(['foo'], 'awesome-test-image.png', {type: 'image/png'}),
-    new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'})
+    new File(['foo'], 'awesome-test-file.pdf', {type: 'application/pdf'}),
   ]
   files.forEach((file, i) => {
     file.id = i

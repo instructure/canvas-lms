@@ -71,6 +71,10 @@ shared_examples_for "file uploads api" do
       json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0, verifier: attachment.uuid)
     end
 
+    if attachment.supports_visibility?
+      json["visibility_level"] = attachment.visibility_level
+    end
+
     unless options[:no_doc_preview]
       json["canvadoc_session_url"] = nil
       json["crocodoc_session_url"] = nil
@@ -136,6 +140,10 @@ shared_examples_for "file uploads api" do
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
       expected_json["preview_url"] = context_url(attachment.context, :context_file_file_preview_url, attachment, annotate: 0, verifier: attachment.uuid)
+    end
+
+    if attachment.supports_visibility?
+      expected_json["visibility_level"] = attachment.visibility_level
     end
 
     expect(json).to eq(expected_json)

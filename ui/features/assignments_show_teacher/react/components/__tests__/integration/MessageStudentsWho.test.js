@@ -27,7 +27,7 @@ describe('MessageStudentsWho integration', () => {
     render: () => renderTeacherView(mockAssignment(), [], {}, 'Students'),
     getOpenDialogElt: fns => fns.getByText(/message students/i),
     confirmDialogOpen: fns => fns.getByText('Message Students Who...'),
-    getCancelDialogElt: fns => fns.getByText(/cancel/i)
+    getCancelDialogElt: fns => fns.getByText(/cancel/i),
   })
 
   it('shows the message students who dialog when the message students who button is clicked', async () => {

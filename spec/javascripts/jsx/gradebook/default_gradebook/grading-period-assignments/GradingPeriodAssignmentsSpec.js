@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Students', suiteHooks => {
@@ -42,7 +42,7 @@ QUnit.module('Gradebook > Students', suiteHooks => {
       gradebook = createGradebook()
       gradingPeriodAssignments = {
         1501: ['2301', '2303'],
-        1502: ['2302', '2304']
+        1502: ['2302', '2304'],
       }
     })
 

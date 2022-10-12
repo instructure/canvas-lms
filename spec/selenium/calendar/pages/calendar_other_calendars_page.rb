@@ -73,6 +73,38 @@ module CalendarOtherCalendarsPage
     ".fc-body"
   end
 
+  def search_input_selector
+    "input[data-testid='search-input']"
+  end
+
+  def account_calendar_checkbox_selector(context_id)
+    "input[data-testid=account-#{context_id}-checkbox]"
+  end
+
+  def account_calendars_list_selector
+    "ul[data-testid='account-calendars-list']"
+  end
+
+  def account_calendar_list_items_selector
+    "#{account_calendars_list_selector} > li"
+  end
+
+  def event_popover_header_selector
+    ".event-details-header"
+  end
+
+  def event_popover_content_selector
+    ".event-details-content"
+  end
+
+  def event_popover_selector
+    ".event-details"
+  end
+
+  def event_link_selector
+    ".view_event_link"
+  end
+
   #------------------------- Elements ---------------------------
   def open_other_calendars_modal_btn
     f(open_other_calendars_modal_btn_selector)
@@ -122,6 +154,34 @@ module CalendarOtherCalendarsPage
     f(calendar_body_selector)
   end
 
+  def search_input
+    f(search_input_selector)
+  end
+
+  def account_calendar_checkbox(context_id)
+    f(account_calendar_checkbox_selector(context_id))
+  end
+
+  def account_calendars_list
+    f(account_calendars_list_selector)
+  end
+
+  def account_calendar_list_items
+    ffj(account_calendar_list_items_selector)
+  end
+
+  def event_popover_title
+    f(event_popover_header_selector)
+  end
+
+  def event_popover_content
+    f(event_popover_content_selector)
+  end
+
+  def event_popover
+    f(event_popover_selector)
+  end
+
   #----------------------- Actions/Methods ----------------------
   def open_other_calendars_modal
     open_other_calendars_modal_btn.click
@@ -140,7 +200,7 @@ module CalendarOtherCalendarsPage
 
   def select_other_calendar(context_id)
     # because clicking the checkbox clicks on a sibling span
-    driver.execute_script("$('input[data-testid=account-#{context_id}-checkbox]').click()")
+    driver.execute_script("$('#{account_calendar_checkbox_selector(context_id)}').click()")
   end
 
   def open_create_new_event_modal
@@ -149,5 +209,12 @@ module CalendarOtherCalendarsPage
 
   def close_flash_alert
     f("#{flash_alert_selector} button").click
+  end
+
+  def search_account(search_term)
+    driver.action.send_keys(search_input, search_term).perform
+    driver.action.send_keys(search_input, :tab).perform
+    driver.action.send_keys(search_input, :tab).perform
+    wait_for_ajax_requests
   end
 end

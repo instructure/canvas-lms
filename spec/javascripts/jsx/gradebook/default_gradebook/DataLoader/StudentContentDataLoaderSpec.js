@@ -19,7 +19,7 @@
 import sinon from 'sinon'
 
 import FakeServer, {
-  paramsFromRequest
+  paramsFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 import {RequestDispatch} from '@canvas/network'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -33,19 +33,19 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
     finalGradeOverrides: {
       1101: {
         courseGrade: {
-          percentage: 91.23
-        }
-      }
+          percentage: 91.23,
+        },
+      },
     },
 
     studentIds: ['1101', '1102', '1103'],
     students: [{id: '1101'}, {id: '1102'}, {id: '1103'}],
-    submissions: [{id: '2501'}, {id: '2502'}, {id: '2503'}]
+    submissions: [{id: '2501'}, {id: '2502'}, {id: '2503'}],
   }
 
   const urls = {
     students: '/api/v1/courses/1201/users',
-    submissions: '/api/v1/courses/1201/students/submissions'
+    submissions: '/api/v1/courses/1201/students/submissions',
   }
 
   let dispatch
@@ -89,10 +89,10 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
       course_settings: {
         allow_final_grade_override: true,
-        filter_speed_grader_by_student_group: false
+        filter_speed_grader_by_student_group: false,
       },
 
-      final_grade_override_enabled: true
+      final_grade_override_enabled: true,
     })
 
     sinon.stub(gradebook, 'gotChunkOfStudents')
@@ -104,7 +104,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
     dispatch = new RequestDispatch()
     performanceControls = new PerformanceControls({
       studentsChunkSize: 2,
-      submissionsChunkSize: 2
+      submissionsChunkSize: 2,
     })
   })
 
@@ -131,7 +131,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         setStudentsResponse(exampleData.studentIds, exampleData.students)
         performanceControls = new PerformanceControls({
           studentsChunkSize: 50,
-          submissionsChunkSize: 2
+          submissionsChunkSize: 2,
         })
         await load()
         const studentRequest = server.findRequest(urls.students)
@@ -233,7 +233,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
       test('sets the `per_page` parameter to the configured per page maximum', async () => {
         performanceControls = new PerformanceControls({
           studentsChunkSize: 2,
-          submissionsPerPage: 45
+          submissionsPerPage: 45,
         })
         await load()
         const submissionsRequest = server.findRequest(urls.submissions)
@@ -254,7 +254,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         await load()
         deepEqual(submissionChunks, [
           exampleData.submissions.slice(0, 1),
-          exampleData.submissions.slice(1, 3)
+          exampleData.submissions.slice(1, 3),
         ])
       })
 
@@ -445,7 +445,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
           .respond([
             {status: 200, body: exampleData.submissions.slice(0, 1)},
             {status: 200, body: exampleData.submissions.slice(1, 2)},
-            {status: 200, body: exampleData.submissions.slice(2, 3)}
+            {status: 200, body: exampleData.submissions.slice(2, 3)},
           ])
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})
@@ -461,7 +461,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
         const submissionRequestIndices = [
           events.indexOf('request submissions page 1'),
           events.indexOf('request submissions page 2'),
-          events.indexOf('request submissions page 3')
+          events.indexOf('request submissions page 3'),
         ]
         const studentRequest2Index = events.indexOf('request students:1103')
         ok(Math.max(...submissionRequestIndices) < studentRequest2Index)
@@ -635,7 +635,7 @@ QUnit.module('Gradebook > DataLoader > StudentContentDataLoader', suiteHooks => 
 
         server.for(urls.submissions, {student_ids: exampleData.studentIds.slice(0, 2)}).respond([
           {status: 200, body: exampleData.submissions.slice(0, 1)},
-          {status: 500, body: exampleData.submissions.slice(1, 2)}
+          {status: 500, body: exampleData.submissions.slice(1, 2)},
         ])
         server
           .for(urls.submissions, {student_ids: exampleData.studentIds.slice(2, 3)})

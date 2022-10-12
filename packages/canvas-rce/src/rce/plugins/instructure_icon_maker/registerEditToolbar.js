@@ -18,25 +18,41 @@
 
 import formatMessage from '../../../format-message'
 import {BUTTON_ID, TOOLBAR_ID, ICON_MAKER_ATTRIBUTE} from './svg/constants'
+import TrayController from '../instructure_image/ImageOptionsTray/TrayController'
 
 export const shouldShowEditButton = node => !!node?.getAttribute(ICON_MAKER_ATTRIBUTE)
+export const EDIT_ALT_TEXT_BUTTON_ID = 'inst-icon-maker-edit-alt-text'
+
+const trayController = new TrayController()
 
 export default function registerEditToolbar(editor, onAction) {
   addButton(editor, onAction)
+  addAltTextButton(editor)
   addContextToolbar(editor)
 }
 
 function addButton(editor, onAction) {
   editor.ui.registry.addButton(BUTTON_ID, {
     onAction,
-    text: formatMessage('Edit'),
+    text: formatMessage('Edit Icon'),
     tooltip: formatMessage('Edit Existing Icon Maker Icon')
+  })
+}
+
+function addAltTextButton(editor) {
+  editor.ui.registry.addButton(EDIT_ALT_TEXT_BUTTON_ID, {
+    onAction: () => {
+      // show the Image Options tray
+      trayController.showTrayForEditor(editor, true)
+    },
+    text: formatMessage('Icon Options'),
+    tooltip: formatMessage('Edit alt text for this icon instance')
   })
 }
 
 function addContextToolbar(editor) {
   editor.ui.registry.addContextToolbar(TOOLBAR_ID, {
-    items: BUTTON_ID,
+    items: `${BUTTON_ID} ${EDIT_ALT_TEXT_BUTTON_ID}`,
     position: 'node',
     scope: 'node',
     predicate: shouldShowEditButton

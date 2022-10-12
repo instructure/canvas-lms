@@ -26,8 +26,8 @@ const props = {
     state: 'problem',
     reporUrl: 'http://example.com',
     status: 'scored',
-    data: '{}'
-  }
+    data: '{}',
+  },
 }
 
 describe('OriginalityReport', () => {

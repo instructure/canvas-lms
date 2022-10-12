@@ -35,7 +35,7 @@ QUnit.module('AnonymousSpeedGraderAlert', suiteHooks => {
 
     props = {
       onClose() {},
-      speedGraderUrl: 'http://test.url:3000'
+      speedGraderUrl: 'http://test.url:3000',
     }
   })
 

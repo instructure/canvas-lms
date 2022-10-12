@@ -32,7 +32,7 @@ export default class CustomColumnHeader extends ColumnHeader<Props, {}> {
           className="Gradebook__ColumnHeaderDetail Gradebook__ColumnHeaderDetail--OneLine"
           style={{textAlign: 'center', width: '100%'}}
         >
-          <Text tag="span" size="x-small">
+          <Text as="span" size="x-small">
             {this.props.title}
           </Text>
         </span>

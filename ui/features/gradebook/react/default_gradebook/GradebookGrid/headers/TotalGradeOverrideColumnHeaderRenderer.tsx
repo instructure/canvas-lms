@@ -18,28 +18,30 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
 import TotalGradeOverrideColumnHeader from './TotalGradeOverrideColumnHeader'
 
 function getProps(options) {
   return {
-    ref: options.ref
+    ref: options.ref,
   }
 }
 
 export default class TotalGradeOverrideColumnHeaderRenderer {
-  gradebook: any
+  gradebook: Gradebook
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
   }
 
-  render(_column, $container, _gridSupport, options) {
+  render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const props = getProps(options)
     ReactDOM.render(<TotalGradeOverrideColumnHeader {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

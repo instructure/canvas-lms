@@ -30,8 +30,8 @@ export default {
     leftArrowDescription: 'Previous',
     onLeftArrowClick() {},
     onRightArrowClick() {},
-    rightArrowDescription: 'Next'
-  }
+    rightArrowDescription: 'Next',
+  },
 }
 
 const Template = args => <Carousel {...args} />

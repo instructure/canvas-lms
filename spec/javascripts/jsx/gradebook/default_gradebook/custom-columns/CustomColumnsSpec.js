@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook > Custom Columns', suiteHooks => {
@@ -44,7 +44,7 @@ QUnit.module('Gradebook > Custom Columns', suiteHooks => {
       customColumns = [
         {id: '2401', teacher_notes: true, hidden: true, title: 'Notes'},
         {id: '2402', teacher_notes: false, hidden: false, title: 'Other Notes'},
-        {id: '2403', teacher_notes: false, hidden: false, title: 'Next Steps'}
+        {id: '2403', teacher_notes: false, hidden: false, title: 'Next Steps'},
       ]
     })
 

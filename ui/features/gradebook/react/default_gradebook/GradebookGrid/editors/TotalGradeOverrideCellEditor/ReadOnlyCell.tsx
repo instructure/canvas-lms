@@ -26,11 +26,11 @@ export default class ReadOnlyCell extends CellEditorComponent {
   static propTypes = {
     gradeEntry: gradeEntry.isRequired,
     gradeInfo: gradeInfo.isRequired,
-    pendingGradeInfo: gradeInfo
+    pendingGradeInfo: gradeInfo,
   }
 
   static defaultProps = {
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   render() {

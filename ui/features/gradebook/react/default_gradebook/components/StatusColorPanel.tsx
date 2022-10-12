@@ -85,7 +85,7 @@ StatusColorPanel.propTypes = {
     missing: string.isRequired,
     resubmitted: string.isRequired,
     dropped: string.isRequired,
-    excused: string.isRequired
+    excused: string.isRequired,
   }).isRequired,
-  onColorsUpdated: func.isRequired
+  onColorsUpdated: func.isRequired,
 }

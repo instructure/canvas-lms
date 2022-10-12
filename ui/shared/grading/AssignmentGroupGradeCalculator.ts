@@ -24,9 +24,9 @@ function partition(collection, partitionFn) {
   return [grouped.true || [], grouped.false || []]
 }
 
-function parseScore(score) {
+function parseScore(score: string) {
   const result = parseFloat(score)
-  return result && isFinite(result) ? result : 0
+  return result && Number.isFinite(result) ? result : 0
 }
 
 function sortPairsDescending([scoreA, submissionA], [scoreB, submissionB]) {
@@ -56,11 +56,15 @@ function sortSubmissionsAscending(submissionA, submissionB) {
   return submissionA.submission.assignment_id - submissionB.submission.assignment_id
 }
 
-function getSubmissionGrade({score, total}) {
+function getSubmissionGrade({score, total}: {score: number; total: number}) {
   return score / total
 }
 
-function estimateQHigh(pointed, unpointed, grades) {
+function estimateQHigh(
+  pointed: {total: number; score: number}[],
+  unpointed: {score: number}[],
+  grades
+) {
   if (unpointed.length > 0) {
     const pointsPossible = sumBy(pointed, 'total')
     const bestPointedScore = Math.max(pointsPossible, sumBy(pointed, 'score'))
@@ -71,7 +75,7 @@ function estimateQHigh(pointed, unpointed, grades) {
   return grades[grades.length - 1]
 }
 
-function buildBigF(keepCount, cannotDrop, sortFn) {
+function buildBigF(keepCount: number, cannotDrop, sortFn) {
   return function bigF(q, submissions) {
     const ratedScores = _.map(submissions, submission => [
       submission.score - q * submission.total,
@@ -139,10 +143,7 @@ function dropPointed(droppableSubmissionData, cannotDrop, keepHighest, keepLowes
 
 function dropUnpointed(submissions, keepHighest, keepLowest) {
   const sortedSubmissions = submissions.sort(sortSubmissionsAscending)
-  return _.chain(sortedSubmissions)
-    .last(keepHighest)
-    .head(keepLowest)
-    .value()
+  return _.chain(sortedSubmissions).last(keepHighest).head(keepLowest).value()
 }
 
 // I am not going to pretend that this code is understandable.
@@ -155,7 +156,14 @@ function dropUnpointed(submissions, keepHighest, keepLowest) {
 // Grades" by Daniel Kane and Jonathan Kane. Please see that paper for
 // a full explanation of the math.
 // (http://cseweb.ucsd.edu/~dakane/droplowest.pdf)
-function dropAssignments(allSubmissionData, rules = {}) {
+function dropAssignments(
+  allSubmissionData,
+  rules: {
+    drop_lowest?: number
+    drop_highest?: number
+    never_drop?: string[]
+  } = {}
+) {
   let dropLowest = rules.drop_lowest || 0
   let dropHighest = rules.drop_highest || 0
   const neverDropIds = rules.never_drop || []
@@ -237,12 +245,7 @@ function calculateGroupGrade(group, allSubmissions, opts) {
   }
 
   const submissionsToKeep = dropAssignments(relevantSubmissionData, group.rules)
-  const score = sum(
-    _.chain(submissionsToKeep)
-      .map('score')
-      .map(parseScore)
-      .value()
-  )
+  const score = sum(_.chain(submissionsToKeep).map('score').map(parseScore).value())
   const possible = sumBy(submissionsToKeep, 'total')
 
   return {

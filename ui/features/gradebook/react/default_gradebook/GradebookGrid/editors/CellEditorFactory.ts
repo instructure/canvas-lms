@@ -21,7 +21,7 @@ import TotalGradeOverrideCellEditor from './TotalGradeOverrideCellEditor/index'
 
 const editorsByColumnType = {
   assignment: AssignmentCellEditor,
-  total_grade_override: TotalGradeOverrideCellEditor
+  total_grade_override: TotalGradeOverrideCellEditor,
 }
 
 export default class CellEditorFactory {

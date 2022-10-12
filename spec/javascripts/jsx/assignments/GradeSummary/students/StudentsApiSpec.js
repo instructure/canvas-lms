@@ -19,7 +19,7 @@
 import * as StudentsApi from 'ui/features/assignment_grade_summary/react/students/StudentsApi.js'
 import FakeServer, {
   paramsFromRequest,
-  pathFromRequest
+  pathFromRequest,
 } from '@canvas/network/NaiveRequestDispatch/__tests__/FakeServer'
 
 QUnit.module('GradeSummary StudentsApi', suiteHooks => {
@@ -47,26 +47,26 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
           grade: 'A',
           provisional_grade_id: '4601',
           score: 10,
-          scorer_id: '1101'
+          scorer_id: '1101',
         },
         {
           grade: 'B',
           provisional_grade_id: '4602',
           score: 9,
-          scorer_id: '1102'
+          scorer_id: '1102',
         },
         {
           grade: 'C',
           provisional_grade_id: '4603',
           score: 8,
-          scorer_id: '1101'
+          scorer_id: '1101',
         },
         {
           grade: 'B-',
           provisional_grade_id: '4604',
           score: 8.9,
-          scorer_id: '1102'
-        }
+          scorer_id: '1102',
+        },
       ]
 
       studentsData = [
@@ -75,16 +75,16 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
           display_name: 'Betty Ford',
           id: '1112',
           provisional_grades: provisionalGradesData.slice(1, 3),
-          selected_provisional_grade_id: '4603'
+          selected_provisional_grade_id: '4603',
         },
         {display_name: 'Charlie Xi', id: '1113', provisional_grades: []},
-        {display_name: 'Dana Smith', id: '1114', provisional_grades: [provisionalGradesData[3]]}
+        {display_name: 'Dana Smith', id: '1114', provisional_grades: [provisionalGradesData[3]]},
       ]
 
       server.for(url).respond([
         {status: 200, body: [studentsData[0]]},
         {status: 200, body: [studentsData[1]]},
-        {status: 200, body: studentsData.slice(2)}
+        {status: 200, body: studentsData.slice(2)},
       ])
 
       loadedProvisionalGrades = []
@@ -106,7 +106,7 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
         onPageLoaded({provisionalGrades, students}) {
           loadedProvisionalGrades.push(provisionalGrades)
           loadedStudents.push(students)
-        }
+        },
       })
 
       await promise
@@ -286,7 +286,7 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       server.unsetResponses(url)
       server.for(url).respond([
         {status: 200, body: [studentsData[0]]},
-        {status: 500, body: {error: 'server error'}}
+        {status: 500, body: {error: 'server error'}},
       ])
 
       try {
@@ -300,7 +300,7 @@ QUnit.module('GradeSummary StudentsApi', suiteHooks => {
       server.unsetResponses(url)
       server.for(url).respond([
         {status: 200, body: [studentsData[0]]},
-        {status: 500, body: {error: 'server error'}}
+        {status: 500, body: {error: 'server error'}},
       ])
 
       try {

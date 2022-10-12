@@ -32,6 +32,7 @@ export default class TrayController {
     this._isOpen = false
     this._shouldOpen = false
     this._renderId = 0
+    this._isIconMaker = false
   }
 
   get $container() {
@@ -48,10 +49,12 @@ export default class TrayController {
     return this._isOpen
   }
 
-  showTrayForEditor(editor) {
+  // Tray may be called to edit an Icon Maker icon alt text
+  showTrayForEditor(editor, isIconMaker = false) {
     this._editor = editor
     this.$img = editor.selection.getNode()
     this._shouldOpen = true
+    this._isIconMaker = isIconMaker
 
     if (bridge.focusedEditor) {
       // Dismiss any content trays that may already be open
@@ -70,6 +73,13 @@ export default class TrayController {
   _applyImageOptions(imageOptions) {
     const editor = this._editor
     const {$img} = this
+
+    if (this._isIconMaker) {
+      this._applyIconAltTextChanges($img, editor, imageOptions)
+      this._dismissTray()
+      editor.focus()
+      return
+    }
 
     if (imageOptions.displayAs === 'embed') {
       // Workaround: When passing empty string to editor.dom.setAttribs it removes the attribute
@@ -97,6 +107,21 @@ export default class TrayController {
     }
     this._dismissTray()
     editor.focus()
+  }
+
+  _applyIconAltTextChanges($img, editor, imageOptions) {
+    // Workaround: When passing empty string to editor.dom.setAttribs it removes the attribute
+    $img.setAttribute('alt', imageOptions.altText)
+    editor.dom.setAttribs($img, {
+      role: imageOptions.isDecorativeImage ? 'presentation' : null
+    })
+
+    // tell tinymce so the context toolbar resets
+    editor.fire('ObjectResized', {
+      target: $img,
+      width: imageOptions.appliedWidth,
+      height: imageOptions.appliedHeight
+    })
   }
 
   _dismissTray() {
@@ -134,6 +159,7 @@ export default class TrayController {
         }}
         onRequestClose={() => this._dismissTray()}
         open={this._shouldOpen}
+        isIconMaker={this._isIconMaker}
       />
     )
     ReactDOM.render(element, this.$container)

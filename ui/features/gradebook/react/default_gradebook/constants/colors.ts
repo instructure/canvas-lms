@@ -37,7 +37,7 @@ export const defaultColors = {
   steel: '#E9EDF5', // (・3・)
   pink: '#F8EAF6',
   lavender: '#F0E8EF',
-  white: '#FFFFFF'
+  white: '#FFFFFF',
 }
 
 const defaultStatusColors = {
@@ -46,13 +46,13 @@ const defaultStatusColors = {
   extended: defaultColors.lavender,
   late: defaultColors.blue,
   missing: defaultColors.salmon,
-  resubmitted: defaultColors.green
+  resubmitted: defaultColors.green,
 }
 
 export function statusColors(userColors = {}) {
   return {
     ...defaultStatusColors,
-    ...userColors
+    ...userColors,
   }
 }
 

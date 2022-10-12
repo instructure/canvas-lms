@@ -16,7 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+import type PerformanceControls from '../PerformanceControls'
+
 export default class CustomColumnsLoader {
+  _gradebook: Gradebook
+
+  _dispatch: RequestDispatch
+
+  _performanceControls: PerformanceControls
+
   constructor({dispatch, gradebook, performanceControls}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
@@ -29,7 +39,7 @@ export default class CustomColumnsLoader {
 
     const params = {
       include_hidden: true,
-      per_page: this._performanceControls.customColumnsPerPage
+      per_page: this._performanceControls.customColumnsPerPage,
     }
 
     return this._dispatch.getDepaginated(url, params).then(customColumns => {

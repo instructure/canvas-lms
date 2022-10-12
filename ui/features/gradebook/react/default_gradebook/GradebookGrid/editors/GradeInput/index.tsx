@@ -31,18 +31,18 @@ const I18n = useI18nScope('gradebook')
 
 const CLASSNAME_FOR_ENTER_GRADES_AS = {
   gradingScheme: 'Grid__GradeCell__GradingSchemeInput',
-  percent: 'Grid__GradeCell__PercentInput'
+  percent: 'Grid__GradeCell__PercentInput',
 }
 
 const themeOverrides = {
   [Button.theme]: {
     iconPadding: '0 3px',
-    smallHeight: '23px'
+    smallHeight: '23px',
   },
 
   [TextInput.theme]: {
-    smallHeight: '27px'
-  }
+    smallHeight: '27px',
+  },
 }
 
 export default class GradeInput extends PureComponent {
@@ -50,12 +50,12 @@ export default class GradeInput extends PureComponent {
     disabled: bool,
     gradeEntry: gradeEntry.isRequired,
     gradeInfo: gradeInfo.isRequired,
-    pendingGradeInfo: gradeInfo
+    pendingGradeInfo: gradeInfo,
   }
 
   static defaultProps = {
     disabled: false,
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {

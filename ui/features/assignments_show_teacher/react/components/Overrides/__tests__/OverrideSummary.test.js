@@ -37,7 +37,7 @@ describe('OverrideSummary', () => {
       unlockAt,
       lockAt,
       submissionTypes: ['online_upload', 'online_url'],
-      allowedAttempts: 1
+      allowedAttempts: 1,
     })
     const {getAllByText, getByTestId} = render(<OverrideSummary override={override} />)
     expect(getByTestId('OverrideAssignTo')).toBeInTheDocument()
@@ -64,7 +64,7 @@ describe('OverrideSummary', () => {
       unlockAt,
       lockAt,
       submissionTypes: ['online_upload', 'online_url'],
-      allowedAttempts: 1
+      allowedAttempts: 1,
     })
     const {getByText} = render(<OverrideSummary override={override} />)
 
@@ -81,7 +81,7 @@ describe('OverrideSummary', () => {
       unlockAt,
       lockAt,
       submissionTypes: ['online_upload', 'online_url'],
-      allowedAttempts: 1
+      allowedAttempts: 1,
     })
     const {getAllByText} = render(<OverrideSummary override={override} />)
 
@@ -99,7 +99,7 @@ describe('OverrideSummary', () => {
       unlockAt,
       lockAt,
       submissionTypes: ['online_upload', 'online_url'],
-      allowedAttempts: 1
+      allowedAttempts: 1,
     })
     const {getAllByText} = render(<OverrideSummary override={override} />)
 

@@ -27,7 +27,7 @@ export const DEFAULT_LATE_POLICY_DATA = Object.freeze({
   lateSubmissionMinimumPercent: 0,
   missingSubmissionDeductionEnabled: false,
   missingSubmissionDeduction: 0,
-  newRecord: true
+  newRecord: true,
 })
 
 function camelizeLatePolicyResponseData(latePolicyResponseData) {

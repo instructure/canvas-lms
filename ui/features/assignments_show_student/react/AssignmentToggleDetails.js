@@ -34,7 +34,7 @@ function AssignmentDetailsText(description) {
 }
 
 AssignmentToggleDetails.propTypes = {
-  description: string
+  description: string,
 }
 
 export default function AssignmentToggleDetails(props) {

@@ -20,9 +20,7 @@ import React, {useState, useEffect} from 'react'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Flex} from '@instructure/ui-flex'
-import {IconMiniArrowEndSolid, IconMiniArrowDownSolid} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
-import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
 
 import doFetchApi from '@canvas/do-fetch-api-effect'
@@ -30,9 +28,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 
 import {addAccountsToTree} from '../utils'
-import {AccountCalendarItem} from './AccountCalendarItem'
-import {CollectionChild, Collection, AccountData, VisibilityChange} from '../types'
-import {treeBrowserTheme} from '../theme'
+import {AccountCalendarItemToggleGroup} from './AccountCalendarItemToggleGroup'
+import {Account, Collection, AccountData, VisibilityChange} from '../types'
 
 const I18n = useI18nScope('account_calendar_settings_account_tree')
 
@@ -42,45 +39,16 @@ type ComponentProps = {
   readonly onAccountToggled: (id: number, visible: boolean) => void
 }
 
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Node: TreeBrowserNode} = TreeBrowser as any
-
 export const AccountTree: React.FC<ComponentProps> = ({
   originAccountId,
   visibilityChanges,
   onAccountToggled
 }) => {
-  const [expandedCollectionIds, setExpandedCollectionIds] = useState<number[]>([])
   const [collections, setCollections] = useState<Collection>({})
   const [loadingCollectionIds, setLoadingCollectionIds] = useState<number[]>([originAccountId])
 
-  const renderItems = (items: CollectionChild[]) => (
-    <>
-      {items.map(item => (
-        <TreeBrowserNode variant="indent" key={`tree_item_${item.id}`}>
-          <AccountCalendarItem
-            item={item}
-            visibilityChanges={visibilityChanges}
-            onAccountToggled={onAccountToggled}
-            padding="xx-small"
-          />
-        </TreeBrowserNode>
-      ))}
-    </>
-  )
-
-  const renderLoadingItem = () => (
-    <TreeBrowserNode variant="indent">
-      <Spinner renderTitle={I18n.t('Loading sub-accounts')} size="x-small" />
-    </TreeBrowserNode>
-  )
-
   const receivedAccountData = accounts => {
-    setCollections(addAccountsToTree(accounts, collections, originAccountId))
-    // expand the root by default
-    if (expandedCollectionIds.length === 0) {
-      setExpandedCollectionIds([originAccountId])
-    }
+    setCollections(addAccountsToTree(accounts, collections))
   }
 
   const fetchAccountData = (
@@ -113,18 +81,17 @@ export const AccountTree: React.FC<ComponentProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleCollectionToggle = (collection: {id: number; expanded: boolean}) => {
-    if (collection.expanded && collections[collection.id].children.length === 1) {
-      fetchAccountData(collection.id)
+  const handleToggle = (account: Account, expanded) => {
+    if (
+      expanded &&
+      collections[account.id].sub_account_count > 0 &&
+      account.id !== originAccountId
+    ) {
+      fetchAccountData(account.id)
     }
-    setExpandedCollectionIds(
-      collection.expanded
-        ? [...expandedCollectionIds, collection.id]
-        : expandedCollectionIds.filter(nodeId => nodeId !== collection.id)
-    )
   }
 
-  if (loadingCollectionIds.includes(originAccountId)) {
+  if (!collections[originAccountId]) {
     return (
       <Flex as="div" alignItems="center" justifyItems="center" padding="x-large">
         <Spinner renderTitle={I18n.t('Loading accounts')} />
@@ -132,32 +99,18 @@ export const AccountTree: React.FC<ComponentProps> = ({
     )
   }
 
-  const renderedCollections = {...collections}
-  for (const id in renderedCollections) {
-    renderedCollections[id].renderBeforeItems = loadingCollectionIds.includes(parseInt(id, 10))
-      ? renderLoadingItem()
-      : renderItems(renderedCollections[id].children)
-  }
-
   return (
     <View as="div" padding="small">
-      <ApplyTheme theme={treeBrowserTheme}>
-        <div id="account-tree">
-          <TreeBrowser
-            variant="indent"
-            selectionType="none"
-            treeLabel={I18n.t(
-              'Accounts tree: navigate the accounts tree hierarchically to toggle account calendar visibility'
-            )}
-            showRootCollection={true}
-            collections={renderedCollections}
-            items={{}}
-            rootId={originAccountId}
-            expanded={expandedCollectionIds}
-            onCollectionToggle={handleCollectionToggle}
-            collectionIcon={IconMiniArrowEndSolid}
-            collectionIconExpanded={IconMiniArrowDownSolid}
-            itemIcon={null}
+      <ApplyTheme>
+        <div id="account-tree" data-testid="account-tree">
+          <AccountCalendarItemToggleGroup
+            parentId={null}
+            accountGroup={[originAccountId]}
+            defaultExpanded={true}
+            collections={collections}
+            handleToggle={handleToggle}
+            visibilityChanges={visibilityChanges}
+            onAccountToggled={onAccountToggled}
           />
         </div>
       </ApplyTheme>

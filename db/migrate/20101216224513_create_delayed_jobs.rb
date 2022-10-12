@@ -43,7 +43,7 @@ class CreateDelayedJobs < ActiveRecord::Migration[4.2]
       # Who is working on this object (if locked)
       table.string   :locked_by, limit: 255
 
-      table.timestamps null: true
+      table.timestamps
 
       table.string   :tag, limit: 255
       table.integer  :max_attempts

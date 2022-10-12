@@ -31,7 +31,7 @@ const I18n = useI18nScope('assignments_2')
 
 TeacherQuery.propTypes = {
   assignmentLid: string,
-  messageAttachmentUploadFolderId: string
+  messageAttachmentUploadFolderId: string,
 }
 
 export default function TeacherQuery({assignmentLid, messageAttachmentUploadFolderId}) {

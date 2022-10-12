@@ -33,16 +33,16 @@ class PostGradesApp extends React.Component {
     labelText: string.isRequired,
     store: shape({
       addChangeListener: func.isRequired,
-      removeChangeListener: func.isRequired
+      removeChangeListener: func.isRequired,
     }).isRequired,
     renderAsButton: bool,
     returnFocusTo: shape({
-      focus: func.isRequired
-    }).isRequired
+      focus: func.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
-    renderAsButton: false
+    renderAsButton: false,
   }
 
   static AppLaunch(store, returnFocusTo) {
@@ -62,7 +62,7 @@ class PostGradesApp extends React.Component {
         if (returnFocusTo) {
           returnFocusTo.focus()
         }
-      }
+      },
     })
 
     function closeDialog(e) {
@@ -91,7 +91,7 @@ class PostGradesApp extends React.Component {
 
   render() {
     const navClass = classnames({
-      'ui-button': this.props.renderAsButton
+      'ui-button': this.props.renderAsButton,
     })
     if (this.props.renderAsButton) {
       return (

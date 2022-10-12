@@ -35,7 +35,7 @@ function mountComponent(customProps) {
     text: 'Missing',
     updateSubmission() {},
     value: 'missing',
-    ...customProps
+    ...customProps,
   }
   return mount(<SubmissionTrayRadioInput {...props} />)
 }

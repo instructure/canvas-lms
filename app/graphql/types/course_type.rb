@@ -137,9 +137,9 @@ module Types
       course.resolved_outcome_calculation_method
     end
 
-    field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: false
+    field :outcome_alignment_stats, CourseOutcomeAlignmentStatsType, null: true
     def outcome_alignment_stats
-      Loaders::CourseOutcomeAlignmentStatsLoader.load(course)
+      Loaders::CourseOutcomeAlignmentStatsLoader.load(course) if course&.grants_right?(current_user, session, :manage_outcomes)
     end
 
     field :sections_connection, SectionType.connection_type, null: true
@@ -280,7 +280,7 @@ module Types
       argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
     end
     def external_tools_connection(filter:)
-      scope = ContextExternalTool.all_tools_for(course, { placements: filter.placement })
+      scope = Lti::ContextToolFinder.all_tools_for(course, { placements: filter.placement })
       filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
     end
 

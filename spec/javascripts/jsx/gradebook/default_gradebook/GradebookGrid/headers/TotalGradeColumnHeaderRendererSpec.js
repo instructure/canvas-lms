@@ -19,7 +19,7 @@
 import ReactDOM from 'react-dom'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 import TotalGradeColumnHeaderRenderer from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/headers/TotalGradeColumnHeaderRenderer'
 
@@ -37,7 +37,7 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
     renderer.render(column, $container, gridSupport, {
       ref(ref) {
         component = ref
-      }
+      },
     })
   }
 
@@ -50,15 +50,15 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
     sinon.stub(gradebook, 'saveSettings')
     columns = {
       frozen: [{id: 'student'}],
-      scrollable: [{id: 'assignment_2301'}, {id: 'total_grade'}]
+      scrollable: [{id: 'assignment_2301'}, {id: 'total_grade'}],
     }
 
     gridSupport = {
       columns: {
         getColumns() {
           return columns
-        }
-      }
+        },
+      },
     }
 
     column = {id: 'total_grade'}
@@ -342,15 +342,15 @@ QUnit.module('GradebookGrid TotalGradeColumnHeaderRenderer', suiteHooks => {
       sinon.stub(gradebook, 'saveSettings')
       columns = {
         frozen: [{id: 'student'}],
-        scrollable: []
+        scrollable: [],
       }
 
       gridSupport = {
         columns: {
           getColumns() {
             return columns
-          }
-        }
+          },
+        },
       }
 
       column = {id: 'total_grade'}

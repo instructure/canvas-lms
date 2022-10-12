@@ -34,7 +34,7 @@ describe('ExternalToolSubmission', () => {
     ENV = {
       ASSIGNMENT_ID: '200',
       DEEP_LINKING_POST_MESSAGE_ORIGIN: windowOrigin,
-      COURSE_ID: '100'
+      COURSE_ID: '100',
     }
 
     tool = {name: 'some external tool', _id: '1'}
@@ -131,7 +131,7 @@ describe('ExternalToolSubmission', () => {
     function postMessage(subject, contents) {
       const data = {
         subject,
-        ...contents
+        ...contents,
       }
       fireEvent(window, new MessageEvent('message', {origin: windowOrigin, data}))
     }
@@ -150,7 +150,7 @@ describe('ExternalToolSubmission', () => {
       const {getByTestId} = renderComponent(SubmissionMocks.basicLtiLaunchSubmitted)
 
       postMessage('A2ExternalContentReady', {
-        content_items: [{'@type': 'FileItem', url: '/another-url'}]
+        content_items: [{'@type': 'FileItem', url: '/another-url'}],
       })
       const iframe = getByTestId('lti-launch-frame')
       expect(iframe.src).toContain('%2Fsubmitted-lti-launch')
@@ -161,7 +161,7 @@ describe('ExternalToolSubmission', () => {
         renderComponent(SubmissionMocks.basicLtiLaunchReadyToSubmit)
 
         postMessage('A2ExternalContentAbsolutelyNotReady', {
-          content_items: [{'@type': 'FileItem', url: '/another-lti-launch'}]
+          content_items: [{'@type': 'FileItem', url: '/another-lti-launch'}],
         })
         expect(onFileUploadRequested).not.toHaveBeenCalled()
       })
@@ -170,7 +170,7 @@ describe('ExternalToolSubmission', () => {
         window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN = 'http://evil-site-origin'
 
         postMessage('A2ExternalContentReady', {
-          content_items: [{'@type': 'FileItem', url: '/another-lti-launch'}]
+          content_items: [{'@type': 'FileItem', url: '/another-lti-launch'}],
         })
         expect(onFileUploadRequested).not.toHaveBeenCalled()
       })
@@ -214,8 +214,8 @@ describe('ExternalToolSubmission', () => {
             externalToolId: tool._id,
             id: submission.id,
             ltiLaunchUrl: contentItem.url,
-            resourceLinkLookupUuid: contentItem.lookup_uuid
-          }
+            resourceLinkLookupUuid: contentItem.lookup_uuid,
+          },
         })
         expect(onFileUploadRequested).not.toHaveBeenCalled()
 
@@ -227,7 +227,7 @@ describe('ExternalToolSubmission', () => {
           '@type': 'FileItem',
           name: 'some file',
           url: '/some-file',
-          mediaType: ''
+          mediaType: '',
         })
       })
 
@@ -236,7 +236,7 @@ describe('ExternalToolSubmission', () => {
           name: 'some file',
           type: 'file',
           url: '/some-file',
-          mediaType: ''
+          mediaType: '',
         })
       })
 
@@ -245,7 +245,7 @@ describe('ExternalToolSubmission', () => {
           '@type': 'LtiLinkItem',
           lookup_uuid: 'some-uuid',
           name: 'some link',
-          url: '/some-url'
+          url: '/some-url',
         })
       })
 
@@ -254,7 +254,7 @@ describe('ExternalToolSubmission', () => {
           name: 'some link',
           lookup_uuid: 'some-uuid',
           type: 'ltiLink',
-          url: '/some-url'
+          url: '/some-url',
         })
       })
     })

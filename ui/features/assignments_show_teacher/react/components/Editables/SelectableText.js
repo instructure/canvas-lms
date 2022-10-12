@@ -36,7 +36,7 @@ import {createChainedFunction} from '@instructure/ui-utils'
 const optShape = shape({
   label: string.isRequired,
   value: string.isRequired,
-  icon: oneOfType([element, func])
+  icon: oneOfType([element, func]),
 })
 
 export default class SelectableText extends React.Component {
@@ -54,13 +54,13 @@ export default class SelectableText extends React.Component {
     multiple: bool,
     size: oneOf(['small', 'medium']),
     options: arrayOf(optShape).isRequired,
-    loadingText: string
+    loadingText: string,
   }
 
   static defaultProps = {
     readOnly: false,
     size: 'medium',
-    multiple: false
+    multiple: false,
   }
 
   constructor(props) {
@@ -68,7 +68,7 @@ export default class SelectableText extends React.Component {
 
     this.state = {
       value: props.value,
-      initialValue: props.value
+      initialValue: props.value,
     }
 
     this._selectInputRef = null

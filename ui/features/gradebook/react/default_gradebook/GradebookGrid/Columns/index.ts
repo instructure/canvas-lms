@@ -16,7 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-function minimize(column) {
+import type {GridColumn} from '../../grid.d'
+import type GradebookGrid from '../index'
+
+function minimize(column: GridColumn) {
   if (!column.cssClass.includes('minimized')) {
     column.cssClass += ' minimized'
   }
@@ -31,7 +34,7 @@ function minimize(column) {
   }
 }
 
-function unminimize(column) {
+function unminimize(column: GridColumn) {
   column.cssClass = column.cssClass.replace(/\s*\bminimized\b/, '')
   column.headerCssClass = column.headerCssClass.replace(/\s*\bminimized\b/, '')
 
@@ -42,12 +45,18 @@ function unminimize(column) {
 }
 
 export default class Columns {
-  constructor(gradebookGrid) {
+  gradebookGrid: GradebookGrid
+
+  constructor(gradebookGrid: GradebookGrid) {
     this.gradebookGrid = gradebookGrid
   }
 
   initialize() {
     const {events, grid, gridData, gridSupport} = this.gradebookGrid
+
+    if (!gridSupport) {
+      throw new Error('gridSupport not initialized')
+    }
 
     grid.onColumnsReordered.subscribe((sourceEvent, _object) => {
       const event = sourceEvent.originalEvent || sourceEvent
@@ -79,7 +88,7 @@ export default class Columns {
     })
   }
 
-  getIndexOfColumn(columnId) {
+  getIndexOfColumn(columnId: string) {
     const {frozen, scrollable} = this.gradebookGrid.gridData.columns
     return [...frozen, ...scrollable].indexOf(columnId)
   }

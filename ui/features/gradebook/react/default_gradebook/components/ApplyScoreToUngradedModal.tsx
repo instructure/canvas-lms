@@ -79,7 +79,7 @@ const ApplyScoreToUngradedModal: React.FC<Props> = ({assignmentGroup, onApply, o
       assignmentGroupId: assignmentGroup?.id,
       markAsMissing,
       onlyPastDue: artifactScope === APPLY_TO_PAST_DUE,
-      value: percent.toUpperCase() === 'EX' ? ('excused' as const) : parsedValue
+      value: percent.toUpperCase() === 'EX' ? ('excused' as const) : parsedValue,
     }
 
     onApply(args)
@@ -156,9 +156,9 @@ export default ApplyScoreToUngradedModal
 ApplyScoreToUngradedModal.propTypes = {
   assignmentGroup: shape({
     id: string.isRequired,
-    name: string.isRequired
+    name: string.isRequired,
   }),
   onApply: func.isRequired,
   onClose: func.isRequired,
-  open: bool.isRequired
+  open: bool.isRequired,
 }

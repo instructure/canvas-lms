@@ -36,8 +36,8 @@ const mocks = [
     request: {
       query: COURSE_ASSIGNMENT_GROUPS_QUERY,
       variables: {
-        courseId: '55'
-      }
+        courseId: '55',
+      },
     },
     result: {
       data: {
@@ -50,34 +50,34 @@ const mocks = [
             pageInfo: {
               endCursor: 'AA==',
               hasNextPage: true,
-              __typename: 'PageInfo'
+              __typename: 'PageInfo',
             },
             nodes: [
               {
                 lid: '71',
                 gid: 'QXNzaWdubWVudEdyb3VwLTcx',
                 name: 'Assignments',
-                __typename: 'AssignmentGroup'
+                __typename: 'AssignmentGroup',
               },
               {
                 lid: '76',
                 gid: 'QXNzaWdubWVudEdyb3VwLTc2',
                 name: 'Group B',
-                __typename: 'AssignmentGroup'
-              }
-            ]
-          }
-        }
-      }
-    }
+                __typename: 'AssignmentGroup',
+              },
+            ],
+          },
+        },
+      },
+    },
   },
   {
     request: {
       query: COURSE_ASSIGNMENT_GROUPS_QUERY,
       variables: {
         courseId: '55',
-        cursor: 'AA=='
-      }
+        cursor: 'AA==',
+      },
     },
     result: {
       data: {
@@ -90,27 +90,27 @@ const mocks = [
             pageInfo: {
               endCursor: 'NA==',
               hasNextPage: false,
-              __typename: 'PageInfo'
+              __typename: 'PageInfo',
             },
             nodes: [
               {
                 lid: '80',
                 gid: 'QXNzaWdubWVudEdyb3VwLTgw',
                 name: 'Group C',
-                __typename: 'AssignmentGroup'
+                __typename: 'AssignmentGroup',
               },
               {
                 lid: '79',
                 gid: 'QXNzaWdubWVudEdyb3VwLTc5',
                 name: 'Group A',
-                __typename: 'AssignmentGroup'
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
+                __typename: 'AssignmentGroup',
+              },
+            ],
+          },
+        },
+      },
+    },
+  },
 ]
 
 describe('AssignmentGroup', () => {

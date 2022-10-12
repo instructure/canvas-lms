@@ -36,7 +36,7 @@ import {
   IconArrowOpenStartLine,
   IconEmailLine,
   IconSpeedGraderLine,
-  IconUploadLine
+  IconUploadLine,
 } from '@instructure/ui-icons'
 import MessageStudents from '@canvas/message-students-modal'
 
@@ -56,14 +56,14 @@ export default class StudentTray extends React.Component {
     trayOpen: bool.isRequired,
     onHideTray: func,
     onPreviousStudent: func,
-    onNextStudent: func
+    onNextStudent: func,
   }
 
   constructor(props) {
     super(props)
     this.state = {
       messageFormOpen: false,
-      allowedAttempts: this.props.assignment.allowedAttempts
+      allowedAttempts: this.props.assignment.allowedAttempts,
     }
   }
 
@@ -127,7 +127,7 @@ export default class StudentTray extends React.Component {
   handleMessageButtonClick = e => {
     e.preventDefault()
     this.setState({
-      messageFormOpen: true
+      messageFormOpen: true,
     })
   }
 
@@ -135,7 +135,7 @@ export default class StudentTray extends React.Component {
     e.preventDefault()
     this.setState(
       {
-        messageFormOpen: false
+        messageFormOpen: false,
       },
       () => {
         this.messageStudentsButton.focus()
@@ -168,7 +168,7 @@ export default class StudentTray extends React.Component {
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1',
-              iconPlusTextMargin: '.5rem'
+              iconPlusTextMargin: '.5rem',
             }}
           >
             {I18n.t('Message Student')}
@@ -183,7 +183,7 @@ export default class StudentTray extends React.Component {
               iconSize: '1.25rem',
               mediumPaddingHorizontal: '0',
               mediumHeight: '1.5rem',
-              iconPlusTextMargin: '.5rem'
+              iconPlusTextMargin: '.5rem',
             }}
           >
             {I18n.t('Submit for Student')}
@@ -230,7 +230,7 @@ export default class StudentTray extends React.Component {
     const validScore = submission.score || submission.score === 0
     const displayString = I18n.t('Score {{student_points}}/{{possible_points}}', {
       student_points: validScore ? submission.score : '\u2013',
-      possible_points: this.props.assignment.pointsPossible
+      possible_points: this.props.assignment.pointsPossible,
     })
 
     return (
@@ -318,8 +318,8 @@ export default class StudentTray extends React.Component {
             recipients={[
               {
                 id: this.props.student.lid,
-                displayName: this.props.student.shortName
-              }
+                displayName: this.props.student.shortName,
+              },
             ]}
             title={I18n.t('Send a message')}
           />

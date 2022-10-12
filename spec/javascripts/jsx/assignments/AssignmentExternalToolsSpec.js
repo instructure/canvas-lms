@@ -36,16 +36,16 @@ QUnit.module('AssignmentExternalTools', hooks => {
           assignment_edit: {
             message_type: 'basic-lti-launch-request',
             url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
-            title: 'assignment_edit Text'
+            title: 'assignment_edit Text',
           },
           assignment_view: {
             message_type: 'basic-lti-launch-request',
             url: 'https://lti-tool-provider-example.herokuapp.com/messages/blti',
             title: 'assignment_view Text',
             launch_width: 600,
-            launch_height: 500
-          }
-        }
+            launch_height: 500,
+          },
+        },
       },
       {
         definition_type: 'ContextExternalTool',
@@ -57,15 +57,15 @@ QUnit.module('AssignmentExternalTools', hooks => {
           assignment_edit: {
             message_type: 'basic-lti-launch-request',
             url: 'http://my-lti.docker/course-navigation',
-            title: 'My LTI'
+            title: 'My LTI',
           },
           assignment_view: {
             message_type: 'basic-lti-launch-request',
             url: 'http://my-lti.docker/assignment-view',
-            title: 'My LTI'
-          }
-        }
-      }
+            title: 'My LTI',
+          },
+        },
+      },
     ]
     sandbox.stub($, 'ajax').returns({status: 200, data: toolDefinitions})
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = ['midi', 'media']

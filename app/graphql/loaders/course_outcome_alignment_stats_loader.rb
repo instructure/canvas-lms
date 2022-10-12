@@ -59,7 +59,16 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
                                   (#{outcome_alignments_to_artifacts_sub.to_sql}) AS sub4
                                 ")
 
-      fulfill(course, alignment_summary_stats[0])
+      indirect_alignments = AssessmentQuestionBank.preload(:assessment_questions).where(id: all_outcome_alignments.where(content_type: "AssessmentQuestionBank").pluck(:content_id))
+      indirect_alignments_count = indirect_alignments.reduce(0) { |acc, bank| acc + bank.assessment_questions.active.count }
+      @artifacts_with_alignments_ids = Set.new(outcome_alignments_to_artifacts.pluck(:content_id))
+      indirect_artifact_alignments_count = indirect_alignments.reduce(0) { |acc, bank| acc + get_indirect_artifact_alignments(bank) }
+
+      alignment_summary_stats = alignment_summary_stats[0]
+      alignment_summary_stats[:total_alignments] += indirect_alignments_count
+      alignment_summary_stats[:aligned_artifacts] = @artifacts_with_alignments_ids.length
+      alignment_summary_stats[:artifact_alignments] += indirect_artifact_alignments_count
+      fulfill(course, alignment_summary_stats)
     end
   end
 
@@ -67,5 +76,13 @@ class Loaders::CourseOutcomeAlignmentStatsLoader < GraphQL::Batch::Loader
 
   def course_valid?(course)
     !Course.find(course.id).nil? if course&.id
+  end
+
+  def get_indirect_artifact_alignments(bank)
+    bank.assessment_questions.preload(:quiz_questions).reduce(0) do |acc, q|
+      artifact_ids = Quizzes::Quiz.where(id: q.quiz_questions.active.pluck(:quiz_id)).pluck(:assignment_id)
+      @artifacts_with_alignments_ids.merge(artifact_ids)
+      acc + q.quiz_questions.active.count
+    end
   end
 end

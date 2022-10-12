@@ -20,6 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {getProps} from './StudentColumnHeaderRenderer.utils'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
 export default class StudentColumnHeaderRenderer {
   gradebook: Gradebook
@@ -28,19 +29,19 @@ export default class StudentColumnHeaderRenderer {
 
   columnName: string
 
-  constructor(gradebook, element, columnName) {
+  constructor(gradebook: Gradebook, element, columnName: string) {
     this.gradebook = gradebook
     this.element = element
     this.columnName = columnName
   }
 
-  render(_column, $container, _gridSupport, options) {
+  render(_column, $container: HTMLElement, _gridSupport: GridSupport, options) {
     const Element = this.element
     const props = getProps(this.gradebook, options, this.columnName)
     ReactDOM.render(<Element {...props} />, $container)
   }
 
-  destroy(_column, $container, _gridSupport) {
+  destroy(_column, $container: HTMLElement, _gridSupport: GridSupport) {
     ReactDOM.unmountComponentAtNode($container)
   }
 }

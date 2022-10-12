@@ -29,8 +29,8 @@ it('renders an OverrideSubmissionType summary', () => {
       'online_upload',
       'on_paper',
       'online_text_entry',
-      'online_url'
-    ]
+      'online_url',
+    ],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="summary" override={override} onChangeOverride={() => {}} />
@@ -51,7 +51,7 @@ it('renders an OverrideSubmissionType summary', () => {
 // eslint-disable-next-line jest/no-disabled-tests
 it.skip('renders details of a file submission type', () => {
   const override = mockOverride({
-    submissionTypes: ['online_upload']
+    submissionTypes: ['online_upload'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
@@ -65,7 +65,7 @@ it.skip('renders details of a file submission type', () => {
 it.skip('renders details of a restricted-type file submission type', () => {
   const override = mockOverride({
     submissionTypes: ['online_upload'],
-    allowedExtensions: ['doc', 'xls']
+    allowedExtensions: ['doc', 'xls'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
@@ -78,7 +78,7 @@ it.skip('renders details of a restricted-type file submission type', () => {
 
 it('renders details of an external tool submission type', () => {
   const override = mockOverride({
-    submissionTypes: ['external_tool']
+    submissionTypes: ['external_tool'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
@@ -89,7 +89,7 @@ it('renders details of an external tool submission type', () => {
 
 it('renders details of a text submission type', () => {
   const override = mockOverride({
-    submissionTypes: ['online_text_entry']
+    submissionTypes: ['online_text_entry'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
@@ -100,7 +100,7 @@ it('renders details of a text submission type', () => {
 
 it('renders details of a url submission type', () => {
   const override = mockOverride({
-    submissionTypes: ['online_url']
+    submissionTypes: ['online_url'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />
@@ -112,7 +112,7 @@ it('renders details of a url submission type', () => {
 // eslint-disable-next-line jest/no-disabled-tests
 it.skip('renders details of multiple submission types', () => {
   const override = mockOverride({
-    submissionTypes: ['online_text_entry', 'online_url', 'online_upload']
+    submissionTypes: ['online_text_entry', 'online_url', 'online_upload'],
   })
   const {getByText} = render(
     <OverrideSubmissionTypes variant="detail" override={override} onChangeOverride={() => {}} />

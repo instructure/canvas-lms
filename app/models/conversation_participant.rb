@@ -596,6 +596,7 @@ class ConversationParticipant < ActiveRecord::Base
       participant = user.all_conversations.where(conversation_id: conversation_id).first
       raise t("not_participating", "The user is not participating in this conversation") unless participant
 
+      InstStatsd::Statsd.increment("inbox.conversation.unarchived.legacy") if participant[:workflow_state] == "archived" && ["mark_as_read", "mark_as_unread"].include?(update_params[:event])
       participant.update_one(update_params)
     end
   end

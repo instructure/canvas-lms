@@ -459,6 +459,9 @@ class ConversationsController < ApplicationController
         if message.has_media_objects || params[:media_comment_id]
           InstStatsd::Statsd.count("inbox.message.sent.media.legacy", batch.recipient_count)
         end
+        if !message[:attachment_ids].nil? && params[:attachment_ids] != ""
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.legacy")
+        end
         InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", @recipients.count)
         if context_type == "Account" || context_type.nil?
           InstStatsd::Statsd.increment("inbox.conversation.sent.account_context.legacy")
@@ -494,6 +497,9 @@ class ConversationsController < ApplicationController
         end
         if message.has_media_objects || params[:media_comment_id]
           InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
+        end
+        if !message[:attachment_ids].nil? && message[:attachment_ids] != ""
+          InstStatsd::Statsd.increment("inbox.message.sent.attachment.legacy")
         end
         if params[:user_note] == "1"
           InstStatsd::Statsd.increment("inbox.conversation.sent.faculty_journal.legacy")
@@ -715,6 +721,7 @@ class ConversationsController < ApplicationController
     prev_conversation_state = @conversation.deep_dup
     if @conversation.update(params.require(:conversation).permit(*API_ALLOWED_FIELDS))
       InstStatsd::Statsd.increment("inbox.conversation.archived.legacy") if params.require(:conversation)["workflow_state"] == "archived"
+      InstStatsd::Statsd.increment("inbox.conversation.unarchived.legacy") if ["read", "unread"].include?(params.require(:conversation)["workflow_state"]) && prev_conversation_state.workflow_state == "archived"
       InstStatsd::Statsd.increment("inbox.conversation.starred.legacy") if ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && !prev_conversation_state.starred
       InstStatsd::Statsd.increment("inbox.conversation.unstarred.legacy") if !ActiveModel::Type::Boolean.new.cast(params[:conversation][:starred]) && prev_conversation_state.starred
       InstStatsd::Statsd.increment("inbox.conversation.unread.legacy") if params.require(:conversation)["workflow_state"] == "unread" && prev_conversation_state.workflow_state == "read"
@@ -971,6 +978,9 @@ class ConversationsController < ApplicationController
     InstStatsd::Statsd.increment("inbox.message.sent.isReply.legacy")
     if params[:media_comment_id] || ConversationMessage.where(id: message[:message]&.id).first&.has_media_objects
       InstStatsd::Statsd.increment("inbox.message.sent.media.legacy")
+    end
+    if !message[:message].nil? && !message[:message][:attachment_ids].nil? && message[:message][:attachment_ids] != ""
+      InstStatsd::Statsd.increment("inbox.message.sent.attachment.legacy")
     end
     InstStatsd::Statsd.count("inbox.message.sent.recipients.legacy", message[:recipients_count])
     render json: message[:message].nil? ? [] : conversation_json(@conversation.reload, @current_user, session, messages: [message[:message]]), status: message[:status]

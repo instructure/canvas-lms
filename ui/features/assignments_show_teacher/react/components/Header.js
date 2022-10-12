@@ -66,13 +66,13 @@ export default class Header extends React.Component {
     onSetWorkstate: func.isRequired,
     onPublishChange: func,
     onDelete: func,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
     onPublishChange: () => {},
     onDelete: () => {},
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
@@ -88,7 +88,7 @@ export default class Header extends React.Component {
 
       assignmentGroupMode: initialMode,
 
-      nameMode: initialMode
+      nameMode: initialMode,
     }
   }
 
@@ -132,7 +132,7 @@ export default class Header extends React.Component {
     this.setState({selectedAssignmentType: selectedType}, () => {
       this.forceUpdate()
       this.setState({
-        selectedAssignmentType: 'assignment' // can't change it yet
+        selectedAssignmentType: 'assignment', // can't change it yet
       })
     })
   }

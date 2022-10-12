@@ -17,9 +17,16 @@
  */
 
 import {asJson, consumePrefetchedXHR} from '@instructure/js-utils'
+import type Gradebook from '../Gradebook'
+import type {RequestDispatch} from '@canvas/network'
+import type {GradingPeriodAssignmentMap} from '../gradebook.d'
 
 export default class GradingPeriodAssignmentsLoader {
-  constructor({dispatch, gradebook}) {
+  _gradebook: Gradebook
+
+  _dispatch: RequestDispatch
+
+  constructor({dispatch, gradebook}: {dispatch: RequestDispatch; gradebook: Gradebook}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
   }
@@ -42,7 +49,7 @@ export default class GradingPeriodAssignmentsLoader {
       promise = this._dispatch.getJSON(url)
     }
 
-    return promise.then(data => {
+    return promise.then((data: {grading_period_assignments: GradingPeriodAssignmentMap}) => {
       this._gradebook.updateGradingPeriodAssignments(data.grading_period_assignments)
     })
   }

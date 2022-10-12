@@ -175,14 +175,48 @@ describe "Jobs V2 API", type: :request do
           expect(json).to eq({ "bar" => 2 })
         end
 
-        it "flags orphaned strands" do
-          Delayed::Job.where(strand: "bar").update_all(next_in_strand: false)
-          json = api_call(:get, "/api/v1/jobs2/queued/by_strand",
-                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "info" })
-          expect(json[0]["strand"]).to eq "bar"
-          expect(json[0]["orphaned"]).to eq true
-          expect(json[1]["strand"]).to eq "foo"
-          expect(json[1]["orphaned"]).to eq false
+        describe "orphaned strands" do
+          before :once do
+            Delayed::Job.where(strand: "bar").update_all(next_in_strand: false, max_concurrent: 2)
+          end
+
+          it "flags orphaned strands" do
+            json = api_call(:get, "/api/v1/jobs2/queued/by_strand",
+                            { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "strand", order: "info" })
+            expect(json[0]["strand"]).to eq "bar"
+            expect(json[0]["orphaned"]).to eq true
+            expect(json[1]["strand"]).to eq "foo"
+            expect(json[1]["orphaned"]).to eq false
+          end
+
+          it "unstucks orphaned strands" do
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", strand: "bar" })
+            expect(json).to eq({ "status" => "OK", "count" => 2 })
+            expect(Delayed::Job.where(strand: "bar").pluck(:next_in_strand)).to eq([true, true])
+          end
+
+          it "returns status 'blocked' if a strand blocker exists" do
+            Delayed::Job.create!(payload_object: ::Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
+                                 source: "JobsMigrator::StrandBlocker",
+                                 strand: "bar",
+                                 next_in_strand: false)
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", strand: "bar" })
+            expect(json).to eq({ "status" => "blocked" })
+          end
+
+          it "returns 0 if the strand isn't stuck" do
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", strand: "foo" })
+            expect(json).to eq({ "status" => "OK", "count" => 0 })
+          end
+
+          it "returns status 404 if the strand doesn't exist" do
+            api_call(:put, "/api/v1/jobs2/unstuck",
+                     { controller: "jobs_v2", action: "unstuck", format: "json", strand: "nope" },
+                     {}, {}, { expected_status: 404 })
+          end
         end
       end
 
@@ -211,14 +245,49 @@ describe "Jobs V2 API", type: :request do
           expect(json.to_a).to eq([["foobar2000", 1], ["zombo20001", 1]])
         end
 
-        it "flags orphaned singletons" do
-          Delayed::Job.where(singleton: "zombo20001").update_all(next_in_strand: false)
-          json = api_call(:get, "/api/v1/jobs2/queued/by_singleton",
-                          { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "singleton", order: "info" })
-          expect(json[0]["singleton"]).to eq "zombo20001"
-          expect(json[0]["orphaned"]).to eq true
-          expect(json[1]["singleton"]).to eq "foobar2000"
-          expect(json[1]["orphaned"]).to eq false
+        describe "orphaned singletons" do
+          before :once do
+            Delayed::Job.where(singleton: "zombo20001").update_all(next_in_strand: false)
+          end
+
+          it "flags orphaned singletons" do
+            json = api_call(:get, "/api/v1/jobs2/queued/by_singleton",
+                            { controller: "jobs_v2", action: "grouped_info", format: "json", bucket: "queued", group: "singleton", order: "info" })
+            expect(json[0]["singleton"]).to eq "zombo20001"
+            expect(json[0]["orphaned"]).to eq true
+            expect(json[1]["singleton"]).to eq "foobar2000"
+            expect(json[1]["orphaned"]).to eq false
+          end
+
+          it "unstucks orphaned singletons" do
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", singleton: "zombo20001" })
+            expect(json).to eq({ "status" => "OK", "count" => 1 })
+            expect(Delayed::Job.find_by(singleton: "zombo20001")).to be_next_in_strand
+          end
+
+          it "returns status 'blocked' if a blocker exists" do
+            Delayed::Job.create!(payload_object: ::Delayed::PerformableMethod.new(Kernel, :sleep, args: [0]),
+                                 source: "JobsMigrator::StrandBlocker",
+                                 singleton: "zombo20001",
+                                 locked_by: ::Delayed::Backend::Base::ON_HOLD_BLOCKER,
+                                 next_in_strand: false)
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", singleton: "zombo20001" })
+            expect(json).to eq({ "status" => "blocked" })
+          end
+
+          it "returns 0 when unstucking a non-stuck singleton" do
+            json = api_call(:put, "/api/v1/jobs2/unstuck",
+                            { controller: "jobs_v2", action: "unstuck", format: "json", singleton: "foobar2000" })
+            expect(json).to eq({ "status" => "OK", "count" => 0 })
+          end
+
+          it "returns status 404 if no job with the given strand exists" do
+            api_call(:put, "/api/v1/jobs2/unstuck",
+                     { controller: "jobs_v2", action: "unstuck", format: "json", singleton: "nope" },
+                     {}, {}, { expected_status: 404 })
+          end
         end
       end
 
@@ -553,6 +622,21 @@ describe "Jobs V2 API", type: :request do
         job = Delayed::Job.find(json["id"])
         expect(job.handler).to eq fj.handler
         expect(fj.reload.requeued_job_id).to eq job.id
+      end
+    end
+
+    describe "unstuck" do
+      it "queues a job to run the unstucker" do
+        json = api_call(:put, "/api/v1/jobs2/unstuck",
+                        { controller: "jobs_v2", action: "unstuck", format: "json" })
+        expect(json["status"]).to eq "pending"
+        progress_id = json["progress"]["id"]
+        expect(progress_id).to be_present
+        progress = Progress.find(progress_id)
+        expect(progress).to be_queued
+        expect(SwitchmanInstJobs::JobsMigrator).to receive(:unblock_strands).and_return(nil)
+        run_jobs
+        expect(progress.reload).to be_completed
       end
     end
   end

@@ -24,7 +24,7 @@ import {func} from 'prop-types'
 import {
   ScreenReaderContent,
   PresentationContent,
-  AccessibleContent
+  AccessibleContent,
 } from '@instructure/ui-a11y-content'
 import {TextInput} from '@instructure/ui-text-input'
 import {Button} from '@instructure/ui-buttons'
@@ -32,7 +32,7 @@ import {
   IconSearchLine,
   IconFilterLine,
   IconSpeedGraderLine,
-  IconEmailLine
+  IconEmailLine,
 } from '@instructure/ui-icons'
 import {Badge} from '@instructure/ui-badge'
 
@@ -59,11 +59,11 @@ function assignmentIsPublished(assignment) {
 export default class StudentsSearcher extends React.Component {
   static propTypes = {
     assignment: TeacherAssignmentShape.isRequired,
-    onMessageStudentsClick: func
+    onMessageStudentsClick: func,
   }
 
   static defaultProps = {
-    onMessageStudentsClick: () => {}
+    onMessageStudentsClick: () => {},
   }
 
   constructor(props) {
@@ -82,7 +82,7 @@ export default class StudentsSearcher extends React.Component {
       assignToFilter: null,
       attemptFilter: null,
       statusFilter: null,
-      numAttempts: Math.max(...attemptsCount)
+      numAttempts: Math.max(...attemptsCount),
     }
   }
 
@@ -183,7 +183,7 @@ export default class StudentsSearcher extends React.Component {
 
   render() {
     const searchVariables = {
-      assignmentId: this.props.assignment.lid
+      assignmentId: this.props.assignment.lid,
     }
     const searchMessages = []
 
@@ -192,7 +192,7 @@ export default class StudentsSearcher extends React.Component {
     } else if (this.state.debouncedSearchValue.length > 0) {
       searchMessages.push({
         text: I18n.t('Search term must be at least %{num} characters', {num: MIN_SEARCH_CHARS}),
-        type: 'error'
+        type: 'error',
       })
     }
 

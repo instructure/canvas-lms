@@ -20,7 +20,7 @@ import * as HistoryActions from './HistoryActions'
 import HistoryApi from '../api/HistoryApi'
 
 export function getHistoryNextPage(url) {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(HistoryActions.fetchHistoryNextPageStart())
 
     return HistoryApi.getNextPage(url)

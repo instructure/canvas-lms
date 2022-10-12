@@ -18,7 +18,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-popover'
@@ -99,10 +100,18 @@ class ProficiencyRating extends React.Component {
   handleFocus = () => {
     if (this.props.canManage) {
       if (this.props.focusField === 'trash') {
-        setTimeout(
-          () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
-          700
-        )
+        /*  changing settimeout to 1ms to move the focus action out of the execution queue 
+            and add it back at after the queue is empty which gives enough time for 
+            the modal to be dismissed
+            reference: http://latentflip.com/loupe/
+        */
+        setTimeout(() => {
+          /* checking if the user has not changed the focus manually 
+             (the default focus for some browsers is the body and 
+             for others is null, so i am adding both to the if ) */
+          if (!document.activeElement || document.activeElement === document.body)
+            this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()
+        }, 1)
       } else if (this.props.focusField === 'description') {
         this.descriptionInput.focus()
       } else if (this.props.focusField === 'points') {
@@ -298,15 +307,15 @@ class ProficiencyRating extends React.Component {
             // mount with focusColorPicker
             shouldFocusContentOnTriggerBlur={true}
             renderTrigger={
-              <Button ref={this.setColorRef} variant="link">
-                <div>
+              <Link as="button" isWithinText={false} ref={this.setColorRef}>
+                <div style={{margin: '0 0.8rem', padding: '0.55rem 0 0'}}>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   <ScreenReaderContent>
                     {I18n.t(`Change color for mastery level %{position}`, {position})}
                   </ScreenReaderContent>
                   <span aria-hidden="true">{I18n.t('Change')}</span>
                 </div>
-              </Button>
+              </Link>
             }
           >
             <ColorPicker

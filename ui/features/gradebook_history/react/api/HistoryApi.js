@@ -34,8 +34,8 @@ function getGradebookHistory(courseId, input) {
     params: {
       start_time: input.from,
       end_time: input.to,
-      include: ['current_grade']
-    }
+      include: ['current_grade'],
+    },
   }
 
   return axios.get(url, params)
@@ -47,5 +47,5 @@ function getNextPage(url) {
 
 export default {
   getGradebookHistory,
-  getNextPage
+  getNextPage,
 }

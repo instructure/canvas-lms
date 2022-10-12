@@ -317,7 +317,7 @@ export default class EquationEditorModal extends Component {
         data-testid="equation-editor-modal-done"
         margin="none none none xx-small"
         onClick={this.handleModalDone}
-        variant="primary"
+        color="primary"
       >
         {formatMessage('Done')}
       </Button>
@@ -391,7 +391,7 @@ export default class EquationEditorModal extends Component {
         onDismiss={this.handleModalCancel}
         onEntered={this.handleEntered}
         onOpen={this.handleOpen}
-        open
+        open={true}
         mountNode={mountNode}
         transition="fade"
         shouldCloseOnDocumentClick={false}

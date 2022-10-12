@@ -1506,19 +1506,19 @@ class Enrollment < ActiveRecord::Base
 
   def copy_scores_from_existing_enrollment
     Score.where(enrollment_id: self).each(&:destroy_permanently!)
-    other_enrollment_of_same_type.scores.each { |score| score.dup.update!(enrollment: self) }
+    other_enrollment_of_same_type_with_score.scores.each { |score| score.dup.update!(enrollment: self) }
   end
 
   def need_to_copy_scores?
     return false unless saved_change_to_id? || being_restored?
 
-    student_or_fake_student? && other_enrollment_of_same_type.present?
+    student_or_fake_student? && other_enrollment_of_same_type_with_score.present?
   end
 
-  def other_enrollment_of_same_type
-    return @other_enrollment_of_same_type if defined?(@other_enrollment_of_same_type)
+  def other_enrollment_of_same_type_with_score
+    return @other_enrollment_of_same_type_with_score if defined?(@other_enrollment_of_same_type_with_score)
 
-    @other_enrollment_of_same_type = other_enrollments_of_type(type).first
+    @other_enrollment_of_same_type_with_score = other_enrollments_of_type(type).joins(:scores).first
   end
 
   def other_enrollments_of_type(types)

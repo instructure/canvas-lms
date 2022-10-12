@@ -19,7 +19,7 @@
 import AssignmentCellFormatter from 'ui/features/gradebook/react/default_gradebook/GradebookGrid/formatters/AssignmentCellFormatter'
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
@@ -41,7 +41,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       ['B', 0.8],
       ['C', 0.7],
       ['D', 0.6],
-      ['F', 0.0]
+      ['F', 0.0],
     ]
     gradebook = createGradebook({default_grading_standard: defaultGradingScheme})
     sinon
@@ -50,7 +50,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
 
     formatter = new AssignmentCellFormatter(gradebook)
     gradebook.setAssignments({
-      2301: {id: '2301', name: 'Algebra 1', grading_type: 'points', points_possible: 10}
+      2301: {id: '2301', name: 'Algebra 1', grading_type: 'points', points_possible: 10},
     })
 
     columnDef = {}
@@ -63,7 +63,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
       score: 8,
       submission_type: 'online_text_entry',
       user_id: '1101',
-      workflow_state: 'active'
+      workflow_state: 'active',
     }
     submissionState = {hideGrade: false}
 
@@ -322,7 +322,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         excused: true,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
       gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       renderCell()
@@ -335,7 +335,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         excused: true,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
       gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       ok(renderCell().classList.contains('excused'))
@@ -347,7 +347,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
         excused: false,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
       gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
       renderCell()
@@ -404,7 +404,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: 'A',
           score: 9.1,
-          valid: true
+          valid: true,
         }
       })
 
@@ -429,7 +429,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: '<img src=null onerror=alert(1) >',
           score: 9.1,
-          valid: true
+          valid: true,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         renderCell()
@@ -442,7 +442,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: 'invalid',
           score: null,
-          valid: false
+          valid: false,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length, 1)
@@ -454,7 +454,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: null,
           score: null,
-          valid: true
+          valid: true,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         strictEqual(renderCell().querySelectorAll('.Grid__GradeCell__InvalidGrade').length, 0)
@@ -470,7 +470,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: null,
           score: null,
-          valid: true
+          valid: true,
         }
       })
 
@@ -689,7 +689,7 @@ QUnit.module('GradebookGrid AssignmentCellFormatter', suiteHooks => {
           excused: false,
           grade: 'incomplete',
           score: 0,
-          valid: true
+          valid: true,
         }
         gradebook.addPendingGradeInfo({assignmentId: '2301', userId: '1101'}, pendingGradeInfo)
         strictEqual(renderCell().querySelectorAll('i.icon-x.Grade--incomplete').length, 1)

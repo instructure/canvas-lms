@@ -80,7 +80,7 @@ describe('UploadFileModal', () => {
     it('disables the Submit button on the Computer panel unless set', () => {
       modalProps.panels = ['COMPUTER']
       const {getByText} = render(<UploadFileModal {...modalProps} />)
-      expect(getByText('Submit').parentElement.disabled).toBe(true)
+      expect(getByText('Submit').closest('button').disabled).toBe(true)
       // would like to see the button get enabled when a value is set,
       // but the components aren't setup in a way to make that practical.
     })
@@ -91,7 +91,7 @@ describe('UploadFileModal', () => {
       await waitFor(() => getByLabelText('File URL'))
       const urlinput = getByLabelText('File URL')
       fireEvent.change(urlinput, {target: {value: 'http://example.com/'}})
-      await waitFor(() => expect(getByText('Submit').parentElement.disabled).toBe(false))
+      await waitFor(() => expect(getByText('Submit').closest('button').disabled).toBe(false))
     })
 
     // IMO, testing the Unsplash panel is more effort than the value of the test,

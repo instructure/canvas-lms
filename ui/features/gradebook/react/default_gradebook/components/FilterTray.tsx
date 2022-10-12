@@ -27,14 +27,9 @@ import FilterTrayPreset from './FilterTrayFilterPreset'
 import useStore from '../stores/index'
 
 import {doFiltersMatch} from '../Gradebook.utils'
+import type {CamelizedGradingPeriod} from '@canvas/grading/grading.d'
 import type {FilterPreset, PartialFilterPreset} from '../gradebook.d'
-import type {
-  Module,
-  AssignmentGroup,
-  Section,
-  GradingPeriod,
-  StudentGroupCategoryMap
-} from '../../../../../api.d'
+import type {AssignmentGroup, Module, Section, StudentGroupCategory} from '../../../../../api.d'
 
 const {Item: FlexItem} = Flex as any
 
@@ -47,8 +42,8 @@ export type FilterTrayProps = {
   modules: Module[]
   assignmentGroups: AssignmentGroup[]
   sections: Section[]
-  gradingPeriods: GradingPeriod[]
-  studentGroupCategories: StudentGroupCategoryMap
+  gradingPeriods: CamelizedGradingPeriod[]
+  studentGroupCategories: StudentGroupCategory[]
 }
 
 export default function FilterTray({
@@ -59,7 +54,7 @@ export default function FilterTray({
   modules,
   gradingPeriods,
   sections,
-  studentGroupCategories
+  studentGroupCategories,
 }: FilterTrayProps) {
   const saveStagedFilter = useStore(state => state.saveStagedFilter)
   const updateFilterPreset = useStore(state => state.updateFilterPreset)
@@ -105,7 +100,7 @@ export default function FilterTray({
                 alt={I18n.t('Friendly panda')}
                 style={{
                   width: '100px',
-                  height: '128px'
+                  height: '128px',
                 }}
               />
             </FlexItem>
@@ -132,7 +127,7 @@ export default function FilterTray({
               name: '',
               filters: appliedFilters,
               created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+              updated_at: new Date().toISOString(),
             }}
             isActive={true}
             gradingPeriods={gradingPeriods}
@@ -152,9 +147,8 @@ export default function FilterTray({
 
         <View as="div" margin="medium 0 0 0">
           {filterPresets.map(filterPreset => (
-            <View as="div" margin="0 0 small 0">
+            <View as="div" margin="0 0 small 0" key={filterPreset.id}>
               <FilterTrayPreset
-                key={filterPreset.id}
                 applyFilters={applyFilters}
                 assignmentGroups={assignmentGroups}
                 filterPreset={filterPreset}

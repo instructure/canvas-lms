@@ -29,13 +29,13 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
 
   suiteHooks.beforeEach(() => {
     const assignment = {
-      pointsPossible: 10
+      pointsPossible: 10,
     }
     const submission = {
       enteredGrade: null,
       enteredScore: null,
       excused: false,
-      id: '2501'
+      id: '2501',
     }
 
     props = {
@@ -47,7 +47,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
       onMenuDismiss() {
         resolveClose()
       },
-      submission
+      submission,
     }
 
     $menuContent = null
@@ -145,7 +145,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
       ...props.submission,
       enteredScore: null,
       enteredGrade: null,
-      excused: true
+      excused: true,
     }
     mountComponent()
     equal(getTextValue(), 'Excused')
@@ -237,7 +237,7 @@ QUnit.module('GradebookGrid CompleteIncompleteGradeInput', suiteHooks => {
           excused: false,
           grade: 'incomplete',
           score: 0,
-          valid: true
+          valid: true,
         }
         mountComponent()
       })

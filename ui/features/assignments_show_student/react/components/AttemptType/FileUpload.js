@@ -54,17 +54,17 @@ class FileUpload extends Component {
         index: number,
         name: string,
         loaded: number,
-        total: number
+        total: number,
       })
     ).isRequired,
     focusOnInit: bool.isRequired,
     onCanvasFileRequested: func.isRequired,
     onUploadRequested: func.isRequired,
-    submission: Submission.shape
+    submission: Submission.shape,
   }
 
   state = {
-    messages: []
+    messages: [],
   }
 
   _isMounted = false
@@ -118,7 +118,7 @@ class FileUpload extends Component {
       fileID,
       onError: () => {
         this.context.setOnFailure(I18n.t('Error updating submission draft'))
-      }
+      },
     })
   }
 
@@ -134,7 +134,7 @@ class FileUpload extends Component {
       },
       onSuccess: () => {
         this.context.setOnSuccess(I18n.t('Uploading files'))
-      }
+      },
     })
   }
 
@@ -150,9 +150,9 @@ class FileUpload extends Component {
       messages: [
         {
           text: I18n.t('Invalid file type'),
-          type: 'error'
-        }
-      ]
+          type: 'error',
+        },
+      ],
     })
   }
 
@@ -168,13 +168,13 @@ class FileUpload extends Component {
         id: this.props.submission.id,
         activeSubmissionType: 'online_upload',
         attempt: this.props.submission.attempt,
-        fileIds: updatedFiles.map(file => file._id)
-      }
+        fileIds: updatedFiles.map(file => file._id),
+      },
     })
 
     if (this._isMounted) {
       this.setState({
-        messages: []
+        messages: [],
       })
     }
 
@@ -220,7 +220,7 @@ class FileUpload extends Component {
                   {I18n.t('File permitted: %{fileTypes}', {
                     fileTypes: this.props.assignment.allowedExtensions
                       .map(ext => ext.toUpperCase())
-                      .join(', ')
+                      .join(', '),
                   })}
                 </Flex.Item>
               )}
@@ -239,7 +239,7 @@ class FileUpload extends Component {
       ...(desktop
         ? {width: '120px', padding: '0 xx-small', height: '310px'}
         : {width: '400px', height: '50px', padding: 'small'}),
-      ...(mobileOnly && {width: '100%'})
+      ...(mobileOnly && {width: '100%'}),
     }
     const lineContainerStyle = {
       display: 'flex',
@@ -247,21 +247,21 @@ class FileUpload extends Component {
       position: 'relative',
       flexDirection: desktop ? 'column' : 'row',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
     }
     const textOrStyle = {
       display: desktop ? 'block' : 'inline',
       width: desktop ? '100%' : '60px',
       zIndex: 99,
       backgroundColor: theme.variables.colors.backgroundLight,
-      padding: desktop ? `${theme.variables.spacing.medium} 0` : '0'
+      padding: desktop ? `${theme.variables.spacing.medium} 0` : '0',
     }
     const lineStyle = {
       height: desktop ? '100%' : '1px',
       width: desktop ? '1px' : '100%',
       left: desktop ? '50%' : '0',
       position: 'absolute',
-      backgroundColor: theme.variables.colors.backgroundDark
+      backgroundColor: theme.variables.colors.backgroundDark,
     }
 
     return (

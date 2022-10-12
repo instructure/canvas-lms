@@ -26,6 +26,7 @@ import StudentFirstNameColumnHeaderRenderer from './StudentFirstNameColumnHeader
 import TotalGradeColumnHeaderRenderer from './TotalGradeColumnHeaderRenderer'
 import TotalGradeOverrideColumnHeaderRenderer from './TotalGradeOverrideColumnHeaderRenderer'
 import type Gradebook from '../../Gradebook'
+import type GridSupport from '../GridSupport'
 
 export default class ColumnHeaderRenderer {
   gradebook: Gradebook
@@ -41,7 +42,7 @@ export default class ColumnHeaderRenderer {
     total_grade_override: TotalGradeOverrideColumnHeaderRenderer
   }
 
-  constructor(gradebook) {
+  constructor(gradebook: Gradebook) {
     this.gradebook = gradebook
     this.factories = {
       assignment: new AssignmentColumnHeaderRenderer(gradebook),
@@ -55,16 +56,16 @@ export default class ColumnHeaderRenderer {
       ),
       student_firstname: new StudentFirstNameColumnHeaderRenderer(gradebook),
       total_grade: new TotalGradeColumnHeaderRenderer(gradebook),
-      total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook)
+      total_grade_override: new TotalGradeOverrideColumnHeaderRenderer(gradebook),
     }
   }
 
-  renderColumnHeader(column, $container, gridSupport) {
+  renderColumnHeader(column, $container: HTMLElement, gridSupport: GridSupport) {
     if (this.factories[column.type]) {
       const options = {
         ref: header => {
           this.gradebook.setHeaderComponentRef(column.id, header)
-        }
+        },
       }
       // The container to render into needs to be slick-column-name because
       // overwriting slick-column-name can cause slick-resizable-handle to be
@@ -75,7 +76,7 @@ export default class ColumnHeaderRenderer {
     }
   }
 
-  destroyColumnHeader(column, $container, gridSupport) {
+  destroyColumnHeader(column, $container: HTMLElement, gridSupport: GridSupport) {
     if (this.factories[column.type]) {
       this.gradebook.removeHeaderComponentRef(column.id)
       const $nameNode = $container.querySelector('.slick-column-name')

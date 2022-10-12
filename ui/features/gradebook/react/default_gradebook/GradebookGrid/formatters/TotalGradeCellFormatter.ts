@@ -37,7 +37,7 @@ function buildHiddenAssignmentsWarning() {
     icon: 'icon-off',
     warningText: I18n.t(
       "This grade differs from the student's view of the grade because some assignment grades are not yet posted"
-    )
+    ),
   }
 }
 
@@ -46,24 +46,24 @@ function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups) {
   const warningText = I18n.t(
     {
       one: 'Score does not include %{groups} because it has no points possible',
-      other: 'Score does not include %{groups} because they have no points possible'
+      other: 'Score does not include %{groups} because they have no points possible',
     },
     {
       count: names.length,
-      groups: $.toSentence(names)
+      groups: $.toSentence(names),
     }
   )
 
   return {
     icon: 'icon-warning final-warning',
-    warningText
+    warningText,
   }
 }
 
 function buildNoPointsPossibleWarning() {
   return {
     icon: 'icon-warning final-warning',
-    warningText: I18n.t("Can't compute score until an assignment has points possible")
+    warningText: I18n.t("Can't compute score until an assignment has points possible"),
   }
 }
 
@@ -139,7 +139,7 @@ export default class TotalGradeCellFormatter {
       },
       shouldShowPoints() {
         return gradebook.options.show_total_grade_as_points
-      }
+      },
     }
   }
 
@@ -182,7 +182,7 @@ export default class TotalGradeCellFormatter {
       possible,
       score: I18n.n(round(grade.score, round.DEFAULT)),
       showPointsNotPercent: this.options.shouldShowPoints(),
-      warning
+      warning,
     }
 
     return render(options)

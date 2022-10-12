@@ -87,10 +87,13 @@ export default function LinkOptionsTray(props) {
 
     props.onSave(linkAttrs)
   }
-  function initialPreviewSelection(content) {
-    if (content.displayAs === DISPLAY_AS_DOWNLOAD_LINK) {
+  function initialPreviewSelection(previewContent) {
+    if (previewContent.displayAs === DISPLAY_AS_DOWNLOAD_LINK) {
       return 'disable'
-    } else if (content.displayAs === DISPLAY_AS_EMBED || content.displayAs === DISPLAY_AS_LINK) {
+    } else if (
+      previewContent.displayAs === DISPLAY_AS_EMBED ||
+      previewContent.displayAs === DISPLAY_AS_LINK
+    ) {
       return 'inline'
     } else {
       return 'overlay'
@@ -223,7 +226,7 @@ export default function LinkOptionsTray(props) {
               <Button
                 disabled={(showText && !text) || !(url && isValidURL)}
                 onClick={handleSave}
-                variant="primary"
+                color="primary"
               >
                 {formatMessage('Done')}
               </Button>

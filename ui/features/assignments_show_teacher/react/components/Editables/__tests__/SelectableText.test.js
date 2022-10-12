@@ -31,7 +31,7 @@ import SelectableText from '../SelectableText'
 const options = [
   {label: 'Pancho Sanchez', value: 'pancho'},
   {label: 'Mongo Santamaria', value: 'mongo'},
-  {label: 'Giovanni Hidalgo', value: 'giovanni'}
+  {label: 'Giovanni Hidalgo', value: 'giovanni'},
 ]
 
 describe('SelectableText, single', () => {

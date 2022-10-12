@@ -27,22 +27,22 @@ export default {
       secondsLate: 0,
       excused: false,
       missing: false,
-      late: false
+      late: false,
     },
     latePolicy: {
-      lateSubmissionInterval: 'day'
+      lateSubmissionInterval: 'day',
     },
     onChange: () => {},
     assignment: {
-      anonymizeStudents: false
+      anonymizeStudents: false,
     },
     colors: {
       excused: '#E5F7E5',
       late: '#F3EFEA',
       missing: '#FEF7E5',
-      none: '#E5F7F6'
-    }
-  }
+      none: '#E5F7F6',
+    },
+  },
 }
 
 const Template = args => <SubmissionTrayRadioInputGroup {...args} />

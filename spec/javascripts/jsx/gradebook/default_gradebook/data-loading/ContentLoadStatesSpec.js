@@ -18,7 +18,7 @@
 
 import {
   createGradebook,
-  setFixtureHtml
+  setFixtureHtml,
 } from 'ui/features/gradebook/react/default_gradebook/__tests__/GradebookSpecHelper'
 
 QUnit.module('Gradebook Data Loading: Content Load States', suiteHooks => {

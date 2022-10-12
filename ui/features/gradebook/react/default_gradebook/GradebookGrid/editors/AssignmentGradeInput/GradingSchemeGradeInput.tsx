@@ -38,7 +38,7 @@ function formatGrade(submission, assignment, gradingScheme, pendingGradeInfo) {
     formatType: 'gradingScheme',
     gradingScheme,
     pointsPossible: assignment.pointsPossible,
-    version: 'entered'
+    version: 'entered',
   }
 
   return GradeFormatHelper.formatSubmissionGrade(submission, formatOptions)
@@ -48,14 +48,14 @@ function getGradeInfo(value, props) {
   return parseTextValue(value, {
     enterGradesAs: 'gradingScheme',
     gradingScheme: props.gradingScheme,
-    pointsPossible: props.assignment.pointsPossible
+    pointsPossible: props.assignment.pointsPossible,
   })
 }
 
 export default class GradingSchemeInput extends Component {
   static propTypes = {
     assignment: shape({
-      pointsPossible: number
+      pointsPossible: number,
     }).isRequired,
     disabled: bool,
     gradingScheme: instanceOf(Array).isRequired,
@@ -64,7 +64,7 @@ export default class GradingSchemeInput extends Component {
     messages: arrayOf(
       shape({
         text: string.isRequired,
-        type: string.isRequired
+        type: string.isRequired,
       })
     ).isRequired,
     onMenuDismiss: func,
@@ -72,13 +72,13 @@ export default class GradingSchemeInput extends Component {
     pendingGradeInfo: shape({
       excused: bool.isRequired,
       grade: string,
-      valid: bool.isRequired
+      valid: bool.isRequired,
     }),
     submission: shape({
       enteredGrade: string,
       enteredScore: number,
-      excused: bool.isRequired
-    }).isRequired
+      excused: bool.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
@@ -86,7 +86,7 @@ export default class GradingSchemeInput extends Component {
     menuContentRef() {},
     onMenuDismiss() {},
     onMenuShow() {},
-    pendingGradeInfo: null
+    pendingGradeInfo: null,
   }
 
   constructor(props) {
@@ -110,7 +110,7 @@ export default class GradingSchemeInput extends Component {
     this.state = {
       gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, this.props),
       menuIsOpen: false,
-      value: formatGrade(submission, assignment, gradingScheme, pendingGradeInfo)
+      value: formatGrade(submission, assignment, gradingScheme, pendingGradeInfo),
     }
   }
 
@@ -121,7 +121,7 @@ export default class GradingSchemeInput extends Component {
 
       this.setState({
         gradeInfo: pendingGradeInfo || getGradeInfo(submission.excused ? 'EX' : value, nextProps),
-        value: formatGrade(submission, assignment, gradingScheme, pendingGradeInfo)
+        value: formatGrade(submission, assignment, gradingScheme, pendingGradeInfo),
       })
     }
   }
@@ -165,7 +165,7 @@ export default class GradingSchemeInput extends Component {
   handleTextChange(event) {
     this.setState({
       gradeInfo: getGradeInfo(event.target.value, this.props),
-      value: event.target.value
+      value: event.target.value,
     })
   }
 
@@ -201,7 +201,7 @@ export default class GradingSchemeInput extends Component {
     return hasGradeChanged(this.props.submission, gradeInfo, {
       enterGradesAs: 'gradingScheme',
       gradingScheme: this.props.gradingScheme,
-      pointsPossible: this.props.assignment.pointsPossible
+      pointsPossible: this.props.assignment.pointsPossible,
     })
   }
 

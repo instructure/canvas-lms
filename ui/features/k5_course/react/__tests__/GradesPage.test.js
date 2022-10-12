@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, waitFor, act} from '@testing-library/react'
 import fetchMock from 'fetch-mock'
-import tz from '@canvas/timezone'
 import {GradesPage} from '../GradesPage'
 import {
   MOCK_GRADING_PERIODS_EMPTY,
@@ -44,6 +43,19 @@ const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
 )
 const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1'
 const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1&include=observed_users'
+
+const dtf = new Intl.DateTimeFormat('en', {
+  // MMM D, YYYY h:mma
+  weekday: 'short',
+  month: 'short',
+  day: 'numeric',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  timeZone: ENV.TIMEZONE
+})
+
+const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
 
 describe('GradesPage', () => {
   const getProps = (overrides = {}) => ({
@@ -120,7 +132,7 @@ describe('GradesPage', () => {
     it('renders the returned assignment details', async () => {
       const {getByText, queryByText} = render(<GradesPage {...getProps()} />)
       await waitFor(() => expect(queryByText('Loading grades for History')).not.toBeInTheDocument())
-      const formattedDueDate = tz.format('2020-04-18T05:59:59Z', 'date.formats.full_with_weekday')
+      const formattedDueDate = dateFormatter('2020-04-18T05:59:59Z')
       ;['WWII Report', formattedDueDate, 'Reports', '9.5 pts', 'Out of 10 pts'].forEach(header => {
         expect(getByText(header)).toBeInTheDocument()
       })
@@ -335,10 +347,7 @@ describe('GradesPage', () => {
 
     it('only shows assignment details for the observed user', async () => {
       const {getByText, rerender} = render(<GradesPage {...getProps({observedUserId: '5'})} />)
-      let formattedSubmittedDate = tz.format(
-        '2021-09-20T23:55:08Z',
-        'date.formats.full_with_weekday'
-      )
+      let formattedSubmittedDate = dateFormatter('2021-09-20T23:55:08Z')
       await waitFor(() => {
         ;[
           'Assignment 3',
@@ -350,7 +359,7 @@ describe('GradesPage', () => {
           expect(getByText(label)).toBeInTheDocument()
         })
       })
-      formattedSubmittedDate = tz.format('2021-09-22T21:25:08Z', 'date.formats.full_with_weekday')
+      formattedSubmittedDate = dateFormatter('2021-09-22T21:25:08Z')
       rerender(<GradesPage {...getProps({observedUserId: '6'})} />)
       ;[
         'Assignment 3',

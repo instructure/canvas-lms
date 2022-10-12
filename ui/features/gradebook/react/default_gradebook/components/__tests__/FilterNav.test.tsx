@@ -32,22 +32,22 @@ const defaultProps: FilterNavProps = {
   modules: [
     {id: '1', name: 'Module 1', position: 1},
     {id: '2', name: 'Module 2', position: 2},
-    {id: '3', name: 'Module 3', position: 3}
+    {id: '3', name: 'Module 3', position: 3},
   ],
   assignmentGroups: [
     {id: '4', name: 'Assignment Group 4', position: 1, group_weight: 0, assignments: []},
     {id: '5', name: 'Assignment Group 5', position: 2, group_weight: 0, assignments: []},
-    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []}
+    {id: '6', name: 'Assignment Group 6', position: 3, group_weight: 0, assignments: []},
   ],
   sections: [
     {id: '7', name: 'Section 7'},
     {id: '8', name: 'Section 8'},
-    {id: '9', name: 'Section 9'}
+    {id: '9', name: 'Section 9'},
   ],
   gradingPeriods: [
     {id: '1', title: 'Grading Period 1', startDate: 1},
     {id: '2', title: 'Grading Period 2', startDate: 2},
-    {id: '3', title: 'Grading Period 3', startDate: 3}
+    {id: '3', title: 'Grading Period 3', startDate: 3},
   ],
   studentGroupCategories: {
     '1': {
@@ -55,10 +55,10 @@ const defaultProps: FilterNavProps = {
       name: 'Student Group Category 1',
       groups: [
         {id: '1', name: 'Student Group 1'},
-        {id: '2', name: 'Student Group 2'}
-      ]
-    }
-  }
+        {id: '2', name: 'Student Group 2'},
+      ],
+    },
+  },
 }
 
 const defaultAppliedFilters: Filter[] = [
@@ -66,8 +66,8 @@ const defaultAppliedFilters: Filter[] = [
     id: '2',
     type: 'module',
     value: '1',
-    created_at: new Date().toISOString()
-  }
+    created_at: new Date().toISOString(),
+  },
 ]
 
 const defaultFilterPresets: FilterPreset[] = [
@@ -79,11 +79,11 @@ const defaultFilterPresets: FilterPreset[] = [
         id: '2',
         type: 'module',
         value: '1',
-        created_at: '2022-02-05T10:18:34-07:00'
-      }
+        created_at: '2022-02-05T10:18:34-07:00',
+      },
     ],
     created_at: '2022-02-05T10:18:34-07:00',
-    updated_at: '2022-02-05T10:18:34-07:00'
+    updated_at: '2022-02-05T10:18:34-07:00',
   },
   {
     id: 'preset-2',
@@ -93,12 +93,12 @@ const defaultFilterPresets: FilterPreset[] = [
         id: '3',
         type: 'section',
         value: '7',
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     ],
     created_at: '2022-02-06T10:18:34-07:00',
-    updated_at: '2022-02-06T10:18:34-07:00'
-  }
+    updated_at: '2022-02-06T10:18:34-07:00',
+  },
 ]
 
 const mockPostResponse = {
@@ -113,20 +113,20 @@ const mockPostResponse = {
           id: 'f783e528-dbb5-4474-972a-0f1a19c29551',
           type: 'section',
           value: '2',
-          created_at: '2022-02-08T17:18:13.190Z'
-        }
-      ]
+          created_at: '2022-02-08T17:18:13.190Z',
+        },
+      ],
     },
     created_at: '2022-02-08T10:18:34-07:00',
-    updated_at: '2022-02-08T10:18:34-07:00'
-  }
+    updated_at: '2022-02-08T10:18:34-07:00',
+  },
 }
 
 describe('FilterNav', () => {
   beforeEach(() => {
     store.setState({
       filterPresets: defaultFilterPresets,
-      appliedFilters: defaultAppliedFilters
+      appliedFilters: defaultAppliedFilters,
     })
     fetchMock.mock('*', 200)
   })
@@ -147,15 +147,15 @@ describe('FilterNav', () => {
           id: '4',
           type: 'module',
           value: '1',
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
         },
         {
           id: '5',
           type: undefined,
           value: undefined,
-          created_at: new Date().toISOString()
-        }
-      ]
+          created_at: new Date().toISOString(),
+        },
+      ],
     })
     const {getAllByTestId} = render(<FilterNav {...defaultProps} />)
     expect(await getAllByTestId('applied-filter-tag')[0]).toHaveTextContent('Module 1')
@@ -198,7 +198,7 @@ describe('Filter dropdown', () => {
   beforeEach(() => {
     store.setState({
       filterPresets: defaultFilterPresets,
-      appliedFilters: []
+      appliedFilters: [],
     })
     fetchMock.mock('*', 200)
   })
@@ -242,7 +242,7 @@ describe('FilterNav (save)', () => {
   beforeEach(() => {
     store.setState({
       filterPresets: defaultFilterPresets,
-      appliedFilters: defaultAppliedFilters
+      appliedFilters: defaultAppliedFilters,
     })
     fetchMock.post('/api/v1/courses/0/gradebook_filters', mockPostResponse)
   })

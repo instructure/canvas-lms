@@ -40,7 +40,7 @@ function TextPlaceholder(props) {
 
 TextPlaceholder.propTypes = {
   addMargin: bool.isRequired,
-  text: string.isRequired
+  text: string.isRequired,
 }
 
 export default function SVGWithTextPlaceholder(props) {
@@ -55,9 +55,9 @@ export default function SVGWithTextPlaceholder(props) {
 SVGWithTextPlaceholder.propTypes = {
   addMargin: bool,
   text: string.isRequired,
-  url: string.isRequired
+  url: string.isRequired,
 }
 
 SVGWithTextPlaceholder.defaultProps = {
-  addMargin: false
+  addMargin: false,
 }

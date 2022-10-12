@@ -23,15 +23,15 @@ export function createCourseGradesWithGradingPeriods() {
         assignmentGroupId: 301,
         assignmentGroupWeight: 40,
         current: {score: 5, possible: 10, submissions: []},
-        final: {score: 5, possible: 20, submissions: []}
+        final: {score: 5, possible: 20, submissions: []},
       },
 
       302: {
         assignmentGroupId: 302,
         assignmentGroupWeight: 60,
         current: {score: 12, possible: 15, submissions: []},
-        final: {score: 12, possible: 25, submissions: []}
-      }
+        final: {score: 12, possible: 25, submissions: []},
+      },
     },
 
     gradingPeriods: {
@@ -43,11 +43,11 @@ export function createCourseGradesWithGradingPeriods() {
             assignmentGroupId: 301,
             assignmentGroupWeight: 40,
             current: {score: 5, possible: 10, submissions: []},
-            final: {score: 5, possible: 20, submissions: []}
-          }
+            final: {score: 5, possible: 20, submissions: []},
+          },
         },
         current: {score: 5, possible: 10, submissions: []},
-        final: {score: 5, possible: 20, submissions: []}
+        final: {score: 5, possible: 20, submissions: []},
       },
 
       702: {
@@ -58,15 +58,15 @@ export function createCourseGradesWithGradingPeriods() {
             assignmentGroupId: 302,
             assignmentGroupWeight: 60,
             current: {score: 12, possible: 15, submissions: []},
-            final: {score: 12, possible: 25, submissions: []}
-          }
+            final: {score: 12, possible: 25, submissions: []},
+          },
         },
         current: {score: 12, possible: 15, submissions: []},
-        final: {score: 12, possible: 25, submissions: []}
-      }
+        final: {score: 12, possible: 25, submissions: []},
+      },
     },
 
     current: {score: 17, possible: 25, submissions: []},
-    final: {score: 17, possible: 45, submissions: []}
+    final: {score: 17, possible: 45, submissions: []},
   }
 }

@@ -26,7 +26,7 @@ const conditionTypes: FilterType[] = [
   'student-group',
   'start-date',
   'end-date',
-  'submissions'
+  'submissions',
 ]
 
 export default conditionTypes

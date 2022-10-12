@@ -252,7 +252,7 @@ export default function VideoOptionsTray(props) {
                   <Button
                     disabled={saveDisabled}
                     onClick={event => handleSave(event, contentProps.updateMediaObject)}
-                    variant="primary"
+                    color="primary"
                   >
                     {formatMessage('Done')}
                   </Button>

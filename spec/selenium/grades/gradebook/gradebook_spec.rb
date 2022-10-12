@@ -431,7 +431,7 @@ describe "Gradebook" do
       Gradebook.action_menu.click
       Gradebook.action_menu_item_selector("export").click
 
-      expect_flash_message :success, "Gradebook export started"
+      expect_flash_message :success, "Gradebook export has started. This may take a few minutes."
     end
   end
 end

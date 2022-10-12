@@ -32,7 +32,7 @@ QUnit.module('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', suiteHoo
 
   suiteHooks.beforeEach(() => {
     exampleData = {
-      gradingPeriodAssignments: {1401: ['2301']}
+      gradingPeriodAssignments: {1401: ['2301']},
     }
   })
 
@@ -42,7 +42,7 @@ QUnit.module('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', suiteHoo
       dispatch = new RequestDispatch()
 
       gradebook = createGradebook({
-        context_id: '1201'
+        context_id: '1201',
       })
       sinon.stub(gradebook, 'updateGradingPeriodAssignments')
 
@@ -61,7 +61,7 @@ QUnit.module('Gradebook > DataLoader > GradingPeriodAssignmentsLoader', suiteHoo
     function resolveRequest() {
       const [request] = getRequests()
       request.response.setJson({
-        grading_period_assignments: exampleData.gradingPeriodAssignments
+        grading_period_assignments: exampleData.gradingPeriodAssignments,
       })
       request.response.send()
     }

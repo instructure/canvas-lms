@@ -36,7 +36,7 @@ export function setAssignmentPostPolicy({assignmentId, postManually}) {
   return createClient()
     .mutate({
       mutation: SET_ASSIGNMENT_POST_POLICY_MUTATION,
-      variables: {assignmentId, postManually}
+      variables: {assignmentId, postManually},
     })
     .then(response => {
       const queryResponse = response && response.data && response.data.setAssignmentPostPolicy

@@ -26,7 +26,7 @@ import {Img} from '@instructure/ui-img'
 import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {Pagination} from '@instructure/ui-pagination'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {debounce} from 'lodash'
 import formatMessage from '../../../../format-message'
 import {StyleSheet, css} from '../../../../common/aphroditeExtensions'
@@ -116,17 +116,9 @@ function Attribution({name, avatarUrl, profileUrl}) {
         <Avatar name={name} src={avatarUrl} size="small" data-fs-exclude={true} />
       </Flex.Item>
       <Flex.Item margin="xx-small" shouldShrink={true}>
-        <Button
-          size="small"
-          variant="link-inverse"
-          href={profileUrl}
-          target="_blank"
-          rel="noopener"
-          display="block"
-          textAlign="start"
-        >
+        <Link color="link-inverse" href={profileUrl} target="_blank" rel="noopener" display="block">
           {name}
-        </Button>
+        </Link>
       </Flex.Item>
     </Flex>
   )
@@ -213,10 +205,9 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                   className={css(hoverStyles.imageWrapper, styles.imageWrapper)}
                   key={resultImage.id}
                 >
-                  <Button
-                    variant="link"
+                  <Link
+                    as="button"
                     display="block"
-                    textAlign="start"
                     theme={{
                       mediumPaddingHorizontal: '0'
                     }}
@@ -262,7 +253,7 @@ export default function UnsplashPanel({source, setUnsplashData, brandColor, live
                         height="10em"
                       />
                     </div>
-                  </Button>
+                  </Link>
                   <div className={css(styles.imageAttribution)}>
                     <Attribution
                       name={resultImage.user.name}

@@ -39,7 +39,7 @@ BulkEditHeader.propTypes = {
   jobSuccess: bool.isRequired,
   onSave: func.isRequired,
   onCancel: func.isRequired,
-  onOpenBatchEdit: func.isRequired
+  onOpenBatchEdit: func.isRequired,
 }
 
 export default function BulkEditHeader({
@@ -50,7 +50,7 @@ export default function BulkEditHeader({
   jobSuccess,
   onSave,
   onCancel,
-  onOpenBatchEdit
+  onOpenBatchEdit,
 }) {
   function renderProgressValue({valueNow}) {
     return <Text>{I18n.t('%{percent}%', {percent: valueNow})}</Text>
@@ -62,7 +62,7 @@ export default function BulkEditHeader({
       [
         originalDateField('due_at'),
         originalDateField('unlock_at'),
-        originalDateField('lock_at')
+        originalDateField('lock_at'),
       ].some(originalField => override.hasOwnProperty(originalField))
     )
   })()
@@ -89,7 +89,7 @@ export default function BulkEditHeader({
               />
               <CanvasInlineAlert liveAlert screenReaderOnly variant="info">
                 {I18n.t('Saving assignment dates progress: %{percent}%', {
-                  percent: jobCompletion
+                  percent: jobCompletion,
                 })}
               </CanvasInlineAlert>
             </View>

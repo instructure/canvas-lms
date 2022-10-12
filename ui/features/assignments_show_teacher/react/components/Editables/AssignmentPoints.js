@@ -41,18 +41,18 @@ export default class AssignmentPoints extends React.Component {
     onChangeMode: func.isRequired,
     onValidate: func.isRequired,
     invalidMessage: func.isRequired,
-    readOnly: bool
+    readOnly: bool,
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      isValid: props.onValidate('pointsPossible', props.pointsPossible)
+      isValid: props.onValidate('pointsPossible', props.pointsPossible),
     }
   }
 
@@ -84,7 +84,7 @@ export default class AssignmentPoints extends React.Component {
         showFlashAlert({
           message: this.props.invalidMessage('pointsPossible') || I18n.t('Error'),
           type: 'error',
-          srOnly: true
+          srOnly: true,
         })
       }
       this.props.onChange(strValue)

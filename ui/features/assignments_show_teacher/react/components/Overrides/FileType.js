@@ -45,18 +45,18 @@ export default class FileType extends React.Component {
     value: string.isRequired,
     options: arrayOf(SubmitOptionShape).isRequired,
     onDelete: func,
-    initialSelection: arrayOf(string)
+    initialSelection: arrayOf(string),
   }
 
   static defaultProps = {
-    readOnly: false
+    readOnly: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      selectedOptions: this.props.initialSelection
+      selectedOptions: this.props.initialSelection,
     }
   }
 

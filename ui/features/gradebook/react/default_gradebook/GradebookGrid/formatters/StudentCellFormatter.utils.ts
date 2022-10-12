@@ -38,7 +38,7 @@ export function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   return {
     login_id: student.login_id,
     sis_id: student.sis_user_id,
-    integration_id: student.integration_id
+    integration_id: student.integration_id,
   }[secondaryInfo]
 }
 
@@ -76,7 +76,7 @@ export function getOptions(gradebook) {
     },
     shouldShowGroups() {
       return gradebook.studentGroupsEnabled
-    }
+    },
   }
 }
 

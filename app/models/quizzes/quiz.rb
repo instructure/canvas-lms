@@ -209,7 +209,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # There is no need to create a new assignment if the quiz being deleted
     return if workflow_state == "deleted"
 
-    if !assignment_id && graded? && (force || !%i[assignment clone migration].include?(@saved_by))
+    if !assignment_id && (graded? || (force && survey?)) && (force || !%i[assignment clone migration].include?(@saved_by))
       assignment = self.assignment
       assignment ||= context.assignments.build(title: title, due_at: due_at, submission_types: "online_quiz")
       assignment.assignment_group_id = self.assignment_group_id

@@ -33,7 +33,7 @@ test('formats score as points when grading_type is "points"', () => {
 test('formats score as percentage when grading_type is "percent"', () => {
   const grade = ScoreToGradeHelper.scoreToGrade(12.34, {
     grading_type: 'percent',
-    points_possible: 50
+    points_possible: 50,
   })
   equal(grade, '24.68%')
 })
@@ -41,7 +41,7 @@ test('formats score as percentage when grading_type is "percent"', () => {
 test('formats score as empty string when grading_type is "percent" and assignment has no points_possible', () => {
   const grade = ScoreToGradeHelper.scoreToGrade(12.34, {
     grading_type: 'percent',
-    points_possible: 0
+    points_possible: 0,
   })
   equal(grade, '')
 })
@@ -59,7 +59,7 @@ test('formats score as "incomplete" when grading_type is "pass_fail" and score i
 test('formats score as empty string when grading_type is "letter_grade" and no gradingScheme given', () => {
   const grade = ScoreToGradeHelper.scoreToGrade(12.34, {
     grading_type: 'letter_grade',
-    points_possible: 10
+    points_possible: 10,
   })
   equal(grade, '')
 })
@@ -69,7 +69,7 @@ test('formats score as empty string when grading_type is "letter_grade" and assi
     ['A', 0.9],
     ['B', 0.8],
     ['C', 0.7],
-    ['F', 0]
+    ['F', 0],
   ])
   equal(grade, '')
 })
@@ -78,7 +78,12 @@ test('formats score as letter grade when grading_type is "letter_grade" and grad
   const grade = ScoreToGradeHelper.scoreToGrade(
     7,
     {grading_type: 'letter_grade', points_possible: 10},
-    [['A', 0.9], ['B', 0.8], ['C', 0.7], ['F', 0]]
+    [
+      ['A', 0.9],
+      ['B', 0.8],
+      ['C', 0.7],
+      ['F', 0],
+    ]
   )
   equal(grade, 'C')
 })

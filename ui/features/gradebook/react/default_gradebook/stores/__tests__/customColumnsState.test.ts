@@ -28,7 +28,7 @@ const exampleCustomColumns: CustomColumn[] = [
     position: 0,
     read_only: false,
     teacher_notes: false,
-    title: 'Custom Column 1'
+    title: 'Custom Column 1',
   },
   {
     hidden: false,
@@ -36,8 +36,8 @@ const exampleCustomColumns: CustomColumn[] = [
     position: 1,
     read_only: false,
     teacher_notes: false,
-    title: 'Custom Column 2'
-  }
+    title: 'Custom Column 2',
+  },
 ]
 
 describe('customColumnsState', () => {
@@ -62,7 +62,7 @@ describe('customColumnsState', () => {
   describe('when sending the initial request', () => {
     it('sets the `per_page` parameter to the configured per page maximum', async () => {
       store.setState({
-        performanceControls: new PerformanceControls({customColumnsPerPage: 45})
+        performanceControls: new PerformanceControls({customColumnsPerPage: 45}),
       })
       store.getState().fetchCustomColumns()
       await network.allRequestsReady()

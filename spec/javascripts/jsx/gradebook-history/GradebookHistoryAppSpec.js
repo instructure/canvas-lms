@@ -32,7 +32,7 @@ QUnit.module('GradebookHistoryApp has component', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
 test('Provider with a store prop', function () {

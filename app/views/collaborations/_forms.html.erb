@@ -36,7 +36,7 @@
             <option value="<%= collab_type['name'] %>"><%= collab_type['name'] %></option>
           <% end %>
         <% end %>
-        <% ContextExternalTool.all_tools_for(@context, placements: :collaboration).each do |tool| %>
+        <% Lti::ContextToolFinder.all_tools_for(@context, placements: :collaboration).each do |tool| %>
           <option value="<%= tool.name %>" data-launch-url="<%= polymorphic_url([@context, :external_tool], id: tool.id, display: 'borderless', launch_type: 'collaboration') %>">
             <%= tool.name %>
           </option>

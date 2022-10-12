@@ -44,9 +44,18 @@ module Outcomes
         user_id: users.map(&:id),
         learning_outcome_id: outcomes.map(&:id)
       )
+      # muted associations is applied to remove assignments that students
+      # are not yet allowed to see:
+      # Assignment Grades have not be posted yet (i.e. Submission.posted_at = nil)
+      # PostPolicy.post_manually is false or null
+      # Assignment grading_type is not_graded
       unless context.grants_any_right?(user, :manage_grades, :view_all_grades)
         results = results.exclude_muted_associations
       end
+      # LOR hidden is populated for non-scoring rubrics only which is set
+      # by checking Don't post Outcomes results to Learning Mastery Gradebook`
+      # when adding a rubric to an assignment
+      # also see rubric_assessment.create_outcome_result
       unless opts[:include_hidden]
         results = results.where(hidden: false)
       end
@@ -116,7 +125,6 @@ module Outcomes
     #
     # Returns an Array of Rollup objects.
     def outcome_results_rollups(results:, users: [], excludes: [], context: nil)
-      ActiveRecord::Associations.preload(results, :learning_outcome)
       rollups = results.group_by(&:user_id).map do |_, user_results|
         Rollup.new(user_results.first.user, rollup_user_results(user_results, context))
       end

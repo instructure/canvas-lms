@@ -1223,6 +1223,7 @@ module Lti
 
         describe "$com.instructure.RCS.service_jwt" do
           subject do
+            allow(controller).to receive(:rce_js_env_base).with(any_args).and_return(JWT: "service-jwt")
             exp_hash = { test: "$com.instructure.RCS.service_jwt" }
             variable_expander.expand_variables!(exp_hash)
             exp_hash[:test]
@@ -1231,7 +1232,6 @@ module Lti
           context "when tool is an internal service" do
             before do
               allow(tool).to receive(:internal_service?).with(any_args).and_return(true)
-              allow(Services::RichContent).to receive(:env_for).with(any_args).and_return(JWT: "service-jwt")
             end
 
             it { is_expected.to eq("service-jwt") }
