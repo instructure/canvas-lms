@@ -470,6 +470,7 @@ export default class GradingPeriodSet extends React.Component {
           <div>
             <div className="ItemGroup__header__title">
               <button
+                type="button"
                 className="Button Button--icon-action GradingPeriodSet__toggle"
                 aria-expanded={this.props.expanded}
                 aria-label={I18n.t('Toggle %{title} grading period visibility', {

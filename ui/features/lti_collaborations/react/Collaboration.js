@@ -89,7 +89,12 @@ class Collaboration extends React.Component {
           )}
 
           {collaboration.permissions.delete && (
-            <button ref="deleteButton" className="btn btn-link" onClick={this.openConfirmation}>
+            <button
+              type="button"
+              ref="deleteButton"
+              className="btn btn-link"
+              onClick={this.openConfirmation}
+            >
               <i className="icon-trash" />
               <span className="screenreader-only">{I18n.t('Delete Collaboration')}</span>
             </button>

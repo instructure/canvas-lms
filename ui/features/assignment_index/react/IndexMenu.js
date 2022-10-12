@@ -97,6 +97,7 @@ export default class IndexMenu extends React.Component {
       return (
         <li role="menuitem">
           <button
+            type="button"
             ref={node => {
               this.disableTrigger = node
             }}
@@ -192,6 +193,7 @@ export default class IndexMenu extends React.Component {
         }}
       >
         <button
+          type="button"
           className="al-trigger btn Button"
           id="course_assignment_settings_link"
           tabIndex="0"
