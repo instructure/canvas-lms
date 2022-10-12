@@ -253,6 +253,10 @@ export type GradebookProps = {
   locale: string
   modules: Module[]
   performanceControls: PerformanceControls
+  recentlyLoadedAssignmentGroups: {
+    assignmentGroups: AssignmentGroup[]
+    gradingPeriodIds?: string[]
+  }
   settingsModalButtonContainer: HTMLElement
   studentIds: string[]
   viewOptionsMenuNode: HTMLElement
@@ -378,7 +382,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   postPolicies: PostPolicies
 
-  gridReady = deferPromise()
+  gridReady = deferPromise<null>()
 
   courseContent: CourseContent
 
@@ -442,7 +446,6 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       dispatch: props.dispatch,
       performanceControls: props.performanceControls,
       fetchStudentIds: props.fetchStudentIds,
-      fetchGradingPeriodAssignments: props.fetchGradingPeriodAssignments,
     })
     if (this.courseFeatures.finalGradeOverrideEnabled) {
       this.finalGradeOverrides = new FinalGradeOverrides(this)
@@ -711,7 +714,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this._updateEssentialDataLoaded()
   }
 
-  gotAllAssignmentGroups = assignmentGroups => {
+  gotAllAssignmentGroups = (assignmentGroups: AssignmentGroup[]) => {
     this.setAssignmentGroupsLoaded(true)
     assignmentGroups.forEach(assignmentGroup => {
       let group = this.assignmentGroups[assignmentGroup.id]
@@ -832,7 +835,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
   finishRenderingUI = () => {
     this.initGrid()
     this.initHeader()
-    this.gridReady.resolve()
+    this.gridReady.resolve(null)
     this.loadOverridesForSIS()
   }
 
@@ -1519,7 +1522,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.postGradesStore.setSelectedSection(sectionId)
       return this.saveSettings({}).then(() => {
         this.updateSectionFilterVisibility()
-        return this.dataLoader.reloadStudentDataForSectionFilterChange()
+        return this.dataLoader.reloadStudentData()
       })
     }
   }
@@ -1566,7 +1569,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
       this.setFilterRowsBySetting('studentGroupId', groupId)
       return this.saveSettings({}).then(() => {
         this.updateStudentGroupFilterVisibility()
-        this.dataLoader.reloadStudentDataForStudentGroupFilterChange()
+        this.dataLoader.reloadStudentData()
       })
     }
   }
@@ -3897,7 +3900,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     this.setState({gradingPeriodId: this.gradingPeriodId})
   }
 
-  getCurrentGradingPeriod = () => {
+  getCurrentGradingPeriod = (): string => {
     if (this.gradingPeriodSet == null) {
       return '0'
     }
@@ -3998,16 +4001,17 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
 
   listSelectedViewOptionsFilters = () => this.gridDisplaySettings.selectedViewOptionsFilters
 
-  toggleEnrollmentFilter = (enrollmentFilter, skipApply = false) => {
+  toggleEnrollmentFilter = (enrollmentFilter: string, skipApply = false) => {
     this.getEnrollmentFilters()[enrollmentFilter] = !this.getEnrollmentFilters()[enrollmentFilter]
     if (!skipApply) {
-      return this.applyEnrollmentFilter()
+      this.applyEnrollmentFilter()
     }
   }
 
   updateStudentHeadersAndReloadData = () => {
     this.updateStudentColumnHeaders()
-    return this.dataLoader.reloadStudentDataForEnrollmentFilterChange()
+    this.dataLoader.reloadStudentData()
+    this.props.fetchGradingPeriodAssignments()
   }
 
   applyEnrollmentFilter = () => {
@@ -4590,12 +4594,16 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     }
 
     // grading period assignments
-    if (
-      prevProps.isGradingPeriodAssignmentsLoading !==
-        this.props.isGradingPeriodAssignmentsLoading &&
-      !this.props.isGradingPeriodAssignmentsLoading
-    ) {
+    if (prevProps.gradingPeriodAssignments !== this.props.gradingPeriodAssignments) {
       this.updateGradingPeriodAssignments(this.props.gradingPeriodAssignments)
+    }
+
+    // assignment groups
+    if (prevProps.recentlyLoadedAssignmentGroups !== this.props.recentlyLoadedAssignmentGroups) {
+      this.updateAssignmentGroups(
+        this.props.recentlyLoadedAssignmentGroups.assignmentGroups,
+        this.props.recentlyLoadedAssignmentGroups.gradingPeriodIds
+      )
     }
 
     // modules
