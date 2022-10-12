@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, bool, func, number, objectOf, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
@@ -177,9 +177,9 @@ export default class SpeedGraderProvisionalGradeSelector extends React.Component
 
     return (
       <View as="div" id="grading_details_container">
-        <Button margin="0" onClick={this.onDetailsToggled} size="small" variant="link">
+        <Link as="button" margin="0" onClick={this.onDetailsToggled} size="small">
           {detailsVisible ? I18n.t('Hide Details') : I18n.t('Show Details')}
-        </Button>
+        </Link>
 
         {detailsVisible && this.renderDetailsContainer()}
       </View>
