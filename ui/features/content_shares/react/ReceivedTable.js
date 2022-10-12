@@ -22,7 +22,8 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import {Table} from '@instructure/ui-table'
 import {Menu} from '@instructure/ui-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {IconMoreLine, IconEyeLine, IconImportLine, IconTrashLine} from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import FriendlyDatetime from '@canvas/datetime/react/components/FriendlyDatetime'
@@ -106,13 +107,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
     if (read_state !== 'read') {
       return (
         <Tooltip renderTip={srText()}>
-          <Button
-            variant="link"
-            size="small"
-            data-testid="received-table-row-unread"
-            onClick={setReadState}
-            margin="0 x-small 0 0"
-          >
+          <Link data-testid="received-table-row-unread" onClick={setReadState} margin="0 small">
             {/* unread indicator, until we can use InstUI Badge for both unread and read indicators */}
             <View
               display="block"
@@ -124,19 +119,13 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
               background="info"
             />
             <ScreenReaderContent>{srText()}</ScreenReaderContent>
-          </Button>
+          </Link>
         </Tooltip>
       )
     } else {
       return (
         <Tooltip renderTip={srText()}>
-          <Button
-            variant="link"
-            size="small"
-            data-testid="received-table-row-read"
-            onClick={setUnreadState}
-            margin="0 x-small 0 0"
-          >
+          <Link data-testid="received-table-row-read" onClick={setUnreadState} margin="0 small">
             <View
               display="block"
               borderWidth="medium"
@@ -146,7 +135,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
               borderColor="info"
             />
             <ScreenReaderContent>{srText()}</ScreenReaderContent>
-          </Button>
+          </Link>
         </Tooltip>
       )
     }
