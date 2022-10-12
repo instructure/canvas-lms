@@ -16,8 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type Gradebook from '../Gradebook'
+
+type Settings = {
+  allowFinalGradeOverride: boolean
+}
+
 export default class CourseSettings {
-  constructor(gradebook, settings) {
+  _gradebook: Gradebook
+
+  _settings: Settings
+
+  constructor(gradebook: Gradebook, settings: Settings) {
     this._gradebook = gradebook
     this._settings = settings
 
@@ -28,11 +38,11 @@ export default class CourseSettings {
     return this._settings.allowFinalGradeOverride
   }
 
-  setAllowFinalGradeOverride(allow) {
+  setAllowFinalGradeOverride(allow: boolean) {
     this._settings.allowFinalGradeOverride = allow
   }
 
-  handleUpdated(settings) {
+  handleUpdated(settings: Settings) {
     const previousSettings = {...this._settings}
     this._settings = {
       ...this._settings,
@@ -43,7 +53,7 @@ export default class CourseSettings {
       this._gradebook.updateColumns()
 
       if (this._settings.allowFinalGradeOverride) {
-        this._gradebook.finalGradeOverrides.loadFinalGradeOverrides()
+        this._gradebook.finalGradeOverrides?.loadFinalGradeOverrides()
       }
     }
   }

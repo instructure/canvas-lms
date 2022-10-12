@@ -29,13 +29,16 @@ export function getFinalGradeOverrides(courseId: string) {
   const url = `/courses/${courseId}/gradebook/final_grade_overrides`
 
   return axios
-    .get(url)
+    .get<{final_grade_overrides: {[studentId: string]: any}}>(url)
     .then(response => {
       const data = {finalGradeOverrides: {}}
 
       for (const studentId in response.data.final_grade_overrides) {
         const responseOverrides = response.data.final_grade_overrides[studentId]
-        const studentOverrides = (data.finalGradeOverrides[studentId] = {})
+        const studentOverrides: {
+          courseGrade?: string
+          gradingPeriodGrades?: {[gradingPeriodId: string]: string}
+        } = (data.finalGradeOverrides[studentId] = {})
 
         if (responseOverrides.course_grade) {
           studentOverrides.courseGrade = camelize(responseOverrides.course_grade)
@@ -54,7 +57,7 @@ export function getFinalGradeOverrides(courseId: string) {
 
       return data
     })
-    .catch(() => {
+    .catch(_error => {
       showFlashAlert({
         message: I18n.t('There was a problem loading final grade overrides.'),
         type: 'error',

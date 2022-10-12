@@ -17,12 +17,21 @@
  */
 
 export default class FinalGradeOverrideDatastore {
+  _gradesByUserId: {
+    [userId: string]: {
+      courseGrade?: string
+      gradingPeriodGrades?: {[gradingPeriodId: string]: string}
+    }
+  }
+
+  _pendingGrades: Array<{userId: string; gradingPeriodId: string | null; gradeInfo: any}>
+
   constructor() {
     this._gradesByUserId = {}
     this._pendingGrades = []
   }
 
-  getGrade(userId, gradingPeriodId) {
+  getGrade(userId: string, gradingPeriodId: string | null) {
     const gradeOverrides = this._gradesByUserId[userId]
     if (!gradeOverrides) {
       return null
@@ -35,7 +44,7 @@ export default class FinalGradeOverrideDatastore {
     return gradeOverrides.courseGrade || null
   }
 
-  updateGrade(userId, gradingPeriodId, grade) {
+  updateGrade(userId: string, gradingPeriodId: string | null, grade) {
     this._gradesByUserId[userId] = this._gradesByUserId[userId] || {}
     const gradeOverrides = this._gradesByUserId[userId]
 
@@ -51,20 +60,20 @@ export default class FinalGradeOverrideDatastore {
     this._gradesByUserId = gradeOverrides
   }
 
-  addPendingGradeInfo(userId, gradingPeriodId, gradeInfo) {
+  addPendingGradeInfo(userId: string, gradingPeriodId: string | null, gradeInfo) {
     const pendingGradeInfo = {gradeInfo, userId, gradingPeriodId}
     this.removePendingGradeInfo(userId, gradingPeriodId)
     this._pendingGrades.push(pendingGradeInfo)
   }
 
-  removePendingGradeInfo(userId, gradingPeriodId) {
+  removePendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     this._pendingGrades =
       this._pendingGrades.filter(
         gradeInfo => gradeInfo.userId !== userId || gradeInfo.gradingPeriodId !== gradingPeriodId
       ) || null
   }
 
-  getPendingGradeInfo(userId, gradingPeriodId) {
+  getPendingGradeInfo(userId: string, gradingPeriodId: string | null) {
     const datum = this._pendingGrades.find(
       gradeInfo => gradeInfo.userId === userId && gradeInfo.gradingPeriodId === gradingPeriodId
     )

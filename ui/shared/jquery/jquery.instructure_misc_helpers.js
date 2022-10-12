@@ -128,7 +128,7 @@ $.fileSize = function (bytes) {
 $.toSentence = function (array, options) {
   if (typeof options === 'undefined') {
     options = {}
-  } else if (options == 'or') {
+  } else if (options === 'or') {
     options = {
       two_words_connector: I18n.t('#support.array.or.two_words_connector'),
       last_word_connector: I18n.t('#support.array.or.last_word_connector'),

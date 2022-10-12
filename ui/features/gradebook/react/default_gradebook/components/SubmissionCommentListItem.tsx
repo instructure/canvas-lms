@@ -113,7 +113,7 @@ export default class SubmissionCommentListItem extends React.Component<Props> {
             <Link href={this.props.authorUrl}>
               <Avatar
                 size="small"
-                name={this.props.author}
+                name={this.props.author || ''}
                 alt={I18n.t('Avatar for %{author}', {author: this.props.author})}
                 src={this.props.authorAvatarUrl}
                 margin="0 x-small 0 0"

@@ -16,8 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import type GradeOverride from '../GradeOverride'
+
+type Attr = {
+  enteredAs: string | null
+  enteredValue: string
+  grade: GradeOverride | null
+  valid: boolean | null
+}
+
 export default class GradeOverrideInfo {
-  constructor(attr) {
+  _attr: Attr
+
+  constructor(attr = {}) {
     this._attr = {
       enteredAs: null,
       enteredValue: '',
@@ -44,6 +55,6 @@ export default class GradeOverrideInfo {
   }
 
   equals(gradeOverrideInfo) {
-    return this.grade.equals(gradeOverrideInfo.grade)
+    return this.grade?.equals(gradeOverrideInfo.grade)
   }
 }

@@ -52,7 +52,7 @@ export default class ReactCellEditor {
     ReactDOM.render(element, this.container)
   }
 
-  handleKeyDown(event) {
+  handleKeyDown(event: KeyboardEvent) {
     if (this.component) {
       return this.component.handleKeyDown(event)
     }
