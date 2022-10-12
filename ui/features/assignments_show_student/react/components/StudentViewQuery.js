@@ -114,7 +114,8 @@ const LoggedOutStudentViewQuery = props => {
   document.title = data.assignment.name
   const dataWithEnv = JSON.parse(JSON.stringify(data))
   dataWithEnv.assignment.env = getAssignmentEnvVariables()
-  return <StudentContent assignment={dataWithEnv.assignment} />
+  dataWithEnv.assignment.rubric = transformRubricData(dataWithEnv.assignment.rubric)
+  return <StudentContent onChangeSubmission={() => {}} assignment={dataWithEnv.assignment} />
 }
 
 const StudentViewQuery = props => {
