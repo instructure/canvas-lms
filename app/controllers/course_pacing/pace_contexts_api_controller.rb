@@ -27,11 +27,7 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   PERMITTED_CONTEXT_TYPES = %w[course section student_enrollment].freeze
 
   def index
-    contexts = begin
-      CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type)
-    rescue NotImplementedError
-      []
-    end
+    contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type)
     paginated_contexts = Api.paginate(contexts, self, api_v1_pace_contexts_url, total_entries: contexts.count)
     render json: {
       pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c) }
