@@ -16,12 +16,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {View} from '@instructure/ui-view'
-import {CloseButton} from '@instructure/ui-buttons'
+import React, {useEffect, useState} from 'react'
+import {connect} from 'react-redux'
+
+import {CloseButton, CondensedButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
-import React, {useEffect} from 'react'
+import {View} from '@instructure/ui-view'
+
 import {useScope as useI18nScope} from '@canvas/i18n'
+
 import {SummarizedChange} from '../utils/change_tracking'
+import {ResetPaceWarningModal} from './reset_pace_warning_modal'
+import {coursePaceActions} from '../actions/course_paces'
+import {StoreState} from '../types'
+import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
+import {getSummarizedChanges} from '../reducers/course_paces'
 
 const I18n = useI18nScope('unpublished_changes_tray_contents')
 
@@ -62,18 +71,43 @@ function styleList() {
 // Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
 // const {Item} = List as any
 
-export type UnpublishedChangesTrayProps = {
-  changes?: SummarizedChange[]
+interface StoreProps {
+  readonly autoSaving: boolean
+  readonly isSyncing: boolean
+  readonly showLoadingOverlay: boolean
+  readonly unpublishedChanges: SummarizedChange[]
+}
+
+interface DispatchProps {
+  onResetPace: typeof coursePaceActions.onResetPace
+}
+
+interface PassedProps {
   handleTrayDismiss: () => void
 }
 
-const UnpublishedChangesTrayContents = ({
-  changes = [],
+type ComponentProps = StoreProps & DispatchProps & PassedProps
+
+export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
+  autoSaving,
+  isSyncing,
+  showLoadingOverlay,
+  onResetPace,
+  unpublishedChanges,
   handleTrayDismiss,
-}: UnpublishedChangesTrayProps) => {
+}) => {
+  const [isResetWarningModalOpen, setResetWarningModalOpen] = useState(false)
+  const cancelDisabled =
+    autoSaving || isSyncing || showLoadingOverlay || unpublishedChanges.length === 0
+
   useEffect(() => {
     styleList()
   }, [])
+
+  const handleResetConfirmed = () => {
+    onResetPace()
+    handleTrayDismiss()
+  }
 
   return (
     <View as="div" width="20rem" margin="0 auto large" padding="small">
@@ -87,9 +121,23 @@ const UnpublishedChangesTrayContents = ({
         <h4>
           <Text weight="bold">{I18n.t('Unpublished Changes')}</Text>
         </h4>
+        {window.ENV.FEATURES.course_paces_redesign && (
+          <CondensedButton
+            interaction={cancelDisabled ? 'disabled' : 'enabled'}
+            onClick={() => setResetWarningModalOpen(true)}
+            margin="small 0 0"
+          >
+            {I18n.t('Reset all')}
+          </CondensedButton>
+        )}
+        <ResetPaceWarningModal
+          open={isResetWarningModalOpen}
+          onCancel={() => setResetWarningModalOpen(false)}
+          onConfirm={handleResetConfirmed}
+        />
       </View>
       <ol className="course_pace_changes">
-        {changes.map(
+        {unpublishedChanges.map(
           c =>
             c.summary && (
               <li key={c.id} style={{overflowWrap: 'break-word'}}>
@@ -102,4 +150,15 @@ const UnpublishedChangesTrayContents = ({
   )
 }
 
-export default UnpublishedChangesTrayContents
+const mapStateToProps = (state: StoreState): StoreProps => {
+  return {
+    autoSaving: getAutoSaving(state),
+    isSyncing: getSyncing(state),
+    showLoadingOverlay: getShowLoadingOverlay(state),
+    unpublishedChanges: getSummarizedChanges(state),
+  }
+}
+
+export default connect(mapStateToProps, {
+  onResetPace: coursePaceActions.onResetPace,
+})(UnpublishedChangesTrayContents)
