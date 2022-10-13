@@ -293,6 +293,7 @@ const DiscussionTopicManager = props => {
             }}
             goToTopic={goToTopic}
             highlightEntryId={highlightEntryId}
+            setHighlightEntryId={setHighlightEntryId}
             isSearchResults={!!searchTerm}
           />
         )
