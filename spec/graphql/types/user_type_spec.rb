@@ -423,6 +423,91 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    context "recipient user deleted" do
+      def delete_recipient
+        # The short issue is CP and CMP are not fk attached to the user, but our code expects an associated user.
+        # As a result the below specs give us options to handle when a user is hard deleted without cleanup.
+        # The CMP requires that the cmp.workflow_state == deleted;
+        # there is no way around this because the loader takes an array of cmps and it would defeat the purpose to check user beforehand.
+        # Thus for now we handle this and return null which can be processed.
+
+        conversation(@student, sender: @teacher)
+
+        # delete student
+        student_id = @student.id
+
+        # delete enrollments can run in a loop if multiple
+        enrollment = @student.enrollments.first
+        enrollment_state = enrollment.enrollment_state
+        enrollment_state.delete
+        enrollment.delete
+
+        # delete stream_item_instances can run in a loop if multiple
+        stream_item_instance = @student.stream_item_instances.first
+        stream_item_instance.delete
+
+        # delete user_account_associations can run in a loop if multiple
+        user_account_association = @student.user_account_associations.first
+        user_account_association.delete
+
+        @student.delete
+
+        # deleting the cmp
+        # the problem cp:  cp_without_associated_user = ConversationParticipant.where(user_id: student_id).first
+        cmp_without_associated_user = ConversationMessageParticipant.where(user_id: student_id).first
+        cmp_without_associated_user.workflow_state = "deleted"
+        cmp_without_associated_user.save
+
+        student_id
+      end
+
+      it "returns empty recipients" do
+        delete_recipient
+        type = GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
+
+        recipients_ids = type.resolve("
+        conversationsConnection(scope: \"sent\") {
+          nodes {
+            conversation {
+              conversationMessagesConnection {
+                nodes {
+                  recipients {
+                    _id
+                  }
+                }
+              }
+            }
+          }
+        }
+        ")
+        expect(recipients_ids[0][0].empty?).to be true
+      end
+
+      context "ConversationMessageParticipant.workflow_state deleted" do
+        it "returns nil for user" do
+          student_id = delete_recipient
+          type = GraphQLTypeTester.new(@teacher, current_user: @teacher, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
+          cmps_ids = type.resolve("
+            conversationsConnection(scope: \"sent\") {
+              nodes {
+                conversation {
+                  conversationParticipantsConnection {
+                    nodes {
+                      user {
+                        _id
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            ")
+          expect(cmps_ids[0].include?(@teacher.id.to_s)).to be true
+          expect(cmps_ids[0].include?(student_id.to_s)).to be false
+        end
+      end
+    end
+
     it "has createdAt field for conversationMessagesConnection" do
       Timecop.freeze do
         c = conversation(@student, @teacher)
