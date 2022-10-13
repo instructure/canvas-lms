@@ -103,6 +103,7 @@ module CanvasRails
     # The main autoloader should ignore it so the `once` autoloader can happily load it
     Rails.autoloaders.main.ignore("#{__dir__}/../lib/base")
     config.paths.add("lib/base", eager_load: true, autoload_once: true)
+    $LOAD_PATH << "#{__dir__}/../lib/base"
 
     # This needs to be set for things in the `once` autoloader really early
     Rails.autoloaders.each do |autoloader|
