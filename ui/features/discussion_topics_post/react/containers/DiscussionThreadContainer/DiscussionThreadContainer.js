@@ -43,6 +43,7 @@ import {SearchContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
+import * as ReactDOMServer from 'react-dom/server'
 import {ReplyInfo} from '../../components/ReplyInfo/ReplyInfo'
 import {Responsive} from '@instructure/ui-responsive'
 
@@ -479,6 +480,16 @@ export const DiscussionThreadContainer = props => {
                     onReplySubmit(message, anonymousAuthorState)
                   }}
                   onCancel={() => setEditorExpanded(false)}
+                  value={
+                    props.discussionEntry.rootEntryId &&
+                    props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+                      ? ReactDOMServer.renderToString(
+                          <span className="mceNonEditable mention" data-mention="1">
+                            @{getDisplayName(props.discussionEntry)}
+                          </span>
+                        )
+                      : ''
+                  }
                 />
               </View>
             )}
