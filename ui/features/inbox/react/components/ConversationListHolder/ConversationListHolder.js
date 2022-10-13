@@ -315,7 +315,7 @@ ConversationListHolder.propTypes = {
    * Bool to determine if there is a next page
    */
   hasMoreMenuData: PropTypes.bool,
-  isError: PropTypes.bool,
+  isError: PropTypes.object,
 }
 
 ConversationListHolder.defaultProps = {

@@ -36,8 +36,8 @@ module Types
     field :recipients, [UserType], null: false
     def recipients
       load_association(:conversation_message_participants).then do |cmps|
-        # handle case where user sent a message to themself
-        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id } unless cmps.size == 1
+        # handle case where user sent a message to themself or if cmp is bad ex: hard deleted user.
+        cmps = cmps.reject { |cmp| cmp.user_id == current_user.id || !cmp.active? } unless cmps.size == 1
         Loaders::AssociationLoader.for(ConversationMessageParticipant, :user).load_many(cmps)
       end
     end
