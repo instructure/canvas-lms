@@ -455,6 +455,14 @@ describe('DiscussionFullPage', () => {
       expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
     )
 
+    // expect the highlight to exist for a while
+    jest.advanceTimersByTime(3000)
+    expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+    // expect the highlight to disappear
+    jest.advanceTimersByTime(3000)
+    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+
     await waitFor(() =>
       expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
     )

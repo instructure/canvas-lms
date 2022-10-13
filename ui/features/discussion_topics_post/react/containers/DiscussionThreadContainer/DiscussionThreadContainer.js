@@ -78,12 +78,14 @@ export const DiscussionThreadContainer = props => {
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+    props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
   const [createDiscussionEntry] = useMutation(CREATE_DISCUSSION_ENTRY, {
     update: updateCache,
-    onCompleted: () => {
+    onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error creating the discussion entry.'))
@@ -484,6 +486,8 @@ export const DiscussionThreadContainer = props => {
               depth={props.depth + 1}
               markAsRead={props.markAsRead}
               parentRefCurrent={threadRefCurrent}
+              highlightEntryId={props.highlightEntryId}
+              setHighlightEntryId={props.setHighlightEntryId}
             />
           )}
         </>
@@ -503,6 +507,7 @@ DiscussionThreadContainer.propTypes = {
   highlightEntryId: PropTypes.string,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  setHighlightEntryId: PropTypes.func,
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -543,6 +548,8 @@ const DiscussionSubentries = props => {
       parentRefCurrent={props.parentRefCurrent}
       removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
       updateDraftCache={props.updateDraftCache}
+      highlightEntryId={props.highlightEntryId}
+      setHighlightEntryId={props.setHighlightEntryId}
     />
   ))
 }
@@ -555,4 +562,6 @@ DiscussionSubentries.propTypes = {
   parentRefCurrent: PropTypes.object,
   removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func,
+  highlightEntryId: PropTypes.string,
+  setHighlightEntryId: PropTypes.func,
 }
