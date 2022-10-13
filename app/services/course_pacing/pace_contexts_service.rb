@@ -31,7 +31,7 @@ class CoursePacing::PaceContextsService
     when "section"
       course.active_course_sections
     when "student_enrollment"
-      raise NotImplementedError
+      course.student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*").to_a
     else
       Canvas::Errors.capture_exception(
         :pace_contexts_service,

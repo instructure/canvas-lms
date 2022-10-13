@@ -126,11 +126,89 @@ describe "Pace Contexts API" do
     end
 
     context "when the student_enrollment type is specified" do
-      it "returns an empty array" do
+      let(:student) { user_model(name: "Foo Bar") }
+      let(:student_two) { user_model(name: "Bar Foo") }
+      let!(:enrollment) { course.enroll_student(student, enrollment_state: "active") }
+      let!(:enrollment_two) { course.enroll_student(student_two, enrollment_state: "active") }
+
+      it "returns an array containing the student enrollments" do
         get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
         expect(response.status).to eq 200
         json = JSON.parse(response.body)
-        expect(json["pace_contexts"]).to match_array([])
+        course.student_enrollments.each do |se|
+          context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == se.id }
+          expect(context_json["name"]).to eq se.user.name
+          expect(context_json["applied_pace"]["type"]).to eq "Course"
+        end
+      end
+
+      it "paginates results" do
+        get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", per_page: 1, format: :json }
+        expect(response.status).to eq 200
+        json = JSON.parse(response.body)
+        expect(json["pace_contexts"].count).to eq 1
+        expect(json["pace_contexts"][0]["item_id"]).to eq enrollment.id
+
+        get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", per_page: 1, page: 2, format: :json }
+        expect(response.status).to eq 200
+        json = JSON.parse(response.body)
+        expect(json["pace_contexts"].count).to eq 1
+        expect(json["pace_contexts"][0]["item_id"]).to eq enrollment_two.id
+      end
+
+      context "when students have multiple enrollments in the same course" do
+        let(:section_one) { add_section("Section One", course: course) }
+        let!(:enrollment_two) { course.enroll_student(student_two, allow_multiple_enrollments: true, section: section_one, enrollment_state: "active") }
+
+        before do
+          Timecop.freeze(2.weeks.ago) do
+            course.enroll_student(student_two, enrollment_state: "active")
+            course.enroll_student(student, allow_multiple_enrollments: true, section: section_one, enrollment_state: "active")
+          end
+        end
+
+        it "returns only the newest enrollment for each student" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].length).to eq 2
+          [enrollment, enrollment_two].each do |e|
+            pace_context = json["pace_contexts"].detect { |pc| pc["item_id"] == e.id }
+            expect(pace_context["name"]).to eq e.user.name
+          end
+        end
+      end
+
+      context "when a the student enrollments have more granular paces" do
+        let(:section) { add_section("Section One", course: course) }
+        let!(:enrollment_two) { multiple_student_enrollment(student_two, section, course: course) }
+
+        before do
+          student_enrollment_pace_model(student_enrollment: enrollment)
+          section_pace_model(section: section)
+        end
+
+        it "specifies the correct applied_pace" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == enrollment.id }
+          expect(context_json["applied_pace"]["type"]).to eq "StudentEnrollment"
+
+          context_json = json["pace_contexts"].detect { |pc| pc["item_id"] == enrollment_two.id }
+          expect(context_json["applied_pace"]["type"]).to eq "Section"
+        end
+      end
+
+      context "when the default pace doesn't exist" do
+        before { default_pace.destroy! }
+
+        it "returns nil for the applied_pace" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].map { |pc| pc["applied_pace"] }).to match_array [nil, nil]
+        end
       end
     end
 
