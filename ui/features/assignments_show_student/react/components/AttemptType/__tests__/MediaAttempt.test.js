@@ -35,6 +35,9 @@ const submissionDraftOverrides = {
         _id: 'm-123456',
         id: '1',
         title: 'dope video',
+        mediaType: 'video',
+        mediaTracks: [],
+        mediaSources: [],
       },
     },
   },
@@ -46,6 +49,7 @@ const makeProps = async overrides => {
     ...assignmentAndSubmission,
     createSubmissionDraft: jest.fn(),
     updateUploadingFiles: jest.fn(),
+    setIframeURL: jest.fn(),
     uploadingFiles: false,
     focusOnInit: false,
   }
@@ -93,15 +97,21 @@ describe('MediaAttempt', () => {
       expect(getByTestId('open-upload-media-modal-button')).not.toHaveFocus()
     })
 
-    it.skip('renders the current submission draft', async () => {
-      // unskip in EVAL-2504
+    it('renders the current submission draft', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('media-recording')).toBeInTheDocument()
     })
 
-    it.skip('removes the current submission draft when the media is removed', async () => {
-      // unskip in EVAL-2504
+    it('renders an iframe if iframeURL is given', async () => {
+      const props = await makeProps(submissionDraftOverrides)
+      const wrapper = render(
+        <MediaAttempt {...props} iframeURL="https://www.youtube.com/embed/U9t-slLl30E" />
+      )
+      expect(wrapper.getByTitle('preview')).toBeInTheDocument()
+    })
+
+    it('removes the current submission draft when the media is removed', async () => {
       const props = await makeProps(submissionDraftOverrides)
       const {getByTestId} = render(<MediaAttempt {...props} />)
       const trashButton = getByTestId('remove-media-recording')
