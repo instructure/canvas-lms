@@ -286,6 +286,11 @@ I18n.send(:extend, Module.new do
   end
   alias_method :t, :translate
 
+  def locale
+    set_locale_with_localizer
+    super
+  end
+
   def bigeasy_locale
     backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr("-", "_")
   end
