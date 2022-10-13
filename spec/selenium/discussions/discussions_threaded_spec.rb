@@ -415,13 +415,9 @@ describe "threaded discussions" do
       type_in_tiny("textarea", "replying to 3rd level reply")
       f("button[data-testid='DiscussionEdit-submit'").click
       wait_for_ajaximations
-      # get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
-      # f("button[data-testid='expand-button']").click
-      # wait_for_ajaximations
-      # expect(f("body")).to contain_jqcss("div:contains('flatten 3rd level replies')")
-      # expect(f("body")).to contain_jqcss("div:contains('replying to 3rd level reply')")
       flattened_reply = DiscussionEntry.last
       expect(flattened_reply.parent_id).to eq third_entry.parent_id
+      expect(flattened_reply.message).to eq "<p><span class=\"mceNonEditable mention\" data-mention=\"1\" data-reactroot=\"\">@student</span>replying to 3rd level reply</p>"
     end
 
     context "replies reporting" do
