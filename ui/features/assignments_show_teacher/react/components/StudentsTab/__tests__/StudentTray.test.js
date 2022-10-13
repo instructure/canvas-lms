@@ -33,7 +33,9 @@ describe('student tray data', () => {
     })
 
     user.submission = submission
-    const {getByText} = render(<StudentTray assignment={assignment} student={user} trayOpen />)
+    const {getByText} = render(
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+    )
     expect(getByText(user.shortName)).toBeInTheDocument()
     const userProfileLink = closest(getByText(user.shortName), 'a')
     expect(userProfileLink.getAttribute('target')).toMatch('_blank')
@@ -60,7 +62,9 @@ describe('student tray data', () => {
     })
     user.submission = submission
 
-    const {getByText} = render(<StudentTray assignment={assignment} student={user} trayOpen />)
+    const {getByText} = render(
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+    )
     expect(getByText(`Score –/${assignment.pointsPossible}`)).toBeInTheDocument()
   })
 })
@@ -79,7 +83,9 @@ describe('student tray actions options', () => {
     })
     user.submission = submission
 
-    const {getByText} = render(<StudentTray assignment={assignment} student={user} trayOpen />)
+    const {getByText} = render(
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+    )
     const messageStudentButton = closest(getByText('Message Student'), 'button')
     expect(messageStudentButton).toBeTruthy()
   })
@@ -94,7 +100,9 @@ describe('student tray actions options', () => {
     })
     user.submission = submission
 
-    const {getByText} = render(<StudentTray assignment={assignment} student={user} trayOpen />)
+    const {getByText} = render(
+      <StudentTray assignment={assignment} student={user} trayOpen={true} />
+    )
     const submitForButton = closest(getByText('Submit for Student'), 'button')
     expect(submitForButton).toBeTruthy()
   })

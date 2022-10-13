@@ -66,7 +66,7 @@ const TrayTextArea = ({onAdd, isAdding}) => {
 
 TrayTextArea.propTypes = {
   onAdd: PropTypes.func.isRequired,
-  isAdding: PropTypes.bool.isRequired
+  isAdding: PropTypes.bool.isRequired,
 }
 
 export default TrayTextArea

@@ -27,7 +27,7 @@ describe('lti.showAlert handler', () => {
   beforeEach(() => {
     responseMessages = {
       sendBadRequestError: jest.fn(),
-      sendSuccess: jest.fn()
+      sendSuccess: jest.fn(),
     }
   })
 
@@ -60,7 +60,7 @@ describe('lti.showAlert handler', () => {
   Object.entries({
     success: 'flashMessageSafe',
     warning: 'flashWarningSafe',
-    error: 'flashErrorSafe'
+    error: 'flashErrorSafe',
   }).forEach(([alertType, method]) => {
     // eslint-disable-next-line jest/valid-describe
     describe(`when alertType is ${alertType}`, () => {

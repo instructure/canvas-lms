@@ -25,20 +25,20 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Developer Keys'),
-      description: I18n.t('Allows user to create developer keys for accounts.')
-    }
+      description: I18n.t('Allows user to create developer keys for accounts.'),
+    },
   ],
   [
     {
       title: I18n.t('Developer Keys'),
       description: I18n.t(
         'Required fields include key name, owner email, tool ID, redirect URL, and icon URL.'
-      )
+      ),
     },
     {
       title: I18n.t('Subaccounts'),
-      description: I18n.t('Not available at the subaccount level.')
-    }
+      description: I18n.t('Not available at the subaccount level.'),
+    },
   ],
   [],
   []

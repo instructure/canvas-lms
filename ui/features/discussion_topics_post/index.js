@@ -37,7 +37,7 @@ if (ENV.SEQUENCE != null) {
         .moduleSequenceFooter({
           assetType: 'Discussion',
           assetID: ENV.SEQUENCE.ASSET_ID,
-          courseID: ENV.SEQUENCE.COURSE_ID
+          courseID: ENV.SEQUENCE.COURSE_ID,
         })
     })
   })

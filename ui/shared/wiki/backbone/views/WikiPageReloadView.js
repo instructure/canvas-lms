@@ -26,7 +26,7 @@ export default class WikiPageReloadView extends Backbone.View {
 
     this.prototype.defaults = {
       modelAttributes: ['title', 'url', 'body'],
-      warning: false
+      warning: false,
     }
 
     this.prototype.events = {'click a.reload': 'reload'}

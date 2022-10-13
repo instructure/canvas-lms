@@ -31,48 +31,48 @@ const ZoomTray = () => (
     links={[
       {
         label: I18n.t('How do I add Zoom to a course?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_add')
+        href: I18n.t('#community.admin_zoom_meetings_faq_add'),
       },
       {
         label: I18n.t('How do I schedule a Zoom video meeting?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_schedule')
+        href: I18n.t('#community.admin_zoom_meetings_faq_schedule'),
       },
       {
         label: I18n.t('How do I invite others to join a meeting?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_invite')
+        href: I18n.t('#community.admin_zoom_meetings_faq_invite'),
       },
       {
         label: I18n.t('How do I start a meeting?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_start')
+        href: I18n.t('#community.admin_zoom_meetings_faq_start'),
       },
       {
         label: I18n.t('How do I record a meeting?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_record')
+        href: I18n.t('#community.admin_zoom_meetings_faq_record'),
       },
       {
         label: I18n.t('How do I know if students have joined the meeting?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_participants')
+        href: I18n.t('#community.admin_zoom_meetings_faq_participants'),
       },
       {
         label: I18n.t('How do I mute and unmute all participants?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_mute')
+        href: I18n.t('#community.admin_zoom_meetings_faq_mute'),
       },
       {
         label: I18n.t('How do I turn my camera on or off and use Zoom controls?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_camera')
+        href: I18n.t('#community.admin_zoom_meetings_faq_camera'),
       },
       {
         label: I18n.t('How do I share my screen?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_screenshare')
+        href: I18n.t('#community.admin_zoom_meetings_faq_screenshare'),
       },
       {
         label: I18n.t('How do I manage and share the recording?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_share_record')
+        href: I18n.t('#community.admin_zoom_meetings_faq_share_record'),
       },
       {
         label: I18n.t('What storage options do I have in Zoom?'),
-        href: I18n.t('#community.admin_zoom_meetings_faq_storage')
-      }
+        href: I18n.t('#community.admin_zoom_meetings_faq_storage'),
+      },
     ]}
   >
     {I18n.t(`Zoom is a real-time video conferencing tool that brings

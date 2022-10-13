@@ -32,7 +32,7 @@ export function start(element, props = {}, state = defaultState) {
 
   const config = {
     maxDomains: 50,
-    accountId: window.ENV.ACCOUNT.id
+    accountId: window.ENV.ACCOUNT.id,
   }
 
   render(

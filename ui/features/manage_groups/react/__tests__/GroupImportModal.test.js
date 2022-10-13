@@ -29,7 +29,7 @@ describe('GroupImportModal', () => {
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
     Object.defineProperty(fileDrop, 'files', {
-      value: [badFile]
+      value: [badFile],
     })
 
     fireEvent.change(fileDrop)
@@ -50,7 +50,7 @@ describe('GroupImportModal', () => {
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
     Object.defineProperty(fileDrop, 'files', {
-      value: [file]
+      value: [file],
     })
 
     fireEvent.change(fileDrop)
@@ -73,7 +73,7 @@ describe('GroupImportModal', () => {
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
     Object.defineProperty(fileDrop, 'files', {
-      value: [file]
+      value: [file],
     })
 
     fireEvent.change(fileDrop)

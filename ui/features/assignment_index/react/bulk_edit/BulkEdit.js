@@ -329,7 +329,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderSaveSuccess() {
     if (jobSuccess) {
       return (
-        <CanvasInlineAlert variant="success" liveAlert>
+        <CanvasInlineAlert variant="success" liveAlert={true}>
           {I18n.t('Assignment dates saved successfully.')}
         </CanvasInlineAlert>
       )
@@ -338,7 +338,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
   function renderFetchError() {
     return (
-      <CanvasInlineAlert variant="error" liveAlert>
+      <CanvasInlineAlert variant="error" liveAlert={true}>
         {I18n.t('There was an error retrieving assignment dates.')}
       </CanvasInlineAlert>
     )
@@ -347,13 +347,13 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
   function renderSaveError() {
     if (startingSaveError) {
       return (
-        <CanvasInlineAlert variant="error" liveAlert>
+        <CanvasInlineAlert variant="error" liveAlert={true}>
           {I18n.t('Error starting save operation:')} {startingSaveError}
         </CanvasInlineAlert>
       )
     } else if (jobErrors) {
       return (
-        <CanvasInlineAlert variant="error" liveAlert>
+        <CanvasInlineAlert variant="error" liveAlert={true}>
           {jobErrors.hasOwnProperty('message')
             ? I18n.t('Error saving assignment dates: ') + jobErrors.message
             : I18n.t('Invalid dates were found. Please correct them and try again.')}
@@ -377,7 +377,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
     if (loading) {
       return (
         <>
-          <CanvasInlineAlert liveAlert screenReaderOnly>
+          <CanvasInlineAlert liveAlert={true} screenReaderOnly={true}>
             {I18n.t('Loading assignments')}
           </CanvasInlineAlert>
           <LoadingIndicator />
@@ -389,7 +389,7 @@ export default function BulkEdit({courseId, onCancel, onSave, defaultDueTime}) {
 
     return (
       <>
-        <CanvasInlineAlert liveAlert screenReaderOnly>
+        <CanvasInlineAlert liveAlert={true} screenReaderOnly={true}>
           {I18n.t('Assignments loaded')}
         </CanvasInlineAlert>
         <BulkEditTable

@@ -28,7 +28,7 @@ const makeProps = (props = {}) =>
     {
       page: 0,
       pageCount: 0,
-      parent: {}
+      parent: {},
     },
     props
   )

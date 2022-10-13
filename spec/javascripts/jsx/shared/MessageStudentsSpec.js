@@ -47,7 +47,7 @@ QUnit.module('MessageStudents', hooks => {
     subject = renderComponent({
       contextCode: 'course_1',
       title: 'Send a message',
-      onRequestClose: () => {}
+      onRequestClose: () => {},
     })
     ok(subject)
   })
@@ -60,10 +60,10 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
 
       const requestData = subject.composeRequestData()
@@ -77,13 +77,13 @@ QUnit.module('MessageStudents', hooks => {
     test('fetches error for a given field from state', () => {
       subject = renderComponent({
         contextCode: 'course_1',
-        title: 'Send a message'
+        title: 'Send a message',
       })
       const errorMessage = 'Please provide a subject.'
       subject.setState({
         errors: {
-          subject: errorMessage
-        }
+          subject: errorMessage,
+        },
       })
       const errors = subject.errorMessagesFor('subject')
       equal(errors[0].text, errorMessage)
@@ -102,10 +102,10 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       data = subject.composeRequestData()
       sinon.spy(subject, 'handleResponseSuccess')
@@ -133,7 +133,7 @@ QUnit.module('MessageStudents', hooks => {
     QUnit.module('on success', hooks => {
       hooks.beforeEach(() => {
         moxios.stubRequest('/api/v1/conversations', {
-          status: 200
+          status: 200,
         })
       })
 
@@ -151,7 +151,7 @@ QUnit.module('MessageStudents', hooks => {
       hooks.beforeEach(() => {
         moxios.stubRequest('/api/v1/conversations', {
           status: 500,
-          response: [{attribute: 'fake', message: 'error'}]
+          response: [{attribute: 'fake', message: 'error'}],
         })
       })
 
@@ -173,7 +173,7 @@ QUnit.module('MessageStudents', hooks => {
       subject = renderComponent({
         contextCode: 'course_1',
         title: 'Send a message',
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
     })
 
@@ -181,7 +181,7 @@ QUnit.module('MessageStudents', hooks => {
       test(`validates length of ${field} and sets error`, () => {
         const data = {
           body: '',
-          subject: ''
+          subject: '',
         }
         let errors = subject.validationErrors(data)
         ok(errors.hasOwnProperty(field))
@@ -194,7 +194,7 @@ QUnit.module('MessageStudents', hooks => {
     test('validates max length for subject', () => {
       const data = {
         body: '',
-        subject: 'x'.repeat(256)
+        subject: 'x'.repeat(256),
       }
       const errors = subject.validationErrors(data)
       ok(errors.hasOwnProperty('subject'))
@@ -209,12 +209,12 @@ QUnit.module('MessageStudents', hooks => {
       subject = renderComponent({
         contextCode: 'course_1',
         title: 'Send a message',
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       subject.setState({
         errors: {
-          subject: 'provide a subject'
-        }
+          subject: 'provide a subject',
+        },
       })
       closeButton = document.querySelector('div.MessageStudents__Alert button')
       clocks = sinon.useFakeTimers()
@@ -236,7 +236,7 @@ QUnit.module('MessageStudents', hooks => {
       subject = renderComponent({
         contextCode: 'course_1',
         title: 'Send a message',
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
     })
 
@@ -251,8 +251,8 @@ QUnit.module('MessageStudents', hooks => {
     test('removes error for provided field if present', () => {
       subject.setState({
         errors: {
-          subject: 'There was an error'
-        }
+          subject: 'There was an error',
+        },
       })
       ok(subject.state.errors.hasOwnProperty('subject'))
 
@@ -268,7 +268,7 @@ QUnit.module('MessageStudents', hooks => {
       subject = renderComponent({
         contextCode: 'course_1',
         title: 'Send a message',
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       const buttons = document.querySelectorAll('button')
       closeButton = buttons[buttons.length - 2]
@@ -291,10 +291,10 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       sinon.spy(subject, 'sendMessage')
 
@@ -363,14 +363,14 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       subject.setState({
         hideAlert: true,
-        sending: true
+        sending: true,
       })
     })
 
@@ -409,10 +409,10 @@ QUnit.module('MessageStudents', hooks => {
           data: [
             {
               attribute: 'subject',
-              message: 'blank'
-            }
-          ]
-        }
+              message: 'blank',
+            },
+          ],
+        },
       }
 
       subject = renderComponent({
@@ -421,10 +421,10 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
       subject.setState({sending: true})
     })
@@ -457,10 +457,10 @@ QUnit.module('MessageStudents', hooks => {
         recipients: [
           {
             id: 1,
-            email: 'some@one.com'
-          }
+            email: 'some@one.com',
+          },
         ],
-        onRequestClose: () => {}
+        onRequestClose: () => {},
       })
     })
 

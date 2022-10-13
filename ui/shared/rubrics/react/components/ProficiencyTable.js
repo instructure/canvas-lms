@@ -53,11 +53,11 @@ function unformatColor(color) {
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
     accountId: PropTypes.string.isRequired,
-    focusTab: PropTypes.func
+    focusTab: PropTypes.func,
   }
 
   static defaultProps = {
-    focusTab: null
+    focusTab: null,
   }
 
   constructor(props) {
@@ -70,8 +70,8 @@ export default class ProficiencyTable extends React.Component {
         this.createRating('Mastery', 3, '0B874B'),
         this.createRating('Near Mastery', 2, 'FAB901'),
         this.createRating('Below Mastery', 1, 'FD5D10'),
-        this.createRating('Well Below Mastery', 0, 'E0061F')
-      ])
+        this.createRating('Well Below Mastery', 0, 'E0061F'),
+      ]),
     }
   }
 
@@ -104,7 +104,7 @@ export default class ProficiencyTable extends React.Component {
         if (e.response && e.response.status !== 404) {
           $.flashError(
             I18n.t('An error occurred while loading account proficiency ratings: %{m}', {
-              m: e.response.statusText
+              m: e.response.statusText,
             })
           )
         }
@@ -120,7 +120,7 @@ export default class ProficiencyTable extends React.Component {
     this.setState({
       loading: false,
       masteryIndex,
-      rows: fromJS(rows)
+      rows: fromJS(rows),
     })
   }
 
@@ -211,9 +211,9 @@ export default class ProficiencyTable extends React.Component {
         description: row.get('description'),
         points: row.get('points'),
         mastery: idx === this.state.masteryIndex,
-        color: row.get('color')
+        color: row.get('color'),
       }))
-      .toJS()
+      .toJS(),
   })
 
   handleSubmit = () => {
@@ -292,10 +292,10 @@ export default class ProficiencyTable extends React.Component {
   renderBillboard() {
     const styles = {
       width: '10rem',
-      margin: '0 auto'
+      margin: '0 auto',
     }
     const divStyle = {
-      textAlign: 'center'
+      textAlign: 'center',
     }
     return (
       <div style={divStyle}>

@@ -25,7 +25,7 @@ import {
   resetPlanner,
   renderToDoSidebar,
   renderWeeklyPlannerHeader,
-  reloadPlannerForObserver
+  reloadPlannerForObserver,
 } from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
@@ -37,24 +37,24 @@ function defaultPlannerOptions() {
       current_user: {
         id: '42',
         display_name: 'Arthur Dent',
-        avatar_image_url: 'http://example.com'
+        avatar_image_url: 'http://example.com',
       },
       PREFERENCES: {
-        custom_colors: {}
+        custom_colors: {},
       },
       K5_USER: false,
-      K5_SUBJECT_COURSE: false
+      K5_SUBJECT_COURSE: false,
     },
     flashError: jest.fn(),
     flashMessage: jest.fn(),
     srFlashMessage: jest.fn(),
-    convertApiUserContent: jest.fn()
+    convertApiUserContent: jest.fn(),
   }
 }
 
 const defaultState = {
   courses: [],
-  currentUser: {id: 13}
+  currentUser: {id: 13},
 }
 
 afterEach(() => {
@@ -74,7 +74,7 @@ describe('with mock api', () => {
     alertInitialize({
       visualSuccessCallback: jest.fn(),
       visualErrorCallback: jest.fn(),
-      srAlertCallback: jest.fn()
+      srAlertCallback: jest.fn(),
     })
   })
 
@@ -173,7 +173,6 @@ describe('with mock api', () => {
   describe('reloadPlannerForObserver', () => {
     beforeEach(() => {
       window.ENV ||= {}
-      ENV.FEATURES = {observer_picker: false}
       store.dispatch = jest.fn()
       store.getState = () => defaultState
     })
@@ -186,28 +185,21 @@ describe('with mock api', () => {
       expect(() => reloadPlannerForObserver('1')).toThrow()
     })
 
-    it('does nothing if not passed an observee id', () => {
+    it('dispatches reloadWithObservee if not passed an observee id', () => {
+      // if no observee_id is passed means the observer is observing himself
       return initializePlanner(defaultPlannerOptions()).then(() => {
         store.dispatch.mockClear()
         reloadPlannerForObserver(null)
-        expect(store.dispatch).not.toHaveBeenCalled()
+        expect(store.dispatch).toHaveBeenCalled()
       })
     })
 
     it('does nothing if given the existing selectedObservee id', () => {
       store.getState = () => ({
         ...defaultState,
-        selectedObservee: '17'
+        selectedObservee: '17',
       })
 
-      return initializePlanner(defaultPlannerOptions()).then(() => {
-        store.dispatch.mockClear()
-        reloadPlannerForObserver('17')
-        expect(store.dispatch).not.toHaveBeenCalled()
-      })
-    })
-
-    it('does nothing if not the weekly planner', () => {
       return initializePlanner(defaultPlannerOptions()).then(() => {
         store.dispatch.mockClear()
         reloadPlannerForObserver('17')
@@ -219,7 +211,7 @@ describe('with mock api', () => {
       store.getState = () => ({
         ...defaultState,
         selectedObservee: '1',
-        weeklyDashboard: {}
+        weeklyDashboard: {},
       })
 
       return initializePlanner(defaultPlannerOptions()).then(() => {

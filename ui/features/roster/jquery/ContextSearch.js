@@ -53,14 +53,14 @@ Object.assign(ContextSearch.prototype, {
         messages: {noResults: I18n.t('no_results', 'No results found')},
         populator: this.populator,
         baseData: {
-          synthetic_contexts: 1
+          synthetic_contexts: 1,
         },
         browser: {
           data: {
-            types: ['context']
-          }
-        }
-      }
+            types: ['context'],
+          },
+        },
+      },
     }
   },
 
@@ -93,7 +93,7 @@ Object.assign(ContextSearch.prototype, {
     if (data.common_courses != null) {
       const contextListHtml = this.contextList({
         courses: data.common_courses,
-        groups: data.common_groups
+        groups: data.common_groups,
       })
       $span.html(contextListHtml)
     } else if (data.user_count != null) {
@@ -165,11 +165,11 @@ Object.assign(ContextSearch.prototype, {
   contextList(contexts) {
     contexts = {courses: _.keys(contexts.courses), groups: _.keys(contexts.groups)}
     return contextList(contexts, this.contexts, {linkToContexts: false, hardCutoff: 2})
-  }
+  },
 })
 
-$.fn.contextSearch = function(options) {
-  return this.each(function() {
+$.fn.contextSearch = function (options) {
+  return this.each(function () {
     return new ContextSearch($(this), $.extend(true, {}, options))
   })
 }

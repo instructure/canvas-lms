@@ -93,7 +93,7 @@ export default class InputHandler {
   getDirectionalInput() {
     return {
       x: this.horizontal,
-      y: this.vertical
+      y: this.vertical,
     }
   }
 }

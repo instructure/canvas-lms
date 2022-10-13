@@ -18,6 +18,7 @@
 
 import type Gradebook from '../Gradebook'
 import type {RequestDispatch} from '@canvas/network'
+import type {AssignmentGroup} from '../../../../../api.d'
 
 export default class SisOverridesLoader {
   _gradebook: Gradebook
@@ -46,7 +47,7 @@ export default class SisOverridesLoader {
     }
 
     // eslint-disable-next-line promise/catch-or-return
-    this._dispatch.getDepaginated(url, params).then(data => {
+    this._dispatch.getDepaginated<AssignmentGroup[]>(url, params).then(data => {
       this._gradebook.addOverridesToPostGradesStore(data)
     })
   }

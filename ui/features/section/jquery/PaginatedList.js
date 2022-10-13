@@ -44,7 +44,7 @@ export default class PaginatedList {
   // I18n keys used by class
   keys = {
     noResults: I18n.t('no_results_found', 'No Results'),
-    viewMore: I18n.t('view_more_link', 'View More')
+    viewMore: I18n.t('view_more_link', 'View More'),
   }
 
   // #
@@ -53,7 +53,7 @@ export default class PaginatedList {
     length: 4,
     lines: 12,
     radius: 7,
-    width: 2
+    width: 2,
   }
 
   // #
@@ -63,11 +63,11 @@ export default class PaginatedList {
     presenter: false,
     requestParams: {
       page: 1,
-      per_page: 25
+      per_page: 25,
     },
     start: true,
     template: $.noop, // empty fn, should be replaced by handlebars template
-    url: ''
+    url: '',
   }
   // should be replaced by url to json data
 
@@ -97,7 +97,7 @@ export default class PaginatedList {
   cacheElements(el) {
     this.el = {
       wrapper: el,
-      list: el.find('ul:first')
+      list: el.find('ul:first'),
     }
     if (this.el.wrapper.css('position') === 'static') {
       this.el.wrapper.css('position', 'relative')
@@ -148,7 +148,7 @@ export default class PaginatedList {
     if (spinnerOnBottom) {
       return $(this.spinner).css({
         bottom: 10,
-        top: 'auto'
+        top: 'auto',
       })
     }
   }
@@ -174,9 +174,7 @@ export default class PaginatedList {
   // has been loaded, remove the 'view more' link.
   // @api private
   updatePaging() {
-    let linkHeader = parseLinkHeader(
-      this.currentRequest.getResponseHeader('Link')
-    )
+    const linkHeader = parseLinkHeader(this.currentRequest.getResponseHeader('Link'))
     if (linkHeader && linkHeader.next) {
       this.options.requestParams.page = linkHeader.next.page
       if (!this.pageLinkPresent) {

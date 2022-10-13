@@ -23,7 +23,7 @@ import {ThreadActions} from '../ThreadActions'
 const defaultRequiredProps = {
   id: '1',
   onMarkAllAsUnread: jest.fn(),
-  onToggleUnread: jest.fn()
+  onToggleUnread: jest.fn(),
 }
 
 const createProps = overrides => {
@@ -38,7 +38,7 @@ const createProps = overrides => {
     onMarkAllAsRead: jest.fn(),
     onMarkThreadAsRead: jest.fn(),
     onReport: jest.fn(),
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -86,7 +86,7 @@ describe('ThreadActions', () => {
   })
 
   it('should not render when is search', () => {
-    const {queryByTestId} = render(<ThreadActions {...defaultRequiredProps} isSearch />)
+    const {queryByTestId} = render(<ThreadActions {...defaultRequiredProps} isSearch={true} />)
     const menu = queryByTestId('thread-actions-menu')
     expect(menu).toBeNull()
   })
@@ -161,7 +161,7 @@ describe('ThreadActions', () => {
 
       it('should render Mark as Read button when unread', () => {
         const props = createProps({onToggleUnread: jest.fn()})
-        const {getByTestId} = render(<ThreadActions isUnread {...props} />)
+        const {getByTestId} = render(<ThreadActions isUnread={true} {...props} />)
 
         const menu = getByTestId('thread-actions-menu')
         expect(menu).toBeInTheDocument()
@@ -287,7 +287,7 @@ describe('ThreadActions', () => {
 
     it('shows Reported if isReported', () => {
       const props = createProps()
-      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported />)
+      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported={true} />)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(getByText('Reported')).toBeTruthy()
@@ -295,7 +295,7 @@ describe('ThreadActions', () => {
 
     it('cannot click if isReported', () => {
       const props = createProps()
-      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported />)
+      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported={true} />)
 
       fireEvent.click(getByTestId('thread-actions-menu'))
       expect(props.onReport.mock.calls.length).toBe(0)

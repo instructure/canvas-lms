@@ -37,7 +37,7 @@ QUnit.module('MathML and MathJax test', {
 
   teardown() {
     document.body.removeChild(view)
-  }
+  },
 })
 
 test('tab links work with url encoded characters in panel id', () => {

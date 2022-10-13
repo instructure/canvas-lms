@@ -21,12 +21,12 @@ import {render, fireEvent, act, within} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import {
   OutcomePanel,
-  OutcomeManagementWithoutGraphql as OutcomeManagement
+  OutcomeManagementWithoutGraphql as OutcomeManagement,
 } from '../OutcomeManagement'
 import {
   masteryCalculationGraphqlMocks,
   masteryScalesGraphqlMocks,
-  outcomeGroupsMocks
+  outcomeGroupsMocks,
 } from '@canvas/outcomes/mocks/Outcomes'
 import {createCache} from '@canvas/apollo'
 import * as OutcomesImporter from '@canvas/outcomes/react/OutcomesImporter'
@@ -98,7 +98,7 @@ describe('OutcomeManagement', () => {
       const fileDrop = getByLabelText(/Upload your Outcomes!/i)
       // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
       Object.defineProperty(fileDrop, 'files', {
-        value: [file]
+        value: [file],
       })
       fireEvent.change(fileDrop)
       expect(showOutcomesImporterMock).toHaveBeenCalled()
@@ -120,7 +120,7 @@ describe('OutcomeManagement', () => {
           mount: expect.any(Element),
           contextUrlRoot: ENV.CONTEXT_URL_ROOT,
           learningOutcomeGroupId: null,
-          onSuccessfulCreateOutcome: expect.any(Function)
+          onSuccessfulCreateOutcome: expect.any(Function),
         },
         '1'
       )
@@ -364,9 +364,9 @@ describe('OutcomeManagement', () => {
         context_asset_string: 'account_11',
         CONTEXT_URL_ROOT: '/account/11',
         PERMISSIONS: {
-          manage_proficiency_calculations: true
+          manage_proficiency_calculations: true,
         },
-        current_user: {id: '1'}
+        current_user: {id: '1'},
       }
     })
 
@@ -384,9 +384,9 @@ describe('OutcomeManagement', () => {
         context_asset_string: 'course_12',
         CONTEXT_URL_ROOT: '/course/12',
         PERMISSIONS: {
-          manage_proficiency_calculations: true
+          manage_proficiency_calculations: true,
         },
-        current_user: {id: '1'}
+        current_user: {id: '1'},
       }
     })
 
@@ -405,9 +405,9 @@ describe('OutcomeManagement', () => {
       IMPROVED_OUTCOMES_MANAGEMENT: true,
       PERMISSIONS: {
         manage_proficiency_calculations: true,
-        manage_outcomes: true
+        manage_outcomes: true,
       },
-      current_user: {id: '1'}
+      current_user: {id: '1'},
     }
     const mocks = [
       ...courseMocks({childGroupsCount: 2}),
@@ -415,27 +415,27 @@ describe('OutcomeManagement', () => {
         title: 'Course folder 0',
         groupId: '200',
         parentOutcomeGroupTitle: 'Root course folder',
-        parentOutcomeGroupId: '2'
+        parentOutcomeGroupId: '2',
       }),
       ...groupDetailMocks({
         title: 'Course folder 0',
         groupId: '200',
         contextType: 'Course',
         contextId: '2',
-        withMorePage: false
+        withMorePage: false,
       }),
       ...groupMocks({
         groupId: '300',
         childGroupOffset: 400,
         parentOutcomeGroupTitle: 'Course folder 0',
-        parentOutcomeGroupId: '200'
+        parentOutcomeGroupId: '200',
       }),
       ...groupDetailMocks({
         groupId: '300',
         contextType: 'Course',
         contextId: '2',
-        withMorePage: false
-      })
+        withMorePage: false,
+      }),
     ]
     const {findByText, findByTestId, getByTestId} = render(
       <MockedProvider cache={cache} mocks={mocks}>

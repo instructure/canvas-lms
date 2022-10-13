@@ -32,7 +32,7 @@ class DueDateCalendars extends React.Component {
     disabled: bool.isRequired,
     dueDatesReadonly: bool.isRequired,
     availabilityDatesReadonly: bool.isRequired,
-    defaultDueTime: string
+    defaultDueTime: string,
   }
 
   // -------------------
@@ -66,7 +66,7 @@ class DueDateCalendars extends React.Component {
       date_field: true,
       datePickerDateField: true,
       DueDateInput: dateType === 'due_at',
-      UnlockLockInput: dateType !== 'due_at'
+      UnlockLockInput: dateType !== 'due_at',
     })
 
   render() {

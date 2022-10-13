@@ -45,7 +45,7 @@ export const MediaComment = {
     title: string,
     canAddCaptions: bool,
     mediaSources: arrayOf(MediaSource.shape),
-    mediaTracks: arrayOf(MediaTrack.shape)
+    mediaTracks: arrayOf(MediaTrack.shape),
   }),
 
   mock: ({
@@ -54,7 +54,7 @@ export const MediaComment = {
     title = 'uploaded-movie.mov',
     canAddCaptions = true,
     mediaSources = [MediaSource.mock()],
-    mediaTracks = [MediaTrack.mock()]
+    mediaTracks = [MediaTrack.mock()],
   } = {}) => ({
     _id,
     id,
@@ -62,6 +62,6 @@ export const MediaComment = {
     canAddCaptions,
     mediaSources,
     mediaTracks,
-    __typename: 'MediaObject'
-  })
+    __typename: 'MediaObject',
+  }),
 }

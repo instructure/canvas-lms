@@ -24,11 +24,11 @@ const activeAddTrayReducer = handleActions(
     [actionTypes.HIDE_ALL_TRAYS]: state => ({...state, show: false}),
     [actionTypes.ADD_TRAY_SAVING_START]: state => ({...state, loading: true}),
     [actionTypes.ADD_TRAY_SAVING_SUCCESS]: state => ({...state, loading: false}),
-    [actionTypes.ADD_TRAY_SAVING_FAIL]: state => ({...state, loading: false})
+    [actionTypes.ADD_TRAY_SAVING_FAIL]: state => ({...state, loading: false}),
   },
   {
     show: false,
-    loading: false
+    loading: false,
   }
 )
 

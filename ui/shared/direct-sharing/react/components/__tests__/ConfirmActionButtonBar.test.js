@@ -32,11 +32,7 @@ describe('ConfirmActionButtonBar', () => {
 
   it('can render just the primary button', () => {
     const {getByText} = render(<ConfirmActionButtonBar primaryLabel="primary" />)
-    expect(
-      getByText('primary')
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBe(null)
+    expect(getByText('primary').closest('button').getAttribute('disabled')).toBe(null)
     expect(document.querySelectorAll('button')).toHaveLength(1)
   })
 
@@ -64,11 +60,9 @@ describe('ConfirmActionButtonBar', () => {
   })
 
   it('can disable the primary button', () => {
-    const {getByText} = render(<ConfirmActionButtonBar primaryLabel="primary" primaryDisabled />)
-    expect(
-      getByText('primary')
-        .closest('button')
-        .getAttribute('disabled')
-    ).toBe('')
+    const {getByText} = render(
+      <ConfirmActionButtonBar primaryLabel="primary" primaryDisabled={true} />
+    )
+    expect(getByText('primary').closest('button').getAttribute('disabled')).toBe('')
   })
 })

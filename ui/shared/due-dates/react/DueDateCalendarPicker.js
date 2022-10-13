@@ -94,7 +94,7 @@ function DueDateCalendarPicker(props) {
           <input
             id={props.dateType}
             name={props.name}
-            readOnly
+            readOnly={true}
             type="text"
             className={`ic-Input ${props.inputClasses}`}
             defaultValue={formatDate(props.dateValue)}
@@ -163,13 +163,13 @@ DueDateCalendarPicker.propTypes = {
   labelText: string,
   labelClasses: string,
   name: string,
-  readonly: bool
+  readonly: bool,
 }
 
 DueDateCalendarPicker.defaultProps = {
   readonly: false,
   defaultToEndOfMinute: false,
-  labelClasses: ''
+  labelClasses: '',
 }
 
 export default DueDateCalendarPicker

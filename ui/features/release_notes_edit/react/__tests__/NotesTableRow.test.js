@@ -27,10 +27,10 @@ const basicNote = {
     en: {
       title: 'A great note title',
       description: 'A really great note description',
-      url: 'https://example.com/great_url'
-    }
+      url: 'https://example.com/great_url',
+    },
   },
-  show_ats: {}
+  show_ats: {},
 }
 
 const fancyNote = {
@@ -40,16 +40,16 @@ const fancyNote = {
     en: {
       title: 'A super great note title',
       description: 'An even better note description',
-      url: 'https://example.com/amazing_url'
+      url: 'https://example.com/amazing_url',
     },
     es: {
       title: 'A super great note title (spanish)',
       description: 'An even better note description (spanish)',
-      url: 'https://es.example.com/amazing_url'
-    }
+      url: 'https://es.example.com/amazing_url',
+    },
   },
   show_ats: {},
-  published: true
+  published: true,
 }
 
 // You need the <table><tbody> wrapper or validateDOMNesting gets angry

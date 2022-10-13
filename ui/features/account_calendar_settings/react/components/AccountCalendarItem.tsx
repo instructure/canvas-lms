@@ -51,7 +51,7 @@ export const AccountCalendarItem: React.FC<ComponentProps> = ({
   visibilityChanges,
   onAccountToggled,
   padding,
-  showTopSeparator = false
+  showTopSeparator = false,
 }) => (
   <ApplyTheme theme={accountListTheme}>
     <View as="div" padding={padding} borderWidth={`${showTopSeparator ? 'small' : '0'} 0 0 0`}>

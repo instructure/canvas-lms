@@ -27,11 +27,11 @@ export const template = generateActionTemplates(
       title: I18n.t('Admin Tools (Logging tab)'),
       description: I18n.t(
         'Determines visibility of the Course Activity option in the Admin Tools Logging tab.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to view course activity information for the account.')
-    }
+      description: I18n.t('Allows user to view course activity information for the account.'),
+    },
   ],
   [],
   [],

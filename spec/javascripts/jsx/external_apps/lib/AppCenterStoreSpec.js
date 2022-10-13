@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import store from 'ui/features/external_apps/react/lib/AppCenterStore.js'
+import store from 'ui/features/external_apps/react/lib/AppCenterStore'
 
 const defaultApps = () => [
   {
@@ -34,7 +34,7 @@ const defaultApps = () => [
       '7th-12th Grade',
       'Postsecondary',
       'Open Content',
-      'Web 2.0'
+      'Web 2.0',
     ],
     description:
       '\n<p>Acclaim is the easiest way to organize and annotate videos for class.</p>\n\n<p>Instructors and students set up folders, upload recordings or embed relevant web videos, and then securely share access among each other. Moments in each video can then be highlighted and discussed using time-specific comments!</p>\n\n<p>To learn more about how to use Acclaim in your class(es), email Melinda at <a href="mailto:melinda@getacclaim.com">melinda@getacclaim.com</a>.</p>\n\n<p>For general information, please visit <a href="https://getacclaim.com">Acclaim</a>.</p>\n',
@@ -49,7 +49,7 @@ const defaultApps = () => [
     short_description: 'Acclaim is the easiest way to organize and annotate videos.',
     short_name: 'acclaim_app',
     status: 'active',
-    total_ratings: 0
+    total_ratings: 0,
   },
   {
     app_type: null,
@@ -73,7 +73,7 @@ const defaultApps = () => [
       'ALEKS is an artificial intelligent assessment and learning system which uses adaptive questioning to quickly and accurately determine exactly what a student kno...',
     short_name: 'aleks',
     status: 'active',
-    total_ratings: 2
+    total_ratings: 2,
   },
   {
     app_type: 'custom',
@@ -97,8 +97,8 @@ const defaultApps = () => [
       "Integrate hands-on learning exercises into your course. With ApprenNet's LTI APP, you can add exercises to your course in which participants 1) submit video res...",
     short_name: 'apprennet',
     status: 'active',
-    total_ratings: 1
-  }
+    total_ratings: 1,
+  },
 ]
 
 QUnit.module('ExternalApps.AppCenterStore', {
@@ -111,24 +111,24 @@ QUnit.module('ExternalApps.AppCenterStore', {
   teardown() {
     this.server.restore()
     return store.reset()
-  }
+  },
 })
 
-test('findAppByShortName', function() {
+test('findAppByShortName', function () {
   store.setState({apps: this.apps})
   equal(store.getState().apps.length, 3)
   const thisApp = store.findAppByShortName('aleks')
   equal(thisApp.id, 66)
 })
 
-test('flagAppAsInstalled', function() {
+test('flagAppAsInstalled', function () {
   store.setState({apps: this.apps})
   ok(!store.findAppByShortName('apprennet').is_installed)
   store.flagAppAsInstalled('apprennet')
   ok(store.findAppByShortName('apprennet').is_installed)
 })
 
-test('filteredApps', function() {
+test('filteredApps', function () {
   store.setState({apps: this.apps})
   equal(store.filteredApps().length, 3)
   store.setState({filterText: 'e'})
@@ -137,11 +137,11 @@ test('filteredApps', function() {
   equal(store.filteredApps().length, 1)
 })
 
-test('fetch', function() {
+test('fetch', function () {
   this.server.respondWith('GET', /\/app_center\/apps/, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.apps)
+    JSON.stringify(this.apps),
   ])
   store.fetch()
   this.server.respond()

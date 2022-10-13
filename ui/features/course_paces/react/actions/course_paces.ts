@@ -18,7 +18,7 @@
 
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
-import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from '@canvas/alerts/react/FlashAlert'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 import {CoursePaceItemDueDates, CoursePace, PaceContextTypes, Progress, StoreState} from '../types'
@@ -45,7 +45,7 @@ export enum Constants {
   RESET_PACE = 'COURSE_PACE/RESET_PACE',
   SET_PROGRESS = 'COURSE_PACE/SET_PROGRESS',
   SET_COMPRESSED_ITEM_DATES = 'COURSE_PACE/SET_COMPRESSED_ITEM_DATES',
-  UNCOMPRESS_DATES = 'COURSE_PACE/UNCOMPRESS_ITEM_DATES'
+  UNCOMPRESS_DATES = 'COURSE_PACE/UNCOMPRESS_ITEM_DATES',
 }
 
 /* Action creators */
@@ -62,7 +62,8 @@ const regularActions = {
   toggleExcludeWeekends: () => createAction(Constants.TOGGLE_EXCLUDE_WEEKENDS),
   resetPace: (originalPace: CoursePace) => createAction(Constants.RESET_PACE, originalPace),
   setProgress: (progress?: Progress) => createAction(Constants.SET_PROGRESS, progress),
-  coursePaceSaved: (coursePace: CoursePace) => createAction(Constants.COURSE_PACE_SAVED, coursePace)
+  coursePaceSaved: (coursePace: CoursePace) =>
+    createAction(Constants.COURSE_PACE_SAVED, coursePace),
 }
 
 const thunkActions = {
@@ -144,7 +145,7 @@ const thunkActions = {
                 message: I18n.t('Finished publishing pace'),
                 err: null,
                 type: 'success',
-                srOnly: true
+                srOnly: true,
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
             } else if (updatedProgress.workflow_state === 'failed') {
@@ -152,7 +153,7 @@ const thunkActions = {
                 message: I18n.t('Failed publishing pace'),
                 err: null,
                 type: 'error',
-                srOnly: true
+                srOnly: true,
               })
               dispatch(uiActions.setCategoryError('publish'))
               console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console
@@ -208,6 +209,7 @@ const thunkActions = {
           dispatch(coursePaceActions.setProgress(progress))
           dispatch(coursePaceActions.pollForPublishStatus())
           dispatch(uiActions.hideLoadingOverlay())
+          dispatch(uiActions.showPaceModal(coursePace))
         })
         .catch(error => {
           dispatch(uiActions.hideLoadingOverlay())
@@ -246,7 +248,7 @@ const thunkActions = {
 
       const state = getState()
       return Api.compress(state.coursePace, {
-        blackout_dates: transformBlackoutDatesForApi(state.blackoutDates.blackoutDates)
+        blackout_dates: transformBlackoutDatesForApi(state.blackoutDates.blackoutDates),
       })
         .then(responseBody => {
           if (!responseBody) throw new Error(I18n.t('Response body was empty'))
@@ -260,7 +262,25 @@ const thunkActions = {
           console.log(error) // eslint-disable-line no-console
         })
     }
-  }
+  },
+  removePace: (): ThunkAction<Promise<void>, StoreState, void, Action> => {
+    return (dispatch, getState) => {
+      dispatch(uiActions.showLoadingOverlay(I18n.t('Removing pace...')))
+      dispatch(uiActions.clearCategoryError('removePace'))
+
+      return Api.removePace(getState().coursePace)
+        .then(() => {
+          dispatch(uiActions.hidePaceModal())
+          showFlashSuccess(I18n.t('Pace removed'))()
+        })
+        .catch(error => {
+          dispatch(uiActions.setCategoryError('removePace', error?.toString()))
+        })
+        .finally(() => {
+          dispatch(uiActions.hideLoadingOverlay())
+        })
+    }
+  },
 }
 
 export const coursePaceActions = {...regularActions, ...thunkActions}

@@ -25,7 +25,7 @@ import {
   getDiscussionSubentriesQueryMock,
   subscribeToDiscussionTopicMock,
   updateDiscussionEntryMock,
-  updateDiscussionEntryParticipantMock
+  updateDiscussionEntryParticipantMock,
 } from '../../graphql/Mocks'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
@@ -37,7 +37,7 @@ jest.mock('@canvas/rce/RichContentEditor')
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1000'}}),
-  resolveAuthorRoles: () => []
+  resolveAuthorRoles: () => [],
 }))
 
 describe('DiscussionFullPage', () => {
@@ -54,9 +54,9 @@ describe('DiscussionFullPage', () => {
       current_user: {
         id: 'PLACEHOLDER',
         display_name: 'Omar Soto-Fortuño',
-        avatar_image_url: 'www.avatar.com'
+        avatar_image_url: 'www.avatar.com',
       },
-      course_id: '1'
+      course_id: '1',
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -65,12 +65,12 @@ describe('DiscussionFullPage', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     window.INST = {
-      editorButtons: []
+      editorButtons: [],
     }
     const liveRegion = document.createElement('div')
     liveRegion.id = 'flash_screenreader_holder'
@@ -104,8 +104,8 @@ describe('DiscussionFullPage', () => {
         ...getDiscussionQueryMock(),
         ...getDiscussionSubentriesQueryMock({
           first: 20,
-          sort: 'desc'
-        })
+          sort: 'desc',
+        }),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
@@ -134,7 +134,7 @@ describe('DiscussionFullPage', () => {
       const mocks = [
         ...getDiscussionQueryMock(),
         ...updateDiscussionEntryParticipantMock({read: false, forcedReadState: true}),
-        ...updateDiscussionEntryParticipantMock({read: true, forcedReadState: true})
+        ...updateDiscussionEntryParticipantMock({read: true, forcedReadState: true}),
       ]
       const container = setup(mocks)
       const actionsButton = await container.findByTestId('thread-actions-menu')
@@ -155,7 +155,7 @@ describe('DiscussionFullPage', () => {
       const mocks = [
         ...getDiscussionQueryMock(),
         ...updateDiscussionEntryParticipantMock({rating: 'liked'}),
-        ...updateDiscussionEntryParticipantMock({rating: 'not_liked'})
+        ...updateDiscussionEntryParticipantMock({rating: 'not_liked'}),
       ]
       const container = setup(mocks)
       const likeButton = await container.findByTestId('like-button')
@@ -196,7 +196,7 @@ describe('DiscussionFullPage', () => {
     it('filters by unread', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
-        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false})
+        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false}),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
@@ -225,7 +225,7 @@ describe('DiscussionFullPage', () => {
     it('hides discussion topic when unread is selected', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
-        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false})
+        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false}),
       ]
       const container = setup(mocks)
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
@@ -245,7 +245,7 @@ describe('DiscussionFullPage', () => {
       const container = setup(mocks)
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
       fireEvent.change(container.getByLabelText('Search entries or author'), {
-        target: {value: 'a'}
+        target: {value: 'a'},
       })
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
     })
@@ -260,7 +260,7 @@ describe('DiscussionFullPage', () => {
     it('allows subscribing to the topic', async () => {
       const mocks = [
         ...getDiscussionQueryMock({isGroup: false}),
-        ...subscribeToDiscussionTopicMock({subscribed: true})
+        ...subscribeToDiscussionTopicMock({subscribed: true}),
       ]
       mocks[0].result.data.legacyNode.subscribed = false
       const container = setup(mocks)
@@ -272,7 +272,7 @@ describe('DiscussionFullPage', () => {
     it('allows unsubscribing to the topic', async () => {
       const mocks = [
         ...getDiscussionQueryMock({isGroup: false}),
-        ...subscribeToDiscussionTopicMock({subscribed: false})
+        ...subscribeToDiscussionTopicMock({subscribed: false}),
       ]
       const container = setup(mocks)
       const subscribeButton = await container.findByText('Subscribed')
@@ -400,7 +400,7 @@ describe('DiscussionFullPage', () => {
     it('should be able to post an anonymous reply to the topic', async () => {
       const mocks = [
         ...getAnonymousDiscussionQueryMock(),
-        ...createDiscussionEntryMock({isAnonymousAuthor: true})
+        ...createDiscussionEntryMock({isAnonymousAuthor: true}),
       ]
       const container = setup(mocks)
 
@@ -434,7 +434,7 @@ describe('DiscussionFullPage', () => {
   it('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock({replyFromEntryId: '1'})
+      ...createDiscussionEntryMock({replyFromEntryId: '1'}),
     ]
     const container = setup(mocks)
 
@@ -537,7 +537,7 @@ describe('DiscussionFullPage', () => {
     it('should highlight the deep linked discussion entry', async () => {
       window.ENV.discussions_deep_link = {
         entry_id: '1',
-        root_entry_id: null
+        root_entry_id: null,
       }
       const container = setup(getDiscussionQueryMock())
 
@@ -559,7 +559,7 @@ describe('DiscussionFullPage', () => {
     afterEach(() => {
       jest.mock('../utils/constants', () => ({
         ...jest.requireActual('../utils/constants'),
-        HIGHLIGHT_TIMEOUT: 0
+        HIGHLIGHT_TIMEOUT: 0,
       }))
     })
 
@@ -567,7 +567,7 @@ describe('DiscussionFullPage', () => {
       const mocks = [
         ...getDiscussionQueryMock({perPage: 1}),
         ...getDiscussionQueryMock({perPage: 1, sort: 'asc'}),
-        ...createDiscussionEntryMock()
+        ...createDiscussionEntryMock(),
       ]
       const container = setup(mocks)
 

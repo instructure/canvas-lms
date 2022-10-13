@@ -26,8 +26,8 @@ import {Attachment} from '../../../../graphql/Attachment'
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
   responsiveQuerySizes: () => ({
-    desktop: {maxWidth: '1000px'}
-  })
+    desktop: {maxWidth: '1000px'},
+  }),
 }))
 
 beforeAll(() => {
@@ -37,7 +37,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -45,8 +45,8 @@ beforeAll(() => {
 describe('DiscussionEntryContainer', () => {
   const topicPostUtilities = () => (
     <PostToolbar
-      isPublished
-      isSubscribed
+      isPublished={true}
+      isSubscribed={true}
       repliesCount={24}
       unreadCount={4}
       onTogglePublish={() => {}}
@@ -73,7 +73,7 @@ describe('DiscussionEntryContainer', () => {
     editedTimingDisplay = 'Feb 2 2:00pm',
     lastReplyAtDisplay = null,
     quotedEntry = null,
-    attachment = null
+    attachment = null,
   } = {}) => ({
     isTopic,
     postUtilities,
@@ -92,7 +92,7 @@ describe('DiscussionEntryContainer', () => {
     editedTimingDisplay,
     lastReplyAtDisplay,
     quotedEntry,
-    attachment
+    attachment,
   })
 
   const setup = props => {
@@ -143,13 +143,13 @@ describe('DiscussionEntryContainer', () => {
             previewMessage:
               'Differences of habit and language are nothing at all if our aims are identical and our hearts are open.',
             author: {
-              shortName: 'Albus Dumbledore'
+              shortName: 'Albus Dumbledore',
             },
             editor: {
-              shortName: 'Albus Dumbledore'
+              shortName: 'Albus Dumbledore',
             },
-            deleted: false
-          }
+            deleted: false,
+          },
         })
       )
       expect(container.getByTestId('reply-preview')).toBeInTheDocument()

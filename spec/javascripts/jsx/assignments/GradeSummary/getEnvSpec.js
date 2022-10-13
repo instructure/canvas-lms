@@ -18,7 +18,7 @@
 
 import fakeENV from 'helpers/fakeENV'
 
-import getEnv from 'ui/features/assignment_grade_summary/react/getEnv.js'
+import getEnv from 'ui/features/assignment_grade_summary/react/getEnv'
 
 QUnit.module('GradeSummary getEnv()', suiteHooks => {
   suiteHooks.beforeEach(() => {

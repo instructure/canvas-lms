@@ -24,8 +24,34 @@ import {extractDataTurnitin} from '@canvas/grading/Turnitin'
 import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 import {extractSimilarityInfo, isPostable, similarityIcon} from '@canvas/grading/SubmissionHelper'
 import {classNamesForAssignmentCell} from './CellStyles'
+import type Gradebook from '../../Gradebook'
+import type {GradingStandard} from '../../gradebook.d'
 
 const I18n = useI18nScope('gradebook')
+
+type Options = {
+  classNames?: string[]
+  dimmed?: boolean
+  disabled?: boolean
+  hidden?: boolean
+  invalid?: boolean
+  showUnpostedIndicator?: boolean
+  turnitinState?: ReturnType<typeof getTurnitinState>
+  similarityData?: ReturnType<typeof extractSimilarityInfo>
+}
+
+type Getters = {
+  getAssignment(assignmentId: string): ReturnType<Gradebook['getAssignment']>
+  getEnterGradesAsSetting(assignmentId: string): ReturnType<Gradebook['getEnterGradesAsSetting']>
+  getGradingSchemeData(assignmentId: string): undefined | GradingStandard[]
+  getPendingGradeInfo(submission: {
+    assignmentId: string
+    userId: string
+  }): ReturnType<Gradebook['getPendingGradeInfo']>
+  getStudent(studentId: string): ReturnType<Gradebook['student']>
+  getSubmissionState(submission): ReturnType<Gradebook['submissionStateMap']['getSubmissionState']>
+  showUpdatedSimilarityScore(): boolean
+}
 
 function getTurnitinState(submission) {
   const turnitin = extractDataTurnitin(submission)
@@ -53,7 +79,7 @@ function needsGrading(submission, pendingGradeInfo) {
   )
 }
 
-function formatGrade(submissionData, assignment, options) {
+function formatGrade(submissionData, assignment, options: Getters) {
   const formatOptions = {
     formatType: options.getEnterGradesAsSetting(assignment.id),
     gradingScheme: options.getGradingSchemeData(assignment.id),
@@ -83,9 +109,9 @@ function renderStartContainer(options) {
   return `<div class="Grid__GradeCell__StartContainer">${content}</div>`
 }
 
-function renderTemplate(grade, options = {}) {
+function renderTemplate(grade: string, options: Options = {}) {
   let classNames = ['Grid__GradeCell', 'gradebook-cell']
-  let content = grade
+  let content: string = grade
 
   if (options.classNames) {
     classNames = [...classNames, ...options.classNames]
@@ -120,21 +146,23 @@ function renderTemplate(grade, options = {}) {
 }
 
 export default class AssignmentCellFormatter {
-  constructor(gradebook) {
+  options: Getters
+
+  constructor(gradebook: Gradebook) {
     this.options = {
-      getAssignment(assignmentId) {
+      getAssignment(assignmentId: string) {
         return gradebook.getAssignment(assignmentId)
       },
-      getEnterGradesAsSetting(assignmentId) {
+      getEnterGradesAsSetting(assignmentId: string) {
         return gradebook.getEnterGradesAsSetting(assignmentId)
       },
-      getGradingSchemeData(assignmentId) {
-        return gradebook.getAssignmentGradingScheme(assignmentId).data
+      getGradingSchemeData(assignmentId: string): undefined | GradingStandard[] {
+        return gradebook.getAssignmentGradingScheme(assignmentId)?.data
       },
-      getPendingGradeInfo(submission) {
+      getPendingGradeInfo(submission: {assignmentId: string; userId: string}) {
         return gradebook.getPendingGradeInfo(submission)
       },
-      getStudent(studentId) {
+      getStudent(studentId: string) {
         return gradebook.student(studentId)
       },
       getSubmissionState(submission) {
@@ -191,7 +219,7 @@ export default class AssignmentCellFormatter {
     const showUnpostedIndicator =
       columnDef.postAssignmentGradesTrayOpenForAssignmentId && isPostable(submission)
 
-    const options = {
+    const options: Options = {
       classNames: classNamesForAssignmentCell(assignmentData, submissionData),
       dimmed: student.isInactive || student.isConcluded || submissionState.locked,
       disabled: student.isConcluded || submissionState.locked,

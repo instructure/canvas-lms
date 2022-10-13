@@ -2795,6 +2795,33 @@ describe DiscussionTopic do
     end
   end
 
+  describe "course with multiple sections" do
+    before :once do
+      @course = course_factory(active_all: true)
+      @section1 = @course.course_sections.create!(name: "Section 1")
+      @section2 = @course.course_sections.create!(name: "Section 2")
+
+      @student1 = create_enrolled_user(@course, @section2, name: "Student 1", enrollment_type: "StudentEnrollment")
+      @student2 = create_enrolled_user(@course, @section2, name: "Student 2", enrollment_type: "StudentEnrollment")
+
+      @student1.enrollments.first.conclude
+
+      @all_users = [@teacher, @student1, @student2]
+    end
+
+    it "section specific topic.users_with_permissions does not show completed enrollments" do
+      topic = DiscussionTopic.new(title: "foo", message: "bar",
+                                  context: @course, user: @teacher)
+      add_section_to_topic(topic, @section2)
+      topic.save!
+
+      users = topic.users_with_permissions(@all_users)
+
+      expect(users.count).to eq(2)
+      expect(users.map(&:id).to_set).to eq([@teacher.id, @student2.id].to_set)
+    end
+  end
+
   context "only_graders_can_rate" do
     it "checks permissions on the course level for group level discussions" do
       group = @course.groups.create!

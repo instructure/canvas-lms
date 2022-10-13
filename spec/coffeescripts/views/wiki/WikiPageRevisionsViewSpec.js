@@ -18,14 +18,14 @@
 
 import $ from 'jquery'
 import {get} from 'lodash'
-import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection.js'
-import WikiPageRevisionsView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionsView.js'
+import WikiPageRevisionsCollection from 'ui/features/wiki_page_revisions/backbone/collections/WikiPageRevisionsCollection'
+import WikiPageRevisionsView from 'ui/features/wiki_page_revisions/backbone/views/WikiPageRevisionsView'
 
 QUnit.module('WikiPageRevisionsView', {
   setup() {},
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 test('selecting a model/view sets the selected attribute on the model', () => {
@@ -54,7 +54,7 @@ test('prevPage fetches previous page from collection', () => {
     .atLeast(1)
     .withArgs({
       page: 'prev',
-      reset: true
+      reset: true,
     })
     .returns($.Deferred())
   const view = new WikiPageRevisionsView({collection})
@@ -69,7 +69,7 @@ test('nextPage fetches next page from collection', () => {
     .atLeast(1)
     .withArgs({
       page: 'next',
-      reset: true
+      reset: true,
     })
     .returns($.Deferred())
   const view = new WikiPageRevisionsView({collection})

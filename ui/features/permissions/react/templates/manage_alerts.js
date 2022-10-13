@@ -25,8 +25,8 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Announcements (Account)'),
-      description: I18n.t('Allows user to add, edit, and delete global announcements.')
-    }
+      description: I18n.t('Allows user to add, edit, and delete global announcements.'),
+    },
   ],
   [],
   [],

@@ -30,7 +30,7 @@ const fakeJob = {
   id: '1024',
   priority: 20,
   max_concurrent: 1,
-  strand: 'foobar'
+  strand: 'foobar',
 }
 
 describe('JobManager', () => {
@@ -63,7 +63,7 @@ describe('JobManager', () => {
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
-      params: {strand: 'foobar', priority: 11, max_concurrent: 1}
+      params: {strand: 'foobar', priority: 11, max_concurrent: 1},
     })
     await flushPromises()
     expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
@@ -88,7 +88,7 @@ describe('JobManager', () => {
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
-      params: {strand: 'foobar', priority: 11, max_concurrent: 7}
+      params: {strand: 'foobar', priority: 11, max_concurrent: 7},
     })
     await flushPromises()
     expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})
@@ -113,7 +113,7 @@ describe('JobManager', () => {
     expect(doFetchApi).toHaveBeenCalledWith({
       path: '/api/v1/jobs2/manage',
       method: 'PUT',
-      params: {strand: 'foobar', priority: 15, max_concurrent: 8}
+      params: {strand: 'foobar', priority: 15, max_concurrent: 8},
     })
     await flushPromises()
     expect(onUpdate).toHaveBeenCalledWith({status: 'OK', count: 1})

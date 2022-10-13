@@ -38,7 +38,7 @@ ready(() => {
 
   const wikiPage = new WikiPage(ENV.WIKI_PAGE, {
     revision: ENV.WIKI_PAGE_REVISION,
-    contextAssetString: ENV.context_asset_string
+    contextAssetString: ENV.context_asset_string,
   })
 
   const wikiPageView = new WikiPageView({
@@ -53,7 +53,7 @@ ready(() => {
     course_id: ENV.COURSE_ID,
     course_home: ENV.COURSE_HOME,
     course_title: ENV.COURSE_TITLE,
-    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK
+    display_show_all_pages: ENV.DISPLAY_SHOW_ALL_LINK,
   })
 
   wikiPageView.render()

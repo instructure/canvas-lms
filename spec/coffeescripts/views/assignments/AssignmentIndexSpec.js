@@ -43,15 +43,15 @@ function assignmentIndex(opts = {withAssignmentSettings: false}) {
     name: 'Group 1',
     assignments: [
       {id: 1, name: 'Foo Name'},
-      {id: 2, name: 'Bar Title'}
-    ]
+      {id: 2, name: 'Bar Title'},
+    ],
   })
   const group2 = new AssignmentGroup({
     name: 'Group 2',
     assignments: [
       {id: 1, name: 'Baz Title'},
-      {id: 2, name: 'Qux Name'}
-    ]
+      {id: 2, name: 'Qux Name'},
+    ],
   })
   assignmentGroups = new AssignmentGroupCollection([group1, group2], {course})
 
@@ -62,24 +62,24 @@ function assignmentIndex(opts = {withAssignmentSettings: false}) {
       model: course,
       assignmentGroups,
       weightsView: AssignmentGroupWeightsView,
-      userIsAdmin: true
+      userIsAdmin: true,
     })
   assignmentSyncSettingsView = new AssignmentSyncSettingsView({
     collection: assignmentGroups,
     model: course,
-    sisName: 'ENV.SIS_NAME'
+    sisName: 'ENV.SIS_NAME',
   })
 
   const assignmentGroupsView = new AssignmentGroupListView({
     collection: assignmentGroups,
-    course
+    course,
   })
 
   let showByView = false
   if (!ENV.PERMISSIONS.manage) {
     showByView = new ToggleShowByView({
       course,
-      assignmentGroups
+      assignmentGroups,
     })
   }
 
@@ -90,7 +90,7 @@ function assignmentIndex(opts = {withAssignmentSettings: false}) {
     assignmentSettingsView,
     assignmentSyncSettingsView,
     showByView,
-    ...opts
+    ...opts,
   })
 
   return app.render()
@@ -101,8 +101,8 @@ QUnit.module('AssignmentIndex', {
     fakeENV.setup({
       PERMISSIONS: {manage: true},
       URLS: {
-        assignment_sort_base_url: 'test'
-      }
+        assignment_sort_base_url: 'test',
+      },
     })
     this.enable_spy = sandbox.spy(IndexView.prototype, 'enableSearch')
   },
@@ -111,7 +111,7 @@ QUnit.module('AssignmentIndex', {
     fakeENV.teardown()
     assignmentGroups = null
     fixtures.empty()
-  }
+  },
 })
 
 // eslint-disable-next-line qunit/resolve-async
@@ -209,8 +209,8 @@ QUnit.module('student index view', {
     fakeENV.setup({
       PERMISSIONS: {manage: false},
       URLS: {
-        assignment_sort_base_url: 'test'
-      }
+        assignment_sort_base_url: 'test',
+      },
     })
   },
 
@@ -218,7 +218,7 @@ QUnit.module('student index view', {
     fakeENV.teardown()
     assignmentGroups = null
     fixtures.empty()
-  }
+  },
 })
 
 test('should not contain a drag and drop warning for screen readers', () => {
@@ -239,14 +239,14 @@ test('should clear search on toggle', () => {
 QUnit.module('AssignmentIndex - bulk edit', {
   setup() {
     fakeENV.setup({
-      PERMISSIONS: {manage_assignments: true}
+      PERMISSIONS: {manage_assignments: true},
     })
   },
 
   teardown() {
     fakeENV.teardown()
     fixtures.empty()
-  }
+  },
 })
 
 test('it should show bulk edit menu', () => {

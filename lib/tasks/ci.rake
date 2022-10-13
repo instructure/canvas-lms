@@ -15,7 +15,7 @@ namespace :ci do
   task reset_database: :environment do
     raise "need to set RAILS_ENV=test" unless Rails.env.test?
 
-    require "spec/support/test_database_utils"
+    require_relative "../../spec/support/test_database_utils"
     TestDatabaseUtils.reset_database!
   end
 

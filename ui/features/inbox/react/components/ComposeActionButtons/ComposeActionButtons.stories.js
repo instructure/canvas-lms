@@ -28,8 +28,8 @@ export default {
     onMediaUpload: {action: 'Media'},
     onCancel: {action: 'Canceled'},
     onSend: {action: 'Sent'},
-    isSending: false
-  }
+    isSending: false,
+  },
 }
 
 const Template = args => <ComposeActionButtons {...args} />
@@ -39,10 +39,10 @@ Default.args = {}
 
 export const MessageSending = Template.bind({})
 MessageSending.args = {
-  isSending: true
+  isSending: true,
 }
 
 export const MediaUploadUnavailable = Template.bind({})
 MediaUploadUnavailable.args = {
-  onMediaUpload: null
+  onMediaUpload: null,
 }

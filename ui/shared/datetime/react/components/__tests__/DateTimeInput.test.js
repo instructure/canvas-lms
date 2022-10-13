@@ -30,13 +30,13 @@ const dateFormatter = new Intl.DateTimeFormat(locale, {
   month: 'long',
   day: 'numeric',
   year: 'numeric',
-  timezone
+  timezone,
 })
 
 const timeFormatter = new Intl.DateTimeFormat(locale, {
   hour: 'numeric',
   minute: 'numeric',
-  timezone
+  timezone,
 })
 
 const props = {
@@ -46,7 +46,7 @@ const props = {
   timezone,
   onChange: Function.prototype,
   value: sampleDateTime,
-  description: 'Pick a Date and Time'
+  description: 'Pick a Date and Time',
 }
 
 function renderInput(overrides = {}) {

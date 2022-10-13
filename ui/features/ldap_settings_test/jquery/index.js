@@ -29,7 +29,7 @@ function testLDAP() {
   clearTestLDAP()
   $('#test_ldap_dialog').dialog({
     title: I18n.t('test_ldap_dialog_title', 'Test LDAP Settings'),
-    width: 600
+    width: 600,
   })
   ENV.LDAP_TESTS[0].js_function()
 }
@@ -43,7 +43,7 @@ function clearTestLDAP() {
   $('#ldap_login_form').hide()
 }
 $.each(ENV.LDAP_TESTS, (i, test) => {
-  test.js_function = function() {
+  test.js_function = function () {
     $('#ldap_' + test.test_type + '_result').html("<img src='/images/ajax-loader.gif'/>")
     $.getJSON(test.url, data => {
       let success = true
@@ -91,9 +91,7 @@ $.each(ENV.LDAP_TESTS, (i, test) => {
   }
 })
 function testLDAPLogin() {
-  $('#ldap_test_login')
-    .attr('disabled', 'true')
-    .attr('value', I18n.t('testing', 'Testing...'))
+  $('#ldap_test_login').attr('disabled', 'true').attr('value', I18n.t('testing', 'Testing...'))
   $('#ldap_login_result').html("<img src='/images/ajax-loader.gif'/>")
   const username = $('#ldap_test_login_user').val()
   const password = $('#ldap_test_login_pass').val()
@@ -120,9 +118,7 @@ function testLDAPLogin() {
         $('#ldap_login_result').html(
           "<h4 style='color:green'>" + h(I18n.t('test_ldap_result_ok', 'OK')) + '</h4>'
         )
-        $('#ldap_test_login')
-          .attr('disabled', '')
-          .attr('value', I18n.t('test_login', 'Test Login'))
+        $('#ldap_test_login').attr('disabled', '').attr('value', I18n.t('test_login', 'Test Login'))
       } else {
         $('#ldap_login_result').html(
           "<h4 style='color:red'>" + h(I18n.t('test_ldap_result_failed', 'Failed')) + '</h4>'

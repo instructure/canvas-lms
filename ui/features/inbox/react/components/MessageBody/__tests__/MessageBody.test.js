@@ -23,7 +23,7 @@ import {MessageBody} from '../MessageBody'
 const createProps = overrides => {
   return {
     onBodyChange: jest.fn(),
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -48,9 +48,9 @@ describe('MessageBody', () => {
       messages: [
         {
           text: 'Please insert a message body.',
-          type: 'error'
-        }
-      ]
+          type: 'error',
+        },
+      ],
     })
     const {getByText} = render(<MessageBody {...props} />)
     expect(getByText(props.messages[0].text)).toBeInTheDocument()

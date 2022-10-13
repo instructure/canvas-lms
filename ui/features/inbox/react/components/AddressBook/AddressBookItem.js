@@ -33,7 +33,7 @@ export const AddressBookItem = ({
   hasPopup,
   onSelect,
   onHover,
-  menuRef
+  menuRef,
 }) => {
   const itemRef = useRef()
 
@@ -80,7 +80,7 @@ export const AddressBookItem = ({
                 {iconBefore}
               </Flex.Item>
             )}
-            <Flex.Item align="center" shouldGrow shouldShrink>
+            <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
               <TruncateText>
                 <Text color={isSelected ? 'primary-inverse' : null}>{children}</Text>
               </TruncateText>
@@ -139,7 +139,7 @@ AddressBookItem.propTypes = {
   /**
    * Boolean to determine if keyboard or mouse navigation is occuring
    */
-  isKeyboardFocus: PropTypes.bool
+  isKeyboardFocus: PropTypes.bool,
 }
 
 export default AddressBookItem

@@ -113,8 +113,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Spennandi umræður" },
   "excused_cf8792eb": { "message": "Undanþegið" },
+  "extended_9a58dcb6": { "message": "Framlengd" },
   "failed_getting_course_list_49846a93": {
     "message": "Tókst ekki að sækja námskeiðslista"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Mistókst að fá Að gera lista"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Tókst ekki að kíkja á framtíð þína"
@@ -136,6 +140,9 @@
     "message": "Mistókst að hlaða kostum"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Mistókst að vista Verkefni" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Mistókst hlaða Að gera lista"
+  },
   "feedback_6dcc1991": { "message": "Endurgjöf" },
   "fun_quiz_47ab0b0": { "message": "Skemmtilegar spurningar" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -246,6 +253,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } til { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Nemandi að gera" },
   "submitted_318fad53": { "message": "Skilað" },
   "success_to_do_created_e34ed395": { "message": "Árangur: Verkefni búið til" },
   "task_16b0ef38": { "message": "Verk" },

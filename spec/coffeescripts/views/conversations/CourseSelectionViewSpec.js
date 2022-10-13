@@ -17,18 +17,18 @@
  */
 
 import Course from '@canvas/courses/backbone/models/Course.coffee'
-import CourseSelectionView from 'ui/features/conversations/backbone/views/CourseSelectionView.js'
-import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection.js'
-import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection.js'
+import CourseSelectionView from 'ui/features/conversations/backbone/views/CourseSelectionView'
+import CourseCollection from 'ui/features/conversations/backbone/collections/CourseCollection'
+import FavoriteCourseCollection from 'ui/features/conversations/backbone/collections/FavoriteCourseCollection'
 import GroupCollection from '@canvas/groups/backbone/collections/GroupCollection.coffee'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
 
-const courseSelectionView = function() {
+const courseSelectionView = function () {
   const courses = {
     favorites: new FavoriteCourseCollection(),
     all: new CourseCollection(),
-    groups: new GroupCollection()
+    groups: new GroupCollection(),
   }
   return new CourseSelectionView({courses})
 }
@@ -40,7 +40,7 @@ QUnit.module('CourseSelectionView', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('it should be accessible', assert => {
@@ -49,69 +49,57 @@ test('it should be accessible', assert => {
   assertions.isAccessible(courseSelectionView(), done, {a11yReport: true})
 })
 
-test('does not label an un-favorited course as concluded', function() {
+test('does not label an un-favorited course as concluded', function () {
   const course = new Course()
   const view = courseSelectionView()
   ok(!view.is_complete(course, this.now))
 })
 
-test('labels a concluded course as concluded', function() {
+test('labels a concluded course as concluded', function () {
   const course = new Course({workflow_state: 'completed'})
   const view = courseSelectionView()
   ok(view.is_complete(course, this.now))
 })
 
-test('does not label a course with a term with no end_at as concluded', function() {
+test('does not label a course with a term with no end_at as concluded', function () {
   const course = new Course({term: 'foo'})
   const view = courseSelectionView()
   ok(!view.is_complete(course, this.now))
 })
 
-test('labels as completed a course with a term with an end_at date in the past', function() {
+test('labels as completed a course with a term with an end_at date in the past', function () {
   const course = new Course({
     term: {
-      end_at: Date.today()
-        .last()
-        .monday()
-        .toISOString()
-    }
+      end_at: Date.today().last().monday().toISOString(),
+    },
   })
   const view = courseSelectionView()
   ok(view.is_complete(course, this.now))
 })
 
-test('does not label as completed a course with a term overriding end_at in the future', function() {
+test('does not label as completed a course with a term overriding end_at in the future', function () {
   const course = new Course({
-    end_at: Date.today()
-      .next()
-      .monday()
-      .toISOString(),
+    end_at: Date.today().next().monday().toISOString(),
     restrict_enrollments_to_course_dates: true,
     term: {
-      end_at: Date.today()
-        .last()
-        .monday()
-        .toISOString()
-    }
+      end_at: Date.today().last().monday().toISOString(),
+    },
   })
   const view = courseSelectionView()
   ok(!view.is_complete(course, this.now))
 })
 
-test('does not label as completed a course with a term with an end_at date in the future', function() {
+test('does not label as completed a course with a term with an end_at date in the future', function () {
   const course = new Course({
     term: {
-      end_at: Date.today()
-        .next()
-        .monday()
-        .toISOString()
-    }
+      end_at: Date.today().next().monday().toISOString(),
+    },
   })
   const view = courseSelectionView()
   ok(!view.is_complete(course, this.now))
 })
 
-test('does not label as completed a course with a term with an end_at that is null', function() {
+test('does not label as completed a course with a term with an end_at that is null', function () {
   const course = new Course({term: {end_at: null}})
   const view = courseSelectionView()
   ok(!view.is_complete(course, this.now))

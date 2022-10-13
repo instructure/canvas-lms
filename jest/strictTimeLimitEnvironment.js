@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-const BaseEnvironment = require('jest-environment-jsdom').default;
+const BaseEnvironment = require('jest-environment-jsdom').default
 
 const CUSTOM_TIMEOUT_LIMIT = 5000
 const ABSOLUTE_TIMEOUT = 7500
@@ -28,9 +28,11 @@ class StrictTimeLimitEnvironment extends BaseEnvironment {
     } else if ((event.test?.duration || 0) > ABSOLUTE_TIMEOUT) {
       // Jest is supposed to enforce the CUSTOM_TIMEOUT_LIMIT, but it doesn't always for
       // async tests. The duration value is always accurate so just enforce it here.
-      throw new Error(`Exceeded the absolute ${ABSOLUTE_TIMEOUT}ms runtime limit for spec "${event.test?.name}"!`)
+      throw new Error(
+        `Exceeded the absolute ${ABSOLUTE_TIMEOUT}ms runtime limit for spec "${event.test?.name}"!`
+      )
     }
   }
 }
 
-module.exports = StrictTimeLimitEnvironment;
+module.exports = StrictTimeLimitEnvironment

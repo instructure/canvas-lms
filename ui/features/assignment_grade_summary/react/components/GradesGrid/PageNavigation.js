@@ -27,7 +27,7 @@ export default class PageNavigation extends Component {
   static propTypes = {
     currentPage: number.isRequired,
     onPageClick: func.isRequired,
-    pageCount: number.isRequired
+    pageCount: number.isRequired,
   }
 
   shouldComponentUpdate(nextProps) {

@@ -44,7 +44,7 @@ test('it converts back to snake_case', () => {
     exclude_quoted: false,
     exclude_self_plag: false,
     originality_report_visibility: 'after_grading',
-    store_in_index: false
+    store_in_index: false,
   }
   const ts = new VeriCiteSettings(options)
   deepEqual(ts.toJSON(), options)
@@ -54,9 +54,9 @@ QUnit.module('VeriCiteSettings#present', {
   setup() {
     this.options = {
       exclude_biblio: true,
-      originality_report_visibility: 'after_grading'
+      originality_report_visibility: 'after_grading',
     }
     this.ts = new VeriCiteSettings(this.options)
     this.view = this.ts.present()
-  }
+  },
 })

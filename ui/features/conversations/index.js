@@ -42,7 +42,7 @@ const I18n = useI18nScope('conversations')
 const ConversationsRouter = Backbone.Router.extend({
   routes: {
     '': 'index',
-    'filter=:state': 'filter'
+    'filter=:state': 'filter',
   },
   sendingCount: 0,
 
@@ -68,7 +68,7 @@ const ConversationsRouter = Backbone.Router.extend({
       'onAddMessage',
       'onSubmissionAddMessage',
       'onSearch',
-      'onKeyDown'
+      'onKeyDown',
     ].forEach(method => (this[method] = this[method].bind(this)))
     const dfd = this._initCollections()
     this._initViews()
@@ -101,7 +101,7 @@ const ConversationsRouter = Backbone.Router.extend({
     })
     $.ajaxJSON('/api/v1/conversations', 'PUT', {
       'conversation_ids[]': messages,
-      event
+      event,
     })
     if (event === 'destroy') this.list.selectedMessages = []
     if (event === 'archive' && this.filters.type !== 'sent') this.list.selectedMessages = []
@@ -140,9 +140,9 @@ const ConversationsRouter = Backbone.Router.extend({
         this.lastFetch = model.fetch({
           data: {
             include_participant_contexts: false,
-            include_private_conversation_enrollments: false
+            include_private_conversation_enrollments: false,
           },
-          success: this.selectConversation
+          success: this.selectConversation,
         })
         this.detail.$el.disableWhileLoading(this.lastFetch)
       }
@@ -185,19 +185,18 @@ const ConversationsRouter = Backbone.Router.extend({
         ? I18n.t(
             {
               one: 'Are you sure you want to archive your copy of this conversation?',
-              other: 'Are you sure you want to archive your copies of these conversations?'
+              other: 'Are you sure you want to archive your copies of these conversations?',
             },
             {count: this.list.selectedMessages.length}
           )
         : I18n.t(
             {
               one: 'Are you sure you want to unarchive this conversation?',
-              other: 'Are you sure you want to unarchive these conversations?'
+              other: 'Are you sure you want to unarchive these conversations?',
             },
             {count: this.list.selectedMessages.length}
           )
     if (!confirm(confirmMessage)) {
-      // eslint-disable-line no-alert
       $(trigger).focus()
       return
     }
@@ -225,7 +224,7 @@ const ConversationsRouter = Backbone.Router.extend({
       {
         one: 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
         other:
-          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
+          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.',
       },
       {count: this.list.selectedMessages.length}
     )
@@ -236,7 +235,7 @@ const ConversationsRouter = Backbone.Router.extend({
     const delmsg = I18n.t(
       {
         one: 'Message Deleted!',
-        other: 'Messages Deleted!'
+        other: 'Messages Deleted!',
       },
       {count: this.list.selectedMessages.length}
     )
@@ -254,7 +253,7 @@ const ConversationsRouter = Backbone.Router.extend({
     $focusNext.focus()
   },
 
-  onCompose(e) {
+  onCompose(_e) {
     this.compose.show(null, {trigger: '#compose-btn'})
   },
 
@@ -347,7 +346,7 @@ const ConversationsRouter = Backbone.Router.extend({
   //
   // Returns a boolean.
   _isRemoteLaunch() {
-    return !!window.location.search.match(/user_id/);
+    return !!window.location.search.match(/user_id/)
   },
 
   // Internal: Open and populate the new message dialog from a remote launch.
@@ -357,10 +356,10 @@ const ConversationsRouter = Backbone.Router.extend({
     this.compose.show(null, {
       user: {
         id: this.param('user_id'),
-        name: this.param('user_name')
+        name: this.param('user_name'),
       },
       context: this.param('context_id'),
-      remoteLaunch: true
+      remoteLaunch: true,
     })
   },
 
@@ -370,7 +369,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.courses = {
       favorites: new FavoriteCourseCollection(),
       all: new CourseCollection(),
-      groups: gc
+      groups: gc,
     }
 
     this.courses.all.setParam('per_page', '50')
@@ -417,7 +416,7 @@ const ConversationsRouter = Backbone.Router.extend({
     $(window).keydown(this.onKeyDown)
   },
 
-  onPageLoad(e) {
+  onPageLoad(_e) {
     $('#main').css({display: 'block'})
   },
 
@@ -449,7 +448,7 @@ const ConversationsRouter = Backbone.Router.extend({
     }
   },
 
-  onNewConversations(conversations) {},
+  onNewConversations(_conversations) {},
 
   _incrementSending(increment) {
     this.sendingCount += increment
@@ -486,7 +485,7 @@ const ConversationsRouter = Backbone.Router.extend({
       collection: new MessageCollection(),
       el: $('.message-list'),
       scrollContainer: $('.message-list-scroller'),
-      buffer: 50
+      buffer: 50,
     })
     this.list.render()
   },
@@ -504,7 +503,7 @@ const ConversationsRouter = Backbone.Router.extend({
       starred: I18n.t('Starred'),
       sent: I18n.t('Sent'),
       archived: I18n.t('Archived'),
-      submission_comments: I18n.t('Submission Comments')
+      submission_comments: I18n.t('Submission Comments'),
     }
 
     // The onArchive function requires the filter to always be set in the url.
@@ -541,7 +540,7 @@ const ConversationsRouter = Backbone.Router.extend({
     this.compose = new MessageFormDialog({
       courses: this.courses,
       folderId: ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID,
-      account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE
+      account_context_code: ENV.CONVERSATIONS.ACCOUNT_CONTEXT_CODE,
     })
   },
 
@@ -558,7 +557,7 @@ const ConversationsRouter = Backbone.Router.extend({
       e.preventDefault()
       this.list.selectAll()
     }
-  }
+  },
 })
 
 ready(() => {

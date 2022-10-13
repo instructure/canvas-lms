@@ -46,7 +46,7 @@ function renderTable(date) {
   const pageViewsView = new PageViewView({
     collection: pageViews,
     el: $table,
-    fetchOptions
+    fetchOptions,
   })
 
   // Add events

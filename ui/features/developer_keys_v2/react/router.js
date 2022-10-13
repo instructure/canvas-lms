@@ -93,5 +93,5 @@ page('/accounts/:contextId/developer_keys', renderShowDeveloperKeys)
 export default {
   start() {
     page.start()
-  }
+  },
 }

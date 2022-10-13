@@ -23,8 +23,8 @@ export default {
   title: 'Examples/Canvas Inbox/Message Body',
   component: MessageBody,
   argTypes: {
-    onBodyChange: {action: 'changed'}
-  }
+    onBodyChange: {action: 'changed'},
+  },
 }
 
 const Template = args => <MessageBody {...args} />
@@ -36,7 +36,7 @@ FieldRequired.args = {
   messages: [
     {
       text: 'Please insert a message body.',
-      type: 'error'
-    }
-  ]
+      type: 'error',
+    },
+  ],
 }

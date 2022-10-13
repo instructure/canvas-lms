@@ -21,9 +21,9 @@ import {actionTypes} from '../actions'
 const activePermissionTrayReducer = handleActions(
   {
     [actionTypes.DISPLAY_PERMISSION_TRAY]: (state, action) => ({
-      permissionName: action.payload.permission.permission_name
+      permissionName: action.payload.permission.permission_name,
     }),
-    [actionTypes.HIDE_ALL_TRAYS]: () => null
+    [actionTypes.HIDE_ALL_TRAYS]: () => null,
   },
   null
 )

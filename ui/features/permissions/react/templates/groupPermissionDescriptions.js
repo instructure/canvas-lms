@@ -37,5 +37,5 @@ export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_course_ta_enrollments: () => I18n.t('add / remove in courses'),
   manage_course_observer_enrollments: () => I18n.t('add / remove in courses'),
   manage_course_designer_enrollments: () => I18n.t('add / remove in courses'),
-  manage_course_templates: () => I18n.t('create / delete / edit')
+  manage_course_templates: () => I18n.t('create / delete / edit'),
 }

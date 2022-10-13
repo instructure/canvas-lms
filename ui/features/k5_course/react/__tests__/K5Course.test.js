@@ -30,7 +30,7 @@ import {
   MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
   MOCK_ENROLLMENTS,
   MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
-  MOCK_GROUPS
+  MOCK_GROUPS,
 } from './mocks'
 import {TAB_IDS} from '@canvas/k5/react/utils'
 import {MOCK_OBSERVED_USERS_LIST} from '@canvas/observer-picker/react/__tests__/fixtures'
@@ -40,7 +40,7 @@ import {OBSERVER_COOKIE_PREFIX} from '@canvas/observer-picker/ObserverGetObserve
 const currentUser = {
   id: '1',
   display_name: 'Geoffrey Jellineck',
-  avatar_image_url: 'http://avatar'
+  avatar_image_url: 'http://avatar',
 }
 const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUser.id}`
 const defaultEnv = {
@@ -49,10 +49,10 @@ const defaultEnv = {
   K5_USER: true,
   FEATURES: {},
   PREFERENCES: {
-    hide_dashcard_color_overlays: false
+    hide_dashcard_color_overlays: false,
   },
   MOMENT_LOCALE: 'en',
-  TIMEZONE: 'America/Denver'
+  TIMEZONE: 'America/Denver',
 }
 
 const dtf = new Intl.DateTimeFormat('en', {
@@ -63,7 +63,7 @@ const dtf = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
-  timeZone: defaultEnv.TIMEZONE
+  timeZone: defaultEnv.TIMEZONE,
 })
 
 const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
@@ -74,7 +74,7 @@ const defaultTabs = [
   {id: '10'},
   {id: '7'},
   {id: '5'},
-  {id: 'context_external_tool_1'}
+  {id: 'context_external_tool_1'},
 ]
 const defaultProps = {
   currentUser,
@@ -88,7 +88,7 @@ const defaultProps = {
   courseOverview: {
     body: '<h2>Time to learn!</h2>',
     url: 'home',
-    canEdit: true
+    canEdit: true,
   },
   hideFinalGrades: false,
   userIsStudent: true,
@@ -107,13 +107,13 @@ const defaultProps = {
       {
         filename: 'hw.pdf',
         display_name: 'hw.pdf',
-        url: 'http://address/to/hw.pdf'
-      }
+        url: 'http://address/to/hw.pdf',
+      },
     ],
     permissions: {
-      update: true
+      update: true,
     },
-    posted_at: '2021-05-14T17:06:21-06:00'
+    posted_at: '2021-05-14T17:06:21-06:00',
   },
   pagesPath: '/courses/30/pages',
   hasWikiPages: true,
@@ -121,14 +121,14 @@ const defaultProps = {
   observedUsersList: [{id: currentUser.id, name: currentUser.display_name}],
   selfEnrollment: {
     option: null,
-    url: null
+    url: null,
   },
   assignmentsDueToday: {},
   assignmentsMissing: {},
   assignmentsCompletedForToday: {},
   currentUserRoles: ['user', 'student', 'teacher'],
   isMasterCourse: false,
-  showImmersiveReader: false
+  showImmersiveReader: false,
 }
 const FETCH_IMPORTANT_INFO_URL = encodeURI('/api/v1/courses/30?include[]=syllabus_body')
 const FETCH_APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_30'
@@ -202,7 +202,7 @@ beforeEach(() => {
   fakeXhrServer.respondWith('GET', GROUPS_URL, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(MOCK_GROUPS)
+    JSON.stringify(MOCK_GROUPS),
   ])
   global.ENV = defaultEnv
   document.body.appendChild(createModulesPartial())
@@ -283,7 +283,7 @@ describe('K-5 Subject Course', () => {
         {id: '10'},
         {id: '5', hidden: true},
         {id: '19'},
-        {id: 'context_external_tool_3', hidden: true}
+        {id: 'context_external_tool_3', hidden: true},
       ]
       const {getAllByRole} = render(
         <K5Course {...defaultProps} tabs={tabs} hasSyllabusBody={false} />
@@ -291,7 +291,7 @@ describe('K-5 Subject Course', () => {
       const renderedTabs = getAllByRole('tab')
       expect(renderedTabs.map(({id}) => id.replace('tab-', ''))).toEqual([
         TAB_IDS.MODULES,
-        TAB_IDS.SCHEDULE
+        TAB_IDS.SCHEDULE,
       ])
     })
 
@@ -415,7 +415,7 @@ describe('K-5 Subject Course', () => {
     it("renders a join button if selfEnrollment.option is 'enroll'", () => {
       const selfEnrollment = {
         option: 'enroll',
-        url: 'http://enroll_url/'
+        url: 'http://enroll_url/',
       }
       const {getByRole} = render(<K5Course {...defaultProps} selfEnrollment={selfEnrollment} />)
       const button = getByRole('link', {name: 'Join this Subject'})
@@ -426,7 +426,7 @@ describe('K-5 Subject Course', () => {
     it("renders a drop button and modal if selfEnrollment.option is 'unenroll'", () => {
       const selfEnrollment = {
         option: 'unenroll',
-        url: 'http://unenroll_url/'
+        url: 'http://unenroll_url/',
       }
       const {getByRole, getByText} = render(
         <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
@@ -448,7 +448,7 @@ describe('K-5 Subject Course', () => {
       fetchMock.post('http://unenroll_url/', 200)
       const selfEnrollment = {
         option: 'unenroll',
-        url: 'http://unenroll_url/'
+        url: 'http://unenroll_url/',
       }
       const {getByRole, getAllByRole, getByText} = render(
         <K5Course {...defaultProps} selfEnrollment={selfEnrollment} />
@@ -484,12 +484,12 @@ describe('K-5 Subject Course', () => {
       const datePortion = new Intl.DateTimeFormat('en', {
         month: 'short',
         day: 'numeric',
-        timeZone: defaultEnv.TIMEZONE
+        timeZone: defaultEnv.TIMEZONE,
       }).format(targetDate)
       const timePortion = new Intl.DateTimeFormat('en', {
         hour: 'numeric',
         minute: 'numeric',
-        timeZone: defaultEnv.TIMEZONE
+        timeZone: defaultEnv.TIMEZONE,
       })
         .format(targetDate)
         .replace(/ [AP]M$/i, '')
@@ -529,7 +529,7 @@ describe('K-5 Subject Course', () => {
     const emptyCourseOverview = {
       body: null,
       url: null,
-      canEdit: null
+      canEdit: null,
     }
 
     it('shows an empty home state if the front page is not set', () => {

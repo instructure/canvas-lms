@@ -23,11 +23,11 @@ const inputMethods = {
     const $body = $('body'),
       $inputCover = $('<div />', {class: 'input_cover'})
 
-    $inputCover.on('mouseleave', function(e) {
+    $inputCover.on('mouseleave', function (e) {
       $(this).remove()
     })
 
-    $(inputs).on('mouseenter', function(e) {
+    $(inputs).on('mouseenter', function (e) {
       const $el = $(this),
         $cover = $inputCover.clone(true)
 
@@ -38,7 +38,7 @@ const inputMethods = {
         left: $el.offset().left - 6,
         top: $el.offset().top - 6,
         zIndex: 15,
-        background: 'url(/images/blank.png) 0 0 repeat'
+        background: 'url(/images/blank.png) 0 0 repeat',
       })
 
       $body.append($cover)
@@ -46,10 +46,10 @@ const inputMethods = {
   },
 
   setWidths(selector) {
-    $(selector || '.answer input[type=text]').each(function() {
+    $(selector || '.answer input[type=text]').each(function () {
       $(this).width($(this).val().length * 9.5)
     })
-  }
+  },
 }
 
 export default inputMethods

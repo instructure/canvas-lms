@@ -20,7 +20,7 @@ import _ from 'underscore'
 
 const _parse = Backbone.Model.prototype.parse
 
-Backbone.Model.prototype.parse = function() {
+Backbone.Model.prototype.parse = function () {
   const res = _parse.apply(this, arguments)
 
   _.each(this.dateAttributes, attr => {

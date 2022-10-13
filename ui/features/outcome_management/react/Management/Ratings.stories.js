@@ -19,7 +19,7 @@
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import useRatings, {
   createRating,
-  defaultOutcomesManagementRatings
+  defaultOutcomesManagementRatings,
 } from '@canvas/outcomes/react/hooks/useRatings'
 import React from 'react'
 import Ratings from './Ratings'
@@ -43,8 +43,8 @@ export default {
   args: {
     isMobileView: false,
     canManage: true,
-    initialRatings: defaultOutcomesManagementRatings
-  }
+    initialRatings: defaultOutcomesManagementRatings,
+  },
 }
 
 const Template = args => {
@@ -63,22 +63,22 @@ WithErrors.args = {
     createRating('Mastery', 3, '0B874B', true),
     createRating('', 2, 'FAB901'),
     createRating('Below Mastery', 1, 'FD5D10'),
-    createRating('Well Below Mastery', 0, 'E0061F')
-  ]
+    createRating('Well Below Mastery', 0, 'E0061F'),
+  ],
 }
 
 export const Mobile = Template.bind({})
 Mobile.args = {
-  isMobileView: true
+  isMobileView: true,
 }
 
 export const ReadOnly = Template.bind({})
 ReadOnly.args = {
-  canManage: false
+  canManage: false,
 }
 
 export const ReadOnlyMobile = Template.bind({})
 ReadOnlyMobile.args = {
   canManage: false,
-  isMobileView: true
+  isMobileView: true,
 }

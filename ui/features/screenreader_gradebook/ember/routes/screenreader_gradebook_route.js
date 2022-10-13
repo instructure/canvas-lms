@@ -27,7 +27,7 @@ const ScreenreaderGradebookRoute = Route.extend({
       assignment_groups: ArrayProxy.create({content: []}),
       submissions: ArrayProxy.create({content: []}),
       custom_columns: fetchAllPages(ENV.GRADEBOOK_OPTIONS.custom_columns_url),
-      sections: fetchAllPages(ENV.GRADEBOOK_OPTIONS.sections_url)
+      sections: fetchAllPages(ENV.GRADEBOOK_OPTIONS.sections_url),
     }
 
     if (ENV.GRADEBOOK_OPTIONS.final_grade_override_enabled) {
@@ -49,7 +49,7 @@ const ScreenreaderGradebookRoute = Route.extend({
       model.outcomes = fetchAllPages(ENV.GRADEBOOK_OPTIONS.outcome_links_url, {
         process(response) {
           return response.map(x => x.outcome)
-        }
+        },
       })
       model.outcome_rollups = fetchAllPages(ENV.GRADEBOOK_OPTIONS.outcome_rollups_url, {
         process(response) {
@@ -58,16 +58,16 @@ const ScreenreaderGradebookRoute = Route.extend({
               row.scores.map(cell => ({
                 user_id: row.links.user,
                 outcome_id: cell.links.outcome,
-                score: cell.score
+                score: cell.score,
               }))
             )
           )
-        }
+        },
       })
     }
 
     return model
-  }
+  },
 })
 
 export default ScreenreaderGradebookRoute

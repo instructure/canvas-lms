@@ -27,8 +27,8 @@ export default {
     groupId: '1',
     groupTitle: 'State Standards',
     isOpen: true,
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const withContext = (children, {contextType = 'Account', contextId = '1'} = {}) => (
@@ -45,7 +45,7 @@ export const Default = Template.bind({})
 
 const TemplateAlt = args => {
   return withContext(<GroupRemoveModal {...args} />, {
-    contextType: 'Course'
+    contextType: 'Course',
   })
 }
 

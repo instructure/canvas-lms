@@ -26,7 +26,7 @@ const Graphs = connect(state => ({
   assignment: state.assignment,
   ranges: state.ranges,
   enrolled: state.enrolled,
-  isLoading: state.isInitialDataLoading
+  isLoading: state.isInitialDataLoading,
 }))(BreakdownGraphs)
 
 const Details = connect(state => ({
@@ -35,7 +35,7 @@ const Details = connect(state => ({
   assignment: state.assignment,
   ranges: state.ranges,
   students: state.studentCache,
-  showDetails: state.showDetails
+  showDetails: state.showDetails,
 }))(BreakdownDetails)
 
 export default class CRSApp {
@@ -47,7 +47,7 @@ export default class CRSApp {
   renderGraphs(root) {
     const actions = {
       openSidebar: this.actions.openSidebar,
-      selectRange: this.actions.selectRange
+      selectRange: this.actions.selectRange,
     }
 
     ReactDOM.render(
@@ -62,7 +62,7 @@ export default class CRSApp {
     const detailActions = {
       selectRange: this.actions.selectRange,
       selectStudent: this.actions.selectStudent,
-      closeSidebar: this.actions.closeSidebar
+      closeSidebar: this.actions.closeSidebar,
     }
 
     ReactDOM.render(

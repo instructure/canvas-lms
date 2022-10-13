@@ -33,13 +33,13 @@ export const KEY_CODES = {
   up: 38,
   down: 40,
   escape: 27,
-  tab: 9
+  tab: 9,
 }
 
 export const KEY_NAMES = {
   [KEY_CODES.up]: 'UpArrow',
   [KEY_CODES.down]: 'DownArrow',
-  [KEY_CODES.enter]: 'Enter'
+  [KEY_CODES.enter]: 'Enter',
 }
 
 export const ARIA_ID_TEMPLATES = {
@@ -48,5 +48,5 @@ export const ARIA_ID_TEMPLATES = {
   },
   activeDescendant: (instanceId, itemId) => {
     return `${instanceId}-mention-popup-item-${itemId}`
-  }
+  },
 }

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import MigrationOptions from 'ui/features/blueprint_course_master/react/components/MigrationOptions.js'
+import MigrationOptions from 'ui/features/blueprint_course_master/react/components/MigrationOptions'
 import MigrationStates from '@canvas/blueprint-courses/react/migrationStates'
 
 const noop = () => {}
@@ -34,7 +34,7 @@ const defaultProps = {
   enableSendNotification: noop,
   includeCustomNotificationMessage: noop,
   setNotificationMessage: noop,
-  includeCourseSettings: noop
+  includeCourseSettings: noop,
 }
 
 test('renders the MigrationOptions component', () => {

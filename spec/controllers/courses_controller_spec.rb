@@ -702,6 +702,20 @@ describe CoursesController do
         expect(response).to be_successful
         expect(assigns[:js_bundles].flatten).to include(:course_notification_settings)
       end
+
+      it "sets discussions_reporting to falsey if react_discussions_post is off" do
+        @course.disable_feature! :react_discussions_post
+        user_session(@user)
+        get "show", params: { id: @course.id, view: "notifications" }
+        expect(assigns[:js_env][:discussions_reporting]).to be_falsey
+      end
+
+      it "sets discussions_reporting to truthy if react_discussions_post is on" do
+        @course.enable_feature! :react_discussions_post
+        user_session(@user)
+        get "show", params: { id: @course.id, view: "notifications" }
+        expect(assigns[:js_env][:discussions_reporting]).to be_truthy
+      end
     end
   end
 
@@ -1545,9 +1559,8 @@ describe CoursesController do
         @student1 = @student
       end
 
-      context "with 'Assignments 2 Observer View' and the 'Observer Picker' enabled" do
+      context "with 'Assignments 2 Observer View'" do
         before do
-          Account.site_admin.enable_feature!(:observer_picker)
           Setting.set("assignments_2_observer_view", "true")
         end
 
@@ -1609,7 +1622,7 @@ describe CoursesController do
         end
       end
 
-      context "without 'Assignments 2 Observer View' or the 'Observer Picker' enabled" do
+      context "without 'Assignments 2 Observer View'" do
         it "redirects to the xlisted course" do
           user_session(@student1)
           @course1.default_section.crosslist_to_course(@course2, run_jobs_immediately: true)
@@ -1999,9 +2012,8 @@ describe CoursesController do
         expect(enrollment.associated_user_id).to eq @student.id
       end
 
-      context "when observer_picker and a2 observer view is enabled" do
+      context "when a2 observer view is enabled" do
         before do
-          Account.site_admin.enable_feature!(:observer_picker)
           Setting.set("assignments_2_observer_view", "true")
         end
 
@@ -2318,14 +2330,6 @@ describe CoursesController do
                lock_all_announcements: true
              }
            }
-    end
-
-    it "correctly checks a sub-account admin's permission" do
-      @sub_account = Account.create!(name: "sub_account", parent_account: @account)
-      @sub_admin = account_admin_user(account: @sub_account)
-      user_session @sub_admin
-      expect(Auditors::Course).to receive(:record_created)
-      post "create", params: { course: { name: "whatever" } }
     end
 
     it "sets the visibility settings when we have permission" do
@@ -3058,6 +3062,41 @@ describe CoursesController do
                                                           blueprint_restrictions_by_object_type: { "notarealtype" => { "content" => "1", "due_dates" => "1" } } } }, format: "json"
         expect(response).to_not be_successful
         expect(response.body).to include "Invalid restrictions"
+      end
+
+      context "logging master courses and course pacing" do
+        before do
+          Account.default.enable_feature!(:course_paces)
+          allow(InstStatsd::Statsd).to receive(:increment)
+        end
+
+        it "does not increment the counter when course pacing is not enabled" do
+          put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.blueprint_course")
+        end
+
+        it "increments the counter when course pacing is already enabled" do
+          put "update", params: { id: @course.id, course: { enable_course_paces: "1" } }, format: "json"
+          put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course").once
+        end
+
+        it "increments the counter when course pacing is enabled at the same time as blueprint" do
+          put "update", params: { id: @course.id, course: { blueprint: "1", enable_course_paces: "1" } }, format: "json"
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course").once
+        end
+
+        it "increments the counter when course pacing is enabled after blueprint has already been enabled" do
+          put "update", params: { id: @course.id, course: { blueprint: "1" } }, format: "json"
+          put "update", params: { id: @course.id, course: { enable_course_paces: "1" } }, format: "json"
+
+          expect(InstStatsd::Statsd).to have_received(:increment).with("course.paced.blueprint_course")
+        end
+
+        it "does not increment the count if a random course items is updated" do
+          put "update", params: { id: @course.id, course: { course_format: "online" } }, format: "json"
+          expect(InstStatsd::Statsd).not_to have_received(:increment).with("course.paced.blueprint_course")
+        end
       end
     end
 

@@ -46,7 +46,7 @@ function verifySteps(stepContainer, stepArray, getStep) {
 
 it('will render collapsed label if steps is collapsed', async () => {
   const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-  const {getAllByText, getByTestId} = render(<StepContainer {...props} isCollapsed />)
+  const {getAllByText, getByTestId} = render(<StepContainer {...props} isCollapsed={true} />)
   expect(getByTestId('collapsed-step-container')).toContainElement(getAllByText('Submitted')[0])
 })
 

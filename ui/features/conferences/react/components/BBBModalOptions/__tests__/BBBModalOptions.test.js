@@ -46,12 +46,12 @@ describe('BBBModalOptions', () => {
       'share_other_webcams',
       'share_microphone',
       'send_public_chat',
-      'send_private_chat'
+      'send_private_chat',
     ],
     setAttendeesOptions,
     setAddToCalendar,
     addToCalendar: false,
-    tab: SETTINGS_TAB
+    tab: SETTINGS_TAB,
   }
 
   const setup = (props = {}) => {

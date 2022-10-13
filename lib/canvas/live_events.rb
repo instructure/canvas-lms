@@ -1009,10 +1009,14 @@ module Canvas::LiveEvents
   end
 
   def self.blueprint_subscription_created(blueprint_subscription)
-    post_event_stringified("blueprint_subscription_created", blueprint_subscription_created_data(blueprint_subscription))
+    post_event_stringified("blueprint_subscription_created", blueprint_subscription_data(blueprint_subscription))
   end
 
-  def self.blueprint_subscription_created_data(blueprint_subscription)
+  def self.blueprint_subscription_deleted(blueprint_subscription)
+    post_event_stringified("blueprint_subscription_deleted", blueprint_subscription_data(blueprint_subscription))
+  end
+
+  def self.blueprint_subscription_data(blueprint_subscription)
     {
       master_template_account_uuid: blueprint_subscription.master_template.course.account.uuid,
       master_template_id: blueprint_subscription.master_template_id,

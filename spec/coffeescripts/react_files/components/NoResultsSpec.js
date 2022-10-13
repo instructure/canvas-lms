@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow} from 'enzyme'
-import NoResults from 'ui/features/files/react/components/NoResults.js'
+import NoResults from 'ui/features/files/react/components/NoResults'
 
 QUnit.module('NoResults')
 

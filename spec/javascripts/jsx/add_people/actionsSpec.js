@@ -37,7 +37,7 @@ const mockAxiosSuccess = (data = {}) => {
       data,
       status: 200,
       statusText: 'Ok',
-      headers: {}
+      headers: {},
     })
   )
 }
@@ -47,8 +47,8 @@ const failureData = {
     data: 'Error',
     status: 400,
     statusText: 'Bad Request',
-    headers: {}
-  }
+    headers: {},
+  },
 }
 const mockAxiosFail = () => {
   mockAxios(() => Promise.reject(failureData))
@@ -69,7 +69,7 @@ const testConfig = () => ({
   },
   teardown() {
     restoreAxios()
-  }
+  },
 })
 QUnit.module('Add People Actions', () => {
   QUnit.module('validateUsers', testConfig())
@@ -84,7 +84,7 @@ QUnit.module('Add People Actions', () => {
       users: [],
       duplicates: [],
       missing: [],
-      errors: []
+      errors: [],
     }
     mockAxiosSuccess(apiResponse)
     store.dispatch(actions.validateUsers())
@@ -92,7 +92,7 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.VALIDATE_USERS_SUCCESS,
-          payload: apiResponse
+          payload: apiResponse,
         }).calledOnce
       )
       resolved()
@@ -108,12 +108,12 @@ QUnit.module('Add People Actions', () => {
           user_name: 'A User',
           account_id: 1,
           account_name: 'The Account',
-          email: 'auser@example.com'
-        }
+          email: 'auser@example.com',
+        },
       ],
       duplicates: [],
       missing: [],
-      errors: []
+      errors: [],
     }
     mockAxiosSuccess(apiResponse)
     store.dispatch(actions.validateUsers())
@@ -132,7 +132,7 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.VALIDATE_USERS_ERROR,
-          payload: failureData
+          payload: failureData,
         }).calledOnce
       )
       resolved()
@@ -147,18 +147,18 @@ QUnit.module('Add People Actions', () => {
   test('dispatches CREATE_USERS_SUCCESS with data when successful', assert => {
     const newUser = {
       name: 'foo',
-      email: 'foo@bar.com'
+      email: 'foo@bar.com',
     }
     runningState.userValidationResult.duplicates = {
       foo: {
         createNew: true,
-        newUserInfo: newUser
-      }
+        newUserInfo: newUser,
+      },
     }
     const resolved = assert.async()
     const apiResponse = {
       invited_users: [newUser],
-      errored_users: []
+      errored_users: [],
     }
     mockAxiosSuccess(apiResponse)
     store.dispatch(actions.resolveValidationIssues())
@@ -166,13 +166,13 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.CREATE_USERS_SUCCESS,
-          payload: apiResponse
+          payload: apiResponse,
         }).calledOnce
       )
       ok(
         storeSpy.withArgs({
           type: actionTypes.ENQUEUE_USERS_TO_BE_ENROLLED,
-          payload: [newUser]
+          payload: [newUser],
         })
       )
       resolved()
@@ -186,7 +186,7 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.CREATE_USERS_ERROR,
-          payload: failureData
+          payload: failureData,
         }).calledOnce
       )
       resolved()
@@ -206,7 +206,7 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.ENROLL_USERS_SUCCESS,
-          payload: {data: 'foo'}
+          payload: {data: 'foo'},
         }).calledOnce
       )
       resolved()
@@ -220,7 +220,7 @@ QUnit.module('Add People Actions', () => {
       ok(
         storeSpy.withArgs({
           type: actionTypes.ENROLL_USERS_ERROR,
-          payload: failureData
+          payload: failureData,
         }).calledOnce
       )
       resolved()
@@ -234,14 +234,14 @@ QUnit.module('Add People Actions', () => {
         selectedUserId: 1,
         newUserInfo: {
           email: 'foo',
-          name: 'bar'
-        }
-      }
+          name: 'bar',
+        },
+      },
     }
     store.dispatch(
       actions.chooseDuplicate({
         address: 'foo',
-        user_id: 1
+        user_id: 1,
       })
     )
     ok(
@@ -249,8 +249,8 @@ QUnit.module('Add People Actions', () => {
         type: actionTypes.CHOOSE_DUPLICATE,
         payload: {
           address: 'foo',
-          user_id: 1
-        }
+          user_id: 1,
+        },
       }).calledOnce,
       'CHOOSE_DUPLICATE'
     )
@@ -261,7 +261,7 @@ QUnit.module('Add People Actions', () => {
     ok(
       storeSpy.withArgs({
         type: actionTypes.SKIP_DUPLICATE,
-        payload: {address: 'foo'}
+        payload: {address: 'foo'},
       }).calledOnce,
       'SKIP_DUPLICATE'
     )
@@ -270,12 +270,12 @@ QUnit.module('Add People Actions', () => {
   test('for duplicate dispatches dependent action', () => {
     const newUser = {
       name: 'Foo Bar',
-      email: 'foo@bar.com'
+      email: 'foo@bar.com',
     }
     store.dispatch(
       actions.enqueueNewForDuplicate({
         address: 'foo',
-        newUserInfo: newUser
+        newUserInfo: newUser,
       })
     )
     ok(
@@ -283,8 +283,8 @@ QUnit.module('Add People Actions', () => {
         type: actionTypes.ENQUEUE_NEW_FOR_DUPLICATE,
         payload: {
           address: 'foo',
-          newUserInfo: newUser
-        }
+          newUserInfo: newUser,
+        },
       }).calledOnce,
       'ENQUEUE_NEW_FOR_DUPLICATE'
     )
@@ -292,13 +292,13 @@ QUnit.module('Add People Actions', () => {
   test('for missing dispatches dependent action', () => {
     const newUser = {
       name: 'Foo Bar',
-      email: 'foo@bar.com'
+      email: 'foo@bar.com',
     }
     runningState.userValidationResult.missing = {foo: {newUserInfo: newUser}}
     store.dispatch(
       actions.enqueueNewForMissing({
         address: 'foo',
-        newUser
+        newUser,
       })
     )
     ok(
@@ -306,8 +306,8 @@ QUnit.module('Add People Actions', () => {
         type: actionTypes.ENQUEUE_NEW_FOR_MISSING,
         payload: {
           address: 'foo',
-          newUser
-        }
+          newUser,
+        },
       }).calledOnce,
       'ENQUEUE_NEW_FOR_MISSING'
     )

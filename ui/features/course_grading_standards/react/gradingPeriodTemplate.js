@@ -72,7 +72,7 @@ class GradingPeriodTemplate extends React.Component {
     id: PropTypes.string.isRequired,
     permissions: PropTypes.shape({
       update: PropTypes.bool.isRequired,
-      delete: PropTypes.bool.isRequired
+      delete: PropTypes.bool.isRequired,
     }).isRequired,
     readOnly: PropTypes.bool.isRequired,
     requiredPropsIfEditable(props) {
@@ -82,7 +82,7 @@ class GradingPeriodTemplate extends React.Component {
         disabled: 'boolean',
         onDeleteGradingPeriod: 'function',
         onDateChange: 'function',
-        onTitleChange: 'function'
+        onTitleChange: 'function',
       }
 
       const invalidProps = []
@@ -97,7 +97,7 @@ class GradingPeriodTemplate extends React.Component {
         const errorMessage = `${prefix} ${invalidProps.join(', ')} not provided or of wrong type.`
         return new Error(errorMessage)
       }
-    }
+    },
   }
 
   componentDidMount() {

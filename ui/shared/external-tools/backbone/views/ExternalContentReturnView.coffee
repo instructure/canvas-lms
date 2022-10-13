@@ -53,6 +53,7 @@ export default class ExternalContentReturnView extends Backbone.View
     json = super
     json.allowances = iframeAllowances()
     json.launch_url = @model.launchUrl(@launchType, @launchParams)
+    json.shouldRenderForwardingIframe = ENV?.FEATURES?.lti_platform_storage
     json
 
   afterRender: ->

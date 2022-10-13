@@ -30,7 +30,7 @@ class DataRow extends React.Component {
     onRowMinScoreChange: func.isRequired,
     uniqueId: number.isRequired,
     round: func.isRequired,
-    editing: bool.isRequired
+    editing: bool.isRequired,
   }
 
   state = {showBottomBorder: false}

@@ -25,13 +25,13 @@ export default {
   component: MessageDetailHeader,
   argTypes: {
     onReply: {action: 'reply'},
-    onReplyAll: {action: 'replyAll'}
-  }
+    onReplyAll: {action: 'replyAll'},
+  },
 }
 
 const Template = args => <MessageDetailHeader {...args} />
 
 export const WithText = Template.bind({})
 WithText.args = {
-  text: 'Message Subject Text'
+  text: 'Message Subject Text',
 }

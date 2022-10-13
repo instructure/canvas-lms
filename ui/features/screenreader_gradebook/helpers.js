@@ -27,7 +27,7 @@ export default {
   flashMaxLengthError() {
     return $.flashError(
       I18n.t('Note length cannot exceed %{maxLength} characters.', {
-        maxLength: GradebookConstants.MAX_NOTE_LENGTH
+        maxLength: GradebookConstants.MAX_NOTE_LENGTH,
       })
     )
   },
@@ -42,5 +42,5 @@ export default {
   },
   textareaIsLessThanOrEqualToMaxLength(textareaLength) {
     return textareaLength <= GradebookConstants.MAX_NOTE_LENGTH
-  }
+  },
 }

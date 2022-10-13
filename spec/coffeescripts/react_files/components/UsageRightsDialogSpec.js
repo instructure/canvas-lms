@@ -42,9 +42,9 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
         new File({
           cid: '1',
           thumbnail_url: 'http://localhost/thumbnail.png',
-          usage_rights: usageRights
-        })
-      ]
+          usage_rights: usageRights,
+        }),
+      ],
     }
   })
 
@@ -89,13 +89,13 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
       new File({
         cid: '1',
         thumbnail_url: 'http://localhost/thumbnail.png',
-        usage_rights: usageRights
+        usage_rights: usageRights,
       }),
       new File({
         cid: '2',
         thumbnail_url: 'http://localhost/thumbnail.png',
-        usage_rights: usageRights
-      })
+        usage_rights: usageRights,
+      }),
     ]
     mountComponent()
     equal(component.fileName.innerText.trim(), '2 items selected')
@@ -114,13 +114,13 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
     const file1 = new File({
       cid: '1',
       thumbnail_url: 'http://localhost/thumbnail.png',
-      usage_rights: copyright
+      usage_rights: copyright,
     })
     file1.displayName = () => 'cats'
     const file2 = new File({
       cid: '2',
       thumbnail_url: 'http://localhost/thumbnail.png',
-      usage_rights: permission
+      usage_rights: permission,
     })
     file2.displayName = () => 'dogs'
     props.itemsToManage = [file1, file2]
@@ -133,13 +133,13 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
     const file1 = new File({
       cid: '3',
       thumbnail_url: 'http://localhost/thumbnail.png',
-      usage_rights: usageRights
+      usage_rights: usageRights,
     })
     file1.displayName = () => 'cats'
     const file2 = new File({
       cid: '4',
       thumbnail_url: 'http://localhost/thumbnail.png',
-      usage_rights: usageRights
+      usage_rights: usageRights,
     })
     file2.displayName = () => 'cats'
     props.itemsToManage = [file1, file2]
@@ -175,7 +175,7 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
       const file = new File({
         cid: '1',
         thumbnail_url: 'http://localhost/thumbnail.png',
-        usage_rights: usageRights
+        usage_rights: usageRights,
       })
       file.displayName = () => 'hello'
       props.itemsToManage = [file]

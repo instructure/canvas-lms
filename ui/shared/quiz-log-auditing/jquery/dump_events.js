@@ -18,7 +18,7 @@
 
 import eventManager from './log_auditing'
 
-export default function(unregister) {
+export default function (unregister) {
   if (unregister) {
     eventManager.unregisterAllTrackers()
   }

@@ -33,7 +33,7 @@ function useSettings(courseId) {
   async function toggleGroup() {
     const response = await axios.request({
       method: enabled ? 'delete' : 'post',
-      url: groupEndpoint
+      url: groupEndpoint,
     })
 
     setGroup(response.data)
@@ -49,7 +49,7 @@ function useSettings(courseId) {
 
       if (response.workflow_state === 'errored') {
         let message = I18n.t('An error occurred during the sync process: %{error}', {
-          error: response.last_error
+          error: response.last_error,
         })
         if (response.last_error_report_id) {
           message = <a href={`/error_reports/${response.last_error_report_id}`}>{message}</a>
@@ -64,7 +64,7 @@ function useSettings(courseId) {
       }
     }, []),
     loading: setLoading,
-    path: groupEndpoint
+    path: groupEndpoint,
   })
 
   // The function called to enable/disable

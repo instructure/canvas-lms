@@ -51,7 +51,7 @@ export function showFilePreview(file_id, verifier = '') {
     .catch(err => {
       showFlashAlert({
         message: I18n.t('Failed getting file to preview'),
-        err
+        err,
       })
     })
 }
@@ -73,8 +73,8 @@ function StandaloneFilePreview({preview_file}) {
         isOpen={isOpen}
         currentFolder={{
           files: {
-            models: [file]
-          }
+            models: [file],
+          },
         }}
         query={
           /* the odd value for only_preview is to tease FilePreview into
@@ -87,5 +87,5 @@ function StandaloneFilePreview({preview_file}) {
   )
 }
 StandaloneFilePreview.propTypes = {
-  preview_file: instanceOf(File)
+  preview_file: instanceOf(File),
 }

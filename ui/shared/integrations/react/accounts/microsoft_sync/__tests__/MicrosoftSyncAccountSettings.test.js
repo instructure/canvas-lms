@@ -32,7 +32,7 @@ const defaultUseFetchMock = ({loading, success}) => {
     microsoft_sync_tenant: '',
     microsoft_sync_login_attribute: 'email',
     microsoft_sync_remote_attribute: 'userPrincipalName',
-    microsoft_sync_login_attribute_suffix: ''
+    microsoft_sync_login_attribute_suffix: '',
   })
 }
 const defaultDoFetchApiMock = () => {}
@@ -50,7 +50,7 @@ const getUpdateButton = container => {
 
 const getTextInput = container => {
   return container.getByRole('textbox', {
-    name: /tenant name input area/i
+    name: /tenant name input area/i,
   })
 }
 
@@ -60,13 +60,13 @@ const getLoginAttributeSelector = ({container}) => {
 
 const getToggle = container => {
   return container.getByRole('checkbox', {
-    name: /allows syncing of canvas course members to a microsoft team/i
+    name: /allows syncing of canvas course members to a microsoft team/i,
   })
 }
 
 const getSuffixInput = container => {
   return container.getByRole('textbox', {
-    name: /login attribute suffix input area/i
+    name: /login attribute suffix input area/i,
   })
 }
 
@@ -82,8 +82,8 @@ describe('MicrosoftSyncAccountSettings', () => {
       MICROSOFT_SYNC: {
         CLIENT_ID: '12345',
         REDIRECT_URI: 'https://www.instructure.com',
-        BASE_URL: 'https://login.microsoftonline.com'
-      }
+        BASE_URL: 'https://login.microsoftonline.com',
+      },
     }
   })
 
@@ -119,7 +119,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_login_attribute: 'sis_user_id',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       })
       expect(getLoginAttributeSelector(container).title).toMatch(/sis user id/i)
@@ -131,7 +131,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_remote_attribute: 'mailNickname',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       })
       expect(getLookupFieldSelector(container).title).toMatch(/email alias/i)
@@ -143,7 +143,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_login_attribute_suffix: '@hello.example.com',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       })
       expect(getSuffixInput(container).value).toEqual('@hello.example.com')
@@ -169,7 +169,7 @@ describe('MicrosoftSyncAccountSettings', () => {
           success({
             microsoft_sync_enabled: false,
             microsoft_sync_tenant: 'testtenant.com',
-            microsoft_sync_login_attribute: 'email'
+            microsoft_sync_login_attribute: 'email',
           })
         },
         () => {
@@ -251,8 +251,8 @@ describe('MicrosoftSyncAccountSettings', () => {
 
       fireEvent.input(getSuffixInput(container), {
         target: {
-          value: 'a'.repeat(256)
-        }
+          value: 'a'.repeat(256),
+        },
       })
 
       fireEvent.click(getUpdateButton(container))
@@ -270,8 +270,8 @@ describe('MicrosoftSyncAccountSettings', () => {
 
       fireEvent.input(getSuffixInput(container), {
         target: {
-          value: '@example.edu\t some extra stuff\n'
-        }
+          value: '@example.edu\t some extra stuff\n',
+        },
       })
 
       fireEvent.click(getUpdateButton(container))
@@ -290,7 +290,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_enabled: true,
           microsoft_sync_login_attribute: 'sis_user_id',
-          microsoft_sync_tenant: 'canvastest2.onmicrosoft.com'
+          microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
         })
       })
 
@@ -309,7 +309,7 @@ describe('MicrosoftSyncAccountSettings', () => {
           success({
             microsoft_sync_tenant: 'testtenant.com',
             microsoft_sync_login_attribute: 'sis_user_id',
-            microsoft_sync_enabled: false
+            microsoft_sync_enabled: false,
           })
         },
         () => {}
@@ -325,7 +325,7 @@ describe('MicrosoftSyncAccountSettings', () => {
           success({
             microsoft_sync_tenant: '',
             microsoft_sync_login_attribute: 'sis_user_id',
-            microsoft_sync_enabled: true
+            microsoft_sync_enabled: true,
           })
         },
         () => {}
@@ -342,14 +342,14 @@ describe('MicrosoftSyncAccountSettings', () => {
         microsoft_sync_tenant: 'canvastest2.onmicrosoft.com',
         microsoft_sync_login_attribute: 'email',
         microsoft_sync_login_attribute_suffix: '@example.com',
-        microsoft_sync_remote_attribute: 'userPrincipalName'
+        microsoft_sync_remote_attribute: 'userPrincipalName',
       }
       const container = setup()
       fireEvent.input(getTextInput(container), {
-        target: {value: expectedValues.microsoft_sync_tenant}
+        target: {value: expectedValues.microsoft_sync_tenant},
       })
       fireEvent.input(getSuffixInput(container), {
-        target: {value: expectedValues.microsoft_sync_login_attribute_suffix}
+        target: {value: expectedValues.microsoft_sync_login_attribute_suffix},
       })
       fireEvent.click(getLookupFieldSelector(container))
       fireEvent.click(container.getByText(/user principal name \(upn\)/i))
@@ -392,7 +392,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_login_attribute: 'email',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       }, stallNetwork)
       fireEvent.click(getUpdateButton(container))
@@ -410,7 +410,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_login_attribute: 'email',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       }, stallNetwork)
       fireEvent.click(getToggle(container))
@@ -426,7 +426,7 @@ describe('MicrosoftSyncAccountSettings', () => {
         success({
           microsoft_sync_tenant: 'testtenant.com',
           microsoft_sync_login_attribute: 'sis_user_id',
-          microsoft_sync_enabled: true
+          microsoft_sync_enabled: true,
         })
       })
       fireEvent.click(getLoginAttributeSelector(container))
@@ -447,7 +447,7 @@ describe('MicrosoftSyncAccountSettings', () => {
           microsoft_sync_login_attribute: 'sis_user_id',
           microsoft_sync_enabled: false,
           microsoft_sync_login_attribute_suffix: '@example.com',
-          microsoft_sync_remote_attribute: 'userPrincipalName'
+          microsoft_sync_remote_attribute: 'userPrincipalName',
         })
       })
 
@@ -469,7 +469,7 @@ describe('MicrosoftSyncAccountSettings', () => {
           success({
             microsoft_sync_tenant: 'testtenant.com',
             microsoft_sync_login_attribute: 'sis_user_id',
-            microsoft_sync_enabled: true
+            microsoft_sync_enabled: true,
           })
         },
         () => {}

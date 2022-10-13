@@ -42,7 +42,7 @@ export const CreateCourseModal = ({
   setModalOpen,
   permissions,
   restrictToMCCAccount,
-  isK5User
+  isK5User,
 }) => {
   const [loading, setLoading] = useState(true)
   const [allAccounts, setAllAccounts] = useState([])
@@ -98,8 +98,8 @@ export const CreateCourseModal = ({
       per_page: 100,
       include: ['account'],
       // Show teachers only accounts where they have a teacher enrollment
-      ...(permissions === 'teacher' && {enrollment_type: 'teacher'})
-    }
+      ...(permissions === 'teacher' && {enrollment_type: 'teacher'}),
+    },
   }
 
   const adminFetchOpts = {
@@ -110,8 +110,8 @@ export const CreateCourseModal = ({
       )
     }, []),
     params: {
-      per_page: 100
-    }
+      per_page: 100,
+    },
   }
 
   const noEnrollmentsFetchOpts = {
@@ -120,7 +120,7 @@ export const CreateCourseModal = ({
       setAllAccounts(account)
       setSelectedAccount(account[0])
       setAccountSearchTerm(account[0].name)
-    }, [])
+    }, []),
   }
 
   let fetchOpts = {}
@@ -134,7 +134,7 @@ export const CreateCourseModal = ({
     loading: setLoading,
     error: useCallback(err => showFlashError(I18n.t('Unable to get accounts'))(err), []),
     fetchAllPages: true,
-    ...fetchOpts
+    ...fetchOpts,
   })
 
   const handleAccountSelected = id => {
@@ -158,13 +158,13 @@ export const CreateCourseModal = ({
   }
 
   const teacherHomeroomFetchOpts = {
-    path: '/api/v1/users/self/courses'
+    path: '/api/v1/users/self/courses',
   }
 
   const adminHomeroomFetchOpts = {
     path: selectedAccount
       ? `api/v1/accounts/${selectedAccount.id}/courses`
-      : '/api/v1/users/self/courses'
+      : '/api/v1/users/self/courses',
   }
 
   useFetchApi({
@@ -180,14 +180,14 @@ export const CreateCourseModal = ({
     }, []),
     params: {
       homeroom: true,
-      per_page: 100
+      per_page: 100,
     },
     error: useCallback(err => showFlashError(I18n.t('Unable to get homerooms'))(err), []),
     fetchAllPages: true,
     // don't let students/users with no enrollments sync homeroom data
     forceResult: ['no_enrollments', 'student'].includes(permissions) ? [] : undefined,
     ...(permissions === 'teacher' && teacherHomeroomFetchOpts),
-    ...(permissions === 'admin' && adminHomeroomFetchOpts)
+    ...(permissions === 'admin' && adminHomeroomFetchOpts),
   })
 
   const handleHomeroomSelected = id => {
@@ -297,5 +297,5 @@ CreateCourseModal.propTypes = {
   setModalOpen: PropTypes.func.isRequired,
   permissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']).isRequired,
   restrictToMCCAccount: PropTypes.bool.isRequired,
-  isK5User: PropTypes.bool.isRequired
+  isK5User: PropTypes.bool.isRequired,
 }

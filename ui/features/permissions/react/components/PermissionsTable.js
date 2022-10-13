@@ -46,13 +46,13 @@ export default class PermissionsTable extends Component {
     roles: arrayOf(propTypes.role).isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
     setAndOpenRoleTray: func.isRequired,
-    setAndOpenPermissionTray: func.isRequired
+    setAndOpenPermissionTray: func.isRequired,
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      expanded: {}
+      expanded: {},
     }
     this.justExpanded = null
     this.tableRef = React.createRef()
@@ -105,7 +105,7 @@ export default class PermissionsTable extends Component {
       scrollArea.scrollBy({
         top: myBottom - scrollAreaBottom,
         left: 0,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
   }
 
@@ -195,7 +195,7 @@ export default class PermissionsTable extends Component {
         <br key="group-description-br" />,
         <Text key="group-description-text" weight="light" size="small">
           {description(perm.contextType)}
-        </Text>
+        </Text>,
       ]
     }
 
@@ -304,14 +304,14 @@ export default class PermissionsTable extends Component {
 function mapStateToProps(state, ownProps) {
   const stateProps = {
     roles: state.roles.filter(r => r.displayed),
-    permissions: state.permissions.filter(p => p.displayed)
+    permissions: state.permissions.filter(p => p.displayed),
   }
   return {...ownProps, ...stateProps}
 }
 
 const mapDispatchToProps = {
   setAndOpenRoleTray: actions.setAndOpenRoleTray,
-  setAndOpenPermissionTray: actions.setAndOpenPermissionTray
+  setAndOpenPermissionTray: actions.setAndOpenPermissionTray,
 }
 
 export const ConnectedPermissionsTable = connect(

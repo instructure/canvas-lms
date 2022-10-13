@@ -32,12 +32,12 @@ function makeFlashAlertMessage(str) {
 }
 
 describe('UploadProgress', () => {
-  it('getLabel displays file name', function() {
+  it('getLabel displays file name', function () {
     const {getByText} = render(<UploadProgress uploader={makeUploader('foo.txt')} />)
     expect(getByText('foo.txt')).toBeInTheDocument()
   })
 
-  it('announces upload progress to screen reader when queue changes', function() {
+  it('announces upload progress to screen reader when queue changes', function () {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const uploader = makeUploader('foo.txt')
     const {container, rerender} = render(<UploadProgress uploader={uploader} />)
@@ -67,7 +67,7 @@ describe('UploadProgress', () => {
     )
   })
 
-  it('does not announce upload progress to screen reader if progress has not changed', function() {
+  it('does not announce upload progress to screen reader if progress has not changed', function () {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     const uploader = makeUploader('foo.txt')
 

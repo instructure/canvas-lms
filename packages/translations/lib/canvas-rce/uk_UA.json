@@ -2,10 +2,8 @@
   "accessibility_checker_b3af1f6c": { "message": "Перевірка доступності" },
   "add_8523c19b": { "message": "Додати" },
   "align_11050992": { "message": "Вирівняти" },
-  "align_center_ca078feb": { "message": "Вирівняти по центру" },
-  "align_left_e9f1f93b": { "message": "Вирівняти по лівому краю" },
-  "align_right_9bad3ac1": { "message": "Вирівняти по правому краю" },
   "all_4321c3a1": { "message": "Всі" },
+  "alpha_15d59033": { "message": "Альфа" },
   "alphabetical_55b5b4e0": { "message": "Алфавітний" },
   "alt_text_611fb322": { "message": "Альтернативний текст" },
   "an_error_occurred_making_a_network_request_d1bda348": {
@@ -23,6 +21,7 @@
   "attributes_963ba262": { "message": "Атрибути" },
   "basic_554cdc0a": { "message": "Базовий" },
   "blue_daf8fea9": { "message": "Синій" },
+  "bottom_15a2a9be": { "message": "Низ" },
   "c_2001_acme_inc_283f7f80": { "message": "(c) 2001 Acme Inc." },
   "cancel_caeb1e68": { "message": "Скасувати" },
   "choose_usage_rights_33683854": {
@@ -59,8 +58,7 @@
   },
   "custom_6979cd81": { "message": "Звичай" },
   "cyan_c1d5f68a": { "message": "Зелено-синій колір" },
-  "decorative_image_3c28aa7d": { "message": "Декоративне зображення" },
-  "decrease_indent_de6343ab": { "message": "Зменшити відступ" },
+  "decrease_indent_d9cf469d": { "message": "Зменшити відступ" },
   "deep_purple_bb3e2907": { "message": "Темно-фіолетовий" },
   "delimiters_4db4840d": { "message": "Розділювачі" },
   "details_98a31b68": { "message": "Подробиці" },
@@ -74,7 +72,6 @@
     "message": "Перетягніть і відпустіть, або клацніть для перегляду вашого комп''ютера"
   },
   "due_multiple_dates_cc0ee3f5": { "message": "Очікується: Кілька дат" },
-  "edit_c5fbea07": { "message": "Редагувати" },
   "embed_image_1080badc": { "message": "Вставити забраження" },
   "external_tools_6e77821": { "message": "Зовнішні інструменти" },
   "files_c300e900": { "message": "Файли" },
@@ -94,12 +91,13 @@
     "message": "Я отримав дозвіл на використання цього файлу."
   },
   "i_hold_the_copyright_71ee91b1": { "message": "Я володію авторським правом" },
+  "icon_215a1dc6": { "message": "Піктограма" },
   "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
     "message": "Якщо ви не виберете права використання, цей файл не буде опублікований після його завантаження."
   },
   "image_8ad06": { "message": "Зображення" },
   "images_7ce26570": { "message": "Зображення" },
-  "increase_indent_6d550a4a": { "message": "Збільшити відступ" },
+  "increase_indent_6af90f7c": { "message": "Збільшити відступ" },
   "indigo_2035fc55": { "message": "Індиго" },
   "insert_593145ef": { "message": "Вставка" },
   "insert_equella_links_49a8dacd": { "message": "Вставити посилання Equella" },
@@ -113,7 +111,6 @@
   "light_blue_5374f600": { "message": "Світло-блакитний" },
   "link_7262adec": { "message": "Посилання" },
   "links_14b70841": { "message": "Посилання" },
-  "load_more_results_460f49a9": { "message": "Завантажити більше результатів" },
   "loading_25990131": { "message": "Завантаження..." },
   "loading_bde52856": { "message": "Завантаження" },
   "loading_failed_b3524381": { "message": "Невдале завантаження..." },
@@ -148,6 +145,8 @@
   "record_upload_media_5fdce166": { "message": "Запис/завантаження медіа" },
   "red_8258edf3": { "message": "Червоний" },
   "relationships_6602af70": { "message": "Зв''язки" },
+  "replace_e61834a7": { "message": "Замінити" },
+  "reset_95a81614": { "message": "Скинути" },
   "rich_content_editor_2708ef21": {
     "message": "Редактор збагаченого контенту"
   },
@@ -169,6 +168,7 @@
     "message": "Це рівняння не можна перетворити у базовому режимі перегляду"
   },
   "title_ee03d132": { "message": "Назва" },
+  "top_66e0adb6": { "message": "Верх" },
   "unpublished_dfd8801": { "message": "Неопублікований" },
   "upload_media_ce31135a": { "message": "Завантажити медіа контент" },
   "uploading_19e8a4e7": { "message": "Завантаження" },

@@ -48,7 +48,7 @@ export class AssignmentPicker extends React.Component {
       filterAssignmentsByName: func.isRequired,
       filterAssignmentsByCategory: func.isRequired,
       selectAssignmentInPicker: func.isRequired,
-      unselectAssignmentInPicker: func.isRequired
+      unselectAssignmentInPicker: func.isRequired,
     }
   }
 
@@ -107,10 +107,10 @@ export class AssignmentPicker extends React.Component {
       {
         zero: 'No items found',
         one: 'One item found',
-        other: '%{count} items found'
+        other: '%{count} items found',
       },
       {
-        count: this.state.resultCount || 0
+        count: this.state.resultCount || 0,
       }
     )
 
@@ -155,7 +155,7 @@ const ConnectedAssignmentPicker = connect(
     selectedAssignments: state.getIn(['assignment_picker', 'selected_assignments'], List()),
     nameFilter: state.getIn(['assignment_picker', 'name_filter'], ''),
     categoryFilter: state.getIn(['assignment_picker', 'category_filter']),
-    triggerAssignmentId: state.getIn(['trigger_assignment', 'id'])
+    triggerAssignmentId: state.getIn(['trigger_assignment', 'id']),
   }), // mapStateToProps
   actions // mapActionsToProps
 )(AssignmentPicker)

@@ -48,14 +48,12 @@ QUnit.module('QuizRubric', {
     $('#test-rubrics-wrapper').remove()
     $('#fixtures').html('')
     $('.ui-dialog').remove()
-  }
+  },
 })
 
 test('rubric editing event loads the rubric form', async () => {
   await QuizRubric.createRubricDialog('#', assignmentRubricHtml)
   $('.add_rubric_link').click()
-  const contentIndex = $('#rubrics')
-    .html()
-    .indexOf('DUMMY CONTENT FOR RUBRIC FORM')
+  const contentIndex = $('#rubrics').html().indexOf('DUMMY CONTENT FOR RUBRIC FORM')
   ok(contentIndex > 0)
 })

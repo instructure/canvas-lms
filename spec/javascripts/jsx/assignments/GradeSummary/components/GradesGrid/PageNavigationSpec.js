@@ -19,7 +19,7 @@
 import React from 'react'
 import {mount} from 'enzyme'
 
-import PageNavigation from 'ui/features/assignment_grade_summary/react/components/GradesGrid/PageNavigation.js'
+import PageNavigation from 'ui/features/assignment_grade_summary/react/components/GradesGrid/PageNavigation'
 
 QUnit.module('GradeSummary PageNavigation', suiteHooks => {
   let props

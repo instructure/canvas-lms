@@ -39,9 +39,9 @@ export const AssessmentRequest = {
     updatedAt: string,
     user: shape({
       id: string,
-      displayName: string
+      displayName: string,
     }),
-    workflowState: string
+    workflowState: string,
   }),
 
   mock: ({
@@ -49,13 +49,13 @@ export const AssessmentRequest = {
     createdAt = '2021-06-23T12:37:45-06:00',
     updatedAt = '2021-06-25T09:24:21-06:00',
     user = {_id: '1', displayName: 'Morty Smith', __typename: 'User'},
-    workflowState = 'assigned'
+    workflowState = 'assigned',
   } = {}) => ({
     _id,
     createdAt,
     updatedAt,
     user,
     workflowState,
-    __typename: 'AssessmentRequest'
-  })
+    __typename: 'AssessmentRequest',
+  }),
 }

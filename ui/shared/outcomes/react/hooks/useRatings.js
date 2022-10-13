@@ -29,7 +29,7 @@ export const createRating = (description, points, focusField = null) => ({
   description,
   points,
   focusField,
-  key: uuid()
+  key: uuid(),
 })
 
 export const defaultRatings = [
@@ -37,7 +37,7 @@ export const defaultRatings = [
   createRating(I18n.t('Mastery'), 3),
   createRating(I18n.t('Near Mastery'), 2),
   createRating(I18n.t('Below Mastery'), 1),
-  createRating(I18n.t('No Evidence'), 0)
+  createRating(I18n.t('No Evidence'), 0),
 ]
 
 export const defaultMasteryPoints = 3
@@ -83,7 +83,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
         ...r,
         points,
         pointsError,
-        descriptionError
+        descriptionError,
       }
     })
   }, [ratings])
@@ -112,7 +112,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
 
     return {
       value: masteryPointsFloat,
-      error
+      error,
     }
   }, [ratings, masteryPoints])
 
@@ -178,7 +178,7 @@ const useRatings = ({initialRatings, initialMasteryPoints}) => {
     ratingsError,
     masteryPointsError,
     clearRatingsFocus,
-    focusOnRatingsError
+    focusOnRatingsError,
   }
 }
 

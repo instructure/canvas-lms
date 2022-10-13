@@ -25,7 +25,7 @@ QUnit.module('Legacy Module', {
   },
   teardown() {
     // tearing down legacy module
-  }
+  },
 })
 
 test('accepts examples only after calls to `QUnit.module`', () => {
@@ -47,10 +47,7 @@ test('restores sandbox stubs between tests', () => {
 })
 
 test('auto-verifies mock expectations', () => {
-  sandbox
-    .mock(stubbable)
-    .expects('getOtherValue')
-    .once()
+  sandbox.mock(stubbable).expects('getOtherValue').once()
   // When the method call below is removed, this and only this spec will fail.
   stubbable.getOtherValue()
 })
@@ -69,7 +66,7 @@ QUnit.module('Legacy Module > when unmanaged async behavior begins in the "setup
        */
       // throw new Error('Build failure "Script error."')
     })
-  }
+  },
 })
 
 test('otherwise passing example 1', () => {
@@ -86,7 +83,7 @@ QUnit.module('Legacy Module > when unmanaged async behavior begins in the "teard
        */
       // throw new Error('Build failure "Script error."')
     })
-  }
+  },
 })
 
 test('otherwise passing example 2', () => {

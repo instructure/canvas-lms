@@ -275,8 +275,17 @@ module Context
       end
     when "external_tools"
       if params[:action] == "retrieve"
-        tool_url = CGI.parse(uri.query)["url"].first rescue nil
-        object = ContextExternalTool.find_external_tool(tool_url, context) if tool_url
+        query_params = CGI.parse(uri.query)
+        tool_url = query_params["url"]&.first
+        resource_link_lookup_uuid = query_params["resource_link_lookup_uuid"]&.first
+        object = if tool_url
+                   ContextExternalTool.find_external_tool(tool_url, context)
+                 elsif resource_link_lookup_uuid
+                   Lti::ResourceLink.where(
+                     lookup_uuid: resource_link_lookup_uuid,
+                     context: context
+                   ).active.take&.current_external_tool(context)
+                 end
       elsif params[:id]
         object = ContextExternalTool.find_external_tool_by_id(params[:id], context)
       end

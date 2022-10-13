@@ -76,8 +76,8 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
       doFetchApi({
         method: 'PUT',
         path: '/api/v1/jobs2/manage',
-        params: {strand: groupText, max_concurrent: maxConcurrent || '', priority}
-      })
+        params: {strand: groupText, max_concurrent: maxConcurrent || '', priority},
+      }),
     ]
     if (numStrands && numStrands !== numStrandsOG) {
       calls.push(saveSetting({variables: {id: numStrandsSettingId, value: numStrands.toString()}}))
@@ -128,7 +128,7 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
         setNumStrandsOG(n)
         setNumStrandsSettingId(setting.id)
       }
-    }
+    },
   })
 
   // presently all we do is update parallelism / priority for entire strands, so don't render an icon otherwise

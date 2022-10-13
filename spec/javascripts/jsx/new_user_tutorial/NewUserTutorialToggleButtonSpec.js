@@ -19,8 +19,8 @@
 /* global QUnit */
 import React from 'react'
 import {shallow} from 'enzyme'
-import NewUserTutorialToggleButton from 'ui/features/new_user_tutorial/react/NewUserTutorialToggleButton.js'
-import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore.js'
+import NewUserTutorialToggleButton from 'ui/features/new_user_tutorial/react/NewUserTutorialToggleButton'
+import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore'
 
 QUnit.module('NewUserTutorialToggleButton Spec')
 
@@ -33,7 +33,7 @@ test('Deafaults to expanded', () => {
 
 test('Toggles isCollapsed when clicked', () => {
   const fakeEvent = {
-    preventDefault() {}
+    preventDefault() {},
   }
 
   const store = createTutorialStore()

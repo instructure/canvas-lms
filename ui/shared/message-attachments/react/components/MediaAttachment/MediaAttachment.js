@@ -46,7 +46,7 @@ export function MediaAttachment(props) {
           shadow="above"
         >
           <CanvasMediaPlayer
-            fluidHeight
+            fluidHeight={true}
             resizeContainer={false}
             media_id={props.file.mediaID}
             media_sources={[{label: props.file.title, src: props.file.src, type: props.file.type}]}
@@ -63,7 +63,7 @@ export function MediaAttachment(props) {
           textOverflow: 'ellipsis',
           overflow: 'hidden',
           whiteSpace: 'nowrap',
-          color: colors.ash
+          color: colors.ash,
         }}
       >
         {props.file.title}
@@ -82,13 +82,13 @@ MediaAttachment.propTypes = {
         src: PropTypes.string.isRequired,
         label: PropTypes.string.isRequired,
         type: PropTypes.string.isRequired,
-        language: PropTypes.string.isRequired
+        language: PropTypes.string.isRequired,
       })
     ),
     title: PropTypes.string.isRequired,
     src: PropTypes.string.isRequired,
-    type: PropTypes.oneOf(['audio', 'video']).isRequired
-  }).isRequired
+    type: PropTypes.oneOf(['audio', 'video']).isRequired,
+  }).isRequired,
 }
 
 export default MediaAttachment

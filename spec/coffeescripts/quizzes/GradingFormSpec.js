@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import GradingForm from 'ui/features/quiz_history/jquery/grading_form.js'
+import GradingForm from 'ui/features/quiz_history/jquery/grading_form'
 import $ from 'jquery'
 
 const gradingFormHtml = `
@@ -31,10 +31,10 @@ QUnit.module('GradingForm', {
   },
   teardown() {
     $('#fixtures').html('')
-  }
+  },
 })
 
-test('no suprious submits', function() {
+test('no suprious submits', function () {
   const scoringSnapshot = {}
   const gradingForm = new GradingForm(scoringSnapshot)
   gradingForm.preventInsanity()
@@ -59,7 +59,7 @@ test('no suprious submits', function() {
   equal(submitCounter, 1)
 })
 
-test('handler paased in is called for key enter', function() {
+test('handler paased in is called for key enter', function () {
   const scoringSnapshot = {}
   const onInputChange = sinon.stub()
   const gradingForm = new GradingForm(scoringSnapshot)
@@ -72,7 +72,7 @@ test('handler paased in is called for key enter', function() {
   ok(onInputChange.calledOnce)
 })
 
-test('handler paased in is not called for other keys', function() {
+test('handler paased in is not called for other keys', function () {
   const scoringSnapshot = {}
   const onInputChange = sinon.stub()
   const gradingForm = new GradingForm(scoringSnapshot)

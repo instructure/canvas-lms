@@ -102,13 +102,13 @@ export default class EventDataSource {
       contexts: {},
       appointmentGroups: {},
       participants: {},
-      fetchedAppointmentGroups: null
+      fetchedAppointmentGroups: null,
     }
     this.contexts.forEach(contextInfo => {
       this.cache.contexts[contextInfo.asset_string] = {
         events: {},
         fetchedRanges: [],
-        fetchedUndated: false
+        fetchedUndated: false,
       }
     })
   }
@@ -258,7 +258,7 @@ export default class EventDataSource {
       return
     }
     this.cache.fetchedAppointmentGroups = {
-      manageable: fetchManageable
+      manageable: fetchManageable,
     }
     this.cache.appointmentGroups = {}
     const dataCB = (data, url, params) => {
@@ -282,9 +282,9 @@ export default class EventDataSource {
       [
         '/api/v1/appointment_groups',
         {
-          include: ['reserved_times', 'participant_count']
-        }
-      ]
+          include: ['reserved_times', 'participant_count'],
+        },
+      ],
     ]
     if (fetchManageable) {
       fetchJobs.push([
@@ -292,12 +292,12 @@ export default class EventDataSource {
         {
           scope: 'manageable',
           include: ['reserved_times', 'participant_count'],
-          include_past_appointments: true
-        }
+          include_past_appointments: true,
+        },
       ])
     }
     return this.startFetch(fetchJobs, dataCB, doneCB, {
-      inFlightCheckKey: 'appointmentGroups'
+      inFlightCheckKey: 'appointmentGroups',
     })
   }
 
@@ -349,7 +349,7 @@ export default class EventDataSource {
       }
     }
     const params = {
-      include: ['reserved_times', 'participant_count', 'appointments', 'child_events']
+      include: ['reserved_times', 'participant_count', 'appointments', 'child_events'],
     }
     return this.startFetch([[group.url, params]], dataCB, () =>
       cb(this.cache.appointmentGroups[group.id].appointmentEvents)
@@ -382,7 +382,7 @@ export default class EventDataSource {
         // addEventToCache handles the duplicate fine, so it's ok
         context_codes: contextList,
         start_date: startDay.toISOString(),
-        end_date: endDay.toISOString()
+        end_date: endDay.toISOString(),
       }
     }
     const paramsForUndatedEvents = contextList => {
@@ -391,7 +391,7 @@ export default class EventDataSource {
       }
       return {
         context_codes: contextList,
-        undated: '1'
+        undated: '1',
       }
     }
     const params = start
@@ -427,7 +427,7 @@ export default class EventDataSource {
         key = `type_${parameters.type}`
       }
       const requestResult = requestResults[key] || {
-        events: []
+        events: [],
       }
       requestResult.next = data.next
       data.forEach(e => {
@@ -486,7 +486,7 @@ export default class EventDataSource {
         let contextInfo = this.cache.contexts[context]
         if (!contextInfo) {
           contextInfo = this.cache.contexts[context] = {
-            fetchedRanges: []
+            fetchedRanges: [],
           }
         }
         if (contextInfo) {
@@ -529,7 +529,7 @@ export default class EventDataSource {
       const pparams = {
         filter: 'all_ungraded_todo_items',
         ...params,
-        context_codes: admin_contexts
+        context_codes: admin_contexts,
       }
       eventDataSources.push(['/api/v1/planner/items', pparams])
     }
@@ -595,9 +595,9 @@ export default class EventDataSource {
         [
           `/api/v1/appointment_groups/${appointmentGroup.id}/${type}`,
           {
-            registration_status: registrationStatus
-          }
-        ]
+            registration_status: registrationStatus,
+          },
+        ],
       ],
       dataCB,
       doneCB

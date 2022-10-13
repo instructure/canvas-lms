@@ -106,7 +106,7 @@ export default class AssignmentPoints extends React.Component {
           <Flex.Item margin="0 x-small 0 0">
             <EditableNumber
               mode={this.props.mode}
-              inline
+              inline={true}
               size="large"
               value={this.props.pointsPossible}
               onChange={this.handlePointsChange}
@@ -114,7 +114,7 @@ export default class AssignmentPoints extends React.Component {
               onInputChange={this.handlePointsInputChange}
               label={editLabel}
               editButtonPlacement="start"
-              required
+              required={true}
               readOnly={this.props.readOnly}
             />
           </Flex.Item>

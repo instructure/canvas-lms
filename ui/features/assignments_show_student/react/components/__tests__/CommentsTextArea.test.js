@@ -317,7 +317,6 @@ describe('CommentTextArea', () => {
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('notifies users when a submission comments with files is sent', async () => {
     // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
@@ -365,7 +364,6 @@ describe('CommentTextArea', () => {
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('users cannot send submission comments with not files or text', async () => {
     // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload
@@ -397,7 +395,6 @@ describe('CommentTextArea', () => {
   // LS-1339 created to figure out why this is failing
   // since updating @instructure/ui-media-player to v7
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('notifies users of error when file fails to upload', async () => {
     // unskip in EVAL-2482
     const mockedFunctionPlacedholder = uploadFileModule.submissionCommentAttachmentsUpload

@@ -52,20 +52,20 @@ export const AuthorInfo = props => {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
-          badgeMarginLeft: '-16px'
+          badgeMarginLeft: '-16px',
         },
         desktop: {
           authorNameTextSize: 'medium',
           timestampTextSize: 'small',
           nameAndRoleDirection: 'row',
-          badgeMarginLeft: '-24px'
+          badgeMarginLeft: '-24px',
         },
         mobile: {
           authorNameTextSize: 'small',
           timestampTextSize: 'x-small',
           nameAndRoleDirection: 'column',
-          badgeMarginLeft: '-16px'
-        }
+          badgeMarginLeft: '-16px',
+        },
       }}
       render={responsiveProps => (
         <Flex>
@@ -75,7 +75,7 @@ export const AuthorInfo = props => {
                 style={{
                   float: 'left',
                   marginLeft: responsiveProps.badgeMarginLeft,
-                  marginTop: hasAuthor ? '11px' : '2px'
+                  marginTop: hasAuthor ? '11px' : '2px',
                 }}
                 data-testid="is-unread"
                 data-isforcedread={props.isForcedRead}
@@ -83,7 +83,7 @@ export const AuthorInfo = props => {
                 <Badge
                   type="notification"
                   placement="start center"
-                  standalone
+                  standalone={true}
                   formatOutput={() => (
                     <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>
                   )}
@@ -102,7 +102,7 @@ export const AuthorInfo = props => {
               <AnonymousAvatar seedString={props.anonymousAuthor.shortName} />
             )}
           </Flex.Item>
-          <Flex.Item shouldShrink>
+          <Flex.Item shouldShrink={true}>
             <Flex direction="column" margin="0 0 0 small">
               {hasAuthor && (
                 <Flex.Item>
@@ -205,7 +205,7 @@ AuthorInfo.propTypes = {
   /**
    * Boolean to determine if the author is the topic author
    */
-  isTopicAuthor: PropTypes.bool
+  isTopicAuthor: PropTypes.bool,
 }
 
 const Timestamps = props => {
@@ -217,11 +217,11 @@ const Timestamps = props => {
     if (props.editor && props.editor?._id !== props.author?._id) {
       return I18n.t('Edited by %{editorName} %{editedTimingDisplay}', {
         editorName: props.editor.displayName,
-        editedTimingDisplay: props.editedTimingDisplay
+        editedTimingDisplay: props.editedTimingDisplay,
       })
     } else {
       return I18n.t('Edited %{editedTimingDisplay}', {
-        editedTimingDisplay: props.editedTimingDisplay
+        editedTimingDisplay: props.editedTimingDisplay,
       })
     }
   }, [props.editedTimingDisplay, props.timingDisplay, props.editor, props.author])
@@ -254,7 +254,7 @@ const Timestamps = props => {
         <Flex.Item overflowX="hidden">
           <Text size={props.timestampTextSize}>
             {I18n.t('Last reply %{lastReplyAtDisplay}', {
-              lastReplyAtDisplay: props.lastReplyAtDisplay
+              lastReplyAtDisplay: props.lastReplyAtDisplay,
             })}
           </Text>
         </Flex.Item>
@@ -270,5 +270,5 @@ Timestamps.propTypes = {
   editedTimingDisplay: PropTypes.string,
   lastReplyAtDisplay: PropTypes.string,
   showCreatedAsTooltip: PropTypes.bool,
-  timestampTextSize: PropTypes.string
+  timestampTextSize: PropTypes.string,
 }

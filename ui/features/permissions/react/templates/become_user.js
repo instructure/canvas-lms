@@ -25,50 +25,50 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('People (Account)'),
-      description: I18n.t('Allows user to act as other users in the account.')
+      description: I18n.t('Allows user to act as other users in the account.'),
     },
     {
       description: I18n.t(
         'This permission should only be assigned to users that your institution has authorized to act as other users in your entire Canvas account.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc. This permissions also allows admins designated to a sub-account to access settings and information outside of their sub-account.'
-      )
+      ),
     },
     {
       title: I18n.t('Student Context Card'),
-      description: I18n.t('Allows user to access the Act as User link on student context cards.')
+      description: I18n.t('Allows user to access the Act as User link on student context cards.'),
     },
     {
       title: I18n.t('SpeedGrader'),
-      description: I18n.t('Allows user to delete a submission file.')
+      description: I18n.t('Allows user to delete a submission file.'),
     },
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t('Allows user to view Login IDs in a course People page.')
-    }
+      description: I18n.t('Allows user to view Login IDs in a course People page.'),
+    },
   ],
   [
     {
       title: I18n.t('API'),
-      description: I18n.t('The Roles API refers to this permission as become_user.')
+      description: I18n.t('The Roles API refers to this permission as become_user.'),
     },
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
         'To view the list of users in an account, Users - view list must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Student Context Card'),
-      description: I18n.t('Student Context Cards must be enabled for an account by an admin.')
+      description: I18n.t('Student Context Cards must be enabled for an account by an admin.'),
     },
     {
       title: I18n.t('Subaccounts'),
-      description: I18n.t('Not available at the subaccount level.')
-    }
+      description: I18n.t('Not available at the subaccount level.'),
+    },
   ],
   [],
   []

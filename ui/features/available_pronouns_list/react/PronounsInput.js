@@ -36,14 +36,14 @@ export default class PronounsInput extends React.Component {
 
     this.state = {
       pronouns: pronounList,
-      input_id: `new_pronoun_input_${nanoid()}`
+      input_id: `new_pronoun_input_${nanoid()}`,
     }
   }
 
   createNewTag = value => (
     <span key={`pronoun_tag_container_${value}`}>
       <Tag
-        dismissible
+        dismissible={true}
         text={value}
         margin="0 small 0 0"
         onClick={() => this.deletePronoun(value)}
@@ -58,7 +58,7 @@ export default class PronounsInput extends React.Component {
 
   deletePronoun = pronounToDelete => {
     this.setState(prevState => ({
-      pronouns: prevState.pronouns.filter(pronoun => pronounToDelete !== pronoun)
+      pronouns: prevState.pronouns.filter(pronoun => pronounToDelete !== pronoun),
     }))
   }
 

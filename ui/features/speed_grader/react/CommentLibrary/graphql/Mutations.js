@@ -66,7 +66,7 @@ const getCache = (cache, userId) => {
     JSON.stringify(
       cache.readQuery({
         query: COMMENTS_QUERY,
-        variables: {userId}
+        variables: {userId},
       })
     )
   )
@@ -76,7 +76,7 @@ const writeToCache = (cache, comments, userId) => {
   cache.writeQuery({
     query: COMMENTS_QUERY,
     variables: {userId},
-    data: comments
+    data: comments,
   })
 }
 

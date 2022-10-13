@@ -25,11 +25,11 @@ const I18n = useI18nScope('quiz_log_auditing.question_answers.essay')
 
 class Essay extends React.Component {
   static defaultProps = {
-    answer: ''
+    answer: '',
   }
 
   state = {
-    htmlView: false
+    htmlView: false,
   }
 
   render() {

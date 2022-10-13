@@ -40,7 +40,7 @@ function abortable({success, error, loading, meta}) {
       active = false
       aborter.abort()
     },
-    signal: aborter.signal
+    signal: aborter.signal,
   }
 }
 
@@ -88,7 +88,7 @@ export default function useFetchApi(
     // comments for fetchAllPages option apply. Overridden by fetchAllPages, if that param is true.
     fetchNumPages = 0,
 
-    fetchOpts = {} // other options to pass to fetch
+    fetchOpts = {}, // other options to pass to fetch
   },
   additionalDependencies = []
 ) {
@@ -105,7 +105,7 @@ export default function useFetchApi(
         success,
         error,
         loading,
-        meta
+        meta,
       })
 
       async function fetchLoop() {
@@ -125,7 +125,7 @@ export default function useFetchApi(
               path,
               headers,
               params: paramsWithPage,
-              fetchOpts: {signal, ...fetchOpts}
+              fetchOpts: {signal, ...fetchOpts},
             })
             const result = convert && json ? convert(json) : json
             accummulatedResults = accummulatedResults.concat(result)
@@ -160,7 +160,7 @@ export default function useFetchApi(
       headers,
       fetchAllPages,
       fetchNumPages,
-      fetchOpts
+      fetchOpts,
     ],
     {deep: true}
   )

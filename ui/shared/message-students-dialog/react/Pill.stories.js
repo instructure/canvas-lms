@@ -25,11 +25,11 @@ export default {
   args: {
     studentId: 1,
     text: 'Betty Ford',
-    onClick: () => {}
+    onClick: () => {},
   },
   argTypes: {
-    onClick: {action: 'Clicked'}
-  }
+    onClick: {action: 'Clicked'},
+  },
 }
 
 const Template = args => <Pill {...args} />
@@ -39,14 +39,14 @@ SelectedStudent.args = {
   studentId: 1,
   text: 'Betty Ford',
   onClick: () => {},
-  selected: true
+  selected: true,
 }
 
 export const UnselectedStudent = Template.bind({})
 UnselectedStudent.args = {
   studentId: 1,
   text: 'Betty Ford',
-  onClick: () => {}
+  onClick: () => {},
 }
 
 export const SelectedObserver = Template.bind({})
@@ -55,7 +55,7 @@ SelectedStudent.args = {
   osberverId: 2,
   text: 'Adam Jones',
   onClick: () => {},
-  selected: true
+  selected: true,
 }
 
 export const UnselectedObserver = Template.bind({})
@@ -63,5 +63,5 @@ UnselectedStudent.args = {
   studentId: 1,
   osberverId: 2,
   text: 'Adam Jones',
-  onClick: () => {}
+  onClick: () => {},
 }

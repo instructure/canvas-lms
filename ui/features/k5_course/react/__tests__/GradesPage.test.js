@@ -26,7 +26,7 @@ import {
   MOCK_ASSIGNMENT_GROUPS,
   MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
   MOCK_ENROLLMENTS,
-  MOCK_ENROLLMENTS_WITH_OBSERVED_USERS
+  MOCK_ENROLLMENTS_WITH_OBSERVED_USERS,
 } from './mocks'
 
 const GRADING_PERIODS_URL = encodeURI(
@@ -52,7 +52,7 @@ const dtf = new Intl.DateTimeFormat('en', {
   year: 'numeric',
   hour: 'numeric',
   minute: 'numeric',
-  timeZone: ENV.TIMEZONE
+  timeZone: ENV.TIMEZONE,
 })
 
 const dateFormatter = d => dtf.format(d instanceof Date ? d : new Date(d))
@@ -65,11 +65,11 @@ describe('GradesPage', () => {
     userIsCourseAdmin: false,
     hideFinalGrades: false,
     currentUser: {
-      id: '1'
+      id: '1',
     },
     showLearningMasteryGradebook: false,
     observedUserId: null,
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {
@@ -201,9 +201,9 @@ describe('GradesPage', () => {
           {
             user_id: '1',
             grades: {
-              current_score: null
-            }
-          }
+              current_score: null,
+            },
+          },
         ]
         fetchMock.get(ENROLLMENTS_URL, enrollmentsData, {overwriteRoutes: true})
         const {findByText} = render(<GradesPage {...getProps()} />)
@@ -216,9 +216,9 @@ describe('GradesPage', () => {
             user_id: '1',
             grades: {
               current_score: 84.6,
-              current_grade: 'B'
-            }
-          }
+              current_grade: 'B',
+            },
+          },
         ]
         fetchMock.get(ENROLLMENTS_URL, enrollmentsData, {overwriteRoutes: true})
         const {findByText} = render(<GradesPage {...getProps()} />)
@@ -266,10 +266,10 @@ describe('GradesPage', () => {
 
     it('shows only assignments in current grading period', async () => {
       fetchMock.get(`${ASSIGNMENT_GROUPS_URL}&grading_period_id=1`, [], {
-        overwriteRoutes: true
+        overwriteRoutes: true,
       })
       fetchMock.get(`${ENROLLMENTS_URL}&grading_period_id=1`, JSON.stringify(MOCK_ENROLLMENTS), {
-        overwriteRoutes: true
+        overwriteRoutes: true,
       })
       const {getByText, findByText, queryByText} = render(<GradesPage {...getProps()} />)
       expect(await findByText('WWII Report')).toBeInTheDocument()
@@ -284,7 +284,7 @@ describe('GradesPage', () => {
       const gradingPeriods = {...MOCK_GRADING_PERIODS_NORMAL}
       gradingPeriods.enrollments[0].totals_for_all_grading_periods_option = false
       fetchMock.get(GRADING_PERIODS_URL, JSON.stringify(gradingPeriods), {
-        overwriteRoutes: true
+        overwriteRoutes: true,
       })
       const {findByText, getByText, queryByText} = render(<GradesPage {...getProps()} />)
       const select = await findByText('Select Grading Period')
@@ -354,7 +354,7 @@ describe('GradesPage', () => {
           `Submitted ${formattedSubmittedDate}`,
           'Assignments',
           '6 pts',
-          'Out of 10 pts'
+          'Out of 10 pts',
         ].forEach(label => {
           expect(getByText(label)).toBeInTheDocument()
         })
@@ -366,7 +366,7 @@ describe('GradesPage', () => {
         `Submitted ${formattedSubmittedDate}`,
         'Assignments',
         '8 pts',
-        'Out of 10 pts'
+        'Out of 10 pts',
       ].forEach(label => {
         expect(getByText(label)).toBeInTheDocument()
       })

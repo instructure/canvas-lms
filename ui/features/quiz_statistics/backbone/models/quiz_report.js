@@ -21,7 +21,7 @@ import fromJSONAPI from '@canvas/quiz-legacy-client-apps/util/from_jsonapi'
 import K from '../../constants'
 import pickAndNormalize from '@canvas/quiz-legacy-client-apps/util/pick_and_normalize'
 
-const isGenerating = function(report) {
+const isGenerating = function (report) {
   const workflowState = report.progress.workflowState
   return ['queued', 'running'].indexOf(workflowState) > -1
 }
@@ -39,5 +39,5 @@ export default Backbone.Model.extend({
     attrs.isGenerating = !attrs.isGenerated && !!(attrs.progress && isGenerating(attrs))
 
     return attrs
-  }
+  },
 })

@@ -24,5 +24,5 @@ export default {
   contextType: PropTypes.oneOf(['users', 'groups', 'accounts', 'courses']),
   contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   folder: PropTypes.instanceOf(Folder),
-  filesystemObject: PropTypes.instanceOf(FilesystemObject)
+  filesystemObject: PropTypes.instanceOf(FilesystemObject),
 }

@@ -41,17 +41,17 @@ QUnit.module('initial coupling', {
     this.$end = $('<input type="text">')
     this.start = new DatetimeField(this.$start, {timeOnly: true})
     this.end = new DatetimeField(this.$end, {timeOnly: true})
-  }
+  },
 })
 
-test('updates start to be <= end', function() {
+test('updates start to be <= end', function () {
   this.start.setTime(new Date(+fixed + 3600000))
   this.end.setTime(fixed)
   coupleTimeFields(this.$start, this.$end)
   equal(+this.start.datetime, +fixed)
 })
 
-test('leaves start < end alone', function() {
+test('leaves start < end alone', function () {
   const earlier = new Date(+fixed - 3600000)
   this.start.setTime(earlier)
   this.end.setTime(fixed)
@@ -59,21 +59,21 @@ test('leaves start < end alone', function() {
   equal(+this.start.datetime, +earlier)
 })
 
-test('leaves blank start alone', function() {
+test('leaves blank start alone', function () {
   this.start.setTime(null)
   this.end.setTime(fixed)
   coupleTimeFields(this.$start, this.$end)
   equal(this.start.blank, true)
 })
 
-test('leaves blank end alone', function() {
+test('leaves blank end alone', function () {
   this.start.setTime(fixed)
   this.end.setTime(null)
   coupleTimeFields(this.$start, this.$end)
   equal(this.end.blank, true)
 })
 
-test('leaves invalid start alone', function() {
+test('leaves invalid start alone', function () {
   this.$start.val('invalid')
   this.start.setFromValue()
   this.end.setTime(fixed)
@@ -82,7 +82,7 @@ test('leaves invalid start alone', function() {
   equal(this.start.invalid, true)
 })
 
-test('leaves invalid end alone', function() {
+test('leaves invalid end alone', function () {
   this.start.setTime(fixed)
   this.$end.val('invalid')
   this.end.setFromValue()
@@ -91,7 +91,7 @@ test('leaves invalid end alone', function() {
   equal(this.end.invalid, true)
 })
 
-test('interprets time as occurring on date', function() {
+test('interprets time as occurring on date', function () {
   this.$date = $('<input type="text">')
   this.date = new DatetimeField(this.$date, {dateOnly: true})
   this.date.setDate(tomorrow)
@@ -109,24 +109,24 @@ QUnit.module('post coupling', {
     this.start = new DatetimeField(this.$start, {timeOnly: true})
     this.end = new DatetimeField(this.$end, {timeOnly: true})
     return coupleTimeFields(this.$start, this.$end)
-  }
+  },
 })
 
-test('changing end updates start to be <= end', function() {
+test('changing end updates start to be <= end', function () {
   this.start.setTime(new Date(+fixed + 3600000))
   this.end.setTime(fixed)
   this.$end.trigger('blur')
   equal(+this.start.datetime, +fixed)
 })
 
-test('changing start updates end to be >= start', function() {
+test('changing start updates end to be >= start', function () {
   this.end.setTime(new Date(+fixed - 3600000))
   this.start.setTime(fixed)
   this.$start.trigger('blur')
   equal(+this.end.datetime, +fixed)
 })
 
-test('leaves start < end alone', function() {
+test('leaves start < end alone', function () {
   const earlier = new Date(+fixed - 3600000)
   this.start.setTime(earlier)
   this.end.setTime(fixed)
@@ -135,21 +135,21 @@ test('leaves start < end alone', function() {
   equal(+this.end.datetime, +fixed)
 })
 
-test('leaves blank start alone', function() {
+test('leaves blank start alone', function () {
   this.start.setTime(null)
   this.end.setTime(fixed)
   this.$end.trigger('blur')
   equal(this.start.blank, true)
 })
 
-test('leaves blank end alone', function() {
+test('leaves blank end alone', function () {
   this.start.setTime(fixed)
   this.end.setTime(null)
   this.$start.trigger('blur')
   equal(this.end.blank, true)
 })
 
-test('leaves invalid start alone', function() {
+test('leaves invalid start alone', function () {
   this.$start.val('invalid')
   this.start.setFromValue()
   this.end.setTime(fixed)
@@ -158,7 +158,7 @@ test('leaves invalid start alone', function() {
   equal(this.start.invalid, true)
 })
 
-test('leaves invalid end alone', function() {
+test('leaves invalid end alone', function () {
   this.start.setTime(fixed)
   this.$end.val('invalid')
   this.end.setFromValue()
@@ -167,7 +167,7 @@ test('leaves invalid end alone', function() {
   equal(this.end.invalid, true)
 })
 
-test('does not rewrite blurred input', function() {
+test('does not rewrite blurred input', function () {
   this.$start.val('7') // interpreted as 7pm, but should not be rewritten
   this.start.setFromValue()
   this.end.setTime(new Date(+this.start.datetime + 3600000))
@@ -175,7 +175,7 @@ test('does not rewrite blurred input', function() {
   equal(this.$start.val(), '7')
 })
 
-test('does not rewrite other input', function() {
+test('does not rewrite other input', function () {
   this.$start.val('7') // interpreted as 7pm, but should not be rewritten
   this.start.setFromValue()
   this.end.setTime(new Date(+this.start.datetime + 3600000))
@@ -183,7 +183,7 @@ test('does not rewrite other input', function() {
   equal(this.$start.val(), '7')
 })
 
-test('does not switch time fields if in order by user profile timezone, even if out of order in local timezone', function() {
+test('does not switch time fields if in order by user profile timezone, even if out of order in local timezone', function () {
   // set local timezone to UTC
   const snapshot = tz.snapshot()
   tz.changeZone(london, 'Europe/London')
@@ -219,10 +219,10 @@ QUnit.module('with date field', {
     this.end = new DatetimeField(this.$end, {timeOnly: true})
     this.date = new DatetimeField(this.$date, {dateOnly: true})
     coupleTimeFields(this.$start, this.$end, this.$date)
-  }
+  },
 })
 
-test('interprets time as occurring on date', function() {
+test('interprets time as occurring on date', function () {
   this.date.setDate(tomorrow)
   this.$date.trigger('blur')
   this.start.setTime(fixed)

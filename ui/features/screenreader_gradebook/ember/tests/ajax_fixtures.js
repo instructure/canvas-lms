@@ -94,13 +94,13 @@ const default_grade_response = [
             url: null,
             user_id: 1,
             workflow_state: 'graded',
-            versioned_attachments: []
-          }
-        }
+            versioned_attachments: [],
+          },
+        },
       ],
       submission_comments: [],
-      attachments: []
-    }
+      attachments: [],
+    },
   },
   {
     submission: {
@@ -175,13 +175,13 @@ const default_grade_response = [
             url: null,
             user_id: 2,
             workflow_state: 'graded',
-            versioned_attachments: []
-          }
-        }
+            versioned_attachments: [],
+          },
+        },
       ],
       submission_comments: [],
-      attachments: []
-    }
+      attachments: [],
+    },
   },
   {
     submission: {
@@ -256,31 +256,31 @@ const default_grade_response = [
             url: null,
             user_id: 3,
             workflow_state: 'graded',
-            versioned_attachments: []
-          }
-        }
+            versioned_attachments: [],
+          },
+        },
       ],
       submission_comments: [],
-      attachments: []
-    }
-  }
+      attachments: [],
+    },
+  },
 ]
 
 const students = [
   {
     user_id: '1',
     user: {id: '1', name: 'Bob Barnes', group_ids: [], sections: [], sortable_name: 'Barnes, Bob'},
-    course_section_id: '1'
+    course_section_id: '1',
   },
   {
     user_id: '2',
     user: {id: '2', name: 'Fred Flint', group_ids: [], sections: [], sortable_name: 'Flint, Fred'},
-    course_section_id: '1'
+    course_section_id: '1',
   },
   {
     user_id: '3',
     user: {id: '3', name: 'Suzy Smith', group_ids: [], sections: [], sortable_name: 'Smith, Suzy'},
-    course_section_id: '1'
+    course_section_id: '1',
   },
   {
     user_id: '4',
@@ -289,9 +289,9 @@ const students = [
       name: 'Buffy Baker',
       group_ids: [],
       sections: [],
-      sortable_name: 'Baker, Buffy'
+      sortable_name: 'Baker, Buffy',
     },
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '5',
@@ -300,9 +300,9 @@ const students = [
       name: 'Willow West',
       group_ids: [],
       sections: [],
-      sortable_name: 'West, Willow'
+      sortable_name: 'West, Willow',
     },
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '5',
@@ -311,9 +311,9 @@ const students = [
       name: 'Willow West',
       group_ids: [],
       sections: [],
-      sortable_name: 'West, Willow'
+      sortable_name: 'West, Willow',
     },
-    course_section_id: '1'
+    course_section_id: '1',
   },
   {
     user_id: '6',
@@ -322,9 +322,9 @@ const students = [
       name: 'Giles Green',
       group_ids: [],
       sections: [],
-      sortable_name: 'Green, Giles'
+      sortable_name: 'Green, Giles',
     },
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '7',
@@ -333,9 +333,9 @@ const students = [
       name: 'Xander Xiao',
       group_ids: [],
       sections: [],
-      sortable_name: 'Xiao, Xander'
+      sortable_name: 'Xiao, Xander',
     },
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '8',
@@ -344,9 +344,9 @@ const students = [
       name: 'Cordelia Lu',
       group_ids: [],
       sections: [],
-      sortable_name: 'Lu, Cordelia'
+      sortable_name: 'Lu, Cordelia',
     },
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '9',
@@ -355,20 +355,20 @@ const students = [
       name: 'Drusilla Da',
       group_ids: [],
       sections: [],
-      sortable_name: 'Da, Drusilla'
+      sortable_name: 'Da, Drusilla',
     },
-    course_section_id: '1'
+    course_section_id: '1',
   },
   {
     user_id: '10',
     user: {id: '10', name: 'Spike Long', group_ids: [], sections: [], sortable_name: 'Long, Spike'},
-    course_section_id: '2'
+    course_section_id: '2',
   },
   {
     user_id: '10',
     user: {id: '10', name: 'Spike Long', group_ids: [], sections: [], sortable_name: 'Long, Spike'},
-    course_section_id: '1'
-  }
+    course_section_id: '1',
+  },
 ]
 
 const concludedStudents = [
@@ -377,8 +377,8 @@ const concludedStudents = [
     course_section_id: '1',
     user_id: '105',
     workflow_state: 'completed',
-    completed_at: '2013-10-01T10:00:00Z'
-  }
+    completed_at: '2013-10-01T10:00:00Z',
+  },
 ]
 
 const assignmentGroups = [
@@ -400,7 +400,7 @@ const assignmentGroups = [
         published: true,
         muted: false,
         only_visible_to_overrides: true,
-        assignment_visibility: ['1']
+        assignment_visibility: ['1'],
       },
       {
         id: '2',
@@ -414,7 +414,7 @@ const assignmentGroups = [
         published: true,
         muted: true,
         only_visible_to_overrides: true,
-        assignment_visibility: ['2']
+        assignment_visibility: ['2'],
       },
       {
         id: '3',
@@ -427,9 +427,9 @@ const assignmentGroups = [
         assignment_group_id: '1',
         published: true,
         muted: false,
-        assignment_visibility: ['1', '2', '3']
-      }
-    ]
+        assignment_visibility: ['1', '2', '3'],
+      },
+    ],
   },
   {
     id: '2',
@@ -447,7 +447,7 @@ const assignmentGroups = [
         position: 5,
         assignment_group_id: '2',
         published: true,
-        muted: false
+        muted: false,
       },
       {
         id: '5',
@@ -459,7 +459,7 @@ const assignmentGroups = [
         position: 6,
         assignment_group_id: '2',
         published: true,
-        muted: true
+        muted: true,
       },
       {
         id: '6',
@@ -470,9 +470,9 @@ const assignmentGroups = [
         due_at: '2013-09-01T10:00:00Z',
         position: 9,
         published: true,
-        assignment_group_id: '2'
-      }
-    ]
+        assignment_group_id: '2',
+      },
+    ],
   },
   {
     id: '4',
@@ -489,7 +489,7 @@ const assignmentGroups = [
         due_at: '2013-09-01T10:00:00Z',
         position: 5,
         assignment_group_id: '4',
-        published: true
+        published: true,
       },
       {
         id: '22',
@@ -500,9 +500,9 @@ const assignmentGroups = [
         due_at: '2013-09-01T10:00:00Z',
         position: 1,
         assignment_group_id: '4',
-        published: true
-      }
-    ]
+        published: true,
+      },
+    ],
   },
   {
     id: '5',
@@ -519,9 +519,9 @@ const assignmentGroups = [
         due_at: '2013-09-01T10:00:00Z',
         position: 1,
         assignment_group_id: '4',
-        published: true
-      }
-    ]
+        published: true,
+      },
+    ],
   },
   {
     id: '6',
@@ -541,7 +541,7 @@ const assignmentGroups = [
         muted: true,
         moderated_grading: true,
         grades_published: false,
-        published: true
+        published: true,
       },
       {
         id: '26',
@@ -555,7 +555,7 @@ const assignmentGroups = [
         muted: false,
         moderated_grading: true,
         grades_published: false,
-        published: true
+        published: true,
       },
       {
         id: '27',
@@ -569,7 +569,7 @@ const assignmentGroups = [
         muted: true,
         moderated_grading: false,
         grades_published: false,
-        published: true
+        published: true,
       },
       {
         id: '28',
@@ -583,10 +583,10 @@ const assignmentGroups = [
         muted: true,
         moderated_grading: true,
         grades_published: true,
-        published: true
-      }
-    ]
-  }
+        published: true,
+      },
+    ],
+  },
 ]
 
 const submissions = [
@@ -602,57 +602,57 @@ const submissions = [
         grade: 'incomplete',
         score: 'incomplete',
         entered_grade: 'incomplete',
-        entered_score: 'incomplete'
-      }
-    ]
+        entered_score: 'incomplete',
+      },
+    ],
   },
   {
     user_id: '2',
     submissions: [
       {id: '3', user_id: '2', assignment_id: '1', grade: '9', score: '9'},
-      {id: '4', user_id: '2', assignment_id: '2', grade: null, score: null}
-    ]
+      {id: '4', user_id: '2', assignment_id: '2', grade: null, score: null},
+    ],
   },
   {
     user_id: '3',
     submissions: [
       {id: '5', user_id: '3', assignment_id: '1', grade: '10', score: '10'},
-      {id: '6', user_id: '3', assignment_id: '2', grade: null, score: null}
-    ]
+      {id: '6', user_id: '3', assignment_id: '2', grade: null, score: null},
+    ],
   },
   {
     user_id: '4',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '5',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '6',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '7',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '8',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '9',
-    submissions: []
+    submissions: [],
   },
   {
     user_id: '10',
-    submissions: []
-  }
+    submissions: [],
+  },
 ]
 
 const sections = [
   {id: '1', name: 'Vampires and Demons'},
-  {id: '2', name: 'Slayers and Scoobies'}
+  {id: '2', name: 'Slayers and Scoobies'},
 ]
 
 const customColumns = [
@@ -661,18 +661,18 @@ const customColumns = [
     id: '1',
     position: 1,
     teacher_notes: true,
-    title: 'Notes'
-  }
+    title: 'Notes',
+  },
 ]
 
 const outcomesRaw = [
   {outcome: {id: '1', title: 'Eating', mastery_points: 3}},
-  {outcome: {id: '2', title: 'Drinking', mastery_points: 5}}
+  {outcome: {id: '2', title: 'Drinking', mastery_points: 5}},
 ]
 
 const outcomes = [
   {id: '1', title: 'Eating', mastery_points: 3},
-  {id: '2', title: 'Drinking', mastery_points: 5}
+  {id: '2', title: 'Drinking', mastery_points: 5},
 ]
 
 const outcomeRollupsRaw = {
@@ -681,20 +681,20 @@ const outcomeRollupsRaw = {
       links: {user: '1'},
       scores: [
         {links: {outcome: '1'}, score: 5},
-        {links: {outcome: '2'}, score: 4}
-      ]
+        {links: {outcome: '2'}, score: 4},
+      ],
     },
     {
       links: {user: '2'},
-      scores: [{links: {outcome: '2'}, score: 3}]
-    }
-  ]
+      scores: [{links: {outcome: '2'}, score: 3}],
+    },
+  ],
 }
 
 const outcomeRollups = [
   {outcome_id: '1', user_id: '1', score: 5},
   {outcome_id: '2', user_id: '1', score: 4},
-  {outcome_id: '2', user_id: '2', score: 3}
+  {outcome_id: '2', user_id: '2', score: 3},
 ]
 
 export default {
@@ -734,7 +734,7 @@ export default {
             start_date: '2013-08-01T00:00:00Z',
             end_date: '2013-09-01T00:00:00Z',
             close_date: '2013-09-08T00:00:00Z',
-            is_closed: true
+            is_closed: true,
           },
           {
             id: '2',
@@ -742,7 +742,7 @@ export default {
             start_date: '2013-09-01T00:00:00Z',
             end_date: '2013-11-01T00:00:00Z',
             close_date: '2013-11-08T00:00:00Z',
-            is_closed: true
+            is_closed: true,
           },
           {
             id: '3',
@@ -750,10 +750,10 @@ export default {
             start_date: '2013-11-01T00:00:00Z',
             end_date: '2014-01-01T00:00:00Z',
             close_date: '2014-01-08T00:00:00Z',
-            is_closed: false
-          }
-        ]
-      }
+            is_closed: false,
+          },
+        ],
+      },
     }
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.enrollments_url, {
@@ -761,9 +761,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.enrollments_with_concluded_url, {
@@ -771,9 +771,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.assignment_groups_url, {
@@ -781,9 +781,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.submissions_url, {
@@ -791,9 +791,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.sections_url, {
@@ -801,9 +801,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.custom_columns_url, {
@@ -811,9 +811,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     // the qUnit specs were sending a request for this that was 404'ing so I just
@@ -823,9 +823,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.setting_update_url, {
@@ -833,9 +833,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.outcome_links_url, {
@@ -843,9 +843,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
 
     return ajax.defineFixture(window.ENV.GRADEBOOK_OPTIONS.outcome_rollups_url, {
@@ -853,9 +853,9 @@ export default {
       jqXHR: {
         getResponseHeader() {
           return {}
-        }
+        },
       },
-      textStatus: 'success'
+      textStatus: 'success',
     })
-  }
+  },
 }

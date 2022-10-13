@@ -32,10 +32,10 @@ export function SearchResultsCount({...props}) {
         {I18n.t(
           {
             one: '1 result found',
-            other: '%{count} results found'
+            other: '%{count} results found',
           },
           {
-            count: props.resultsFound
+            count: props.resultsFound,
           }
         )}
       </Text>
@@ -44,5 +44,5 @@ export function SearchResultsCount({...props}) {
 }
 
 SearchResultsCount.propTypes = {
-  resultsFound: PropTypes.number.isRequired
+  resultsFound: PropTypes.number.isRequired,
 }

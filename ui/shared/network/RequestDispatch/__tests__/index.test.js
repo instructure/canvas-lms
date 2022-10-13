@@ -22,7 +22,7 @@ import {NetworkFake, setPaginationLinkHeader} from '../../NetworkFake/index'
 import RequestDispatch, {
   DEFAULT_ACTIVE_REQUEST_LIMIT,
   MAX_ACTIVE_REQUEST_LIMIT,
-  MIN_ACTIVE_REQUEST_LIMIT
+  MIN_ACTIVE_REQUEST_LIMIT,
 } from '../index'
 
 describe('Shared > Network > RequestDispatch', () => {

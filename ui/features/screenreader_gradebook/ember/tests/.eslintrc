@@ -1,0 +1,39 @@
+{
+  "env": {
+    "qunit": true
+  },
+  "globals": {
+    "module": true,
+    "test": true,
+    "equal": true,
+    "ok": true,
+    "sandbox": true,
+    "sinon": true,
+    "deepEqual": true,
+    "click": true,
+    "andThen": true,
+    "visit": true,
+    "find": true,
+    "App": true,
+    "start": true
+  },
+  "extends": ["plugin:qunit/recommended", "plugin:qunit/two"],
+  "plugins": ["qunit"],
+  "rules": {
+    "no-restricted-globals": "off",
+    "func-names": "off",
+    "prefer-arrow-callback": "off",
+    "jest/no-identical-title": "off",
+    "qunit/no-global-stop-start": "off",
+    "qunit/no-setup-teardown": "off",
+    "qunit/no-global-assertions": "off",
+    "qunit/no-global-module-test": "off",
+    "qunit/require-expect": "off",
+    "qunit/no-assert-logical-expression": "error",
+    "qunit/no-commented-tests": "error",
+    "qunit/no-compare-relation-boolean": "error"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  }
+}

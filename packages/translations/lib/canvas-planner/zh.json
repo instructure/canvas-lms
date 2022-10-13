@@ -97,7 +97,9 @@
   "error_loading_past_items_2881dbb1": { "message": "加载过去的项目时出错" },
   "exciting_discussion_9f67bd0a": { "message": "精彩的讨论" },
   "excused_cf8792eb": { "message": "已请假" },
+  "extended_9a58dcb6": { "message": "扩展" },
   "failed_getting_course_list_49846a93": { "message": "获取课程列表失败" },
+  "failed_getting_to_do_list_10ce2833": { "message": "获取待办事项列表失败" },
   "failed_peeking_into_your_future_e95b9306": { "message": "无法查看未来" },
   "failed_peeking_into_your_past_5bec2323": { "message": "无法查看过去" },
   "failed_saving_changes_on_name_1e100ad": {
@@ -108,6 +110,9 @@
   "failed_to_get_new_activity_17e7ec7c": { "message": "获取新活动失败" },
   "failed_to_load_opportunities_52ab6404": { "message": "加载机遇失败" },
   "failed_to_save_to_do_ddc7503b": { "message": "保存待办事项出错" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "加载待办事项列表失败"
+  },
   "feedback_6dcc1991": { "message": "反馈" },
   "fun_quiz_47ab0b0": { "message": "趣味测验" },
   "go_to_card_view_dashboard_9d03970e": { "message": "前往卡片视图仪表板" },
@@ -206,6 +211,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } 至 { endTime }"
   },
+  "student_to_do_c018c835": { "message": "学生待办事项" },
   "submitted_318fad53": { "message": "已提交" },
   "success_to_do_created_e34ed395": { "message": "成功：创建的待办列表" },
   "task_16b0ef38": { "message": "任务" },

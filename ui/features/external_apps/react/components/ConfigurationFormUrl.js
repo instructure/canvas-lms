@@ -33,11 +33,11 @@ export default class ConfigurationFormUrl extends React.Component {
     sharedSecret: PropTypes.string,
     configUrl: PropTypes.string,
     allowMembershipServiceAccess: PropTypes.bool,
-    membershipServiceFeatureFlagEnabled: PropTypes.bool
+    membershipServiceFeatureFlagEnabled: PropTypes.bool,
   }
 
   state = {
-    errors: {}
+    errors: {},
   }
 
   isValid = () => {
@@ -70,7 +70,7 @@ export default class ConfigurationFormUrl extends React.Component {
       consumerKey: this.refs.consumerKey.state.value,
       sharedSecret: this.refs.sharedSecret.state.value,
       configUrl: this.refs.configUrl.state.value,
-      verifyUniqueness: 'true'
+      verifyUniqueness: 'true',
     }
 
     if (this.props.membershipServiceFeatureFlagEnabled) {
@@ -102,7 +102,7 @@ export default class ConfigurationFormUrl extends React.Component {
           id="name"
           defaultValue={this.props.name}
           renderLabel={I18n.t('Name')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
         <div className="grid-row">
@@ -134,7 +134,7 @@ export default class ConfigurationFormUrl extends React.Component {
           defaultValue={this.props.configUrl}
           renderLabel={I18n.t('Config URL')}
           hintText={I18n.t('Example: https://example.com/config.xml')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
       </div>

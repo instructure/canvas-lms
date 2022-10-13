@@ -37,7 +37,7 @@ export function GroupedInfoColumnHeader({bucket}) {
       queued: I18n.t('Max wait time'),
       running: I18n.t('Max run time'),
       future: I18n.t('Next run at'),
-      failed: I18n.t('Last failed at')
+      failed: I18n.t('Last failed at'),
     }
   }, [])
 
@@ -50,7 +50,7 @@ export function InfoColumnHeader({bucket}) {
       queued: I18n.t('Wait time'),
       running: I18n.t('Run time'),
       future: I18n.t('Run at'),
-      failed: I18n.t('Failed at')
+      failed: I18n.t('Failed at'),
     }
   }, [])
 

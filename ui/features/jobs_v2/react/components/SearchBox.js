@@ -34,7 +34,7 @@ function useJobSearchApi(fetchApiOpts) {
     forceResult: (fetchApiOpts.params.term?.length || 0) === 0 ? [] : undefined,
     path: `/api/v1/jobs2/${fetchApiOpts.params.bucket}/by_${fetchApiOpts.params.group}/search`,
     convert: convertResult,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }
 

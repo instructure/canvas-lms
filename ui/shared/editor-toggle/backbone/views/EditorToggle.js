@@ -51,7 +51,7 @@ export default function EditorToggle(elem, options) {
     // whether or not a "Switch Views" link should be provided to edit the
     // raw html
     switchViews: true,
-    ...options
+    ...options,
   }
   if (this.options.view) this.view = this.options.view
   this.textArea = this.createTextArea()
@@ -84,7 +84,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
     const opts = $.extend(
       {
         focus: true,
-        tinyOptions: this.options.tinyOptions || {}
+        tinyOptions: this.options.tinyOptions || {},
       },
       this.options.rceOptions
     )
@@ -166,7 +166,7 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
         // we want the textarea at least that big as well
         .css({
           width: '100%',
-          minHeight: '110px'
+          minHeight: '110px',
         })
         .addClass('editor-toggle')
         .attr('id', nextID())
@@ -207,5 +207,5 @@ Object.assign(EditorToggle.prototype, Backbone.Events, {
 
   cancel() {
     RichContentEditor.closeRCE(this.textArea)
-  }
+  },
 })

@@ -49,7 +49,7 @@ export default class ErrorBoundary extends React.Component<ErrorBoundaryProps, E
           error: this.state.error,
           componentStack: null,
           eventId: null,
-          resetError: () => this.setState({error: null})
+          resetError: () => this.setState({error: null}),
         })
       } else {
         return this.props.errorComponent

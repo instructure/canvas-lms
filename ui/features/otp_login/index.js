@@ -22,9 +22,7 @@ import 'jquery-fancy-placeholder'
 
 ready(() => {
   $('.field-with-fancyplaceholder input').fancyPlaceholder()
-  $('#login_form')
-    .find(':text:first')
-    .select()
+  $('#login_form').find(':text:first').select()
 
   const $select_phone_form = $('#select_phone_form')
   const $new_phone_form = $('#new_phone_form')

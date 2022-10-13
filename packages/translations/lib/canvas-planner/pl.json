@@ -109,8 +109,12 @@
   },
   "exciting_discussion_9f67bd0a": { "message": "Ekscytująca dyskusja" },
   "excused_cf8792eb": { "message": "Usprawiedliwiony" },
+  "extended_9a58dcb6": { "message": "Rozszerzone" },
   "failed_getting_course_list_49846a93": {
     "message": "Nie udało się pobrać listy kursów"
+  },
+  "failed_getting_to_do_list_10ce2833": {
+    "message": "Niepowodzenie pobierania listy do zrobienia"
   },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Nie udało się zaglądnąć w Twoją przyszłość"
@@ -134,6 +138,9 @@
     "message": "Nie udało się wczytać okazji"
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Nie udało się zapisać do" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "Niepowodzenie wczytywania listy do zrobienia"
+  },
   "feedback_6dcc1991": { "message": "Informacje zwrotne" },
   "fun_quiz_47ab0b0": { "message": "Fajny test" },
   "go_to_card_view_dashboard_9d03970e": {
@@ -252,6 +259,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } do { endTime }"
   },
+  "student_to_do_c018c835": { "message": "Lista zadań uczestnika" },
   "submitted_318fad53": { "message": "Przesłano" },
   "success_to_do_created_e34ed395": {
     "message": "Zakończono powodzeniem: Utworzono zadanie"

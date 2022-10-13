@@ -32,7 +32,7 @@ const initialStoreState = {
   searchedNames: {},
   currentlySearching: false,
   allStudentsFetched: false,
-  requestedStudentsForCourse: false
+  requestedStudentsForCourse: false,
 }
 
 const OverrideStudentStore = createStore($.extend(true, {}, initialStoreState))
@@ -70,7 +70,7 @@ OverrideStudentStore.fetchStudentsByID = function (givenIds) {
     {
       user_ids: givenIds.join(','),
       enrollment_type: 'student',
-      include: ['enrollments', 'group_ids']
+      include: ['enrollments', 'group_ids'],
     },
     this._fetchStudentsByIDSuccessHandler.bind(this, {})
   )
@@ -99,7 +99,7 @@ OverrideStudentStore.fetchStudentsByName = function (nameString) {
   const searchUsersPath = this.getContextPath() + '/search_users'
 
   this.setState({
-    currentlySearching: true
+    currentlySearching: true,
   })
 
   $.getJSON(
@@ -108,7 +108,7 @@ OverrideStudentStore.fetchStudentsByName = function (nameString) {
       search_term: nameString,
       enrollment_type: 'student',
       include_inactive: false,
-      include: ['enrollments', 'group_ids']
+      include: ['enrollments', 'group_ids'],
     },
     this._fetchStudentsByNameSuccessHandler.bind(this, {nameString}),
     this._fetchStudentsByNameErrorHandler.bind(this, {nameString})
@@ -148,7 +148,7 @@ OverrideStudentStore.fetchStudentsForCourse = function () {
       per_page: STUDENTS_FETCHED_PER_PAGE,
       enrollment_type: 'student',
       include_inactive: false,
-      include: ['enrollments', 'group_ids']
+      include: ['enrollments', 'group_ids'],
     },
     this._fetchStudentsForCourseSuccessHandler.bind(this, {pageNumber: 1})
   )
@@ -192,7 +192,7 @@ OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
 
   const allStudents = Object.values({
     ...this.getState().students,
-    ..._.keyBy(newlyFetchedStudents, student => student.id)
+    ..._.keyBy(newlyFetchedStudents, student => student.id),
   })
 
   AssignmentOverrideHelper.setStudentDisplayNames(allStudents)
@@ -201,7 +201,7 @@ OverrideStudentStore.addStudents = function (newlyFetchedStudents) {
 
 OverrideStudentStore.doneSearching = function () {
   this.setState({
-    currentlySearching: false
+    currentlySearching: false,
   })
 }
 
@@ -238,7 +238,7 @@ OverrideStudentStore.markNameSearched = function (name) {
   const searchedNames = this.getState().searchedNames
   searchedNames[name] = true
   this.setState({
-    searchedNames
+    searchedNames,
   })
 }
 

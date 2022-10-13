@@ -24,7 +24,7 @@ const FinalGradeOverrideComponent = Ember.Component.extend({
   inputValue: null,
   internalInputValue: null,
 
-  inputDescription: function() {
+  inputDescription: function () {
     const percentage = this.get('finalGradeOverride.percentage')
     const gradingStandard = this.get('gradingStandard')
 
@@ -34,7 +34,7 @@ const FinalGradeOverrideComponent = Ember.Component.extend({
     return GradeFormatHelper.formatGrade(percentage, {gradingType: 'percent'})
   }.property('finalGradeOverride', 'gradingStandard'),
 
-  finalGradeOverrideChanged: function() {
+  finalGradeOverrideChanged: function () {
     const percentage = this.get('finalGradeOverride.percentage')
     const gradingStandard = this.get('gradingStandard')
 
@@ -58,7 +58,7 @@ const FinalGradeOverrideComponent = Ember.Component.extend({
     this.sendAction('onEditFinalGradeOverride', this.get('inputValue'))
     // Always show a valid grade in the input on blur.
     this.set('inputValue', this.get('internalInputValue'))
-  }
+  },
 })
 
 export default FinalGradeOverrideComponent

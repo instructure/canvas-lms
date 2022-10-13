@@ -29,13 +29,13 @@ export default {
 
   propTypes: {
     rootTillCurrentFolder: PropTypes.arrayOf(customPropTypes.folder),
-    contextAssetString: PropTypes.string.isRequired
+    contextAssetString: PropTypes.string.isRequired,
   },
 
   getInitialState() {
     return {
       maxCrumbWidth: MAX_CRUMB_WIDTH,
-      availableWidth: 200000
+      availableWidth: 200000,
     }
   },
 
@@ -59,10 +59,7 @@ export default {
     const $oldCrumbs = $('#breadcrumbs')
     const heightOfOneBreadcrumb = $oldCrumbs.find('li:visible:first').height() * 1.5
     const homeName = $oldCrumbs.find('.home').text()
-    const $a = $oldCrumbs
-      .find('li')
-      .eq(1)
-      .find('a')
+    const $a = $oldCrumbs.find('li').eq(1).find('a')
     const contextUrl = $a.attr('href')
     const contextName = $a.text()
     $('.ic-app-nav-toggle-and-crumbs').remove()
@@ -78,7 +75,7 @@ export default {
     this.setState(
       {
         availableWidth: newAvailableWidth,
-        maxCrumbWidth: MAX_CRUMB_WIDTH
+        maxCrumbWidth: MAX_CRUMB_WIDTH,
       },
       this.checkIfCrumbsFit
     )
@@ -99,5 +96,5 @@ export default {
       const maxCrumbWidth = Math.max(MIN_CRUMB_WIDTH, this.state.maxCrumbWidth - 20)
       this.setState({maxCrumbWidth}, this.checkIfCrumbsFit)
     }
-  }
+  },
 }

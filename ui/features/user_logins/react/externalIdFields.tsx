@@ -41,8 +41,8 @@ declare global {
 window.canvas_pseudonyms = {
   jqInterface: {
     onCancel() {},
-    onEdit(_args?: PseudonymEditArgs) {}
-  }
+    onEdit(_args?: PseudonymEditArgs) {},
+  },
 }
 
 const ExternalIdField = ({currentValue, id, label, portalSelector}) => {
@@ -84,7 +84,7 @@ interface ExternalIdsProps {
 const ExternalIds: React.FC<ExternalIdsProps> = ({
   integrationIdLabel,
   jqInterface,
-  sisUserIdLabel
+  sisUserIdLabel,
 }: ExternalIdsProps) => {
   const [canEditSisUserId, setCanEditSisUserId] = useState<boolean | undefined>(false)
   const [integrationId, setIntegrationId] = useState<number | undefined>()

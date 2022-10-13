@@ -26,7 +26,7 @@ const onChange = jest.fn()
 
 const defaultProps = {
   blackoutDates: BLACKOUT_DATES,
-  onChange
+  onChange,
 }
 
 describe('BlackoutDates', () => {
@@ -62,7 +62,7 @@ describe('BlackoutDates', () => {
     const newBlackoutDate = {
       event_title: 'Black me out',
       start_date: 'April 1, 2022',
-      end_date: 'April 2, 2022'
+      end_date: 'April 2, 2022',
     }
     const {getByLabelText, getByRole} = render(<BlackoutDates {...defaultProps} />)
 
@@ -76,7 +76,7 @@ describe('BlackoutDates', () => {
     })
     act(() => {
       fireEvent.change(startDate, {
-        target: {value: newBlackoutDate.start_date}
+        target: {value: newBlackoutDate.start_date},
       })
     })
     act(() => {

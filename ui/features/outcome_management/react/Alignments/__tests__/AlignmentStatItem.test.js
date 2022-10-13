@@ -27,7 +27,7 @@ describe('AlignmentStatItem', () => {
     count: 10,
     percent: 0.75,
     average: 1.2,
-    ...props
+    ...props,
   })
 
   it('renders component', () => {

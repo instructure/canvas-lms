@@ -22,13 +22,14 @@ import {shape, func} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('external_tools')
 
 export default class ConfigureExternalToolButton extends React.Component {
   static propTypes = {
     tool: shape({}).isRequired,
-    returnFocus: func.isRequired
+    returnFocus: func.isRequired,
   }
 
   constructor(props) {
@@ -37,7 +38,7 @@ export default class ConfigureExternalToolButton extends React.Component {
       modalIsOpen: props.modalIsOpen,
       beforeExternalContentAlertClass: 'screenreader-only',
       afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {}
+      iframeStyle: {},
     }
   }
 
@@ -64,7 +65,7 @@ export default class ConfigureExternalToolButton extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -76,7 +77,7 @@ export default class ConfigureExternalToolButton extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -105,15 +106,13 @@ export default class ConfigureExternalToolButton extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
+        <ToolLaunchIframe
           src={this.getLaunchUrl(this.props.tool.tool_configuration)}
           title={I18n.t('Tool Configuration')}
-          className="tool_launch"
           style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

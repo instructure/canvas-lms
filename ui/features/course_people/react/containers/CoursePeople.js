@@ -29,7 +29,7 @@ const CoursePeople = () => {
   const {loading, data} = useQuery(ROSTER_QUERY, {
     variables: {courseID: ENV.course.id},
     fetchPolicy: 'cache-and-network',
-    errorPolicy: 'all'
+    errorPolicy: 'all',
   })
 
   const responsiveRoster = (

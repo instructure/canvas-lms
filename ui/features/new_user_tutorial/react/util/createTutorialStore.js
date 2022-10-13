@@ -19,7 +19,7 @@
 import createStore from '@canvas/util/createStore'
 
 const defaultState = Object.freeze({
-  isCollapsed: false
+  isCollapsed: false,
 })
 
 const createTutorialStore = (initialState = defaultState) => {

@@ -44,7 +44,7 @@ const AssociatedText = ({count, onClick}) => (
             {
               zero: 'Not associated with any accounts',
               one: 'Associated with one account',
-              other: 'Associated with %{count} accounts'
+              other: 'Associated with %{count} accounts',
             },
             {count}
           )}
@@ -59,7 +59,7 @@ const AssociatedText = ({count, onClick}) => (
 
 AssociatedText.propTypes = {
   count: number.isRequired,
-  onClick: func.isRequired
+  onClick: func.isRequired,
 }
 
 // Return a list of the names of the given accounts.
@@ -76,9 +76,9 @@ AssociatedAccounts.propTypes = {
   accounts: arrayOf(
     shape({
       id: string,
-      name: string
+      name: string,
     }).isRequired
-  )
+  ),
 }
 
 const CourseTemplateDetails = ({isEditable}) => {
@@ -92,7 +92,7 @@ const CourseTemplateDetails = ({isEditable}) => {
   async function getCourseSettings() {
     try {
       const {json} = await doFetchApi({
-        path: `/api/v1${ENV.CONTEXT_BASE_URL}?include[]=templated_accounts`
+        path: `/api/v1${ENV.CONTEXT_BASE_URL}?include[]=templated_accounts`,
       })
       setChecked(json.template)
       setTemplatedAccounts(json.templated_accounts)
@@ -174,11 +174,11 @@ const CourseTemplateDetails = ({isEditable}) => {
 }
 
 CourseTemplateDetails.propTypes = {
-  isEditable: bool
+  isEditable: bool,
 }
 
 CourseTemplateDetails.defaultProps = {
-  isEditable: false
+  isEditable: false,
 }
 
 export default CourseTemplateDetails

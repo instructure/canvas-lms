@@ -16,22 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import {MemoryRouter} from 'react-router-dom'
 import QuestionListing from '../question_listing'
-import assertChange from 'chai-assert-change'
 import K from '../../../constants'
 
 describe('canvas_quizzes/events/views/question_listing', () => {
   it('renders', () => {
     render(
       <MemoryRouter>
-        <QuestionListing
-          questions={[
-            { id: 'q1', questionType: K.Q_SHORT_ANSWER }
-          ]}
-        />
+        <QuestionListing questions={[{id: 'q1', questionType: K.Q_SHORT_ANSWER}]} />
       </MemoryRouter>
     )
   })

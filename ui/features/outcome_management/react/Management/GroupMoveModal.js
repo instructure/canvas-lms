@@ -42,9 +42,9 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
           variables: {
             input: {
               id: groupId,
-              parentOutcomeGroupId: targetGroup.id
-            }
-          }
+              parentOutcomeGroupId: targetGroup.id,
+            },
+          },
         })
 
         const movedOutcomeGroup = result.data?.updateLearningOutcomeGroup?.learningOutcomeGroup
@@ -54,15 +54,15 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
         showFlashAlert({
           message: I18n.t('"%{groupTitle}" was moved to "%{newGroupTitle}".', {
             groupTitle,
-            newGroupTitle: targetGroup.name
+            newGroupTitle: targetGroup.name,
           }),
-          type: 'success'
+          type: 'success',
         })
         onSuccess()
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while moving this group. Please try again.'),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -73,7 +73,7 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
     <Modal
       open={isOpen}
       onDismiss={onCloseHandler}
-      shouldReturnFocus
+      shouldReturnFocus={true}
       size="medium"
       overflow="scroll"
       label={I18n.t('Move "%{groupTitle}"', {groupTitle})}
@@ -116,11 +116,11 @@ GroupMoveModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired,
-  parentGroup: PropTypes.object.isRequired
+  parentGroup: PropTypes.object.isRequired,
 }
 
 GroupMoveModal.defaultProps = {
-  onSuccess: () => {}
+  onSuccess: () => {},
 }
 
 export default GroupMoveModal

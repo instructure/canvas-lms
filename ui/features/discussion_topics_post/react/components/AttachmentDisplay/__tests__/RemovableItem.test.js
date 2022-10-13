@@ -29,7 +29,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -44,7 +44,7 @@ describe('RemovableItem', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '767px'}
+        mobile: {maxWidth: '767px'},
       }))
     })
 
@@ -53,8 +53,8 @@ describe('RemovableItem', () => {
         attachment: {
           _id: 1,
           displayName: 'file_name.file',
-          url: 'file_download_example.com'
-        }
+          url: 'file_download_example.com',
+        },
       })
 
       expect(queryByTestId('remove-button')).toBeTruthy()

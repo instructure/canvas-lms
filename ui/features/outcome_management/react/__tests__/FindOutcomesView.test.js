@@ -27,7 +27,7 @@ import {
   IMPORT_NOT_STARTED,
   IMPORT_FAILED,
   IMPORT_PENDING,
-  IMPORT_COMPLETED
+  IMPORT_COMPLETED,
 } from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 jest.useFakeTimers()
@@ -43,7 +43,7 @@ describe('FindOutcomesView', () => {
     collection: {
       id: '1',
       name: 'State Standards',
-      isRootGroup: false
+      isRootGroup: false,
     },
     outcomesGroup: {
       title: 'State Standards',
@@ -60,15 +60,15 @@ describe('FindOutcomesView', () => {
               _id: '11',
               title: 'Outcome 1',
               description: 'Outcome 1 description',
-              isImported: false
-            }
-          }
+              isImported: false,
+            },
+          },
         ],
         pageInfo: {
           endCursor: 'abc',
-          hasNextPage: true
-        }
-      }
+          hasNextPage: true,
+        },
+      },
     },
     loading: false,
     searchString: '',
@@ -81,7 +81,7 @@ describe('FindOutcomesView', () => {
     shouldFocusAddAllBtn: false,
     onAddAllHandler: onAddAllHandlerMock,
     loadMore: onLoadMoreHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -122,8 +122,8 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           collection: {
             ...defaultProps().collection,
-            name: null
-          }
+            name: null,
+          },
         })}
       />
     )
@@ -142,8 +142,8 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            outcomesCount: 0
-          }
+            outcomesCount: 0,
+          },
         })}
       />
     )
@@ -167,9 +167,9 @@ describe('FindOutcomesView', () => {
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
             outcomes: {
-              edges: []
-            }
-          }
+              edges: [],
+            },
+          },
         })}
       />
     )
@@ -183,9 +183,9 @@ describe('FindOutcomesView', () => {
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
             outcomes: {
-              edges: []
-            }
-          }
+              edges: [],
+            },
+          },
         })}
       />
     )
@@ -210,7 +210,7 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          importGroupStatus: IMPORT_FAILED
+          importGroupStatus: IMPORT_FAILED,
         })}
       />
     )
@@ -221,7 +221,7 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          importGroupStatus: IMPORT_NOT_STARTED
+          importGroupStatus: IMPORT_NOT_STARTED,
         })}
       />
     )
@@ -232,7 +232,7 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          importGroupStatus: IMPORT_PENDING
+          importGroupStatus: IMPORT_PENDING,
         })}
       />
     )
@@ -246,8 +246,8 @@ describe('FindOutcomesView', () => {
           importOutcomesStatus: {11: IMPORT_COMPLETED},
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 2
-          }
+            notImportedOutcomesCount: 2,
+          },
         })}
       />
     )
@@ -261,8 +261,8 @@ describe('FindOutcomesView', () => {
           importOutcomesStatus: {11: IMPORT_PENDING},
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
+            notImportedOutcomesCount: 1,
+          },
         })}
       />
     )
@@ -276,8 +276,8 @@ describe('FindOutcomesView', () => {
           importOutcomesStatus: {11: IMPORT_COMPLETED},
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
+            notImportedOutcomesCount: 1,
+          },
         })}
       />
     )
@@ -291,8 +291,8 @@ describe('FindOutcomesView', () => {
           importOutcomesStatus: {11: IMPORT_FAILED},
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
+            notImportedOutcomesCount: 1,
+          },
         })}
       />
     )
@@ -306,8 +306,8 @@ describe('FindOutcomesView', () => {
           importOutcomesStatus: {0: IMPORT_COMPLETED},
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            notImportedOutcomesCount: 1
-          }
+            notImportedOutcomesCount: 1,
+          },
         })}
       />
     )
@@ -326,8 +326,8 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           outcomesGroup: {
             ...defaultProps().outcomesGroup,
-            outcomesCount: 0
-          }
+            outcomesCount: 0,
+          },
         })}
       />
     )
@@ -343,7 +343,7 @@ describe('FindOutcomesView', () => {
     const {getByText} = render(
       <FindOutcomesView
         {...defaultProps({
-          outcomesGroup: {...defaultProps().outcomesGroup, notImportedOutcomesCount: 0}
+          outcomesGroup: {...defaultProps().outcomesGroup, notImportedOutcomesCount: 0},
         })}
       />
     )
@@ -356,8 +356,8 @@ describe('FindOutcomesView', () => {
         {...defaultProps({
           collection: {
             ...defaultProps().collection,
-            isRootGroup: true
-          }
+            isRootGroup: true,
+          },
         })}
       />
     )
@@ -374,7 +374,7 @@ describe('FindOutcomesView', () => {
       <FindOutcomesView
         {...defaultProps({
           loading: true,
-          outcomesGroup: {...defaultProps().outcomesGroup, outcomes: null}
+          outcomesGroup: {...defaultProps().outcomesGroup, outcomes: null},
         })}
       />
     )
@@ -395,7 +395,7 @@ describe('FindOutcomesView', () => {
     const {getByPlaceholderText} = render(
       <FindOutcomesView
         {...defaultProps({
-          importGroupStatus: IMPORT_PENDING
+          importGroupStatus: IMPORT_PENDING,
         })}
       />
     )
@@ -406,7 +406,7 @@ describe('FindOutcomesView', () => {
     const {getByPlaceholderText} = render(
       <FindOutcomesView
         {...defaultProps({
-          importGroupStatus: IMPORT_COMPLETED
+          importGroupStatus: IMPORT_COMPLETED,
         })}
       />
     )

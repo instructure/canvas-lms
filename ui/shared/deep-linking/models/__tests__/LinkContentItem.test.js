@@ -29,9 +29,9 @@ const json = {
   invalidProp: 'banana',
   custom: {
     root_account_id: '$Canvas.rootAccount.id',
-    referer: 'LTI test tool example'
+    referer: 'LTI test tool example',
   },
-  lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+  lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2',
 }
 
 const linkContentItem = (overrides, selection) => {
@@ -117,7 +117,7 @@ describe('toHtmlString', () => {
     const iframe = {
       src: 'http://www.instructure.com',
       width: 500,
-      height: 200
+      height: 200,
     }
 
     it('returns markup for an iframe', () => {

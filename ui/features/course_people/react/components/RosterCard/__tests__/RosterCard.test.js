@@ -30,17 +30,17 @@ import {
   OBSERVER_1,
   DATETIME_PATTERN,
   STOPWATCH_PATTERN,
-  SITE_ADMIN_ENV
+  SITE_ADMIN_ENV,
 } from '../../../../util/test-constants'
 
 const userToProps = user => ({
   courseUsersConnectionNode: getRosterQueryMock({mockUsers: [mockUser(user)]})[0].result.data.course
-    .usersConnection.nodes[0]
+    .usersConnection.nodes[0],
 })
 
 const mockSettingsToProps = mockSettings => ({
   courseUsersConnectionNode:
-    getRosterQueryMock(mockSettings)[0].result.data.course.usersConnection.nodes[0]
+    getRosterQueryMock(mockSettings)[0].result.data.course.usersConnection.nodes[0],
 })
 
 const DEFAULT_PROPS = userToProps(STUDENT_1)
@@ -201,7 +201,7 @@ describe('RosterCard', () => {
         ...window.ENV.permissions,
         can_allow_admin_actions: false,
         manage_admin_users: false,
-        manage_students: false
+        manage_students: false,
       }
     })
 

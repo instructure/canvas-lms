@@ -25,49 +25,49 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to add discussions in the Discussions page.')
-    }
+      description: I18n.t('Allows user to add discussions in the Discussions page.'),
+    },
   ],
   [
     {
       title: I18n.t('Announcements'),
-      description: I18n.t('To create announcements, Discussions - moderate must also be enabled.')
+      description: I18n.t('To create announcements, Discussions - moderate must also be enabled.'),
     },
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('To view discussions in a course, Discussions - view must be enabled.')
+      description: I18n.t('To view discussions in a course, Discussions - view must be enabled.'),
     },
     {
       description: I18n.t(
         'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
-      )
+      ),
     },
     {
-      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.')
-    }
+      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
+    },
   ],
   [
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to add discussions in the Discussions page.')
-    }
+      description: I18n.t('Allows user to add discussions in the Discussions page.'),
+    },
   ],
   [
     {
       title: I18n.t('Announcements'),
-      description: I18n.t('To create announcements, Discussions - moderate must also be enabled.')
+      description: I18n.t('To create announcements, Discussions - moderate must also be enabled.'),
     },
     {
       title: I18n.t('Discussions'),
-      description: I18n.t('To view discussions in a course, Discussions - view must be enabled.')
+      description: I18n.t('To view discussions in a course, Discussions - view must be enabled.'),
     },
     {
       description: I18n.t(
         'Both Discussions - create and Discussions - moderate allow the user to create a discussion in the Discussions page.'
-      )
+      ),
     },
     {
-      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.')
-    }
+      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.'),
+    },
   ]
 )

@@ -45,10 +45,7 @@ describe('Outcomes > IndividualStudentMastery > NaiveFetchDispatch', () => {
 
     function fetch(resourceIndex) {
       return new Promise((resolve, reject) => {
-        dispatch
-          .fetch(resourceUrl(resourceIndex))
-          .then(resolve)
-          .catch(reject)
+        dispatch.fetch(resourceUrl(resourceIndex)).then(resolve).catch(reject)
       })
     }
 

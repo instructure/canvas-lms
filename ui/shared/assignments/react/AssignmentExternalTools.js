@@ -24,6 +24,7 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/rails-flash-notifications'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import {asJson, getPrefetchedXHR, defaultFetchOptions} from '@instructure/js-utils'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('moderated_grading')
 
@@ -34,7 +35,7 @@ class AssignmentExternalTools extends React.Component {
       tools: [],
       beforeExternalContentAlertClass: 'screenreader-only',
       afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {}
+      iframeStyle: {},
     }
   }
 
@@ -95,7 +96,7 @@ class AssignmentExternalTools extends React.Component {
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.getMaxIFrameWidth() - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.getMaxIFrameWidth() - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -107,7 +108,7 @@ class AssignmentExternalTools extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -128,16 +129,14 @@ class AssignmentExternalTools extends React.Component {
       styles.width = tool.placements[this.props.placement].launch_width
     }
     return (
-      <iframe
+      <ToolLaunchIframe
         src={tool.launch}
-        className="tool_launch"
         style={styles}
         key={tool.definition_id}
         title={I18n.t('External Tool %{tool_id}', {tool_id: tool.definition_id})}
         ref={e => {
           this[`tool_iframe_${tool.definition_id}`] = e
         }}
-        data-lti-launch="true"
       />
     )
   }
@@ -195,11 +194,11 @@ class AssignmentExternalTools extends React.Component {
 AssignmentExternalTools.propTypes = {
   placement: PropTypes.string.isRequired,
   courseId: PropTypes.number.isRequired,
-  assignmentId: PropTypes.number
+  assignmentId: PropTypes.number,
 }
 
 AssignmentExternalTools.defaultProps = {
-  assignmentId: undefined
+  assignmentId: undefined,
 }
 
 const attach = function (element, placement, courseId, assignmentId) {
@@ -215,7 +214,7 @@ const attach = function (element, placement, courseId, assignmentId) {
 
 const ConfigurationTools = {
   configTools: AssignmentExternalTools,
-  attach
+  attach,
 }
 
 export default ConfigurationTools

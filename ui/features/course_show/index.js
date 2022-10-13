@@ -31,18 +31,18 @@ const I18n = useI18nScope('courses.show')
 
 $(document).ready(() => {
   const $selfUnenrollmentDialog = $('#self_unenrollment_dialog')
-  $('.self_unenrollment_link').click(event =>
+  $('.self_unenrollment_link').click(_event =>
     $selfUnenrollmentDialog
       .dialog({title: I18n.t('titles.drop_course', 'Drop this Course')})
       .fixDialogButtons()
   )
 
-  $selfUnenrollmentDialog.on('click', '.action', function() {
+  $selfUnenrollmentDialog.on('click', '.action', function () {
     $selfUnenrollmentDialog.disableWhileLoading($.Deferred())
     $.ajaxJSON($(this).attr('href'), 'POST', {}, () => window.location.reload())
   })
 
-  $('.re_send_confirmation_link').click(function(event) {
+  $('.re_send_confirmation_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $link.text(I18n.t('re_sending', 'Re-Sending...'))
@@ -50,20 +50,18 @@ $(document).ready(() => {
       $link.attr('href'),
       'POST',
       {},
-      data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
-      data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
+      _data => $link.text(I18n.t('send_done', 'Done! Message may take a few minutes.')),
+      _data => $link.text(I18n.t('send_failed', 'Request failed. Try again.'))
     )
   })
 
-  $('.home_page_link').click(function(event) {
+  $('.home_page_link').click(function (event) {
     event.preventDefault()
     const $link = $(this)
     $('.floating_links').hide()
     $('#course_messages').slideUp(() => $('.floating_links').show())
 
-    $('#home_page')
-      .slideDown()
-      .loadingImage()
+    $('#home_page').slideDown().loadingImage()
     $link.hide()
     $.ajaxJSON($(this).attr('href'), 'GET', {}, data => {
       $('#home_page').loadingImage('remove')
@@ -90,10 +88,8 @@ $(document).ready(() => {
     if ($('#wizard_box:visible').length > 0) {
       $('#wizard_box .option.publish_step').click()
     } else {
-      $('#wizard_box').slideDown('slow', function() {
-        $(this)
-          .find('.option.publish_step')
-          .click()
+      $('#wizard_box').slideDown('slow', function () {
+        $(this).find('.option.publish_step').click()
       })
     }
   })

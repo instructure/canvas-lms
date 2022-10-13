@@ -117,6 +117,26 @@ class GradebooksController < ApplicationController
                     })
       end
 
+      if Account.site_admin.feature_enabled?(:visibility_feedback_student_grades_page)
+        json[:submission_comments] = submission.visible_submission_comments.map do |comment|
+          {
+            id: comment.id,
+            attempt: comment.attempt,
+            author: {
+              id: comment.author_id,
+              display_name: comment.author_name
+            },
+            created_at: comment.created_at,
+            edited_at: comment.edited_at,
+            updated_at: comment.updated_at,
+            comment: comment.comment,
+            display_updated_at: datetime_string(comment.updated_at),
+            is_read: comment.read?(@current_user)
+          }
+        end.as_json
+        json[:assignment_url] = context_url(@context, :context_assignment_url, submission.assignment_id)
+      end
+
       json
     end
 
@@ -906,7 +926,7 @@ class GradebooksController < ApplicationController
           can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
           media_comment_asset_string: @current_user.asset_string,
           late_policy: @context.late_policy&.as_json(include_root: false),
-          speedgrader_dialog_for_unposted_comments: Account.site_admin.feature_enabled?(:speedgrader_dialog_for_unposted_comments)
+          speedgrader_grade_sync_max_attempts: Setting.get("speedgrader.grade_sync_max_attempts", "20").to_i
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")

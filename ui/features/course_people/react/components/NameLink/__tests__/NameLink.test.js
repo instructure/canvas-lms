@@ -27,7 +27,7 @@ const DEFAULT_PROPS = {
   studentId: '2',
   name: 'Test User',
   htmlUrl: 'http://test.host/courses/1/users/2',
-  enrollments: [{type: TEACHER_ENROLLMENT}]
+  enrollments: [{type: TEACHER_ENROLLMENT}],
 }
 
 describe('NameLink', () => {
@@ -39,7 +39,7 @@ describe('NameLink', () => {
     window.ENV = {
       STUDENT_CONTEXT_CARDS_ENABLED: true,
       course: {id: '1'},
-      current_user: {id: '999'}
+      current_user: {id: '999'},
     }
   })
 

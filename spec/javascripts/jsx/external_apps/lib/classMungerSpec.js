@@ -16,25 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import classMunger from 'ui/features/external_apps/react/lib/classMunger.js'
+import classMunger from 'ui/features/external_apps/react/lib/classMunger'
 
 QUnit.module('ExternalApps.classMunger')
 
 test('conditionally joins classes', () => {
   let cls = classMunger('foo', {
     bar: true,
-    baz: false
+    baz: false,
   })
   equal(cls, 'foo bar')
   cls = classMunger('foo', {
     bar: true,
-    baz: true
+    baz: true,
   })
   equal(cls, 'foo bar baz')
   cls = classMunger('foo fum', {
     bar: true,
     baz: false,
-    bop: true
+    bop: true,
   })
   equal(cls, 'foo fum bar bop')
 })

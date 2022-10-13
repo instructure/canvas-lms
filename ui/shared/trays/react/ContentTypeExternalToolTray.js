@@ -19,17 +19,18 @@ import React from 'react'
 import {arrayOf, oneOf, bool, string, shape, func} from 'prop-types'
 import CanvasTray from './Tray'
 import $ from 'jquery'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const toolShape = shape({
   id: string.isRequired,
   title: string.isRequired,
   base_url: string.isRequired,
-  icon_url: string
+  icon_url: string,
 })
 
 const moduleShape = shape({
   id: string.isRequired,
-  name: string.isRequired
+  name: string.isRequired,
 })
 
 const knownResourceTypes = [
@@ -42,7 +43,7 @@ const knownResourceTypes = [
   'module',
   'quiz',
   'page',
-  'video'
+  'video',
 ]
 
 ContentTypeExternalToolTray.propTypes = {
@@ -53,7 +54,7 @@ ContentTypeExternalToolTray.propTypes = {
   allowItemSelection: bool.isRequired,
   selectableItems: arrayOf(moduleShape).isRequired,
   onDismiss: func,
-  open: bool
+  open: bool,
 }
 
 export default function ContentTypeExternalToolTray({
@@ -64,7 +65,7 @@ export default function ContentTypeExternalToolTray({
   allowItemSelection,
   selectableItems,
   onDismiss,
-  open
+  open,
 }) {
   const queryParams = {
     com_instructure_course_accept_canvas_resource_types: acceptedResourceTypes,
@@ -72,7 +73,7 @@ export default function ContentTypeExternalToolTray({
     com_instructure_course_allow_canvas_resource_selection: allowItemSelection,
     com_instructure_course_available_canvas_resources: selectableItems,
     display: 'borderless',
-    placement
+    placement,
   }
   const prefix = tool?.base_url.indexOf('?') === -1 ? '?' : '&'
   const iframeUrl = `${tool?.base_url}${prefix}${$.param(queryParams)}`
@@ -87,12 +88,11 @@ export default function ContentTypeExternalToolTray({
       padding="0"
       headerPadding="medium"
     >
-      <iframe
+      <ToolLaunchIframe
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}
         data-testid="ltiIframe"
         src={iframeUrl}
         title={title}
-        data-lti-launch="true"
       />
     </CanvasTray>
   )

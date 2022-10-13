@@ -49,8 +49,8 @@ async function getValidTypes() {
   const schema = makeExecutableSchema({
     typeDefs: schemaString,
     resolverValidationOptions: {
-      requireResolversForResolveType: false
-    }
+      requireResolversForResolveType: false,
+    },
   })
   const result = await graphql(schema, typeIntrospectionQuery)
   _typeIntrospectionSet = new Set(result.data.__schema.types.map(type => type.name))
@@ -133,8 +133,8 @@ export default async function mockGraphqlQuery(query, overrides = [], variables 
   const schema = makeExecutableSchema({
     typeDefs: schemaString,
     resolverValidationOptions: {
-      requireResolversForResolveType: false
-    }
+      requireResolversForResolveType: false,
+    },
   })
 
   // Run our query againsted the mocked server

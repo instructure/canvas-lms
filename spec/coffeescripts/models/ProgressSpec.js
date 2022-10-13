@@ -33,13 +33,13 @@ QUnit.module('progressable', {
   teardown() {
     server.restore()
     clock.restore()
-  }
+  },
 })
 const respond = data =>
   server.respond('GET', model.url(), [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(data)
+    JSON.stringify(data),
   ])
 
 test('polls the progress api until the job is finished', () => {

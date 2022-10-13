@@ -30,20 +30,20 @@ QUnit.module('MessageStudentsDialog', {
           recipients: [
             {
               id: 1,
-              short_name: 'bob'
-            }
-          ]
+              short_name: 'bob',
+            },
+          ],
         },
         {
           name: "haven't taken the quiz",
           recipients: [
             {
               id: 2,
-              short_name: 'alice'
-            }
-          ]
-        }
-      ]
+              short_name: 'alice',
+            },
+          ],
+        },
+      ],
     }
     this.dialog = new MessageStudentsDialog(this.testData)
     this.dialog.render()
@@ -52,10 +52,10 @@ QUnit.module('MessageStudentsDialog', {
   teardown() {
     this.dialog.remove()
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('#initialize', function() {
+test('#initialize', function () {
   deepEqual(this.dialog.recipientGroups, this.testData.recipientGroups, 'saves recipientGroups')
   deepEqual(
     this.dialog.recipients,
@@ -66,14 +66,14 @@ test('#initialize', function() {
   ok(this.dialog.model, 'creates conversation automatically')
 })
 
-test('updates list of recipients when dropdown changes', function() {
+test('updates list of recipients when dropdown changes', function () {
   this.dialog.$recipientGroupName.val("haven't taken the quiz").trigger('change')
   const html = this.dialog.$el.html()
   ok(html.match('alice'), 'updated with the new list of recipients')
   ok(!html.match('bob'), "doesn't contain old list of recipients")
 })
 
-test('#getFormValues returns correct values', function() {
+test('#getFormValues returns correct values', function () {
   const messageBody = 'Students please take your quiz, dang it!'
   this.dialog.$messageBody.val(messageBody)
   const json = this.dialog.getFormData()
@@ -87,7 +87,7 @@ test('#getFormValues returns correct values', function() {
   )
 })
 
-test('validateBeforeSave', function() {
+test('validateBeforeSave', function () {
   let errors = this.dialog.validateBeforeSave({body: ''}, {})
   ok(errors.body[0].message, 'validates empty body')
   errors = this.dialog.validateBeforeSave({body: 'take your dang quiz'}, {recipients: []})

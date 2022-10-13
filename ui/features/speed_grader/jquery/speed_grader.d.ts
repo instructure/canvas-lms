@@ -84,3 +84,12 @@ export type Attachment = {
   viewed_at: string
   word_count: number
 }
+
+type GradeLoadingStateMap = {
+  [userId: string]: boolean
+}
+
+export type GradeLoadingData = {
+  currentStudentId: string
+  gradesLoading: GradeLoadingStateMap
+}

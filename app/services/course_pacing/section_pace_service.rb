@@ -26,6 +26,10 @@ class CoursePacing::SectionPaceService < CoursePacing::PaceServiceInterface
     paces_in_course(course_for(section)).find_by!(course_section_id: section.id)
   end
 
+  def self.template_pace_for(section)
+    course_for(section).course_paces.primary.take
+  end
+
   def self.create_params(section)
     super.merge({ course_section_id: section.id })
   end

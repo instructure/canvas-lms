@@ -60,7 +60,7 @@ export default function PostToStudentsButton(props) {
     ...otherProps,
     'aria-readonly': !assignment.gradesPublished ? null : !assignment.muted || !canClick,
     disabled: assignment.gradesPublished ? null : true,
-    onClick: unmutable && canClick ? onClick : null
+    onClick: unmutable && canClick ? onClick : null,
   }
 
   if (!assignment.muted) {
@@ -77,12 +77,12 @@ export default function PostToStudentsButton(props) {
 PostToStudentsButton.propTypes = {
   assignment: shape({
     gradesPublished: bool.isRequired,
-    muted: bool.isRequired
+    muted: bool.isRequired,
   }).isRequired,
   onClick: func.isRequired,
-  unmuteAssignmentStatus: oneOf([FAILURE, STARTED, SUCCESS])
+  unmuteAssignmentStatus: oneOf([FAILURE, STARTED, SUCCESS]),
 }
 
 PostToStudentsButton.defaultProps = {
-  unmuteAssignmentStatus: null
+  unmuteAssignmentStatus: null,
 }

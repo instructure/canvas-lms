@@ -39,7 +39,7 @@ export const getFileThumbnail = (file, iconSize = 'medium') => {
     small: '2rem',
     medium: '3rem',
     large: '5rem',
-    'x-large': '10rem'
+    'x-large': '10rem',
   }
   standardizeToFilesAPI(file)
   const size = iconSizes.hasOwnProperty(iconSize) ? iconSize : 'medium'
@@ -50,7 +50,7 @@ export const getFileThumbnail = (file, iconSize = 'medium') => {
         src={file.thumbnail_url}
         style={{
           height: iconSizes[size],
-          width: iconSizes[size]
+          width: iconSizes[size],
         }}
       />
     )

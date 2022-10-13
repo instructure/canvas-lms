@@ -24,8 +24,8 @@ TestCollection.prototype.defaults = {
   foo: 'bar',
   params: {
     multi: ['foos', 'bars'],
-    single: 1
-  }
+    single: 1,
+  },
 }
 TestCollection.optionProperty('foo')
 TestCollection.prototype.url = '/fake'
@@ -38,7 +38,7 @@ QUnit.module('Backbone.Collection', {
   },
   teardown() {
     this.xhr.restore
-  }
+  },
 })
 
 test('default options', () => {
@@ -81,7 +81,7 @@ test('uses conventional default url', () => {
   )
 
   const FakeCollection = Backbone.Collection.extend({
-    model: FakeModel
+    model: FakeModel,
   })
 
   const collection = new FakeCollection()
@@ -109,7 +109,7 @@ test('setParams', () => {
   ok(!collection.options.params, 'no params')
   collection.setParams({
     foo: 'bar',
-    baz: 'qux'
+    baz: 'qux',
   })
   deepEqual(collection.options.params, {foo: 'bar', baz: 'qux'})
 })
@@ -120,7 +120,7 @@ test('triggers setParams event', () => {
   collection.on('setParams', spy)
   const params = {
     foo: 'bar',
-    baz: 'qux'
+    baz: 'qux',
   }
   collection.setParams(params)
   ok(spy.calledOnce, 'event triggered')
@@ -142,28 +142,40 @@ test('parse', () => {
 
   document = {
     meta: {},
-    posts: [{id: 1, links: {author: 1}}, {id: 2, links: {author: 1}}]
+    posts: [
+      {id: 1, links: {author: 1}},
+      {id: 2, links: {author: 1}},
+    ],
   }
   equal(collection.parse(document), document.posts, 'extracts primary collection')
 
   const john = {id: 1, name: 'John Doe'}
   document = {
-    posts: [{id: 1, links: {author: 1}}, {id: 2, links: {author: 1}}],
+    posts: [
+      {id: 1, links: {author: 1}},
+      {id: 2, links: {author: 1}},
+    ],
     linked: {
-      authors: [john]
-    }
+      authors: [john],
+    },
   }
-  let expected = [{id: 1, author: john}, {id: 2, author: john}]
+  let expected = [
+    {id: 1, author: john},
+    {id: 2, author: john},
+  ]
   deepEqual(collection.parse(document), expected, 'extracts primary collection')
 
   // string
   SideLoader.prototype.sideLoad = {author: 'users'}
 
   document = {
-    posts: [{id: 1, links: {author: 1}}, {id: 2, links: {author: 1}}],
+    posts: [
+      {id: 1, links: {author: 1}},
+      {id: 2, links: {author: 1}},
+    ],
     linked: {
-      users: [john]
-    }
+      users: [john],
+    },
   }
   deepEqual(collection.parse(document), expected, 'recognizes string side load as collection name')
 
@@ -171,32 +183,41 @@ test('parse', () => {
   SideLoader.prototype.sideLoad = {
     author: {
       collection: 'users',
-      foreignKey: 'user_id'
-    }
+      foreignKey: 'user_id',
+    },
   }
 
   document = {
-    posts: [{id: 1, links: {user_id: 1}}, {id: 2, links: {user_id: 1}}],
+    posts: [
+      {id: 1, links: {user_id: 1}},
+      {id: 2, links: {user_id: 1}},
+    ],
     linked: {
-      users: [john]
-    }
+      users: [john],
+    },
   }
   deepEqual(collection.parse(document), expected, 'recognizes complex side load declaration')
 
   // multiple
   SideLoader.prototype.sideLoad = {
     author: 'users',
-    editor: 'users'
+    editor: 'users',
   }
 
   let jane = {id: 2, name: 'Jane Doe'}
   document = {
-    posts: [{id: 1, links: {author: 1, editor: 2}}, {id: 2, links: {author: 2, editor: 1}}],
+    posts: [
+      {id: 1, links: {author: 1, editor: 2}},
+      {id: 2, links: {author: 2, editor: 1}},
+    ],
     linked: {
-      users: [john, jane]
-    }
+      users: [john, jane],
+    },
   }
-  expected = [{id: 1, author: john, editor: jane}, {id: 2, author: jane, editor: john}]
+  expected = [
+    {id: 1, author: john, editor: jane},
+    {id: 2, author: jane, editor: john},
+  ]
   deepEqual(collection.parse(document), expected, 'recognizes multiple side load declarations')
 
   // keeps links attributes that are not found or not defined
@@ -207,16 +228,16 @@ test('parse', () => {
     posts: [
       {id: 1, links: {author: 1, editor: 2}},
       {id: 2, links: {author: 2, editor: 1}},
-      {id: 3, links: {author: 5, editor: 1}}
+      {id: 3, links: {author: 5, editor: 1}},
     ],
     linked: {
-      users: [john, jane]
-    }
+      users: [john, jane],
+    },
   }
   expected = [
     {id: 1, author: john, links: {editor: 2}},
     {id: 2, author: jane, links: {editor: 1}},
-    {id: 3, links: {author: 5, editor: 1}}
+    {id: 3, links: {author: 5, editor: 1}},
   ]
   deepEqual(
     collection.parse(document),
@@ -228,13 +249,19 @@ test('parse', () => {
   SideLoader.prototype.sideLoad = {authors: true}
 
   document = {
-    posts: [{id: 1, links: {authors: ['1', '2']}}, {id: 2, links: {authors: ['1']}}],
+    posts: [
+      {id: 1, links: {authors: ['1', '2']}},
+      {id: 2, links: {authors: ['1']}},
+    ],
     linked: {
-      authors: [john, jane]
-    }
+      authors: [john, jane],
+    },
   }
 
-  expected = [{id: 1, authors: [john, jane]}, {id: 2, authors: [john]}]
+  expected = [
+    {id: 1, authors: [john, jane]},
+    {id: 2, authors: [john]},
+  ]
 
   deepEqual(
     collection.parse(document),
@@ -246,13 +273,19 @@ test('parse', () => {
   SideLoader.prototype.sideLoad = {authors: 'users'}
 
   document = {
-    posts: [{id: 1, links: {authors: ['1', '2']}}, {id: 2, links: {authors: ['1']}}],
+    posts: [
+      {id: 1, links: {authors: ['1', '2']}},
+      {id: 2, links: {authors: ['1']}},
+    ],
     linked: {
-      users: [john, jane]
-    }
+      users: [john, jane],
+    },
   }
 
-  expected = [{id: 1, authors: [john, jane]}, {id: 2, authors: [john]}]
+  expected = [
+    {id: 1, authors: [john, jane]},
+    {id: 2, authors: [john]},
+  ]
 
   deepEqual(
     collection.parse(document),
@@ -264,18 +297,24 @@ test('parse', () => {
   SideLoader.prototype.sideLoad = {
     authors: {
       collection: 'users',
-      foreignKey: 'author_ids'
-    }
+      foreignKey: 'author_ids',
+    },
   }
 
   document = {
-    posts: [{id: 1, links: {author_ids: ['1', '2']}}, {id: 2, links: {author_ids: ['1']}}],
+    posts: [
+      {id: 1, links: {author_ids: ['1', '2']}},
+      {id: 2, links: {author_ids: ['1']}},
+    ],
     linked: {
-      users: [john, jane]
-    }
+      users: [john, jane],
+    },
   }
 
-  expected = [{id: 1, authors: [john, jane]}, {id: 2, authors: [john]}]
+  expected = [
+    {id: 1, authors: [john, jane]},
+    {id: 2, authors: [john]},
+  ]
 
   deepEqual(
     collection.parse(document),
@@ -287,15 +326,18 @@ test('parse', () => {
   SideLoader.prototype.sideLoad = {
     authors: {
       collection: 'authors',
-      foreignKey: 'author_ids'
-    }
+      foreignKey: 'author_ids',
+    },
   }
 
   document = {
-    posts: [{id: 1, links: {author_ids: ['1', '2']}}, {id: 2, links: {author_ids: ['1']}}],
+    posts: [
+      {id: 1, links: {author_ids: ['1', '2']}},
+      {id: 2, links: {author_ids: ['1']}},
+    ],
     linked: {
-      users: [john, jane]
-    }
+      users: [john, jane],
+    },
   }
 
   expected = "Could not find linked collection for 'authors' using 'author_ids'."
@@ -311,15 +353,21 @@ test('parse', () => {
   // Links attribute
   document = {
     links: {
-      'posts.author': 'http://example.com/authors/{posts.author}'
+      'posts.author': 'http://example.com/authors/{posts.author}',
     },
-    posts: [{id: 1, links: {authors: ['1', '2']}}, {id: 2, links: {authors: ['1']}}],
+    posts: [
+      {id: 1, links: {authors: ['1', '2']}},
+      {id: 2, links: {authors: ['1']}},
+    ],
     linked: {
-      authors: [john, jane]
-    }
+      authors: [john, jane],
+    },
   }
 
-  expected = [{id: 1, authors: [john, jane]}, {id: 2, authors: [john]}]
+  expected = [
+    {id: 1, authors: [john, jane]},
+    {id: 2, authors: [john]},
+  ]
 
   deepEqual(collection.parse(document), expected, 'extracts links with links root')
 })

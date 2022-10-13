@@ -24,7 +24,7 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 
 const defaultProps = () => ({
   pageTitles: ['page_1'],
-  onConfirm: () => Promise.resolve({})
+  onConfirm: () => Promise.resolve({}),
 })
 
 test('renders the ConfirmDeleteModal component', () => {
@@ -54,10 +54,5 @@ test('shows spinner on delete', () => {
 
 test('renders provided page titles', () => {
   const modal = shallow(<ConfirmDeleteModal {...defaultProps()} />)
-  expect(
-    modal
-      .find(Modal.Body)
-      .render()
-      .text()
-  ).toMatch(/page_1/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/page_1/)
 })

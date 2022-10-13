@@ -53,7 +53,7 @@ describe('OverrideAttempts', () => {
    *  will just be skipped, and the component can be fixed later when work
    *  resumes on A2.
    */
-  // eslint-disable-next-line jest/no-disabled-tests
+
   it.skip('renders unlimited override attempts detail', () => {
     const override = mockOverride({})
 
@@ -62,7 +62,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={() => {}}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
@@ -72,7 +72,6 @@ describe('OverrideAttempts', () => {
     expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
   })
 
-  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('renders limited override attempts detail', () => {
     const override = mockOverride({allowedAttempts: 2})
     const {getByLabelText, getByTestId} = render(
@@ -80,7 +79,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={() => {}}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
     expect(getByTestId('OverrideAttempts-Detail')).toBeInTheDocument()
@@ -98,7 +97,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={() => {}}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
     expect(queryByTestId('OverrideAttempts-Attempts')).toBeNull()
@@ -109,7 +108,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={() => {}}
         variant="detail"
-        readOnly
+        readOnly={true}
       />,
       {container}
     )
@@ -125,7 +124,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={onChange}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
 
@@ -143,7 +142,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={onChange}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
 
@@ -161,7 +160,7 @@ describe('OverrideAttempts', () => {
         allowedAttempts={override.allowedAttempts}
         onChange={onChange}
         variant="detail"
-        readOnly
+        readOnly={true}
       />
     )
 

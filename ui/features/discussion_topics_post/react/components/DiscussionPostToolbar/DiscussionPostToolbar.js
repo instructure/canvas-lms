@@ -25,7 +25,7 @@ import {
   IconArrowDownLine,
   IconArrowUpLine,
   IconSearchLine,
-  IconTroubleLine
+  IconTroubleLine,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 
@@ -45,7 +45,7 @@ const I18n = useI18nScope('discussions_posts')
 export const getMenuConfig = props => {
   const options = {
     all: () => I18n.t('All'),
-    unread: () => I18n.t('Unread')
+    unread: () => I18n.t('Unread'),
   }
   if (props.enableDeleteFilter) {
     options.deleted = () => I18n.t('Deleted')
@@ -81,7 +81,7 @@ export const DiscussionPostToolbar = props => {
       handleClear: () => {
         props.onSearchChange('')
       },
-      searchTerm: props.searchTerm
+      searchTerm: props.searchTerm,
     })
   }
 
@@ -96,14 +96,14 @@ export const DiscussionPostToolbar = props => {
           search: {
             shouldGrow: true,
             shouldShrink: true,
-            width: '100%'
+            width: '100%',
           },
           filter: {
             shouldGrow: true,
             shouldShrink: true,
-            width: null
+            width: null,
           },
-          padding: 'xx-small'
+          padding: 'xx-small',
         },
         desktop: {
           direction: 'row',
@@ -111,20 +111,20 @@ export const DiscussionPostToolbar = props => {
           search: {
             shouldGrow: true,
             shouldShrink: true,
-            width: null
+            width: null,
           },
           filter: {
             shouldGrow: false,
             shouldShrink: false,
-            width: '120px'
+            width: '120px',
           },
-          padding: '0'
-        }
+          padding: '0',
+        },
       }}
       render={responsiveProps => (
         <View maxWidth="56.875em">
           <Flex width="100%" direction={responsiveProps.direction}>
-            <Flex.Item margin={responsiveProps.dividingMargin} shouldShrink>
+            <Flex.Item margin={responsiveProps.dividingMargin} shouldShrink={true}>
               <Flex>
                 {/* Groups */}
                 {props.childTopics?.length && (
@@ -159,7 +159,7 @@ export const DiscussionPostToolbar = props => {
                       renderBeforeInput={<IconSearchLine display="block" />}
                       renderAfterInput={clearButton}
                       placeholder={I18n.t('Search entries or author...')}
-                      shouldNotWrap
+                      shouldNotWrap={true}
                       width={responsiveProps.search.width}
                     />
                   </span>
@@ -167,7 +167,7 @@ export const DiscussionPostToolbar = props => {
               </Flex>
             </Flex.Item>
 
-            <Flex.Item shouldGrow>
+            <Flex.Item shouldGrow={true}>
               <Flex>
                 {/* Filter */}
                 <Flex.Item
@@ -233,7 +233,7 @@ export const DiscussionPostToolbar = props => {
                   </Tooltip>
                 </Flex.Item>
                 {props.discussionAnonymousState && ENV.current_user_roles?.includes('student') && (
-                  <Flex.Item shouldGrow>
+                  <Flex.Item shouldGrow={true}>
                     <Flex justifyItems="end">
                       <Flex.Item>
                         <Tooltip renderTip={I18n.t('This is your anonymous avatar')}>
@@ -264,9 +264,9 @@ DiscussionPostToolbar.propTypes = {
   onViewFilter: PropTypes.func,
   onSortClick: PropTypes.func,
   searchTerm: PropTypes.string,
-  discussionAnonymousState: PropTypes.string
+  discussionAnonymousState: PropTypes.string,
 }
 
 DiscussionPostToolbar.defaultProps = {
-  sortDirection: 'desc'
+  sortDirection: 'desc',
 }

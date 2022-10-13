@@ -42,7 +42,7 @@ export default function RoleTrayTableRow({
   permissionLabel,
   role,
   permButton: PermButton,
-  permCheckbox: PermCheckbox
+  permCheckbox: PermCheckbox,
 }) {
   const isGranular = typeof permission.group !== 'undefined'
   let button
@@ -125,12 +125,12 @@ RoleTrayTableRow.propTypes = {
   role: permissionPropTypes.role.isRequired,
   title: string.isRequired,
   permButton: oneOfType([node, func]), // used for tests only
-  permCheckbox: oneOfType([node, func]) // used for tests only
+  permCheckbox: oneOfType([node, func]), // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
   expandable: false,
   permButton: ConnectedPermissionButton,
-  permCheckbox: ConnectedGranularCheckbox
+  permCheckbox: ConnectedGranularCheckbox,
 }

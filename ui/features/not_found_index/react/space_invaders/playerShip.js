@@ -29,7 +29,7 @@ export default class PlayerShip {
 
     this.position = {
       x: gameWidth / 2 - this.img.width / 2,
-      y: gameHeight - this.img.height - 10
+      y: gameHeight - this.img.height - 10,
     }
     this.speed = 2
 
@@ -48,7 +48,7 @@ export default class PlayerShip {
       x: this.position.x,
       y: this.position.y,
       width: this.img.width,
-      height: this.img.height
+      height: this.img.height,
     }
   }
 

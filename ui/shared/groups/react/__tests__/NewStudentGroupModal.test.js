@@ -34,7 +34,7 @@ describe('NewStudentGroupModal', () => {
 
   stubEnv({
     current_user_id: '2',
-    course_id: '1'
+    course_id: '1',
   })
 
   afterEach(() => {
@@ -83,7 +83,7 @@ describe('NewStudentGroupModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Group Name'), {
-      target: {value: 'Dat new new'}
+      target: {value: 'Dat new new'},
     })
     expect(getByLabelText('Group Name')).toHaveValue('Dat new new')
     fireEvent.click(getByText('Cancel'))
@@ -123,7 +123,7 @@ describe('NewStudentGroupModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Group Name'), {
-      target: {value: 'name'}
+      target: {value: 'name'},
     })
     expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
   })
@@ -140,7 +140,7 @@ describe('NewStudentGroupModal', () => {
       />
     )
     fireEvent.input(getByLabelText('Group Name'), {
-      target: {value: 'name'}
+      target: {value: 'name'},
     })
     fireEvent.click(getByRole('combobox', {name: 'Invite Students'}))
     fireEvent.click(getByRole('option', {name: 'Student'}))
@@ -150,9 +150,9 @@ describe('NewStudentGroupModal', () => {
     expect(JSON.parse(fetchOptions.body)).toMatchObject({
       group: {
         join_level: 'parent_context_auto_join',
-        name: 'name'
+        name: 'name',
       },
-      invitees: ['1']
+      invitees: ['1'],
     })
     expect(getAllByText(/Saving group/i)).toBeTruthy()
     await fetchMock.flush(true)
@@ -181,7 +181,7 @@ describe('NewStudentGroupModal', () => {
         />
       )
       fireEvent.input(getByLabelText('Group Name'), {
-        target: {value: 'name'}
+        target: {value: 'name'},
       })
       fireEvent.click(getByText('Submit'))
       await fetchMock.flush(true)

@@ -31,7 +31,7 @@ describe('Integrations', () => {
   beforeEach(() => {
     window.ENV = {
       COURSE_ID: 2,
-      MSFT_SYNC_ENABLED: true
+      MSFT_SYNC_ENABLED: true,
     }
   })
 
@@ -96,7 +96,7 @@ describe('Integrations', () => {
 
       expect(axios.request).toHaveBeenLastCalledWith({
         method: 'delete',
-        url: `/api/v1/courses/2/microsoft_sync/group`
+        url: `/api/v1/courses/2/microsoft_sync/group`,
       })
       expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeTruthy()
     })
@@ -151,7 +151,7 @@ describe('Integrations', () => {
 
         expect(axios.request).toHaveBeenLastCalledWith({
           method: 'post',
-          url: `/api/v1/courses/2/microsoft_sync/group`
+          url: `/api/v1/courses/2/microsoft_sync/group`,
         })
 
         expect(subject.getByLabelText('Toggle Microsoft Sync').checked).toBeFalsy()

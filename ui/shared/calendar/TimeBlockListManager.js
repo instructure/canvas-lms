@@ -42,7 +42,7 @@ export default class TimeBlockListManager {
     this.sort()
 
     const consolidatedBlocks = []
-    consolidatedBlocks.last = function() {
+    consolidatedBlocks.last = function () {
       return this[this.length - 1]
     }
 

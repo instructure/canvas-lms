@@ -22,7 +22,7 @@ import {act, render as rtlRender, fireEvent} from '@testing-library/react'
 import FindOutcomesModal from '../FindOutcomesModal'
 import OutcomesContext, {
   ACCOUNT_GROUP_ID,
-  ROOT_GROUP_ID
+  ROOT_GROUP_ID,
 } from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {createCache} from '@canvas/apollo'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
@@ -32,7 +32,7 @@ import {
   groupMocks,
   importGroupMocks,
   importOutcomeMocks,
-  treeGroupMocks
+  treeGroupMocks,
 } from '@canvas/outcomes/mocks/Management'
 import {clickEl} from '@canvas/outcomes/react/helpers/testHelpers'
 import resolveProgress from '@canvas/progress/resolve_progress'
@@ -57,7 +57,7 @@ const defaultTreeGroupMocks = () =>
     groupsStruct: {
       100: [200],
       200: [300],
-      300: [400, 401, 402]
+      300: [400, 401, 402],
     },
     detailsStructure: {
       100: [1, 2, 3],
@@ -65,16 +65,16 @@ const defaultTreeGroupMocks = () =>
       300: [1, 2, 3],
       400: [1],
       401: [2],
-      402: [3]
+      402: [3],
     },
     contextId: '1',
     contextType: 'Course',
     findOutcomesTargetGroupId: '0',
     groupOutcomesNotImportedCount: {
       200: 3,
-      300: 3
+      300: 3,
     },
-    withGroupDetailsRefetch: true
+    withGroupDetailsRefetch: true,
   })
 
 describe('FindOutcomesModal', () => {
@@ -93,8 +93,8 @@ describe('FindOutcomesModal', () => {
       isImported: false,
       contextType: 'Course',
       outcomesCount: 51,
-      withFindGroupRefetch
-    })
+      withFindGroupRefetch,
+    }),
   ]
   const defaultProps = (props = {}) => ({
     open: true,
@@ -102,7 +102,7 @@ describe('FindOutcomesModal', () => {
     onCloseHandler: onCloseHandlerMock,
     setTargetGroupIdsToRefetch: setTargetGroupIdsToRefetchMock,
     setImportsTargetGroup: setImportsTargetGroupMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -128,7 +128,7 @@ describe('FindOutcomesModal', () => {
       renderer = rtlRender,
       globalRootId = '',
       rootOutcomeGroup = {id: '0'},
-      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId]
+      rootIds = [ACCOUNT_GROUP_ID, ROOT_GROUP_ID, globalRootId],
     } = {}
   ) => {
     return renderer(
@@ -142,8 +142,8 @@ describe('FindOutcomesModal', () => {
             rootIds,
             rootOutcomeGroup,
             treeBrowserRootGroupId: ROOT_GROUP_ID,
-            treeBrowserAccountGroupId: ACCOUNT_GROUP_ID
-          }
+            treeBrowserAccountGroupId: ACCOUNT_GROUP_ID,
+          },
         }}
       >
         <MockedProvider cache={cache} mocks={mocks}>
@@ -162,7 +162,7 @@ describe('FindOutcomesModal', () => {
 
     it('renders component with "Add Outcomes to Course" title when contextType is Course', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course'
+        contextType: 'Course',
       })
       await act(async () => jest.runAllTimers())
       expect(getByText('Add Outcomes to Course')).toBeInTheDocument()
@@ -174,12 +174,12 @@ describe('FindOutcomesModal', () => {
           {...defaultProps({
             targetGroup: {
               _id: '1',
-              title: 'The Group Title'
-            }
+              title: 'The Group Title',
+            },
           })}
         />,
         {
-          contextType: 'Course'
+          contextType: 'Course',
         }
       )
       await act(async () => jest.runAllTimers())
@@ -206,7 +206,7 @@ describe('FindOutcomesModal', () => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: 'An error occurred while loading account learning outcome groups.',
             srOnly: true,
-            type: 'error'
+            type: 'error',
           })
           expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
         })
@@ -216,13 +216,13 @@ describe('FindOutcomesModal', () => {
         it('displays a screen reader error and text error on failed request', async () => {
           const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
             contextType: 'Course',
-            mocks: []
+            mocks: [],
           })
           await act(async () => jest.runAllTimers())
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
             message: 'An error occurred while loading course learning outcome groups.',
             srOnly: true,
-            type: 'error'
+            type: 'error',
           })
           expect(getByText(/An error occurred while loading course outcomes/)).toBeInTheDocument()
         })
@@ -260,7 +260,7 @@ describe('FindOutcomesModal', () => {
       const {getByText, getByLabelText, queryByText} = render(
         <FindOutcomesModal {...defaultProps()} />,
         {
-          mocks: [...findModalMocks(), ...findOutcomesMocks()]
+          mocks: [...findModalMocks(), ...findOutcomesMocks()],
         }
       )
       await act(async () => jest.runAllTimers())
@@ -295,7 +295,7 @@ describe('FindOutcomesModal', () => {
 
       it('Does not render Account Standards groups for root accounts', async () => {
         const {queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          mocks: findModalMocks({parentAccountChildren: 0})
+          mocks: findModalMocks({parentAccountChildren: 0}),
         })
         await act(async () => jest.runAllTimers())
         expect(queryByText('Account Standards')).not.toBeInTheDocument()
@@ -304,7 +304,7 @@ describe('FindOutcomesModal', () => {
 
     it('displays a flash alert when a child group fails to load', async () => {
       const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-        contextType: 'Course'
+        contextType: 'Course',
       })
       await act(async () => jest.runAllTimers())
       await clickWithinMobileSelect(queryByText('Groups'))
@@ -313,7 +313,7 @@ describe('FindOutcomesModal', () => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while loading course learning outcome groups.',
         type: 'error',
-        srOnly: false
+        srOnly: false,
       })
     })
 
@@ -321,7 +321,7 @@ describe('FindOutcomesModal', () => {
       const {getByText, getByLabelText, queryByTestId, queryByText} = render(
         <FindOutcomesModal {...defaultProps()} />,
         {
-          mocks: [...findModalMocks(), ...findOutcomesMocks()]
+          mocks: [...findModalMocks(), ...findOutcomesMocks()],
         }
       )
       await act(async () => jest.runAllTimers())
@@ -343,7 +343,7 @@ describe('FindOutcomesModal', () => {
       it('renders the State Standards group and subgroups', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: findModalMocks({includeGlobalRootGroup: true}),
-          globalRootId: '1'
+          globalRootId: '1',
         })
         await act(async () => jest.runAllTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
@@ -353,7 +353,7 @@ describe('FindOutcomesModal', () => {
 
       it('does not render the State Standard group if no globalRootId is set', async () => {
         const {queryByText, getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
-          mocks: findModalMocks({includeGlobalRootGroup: true})
+          mocks: findModalMocks({includeGlobalRootGroup: true}),
         })
         await act(async () => jest.runAllTimers())
         expect(getByText(/An error occurred while loading account outcomes/)).toBeInTheDocument()
@@ -363,7 +363,7 @@ describe('FindOutcomesModal', () => {
       it('does not list outcomes within the State Standard group', async () => {
         const {getByText, queryByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           mocks: [...findModalMocks({includeGlobalRootGroup: true}), ...groupMocks({groupId: '1'})],
-          globalRootId: '1'
+          globalRootId: '1',
         })
         await act(async () => jest.runAllTimers())
         await clickWithinMobileSelect(queryByText('Groups'))
@@ -404,8 +404,8 @@ describe('FindOutcomesModal', () => {
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
             ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
-            ...importGroupMocks({groupId: '300'})
-          ]
+            ...importGroupMocks({groupId: '300'}),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -428,8 +428,8 @@ describe('FindOutcomesModal', () => {
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
             ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
-            ...importGroupMocks({groupId: '300'})
-          ]
+            ...importGroupMocks({groupId: '300'}),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -457,13 +457,13 @@ describe('FindOutcomesModal', () => {
               isImported: false,
               contextType: 'Course',
               outcomesCount: 50,
-              withFindGroupRefetch
+              withFindGroupRefetch,
             }),
             ...importGroupMocks({
               groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
+              targetContextType: 'Course',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -484,9 +484,9 @@ describe('FindOutcomesModal', () => {
             ...courseImportMocks,
             ...importGroupMocks({
               groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
+              targetContextType: 'Course',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -508,9 +508,9 @@ describe('FindOutcomesModal', () => {
             ...courseImportMocks,
             ...importGroupMocks({
               groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
+              targetContextType: 'Course',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -523,7 +523,7 @@ describe('FindOutcomesModal', () => {
       it('returns focus on Add All Outcomes button if Cancel button of ConfirmationBox is clicked', async () => {
         const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
-          mocks: courseImportMocks
+          mocks: courseImportMocks,
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -540,7 +540,7 @@ describe('FindOutcomesModal', () => {
       it('returns focus on Done button if Import Anyway button of ConfirmationBox is clicked', async () => {
         const {getByText} = render(<FindOutcomesModal {...defaultProps()} />, {
           contextType: 'Course',
-          mocks: courseImportMocks
+          mocks: courseImportMocks,
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -562,9 +562,9 @@ describe('FindOutcomesModal', () => {
             ...importGroupMocks({
               groupId: '300',
               targetContextType: 'Course',
-              failResponse: true
-            })
-          ]
+              failResponse: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -586,9 +586,9 @@ describe('FindOutcomesModal', () => {
               ...courseImportMocks,
               ...importGroupMocks({
                 groupId: '300',
-                targetContextType: 'Course'
-              })
-            ]
+                targetContextType: 'Course',
+              }),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -616,9 +616,9 @@ describe('FindOutcomesModal', () => {
               ...defaultTreeGroupMocks(),
               ...importGroupMocks({
                 groupId: '200',
-                targetContextType: 'Course'
-              })
-            ]
+                targetContextType: 'Course',
+              }),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -658,9 +658,9 @@ describe('FindOutcomesModal', () => {
               ...defaultTreeGroupMocks(),
               ...importGroupMocks({
                 groupId: '300',
-                targetContextType: 'Course'
-              })
-            ]
+                targetContextType: 'Course',
+              }),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -695,9 +695,9 @@ describe('FindOutcomesModal', () => {
               ...defaultTreeGroupMocks(),
               ...importGroupMocks({
                 groupId: '300',
-                targetContextType: 'Course'
-              })
-            ]
+                targetContextType: 'Course',
+              }),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -725,15 +725,15 @@ describe('FindOutcomesModal', () => {
             outcomeOrGroupId: '300',
             isGroup: true,
             groupTitle: 'Group 300',
-            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-          }
+            progress: {_id: '111', state: 'queued', __typename: 'Progress'},
+          },
         ])
 
         const {getByText, getAllByText, queryByText} = render(
           <FindOutcomesModal {...defaultProps()} />,
           {
             contextType: 'Course',
-            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()]
+            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -761,9 +761,9 @@ describe('FindOutcomesModal', () => {
             ...courseImportMocks,
             ...importGroupMocks({
               groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
+              targetContextType: 'Course',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -782,9 +782,9 @@ describe('FindOutcomesModal', () => {
             ...courseImportMocks,
             ...importGroupMocks({
               groupId: '300',
-              targetContextType: 'Course'
-            })
-          ]
+              targetContextType: 'Course',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -806,8 +806,8 @@ describe('FindOutcomesModal', () => {
             ...findModalMocks(),
             ...groupMocks({groupId: '100'}),
             ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
-            ...importGroupMocks({groupId: '300'})
-          ]
+            ...importGroupMocks({groupId: '300'}),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -827,8 +827,8 @@ describe('FindOutcomesModal', () => {
             {...defaultProps({
               targetGroup: {
                 _id: '1',
-                title: 'The Group Title'
-              }
+                title: 'The Group Title',
+              },
             })}
           />,
           {
@@ -837,8 +837,8 @@ describe('FindOutcomesModal', () => {
               ...findModalMocks(),
               ...groupMocks({groupId: '100'}),
               ...findOutcomesMocks({groupId: '300', withFindGroupRefetch}),
-              ...importGroupMocks({groupId: '300', targetGroupId: '1'})
-            ]
+              ...importGroupMocks({groupId: '300', targetGroupId: '1'}),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -861,9 +861,9 @@ describe('FindOutcomesModal', () => {
             ...importGroupMocks({
               groupId: '300',
               targetContextType: 'Course',
-              failResponse: true
-            })
-          ]
+              failResponse: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -886,9 +886,9 @@ describe('FindOutcomesModal', () => {
             ...importGroupMocks({
               groupId: '300',
               targetContextType: 'Course',
-              failMutationNoErrMsg: true
-            })
-          ]
+              failMutationNoErrMsg: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -910,15 +910,15 @@ describe('FindOutcomesModal', () => {
           {
             outcomeOrGroupId: '1',
             isGroup: false,
-            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-          }
+            progress: {_id: '111', state: 'queued', __typename: 'Progress'},
+          },
         ])
 
         const {getByText, queryByText, queryAllByText} = render(
           <FindOutcomesModal {...defaultProps()} />,
           {
             contextType: 'Course',
-            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()]
+            mocks: [...findModalMocks({parentAccountChildren: 1}), ...defaultTreeGroupMocks()],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -952,9 +952,9 @@ describe('FindOutcomesModal', () => {
                 outcomeId: '5',
                 targetContextType: 'Course',
                 sourceContextId: '1',
-                sourceContextType: 'Account'
-              })
-            ]
+                sourceContextType: 'Account',
+              }),
+            ],
           }
         )
         await act(async () => jest.runAllTimers())
@@ -976,9 +976,9 @@ describe('FindOutcomesModal', () => {
               outcomeId: '5',
               targetContextType: 'Course',
               sourceContextId: '1',
-              sourceContextType: 'Account'
-            })
-          ]
+              sourceContextType: 'Account',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -998,9 +998,9 @@ describe('FindOutcomesModal', () => {
               targetContextType: 'Course',
               sourceContextId: '1',
               sourceContextType: 'Account',
-              failResponse: true
-            })
-          ]
+              failResponse: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1020,9 +1020,9 @@ describe('FindOutcomesModal', () => {
               outcomeId: '5',
               targetContextType: 'Course',
               sourceContextId: '1',
-              sourceContextType: 'Account'
-            })
-          ]
+              sourceContextType: 'Account',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1047,14 +1047,14 @@ describe('FindOutcomesModal', () => {
               contextType: 'Account',
               outcomesGroupContextId: '2',
               outcomesCount: 51,
-              withFindGroupRefetch
+              withFindGroupRefetch,
             }),
             ...importOutcomeMocks({
               outcomeId: '5',
               sourceContextId: '2',
-              sourceContextType: 'Account'
-            })
-          ]
+              sourceContextType: 'Account',
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1080,14 +1080,14 @@ describe('FindOutcomesModal', () => {
               outcomesGroupContextId: null,
               outcomesGroupContextType: null,
               outcomesCount: 51,
-              withFindGroupRefetch
+              withFindGroupRefetch,
             }),
             ...importOutcomeMocks({
               outcomeId: '5',
               sourceContextId: null,
-              sourceContextType: null
-            })
-          ]
+              sourceContextType: null,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1110,9 +1110,9 @@ describe('FindOutcomesModal', () => {
               targetContextType: 'Course',
               sourceContextId: '1',
               sourceContextType: 'Account',
-              failResponse: true
-            })
-          ]
+              failResponse: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))
@@ -1136,9 +1136,9 @@ describe('FindOutcomesModal', () => {
               targetContextType: 'Course',
               sourceContextId: '1',
               sourceContextType: 'Account',
-              failMutationNoErrMsg: true
-            })
-          ]
+              failMutationNoErrMsg: true,
+            }),
+          ],
         })
         await act(async () => jest.runAllTimers())
         await clickEl(getByText('Account Standards'))

@@ -33,7 +33,7 @@ describe('InternalSettingActionButtons', () => {
         onSubmitPendingChange={onSubmitChanges}
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
-        pendingChange
+        pendingChange={true}
       />
     )
 
@@ -76,7 +76,7 @@ describe('InternalSettingActionButtons', () => {
         onSubmitPendingChange={onSubmitChanges}
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
-        pendingChange
+        pendingChange={true}
       />
     )
 
@@ -94,7 +94,7 @@ describe('InternalSettingActionButtons', () => {
         onSubmitPendingChange={onSubmitChanges}
         onClearPendingChange={onClearChanges}
         onDelete={onDelete}
-        secret
+        secret={true}
       />
     )
 

@@ -335,6 +335,20 @@ describe GradeSummaryPresenter do
       p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
       expect(p.submissions.map(&:assignment_id)).to eq [assign.id]
     end
+
+    it "doesn't error on enable feature flag visibility_feedback_student_grades_page" do
+      Account.site_admin.enable_feature!(:visibility_feedback_student_grades_page)
+      assignment = @course.assignments.create!(points_possible: 10)
+      submission_to_comment = assignment.grade_student(@student, grade: 10, grader: @teacher).first
+      comment_1 = submission_to_comment.add_comment(comment: "a student comment", author: @teacher)
+      comment_1.mark_read!(@student)
+      submission_to_comment.add_comment(comment: "another comment", author: @teacher)
+      p = GradeSummaryPresenter.new(@course, @teacher, @student.id)
+      submission = p.submissions.find { |s| s[:assignment_id] == assignment.id }
+      expect(submission.submission_comments.length).to eq 2
+      expect(submission.submission_comments[0].read?(@student)).to eq true
+      expect(submission.submission_comments[1].read?(@student)).to eq false
+    end
   end
 
   describe "#assignments" do

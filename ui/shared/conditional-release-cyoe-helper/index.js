@@ -40,13 +40,13 @@ const parseEnvData = () => {
               assignment_id: rule.trigger_assignment_id,
               assignment: rule.trigger_assignment_model,
               upper_bound: range.upper_bound,
-              lower_bound: range.lower_bound
+              lower_bound: range.lower_bound,
             })
           })
         })
       })
       return released
-    }, {})
+    }, {}),
   }
 }
 
@@ -61,7 +61,7 @@ const formatRange = asgId => {
     const range = ranges[0]
     return I18n.t('%{upper} - %{lower}', {
       upper: transformScore(range.upper_bound, range.assignment, true),
-      lower: transformScore(range.lower_bound, range.assignment, false)
+      lower: transformScore(range.lower_bound, range.assignment, false),
     })
   } else {
     return null
@@ -80,8 +80,8 @@ export default {
           isCyoeAble: asgId && isGraded,
           isTrigger: asgId && isGraded && isTrigger(asgId),
           isReleased: isReleased(asgId),
-          releasedLabel: formatRange(asgId)
+          releasedLabel: formatRange(asgId),
         }
       : {}
-  }
+  },
 }

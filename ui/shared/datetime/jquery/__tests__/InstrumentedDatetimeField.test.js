@@ -51,7 +51,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
       expect(events.length).toEqual(1)
       expect(events[0]).toMatchObject({
         method: 'type',
-        value: '2021-08-24 18:00:00'
+        value: '2021-08-24 18:00:00',
       })
     })
   })
@@ -75,7 +75,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
       expect(events.length).toEqual(1)
       expect(events[0]).toMatchObject({
         method: 'pick',
-        value: 'Aug 24, 2021, 6:30 PM'
+        value: 'Aug 24, 2021, 6:30 PM',
       })
     })
   })
@@ -92,7 +92,7 @@ describe('@canvas/datetime/InstrumentedDatetimeField', () => {
       expect(events.length).toEqual(1)
       expect(events[0]).toMatchObject({
         method: 'paste',
-        value: '2021-08-24 18:00:00'
+        value: '2021-08-24 18:00:00',
       })
     })
   })

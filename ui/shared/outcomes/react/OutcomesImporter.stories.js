@@ -28,8 +28,8 @@ export default {
     resetOutcomeViews: () => {},
     importId: '1',
     contextUrlRoot: '',
-    invokedImport: true
-  }
+    invokedImport: true,
+  },
 }
 
 const Template = args => <OutcomesImporter {...args} />

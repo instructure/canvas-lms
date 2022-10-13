@@ -41,13 +41,13 @@ const QuizStatistics = Backbone.Model.extend({
     attrs.questionStatistics = wrap(payload.question_statistics).map(parseQuestion)
 
     return attrs
-  }
+  },
 })
 
 // @return {Number}
 //  Count of participants who were presented with this question and provided
 //  any sort of response (even if it's a blank/no response.)
-const calculateParticipantCount = function(question) {
+const calculateParticipantCount = function (question) {
   let answerPool
 
   // pick any answer set; they will all have the same response count, only
@@ -60,16 +60,16 @@ const calculateParticipantCount = function(question) {
   if (question.questionType === 'multiple_answers_question') {
     return question.responses // This will not indicate a response for blank responses
   }
-  return wrap(answerPool).reduce(function(sum, answer) {
+  return wrap(answerPool).reduce(function (sum, answer) {
     return sum + (answer.responses || 0)
   }, 0)
 }
 
-parseQuestion = function(question) {
+parseQuestion = function (question) {
   let correctAnswerPointBiserials
   const attrs = pickAndNormalize(question, K.QUESTION_STATISTICS_ATTRS)
   const participantCount = calculateParticipantCount(attrs)
-  const decorateAnswer = function(answer) {
+  const decorateAnswer = function (answer) {
     if (answer.id === 'none') {
       answer.text = I18n.t('no_answer', 'No Answer')
     } else if (answer.id === 'other') {
@@ -95,7 +95,7 @@ parseQuestion = function(question) {
   if (attrs.answers) {
     attrs.answers.forEach(decorateAnswer)
   } else if (attrs.answerSets) {
-    attrs.answerSets.forEach(function(answerSet) {
+    attrs.answerSets.forEach(function (answerSet) {
       wrap(answerSet.answers).forEach(decorateAnswer)
     })
   }
@@ -103,13 +103,13 @@ parseQuestion = function(question) {
   // Extract the discrimination index from the point biserial record for the
   // correct answer. Applies only to MC/TF questions.
   if (attrs.pointBiserials) {
-    attrs.pointBiserials = attrs.pointBiserials.map(function(pointBiserial) {
+    attrs.pointBiserials = attrs.pointBiserials.map(function (pointBiserial) {
       return pickAndNormalize(pointBiserial, K.POINT_BISERIAL_ATTRS)
     })
 
     correctAnswerPointBiserials =
       findWhere(attrs.pointBiserials, {
-        correct: true
+        correct: true,
       }) || {}
 
     attrs.discriminationIndex = correctAnswerPointBiserials.pointBiserial
@@ -119,7 +119,7 @@ parseQuestion = function(question) {
   // score distribution vector so that we can say "X% of students received a
   // score of Y".
   if (attrs.pointDistribution) {
-    attrs.pointDistribution.forEach(function(point) {
+    attrs.pointDistribution.forEach(function (point) {
       if (participantCount > 0) {
         point.ratio = round((point.count / participantCount) * 100.0)
       } else {

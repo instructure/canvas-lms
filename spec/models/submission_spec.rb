@@ -3679,14 +3679,14 @@ describe Submission do
       end
 
       it "is unread after grade is read and teacher posts a comment" do
-        @submission.mark_item_read(@student, "grade")
+        @submission.mark_item_read("grade")
         @submission = @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" }).first
 
         expect(@submission.reload.read?(@student)).to be_falsey
       end
 
       it "is read after grade is read and student posts a comment" do
-        @submission.mark_item_read(@student, "grade")
+        @submission.mark_item_read("grade")
         @submission = @assignment.update_submission(@student, { commenter: @student, comment: "good!" }).first
 
         expect(@submission.reload.read?(@student)).to be_truthy
@@ -3708,8 +3708,8 @@ describe Submission do
       it "is read if grade and rubric are read" do
         ContentParticipation.participate(content: @submission, user: @student, content_item: "rubric")
 
-        @submission.mark_item_read(@student, "grade")
-        @submission.mark_item_read(@student, "rubric")
+        @submission.mark_item_read("grade")
+        @submission.mark_item_read("rubric")
 
         expect(@submission.read?(@student)).to be_truthy
       end
@@ -3717,7 +3717,7 @@ describe Submission do
       it "changes the state from read to unread" do
         @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
 
-        @submission.mark_item_unread(@student, "comment")
+        @submission.mark_item_unread("comment")
 
         expect(@submission.unread?(@student)).to be_truthy
       end
@@ -4356,6 +4356,23 @@ describe Submission do
       @another_assignment.save!
 
       @another_submission.reload
+      expect(@another_submission).to be_missing
+    end
+
+    it "returns true for missing quiz_lti submissions when cached_quiz_lti is false but assignment.quiz_lti is true" do
+      @course.context_external_tools.create!(
+        name: "Quizzes.Next",
+        consumer_key: "test_key",
+        shared_secret: "test_secret",
+        tool_id: "Quizzes 2",
+        url: "http://example.com/launch"
+      )
+
+      @another_assignment.quiz_lti!
+      @another_assignment.save!
+
+      @another_submission.reload
+      @another_submission.update!(cached_quiz_lti: false)
       expect(@another_submission).to be_missing
     end
   end
@@ -7155,11 +7172,17 @@ describe Submission do
       let(:reviewer_sub) { @assignment.submissions.find_by!(user: reviewer) }
 
       before do
-        @assignment.update!(peer_reviews: true)
+        @assignment.update!(submission_types: "online_text_entry", peer_reviews: true)
       end
 
-      it "returns true for peer reviewer of student under view" do
+      it "returns false for peer reviewer of student under view that has not submitted" do
         AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: @submission, user: @student)
+        expect(@submission.can_view_details?(reviewer)).to be false
+      end
+
+      it "returns true for peer reviewer of student under view that has submitted" do
+        AssessmentRequest.create!(assessor: reviewer, assessor_asset: reviewer_sub, asset: @submission, user: @student)
+        @assignment.submit_homework(reviewer, body: "hi")
         expect(@submission.can_view_details?(reviewer)).to be true
       end
 

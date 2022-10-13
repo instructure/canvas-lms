@@ -25,65 +25,65 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Collaborations'),
-      description: I18n.t('Allows user to create collaborations.')
+      description: I18n.t('Allows user to create collaborations.'),
     },
     {
-      description: I18n.t('Allows user to view, edit, and delete collaborations they created.')
-    }
+      description: I18n.t('Allows user to view, edit, and delete collaborations they created.'),
+    },
   ],
   [
     {
       title: I18n.t('Collaborations'),
       description: I18n.t(
         'To allow view edit delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view edit delete all collaborations.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To add students to a collaboration, Users - view list must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To add a course group to a collaboration, Groups - add must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Collaborations'),
-      description: I18n.t('Allows user to create collaborations.')
+      description: I18n.t('Allows user to create collaborations.'),
     },
     {
-      description: I18n.t('Allows user to view, edit, and delete conferences they created.')
-    }
+      description: I18n.t('Allows user to view, edit, and delete conferences they created.'),
+    },
   ],
   [
     {
       title: I18n.t('Collaborations'),
       description: I18n.t(
         'To allow view, edit, and delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view, edit, and delete all collaborations.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To add students to a collaboration, Users - view list must also be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To add a course group to a collaboration, Groups - add must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

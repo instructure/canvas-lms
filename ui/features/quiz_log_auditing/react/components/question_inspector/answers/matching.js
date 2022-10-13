@@ -20,7 +20,7 @@ import K from '../../../../constants'
 import NO_ANSWER from './no_answer'
 import React from 'react'
 
-const Matching = ({ answer, question }) => (
+const Matching = ({answer, question}) => (
   <table>
     <tbody>
       {question.answers.map(questionAnswer => {

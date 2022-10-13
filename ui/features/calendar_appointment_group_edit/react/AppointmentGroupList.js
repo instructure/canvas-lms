@@ -34,7 +34,7 @@ const renderAppointment = (appointment, participantList = '') => {
   const timeLabel = I18n.t('%{start_date}, %{start_time} to %{end_time}', {
     start_date: $.dateString(appointment.start_at),
     start_time: $.timeString(appointment.start_at),
-    end_time: $.timeString(appointment.end_at)
+    end_time: $.timeString(appointment.end_at),
   })
 
   const isReserved = appointment.child_events && appointment.child_events.length > 0
@@ -42,19 +42,19 @@ const renderAppointment = (appointment, participantList = '') => {
   const badgeClasses = classnames({
     AppointmentGroupList__Badge: true,
     'AppointmentGroupList__Badge--reserved': isReserved,
-    'AppointmentGroupList__Badge--unreserved': !isReserved
+    'AppointmentGroupList__Badge--unreserved': !isReserved,
   })
 
   const rowClasses = classnames({
     AppointmentGroupList__Appointment: true,
     'AppointmentGroupList__Appointment--reserved': isReserved,
-    'AppointmentGroupList__Appointment--unreserved': !isReserved
+    'AppointmentGroupList__Appointment--unreserved': !isReserved,
   })
 
   const iconClasses = classnames({
     AppointmentGroupList__Icon: true,
     'AppointmentGroupList__Icon--reserved': isReserved,
-    'AppointmentGroupList__Icon--unreserved': !isReserved
+    'AppointmentGroupList__Icon--unreserved': !isReserved,
   })
 
   const statusText = isReserved ? (
@@ -93,7 +93,7 @@ const renderAppointment = (appointment, participantList = '') => {
 
 export default class AppointmentGroupList extends React.Component {
   static propTypes = {
-    appointmentGroup: PropTypes.object
+    appointmentGroup: PropTypes.object,
   }
 
   renderAppointmentList() {

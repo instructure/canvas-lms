@@ -30,6 +30,6 @@ export default function useContentShareUserSearchApi(opts) {
   useFetchApi({
     path: `/api/v1/courses/${courseId}/content_share_users`,
     forceResult,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }

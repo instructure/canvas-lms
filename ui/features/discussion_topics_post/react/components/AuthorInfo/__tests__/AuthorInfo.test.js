@@ -35,7 +35,7 @@ const setup = ({
   lastReplyAtDisplay = 'Mar 3 3:00pm',
   showCreatedAsTooltip = false,
   searchTerm = '',
-  isTopicAuthor = true
+  isTopicAuthor = true,
 } = {}) =>
   render(
     <SearchContext.Provider value={{searchTerm}}>
@@ -176,7 +176,7 @@ describe('AuthorInfo', () => {
     it('renders you for the current user if anonymous', () => {
       const container = setup({
         author: null,
-        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER})
+        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER}),
       })
       expect(container.getByText('Anonymous 1 (You)')).toBeInTheDocument()
     })
@@ -185,7 +185,7 @@ describe('AuthorInfo', () => {
     it('removes id if null', () => {
       const container = setup({
         author: null,
-        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER, id: null})
+        anonymousAuthor: AnonymousUser.mock({shortName: CURRENT_USER, id: null}),
       })
       expect(container.getByText('Anonymous (You)')).toBeInTheDocument()
     })

@@ -43,7 +43,7 @@ export default class ContentItemProcessor {
       link: LinkContentItem,
       ltiResourceLink: ResourceLinkContentItem,
       image: ImageContentItem,
-      html: HtmlFragmentContentItem
+      html: HtmlFragmentContentItem,
     }
   }
 
@@ -58,11 +58,11 @@ export default class ContentItemProcessor {
       content_items,
       {
         msg,
-        errormsg
+        errormsg,
       },
       {
         log,
-        errorlog
+        errorlog,
       },
       ltiEndpoint,
       processHandler

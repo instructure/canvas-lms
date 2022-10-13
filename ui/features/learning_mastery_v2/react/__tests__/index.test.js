@@ -31,20 +31,20 @@ describe('LearningMastery', () => {
       color: 'blue',
       description: 'great!',
       mastery: false,
-      points: 5
+      points: 5,
     },
     {
       color: 'green',
       description: 'mastery!',
       mastery: true,
-      points: 3
+      points: 3,
     },
     {
       color: 'red',
       description: 'not great',
       mastery: false,
-      points: 0
-    }
+      points: 0,
+    },
   ]
 
   const users = [
@@ -52,8 +52,8 @@ describe('LearningMastery', () => {
       id: '1',
       name: 'Student 1',
       display_name: 'Student 1',
-      avatar_url: 'url'
-    }
+      avatar_url: 'url',
+    },
   ]
 
   const outcomes = [
@@ -61,8 +61,8 @@ describe('LearningMastery', () => {
       id: '1',
       title: 'outcome 1',
       mastery_points: 5,
-      ratings
-    }
+      ratings,
+    },
   ]
 
   const rollups = [
@@ -75,17 +75,17 @@ describe('LearningMastery', () => {
             points: 3,
             color: 'green',
             description: 'rating description!',
-            mastery: false
-          }
-        }
-      ]
-    }
+            mastery: false,
+          },
+        },
+      ],
+    },
   ]
 
   const defaultProps = (props = {}) => {
     return {
       courseId: '1',
-      ...props
+      ...props,
     }
   }
 
@@ -94,7 +94,7 @@ describe('LearningMastery', () => {
     useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
     oldEnv = {...window.ENV}
     window.ENV = {
-      GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true}
+      GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}, ACCOUNT_LEVEL_MASTERY_SCALES: true},
     }
   })
 
@@ -135,7 +135,7 @@ describe('LearningMastery', () => {
     render(<LearningMastery {...props} />)
     expect(useRollups).toHaveBeenCalledWith({
       courseId: props.courseId,
-      accountLevelMasteryScalesFF: true
+      accountLevelMasteryScalesFF: true,
     })
   })
 })

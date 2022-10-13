@@ -27,11 +27,11 @@ export default {
     searchFilter: {search_term: ''},
     permissions: window.ENV.PERMISSIONS,
     accountId: window.ENV.ACCOUNT_ID,
-    rootAccountId: window.ENV.ROOT_ACCOUNT_ID
+    rootAccountId: window.ENV.ROOT_ACCOUNT_ID,
   },
   tabList: {
     basePath: '',
     tabs: tabList,
-    selected: 0
-  }
+    selected: 0,
+  },
 }

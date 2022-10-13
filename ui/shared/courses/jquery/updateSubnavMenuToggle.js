@@ -36,7 +36,7 @@ const subnavMenuTranslations = {
     },
     get groups() {
       return I18n.t('Hide Groups Navigation Menu')
-    }
+    },
   },
   show: {
     get default() {
@@ -53,11 +53,11 @@ const subnavMenuTranslations = {
     },
     get groups() {
       return I18n.t('Show Groups Navigation Menu')
-    }
-  }
+    },
+  },
 }
 
-const updateSubnavMenuToggle = function(pathname = window.location.pathname) {
+const updateSubnavMenuToggle = function (pathname = window.location.pathname) {
   // update subnav menu toggle for accessibility
   const subnavMenuExpanded = document.body.classList.contains('course-menu-expanded')
   const subnavMenuAction = subnavMenuExpanded ? 'hide' : 'show'

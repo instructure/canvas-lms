@@ -18,7 +18,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import ThemeEditorColorRow from 'ui/features/theme_editor/react/ThemeEditorColorRow.js'
+import ThemeEditorColorRow from 'ui/features/theme_editor/react/ThemeEditorColorRow'
 
 let elem, props
 
@@ -28,7 +28,7 @@ QUnit.module('ThemeEditorColorRow Component', {
     props = {
       varDef: {},
       onChange: sinon.spy(),
-      handleThemeStateChange: sinon.spy()
+      handleThemeStateChange: sinon.spy(),
     }
     // element needs to be attached to test focus
     document.body.appendChild(elem)
@@ -36,7 +36,7 @@ QUnit.module('ThemeEditorColorRow Component', {
 
   teardown() {
     document.body.removeChild(elem)
-  }
+  },
 })
 
 test('showWarning', () => {

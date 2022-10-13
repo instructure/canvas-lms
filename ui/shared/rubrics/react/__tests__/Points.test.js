@@ -29,7 +29,7 @@ describe('The Points component', () => {
     expect(
       component({
         assessment: {...id, points: validPoints('1')},
-        pointsPossible: 2
+        pointsPossible: 2,
       })
     ).toMatchSnapshot()
   })
@@ -39,7 +39,7 @@ describe('The Points component', () => {
       component({
         assessment: {...id, points: validPoints('1')},
         assessing: true,
-        pointsPossible: 2
+        pointsPossible: 2,
       })
     ).toMatchSnapshot()
   })
@@ -48,7 +48,7 @@ describe('The Points component', () => {
     expect(
       component({
         assessment: {...id, points: validPoints('1.1')},
-        pointsPossible: 2
+        pointsPossible: 2,
       })
         .find('div')
         .text()
@@ -59,7 +59,7 @@ describe('The Points component', () => {
     expect(
       component({
         assessment: {...id, points: {text: null, valid: true, value: 1.255}},
-        pointsPossible: 2
+        pointsPossible: 2,
       })
         .find('div')
         .text()
@@ -71,7 +71,7 @@ describe('The Points component', () => {
       component({
         assessing: true,
         assessment: {...id, points: {text: '', valid: true, value: undefined}},
-        pointsPossible: 2
+        pointsPossible: 2,
       })
         .find('TextInput')
         .prop('messages')
@@ -83,7 +83,7 @@ describe('The Points component', () => {
       component({
         assessing: false,
         assessment: null,
-        pointsPossible: 2
+        pointsPossible: 2,
       })
         .find('div')
         .text()
@@ -96,9 +96,9 @@ describe('The Points component', () => {
       assessing: true,
       assessment: {
         ...id,
-        points
+        points,
       },
-      pointsPossible: 5
+      pointsPossible: 5,
     })
 
   it('renders an error when valid is false', () => {
@@ -114,9 +114,7 @@ describe('The Points component', () => {
   it('renders no error when valid is true', () => {
     const expectNoErrorsWith = (text, value) =>
       expect(
-        withPoints({text, valid: true, value})
-          .find('TextInput')
-          .prop('messages')
+        withPoints({text, valid: true, value}).find('TextInput').prop('messages')
       ).toHaveLength(0)
 
     expectNoErrorsWith('')

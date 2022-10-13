@@ -22,8 +22,17 @@ import assignmentUtils from './assignmentUtils'
 import PostGradesDialogCorrectionsPage from './PostGradesDialogCorrectionsPage'
 import PostGradesDialogNeedsGradingPage from './PostGradesDialogNeedsGradingPage'
 import PostGradesDialogSummaryPage from './PostGradesDialogSummaryPage'
+import PostGradesStore from './PostGradesStore'
+import type {AssignmentWithOverride} from '../default_gradebook/gradebook.d'
 
-class PostGradesDialog extends React.Component {
+type Props = {
+  store: ReturnType<typeof PostGradesStore>
+  closeDialog: (event) => void
+}
+
+class PostGradesDialog extends React.Component<Props> {
+  boundForceUpdate?: () => void
+
   componentDidMount() {
     this.boundForceUpdate = this.forceUpdate.bind(this)
     this.props.store.addChangeListener(this.boundForceUpdate)
@@ -54,9 +63,9 @@ class PostGradesDialog extends React.Component {
   validOverrideForSelection = (store, a) => {
     if (
       store.validCheck(a) &&
-      a.overrideForThisSection != undefined &&
-      a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id &&
-      a.hadOriginalErrors == undefined
+      a.overrideForThisSection &&
+      a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id &&
+      typeof a.hadOriginalErrors === 'undefined'
     ) {
       return true
     }
@@ -64,15 +73,13 @@ class PostGradesDialog extends React.Component {
   }
 
   validMultipleOverride = a => {
-    const invalid_overrides = _.filter(a.overrides, o => {
-      o == null
-    })
+    const invalid_overrides = _.filter(a.overrides, o => o == null)
     if (
-      invalid_overrides.length == 0 &&
+      invalid_overrides.length === 0 &&
       a.due_at == null &&
-      a.overrides != undefined &&
+      Array.isArray(a.overrides) &&
       a.overrides.length > 0 &&
-      a.overrides.length == a.sectionCount
+      a.overrides.length === a.sectionCount
     ) {
       return true
     } else {
@@ -81,11 +88,8 @@ class PostGradesDialog extends React.Component {
   }
 
   invalidAssignments = (assignments, store) => {
-    const original_error_assignments = assignmentUtils.withOriginalErrors(
-      assignments,
-      this.props.store
-    )
-    const invalid_assignments = []
+    const original_error_assignments = assignmentUtils.withOriginalErrors(assignments)
+    const invalid_assignments: AssignmentWithOverride[] = []
     _.each(assignments, a => {
       // override for a section is valid but the 'Everyone Else' scenario is still invalid
       if (this.validOverrideForSelection(store, a)) {
@@ -94,59 +98,62 @@ class PostGradesDialog extends React.Component {
 
       // for handling an assignment with an override for each section and all of them being valid
       if (this.validMultipleOverride(a)) {
+        // no-op
       }
 
       // assignments that have been ignored
       else if (a.please_ignore) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the section that doesn't have an override
       else if (
-        a.currentlySelected.id.toString() == store.overrideForEveryone(a) &&
-        a.currentlySelected.type == 'section' &&
+        a.currentlySelected.id.toString() === store.overrideForEveryone(a) &&
+        a.currentlySelected.type === 'section' &&
         a.due_at != null &&
-        (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
+        !a.hadOriginalErrors
       ) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario at the course level with sections that have overrides and other sections that are tied under the course "override"
-      else if (
-        a.currentlySelected.type == 'course' &&
-        a.due_at != null &&
-        (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
-      ) {
+      else if (a.currentlySelected.type === 'course' && a.due_at != null && !a.hadOriginalErrors) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the section that does have an override
       else if (
-        (original_error_assignments.length > 0 || original_error_assignments.length == 0) &&
+        (original_error_assignments.length > 0 || original_error_assignments.length === 0) &&
         store.validCheck(a) &&
-        a.overrideForThisSection != undefined &&
-        a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id &&
-        a.currentlySelected.type == 'section' &&
-        (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
+        a.overrideForThisSection &&
+        a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id &&
+        a.currentlySelected.type === 'section' &&
+        !a.hadOriginalErrors
       ) {
+        // no-op
       }
 
       // for handling the 'Everyone Else' scenario on the course
       else if (
         store.validCheck(a) &&
-        a.overrideForThisSection != undefined &&
-        (a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id ||
-          a.currentlySelected.id.toString() != a.overrideForThisSection.course_section_id) &&
-        a.currentlySelected.type != 'section' &&
-        (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
+        a.overrideForThisSection &&
+        (a.currentlySelected.id.toString() === a.overrideForThisSection.course_section_id ||
+          a.currentlySelected.id.toString() !== a.overrideForThisSection.course_section_id) &&
+        a.currentlySelected.type !== 'section' &&
+        !a.hadOriginalErrors
       ) {
+        // no-op
       }
 
       // explicitly check for assignment for the entire course and no overrides
       else if (
-        (a.overrides == undefined || a.overrides.length === 0) &&
-        (original_error_assignments.length > 0 || original_error_assignments.length == 0) &&
+        (typeof a.overrides === 'undefined' || a.overrides.length === 0) &&
+        (original_error_assignments.length > 0 || original_error_assignments.length === 0) &&
         a.due_at != null &&
         store.validCheck(a) &&
-        (a.hadOriginalErrors == undefined || a.hadOriginalErrors == false)
+        !a.hadOriginalErrors
       ) {
+        // no-op
       }
 
       // is invalid
@@ -157,10 +164,10 @@ class PostGradesDialog extends React.Component {
     return invalid_assignments
   }
 
-  pageSet = (page, errors) => {
-    if (page == 'corrections' && errors.length == 0) {
+  pageSet = (page: string, errors) => {
+    if (page === 'corrections' && errors.length === 0) {
       page = 'summary'
-    } else if (page == 'summary' && errors.length != 0) {
+    } else if (page === 'summary' && errors.length !== 0) {
       page = 'corrections'
     }
     return page
@@ -180,10 +187,10 @@ class PostGradesDialog extends React.Component {
             advanceToSummaryPage={this.advanceToSummaryPage}
           /> // /
         )
-      case 'summary':
-        var assignments = store.getState().assignments
-        var postCount = assignmentUtils.notIgnored(assignments).length
-        var needsGradingCount = assignmentUtils.needsGrading(assignments).length
+      case 'summary': {
+        const assignments = store.getState().assignments
+        const postCount = assignmentUtils.notIgnored(assignments).length
+        const needsGradingCount = assignmentUtils.needsGrading(assignments).length
         return (
           <PostGradesDialogSummaryPage
             postCount={postCount}
@@ -192,15 +199,17 @@ class PostGradesDialog extends React.Component {
             postGrades={this.postGrades}
           /> // /
         )
-      case 'needsGrading':
-        var assignments = store.getState().assignments
-        var needsGrading = assignmentUtils.needsGrading(assignments)
+      }
+      case 'needsGrading': {
+        const assignments = store.getState().assignments
+        const needsGrading = assignmentUtils.needsGrading(assignments)
         return (
           <PostGradesDialogNeedsGradingPage
             needsGrading={needsGrading}
             leaveNeedsGradingPage={this.leaveNeedsGradingPage}
           /> // /
         )
+      }
     }
   }
 }

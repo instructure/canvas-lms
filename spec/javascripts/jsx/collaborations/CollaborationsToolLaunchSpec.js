@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import CollaborationsToolLaunch from 'ui/features/lti_collaborations/react/CollaborationsToolLaunch.js'
+import CollaborationsToolLaunch from 'ui/features/lti_collaborations/react/CollaborationsToolLaunch'
 
 let fixtures
 
@@ -33,7 +33,7 @@ QUnit.module('CollaborationsToolLaunch screenreader functionality', {
   teardown() {
     fixtures.empty()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test('shows beginning info alert and adds styles to iframe', () => {

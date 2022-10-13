@@ -25,7 +25,7 @@ describe('EmptyK5Announcement', () => {
     courseName: "Mr. Smith's Homeroom 2",
     courseUrl: 'http://google.com/courseurl2',
     canReadAnnouncements: true,
-    ...overrides
+    ...overrides,
   })
 
   it('renders link to homeroom course', () => {

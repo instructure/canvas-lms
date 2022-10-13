@@ -130,7 +130,7 @@ function BaseUploadTool({children, hideFooter, icon, label, renderFooter, title}
       onDismiss={closeModal}
       size="large"
       label={modalTitle}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         <CloseButton
@@ -277,7 +277,7 @@ ExternalTool.propTypes = {
 function WebcamPhotoUpload({onPhotoTaken}) {
   return (
     <BaseUploadTool
-      hideFooter
+      hideFooter={true}
       icon={<Img alt={I18n.t('Take a Photo via Webcam')} src={TakePhotoUrl} {...iconDimensions} />}
       label={I18n.t('Webcam Photo')}
       title={I18n.t('Take a Photo via Webcam')}

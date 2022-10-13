@@ -46,9 +46,9 @@ CustomHelpLinkIconInput.propTypes = {
   value: PropTypes.string.isRequired,
   children: PropTypes.node.isRequired,
   label: PropTypes.string.isRequired,
-  defaultChecked: PropTypes.bool
+  defaultChecked: PropTypes.bool,
 }
 
 CustomHelpLinkIconInput.defaultProps = {
-  defaultChecked: false
+  defaultChecked: false,
 }

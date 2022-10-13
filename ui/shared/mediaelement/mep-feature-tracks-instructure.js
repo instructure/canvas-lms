@@ -27,14 +27,13 @@
 //   ui/shared/mediaelement/mep-feature-tracks-instructure.js
 //
 
-import { useScope as useI18nScope } from '@canvas/i18n';
+import {useScope as useI18nScope} from '@canvas/i18n'
 import htmlEscape from 'html-escape'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
-;
 
-const I18n = useI18nScope('mepfeaturetracksinstructure');
+const I18n = useI18nScope('mepfeaturetracksinstructure')
 
-(function($) {
+;(function ($) {
   // add extra default options
   $.extend(mejs.MepDefaults, {
     // this will automatically turn on a <track>
@@ -53,7 +52,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
     toggleCaptionsButtonWhenOnlyOne: false,
 
     // #id or .class
-    slidesSelector: ''
+    slidesSelector: '',
   })
 
   $.extend(MediaElementPlayer.prototype, {
@@ -88,9 +87,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
         }
       }
       t.cleartracks(player, controls, layers, media)
-      player.chapters = $('<div class="mejs-chapters mejs-layer"></div>')
-        .prependTo(layers)
-        .hide()
+      player.chapters = $('<div class="mejs-chapters mejs-layer"></div>').prependTo(layers).hide()
       player.captions = $(
         '<div class="mejs-captions-layer mejs-layer"><div class="mejs-captions-position mejs-captions-position-hover" ' +
           attr +
@@ -163,7 +160,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
           )
 
           // handle clicks to the language radio buttons
-          .on('keydown', function(e) {
+          .on('keydown', function (e) {
             if (e.target.tagName.toLowerCase() === 'a') {
               // bypass for upload/delete links
               return true
@@ -193,9 +190,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
                 break
               case 27: // esc
                 player.hideCaptionsSelector()
-                $(this)
-                  .find('button')
-                  .focus()
+                $(this).find('button').focus()
                 break
               default:
                 return true
@@ -220,17 +215,13 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
           )
 
           // handle clicks to the language radio buttons
-          .on('click', 'input[type=radio]', function() {
+          .on('click', 'input[type=radio]', function () {
             lang = this.value
             player.setTrack(lang)
           })
 
-          .on('click', 'button', function() {
-            if (
-              $(this)
-                .siblings('.mejs-captions-selector')
-                .hasClass('mejs-offscreen')
-            ) {
+          .on('click', 'button', function () {
+            if ($(this).siblings('.mejs-captions-selector').hasClass('mejs-offscreen')) {
               player.showCaptionsSelector()
               $(this)
                 .siblings('.mejs-captions-selector')
@@ -323,9 +314,9 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
             player.chapters.fadeIn(200).height(player.chapters.find('.mejs-chapter').outerHeight())
           }
         },
-        function() {
+        function () {
           if (player.hasChapters && !media.paused) {
-            player.chapters.fadeOut(200, function() {
+            player.chapters.fadeOut(200, function () {
               $(this).addClass('mejs-offscreen')
               $(this).css('display', 'block')
             })
@@ -373,19 +364,14 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
         label += ': ' + current.label
       }
 
-      this.captionsButton
-        .find('button')
-        .attr('aria-label', label)
-        .attr('title', label)
+      this.captionsButton.find('button').attr('aria-label', label).attr('title', label)
     },
 
     setTrack(lang) {
       let t = this,
         i
 
-      $(this)
-        .attr('aria-selected', true)
-        .attr('checked', 'checked')
+      $(this).attr('aria-selected', true).attr('checked', 'checked')
       $(this)
         .closest('.mejs-captions-selector')
         .find('input[type=radio]')
@@ -428,7 +414,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
     loadTrack(index) {
       const t = this,
         track = t.tracks[index],
-        after = function() {
+        after = function () {
           track.isLoaded = true
 
           t.enableTrackButton(track.srclang, track.label)
@@ -469,7 +455,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
           error() {
             t.removeTrackButton(track.srclang)
             t.loadNextTrack()
-          }
+          },
         })
       }
     },
@@ -541,11 +527,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
             .attr('aria-label', label)
             .val(lang)
         )
-        .append(
-          $('<label aria-hidden="true">')
-            .attr('for', id)
-            .text(label)
-        )
+        .append($('<label aria-hidden="true">').attr('for', id).text(label))
 
       if (t.options.can_add_captions) {
         $li.append(
@@ -676,20 +658,12 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
 
       if (typeof img === 'undefined' || typeof img.fadeIn === 'undefined') {
         t.slides.entries.imgs[index] = img = $('<img src="' + url + '">').on('load', () => {
-          img
-            .appendTo(t.slidesContainer)
-            .hide()
-            .fadeIn()
-            .siblings(':visible')
-            .fadeOut()
+          img.appendTo(t.slidesContainer).hide().fadeIn().siblings(':visible').fadeOut()
         })
       } else if (!img.is(':visible') && !img.is(':animated')) {
         // console.log('showing existing slide');
 
-        img
-          .fadeIn()
-          .siblings(':visible')
-          .fadeOut()
+        img.fadeIn().siblings(':visible').fadeOut()
       }
     },
 
@@ -779,7 +753,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
         usedPercent += percent
       }
 
-      t.chapters.find('div.mejs-chapter').click(function() {
+      t.chapters.find('div.mejs-chapter').click(function () {
         t.media.setCurrentTime(parseFloat($(this).attr('rel')))
         if (t.media.paused) {
           t.media.play()
@@ -787,11 +761,11 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
       })
 
       t.chapters.show()
-    }
+    },
   })
 
   mejs.language = {
-    codes: closedCaptionLanguages
+    codes: closedCaptionLanguages,
   }
 
   /*
@@ -809,7 +783,8 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
 	*/
   mejs.TrackFormatParser = {
     webvtt: {
-      pattern_timecode: /^((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
+      pattern_timecode:
+        /^((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{1,3})?) --\> ((?:[0-9]{1,2}:)?[0-9]{2}:[0-9]{2}([,.][0-9]{3})?)(.*)$/,
 
       parse(trackText) {
         let i = 0,
@@ -846,13 +821,13 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
                   ? 0.2
                   : mejs.Utility.convertSMPTEtoSeconds(timecode[1]),
               stop: mejs.Utility.convertSMPTEtoSeconds(timecode[3]),
-              settings: timecode[5]
+              settings: timecode[5],
             })
           }
           identifier = ''
         }
         return entries
-      }
+      },
     },
     // Thanks to Justin Capella: https://github.com/johndyer/mediaelement/pull/420
     dfxp: {
@@ -881,7 +856,7 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
           const _temp_times = {
             start: null,
             stop: null,
-            style: null
+            style: null,
           }
           if (lines.eq(i).attr('begin'))
             _temp_times.start = mejs.Utility.convertSMPTEtoSeconds(lines.eq(i).attr('begin'))
@@ -907,19 +882,19 @@ const I18n = useI18nScope('mepfeaturetracksinstructure');
           entries.text.push(text)
         }
         return entries
-      }
+      },
     },
     split2(text, regex) {
       // normal version for compliant browsers
       // see below for IE fix
       return text.split(regex)
-    }
+    },
   }
 
   // test for browsers with bad String.split method.
   if ('x\n\ny'.split(/\n/gi).length != 3) {
     // add super slow IE8 and below version
-    mejs.TrackFormatParser.split2 = function(text, regex) {
+    mejs.TrackFormatParser.split2 = function (text, regex) {
       let parts = [],
         chunk = '',
         i

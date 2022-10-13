@@ -23,7 +23,7 @@ import React from 'react'
 function makeProps(overrides) {
   const props = {
     ...overrides,
-    onClick: jest.fn().mockResolvedValue({})
+    onClick: jest.fn().mockResolvedValue({}),
   }
   return props
 }

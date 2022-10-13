@@ -35,8 +35,8 @@ export default function configureStore(env) {
     context: {
       currentUser: env.currentUser,
       finalGrader: env.finalGrader,
-      graders: env.graders
-    }
+      graders: env.graders,
+    },
   }
 
   reducers.forEach(reducer => {

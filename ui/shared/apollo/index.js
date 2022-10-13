@@ -47,8 +47,8 @@ function setHeadersLink() {
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'GraphQL-Metrics': true,
-        'X-CSRF-Token': getCookie('_csrf_token')
-      }
+        'X-CSRF-Token': getCookie('_csrf_token'),
+      },
     })
     return forward(operation)
   })
@@ -57,11 +57,11 @@ function setHeadersLink() {
 function createHttpLink(httpLinkOptions = {}) {
   const defaultOptions = {
     uri: '/api/graphql',
-    credentials: 'same-origin'
+    credentials: 'same-origin',
   }
   const linkOpts = {
     ...defaultOptions,
-    ...httpLinkOptions
+    ...httpLinkOptions,
   }
   return new HttpLink(linkOpts)
 }
@@ -93,8 +93,8 @@ function createCache() {
       return cacheKey
     },
     fragmentMatcher: new IntrospectionFragmentMatcher({
-      introspectionQueryResultData
-    })
+      introspectionQueryResultData,
+    }),
   })
 }
 
@@ -102,7 +102,7 @@ async function createPersistentCache(passphrase = null) {
   const cache = createCache()
   await persistCache({
     cache,
-    storage: new EncryptedForage(passphrase)
+    storage: new EncryptedForage(passphrase),
   })
   return cache
 }
@@ -114,7 +114,7 @@ function createClient(opts = {}) {
   const stateLink = withClientState({
     cache,
     resolvers,
-    defaults
+    defaults,
   })
 
   // if this option exists, we want this client
@@ -143,7 +143,7 @@ function createClient(opts = {}) {
   // https://github.com/apollographql/apollo-client/blob/main/src/link/core/ApolloLink.ts
   const httpLinkOptions = {
     ...defaultHttpLinkOptions,
-    ...(opts.httpLinkOptions || {})
+    ...(opts.httpLinkOptions || {}),
   }
 
   const links =
@@ -152,13 +152,13 @@ function createClient(opts = {}) {
           createConsoleErrorReportLink(),
           setHeadersLink(),
           stateLink,
-          createHttpLink(httpLinkOptions)
+          createHttpLink(httpLinkOptions),
         ]
       : [createConsoleErrorReportLink(), stateLink, createClient.mockLink]
 
   const client = new ApolloClient({
     link: ApolloLink.from(links),
-    cache
+    cache,
   })
 
   return client

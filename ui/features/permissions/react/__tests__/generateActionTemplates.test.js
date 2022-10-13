@@ -37,7 +37,7 @@ describe('permissions::generateActionTemplates::', () => {
     expect(result).toEqual(
       expect.objectContaining({
         [ACCOUNT]: expect.anything(),
-        [COURSE]: expect.anything()
+        [COURSE]: expect.anything(),
       })
     )
   })

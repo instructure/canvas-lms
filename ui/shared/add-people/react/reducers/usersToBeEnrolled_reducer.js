@@ -32,7 +32,7 @@ export default handleActions(
     [actionTypes.RESET]: (state, action) =>
       !action.payload || action.payload.includes('usersToBeEnrolled')
         ? defaultState.usersToBeEnrolled
-        : state
+        : state,
   },
   defaultState.usersToBeEnrolled
 )

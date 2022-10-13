@@ -30,7 +30,7 @@ function moveItem(item, destinationFolder, options = {}) {
     // success
     data => dfd.resolve(data),
     // failure
-    (jqXHR, textStatus, errorThrown) => {
+    (jqXHR, _textStatus, _errorThrown) => {
       if (jqXHR.status === 409) {
         // file already exists: prompt and retry
         ReactDOM.render(
@@ -45,7 +45,7 @@ function moveItem(item, destinationFolder, options = {}) {
               moveItem(item, destinationFolder, opts).then(
                 data => dfd.resolve(data),
                 () => dfd.reject()
-              )
+              ),
           }),
           $('<div>').appendTo('body')[0]
         )
@@ -66,12 +66,12 @@ export default function moveStuff(filesAndFolders, destinationFolder) {
         'move_success',
         {
           one: '%{item} moved to %{destinationFolder}',
-          other: '%{count} items moved to %{destinationFolder}'
+          other: '%{count} items moved to %{destinationFolder}',
         },
         {
           count: filesAndFolders.length,
           item: filesAndFolders[0] && filesAndFolders[0].displayName(),
-          destinationFolder: destinationFolder.displayName()
+          destinationFolder: destinationFolder.displayName(),
         }
       )
     )

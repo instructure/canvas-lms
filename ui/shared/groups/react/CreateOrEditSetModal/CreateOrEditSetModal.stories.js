@@ -32,7 +32,7 @@ let reminder = false
 
 export default {
   title: 'Examples/manage_groups/CreateOrEditSetModal',
-  component: CreateOrEditSetModal
+  component: CreateOrEditSetModal,
 }
 
 let mockApiConfig = {}
@@ -52,7 +52,7 @@ function mockApi({path, body, method}) {
     const json = {
       id: mockApiConfig.groupsetId,
       name: mockApiConfig.groupSetName,
-      groups_count: mockApiConfig.groupsCount
+      groups_count: mockApiConfig.groupsCount,
     }
     return Promise.resolve({json})
   }
@@ -75,7 +75,7 @@ function mockApi({path, body, method}) {
       id,
       completion: 0,
       workflow_state: 'running',
-      url
+      url,
     }
     mockApiConfig.jobId = id
     mockApiConfig.assignStart = new Date()
@@ -99,7 +99,7 @@ function mockApi({path, body, method}) {
       url: mockApiConfig.progressUrl,
       context_id: mockApiConfig.groupsetId,
       completion,
-      workflow_state
+      workflow_state,
     }
     return Promise.resolve({json})
   }
@@ -112,7 +112,7 @@ function mockApi({path, body, method}) {
       id,
       groups_count: mockApiConfig.groupsCount,
       name: mockApiConfig.groupSetName,
-      unassigned_users_count: 0
+      unassigned_users_count: 0,
     }
     return Promise.resolve({json})
   }
@@ -131,7 +131,7 @@ const Wrapper = () => {
   ENV = {
     allow_self_signup: selfSignup,
     student_section_count: numSections,
-    context_asset_string: 'course_1'
+    context_asset_string: 'course_1',
   }
 
   function openModal() {

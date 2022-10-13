@@ -29,12 +29,12 @@ import {updateDiscussionEntryParticipantMock} from '../../../../graphql/Mocks'
 
 jest.mock('../../../utils/constants', () => ({
   ...jest.requireActual('../../../utils/constants'),
-  AUTO_MARK_AS_READ_DELAY: 0
+  AUTO_MARK_AS_READ_DELAY: 0,
 }))
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 describe('IsolatedThreadsContainer', () => {
@@ -48,9 +48,9 @@ describe('IsolatedThreadsContainer', () => {
       current_user: {
         id: 'PLACEHOLDER',
         display_name: 'Omar Soto-Fortuño',
-        avatar_image_url: 'www.avatar.com'
+        avatar_image_url: 'www.avatar.com',
       },
-      course_id: '1'
+      course_id: '1',
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -59,7 +59,7 @@ describe('IsolatedThreadsContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -72,7 +72,7 @@ describe('IsolatedThreadsContainer', () => {
   const defaultProps = ({
     discussionEntryOverrides = {},
     discussionOverrides = {},
-    overrides = {}
+    overrides = {},
   } = {}) => ({
     discussionTopic: Discussion.mock(discussionOverrides),
     discussionEntry: DiscussionEntry.mock({
@@ -83,14 +83,14 @@ describe('IsolatedThreadsContainer', () => {
             id: '50',
             read: false,
             message: '<p>This is the child reply</P>',
-            ...discussionEntryOverrides
-          })
+            ...discussionEntryOverrides,
+          }),
         ],
         pageInfo: PageInfo.mock(),
-        __typename: 'DiscussionSubentriesConnection'
-      }
+        __typename: 'DiscussionSubentriesConnection',
+      },
     }),
-    ...overrides
+    ...overrides,
   })
 
   const setup = (props, mocks) => {
@@ -124,7 +124,7 @@ describe('IsolatedThreadsContainer', () => {
     it('show newer spinner when fetchingMoreNewerReplies is true', async () => {
       const container = setup(
         defaultProps({
-          overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: true}
+          overrides: {hasMoreNewerReplies: true, fetchingMoreNewerReplies: true},
         })
       )
       await waitFor(() => expect(container.queryByTestId('new-reply-spinner')).toBeTruthy())
@@ -246,9 +246,9 @@ describe('IsolatedThreadsContainer', () => {
         defaultProps({
           discussionEntryOverrides: {
             entryParticipant: {
-              reportType: 'other'
-            }
-          }
+              reportType: 'other',
+            },
+          },
         })
       )
 
@@ -262,7 +262,7 @@ describe('IsolatedThreadsContainer', () => {
         defaultProps(),
         updateDiscussionEntryParticipantMock({
           discussionEntryId: '50',
-          reportType: 'other'
+          reportType: 'other',
         })
       )
 
@@ -288,7 +288,7 @@ describe('IsolatedThreadsContainer', () => {
 
     it('renders name', () => {
       const props = defaultProps({
-        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()}
+        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()},
       })
       const container = setup(props)
       expect(container.queryByText('Sorry, Something Broke')).toBeNull()
@@ -299,7 +299,7 @@ describe('IsolatedThreadsContainer', () => {
   describe('auto read', () => {
     const intersectionObserverMock = () => ({
       observe: () => null,
-      unobserve: () => null
+      unobserve: () => null,
     })
 
     beforeEach(() => {
@@ -339,10 +339,10 @@ describe('IsolatedThreadsContainer', () => {
         rootEntryId: '50',
         quotedEntry: {
           ...DiscussionEntry.mock({_id: '100'}),
-          previewMessage: '<p>This is the quoted reply</p>'
-        }
+          previewMessage: '<p>This is the quoted reply</p>',
+        },
       },
-      overrides: {onOpenIsolatedView}
+      overrides: {onOpenIsolatedView},
     })
     const {getByTestId, queryByText} = setup(props)
 

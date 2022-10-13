@@ -44,5 +44,5 @@ export default {
       )
     }
     return `/api/v1/${this._contextPath()}/${resourceName}`
-  }
+  },
 }

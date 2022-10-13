@@ -30,7 +30,7 @@ QUnit.module('Quizzes::LogAuditing::EventBuffer', {
   teardown() {
     localStorage.removeItem(K.EVT_STORAGE_KEY)
     return useMemoryStorage()
-  }
+  },
 })
 
 test('#constructor: it auto-loads from localStorage', () => {

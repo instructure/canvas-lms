@@ -22,7 +22,7 @@ class PaginatedUserCheckList extends React.Component {
   static defaultProps = {
     permanentUsers: [],
     checked: [],
-    labelId: null
+    labelId: null,
   }
 
   _isChecked = id => this.props.checked.includes(id)

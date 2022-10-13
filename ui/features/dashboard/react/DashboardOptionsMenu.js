@@ -23,7 +23,7 @@ import axios from '@canvas/axios'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Menu} from '@instructure/ui-menu'
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconMoreLine} from '@instructure/ui-icons'
 
 const I18n = useI18nScope('dashboard')
@@ -34,18 +34,18 @@ export default class DashboardOptionsMenu extends React.Component {
     planner_enabled: PropTypes.bool,
     onDashboardChange: PropTypes.func.isRequired,
     menuButtonRef: PropTypes.func,
-    canEnableElementaryDashboard: PropTypes.bool
+    canEnableElementaryDashboard: PropTypes.bool,
   }
 
   static defaultProps = {
     planner_enabled: false,
     view: 'cards',
     menuButtonRef: () => {},
-    canEnableElementaryDashboard: false
+    canEnableElementaryDashboard: false,
   }
 
   state = {
-    showColorOverlays: !(ENV && ENV.PREFERENCES && ENV.PREFERENCES.hide_dashcard_color_overlays)
+    showColorOverlays: !(ENV && ENV.PREFERENCES && ENV.PREFERENCES.hide_dashcard_color_overlays),
   }
 
   handleViewOptionSelect = (e, [newlySelectedView]) => {

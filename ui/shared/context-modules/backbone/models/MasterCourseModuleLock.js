@@ -25,8 +25,8 @@ const MasterCourseModuleLock = Backbone.Model.extend({
   defaults: {
     is_master_course_master_content: false,
     is_master_course_child_content: false,
-    restricted_by_master_course: false
-  }
+    restricted_by_master_course: false,
+  },
 })
 
 export default MasterCourseModuleLock

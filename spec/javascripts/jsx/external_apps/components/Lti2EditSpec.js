@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import Lti2Edit from 'ui/features/external_apps/react/components/Lti2Edit.js'
+import Lti2Edit from 'ui/features/external_apps/react/components/Lti2Edit'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
@@ -36,7 +36,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 QUnit.module('ExternalApps.Lti2Edit', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {
@@ -47,11 +47,11 @@ test('renders', () => {
       description: null,
       enabled: false,
       installed_locally: true,
-      name: 'Twitter'
+      name: 'Twitter',
     },
     handleActivateLti2() {},
     handleDeactivateLti2() {},
-    handleCancel() {}
+    handleCancel() {},
   }
   const component = renderComponent(data)
   ok(component)

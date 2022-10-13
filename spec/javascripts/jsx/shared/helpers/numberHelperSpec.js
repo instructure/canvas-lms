@@ -43,7 +43,7 @@ QUnit.module('Number Helper Parse and Validate', {
     if (numberHelper._parseNumber.restore) {
       numberHelper._parseNumber.restore()
     }
-  }
+  },
 })
 
 test('uses default parse function', () => {
@@ -65,7 +65,7 @@ test('uses delimiter and separator from current locale', () => {
   ok(
     numberHelper._parseNumber.calledWithMatch(input, {
       thousands: delimiter,
-      decimal: separator
+      decimal: separator,
     })
   )
 })

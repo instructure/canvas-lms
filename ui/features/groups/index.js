@@ -23,7 +23,7 @@ import React from 'react'
 
 ready(() => {
   ReactDOM.render(
-    <StudentView enableGroupCreation enableEveryoneTab />,
+    <StudentView enableGroupCreation={true} enableEveryoneTab={true} />,
     document.getElementById('content')
   )
 })

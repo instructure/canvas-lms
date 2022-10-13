@@ -20,7 +20,7 @@ const originals = {
   clearInterval: window.clearInterval,
   clearTimeout: window.clearTimeout,
   setInterval: window.setInterval,
-  setTimeout: window.setTimeout
+  setTimeout: window.setTimeout,
 }
 
 export default function waitForCondition(conditionFn, timeout = 500) {

@@ -52,12 +52,12 @@ ConfirmationForm.propTypes = {
   onConfirm: PropTypes.func.isRequired,
   message: PropTypes.string.isRequired,
   confirmLabel: PropTypes.string,
-  cancelLabel: PropTypes.string
+  cancelLabel: PropTypes.string,
 }
 
 ConfirmationForm.defaultProps = {
   confirmLabel: I18n.t('Submit'),
-  cancelLabel: I18n.t('Cancel')
+  cancelLabel: I18n.t('Cancel'),
 }
 
 export default ConfirmationForm

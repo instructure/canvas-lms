@@ -34,7 +34,7 @@ const I18n = useI18nScope('discussion_topics_post')
 const REPORT_TYPES = [
   {value: 'inappropriate', getLabel: () => I18n.t('Inappropriate')},
   {value: 'offensive', getLabel: () => I18n.t('Offensive, abusive')},
-  {value: 'other', getLabel: () => I18n.t('Other')}
+  {value: 'other', getLabel: () => I18n.t('Other')},
 ]
 
 export const ReportReply = props => {
@@ -51,7 +51,7 @@ export const ReportReply = props => {
       onDismiss={onClose}
       size="medium"
       label={I18n.t('Report Reply')}
-      shouldCloseOnDocumentClick
+      shouldCloseOnDocumentClick={true}
     >
       <Modal.Header>
         <CloseButton
@@ -128,11 +128,11 @@ ReportReply.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   showReportModal: PropTypes.bool,
   isLoading: PropTypes.bool,
-  errorSubmitting: PropTypes.bool
+  errorSubmitting: PropTypes.bool,
 }
 
 ReportReply.defaultProps = {
   showReportModal: false,
   isLoading: false,
-  errorSubmitting: false
+  errorSubmitting: false,
 }

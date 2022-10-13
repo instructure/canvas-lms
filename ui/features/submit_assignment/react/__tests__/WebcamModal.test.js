@@ -33,7 +33,7 @@ describe('WebcamModal', () => {
       onSelectImage: jest.fn(),
       onDismiss: jest.fn(),
       open: false,
-      ...override
+      ...override,
     }
   }
 
@@ -73,7 +73,7 @@ describe('WebcamModal', () => {
     const stop = jest.fn()
     mediaUtils.getUserMedia = jest.fn(() =>
       Promise.resolve({
-        getTracks: () => [{stop}]
+        getTracks: () => [{stop}],
       })
     )
     let result
@@ -127,7 +127,7 @@ describe('WebcamModal', () => {
     fireEvent.click(result.getByText('Use This Photo'))
     expect(props.onSelectImage).toHaveBeenCalledWith(
       expect.objectContaining({
-        blob: mockedBlob
+        blob: mockedBlob,
       })
     )
   })

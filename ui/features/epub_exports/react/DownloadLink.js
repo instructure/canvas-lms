@@ -27,7 +27,7 @@ class DownloadLink extends React.Component {
   static displayName = 'DownloadLink'
 
   static propTypes = {
-    course: PropTypes.object.isRequired
+    course: PropTypes.object.isRequired,
   }
 
   epubExport = () => this.props.course.epub_export || {}

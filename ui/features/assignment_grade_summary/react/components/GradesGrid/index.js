@@ -35,12 +35,12 @@ function studentToRow(student, pageStart, studentIndex, rowOptions) {
   return {
     speedGraderUrl: speedGraderUrl(courseId, assignmentId, {
       anonymousStudents,
-      studentId: student.id
+      studentId: student.id,
     }),
     studentId: student.id,
     studentName:
       student.displayName ||
-      I18n.t('Student %{studentNumber}', {studentNumber: I18n.n(pageStart + studentIndex + 1)})
+      I18n.t('Student %{studentNumber}', {studentNumber: I18n.n(pageStart + studentIndex + 1)}),
   }
 }
 
@@ -70,16 +70,16 @@ export default class GradesGrid extends Component {
     anonymousStudents: bool.isRequired,
     assignment: shape({
       courseId: string.isRequired,
-      id: string.isRequired
+      id: string.isRequired,
     }).isRequired,
     disabledCustomGrade: bool.isRequired,
     finalGrader: shape({
-      graderId: string.isRequired
+      graderId: string.isRequired,
     }),
     graders: arrayOf(
       shape({
         graderName: string,
-        graderId: string.isRequired
+        graderId: string.isRequired,
       })
     ).isRequired,
     grades: shape({}).isRequired,
@@ -88,14 +88,14 @@ export default class GradesGrid extends Component {
     students: arrayOf(
       shape({
         displayName: string,
-        id: string.isRequired
+        id: string.isRequired,
       }).isRequired
-    ).isRequired
+    ).isRequired,
   }
 
   static defaultProps = {
     finalGrader: null,
-    onGradeSelect: null
+    onGradeSelect: null,
   }
 
   constructor(props) {
@@ -103,7 +103,7 @@ export default class GradesGrid extends Component {
 
     this.state = {
       currentPageIndex: 0,
-      pages: studentsToPages(props)
+      pages: studentsToPages(props),
     }
   }
 

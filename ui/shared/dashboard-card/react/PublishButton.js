@@ -35,22 +35,22 @@ export default class PublishButton extends React.Component {
     pagesUrl: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired,
     courseNickname: PropTypes.string.isRequired,
-    frontPageTitle: PropTypes.string
+    frontPageTitle: PropTypes.string,
   }
 
   static defaultProps = {
-    frontPageTitle: ''
+    frontPageTitle: '',
   }
 
   state = {
-    showModal: false
+    showModal: false,
   }
 
   componentDidMount() {
     const {defaultView} = this.props
     this.defaultViewStore = createStore({
       selectedDefaultView: defaultView,
-      savedDefaultView: defaultView
+      savedDefaultView: defaultView,
     })
   }
 
@@ -90,7 +90,7 @@ export default class PublishButton extends React.Component {
         </Button>
         {showModal && (
           <HomePagePromptContainer
-            forceOpen
+            forceOpen={true}
             store={this.defaultViewStore}
             courseId={courseId}
             wikiUrl={pagesUrl}

@@ -54,7 +54,7 @@ export const handleDeepLinking = async event => {
     const item = await processSingleContentItem(event)
     onExternalContentReady(event, {
       service_id: item.service_id,
-      contentItems: [item]
+      contentItems: [item],
     })
   } catch (e) {
     $.flashError(I18n.t('Error retrieving content from tool'))

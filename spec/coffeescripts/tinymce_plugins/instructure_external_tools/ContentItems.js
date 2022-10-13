@@ -24,18 +24,18 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'window'
+      presentationDocumentTarget: 'window',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_thumb_frame: {
     text: 'Arch Linux thumbnail frame',
@@ -44,18 +44,18 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'frame'
+      presentationDocumentTarget: 'frame',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_thumb_iframe: {
     text: 'Arch Linux thumbnail iframe',
@@ -64,18 +64,18 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'iframe'
+      presentationDocumentTarget: 'iframe',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_thumb_embed: {
     text: 'Arch Linux thumbnail embed',
@@ -84,18 +84,18 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'embed'
+      presentationDocumentTarget: 'embed',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_embed: {
     text: 'Arch Linux plain embed',
@@ -104,13 +104,13 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'embed'
+      presentationDocumentTarget: 'embed',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_frame: {
     text: 'Arch Linux plain frame',
@@ -119,13 +119,13 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'frame'
+      presentationDocumentTarget: 'frame',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_iframe: {
     text: 'Arch Linux plain iframe',
@@ -134,13 +134,13 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'iframe'
+      presentationDocumentTarget: 'iframe',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?display=borderless&url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   lti_window: {
     text: 'Arch Linux plain window',
@@ -149,13 +149,13 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'window'
+      presentationDocumentTarget: 'window',
     },
     mediaType: 'application/vnd.ims.lti.v1.ltilink',
     '@type': 'LtiLink',
     '@id': 'http://lti-tool-provider-example.dev/messages/blti',
     canvasURL:
-      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti'
+      '/courses/1/external_tools/retrieve?url=http%3A%2F%2Flti-tool-provider-example.dev%2Fmessages%2Fblti',
   },
   text_thumb_embed: {
     text: 'Arch Linux file item thumbnail embed',
@@ -164,16 +164,16 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'embed'
+      presentationDocumentTarget: 'embed',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_thumb_frame: {
     text: 'Arch Linux file item thumbnail frame',
@@ -182,16 +182,16 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'frame'
+      presentationDocumentTarget: 'frame',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_thumb_iframe: {
     text: 'Arch Linux file item thumbnail iframe',
@@ -200,16 +200,16 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'iframe'
+      presentationDocumentTarget: 'iframe',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_thumb_window: {
     text: 'Arch Linux file item thumbnail window',
@@ -218,16 +218,16 @@ export default {
     thumbnail: {
       height: 128,
       width: 128,
-      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png'
+      '@id': 'http://www.runeaudio.com/assets/img/banner-archlinux.png',
     },
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'window'
+      presentationDocumentTarget: 'window',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_embed: {
     text: 'Arch Linux file item embed',
@@ -236,11 +236,11 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'embed'
+      presentationDocumentTarget: 'embed',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_frame: {
     text: 'Arch Linux file item frame',
@@ -249,11 +249,11 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'frame'
+      presentationDocumentTarget: 'frame',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_iframe: {
     text: 'Arch Linux file item iframe',
@@ -262,11 +262,11 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'iframe'
+      presentationDocumentTarget: 'iframe',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_window: {
     text: 'Arch Linux file item window',
@@ -275,11 +275,11 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'window'
+      presentationDocumentTarget: 'window',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
   },
   text_window_no_text: {
     text: '',
@@ -288,10 +288,10 @@ export default {
     placementAdvice: {
       displayHeight: 600,
       displayWidth: 800,
-      presentationDocumentTarget: 'window'
+      presentationDocumentTarget: 'window',
     },
     mediaType: 'text/plain',
     '@type': 'FileItem',
-    '@id': 'http://lti-tool-provider-example.dev/test_file.txt'
-  }
+    '@id': 'http://lti-tool-provider-example.dev/test_file.txt',
+  },
 }

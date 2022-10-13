@@ -32,16 +32,16 @@ export default class GroupsView extends PaginatedCollectionView {
     this.prototype.els = {
       // override Filterable's els, since our filter is in another view
       ...PaginatedCollectionView.prototype.els,
-      '.no-results': '$noResults'
+      '.no-results': '$noResults',
     }
 
     this.prototype.events = {
       ...PaginatedCollectionView.prototype.events,
       scroll: 'closeMenus',
-      dragstart: 'closeMenus'
+      dragstart: 'closeMenus',
     }
 
-    this.prototype.closeMenus = _.throttle(function() {
+    this.prototype.closeMenus = _.throttle(function () {
       return this.collection.models.map(model => model.itemView.closeMenus())
     }, 50)
   }
@@ -66,15 +66,15 @@ export default class GroupsView extends PaginatedCollectionView {
       collection: group.users(),
       itemViewOptions: {
         canEditGroupAssignment: !group.isLocked(),
-        markInactiveStudents: __guard__(group.users(), x => x.markInactiveStudents)
-      }
+        markInactiveStudents: __guard__(group.users(), x => x.markInactiveStudents),
+      },
     })
     const groupDetailView = new GroupDetailView({model: group, users: group.users()})
     const groupView = new GroupView({
       model: group,
       groupUsersView,
       groupDetailView,
-      addUnassignedMenu: this.options.addUnassignedMenu
+      addUnassignedMenu: this.options.addUnassignedMenu,
     })
     return (group.itemView = groupView)
   }

@@ -30,7 +30,7 @@ function renderInput(overrides = {}) {
     timezone: 'UTC',
     formatDate: jest.fn(date => date.toISOString()),
     onSelectedDateChange: jest.fn(),
-    ...overrides
+    ...overrides,
   }
   const result = render(<CanvasDateInput {...props} />)
   result.props = props
@@ -200,7 +200,7 @@ describe('dirty input state', () => {
     const {getInput} = renderAndDirtyInput('May 20, 2020', {
       selectedDate: new Date(),
       timezone: tz,
-      onSelectedDateChange: handleDateChange
+      onSelectedDateChange: handleDateChange,
     })
     fireEvent.blur(getInput())
     expect(handleDateChange.mock.calls[0][0].toISOString()).toEqual('2020-05-20T00:00:00.000Z')
@@ -289,7 +289,7 @@ describe('error messages', () => {
 describe('messages', () => {
   it('shows the specified messages', () => {
     const {getByText} = renderInput({
-      messages: [{type: 'hint', text: 'my what an interesting date'}]
+      messages: [{type: 'hint', text: 'my what an interesting date'}],
     })
     expect(getByText('my what an interesting date')).toBeInTheDocument()
   })

@@ -27,7 +27,7 @@ const I18n = useI18nScope('new_user_tutorial')
 
 class NewUserTutorialToggleButton extends React.Component {
   static propTypes = {
-    store: PropTypes.shape(plainStoreShape).isRequired
+    store: PropTypes.shape(plainStoreShape).isRequired,
   }
 
   constructor(props) {
@@ -55,7 +55,7 @@ class NewUserTutorialToggleButton extends React.Component {
     event.preventDefault()
 
     this.props.store.setState({
-      isCollapsed: !this.state.isCollapsed
+      isCollapsed: !this.state.isCollapsed,
     })
   }
 

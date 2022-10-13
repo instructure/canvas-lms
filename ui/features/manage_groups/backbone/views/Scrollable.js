@@ -71,7 +71,7 @@ export default {
       },
       0
     )
-    this._resize = function() {
+    this._resize = function () {
       const offsetTop = this.$el.offset().top
       let availableHeight = $window.height()
       availableHeight -= $footer.outerHeight(true)
@@ -107,5 +107,5 @@ export default {
     })
 
     return this.$el.on('dragstop', (event, ui) => clearTimeout(this._checkScrollTimeout))
-  }
+  },
 }

@@ -33,7 +33,7 @@ const props = {
     id: '5',
     display_name: 'John Smith',
     html_url: '',
-    avatar_image_url: null
+    avatar_image_url: null,
   },
   className: '',
   id: '5',
@@ -42,7 +42,7 @@ const props = {
   defaultSelected: false,
   isRead: false,
   showAvatar: true,
-  onSelectedChanged: () => {}
+  onSelectedChanged: () => {},
 }
 
 test('renders the CourseItemRow component', () => {
@@ -172,8 +172,8 @@ test('renders master course lock icon if isMasterCourse', () => {
       lockedText: '',
       course_id: '3',
       content_id: '5',
-      content_type: 'announcement'
-    })
+      content_type: 'announcement',
+    }),
   }
   const tree = mount(<CourseItemRow {...props} masterCourse={masterCourse} />)
   ok(tree.instance().masterCourseLock)
@@ -194,8 +194,8 @@ test('renders master course lock icon if isChildCourse', () => {
       lockedText: '',
       course_id: '3',
       content_id: '5',
-      content_type: 'announcement'
-    })
+      content_type: 'announcement',
+    }),
   }
   const tree = mount(<CourseItemRow {...props} masterCourse={masterCourse} />)
   ok(tree.instance().masterCourseLock)
@@ -204,7 +204,7 @@ test('renders master course lock icon if isChildCourse', () => {
 test('renders no master course lock icon if no master course data provided', () => {
   const masterCourse = {
     courseData: {},
-    getLockOptions: () => ({})
+    getLockOptions: () => ({}),
   }
   const tree = mount(<CourseItemRow {...props} masterCourse={masterCourse} />)
   notOk(tree.instance().masterCourseLock)
@@ -213,7 +213,7 @@ test('renders no master course lock icon if no master course data provided', () 
 test('renders no master course lock icon if isMasterCourse and isChildCourse are false', () => {
   const masterCourse = {
     courseData: {isMasterCourse: false, isChildCourse: false},
-    getLockOptions: () => ({})
+    getLockOptions: () => ({}),
   }
   const tree = mount(<CourseItemRow {...props} masterCourse={masterCourse} />)
   notOk(tree.instance().masterCourseLock)

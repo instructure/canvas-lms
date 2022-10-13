@@ -40,6 +40,6 @@ const Helpers = {
     }
 
     return {file, type}
-  }
+  },
 }
 export default Helpers

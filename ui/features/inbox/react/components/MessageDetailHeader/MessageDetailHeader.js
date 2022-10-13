@@ -46,17 +46,17 @@ export const MessageDetailHeader = ({...props}) => {
         mobile: {
           level: 'h4',
           as: 'h3',
-          datatestId: 'message-detail-header-mobile'
+          datatestId: 'message-detail-header-mobile',
         },
         desktop: {
           level: 'h3',
           as: 'h3',
-          datatestId: 'message-detail-header-desktop'
-        }
+          datatestId: 'message-detail-header-desktop',
+        },
       }}
       render={responsiveProps => (
         <Flex padding="small">
-          <Flex.Item shouldGrow shouldShrink>
+          <Flex.Item shouldGrow={true} shouldShrink={true}>
             <span tabIndex="-1" ref={ref => props.focusRef(ref)} />
             <Heading
               level={responsiveProps.level}
@@ -164,10 +164,10 @@ MessageDetailHeader.propTypes = {
   focusRef: PropTypes.any,
   onForward: PropTypes.func,
   submissionCommentURL: PropTypes.string,
-  scope: PropTypes.string
+  scope: PropTypes.string,
 }
 
 MessageDetailHeader.defaultProps = {
   text: null,
-  focusRef: () => {}
+  focusRef: () => {},
 }

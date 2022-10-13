@@ -22,9 +22,7 @@ import RecentStudentCollectionView from './backbone/views/RecentStudentCollectio
 import 'jqueryui/tabs'
 
 $(() => {
-  $('#reports-tabs')
-    .tabs()
-    .show()
+  $('#reports-tabs').tabs().show()
 
   const recentStudentCollection = new UserCollection()
   recentStudentCollection.url = ENV.RECENT_STUDENTS_URL
@@ -34,6 +32,6 @@ $(() => {
   window.app = {studentsTab: {}}
   window.app.studentsTab = new RecentStudentCollectionView({
     el: '#tab-students .item_list',
-    collection: recentStudentCollection
+    collection: recentStudentCollection,
   })
 })

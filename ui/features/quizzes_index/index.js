@@ -33,14 +33,14 @@ const I18n = useI18nScope('quizzes_index')
 
 const QuizzesIndexRouter = Backbone.Router.extend({
   routes: {
-    '': 'index'
+    '': 'index',
   },
 
   translations: {
     assignmentQuizzes: I18n.t('headers.assignment_quizzes', 'Assignment Quizzes'),
     practiceQuizzes: I18n.t('headers.practice_quizzes', 'Practice Quizzes'),
     surveys: I18n.t('headers.surveys', 'Surveys'),
-    toggleMessage: I18n.t('toggle_message', 'toggle quiz visibility')
+    toggleMessage: I18n.t('toggle_message', 'toggle quiz visibility'),
   },
 
   initialize() {
@@ -62,7 +62,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
         this.translations.surveys,
         'surveys'
       ),
-      noQuizzes: new NoQuizzesView()
+      noQuizzes: new NoQuizzesView(),
     }
   },
 
@@ -74,7 +74,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
       noQuizzesView: this.quizzes.noQuizzes,
       permissions: ENV.PERMISSIONS,
       flags: ENV.FLAGS,
-      urls: ENV.URLS
+      urls: ENV.URLS,
     })
     this.view.render()
     if (this.shouldLoadOverrides()) this.loadOverrides()
@@ -107,13 +107,13 @@ const QuizzesIndexRouter = Backbone.Router.extend({
       isSurvey: type === 'surveys',
       listId: `${type}-quizzes`,
       title,
-      toggleMessage: this.translations.toggleMessage
+      toggleMessage: this.translations.toggleMessage,
     })
   },
 
   shouldLoadOverrides() {
     return true
-  }
+  },
 })
 
 ready(() => {

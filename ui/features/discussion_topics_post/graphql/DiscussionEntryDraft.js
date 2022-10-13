@@ -37,7 +37,7 @@ export const DiscussionEntryDraft = {
     discussionTopicId: string,
     rootEntryId: string,
     discussionEntryId: string,
-    message: string
+    message: string,
   }),
 
   mock: ({
@@ -48,7 +48,7 @@ export const DiscussionEntryDraft = {
     message = 'Howdy Partner, this is a draft message!',
     discussionTopicId = '5',
     discussionEntryId = '8',
-    rootEntryId = null
+    rootEntryId = null,
   } = {}) => ({
     id,
     _id,
@@ -58,8 +58,8 @@ export const DiscussionEntryDraft = {
     updatedAt,
     message,
     rootEntryId,
-    __typename: 'DiscussionEntryDraft'
-  })
+    __typename: 'DiscussionEntryDraft',
+  }),
 }
 
 export const DefaultMocks = {
@@ -71,6 +71,6 @@ export const DefaultMocks = {
     message: 'Howdy Partner, this is a draft message!',
     discussionTopicId: '5',
     discussionEntryId: '8',
-    rootEntryId: null
-  })
+    rootEntryId: null,
+  }),
 }

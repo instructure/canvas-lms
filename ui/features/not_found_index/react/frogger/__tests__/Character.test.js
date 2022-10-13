@@ -23,7 +23,7 @@ const defaultCharacterParams = () => ({
   height: 120,
   x: 10,
   y: 20,
-  speed: 100
+  speed: 100,
 })
 
 test('Character constructur creates with correct paremeters', () => {

@@ -38,7 +38,7 @@ test('QuizEvent.fromJSON', () => {
   const descriptor = {
     client_timestamp: new Date().toJSON(),
     event_type: 'some_type',
-    event_data: {foo: 'bar'}
+    event_data: {foo: 'bar'},
   }
   const event = QuizEvent.fromJSON(descriptor)
   equal(event.recordedAt.toJSON(), descriptor.client_timestamp)

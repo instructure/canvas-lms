@@ -19,7 +19,7 @@
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 
 QUnit.module('accessibleDateFormat', {
-  setup() {}
+  setup() {},
 })
 
 test('it pulls out the links from an Axios response header', () => {

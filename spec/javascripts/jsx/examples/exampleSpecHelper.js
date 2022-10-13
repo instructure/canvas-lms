@@ -17,5 +17,5 @@
  */
 
 export default {
-  text: 'Example Text'
+  text: 'Example Text',
 }

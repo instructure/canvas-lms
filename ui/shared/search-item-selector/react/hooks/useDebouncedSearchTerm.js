@@ -98,6 +98,6 @@ export default function useDebouncedSearchTerm(
     setSearchTerm,
     searchTermIsPending,
     cancelCallback: wrappedCancelCallback,
-    callPending
+    callPending,
   }
 }

@@ -24,7 +24,7 @@ import {
   IconCalendarMonthLine,
   IconDiscussionLine,
   IconQuizLine,
-  IconAssignmentLine
+  IconAssignmentLine,
 } from '@instructure/ui-icons'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -40,23 +40,23 @@ const itemTypes = [
   {
     type: 'event',
     icon: <IconCalendarMonthLine />,
-    label: I18n.t('Calendar Event')
+    label: I18n.t('Calendar Event'),
   },
   {
     type: 'discussion_topic',
     icon: <IconDiscussionLine />,
-    label: I18n.t('Discussion')
+    label: I18n.t('Discussion'),
   },
   {
     type: 'online_quiz',
     icon: <IconQuizLine />,
-    label: I18n.t('Quiz')
+    label: I18n.t('Quiz'),
   },
   {
     type: 'assignment',
     icon: <IconAssignmentLine />,
-    label: I18n.t('Assignment')
-  }
+    label: I18n.t('Assignment'),
+  },
 ]
 
 const ItemIcon = ({type, color}) => {
@@ -96,7 +96,7 @@ const ImportantDateItem = ({title, context, color, type, url}) => (
           theme={{
             color: k5Theme.variables.colors.textDarkest,
             hoverColor: k5Theme.variables.colors.textDarkest,
-            fontWeight: 700
+            fontWeight: 700,
           }}
         >
           {title}
@@ -112,11 +112,11 @@ export const ImportantDateItemShape = {
   context: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  url: PropTypes.string.isRequired
+  url: PropTypes.string.isRequired,
 }
 
 ImportantDateItem.propTypes = {
-  ...ImportantDateItemShape
+  ...ImportantDateItemShape,
 }
 
 export default ImportantDateItem

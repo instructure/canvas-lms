@@ -77,7 +77,7 @@ ready(() => {
       startButton.addEventListener('click', () => {
         ReactDOM.render(
           <CreateCourseModal
-            isModalOpen
+            isModalOpen={true}
             setModalOpen={isOpen => {
               if (!isOpen) ReactDOM.unmountComponentAtNode(container)
             }}

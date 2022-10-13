@@ -20,11 +20,11 @@ import Dispatcher from './dispatcher'
 
 const Actions = {}
 
-Actions.regenerateReport = function(id) {
+Actions.regenerateReport = function (id) {
   return Dispatcher.dispatch('quizReports:regenerate', id)
 }
 
-Actions.abortReportGeneration = function(id) {
+Actions.abortReportGeneration = function (id) {
   return Dispatcher.dispatch('quizReports:abort', id)
 }
 

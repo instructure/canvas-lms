@@ -245,37 +245,37 @@ describe CanvasOutcomesHelper do
           end
 
           it "returns results with one assignment id" do
-            expected_results = [{ "result" => "stuff" }]
+            expected_results = [{ result: "stuff" }]
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
             expect(subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple assignment ids" do
-            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
+            expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one outcome id" do
-            expected_results = [{ "result_one" => "stuff" }]
+            expected_results = [{ result_one: "stuff" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff"}]}')
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple outcome ids" do
-            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
+            expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with one user uuid" do
-            expected_results = [{ "result_one" => "stuff1" }]
+            expected_results = [{ result_one: "stuff1" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"}]}')
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", one_user_uuid)).to eq expected_results
           end
 
           it "returns results with multiple user uuids" do
-            expected_results = [{ "result_one" => "stuff1" }, { "result_two" => "stuff2" }]
+            expected_results = [{ result_one: "stuff1" }, { result_two: "stuff2" }]
             stub_get_lmgb_results("associated_asset_id_list=1,2&associated_asset_type=assign.type&external_outcome_id_list=1,2&user_uuid_list=#{multiple_user_uuids}").to_return(status: 200, body: '{"results":[{"result_one":"stuff1"},{"result_two":"stuff2"}]}')
             expect(subject.get_lmgb_results(@course, "1,2", "assign.type", "1,2", multiple_user_uuids)).to eq expected_results
           end
@@ -341,8 +341,64 @@ describe CanvasOutcomesHelper do
         end
 
         it "returns results with one assignment id" do
-          expected_results = [{ "result" => "stuff" }]
+          expected_results = [{ result: "stuff" }]
           stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 200, body: '{"results":[{"result":"stuff"}]}')
+          expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
+        end
+
+        def attempt(id, points, json_to_hash_with_symbol_keys: false)
+          metadata = "{\"question_metadata\":[{\"quiz_item_id\":\"#{id}\",\"quiz_item_title\":\"Question #{id}\",\"points\":\"#{points}\",\"points_possible\":\"3.0\"}]}"
+          if json_to_hash_with_symbol_keys
+            metadata = JSON.parse(metadata).deep_symbolize_keys
+            { id: id, metadata: metadata }
+          else
+            { "id" => id, "metadata" => metadata }
+          end
+        end
+
+        it "returns parsed results, multiple results with multiple attempts" do
+          mocked_result = { "results" => [
+            {
+              "associated_asset_id" => 1,
+              "attempts" => [
+                attempt(0, 0.0),
+                attempt(1, 1.0)
+              ]
+            },
+            {
+              "associated_asset_id" => 2,
+              "attempts" => [
+                attempt(2, 2.0),
+                attempt(3, 3.0)
+              ]
+            },
+            {
+              "associated_asset_id" => 3
+            }
+          ] }
+          expected_results = [
+            {
+              associated_asset_id: 1,
+              attempts: [
+                attempt(0, 0.0, json_to_hash_with_symbol_keys: true),
+                attempt(1, 1.0, json_to_hash_with_symbol_keys: true)
+              ]
+            },
+            {
+              associated_asset_id: 2,
+              attempts: [
+                attempt(2, 2.0, json_to_hash_with_symbol_keys: true),
+                attempt(3, 3.0, json_to_hash_with_symbol_keys: true)
+              ]
+            },
+            {
+              associated_asset_id: 3
+            }
+          ]
+
+          stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}")
+            .to_return(status: 200, body: mocked_result.to_json.to_s)
+
           expect(subject.get_lmgb_results(account, "1", "assign.type", "1", one_user_uuid)).to eq expected_results
         end
       end

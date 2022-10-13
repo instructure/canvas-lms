@@ -26,8 +26,8 @@ export const AddressBookContainer = props => {
   const userID = ENV.current_user_id?.toString()
   const [filterHistory, setFilterHistory] = useState([
     {
-      context: null
-    }
+      context: null,
+    },
   ])
   const [inputValue, setInputValue] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
@@ -48,9 +48,9 @@ export const AddressBookContainer = props => {
     variables: {
       context: filterHistory[filterHistory.length - 1]?.context?.contextID,
       search: searchTerm,
-      userID
+      userID,
     },
-    notifyOnNetworkStatusChange: true
+    notifyOnNetworkStatusChange: true,
   })
   const {loading, data} = addressBookRecipientsQuery
 
@@ -62,8 +62,8 @@ export const AddressBookContainer = props => {
       setInputValue('')
       setFilterHistory([
         {
-          context: null
-        }
+          context: null,
+        },
       ])
     }
   }, [props.activeCourseFilter])
@@ -81,7 +81,7 @@ export const AddressBookContainer = props => {
         search: searchTerm,
         userID,
         afterUser: data?.legacyNode?.recipients?.usersConnection?.pageInfo.endCursor,
-        afterContext: data?.legacyNode?.recipients?.contextsConnection?.pageInfo.endCursor
+        afterContext: data?.legacyNode?.recipients?.contextsConnection?.pageInfo.endCursor,
       },
       updateQuery: (previousResult, {fetchMoreResult}) => {
         setIsLoadingMoreData(false)
@@ -93,25 +93,25 @@ export const AddressBookContainer = props => {
               contextsConnection: {
                 nodes: [
                   ...previousResult.legacyNode?.recipients?.contextsConnection?.nodes,
-                  ...fetchMoreResult.legacyNode?.recipients?.contextsConnection?.nodes
+                  ...fetchMoreResult.legacyNode?.recipients?.contextsConnection?.nodes,
                 ],
                 pageInfo: fetchMoreResult.legacyNode?.recipients?.contextsConnection?.pageInfo,
-                __typename: 'MessageableContextConnection'
+                __typename: 'MessageableContextConnection',
               },
               usersConnection: {
                 nodes: [
                   ...previousResult.legacyNode?.recipients?.usersConnection?.nodes,
-                  ...fetchMoreResult.legacyNode?.recipients?.usersConnection?.nodes
+                  ...fetchMoreResult.legacyNode?.recipients?.usersConnection?.nodes,
                 ],
                 pageInfo: fetchMoreResult.legacyNode?.recipients?.usersConnection?.pageInfo,
-                __typename: 'MessageableUserConnection'
+                __typename: 'MessageableUserConnection',
               },
-              __typename: 'Recipients'
+              __typename: 'Recipients',
             },
-            __typename: 'User'
-          }
+            __typename: 'User',
+          },
         }
-      }
+      },
     })
   }
 
@@ -135,7 +135,7 @@ export const AddressBookContainer = props => {
       courseEnrollment =>
         (courseEnrollment = {
           courseID: courseEnrollment.course._id,
-          courseRole: courseEnrollment.type
+          courseRole: courseEnrollment.type,
         })
     )
   }
@@ -145,8 +145,8 @@ export const AddressBookContainer = props => {
       addFilterHistory({
         context: {
           contextID: props.activeCourseFilter.contextID,
-          contextName: props.activeCourseFilter.contextName
-        }
+          contextName: props.activeCourseFilter.contextName,
+        },
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,7 +164,7 @@ export const AddressBookContainer = props => {
       return {
         id: c.id,
         name: c.name,
-        itemType: CONTEXT_TYPE
+        itemType: CONTEXT_TYPE,
       }
     })
 
@@ -174,7 +174,7 @@ export const AddressBookContainer = props => {
         id: u.id,
         name: u.name,
         commonCoursesInfo: getCommonCoursesInformation(u.commonCoursesConnection),
-        itemType: USER_TYPE
+        itemType: USER_TYPE,
       }
     })
 
@@ -212,12 +212,12 @@ export const AddressBookContainer = props => {
   const handleSelect = (item, isContext, isBackButton, isSubmenu) => {
     if (isContext) {
       addFilterHistory({
-        context: {contextID: item.id, contextName: item.name}
+        context: {contextID: item.id, contextName: item.name},
       })
     } else if (isSubmenu) {
       addFilterHistory({
         context: null,
-        subMenuSelection: item.id
+        subMenuSelection: item.id,
       })
     } else if (isBackButton) {
       if (inputValue) {
@@ -290,13 +290,13 @@ AddressBookContainer.propTypes = {
    * bool which determines if "select all" in a context menu appears
    */
   hasSelectAllFilterOption: PropTypes.bool,
-  addressBookMessages: PropTypes.array
+  addressBookMessages: PropTypes.array,
 }
 
 AddressBookContainer.defaultProps = {
   onSelectedIdsChange: () => {},
   onInputValueChange: () => {},
-  hasSelectAllFilterOption: false
+  hasSelectAllFilterOption: false,
 }
 
 export default AddressBookContainer

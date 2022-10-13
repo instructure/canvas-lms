@@ -42,7 +42,7 @@ QUnit.module('DueDateRow with empty props and canDelete true', {
       handleTokenAdd() {},
       handleTokenRemove() {},
       replaceDate() {},
-      inputsDisabled: false
+      inputsDisabled: false,
     }
     const DueDateRowElement = <DueDateRow {...props} />
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
@@ -50,14 +50,14 @@ QUnit.module('DueDateRow with empty props and canDelete true', {
   teardown() {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDateRow).parentNode)
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   ok(this.dueDateRow)
 })
 
-test('returns a remove link if canDelete', function() {
+test('returns a remove link if canDelete', function () {
   ok(this.dueDateRow.removeLinkIfNeeded())
 })
 
@@ -70,25 +70,25 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
         {
           get(attr) {
             return {course_section_id: 1}[attr]
-          }
+          },
         },
         {
           get(attr) {
             return {course_section_id: 2}[attr]
-          }
+          },
         },
         {
           get(attr) {
             return {
-              student_ids: [1, 2, 3]
+              student_ids: [1, 2, 3],
             }[attr]
-          }
+          },
         },
         {
           get(attr) {
             return {group_id: 2}[attr]
-          }
-        }
+          },
+        },
       ],
       sections: {2: {name: 'section name'}},
       students: {2: {name: 'student name'}, 3: {displayName: 'Nacho Libre', name: 'other student'}},
@@ -104,7 +104,7 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
       handleTokenAdd() {},
       handleTokenRemove() {},
       replaceDate() {},
-      inputsDisabled: false
+      inputsDisabled: false,
     }
     const DueDateRowElement = <DueDateRow {...props} />
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
@@ -112,58 +112,58 @@ QUnit.module('DueDateRow with realistic props and canDelete false', {
   teardown() {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDateRow).parentNode)
-  }
+  },
 })
 
-test('renders', function() {
+test('renders', function () {
   ok(this.dueDateRow)
 })
 
-test('does not return remove link if not canDelete', function() {
+test('does not return remove link if not canDelete', function () {
   ok(!this.dueDateRow.removeLinkIfNeeded())
 })
 
-test('tokenizing ADHOC overrides works', function() {
+test('tokenizing ADHOC overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   equal(6, tokens.length)
   equal(3, tokens.filter(t => t.type === 'student').length)
 })
 
-test('tokenizing section overrides works', function() {
+test('tokenizing section overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   equal(6, tokens.length)
   equal(2, tokens.filter(t => t.type === 'section').length)
 })
 
-test('tokenizing group overrides works', function() {
+test('tokenizing group overrides works', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   equal(6, tokens.length)
   equal(1, tokens.filter(t => t.type === 'group').length)
 })
 
-test('section tokens are given their proper name if loaded', function() {
+test('section tokens are given their proper name if loaded', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'section name')
   ok(!!token)
 })
 
-test('returns correct name from nameOrLoading', function() {
+test('returns correct name from nameOrLoading', function () {
   const collection = {
-    '2': {
+    2: {
       id: '2',
       name: 'pronouns student',
       created_at: '2019-10-28T07:53:54-06:00',
       sortable_name: 'mileaciobonu, felix',
       short_name: 'felix mileaciobonu',
-      pronouns: 'He/Him'
+      pronouns: 'He/Him',
     },
-    '5': {
+    5: {
       id: '5',
       name: 'no pronounsstudent',
       created_at: '2019-11-18T21:31:59-07:00',
       sortable_name: 'student, test',
-      short_name: 'test student'
-    }
+      short_name: 'test student',
+    },
   }
   const pronounsName = this.dueDateRow.nameOrLoading(collection, '2')
   const noPronounsName = this.dueDateRow.nameOrLoading(collection, '5')
@@ -173,25 +173,25 @@ test('returns correct name from nameOrLoading', function() {
   equal(loading, 'Loading...')
 })
 
-test('student tokens are displayName if loaded', function() {
+test('student tokens are displayName if loaded', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'Nacho Libre')
   ok(!!token)
 })
 
-test('student tokens are name if loaded and displayName is not present', function() {
+test('student tokens are name if loaded and displayName is not present', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'student name')
   ok(!!token)
 })
 
-test('group tokens are their proper name if loaded', function() {
+test('group tokens are their proper name if loaded', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'group name')
   ok(!!token)
 })
 
-test('student tokens are given the name "Loading..." if they havent loaded', function() {
+test('student tokens are given the name "Loading..." if they havent loaded', function () {
   const tokens = this.dueDateRow.tokenizedOverrides()
   const token = tokens.find(t => t.name === 'Loading...')
   ok(!!token)
@@ -217,7 +217,7 @@ QUnit.module('DueDateRow with empty props and inputsDisabled true', {
       handleTokenAdd() {},
       handleTokenRemove() {},
       replaceDate() {},
-      inputsDisabled: true
+      inputsDisabled: true,
     }
     const DueDateRowElement = <DueDateRow {...props} />
     this.dueDateRow = ReactDOM.render(DueDateRowElement, $('<div>').appendTo('body')[0])
@@ -225,9 +225,9 @@ QUnit.module('DueDateRow with empty props and inputsDisabled true', {
   teardown() {
     fakeENV.teardown()
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.dueDateRow).parentNode)
-  }
+  },
 })
 
-test('does not return a remove link', function() {
+test('does not return a remove link', function () {
   notOk(this.dueDateRow.removeLinkIfNeeded())
 })

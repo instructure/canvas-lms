@@ -18,7 +18,7 @@
 
 export default {
   camelize(str, lowerFirst) {
-    return (str || '').replace(/(?:^|[-_])(\w)/g, function(_, c, index) {
+    return (str || '').replace(/(?:^|[-_])(\w)/g, function (_, c, index) {
       if (index === 0 && lowerFirst) {
         return c ? c.toLowerCase() : ''
       } else {
@@ -28,8 +28,8 @@ export default {
   },
 
   underscore(str) {
-    return str.replace(/([A-Z])/g, function($1) {
+    return str.replace(/([A-Z])/g, function ($1) {
       return '_' + $1.toLowerCase()
     })
-  }
+  },
 }

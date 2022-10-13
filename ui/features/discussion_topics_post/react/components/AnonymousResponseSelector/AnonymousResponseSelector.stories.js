@@ -22,7 +22,7 @@ import {AnonymousResponseSelector} from './AnonymousResponseSelector'
 export default {
   title: 'Examples/Discussion Posts/Components/AnonymousResponseSelector',
   component: AnonymousResponseSelector,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AnonymousResponseSelector {...args} />
@@ -30,17 +30,17 @@ const Template = args => <AnonymousResponseSelector {...args} />
 export const PartiallyAnonymous = Template.bind({})
 PartiallyAnonymous.args = {
   username: 'Hermione Granger',
-  discussionAnonymousState: 'partial_anonymity'
+  discussionAnonymousState: 'partial_anonymity',
 }
 
 export const FullyAnonymous = Template.bind({})
 FullyAnonymous.args = {
   username: 'Harry Potter',
-  discussionAnonymousState: 'full_anonymity'
+  discussionAnonymousState: 'full_anonymity',
 }
 
 export const NotAnonymous = Template.bind({})
 NotAnonymous.args = {
   username: 'Ronald Weasley',
-  discussionAnonymousState: null
+  discussionAnonymousState: null,
 }

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import reducer from 'ui/features/account_course_user_search/react/reducers/rootReducer.js'
+import reducer from 'ui/features/account_course_user_search/react/reducers/rootReducer'
 
 QUnit.module('Account Course User Search Reducer')
 
@@ -24,13 +24,13 @@ test('ADD_ERROR action reducer', () => {
   const initialState = {
     userList: {
       users: [],
-      errors: []
-    }
+      errors: [],
+    },
   }
 
   const action = {
     type: 'ADD_ERROR',
-    error: {errorKey: 'test error'}
+    error: {errorKey: 'test error'},
   }
 
   const newState = reducer(initialState, action)
@@ -47,8 +47,8 @@ test('ADD_TO_USERS action reducer', () => {
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'ADD_TO_USERS',
@@ -60,10 +60,10 @@ test('ADD_TO_USERS action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
-      ]
-    }
+          sortable_name: 'someuser',
+        },
+      ],
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -81,8 +81,8 @@ test('ADD_TO_USERS action reducer invalid email', () => {
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'ADD_TO_USERS',
@@ -94,10 +94,10 @@ test('ADD_TO_USERS action reducer invalid email', () => {
           login_id: 'invalid.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
-      ]
-    }
+          sortable_name: 'someuser',
+        },
+      ],
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -115,8 +115,8 @@ test('GOT_USERS action reducer', () => {
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const LinkHeader =
     '<http://canvas/api/v1/accounts/1/users?page=2>; rel="current",' +
@@ -130,7 +130,7 @@ test('GOT_USERS action reducer', () => {
     next: {page: '3', rel: 'next', url: 'http://canvas/api/v1/accounts/1/users?page=3'},
     prev: {page: '1', rel: 'prev', url: 'http://canvas/api/v1/accounts/1/users?page=1'},
     first: {page: '1', rel: 'first', url: 'http://canvas/api/v1/accounts/1/users?page=1'},
-    last: {page: '5', rel: 'last', url: 'http://canvas/api/v1/accounts/1/users?page=5'}
+    last: {page: '5', rel: 'last', url: 'http://canvas/api/v1/accounts/1/users?page=5'},
   }
 
   const action = {
@@ -143,16 +143,13 @@ test('GOT_USERS action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
+          sortable_name: 'someuser',
+        },
       ],
       xhr: {
-        getResponseHeader: sandbox
-          .mock()
-          .withArgs('Link')
-          .returns(LinkHeader)
-      }
-    }
+        getResponseHeader: sandbox.mock().withArgs('Link').returns(LinkHeader),
+      },
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -171,23 +168,23 @@ test('GOT_USER_UPDATE action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
+          sortable_name: 'someuser',
+        },
       ],
       isLoading: true,
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'GOT_USER_UPDATE',
     payload: {
       id: '1',
-      name: 'aNewName'
-    }
+      name: 'aNewName',
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -204,23 +201,23 @@ test('OPEN_EDIT_USER_DIALOG action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
+          sortable_name: 'someuser',
+        },
       ],
       isLoading: true,
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'OPEN_EDIT_USER_DIALOG',
     payload: {
       id: '1',
-      name: 'aNewName'
-    }
+      name: 'aNewName',
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -242,23 +239,23 @@ test('CLOSE_EDIT_USER_DIALOG action reducer', () => {
           name: 'someuser',
           short_name: 'someuser',
           sortable_name: 'someuser',
-          editUserDialogOpen: true
-        }
+          editUserDialogOpen: true,
+        },
       ],
       isLoading: true,
       errors: {search_term: ''},
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'CLOSE_EDIT_USER_DIALOG',
     payload: {
       id: '1',
-      name: 'aNewName'
-    }
+      name: 'aNewName',
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -279,22 +276,22 @@ test('UPDATE_SEARCH_FILTER action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
+          sortable_name: 'someuser',
+        },
       ],
       isLoading: true,
       errors: {},
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'UPDATE_SEARCH_FILTER',
     payload: {
-      search_term: 'someuser'
-    }
+      search_term: 'someuser',
+    },
   }
 
   const newState = reducer(initialState, action)
@@ -316,20 +313,20 @@ test('LOADING_USERS action reducer', () => {
           login_id: 'some_email@example.com',
           name: 'someuser',
           short_name: 'someuser',
-          sortable_name: 'someuser'
-        }
+          sortable_name: 'someuser',
+        },
       ],
       isLoading: false,
       errors: {},
       links: undefined,
       searchFilter: {search_term: ''},
       permissions: [],
-      accountId: '123'
-    }
+      accountId: '123',
+    },
   }
   const action = {
     type: 'LOADING_USERS',
-    payload: {}
+    payload: {},
   }
 
   const newState = reducer(initialState, action)
@@ -344,22 +341,22 @@ test('SELECT_TAB action reducer', () => {
         {
           title: 'Tab1',
           path: '/courses',
-          permisssions: []
+          permisssions: [],
         },
         {
           title: 'Tab2',
           path: '/courses',
-          permisssions: []
-        }
+          permisssions: [],
+        },
       ],
-      selected: 0
-    }
+      selected: 0,
+    },
   }
   const action = {
     type: 'SELECT_TAB',
     payload: {
-      selected: 1
-    }
+      selected: 1,
+    },
   }
 
   const newState = reducer(initialState, action)

@@ -34,10 +34,10 @@ QUnit.module('Navigation: Click Tests', {
   },
   teardown() {
     return $('#fixtures').html('')
-  }
+  },
 })
 
-test('clicking treeitem heading selects that tree item', function() {
+test('clicking treeitem heading selects that tree item', function () {
   const $heading = this.$tree.find('.treeitem-heading')
   const $treeitem = $heading.closest('[role=treeitem]')
   $heading.click()

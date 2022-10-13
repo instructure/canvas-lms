@@ -32,8 +32,8 @@ export default {
     onMarkAllAsUnread: {action: 'onMarkAsUnread'},
     onToggleUnread: {action: 'onToggleUnread'},
     openInSpeedGrader: {action: 'openInSpeedGrader'},
-    onReport: {action: 'onReport'}
-  }
+    onReport: {action: 'onReport'},
+  },
 }
 
 const Template = args => <ThreadActions {...args} />
@@ -46,27 +46,27 @@ TeacherView.args = {}
 
 export const OwnerView = Template.bind({})
 OwnerView.args = {
-  openInSpeedGrader: null
+  openInSpeedGrader: null,
 }
 
 export const OtherStudentView = Template.bind({})
 OtherStudentView.args = {
   onDelete: null,
   onEdit: null,
-  openInSpeedGrader: null
+  openInSpeedGrader: null,
 }
 
 export const UnreadThread = Template.bind({})
 UnreadThread.args = {
-  isUnread: true
+  isUnread: true,
 }
 
 export const ReadThread = Template.bind({})
 ReadThread.args = {
-  isUnread: false
+  isUnread: false,
 }
 
 export const Reported = Template.bind({})
 Reported.args = {
-  isReported: true
+  isReported: true,
 }

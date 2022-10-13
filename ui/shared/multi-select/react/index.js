@@ -32,7 +32,7 @@ const CanvasMultiSelectOption = () => <div />
 
 CanvasMultiSelectOption.propTypes = {
   id: string.isRequired, // eslint-disable-line react/no-unused-prop-types
-  value: string.isRequired // eslint-disable-line react/no-unused-prop-types
+  value: string.isRequired, // eslint-disable-line react/no-unused-prop-types
 }
 
 function alwaysArray(scalarOrArray) {
@@ -72,7 +72,7 @@ function CanvasMultiSelect(props) {
       React.Children.map(children, n => ({
         id: n.props.id,
         value: n.props.value,
-        label: n.props.children
+        label: n.props.children,
       })),
     [children]
   )
@@ -140,7 +140,7 @@ function CanvasMultiSelect(props) {
         const tagText = opt.props.children || opt.props.label
         return (
           <Tag
-            dismissible
+            dismissible={true}
             key={opt.key}
             text={tagText}
             title={I18n.t('Remove %{label}', {label: tagText})}
@@ -168,7 +168,7 @@ function CanvasMultiSelect(props) {
         ? I18n.t(
             {
               one: 'One option available.',
-              other: '%{count} options available.'
+              other: '%{count} options available.',
             },
             {count: filtered.length}
           )
@@ -253,7 +253,7 @@ function CanvasMultiSelect(props) {
     onKeyDown,
     onBlur,
     assistiveText: I18n.t('Type or use arrow keys to navigate. Multiple selections are allowed.'),
-    renderBeforeInput: contentBeforeInput()
+    renderBeforeInput: contentBeforeInput(),
   }
 
   return (
@@ -262,7 +262,7 @@ function CanvasMultiSelect(props) {
         {renderChildren()}
       </Select>
       {announcement && (
-        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly>
+        <Alert liveRegion={liveRegion} liveRegionPoliteness="assertive" screenReaderOnly={true}>
           {announcement}
         </Alert>
       )}
@@ -279,7 +279,7 @@ CanvasMultiSelect.propTypes = {
   onChange: func.isRequired,
   children: node.isRequired,
   selectedOptionIds: arrayOf(string).isRequired,
-  noOptionsLabel: string
+  noOptionsLabel: string,
 }
 
 CanvasMultiSelect.defaultProps = {
@@ -287,7 +287,7 @@ CanvasMultiSelect.defaultProps = {
   customRenderBeforeInput: null,
   noOptionsLabel: '---',
   selectedOptionIds: [],
-  disabled: false
+  disabled: false,
 }
 
 CanvasMultiSelect.Option = CanvasMultiSelectOption

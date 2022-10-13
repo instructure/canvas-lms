@@ -35,7 +35,7 @@ export default class ConversationStatusFilter extends React.Component {
       if (typeof key !== 'string' || typeof obj[key] !== 'string') {
         return new Error("Keys and values of 'filter' prop must be strings")
       }
-    }).isRequired
+    }).isRequired,
   }
 
   constructor(props) {
@@ -100,7 +100,7 @@ export default class ConversationStatusFilter extends React.Component {
           id="conversation_filter_select"
           onChange={e => this.updateBackboneState(e.target.value)}
           style={{
-            width: '115%'
+            width: '115%',
           }}
           value={this.state.selected}
         >

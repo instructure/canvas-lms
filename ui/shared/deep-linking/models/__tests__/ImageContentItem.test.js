@@ -22,7 +22,7 @@ const json = {
   url: 'https://www.test.com/image',
   title: 'Title',
   text: 'some text',
-  invalidProp: 'banana'
+  invalidProp: 'banana',
 }
 
 const imageContentItem = overrides => {
@@ -46,7 +46,7 @@ describe('toHtmlString', () => {
   describe('when width and height are given', () => {
     const contentItem = imageContentItem({
       width: 100,
-      height: 200
+      height: 200,
     })
 
     it('sets the width and height', () => {
@@ -60,7 +60,7 @@ describe('toHtmlString', () => {
     const contentItem = imageContentItem({
       thumbnail: 'http://www.test.com/thumbnail',
       width: 100,
-      height: 200
+      height: 200,
     })
 
     it('creates a link to the image using the thumbnail', () => {

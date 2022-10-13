@@ -25,91 +25,91 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t('Allows user to view login ID information for users.')
+      description: I18n.t('Allows user to view login ID information for users.'),
     },
     {
-      description: I18n.t('Allows user to view user details for course users.')
+      description: I18n.t('Allows user to view user details for course users.'),
     },
     {
-      description: I18n.t('Allows user to edit a user’s section or role (if not added via SIS).')
-    }
+      description: I18n.t('Allows user to edit a user’s section or role (if not added via SIS).'),
+    },
   ],
   [
     {
       title: I18n.t('People (Account)'),
       description: I18n.t(
         'To edit user details, modify login details, or change user passwords, Users - manage login details must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t('To view the People page, Courses - view list must be enabled.')
+      description: I18n.t('To view the People page, Courses - view list must be enabled.'),
     },
     {
       description: I18n.t(
         'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
-      )
+      ),
     },
     {
-      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.')
+      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.'),
     },
     {
       description: I18n.t(
         'To edit a user’s section, Conversations - send to individual course members must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Observers (Course)'),
       description: I18n.t(
         'To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People'),
-      description: I18n.t('Allows user to view login ID information for users.')
+      description: I18n.t('Allows user to view login ID information for users.'),
     },
     {
-      description: I18n.t('Allows user to view user details for course users.')
+      description: I18n.t('Allows user to view user details for course users.'),
     },
     {
-      description: I18n.t('Allows user to edit a user’s section or role (if not added via SIS).')
-    }
+      description: I18n.t('Allows user to edit a user’s section or role (if not added via SIS).'),
+    },
   ],
   [
     {
       title: I18n.t('People'),
-      description: I18n.t('To view the People page, Courses - view list must be enabled.')
+      description: I18n.t('To view the People page, Courses - view list must be enabled.'),
     },
     {
       description: I18n.t(
         'To add or remove users to a course, the appropriate Users permission must be enabled (e.g. Users - Teachers).'
-      )
+      ),
     },
     {
-      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.')
+      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.'),
     },
     {
       description: I18n.t(
         'To edit a user’s section, Conversations - send to individual course members must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('Observers'),
       description: I18n.t(
         'To link an observer to a student, Conversations - send to individual course members must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To generate a pairing code on behalf of a student to share with an observer, Users - Generate observer pairing code for students must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

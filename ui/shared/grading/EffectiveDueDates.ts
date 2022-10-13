@@ -24,7 +24,7 @@ import type {
   Submission,
   DueDate,
   UserDueDateMap,
-  AssignmentUserDueDateMap
+  AssignmentUserDueDateMap,
 } from '../../api.d'
 
 export function scopeToUser(
@@ -69,7 +69,7 @@ export function updateWithSubmissions(
     assignmentDueDates[submission.user_id] = {
       due_at: submission.cached_due_date,
       grading_period_id: gradingPeriod ? gradingPeriod.id : null,
-      in_closed_grading_period: gradingPeriod ? gradingPeriod.isClosed : false
+      in_closed_grading_period: gradingPeriod ? gradingPeriod.isClosed : false,
     }
 
     effectiveDueDates[submission.assignment_id] = assignmentDueDates

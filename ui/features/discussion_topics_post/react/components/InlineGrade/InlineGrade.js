@@ -80,5 +80,5 @@ InlineGrade.prototypes = {
   isLoading: PropTypes.bool,
   onGradeChange: PropTypes.func,
   pointsPossible: PropTypes.string.isRequired,
-  currentGrade: PropTypes.string
+  currentGrade: PropTypes.string,
 }

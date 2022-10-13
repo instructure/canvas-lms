@@ -56,7 +56,7 @@ describe('EditableNumber', () => {
         onChangeMode={() => {}}
         label="Pick a number"
         value="17"
-        readOnly
+        readOnly={true}
       />
     )
     expect(queryByText('Pick a number')).toBeNull()

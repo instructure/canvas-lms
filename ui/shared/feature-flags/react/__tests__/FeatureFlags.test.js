@@ -28,7 +28,7 @@ const rows = [
   sampleData.allowedFeature,
   sampleData.onFeature,
   sampleData.offFeature,
-  sampleData.betaFeature
+  sampleData.betaFeature,
 ]
 
 describe('feature_flags::FeatureFlags', () => {

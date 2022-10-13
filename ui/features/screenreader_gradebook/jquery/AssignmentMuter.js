@@ -72,7 +72,7 @@ export default class AssignmentMuter {
           text: I18n.t('Cancel'),
           class: 'Button',
           'data-action': 'cancel',
-          click: () => this.$dialog.dialog('close')
+          click: () => this.$dialog.dialog('close'),
         },
         {
           text: I18n.t('Mute Assignment'),
@@ -82,21 +82,14 @@ export default class AssignmentMuter {
           click: () =>
             this.$dialog.disableWhileLoading(
               $.ajaxJSON(this.url, 'put', {status: true}, this.afterUpdate)
-            )
-        }
+            ),
+        },
       ],
       open: () =>
-        setTimeout(
-          () =>
-            this.$dialog
-              .parent()
-              .find('.ui-dialog-titlebar-close')
-              .focus(),
-          100
-        ),
+        setTimeout(() => this.$dialog.parent().find('.ui-dialog-titlebar-close').focus(), 100),
       close: () => this.$dialog.remove(),
       resizable: false,
-      width: 400
+      width: 400,
     })
     this.$dialog.on('dialogclose', onClose)
   }
@@ -117,8 +110,8 @@ export default class AssignmentMuter {
       {
         ...this.assignment,
         anonymize_students: assignment.anonymize_students,
-        muted: assignment.muted
-      }
+        muted: assignment.muted,
+      },
     ])
   }
 
@@ -135,7 +128,7 @@ export default class AssignmentMuter {
             text: I18n.t('Cancel'),
             class: 'Button',
             'data-action': 'cancel',
-            click: () => this.$dialog.dialog('close')
+            click: () => this.$dialog.dialog('close'),
           },
           {
             text: I18n.t('unmute_button', 'Unmute Assignment'),
@@ -145,22 +138,15 @@ export default class AssignmentMuter {
             click: () =>
               this.$dialog.disableWhileLoading(
                 $.ajaxJSON(this.url, 'put', {status: false}, this.afterUpdate)
-              )
-          }
+              ),
+          },
         ],
         open: () =>
-          setTimeout(
-            () =>
-              this.$dialog
-                .parent()
-                .find('.ui-dialog-titlebar-close')
-                .focus(),
-            100
-          ),
+          setTimeout(() => this.$dialog.parent().find('.ui-dialog-titlebar-close').focus(), 100),
         close: () => this.$dialog.dialog('close'),
         resizable: false,
         title: I18n.t('unmute_assignment', 'Unmute Assignment'),
-        width: 400
+        width: 400,
       })
   }
 }

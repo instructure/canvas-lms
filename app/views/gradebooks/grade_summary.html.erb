@@ -330,20 +330,24 @@
             </span>
             <i class="icon-rubric"></i>
             <% if @visibility_feedback_enabled %>
-              <% if submission.unread_item?(@current_user, "rubric") %>
+              <% if assignment_presenter.item_unread?("rubric") %>
                 <div
                   class="unread_rubric_dot"
-                  data-href="<%= api_v1_course_submission_rubric_assessments_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
+                  data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "rubric") %>">&nbsp;</div>
               <% end %>
             <% end %>
           </a>
           <a href="#"
+            id="assignment_comment_<%= assignment.id %>"
             class="toggle_comments_link tooltip"
             aria-label="<%= t('Read comments') %>"
+
             aria-describedby="comment_count_for_assignment_<%= assignment.id %>"
             <% if assignment_presenter.has_comments? && !assignment_presenter.hide_grade_from_student? %>
               aria-expanded="false"
-              aria-controls="comments_thread_<%= assignment.id %>"
+              <% if !@visibility_feedback_enabled %>
+                aria-controls="comments_thread_<%= assignment.id %>"
+              <% end %>
               role="button"
             <% else %>
               aria-hidden='true'
@@ -364,10 +368,10 @@
               <span class="comment_count">
                 <%= visible_comments_count || "" %>
               </span>
-              <% if assignment_presenter.is_unread? %>
+              <% if assignment_presenter.item_unread?("comment") %>
                 <div
                   class="unread_comment_dot"
-                  data-href="<%= api_v1_course_submission_mark_read_url(@context.id, assignment.id, submission.user.id) %>">&nbsp;</div>
+                  data-href="<%= api_v1_course_submission_mark_item_read_url(@context.id, assignment.id, submission.user.id, "comment") %>">&nbsp;</div>
               <% end %>
             <% end %>
           </a>
@@ -651,6 +655,7 @@
       </tr>
     <% end %>
   </table>
+  <div id="GradeSummarySubmissionCommentsTray"></div>
   </div>
   <% if @presenter.hidden_submissions_for_published_assignments? %>
     <small><i class="icon-off" role="presentation"></i><%= t("Your instructor has not posted the grade. While your instructor has not posted the grade, grade and comment information is unavailable.") %></small>

@@ -26,7 +26,7 @@ import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 import {
   updateLearningOutcomeMocks,
-  setFriendlyDescriptionOutcomeMock
+  setFriendlyDescriptionOutcomeMock,
 } from '@canvas/outcomes/mocks/Management'
 import {defaultRatings, defaultMasteryPoints} from '@canvas/outcomes/react/hooks/useRatings'
 
@@ -47,7 +47,7 @@ describe('OutcomeEditModal', () => {
     calculationMethod: 'decaying_average',
     calculationInt: 65,
     masteryPoints: defaultMasteryPoints,
-    ratings: defaultRatings.map(rating => pick(rating, ['description', 'points']))
+    ratings: defaultRatings.map(rating => pick(rating, ['description', 'points'])),
   }
 
   const defaultProps = (props = {}) => ({
@@ -55,7 +55,7 @@ describe('OutcomeEditModal', () => {
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onEditLearningOutcomeHandler: onEditLearningOutcomeHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -72,17 +72,17 @@ describe('OutcomeEditModal', () => {
       contextType: 'Account',
       contextId: '1',
       friendlyDescriptionFF: true,
-      accountLevelMasteryScalesFF: true
+      accountLevelMasteryScalesFF: true,
     },
-    mockOverrides = []
+    mockOverrides = [],
   } = {}) => {
     const mocks = [
       setFriendlyDescriptionOutcomeMock({
         failResponse,
-        failMutation
+        failMutation,
       }),
       ...updateLearningOutcomeMocks({description: outcome.description}),
-      ...mockOverrides
+      ...mockOverrides,
     ]
 
     return render(
@@ -166,7 +166,7 @@ describe('OutcomeEditModal', () => {
 
   it('Hides forms elements when editing in different context', () => {
     const {getByTestId, queryByTestId} = renderWithProvider({
-      env: {contextType: 'Course', contextId: '1', friendlyDescriptionFF: true}
+      env: {contextType: 'Course', contextId: '1', friendlyDescriptionFF: true},
     })
     expect(queryByTestId('name-input')).not.toBeInTheDocument()
     expect(queryByTestId('display-name-input')).not.toBeInTheDocument()
@@ -203,15 +203,15 @@ describe('OutcomeEditModal', () => {
       const mocks = updateLearningOutcomeMocks({
         title: 'Updated name',
         description: 'Updated description',
-        displayName: 'Updated friendly name'
+        displayName: 'Updated friendly name',
       })
       const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
-        mockOverrides: mocks
+        mockOverrides: mocks,
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
-        target: {value: 'Updated description'}
+        target: {value: 'Updated description'},
       })
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
@@ -219,7 +219,7 @@ describe('OutcomeEditModal', () => {
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -227,22 +227,22 @@ describe('OutcomeEditModal', () => {
       const mocks = updateLearningOutcomeMocks({
         description: '',
         title: 'Outcome',
-        displayName: 'Updated friendly name'
+        displayName: 'Updated friendly name',
       })
       const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
         mockOverrides: mocks,
-        overrides: {outcome: {...outcome, _id: '3'}}
+        overrides: {outcome: {...outcome, _id: '3'}},
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByDisplayValue('Outcome description'), {
-        target: {value: null}
+        target: {value: null},
       })
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Outcome" was successfully updated.',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -250,23 +250,23 @@ describe('OutcomeEditModal', () => {
       const mocks = updateLearningOutcomeMocks({
         title: 'Outcome',
         description: '',
-        displayName: 'Friendly name'
+        displayName: 'Friendly name',
       })
       const {getByText, getByLabelText, getByDisplayValue} = renderWithProvider({
         mockOverrides: mocks,
-        overrides: {outcome: {...outcome, _id: '2'}}
+        overrides: {outcome: {...outcome, _id: '2'}},
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Friendly name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
-        target: {value: null}
+        target: {value: null},
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
   })
@@ -275,35 +275,35 @@ describe('OutcomeEditModal', () => {
     it('updates only friendly description if only friendly description is changed', async () => {
       const {getByText, getByLabelText} = renderWithProvider()
       fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-        target: {value: 'Updated friendly description'}
+        target: {value: 'Updated friendly description'},
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Outcome" was successfully updated.',
-        type: 'success'
+        type: 'success',
       })
     })
 
     it('handles friendly description update failure', async () => {
       const {getByText, getByLabelText} = renderWithProvider({failResponse: true})
       fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-        target: {value: 'Updated friendly description'}
+        target: {value: 'Updated friendly description'},
       })
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(onEditLearningOutcomeHandlerMock).not.toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while editing this outcome. Please try again.',
-        type: 'error'
+        type: 'error',
       })
     })
 
     it('shows error message below friendly description field if friendly description > 255 characters', () => {
       const {getByText, getByLabelText} = renderWithProvider()
       fireEvent.change(getByLabelText('Friendly description (for parent/student display)'), {
-        target: {value: 'a'.repeat(256)}
+        target: {value: 'a'.repeat(256)},
       })
       expect(getByText('Must be 255 characters or less')).toBeInTheDocument()
     })
@@ -312,7 +312,7 @@ describe('OutcomeEditModal', () => {
   describe('with Friendly Description Feature Flag disabled', () => {
     it('does not display Friendly Description field in modal', async () => {
       const {queryByLabelText} = renderWithProvider({
-        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false}
+        env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
       })
       await act(async () => jest.runOnlyPendingTimers())
       expect(
@@ -323,18 +323,18 @@ describe('OutcomeEditModal', () => {
     it('does not call friendly description mutation when updating outcome', async () => {
       const mocks = updateLearningOutcomeMocks({
         description: 'Updated description',
-        displayName: 'Updated friendly name'
+        displayName: 'Updated friendly name',
       })
       const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
         mockOverrides: mocks,
         env: {contextType: 'Account', contextId: '1', friendlyDescriptionFF: false},
         // mock setFriendlyDescription mutation to throw an error
-        failResponse: true
+        failResponse: true,
       })
       await act(async () => jest.runOnlyPendingTimers())
       fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
       fireEvent.change(getByDisplayValue('Outcome description'), {
-        target: {value: 'Updated description'}
+        target: {value: 'Updated description'},
       })
       fireEvent.change(getByLabelText('Friendly Name'), {target: {value: 'Updated friendly name'}})
       fireEvent.click(getByText('Save'))
@@ -342,7 +342,7 @@ describe('OutcomeEditModal', () => {
       expect(onEditLearningOutcomeHandlerMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: '"Updated name" was successfully updated.',
-        type: 'success'
+        type: 'success',
       })
     })
   })
@@ -354,8 +354,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         expect(getByLabelText('Calculation Method')).toBeInTheDocument()
       })
@@ -365,8 +365,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Course',
             contextId: '2',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         expect(getByTestId('read-only-calculation-method')).toBeInTheDocument()
       })
@@ -376,8 +376,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
         expect(queryByText(/Add Mastery Level/)).toBeInTheDocument()
@@ -388,8 +388,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Course',
             contextId: '2',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         expect(getByTestId('outcome-management-ratings')).toBeInTheDocument()
         expect(queryByText(/Add Mastery Level/)).not.toBeInTheDocument()
@@ -401,23 +401,23 @@ describe('OutcomeEditModal', () => {
           displayName: 'Updated friendly outcome name',
           calculationMethod: 'latest',
           calculationInt: null,
-          individualCalculation: true
+          individualCalculation: true,
         })
         const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
+            accountLevelMasteryScalesFF: false,
           },
-          mockOverrides: mocks
+          mockOverrides: mocks,
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
         fireEvent.change(getByLabelText('Friendly Name'), {
-          target: {value: 'Updated friendly outcome name'}
+          target: {value: 'Updated friendly outcome name'},
         })
         fireEvent.change(getByDisplayValue('Outcome description'), {
-          target: {value: 'Updated description'}
+          target: {value: 'Updated description'},
         })
         fireEvent.click(getByDisplayValue('Decaying Average'))
         fireEvent.click(getByText('Most Recent Score'))
@@ -425,7 +425,7 @@ describe('OutcomeEditModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: '"Updated name" was successfully updated.',
-          type: 'success'
+          type: 'success',
         })
       })
 
@@ -436,23 +436,23 @@ describe('OutcomeEditModal', () => {
           ratings: defaultRatings
             .filter(r => r.points !== 0)
             .map(rating => pick(rating, ['description', 'points'])),
-          individualRatings: true
+          individualRatings: true,
         })
         const {getByText, getByDisplayValue, getByLabelText} = renderWithProvider({
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
+            accountLevelMasteryScalesFF: false,
           },
-          mockOverrides: mocks
+          mockOverrides: mocks,
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Updated name'}})
         fireEvent.change(getByLabelText('Friendly Name'), {
-          target: {value: 'Updated friendly outcome name'}
+          target: {value: 'Updated friendly outcome name'},
         })
         fireEvent.change(getByDisplayValue('Outcome description'), {
-          target: {value: 'Updated description'}
+          target: {value: 'Updated description'},
         })
         fireEvent.click(getByText('Delete mastery level 5'))
         fireEvent.click(getByText('Confirm'))
@@ -460,7 +460,7 @@ describe('OutcomeEditModal', () => {
         await act(async () => jest.runOnlyPendingTimers())
         expect(showFlashAlertSpy).toHaveBeenCalledWith({
           message: '"Updated name" was successfully updated.',
-          type: 'success'
+          type: 'success',
         })
       })
 
@@ -469,8 +469,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         expect(getByTestId('outcome-edit-modal-horizontal-divider')).toBeInTheDocument()
       })
@@ -480,8 +480,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         const ratingDescription = getByLabelText('Change description for mastery level 2')
         fireEvent.change(ratingDescription, {target: {value: ''}})
@@ -499,8 +499,8 @@ describe('OutcomeEditModal', () => {
           env: {
             contextType: 'Account',
             contextId: '1',
-            accountLevelMasteryScalesFF: false
-          }
+            accountLevelMasteryScalesFF: false,
+          },
         })
         const masteryPoints = getByLabelText('Change mastery points')
         fireEvent.change(masteryPoints, {target: {value: '-1'}})

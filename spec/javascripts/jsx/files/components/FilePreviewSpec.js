@@ -43,7 +43,7 @@ QUnit.module('File Preview Rendering', {
         'content-type': 'unknown/unknown',
         size: 1000000,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       },
       {preflightUrl: ''}
     )
@@ -55,7 +55,7 @@ QUnit.module('File Preview Rendering', {
         'content-type': 'unknown/unknown',
         size: 1000000,
         created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       },
       {preflightUrl: ''}
     )
@@ -68,7 +68,7 @@ QUnit.module('File Preview Rendering', {
         size: 1000000,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-        url: 'test/test/test.png'
+        url: 'test/test/test.png',
       },
       {preflightUrl: ''}
     )
@@ -86,7 +86,7 @@ QUnit.module('File Preview Rendering', {
     const file2 = {}
     const file3 = {}
     const currentFolder = {}
-  }
+  },
 })
 
 test('clicking the info button should render out the info panel', () => {
@@ -94,18 +94,13 @@ test('clicking the info button should render out the info panel', () => {
     <FilePreview
       isOpen
       query={{
-        preview: '1'
+        preview: '1',
       }}
       currentFolder={currentFolder}
     />
   )
   $('.ef-file-preview-header-info').click()
-  equal(
-    $('tr:contains("Name")')
-      .find('td')
-      .text(),
-    'Test File.file1'
-  )
+  equal($('tr:contains("Name")').find('td').text(), 'Test File.file1')
 
   // click it again to hide it
   $('.ef-file-preview-header-info').click()
@@ -118,7 +113,7 @@ test('opening the preview for one file should show navigation buttons for the pr
     <FilePreview
       isOpen
       query={{
-        preview: '2'
+        preview: '2',
       }}
       currentFolder={currentFolder}
     />
@@ -144,7 +139,7 @@ test('download button should be rendered on the file preview', () => {
     <FilePreview
       isOpen
       query={{
-        preview: '3'
+        preview: '3',
       }}
       currentFolder={currentFolder}
     />
@@ -166,7 +161,7 @@ test('clicking the close button calls closePreview with the correct url', () => 
         preview: '3',
         search_term: 'web',
         sort: 'size',
-        order: 'desc'
+        order: 'desc',
       }}
       collection={filesCollection}
       closePreview={url => {

@@ -23,17 +23,17 @@ import {CURRENT_USER} from '../../../../../features/discussion_topics_post/react
 export default {
   title: 'Examples/Discussion Posts/Components/AnonymousAvatar',
   component: AnonymousAvatar,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AnonymousAvatar {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  seedString: 'Rowdy Lemon'
+  seedString: 'Rowdy Lemon',
 }
 
 export const WithCurrentUser = Template.bind({})
 WithCurrentUser.args = {
-  seedString: CURRENT_USER
+  seedString: CURRENT_USER,
 }

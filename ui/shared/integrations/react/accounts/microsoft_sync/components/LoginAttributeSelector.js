@@ -54,5 +54,5 @@ export default function LoginAttributeSelector(props) {
 
 LoginAttributeSelector.propTypes = {
   attributeChangedHandler: PropTypes.func,
-  selectedLoginAttribute: PropTypes.string
+  selectedLoginAttribute: PropTypes.string,
 }

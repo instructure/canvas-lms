@@ -28,7 +28,7 @@ import {
   isTopicAuthor,
   updateDiscussionTopicEntryCounts,
   responsiveQuerySizes,
-  getDisplayName
+  getDisplayName,
 } from '../../utils'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
@@ -41,7 +41,7 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {
   UPDATE_DISCUSSION_ENTRIES_READ_STATE,
   UPDATE_DISCUSSION_ENTRY,
-  UPDATE_DISCUSSION_ENTRY_PARTICIPANT
+  UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
 } from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
@@ -56,7 +56,7 @@ export const IsolatedThreadsContainer = props => {
 
   const updateCache = (cache, result) => {
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
-      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length
+      unreadCountChange: -result.data.updateDiscussionEntriesReadState.discussionEntries.length,
     })
   }
 
@@ -67,7 +67,7 @@ export const IsolatedThreadsContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while updating the replies'))
-    }
+    },
   })
 
   useEffect(() => {
@@ -83,14 +83,14 @@ export const IsolatedThreadsContainer = props => {
         updateDiscussionEntriesReadState({
           variables: {
             discussionEntryIds: entryIds,
-            read: true
+            read: true,
           },
           optimisticResponse: {
             updateDiscussionEntriesReadState: {
               discussionEntries: entries,
-              __typename: 'UpdateDiscussionEntriesReadStatePayload'
-            }
-          }
+              __typename: 'UpdateDiscussionEntriesReadStatePayload',
+            },
+          },
         })
       }, AUTO_MARK_AS_READ_DELAY)
 
@@ -99,7 +99,7 @@ export const IsolatedThreadsContainer = props => {
   }, [
     discussionEntriesToUpdate,
     props.discussionEntry.discussionSubentriesConnection.nodes,
-    updateDiscussionEntriesReadState
+    updateDiscussionEntriesReadState,
   ])
 
   const setToBeMarkedAsRead = entryId => {
@@ -181,7 +181,7 @@ IsolatedThreadsContainer.propTypes = {
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
   fetchingMoreNewerReplies: PropTypes.bool,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }
 
 export default IsolatedThreadsContainer
@@ -214,7 +214,7 @@ const IsolatedThreadContainer = props => {
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.4,
         }
       )
 
@@ -237,7 +237,7 @@ const IsolatedThreadContainer = props => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error while updating the reply.'))
-    }
+    },
   })
 
   const [updateDiscussionEntryReported] = useMutation(UPDATE_DISCUSSION_ENTRY_PARTICIPANT, {
@@ -255,7 +255,7 @@ const IsolatedThreadContainer = props => {
       setTimeout(() => {
         setReportingError(false)
       }, 3000)
-    }
+    },
   })
 
   const onUpdate = (message, _includeReplyPreview, fileId) => {
@@ -263,8 +263,8 @@ const IsolatedThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         message,
-        removeAttachment: !fileId
-      }
+        removeAttachment: !fileId,
+      },
     })
   }
 
@@ -274,7 +274,7 @@ const IsolatedThreadContainer = props => {
         key={`reply-${props.discussionEntry.id}`}
         authorName={getDisplayName(props.discussionEntry)}
         delimiterKey={`reply-delimiter-${props.discussionEntry.id}`}
-        isIsolatedView
+        isIsolatedView={true}
         onClick={() =>
           props.onOpenIsolatedView(
             props.discussionEntry._id,
@@ -321,18 +321,18 @@ const IsolatedThreadContainer = props => {
       query={responsiveQuerySizes({mobile: true, desktop: true})}
       props={{
         mobile: {
-          padding: 'x-small'
+          padding: 'x-small',
         },
         desktop: {
-          padding: 'x-small medium'
-        }
+          padding: 'x-small medium',
+        },
       }}
       render={responsiveProps => (
         <div ref={onThreadRefCurrentSet}>
           <View as="div" padding={responsiveProps.padding}>
             <Highlight isHighlighted={props.isHighlighted}>
               <Flex padding="small">
-                <Flex.Item shouldShrink shouldGrow>
+                <Flex.Item shouldShrink={true} shouldGrow={true}>
                   <DiscussionEntryContainer
                     discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
@@ -396,7 +396,7 @@ const IsolatedThreadContainer = props => {
                     isEditing={isEditing}
                     onSave={onUpdate}
                     onCancel={() => setIsEditing(false)}
-                    isIsolatedView
+                    isIsolatedView={true}
                     editor={props.discussionEntry.editor}
                     isUnread={!props.discussionEntry.entryParticipant?.read}
                     isForcedRead={props.discussionEntry.entryParticipant?.forcedReadState}
@@ -419,7 +419,10 @@ const IsolatedThreadContainer = props => {
                     attachment={props.discussionEntry.attachment}
                   >
                     <View as="div" padding="x-small none none">
-                      <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>
+                      <ThreadingToolbar
+                        discussionEntry={props.discussionEntry}
+                        isIsolatedView={true}
+                      >
                         {threadActions}
                       </ThreadingToolbar>
                     </View>
@@ -432,8 +435,8 @@ const IsolatedThreadContainer = props => {
                       updateDiscussionEntryReported({
                         variables: {
                           discussionEntryId: props.discussionEntry._id,
-                          reportType
-                        }
+                          reportType,
+                        },
                       })
                       setReportModalIsLoading(true)
                     }}
@@ -462,5 +465,5 @@ IsolatedThreadContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  updateDraftCache: PropTypes.func
+  updateDraftCache: PropTypes.func,
 }

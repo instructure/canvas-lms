@@ -46,7 +46,7 @@ const assignmentTarget = {
     }
 
     component.resetAssignmentDropTarget()
-  }
+  },
 }
 
 class AssignmentSet extends React.Component {
@@ -65,7 +65,7 @@ class AssignmentSet extends React.Component {
       // injected by React DnD
       connectDropTarget: func.isRequired,
       isOver: bool.isRequired,
-      canDrop: bool.isRequired
+      canDrop: bool.isRequired,
     }
   }
 
@@ -73,7 +73,7 @@ class AssignmentSet extends React.Component {
     super()
 
     this.state = {
-      dropTarget: undefined
+      dropTarget: undefined,
     }
 
     this.setAssignmentDropTarget = this.setAssignmentDropTarget.bind(this)
@@ -113,7 +113,7 @@ class AssignmentSet extends React.Component {
   }
 
   renderDragToggle(isLast) {
-    return <ConditionToggle isAnd isFake={isLast} />
+    return <ConditionToggle isAnd={true} isFake={isLast} />
   }
 
   renderAssignments() {
@@ -123,7 +123,7 @@ class AssignmentSet extends React.Component {
 
         const setInnerClasses = classNames({
           'cr-assignment-set__inner': true,
-          'cr-assignment-set__inner__draggedOver': idx === this.state.dropTarget
+          'cr-assignment-set__inner__draggedOver': idx === this.state.dropTarget,
         })
 
         const path = this.props.path.push(idx)
@@ -151,7 +151,7 @@ class AssignmentSet extends React.Component {
       'cr-assignment-set': true,
       'cr-assignment-set__empty': this.props.setAssignments.size === 0,
       'cr-assignment-set__drag-over': isOver,
-      'cr-assignment-set__can-drop': canDrop
+      'cr-assignment-set__can-drop': canDrop,
     })
 
     return connectDropTarget(
@@ -168,5 +168,5 @@ class AssignmentSet extends React.Component {
 export default DropTarget('AssignmentCard', assignmentTarget, (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
-  canDrop: monitor.canDrop()
+  canDrop: monitor.canDrop(),
 }))(AssignmentSet)

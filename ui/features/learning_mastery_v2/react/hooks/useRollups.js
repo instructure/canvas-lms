@@ -32,8 +32,8 @@ const getRow = (studentRollups, outcomes) =>
       outcomeId: outcome.id,
       rating: {
         ...rating,
-        color: `#` + rating.color
-      }
+        color: `#` + rating.color,
+      },
     }
   })
 
@@ -51,7 +51,7 @@ const rollupsByUser = (rollups, outcomes) => {
   const rollupsByUserId = groupBy(rollups, rollup => rollup.links.user)
   return Object.entries(rollupsByUserId).map(([studentId, studentRollups]) => ({
     studentId,
-    outcomeRollups: getRow(studentRollups, outcomes)
+    outcomeRollups: getRow(studentRollups, outcomes),
   }))
 }
 
@@ -75,7 +75,7 @@ export default function useRollups({courseId, accountMasteryScalesEnabled}) {
       } catch (_e) {
         showFlashAlert({
           message: I18n.t('Error loading rollups'),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -85,6 +85,6 @@ export default function useRollups({courseId, accountMasteryScalesEnabled}) {
     isLoading,
     students,
     outcomes,
-    rollups
+    rollups,
   }
 }

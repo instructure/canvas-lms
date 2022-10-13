@@ -158,7 +158,7 @@ export default class MessageStudentsWhoForm extends React.Component {
         {this.renderFilter()}
         <Select
           label={I18n.t('To:')}
-          multiple
+          multiple={true}
           selectedOption={this.props.selectedStudents}
           onChange={this.handleStudentsChange}
           data-testid="student-recipients"

@@ -24,7 +24,7 @@ export function mockShare(overrides = {}) {
     sender: {
       id: '2',
       display_name: 'sender name',
-      avatar_url: 'http://avatar_url'
+      avatar_url: 'http://avatar_url',
     },
     created_at: '2019-07-04T12:00:00Z',
     updated_at: '2019-07-24T12:00:00Z',
@@ -36,10 +36,10 @@ export function mockShare(overrides = {}) {
       attachment: {
         id: '4',
         created_at: '2019-07-04T12:00:00Z',
-        url: 'https://attachment.url'
-      }
+        url: 'https://attachment.url',
+      },
     },
-    ...overrides
+    ...overrides,
   }
 }
 
@@ -48,7 +48,7 @@ export const assignmentShare = mockShare()
 export const attachmentShare = mockShare({
   content_type: 'attachment',
   id: '3',
-  name: 'attachment.pdf'
+  name: 'attachment.pdf',
 })
 
 export const readDiscussionShare = mockShare({
@@ -57,6 +57,6 @@ export const readDiscussionShare = mockShare({
   read_state: 'read',
   content_type: 'discussion_topic',
   created_at: '2019-07-05T12:00:00Z',
-  updated_at: '2019-07-25T12:00:00Z'
+  updated_at: '2019-07-25T12:00:00Z',
 })
 export const unreadDiscussionShare = {...readDiscussionShare, read_state: 'unread'}

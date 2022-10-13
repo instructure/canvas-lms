@@ -40,8 +40,8 @@ const mimeClasses = {
       'audio/mid',
       'audio/x-wav',
       'audio/basic',
-      'audio/mpeg'
-    ]
+      'audio/mpeg',
+    ],
   },
   code: {
     get displayName() {
@@ -53,8 +53,8 @@ const mimeClasses = {
       'text/x-yaml',
       'application/xml',
       'application/javascript',
-      'text/x-csharp'
-    ]
+      'text/x-csharp',
+    ],
   },
   doc: {
     get displayName() {
@@ -66,26 +66,26 @@ const mimeClasses = {
       'application/msword',
       'application/rtf',
       'application/vnd.oasis.opendocument.text',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ]
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    ],
   },
   flash: {
     get displayName() {
       return I18n.t('Flash')
     },
-    mimeTypes: ['application/x-shockwave-flash']
+    mimeTypes: ['application/x-shockwave-flash'],
   },
   html: {
     get displayName() {
       return I18n.t('Web page')
     },
-    mimeTypes: ['text/html', 'application/xhtml+xml']
+    mimeTypes: ['text/html', 'application/xhtml+xml'],
   },
   image: {
     get displayName() {
       return I18n.t('Image')
     },
-    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg', 'image/webp']
+    mimeTypes: ['image/png', 'image/x-psd', 'image/gif', 'image/pjpeg', 'image/jpeg', 'image/webp'],
   },
   ppt: {
     get displayName() {
@@ -93,20 +93,20 @@ const mimeClasses = {
     },
     mimeTypes: [
       'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-      'application/vnd.ms-powerpoint'
-    ]
+      'application/vnd.ms-powerpoint',
+    ],
   },
   pdf: {
     get displayName() {
       return I18n.t('PDF')
     },
-    mimeTypes: ['application/pdf']
+    mimeTypes: ['application/pdf'],
   },
   text: {
     get displayName() {
       return I18n.t('Plain text')
     },
-    mimeTypes: ['text', 'text/plain']
+    mimeTypes: ['text', 'text/plain'],
   },
   video: {
     get displayName() {
@@ -122,8 +122,8 @@ const mimeClasses = {
       'video/x-la-asf',
       'video/3gpp',
       'video/webm',
-      'video/avi'
-    ]
+      'video/avi',
+    ],
   },
   xls: {
     get displayName() {
@@ -133,8 +133,8 @@ const mimeClasses = {
       'application/vnd.oasis.opendocument.spreadsheet',
       'text/csv',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'application/vnd.ms-excel'
-    ]
+      'application/vnd.ms-excel',
+    ],
   },
   zip: {
     get displayName() {
@@ -145,9 +145,9 @@ const mimeClasses = {
       'application/x-zip-compressed',
       'application/zip',
       'application/x-zip',
-      'application/x-rar'
-    ]
-  }
+      'application/x-rar',
+    ],
+  },
 }
 
 export default function mimeClass(contentType) {

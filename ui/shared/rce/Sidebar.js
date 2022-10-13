@@ -102,7 +102,7 @@ const Sidebar = {
     this.instance = undefined
     this.initializing = false
     this.subscriptions = {}
-  }
+  },
 }
 
 export default Sidebar

@@ -36,7 +36,7 @@ QUnit.module('DueDateOverride#validateTokenInput', {
   },
   teardown() {
     this.fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('rowKey can be prefixed with a zero', () => {
@@ -60,7 +60,7 @@ QUnit.module('DueDateOverride#validateGroupOverrides', {
   },
   teardown() {
     this.fixtures.innerHTML = ''
-  }
+  },
 })
 
 test('rowKey can be prefixed with a zero', () => {
@@ -89,7 +89,7 @@ QUnit.module('DueDateOverride#validateDatetimes', () => {
   test('skips overrides whose row key has already been validated', () => {
     const overrides = [
       {rowKey: '1', student_ids: [1]},
-      {rowKey: '1', student_ids: [1]}
+      {rowKey: '1', student_ids: [1]},
     ]
     const data = {assignment_overrides: overrides}
 
@@ -107,15 +107,15 @@ QUnit.module('DueDateOverride#validateDatetimes', () => {
     hooks.beforeEach(() => {
       const start_at = {
         date: new Date('Nov 10, 2018').toISOString(),
-        date_context: 'course'
+        date_context: 'course',
       }
       const end_at = {
         date: new Date('Nov 20, 2018').toISOString(),
-        date_context: 'course'
+        date_context: 'course',
       }
 
       fakeENV.setup({
-        VALID_DATE_RANGE: {start_at, end_at}
+        VALID_DATE_RANGE: {start_at, end_at},
       })
     })
 

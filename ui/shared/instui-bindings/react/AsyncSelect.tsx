@@ -48,7 +48,7 @@ type Props = {
 }
 
 CanvasAsyncSelect.propTypes = {
-  ...selectPropTypes
+  ...selectPropTypes,
 }
 
 export default function CanvasAsyncSelect({
@@ -87,7 +87,7 @@ export default function CanvasAsyncSelect({
     const {id, renderBeforeLabel, ...optionProps} = option.props
     const props = {
       isHighlighted: id === highlightedOptionId,
-      isSelected: id === selectedOptionId
+      isSelected: id === selectedOptionId,
     }
     const optionChildren = option.props.children
     const renderBeforeText =
@@ -203,7 +203,7 @@ export default function CanvasAsyncSelect({
     onRequestShowOptions: handleShowOptions,
     onRequestHideOptions: handleHideOptions,
     onRequestHighlightOption: handleHighlightOption,
-    onRequestSelectOption: handleSelectOption
+    onRequestSelectOption: handleSelectOption,
   }
 
   // remember previous isLoading value so we know whether we need to send announcements
@@ -218,7 +218,7 @@ export default function CanvasAsyncSelect({
       <Alert
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         liveRegionPoliteness="assertive"
-        screenReaderOnly
+        screenReaderOnly={true}
       >
         {announcement}
       </Alert>

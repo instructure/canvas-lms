@@ -27,7 +27,7 @@ const initialStoreState = {
   items: [],
   isLoading: false,
   hasLoaded: false,
-  hasMore: false
+  hasMore: false,
 }
 
 class ObjectStore {
@@ -62,7 +62,7 @@ class ObjectStore {
       url,
       type: 'GET',
       success: this._fetchSuccessHandler.bind(this, options),
-      error: this._fetchErrorHandler.bind(this)
+      error: this._fetchErrorHandler.bind(this),
     })
   }
 
@@ -104,7 +104,7 @@ class ObjectStore {
       isLoading: false,
       isLoaded: true,
       items,
-      hasMore: !!links.next
+      hasMore: !!links.next,
     })
 
     if (options && options.fetchAll && !!links.next) {
@@ -117,7 +117,7 @@ class ObjectStore {
       items: [],
       isLoading: false,
       isLoaded: false,
-      hasMore: true
+      hasMore: true,
     })
   }
 }

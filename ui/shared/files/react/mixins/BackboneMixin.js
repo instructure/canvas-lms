@@ -25,7 +25,7 @@ const collectionBehavior = {
   changeOptions: 'add remove reset sort',
   updateScheduler(func) {
     return _.debounce(func, 0)
-  }
+  },
 }
 
 const modelBehavior = {
@@ -33,7 +33,7 @@ const modelBehavior = {
 
   // note: if we debounce models too we can no longer use model attributes
   // as properties to react controlled components due to https://github.com/facebook/react/issues/955
-  updateScheduler: _.identity
+  updateScheduler: _.identity,
 }
 
 function subscribe(component, modelOrCollection, customChangeOptions) {
@@ -88,6 +88,6 @@ export default function BackboneMixin(optionsOrPropName, customChangeOptions) {
     componentWillUnmount() {
       // Ensure that we clean up any dangling references when the component is destroyed.
       unsubscribe(this, modelOrCollection(this.props))
-    }
+    },
   }
 }

@@ -17,23 +17,15 @@
  */
 
 import $ from 'jquery'
-import {addUsersLink, openReportDescriptionLink} from 'ui/features/account_settings/jquery/index.js'
+import {addUsersLink, openReportDescriptionLink} from 'ui/features/account_settings/jquery/index'
 
 QUnit.module('AccountSettings.openReportDescriptionLink', {
   setup() {
     const $html = $('<div>')
       .addClass('title')
       .addClass('reports')
-      .append(
-        $('<span>')
-          .addClass('title')
-          .text('Title')
-      )
-      .append(
-        $('<div>')
-          .addClass('report_description')
-          .text('Description')
-      )
+      .append($('<span>').addClass('title').text('Title'))
+      .append($('<div>').addClass('report_description').text('Description'))
       .append($('<a>').addClass('trigger'))
     $html.find('a').click(openReportDescriptionLink)
     $('#fixtures').append($html)
@@ -41,7 +33,7 @@ QUnit.module('AccountSettings.openReportDescriptionLink', {
   teardown() {
     $('#fixtures').empty()
     $('.ui-dialog').remove()
-  }
+  },
 })
 
 test('keeps the description in the DOM', () => {
@@ -51,22 +43,16 @@ test('keeps the description in the DOM', () => {
 
 QUnit.module('AccountSettings.addUsersLink', {
   setup() {
-    const $select = $('<select>')
-      .attr('id', 'admin_role_id')
-      .append($('<option>').attr('val', '1'))
-    const $form = $('<div>')
-      .attr('id', 'enroll_users_form')
-      .append($select)
-    const $trigger = $('<a>')
-      .addClass('trigger')
-      .click(addUsersLink)
+    const $select = $('<select>').attr('id', 'admin_role_id').append($('<option>').attr('val', '1'))
+    const $form = $('<div>').attr('id', 'enroll_users_form').append($select)
+    const $trigger = $('<a>').addClass('trigger').click(addUsersLink)
     $('#fixtures').append($form)
     $('#fixtures').append($trigger)
     $form.hide()
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('keeps the description in the DOM', () => {

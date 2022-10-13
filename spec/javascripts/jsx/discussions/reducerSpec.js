@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/discussion_topics_index/react/actions.js'
-import reducer from 'ui/features/discussion_topics_index/react/rootReducer.js'
+import actions from 'ui/features/discussion_topics_index/react/actions'
+import reducer from 'ui/features/discussion_topics_index/react/rootReducer'
 
 QUnit.module('Discussions reducer')
 
@@ -27,8 +27,8 @@ test('GET_DISCUSSIONS_SUCCESS sets allDiscussions', () => {
   const dispatchData = {
     data: [
       {id: 1, pinned: true, locked: false, position: 2, last_reply_at: '2018-02-26T23:35:57Z'},
-      {id: 2, pinned: false, locked: false, position: null, last_reply_at: '2018-02-26T23:35:57Z'}
-    ]
+      {id: 2, pinned: false, locked: false, position: null, last_reply_at: '2018-02-26T23:35:57Z'},
+    ],
   }
   const newState = reduce(actions.getDiscussionsSuccess(dispatchData), {allDiscussions: {}})
   const expectedData = {
@@ -38,7 +38,7 @@ test('GET_DISCUSSIONS_SUCCESS sets allDiscussions', () => {
       locked: false,
       position: 2,
       last_reply_at: '2018-02-26T23:35:57Z',
-      filtered: false
+      filtered: false,
     },
     2: {
       id: 2,
@@ -46,8 +46,8 @@ test('GET_DISCUSSIONS_SUCCESS sets allDiscussions', () => {
       locked: false,
       position: null,
       last_reply_at: '2018-02-26T23:35:57Z',
-      filtered: false
-    }
+      filtered: false,
+    },
   }
   deepEqual(newState.allDiscussions, expectedData)
 })
@@ -65,14 +65,14 @@ test('GET_DISCUSSIONS_SUCCESS properly sorts discussions', () => {
 
       // Closed for comments is sorted by date last modified
       {id: 5, pinned: false, locked: true, position: null, last_reply_at: '2017-02-26T23:35:57Z'},
-      {id: 6, pinned: false, locked: true, position: null, last_reply_at: '2018-02-26T23:35:57Z'}
-    ]
+      {id: 6, pinned: false, locked: true, position: null, last_reply_at: '2018-02-26T23:35:57Z'},
+    ],
   }
 
   const newState = reduce(actions.getDiscussionsSuccess(dispatchData), {
     pinnedDiscussionIds: [],
     unpinnedDiscussionIds: [],
-    closedForCommentsDiscussionIds: []
+    closedForCommentsDiscussionIds: [],
   })
 
   deepEqual(newState.pinnedDiscussionIds, [2, 1])
@@ -85,7 +85,7 @@ test('UPDATE_DISCUSSION_SUCCESS should update pinnedDiscussionIds when pinning a
     actions.updateDiscussionSuccess({discussion: {id: 1, pinned: true, locked: false}}),
     {
       allDiscussions: {1: {id: 1, pinned: false, locked: false}},
-      pinnedDiscussionIds: [1]
+      pinnedDiscussionIds: [1],
     }
   )
   deepEqual(newState.closedForCommentsDiscussionIds, [])
@@ -98,7 +98,7 @@ test('UPDATE_DISCUSSION_SUCCESS should update unpinnedDiscussinIds when unpinnin
     actions.updateDiscussionSuccess({discussion: {id: 1, pinned: false, locked: false}}),
     {
       allDiscussions: {1: {id: 1, pinned: true, locked: false}},
-      pinnedDiscussionIds: [1]
+      pinnedDiscussionIds: [1],
     }
   )
   deepEqual(newState.closedForCommentsDiscussionIds, [])
@@ -111,7 +111,7 @@ test('UPDATE_DISCUSSION_SUCCESS should not update closedForComments discussion',
     actions.updateDiscussionSuccess({discussion: {id: 1, pinned: false, locked: true}}),
     {
       allDiscussions: {1: {id: 1, pinned: true, locked: false}},
-      pinnedDiscussionIds: [1]
+      pinnedDiscussionIds: [1],
     }
   )
   deepEqual(newState.closedForCommentsDiscussionIds, [1])
@@ -121,14 +121,14 @@ test('UPDATE_DISCUSSION_SUCCESS should not update closedForComments discussion',
 
 test('TOGGLE_SUBSCRIBE_SUCCESS should update subscribed to false when new state is false', () => {
   const newState = reduce(actions.toggleSubscribeSuccess({id: 1, subscribed: false}), {
-    allDiscussions: {1: {id: 1, subscribed: true}}
+    allDiscussions: {1: {id: 1, subscribed: true}},
   })
   deepEqual(newState.allDiscussions[1], {id: 1, subscribed: false})
 })
 
 test('TOGGLE_SUBSCRIBE_SUCCESS should update subscribed to true when new state is true', () => {
   const newState = reduce(actions.toggleSubscribeSuccess({id: 1, subscribed: true}), {
-    allDiscussions: {1: {id: 1, subscribed: false}}
+    allDiscussions: {1: {id: 1, subscribed: false}},
   })
   deepEqual(newState.allDiscussions[1], {id: 1, subscribed: true})
 })
@@ -137,8 +137,8 @@ test('TOGGLE_SUBSCRIBE_SUCCESS should only update the state of the supplied id',
   const newState = reduce(actions.toggleSubscribeSuccess({id: 1, subscribed: false}), {
     allDiscussions: {
       1: {id: 1, subscribed: true},
-      2: {id: 2, subscribed: true}
-    }
+      2: {id: 2, subscribed: true},
+    },
   })
 
   deepEqual(newState.allDiscussions[1], {id: 1, subscribed: false})
@@ -189,7 +189,7 @@ test('SAVING_SETTINGS_SUCCESS should return payload if returned', () => {
 
 test('SAVING_SETTINGS_SUCCESS should return old state if nothing is returned', () => {
   const newState = reduce(actions.savingSettingsSuccess({userSettings: 'blee'}), {
-    courseSettings: 'blah'
+    courseSettings: 'blah',
   })
   deepEqual(newState.courseSettings, 'blah')
 })
@@ -208,7 +208,7 @@ test('SAVING_SETTINGS_SUCCESS should return payload for user settings', () => {
 
 test('ARRANGE_PINNED_DISCUSSIONS should update unpinned discussion', () => {
   const newState = reduce(actions.arrangePinnedDiscussions({order: [10, 5, 2, 1]}), {
-    pinnedDiscussionIds: [1, 2, 5, 10]
+    pinnedDiscussionIds: [1, 2, 5, 10],
   })
   deepEqual(newState.pinnedDiscussionIds, [10, 5, 2, 1])
 })
@@ -218,8 +218,8 @@ test('DUPLICATE_DISCUSSIONS_SUCCESS should update discussion positions', () => {
     allDiscussions: {
       2: {title: 'landon', id: 2, position: 20, pinned: true, locked: false},
       3: {title: 'steven', id: 3, position: 21, pinned: true, locked: false},
-      4: {title: 'aaron', id: 4, position: 22, pinned: true, locked: false}
-    }
+      4: {title: 'aaron', id: 4, position: 22, pinned: true, locked: false},
+    },
   }
   const payload = {
     originalId: 3,
@@ -229,8 +229,8 @@ test('DUPLICATE_DISCUSSIONS_SUCCESS should update discussion positions', () => {
       position: 22,
       pinned: true,
       locked: false,
-      new_positions: {2: 20, 3: 21, 5: 22, 4: 23}
-    }
+      new_positions: {2: 20, 3: 21, 5: 22, 4: 23},
+    },
   }
 
   const newState = reduce(actions.duplicateDiscussionSuccess(payload), originalState)
@@ -250,12 +250,12 @@ test('UPDATE_DISCUSSIONS_SEARCH should set the filter flag on discussions', () =
       4: {id: 4, title: 'foo', filtered: false, read_state: 'unread', unread_count: 0},
 
       5: {id: 5, title: 'bar', filtered: false, read_state: 'read', unread_count: 1},
-      6: {id: 6, title: 'bar', filtered: false, read_state: 'read', unread_count: 0}
-    }
+      6: {id: 6, title: 'bar', filtered: false, read_state: 'read', unread_count: 0},
+    },
   }
   const dispatchData = {
     searchTerm: 'foo',
-    filter: 'unread'
+    filter: 'unread',
   }
 
   const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
@@ -276,7 +276,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'read',
         unread_count: 1,
-        author: {display_name: 'wacko_steven'}
+        author: {display_name: 'wacko_steven'},
       },
       2: {
         id: 2,
@@ -284,7 +284,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'read',
         unread_count: 0,
-        author: {display_name: 'wacko_landon'}
+        author: {display_name: 'wacko_landon'},
       },
 
       3: {
@@ -293,7 +293,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'unread',
         unread_count: 1,
-        author: {display_name: 'wacko_steven'}
+        author: {display_name: 'wacko_steven'},
       },
       4: {
         id: 4,
@@ -301,7 +301,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'unread',
         unread_count: 0,
-        author: {display_name: 'wacko_landon'}
+        author: {display_name: 'wacko_landon'},
       },
 
       5: {
@@ -310,7 +310,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'read',
         unread_count: 1,
-        author: {display_name: 'wacko_steven'}
+        author: {display_name: 'wacko_steven'},
       },
       6: {
         id: 6,
@@ -318,13 +318,13 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
         filtered: false,
         read_state: 'read',
         unread_count: 0,
-        author: {display_name: 'wacko_landon'}
-      }
-    }
+        author: {display_name: 'wacko_landon'},
+      },
+    },
   }
   const dispatchData = {
     searchTerm: 'steven',
-    filter: 'read'
+    filter: 'read',
   }
 
   const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
@@ -336,7 +336,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
       filtered: false,
       read_state: 'read',
       unread_count: 1,
-      author: {display_name: 'wacko_steven'}
+      author: {display_name: 'wacko_steven'},
     },
     {
       id: 3,
@@ -344,7 +344,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
       filtered: false,
       read_state: 'unread',
       unread_count: 1,
-      author: {display_name: 'wacko_steven'}
+      author: {display_name: 'wacko_steven'},
     },
     {
       id: 5,
@@ -352,8 +352,8 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for discussions based on author', 
       filtered: false,
       read_state: 'read',
       unread_count: 1,
-      author: {display_name: 'wacko_steven'}
-    }
+      author: {display_name: 'wacko_steven'},
+    },
   ])
 })
 
@@ -365,7 +365,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
         title: 'foo',
         filtered: false,
         read_state: 'read',
-        unread_count: 1
+        unread_count: 1,
       },
       2: {
         id: 2,
@@ -373,7 +373,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
         filtered: false,
         read_state: 'read',
         unread_count: 0,
-        author: {display_name: 'wacko_landon'}
+        author: {display_name: 'wacko_landon'},
       },
 
       3: {
@@ -382,14 +382,14 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
         filtered: false,
         read_state: 'unread',
         unread_count: 1,
-        author: {display_name: 'wacko_steven'}
+        author: {display_name: 'wacko_steven'},
       },
       4: {
         id: 4,
         title: 'foo',
         filtered: false,
         read_state: 'unread',
-        unread_count: 0
+        unread_count: 0,
       },
 
       5: {
@@ -398,7 +398,7 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
         filtered: false,
         read_state: 'read',
         unread_count: 1,
-        author: {display_name: 'wacko_steven'}
+        author: {display_name: 'wacko_steven'},
       },
       6: {
         id: 6,
@@ -406,13 +406,13 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
         filtered: false,
         read_state: 'read',
         unread_count: 0,
-        author: {display_name: 'wacko_landon'}
-      }
-    }
+        author: {display_name: 'wacko_landon'},
+      },
+    },
   }
   const dispatchData = {
     searchTerm: 'anonymous',
-    filter: 'read'
+    filter: 'read',
   }
 
   const newState = reduce(actions.updateDiscussionsSearch(dispatchData), initialState)
@@ -424,15 +424,15 @@ test('UPDATE_DISCUSSIONS_SEARCH should search for anonymous author discussions w
       title: 'foo',
       filtered: false,
       read_state: 'read',
-      unread_count: 1
+      unread_count: 1,
     },
     {
       id: 4,
       title: 'foo',
       filtered: false,
       read_state: 'unread',
-      unread_count: 0
-    }
+      unread_count: 0,
+    },
   ])
 })
 
@@ -441,22 +441,22 @@ test('DELETE_DISCUSSION_SUCCESS should delete discussion and set focusOn', () =>
     discussion: {title: 'venk', id: 5, permissions: {delete: true}},
     nextFocusDiscussion: {
       focusId: 2,
-      focusOn: 'manageMenu'
-    }
+      focusOn: 'manageMenu',
+    },
   }
   const initialData = {
     allDiscussions: {
       1: {title: 'landon', id: 1, permissions: {delete: true}},
       2: {title: 'steven', id: 2, permissions: {delete: true}},
       5: {title: 'venk', id: 5, permissions: {delete: true}},
-      10: {title: 'aaron', id: 10, permissions: {delete: true}}
-    }
+      10: {title: 'aaron', id: 10, permissions: {delete: true}},
+    },
   }
   const newState = reduce(actions.deleteDiscussionSuccess(dispatchData), initialData)
   deepEqual(newState.allDiscussions, {
     1: {title: 'landon', id: 1, permissions: {delete: true}},
     2: {title: 'steven', id: 2, permissions: {delete: true}, focusOn: 'manageMenu'},
-    10: {title: 'aaron', id: 10, permissions: {delete: true}}
+    10: {title: 'aaron', id: 10, permissions: {delete: true}},
   })
 })
 
@@ -465,23 +465,23 @@ test('DRAG_AND_DROP should add order pinned discussion correctly', () => {
     allDiscussions: {
       1: {id: 1, pinned: true},
       2: {id: 2, pinned: true},
-      3: {id: 3, pinned: true}
+      3: {id: 3, pinned: true},
     },
     pinnedDiscussionIds: [1, 2, 3],
     unpinnedDiscussionIds: [],
-    closedForCommentsDiscussionIds: []
+    closedForCommentsDiscussionIds: [],
   }
 
   const dispatchData = {
     order: [3, 2, 1],
-    discussion: {id: 3, pinned: true}
+    discussion: {id: 3, pinned: true},
   }
 
   // start and failure should do the same thing here, just called with
   // different arguments in the action.
   const states = [
     reduce(actions.dragAndDropStart(dispatchData), initialState),
-    reduce(actions.dragAndDropFail(dispatchData), initialState)
+    reduce(actions.dragAndDropFail(dispatchData), initialState),
   ]
   states.forEach(newState => {
     deepEqual(newState.pinnedDiscussionIds, [3, 2, 1])
@@ -495,23 +495,23 @@ test('DRAG_AND_DROP should put pinned discussion without ordering at the bottom'
     allDiscussions: {
       1: {id: 1, pinned: true},
       2: {id: 2, pinned: true},
-      3: {id: 3, pinned: false}
+      3: {id: 3, pinned: false},
     },
     pinnedDiscussionIds: [1, 2],
     unpinnedDiscussionIds: [3],
-    closedForCommentsDiscussionIds: []
+    closedForCommentsDiscussionIds: [],
   }
 
   const dispatchData = {
     order: undefined,
-    discussion: {id: 3, pinned: true}
+    discussion: {id: 3, pinned: true},
   }
 
   // start and failure should do the same thing here, just called with
   // different arguments in the action.
   const states = [
     reduce(actions.dragAndDropStart(dispatchData), initialState),
-    reduce(actions.dragAndDropFail(dispatchData), initialState)
+    reduce(actions.dragAndDropFail(dispatchData), initialState),
   ]
   states.forEach(newState => {
     deepEqual(newState.pinnedDiscussionIds, [1, 2, 3])

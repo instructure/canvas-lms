@@ -85,7 +85,7 @@ export default class SidebarView extends Backbone.View {
         readOnly: this.readOnly,
         selectFirstItem: isRoot && this.selectFirstItem,
         inFindDialog: this.inFindDialog,
-        directoryDepth: i + 1
+        directoryDepth: i + 1,
       })
       this.firstDir = false
     }
@@ -231,8 +231,8 @@ export default class SidebarView extends Backbone.View {
         title: I18n.t('titles.find_outcomes', 'Find Outcomes'),
         selectedGroup: this.selectedGroup(),
         directoryView: new FindDirectoryView({
-          outcomeGroup: this.selectedGroup()
-        })
+          outcomeGroup: this.selectedGroup(),
+        }),
       })
       findDialog.on('import', this.addAndSelect, this)
     } else {
@@ -257,7 +257,7 @@ export default class SidebarView extends Backbone.View {
       $.flashError(
         I18n.t('%{model} is already located in %{newGroup}', {
           model: model.get('title'),
-          newGroup: newGroup.get('title')
+          newGroup: newGroup.get('title'),
         })
       )
       return
@@ -288,7 +288,7 @@ export default class SidebarView extends Backbone.View {
           $.flashMessage(
             I18n.t('Successfully moved %{model} to %{newGroup}', {
               model: model.get('title'),
-              newGroup: newGroup.get('title')
+              newGroup: newGroup.get('title'),
             })
           ),
         1500

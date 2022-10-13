@@ -28,7 +28,7 @@ import {
   IconMsPptLine,
   IconPdfLine,
   IconPaperclipLine,
-  IconZippedLine
+  IconZippedLine,
 } from '@instructure/ui-icons'
 
 export const DEFAULT_ICON = <IconPaperclipLine />
@@ -48,7 +48,7 @@ export const ICON_TYPES = {
   text: <IconDocumentLine />,
   video: <IconAttachMediaLine />,
   xls: <IconMsExcelLine />,
-  zip: <IconZippedLine />
+  zip: <IconZippedLine />,
 }
 
 export function getIconByType(attachment_type) {

@@ -224,6 +224,7 @@
             <% end %>
 
             <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+            <div id="grades-loading-spinner"></div>
             <div id="grading">
               <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
               <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>

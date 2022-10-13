@@ -34,8 +34,8 @@ class UploadProgress extends React.Component {
       roundProgress: func.isRequired,
       abort: func.isRequired,
       file: instanceOf(File).isRequired,
-      canAbort: func.isRequired
-    })
+      canAbort: func.isRequired,
+    }),
   }
 
   constructor(props) {
@@ -43,7 +43,7 @@ class UploadProgress extends React.Component {
 
     this.state = {
       progress: 0,
-      messages: {}
+      messages: {},
     }
 
     this.resetProgress = this.resetProgress.bind(this)
@@ -123,7 +123,7 @@ class UploadProgress extends React.Component {
   render() {
     const rowClassNames = classnames({
       'ef-item-row': true,
-      'text-error': this.props.uploader.error
+      'text-error': this.props.uploader.error,
     })
 
     return (

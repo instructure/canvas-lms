@@ -19,14 +19,17 @@
 import React from 'react'
 import {Text} from '@instructure/ui-text'
 
-import {gradeInfo, gradeEntry} from '../GradeInput/PropTypes'
+import {
+  gradeInfo as gradeInfoPropType,
+  gradeEntry as gradeEntryPropType,
+} from '../GradeInput/PropTypes'
 import CellEditorComponent from '../CellEditorComponent'
 
 export default class ReadOnlyCell extends CellEditorComponent {
   static propTypes = {
-    gradeEntry: gradeEntry.isRequired,
-    gradeInfo: gradeInfo.isRequired,
-    pendingGradeInfo: gradeInfo,
+    gradeEntry: gradeEntryPropType.isRequired,
+    gradeInfo: gradeInfoPropType.isRequired,
+    pendingGradeInfo: gradeInfoPropType,
   }
 
   static defaultProps = {

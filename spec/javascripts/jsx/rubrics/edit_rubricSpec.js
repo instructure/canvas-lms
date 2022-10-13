@@ -21,7 +21,7 @@ import rubricEditing from '@canvas/rubrics/jquery/edit_rubric'
 QUnit.module('edit_rubric', {
   teardown: () => {
     $('.edit_rubric_test').remove()
-  }
+  },
 })
 
 test('hidePoints hides elements marked with class toggle_for_hide_points', () => {
@@ -72,11 +72,7 @@ test('clicking hide_points checkbox hides grading_rubric checkbox', () => {
   rubricEditing.init()
   $('.hide_points_checkbox').prop('checked', true)
   $('.hide_points_checkbox').triggerHandler('change')
-  ok(
-    $('.rubric_grading')
-      .attr('style')
-      .includes('display: none;')
-  )
+  ok($('.rubric_grading').attr('style').includes('display: none;'))
 })
 
 test('clicking hide_points checkbox unchecks grading_rubric checkbox if checked', () => {
@@ -93,11 +89,7 @@ test('clicking hide_points checkbox hides totalling_rubric checkbox', () => {
   rubricEditing.init()
   $('.hide_points_checkbox').prop('checked', true)
   $('.hide_points_checkbox').triggerHandler('change')
-  ok(
-    $('.totalling_rubric')
-      .attr('style')
-      .includes('display: none')
-  )
+  ok($('.totalling_rubric').attr('style').includes('display: none'))
 })
 
 test('clicking hide_points checkbox unchecks totalling_rubric checkbox if checked', () => {

@@ -33,18 +33,18 @@ describe('ScoresGrid', () => {
                 points: 3,
                 color: 'green',
                 description: 'mastery',
-                mastery: false
-              }
-            }
-          ]
-        }
+                mastery: false,
+              },
+            },
+          ],
+        },
       ],
       students: [
         {
           id: '1',
           name: 'Student Name',
-          display_name: 'Student Name'
-        }
+          display_name: 'Student Name',
+        },
       ],
       outcomes: [
         {
@@ -56,13 +56,13 @@ describe('ScoresGrid', () => {
               points: 5,
               color: 'green',
               description: 'Description',
-              mastery: true
-            }
-          ]
-        }
+              mastery: true,
+            },
+          ],
+        },
       ],
       visibleRatings: [true, true, true, true, true, true],
-      ...props
+      ...props,
     }
   }
 

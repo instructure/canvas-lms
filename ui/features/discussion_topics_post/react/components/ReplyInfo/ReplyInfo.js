@@ -32,12 +32,12 @@ export const ReplyInfo = props => {
       ? I18n.t(
           {
             one: '%{replyCount} reply, %{unreadCount} unread',
-            other: '%{replyCount} replies, %{unreadCount} unread'
+            other: '%{replyCount} replies, %{unreadCount} unread',
           },
           {
             count: props.replyCount,
             replyCount: props.replyCount,
-            unreadCount: props.unreadCount
+            unreadCount: props.unreadCount,
           }
         )
       : I18n.t(
@@ -51,12 +51,12 @@ export const ReplyInfo = props => {
       ? I18n.t(
           {
             one: '%{replyCount} reply (%{unreadCount})',
-            other: '%{replyCount} replies (%{unreadCount})'
+            other: '%{replyCount} replies (%{unreadCount})',
           },
           {
             count: props.replyCount,
             replyCount: props.replyCount,
-            unreadCount: props.unreadCount
+            unreadCount: props.unreadCount,
           }
         )
       : I18n.t(
@@ -72,12 +72,12 @@ export const ReplyInfo = props => {
       props={{
         mobile: {
           displayText: getCondensedText(),
-          screenReaderLabel: getFullText()
+          screenReaderLabel: getFullText(),
         },
         desktop: {
           displayText: getFullText(),
-          screenReaderLabel: getFullText()
-        }
+          screenReaderLabel: getFullText(),
+        },
       }}
       render={responsiveProps => (
         <AccessibleContent alt={responsiveProps.screenReaderLabel}>
@@ -96,5 +96,5 @@ ReplyInfo.propTypes = {
   /**
    * The number of unread replies
    */
-  unreadCount: PropTypes.number
+  unreadCount: PropTypes.number,
 }

@@ -456,5 +456,28 @@ describe "threaded discussions" do
         expect(authors).not_to include("student")
       end
     end
+
+    context "users must post before seeing replies" do
+      it "requires a post before seeing replies for students" do
+        topic = create_discussion("must see replies", "threaded")
+        topic.require_initial_post = true
+        topic.save!
+        topic.reload
+        topic.discussion_entries.create!(
+          user: @teacher,
+          message: "students can only see this if they reply"
+        )
+        user_session(@student)
+        get "/courses/#{@course.id}/discussion_topics/#{topic.id}"
+        expect(fj("div:contains('You must post before seeing replies.')")).to be_present
+        expect(f("body")).not_to contain_jqcss("div:contains('students can only see this if they reply')")
+        f("button[data-testid='discussion-topic-reply']").click
+        type_in_tiny("textarea", "student here")
+        fj("button:contains('Reply')").click
+        wait_for_ajaximations
+        expect(f("body")).to contain_jqcss("div:contains('students can only see this if they reply')")
+        expect(f("body")).to contain_jqcss("div:contains('student here')")
+      end
+    end
   end
 end

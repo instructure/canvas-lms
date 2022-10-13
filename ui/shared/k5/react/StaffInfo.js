@@ -44,7 +44,7 @@ export default function StaffInfo({
   name,
   bio,
   avatarUrl = '/images/messages/avatar-50.png',
-  role
+  role,
 }) {
   const [isModalOpen, setModalOpen] = useState(false)
   const [message, setMessage] = useState('')
@@ -75,7 +75,7 @@ export default function StaffInfo({
         <Flex.Item align="start">
           <Avatar name={name} src={avatarUrl} alt={I18n.t('Avatar for %{name}', {name})} />
         </Flex.Item>
-        <Flex.Item shouldShrink shouldGrow padding="0 small">
+        <Flex.Item shouldShrink={true} shouldGrow={true} padding="0 small">
           <Heading level="h3">{name}</Heading>
           <Text as="div" size="small" data-automation="instructor-role">
             {readableRoleName(role)}
@@ -160,7 +160,7 @@ export const StaffShape = {
   name: PropTypes.string.isRequired,
   bio: PropTypes.string,
   avatarUrl: PropTypes.string,
-  role: PropTypes.string.isRequired
+  role: PropTypes.string.isRequired,
 }
 
 StaffInfo.propTypes = StaffShape

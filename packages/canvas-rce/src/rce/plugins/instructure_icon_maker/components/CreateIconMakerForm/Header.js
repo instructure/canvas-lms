@@ -27,8 +27,39 @@ import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconQuestionLine} from '@instructure/ui-icons'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {FormFieldLabel} from '@instructure/ui-form-field'
 import {decode} from '../../svg/utils'
 import useDebouncedValue from '../../utils/useDebouncedValue'
+
+const getAltTextLabel = () => (
+  <Flex alignItems="center" margin="0 0 small 0">
+    <Flex.Item>
+      <FormFieldLabel>{formatMessage('Alt Text')}</FormFieldLabel>
+    </Flex.Item>
+    <Flex.Item margin="0 0 0 xx-small">
+      <Tooltip
+        on={['hover', 'focus']}
+        placement="top"
+        renderTip={
+          <>
+            <ScreenReaderContent>{formatMessage('Toggle tooltip')}</ScreenReaderContent>
+            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
+              {formatMessage('Used by screen readers to describe the content of an image')}
+            </View>
+          </>
+        }
+      >
+        <IconButton
+          renderIcon={IconQuestionLine}
+          withBackground={false}
+          withBorder={false}
+          size="small"
+        />
+      </Tooltip>
+    </Flex.Item>
+  </Flex>
+)
 
 export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) => {
   const originalName = settings.originalName
@@ -40,32 +71,6 @@ export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) 
     if (!allowNameChange) onChange({name: originalName})
   }, [allowNameChange, onChange, originalName])
 
-  const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
-  const textAreaLabel = (
-    <Flex alignItems="center">
-      <Flex.Item>{formatMessage('Alt Text')}</Flex.Item>
-
-      <Flex.Item margin="0 0 0 xx-small">
-        <Tooltip
-          on={['hover', 'focus']}
-          placement="top"
-          renderTip={
-            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
-              {tooltipText}
-            </View>
-          }
-        >
-          <IconButton
-            renderIcon={IconQuestionLine}
-            withBackground={false}
-            withBorder={false}
-            size="small"
-            screenReaderLabel={formatMessage('Toggle tooltip')}
-          />
-        </Tooltip>
-      </Flex.Item>
-    </Flex>
-  )
   return (
     <Flex direction="column" padding="small small 0">
       <Flex.Item padding="small">
@@ -85,11 +90,11 @@ export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) 
       {!editing && (
         <>
           <Flex.Item padding="small">
+            {getAltTextLabel()}
             <TextArea
               id="icon-alt-text"
               height="4rem"
               disabled={settings.isDecorative}
-              label={textAreaLabel}
               onChange={setAlt}
               placeholder={formatMessage('(Describe the icon)')}
               resize="vertical"

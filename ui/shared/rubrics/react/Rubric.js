@@ -34,13 +34,13 @@ const MIN_WIDTH_PIXELS = 95
 
 const totalString = score =>
   I18n.t('Total Points: %{total}', {
-    total: I18n.toNumber(score, {precision: 2, strip_insignificant_zeros: true})
+    total: I18n.toNumber(score, {precision: 2, strip_insignificant_zeros: true}),
   })
 
 const totalAssessingString = (score, possible) =>
   I18n.t('Total Points: %{total} out of %{possible}', {
     total: roundIfWhole(score),
-    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true})
+    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
   })
 
 // This is a gross hack to make sure the first row in the table is of the eventual columns
@@ -59,7 +59,7 @@ const Rubric = props => {
     rubricAssessment,
     rubricAssociation,
     isSummary,
-    flexWidth
+    flexWidth,
   } = props
 
   const tableRef = useRef()
@@ -84,7 +84,7 @@ const Rubric = props => {
     onAssessmentChange({
       ...rubricAssessment,
       data,
-      score: sum(points)
+      score: sum(points),
     })
   }
 
@@ -148,7 +148,7 @@ const Rubric = props => {
       <Table.ColHeader id="table-heading-points" key="TableHeadingPoints" width={narrowColWidths}>
         {I18n.t('Pts')}
       </Table.ColHeader>
-    ) : null
+    ) : null,
   ]
 
   const numColumns = 2 + (showPointsColumn() ? 1 : 0)
@@ -223,7 +223,7 @@ Rubric.propTypes = {
   },
   rubricAssociation: PropTypes.shape(rubricAssociationShape),
   isSummary: PropTypes.bool,
-  flexWidth: PropTypes.bool
+  flexWidth: PropTypes.bool,
 }
 
 Rubric.defaultProps = {
@@ -233,7 +233,7 @@ Rubric.defaultProps = {
   rubricAssessment: null,
   rubricAssociation: {},
   isSummary: false,
-  flexWidth: false
+  flexWidth: false,
 }
 
 export default Rubric

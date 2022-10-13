@@ -34,20 +34,20 @@ export const AssessmentRequest = {
   shape: shape({
     anonymizedUser: shape({
       id: string,
-      displayName: string
+      displayName: string,
     }),
     anonymousId: string,
-    workflowState: string
+    workflowState: string,
   }),
 
   mock: ({
     anonymizedUser = {_id: '1', displayName: 'Morty Smith', __typename: 'AnonymizedUser'},
     anonymousId = '7a8c1',
-    workflowState = 'assigned'
+    workflowState = 'assigned',
   } = {}) => ({
     anonymizedUser,
     anonymousId,
     workflowState,
-    __typename: 'AssessmentRequest'
-  })
+    __typename: 'AssessmentRequest',
+  }),
 }

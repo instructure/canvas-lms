@@ -31,7 +31,7 @@ describe('K5Announcement', () => {
     canReadAnnouncements: true,
     published: true,
     showCourseDetails: true,
-    ...overrides
+    ...overrides,
   })
 
   const getProps = (courseOverrides = {}, anncOverrides = {}) => ({
@@ -45,10 +45,10 @@ describe('K5Announcement', () => {
       attachment: {
         display_name: 'exam1.pdf',
         url: 'http://google.com/download',
-        filename: '1608134586_366__exam1.pdf'
+        filename: '1608134586_366__exam1.pdf',
       },
-      ...anncOverrides
-    }
+      ...anncOverrides,
+    },
   })
 
   it('shows homeroom course title with underlying link for teachers', () => {
@@ -65,11 +65,36 @@ describe('K5Announcement', () => {
     expect(courseName.href).toBeUndefined()
   })
 
-  it('shows announcement title with a link to the announcement', () => {
-    const {getByText} = render(<K5Announcement {...getProps()} />)
-    const announcementTitle = getByText('20 minutes of weekly reading')
-    expect(announcementTitle).toBeInTheDocument()
-    expect(announcementTitle.href).toBe('http://google.com/url')
+  describe('announcement title', () => {
+    it('includes a link to the announcement for teachers on dashboard', () => {
+      const {getByText} = render(<K5Announcement {...getProps()} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('includes a link to the announcement for teachers in a subject', () => {
+      const {getByText} = render(<K5Announcement {...getProps({showCourseDetails: false})} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('includes a link to the announcement for students in a subject', () => {
+      const {getByText} = render(
+        <K5Announcement {...getProps({canEdit: false, showCourseDetails: false})} />
+      )
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBe('http://google.com/url')
+    })
+
+    it('does not include link to the announcement for students on the dashboard', () => {
+      const {getByText} = render(<K5Announcement {...getProps({canEdit: false})} />)
+      const announcementTitle = getByText('20 minutes of weekly reading')
+      expect(announcementTitle).toBeInTheDocument()
+      expect(announcementTitle.href).toBeUndefined()
+    })
   })
 
   it('shows announcement body with rich content', () => {
@@ -148,8 +173,8 @@ describe('K5Announcement', () => {
         {
           body: '[]',
           headers: {
-            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-          }
+            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+          },
         },
         {}
       )
@@ -174,12 +199,12 @@ describe('K5Announcement', () => {
               message: 'Hello, I am announcement 2',
               html_url: '/courses/1/discussion_topics/18',
               posted_at: '2021-05-13T17:06:21-06:00',
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-          }
+            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+          },
         },
         {}
       )
@@ -202,12 +227,12 @@ describe('K5Announcement', () => {
               message: 'Hello, I am announcement 2',
               html_url: '/courses/1/discussion_topics/18',
               posted_at: '2021-05-13T17:06:21-06:00',
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-          }
+            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+          },
         },
         {}
       )
@@ -246,12 +271,12 @@ describe('K5Announcement', () => {
               message: 'Hello, I am announcement 2',
               html_url: '/courses/1/discussion_topics/18',
               posted_at: postedAt,
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-          }
+            Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+          },
         },
         {}
       )
@@ -277,19 +302,19 @@ describe('K5Announcement', () => {
               title: '20 minutes of weekly reading',
               message: 'Message here',
               html_url: '/courses/1/discussion_topics/18',
-              attachments: []
+              attachments: [],
             },
             {
               id: '18',
               title: 'Announcement B',
               message: 'Message here',
               html_url: '/courses/1/discussion_topics/18',
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=2>; rel="next"'
-          }
+            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=2>; rel="next"',
+          },
         },
         {}
       )
@@ -302,19 +327,19 @@ describe('K5Announcement', () => {
               title: 'Announcement C',
               message: 'Message here',
               html_url: '/courses/1/discussion_topics/19',
-              attachments: []
+              attachments: [],
             },
             {
               id: '20',
               title: 'Announcement D',
               message: 'Message here',
               html_url: '/courses/1/discussion_topics/20',
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=3>; rel="next"'
-          }
+            Link: '</api/v1/announcements?active_only=true&context_codes[]=course_123&per_page=2&page=3>; rel="next"',
+          },
         },
         {}
       )
@@ -327,12 +352,12 @@ describe('K5Announcement', () => {
               title: 'Announcement E',
               message: 'Message here',
               html_url: '/courses/1/discussion_topics/21',
-              attachments: []
-            }
+              attachments: [],
+            },
           ]),
           headers: {
-            Link: ''
-          }
+            Link: '',
+          },
         },
         {}
       )
@@ -387,8 +412,8 @@ describe('K5Announcement', () => {
             {
               body: '[]',
               headers: {
-                Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-              }
+                Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+              },
             },
             {}
           )
@@ -423,12 +448,12 @@ describe('K5Announcement', () => {
                   message: 'Hello, I am announcement 2',
                   html_url: '/courses/1/discussion_topics/18',
                   posted_at: '2021-05-13T17:06:21-06:00',
-                  attachments: []
-                }
+                  attachments: [],
+                },
               ]),
               headers: {
-                Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"'
-              }
+                Link: '</api/v1/announcements>; rel="current",</api/v1/announcements>; rel="first",</api/v1/announcements>; rel="last"',
+              },
             },
             {}
           )

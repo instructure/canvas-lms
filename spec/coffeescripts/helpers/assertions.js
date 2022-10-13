@@ -50,8 +50,8 @@ module.exports = {
     const axeConfig = {
       runOnly: {
         type: 'tag',
-        values: ['wcag2a', 'wcag2aa', 'section508', 'best-practice']
-      }
+        values: ['wcag2a', 'wcag2aa', 'section508', 'best-practice'],
+      },
     }
 
     return axe.a11yCheck(el, axeConfig, result => {
@@ -78,5 +78,5 @@ module.exports = {
       substring,
       'expected string not found in actual'
     )
-  }
+  },
 }

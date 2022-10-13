@@ -36,7 +36,7 @@ function setEditUserDialogOpenState(state, action, visibility) {
         return {...user, editUserDialogOpen: visibility}
       }
       return user
-    })
+    }),
   }
 }
 
@@ -46,8 +46,8 @@ const userListHandlers = {
       ...state,
       errors: {
         ...state.errors,
-        ...action.error
-      }
+        ...action.error,
+      },
     }
   },
   ADD_TO_USERS: (state, action) => {
@@ -60,7 +60,7 @@ const userListHandlers = {
 
     const newState = {
       isLoading: false,
-      users: state.users.concat(mappedEmailUsers)
+      users: state.users.concat(mappedEmailUsers),
     }
     if (action.payload.xhr) {
       newState.links = parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
@@ -72,13 +72,13 @@ const userListHandlers = {
       ...state,
       users: action.payload.users,
       isLoading: false,
-      links: parseLinkHeader(action.payload.xhr.getResponseHeader('Link'))
+      links: parseLinkHeader(action.payload.xhr.getResponseHeader('Link')),
     }
   },
   GOT_USER_UPDATE(state, action) {
     return {
       ...state,
-      users: state.users.map(user => (user.id === action.payload.id ? action.payload : user))
+      users: state.users.map(user => (user.id === action.payload.id ? action.payload : user)),
     }
   },
   OPEN_EDIT_USER_DIALOG(state, action) {
@@ -91,12 +91,12 @@ const userListHandlers = {
     return {
       ...state,
       errors: {
-        search_term: ''
+        search_term: '',
       },
       searchFilter: {
         ...state.searchFilter,
-        ...action.payload
-      }
+        ...action.payload,
+      },
     }
   },
   SEARCH_TERM_TOO_SHORT(state, action) {
@@ -104,16 +104,16 @@ const userListHandlers = {
       ...state,
       errors: {
         ...state.errors,
-        search_term: action.errors.termTooShort
-      }
+        search_term: action.errors.termTooShort,
+      },
     }
   },
   LOADING_USERS(state, _action) {
     return {
       ...state,
-      isLoading: true
+      isLoading: true,
     }
-  }
+  },
 }
 
 const tabListHandlers = {
@@ -122,18 +122,20 @@ const tabListHandlers = {
     return {
       ...state,
       selected,
-      queryParams
+      queryParams,
     }
-  }
+  },
 }
 
-const makeReducer = handlerList => (state = initialState, action) => {
-  const handler = handlerList[action.type]
-  if (handler) return handler({...state}, action)
-  return state
-}
+const makeReducer =
+  handlerList =>
+  (state = initialState, action) => {
+    const handler = handlerList[action.type]
+    if (handler) return handler({...state}, action)
+    return state
+  }
 
 export default combineReducers({
   userList: makeReducer(userListHandlers),
-  tabList: makeReducer(tabListHandlers)
+  tabList: makeReducer(tabListHandlers),
 })

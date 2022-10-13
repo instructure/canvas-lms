@@ -51,7 +51,7 @@ export default function JobsIndex() {
       queued: I18n.t('Queued jobs'),
       running: I18n.t('Running jobs'),
       future: I18n.t('Future jobs'),
-      failed: I18n.t('Failed jobs')
+      failed: I18n.t('Failed jobs'),
     }
   }, [])
 
@@ -59,7 +59,7 @@ export default function JobsIndex() {
     return {
       tag: I18n.t('Tag'),
       strand: I18n.t('Strand'),
-      singleton: I18n.t('Singleton')
+      singleton: I18n.t('Singleton'),
     }
   }, [])
 
@@ -67,7 +67,7 @@ export default function JobsIndex() {
     return {
       tag: I18n.t('Tags'),
       strand: I18n.t('Strands'),
-      singleton: I18n.t('Singletons')
+      singleton: I18n.t('Singletons'),
     }
   }, [])
 
@@ -92,7 +92,7 @@ export default function JobsIndex() {
         page: state.groups_page,
         scope: state.scope,
         start_date: convertTimestamp(state.start_date),
-        end_date: convertTimestamp(state.end_date)
+        end_date: convertTimestamp(state.end_date),
       },
       loading: useCallback(loading => {
         dispatch({type: 'GROUPS_LOADING', payload: loading})
@@ -102,7 +102,7 @@ export default function JobsIndex() {
       }, []),
       success: useCallback(response => {
         dispatch({type: 'FETCHED_GROUPS', payload: response})
-      }, [])
+      }, []),
     },
     [state.groups_refresh_nonce]
   )
@@ -116,7 +116,7 @@ export default function JobsIndex() {
         page: state.jobs_page,
         scope: state.scope,
         start_date: convertTimestamp(state.start_date),
-        end_date: convertTimestamp(state.end_date)
+        end_date: convertTimestamp(state.end_date),
       },
       loading: useCallback(loading => {
         dispatch({type: 'JOBS_LOADING', payload: loading})
@@ -126,7 +126,7 @@ export default function JobsIndex() {
       }, []),
       success: useCallback(response => {
         dispatch({type: 'FETCHED_JOBS', payload: response})
-      }, [])
+      }, []),
     },
     [state.jobs_refresh_nonce]
   )

@@ -23,13 +23,13 @@ const content_items = [
   {
     type: 'link',
     title: 'title',
-    url: 'http://www.tool.com'
+    url: 'http://www.tool.com',
   },
   {
     type: 'ltiResourceLink',
     title: 'LTI Link',
-    url: 'http://www.tool.com/lti'
-  }
+    url: 'http://www.tool.com/lti',
+  },
 ]
 
 const data = overrides => ({
@@ -40,7 +40,7 @@ const data = overrides => ({
   errorlog: 'error log',
   ltiEndpoint: 'https://www.instructure.com/lti',
   subject: 'LtiDeepLinkingResponse',
-  ...overrides
+  ...overrides,
 })
 
 describe('processSingleContentItem', () => {

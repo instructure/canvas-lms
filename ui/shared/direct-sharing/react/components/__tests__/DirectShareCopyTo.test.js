@@ -35,7 +35,7 @@ const userManagedCoursesList = [
     account_name: 'QA-LOCAL-QA',
     account_id: '1',
     start_at: 'Aug 6, 2019 at 6:47pm',
-    end_at: null
+    end_at: null,
   },
   {
     name: 'Course Advanced Math 200',
@@ -45,8 +45,8 @@ const userManagedCoursesList = [
     account_name: 'QA-LOCAL-QA',
     account_id: '1',
     start_at: 'Apr 27, 2019 at 2:19pm',
-    end_at: 'Dec 31, 2019 at 3am'
-  }
+    end_at: 'Dec 31, 2019 at 3am',
+  },
 ]
 
 describe('DirectShareCopyToTray', () => {
@@ -61,7 +61,7 @@ describe('DirectShareCopyToTray', () => {
   describe('tray controls', () => {
     it('closes the tray when X is clicked', () => {
       const handleDismiss = jest.fn()
-      const {getByText} = render(<DirectShareCourseTray open onDismiss={handleDismiss} />)
+      const {getByText} = render(<DirectShareCourseTray open={true} onDismiss={handleDismiss} />)
       fireEvent.click(getByText(/close/i))
 
       expect(handleDismiss).toHaveBeenCalled()
@@ -71,7 +71,7 @@ describe('DirectShareCopyToTray', () => {
       useManagedCourseSearchApi.mockImplementationOnce(({error}) =>
         error([{status: 400, body: 'Error fetching data'}])
       )
-      const {getByText} = render(<DirectShareCourseTray open />)
+      const {getByText} = render(<DirectShareCourseTray open={true} />)
 
       expect(getByText('Sorry, Something Broke')).toBeInTheDocument()
     })
@@ -83,7 +83,7 @@ describe('DirectShareCopyToTray', () => {
       useModuleCourseSearchApi.mockImplementationOnce(({error}) =>
         error([{status: 400, body: 'Error fetching data'}])
       )
-      const {getByText} = render(<DirectShareCourseTray open />)
+      const {getByText} = render(<DirectShareCourseTray open={true} />)
       fireEvent.click(getByText(/select a course/i))
       fireEvent.click(getByText('Course Math 101'))
       await act(() => fetchMock.flush(true))
@@ -97,7 +97,7 @@ describe('DirectShareCopyToTray', () => {
       useManagedCourseSearchApi.mockImplementationOnce(({success}) => {
         success(userManagedCoursesList)
       })
-      const {getByText, getByLabelText} = render(<DirectShareCourseTray open />)
+      const {getByText, getByLabelText} = render(<DirectShareCourseTray open={true} />)
       const courseDropdown = getByLabelText(/select a course/i)
       fireEvent.click(courseDropdown)
 

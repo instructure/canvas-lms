@@ -40,7 +40,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         '.page-changed-alert': '$pageChangedAlert',
         '.help_dialog': '$helpDialog',
         '#todo_date_container': '$studentTodoAtContainer',
-        '#student_planner_checkbox': '$studentPlannerCheckbox'
+        '#student_planner_checkbox': '$studentPlannerCheckbox',
       },
 
       events: {
@@ -48,8 +48,8 @@ export default class WikiPageEditView extends ValidatedFormView {
         'click .delete_page': 'deleteWikiPage',
         'click .form-actions .cancel': 'cancel',
         'click .form-actions .save_and_publish': 'saveAndPublish',
-        'click #student_planner_checkbox': 'toggleStudentTodo'
-      }
+        'click #student_planner_checkbox': 'toggleStudentTodo',
+      },
     })
 
     this.prototype.template = template
@@ -79,7 +79,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       TEACHER_ROLE: false,
       STUDENT_ROLE: false,
       MEMBER_ROLE: false,
-      ANYONE_ROLE: false
+      ANYONE_ROLE: false,
     }
 
     // rather than requiring the editing_roles to match a
@@ -104,7 +104,7 @@ export default class WikiPageEditView extends ValidatedFormView {
       PUBLISH_NOW: !!this.WIKI_RIGHTS.publish_page && !this.model.get('published'),
       DELETE: !!this.PAGE_RIGHTS.delete,
       EDIT_TITLE: !!this.PAGE_RIGHTS.update || json.new_record,
-      EDIT_ROLES: !!this.WIKI_RIGHTS.update
+      EDIT_ROLES: !!this.WIKI_RIGHTS.update,
     }
     json.SHOW = {COURSE_ROLES: json.contextName === 'courses'}
 
@@ -153,7 +153,7 @@ export default class WikiPageEditView extends ValidatedFormView {
           labelledBy="student_todo_at_date_label"
           inputClasses=""
           disabled={false}
-          isFancyMidnight
+          isFancyMidnight={true}
           dateValue={this.studentTodoAtDateValue}
           labelText="Student Planner Date"
           labelClasses="screenreader-only"
@@ -206,7 +206,7 @@ export default class WikiPageEditView extends ValidatedFormView {
         'This page has changed since you started editing it. *Reloading* will lose all of your changes.',
         {wrapper: '<a class="reload" href="#">$1</a>'}
       ),
-      warning: true
+      warning: true,
     })
     this.reloadView.on('changed', () => {
       this.$headerBarOuterContainer.addClass('page-changed')
@@ -240,8 +240,8 @@ export default class WikiPageEditView extends ValidatedFormView {
       errors.title = [
         {
           type: 'required',
-          message: I18n.t('errors.require_title', 'You must enter a title')
-        }
+          message: I18n.t('errors.require_title', 'You must enter a title'),
+        },
       ]
     }
 
@@ -250,8 +250,8 @@ export default class WikiPageEditView extends ValidatedFormView {
       errors.student_todo_at = [
         {
           type: 'required',
-          message: I18n.t('You must enter a date')
-        }
+          message: I18n.t('You must enter a date'),
+        },
       ]
     }
 
@@ -355,7 +355,7 @@ export default class WikiPageEditView extends ValidatedFormView {
 
     const deleteDialog = new WikiPageDeleteDialog({
       model: this.model,
-      wiki_pages_path: this.wiki_pages_path
+      wiki_pages_path: this.wiki_pages_path,
     })
     return deleteDialog.open()
   }

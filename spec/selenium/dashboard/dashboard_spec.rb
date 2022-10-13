@@ -479,24 +479,7 @@ describe "dashboard" do
       driver.manage.delete_cookie("#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}")
     end
 
-    context "with observer_picker flag off" do
-      before :once do
-        Account.site_admin.disable_feature!(:observer_picker)
-      end
-
-      it "loads all student cards with no picker" do
-        get "/"
-        expect(card_container).to include_text("Course 1")
-        expect(card_container).to include_text("Course 2")
-        expect(dashboard_container).not_to contain_css(observed_student_dropdown_selector)
-      end
-    end
-
-    context "with observer_picker flag on" do
-      before :once do
-        Account.site_admin.enable_feature!(:observer_picker)
-      end
-
+    context "observed students picker" do
       it "loads only the first student's cards and shows them in the picker" do
         get "/"
         expect(card_container).to include_text("Course 1")

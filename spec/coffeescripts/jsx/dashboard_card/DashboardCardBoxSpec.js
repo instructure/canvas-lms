@@ -46,21 +46,21 @@ QUnit.module('DashboardCardBox', suiteHooks => {
           id: '1',
           isFavorited: true,
           courseName: 'Bio 101',
-          assetString: 'course_1'
+          assetString: 'course_1',
         },
         {
           id: '2',
           isFavorited: true,
           courseName: 'Philosophy 201',
-          assetString: 'course_1'
-        }
-      ]
+          assetString: 'course_1',
+        },
+      ],
     }
 
     fetchMock.put(/\/api\/v1\/users\/1\/colors\/.*/, {
       status: 200,
       headers: {'Content-Type': 'application/json'},
-      body: ''
+      body: '',
     })
 
     server = sinon.fakeServer.create({respondImmediately: true})
@@ -157,7 +157,7 @@ QUnit.module('DashboardCardBox', suiteHooks => {
     test('correctly splits course cards into published and unpublished in split view', () => {
       props.courseCards = [
         {...props.courseCards[0], published: false},
-        {...props.courseCards[1], published: true}
+        {...props.courseCards[1], published: true},
       ]
       props.showSplitDashboardView = true
       mountComponent()

@@ -37,5 +37,5 @@ export default Backbone.Model.extend({
     )
 
     return attrs
-  }
+  },
 })

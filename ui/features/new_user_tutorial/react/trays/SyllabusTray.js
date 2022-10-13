@@ -29,17 +29,17 @@ const SyllabusTray = () => (
     image="/images/tutorial-tray-images/Panda_Syllabus.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the Syllabus as an instructor?'),
-        href: I18n.t('#community.instructor_use_syllabus')
+        href: I18n.t('#community.instructor_use_syllabus'),
       },
       {
         label: I18n.t('How do I edit the Syllabus description in a course?'),
-        href: I18n.t('#community.instructor_edit_syllabus')
-      }
+        href: I18n.t('#community.instructor_edit_syllabus'),
+      },
     ]}
   >
     {I18n.t(`The Syllabus lets you welcome your course users and share expectations

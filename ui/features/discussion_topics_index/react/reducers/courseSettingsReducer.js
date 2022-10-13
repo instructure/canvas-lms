@@ -26,7 +26,7 @@ const courseSettingsReducer = handleActions(
         return action.payload.courseSettings
       }
       return state
-    }
+    },
   },
   {}
 )

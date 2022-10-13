@@ -20,13 +20,13 @@ export const EnterGradesAs = Object.freeze({
   GRADING_SCHEME: 'gradingScheme',
   PASS_FAIL: 'passFail',
   PERCENTAGE: 'percent',
-  POINTS: 'points'
+  POINTS: 'points',
 })
 
 export default class GradeEntry {
   constructor(options = {}) {
     this.options = {
-      ...options
+      ...options,
     }
   }
 

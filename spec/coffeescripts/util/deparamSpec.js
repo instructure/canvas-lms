@@ -25,18 +25,18 @@ const params_obj = {
   b: {
     x: ['7'],
     y: '8',
-    z: ['9', '0', 'true', 'false', 'undefined', '']
+    z: ['9', '0', 'true', 'false', 'undefined', ''],
   },
-  c: '1'
+  c: '1',
 }
 const params_obj_coerce = {
   a: [4, 5, 6],
   b: {
     x: [7],
     y: 8,
-    z: [9, 0, true, false, undefined, '']
+    z: [9, 0, true, false, undefined, ''],
   },
-  c: 1
+  c: 1,
 }
 
 QUnit.module('deparam')
@@ -55,7 +55,7 @@ test('prototype pollution protection', () => {
   safe_result.a = '1'
   // eslint-disable-next-line no-proto
   safe_result.__proto__ = {
-    div: ['1', '<img/src/onerror=alert(document.domain)>', '1']
+    div: ['1', '<img/src/onerror=alert(document.domain)>', '1'],
   }
 
   const obj = {}

@@ -26,7 +26,7 @@ export default {
 
   propTypes: {
     contextType: customPropTypes.contextType.isRequired,
-    contextId: customPropTypes.contextId.isRequired
+    contextId: customPropTypes.contextId.isRequired,
   },
 
   update() {
@@ -42,5 +42,5 @@ export default {
 
   componentWillUnmount() {
     clearInterval(this.interval)
-  }
+  },
 }

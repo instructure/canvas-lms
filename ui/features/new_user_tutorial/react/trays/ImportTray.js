@@ -29,25 +29,25 @@ const ImportTray = () => (
     image="/images/tutorial-tray-images/Panda_Map.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I copy a Canvas course into a new course shell?'),
-        href: I18n.t('#community.instructor_copy_course')
+        href: I18n.t('#community.instructor_copy_course'),
       },
       {
         label: I18n.t('How do I import a Canvas course export package?'),
-        href: I18n.t('#community.instructor_import_package')
+        href: I18n.t('#community.instructor_import_package'),
       },
       {
         label: I18n.t('How do I select specific content as part of a course import?'),
-        href: I18n.t('#community.instructor_select_import_content')
+        href: I18n.t('#community.instructor_select_import_content'),
       },
       {
         label: I18n.t('How do I adjust events and due dates in a course import?'),
-        href: I18n.t('#community.instructor_adjust_dates_on_import')
-      }
+        href: I18n.t('#community.instructor_adjust_dates_on_import'),
+      },
     ]}
   >
     {I18n.t(`Easily import or copy content from another Canvas course into

@@ -36,7 +36,7 @@ const useOutcomesRemove = () => {
   const setStatus = (outcomeId, status) => {
     setRemoveOutcomesStatus(prevStatus => ({
       ...prevStatus,
-      [outcomeId]: status
+      [outcomeId]: status,
     }))
   }
 
@@ -46,26 +46,26 @@ const useOutcomesRemove = () => {
         message: I18n.t(
           {
             one: 'This outcome was successfully removed.',
-            other: '%{count} outcomes were successfully removed.'
+            other: '%{count} outcomes were successfully removed.',
           },
           {
-            count: outcomeCount
+            count: outcomeCount,
           }
         ),
-        type: 'success'
+        type: 'success',
       })
     } else {
       showFlashAlert({
         message: I18n.t(
           {
             one: 'An error occurred while removing this outcome. Please try again.',
-            other: 'An error occurred while removing these outcomes. Please try again.'
+            other: 'An error occurred while removing these outcomes. Please try again.',
           },
           {
-            count: outcomeCount
+            count: outcomeCount,
           }
         ),
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -87,9 +87,9 @@ const useOutcomesRemove = () => {
         const result = await deleteOutcomeLinks({
           variables: {
             input: {
-              ids: removableLinkIds
-            }
-          }
+              ids: removableLinkIds,
+            },
+          },
         })
 
         const deletedOutcomeLinkIds = result.data?.deleteOutcomeLinks?.deletedOutcomeLinkIds
@@ -116,7 +116,7 @@ const useOutcomesRemove = () => {
   return {
     removeOutcomes,
     removeOutcomesStatus,
-    setRemoveOutcomesStatus
+    setRemoveOutcomesStatus,
   }
 }
 

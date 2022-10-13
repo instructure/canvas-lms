@@ -116,7 +116,7 @@ module SectionTabHelper
             !new_collaborations_enabled
           elsif tab_is?(tab, "TAB_CONFERENCES")
             !WebConference.config(context: @context)
-          elsif quiz_lti_tab?(tab)
+          elsif Lti::ExternalToolTab.tool_for_tab(tab)&.quiz_lti?
             !new_quizzes_navigation_placements_enabled?(context)
           elsif tab_is?(tab, "TAB_PEOPLE")
             # can't manage people in template courses
@@ -149,15 +149,7 @@ module SectionTabHelper
     end
 
     def tab_is?(tab, const_name)
-      context.class.const_defined?(const_name) && tab[:id] == context.class.const_get(const_name)
-    end
-
-    def quiz_lti_tab?(tab)
-      if tab[:id].is_a?(String) && tab[:id].start_with?("context_external_tool_") && tab[:args] && tab[:args][1]
-        return ContextExternalTool.find_by(id: tab[:args][1])&.quiz_lti?
-      end
-
-      false
+      Api::V1::Tab.tab_is?(tab, context, const_name)
     end
   end
 

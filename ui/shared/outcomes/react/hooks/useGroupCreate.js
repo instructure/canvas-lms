@@ -35,9 +35,9 @@ const useGroupCreate = () => {
           variables: {
             input: {
               id: parentGroupId,
-              title: groupName
-            }
-          }
+              title: groupName,
+            },
+          },
         })
         const newGroup =
           addOutcomeGroupResult.data?.createLearningOutcomeGroup?.learningOutcomeGroup
@@ -48,13 +48,13 @@ const useGroupCreate = () => {
 
         showFlashAlert({
           message: I18n.t('"%{groupName}" was successfully created.', {groupName}),
-          type: 'success'
+          type: 'success',
         })
         return newGroup
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while creating this group. Please try again.'),
-          type: 'error'
+          type: 'error',
         })
       }
     },
@@ -66,7 +66,7 @@ const useGroupCreate = () => {
   return {
     createGroup,
     createdGroups,
-    clearCreatedGroups
+    clearCreatedGroups,
   }
 }
 

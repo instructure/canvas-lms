@@ -85,7 +85,7 @@ export const AnonymousResponseSelector = props => {
                   src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
                   name={props.username}
                   color="licorice"
-                  hasInverseColor
+                  hasInverseColor={true}
                   margin="0 small 0 0"
                 />
               }
@@ -115,7 +115,7 @@ export const AnonymousResponseSelector = props => {
           name={props.username}
           src={props.avatarUrl === DEFAULT_AVATAR_URL ? null : props.avatarUrl}
           color="licorice"
-          hasInverseColor
+          hasInverseColor={true}
         />
       )}
       <View margin="0 0 small small">{replyAsOption()}</View>
@@ -127,7 +127,7 @@ AnonymousResponseSelector.propTypes = {
   avatarUrl: propTypes.string,
   username: propTypes.string,
   setAnonymousAuthorState: propTypes.func,
-  discussionAnonymousState: propTypes.string
+  discussionAnonymousState: propTypes.string,
 }
 
 export default AnonymousResponseSelector

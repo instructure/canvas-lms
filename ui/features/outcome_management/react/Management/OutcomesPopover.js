@@ -43,8 +43,8 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
 
   const themeOverrides = {
     [Heading.theme]: {
-      h5FontWeight: 700
-    }
+      h5FontWeight: 700,
+    },
   }
 
   return (
@@ -68,10 +68,10 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
             {I18n.t(
               {
                 one: '1 Outcome Selected',
-                other: '%{count} Outcomes Selected'
+                other: '%{count} Outcomes Selected',
               },
               {
-                count: outcomeCount
+                count: outcomeCount,
               }
             )}
           </Link>
@@ -121,7 +121,7 @@ const OutcomesPopover = forwardRef(({outcomes, outcomeCount, onClearHandler}, re
 OutcomesPopover.propTypes = {
   outcomes: PropTypes.objectOf(outcomeShape).isRequired,
   outcomeCount: PropTypes.number.isRequired,
-  onClearHandler: PropTypes.func.isRequired
+  onClearHandler: PropTypes.func.isRequired,
 }
 
 export default OutcomesPopover

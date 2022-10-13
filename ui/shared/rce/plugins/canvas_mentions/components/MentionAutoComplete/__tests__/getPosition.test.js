@@ -27,10 +27,10 @@ describe('Get Position tests', () => {
           left: 10,
           right: 10,
           width: 10,
-          height: 10
-        })
-      })
-    })
+          height: 10,
+        }),
+      }),
+    }),
   }
   const tinymce = {
     dom: {
@@ -42,11 +42,11 @@ describe('Get Position tests', () => {
             left: 10,
             right: 10,
             width: 10,
-            height: 10
-          })
-        }
-      ]
-    }
+            height: 10,
+          }),
+        },
+      ],
+    },
   }
 
   beforeEach(() => {

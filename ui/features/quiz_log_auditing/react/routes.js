@@ -17,12 +17,7 @@
  */
 
 import React from 'react'
-import {
-  BrowserRouter,
-  HashRouter,
-  Switch,
-  Route,
-} from 'react-router-dom'
+import {BrowserRouter, HashRouter, Switch, Route} from 'react-router-dom'
 
 import AnswerMatrixRoute from './routes/answer_matrix'
 import AppRoute from './routes/app'

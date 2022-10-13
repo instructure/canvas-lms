@@ -30,7 +30,7 @@ const CONTENT_SELECTION_TYPES = [
   'modules',
   'module_items',
   'pages',
-  'rubrics'
+  'rubrics',
 ]
 
 // build the shape {folders: arrayOf(...), files: arrayOf(...), ...}

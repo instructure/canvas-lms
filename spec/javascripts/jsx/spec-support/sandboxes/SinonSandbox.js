@@ -46,7 +46,7 @@ export default class SinonSandbox {
       injectInto: global.sandbox,
       properties: ['clock', 'mock', 'server', 'spy', 'stub'],
       useFakeServer: true,
-      useFakeTimers: false
+      useFakeTimers: false,
     })
 
     sinon.assert.fail = message => qunit.ok(false, message)

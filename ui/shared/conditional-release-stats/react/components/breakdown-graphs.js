@@ -36,7 +36,7 @@ class BreakdownGraphs extends React.Component {
 
     // actions
     openSidebar: func.isRequired,
-    selectRange: func.isRequired
+    selectRange: func.isRequired,
   }
 
   renderContent() {

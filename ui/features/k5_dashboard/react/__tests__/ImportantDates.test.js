@@ -29,7 +29,7 @@ import {
   MOCK_CARDS,
   MOCK_EVENTS,
   MOCK_OBSERVEE_EVENTS,
-  MOCK_OBSERVEE_ASSIGNMENTS
+  MOCK_OBSERVEE_ASSIGNMENTS,
 } from '@canvas/k5/react/__tests__/fixtures'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
@@ -46,7 +46,7 @@ describe('ImportantDates', () => {
     timeZone: 'UTC',
     contexts: MOCK_CARDS,
     selectedContextsLimit: 2,
-    ...overrides
+    ...overrides,
   })
 
   beforeEach(() => {
@@ -171,7 +171,7 @@ describe('ImportantDates', () => {
       <ImportantDates {...getProps({selectedContextCodes: ['course_3']})} />
     )
     const calendarsButton = getByRole('button', {
-      name: 'Select calendars to retrieve important dates from'
+      name: 'Select calendars to retrieve important dates from',
     })
     expect(calendarsButton).not.toBeDisabled()
 
@@ -192,7 +192,7 @@ describe('ImportantDates', () => {
 
     act(() =>
       getByRole('button', {
-        name: 'Select calendars to retrieve important dates from'
+        name: 'Select calendars to retrieve important dates from',
       }).click()
     )
 
@@ -209,7 +209,7 @@ describe('ImportantDates', () => {
 
     act(() =>
       getByRole('button', {
-        name: 'Select calendars to retrieve important dates from'
+        name: 'Select calendars to retrieve important dates from',
       }).click()
     )
 
@@ -229,7 +229,7 @@ describe('ImportantDates', () => {
   describe('Parent Support', () => {
     beforeEach(() => {
       global.ENV = {
-        current_user_id: currentUserId
+        current_user_id: currentUserId,
       }
       fetchMock.get(OBSERVER_ASSIGNMENTS_URL, JSON.stringify(MOCK_OBSERVEE_ASSIGNMENTS))
       fetchMock.get(OBSERVER_EVENTS_URL, JSON.stringify(MOCK_OBSERVEE_EVENTS))

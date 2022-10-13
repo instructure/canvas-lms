@@ -19,10 +19,15 @@
 import {clearData, putData} from '../platform_storage'
 
 export default function handler({message, responseMessages, event}) {
-  const {key, value} = message
+  const {key, value, message_id} = message
 
   if (!key) {
     responseMessages.sendBadRequestError("Missing required 'key' field")
+    return true
+  }
+
+  if (!message_id) {
+    responseMessages.sendBadRequestError("Missing required 'message_id' field")
     return true
   }
 

@@ -36,7 +36,7 @@ const I18n = useI18nScope('calendar')
 export default class EditPlannerNoteDetails extends ValidatedFormView {
   events = {
     ...EditPlannerNoteDetails.prototype.events,
-    'change .context_id': 'contextChange'
+    'change .context_id': 'contextChange',
   }
 
   template = editPlannerNoteTemplate
@@ -46,7 +46,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
       title: event.title,
       contexts: event.plannerNoteContexts(),
       date: event.startDate(),
-      details: htmlEscape(event.description)
+      details: htmlEscape(event.description),
     })
 
     this.event = event
@@ -141,9 +141,9 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
     // set them up as appropriate variants of datetime_field
     $date.datetime_field({
       datepicker: {
-        dateFormat: datePickerFormat(I18n.t('#date.formats.default'))
+        dateFormat: datePickerFormat(I18n.t('#date.formats.default')),
       },
-      dateOnly: true
+      dateOnly: true,
     })
     $time.time_field()
 
@@ -162,7 +162,7 @@ export default class EditPlannerNoteDetails extends ValidatedFormView {
       details: data.details,
       id: this.event.object.id,
       type: 'planner_note',
-      context_code: data.context_code
+      context_code: data.context_code,
     }
     // check if input box was cleared for explicitly undated
     if (params.todo_date) {

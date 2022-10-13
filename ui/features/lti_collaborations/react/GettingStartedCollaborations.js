@@ -18,16 +18,12 @@
 
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import splitAssetString from '@canvas/util/splitAssetString'
 
 const I18n = useI18nScope('react_collaborations')
 
 class GettingStartedCollaborations extends React.Component {
   renderContent() {
     let header, content, link
-    const [context, contextId] = splitAssetString(
-      (ENV.PARENT_CONTEXT && ENV.PARENT_CONTEXT.context_asset_string) || ENV.context_asset_string
-    )
 
     if (this.props.ltiCollaborators.ltiCollaboratorsData.length === 0) {
       if (ENV.current_user_roles.indexOf('teacher') !== -1) {

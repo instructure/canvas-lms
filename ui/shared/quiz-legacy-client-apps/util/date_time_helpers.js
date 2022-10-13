@@ -21,11 +21,11 @@ import '@canvas/datetime'
 
 const exports = {}
 
-exports.friendlyDatetime = function(dateTime, perspective) {
+exports.friendlyDatetime = function (dateTime, perspective) {
   const muddledDateTime = dateTime
 
   if (muddledDateTime) {
-    muddledDateTime.clone = function() {
+    muddledDateTime.clone = function () {
       return new Date(muddledDateTime.getTime())
     }
   }

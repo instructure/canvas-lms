@@ -22,7 +22,7 @@ import I18n from 'i18n-js'
 import {
   extend as activateI18nliner,
   inferKey,
-  normalizeDefault
+  normalizeDefault,
 } from '@instructure/i18nliner-runtime'
 import logEagerLookupViolations from './logEagerLookupViolations'
 import htmlEscape from 'html-escape'
@@ -34,27 +34,21 @@ activateI18nliner(I18n, {
   // handle our absolute keys
   keyPattern: /^\#?\w+(\.\w+)+$/,
 
-  inferKey: (defaultValue, translateOptions) => (
-    `#${inferKey(defaultValue, translateOptions)}`
-  ),
+  inferKey: (defaultValue, translateOptions) => `#${inferKey(defaultValue, translateOptions)}`,
 
   // when inferring the key at runtime (i.e. js/coffee or inline hbs `t`
   // call), signal to normalizeKey that it shouldn't be scoped.
   normalizeKey: (key, options) => {
     if (key[0] === '#') {
       return key.slice(1)
-    }
-    else if (options.scope) {
+    } else if (options.scope) {
       return `${options.scope}.${key}`
-    }
-    else {
+    } else {
       return key
     }
   },
 
-  normalizeDefault: (window.ENV && window.ENV.lolcalize) ?
-    i18nLolcalize :
-    normalizeDefault
+  normalizeDefault: window.ENV && window.ENV.lolcalize ? i18nLolcalize : normalizeDefault,
 })
 
 /*
@@ -65,7 +59,7 @@ activateI18nliner(I18n, {
  */
 const interpolate = I18n.interpolate.bind(I18n)
 
-I18n.interpolate = function(message, origOptions) {
+I18n.interpolate = function (message, origOptions) {
   const options = {...origOptions}
   const matches = message.match(I18n.placeholder) || []
 
@@ -80,14 +74,14 @@ I18n.interpolate = function(message, origOptions) {
 
 I18n.locale = document.documentElement.getAttribute('lang')
 
-I18n.lookup = logEagerLookupViolations(function(key, options = {}) {
+I18n.lookup = logEagerLookupViolations(function (key, options = {}) {
   const locale = options.locale || I18n.currentLocale()
   const localeTranslations = I18n.translations[locale] || {}
   return localeTranslations[key] || options.defaultValue || null
 })
 
 const _localize = I18n.localize.bind(I18n)
-I18n.localize = function(scope, value) {
+I18n.localize = function (scope, value) {
   let result = _localize.call(this, scope, value)
   if (scope.match(/^(date|time)/)) result = result.replace(/\s{2,}/, ' ')
   return result
@@ -101,16 +95,14 @@ I18n.n = I18n.localizeNumber = (value, options = {}) => {
     // 5 is as high as we want to go without causing precision issues
     // when used with toFixed() and large numbers
     strip_insignificant_zeros: options.strip_insignificant_zeros || options.precision == null,
-    precision: options.precision != null ? options.precision : 5
+    precision: options.precision != null ? options.precision : 5,
   }
 
   if (value && value.toString().match(/e/)) {
     return value.toString()
-  }
-  else if (options.percentage) {
+  } else if (options.percentage) {
     return I18n.toPercentage(value, format)
-  }
-  else {
+  } else {
     return I18n.toNumber(value, format)
   }
 }
@@ -120,12 +112,12 @@ const padding = (n, pad = '00', len = 2) => {
   return s.substr(s.length - len)
 }
 
-I18n.strftime = function(date, format) {
+I18n.strftime = function (date, format) {
   const options = {
     abbr_day_names: I18n.lookup('date.abbr_day_names'),
     abbr_month_names: I18n.lookup('date.abbr_month_names'),
     day_names: I18n.lookup('date.day_names'),
-    meridian: I18n.lookup('date.meridian', { defaultValue: ['AM', 'PM'] }),
+    meridian: I18n.lookup('date.meridian', {defaultValue: ['AM', 'PM']}),
     month_names: I18n.lookup('date.month_names'),
   }
 
@@ -176,7 +168,7 @@ I18n.strftime = function(date, format) {
           r: '%I:%M:%S %p',
           R: '%H:%M',
           T: '%H:%M:%S',
-          v: '%e-%b-%Y'
+          v: '%e-%b-%Y',
         }[p1])
     )
     .replace(/%(%|\-?[a-zA-Z]|3N)/g, (str, p1) => {
@@ -278,7 +270,7 @@ I18n.strftime = function(date, format) {
 }
 
 // like the original, except it formats count
-I18n.pluralize = function(count, scope, options) {
+I18n.pluralize = function (count, scope, options) {
   let translation
 
   try {

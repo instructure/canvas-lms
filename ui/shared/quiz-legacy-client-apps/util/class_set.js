@@ -28,9 +28,9 @@
  * @return {String}
  *         The produced class string ready for use as a className prop.
  */
-const classSet = function(set) {
+const classSet = function (set) {
   return Object.keys(set)
-    .reduce(function(classes, key) {
+    .reduce(function (classes, key) {
       if (set[key]) {
         classes.push(key)
       }

@@ -20,7 +20,7 @@ import $ from 'jquery'
 
 export default {
   xhr: {
-    timeout: 5000
+    timeout: 5000,
   },
 
   pollingFrequency: 500,

@@ -334,6 +334,10 @@ pipeline {
             timeout(60) {
               // Skip translation builds for patchsets uploaded by svc.cloudjenkins
               if (env.GERRIT_PATCHSET_UPLOADER_EMAIL == 'svc.cloudjenkins@instructure.com' && env.GERRIT_CHANGE_SUBJECT =~ /translation$/) {
+                // Set status to NOT_BUILT for pre-merge builds
+                if (!configuration.isChangeMerged()) {
+                  currentBuild.result = 'NOT_BUILT'
+                }
                 return
               }
 

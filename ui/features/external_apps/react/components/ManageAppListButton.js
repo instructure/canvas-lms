@@ -29,18 +29,18 @@ const I18n = useI18nScope('external_tools')
 export default class ManageAppListButton extends React.Component {
   static propTypes = {
     onUpdateAccessToken: PropTypes.func.isRequired,
-    extAppStore: PropTypes.object
+    extAppStore: PropTypes.object,
   }
 
   state = {
     modalIsOpen: false,
-    accessToken: undefined
+    accessToken: undefined,
   }
 
   componentDidMount() {
     this.setState({
       originalAccessToken: this.maskedAccessToken(ENV.MASKED_APP_CENTER_ACCESS_TOKEN),
-      accessToken: this.maskedAccessToken(ENV.MASKED_APP_CENTER_ACCESS_TOKEN)
+      accessToken: this.maskedAccessToken(ENV.MASKED_APP_CENTER_ACCESS_TOKEN),
     })
   }
 
@@ -58,7 +58,7 @@ export default class ManageAppListButton extends React.Component {
 
   successHandler = () => {
     this.setState(state => ({
-      originalAccessToken: this.maskedAccessToken(state.accessToken.substring(0, 5))
+      originalAccessToken: this.maskedAccessToken(state.accessToken.substring(0, 5)),
     }))
     if (typeof this.props.onUpdateAccessToken === 'function') {
       this.props.onUpdateAccessToken()
@@ -116,10 +116,10 @@ export default class ManageAppListButton extends React.Component {
                   {
                     wrappers: [
                       '<a href="https://www.eduappcenter.com">$1</a>',
-                      '<a href="' + allowListLink + '">$1</a>'
-                    ]
+                      '<a href="' + allowListLink + '">$1</a>',
+                    ],
                   }
-                )
+                ),
               }}
             />
             <form>

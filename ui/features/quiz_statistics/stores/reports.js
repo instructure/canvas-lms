@@ -26,7 +26,7 @@ import Store from '@canvas/quiz-legacy-client-apps/store'
 
 const quizReports = new QuizReports()
 
-const triggerDownload = function(url) {
+const triggerDownload = function (url) {
   const iframe = document.createElement('iframe')
   iframe.style.display = 'none'
   iframe.src = url
@@ -61,10 +61,10 @@ export default new Store(
         .fetch({
           data: {
             include: ['progress', 'file'],
-            includes_all_versions: config.includesAllVersions
-          }
+            includes_all_versions: config.includesAllVersions,
+          },
         })
-        .then(function(payload) {
+        .then(function (payload) {
           onLoad(payload, {replace: true, track: true})
         })
     },
@@ -160,7 +160,7 @@ export default new Store(
           quizReports.add(quizReport)
           quizReport.fetch().then(resolve, reject)
         }, reject)
-      }
+      },
     },
 
     __reset__() {
@@ -174,7 +174,7 @@ export default new Store(
     trackReportGeneration(quizReport, autoDownload) {
       let emitChange, progressUrl, poll, reload
       const quizReportId = quizReport.get('id')
-      let generationRequest = generationRequests.filter(function(request) {
+      let generationRequest = generationRequests.filter(function (request) {
         return request.quizReportId === quizReportId
       })[0]
 
@@ -185,7 +185,7 @@ export default new Store(
 
       generationRequest = {
         quizReportId,
-        autoDownload
+        autoDownload,
       }
 
       generationRequests.push(generationRequest)
@@ -193,21 +193,21 @@ export default new Store(
       emitChange = this.emitChange.bind(this)
       progressUrl = quizReport.get('progress').url
 
-      poll = function() {
+      poll = function () {
         return pollProgress(progressUrl, {
           interval: 1000,
           onTick(completion, progress) {
             quizReport.set('progress', progress)
             emitChange()
-          }
+          },
         })
       }
 
-      reload = function() {
+      reload = function () {
         return quizReport.fetch({
           data: {
-            include: ['progress', 'file']
-          }
+            include: ['progress', 'file'],
+          },
         })
       }
 
@@ -226,14 +226,14 @@ export default new Store(
 
     /** @private */
     stopTracking(quizReportId) {
-      const request = generationRequests.filter(function(request) {
+      const request = generationRequests.filter(function (request) {
         return request.quizReportId === quizReportId
       })[0]
 
       if (request) {
         generationRequests.splice(generationRequests.indexOf(request), 1)
       }
-    }
+    },
   },
   Dispatcher
 )

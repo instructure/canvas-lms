@@ -25,79 +25,79 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('People (Course)'),
-      description: I18n.t('Allows user to view login ID information for students.')
+      description: I18n.t('Allows user to view login ID information for students.'),
     },
     {
-      description: I18n.t('Allows user to view prior enrollments.')
+      description: I18n.t('Allows user to view prior enrollments.'),
     },
     {
-      description: I18n.t('Allows user to access a user’s settings menu and user details.')
+      description: I18n.t('Allows user to access a user’s settings menu and user details.'),
     },
     {
-      description: I18n.t('Allows user to resend course invitations from the Course People page.')
-    }
+      description: I18n.t('Allows user to resend course invitations from the Course People page.'),
+    },
   ],
   [
     {
       title: I18n.t('Courses (Account)'),
       description: I18n.t(
         'To access the account Courses page, Courses - view list must be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('People (Course)'),
       description: I18n.t(
         'To add or remove a student to or from a course, the Users - Student permission must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To view the list of users in the course, Users - view list must be enabled.'
-      )
+      ),
     },
     {
-      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.')
+      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.'),
     },
     {
       description: I18n.t(
         'To edit a student’s section, Conversations - send to individual course members must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People'),
-      description: I18n.t('Allows user to view login ID information for students.')
+      description: I18n.t('Allows user to view login ID information for students.'),
     },
     {
-      description: I18n.t('Allows user to view prior enrollments.')
+      description: I18n.t('Allows user to view prior enrollments.'),
     },
     {
-      description: I18n.t('Allows user to access a user’s settings menu and user details.')
+      description: I18n.t('Allows user to access a user’s settings menu and user details.'),
     },
     {
-      description: I18n.t('Allows user to resend course invitations from the Course People page.')
-    }
+      description: I18n.t('Allows user to resend course invitations from the Course People page.'),
+    },
   ],
   [
     {
       title: I18n.t('People'),
       description: I18n.t(
         'To add or remove a student to or from a course, the Users - Students permissions must be enabled.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To view the list of users in the course, Users - view list must be enabled.'
-      )
+      ),
     },
     {
-      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.')
+      description: I18n.t('To view SIS IDs, SIS Data - read must be enabled.'),
     },
     {
       description: I18n.t(
         'To edit a student’s section, Conversations - send to individual course members must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

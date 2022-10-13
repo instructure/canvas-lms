@@ -42,7 +42,7 @@ QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {
         final_grade_overrides_url: 'final_grade_overrides',
         sections_url: 'sections',
         outcome_links_url: 'outcome_links',
-        outcome_rollups_url: 'outcome_rollups'
+        outcome_rollups_url: 'outcome_rollups',
       }
       route = ScreenreaderGradebookRoute.create()
     })
@@ -72,12 +72,12 @@ QUnit.module('ScreenreaderGradebookRoute', suiteHooks => {
 
       test('sets content after records are loaded', async () => {
         const overrideData = {
-          '23': {
+          23: {
             courseGrade: {
-              percentage: 91.1
+              percentage: 91.1,
             },
-            gradingPeriodGrades: {}
-          }
+            gradingPeriodGrades: {},
+          },
         }
         const apiStub = sinon
           .stub(FinalGradeOverrideApi, 'getFinalGradeOverrides')

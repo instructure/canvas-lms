@@ -39,11 +39,11 @@ const serializeSet = (set: CamelizedGradingPeriodSet) => {
   const gradingPeriodSetAttrs = {
     title: set.title,
     weighted: set.weighted,
-    display_totals_for_all_grading_periods: set.displayTotalsForAllGradingPeriods
+    display_totals_for_all_grading_periods: set.displayTotalsForAllGradingPeriods,
   }
   return {
     grading_period_set: gradingPeriodSetAttrs,
-    enrollment_term_ids: set.enrollmentTermIDs
+    enrollment_term_ids: set.enrollmentTermIDs,
   }
 }
 
@@ -55,7 +55,7 @@ const baseDeserializeSet = (set: GradingPeriodSet): CamelizedGradingPeriodSet =>
   gradingPeriods: gradingPeriodsApi.deserializePeriods(set.grading_periods),
   permissions: set.permissions, // TODO: investigate if this is needed
   createdAt: new Date(set.created_at),
-  enrollmentTermIDs: undefined
+  enrollmentTermIDs: undefined,
 })
 
 const gradingPeriodSetTitle = set => {
@@ -101,5 +101,5 @@ export default {
 
   update(set) {
     return axios.patch(updateUrl(set.id), serializeSet(set)).then(_response => set)
-  }
+  },
 }

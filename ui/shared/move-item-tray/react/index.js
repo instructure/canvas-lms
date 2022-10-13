@@ -40,7 +40,7 @@ export default class MoveItemTray extends React.Component {
     formatSaveUrl: func,
     formatSaveData: func,
     onMoveSuccess: func,
-    onExited: func
+    onExited: func,
   }
 
   static defaultProps = {
@@ -51,11 +51,11 @@ export default class MoveItemTray extends React.Component {
     formatSaveUrl: () => null,
     formatSaveData: order => ({order: order.join(',')}),
     onExited: () => {},
-    onMoveSuccess: () => {}
+    onMoveSuccess: () => {},
   }
 
   state = {
-    open: true
+    open: true,
   }
 
   onExited = () => {
@@ -95,7 +95,7 @@ export default class MoveItemTray extends React.Component {
         onDismiss={this.close}
         onExited={this.onExited}
         placement="end"
-        shouldContainFocus
+        shouldContainFocus={true}
       >
         <CloseButton
           placement="start"

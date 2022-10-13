@@ -32,18 +32,18 @@ export const LAST_PAGE_UNKNOWN_MARKER = '...'
 
 const linkPropType = shape({
   url: string.isRequired,
-  page: string.isRequired
+  page: string.isRequired,
 }).isRequired
 
 export default class SearchMessage extends Component {
   static propTypes = {
     collection: shape({
       data: array.isRequired,
-      links: shape({current: linkPropType})
+      links: shape({current: linkPropType}),
     }).isRequired,
     knownLastPage: string,
     setPage: func.isRequired,
-    noneFoundMessage: string.isRequired
+    noneFoundMessage: string.isRequired,
   }
 
   state = {}
@@ -151,8 +151,8 @@ export default class SearchMessage extends Component {
               <Pagination.Page
                 data-testid="page-button"
                 key="last-page-unknown"
-                disabled
-                aria-hidden
+                disabled={true}
+                aria-hidden={true}
               >
                 {LAST_PAGE_UNKNOWN_MARKER}
               </Pagination.Page>

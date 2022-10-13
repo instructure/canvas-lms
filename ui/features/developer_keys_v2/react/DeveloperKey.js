@@ -196,12 +196,12 @@ class DeveloperKey extends React.Component {
           <Table.Cell>
             <div>
               {I18n.t('Access Token Count: %{access_token_count}', {
-                access_token_count: developerKey.access_token_count
+                access_token_count: developerKey.access_token_count,
               })}
             </div>
             <div>
               {I18n.t('Created: %{created_at}', {
-                created_at: $.datetimeString(developerKey.created_at)
+                created_at: $.datetimeString(developerKey.created_at),
               })}
             </div>
             <div>{this.lastUsed(developerKey)}</div>
@@ -252,7 +252,7 @@ class DeveloperKey extends React.Component {
 
 DeveloperKey.propTypes = {
   store: shape({
-    dispatch: func.isRequired
+    dispatch: func.isRequired,
   }).isRequired,
   actions: shape({
     makeVisibleDeveloperKey: func.isRequired,
@@ -261,7 +261,7 @@ DeveloperKey.propTypes = {
     deactivateDeveloperKey: func.isRequired,
     deleteDeveloperKey: func.isRequired,
     editDeveloperKey: func.isRequired,
-    developerKeysModalOpen: func.isRequired
+    developerKeysModalOpen: func.isRequired,
   }).isRequired,
   developerKey: shape({
     id: string.isRequired,
@@ -272,15 +272,15 @@ DeveloperKey.propTypes = {
     name: string,
     user_id: string,
     workflow_state: string,
-    is_lti_key: bool
+    is_lti_key: bool,
   }).isRequired,
   ctx: shape({
     params: shape({
-      contextId: string.isRequired
-    })
+      contextId: string.isRequired,
+    }),
   }).isRequired,
   inherited: bool,
-  onDelete: func.isRequired
+  onDelete: func.isRequired,
 }
 
 DeveloperKey.defaultProps = {inherited: false}

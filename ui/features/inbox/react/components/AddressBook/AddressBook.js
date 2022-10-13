@@ -26,12 +26,12 @@ import {Heading} from '@instructure/ui-heading'
 import {
   IconArrowOpenStartLine,
   IconArrowOpenEndLine,
-  IconAddressBookLine
+  IconAddressBookLine,
 } from '@instructure/ui-icons'
 import {
   ScreenReaderContent,
   AccessibleContent,
-  PresentationContent
+  PresentationContent,
 } from '@instructure/ui-a11y-content'
 import {IconButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -76,7 +76,7 @@ export const AddressBook = ({
   hasSelectAllFilterOption,
   currentFilter,
   activeCourseFilter,
-  addressBookMessages
+  addressBookMessages,
 }) => {
   const textInputRef = useRef(null)
   const componentViewRef = useRef(null)
@@ -97,20 +97,20 @@ export const AddressBook = ({
     : []
   const homeMenu = [
     {id: 'subMenuCourse', name: I18n.t('Courses'), itemType: SUBMENU_TYPE},
-    {id: 'subMenuStudents', name: I18n.t('Students'), itemType: SUBMENU_TYPE}
+    {id: 'subMenuStudents', name: I18n.t('Students'), itemType: SUBMENU_TYPE},
   ]
   const [data, setData] = useState([
     ...backButtonArray,
     ...headerArray,
     ...menuData.contextData,
-    ...menuData.userData
+    ...menuData.userData,
   ])
   const ariaAddressBookLabel = I18n.t('Address Book')
   const [menuItemCurrent, setMenuItemCurrent] = useState(null)
   const [isSubMenuSelection, setIsSubMenuSelection] = useState(true)
 
   const {refetch: refetchTotalRecipients} = useQuery(TOTAL_RECIPIENTS, {
-    skip: true
+    skip: true,
   })
   const [isloadingRecipientsTotal, setIsloadingRecipientsTotal] = useState(false)
 
@@ -150,8 +150,8 @@ export const AddressBook = ({
         {
           id: currentFilter.context.contextID,
           name: `${I18n.t('All in')} ${currentFilter.context.contextName}`,
-          itemType: SELECT_ENTIRE_CONTEXT_TYPE
-        }
+          itemType: SELECT_ENTIRE_CONTEXT_TYPE,
+        },
       ]
     : []
 
@@ -174,7 +174,7 @@ export const AddressBook = ({
         ...headerArray,
         ...selectAllContextArray,
         ...menuData.contextData,
-        ...menuData.userData
+        ...menuData.userData,
       ])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -219,7 +219,7 @@ export const AddressBook = ({
         {
           root: null,
           rootMargin: '0px',
-          threshold: 0.4
+          threshold: 0.4,
         }
       )
 
@@ -294,7 +294,7 @@ export const AddressBook = ({
     return (
       <View as="div" padding="xx-small">
         <Flex width="100%" margin="xxx-small none xxx-small xxx-small">
-          <Flex.Item align="center" shouldGrow shouldShrink>
+          <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
             <View>
               <Text>{I18n.t('No Results Found')}</Text>
             </View>
@@ -314,7 +314,7 @@ export const AddressBook = ({
           key="address-book-header"
           data-testid="address-book-header"
         >
-          <Flex.Item align="center" shouldGrow shouldShrink>
+          <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
             <View>
               <PresentationContent>
                 <TruncateText>
@@ -350,7 +350,7 @@ export const AddressBook = ({
           <Flex.Item align="start" margin="0 small 0 0">
             <Spinner renderTitle={I18n.t('Loading')} size="x-small" />
           </Flex.Item>
-          <Flex.Item align="center" shouldGrow shouldShrink>
+          <Flex.Item align="center" shouldGrow={true} shouldShrink={true}>
             <View>
               <Text>{I18n.t('Loading')}</Text>
             </View>
@@ -373,7 +373,7 @@ export const AddressBook = ({
                 {menuItem.name}
               </AccessibleContent>
             }
-            dismissible
+            dismissible={true}
             margin="0 xx-small 0 0"
             onClick={() => {
               removeTag(menuItem)
@@ -506,7 +506,7 @@ export const AddressBook = ({
     <View as="div" width={width}>
       <div ref={componentViewRef}>
         <Flex alignItems="start">
-          <Flex.Item padding="none xxx-small none none" shouldGrow shouldShrink>
+          <Flex.Item padding="none xxx-small none none" shouldGrow={true} shouldShrink={true}>
             <Popover
               on="click"
               offsetY={4}
@@ -583,7 +583,7 @@ export const AddressBook = ({
                       marginBlockStart: '0px',
                       marginBlockEnd: '0px',
                       margin: '0',
-                      maxWidth: '100%'
+                      maxWidth: '100%',
                     }}
                     data-testid="address-book-popover"
                   >
@@ -623,7 +623,7 @@ AddressBook.defaultProps = {
   onTextChange: () => {},
   onSelect: () => {},
   onSelectedIdsChange: () => {},
-  selectedRecipients: []
+  selectedRecipients: [],
 }
 
 AddressBook.propTypes = {
@@ -700,7 +700,7 @@ AddressBook.propTypes = {
    */
   currentFilter: PropTypes.object,
   activeCourseFilter: PropTypes.object,
-  addressBookMessages: PropTypes.array
+  addressBookMessages: PropTypes.array,
 }
 
 export default AddressBook

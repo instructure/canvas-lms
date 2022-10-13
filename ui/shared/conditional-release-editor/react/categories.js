@@ -26,7 +26,7 @@ export const OTHER_ID = 'other'
 const Categories = [
   {
     label: () => I18n.t('All Items'),
-    id: ALL_ID
+    id: ALL_ID,
   },
   {
     label: () => I18n.t('Assignments'),
@@ -39,29 +39,29 @@ const Categories = [
       'external_tool',
       'not_graded',
       'media_recording',
-      'none'
-    ]
+      'none',
+    ],
   },
   {
     label: () => I18n.t('Quizzes'),
     id: 'quiz',
-    submission_types: ['online_quiz']
+    submission_types: ['online_quiz'],
   },
   {
     label: () => I18n.t('Discussions'),
     id: 'discussion',
-    submission_types: ['discussion_topic']
+    submission_types: ['discussion_topic'],
   },
   {
     label: () => I18n.t('Pages'),
     id: 'page',
-    submission_types: ['wiki_page']
+    submission_types: ['wiki_page'],
   },
   {
     label: () => I18n.t('Other'),
     id: OTHER_ID,
-    submission_types: ['']
-  }
+    submission_types: [''],
+  },
 ]
 
 export default Categories

@@ -48,7 +48,7 @@ function StudentGroupFilter(props) {
         }}
         style={{
           margin: '0',
-          width: '100%'
+          width: '100%',
         }}
         value={props.value || '0'}
       >
@@ -68,15 +68,15 @@ StudentGroupFilter.propTypes = {
       groups: arrayOf(
         shape({
           id: string.isRequired,
-          name: string.isRequired
+          name: string.isRequired,
         })
       ),
-      name: string.isRequired
+      name: string.isRequired,
     })
   ),
   label: string.isRequired,
   onChange: func.isRequired,
-  value: string
+  value: string,
 }
 
 export default StudentGroupFilter

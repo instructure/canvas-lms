@@ -204,6 +204,10 @@ describe AssessmentRequest do
   end
 
   describe "#available?" do
+    before :once do
+      @assignment.update!(peer_reviews: true, submission_types: "online_text_entry")
+    end
+
     it "available should be true when both user and assessor have submitted homework" do
       assessment_request = AssessmentRequest.create!(
         asset: @assignment.submit_homework(@submission_student, body: "hi"),
@@ -211,7 +215,7 @@ describe AssessmentRequest do
         assessor: @review_student,
         assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
       )
-      expect(assessment_request.available?).to eq true
+      expect(assessment_request).to be_available
     end
 
     it "available should be false when only user has submitted homework" do
@@ -221,7 +225,7 @@ describe AssessmentRequest do
         assessor: @review_student,
         assessor_asset: @assignment.submission_for_student(@review_student)
       )
-      expect(assessment_request.available?).to eq false
+      expect(assessment_request).not_to be_available
     end
 
     it "available should be false when only accessor has submitted homework" do
@@ -231,7 +235,29 @@ describe AssessmentRequest do
         assessor: @review_student,
         assessor_asset: @assignment.submit_homework(@review_student, body: "hi")
       )
-      expect(assessment_request.available?).to eq false
+      expect(assessment_request).not_to be_available
+    end
+
+    it "available should be true when the submission type of the assignment contains 'none'" do
+      @assignment.update(submission_types: "none")
+      assessment_request = AssessmentRequest.create!(
+        asset: @assignment.submission_for_student(@submission_student),
+        user: @submission_student,
+        assessor: @review_student,
+        assessor_asset: @assignment.submission_for_student(@review_student)
+      )
+      expect(assessment_request).to be_available
+    end
+
+    it "available should be true when the submission type of the assignment contains 'on paper'" do
+      @assignment.update(submission_types: "on_paper")
+      assessment_request = AssessmentRequest.create!(
+        asset: @assignment.submission_for_student(@submission_student),
+        user: @submission_student,
+        assessor: @review_student,
+        assessor_asset: @assignment.submission_for_student(@review_student)
+      )
+      expect(assessment_request).to be_available
     end
   end
 

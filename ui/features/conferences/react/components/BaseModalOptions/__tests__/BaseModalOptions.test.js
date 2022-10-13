@@ -38,7 +38,7 @@ describe('BaseModalOptions', () => {
     description: 'First conference of all time',
     setDescription,
     invitationOptions: ['invite_all'],
-    setInvitationOptions
+    setInvitationOptions,
   }
 
   const setup = (props = {}) => {

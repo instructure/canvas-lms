@@ -22,8 +22,8 @@ export default {
       type: 'SELECT_TAB',
       payload: {
         selected,
-        queryParams
-      }
+        queryParams,
+      },
     }
-  }
+  },
 }

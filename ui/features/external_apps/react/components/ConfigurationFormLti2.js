@@ -25,11 +25,11 @@ const I18n = useI18nScope('external_tools')
 
 export default class ConfigurationFormLti2 extends React.Component {
   static propTypes = {
-    registrationUrl: PropTypes.string.isRequired
+    registrationUrl: PropTypes.string.isRequired,
   }
 
   state = {
-    errors: {}
+    errors: {},
   }
 
   isValid = () => {
@@ -42,7 +42,7 @@ export default class ConfigurationFormLti2 extends React.Component {
   }
 
   getFormData = () => ({
-    registrationUrl: this.refs.registrationUrl.state.value
+    registrationUrl: this.refs.registrationUrl.state.value,
   })
 
   render() {
@@ -55,7 +55,7 @@ export default class ConfigurationFormLti2 extends React.Component {
           defaultValue={this.props.registrationUrl}
           renderLabel={I18n.t('Registration URL')}
           hintText={I18n.t('Example: https://lti-tool-provider-example.herokuapp.com/register')}
-          isRequired
+          isRequired={true}
           errors={this.state.errors}
         />
       </div>

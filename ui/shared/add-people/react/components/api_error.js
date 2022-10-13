@@ -25,7 +25,7 @@ const I18n = useI18nScope('add_peopleApiError')
 
 class ApiError extends React.Component {
   static propTypes = {
-    error: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired
+    error: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]).isRequired,
   }
 
   renderErrorList() {

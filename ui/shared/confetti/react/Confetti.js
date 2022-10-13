@@ -35,7 +35,7 @@ const getBrandingColors = () => {
     if (secondaryBrand) colors.push(Object.values(hex2Rgb(secondaryBrand)))
     if (colors.length > 0) {
       return {
-        colors
+        colors,
       }
     }
   }
@@ -53,7 +53,7 @@ const getProps = () => {
         type: 'image',
         src: logoUrl,
         weight: 0.05,
-        size: 40
+        size: 40,
       })
     }
   }
@@ -91,7 +91,7 @@ export default function Confetti({triggerCount}) {
 
     confetti = new ConfettiGenerator({
       props: getProps(),
-      ...getBrandingColors()
+      ...getBrandingColors(),
     })
 
     clearConfettiOnSpaceOrEscape = event => {
@@ -106,7 +106,7 @@ export default function Confetti({triggerCount}) {
     setTimeout(() => {
       showFlashAlert({
         message: I18n.t('Great work! From the Canvas developers'),
-        srOnly: true
+        srOnly: true,
       })
     }, 2500)
 

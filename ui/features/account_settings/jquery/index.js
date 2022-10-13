@@ -48,7 +48,7 @@ export function openReportDescriptionLink(event) {
   const responsiveWidth = _settings_desktop ? 800 : _settings_smallTablet ? 550 : 320
   $desc.clone().dialog({
     title,
-    width: responsiveWidth
+    width: responsiveWidth,
   })
 }
 
@@ -120,8 +120,8 @@ $(document).ready(function () {
           if (value && value.length > 255) {
             return I18n.t('account_name_too_long', 'Account Name is too long')
           }
-        }
-      }
+        },
+      },
     }
 
     let result = $this.validateForm(account_validations)
@@ -136,8 +136,8 @@ $(document).ready(function () {
             if (value && value.length > 30) {
               return I18n.t('help_menu_name_too_long', 'Help menu name is too long')
             }
-          }
-        }
+          },
+        },
       }
       result = result && $this.validateForm(help_menu_validations)
     }
@@ -147,7 +147,7 @@ $(document).ready(function () {
     }
   })
   $('.datetime_field').datetime_field({
-    addHiddenInput: true
+    addHiddenInput: true,
   })
 
   globalAnnouncements.augmentView()
@@ -178,7 +178,7 @@ $(document).ready(function () {
         const splitContext = window.ENV.context_asset_string.split('_')
 
         fetch(`/${splitContext[0]}s/${splitContext[1]}/reports_tab`, {
-          headers: {accept: 'text/html'}
+          headers: {accept: 'text/html'},
         })
           .then(req => req.text())
           .then(html => {
@@ -215,7 +215,7 @@ $(document).ready(function () {
               error(_data) {
                 $(this).loadingImage('remove')
                 $(this).parent('.report_dialog').dialog('close')
-              }
+              },
             })
 
             $('.configure_report_link').click(function (_event) {
@@ -230,7 +230,7 @@ $(document).ready(function () {
                   .dialog({
                     autoOpen: false,
                     width: responsiveWidth,
-                    title: I18n.t('titles.configure_report', 'Configure Report')
+                    title: I18n.t('titles.configure_report', 'Configure Report'),
                   })
               }
               $dialog.dialog('open')
@@ -245,11 +245,11 @@ $(document).ready(function () {
         // loads in.
         const cache = setupCache({
           maxAge: 0.5 * 60 * 1000, // Hold onto the data for 30 seconds
-          debug: true
+          debug: true,
         })
 
         const api = axios.create({
-          adapter: cache.adapter
+          adapter: cache.adapter,
         })
 
         const splitContext = window.ENV.context_asset_string.split('_')
@@ -270,9 +270,9 @@ $(document).ready(function () {
                   initialCspSettings: ENV.CSP,
                   liveRegion: [
                     document.getElementById('flash_message_holder'),
-                    document.getElementById('flash_screenreader_holder')
+                    document.getElementById('flash_screenreader_holder'),
                   ],
-                  api
+                  api,
                 })
               })
               .catch(() => {
@@ -305,7 +305,7 @@ $(document).ready(function () {
     event.preventDefault()
     $('#ip_filters_dialog').dialog({
       title: I18n.t('titles.what_are_quiz_ip_filters', 'What are Quiz IP Filters?'),
-      width: 400
+      width: 400,
     })
   })
 
@@ -316,7 +316,7 @@ $(document).ready(function () {
         'titles.open_registration_delegated_warning_dialog',
         'An External Identity Provider is Enabled'
       ),
-      width: 400
+      width: 400,
     })
   })
 
@@ -358,7 +358,7 @@ $(document).ready(function () {
         $item.slideUp(function () {
           $(this).remove()
         })
-      }
+      },
     })
   })
 
@@ -415,7 +415,7 @@ $(document).ready(function () {
     const turnitin_data = {
       turnitin_account_id: account.turnitin_account_id,
       turnitin_shared_secret: account.turnitin_shared_secret,
-      turnitin_host: account.turnitin_host
+      turnitin_host: account.turnitin_host,
     }
     $link.text(I18n.t('notices.turnitin.checking_settings', 'checking Turnitin settings...'))
     $.getJSON(
@@ -453,7 +453,7 @@ $(document).ready(function () {
 
     $dialog.dialog({
       autoOpen: false,
-      width: 560
+      width: 560,
     })
 
     $(`<button class="Button Button--icon-action" type="button">
@@ -527,7 +527,7 @@ $(document).ready(function () {
         RichContentEditor.loadNewEditor($textarea, {
           focus: true,
           manageParent: true,
-          defaultContent
+          defaultContent,
         })
       } else {
         $rce_container.hide()

@@ -57,16 +57,16 @@ export const AccountList: React.FC<ComponentProps> = ({
   searchValue,
   filterValue,
   visibilityChanges,
-  onAccountToggled
+  onAccountToggled,
 }) => {
   const [accounts, setAccounts] = useState<Account[]>([])
   const [isLoading, setLoading] = useState(false)
   const {
     searchTerm: debouncedSearchTerm,
     setSearchTerm: setDebouncedSearchTerm,
-    searchTermIsPending
+    searchTermIsPending,
   } = useDebouncedSearchTerm('', {
-    isSearchableTerm: term => term.length >= MIN_SEARCH_TERM_LENGTH || term.length === 0
+    isSearchableTerm: term => term.length >= MIN_SEARCH_TERM_LENGTH || term.length === 0,
   })
 
   useEffect(() => {
@@ -85,11 +85,11 @@ export const AccountList: React.FC<ComponentProps> = ({
     params: {
       search_term: debouncedSearchTerm,
       filter: filterValue === FilterType.SHOW_ALL ? '' : filterValue,
-      per_page: debouncedSearchTerm ? PAGE_LENGTH_SEARCH : PAGE_LENGTH_FILTER
+      per_page: debouncedSearchTerm ? PAGE_LENGTH_SEARCH : PAGE_LENGTH_FILTER,
     },
     success: useCallback(accountData => setAccounts(castIdsToInt(accountData)), []),
     error: useCallback(error => showFlashError(I18n.t('Unable to load results'))(error), []),
-    loading: setLoading
+    loading: setLoading,
   })
 
   if (isLoading || searchTermIsPending) {

@@ -26,7 +26,7 @@ describe('TrayTextArea', () => {
     return {
       isAdding: false,
       onAdd: onAddMock,
-      ...props
+      ...props,
     }
   }
 

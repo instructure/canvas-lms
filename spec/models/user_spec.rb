@@ -744,37 +744,6 @@ describe User do
     end
   end
 
-  describe "#course_creation_rights?" do
-    it "return appropriately for lower level admins" do
-      @sub_account = Account.create!(parent_account: Account.default)
-      @sub_sub_account = Account.create!(parent_account: @sub_account)
-      @sub_sub_admin = account_admin_user(account: @sub_sub_account)
-      expect(@sub_sub_admin.sub_account_for_course_creation(Account.default)).to eq @sub_sub_account
-    end
-
-    it "return appropriately for teachers and students when applicable" do
-      @c = Course.create!
-      Account.default.update_attribute(:settings, { teachers_can_create_courses: true, students_can_create_courses: true })
-      @student = student_in_course(name: "Student", course: @c, enrollment_state: :active).user
-      @teacher = teacher_in_course(name: "Teacher", course: @c, enrollment_state: :active).user
-      expect(@student.sub_account_for_course_creation(Account.default)).to eq Account.default.manually_created_courses_account
-      expect(@teacher.sub_account_for_course_creation(Account.default)).to eq Account.default.manually_created_courses_account
-    end
-
-    it "caches the account properly" do
-      skip "Unskip in LS-3347"
-      enable_cache do
-        @sub_account = Account.create!(parent_account: Account.default)
-        @sub_admin = account_admin_user(account: @sub_account)
-        expect(Rails.cache.read(["sub_account_for_course_creation", Account.default, @sub_admin])).to be_falsey
-        @sub_admin.sub_account_for_course_creation Account.default
-        expect(Rails.cache.read(["sub_account_for_course_creation", Account.default, @sub_admin])).to be_truthy
-        Account.default.account_users.create!(user: @sub_admin)
-        expect(Rails.cache.read(["sub_account_for_course_creation", Account.default, @sub_admin])).to be_falsey
-      end
-    end
-  end
-
   describe "#courses_with_primary_enrollment" do
     it "returns appropriate courses with primary enrollment" do
       user_factory

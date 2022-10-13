@@ -28,7 +28,7 @@ const props = {
       user_name: 'User One',
       account_id: 1,
       account_name: 'School of Rock',
-      login_id: 'user1'
+      login_id: 'user1',
     },
     {
       address: 'foobar',
@@ -38,17 +38,17 @@ const props = {
       account_name: 'Site Admin',
       email: 'foo@bar.com',
       login_id: 'foobar',
-      sis_user_id: 'sisid1'
+      sis_user_id: 'sisid1',
     },
     {
       name: 'Xy Zzy',
       email: 'zyzzy@here.com',
       user_id: 41,
       user_name: 'Xy Zzy',
-      address: 'zyzzy@here.com'
-    }
+      address: 'zyzzy@here.com',
+    },
   ],
-  defaultInstitutionName: 'School of Hard Knocks'
+  defaultInstitutionName: 'School of Hard Knocks',
 }
 
 describe('PeopleReadyList', () => {
@@ -67,25 +67,13 @@ describe('PeopleReadyList', () => {
     const rows = peopleReadyList.find('tbody tr')
     expect(rows).toHaveLength(3) // 3 rows
 
-    const inst0 = rows
-      .first()
-      .children()
-      .last()
-      .text()
+    const inst0 = rows.first().children().last().text()
     expect(inst0).toEqual(props.nameList[0].account_name) // first user has correct institution
 
-    const inst2 = rows
-      .at(2)
-      .children()
-      .last()
-      .text()
+    const inst2 = rows.at(2).children().last().text()
     expect(inst2).toEqual(props.defaultInstitutionName) // last user has default institution name
 
-    const sisid = rows
-      .at(1)
-      .children()
-      .at(3)
-      .text()
+    const sisid = rows.at(1).children().at(3).text()
     expect(sisid).toEqual(props.nameList[1].sis_user_id) // 'middle user has sis id displayed'
   })
 
@@ -102,7 +90,7 @@ describe('PeopleReadyList', () => {
   })
 
   test('hides SIS ID column if not permitted', () => {
-    let wrapper = mount(<PeopleReadyList {...props} canReadSIS />)
+    let wrapper = mount(<PeopleReadyList {...props} canReadSIS={true} />)
     let peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     let cols = peopleReadyList.find('thead th')

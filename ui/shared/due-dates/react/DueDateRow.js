@@ -44,7 +44,7 @@ class DueDateRow extends React.Component {
     currentlySearching: PropTypes.bool.isRequired,
     allStudentsFetched: PropTypes.bool.isRequired,
     inputsDisabled: PropTypes.bool.isRequired,
-    defaultDueTime: PropTypes.string
+    defaultDueTime: PropTypes.string,
   }
 
   // --------------------
@@ -86,7 +86,7 @@ class DueDateRow extends React.Component {
       id: `section-key-${index}`,
       type: 'section',
       course_section_id: override.get('course_section_id'),
-      name: this.nameForCourseSection(override.get('course_section_id'))
+      name: this.nameForCourseSection(override.get('course_section_id')),
     }))
   }
 
@@ -96,7 +96,7 @@ class DueDateRow extends React.Component {
       id: `group-key-${index}`,
       type: 'group',
       group_id: override.get('group_id'),
-      name: this.nameForGroup(override.get('group_id'))
+      name: this.nameForGroup(override.get('group_id')),
     }))
   }
 
@@ -117,7 +117,7 @@ class DueDateRow extends React.Component {
     return _.map(noopOverrides, (override, index) => ({
       id: `noop-key-${index}`,
       noop_id: override.get('noop_id'),
-      name: override.get('title')
+      name: override.get('title'),
     }))
   }
 
@@ -125,7 +125,7 @@ class DueDateRow extends React.Component {
     id: `student-key-${index}`,
     type: 'student',
     student_id: studentId,
-    name: this.nameForStudentToken(studentId)
+    name: this.nameForStudentToken(studentId),
   })
 
   nameForCourseSection = sectionId => {

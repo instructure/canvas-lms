@@ -426,11 +426,11 @@ describe "admin settings tab" do
       Account.default.settings[:custom_help_links] = [help_link]
       Account.default.save!
 
+      default_links = Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
+      filtered_links = Account.default.help_links_builder.filtered_links(default_links)
       help_links = Account.default.help_links
       expect(help_links).to include(help_link.merge(type: "custom"))
-      expect(help_links & Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)).to eq(
-        Account.default.help_links_builder.instantiate_links(Account.default.help_links_builder.default_links)
-      )
+      expect(help_links & filtered_links).to eq(filtered_links)
 
       get "/accounts/#{Account.default.id}/settings"
 
@@ -441,8 +441,8 @@ describe "admin settings tab" do
       click_submit
 
       new_help_links = Account.default.help_links
-      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.default_links.first[:id].to_s)
-      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.default_links.last[:id].to_s)
+      expect(new_help_links.pluck(:id)).to_not include(Account.default.help_links_builder.filtered_links(default_links).first[:id].to_s)
+      expect(new_help_links.pluck(:id)).to include(Account.default.help_links_builder.filtered_links(default_links).last[:id].to_s)
       expect(new_help_links.last).to include(help_link)
     end
 

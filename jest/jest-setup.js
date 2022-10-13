@@ -30,12 +30,12 @@ useTranslations('en', CoreTranslations)
 
 rceFormatMessage.setup({
   locale: 'en',
-  missingTranslation: 'ignore'
+  missingTranslation: 'ignore',
 })
 
 plannerFormatMessage.setup({
   locale: 'en',
-  missingTranslation: 'ignore'
+  missingTranslation: 'ignore',
 })
 
 /**
@@ -102,7 +102,7 @@ const ignoredErrors = [
   /Warning: Failed prop type: Expected one of Checkbox in CheckboxGroup but found `View`/,
   /Warning: Failed prop type: Expected one of TreeNode in TreeCollection but found 'undefined'/,
   /You are using the simple \(heuristic\) fragment matcher, but your queries contain union or interface types./,
-  /You seem to have overlapping act\(\) calls/
+  /You seem to have overlapping act\(\) calls/,
 ]
 const globalWarn = global.console.warn
 const ignoredWarnings = [
@@ -111,7 +111,7 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /value provided is not in a recognized RFC2822 or ISO format/
+  /value provided is not in a recognized RFC2822 or ISO format/,
 ]
 global.console = {
   log: console.log,
@@ -134,7 +134,7 @@ global.console = {
     )
   },
   info: console.info,
-  debug: console.debug
+  debug: console.debug,
 }
 /* eslint-enable no-console */
 filterUselessConsoleMessages(global.console)
@@ -145,8 +145,8 @@ window.scroll = () => {}
 window.ENV = {
   use_rce_enhancements: true,
   FEATURES: {
-    extended_submission_state: true
-  }
+    extended_submission_state: true,
+  },
 }
 
 Enzyme.configure({adapter: new Adapter()})
@@ -173,7 +173,7 @@ if (!Array.prototype.flat) {
         return acc
       }, [])
     },
-    writable: true
+    writable: true,
   })
 }
 
@@ -184,7 +184,7 @@ if (!Array.prototype.flatMap) {
     value: function flatMap(_cb) {
       return Array.prototype.map.apply(this, arguments).flat()
     },
-    writable: true
+    writable: true,
   })
 }
 
@@ -193,7 +193,7 @@ require('@instructure/ui-themes')
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
-    value: require('@sheerun/mutationobserver-shim')
+    value: require('@sheerun/mutationobserver-shim'),
   })
 }
 
@@ -217,7 +217,7 @@ if (!('IntersectionObserver' in window)) {
       unobserve() {
         return null
       }
-    }
+    },
   })
 }
 
@@ -233,7 +233,7 @@ if (!('ResizeObserver' in window)) {
       unobserve() {
         return null
       }
-    }
+    },
   })
 }
 
@@ -241,7 +241,7 @@ if (!('matchMedia' in window)) {
   window.matchMedia = () => ({
     matches: false,
     addListener: () => {},
-    removeListener: () => {}
+    removeListener: () => {},
   })
   window.matchMedia._mocked = true
 }
@@ -265,17 +265,17 @@ Object.defineProperty(window, 'location', {
         href: {
           ...locationProperties.href,
           // Prevents JSDOM errors from doing window.location.href = ...
-          set: () => {}
+          set: () => {},
         },
         reload: {
           configurable: true,
           enumerable: true,
           writeable: true,
           // Prevents JSDOM errors from doing window.location.reload()
-          value: () => {}
-        }
+          value: () => {},
+        },
       }
     ),
   // Prevents JSDOM errors from doing window.location = ...
-  set: () => {}
+  set: () => {},
 })

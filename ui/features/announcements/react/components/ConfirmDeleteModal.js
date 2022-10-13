@@ -48,18 +48,18 @@ export default class ConfirmDeleteModal extends Component {
     onCancel: func,
     onHide: func,
     modalRef: func,
-    parent: node
+    parent: node,
   }
 
   static defaultProps = {
     onCancel: null,
     onHide: null,
     parent: null,
-    modalRef: null
+    modalRef: null,
   }
 
   state = {
-    show: false
+    show: false,
   }
 
   componentDidMount() {
@@ -103,7 +103,7 @@ export default class ConfirmDeleteModal extends Component {
           {I18n.t(
             {
               one: 'You are about to delete 1 announcement. Are you sure?',
-              other: 'You are about to delete %{count} announcements. Are you sure?'
+              other: 'You are about to delete %{count} announcements. Are you sure?',
             },
             {count: this.props.selectedCount}
           )}

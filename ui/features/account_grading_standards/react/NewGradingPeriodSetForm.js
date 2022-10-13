@@ -33,8 +33,8 @@ export default class NewGradingPeriodSetForm extends React.Component {
     closeForm: PropTypes.func.isRequired,
     addGradingPeriodSet: PropTypes.func.isRequired,
     urls: PropTypes.shape({
-      gradingPeriodSetsURL: PropTypes.string.isRequired
-    }).isRequired
+      gradingPeriodSetsURL: PropTypes.string.isRequired,
+    }).isRequired,
   }
 
   state = {
@@ -42,7 +42,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
     title: '',
     weighted: false,
     displayTotalsForAllGradingPeriods: false,
-    selectedEnrollmentTermIDs: []
+    selectedEnrollmentTermIDs: [],
   }
 
   componentDidMount() {
@@ -51,7 +51,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
 
   setSelectedEnrollmentTermIDs = termIDs => {
     this.setState({
-      selectedEnrollmentTermIDs: termIDs
+      selectedEnrollmentTermIDs: termIDs,
     })
   }
 
@@ -74,7 +74,7 @@ export default class NewGradingPeriodSetForm extends React.Component {
           title: this.state.title.trim(),
           weighted: this.state.weighted,
           displayTotalsForAllGradingPeriods: this.state.displayTotalsForAllGradingPeriods,
-          enrollmentTermIDs: this.state.selectedEnrollmentTermIDs
+          enrollmentTermIDs: this.state.selectedEnrollmentTermIDs,
         }
         setsApi.create(set).then(this.submitSucceeded).catch(this.submitFailed)
       } else {

@@ -37,14 +37,14 @@ export default class EditSectionsView extends DialogBaseView {
 
     this.prototype.dialogOptions = {
       id: 'edit_sections',
-      title: I18n.t('titles.section_enrollments', 'Section Enrollments')
+      title: I18n.t('titles.section_enrollments', 'Section Enrollments'),
     }
   }
 
   render() {
     this.$el.html(
       editSectionsViewTemplate({
-        sectionsUrl: ENV.SEARCH_URL
+        sectionsUrl: ENV.SEARCH_URL,
       })
     )
     this.setupContextSearch()
@@ -67,17 +67,17 @@ export default class EditSectionsView extends DialogBaseView {
           exclude: _.map(
             this.model.sectionEditableEnrollments(),
             e => `section_${e.course_section_id}`
-          ).concat(ENV.CONCLUDED_SECTIONS)
+          ).concat(ENV.CONCLUDED_SECTIONS),
         },
         noExpand: true,
         browser: {
           data: {
             per_page: 100,
             types: ['section'],
-            search_all_contexts: true
-          }
-        }
-      }
+            search_all_contexts: true,
+          },
+        },
+      },
     })
     this.input = this.$('#section_input').data('token_input')
     this.input.$fakeInput.css('width', '100%')
@@ -97,7 +97,7 @@ export default class EditSectionsView extends DialogBaseView {
                 id: section.id,
                 name: section.name,
                 role: e.role,
-                can_be_removed: e.can_be_removed
+                can_be_removed: e.can_be_removed,
               })
             )
           )
@@ -115,13 +115,13 @@ export default class EditSectionsView extends DialogBaseView {
     $link.attr(
       'title',
       I18n.t('remove_user_from_course_section', 'Remove user from %{course_section}', {
-        course_section: $token.find('div').attr('title')
+        course_section: $token.find('div').attr('title'),
       })
     )
     const $screenreader_span = $('<span class="screenreader-only"></span>').append(
       h(
         I18n.t('remove_user_from_course_section', 'Remove user from %{course_section}', {
-          course_section: h($token.find('div').attr('title'))
+          course_section: h($token.find('div').attr('title')),
         })
       )
     )
@@ -134,13 +134,7 @@ export default class EditSectionsView extends DialogBaseView {
 
     const enrollment = this.model.findEnrollmentByRole(this.model.currentRole)
     const currentIds = _.map(this.model.sectionEditableEnrollments(), en => en.course_section_id)
-    const sectionIds = _.map(
-      $('#user_sections').find('input'),
-      i =>
-        $(i)
-          .val()
-          .split('_')[1]
-    )
+    const sectionIds = _.map($('#user_sections').find('input'), i => $(i).val().split('_')[1])
     const newSections = _.reject(sectionIds, i => _.includes(currentIds, i))
     const newEnrollments = []
     const deferreds = []
@@ -151,8 +145,8 @@ export default class EditSectionsView extends DialogBaseView {
         enrollment: {
           user_id: this.model.get('id'),
           type: enrollment.type,
-          limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section
-        }
+          limit_privileges_to_course_section: enrollment.limit_privileges_to_course_section,
+        },
       }
       if (!this.model.pending(this.model.currentRole)) {
         data.enrollment.enrollment_state = 'active'

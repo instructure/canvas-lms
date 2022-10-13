@@ -24,14 +24,14 @@ describe('handleDeepLinking', () => {
     {
       type: 'link',
       title: 'title',
-      url: 'http://www.tool.com'
-    }
+      url: 'http://www.tool.com',
+    },
   ]
 
   const event = overrides => ({
     origin: 'http://www.test.com',
     data: {subject: 'LtiDeepLinkingResponse', content_items},
-    ...overrides
+    ...overrides,
   })
 
   let ajaxJSON, flashError, env
@@ -42,7 +42,7 @@ describe('handleDeepLinking', () => {
     ajaxJSON = $.ajaxJSON
 
     window.ENV = {
-      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com'
+      DEEP_LINKING_POST_MESSAGE_ORIGIN: 'http://www.test.com',
     }
 
     $.flashError = jest.fn()
@@ -73,7 +73,7 @@ describe('handleDeepLinking', () => {
 
   describe('when there is a unhandled error parsing the content item', () => {
     const overrides = {
-      data: {subject: 'LtiDeepLinkingResponse', content_items: 1}
+      data: {subject: 'LtiDeepLinkingResponse', content_items: 1},
     }
 
     it('does not attempt to create a collaboration', async () => {
@@ -99,8 +99,8 @@ describe('onExternalContentReady', () => {
     {},
     {
       contentItems: {},
-      ...overrides
-    }
+      ...overrides,
+    },
   ]
   let querySelector, ajaxJSON
 
@@ -110,7 +110,7 @@ describe('onExternalContentReady', () => {
 
     global.document.querySelector = jest.fn().mockImplementation(() => ({
       href: 'http://www.test.com/update',
-      getAttribute: () => 'http://www.test.com/create'
+      getAttribute: () => 'http://www.test.com/create',
     }))
     $.ajaxJSON = jest.fn().mockImplementation(() => ({}))
   })

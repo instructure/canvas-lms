@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import CollaborationsList from 'ui/features/lti_collaborations/react/CollaborationsList.js'
+import CollaborationsList from 'ui/features/lti_collaborations/react/CollaborationsList'
 
 QUnit.module('CollaborationsList')
 
@@ -32,8 +32,8 @@ const collaborations = [
     updated_at: new Date(0).toString(),
     permissions: {
       update: true,
-      delete: true
-    }
+      delete: true,
+    },
   },
   {
     id: 2,
@@ -44,15 +44,15 @@ const collaborations = [
     updated_at: new Date(0).toString(),
     permissions: {
       update: true,
-      delete: true
-    }
-  }
+      delete: true,
+    },
+  },
 ]
 
 const collaborationsState = {
   nextPage: 'www.testurl.com',
   listCollaborationsPending: 'true',
-  list: collaborations
+  list: collaborations,
 }
 
 test('renders the list of collaborations', () => {

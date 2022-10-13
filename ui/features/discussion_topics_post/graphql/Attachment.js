@@ -33,19 +33,19 @@ export const Attachment = {
     id: string,
     _id: string,
     displayName: string,
-    url: string
+    url: string,
   }),
 
   mock: ({
     id = 'RGlzY3Vzc2lvbi0y',
     _id = '7',
     displayName = '288777.jpeg',
-    url = 'some_url'
+    url = 'some_url',
   } = {}) => ({
     id,
     _id,
     displayName,
     url,
-    __typename: 'File'
-  })
+    __typename: 'File',
+  }),
 }

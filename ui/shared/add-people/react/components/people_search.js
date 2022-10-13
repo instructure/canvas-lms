@@ -35,7 +35,7 @@ class PeopleSearch extends React.Component {
 
   static defaultProps = {
     searchType: 'cc_path',
-    nameList: ''
+    nameList: '',
   }
 
   constructor(props) {
@@ -93,7 +93,7 @@ class PeopleSearch extends React.Component {
       })
       if (badEmail) {
         message = I18n.t('It looks like you have an invalid email address: "%{addr}"', {
-          addr: badEmail
+          addr: badEmail,
         })
       }
     }
@@ -227,7 +227,7 @@ class PeopleSearch extends React.Component {
           </div>
         </fieldset>
         <div className="peoplesearch__instructions">
-          <div className="usericon" aria-hidden>
+          <div className="usericon" aria-hidden={true}>
             <IconUserSolid />
           </div>
           <Text size="medium">

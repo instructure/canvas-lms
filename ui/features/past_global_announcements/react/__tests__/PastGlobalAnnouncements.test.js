@@ -25,7 +25,7 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     beforeAll(() => {
       window.ENV.global_notifications = {
         current: ['<div><p>This is an active announcement</p></div>'],
-        past: ['<div><p>This is a past announcement</p></div>']
+        past: ['<div><p>This is a past announcement</p></div>'],
       }
     })
 
@@ -45,7 +45,7 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     beforeAll(() => {
       window.ENV.global_notifications = {
         current: [],
-        past: []
+        past: [],
       }
     })
 
@@ -66,9 +66,9 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
       window.ENV.global_notifications = {
         current: [
           '<div><p>This is current page one</p></div>',
-          '<div><p>This is current page two</p></div>'
+          '<div><p>This is current page two</p></div>',
         ],
-        past: []
+        past: [],
       }
       const {findByText} = render(<PastGlobalAnnouncements />)
       expect(await findByText('This is current page one')).toBeVisible()
@@ -79,7 +79,10 @@ describe('past_global_announcements::pastGlobalAnnouncements', () => {
     it('checks paging for past section is working', async () => {
       window.ENV.global_notifications = {
         current: [],
-        past: ['<div><p>This is past page one</p></div>', '<div><p>This is past page two</p></div>']
+        past: [
+          '<div><p>This is past page one</p></div>',
+          '<div><p>This is past page two</p></div>',
+        ],
       }
       const {findByText} = render(<PastGlobalAnnouncements />)
       fireEvent.click(await findByText('Recent'))

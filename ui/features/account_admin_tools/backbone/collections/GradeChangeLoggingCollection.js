@@ -31,18 +31,18 @@ export default class GradeChangeLoggingCollection extends PaginatedCollection {
 GradeChangeLoggingCollection.prototype.sideLoad = {
   grader: {
     foreignKey: 'grader',
-    collection: 'users'
+    collection: 'users',
   },
   student: {
     foreignKey: 'student',
-    collection: 'users'
+    collection: 'users',
   },
   course: {
     foreignKey: 'course',
-    collection: 'courses'
+    collection: 'courses',
   },
   assignment: {
     foreignKey: 'assignment',
-    collection: 'assignments'
-  }
+    collection: 'assignments',
+  },
 }

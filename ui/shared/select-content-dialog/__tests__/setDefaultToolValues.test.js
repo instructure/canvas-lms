@@ -23,12 +23,12 @@ describe('setDefaultToolValues', () => {
   const definition_id = '22'
   const tool = {
     definition_type,
-    definition_id
+    definition_id,
   }
 
   const url = 'https://www.test-tool.com/lti_launch'
   const result = {
-    url
+    url,
   }
 
   const postMessageOrigin = window.ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
@@ -63,7 +63,7 @@ describe('setDefaultToolValues', () => {
     expect(window.postMessage).toHaveBeenCalledWith(
       {
         subject: 'defaultToolContentReady',
-        content: result
+        content: result,
       },
       'canvas.instructure.com'
     )
@@ -88,14 +88,14 @@ describe('setDefaultToolValues', () => {
   })
 
   it('sets the iframe width', () => {
-    expect(document.querySelector('#assignment_external_tool_tag_attributes_iframe_width').value).toEqual(
-      ''
-    )
+    expect(
+      document.querySelector('#assignment_external_tool_tag_attributes_iframe_width').value
+    ).toEqual('')
   })
 
   it('sets the iframe height', () => {
-    expect(document.querySelector('#assignment_external_tool_tag_attributes_iframe_height').value).toEqual(
-      ''
-    )
+    expect(
+      document.querySelector('#assignment_external_tool_tag_attributes_iframe_height').value
+    ).toEqual('')
   })
 })

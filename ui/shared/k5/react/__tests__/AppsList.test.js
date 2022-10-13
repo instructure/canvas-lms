@@ -29,29 +29,29 @@ describe('AppsList', () => {
         courses: [
           {
             id: '1',
-            name: 'Physics'
+            name: 'Physics',
           },
           {
             id: '2',
-            name: 'English'
-          }
+            name: 'English',
+          },
         ],
         title: 'YouTube',
-        icon: '/youtubeicon.png'
+        icon: '/youtubeicon.png',
       },
       {
         id: '3',
         courses: [
           {
             id: '2',
-            name: 'English'
-          }
+            name: 'English',
+          },
         ],
         title: 'Drive',
-        icon: '/driveicon.png'
-      }
+        icon: '/driveicon.png',
+      },
     ],
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {

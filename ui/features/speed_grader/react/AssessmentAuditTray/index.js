@@ -38,13 +38,13 @@ export default class AssessmentAuditTray extends Component {
   static propTypes = {
     api: instanceOf(Api),
     onEntered: func,
-    onExited: func
+    onExited: func,
   }
 
   static defaultProps = {
     api: new Api(),
     onEntered() {},
-    onExited() {}
+    onExited() {},
   }
 
   constructor(props) {
@@ -53,7 +53,7 @@ export default class AssessmentAuditTray extends Component {
     this.state = {
       auditEventsLoaded: false,
       auditTrail: buildAuditTrail({}),
-      open: false
+      open: false,
     }
   }
 
@@ -66,7 +66,7 @@ export default class AssessmentAuditTray extends Component {
       ...context,
       auditEventsLoaded: false,
       auditTrail: buildAuditTrail({}),
-      open: true
+      open: true,
     })
 
     const {assignment, courseId, submission} = context
@@ -78,7 +78,7 @@ export default class AssessmentAuditTray extends Component {
         if (this.state.open && this.state.submission.id === submission.id) {
           this.setState({
             auditEventsLoaded: true,
-            auditTrail: buildAuditTrail(auditData)
+            auditTrail: buildAuditTrail(auditData),
           })
         }
       })

@@ -33,7 +33,7 @@ QUnit.module('CourseImagePicker Component', {
         courseImagePicker = node
       },
       courseId: 0,
-      ...props
+      ...props,
     })
     ReactDOM.render(element, wrapper)
     return courseImagePicker
@@ -42,7 +42,7 @@ QUnit.module('CourseImagePicker Component', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
     window.ENV = reset_env
-  }
+  },
 })
 
 test('calls the handleFileUpload prop when drop occurs', function (assert) {
@@ -57,8 +57,8 @@ test('calls the handleFileUpload prop when drop occurs', function (assert) {
 
   TestUtils.Simulate.drop(area, {
     dataTransfer: {
-      files: [{type: 'image/jpg', name: 'image.jpg', size: 10}]
-    }
+      files: [{type: 'image/jpg', name: 'image.jpg', size: 10}],
+    },
   })
   // there's some async activity in there
   window.setTimeout(() => {

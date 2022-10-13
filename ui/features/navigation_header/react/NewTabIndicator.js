@@ -39,7 +39,7 @@ const NewTabIndicator = ({tabName}) => {
 }
 
 NewTabIndicator.propTypes = {
-  tabName: PropTypes.string.isRequired
+  tabName: PropTypes.string.isRequired,
 }
 
 export default NewTabIndicator

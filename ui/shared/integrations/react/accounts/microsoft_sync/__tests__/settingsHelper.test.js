@@ -21,7 +21,7 @@ import {
   sliceSyncSettings,
   getTenantErrorMessages,
   getSuffixErrorMessages,
-  SYNC_SETTINGS
+  SYNC_SETTINGS,
 } from '../lib/settingsHelper'
 import {defaultState} from '../lib/settingsReducer'
 import fetchMock from 'fetch-mock'
@@ -33,14 +33,14 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
       microsoft_sync_enabled: true,
       microsoft_sync_login_attribute: 'email',
       microsoft_sync_login_attribute_suffix: '@example.com',
-      microsoft_sync_remote_attribute: 'mail'
+      microsoft_sync_remote_attribute: 'mail',
     }
 
     let oldEnv
     beforeAll(() => {
       oldEnv = ENV
       ENV = {
-        CONTEXT_BASE_URL: 'accounts/4'
+        CONTEXT_BASE_URL: 'accounts/4',
       }
       fetchMock.mock('*', 200)
     })
@@ -64,16 +64,16 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
 
     it('calls with the correct body format', async () => {
       await doUpdateSettings({
-        ...expectedBody
+        ...expectedBody,
       })
 
       expect(fetchMock.called()).toBeTruthy()
       expect(JSON.parse(fetchMock.lastCall()[1].body)).toStrictEqual({
         account: {
           settings: {
-            ...expectedBody
-          }
-        }
+            ...expectedBody,
+          },
+        },
       })
     })
   })
@@ -92,7 +92,7 @@ describe('MicrosoftSyncAccountSettings settingsHelper', () => {
     const createState = tenant => {
       return {
         tenantErrorMessages: [],
-        microsoft_sync_tenant: tenant
+        microsoft_sync_tenant: tenant,
       }
     }
 

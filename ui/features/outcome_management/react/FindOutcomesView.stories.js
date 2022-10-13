@@ -28,7 +28,7 @@ export default {
     collection: {
       name: 'State Standards',
       isRootGroup: true,
-      id: '1'
+      id: '1',
     },
     outcomeGroup: {
       contextId: '1',
@@ -40,21 +40,21 @@ export default {
               _id: '11',
               title: 'Outcome 1',
               description: 'Outcome 1 description',
-              isImported: false
-            }
-          }
+              isImported: false,
+            },
+          },
         ],
         pageInfo: {
           endCursor: 'abc',
-          hasNextPage: true
-        }
-      }
+          hasNextPage: true,
+        },
+      },
     },
     searchString: '',
     onChangeHandler: () => {},
     onClearHandler: () => {},
-    onAddAllHandler: () => {}
-  }
+    onAddAllHandler: () => {},
+  },
 }
 
 const Template = args => (
@@ -69,48 +69,48 @@ export const withLongGroupName = Template.bind({})
 withLongGroupName.args = {
   collection: {
     name: 'This is a very long group name '.repeat(5),
-    outcomesCount: 5
-  }
+    outcomesCount: 5,
+  },
 }
 
 export const withLongSearch = Template.bind({})
 withLongSearch.args = {
-  searchString: 'This is a very long search '.repeat(7)
+  searchString: 'This is a very long search '.repeat(7),
 }
 
 export const withSpaceSeparatedGroupName = Template.bind({})
 withSpaceSeparatedGroupName.args = {
   collection: {
     name: 'CCSS ​Math ​Content ​2 ​MD ​A​1 '.repeat(3),
-    outcomesCount: 6
-  }
+    outcomesCount: 6,
+  },
 }
 
 export const withDotSeparatedGroupName = Template.bind({})
 withDotSeparatedGroupName.args = {
   collection: {
     name: 'CCSS.​Math.​Content.​2.​MD.​A.​1.'.repeat(3),
-    outcomesCount: 7
-  }
+    outcomesCount: 7,
+  },
 }
 
 export const withMissingGroupName = Template.bind({})
 withMissingGroupName.args = {
   collection: {
-    name: ''
-  }
+    name: '',
+  },
 }
 
 export const withLargeNumberOfOutcomes = Template.bind({})
 withLargeNumberOfOutcomes.args = {
   collection: {
-    outcomesCount: 1234567890
-  }
+    outcomesCount: 1234567890,
+  },
 }
 
 export const withMissingNumberOfOutcomes = Template.bind({})
 withMissingNumberOfOutcomes.args = {
   collection: {
-    outcomesCount: null
-  }
+    outcomesCount: null,
+  },
 }

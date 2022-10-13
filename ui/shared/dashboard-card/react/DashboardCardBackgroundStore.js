@@ -32,29 +32,29 @@ const DEFAULT_COLOR_OPTIONS = [
   '#986C16',
   '#177B63',
   '#324A4D',
-  '#3C4F36'
+  '#3C4F36',
 ]
 
 const customColorsHash = (ENV.PREFERENCES && ENV.PREFERENCES.custom_colors) || {}
 
 const DashboardCardBackgroundStore = createStore({
   courseColors: customColorsHash,
-  usedDefaults: []
+  usedDefaults: [],
 })
 
 // ===============
 //    GET STATE
 // ===============
 
-DashboardCardBackgroundStore.colorForCourse = function(courseAssetString) {
+DashboardCardBackgroundStore.colorForCourse = function (courseAssetString) {
   return this.getCourseColors()[courseAssetString]
 }
 
-DashboardCardBackgroundStore.getCourseColors = function() {
+DashboardCardBackgroundStore.getCourseColors = function () {
   return this.getState().courseColors
 }
 
-DashboardCardBackgroundStore.getUsedDefaults = function() {
+DashboardCardBackgroundStore.getUsedDefaults = function () {
   return this.getState().usedDefaults
 }
 
@@ -62,19 +62,19 @@ DashboardCardBackgroundStore.getUsedDefaults = function() {
 //    SET STATE
 // ===============
 
-DashboardCardBackgroundStore.setColorForCourse = function(courseAssetString, colorCode) {
+DashboardCardBackgroundStore.setColorForCourse = function (courseAssetString, colorCode) {
   const originalColors = this.getCourseColors()
   const newColors = {...originalColors, [courseAssetString]: colorCode}
   this.setState({courseColors: newColors})
 }
 
-DashboardCardBackgroundStore.setDefaultColors = function(allCourseAssetStrings) {
+DashboardCardBackgroundStore.setDefaultColors = function (allCourseAssetStrings) {
   const customCourseAssetStrings = _.keys(this.getCourseColors())
   const nonCustomStrings = _.difference(allCourseAssetStrings, customCourseAssetStrings)
   _.each(nonCustomStrings, courseString => this.setDefaultColor(courseString))
 }
 
-DashboardCardBackgroundStore.setDefaultColor = function(courseAssetString) {
+DashboardCardBackgroundStore.setDefaultColor = function (courseAssetString) {
   const colorForCourse = _.sample(this.leastUsedDefaults())
   this.setColorForCourse(courseAssetString, colorForCourse)
   this.markColorUsed(colorForCourse)
@@ -85,7 +85,7 @@ DashboardCardBackgroundStore.setDefaultColor = function(courseAssetString) {
 //     HELPERS
 // ===============
 
-DashboardCardBackgroundStore.leastUsedDefaults = function() {
+DashboardCardBackgroundStore.leastUsedDefaults = function () {
   const usedDefaults = this.getUsedDefaults()
 
   const usedColorsByFrequency = _.groupBy(
@@ -94,12 +94,7 @@ DashboardCardBackgroundStore.leastUsedDefaults = function() {
   )
 
   const mostCommonColors = _.uniq(
-    usedColorsByFrequency[
-      _.chain(usedColorsByFrequency)
-        .keys()
-        .max()
-        .value()
-    ]
+    usedColorsByFrequency[_.chain(usedColorsByFrequency).keys().max().value()]
   )
 
   return _.difference(DEFAULT_COLOR_OPTIONS, mostCommonColors).length === 0
@@ -111,12 +106,12 @@ DashboardCardBackgroundStore.leastUsedDefaults = function() {
 //     ACTIONS
 // ===============
 
-DashboardCardBackgroundStore.markColorUsed = function(usedColor) {
+DashboardCardBackgroundStore.markColorUsed = function (usedColor) {
   const newUsedColors = this.getUsedDefaults().concat(usedColor)
   this.setState({usedDefaults: newUsedColors})
 }
 
-DashboardCardBackgroundStore.persistNewColor = function(courseAssetString, colorForCourse) {
+DashboardCardBackgroundStore.persistNewColor = function (courseAssetString, colorForCourse) {
   const tmp = {}
   tmp[courseAssetString] = colorForCourse
   ContextColorer.persistContextColors(tmp, ENV.current_user_id)

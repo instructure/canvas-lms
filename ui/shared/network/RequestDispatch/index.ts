@@ -26,18 +26,30 @@ export const DEFAULT_ACTIVE_REQUEST_LIMIT = 12 // overall limit
 export const MAX_ACTIVE_REQUEST_LIMIT = 100
 export const MIN_ACTIVE_REQUEST_LIMIT = process.env.NODE_ENV !== 'production' ? 1 : 10
 
-function ensureValidRequestLimit(value) {
-  let cleanValue = Number.parseInt(value, 10)
+type Request = {
+  deferred: ReturnType<typeof deferPromise>
+  active: boolean
+  start: () => void
+}
+
+function ensureValidRequestLimit(value?: string | number) {
+  let cleanValue = typeof value === 'number' ? value : Number.parseInt(String(value || ''), 10)
   cleanValue = Number.isNaN(cleanValue) ? DEFAULT_ACTIVE_REQUEST_LIMIT : cleanValue
   cleanValue = Math.min(MAX_ACTIVE_REQUEST_LIMIT, cleanValue)
   return Math.max(MIN_ACTIVE_REQUEST_LIMIT, cleanValue)
 }
 
 export default class RequestDispatch {
-  constructor(options = {}) {
+  options: {
+    activeRequestLimit: number
+  }
+
+  requests: Request[]
+
+  constructor(options: {activeRequestLimit?: string | number} = {}) {
     this.options = {
       ...options,
-      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit)
+      activeRequestLimit: ensureValidRequestLimit(options.activeRequestLimit),
     }
     this.requests = []
   }
@@ -70,18 +82,19 @@ export default class RequestDispatch {
     }
   }
 
-  getDepaginated(
+  getDepaginated<T>(
     url: string,
     params,
     pageCallback: (data?) => void = () => {},
-    pagesEnqueuedCallback = () => {}
-  ) {
+    pagesEnqueuedCallback = (_deferreds: ReturnType<typeof deferPromise>[]) => {}
+  ): Promise<T> {
     const request = {
-      deferred: deferPromise(),
-      active: false
+      deferred: deferPromise<T>(),
+      active: false,
+      start: () => {},
     }
 
-    const allEnqueued = deferreds => {
+    const allEnqueued = (deferreds: ReturnType<typeof deferPromise>[]) => {
       /*
        * The initial request to get the first page and page link headers has
        * completed, so the corresponding request object in this queue can be
@@ -123,7 +136,8 @@ export default class RequestDispatch {
   getJSON(url: string, params?) {
     const request = {
       deferred: deferPromise(),
-      active: false
+      start: () => {},
+      active: false,
     }
 
     /* eslint-disable promise/catch-or-return */

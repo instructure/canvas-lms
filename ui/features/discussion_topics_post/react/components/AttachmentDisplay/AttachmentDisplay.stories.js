@@ -22,7 +22,7 @@ import {AttachmentDisplay} from './AttachmentDisplay'
 export default {
   title: 'Examples/Discussion Posts/Components/AttachmentDisplay',
   component: AttachmentDisplay,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <AttachmentDisplay {...args} />
@@ -33,16 +33,16 @@ AttachmentPresent.args = {
     {
       id: 1,
       display_name: 'file_name.file',
-      url: 'file_download_example.com'
-    }
+      url: 'file_download_example.com',
+    },
   ],
   setAttachments: () => {},
-  setAttachmentsToUpload: () => {}
+  setAttachmentsToUpload: () => {},
 }
 
 export const NoAttachment = Template.bind({})
 NoAttachment.args = {
   attachments: [],
   setAttachments: () => {},
-  setAttachmentsToUpload: () => {}
+  setAttachmentsToUpload: () => {},
 }

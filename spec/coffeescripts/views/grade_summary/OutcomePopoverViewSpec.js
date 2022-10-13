@@ -29,31 +29,31 @@ QUnit.module('OutcomePopoverViewSpec', {
     this.popoverView = new OutcomePopoverView({
       el: $('<div><i></i></div>'),
       model: new Outcome(),
-      template
+      template,
     })
-    this.e = function(name, options = {}) {
+    this.e = function (name, options = {}) {
       return $.Event(name, {...options, currentTarget: this.popoverView.el})
     }
     this.clock = sinon.useFakeTimers()
   },
   teardown() {
     this.clock.restore()
-  }
+  },
 })
 
-test('closePopover', function() {
+test('closePopover', function () {
   ok(isUndefined(this.popoverView.popover, 'precondition'))
   ok(this.popoverView.closePopover())
   this.popoverView.popover = new Popover(this.e('mouseleave'), this.popoverView.render(), {
     verticalSide: 'bottom',
-    manualOffset: 14
+    manualOffset: 14,
   })
   ok(this.popoverView.popover instanceof Popover)
   ok(this.popoverView.closePopover())
   ok(isUndefined(this.popoverView.popover))
 })
 
-test('mouseenter', function() {
+test('mouseenter', function () {
   const spy = sandbox.spy(this.popoverView, 'openPopover')
   ok(!this.popoverView.inside, 'precondition')
   this.popoverView.el.find('i').trigger(this.e('mouseenter'))
@@ -61,7 +61,7 @@ test('mouseenter', function() {
   ok(this.popoverView.inside)
 })
 
-test('mouseleave when no popover is present', function() {
+test('mouseleave when no popover is present', function () {
   const spy = sandbox.spy(this.popoverView, 'closePopover')
   ok(isUndefined(this.popoverView.popover), 'precondition')
   this.popoverView.el.find('i').trigger(this.e('mouseleave'))
@@ -69,7 +69,7 @@ test('mouseleave when no popover is present', function() {
   ok(!spy.called)
 })
 
-test('mouseleave when popover is present', function() {
+test('mouseleave when popover is present', function () {
   this.popoverView.el.find('i').trigger('mouseenter')
   ok(!isUndefined(this.popoverView.popover), 'precondition')
   ok(this.popoverView.inside, 'precondition')
@@ -79,7 +79,7 @@ test('mouseleave when popover is present', function() {
   ok(spy.called)
 })
 
-test('openPopover', function() {
+test('openPopover', function () {
   ok(isUndefined(this.popoverView.popover), 'precondition')
   const elementSpy = sandbox.stub(this.popoverView.outcomeLineGraphView, 'setElement')
   const renderSpy = sandbox.stub(this.popoverView.outcomeLineGraphView, 'render')

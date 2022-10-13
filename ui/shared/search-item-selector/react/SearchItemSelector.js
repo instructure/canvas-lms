@@ -38,8 +38,8 @@ SearchItemSelector.propTypes = {
   placeholder: string,
   manualSelection: string,
   mountNodeRef: shape({
-    current: instanceOf(Element)
-  })
+    current: instanceOf(Element),
+  }),
 }
 
 SearchItemSelector.defaultProps = {
@@ -48,7 +48,7 @@ SearchItemSelector.defaultProps = {
   renderLabel: '',
   minimumSearchLength: MINIMUM_SEARCH_LENGTH,
   isSearchableTerm: term => (term?.length || 0) >= MINIMUM_SEARCH_LENGTH,
-  additionalParams: {}
+  additionalParams: {},
 }
 
 export default function SearchItemSelector({
@@ -62,7 +62,7 @@ export default function SearchItemSelector({
   minimumSearchLength,
   isSearchableTerm,
   placeholder,
-  manualSelection
+  manualSelection,
 }) {
   const [items, setItems] = useState(null)
   const [error, setError] = useState(null)
@@ -70,7 +70,7 @@ export default function SearchItemSelector({
   const [inputValue, setInputValue] = useState('')
   const [selectedItem, setSelectedItem] = useState(null)
   const {searchTerm, setSearchTerm, searchTermIsPending} = useDebouncedSearchTerm('', {
-    isSearchableTerm
+    isSearchableTerm,
   })
 
   useEffect(() => {
@@ -97,7 +97,7 @@ export default function SearchItemSelector({
     success: setItems,
     error: setError,
     loading: setIsLoading,
-    params: {...searchParams, ...additionalParams}
+    params: {...searchParams, ...additionalParams},
   })
 
   const handleItemSelected = (ev, id) => {
@@ -145,7 +145,7 @@ export default function SearchItemSelector({
     onInputChange: handleInputChanged,
     onOptionSelected: handleItemSelected,
     mountNode: mountNodeRef?.current,
-    onFocus
+    onFocus,
   }
   return <CanvasAsyncSelect {...selectProps}>{itemOptions}</CanvasAsyncSelect>
 }

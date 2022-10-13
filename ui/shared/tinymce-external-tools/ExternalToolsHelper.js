@@ -54,7 +54,7 @@ export default {
   buttonConfig(button, editor) {
     const config = {
       title: button.name,
-      classes: 'widget btn instructure_external_tool_button'
+      classes: 'widget btn instructure_external_tool_button',
     }
     config.id = button.id
     config.onAction = () => {
@@ -102,5 +102,5 @@ export default {
       // eslint-disable-next-line no-console
       console.log('Cannot save LTI MRU list', ex.message)
     }
-  }
+  },
 }

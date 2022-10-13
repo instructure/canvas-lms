@@ -24,9 +24,9 @@ import PropTypes from 'prop-types'
 const LabeledTextField = ({name, validate, Component = TextInput, ...props}) => {
   const {
     input,
-    meta: {touched, error, submitError}
+    meta: {touched, error, submitError},
   } = useField(name, {
-    validate
+    validate,
   })
 
   let errorMessages = []
@@ -43,7 +43,7 @@ const LabeledTextField = ({name, validate, Component = TextInput, ...props}) => 
 
   errorMessages = errorMessages.map(text => ({
     text,
-    type: 'error'
+    type: 'error',
   }))
 
   return <Component {...input} messages={errorMessages} {...props} />
@@ -52,7 +52,7 @@ const LabeledTextField = ({name, validate, Component = TextInput, ...props}) => 
 LabeledTextField.propTypes = {
   name: PropTypes.string.isRequired,
   validate: PropTypes.func,
-  Component: PropTypes.elementType
+  Component: PropTypes.elementType,
 }
 
 export default LabeledTextField

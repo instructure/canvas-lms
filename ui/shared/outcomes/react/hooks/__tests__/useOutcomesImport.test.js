@@ -21,7 +21,7 @@ import {renderHook, act} from '@testing-library/react-hooks/dom'
 import useOutcomesImport, {
   IMPORT_PENDING,
   IMPORT_FAILED,
-  IMPORT_COMPLETED
+  IMPORT_COMPLETED,
 } from '../useOutcomesImport'
 import {createCache} from '@canvas/apollo'
 import {MockedProvider} from '@apollo/react-testing'
@@ -52,7 +52,7 @@ describe('useOutcomesImport', () => {
     children,
     mocks = importGroupMocks(),
     contextType = 'Account',
-    contextId = '1'
+    contextId = '1',
   }) => (
     <MockedProvider cache={cache} mocks={mocks}>
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
@@ -64,7 +64,7 @@ describe('useOutcomesImport', () => {
   const sharedResolverSpecs = () => {
     it('calls for resolveProgress', async () => {
       renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
 
       await waitFor(() => {
@@ -75,7 +75,7 @@ describe('useOutcomesImport', () => {
 
   it('creates custom hook with proper exports', () => {
     const {result} = renderHook(() => useOutcomesImport(), {
-      wrapper
+      wrapper,
     })
     expect(typeof result.current.importOutcomes).toBe('function')
     expect(typeof result.current.clearGroupsStatus).toBe('function')
@@ -89,11 +89,11 @@ describe('useOutcomesImport', () => {
   describe('Group import', () => {
     it('adds imported group id with pending status to importGroupsStatus before starting group import', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
@@ -103,12 +103,12 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importGroupMocks({failResponse: true})
-        }
+          mocks: importGroupMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       await act(async () => jest.runAllTimers())
@@ -117,11 +117,11 @@ describe('useOutcomesImport', () => {
 
     it('calls progress tracker after group import mutation is triggered', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       await act(async () => jest.runAllTimers())
@@ -129,21 +129,21 @@ describe('useOutcomesImport', () => {
       expect(resolveProgress).toHaveBeenCalledWith(
         {
           url: '/api/v1/progress/111',
-          workflow_state: 'queued'
+          workflow_state: 'queued',
         },
         {
-          interval: 5000
+          interval: 5000,
         }
       )
     })
 
     it('changes import group status from pending to completed when progress tracker resolves', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
@@ -154,36 +154,36 @@ describe('useOutcomesImport', () => {
     it('changes import group status from pending to failed if progress tracker throws error', async () => {
       resolveProgress.mockImplementationOnce(() => Promise.reject(new Error()))
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes.',
-        type: 'error'
+        type: 'error',
       })
       expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_FAILED})
     })
 
     it('imports group in Account context and displays flash confirmation', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
           outcomeOrGroupId: groupId,
-          groupTitle: 'New Group'
+          groupTitle: 'New Group',
         })
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to this account.',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -192,22 +192,22 @@ describe('useOutcomesImport', () => {
         wrapper,
         initialProps: {
           mocks: importGroupMocks({
-            targetGroupId: 123
-          })
-        }
+            targetGroupId: 123,
+          }),
+        },
       })
       act(() => {
         result.current.importOutcomes({
           outcomeOrGroupId: groupId,
           groupTitle: 'New Group',
           targetGroupId: 123,
-          targetGroupTitle: '123 Group'
+          targetGroupTitle: '123 Group',
         })
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to 123 Group.',
-        type: 'success'
+        type: 'success',
       })
     })
 
@@ -217,32 +217,32 @@ describe('useOutcomesImport', () => {
         initialProps: {
           mocks: importGroupMocks({
             targetContextId: '2',
-            targetContextType: 'Course'
+            targetContextType: 'Course',
           }),
           contextType: 'Course',
-          contextId: '2'
-        }
+          contextId: '2',
+        },
       })
       act(() => {
         result.current.importOutcomes({
           outcomeOrGroupId: groupId,
-          groupTitle: 'New Group'
+          groupTitle: 'New Group',
         })
       })
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'All outcomes from New Group have been successfully added to this course.',
-        type: 'success'
+        type: 'success',
       })
     })
 
     it('sets hasAddedOutcomes to true after an import', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       await act(async () => jest.runAllTimers())
@@ -253,8 +253,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importGroupMocks({failResponse: true})
-        }
+          mocks: importGroupMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
@@ -262,7 +262,7 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes: GraphQL error: Network error.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -270,8 +270,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importGroupMocks({failMutationNoErrMsg: true})
-        }
+          mocks: importGroupMocks({failMutationNoErrMsg: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: '100'})
@@ -279,17 +279,17 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing these outcomes.',
-        type: 'error'
+        type: 'error',
       })
     })
 
     it('clears importGroupsStatus if clearGroupsStatus called', async () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
       act(() => {
         result.current.importOutcomes({
-          outcomeOrGroupId: groupId
+          outcomeOrGroupId: groupId,
         })
       })
       await act(async () => jest.runAllTimers())
@@ -307,8 +307,8 @@ describe('useOutcomesImport', () => {
             outcomeOrGroupId: groupId,
             isGroup: true,
             groupTitle: 'Group 100',
-            progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-          }
+            progress: {_id: '111', state: 'queued', __typename: 'Progress'},
+          },
         ])
       })
 
@@ -318,7 +318,7 @@ describe('useOutcomesImport', () => {
 
       it('returns group with import pending status', () => {
         const {result} = renderHook(() => useOutcomesImport(), {
-          wrapper
+          wrapper,
         })
 
         expect(result.current.importGroupsStatus).toEqual({[groupId]: IMPORT_PENDING})
@@ -333,8 +333,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks()
-        }
+          mocks: importOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -346,8 +346,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks({failResponse: true})
-        }
+          mocks: importOutcomeMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -360,8 +360,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks()
-        }
+          mocks: importOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -371,10 +371,10 @@ describe('useOutcomesImport', () => {
       expect(resolveProgress).toHaveBeenCalledWith(
         {
           url: '/api/v1/progress/211',
-          workflow_state: 'queued'
+          workflow_state: 'queued',
         },
         {
-          interval: 1000
+          interval: 1000,
         }
       )
     })
@@ -383,8 +383,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks()
-        }
+          mocks: importOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -399,8 +399,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks()
-        }
+          mocks: importOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -409,7 +409,7 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
-        type: 'error'
+        type: 'error',
       })
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_FAILED})
     })
@@ -418,8 +418,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks({failResponse: true})
-        }
+          mocks: importOutcomeMocks({failResponse: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -427,7 +427,7 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome: GraphQL error: Network error.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -435,8 +435,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks({failMutationNoErrMsg: true})
-        }
+          mocks: importOutcomeMocks({failMutationNoErrMsg: true}),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -444,7 +444,7 @@ describe('useOutcomesImport', () => {
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while importing this outcome.',
-        type: 'error'
+        type: 'error',
       })
     })
 
@@ -452,8 +452,8 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks()
-        }
+          mocks: importOutcomeMocks(),
+        },
       })
       act(() => {
         result.current.importOutcomes({outcomeOrGroupId: outcomeId, isGroup: false})
@@ -470,15 +470,15 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks({sourceContextId: 300, sourceContextType: 'Account'})
-        }
+          mocks: importOutcomeMocks({sourceContextId: 300, sourceContextType: 'Account'}),
+        },
       })
       act(() => {
         result.current.importOutcomes({
           outcomeOrGroupId: outcomeId,
           isGroup: false,
           sourceContextId: 300,
-          sourceContextType: 'Account'
+          sourceContextType: 'Account',
         })
       })
       await act(async () => jest.runAllTimers())
@@ -489,14 +489,14 @@ describe('useOutcomesImport', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
         wrapper,
         initialProps: {
-          mocks: importOutcomeMocks({targetGroupId: 123})
-        }
+          mocks: importOutcomeMocks({targetGroupId: 123}),
+        },
       })
       act(() => {
         result.current.importOutcomes({
           outcomeOrGroupId: outcomeId,
           isGroup: false,
-          targetGroupId: 123
+          targetGroupId: 123,
         })
       })
       await act(async () => jest.runAllTimers())
@@ -510,8 +510,8 @@ describe('useOutcomesImport', () => {
         {
           outcomeOrGroupId: outcomeId,
           isGroup: false,
-          progress: {_id: '111', state: 'queued', __typename: 'Progress'}
-        }
+          progress: {_id: '111', state: 'queued', __typename: 'Progress'},
+        },
       ])
     })
 
@@ -521,7 +521,7 @@ describe('useOutcomesImport', () => {
 
     it('returns outcome with import pending status', () => {
       const {result} = renderHook(() => useOutcomesImport(), {
-        wrapper
+        wrapper,
       })
 
       expect(result.current.importOutcomesStatus).toEqual({[outcomeId]: IMPORT_PENDING})

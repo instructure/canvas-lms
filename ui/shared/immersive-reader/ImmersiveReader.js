@@ -69,10 +69,10 @@ function handleClick({title, content}, readerSDK) {
           const chunks = new ContentChunker().chunk(htmlPayload)
           const requestContent = {
             title,
-            chunks
+            chunks,
           }
           const options = {
-            cookiePolicy: CookiePolicy.Disable
+            cookiePolicy: CookiePolicy.Disable,
           }
           launchAsync(token, subdomain, requestContent, options)
         })

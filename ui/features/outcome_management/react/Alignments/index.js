@@ -38,7 +38,7 @@ const AlignmentSummary = () => {
     totalAlignments,
     totalArtifacts,
     alignedArtifacts,
-    artifactAlignments
+    artifactAlignments,
   } = courseAlignmentStats
 
   const {
@@ -48,7 +48,7 @@ const AlignmentSummary = () => {
     searchString,
     onSearchChangeHandler: updateSearch,
     onSearchClearHandler: clearSearch,
-    onFilterChangeHandler: updateFilter
+    onFilterChangeHandler: updateFilter,
   } = useCourseAlignments()
 
   const renderAlignmentStatsLoader = () => (

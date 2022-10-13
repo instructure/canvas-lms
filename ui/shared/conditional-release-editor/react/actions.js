@@ -115,7 +115,7 @@ const clearOutOfRangeScores = (dispatch, getState) => {
 export const SET_ERROR_AT_SCORE_INDEX = 'SET_ERROR_AT_SCORE_INDEX'
 export const setErrorAtScoreIndex = createAction(SET_ERROR_AT_SCORE_INDEX, (index, error) => ({
   index,
-  error
+  error,
 }))
 
 // Creates, saves, or deletes rule depending on current state
@@ -173,7 +173,7 @@ export const moveAssignment = (oldPath, newPath, assignment) => {
       dispatch(
         insertAssignment({
           path: newPath,
-          assignment
+          assignment,
         })
       )
 

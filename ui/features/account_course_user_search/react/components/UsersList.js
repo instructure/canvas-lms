@@ -111,5 +111,5 @@ UsersList.propTypes = {
   handleSubmitEditUserForm: func.isRequired,
   searchFilter: object.isRequired,
   onUpdateFilters: func.isRequired,
-  columnHeaderRef: func.isRequired
+  columnHeaderRef: func.isRequired,
 }

@@ -24,7 +24,7 @@ import {
   IconQuestionLine,
   IconStandardsLine,
   IconTrashLine,
-  IconUnmutedLine
+  IconUnmutedLine,
 } from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
@@ -35,13 +35,13 @@ export const auditEventStudentAnonymityStates = Object.freeze({
   OFF: 'OFF',
   ON: 'ON',
   TURNED_OFF: 'TURNED_OFF',
-  TURNED_ON: 'TURNED_ON'
+  TURNED_ON: 'TURNED_ON',
 })
 
 export const overallAnonymityStates = Object.freeze({
   FULL: 'FULL',
   NA: 'N/A',
-  PARTIAL: 'PARTIAL'
+  PARTIAL: 'PARTIAL',
 })
 
 const defaultIcon = IconQuestionLine
@@ -52,7 +52,7 @@ const iconsByEventTrailType = {
   gradebook: IconGradebookLine,
   muted: IconMutedLine,
   unmuted: IconUnmutedLine,
-  updated: IconEditLine
+  updated: IconEditLine,
 }
 
 const defaultLabel = I18n.t('Unknown event')
@@ -127,7 +127,7 @@ const labelByEventType = {
   submission_comment_created: I18n.t('Submission comment created'),
   submission_comment_deleted: I18n.t('Submission comment deleted'),
   submission_comment_updated: I18n.t('Submission comment updated'),
-  submission_updated: I18n.t('Submission updated')
+  submission_updated: I18n.t('Submission updated'),
 }
 
 const defaultTrailType = 'unknown'
@@ -173,14 +173,14 @@ const trailTypeByEventType = {
   submission_comment_created: 'created',
   submission_comment_deleted: 'deleted',
   submission_comment_updated: 'updated',
-  submission_updated: 'updated'
+  submission_updated: 'updated',
 }
 
 const roleLabels = {
   admin: I18n.t('Administrator'),
   final_grader: I18n.t('Final Grader'),
   grader: I18n.t('Grader'),
-  student: I18n.t('Student')
+  student: I18n.t('Student'),
 }
 
 function trailTypeFor(auditEvent) {

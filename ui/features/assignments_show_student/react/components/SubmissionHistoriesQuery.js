@@ -56,7 +56,7 @@ class SubmissionHistoriesQuery extends React.Component {
             }
           >
             <LoggedOutTabs
-              nonAcceptedEnrollment
+              nonAcceptedEnrollment={true}
               assignment={this.props.initialQueryData.assignment}
             />
           </Suspense>

@@ -49,5 +49,18 @@ module Lti
         tab
       end
     end
+
+    def self.tool_id_for_tab(tab)
+      return nil unless tab.is_a?(Hash) && tab[:id].is_a?(String)
+      return nil unless tab[:id].start_with?("context_external_tool")
+      return nil unless tab[:args]
+
+      tab[:args][1]
+    end
+
+    def self.tool_for_tab(tab)
+      tool_id = tool_id_for_tab(tab)
+      tool_id && ContextExternalTool.find_by(id: tool_id)
+    end
   end
 end

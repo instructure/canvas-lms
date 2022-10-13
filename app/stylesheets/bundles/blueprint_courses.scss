@@ -183,20 +183,7 @@
 
 .bcs__header {
   background: $electric;
-  position: relative;
-  text-align: center;
-  padding: direction-sides(1.2em 1.75em 1.2em 0);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .2);
-}
-
-.bcs__close-wrapper {
-  float: direction(left);
-
-  button {
-    position: relative;
-    top: -0.25em;
-    #{direction(left)}: 0.5em;
-  }
 }
 
 .bcs__modal-content-wrapper {

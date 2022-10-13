@@ -23,7 +23,7 @@ import {ChildTopic} from '../../../../graphql/ChildTopic'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
@@ -33,7 +33,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -86,7 +86,7 @@ describe('DiscussionPostToolbar', () => {
 
     it('"My Drafts" filter should be visible', () => {
       window.ENV = {
-        draft_discussions: true
+        draft_discussions: true,
       }
       const onViewFilterMock = jest.fn()
       const {getByText, getByLabelText} = setup({onViewFilter: onViewFilterMock})
@@ -99,7 +99,7 @@ describe('DiscussionPostToolbar', () => {
   describe('Sort control', () => {
     it('should show up arrow when ascending', () => {
       const {getByTestId} = setup({
-        sortDirection: 'asc'
+        sortDirection: 'asc',
       })
       const upArrow = getByTestId('UpArrow')
       expect(upArrow).toBeTruthy()
@@ -107,7 +107,7 @@ describe('DiscussionPostToolbar', () => {
 
     it('should show down arrow when descending', () => {
       const {getByTestId} = setup({
-        sortDirection: 'desc'
+        sortDirection: 'desc',
       })
       const downArrow = getByTestId('DownArrow')
       expect(downArrow).toBeTruthy()
@@ -116,7 +116,7 @@ describe('DiscussionPostToolbar', () => {
     it('should call onClick when clicked', () => {
       const onSortClickMock = jest.fn()
       const {getByTestId} = setup({
-        onSortClick: onSortClickMock
+        onSortClick: onSortClickMock,
       })
       const button = getByTestId('sortButton')
       button.click()
@@ -127,14 +127,14 @@ describe('DiscussionPostToolbar', () => {
   describe('Groups Menu Button', () => {
     it('should not render when there are no child topics', () => {
       const container = setup({
-        childTopics: []
+        childTopics: [],
       })
       expect(container.queryByTestId('groups-menu-button')).toBeNull()
     })
 
     it('should render when there are child topics', () => {
       const container = setup({
-        childTopics: [ChildTopic.mock()]
+        childTopics: [ChildTopic.mock()],
       })
       expect(container.queryByTestId('groups-menu-button')).toBeTruthy()
     })
@@ -145,7 +145,7 @@ describe('DiscussionPostToolbar', () => {
       it('should render discussionAnonymousState is not null', () => {
         ENV.current_user_roles = ['student']
         const container = setup({
-          discussionAnonymousState: 'full_anonymity'
+          discussionAnonymousState: 'full_anonymity',
         })
         expect(container.queryByTestId('anonymous_avatar')).toBeTruthy()
       })
@@ -155,7 +155,7 @@ describe('DiscussionPostToolbar', () => {
       it('should render discussionAnonymousState is null', () => {
         ENV.current_user_roles = ['student']
         const container = setup({
-          discussionAnonymousState: null
+          discussionAnonymousState: null,
         })
         expect(container.queryByTestId('anonymous_avatar')).toBeNull()
       })

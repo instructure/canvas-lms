@@ -34,6 +34,7 @@ import type {
   FilterPreset,
   GradebookFilterApiRequest,
   GradebookFilterApiResponse,
+  GradingPeriodAssignmentMap,
   PartialFilterPreset,
   SubmissionFilterValue,
 } from './gradebook.d'
@@ -47,6 +48,7 @@ import type {
   StudentGroupCategory,
   StudentMap,
   Submission,
+  SubmissionType,
 } from '../../../../api.d'
 import type {GridColumn} from './grid'
 import {columnWidths} from './initialState'
@@ -432,4 +434,55 @@ export function testWidth(text: string, minWidth: number, maxWidth: number) {
   const textWidth = getTextWidth(text) || 0
   const width = Math.max(textWidth + padding, minWidth)
   return Math.min(width, maxWidth)
+}
+
+export function otherGradingPeriodAssignmentIds(
+  gradingPeriodAssignments: GradingPeriodAssignmentMap,
+  selectedAssignmentIds: string[],
+  selectedPeriodId: string
+) {
+  const restIds = Object.values(gradingPeriodAssignments)
+    .flat()
+    .filter((id: string) => !selectedAssignmentIds.includes(id))
+
+  return {
+    otherAssignmentIds: [...new Set(restIds)],
+    otherGradingPeriodIds: Object.keys(gradingPeriodAssignments).filter(
+      gpId => gpId !== selectedPeriodId
+    ),
+  }
+}
+
+const createQueryString = ([key, val]: [
+  string,
+  string | number | boolean | string[] | SubmissionType[]
+]) => {
+  if (Array.isArray(val)) {
+    return val.map(v => createQueryString([`${key}[]`, v])).join('&')
+  }
+
+  return `${encodeURIComponent(key)}=${encodeURIComponent(val)}`
+}
+
+const DEFAULT_REQUEST_CHARACTER_LIMIT = 8000 // apache limit
+
+export function maxAssignmentCount(
+  params: {
+    include: string[]
+    override_assignment_dates: boolean
+    exclude_response_fields: string[]
+    exclude_assignment_submission_types: SubmissionType[]
+    per_page: number
+    assignment_ids?: string
+  },
+  pathName: string,
+  requestCharacterLimit: number = DEFAULT_REQUEST_CHARACTER_LIMIT
+) {
+  const queryString = Object.entries(params).map(createQueryString).join('&')
+  const currentURI = `${window.location.hostname}${pathName}?${queryString}`
+  const charsAvailable = requestCharacterLimit - `${currentURI}&assignment_ids=`.length
+  const globalIdLength = 8
+  const assignmentParam = encodeURIComponent(`${'0'.repeat(globalIdLength)},`)
+
+  return Math.floor(charsAvailable / assignmentParam.length)
 }

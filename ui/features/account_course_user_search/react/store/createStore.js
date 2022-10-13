@@ -132,7 +132,6 @@ export default function factory(spec) {
         this.previousLoadRequest = xhr
 
         return xhr.then(
-          // eslint-disable-next-line no-shadow
           (data, _textStatus, xhr) => {
             if (this.jsonKey) data = data[this.jsonKey]
             if (options.wrap) data = [data]
@@ -159,8 +158,8 @@ export default function factory(spec) {
         this.setState({
           [key]: {
             ...this.getStateFor(key),
-            ...newState
-          }
+            ...newState,
+          },
         })
       },
 
@@ -186,7 +185,7 @@ export default function factory(spec) {
       get(params) {
         const key = this.getKey(params)
         return this.getStateFor(key)
-      }
+      },
     },
     spec
   )

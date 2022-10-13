@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions.js'
-import * as AssignmentApi from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi.js'
-import configureStore from 'ui/features/assignment_grade_summary/react/configureStore.js'
+import * as AssignmentActions from 'ui/features/assignment_grade_summary/react/assignment/AssignmentActions'
+import * as AssignmentApi from 'ui/features/assignment_grade_summary/react/assignment/AssignmentApi'
+import configureStore from 'ui/features/assignment_grade_summary/react/configureStore'
 
 QUnit.module('GradeSummary AssignmentActions', suiteHooks => {
   let store

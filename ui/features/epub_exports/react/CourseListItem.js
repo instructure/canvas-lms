@@ -33,7 +33,7 @@ class CourseListItem extends React.Component {
   static displayName = 'CourseListItem'
 
   static propTypes = {
-    course: PropTypes.object.isRequired
+    course: PropTypes.object.isRequired,
   }
 
   epubExport = () => this.props.course.epub_export || {}
@@ -76,7 +76,7 @@ class CourseListItem extends React.Component {
   render() {
     const course = this.props.course,
       classes = {
-        'ig-row': true
+        'ig-row': true,
       }
     classes[this.epubExport().workflow_state] = !_.isEmpty(this.epubExport())
 

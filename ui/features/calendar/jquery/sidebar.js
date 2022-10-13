@@ -107,7 +107,7 @@ class VisibleContextManager {
     this.notify()
 
     return $.ajaxJSON('/api/v1/calendar_events/save_selected_contexts', 'POST', {
-      selected_contexts: this.contexts.length > 0 ? this.contexts : '[]'
+      selected_contexts: this.contexts.length > 0 ? this.contexts : '[]',
     })
   }
 
@@ -136,7 +136,7 @@ class VisibleContextManager {
       wrapper[0].appendChild(generateEmptyState())
     }
     return $.ajaxJSON('/api/v1/calendar_events/save_enabled_account_calendars', 'POST', {
-      enabled_account_calendars: enabledAccountIds.length > 0 ? enabledAccountIds : ''
+      enabled_account_calendars: enabledAccountIds.length > 0 ? enabledAccountIds : '',
     })
   }
 
@@ -180,7 +180,7 @@ function setupCalendarFeedsWithSpecialAccessibilityConsiderationsForNVDA() {
     $.extend(
       {
         autoOpen: false,
-        modal: true
+        modal: true,
       },
       $calendarFeedModalOpener.data('dialogOpts')
     )
@@ -214,7 +214,7 @@ function refreshOtherCalendarsSection($holder, otherCalendars, notify) {
     contextListTemplate({
       contexts: otherCalendars,
       type: 'other-calendars',
-      includeRemoveOption: 'calendars'
+      includeRemoveOption: 'calendars',
     })
   )
   notify()
@@ -225,13 +225,12 @@ function convertAccountCalendars(accountCalendars) {
     id: oC.id,
     name: oC.name,
     asset_string: oC.asset_string,
-    type: oC.type
+    type: oC.type,
   }))
 }
 
 export default function sidebar(contexts, selectedContexts, dataSource, onContextsChange) {
   const $skipLink = $('.skip-to-calendar')
-  const $colorPickerBtn = $('.ContextList__MoreBtn')
   const $calendarHolder = $('#calendar-list-holder')
   const $otherCalendarsHolder = $('#other-calendars-list-holder')
   const $combineHolder = $($calendarHolder).add($otherCalendarsHolder)
@@ -266,7 +265,7 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
       const newAddedCalendars = newOtherCalendars.filter(newAC => {
         return !otherCalendars.some(oldAC => newAC.id === oldAC.id)
       })
-      const removedCalendars = otherCalendars.filter(oldAC =>{
+      const removedCalendars = otherCalendars.filter(oldAC => {
         return !newOtherCalendars.some(newAC => oldAC.id === newAC.id)
       })
 
@@ -299,12 +298,12 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
     setupAccountCalendarDialog(getSelectedOtherCalendars, onOtherCalendarsChange)
   }
 
-  $combineHolder.on('click keyclick', '.context-list-toggle-box', function (event) {
+  $combineHolder.on('click keyclick', '.context-list-toggle-box', function (_event) {
     const parent = $(this).closest('.context_list_context')
     visibleContexts.toggle($(parent).data('context'))
   })
 
-  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', async function (event) {
+  $otherCalendarsHolder.on('click keyclick', '.ContextList__DeleteBtn', async function (_event) {
     const parent = $(this).closest('.context_list_context')
     const toRemove = $(parent).data('context')
     const calendarToRemoveIndex = otherCalendars.findIndex(oC => oC.asset_string === toRemove)
@@ -314,21 +313,21 @@ export default function sidebar(contexts, selectedContexts, dataSource, onContex
       if (response.status === 'ok') {
         showFlashAlert({
           type: 'success',
-          message: I18n.t('Calendar removed')
+          message: I18n.t('Calendar removed'),
         })
       }
     } catch (err) {
       showFlashAlert({
         err,
-        message: I18n.t('An error occurred while removing the calendar')
+        message: I18n.t('An error occurred while removing the calendar'),
       })
     }
   })
 
-  $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (event) {
+  $combineHolder.on('click keyclick', '.ContextList__MoreBtn', function (_event) {
     const positions = {
       top: $(this).offset().top - $(window).scrollTop(),
-      left: $(this).offset().left - $(window).scrollLeft()
+      left: $(this).offset().left - $(window).scrollLeft(),
     }
 
     const assetString = $(this).closest('li').data('context')

@@ -43,8 +43,8 @@ export const MediaObject = {
     mediaSources: arrayOf(MediaSource.shape),
     mediaType: string,
     mediaTracks: arrayOf(MediaTrack.shape),
-    title: string
-  })
+    title: string,
+  }),
 }
 
 export const DefaultMocks = {
@@ -52,6 +52,6 @@ export const DefaultMocks = {
     mediaSources: [{}],
     mediaTracks: [{}],
     mediaType: 'video',
-    title: 'Mocked Video'
-  })
+    title: 'Mocked Video',
+  }),
 }

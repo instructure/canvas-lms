@@ -35,10 +35,10 @@ const EX: {[k: string]: QueryParameterMap} = {
   array_of_objects: {
     blah: [
       {one: 1, two: 2},
-      {one: '1', two: '2'}
-    ]
+      {one: '1', two: '2'},
+    ],
   },
-  object_with_arrays: {blah: {one: [1, 2, 3], two: [2, 4, 6]}}
+  object_with_arrays: {blah: {one: [1, 2, 3], two: [2, 4, 6]}},
 }
 
 describe('toQueryString::', () => {

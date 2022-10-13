@@ -118,11 +118,11 @@ export default function AdminSplit({user, splitUrl, splitUsers}) {
 const userShape = shape({
   id: string.isRequired,
   display_name: string.isRequired,
-  html_url: string.isRequired
+  html_url: string.isRequired,
 })
 
 AdminSplit.propTypes = {
   splitUrl: string.isRequired,
   user: userShape.isRequired,
-  splitUsers: arrayOf(userShape).isRequired
+  splitUsers: arrayOf(userShape).isRequired,
 }

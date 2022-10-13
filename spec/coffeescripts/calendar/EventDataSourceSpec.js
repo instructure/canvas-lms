@@ -36,7 +36,7 @@ QUnit.module('EventDataSource: getEvents', {
       {asset_string: 'course_1'},
       {asset_string: 'course_2'},
       {asset_string: 'course_3'},
-      {asset_string: 'group_1'}
+      {asset_string: 'group_1'},
     ])
     this.contexts = ['course_1', 'course_2', 'course_3']
 
@@ -57,8 +57,8 @@ QUnit.module('EventDataSource: getEvents', {
           context_code,
           calendar_event: {
             id,
-            start_at
-          }
+            start_at,
+          },
         })
       },
       addAssignment(context_code, id, due_at) {
@@ -66,8 +66,8 @@ QUnit.module('EventDataSource: getEvents', {
           context_code,
           assignment: {
             id,
-            due_at
-          }
+            due_at,
+          },
         })
       },
       addPlannerItem(context_type, context_id, plannable_type, plannable_id, title, todo_date) {
@@ -76,12 +76,12 @@ QUnit.module('EventDataSource: getEvents', {
           plannable_id,
           plannable: {
             title,
-            todo_date
-          }
+            todo_date,
+          },
         }
         item[`${context_type}_id`] = context_id
         return this.calendarEvents.push(item)
-      }
+      },
     }
 
     // stub the fetch method on the source to just use our stubbed query
@@ -91,7 +91,7 @@ QUnit.module('EventDataSource: getEvents', {
       this.server.lastQuery = {
         start_date,
         end_date,
-        undated
+        undated,
       }
       dataCB(this.server.calendarEvents, null, {type: 'events'})
       dataCB(this.server.assignments, null, {type: 'assignments'})
@@ -101,7 +101,7 @@ QUnit.module('EventDataSource: getEvents', {
 
   teardown() {
     tz.restore(this.snapshot)
-  }
+  },
 })
 
 test('addEventToCache handles cases where the contextCode returns a list', function () {
@@ -109,7 +109,7 @@ test('addEventToCache handles cases where the contextCode returns a list', funct
     contextCode() {
       return 'course_1,course_2'
     },
-    id: 42
+    id: 42,
   }
   this.source.addEventToCache(fakeEvent)
   ok(this.source.cache.contexts.course_1.events[42])
@@ -120,7 +120,7 @@ test('addEventToCache handles the case where contextCode contains context not in
     contextCode() {
       return 'course_4,course_2'
     },
-    id: 42
+    id: 42,
   }
   this.source.addEventToCache(fakeEvent)
   ok(this.source.cache.contexts.course_2.events[42])
@@ -131,7 +131,7 @@ test('addEventToCache handles cases where the contextCode is a single item', fun
     contextCode() {
       return 'course_1'
     },
-    id: 42
+    id: 42,
   }
   this.source.addEventToCache(fakeEvent)
   ok(this.source.cache.contexts.course_1.events[42])
@@ -273,7 +273,7 @@ test('pagination: calls data callback with each page of data if set', function (
 test('indexParams filters appointment_group_ids from params', function () {
   const p = this.source.indexParams({
     blah: 'blah',
-    context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337']
+    context_codes: ['course_1', 'appointment_group_2', 'group_3', 'appointment_group_1337'],
   })
   equal(p.blah, 'blah')
   deepEqual(p.context_codes, ['course_1', 'group_3'])
@@ -318,19 +318,19 @@ test('filters out course pacing assignments for teachers', function () {
       {
         asset_string: 'course_1',
         can_make_reservation: false,
-        course_pacing_enabled: false
+        course_pacing_enabled: false,
       },
       {
         asset_string: 'course_2',
         can_make_reservation: false,
-        course_pacing_enabled: true
+        course_pacing_enabled: true,
       },
       {
         asset_string: 'course_3',
         can_make_reservation: true,
-        course_pacing_enabled: true
-      }
-    ]
+        course_pacing_enabled: true,
+      },
+    ],
   }
   this.server.addAssignment('course_1', '100', fcUtil.unwrap(this.date3).toISOString())
   this.server.addAssignment('course_2', '200', fcUtil.unwrap(this.date3).toISOString())
@@ -338,7 +338,7 @@ test('filters out course pacing assignments for teachers', function () {
   const params = {
     context_codes: ['course_1', 'course_2', 'course_3'],
     start_date: this.date1,
-    end_date: this.date4
+    end_date: this.date4,
   }
   const assignmentParameters = this.source.assignmentParams(params)
   equal(assignmentParameters.context_codes.length, 2)

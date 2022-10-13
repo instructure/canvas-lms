@@ -29,20 +29,20 @@ DirectShareUserPanel.propTypes = {
   courseId: string,
   selectedUsers: arrayOf(basicUser),
   onUserSelected: func, // basicUser => {}
-  onUserRemoved: func // basicUser => {}
+  onUserRemoved: func, // basicUser => {}
 }
 
 export default function DirectShareUserPanel({
   selectedUsers,
   onUserSelected,
   onUserRemoved,
-  courseId
+  courseId,
 }) {
   function renderSelectedUserTags() {
     return selectedUsers.map(user => (
       <Tag
         key={user.id}
-        dismissible
+        dismissible={true}
         title={I18n.t('Remove %{name}', {name: user.name})}
         text={user.name}
         onClick={() => onUserRemoved(user)}

@@ -32,7 +32,7 @@ data._monthsShort = [
   'sep',
   'okt',
   'nov',
-  'dec'
+  'dec',
 ]
 
 data._weekdaysShort = ['ned', 'pon', 'tor', 'sre', 'čet', 'pet', 'sob']

@@ -37,7 +37,7 @@ const accountCalendarsType = arrayOf(
     id: string.isRequired,
     name: string.isRequired,
     asset_string: string.isRequired,
-    type: string.isRequired
+    type: string.isRequired,
   })
 )
 
@@ -48,7 +48,7 @@ const AccountCalendarResultsArea = ({
   isLoading,
   loadNextPage,
   selectedCalendars,
-  setSelectedCalendars
+  setSelectedCalendars,
 }) => {
   useEffect(() => {
     if (!isLoading && results?.length >= 0) {
@@ -154,7 +154,7 @@ AccountCalendarResultsArea.propTypes = {
   isLoading: bool.isRequired,
   loadNextPage: func.isRequired,
   selectedCalendars: accountCalendarsType,
-  setSelectedCalendars: func.isRequired
+  setSelectedCalendars: func.isRequired,
 }
 
 export default AccountCalendarResultsArea

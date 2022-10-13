@@ -27,7 +27,7 @@ $('.close_migration_notification_link').click(function (event) {
   $(this).attr('disabled', true)
   doFetchApi({
     path: $(this).attr('rel'),
-    method: 'POST'
+    method: 'POST',
   })
     .then(() => {
       $(this).closest('.quiz_migration_notification').remove()

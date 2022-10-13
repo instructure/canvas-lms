@@ -24,12 +24,12 @@ import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 export default {
   title: 'Examples/Discussion Posts/Containers/Post Message Container',
   component: DiscussionEntryMessageContainer,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <DiscussionEntryMessageContainer {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  discussionEntry: DiscussionEntry.mock()
+  discussionEntry: DiscussionEntry.mock(),
 }

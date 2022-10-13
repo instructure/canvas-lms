@@ -44,7 +44,7 @@ const Tray = ({
   showSuggestions,
   setShowSuggestions,
   updateComment,
-  setRemovedItemIndex
+  setRemovedItemIndex,
 }) => {
   const closeButtonRef = useRef(null)
   useEffect(() => {
@@ -109,14 +109,14 @@ const Tray = ({
                   }
                   variant="toggle"
                   size="small"
-                  inline
+                  inline={true}
                   onChange={e => setShowSuggestions(e.target.checked)}
                   checked={showSuggestions}
                 />
               </div>
             </View>
           </Flex.Item>
-          <Flex.Item size="65vh" shouldGrow data-testid="library-comment-area">
+          <Flex.Item size="65vh" shouldGrow={true} data-testid="library-comment-area">
             {comments.map((commentItem, index) => {
               const shouldFocus =
                 removedItemIndex !== null && index === Math.max(removedItemIndex - 1, 0)
@@ -147,7 +147,7 @@ Tray.propTypes = {
   comments: PropTypes.arrayOf(
     PropTypes.shape({
       comment: PropTypes.string.isRequired,
-      _id: PropTypes.string.isRequired
+      _id: PropTypes.string.isRequired,
     })
   ).isRequired,
   isOpen: PropTypes.bool.isRequired,
@@ -160,11 +160,11 @@ Tray.propTypes = {
   showSuggestions: PropTypes.bool.isRequired,
   setShowSuggestions: PropTypes.func.isRequired,
   updateComment: PropTypes.func.isRequired,
-  setRemovedItemIndex: PropTypes.func.isRequired
+  setRemovedItemIndex: PropTypes.func.isRequired,
 }
 
 Tray.defaultProps = {
-  removedItemIndex: null
+  removedItemIndex: null,
 }
 
 export default Tray

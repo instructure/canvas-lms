@@ -35,7 +35,7 @@ QUnit.module('ConfirmUnfavoriteCourseModal', suiteHooks => {
       courseName: 'defense against the dark arts',
       onConfirm: sinon.spy(),
       onClose: sinon.spy(),
-      onEntered: sinon.spy()
+      onEntered: sinon.spy(),
     }
   })
 

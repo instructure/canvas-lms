@@ -29,7 +29,7 @@ export const DESIGNER_1 = {
   sisId: 'Designer1-SIS-ID',
   loginId: 'Designer1@instructure.com',
   enrollmentType: 'DesignerEnrollment',
-  sisRole: 'designer'
+  sisRole: 'designer',
 }
 
 export const OBSERVER_1 = {
@@ -43,14 +43,14 @@ export const OBSERVER_1 = {
     mockEnrollment({
       _id: '40',
       associatedUserID: '123',
-      associatedUserName: 'Observed Student 1'
+      associatedUserName: 'Observed Student 1',
     }),
     mockEnrollment({
       _id: '40',
       associatedUserID: '124',
-      associatedUserName: 'Observed Student 2'
-    })
-  ]
+      associatedUserName: 'Observed Student 2',
+    }),
+  ],
 }
 
 export const STUDENT_1 = {
@@ -60,7 +60,7 @@ export const STUDENT_1 = {
   sisId: 'Student1-SIS-ID',
   loginId: 'Student1@instructure.com',
   lastActivityAt: '2021-11-04T09:54:01-06:00',
-  totalActivityTime: 90
+  totalActivityTime: 90,
 }
 
 export const STUDENT_2 = {
@@ -69,7 +69,7 @@ export const STUDENT_2 = {
   avatarUrl: 'https://gravatar.com/avatar/52c160622b09015c70fa0f4c25de6cca?s=200&d=identicon&r=pg',
   sisId: 'Student2-SIS-ID',
   loginId: 'Student2@instructure.com',
-  enrollmentStatus: 'invited'
+  enrollmentStatus: 'invited',
 }
 
 export const STUDENT_3 = {
@@ -77,7 +77,7 @@ export const STUDENT_3 = {
   _id: '33',
   sisId: 'Student3-SIS-ID',
   loginId: 'Student3@instructure.com',
-  enrollmentStatus: 'inactive'
+  enrollmentStatus: 'inactive',
 }
 
 export const TEACHER_1 = {
@@ -90,7 +90,7 @@ export const TEACHER_1 = {
   enrollmentType: TEACHER_ENROLLMENT,
   sisRole: 'teacher',
   lastActivityAt: '2022-07-27T10:21:33-06:00',
-  totalActivityTime: 60708
+  totalActivityTime: 60708,
 }
 
 export const TA_1 = {
@@ -102,7 +102,7 @@ export const TA_1 = {
   enrollmentType: 'TaEnrollment',
   sisRole: 'ta',
   lastActivityAt: '2022-08-16T14:08:13-06:00',
-  totalActivityTime: 407
+  totalActivityTime: 407,
 }
 
 /* ****************************************************************************************************************** */
@@ -123,7 +123,7 @@ export const STOPWATCH_PATTERN = new RegExp(/^[0-9]+(:[0-5][0-9]){1,2}$/) // 00:
 export const SITE_ADMIN_ENV = {
   course: {
     id: '1',
-    hideSectionsOnCourseUsersPage: false
+    hideSectionsOnCourseUsersPage: false,
   },
   current_user: {id: '999'},
   permissions: {
@@ -132,6 +132,6 @@ export const SITE_ADMIN_ENV = {
     read_reports: true,
     can_allow_admin_actions: true,
     manage_admin_users: true,
-    manage_students: true
-  }
+    manage_students: true,
+  },
 }

@@ -70,8 +70,8 @@ QUnit.module('EquationEditorView', () => {
           getContent() {
             return 'Editor Content.'
           },
-          moveToBookmark() {}
-        }
+          moveToBookmark() {},
+        },
       }
       const view = new EquationEditorView(editor)
       assert.equal(view.el.nodeName, 'DIV')

@@ -28,8 +28,8 @@ export default {
   component: CreateOutcomeModal,
   args: {
     isOpen: true,
-    onCloseHandler: () => {}
-  }
+    onCloseHandler: () => {},
+  },
 }
 
 const Template = args => {

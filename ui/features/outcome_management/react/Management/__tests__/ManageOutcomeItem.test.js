@@ -32,7 +32,7 @@ const render = (
     contextType = 'Account',
     friendlyDescriptionFF = true,
     accountLevelMasteryScalesFF = true,
-    renderer = rtlRender
+    renderer = rtlRender,
   } = {}
 ) => {
   return renderer(
@@ -44,8 +44,8 @@ const render = (
           contextId,
           contextType,
           friendlyDescriptionFF,
-          accountLevelMasteryScalesFF
-        }
+          accountLevelMasteryScalesFF,
+        },
       }}
     >
       <MockedProvider mocks={[]}>{children}</MockedProvider>
@@ -73,7 +73,7 @@ describe('ManageOutcomeItem', () => {
     canUnlink: true,
     onMenuHandler: onMenuHandlerMock,
     onCheckboxHandler: onCheckboxHandlerMock,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -142,7 +142,7 @@ describe('ManageOutcomeItem', () => {
 
   it('displays enabled caret button if no description and accountLevelMasteryScales is disabled', () => {
     const {queryByTestId} = render(<ManageOutcomeItem {...defaultProps({description: null})} />, {
-      accountLevelMasteryScalesFF: false
+      accountLevelMasteryScalesFF: false,
     })
     expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()
   })
@@ -176,7 +176,7 @@ describe('ManageOutcomeItem', () => {
     it('enables option if user is admin within course context', () => {
       const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
         contextType: 'Course',
-        friendlyDescriptionFF: false
+        friendlyDescriptionFF: false,
       })
       fireEvent.click(getByText('Menu for outcome Outcome Title'))
       fireEvent.click(getByText('Edit'))
@@ -188,7 +188,7 @@ describe('ManageOutcomeItem', () => {
     it('enables option if outcome is created within the same context', () => {
       const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
         contextId: '1',
-        friendlyDescriptionFF: false
+        friendlyDescriptionFF: false,
       })
       fireEvent.click(getByText('Menu for outcome Outcome Title'))
       fireEvent.click(getByText('Edit'))
@@ -213,14 +213,14 @@ describe('ManageOutcomeItem', () => {
   describe('Without manage_outcomes permission / canManage false', () => {
     it('hides kebab menu', () => {
       const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
     })
 
     it('hides checkbox', () => {
       const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
-        canManage: false
+        canManage: false,
       })
       expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
     })
@@ -232,7 +232,7 @@ describe('ManageOutcomeItem', () => {
         const {queryByTestId} = render(
           <ManageOutcomeItem {...defaultProps({description: null})} />,
           {
-            accountLevelMasteryScalesFF: false
+            accountLevelMasteryScalesFF: false,
           }
         )
         expect(queryByTestId('icon-arrow-right').closest('button')).toBeEnabled()

@@ -58,7 +58,7 @@ export function updateGrade(gradeInfo) {
 }
 
 export function acceptGraderGrades(graderId) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const {assignment} = getState().assignment
     const {bulkSelectionDetails} = getState().grades
     const {provisionalGradeIds} = bulkSelectionDetails[graderId]
@@ -77,7 +77,7 @@ export function acceptGraderGrades(graderId) {
 }
 
 function selectProvisionalGrade(gradeInfo) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const {assignment} = getState().assignment
 
     dispatch(setSelectProvisionalGradeStatus(gradeInfo, STARTED))
@@ -106,20 +106,20 @@ function apiUpdateProvisionalGrade(state, gradeInfo) {
     final: isFinalGrader,
     grade: gradeInfo.score,
     gradedAnonymously: anonymous,
-    [userIdField]: gradeInfo.studentId
+    [userIdField]: gradeInfo.studentId,
   }
 
   return GradesApi.updateProvisionalGrade(assignment.courseId, submission).then(
     updatedSubmission => ({
       ...gradeInfo,
       graderId: gradeInfo.graderId || currentUser.graderId,
-      id: updatedSubmission.provisionalGradeId
+      id: updatedSubmission.provisionalGradeId,
     })
   )
 }
 
 function updateProvisionalGrade(gradeInfo) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const state = getState()
 
     dispatch(setUpdateGradeStatus(gradeInfo, STARTED))
@@ -136,7 +136,7 @@ function updateProvisionalGrade(gradeInfo) {
 }
 
 function createAndSelectProvisionalGrade(gradeInfo) {
-  return function(dispatch, getState) {
+  return function (dispatch, getState) {
     const state = getState()
 
     dispatch(setUpdateGradeStatus(gradeInfo, STARTED))

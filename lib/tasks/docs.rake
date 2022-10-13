@@ -3,7 +3,7 @@
 begin
   require "yard"
   require "yard-appendix"
-  require "config/initializers/json"
+  require_relative "../../config/initializers/json"
 
   DOC_DIR     = File.join(%w[public doc api])
   API_DOC_DIR = Rails.root.join(DOC_DIR).expand_path

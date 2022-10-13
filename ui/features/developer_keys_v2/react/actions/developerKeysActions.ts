@@ -28,46 +28,46 @@ actions.listDeveloperKeysStart = payload => ({type: actions.LIST_DEVELOPER_KEYS_
 actions.LIST_DEVELOPER_KEYS_SUCCESSFUL = 'LIST_DEVELOPER_KEYS_SUCCESSFUL'
 actions.listDeveloperKeysSuccessful = payload => ({
   type: actions.LIST_DEVELOPER_KEYS_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL = 'LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL'
 actions.listRemainingDeveloperKeysSuccessful = payload => ({
   type: actions.LIST_REMAINING_DEVELOPER_KEYS_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_DEVELOPER_KEYS_FAILED = 'LIST_DEVELOPER_KEYS_FAILED'
 actions.listDeveloperKeysFailed = error => ({
   type: actions.LIST_DEVELOPER_KEYS_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.LIST_INHERITED_DEVELOPER_KEYS_START = 'LIST_INHERITED_DEVELOPER_KEYS_START'
 actions.listInheritedDeveloperKeysStart = payload => ({
   type: actions.LIST_INHERITED_DEVELOPER_KEYS_START,
-  payload
+  payload,
 })
 
 actions.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL = 'LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL'
 actions.listInheritedDeveloperKeysSuccessful = payload => ({
   type: actions.LIST_INHERITED_DEVELOPER_KEYS_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL =
   'LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL'
 actions.listRemainingInheritedDeveloperKeysSuccessful = payload => ({
   type: actions.LIST_REMAINING_INHERITED_DEVELOPER_KEYS_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_INHERITED_DEVELOPER_KEYS_FAILED = 'LIST_INHERITED_DEVELOPER_KEYS_FAILED'
 actions.listInheritedDeveloperKeysFailed = error => ({
   type: actions.LIST_INHERITED_DEVELOPER_KEYS_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.LIST_DEVELOPER_KEYS_REPLACE = 'LIST_DEVELOPER_KEYS_REPLACE'
@@ -76,7 +76,7 @@ actions.listDeveloperKeysReplace = payload => ({type: actions.LIST_DEVELOPER_KEY
 actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE = 'LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE'
 actions.listDeveloperKeysReplaceBindingState = payload => ({
   type: actions.LIST_DEVELOPER_KEYS_REPLACE_BINDING_STATE,
-  payload
+  payload,
 })
 
 actions.LIST_DEVELOPER_KEYS_DELETE = 'LIST_DEVELOPER_KEYS_DELETE'
@@ -88,20 +88,20 @@ actions.listDeveloperKeysPrepend = payload => ({type: actions.LIST_DEVELOPER_KEY
 actions.DEACTIVATE_DEVELOPER_KEY_START = 'DEACTIVATE_DEVELOPER_KEY_START'
 actions.deactivateDeveloperKeyStart = payload => ({
   type: actions.DEACTIVATE_DEVELOPER_KEY_START,
-  payload
+  payload,
 })
 
 actions.DEACTIVATE_DEVELOPER_KEY_SUCCESSFUL = 'DEACTIVATE_DEVELOPER_KEY_SUCCESSFUL'
 actions.deactivateDeveloperKeySuccessful = payload => ({
   type: actions.DEACTIVATE_DEVELOPER_KEY_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.DEACTIVATE_DEVELOPER_KEY_FAILED = 'DEACTIVATE_DEVELOPER_KEY_FAILED'
 actions.deactivateDeveloperKeyFailed = error => ({
   type: actions.DEACTIVATE_DEVELOPER_KEY_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.MAKE_VISIBLE_DEVELOPER_KEY_START = 'MAKE_VISIBLE_DEVELOPER_KEY_START'
@@ -109,14 +109,14 @@ actions.makeVisibleDeveloperKeyStart = () => ({type: actions.MAKE_VISIBLE_DEVELO
 
 actions.MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL = 'MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL'
 actions.makeVisibleDeveloperKeySuccessful = () => ({
-  type: actions.MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL
+  type: actions.MAKE_VISIBLE_DEVELOPER_KEY_SUCCESSFUL,
 })
 
 actions.MAKE_VISIBLE_DEVELOPER_KEY_FAILED = 'MAKE_VISIBLE_DEVELOPER_KEY_FAILED'
 actions.makeVisibleDeveloperKeyFailed = error => ({
   type: actions.MAKE_VISIBLE_DEVELOPER_KEY_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.MAKE_INVISIBLE_DEVELOPER_KEY_START = 'MAKE_INVISIBLE_DEVELOPER_KEY_START'
@@ -124,14 +124,14 @@ actions.makeInvisibleDeveloperKeyStart = () => ({type: actions.MAKE_INVISIBLE_DE
 
 actions.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL = 'MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL'
 actions.makeInvisibleDeveloperKeySuccessful = () => ({
-  type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL
+  type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_SUCCESSFUL,
 })
 
 actions.MAKE_INVISIBLE_DEVELOPER_KEY_FAILED = 'MAKE_INVISIBLE_DEVELOPER_KEY_FAILED'
 actions.makeInvisibleDeveloperKeyFailed = error => ({
   type: actions.MAKE_INVISIBLE_DEVELOPER_KEY_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.DELETE_DEVELOPER_KEY_START = 'DELETE_DEVELOPER_KEY_START'
@@ -140,33 +140,33 @@ actions.deleteDeveloperKeyStart = payload => ({type: actions.DELETE_DEVELOPER_KE
 actions.DELETE_DEVELOPER_KEY_SUCCESSFUL = 'DELETE_DEVELOPER_KEY_SUCCESSFUL'
 actions.deleteDeveloperKeySuccessful = payload => ({
   type: actions.DELETE_DEVELOPER_KEY_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.DELETE_DEVELOPER_KEY_FAILED = 'DELETE_DEVELOPER_KEY_FAILED'
 actions.deleteDeveloperKeyFailed = error => ({
   type: actions.DELETE_DEVELOPER_KEY_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.ACTIVATE_DEVELOPER_KEY_START = 'ACTIVATE_DEVELOPER_KEY_START'
 actions.activateDeveloperKeyStart = payload => ({
   type: actions.ACTIVATE_DEVELOPER_KEY_START,
-  payload
+  payload,
 })
 
 actions.ACTIVATE_DEVELOPER_KEY_SUCCESSFUL = 'ACTIVATE_DEVELOPER_KEY_SUCCESSFUL'
 actions.activateDeveloperKeySuccessful = payload => ({
   type: actions.ACTIVATE_DEVELOPER_KEY_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.ACTIVATE_DEVELOPER_KEY_FAILED = 'ACTIVATE_DEVELOPER_KEY_FAILED'
 actions.activateDeveloperKeyFailed = error => ({
   type: actions.ACTIVATE_DEVELOPER_KEY_FAILED,
   error: true,
-  payload: error
+  payload: error,
 })
 
 actions.CREATE_OR_EDIT_DEVELOPER_KEY_START = 'CREATE_OR_EDIT_DEVELOPER_KEY_START'
@@ -174,7 +174,7 @@ actions.createOrEditDeveloperKeyStart = () => ({type: actions.CREATE_OR_EDIT_DEV
 
 actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL = 'CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL'
 actions.createOrEditDeveloperKeySuccessful = () => ({
-  type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL
+  type: actions.CREATE_OR_EDIT_DEVELOPER_KEY_SUCCESSFUL,
 })
 
 actions.CREATE_OR_EDIT_DEVELOPER_KEY_FAILED = 'CREATE_OR_EDIT_DEVELOPER_KEY_FAILED'
@@ -208,13 +208,13 @@ actions.setBindingWorkflowStateStart = () => ({type: actions.SET_BINDING_WORKFLO
 actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL = 'SET_BINDING_WORKFLOW_STATE_SUCCESSFUL'
 actions.setBindingWorkflowStateSuccessful = response => ({
   type: actions.SET_BINDING_WORKFLOW_STATE_SUCCESSFUL,
-  payload: response
+  payload: response,
 })
 
 actions.SET_BINDING_WORKFLOW_STATE_FAILED = 'SET_BINDING_WORKFLOW_STATE_FAILED'
 actions.setBindingWorkflowStateFailed = payload => ({
   type: actions.SET_BINDING_WORKFLOW_STATE_FAILED,
-  payload
+  payload,
 })
 
 actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
@@ -226,7 +226,7 @@ actions.listDeveloperKeyScopesStart = () => ({type: actions.LIST_DEVELOPER_KEY_S
 actions.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL = 'LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL'
 actions.listDeveloperKeyScopesSuccessful = payload => ({
   type: actions.LIST_DEVELOPER_KEY_SCOPES_SUCCESSFUL,
-  payload
+  payload,
 })
 
 actions.LIST_DEVELOPER_KEY_SCOPES_FAILED = 'LIST_DEVELOPER_KEY_SCOPES_FAILED'
@@ -235,7 +235,7 @@ actions.listDeveloperKeyScopesFailed = () => ({type: actions.LIST_DEVELOPER_KEY_
 actions.LIST_DEVELOPER_KEY_SCOPES_SET = 'LIST_DEVELOPER_KEY_SCOPES_SET'
 actions.listDeveloperKeyScopesSet = selectedScopes => ({
   type: actions.LIST_DEVELOPER_KEY_SCOPES_SET,
-  payload: selectedScopes
+  payload: selectedScopes,
 })
 
 actions.listDeveloperKeyScopes = accountId => dispatch => {
@@ -262,14 +262,14 @@ actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => di
   dispatch(
     actions.listDeveloperKeysReplaceBindingState({
       developerKeyId: developerKey.id,
-      newAccountBinding: {...previousAccountBinding, workflow_state: workflowState}
+      newAccountBinding: {...previousAccountBinding, workflow_state: workflowState},
     })
   )
   axios
     .post(url, {
       developer_key_account_binding: {
-        workflow_state: workflowState
-      }
+        workflow_state: workflowState,
+      },
     })
     .then(response => {
       dispatch(actions.setBindingWorkflowStateSuccessful(response.data))
@@ -278,7 +278,7 @@ actions.setBindingWorkflowState = (developerKey, accountId, workflowState) => di
       dispatch(
         actions.setBindingWorkflowStateFailed({
           developerKeyId: developerKey.id,
-          previousAccountBinding
+          previousAccountBinding,
         })
       )
       $.flashError(error.message)
@@ -291,7 +291,7 @@ actions.createOrEditDeveloperKey = (formData, url, method) => dispatch => {
   return axios({
     method,
     url,
-    data: formData
+    data: formData,
   })
     .then(response => {
       if (method === 'post') {
@@ -330,13 +330,13 @@ actions.getDeveloperKeys = (url, newSearch) => (dispatch, _getState) => {
     url,
     dispatch,
     success: actions.listDeveloperKeysSuccessful,
-    failure: actions.listDeveloperKeysFailed
+    failure: actions.listDeveloperKeysFailed,
   })
   retrieveDevKeys({
     url: `${url}?${inherited}`,
     dispatch,
     success: actions.listInheritedDeveloperKeysSuccessful,
-    failure: actions.listInheritedDeveloperKeysFailed
+    failure: actions.listInheritedDeveloperKeysFailed,
   })
 }
 
@@ -347,7 +347,7 @@ function retrieveRemainingDevKeys({
   retrieve,
   success,
   failure,
-  callback
+  callback,
 }) {
   return axios
     .get(url)
@@ -379,7 +379,7 @@ actions.getRemainingDeveloperKeys = (url, developerKeysPassedIn, callback) => di
     retrieve: actions.getRemainingDeveloperKeys,
     success: actions.listRemainingDeveloperKeysSuccessful,
     failure: actions.listDeveloperKeysFailed,
-    callback
+    callback,
   })
 }
 
@@ -393,7 +393,7 @@ actions.getRemainingInheritedDeveloperKeys = (url, developerKeysPassedIn, callba
     retrieve: actions.getRemainingInheritedDeveloperKeys,
     success: actions.listRemainingInheritedDeveloperKeysSuccessful,
     failure: actions.listInheritedDeveloperKeysFailed,
-    callback
+    callback,
   })
 }
 
@@ -403,7 +403,7 @@ actions.deactivateDeveloperKey = developerKey => (dispatch, _getState) => {
   const url = `/api/v1/developer_keys/${developerKey.id}`
   axios
     .put(url, {
-      developer_key: {event: 'deactivate'}
+      developer_key: {event: 'deactivate'},
     })
     .then(response => {
       dispatch(actions.listDeveloperKeysReplace(response.data))
@@ -418,7 +418,7 @@ actions.activateDeveloperKey = developerKey => (dispatch, _getState) => {
   const url = `/api/v1/developer_keys/${developerKey.id}`
   axios
     .put(url, {
-      developer_key: {event: 'activate'}
+      developer_key: {event: 'activate'},
     })
     .then(response => {
       dispatch(actions.listDeveloperKeysReplace(response.data))
@@ -433,7 +433,7 @@ actions.makeInvisibleDeveloperKey = developerKey => (dispatch, _getState) => {
   const url = `/api/v1/developer_keys/${developerKey.id}`
   axios
     .put(url, {
-      developer_key: {visible: false}
+      developer_key: {visible: false},
     })
     .then(response => {
       dispatch(actions.listDeveloperKeysReplace(response.data))
@@ -448,7 +448,7 @@ actions.makeVisibleDeveloperKey = developerKey => (dispatch, _getState) => {
   const url = `/api/v1/developer_keys/${developerKey.id}`
   axios
     .put(url, {
-      developer_key: {visible: true}
+      developer_key: {visible: true},
     })
     .then(response => {
       dispatch(actions.listDeveloperKeysReplace(response.data))
@@ -473,7 +473,7 @@ actions.deleteDeveloperKey = developerKey => dispatch => {
 actions.LTI_KEYS_SET_LTI_KEY = 'LTI_KEYS_SET_LTI_KEY'
 actions.ltiKeysSetLtiKey = payload => ({
   type: actions.LTI_KEYS_SET_LTI_KEY,
-  payload
+  payload,
 })
 
 actions.RESET_LTI_STATE = 'RESET_LTI_STATE'
@@ -490,9 +490,9 @@ actions.saveLtiToolConfiguration =
       .post(url, {
         tool_configuration: {
           settings,
-          ...(settings_url ? {settings_url} : {})
+          ...(settings_url ? {settings_url} : {}),
         },
-        developer_key
+        developer_key,
       })
       .then(response => {
         const newKey = response.data.developer_key
@@ -524,14 +524,14 @@ actions.updateLtiKey = (
         notes: developerKey.notes,
         email: developerKey.email,
         scopes: developerKey.scopes,
-        redirect_uris: developerKey.redirect_uris
+        redirect_uris: developerKey.redirect_uris,
       },
       tool_configuration: {
         custom_fields: customFields,
         disabled_placements,
         settings: toolConfiguration,
-        privacy_level: privacyLevel
-      }
+        privacy_level: privacyLevel,
+      },
     })
     .then(data => {
       return data.data

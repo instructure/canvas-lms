@@ -59,31 +59,31 @@ const variants: VariantMap = {
       'DefaultGradebookLearningMastery',
       'IndividualGradebook',
       'Separator',
-      'GradebookHistory'
+      'GradebookHistory',
     ],
     href: courseUrl => `${courseUrl}/gradebook?view=gradebook`,
     key: 'default-gradebook',
-    menuLabel: I18n.t('Gradebook…')
+    menuLabel: I18n.t('Gradebook…'),
   },
   DefaultGradebookLearningMastery: {
     activeLabel: I18n.t('Learning Mastery Grade Book'),
     activeOptions: ['DefaultGradebook', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
     href: courseUrl => `${courseUrl}/gradebook?view=learning_mastery`,
     key: 'learning-mastery',
-    menuLabel: I18n.t('Learning Mastery…')
+    menuLabel: I18n.t('Learning Mastery…'),
   },
   GradebookHistory: {
     activeLabel: I18n.t('Gradebook History'),
     activeOptions: ['DefaultGradebook', 'IndividualGradebook', 'DefaultGradebookLearningMastery'],
     href: courseUrl => `${courseUrl}/gradebook/history`,
     key: 'gradebook-history',
-    menuLabel: I18n.t('Gradebook History…')
+    menuLabel: I18n.t('Gradebook History…'),
   },
   IndividualGradebook: {
     href: courseUrl => `${courseUrl}/gradebook/change_gradebook_version?version=individual`,
     key: 'individual-gradebook',
-    menuLabel: I18n.t('Individual Gradebook…')
-  }
+    menuLabel: I18n.t('Individual Gradebook…'),
+  },
 }
 
 type Props = {

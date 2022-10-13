@@ -34,7 +34,7 @@ export default function AccountsTray({accounts, hasLoaded}) {
         {I18n.t('Admin')}
       </Heading>
       <hr role="presentation" />
-      <List isUnstyled margin="small 0" itemSpacing="small">
+      <List isUnstyled={true} margin="small 0" itemSpacing="small">
         {hasLoaded ? (
           accounts
             .map(account => (
@@ -52,7 +52,7 @@ export default function AccountsTray({accounts, hasLoaded}) {
                 <Link isWithinText={false} href="/accounts">
                   {I18n.t('All Accounts')}
                 </Link>
-              </List.Item>
+              </List.Item>,
             ])
         ) : (
           <List.Item>
@@ -68,12 +68,12 @@ AccountsTray.propTypes = {
   accounts: arrayOf(
     shape({
       id: string.isRequired,
-      name: string.isRequired
+      name: string.isRequired,
     })
   ).isRequired,
-  hasLoaded: bool.isRequired
+  hasLoaded: bool.isRequired,
 }
 
 AccountsTray.defaultProps = {
-  accounts: []
+  accounts: [],
 }

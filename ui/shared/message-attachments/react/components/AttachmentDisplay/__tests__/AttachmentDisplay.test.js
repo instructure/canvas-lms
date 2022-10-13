@@ -25,7 +25,7 @@ const setup = props => {
     <AttachmentDisplay
       attachments={[
         {id: '1', displayName: '1'},
-        {id: '2', displayName: '2'}
+        {id: '2', displayName: '2'},
       ]}
       onReplaceItem={Function.prototype}
       onDeleteItem={Function.prototype}

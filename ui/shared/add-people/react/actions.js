@@ -43,7 +43,7 @@ const actionDefs = [
 
   'ENQUEUE_USERS_TO_BE_ENROLLED', // prepare to enroll validated users
 
-  'RESET' // reset([array of state subsections to reset]) undefined or empty = reset everything
+  'RESET', // reset([array of state subsections to reset]) undefined or empty = reset everything
 ]
 
 export const actionTypes = actionDefs.reduce((types, action) => {

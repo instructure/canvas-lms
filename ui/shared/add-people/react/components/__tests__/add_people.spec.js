@@ -26,25 +26,25 @@ describe('Focus Handling', () => {
       isOpen: true,
       courseParams: {
         roles: [],
-        sections: []
+        sections: [],
       },
       apiState: {
-        isPending: 0
+        isPending: 0,
       },
       inputParams: {
-        nameList: ''
+        nameList: '',
       },
       validateUsers() {},
       enrollUsers() {},
-      reset() {}
+      reset() {},
     }
 
     const wrapper = mount(<AddPeople {...props} />)
 
     wrapper.setProps({
       apiState: {
-        error: 'Some random error'
-      }
+        error: 'Some random error',
+      },
     })
 
     expect(document.activeElement.textContent).toEqual('Cancel')
@@ -55,32 +55,32 @@ describe('Focus Handling', () => {
       isOpen: true,
       courseParams: {
         roles: [],
-        sections: []
+        sections: [],
       },
       apiState: {
-        isPending: 0
+        isPending: 0,
       },
       inputParams: {
         nameList: '',
         searchType: 'unique_id',
         role: 'student',
-        section: '1'
+        section: '1',
       },
       userValidationResult: {
         missing: {
-          'gotta have': 'something missing'
+          'gotta have': 'something missing',
         },
-        duplicates: {}
+        duplicates: {},
       },
       validateUsers() {},
       enrollUsers() {},
-      reset() {}
+      reset() {},
     }
 
     const wrapper = mount(<AddPeople {...props} />)
 
     wrapper.setState({
-      currentPage: 'peoplevalidationissues'
+      currentPage: 'peoplevalidationissues',
     })
 
     expect(document.activeElement.textContent).toEqual('Cancel')

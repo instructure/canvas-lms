@@ -24,7 +24,8 @@ import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {TextInput} from '@instructure/ui-text-input'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Text} from '@instructure/ui-text'
+import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('add_people_missing_people_section')
 
@@ -37,23 +38,31 @@ function eatEvent(event) {
   event.preventDefault()
 }
 
+function AddName({address, namePrompt, onClick, theme}) {
+  return (
+    <Link data-address={address} isWithinText={false} as="button" onClick={onClick} theme={theme}>
+      <Text>{namePrompt}</Text>
+    </Link>
+  )
+}
+
 class MissingPeopleSection extends React.Component {
   static propTypes = {
     missing: PropTypes.shape(missingsShape).isRequired,
     searchType: PropTypes.string.isRequired,
     inviteUsersURL: PropTypes.string,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    inviteUsersURL: undefined
+    inviteUsersURL: undefined,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
-      selectAll: false
+      selectAll: false,
     }
     this.tbodyNode = React.createRef()
   }
@@ -96,7 +105,7 @@ class MissingPeopleSection extends React.Component {
     }
     const newUserInfo = {
       name: (missingUser.newUserInfo && missingUser.newUserInfo.name) || '',
-      email: (missingUser.newUserInfo && missingUser.newUserInfo.email) || defaultEmail
+      email: (missingUser.newUserInfo && missingUser.newUserInfo.email) || defaultEmail,
     }
 
     if (typeof this.props.onChange === 'function') {
@@ -168,12 +177,12 @@ class MissingPeopleSection extends React.Component {
             <Table.Cell>
               <Checkbox
                 value={missing.address}
-                checked
+                checked={true}
                 onChange={this.onUncheckUser}
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Check to skip adding a user for %{loginid}', {
-                      loginid: missing.address
+                      loginid: missing.address,
                     })}
                   </ScreenReaderContent>
                 }
@@ -181,7 +190,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}
@@ -193,7 +202,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="email"
                 type="email"
                 placeholder={emailLabel}
@@ -222,9 +231,11 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell colSpan="2">
-              <CondensedButton onClick={this.onSelectNewForMissing} data-address={missing.address}>
-                {namePrompt}
-              </CondensedButton>
+              <AddName
+                address={missing.address}
+                namePrompt={namePrompt}
+                onClick={this.onSelectNewForMissing}
+              />
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>
@@ -255,12 +266,12 @@ class MissingPeopleSection extends React.Component {
             <Table.Cell>
               <Checkbox
                 value={missing.address}
-                checked
+                checked={true}
                 onChange={this.onUncheckUser}
                 label={
                   <ScreenReaderContent>
                     {I18n.t('Check to skip adding a user for %{loginid}', {
-                      loginid: missing.address
+                      loginid: missing.address,
                     })}
                   </ScreenReaderContent>
                 }
@@ -268,7 +279,7 @@ class MissingPeopleSection extends React.Component {
             </Table.Cell>
             <Table.Cell>
               <TextInput
-                isRequired
+                isRequired={true}
                 name="name"
                 type="text"
                 placeholder={nameLabel}
@@ -297,13 +308,12 @@ class MissingPeopleSection extends React.Component {
               />
             </Table.Cell>
             <Table.Cell>
-              <CondensedButton
+              <AddName
+                address={missing.address}
+                namePrompt={namePrompt}
                 onClick={this.onSelectNewForMissing}
-                data-address={missing.address}
                 theme={{mediumPaddingHorizontal: '0', mediumHeight: 'normal'}}
-              >
-                {namePrompt}
-              </CondensedButton>
+              />
             </Table.Cell>
             <Table.RowHeader>{missing.address}</Table.RowHeader>
           </Table.Row>

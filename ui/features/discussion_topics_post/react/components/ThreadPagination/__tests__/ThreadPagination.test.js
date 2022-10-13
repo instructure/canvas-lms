@@ -24,7 +24,7 @@ const defaultProps = overrides => ({
   setPage: jest.fn(),
   selectedPage: 1,
   totalPages: 10,
-  ...overrides
+  ...overrides,
 })
 
 describe('ThreadPagination', () => {

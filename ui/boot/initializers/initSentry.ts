@@ -54,8 +54,8 @@ export function initSentry() {
 
       initialScope: {
         tags: {k12: ENV.k12, k5_user: ENV.K5_USER, student_user: ENV.current_user_is_student},
-        user: {id: ENV.current_user_global_id}
-      }
+        user: {id: ENV.current_user_global_id},
+      },
     })
 
     if (sentrySettings.normalized_route)

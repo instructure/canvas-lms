@@ -35,7 +35,7 @@ export default class QuestionFlagged extends EventTracker {
 
       return deliver({
         flagged: isFlagged,
-        questionId
+        questionId,
       })
     })
   }
@@ -44,5 +44,5 @@ QuestionFlagged.prototype.eventType = K.EVT_QUESTION_FLAGGED
 QuestionFlagged.prototype.options = {
   buttonSelector: '.flag_question',
   questionSelector: '.question',
-  questionMarkedClass: 'marked'
+  questionMarkedClass: 'marked',
 }

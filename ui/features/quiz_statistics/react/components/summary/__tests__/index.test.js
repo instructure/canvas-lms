@@ -16,21 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import Summary from '../index'
 import QuizReports from '../../../../__tests__/fixtures/quiz_reports.json'
 
 describe('canvas_quizzes/statistics/views/summary', () => {
   it('renders', () => {
-    render(
-      <Summary quizReports={QuizReports.quiz_reports} />
-    )
+    render(<Summary quizReports={QuizReports.quiz_reports} />)
   })
 
   it('renders in loading state', () => {
-    render(
-      <Summary loading />
-    )
+    render(<Summary loading={true} />)
   })
 })

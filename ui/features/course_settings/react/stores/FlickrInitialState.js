@@ -20,7 +20,7 @@ const FlickrInitialState = {
   searching: false,
   searchResults: [],
   searchTerm: '',
-  page: 1
+  page: 1,
 }
 
 export default FlickrInitialState

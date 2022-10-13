@@ -30,23 +30,23 @@ const HomeTray = () => (
     image="/images/tutorial-tray-images/Panda_Home.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the Course Home Page as an instructor?'),
-        href: I18n.t('#community.instructor_use_course_homepage')
+        href: I18n.t('#community.instructor_use_course_homepage'),
       },
       {
         label: I18n.t(
           'What layout options are available in the Course Home Page as an instructor?'
         ),
-        href: I18n.t('#community.instructor_homepage_layout_options')
+        href: I18n.t('#community.instructor_homepage_layout_options'),
       },
       {
         label: I18n.t('How do I change the Course Home Page?'),
-        href: I18n.t('#community.instructor_change_course_home')
-      }
+        href: I18n.t('#community.instructor_change_course_home'),
+      },
     ]}
   >
     {I18n.t(`The Course Home Page is the first page students see when they open

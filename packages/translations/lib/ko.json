@@ -5,6 +5,9 @@
     "all_4321c3a1": {
         "message": "전부"
     },
+    "alpha_15d59033": {
+        "message": "알파"
+    },
     "announcement_fb4cb645": {
         "message": "공지 사항"
     },
@@ -89,9 +92,6 @@
     "date_ee500367": {
         "message": "날짜"
     },
-    "decrease_indent_de6343ab": {
-        "message": "들여쓰기 축소"
-    },
     "delete_a6efa79d": {
         "message": "삭제"
     },
@@ -128,9 +128,6 @@
     "embed_image_1080badc": {
         "message": "이미지 포함"
     },
-    "external_links_3d9f074e": {
-        "message": "외부 링크"
-    },
     "external_tools_6e77821": {
         "message": "외부도구"
     },
@@ -161,14 +158,14 @@
     "home_351838cd": {
         "message": "홈"
     },
+    "icon_215a1dc6": {
+        "message": "아이콘"
+    },
     "image_8ad06": {
         "message": "이미지"
     },
     "images_7ce26570": {
         "message": "이미지"
-    },
-    "increase_indent_6d550a4a": {
-        "message": "들여쓰기 확대"
     },
     "insert_593145ef": {
         "message": "삽입"
@@ -205,9 +202,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "더 로드"
-    },
-    "load_more_results_460f49a9": {
-        "message": "Load more results"
     },
     "loading_25990131": {
         "message": "로드하는 중..."
@@ -292,6 +286,9 @@
     },
     "relationships_6602af70": {
         "message": "관계"
+    },
+    "reset_95a81614": {
+        "message": "원래대로"
     },
     "save_11a80ec3": {
         "message": "저장"

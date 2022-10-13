@@ -34,7 +34,7 @@ export default class WikiPageRevisionsCollection extends PaginatedCollection {
       const collection = this
       const {parentModel} = collection
 
-      function setupModel(model) {
+      const setupModel = model => {
         model.page = parentModel
         model.pageUrl = parentModel.get('url')
         model.contextAssetString = parentModel.contextAssetString
@@ -43,7 +43,7 @@ export default class WikiPageRevisionsCollection extends PaginatedCollection {
         }
       }
 
-      this.on('reset', models => models.each(setupModel))
+      this.on('reset', models_ => models_.each(setupModel))
       this.on('add', model => setupModel(model))
     }
   }

@@ -25,7 +25,7 @@ describe('SimilarityPledge', () => {
     const onChange = jest.fn()
 
     const {getByRole} = render(
-      <SimilarityPledge checked eulaUrl="http://some.url" onChange={onChange} />
+      <SimilarityPledge checked={true} eulaUrl="http://some.url" onChange={onChange} />
     )
     const checkbox = getByRole('checkbox', {name: /I agree/})
     act(() => {
@@ -40,7 +40,7 @@ describe('SimilarityPledge', () => {
 
     const {getByTestId} = render(
       <SimilarityPledge
-        checked
+        checked={true}
         comments={comments}
         eulaUrl="http://some.url"
         onChange={jest.fn()}
@@ -55,7 +55,7 @@ describe('SimilarityPledge', () => {
 
   it('includes a link to the supplied eulaUrl when one is provided', () => {
     const {getByRole} = render(
-      <SimilarityPledge checked eulaUrl="http://some.url/" onChange={jest.fn()} />
+      <SimilarityPledge checked={true} eulaUrl="http://some.url/" onChange={jest.fn()} />
     )
 
     const eulaLink = getByRole('link', {name: 'End-User License Agreement'})
@@ -64,7 +64,11 @@ describe('SimilarityPledge', () => {
 
   it('renders the value of pledgeText as the checkbox label when no eulaUrl is given', () => {
     const {getByLabelText} = render(
-      <SimilarityPledge checked pledgeText="a grave and solemn pledge" onChange={jest.fn()} />
+      <SimilarityPledge
+        checked={true}
+        pledgeText="a grave and solemn pledge"
+        onChange={jest.fn()}
+      />
     )
 
     const checkbox = getByLabelText('a grave and solemn pledge')
@@ -74,7 +78,7 @@ describe('SimilarityPledge', () => {
   it('renders the eulaUrl when both eulaUrl and pledgeText are provided', () => {
     const {getByLabelText} = render(
       <SimilarityPledge
-        checked
+        checked={true}
         eulaUrl="http://some.url"
         pledgeText="a grave and solemn pledge"
         onChange={jest.fn()}
@@ -87,7 +91,7 @@ describe('SimilarityPledge', () => {
   it('renders the pledgeText when both eulaUrl and pledgeText are provided', () => {
     const {getByLabelText} = render(
       <SimilarityPledge
-        checked
+        checked={true}
         eulaUrl="http://some.url"
         pledgeText="a grave and solemn pledge"
         onChange={jest.fn()}
@@ -99,7 +103,7 @@ describe('SimilarityPledge', () => {
 
   it('checks the checkbox if "checked" is true', () => {
     const {getByLabelText} = render(
-      <SimilarityPledge checked onChange={jest.fn()} pledgeText="a grave and solemn oath" />
+      <SimilarityPledge checked={true} onChange={jest.fn()} pledgeText="a grave and solemn oath" />
     )
 
     const checkbox = getByLabelText('a grave and solemn oath')

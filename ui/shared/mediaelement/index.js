@@ -35,14 +35,18 @@ import 'mediaelement/src/js/mep-feature-sourcechooser'
 import 'mediaelement/build/mediaelementplayer.min.css'
 import '../../../app/stylesheets/base/_custom_mediaelementplayer.css'
 
-
 // Our custom monkeypatches to MediaElement plguins:
 
 import './mep-feature-tracks-instructure'
 
 // only show the source chooser for <video>s, not for <audio>.
 const orginalBuildsourcechooser = window.MediaElementPlayer.prototype.buildsourcechooser
-window.MediaElementPlayer.prototype.buildsourcechooser = function(player, _controls, _layers, _media) {
+window.MediaElementPlayer.prototype.buildsourcechooser = function (
+  player,
+  _controls,
+  _layers,
+  _media
+) {
   if (!player.isVideo) return
   return orginalBuildsourcechooser.apply(this, arguments)
 }
@@ -50,16 +54,15 @@ window.MediaElementPlayer.prototype.buildsourcechooser = function(player, _contr
 // INSTRUCTURE CUSTOMIZATION: add 0.50x playback speed option
 window.mejs.MepDefaults.speeds.push('0.50')
 
-
 // Tell mediaelementJS to use strings for the user's locale.
 // when we start doing locale-specific webpack builds,
 // change window.ENV.LOCALE to process.env.BUILD_LOCALE
-import(`mediaelement/build/lang/me-i18n-locale-${window.ENV.LOCALE}`).then(strings => {
-  if (strings) window.mejs.i18n.locale.language = window.ENV.LOCALE
-}).catch(() => {
-  // medialementjs doesn't have strings for this locale
-})
-
-
+import(`mediaelement/build/lang/me-i18n-locale-${window.ENV.LOCALE}`)
+  .then(strings => {
+    if (strings) window.mejs.i18n.locale.language = window.ENV.LOCALE
+  })
+  .catch(() => {
+    // medialementjs doesn't have strings for this locale
+  })
 
 export default window.mejs

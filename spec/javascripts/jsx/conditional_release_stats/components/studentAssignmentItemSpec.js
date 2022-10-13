@@ -30,10 +30,10 @@ const defaultProps = () => ({
     name: 'hello world',
     grading_type: 'percent',
     points_possible: 100,
-    submission_types: ['online_text_entry']
+    submission_types: ['online_text_entry'],
   },
   trend: 0,
-  score: 0.8
+  score: 0.8,
 })
 
 test('renders assignment item correctly', () => {

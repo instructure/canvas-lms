@@ -28,7 +28,7 @@ export default function UserLink({size, avatar_url, name, avatarName, ...propsTo
         name={avatarName}
         src={avatar_url}
         margin="0 x-small xxx-small 0"
-        data-fs-exclude
+        data-fs-exclude={true}
       />
       {name}
     </Link>
@@ -40,5 +40,5 @@ UserLink.propTypes = {
   href: Link.propTypes.href,
   name: Avatar.propTypes.name,
   avatarName: Avatar.propTypes.name,
-  avatar_url: Avatar.propTypes.src
+  avatar_url: Avatar.propTypes.src,
 }

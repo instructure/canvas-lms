@@ -32,10 +32,10 @@ QUnit.module('DueDateAddRowButton with true display prop', {
   },
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateAddRowButton).parentNode)
-  }
+  },
 })
 
-test('renders a button', function() {
+test('renders a button', function () {
   ok(this.DueDateAddRowButton)
   ok(this.DueDateAddRowButton.refs.addButton)
 })
@@ -53,10 +53,10 @@ QUnit.module('DueDateAddRowButton with false display prop', {
     if (ReactDOM.findDOMNode(this.DueDateAddRowButton)) {
       ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.DueDateAddRowButton).parentNode)
     }
-  }
+  },
 })
 
-test('does not render a button', function() {
+test('does not render a button', function () {
   ok(this.DueDateAddRowButton)
   ok(!this.DueDateAddRowButton.refs.addButton)
 })

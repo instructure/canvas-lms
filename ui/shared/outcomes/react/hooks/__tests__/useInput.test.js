@@ -22,8 +22,8 @@ import useInput from '../useInput'
 describe('useInput', () => {
   const event = {
     target: {
-      value: '1'
-    }
+      value: '1',
+    },
   }
 
   test('should create custom hook with initial state', () => {

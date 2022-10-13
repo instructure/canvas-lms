@@ -21,7 +21,7 @@ module.exports = {
   name: 'nn_NO',
   day: {
     abbrev: ['sø.', 'må.', 'ty.', 'on.', 'to.', 'fr.', 'la.'],
-    full: ['sundag', 'måndag', 'tysdag', 'onsdag', 'torsdag', 'fredag', 'laurdag']
+    full: ['sundag', 'måndag', 'tysdag', 'onsdag', 'torsdag', 'fredag', 'laurdag'],
   },
   month: {
     abbrev: [
@@ -36,7 +36,7 @@ module.exports = {
       'sep.',
       'okt.',
       'nov.',
-      'des.'
+      'des.',
     ],
     full: [
       'januar',
@@ -50,13 +50,13 @@ module.exports = {
       'september',
       'oktober',
       'november',
-      'desember'
-    ]
+      'desember',
+    ],
   },
   meridiem: ['', ''],
   date: '%Y-%m-%d',
   time24: 'kl. %H.%M %z',
   dateTime: '%b %-d at %l:%M%P',
   time12: '',
-  full: '%b %-d, %Y %-l:%M%P'
+  full: '%b %-d, %Y %-l:%M%P',
 }

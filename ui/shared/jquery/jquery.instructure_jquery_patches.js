@@ -33,7 +33,7 @@ $.attrHooks.method = $.extend($.attrHooks.method, {
     }
     elem.setAttribute('method', value)
     return value
-  }
+  },
 })
 
 $.fn.originalScrollTop = $.fn.scrollTop

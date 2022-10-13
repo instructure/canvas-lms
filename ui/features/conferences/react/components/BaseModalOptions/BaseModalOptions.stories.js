@@ -23,7 +23,7 @@ import BaseModalOptions from './BaseModalOptions'
 export default {
   title: 'Examples/Conferences/BaseModalOptions',
   component: BaseModalOptions,
-  argTypes: {}
+  argTypes: {},
 }
 
 const defaultProps = {
@@ -36,7 +36,7 @@ const defaultProps = {
   description: 'First conference of all time',
   setDescription: () => {},
   invitationOptions: ['invite_all'],
-  setInvitationOptions: () => {}
+  setInvitationOptions: () => {},
 }
 
 const Template = props => (

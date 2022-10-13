@@ -29,7 +29,7 @@ export default function CommentLibrary({
   setFocusToTextArea,
   userId,
   commentAreaText,
-  suggestionsRef
+  suggestionsRef,
 }) {
   return (
     <ApolloProvider client={client}>
@@ -51,5 +51,5 @@ CommentLibrary.propTypes = {
   setFocusToTextArea: PropTypes.func.isRequired,
   userId: PropTypes.string.isRequired,
   commentAreaText: PropTypes.string.isRequired,
-  suggestionsRef: PropTypes.object
+  suggestionsRef: PropTypes.object,
 }

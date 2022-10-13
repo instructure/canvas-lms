@@ -17,25 +17,25 @@
  */
 
 import $ from 'jquery'
-import SectionMenuView from 'ui/features/learning_mastery/backbone/views/SectionMenuView.js'
+import SectionMenuView from 'ui/features/learning_mastery/backbone/views/SectionMenuView'
 import 'jquery-tinypubsub'
 
 const sections = [
   {
     id: 1,
     name: 'Section One',
-    checked: true
+    checked: true,
   },
   {
     id: 2,
     name: 'Section Two',
-    checked: false
-  }
+    checked: false,
+  },
 ]
 const course = {
   id: 1,
   name: 'Course One',
-  checked: false
+  checked: false,
 }
 const currentSection = 1
 
@@ -44,17 +44,17 @@ QUnit.module('gradebook/SectionMenuView', {
     this.view = new SectionMenuView({
       sections,
       currentSection,
-      course
+      course,
     })
     this.view.render()
     return this.view.$el.appendTo('#fixtures')
   },
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
-test('it renders a button', function() {
+test('it renders a button', function () {
   ok(this.view.$el.find('button').length, 'button displays')
   ok(
     this.view.$el
@@ -65,7 +65,7 @@ test('it renders a button', function() {
   )
 })
 
-test('it displays given sections', function() {
+test('it displays given sections', function () {
   const clock = sinon.useFakeTimers()
   this.view.$el.find('button').click()
   clock.tick(101)
@@ -76,15 +76,13 @@ test('it displays given sections', function() {
   return clock.restore()
 })
 
-test('it changes sections', function() {
+test('it changes sections', function () {
   this.view.$el.find('button').click()
-  $('input[value=2]')
-    .parent()
-    .click()
+  $('input[value=2]').parent().click()
   ok(this.view.currentSection === '2', 'updates its section')
 })
 
-test('it publishes changes', function(assert) {
+test('it publishes changes', function (assert) {
   const start = assert.async()
   assert.expect(1)
   $.subscribe('currentSection/change', section => {
@@ -92,8 +90,6 @@ test('it publishes changes', function(assert) {
     return start()
   })
   this.view.$el.find('button').click()
-  $('input[value=2]')
-    .parent()
-    .click()
+  $('input[value=2]').parent().click()
   return $.unsubscribe('currentSection/change')
 })

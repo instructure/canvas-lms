@@ -84,6 +84,10 @@ export function extractStudentIdFromHash(hashString: string, anonymizableStudent
 export const configureRecognition = (recognition, messages) => {
   recognition.continuous = true
   recognition.interimResults = true
+  const lang = window.navigator.language || ENV.LOCALE || ENV.BIGEASY_LOCALE
+  if (lang) {
+    recognition.lang = lang
+  }
   let final_transcript = ''
 
   recognition.onstart = function () {
@@ -159,7 +163,7 @@ export function initKeyCodes($window, $grade, $add_a_comment_textarea, EG) {
   }
   const keycodeOptions = {
     keyCodes: 'j k p n c r g',
-    ignore: 'input, textarea, embed, object'
+    ignore: 'input, textarea, embed, object',
   }
   $window.keycodes(keycodeOptions, event => {
     event.preventDefault()

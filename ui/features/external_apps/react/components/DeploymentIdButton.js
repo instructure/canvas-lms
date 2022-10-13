@@ -27,11 +27,11 @@ const I18n = useI18nScope('external_tools')
 export default class DeploymentIdButton extends React.Component {
   static propTypes = {
     tool: PropTypes.shape({name: PropTypes.string, deployment_id: PropTypes.string}).isRequired,
-    returnFocus: PropTypes.func.isRequired
+    returnFocus: PropTypes.func.isRequired,
   }
 
   state = {
-    modalIsOpen: false
+    modalIsOpen: false,
   }
 
   openModal = e => {

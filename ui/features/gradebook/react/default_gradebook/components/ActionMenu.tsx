@@ -191,7 +191,7 @@ class ActionMenu extends React.Component<ActionMenuProps, ActionMenuState> {
 
     const previousExport = {
       label: `${I18n.t('New Export')} (${DateHelper.formatDatetimeForDisplay(updatedAt)})`,
-      attachmentUrl
+      attachmentUrl,
     }
 
     this.setState({previousExport})

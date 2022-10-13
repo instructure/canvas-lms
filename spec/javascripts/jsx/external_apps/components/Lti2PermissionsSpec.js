@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import Lti2Permissions from 'ui/features/external_apps/react/components/Lti2Permissions.js'
+import Lti2Permissions from 'ui/features/external_apps/react/components/Lti2Permissions'
 
 QUnit.module('ExternalApps.Lti2Permissions')
 
@@ -32,7 +32,7 @@ test('renders', () => {
           description: null,
           enabled: false,
           installed_locally: true,
-          name: 'Twitter'
+          name: 'Twitter',
         }}
         handleCancelLti2={() => {}}
         handleActivateLti2={() => {}}

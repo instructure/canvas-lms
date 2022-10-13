@@ -31,7 +31,7 @@ export default class DiscussionFilterState extends Model {
     this.set({
       unread: false,
       query: null,
-      collapsed: false
+      collapsed: false,
     })
     return this.trigger('reset')
   }
@@ -39,5 +39,5 @@ export default class DiscussionFilterState extends Model {
 DiscussionFilterState.prototype.defaults = {
   unread: false,
   query: null,
-  collapsed: false
+  collapsed: false,
 }

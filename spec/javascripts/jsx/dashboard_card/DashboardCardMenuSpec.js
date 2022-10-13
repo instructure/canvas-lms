@@ -29,9 +29,9 @@ const defaultProps = () => ({
     nickname: 'foos',
     originalName: 'foosball',
     courseId: '1',
-    onNicknameChange: () => {}
+    onNicknameChange: () => {},
   },
-  applicationElement: () => document.getElementById('fixtures')
+  applicationElement: () => document.getElementById('fixtures'),
 })
 
 const defaultMovementMenuProps = () => ({
@@ -39,8 +39,8 @@ const defaultMovementMenuProps = () => ({
     canMoveLeft: false,
     canMoveRight: true,
     canMoveToBeginning: false,
-    canMoveToEnd: true
-  }
+    canMoveToEnd: true,
+  },
 })
 
 const getTabWithText = text => {
@@ -55,10 +55,10 @@ QUnit.module('DashboardCardMenu - reordering', {
 
   teardown() {
     this.wrapper.unmount()
-  }
+  },
 })
 
-test('it should render a tabList with colorpicker and movement menu', function(assert) {
+test('it should render a tabList with colorpicker and movement menu', function (assert) {
   const done = assert.async()
 
   const handleShow = () => {
@@ -74,7 +74,7 @@ test('it should render a tabList with colorpicker and movement menu', function(a
   })
 })
 
-test('it should close the popover on close button click', function(assert) {
+test('it should close the popover on close button click', function (assert) {
   const done = assert.async()
 
   let popoverContent
@@ -93,7 +93,7 @@ test('it should close the popover on close button click', function(assert) {
   })
 })
 
-test('it should close the popover on color picker close', function(assert) {
+test('it should close the popover on color picker close', function (assert) {
   const done = assert.async()
 
   let popoverContent
@@ -112,7 +112,7 @@ test('it should close the popover on color picker close', function(assert) {
   })
 })
 
-test('it should close the popover on movement menu option select', function(assert) {
+test('it should close the popover on movement menu option select', function (assert) {
   const done = assert.async()
 
   let popoverContent

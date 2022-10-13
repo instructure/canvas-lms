@@ -32,7 +32,7 @@ const LEADING_SLASH_TILL_BUT_NOT_INCLUDING_NEXT_SLASH = /^\/[^\/]*/
 export default {
   displayName: 'ShowFolder',
 
-  debouncedForceUpdate: _.debounce(function() {
+  debouncedForceUpdate: _.debounce(function () {
     if (this.isMounted()) this.forceUpdate()
   }, 0),
 
@@ -68,7 +68,7 @@ export default {
         this.props.onResolvePath({
           currentFolder,
           rootTillCurrentFolder,
-          showingSearchResults: false
+          showingSearchResults: false,
         })
 
         return [currentFolder.folders, currentFolder.files].forEach(collection => {
@@ -144,5 +144,5 @@ export default {
 
       return setTimeout(() => page(`${filesEnv.baseUrl}?${$.param(this.props.query)}`), 0)
     }
-  }
+  },
 }

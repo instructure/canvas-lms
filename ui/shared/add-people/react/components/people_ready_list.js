@@ -30,13 +30,13 @@ class PeopleReadyList extends React.Component {
   static propTypes = {
     nameList: PropTypes.arrayOf(PropTypes.shape(personReadyToEnrollShape)),
     defaultInstitutionName: PropTypes.string,
-    canReadSIS: PropTypes.bool
+    canReadSIS: PropTypes.bool,
   }
 
   static defaultProps = {
     nameList: [],
     defaultInstitutionName: '',
-    canReadSIS: true
+    canReadSIS: true,
   }
 
   renderNotice() {

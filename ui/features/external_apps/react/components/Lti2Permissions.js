@@ -25,7 +25,7 @@ const I18n = useI18nScope('external_tools')
 
 export default function Lti2Permissions(props) {
   const p1 = I18n.t('*name* has been successfully installed but has not yet been enabled.', {
-    wrappers: [`<strong>${htmlEscape(props.tool.name)}</strong>`]
+    wrappers: [`<strong>${htmlEscape(props.tool.name)}</strong>`],
   })
   return (
     <div className="Lti2Permissions">
@@ -54,5 +54,5 @@ export default function Lti2Permissions(props) {
 Lti2Permissions.propTypes = {
   tool: PropTypes.object.isRequired,
   handleCancelLti2: PropTypes.func.isRequired,
-  handleActivateLti2: PropTypes.func.isRequired
+  handleActivateLti2: PropTypes.func.isRequired,
 }

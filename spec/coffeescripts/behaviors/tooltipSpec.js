@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import tooltip from '../../../ui/boot/initializers/activateTooltips.js'
+import tooltip from '../../../ui/boot/initializers/activateTooltips'
 
 QUnit.module('tooltip')
 
@@ -26,7 +26,7 @@ test('provides a position hash for a cardinal direction', () => {
   const expected = {
     my: 'center top',
     at: 'center bottom+5',
-    collision: 'flipfit'
+    collision: 'flipfit',
   }
   equal(opts.position.my, expected.my)
   equal(opts.position.at, expected.at)
@@ -36,7 +36,7 @@ test('provides a position hash for a cardinal direction', () => {
 test('can be compelled to abandon collision detection', () => {
   const opts = {
     position: 'bottom',
-    force_position: 'true'
+    force_position: 'true',
   }
   tooltip.setPosition(opts)
   equal(opts.position.collision, 'none')

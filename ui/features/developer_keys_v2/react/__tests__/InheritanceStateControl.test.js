@@ -28,7 +28,7 @@ import storeCreator from '../store/store'
 const sampleDeveloperKey = (defaults = {}) => {
   return _.merge(_.clone(defaults), {
     id: '1',
-    workflow_state: 'on'
+    workflow_state: 'on',
   })
 }
 
@@ -36,19 +36,19 @@ const getProps = (developerKey, store = false) => {
   if (!store) {
     store = storeCreator({
       listDeveloperKeys: {
-        list: [developerKey]
-      }
+        list: [developerKey],
+      },
     })
   }
   return {
     developerKey,
     ctx: {
       params: {
-        contextId: '1'
-      }
+        contextId: '1',
+      },
     },
     store,
-    actions
+    actions,
   }
 }
 
@@ -68,8 +68,8 @@ describe('InheritanceStateControl', () => {
       developer_key_account_binding: {
         developer_key_id: '1',
         workflow_state: 'off',
-        account_owns_binding: true
-      }
+        account_owns_binding: true,
+      },
     })
     const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
     const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
@@ -81,8 +81,8 @@ describe('InheritanceStateControl', () => {
       developer_key_account_binding: {
         developer_key_id: '1',
         workflow_state: 'on',
-        account_owns_binding: true
-      }
+        account_owns_binding: true,
+      },
     })
     const wrapper = mount(<InheritanceStateControl {...getProps(key)} />)
     const checkedBtn = wrapper.find('input[checked=true]').getDOMNode()
@@ -103,13 +103,13 @@ describe('InheritanceStateControl', () => {
       developer_key_account_binding: {
         developer_key_id: '1',
         workflow_state: 'on',
-        account_owns_binding: true
-      }
+        account_owns_binding: true,
+      },
     })
     const store = storeCreator({
       listDeveloperKeys: {
-        list: [key]
-      }
+        list: [key],
+      },
     })
 
     render(<InheritanceStateControl {...getProps(key, store)} />)
@@ -127,13 +127,13 @@ describe('InheritanceStateControl', () => {
       developer_key_account_binding: {
         developer_key_id: '1',
         workflow_state: 'on',
-        account_owns_binding: true
-      }
+        account_owns_binding: true,
+      },
     })
     const store = storeCreator({
       listDeveloperKeys: {
-        list: [key]
-      }
+        list: [key],
+      },
     })
 
     render(<InheritanceStateControl {...getProps(key, store)} />)
@@ -146,14 +146,14 @@ describe('InheritanceStateControl', () => {
 
   const rootAccountCTX = {
     params: {
-      contextId: '1'
-    }
+      contextId: '1',
+    },
   }
 
   const siteAdminCTX = {
     params: {
-      contextId: 'site_admin'
-    }
+      contextId: 'site_admin',
+    },
   }
 
   function mockDevKey(workflowState, isOwnedByAccount, inheritedTo) {
@@ -161,9 +161,9 @@ describe('InheritanceStateControl', () => {
       id: '10000000000123',
       developer_key_account_binding: {
         workflow_state: workflowState || 'off',
-        account_owns_binding: isOwnedByAccount || false
+        account_owns_binding: isOwnedByAccount || false,
       },
-      inherited_to: inheritedTo
+      inherited_to: inheritedTo,
     }
   }
 

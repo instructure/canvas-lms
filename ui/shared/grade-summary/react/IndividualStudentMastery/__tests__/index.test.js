@@ -32,7 +32,7 @@ beforeEach(() => {
 const props = {
   studentId: 12,
   courseId: 110,
-  onExpansionChange: jest.fn()
+  onExpansionChange: jest.fn(),
 }
 
 it('renders the component', () => {
@@ -61,7 +61,7 @@ it('renders outcome groups if they are returned', async () => {
   fetchOutcomes.mockImplementation(() =>
     Promise.resolve({
       outcomeGroups: [{id: 1, title: 'Group'}],
-      outcomes: []
+      outcomes: [],
     })
   )
   const {findByText} = render(<IndividualStudentMastery {...props} />)
@@ -85,9 +85,9 @@ describe('expand and contract', () => {
             calculation_method: 'highest',
             assignments: [],
             results: [],
-            ratings: []
-          }
-        ]
+            ratings: [],
+          },
+        ],
       })
     )
   })
@@ -99,9 +99,9 @@ describe('expand and contract', () => {
           {id: 1, title: 'ZZ Top Albums'},
           {id: 2, title: 'Aerosmith Albums'},
           {id: 3, title: 'Aardvark Albums'},
-          {id: 4, title: 'abba Albums'}
+          {id: 4, title: 'abba Albums'},
         ],
-        outcomes: []
+        outcomes: [],
       })
     )
     const {findAllByRole} = render(<IndividualStudentMastery {...props} />)

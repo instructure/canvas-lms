@@ -47,7 +47,7 @@ describe('shouldUseFeature()', () => {
     describe('and the buttons & icons (icon maker) feature flag is on', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
-          buttons_and_icons_root_account: true
+          buttons_and_icons_root_account: true,
         }
       })
 
@@ -82,7 +82,7 @@ describe('shouldUseFeature()', () => {
     describe('and the buttons & icons (icon maker) feature flag is off', () => {
       beforeEach(() => {
         windowEnv.FEATURES = {
-          buttons_and_icons_root_account: true
+          buttons_and_icons_root_account: true,
         }
       })
 

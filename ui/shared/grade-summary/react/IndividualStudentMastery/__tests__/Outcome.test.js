@@ -29,10 +29,10 @@ const result = ({id = 1, date = new Date(), hide_points = false}, assignmentOver
     name: 'My alignment',
     submission_types: '',
     score: 0,
-    ...assignmentOverrides
+    ...assignmentOverrides,
   },
   hide_points,
-  submitted_or_assessed_at: date.toISOString()
+  submitted_or_assessed_at: date.toISOString(),
 })
 
 const time1 = new Date(Date.UTC(2018, 1, 1, 7, 1, 0)).toISOString()
@@ -47,8 +47,8 @@ const defaultProps = (props = {}) => ({
         learning_outcome_id: 1,
         submission_types: 'online_quiz',
         name: 'My assignment',
-        html_url: 'www.example.com'
-      }
+        html_url: 'www.example.com',
+      },
     ],
     expansionId: 100,
     mastered: false,
@@ -66,9 +66,9 @@ const defaultProps = (props = {}) => ({
           html_url: 'http://foo',
           name: 'My assignment',
           submission_types: 'online_quiz',
-          score: 0
+          score: 0,
         },
-        submitted_or_assessed_at: time1
+        submitted_or_assessed_at: time1,
       },
       {
         id: 2,
@@ -79,21 +79,21 @@ const defaultProps = (props = {}) => ({
           name: 'My assessment',
           html_url: 'http://bar',
           submission_types: 'magic_marker',
-          score: 0
+          score: 0,
         },
-        submitted_or_assessed_at: time2
-      }
+        submitted_or_assessed_at: time2,
+      },
     ],
     title: 'My outcome',
-    score: 1
+    score: 1,
   },
   expanded: false,
   onExpansionChange: () => {},
-  ...props
+  ...props,
 })
 
 it('renders correctly expanded', () => {
-  const {getByText, getByRole} = render(<Outcome {...defaultProps()} expanded />)
+  const {getByText, getByRole} = render(<Outcome {...defaultProps()} expanded={true} />)
   expect(getByText('My outcome')).not.toBeNull()
   expect(getByRole('list')).not.toBeNull()
 })
@@ -101,7 +101,7 @@ it('renders correctly expanded', () => {
 it('renders correctly expanded with no results', () => {
   const props = defaultProps()
   props.outcome.results = []
-  const {getByText} = render(<Outcome {...props} expanded />)
+  const {getByText} = render(<Outcome {...props} expanded={true} />)
   expect(getByText(/Not yet assessed/)).not.toBeNull()
 })
 
@@ -109,7 +109,7 @@ it('renders correctly expanded with no results or assignments', () => {
   const props = defaultProps()
   props.outcome.results = []
   props.outcome.assignments = []
-  const {getByText} = render(<Outcome {...props} expanded />)
+  const {getByText} = render(<Outcome {...props} expanded={true} />)
   expect(getByText(/No alignments are available/)).not.toBeNull()
 })
 
@@ -140,7 +140,7 @@ describe('header', () => {
     const props = defaultProps()
     props.outcome.results = [
       result({id: 1, hide_points: false}),
-      result({id: 2, hide_points: true})
+      result({id: 2, hide_points: true}),
     ]
     const {getByText} = render(<Outcome {...props} />)
     expect(getByText('1/5')).not.toBeNull()
@@ -155,7 +155,7 @@ describe('header', () => {
 })
 
 it('includes the individual results', () => {
-  const {getAllByRole} = render(<Outcome {...defaultProps()} expanded />)
+  const {getAllByRole} = render(<Outcome {...defaultProps()} expanded={true} />)
   const results = getAllByRole('listitem')
   expect(results).toHaveLength(2)
 })
@@ -170,10 +170,10 @@ it('renders the results by most recent', () => {
     result({id: 1, date: hourAgo}, {name: 'hour ago'}),
     result({id: 2, date: now}, {name: 'now'}),
     result({id: 3, date: minuteAgo}, {name: 'minute ago'}),
-    result({id: 4, date: yearishAgo}, {name: 'year ago'})
+    result({id: 4, date: yearishAgo}, {name: 'year ago'}),
   ]
 
-  const {getAllByRole} = render(<Outcome {...props} expanded />)
+  const {getAllByRole} = render(<Outcome {...props} expanded={true} />)
   const results = getAllByRole('listitem')
   expect(results).toHaveLength(4)
   expect(within(results[0]).getByText('now')).not.toBeNull()

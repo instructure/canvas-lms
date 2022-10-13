@@ -33,12 +33,12 @@ export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...pr
       props={{
         mobile: {
           variant: 'toggle',
-          dataTestId: 'individual-message-checkbox-mobile'
+          dataTestId: 'individual-message-checkbox-mobile',
         },
         desktop: {
           variant: 'simple',
-          dataTestId: 'individual-message-checkbox'
-        }
+          dataTestId: 'individual-message-checkbox',
+        },
       }}
       render={responsiveProps => (
         <Checkbox
@@ -58,9 +58,9 @@ export const IndividualMessageCheckbox = ({checked, maxGroupRecipientsMet, ...pr
 IndividualMessageCheckbox.propTypes = {
   onChange: PropTypes.func.isRequired,
   checked: PropTypes.bool,
-  maxGroupRecipientsMet: PropTypes.bool
+  maxGroupRecipientsMet: PropTypes.bool,
 }
 
 IndividualMessageCheckbox.defaultProps = {
-  checked: false
+  checked: false,
 }

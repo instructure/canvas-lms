@@ -30,20 +30,20 @@ const I18n = useI18nScope('gradinggradingStandard')
 
 class GradingStandard extends React.Component {
   static propTypes = {
-    standard: shape({title: string.isRequired}).isRequired
+    standard: shape({title: string.isRequired}).isRequired,
   }
 
   state = {
     editingStandard: $.extend(true, {}, this.props.standard),
     saving: false,
-    showAlert: false
+    showAlert: false,
   }
 
   componentWillReceiveProps(nextProps) {
     this.setState({
       editingStandard: $.extend(true, {}, this.props.standard),
       saving: nextProps.saving,
-      showAlert: false
+      showAlert: false,
     })
   }
 
@@ -71,11 +71,11 @@ class GradingStandard extends React.Component {
 
   triggerSaveGradingStandard = () => {
     if (this.standardIsValid()) {
-      this.setState({saving: true}, function() {
+      this.setState({saving: true}, function () {
         this.props.onSaveGradingStandard(this.state.editingStandard)
       })
     } else {
-      this.setState({showAlert: true}, function() {
+      this.setState({showAlert: true}, function () {
         ReactDOM.findDOMNode(this.refs.invalidStandardAlert).focus()
       })
     }
@@ -97,7 +97,7 @@ class GradingStandard extends React.Component {
     const score = rowAfter ? (rowBefore[1] - rowAfter[1]) / 2 + rowAfter[1] : 0
 
     const newEditingStandard = update(this.state.editingStandard, {
-      data: {$splice: [[index + 1, 0, ['', score]]]}
+      data: {$splice: [[index + 1, 0, ['', score]]]},
     })
     this.setState({editingStandard: newEditingStandard})
   }
@@ -122,7 +122,7 @@ class GradingStandard extends React.Component {
   }
 
   hideAlert = () => {
-    this.setState({showAlert: false}, function() {
+    this.setState({showAlert: false}, function () {
       ReactDOM.findDOMNode(this.refs.title).focus()
     })
   }
@@ -132,10 +132,7 @@ class GradingStandard extends React.Component {
   rowDataIsValid = () => {
     if (this.state.editingStandard.data.length <= 1) return true
     const rowValues = _.map(this.state.editingStandard.data, dataRow => String(dataRow[1]).trim())
-    const sanitizedRowValues = _.chain(rowValues)
-      .compact()
-      .uniq()
-      .value()
+    const sanitizedRowValues = _.chain(rowValues).compact().uniq().value()
     const inputsAreUniqueAndNonEmpty = sanitizedRowValues.length === rowValues.length
     const valuesDoNotOverlap = !_.some(this.state.editingStandard.data, (element, index, list) => {
       if (index < 1) return false
@@ -149,10 +146,7 @@ class GradingStandard extends React.Component {
 
   rowNamesAreValid = () => {
     const rowNames = _.map(this.state.editingStandard.data, dataRow => dataRow[0].trim())
-    const sanitizedRowNames = _.chain(rowNames)
-      .compact()
-      .uniq()
-      .value()
+    const sanitizedRowNames = _.chain(rowNames).compact().uniq().value()
     return sanitizedRowNames.length === rowNames.length
   }
 
@@ -163,7 +157,7 @@ class GradingStandard extends React.Component {
         <div ref="cannotManageMessage">
           {I18n.t('(%{context}: %{contextName})', {
             context: this.props.standard.context_type.toLowerCase(),
-            contextName: this.props.standard.context_name
+            contextName: this.props.standard.context_name,
           })}
         </div>
       )
@@ -208,7 +202,7 @@ class GradingStandard extends React.Component {
 
   renderDataRows = () => {
     const data = this.props.editing ? this.state.editingStandard.data : this.props.standard.data
-    return data.map(function(item, idx, array) {
+    return data.map(function (item, idx, array) {
       return (
         <DataRow
           key={idx}
@@ -230,7 +224,12 @@ class GradingStandard extends React.Component {
   renderSaveButton = () => {
     if (this.state.saving) {
       return (
-        <button type="button" ref="saveButton" className="btn btn-primary save_button" disabled>
+        <button
+          type="button"
+          ref="saveButton"
+          className="btn btn-primary save_button"
+          disabled={true}
+        >
           {I18n.t('Saving...')}
         </button>
       )
@@ -338,7 +337,7 @@ class GradingStandard extends React.Component {
       )}/grading_standards`
       const titleText = I18n.t('Manage grading schemes in %{context_name}', {
         context_name:
-          this.props.standard.context_name || this.props.standard.context_type.toLowerCase()
+          this.props.standard.context_name || this.props.standard.context_type.toLowerCase(),
       })
       return (
         <a

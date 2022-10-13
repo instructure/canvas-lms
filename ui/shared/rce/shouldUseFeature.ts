@@ -17,7 +17,7 @@
  */
 
 export enum Feature {
-  IconMaker
+  IconMaker,
 }
 
 export default function shouldUseFeature(feature: Feature, windowEnv: object): boolean {

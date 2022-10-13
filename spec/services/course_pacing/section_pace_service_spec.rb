@@ -22,8 +22,7 @@ describe CoursePacing::SectionPaceService do
   let(:section) { add_section("Section One", course: course) }
   let(:section_two) { add_section("Section Two", course: course) }
   let!(:section_pace) { section_pace_model(section: section) }
-
-  before { course_pace_model(course: course) }
+  let!(:course_pace) { course_pace_model(course: course) }
 
   describe ".paces_in_course" do
     it "returns the paces for the provided course" do
@@ -54,6 +53,22 @@ describe CoursePacing::SectionPaceService do
     end
   end
 
+  describe ".template_pace_for" do
+    context "when the course does not have a pace" do
+      before { section.course.course_paces.primary.destroy_all }
+
+      it "returns nil" do
+        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to eq nil
+      end
+    end
+
+    context "when the course has a pace" do
+      it "returns the course pace" do
+        expect(CoursePacing::SectionPaceService.template_pace_for(section)).to eq course_pace
+      end
+    end
+  end
+
   describe ".create_in_context" do
     context "when the context already has a pace" do
       it "returns the pace" do
@@ -64,7 +79,7 @@ describe CoursePacing::SectionPaceService do
     context "when the context does not have a pace" do
       let(:new_section) { add_section("New Section", course: course) }
 
-      it "requires implementation" do
+      it "creates a pace in the context" do
         expect do
           CoursePacing::SectionPaceService.create_in_context(new_section)
         end.to change {

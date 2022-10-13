@@ -18,7 +18,7 @@
 
 import _ from 'underscore'
 // backward is a stupid requirement for discussions
-_.flattenObjects = function(array, key, backward, output) {
+_.flattenObjects = function (array, key, backward, output) {
   if (!_.isArray(array)) {
     array = [array]
   }

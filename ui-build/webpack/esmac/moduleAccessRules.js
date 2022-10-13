@@ -35,48 +35,48 @@ module.exports = [
     rule: 'Allow engine entrypoints to source everything there',
     source: 'ui/engine/{index.ts,capabilities/index.ts}',
     target: 'ui/engine/**',
-    specifier: 'relative'
+    specifier: 'relative',
   },
 
   {
     rule: 'Allow capabilities to depend on each other',
     source: 'ui/engine/capabilities/*/**',
     target: 'ui/engine/capabilities/*/**',
-    specifier: 'relative'
+    specifier: 'relative',
   },
-  
+
   {
     source: 'ui/features/*/index.js',
     target: 'ui/engine/**',
-    specifier: 'bare'
+    specifier: 'bare',
   },
 
   {
     rule: 'Let shims do whatever they need to',
     source: 'ui/shims/*',
     target: '**',
-    specifier: 'any'
+    specifier: 'any',
   },
 
   {
     rule: 'Let everyone consume shims',
     source: '**',
     target: 'ui/shims/*',
-    specifier: 'bare'
+    specifier: 'bare',
   },
 
   {
     rule: 'Let everyone consume legacy public/javascripts/',
     source: '**',
     target: 'public/javascripts/**',
-    specifier: 'bare'
+    specifier: 'bare',
   },
 
   {
     rule: 'Let calendar monkey patch moment/timezone',
     source: 'ui/features/calendar/ext/**',
     target: 'ui/ext/custom_{moment,timezone}_locales/**',
-    specifier: 'relative'
+    specifier: 'relative',
   },
 
   {
@@ -97,7 +97,7 @@ module.exports = [
     `,
     source: '**',
     target: 'packages/**',
-    specifier: 'package'
+    specifier: 'package',
   },
 
   {
@@ -108,7 +108,7 @@ module.exports = [
     source: 'ui/shared/*/**',
     target: 'ui/shared/*/**',
     boundary: 0,
-    specifier: 'relative'
+    specifier: 'relative',
   },
 
   {
@@ -118,7 +118,7 @@ module.exports = [
     `,
     source: '{gems/plugins,public/javascripts,ui}/**',
     target: 'ui/shared/**',
-    specifier: 'package'
+    specifier: 'package',
   },
 
   {
@@ -129,7 +129,7 @@ module.exports = [
     source: 'ui/features/*/**',
     target: 'ui/features/*/**',
     boundary: 0,
-    specifier: 'relative'
+    specifier: 'relative',
   },
 
   {
@@ -140,6 +140,6 @@ module.exports = [
     source: 'gems/plugins/*/**',
     target: 'gems/plugins/*/**',
     boundary: 0,
-    specifier: 'relative'
+    specifier: 'relative',
   },
 ]

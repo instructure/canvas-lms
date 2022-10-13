@@ -25,7 +25,7 @@ const I18n = useI18nScope('SearchGradingPeriodsField')
 
 export default class SearchGradingPeriodsField extends React.Component {
   static propTypes = {
-    changeSearchText: PropTypes.func.isRequired
+    changeSearchText: PropTypes.func.isRequired,
   }
 
   onChange = event => {
@@ -33,7 +33,7 @@ export default class SearchGradingPeriodsField extends React.Component {
     this.search(trimmedText)
   }
 
-  search = _.debounce(function(trimmedText) {
+  search = _.debounce(function (trimmedText) {
     this.props.changeSearchText(trimmedText)
   }, 200)
 

@@ -30,8 +30,8 @@ import QuizLogAuditingEventDumper from '@canvas/quiz-log-auditing/jquery/dump_ev
 import RichContentEditor from '@canvas/rce/RichContentEditor'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/util/toJSON'
-import '@canvas/datetime'/* friendlyDatetime, friendlyDate */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* getFormData, errorBox */
+import '@canvas/datetime' /* friendlyDatetime, friendlyDate */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* getFormData, errorBox */
 import 'jqueryui/dialog'
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
@@ -46,16 +46,15 @@ let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
 const quizSubmission = (function () {
-  let timeMod = 0,
-    endAt = $('.end_at'),
-    endAtParsed = endAt.text() && new Date(endAt.text()),
-    dueAt = $('.due_at'),
-    dueAtParsed = dueAt.text() && new Date(dueAt.text()),
-    startedAt = $('.started_at'),
-    inBackground = false,
-    $countdownSeconds = $('.countdown_seconds'),
-    $timeRunningTimeRemaining = $('.time_running,.time_remaining'),
-    $lastSaved = $('#last_saved_indicator')
+  let timeMod = 0
+  const endAt = $('.end_at')
+  const endAtParsed = endAt.text() && new Date(endAt.text())
+  const dueAt = $('.due_at')
+  const dueAtParsed = dueAt.text() && new Date(dueAt.text())
+  const startedAt = $('.started_at')
+  const $countdownSeconds = $('.countdown_seconds')
+  const $timeRunningTimeRemaining = $('.time_running,.time_remaining')
+  const $lastSaved = $('#last_saved_indicator')
   const $timerAutosubmitDisabled = $('.timer_autosubmit_disabled'),
     timerAutosubmitDisabledParsed = $timerAutosubmitDisabled.text() === 'true',
     $endAtWithoutTimeLimit = $('.end_at_without_time_limit'),
@@ -85,7 +84,7 @@ const quizSubmission = (function () {
       endAtWithoutTimeLimitParsed && endAtWithoutTimeLimitParsed - new Date(),
     startedAt,
     hasTimeLimit: !!ENV.QUIZ.time_limit,
-    timeLeft: parseInt($('.time_left').text()) * 1000,
+    timeLeft: parseInt($('.time_left').text(), 10) * 1000,
     timeToDueDate: dueAtParsed - new Date(),
     oneAtATime: $('#submit_quiz_form').hasClass('one_question_at_a_time'),
     cantGoBack: $('#submit_quiz_form').hasClass('cant_go_back'),
@@ -143,7 +142,7 @@ const quizSubmission = (function () {
         ) {
           $lastSaved.text(
             I18n.t('saving_not_needed', 'No new data to save. Last checked at %{t}', {
-              t: $.friendlyDatetime(new Date())
+              t: $.friendlyDatetime(new Date()),
             })
           )
 
@@ -203,14 +202,14 @@ const quizSubmission = (function () {
 
             // has the user logged out?
             // TODO: support this redirect in LDB, by getting out of high security mode.
-            if (ec.status === 401 || resp.status == 'unauthorized') {
+            if (ec.status === 401 || resp.status === 'unauthorized') {
               showDeauthorizedDialog()
               // since we popped up our own "not logged in" modal, skip the default error handler
               // see jquery.ajaxJSON.js defaultAjaxError
               if ($.inArray(ec, $.ajaxJSON.ignoredXHRs) === -1) {
                 $.ajaxJSON.ignoredXHRs.push(ec)
               }
-            } else if (ec.status === 403 || resp.status == 'forbidden') {
+            } else if (ec.status === 403 || resp.status === 'forbidden') {
               // Something has been malaligned and we now need ruby to figure out where we should be
               window.location.reload()
             } else {
@@ -246,7 +245,7 @@ const quizSubmission = (function () {
             }
           },
           {
-            timeout: 15000
+            timeout: 15000,
           }
         )
       })(data)
@@ -417,14 +416,14 @@ const quizSubmission = (function () {
           modal: true,
           overlay: {
             backgroundColor: '#000',
-            opacity: 0.7
+            opacity: 0.7,
           },
           close() {
             if (!quizSubmission.submitting && quizSubmission.shouldSubmitAtEndAt()) {
               quizSubmission.submitting = true
               quizSubmission.submitQuiz()
             }
-          }
+          },
         })
     },
 
@@ -488,7 +487,7 @@ const quizSubmission = (function () {
     },
 
     updateFinalSubmitButtonState() {
-      const allQuestionsAnswered = $('#question_list li:not(.answered, .text_only)').length == 0
+      const allQuestionsAnswered = $('#question_list li:not(.answered, .text_only)').length === 0
       const lastQuizPage = $('#submit_quiz_form').hasClass('last_page')
       const thisQuestionAnswered = $('div.question.answered').length > 0
       const oneAtATime = quizSubmission.oneAtATime
@@ -528,8 +527,8 @@ const quizSubmission = (function () {
       button.prop('disabled', true)
       const action = button.data('action')
       $('#submit_quiz_form').attr('action', action).submit()
-    }
-  };
+    },
+  }
 })()
 
 $(window).focus(evt => {
@@ -558,7 +557,7 @@ $("a[href^='#']")
 $(function () {
   autoBlurActiveInput()
 
-  if ($('#preview_mode_link').length == 0) {
+  if ($('#preview_mode_link').length === 0) {
     let unloadWarned = false
 
     window.addEventListener('beforeunload', e => {
@@ -595,7 +594,7 @@ $(function () {
           data,
           type: 'POST',
           dataType: 'json',
-          async: false
+          async: false,
         })
 
         // since this is sync, a callback never fires to reset this
@@ -652,7 +651,7 @@ $(function () {
     })
     .find('.list_question')
     .bind({
-      mouseenter(event) {
+      mouseenter(_event) {
         const $this = $(this),
           data = $this.data()
 
@@ -661,24 +660,24 @@ $(function () {
           data.relatedQuestion.addClass('related')
         }
       },
-      mouseleave(event) {
+      mouseleave(_event) {
         if (!quizSubmission.oneAtATime) {
           const relatedQuestion = $(this).data('relatedQuestion')
           relatedQuestion && relatedQuestion.removeClass('related')
         }
       },
-      click(event) {
+      click(_event) {
         quizSubmission.clearAccessCode = false
-      }
+      },
     })
 
   $questions.find('.group_top,.answer_select').bind({
-    mouseenter(event) {
+    mouseenter(_event) {
       $(this).addClass('hover')
     },
-    mouseleave(event) {
+    mouseleave(_event) {
       $(this).removeClass('hover')
-    }
+    },
   })
 
   $('.file-upload-question-holder').each((i, el) => {
@@ -699,7 +698,7 @@ $(function () {
   })
 
   $questions
-    .delegate(':checkbox,:radio', 'change', function (event) {
+    .delegate(':checkbox,:radio', 'change', function (_event) {
       const $answer = $(this).parents('.answer')
       if (lastAnswerSelected == $answer[0]) {
         quizSubmission.updateSubmission()
@@ -723,7 +722,7 @@ $(function () {
             ? ''
             : I18n.n(precisionQuestionInputVal.toPrecision(precision), {
                 strip_insignificant_zeros: true,
-                precision
+                precision,
               })
         )
       }
@@ -732,7 +731,7 @@ $(function () {
       }
     })
     .delegate('.numerical_question_input', {
-      keyup(event) {
+      keyup(_event) {
         const $this = $(this)
         const val = $this.val() + ''
         const $errorBox = $this.data('associated_error_box')
@@ -746,7 +745,7 @@ $(function () {
             I18n.t('errors.only_numerical_values', 'only numerical values are accepted')
           )
         }
-      }
+      },
     })
     .delegate('.flag_question', 'click', function (e) {
       e.preventDefault()
@@ -775,14 +774,14 @@ $(function () {
         tagName = this.tagName.toUpperCase(),
         id = $this.parents('.question').attr('id'),
         val = ''
-      if (tagName == 'A') return
+      if (tagName === 'A') return
       if (changedMap) {
         // reduce redundant jquery lookups and other calls
         if (changedMap[id]) return
         changedMap[id] = true
       }
 
-      if (tagName == 'TEXTAREA') {
+      if (tagName === 'TEXTAREA') {
         val = RichContentEditor.callOnRCE($this, 'get_code')
         const $tagInstance = $this
         $this
@@ -794,9 +793,9 @@ $(function () {
             //  todo: replace .andSelf with .addBack when JQuery is upgraded.
             $(this).siblings('.toggle_question_content_views_link').andSelf().toggle()
           })
-      } else if ($this.attr('type') == 'text' || $this.attr('type') == 'hidden') {
+      } else if ($this.attr('type') === 'text' || $this.attr('type') === 'hidden') {
         val = $this.val()
-      } else if (tagName == 'SELECT') {
+      } else if (tagName === 'SELECT') {
         const $selects = $this.parents('.question').find('select.question_input')
         val = !$selects.filter(function () {
           return !$(this).val()
@@ -841,7 +840,7 @@ $(function () {
   setTimeout(function () {
     $('#question_list .list_question').each(function () {
       const $this = $(this)
-      if ($this.find('.jump_to_question_link').text() == 'Spacer') {
+      if ($this.find('.jump_to_question_link').text() === 'Spacer') {
         $this.remove()
       }
     })
@@ -849,7 +848,7 @@ $(function () {
 
   // Suppress "<ENTER>" key from submitting a form when clicked inside a text input.
   $('#submit_quiz_form input[type=text]').keypress(e => {
-    if (e.keyCode == 13) return false
+    if (e.keyCode === 13) return false
   })
 
   $('.quiz_submit').click(event => {
@@ -883,7 +882,7 @@ $(function () {
             'confirms.unseen_questions',
             {
               one: "There is still 1 question you haven't seen yet.  Submit anyway?",
-              other: "There are still %{count} questions you haven't seen yet.  Submit anyway?"
+              other: "There are still %{count} questions you haven't seen yet.  Submit anyway?",
             },
             {count: unseen}
           )
@@ -896,7 +895,7 @@ $(function () {
             {
               one: 'You have 1 unanswered question (see the right sidebar for details).  Submit anyway?',
               other:
-                'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?'
+                'You have %{count} unanswered questions (see the right sidebar for details).  Submit anyway?',
             },
             {count: unanswered}
           )
@@ -934,7 +933,7 @@ $(function () {
       RichContentEditor.loadNewEditor($(this), {
         manageParent: true,
         autosave: {enabled: false},
-        maxInitRenderedRCEs: 5
+        maxInitRenderedRCEs: 5,
       })
     })
   }, 2000)
@@ -948,7 +947,7 @@ $(function () {
 
     quizTakingPolice.postMessage({
       code: 'startStopwatch',
-      frequency: quizSubmission.clockInterval
+      frequency: quizSubmission.clockInterval,
     })
   } else {
     setInterval(quizSubmission.updateTime, quizSubmission.clockInterval)
@@ -982,7 +981,7 @@ showDeauthorizedDialog = function () {
         class: 'dialog_closer',
         click() {
           $(this).dialog('close')
-        }
+        },
       },
       {
         text: I18n.t('#buttons.login', 'Login'),
@@ -990,9 +989,9 @@ showDeauthorizedDialog = function () {
         click() {
           quizSubmission.navigatingToRelogin = true
           $('#deauthorized_dialog').submit()
-        }
-      }
-    ]
+        },
+      },
+    ],
   })
 }
 
@@ -1025,7 +1024,7 @@ $(() => {
     'aria-role': 'note',
     'aria-live': 'assertive',
     'aria-atomic': 'true',
-    'aria-relevant': 'additions'
+    'aria-relevant': 'additions',
   }).appendTo(document.body)
 
   $(document).on('keydown.timer_quickjump', function readTimeLeft(e) {

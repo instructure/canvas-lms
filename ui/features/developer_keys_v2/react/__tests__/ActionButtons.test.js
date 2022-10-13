@@ -28,8 +28,8 @@ const props = ({
   developerKey = {
     id: '1',
     api_key: 'test',
-    created_at: 'test'
-  }
+    created_at: 'test',
+  },
 } = {}) => {
   return {
     dispatch: jest.fn(),
@@ -43,7 +43,7 @@ const props = ({
     visible: true,
     developerName: 'Unnamed Tool',
     onDelete: jest.fn(),
-    showVisibilityToggle
+    showVisibilityToggle,
   }
 }
 
@@ -70,8 +70,8 @@ it('does render edit button for non lti keys', () => {
           id: '1',
           api_key: 'test',
           created_at: 'test',
-          is_lti_key: true
-        }
+          is_lti_key: true,
+        },
       })}
     />
   )
@@ -87,8 +87,8 @@ it('warns the user when deleting a LTI key', () => {
           id: '1',
           api_key: 'test',
           created_at: 'test',
-          is_lti_key: true
-        }
+          is_lti_key: true,
+        },
       })}
     />
   )

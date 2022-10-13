@@ -30,8 +30,8 @@ describe('AttachmentDisplay', () => {
       attachment: {
         _id: 1,
         displayName: 'file_name.file',
-        url: 'file_download_example.com'
-      }
+        url: 'file_download_example.com',
+      },
     })
 
     expect(queryByText('file_name.file')).toBeTruthy()
@@ -42,8 +42,8 @@ describe('AttachmentDisplay', () => {
       attachment: {
         _id: 1,
         displayName: 'Fundamentals of Differential Equations - Exercise 17 _ Quizlet.pdf',
-        url: 'file_download_example.com'
-      }
+        url: 'file_download_example.com',
+      },
     })
 
     expect(queryByText('Fundamentals of Differential E...')).toBeTruthy()

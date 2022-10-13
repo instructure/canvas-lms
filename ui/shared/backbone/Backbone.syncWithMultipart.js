@@ -28,7 +28,7 @@ xsslint jqueryObject.identifier el
 */
 
 Backbone.syncWithoutMultipart = Backbone.sync
-Backbone.syncWithMultipart = function(method, model, options) {
+Backbone.syncWithMultipart = function (method, model, options) {
   // Create a hidden iframe
   const iframeId = _.uniqueId('file_upload_iframe_')
   const $iframe = $(`<iframe id="${iframeId}" name="${iframeId}"></iframe>`).hide()
@@ -39,7 +39,7 @@ Backbone.syncWithMultipart = function(method, model, options) {
     create: 'POST',
     update: 'PUT',
     delete: 'DELETE',
-    read: 'GET'
+    read: 'GET',
   }[method]
 
   function toForm(object, nested, asArray) {
@@ -56,7 +56,7 @@ Backbone.syncWithMultipart = function(method, model, options) {
       } else if (!`${key}`.match(/^_/) && attr != null && attr instanceof Date) {
         return $('<input/>', {
           name: key,
-          value: attr.toISOString()
+          value: attr.toISOString(),
         })[0]
       } else if (
         !`${key}`.match(/^_/) &&
@@ -66,7 +66,7 @@ Backbone.syncWithMultipart = function(method, model, options) {
       ) {
         return $('<input/>', {
           name: key,
-          value: attr
+          value: attr,
         })[0]
       }
     })
@@ -129,7 +129,7 @@ Backbone.syncWithMultipart = function(method, model, options) {
   return dfd
 }
 
-export default Backbone.sync = function(method, model, options) {
+export default Backbone.sync = function (method, model, options) {
   return Backbone[
     options && options.multipart ? 'syncWithMultipart' : 'syncWithoutMultipart'
   ].apply(this, arguments)

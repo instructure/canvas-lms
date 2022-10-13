@@ -37,23 +37,23 @@ export default class CourseImagePicker extends React.Component {
     courseId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     handleFileUpload: PropTypes.func,
     handleImageSearchUrlUpload: PropTypes.func,
-    uploadingImage: PropTypes.bool
+    uploadingImage: PropTypes.bool,
   }
 
   static defaultProps = {
     handleFileUpload: () => {},
     handleImageSearchUrlUpload: () => {},
-    uploadingImage: false
+    uploadingImage: false,
   }
 
   state = {
     selectedIndex: 0,
-    fileDropMessages: null
+    fileDropMessages: null,
   }
 
   handleTabChange = (event, {index}) => {
     this.setState({
-      selectedIndex: index
+      selectedIndex: index,
     })
   }
 
@@ -63,7 +63,7 @@ export default class CourseImagePicker extends React.Component {
       {
         dataTransfer: {files},
         preventDefault: () => {},
-        stopPropagagtion: () => {}
+        stopPropagagtion: () => {},
       },
       this.props.courseId
     )
@@ -71,7 +71,7 @@ export default class CourseImagePicker extends React.Component {
 
   handleDropRejected = () => {
     this.setState({
-      fileDropMessages: [{text: I18n.t('File must be an image'), type: 'error'}]
+      fileDropMessages: [{text: I18n.t('File must be an image'), type: 'error'}],
     })
   }
 

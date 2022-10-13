@@ -27,7 +27,7 @@ const I18n = useI18nScope('link_validator')
 
 export default class ValidatorResults extends React.Component {
   state = {
-    showUnpublished: true
+    showUnpublished: true,
   }
 
   toggleShowUnpublished = () => {

@@ -27,7 +27,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
     const msg = I18n.t(
       {
         one: 'Showing 1 account calendar',
-        other: 'Showing %{count} account calendars.'
+        other: 'Showing %{count} account calendars.',
       },
       {count: results}
     )
@@ -37,7 +37,7 @@ export const alertForMatchingAccounts = (results, showDefault) => {
     {
       one: '1 account calendar found.',
       other: '%{count} account calendars found.',
-      zero: 'No matching account calendars found.'
+      zero: 'No matching account calendars found.',
     },
     {count: results}
   )

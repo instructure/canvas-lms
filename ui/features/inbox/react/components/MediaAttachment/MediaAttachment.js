@@ -54,5 +54,5 @@ export const MediaAttachment = props => {
 
 MediaAttachment.propTypes = {
   mediaTitle: PropTypes.string,
-  onRemoveMedia: PropTypes.func
+  onRemoveMedia: PropTypes.func,
 }

@@ -26,7 +26,7 @@ const I18n = useI18nScope('external_tools')
 export default class ManageUpdateExternalToolButton extends React.Component {
   static propTypes = {
     tool: PropTypes.object.isRequired,
-    returnFocus: PropTypes.func.isRequired
+    returnFocus: PropTypes.func.isRequired,
   }
 
   openReregModal = e => {
@@ -35,7 +35,7 @@ export default class ManageUpdateExternalToolButton extends React.Component {
 
   render() {
     const updateAriaLabel = I18n.t('Manage update for %{toolName}', {
-      toolName: this.props.tool.name
+      toolName: this.props.tool.name,
     })
 
     const cssClassName = this.props.tool.has_update ? '' : ' hide'

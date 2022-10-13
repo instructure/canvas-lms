@@ -43,12 +43,12 @@ export default class RSSFeedList extends React.Component {
     hasLoadedFeed: bool,
     getExternalFeeds: func.isRequired,
     deleteExternalFeed: func.isRequired,
-    focusLastElement: func.isRequired
+    focusLastElement: func.isRequired,
   }
 
   static defaultProps = {
     feeds: [],
-    hasLoadedFeed: false
+    hasLoadedFeed: false,
   }
 
   componentDidMount() {
@@ -76,7 +76,7 @@ export default class RSSFeedList extends React.Component {
       {
         zero: '%{count} posts added',
         one: '%{count} post added',
-        other: '%{count} posts added'
+        other: '%{count} posts added',
       },
       {count: numberOfPosts}
     )
@@ -148,7 +148,7 @@ export default class RSSFeedList extends React.Component {
 
 const connectState = state => ({
   feeds: state.externalRssFeed.feeds,
-  hasLoadedFeed: state.externalRssFeed.hasLoadedFeed
+  hasLoadedFeed: state.externalRssFeed.hasLoadedFeed,
 })
 const connectActions = dispatch =>
   bindActionCreators(

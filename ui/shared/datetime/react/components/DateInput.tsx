@@ -31,7 +31,7 @@ import {
   DateInputInteraction,
   DateInputLayout,
   DateInputDisplay,
-  DateInputSize
+  DateInputSize,
 } from '@instructure/ui-date-input/types'
 
 const I18n = useI18nScope('app_shared_components_canvas_date_time')
@@ -157,7 +157,7 @@ export default function CanvasDateInput({
   dataTestid,
   size,
   display,
-  placeholder
+  placeholder,
 }: CanvasDateInputProps) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate ? moment.tz(selectedDate, timezone) : null
@@ -212,12 +212,12 @@ export default function CanvasDateInput({
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-      timeZone: timezone
+      timeZone: timezone,
     })
 
     const dayFormat = new Intl.DateTimeFormat(locale, {
       day: 'numeric',
-      timeZone: timezone
+      timeZone: timezone,
     })
 
     return generateMonthMoments().map(dayMoment => (
@@ -285,7 +285,7 @@ export default function CanvasDateInput({
         id: widgetId,
         method: 'pick',
         parsed: (newDate && newDate.toISOString()) || undefined,
-        value: date
+        value: date,
       })
     } else if (inputDetails?.method === 'paste') {
       const pastedValue = inputDetails.value
@@ -296,14 +296,14 @@ export default function CanvasDateInput({
         id: widgetId,
         method: 'paste',
         parsed: (newDate && newDate.toISOString()) || undefined,
-        value: pastedValue
+        value: pastedValue,
       })
     } else if (!inputEmpty) {
       log({
         id: widgetId,
         method: 'type',
         parsed: (newDate && newDate.toISOString()) || undefined,
-        value: inputValue.trim()
+        value: inputValue.trim(),
       })
     }
     onBlur?.(event)
@@ -318,7 +318,7 @@ export default function CanvasDateInput({
   function trackPasteEvent(e) {
     setInputDetails({
       method: 'paste',
-      value: e.clipboardData.getData('text')
+      value: e.clipboardData.getData('text'),
     })
   }
 
@@ -397,7 +397,7 @@ export default function CanvasDateInput({
       onChange={handleChange}
       onPaste={trackPasteEvent}
       onKeyUp={handleKey}
-      isInline
+      isInline={true}
       placement={placement}
       messages={messages.concat(internalMessages)}
       isShowingCalendar={isShowingCalendar}

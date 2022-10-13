@@ -55,7 +55,7 @@ export default class GroupUserView extends View {
     const result = {
       groupId: group && group.id,
       ...this,
-      ...super.toJSON(...arguments)
+      ...super.toJSON(...arguments),
     }
     result.shouldMarkInactive =
       this.options.markInactiveStudents && this.model.attributes.is_inactive

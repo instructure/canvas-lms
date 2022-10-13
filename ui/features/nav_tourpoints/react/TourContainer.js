@@ -30,7 +30,7 @@ const TourContainer = ({
   close,
   firstLabel,
   softClose = close,
-  content
+  content,
 }) => {
   const closeButtonRef = React.useRef()
   const focusRef = React.useRef()
@@ -74,7 +74,7 @@ const TourContainer = ({
         </View>
         {content}
         <Flex margin="medium 0 0 0">
-          <Flex.Item shouldGrow>
+          <Flex.Item shouldGrow={true}>
             {current === 0 ? (
               firstLabel
             ) : (

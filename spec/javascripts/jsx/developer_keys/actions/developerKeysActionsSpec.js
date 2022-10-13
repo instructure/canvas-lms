@@ -27,7 +27,7 @@ function thenStub() {
   return {
     then: () => {
       return {catch: () => {}}
-    }
+    },
   }
 }
 

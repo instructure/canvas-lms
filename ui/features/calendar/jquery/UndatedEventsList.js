@@ -42,7 +42,7 @@ export default class UndatedEventsList {
       'CommonEvent/eventDeleted': this.eventDeleted,
       'CommonEvent/eventSaving': this.eventSaving,
       'CommonEvent/eventSaved': this.eventSaved,
-      'Calendar/visibleContextListChanged': this.visibleContextListChanged
+      'Calendar/visibleContextListChanged': this.visibleContextListChanged,
     })
 
     this.div
@@ -64,7 +64,7 @@ export default class UndatedEventsList {
       lines: 8,
       length: 2,
       width: 2,
-      radius: 3
+      radius: 3,
     })
 
     const loadingTimer = setTimeout(
@@ -93,23 +93,23 @@ export default class UndatedEventsList {
           this.calendar.closeEventPopups()
           $(this).hide()
         },
-        stop(e, ui) {
+        stop(_e, _ui) {
           // Only show the element after the drag stops if it doesn't have a start date now
           // (meaning it wasn't dropped on the calendar)
           if (!$(this).data('calendarEvent').start) $(this).show()
-        }
+        },
       })
 
       this.div.droppable({
         hoverClass: 'droppable-hover',
         accept: '.fc-event',
-        drop: (e, ui) => {
+        drop: (_e, _ui) => {
           let event
           if (!(event = this.calendar.lastEventDragged)) return
           event.start = null
           event.end = null
           return event.saveDates()
-        }
+        },
       })
 
       if (this.previouslyFocusedElement) {
@@ -126,7 +126,7 @@ export default class UndatedEventsList {
     this.load()
   }
 
-  toggle = e => {
+  toggle = _e => {
     // defer this until after the section toggles
     setTimeout(() => {
       this.hidden = !this.div.is(':visible')
@@ -136,9 +136,7 @@ export default class UndatedEventsList {
 
   clickEvent = jsEvent => {
     jsEvent.preventDefault()
-    const eventId = $(jsEvent.target)
-      .closest('.event')
-      .data('event-id')
+    const eventId = $(jsEvent.target).closest('.event').data('event-id')
     const event = this.dataSource.eventWithId(eventId)
     if (event) {
       return new ShowEventDetailsDialog(event, this.dataSource).show(jsEvent)

@@ -24,20 +24,20 @@ const collectionsExample = {
     id: 1,
     name: 'Root Group',
     collections: [2, 3],
-    parentGroupId: 0
+    parentGroupId: 0,
   },
   2: {
     id: 2,
     name: 'Group 2',
     collections: [4],
-    parentGroupId: 1
+    parentGroupId: 1,
   },
   3: {
     id: 3,
     name: 'Group 3',
     collections: [],
-    parentGroupId: 1
-  }
+    parentGroupId: 1,
+  },
 }
 
 export default {
@@ -45,8 +45,8 @@ export default {
   component: GroupSelectionDrillDown,
   args: {
     collections: collectionsExample,
-    rootId: 1
-  }
+    rootId: 1,
+  },
 }
 
 const Template = args => <GroupSelectionDrillDown {...args} />

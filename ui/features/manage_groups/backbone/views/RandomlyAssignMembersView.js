@@ -30,7 +30,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
     this.prototype.defaults = {
       title: I18n.t('randomly_assigning_members', 'Randomly Assigning Students'),
       width: 450,
-      height: 250
+      height: 250,
     }
 
     this.prototype.template = template
@@ -41,7 +41,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
 
     this.prototype.events = {
       'click .dialog_closer': 'close',
-      'click .randomly-assign-members-confirm': 'randomlyAssignMembers'
+      'click .randomly-assign-members-confirm': 'randomlyAssignMembers',
     }
 
     this.prototype.els = {'input[name=group_by_section]': '$group_by_section'}
@@ -80,7 +80,7 @@ export default class RandomlyAssignMembersView extends DialogFormView {
     if (groupHasSubmission) {
       this.cloneCategoryView = new GroupCategoryCloneView({
         model: this.model,
-        openedFromCaution: true
+        openedFromCaution: true,
       })
       this.cloneCategoryView.open()
       return this.cloneCategoryView.on('close', () => {

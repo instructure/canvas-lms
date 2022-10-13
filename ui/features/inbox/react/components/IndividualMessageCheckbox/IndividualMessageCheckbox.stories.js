@@ -25,8 +25,8 @@ export default {
   component: IndividualMessageCheckbox,
   argTypes: {
     checked: {control: 'boolean'},
-    onChange: {action: 'Changed'}
-  }
+    onChange: {action: 'Changed'},
+  },
 }
 
 const Template = args => <IndividualMessageCheckbox {...args} />
@@ -35,5 +35,5 @@ export const Unchecked = Template.bind({})
 
 export const Checked = Template.bind({})
 Checked.args = {
-  checked: true
+  checked: true,
 }

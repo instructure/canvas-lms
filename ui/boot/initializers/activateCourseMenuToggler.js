@@ -29,8 +29,7 @@ export function up() {
       try {
         initialize()
         resolve()
-      }
-      catch (e) {
+      } catch (e) {
         reject(e)
       }
     })

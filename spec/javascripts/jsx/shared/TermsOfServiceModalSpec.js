@@ -27,7 +27,7 @@ QUnit.module('Terms of Service Modal Link', {
   },
   afterEach() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('renders correct link when preview is provided', () => {

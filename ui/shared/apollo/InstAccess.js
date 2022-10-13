@@ -71,8 +71,8 @@ class InstAccess {
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        'X-CSRF-Token': getCookie('_csrf_token')
-      }
+        'X-CSRF-Token': getCookie('_csrf_token'),
+      },
     }
     const tokenResponse = await this.fetchImpl('/api/v1/inst_access_tokens', fetchOptions)
     const tokenBody = await tokenResponse.json()

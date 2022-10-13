@@ -26,8 +26,8 @@ export default {
     type: 'outcome',
     count: 10,
     percent: 0.75,
-    average: 1.2
-  }
+    average: 1.2,
+  },
 }
 
 const Template = args => <AlignmentStatItem {...args} />
@@ -36,5 +36,5 @@ export const Default = Template.bind({})
 
 export const withArtifactType = Template.bind({})
 withArtifactType.args = {
-  type: 'artifact'
+  type: 'artifact',
 }

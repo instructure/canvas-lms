@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,26 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function deferPromise() {
-  const deferred = {
-    state: 'pending'
+import formatMessage from '../../format-message'
+
+const locale = {
+  "count_plural_one_item_loaded_other_items_loaded_857023b7": {
+    "message": "{ count, plural,\n  other {}\n}"
   }
-
-  deferred.promise = new Promise((resolve, reject) => {
-    deferred.resolve = value => {
-      if (deferred.state === 'pending') {
-        deferred.state = 'resolved'
-        resolve(value)
-      }
-    }
-
-    deferred.reject = error => {
-      if (deferred.state === 'pending') {
-        deferred.state = 'rejected'
-        reject(error)
-      }
-    }
-  })
-
-  return deferred
 }
+
+
+formatMessage.addLocale({'th-TH': locale})

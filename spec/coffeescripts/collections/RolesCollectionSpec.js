@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Role from 'ui/features/roster/backbone/models/Role.js'
-import RolesCollection from 'ui/features/roster/backbone/collections/RolesCollection.js'
+import Role from 'ui/features/roster/backbone/models/Role'
+import RolesCollection from 'ui/features/roster/backbone/collections/RolesCollection'
 
 QUnit.module('RolesCollection', {
   setup() {
@@ -25,30 +25,30 @@ QUnit.module('RolesCollection', {
   },
   teardown() {
     this.account_id = null
-  }
+  },
 })
 
-test('generate the correct url for a collection of roles', 1, function() {
+test('generate the correct url for a collection of roles', 1, function () {
   const roles_collection = new RolesCollection(null, {
-    contextAssetString: `account_${this.account_id}`
+    contextAssetString: `account_${this.account_id}`,
   })
   equal(roles_collection.url(), `/api/v1/accounts/${this.account_id}/roles`, 'roles collection url')
 })
 
-test('fetches a collection of roles', 1, function() {
+test('fetches a collection of roles', 1, function () {
   const server = sinon.fakeServer.create()
   const role1 = new Role()
   const role2 = new Role()
   const roles_collection = new RolesCollection(null, {
-    contextAssetString: `account_${this.account_id}`
+    contextAssetString: `account_${this.account_id}`,
   })
   roles_collection.fetch({
-    success: () => equal(roles_collection.size(), 2, 'Adds all of the roles to the collection')
+    success: () => equal(roles_collection.size(), 2, 'Adds all of the roles to the collection'),
   })
   server.respond('GET', roles_collection.url(), [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify([role1, role2])
+    JSON.stringify([role1, role2]),
   ])
   server.restore()
 })
@@ -57,30 +57,30 @@ test('keeps roles in order based on sort order then alphabetically', () => {
   RolesCollection.sortOrder = ['AccountMembership', 'StudentEnrollment', 'TaEnrollment']
   const roleFirst = new Role({
     base_role_type: 'AccountMembership',
-    role: 'AccountAdmin'
+    role: 'AccountAdmin',
   })
   const roleSecond = new Role({
     base_role_type: 'AccountMembership',
-    role: 'Another account membership'
+    role: 'Another account membership',
   })
   const roleThird = new Role({
     base_role_type: 'StudentEnrollment',
-    role: 'A student Role'
+    role: 'A student Role',
   })
   const roleFourth = new Role({
     base_role_type: 'StudentEnrollment',
-    role: 'B student Role'
+    role: 'B student Role',
   })
   const roleFith = new Role({
     base_role_type: 'TaEnrollment',
-    role: 'A TA role'
+    role: 'A TA role',
   })
   const roleCollection = new RolesCollection([
     roleThird,
     roleSecond,
     roleFirst,
     roleFourth,
-    roleFith
+    roleFith,
   ])
   equal(roleCollection.models[0], roleFirst, 'First role is in order')
   equal(roleCollection.models[1], roleSecond, 'Second role is in order')

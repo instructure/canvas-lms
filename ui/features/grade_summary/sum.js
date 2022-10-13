@@ -29,5 +29,5 @@ import _ from 'underscore'
 export default _.mixin({
   sum(array, accessor = null, start = 0) {
     return _.reduce(array, (memo, el) => (accessor != null ? accessor(el) : el) + memo, start)
-  }
+  },
 })

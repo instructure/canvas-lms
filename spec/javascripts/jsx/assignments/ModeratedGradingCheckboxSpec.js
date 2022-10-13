@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ModeratedGradingCheckbox from 'ui/features/assignment_edit/react/ModeratedGradingCheckbox.js'
+import ModeratedGradingCheckbox from 'ui/features/assignment_edit/react/ModeratedGradingCheckbox'
 
 QUnit.module('ModeratedGradingCheckbox', hooks => {
   let props

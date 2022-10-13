@@ -23,7 +23,7 @@ import {Discussion} from '../../../../graphql/Discussion'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
@@ -33,7 +33,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -75,7 +75,7 @@ describe('PostToolbar', () => {
       const {getByText} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
-        canUnpublish: true
+        canUnpublish: true,
       })
       expect(onTogglePublishMock.mock.calls.length).toBe(0)
       fireEvent.click(getByText('Published'))
@@ -87,7 +87,7 @@ describe('PostToolbar', () => {
       const {getByText} = setup({
         onTogglePublish: onTogglePublishMock,
         isPublished: true,
-        canUnpublish: false
+        canUnpublish: false,
       })
       expect(getByText('Published').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
@@ -104,7 +104,7 @@ describe('PostToolbar', () => {
       const {queryByText, getByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
-        discussion: Discussion.mock({groupSet: null})
+        discussion: Discussion.mock({groupSet: null}),
       })
       expect(queryByText('Subscribed')).toBeTruthy()
       expect(onToggleSubscriptionMock.mock.calls.length).toBe(0)
@@ -118,7 +118,7 @@ describe('PostToolbar', () => {
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
         isSubscribed: true,
-        discussion: Discussion.mock({groupSet: null})
+        discussion: Discussion.mock({groupSet: null}),
       })
       expect(queryByText('Subscribed')).toBeTruthy()
     })
@@ -128,7 +128,7 @@ describe('PostToolbar', () => {
       const onToggleSubscriptionMock = jest.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
-        isSubscribed: true
+        isSubscribed: true,
       })
       expect(queryByText('Subscribed')).toBeFalsy()
     })
@@ -138,7 +138,7 @@ describe('PostToolbar', () => {
       const onToggleSubscriptionMock = jest.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
-        isSubscribed: true
+        isSubscribed: true,
       })
       expect(queryByText('Subscribed')).toBeFalsy()
     })
@@ -148,7 +148,7 @@ describe('PostToolbar', () => {
       const onToggleSubscriptionMock = jest.fn()
       const {queryByText} = setup({
         onToggleSubscription: onToggleSubscriptionMock,
-        isSubscribed: true
+        isSubscribed: true,
       })
       expect(queryByText('Subscribed')).toBeFalsy()
     })
@@ -222,7 +222,7 @@ describe('PostToolbar', () => {
       describe('comments are currently enabled', () => {
         it('renders correct display text', () => {
           const {queryByText, getByTestId} = setup({
-            onCloseForComments: jest.fn()
+            onCloseForComments: jest.fn(),
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Close for Comments')).toBeTruthy()
@@ -232,7 +232,7 @@ describe('PostToolbar', () => {
         it('calls provided callback when clicked', () => {
           const onToggleCommentsMock = jest.fn()
           const {getByTestId, getByText} = setup({
-            onCloseForComments: onToggleCommentsMock
+            onCloseForComments: onToggleCommentsMock,
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(onToggleCommentsMock.mock.calls.length).toBe(0)
@@ -244,7 +244,7 @@ describe('PostToolbar', () => {
       describe('comments are currently disabled', () => {
         it('renders correct display text', () => {
           const {queryByText, getByTestId} = setup({
-            onOpenForComments: jest.fn()
+            onOpenForComments: jest.fn(),
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(queryByText('Open for Comments')).toBeTruthy()
@@ -254,7 +254,7 @@ describe('PostToolbar', () => {
         it('calls provided callback when clicked', () => {
           const onToggleCommentsMock = jest.fn()
           const {getByTestId, getByText} = setup({
-            onOpenForComments: onToggleCommentsMock
+            onOpenForComments: onToggleCommentsMock,
           })
           fireEvent.click(getByTestId('discussion-post-menu-trigger'))
           expect(onToggleCommentsMock.mock.calls.length).toBe(0)
@@ -326,7 +326,7 @@ describe('PostToolbar', () => {
         const onDisplayRubricMock = jest.fn()
         const {getByTestId, getByText} = setup({
           onDisplayRubric: onDisplayRubricMock,
-          showRubric: true
+          showRubric: true,
         })
         fireEvent.click(getByTestId('discussion-post-menu-trigger'))
         expect(onDisplayRubricMock.mock.calls.length).toBe(0)
@@ -343,15 +343,15 @@ describe('PostToolbar', () => {
               base_url: 'example.com',
               canvas_icon_class: 'icon-commons',
               id: '1',
-              title: 'Share to Commons'
+              title: 'Share to Commons',
             },
             {
               base_url: 'example.com',
               canvas_icon_class: 'icon-example',
               id: '2',
-              title: 'Share to Example'
-            }
-          ]
+              title: 'Share to Example',
+            },
+          ],
         }
       })
 

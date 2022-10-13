@@ -48,7 +48,7 @@ export default class AsyncHelper {
 
   waitForRequests = () => {
     return new Promise(resolve => {
-      var defer = () =>
+      const defer = () =>
         Ember.run.later(() => {
           if (this.pendingRequests) {
             return defer()

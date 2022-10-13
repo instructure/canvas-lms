@@ -36,7 +36,7 @@ function delaySend($target, methodName, ...args) {
     RCELOADED_EVENT_NAME,
     {
       method_name: methodName,
-      args
+      args,
     },
     (e, remoteEditor) => {
       remoteEditor.call(e.data.method_name, ...e.data.args)

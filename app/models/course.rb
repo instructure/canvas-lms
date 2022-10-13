@@ -914,15 +914,17 @@ class Course < ActiveRecord::Base
   scope :without_enrollments, lambda {
     where("NOT EXISTS (?)", Enrollment.active.where("enrollments.course_id=courses.id"))
   }
+
+  # completed and not_completed -- logic should match up as much as possible with #soft_concluded?
   scope :completed, lambda {
     joins(:enrollment_term)
-      .where("courses.workflow_state='completed' OR courses.conclude_at<? OR enrollment_terms.end_at<?", Time.now.utc, Time.now.utc)
+      .where("courses.workflow_state='completed' OR courses.conclude_at<? OR (courses.conclude_at IS NULL AND enrollment_terms.end_at<?)", Time.now.utc, Time.now.utc)
   }
   scope :not_completed, lambda {
     joins(:enrollment_term)
       .where("courses.workflow_state<>'completed' AND
           (courses.conclude_at IS NULL OR courses.conclude_at>=?) AND
-          (enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)", Time.now.utc, Time.now.utc)
+          (courses.conclude_at IS NOT NULL OR enrollment_terms.end_at IS NULL OR enrollment_terms.end_at>=?)", Time.now.utc, Time.now.utc)
   }
   scope :by_teachers, lambda { |teacher_ids|
     if teacher_ids.empty?
@@ -1941,6 +1943,7 @@ class Course < ActiveRecord::Base
   end
 
   # Public: Return true if the end date for a course (or its term, if the course doesn't have one) has passed.
+  # Logic should match up as much as possible with scopes `completed` and `not_completed`
   #
   # Returns boolean
   def soft_concluded?(enrollment_type = nil)

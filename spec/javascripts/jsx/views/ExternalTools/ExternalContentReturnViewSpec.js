@@ -29,7 +29,7 @@ QUnit.module('ExternalContentReturnView screenreader only content', {
   setup() {
     fakeENV.setup({
       context_asset_string: 'courses_1',
-      LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media']
+      LTI_LAUNCH_FRAME_ALLOWANCES: ['midi', 'media'],
     })
     view = new ExternalContentReturnView({model: new ExternalTool()})
     view.render()
@@ -39,7 +39,7 @@ QUnit.module('ExternalContentReturnView screenreader only content', {
 
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('shows beginning info alert and adds class to iframe', () => {

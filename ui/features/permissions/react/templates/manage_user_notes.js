@@ -25,77 +25,77 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Global Navigation'),
-      description: I18n.t('Allows user to view the Faculty Journal link in Global Navigation.')
+      description: I18n.t('Allows user to view the Faculty Journal link in Global Navigation.'),
     },
     {
       title: I18n.t('Student Interaction Report'),
       description: I18n.t(
         'Allows user to view Faculty Journal entries in the Student Interactions Report.'
-      )
+      ),
     },
     {
       title: I18n.t('User Details'),
       description: I18n.t(
         'Allows user to view a link to the Faculty Journal in the User Details page sidebar.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'Allows user to view Faculty Journal information for individual students.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to create new entries in the Faculty Journal.')
-    }
+      description: I18n.t('Allows user to create new entries in the Faculty Journal.'),
+    },
   ],
   [
     {
       title: I18n.t('Reports'),
       description: I18n.t(
         'To view the Student Interactions Report, Grades - view all grades and Courses - view usage reports must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('User Details'),
       description: I18n.t(
         'To view the User Details page for a student, Users - add/remove students in courses must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Student Interaction Report'),
       description: I18n.t(
         'Allows user to view Faculty Journal entries in the Student Interactions Report.'
-      )
+      ),
     },
     {
       title: I18n.t('User Details'),
       description: I18n.t(
         'Allows user to view a link to the Faculty Journal in the User Details page sidebar.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'Allows user to view Faculty Journal information for individual students.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to create new entries in the Faculty Journal.')
-    }
+      description: I18n.t('Allows user to create new entries in the Faculty Journal.'),
+    },
   ],
   [
     {
       title: I18n.t('Reports'),
       description: I18n.t(
         'To view the Student Interactions Report, Grades - view all grades and Courses - view usage reports must also be enabled.'
-      )
+      ),
     },
     {
       title: I18n.t('User Details'),
       description: I18n.t(
         'To view the User Details page for a student, Users - add/remove students in courses must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

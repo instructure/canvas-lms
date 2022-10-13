@@ -30,7 +30,7 @@ import {
   NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
   SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
   STARTED,
-  SUCCESS
+  SUCCESS,
 } from '../assignment/AssignmentActions'
 
 const I18n = useI18nScope('assignment_grade_summary')
@@ -71,7 +71,7 @@ export default function ReleaseButton(props) {
     ...otherProps,
     disabled: !isValidSelection || null,
     'aria-readonly': !canClick,
-    onClick: canClick ? onClick : null
+    onClick: canClick ? onClick : null,
   }
 
   if (gradesReleased) {
@@ -94,10 +94,10 @@ ReleaseButton.propTypes = {
     NOT_ALL_SUBMISSIONS_HAVE_SELECTED_GRADE,
     SELECTED_GRADES_FROM_UNAVAILABLE_GRADERS,
     STARTED,
-    SUCCESS
-  ])
+    SUCCESS,
+  ]),
 }
 
 ReleaseButton.defaultProps = {
-  releaseGradesStatus: null
+  releaseGradesStatus: null,
 }

@@ -20,27 +20,27 @@ export const MOCK_OBSERVED_USERS_LIST = [
   {
     id: '13',
     name: 'Zelda',
-    avatar_url: 'http://avatar'
+    avatar_url: 'http://avatar',
   },
   {
     id: '4',
     name: 'Student 4',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
+    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png',
   },
   {
     id: '2',
     name: 'Student 2',
     avatar_url:
-      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
+      'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h',
   },
   {
     id: '5',
     name: 'Student 5',
-    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
-  }
+    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png',
+  },
 ]
 
 export const SHOW_K5_DASHBOARD_ROUTE = /\/api\/v1\/show_k5_dashboard/
 export const showK5DashboardResponse = (k5User = true) => ({
-  show_k5_dashboard: k5User
+  show_k5_dashboard: k5User,
 })

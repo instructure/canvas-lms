@@ -25,7 +25,7 @@ test('generates the correct fetch url', () => {
   const content_migration_id = 10
   const cmiCollection = new ContentMigrationIssueCollection([], {
     course_id,
-    content_migration_id
+    content_migration_id,
   })
   equal(
     cmiCollection.url(),

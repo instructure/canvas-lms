@@ -51,10 +51,10 @@ export function DueDatesForParticipantList({...props}) {
               <Link onClick={() => setIsExpanded(!isExpanded)}>
                 {isExpanded
                   ? I18n.t('%{count} less', {
-                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO
+                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO,
                     })
                   : I18n.t('%{count} more', {
-                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO
+                      count: props.assignmentOverride.set.students.length - TRUNCATE_TO,
                     })}
               </Link>
             </Text>
@@ -74,5 +74,5 @@ export function DueDatesForParticipantList({...props}) {
 DueDatesForParticipantList.propTypes = {
   assignmentOverride: AssignmentOverride.shape,
   textSize: PropTypes.string,
-  overrideTitle: PropTypes.string
+  overrideTitle: PropTypes.string,
 }

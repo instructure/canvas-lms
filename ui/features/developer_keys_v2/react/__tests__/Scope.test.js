@@ -24,14 +24,14 @@ const scope = {
   resource: 'account_domain_lookups',
   verb: 'GET',
   path: '/api/v1/accounts/search',
-  scope: 'url:GET|/api/v1/accounts/search'
+  scope: 'url:GET|/api/v1/accounts/search',
 }
 
 it('checks the checkbox if the checked prop is true', () => {
   const props = {
     onChange: jest.fn(),
     checked: true,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
@@ -42,7 +42,7 @@ it('does not check the checkbox if the checked prop is false', () => {
   const props = {
     onChange: jest.fn(),
     checked: false,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
@@ -53,7 +53,7 @@ it('renders Enable Scope if not checked', () => {
   const props = {
     onChange: jest.fn(),
     checked: false,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
@@ -64,7 +64,7 @@ it('renders Disable Scope if checked', () => {
   const props = {
     onChange: jest.fn(),
     checked: true,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
@@ -75,7 +75,7 @@ it('renders scope', () => {
   const props = {
     onChange: jest.fn(),
     checked: true,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)
@@ -86,7 +86,7 @@ it('renders the scope verb', () => {
   const props = {
     onChange: jest.fn(),
     checked: false,
-    scope
+    scope,
   }
 
   const wrapper = mount(<DeveloperKeyScope {...props} />)

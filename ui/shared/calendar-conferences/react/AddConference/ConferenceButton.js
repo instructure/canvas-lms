@@ -33,7 +33,7 @@ const ConferenceButton = ({
   currentConferenceType,
   onSelect,
   inputRef,
-  disabled
+  disabled,
 }) => {
   if (!conferenceTypes || conferenceTypes.length === 0) {
     return (
@@ -77,12 +77,12 @@ ConferenceButton.propTypes = {
   conferenceTypes: PropTypes.arrayOf(webConferenceType).isRequired,
   currentConferenceType: webConferenceType,
   onSelect: PropTypes.func.isRequired,
-  inputRef: PropTypes.func
+  inputRef: PropTypes.func,
 }
 
 ConferenceButton.defaultProps = {
   currentConferenceType: null,
-  inputRef: null
+  inputRef: null,
 }
 
 export default ConferenceButton

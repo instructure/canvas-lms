@@ -18,7 +18,7 @@
 
 import React from 'react'
 import * as enzyme from 'enzyme'
-import BlueprintAssociations from 'ui/features/blueprint_course_master/react/components/BlueprintAssociations.js'
+import BlueprintAssociations from 'ui/features/blueprint_course_master/react/components/BlueprintAssociations'
 import getSampleData from '../getSampleData'
 
 QUnit.module('BlueprintAssociations component')
@@ -38,7 +38,7 @@ const defaultProps = () => ({
   isSavingAssociations: false,
   hasUnsyncedChanges: false,
   subAccounts: getSampleData().subAccounts,
-  terms: getSampleData().terms
+  terms: getSampleData().terms,
 })
 
 test('renders the BlueprintAssociations component', () => {

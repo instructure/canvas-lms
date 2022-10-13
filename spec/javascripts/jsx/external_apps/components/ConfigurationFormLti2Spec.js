@@ -19,7 +19,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import ConfigurationFormLti2 from 'ui/features/external_apps/react/components/ConfigurationFormLti2.js'
+import ConfigurationFormLti2 from 'ui/features/external_apps/react/components/ConfigurationFormLti2'
 
 const {Simulate} = TestUtils
 const wrapper = document.getElementById('fixtures')
@@ -29,7 +29,7 @@ const renderComponent = data => ReactDOM.render(createElement(data), wrapper)
 QUnit.module('ExternalApps.ConfigurationFormLti2', {
   teardown() {
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('renders', () => {

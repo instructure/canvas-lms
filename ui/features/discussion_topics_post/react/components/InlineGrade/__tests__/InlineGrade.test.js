@@ -22,7 +22,7 @@ import {InlineGrade} from '../InlineGrade'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 const setup = props => {
@@ -33,12 +33,12 @@ const defaultProps = ({
   isGraded = false,
   isLoading = false,
   currentGrade = '',
-  pointsPossible = '100'
+  pointsPossible = '100',
 } = {}) => ({
   isGraded,
   isLoading,
   currentGrade,
-  pointsPossible
+  pointsPossible,
 })
 
 describe('DiscussionTopicAlertManager', () => {

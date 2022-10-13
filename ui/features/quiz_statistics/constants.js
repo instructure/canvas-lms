@@ -25,7 +25,7 @@ export default {
     'points_possible',
     'speed_grader_url',
     'anonymous_survey',
-    'quiz_submissions_zip_url'
+    'quiz_submissions_zip_url',
   ],
 
   SUBMISSION_STATISTICS_ATTRS: [
@@ -35,7 +35,7 @@ export default {
     'score_stdev',
     'scores',
     'duration_average',
-    'unique_count'
+    'unique_count',
   ],
 
   QUESTION_STATISTICS_ATTRS: [
@@ -67,7 +67,7 @@ export default {
 
     // Essay
     'full_credit',
-    'point_distribution'
+    'point_distribution',
   ],
 
   POINT_BISERIAL_ATTRS: ['answer_id', 'correct', 'distractor', 'point_biserial'],
@@ -78,14 +78,14 @@ export default {
     'readable_type',
     'generatable',
     'includes_all_versions',
-    'url'
+    'url',
   ],
 
   PROGRESS_ATTRS: [
     'id',
     'completion',
     'url', // for polling
-    'workflow_state'
+    'workflow_state',
   ],
 
   ATTACHMENT_ATTRS: ['created_at', 'url'],
@@ -93,5 +93,5 @@ export default {
   PROGRESS_QUEUED: 'queued',
   PROGRESS_ACTIVE: 'running',
   PROGRESS_COMPLETE: 'completed',
-  PROGRESS_FAILED: 'failed'
+  PROGRESS_FAILED: 'failed',
 }

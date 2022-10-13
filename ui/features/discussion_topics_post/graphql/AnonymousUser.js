@@ -31,21 +31,21 @@ export const AnonymousUser = {
   shape: shape({
     id: string,
     avatarUrl: string,
-    shortName: string
+    shortName: string,
   }),
 
   mock: ({id = '1', avatarUrl = null, shortName = '1'} = {}) => ({
     id,
     avatarUrl,
     shortName,
-    __typename: 'AnonymousUser'
-  })
+    __typename: 'AnonymousUser',
+  }),
 }
 
 export const DefaultMocks = {
   AnonymousUser: () => ({
     id: '1',
     avatarUrl: null,
-    shortName: '1'
-  })
+    shortName: '1',
+  }),
 }

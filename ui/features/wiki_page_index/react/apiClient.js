@@ -29,7 +29,7 @@ export function deletePages(contextName, contextId, pageUrls) {
       return axios.delete(url)
     },
     {
-      poolSize: MAX_CONCURRENT_REQS
+      poolSize: MAX_CONCURRENT_REQS,
     }
   )
 }

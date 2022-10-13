@@ -25,13 +25,13 @@ export default {
   args: {
     method: {
       calculationMethod: 'decaying_average',
-      calculationInt: 65
+      calculationInt: 65,
     },
     canManage: true,
     update: () => {},
     onNotifyPendingChanges: () => {},
-    contextType: 'Account'
-  }
+    contextType: 'Account',
+  },
 }
 
 const Template = args => <ProficiencyCalculation {...args} />

@@ -27,7 +27,7 @@ import {
   loadPlannerDashboard,
   reloadPlannerForObserver,
   renderToDoSidebar,
-  responsiviser
+  responsiviser,
 } from '@instructure/canvas-planner'
 import {asAxios, getPrefetchedXHR} from '@instructure/js-utils'
 import {showFlashAlert, showFlashError} from '@canvas/alerts/react/FlashAlert'
@@ -50,7 +50,7 @@ const [show, hide] = ['block', 'none'].map(displayVal => id => {
 })
 
 const observerMode = () =>
-  ENV.FEATURES?.observer_picker && ENV.current_user_roles?.includes('observer')
+  ENV.current_user_roles?.includes('observer')
 
 /**
  * This component renders the header and the to do sidebar for the user
@@ -64,7 +64,7 @@ class DashboardHeader extends React.Component {
     allowElementaryDashboard: bool,
     env: object,
     loadDashboardSidebar: func,
-    responsiveSize: oneOf(['small', 'medium', 'large'])
+    responsiveSize: oneOf(['small', 'medium', 'large']),
   }
 
   static defaultProps = {
@@ -72,7 +72,7 @@ class DashboardHeader extends React.Component {
     screenReaderFlashMessage: () => {},
     env: {},
     loadDashboardSidebar,
-    responsiveSize: 'large'
+    responsiveSize: 'large',
   }
 
   constructor(...args) {
@@ -101,11 +101,11 @@ class DashboardHeader extends React.Component {
         dateTimeFormatters: {
           dateString: $.dateString,
           timeString: $.timeString,
-          datetimeString: $.datetimeString
+          datetimeString: $.datetimeString,
         },
         externalFallbackFocusable: this.menuButtonFocusable,
         observedUser,
-        env: this.props.env
+        env: this.props.env,
       })
     }
   }
@@ -117,7 +117,7 @@ class DashboardHeader extends React.Component {
       ? this.props.dashboard_view
       : 'cards',
     loadedViews: [],
-    selectedObserveeId: null
+    selectedObserveeId: null,
   }
 
   componentDidMount() {
@@ -219,7 +219,7 @@ class DashboardHeader extends React.Component {
   saveDashboardView(newView) {
     axios
       .put('/dashboard/view', {
-        dashboard_view: newView
+        dashboard_view: newView,
       })
       .catch(() => {
         showFlashError(I18n.t('Failed to save dashboard selection'))()
@@ -229,7 +229,7 @@ class DashboardHeader extends React.Component {
   saveElementaryPreference(disabled) {
     return axios
       .put('/api/v1/users/self/settings', {
-        elementary_dashboard_disabled: disabled
+        elementary_dashboard_disabled: disabled,
       })
       .then(() => window.location.reload())
       .catch(showFlashError(I18n.t('Failed to save dashboard selection')))
@@ -282,7 +282,7 @@ class DashboardHeader extends React.Component {
     const elements = {
       planner: ['dashboard-planner', 'dashboard-planner-header', 'dashboard-planner-header-aux'],
       activity: ['dashboard-activity', 'right-side-wrapper'],
-      cards: ['DashboardCard_Container', 'right-side-wrapper']
+      cards: ['DashboardCard_Container', 'right-side-wrapper'],
     }
     this.loadDashboard(newView)
 
@@ -384,7 +384,7 @@ function loadDashboardSidebar(observedUserId) {
         startButton.addEventListener('click', () => {
           ReactDOM.render(
             <CreateCourseModal
-              isModalOpen
+              isModalOpen={true}
               setModalOpen={isOpen => {
                 if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
               }}

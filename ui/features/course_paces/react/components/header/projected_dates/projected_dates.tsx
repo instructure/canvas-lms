@@ -32,7 +32,7 @@ import {
   getCoursePaceItems,
   getCompression,
   getPaceDuration,
-  getPlannedEndDate
+  getPlannedEndDate,
 } from '../../../reducers/course_paces'
 import {coursePaceTimezone, coursePaceDateFormatter} from '../../../shared/api/backend_serializer'
 
@@ -50,7 +50,7 @@ const START_DATE_CAPTIONS = {
   // by the term or course dates
   term: I18n.t('Determined by course start date'),
   section: I18n.t('Determined by section start date'),
-  hypothetical: I18n.t("Determined by today's date")
+  hypothetical: I18n.t("Determined by today's date"),
 }
 
 const END_DATE_CAPTIONS = {
@@ -59,7 +59,7 @@ const END_DATE_CAPTIONS = {
   course: I18n.t('Determined by course end date'),
   term: I18n.t('Determined by course end date'),
   section: I18n.t('Determined by section end date'),
-  hypothetical: I18n.t('Determined by course pace')
+  hypothetical: I18n.t('Determined by course pace'),
 }
 
 type StoreProps = {
@@ -79,7 +79,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
   plannedEndDate,
   compressDates,
   uncompressDates,
-  compression
+  compression,
 }) => {
   const [dateFormatter] = useState(coursePaceDateFormatter)
 
@@ -139,7 +139,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
               {I18n.t(
                 {
                   one: '1 assignment',
-                  other: '%{count} assignments'
+                  other: '%{count} assignments',
                 },
                 {count: assignments}
               )}
@@ -153,7 +153,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
               {I18n.t(
                 {
                   one: '1 week',
-                  other: '%{count} weeks'
+                  other: '%{count} weeks',
                 },
                 {count: paceDuration.weeks}
               )}
@@ -161,7 +161,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
               {I18n.t(
                 {
                   one: '1 day',
-                  other: '%{count} days'
+                  other: '%{count} days',
                 },
                 {count: paceDuration.days}
               )}{' '}
@@ -190,12 +190,12 @@ export const ProjectedDates: React.FC<StoreProps> = ({
                 'coursepace-start-date'
               )}
             </FlexItem>
-            <FlexItem margin="0 medium medium 0" shouldGrow>
+            <FlexItem margin="0 medium medium 0" shouldGrow={true}>
               {renderDate(I18n.t('End Date'), endDateValue, endHelpText, 'coursepace-end-date')}
             </FlexItem>
           </>
         )}
-        <FlexItem margin="0 0 x-small 0" shouldGrow>
+        <FlexItem margin="0 0 x-small 0" shouldGrow={true}>
           {renderSummary()}
         </FlexItem>
       </Flex>
@@ -209,10 +209,10 @@ const mapStateToProps = (state: StoreState) => {
     assignments: getCoursePaceItems(state).length,
     paceDuration: getPaceDuration(state),
     plannedEndDate: getPlannedEndDate(state),
-    compression: getCompression(state)
+    compression: getCompression(state),
   }
 }
 export default connect(mapStateToProps, {
   compressDates: actions.compressDates,
-  uncompressDates: actions.uncompressDates
+  uncompressDates: actions.uncompressDates,
 })(ProjectedDates)

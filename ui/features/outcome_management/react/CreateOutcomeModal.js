@@ -36,18 +36,18 @@ import {titleValidator, displayNameValidator} from '../validators/outcomeValidat
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {
   CREATE_LEARNING_OUTCOME,
-  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION
+  SET_OUTCOME_FRIENDLY_DESCRIPTION_MUTATION,
 } from '@canvas/outcomes/graphql/Management'
 import {useManageOutcomes} from '@canvas/outcomes/react/treeBrowser'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {useMutation} from 'react-apollo'
 import OutcomesRceField from './shared/OutcomesRceField'
 import ProficiencyCalculation, {
-  defaultProficiencyCalculation
+  defaultProficiencyCalculation,
 } from './MasteryCalculation/ProficiencyCalculation'
 import useRatings, {
   defaultRatings,
-  defaultMasteryPoints
+  defaultMasteryPoints,
 } from '@canvas/outcomes/react/hooks/useRatings'
 import useOutcomeFormValidate from '@canvas/outcomes/react/hooks/useOutcomeFormValidate'
 import {processRatingsAndMastery} from '@canvas/outcomes/react/helpers/ratingsHelpers'
@@ -69,7 +69,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   const [createLearningOutcome] = useMutation(CREATE_LEARNING_OUTCOME)
   const {rootId, collections} = useManageOutcomes({
     collection: 'OutcomeManagementPanel',
-    initialGroupId: starterGroupId
+    initialGroupId: starterGroupId,
   })
   const {
     ratings,
@@ -79,10 +79,10 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     ratingsError,
     masteryPointsError,
     clearRatingsFocus,
-    focusOnRatingsError
+    focusOnRatingsError,
   } = useRatings({
     initialRatings: defaultRatings,
-    initialMasteryPoints: defaultMasteryPoints
+    initialMasteryPoints: defaultMasteryPoints,
   })
   const {
     validateForm,
@@ -91,7 +91,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
     setDisplayNameRef,
     setFriendlyDescriptionRef,
     setMasteryPointsRef,
-    setCalcIntRef
+    setCalcIntRef,
   } = useOutcomeFormValidate({focusOnRatingsError, clearRatingsFocus})
 
   const [selectedGroup, setSelectedGroup] = useState(null)
@@ -134,7 +134,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
   if (friendlyDescription.length > 255) {
     friendlyDescriptionMessages.push({
       text: I18n.t('Must be 255 characters or less'),
-      type: 'error'
+      type: 'error',
     })
   }
 
@@ -145,7 +145,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
       ratingsError,
       friendlyDescriptionError: friendlyDescriptionMessages.length > 0,
       displayNameError: invalidDisplayName,
-      titleError: invalidTitle
+      titleError: invalidTitle,
     }) && selectedGroup
       ? onCreateOutcomeHandler()
       : focusOnError()
@@ -160,7 +160,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
           groupId: selectedGroup.id,
           title,
           displayName,
-          description
+          description,
         }
         if (!accountLevelMasteryScalesFF) {
           input.calculationMethod = proficiencyCalculation.calculationMethod
@@ -172,8 +172,8 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
         }
         const createLearningOutcomeResult = await createLearningOutcome({
           variables: {
-            input
-          }
+            input,
+          },
         })
 
         const outcomeId =
@@ -190,9 +190,9 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 outcomeId,
                 description: friendlyDescription,
                 contextId,
-                contextType
-              }
-            }
+                contextType,
+              },
+            },
           })
         }
         onSuccess({selectedGroupAncestorIds})
@@ -203,12 +203,12 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
 
         showFlashAlert({
           message: I18n.t('"%{title}" was successfully created.', {title}),
-          type: 'success'
+          type: 'success',
         })
       } catch (err) {
         showFlashAlert({
           message: I18n.t('An error occurred while creating this outcome. Please try again.'),
-          type: 'error'
+          type: 'error',
         })
       }
     })()
@@ -247,7 +247,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
         size={!isMobileView ? 'large' : 'fullscreen'}
         label={I18n.t('Create Outcome')}
         open={isOpen}
-        shouldReturnFocus
+        shouldReturnFocus={true}
         onDismiss={closeModal}
         shouldCloseOnDocumentClick={false}
         data-testid="createOutcomeModal"
@@ -298,7 +298,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                 onChangeRatings={setRatings}
                 masteryPoints={masteryPoints}
                 onChangeMasteryPoints={setMasteryPoints}
-                canManage
+                canManage={true}
                 masteryInputRef={setMasteryPointsRef}
               />
               <View as="div" minHeight="14rem">
@@ -312,7 +312,7 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
                   setError={setProficiencyCalculationError}
                   masteryPoints={masteryPoints.value}
                   individualOutcome="edit"
-                  canManage
+                  canManage={true}
                   calcIntInputRef={setCalcIntRef}
                 />
               </View>
@@ -355,14 +355,14 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
 }
 
 CreateOutcomeModal.defaultProps = {
-  onSuccess: () => {}
+  onSuccess: () => {},
 }
 
 CreateOutcomeModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onSuccess: PropTypes.func,
-  starterGroupId: PropTypes.string
+  starterGroupId: PropTypes.string,
 }
 
 export default CreateOutcomeModal

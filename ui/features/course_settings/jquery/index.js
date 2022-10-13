@@ -18,10 +18,8 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import {tabIdFromElement} from './course_settings_helper'
 import tz from '@canvas/timezone'
-import forceScreenReaderToReparse from 'force-screenreader-to-reparse'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime' /* datetimeString, date_field */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, fillFormData, getFormData, formErrors */
@@ -55,18 +53,18 @@ var GradePublishing = {
   update(messages, requestInProgress) {
     const $publish_grades_link = $('#publish_grades_link'),
       $publish_grades_error = $('#publish_grades_error')
-    if (GradePublishing.status == 'published') {
+    if (GradePublishing.status === 'published') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Resync grades to SIS'))
       $publish_grades_link.removeClass('disabled')
-    } else if (GradePublishing.status == 'publishing' || GradePublishing.status == 'pending') {
+    } else if (GradePublishing.status === 'publishing' || GradePublishing.status === 'pending') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Syncing grades to SIS...'))
       if (!requestInProgress) {
         setTimeout(GradePublishing.checkup, 5000)
       }
       $publish_grades_link.addClass('disabled')
-    } else if (GradePublishing.status == 'unpublished') {
+    } else if (GradePublishing.status === 'unpublished') {
       $publish_grades_error.hide()
       $publish_grades_link.text(I18n.t('Sync grades to SIS'))
       $publish_grades_link.removeClass('disabled')
@@ -89,8 +87,8 @@ var GradePublishing = {
   publish() {
     let confirmMessage
     if (
-      GradePublishing.status == 'publishing' ||
-      GradePublishing.status == 'pending' ||
+      GradePublishing.status === 'publishing' ||
+      GradePublishing.status === 'pending' ||
       GradePublishing.status == null
     ) {
       return
@@ -111,7 +109,7 @@ var GradePublishing = {
     GradePublishing.status = 'publishing'
     GradePublishing.update({}, true)
     const successful_statuses = {published: 1, publishing: 1, pending: 1}
-    const error = function (data, xhr, status, error) {
+    const error = function (_data, _xhr, _status, _error) {
       GradePublishing.status = 'unknown'
       $.flashError(
         I18n.t(
@@ -139,7 +137,7 @@ var GradePublishing = {
       },
       error
     )
-  }
+  },
 }
 
 function checkHomeroomSyncProgress(progress) {
@@ -197,7 +195,7 @@ $(document).ready(function () {
 
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $add_section_form
         .find('button')
         .attr('disabled', true)
@@ -214,7 +212,7 @@ $(document).ready(function () {
         .text(I18n.t('buttons.add_section', 'Add Section'))
       $section.fillTemplateData({
         data: section,
-        hrefValues: ['id']
+        hrefValues: ['id'],
       })
       $section.find('.screenreader-only').each((_index, el) => {
         const $el = $(el)
@@ -236,9 +234,9 @@ $(document).ready(function () {
         .find('button')
         .attr('disabled', false)
         .text(I18n.t('errors.section', 'Add Section Failed, Please Try Again'))
-    }
+    },
   })
-  $('.cant_delete_section_link').click(function (event) {
+  $('.cant_delete_section_link').click(function (_event) {
     alert($(this).attr('title'))
     return false
   })
@@ -261,14 +259,14 @@ $(document).ready(function () {
         $section.loadingImage('remove').find('.edit_section_link').click()
         $edit_section_form.formErrors(data)
         this.find('#course_section_name_edit').focus()
-      }
+      },
     })
     .find(':text')
     .bind('blur', () => {
       $edit_section_form.submit()
     })
     .keycodes('return esc', function (event) {
-      if (event.keyString == 'return') {
+      if (event.keyString === 'return') {
         $edit_section_form.submit()
       } else {
         $(this).parents('.section').find('.name').show()
@@ -291,7 +289,7 @@ $(document).ready(function () {
       .confirmDelete({
         url: $(this).attr('href'),
         message: I18n.t('confirm.delete_section', 'Are you sure you want to delete this section?'),
-        success(data) {
+        success(_data) {
           const $prevItem = $(this).prev()
           const $toFocus = $prevItem.length
             ? $prevItem.find('.delete_section_link,.cant_delete_section_link')
@@ -300,13 +298,11 @@ $(document).ready(function () {
             $(this).remove()
             $toFocus.focus()
           })
-        }
+        },
       })
     return false
   })
   $('#nav_form').submit(function () {
-    const tab_id_regex = /(\d+)$/
-
     const tabs = []
     $('#nav_enabled_list li').each(function () {
       const tab_id = tabIdFromElement(this)
@@ -330,7 +326,7 @@ $(document).ready(function () {
     $('#nav_form').dialog({
       modal: true,
       resizable: false,
-      width: 400
+      width: 400,
     })
   })
 
@@ -338,7 +334,7 @@ $(document).ready(function () {
     .sortable({
       items: 'li.enabled',
       connectWith: '.connectedSortable',
-      axis: 'y'
+      axis: 'y',
     })
     .disableSelection()
 
@@ -348,11 +344,11 @@ $(document).ready(function () {
       $('.add_users_link:visible').click()
       $("#enroll_users_form select[name='enrollment_type']").val(val)
     }
-    if (hash == '#add_students') {
+    if (hash === '#add_students') {
       handleFragmentType('StudentEnrollment')
-    } else if (hash == '#add_tas') {
+    } else if (hash === '#add_tas') {
       handleFragmentType('TaEnrollment')
-    } else if (hash == '#add_teacher') {
+    } else if (hash === '#add_teacher') {
       handleFragmentType('TeacherEnrollment')
     }
   })
@@ -360,14 +356,14 @@ $(document).ready(function () {
     source: $('#course_account_id_url').attr('href'),
     select(event, ui) {
       $('#course_account_id').val(ui.item.id)
-    }
+    },
   })
   $('.move_course_link').click(event => {
     event.preventDefault()
     $('#move_course_dialog')
       .dialog({
         title: I18n.t('titles.move_course', 'Move Course'),
-        width: 500
+        width: 500,
       })
       .fixDialogButtons()
   })
@@ -405,13 +401,13 @@ $(document).ready(function () {
       $(this).find('.storage_quota_mb').text(data['course[storage_quota_mb]'])
       $('.course_form_more_options').hide()
     },
-    success(data) {
+    success(_data) {
       $('#course_reload_form').submit()
     },
-    error(data) {
+    error(_data) {
       $(this).loadingImage('remove')
     },
-    disableWhileLoading: 'spin_on_success'
+    disableWhileLoading: 'spin_on_success',
   })
   $('.associated_user_link').click(function (event) {
     event.preventDefault()
@@ -419,7 +415,7 @@ $(document).ready(function () {
     const $enrollment = $(this).parents('.enrollment_link')
     const user_data = $user.getTemplateData({textValues: ['name']})
     const enrollment_data = $enrollment.getTemplateData({
-      textValues: ['enrollment_id', 'associated_user_id']
+      textValues: ['enrollment_id', 'associated_user_id'],
     })
     link_enrollment.choose(
       user_data.name,
@@ -441,7 +437,7 @@ $(document).ready(function () {
   $('.course_info')
     .not('.uneditable')
     .click(function (event) {
-      if (event.target.nodeName == 'INPUT') {
+      if (event.target.nodeName === 'INPUT') {
         return
       }
       const $obj = $(this).parents('td').find('.course_form')
@@ -481,19 +477,19 @@ $(document).ready(function () {
       url,
       'POST',
       {},
-      data => {
+      _data => {
         $enrollment_dialog.fillTemplateData({
-          data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+          data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
         })
         $link.text(I18n.t('invitation_sent', 'Invitation Sent!'))
         const $user = $enrollment_dialog.data('user')
         if ($user) {
           $user.fillTemplateData({
-            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
           })
         }
       },
-      data => {
+      _data => {
         $link.text(I18n.t('errors.invitation', 'Invitation Failed.  Please try again.'))
       }
     )
@@ -525,14 +521,14 @@ $(document).ready(function () {
       $button.attr('href'),
       'POST',
       {},
-      function (data) {
+      function (_data) {
         $button
           .text(I18n.t('buttons.re_sent_all', 'Re-Sent All Unaccepted Invitations!'))
           .attr('disabled', false)
         $('.user_list .user.pending').each(function () {
           const $user = $(this)
           $user.fillTemplateData({
-            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')}
+            data: {invitation_sent_at: I18n.t('invitation_sent_now', 'Just Now')},
           })
         })
         setTimeout(() => {
@@ -566,7 +562,7 @@ $(document).ready(function () {
       event.preventDefault()
       $('#reset_course_content_dialog').dialog({
         title: I18n.t('titles.reset_course_content_dialog_help', 'Reset Course Content'),
-        width: 500
+        width: 500,
       })
 
       $('.ui-dialog').focus()
@@ -576,11 +572,11 @@ $(document).ready(function () {
     $('#reset_course_content_dialog').dialog('close')
   })
 
-  $('#course_custom_course_visibility').click(function (event) {
+  $('#course_custom_course_visibility').click(function (_event) {
     $('#customize_course_visibility').toggle(this.checked)
   })
 
-  $('#course_custom_course_visibility').ready(event => {
+  $('#course_custom_course_visibility').ready(_event => {
     if ($('#course_custom_course_visibility').prop('checked')) {
       $('#customize_course_visibility').toggle(true)
     } else {
@@ -615,16 +611,16 @@ $(document).ready(function () {
     })
   }
 
-  $('#course_course_visibility').change(function (event) {
+  $('#course_course_visibility').change(function (_event) {
     refresh_visibility_options()
     $('#customize_course_visibility select').val($('#course_course_visibility').val())
   })
 
-  $('#course_custom_course_visibility').ready(event => {
+  $('#course_custom_course_visibility').ready(_event => {
     refresh_visibility_options()
   })
 
-  $('#course_show_announcements_on_home_page').change(function (event) {
+  $('#course_show_announcements_on_home_page').change(function (_event) {
     $('#course_home_page_announcement_limit').prop('disabled', !$(this).prop('checked'))
   })
 

@@ -50,7 +50,7 @@ describe('TimeLateInput', () => {
       renderLabelBefore: false,
       secondsLate: 0,
       onSecondsLateUpdated: jest.fn(),
-      width: '5rem'
+      width: '5rem',
     }
   })
 

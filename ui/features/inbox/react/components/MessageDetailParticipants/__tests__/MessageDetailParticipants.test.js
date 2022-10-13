@@ -27,8 +27,8 @@ describe('MessageDetailParticipants', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
-        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}]
-      }
+        recipients: [{name: 'Tom Thompson'}, {name: 'Billy Harris'}],
+      },
     }
 
     const {getByText} = render(<MessageDetailParticipants {...props} />)
@@ -41,8 +41,8 @@ describe('MessageDetailParticipants', () => {
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
-        recipients: participantList
-      }
+        recipients: participantList,
+      },
     }
     const container = render(<MessageDetailParticipants {...props} />)
     expect(container.queryByTestId('participant-list')).not.toBeInTheDocument()
@@ -66,13 +66,13 @@ describe('MessageDetailParticipants', () => {
       {name: 'Cristoforo Gülnarə'},
       {name: 'Katka Lauge'},
       {name: 'Sofia Fernanda'},
-      {name: 'Orestes Etheldreda'}
+      {name: 'Orestes Etheldreda'},
     ]
     const props = {
       conversationMessage: {
         author: {name: 'Tom Thompson'},
-        recipients: participantList
-      }
+        recipients: participantList,
+      },
     }
 
     const container = render(<MessageDetailParticipants {...props} />)

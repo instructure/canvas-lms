@@ -64,7 +64,7 @@ const useSelectedOutcomes = (initialValue = new Set()) => {
     toggleSelectedOutcomes,
     clearSelectedOutcomes,
     removeSelectedOutcome,
-    dispatchSelectedOutcomeIds
+    dispatchSelectedOutcomeIds,
   }
 }
 

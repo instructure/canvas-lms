@@ -33,14 +33,14 @@ const SlideTransition: React.FC<ComponentProps> = ({children, direction, expande
     direction === 'horizontal'
       ? {
           as: 'span',
-          width: expanded ? size : '0'
+          width: expanded ? size : '0',
         }
       : {}
   const verticalProps =
     direction === 'vertical'
       ? {
           as: 'div',
-          maxHeight: expanded ? size : '0'
+          maxHeight: expanded ? size : '0',
         }
       : {}
   return (
@@ -50,7 +50,7 @@ const SlideTransition: React.FC<ComponentProps> = ({children, direction, expande
       {...horizontalProps}
       {...verticalProps}
     >
-      <Transition in={expanded} type="fade" unmountOnExit theme={{duration: '500ms'}}>
+      <Transition in={expanded} type="fade" unmountOnExit={true} theme={{duration: '500ms'}}>
         {children}
       </Transition>
     </View>

@@ -22,7 +22,7 @@ import {InlineGrade} from './InlineGrade'
 export default {
   title: 'Examples/Discussion Posts/Components/InlineGrade',
   component: InlineGrade,
-  argTypes: {onGradeChange: {action: 'Grade Change'}}
+  argTypes: {onGradeChange: {action: 'Grade Change'}},
 }
 
 const Template = args => <InlineGrade {...args} />
@@ -30,7 +30,7 @@ const Template = args => <InlineGrade {...args} />
 export const NeedsGrading = Template.bind({})
 NeedsGrading.args = {
   isGraded: false,
-  pointsPossible: '100'
+  pointsPossible: '100',
 }
 
 export const Loading = Template.bind({})
@@ -38,12 +38,12 @@ Loading.args = {
   currentGrade: '90',
   isLoading: true,
   isGraded: false,
-  pointsPossible: '100'
+  pointsPossible: '100',
 }
 
 export const Graded = Template.bind({})
 Graded.args = {
   currentGrade: '90',
   isGraded: true,
-  pointsPossible: '100'
+  pointsPossible: '100',
 }

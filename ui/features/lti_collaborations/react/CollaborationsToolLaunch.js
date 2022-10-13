@@ -19,6 +19,7 @@
 import React from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('collaborations')
 
@@ -31,7 +32,7 @@ class CollaborationsToolLaunch extends React.Component {
       height: 500,
       beforeExternalContentAlertClass: 'screenreader-only',
       afterExternalContentAlertClass: 'screenreader-only',
-      iframeStyle: {}
+      iframeStyle: {},
     }
 
     main = document.querySelector('#main')
@@ -52,13 +53,13 @@ class CollaborationsToolLaunch extends React.Component {
 
   setHeight = () => {
     this.setState({
-      height: main.getBoundingClientRect().height - 48
+      height: main.getBoundingClientRect().height - 48,
     })
   }
 
   handleAlertFocus = event => {
     const newState = {
-      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`}
+      iframeStyle: {border: '2px solid #0374B5', width: `${this.iframe.offsetWidth - 4}px`},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = ''
@@ -70,7 +71,7 @@ class CollaborationsToolLaunch extends React.Component {
 
   handleAlertBlur = event => {
     const newState = {
-      iframeStyle: {border: 'none', width: '100%'}
+      iframeStyle: {border: 'none', width: '100%'},
     }
     if (event.target.className.search('before') > -1) {
       newState.beforeExternalContentAlertClass = 'screenreader-only'
@@ -99,14 +100,12 @@ class CollaborationsToolLaunch extends React.Component {
             {I18n.t('The following content is partner provided')}
           </div>
         </div>
-        <iframe
-          className="tool_launch"
+        <ToolLaunchIframe
           src={this.props.launchUrl}
           style={this.state.iframeStyle}
           ref={e => {
             this.iframe = e
           }}
-          data-lti-launch="true"
         />
         <div
           onFocus={this.handleAlertFocus}

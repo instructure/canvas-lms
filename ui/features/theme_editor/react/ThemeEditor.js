@@ -38,21 +38,21 @@ const TABS = [
     id: 'te-editor',
     label: I18n.t('Edit'),
     value: 'edit',
-    selected: true
+    selected: true,
   },
   {
     id: 'te-upload',
     label: I18n.t('Upload'),
     value: 'upload',
-    selected: false
-  }
+    selected: false,
+  },
 ]
 
 const OVERRIDE_FILE_KEYS = [
   'js_overrides',
   'css_overrides',
   'mobile_js_overrides',
-  'mobile_css_overrides'
+  'mobile_css_overrides',
 ]
 
 function findVarDef(variableSchema, variableName) {
@@ -85,7 +85,7 @@ export default class ThemeEditor extends React.Component {
     variableSchema: customTypes.variableSchema,
     allowGlobalIncludes: PropTypes.bool,
     accountID: PropTypes.string,
-    useHighContrast: PropTypes.bool
+    useHighContrast: PropTypes.bool,
   }
 
   constructor(props) {
@@ -94,7 +94,7 @@ export default class ThemeEditor extends React.Component {
     const theme = _.flatMap(variableSchema, s => s.variables).reduce(
       (acc, next) => ({
         ...acc,
-        ...{[next.variable_name]: next.default}
+        ...{[next.variable_name]: next.default},
       }),
       {}
     )
@@ -108,15 +108,15 @@ export default class ThemeEditor extends React.Component {
         files: OVERRIDE_FILE_KEYS.map(key => ({
           customFileUpload: true,
           variable_name: key,
-          value: this.originalThemeOverrides[key]
-        }))
+          value: this.originalThemeOverrides[key],
+        })),
       },
       changedValues: {},
       showProgressModal: false,
       progress: 0,
       sharedBrandConfigBeingEdited: readSharedBrandConfigBeingEditedFromStorage(),
       showSubAccountProgress: false,
-      activeSubAccountProgresses: []
+      activeSubAccountProgresses: [],
     }
   }
 
@@ -176,7 +176,7 @@ export default class ThemeEditor extends React.Component {
     if (value instanceof File) {
       const fileStorageObject = {
         variable_name: key,
-        value
+        value,
       }
       if (opts.customFileUpload) {
         fileStorageObject.customFileUpload = true
@@ -190,14 +190,14 @@ export default class ThemeEditor extends React.Component {
     } else {
       properties = {
         ...properties,
-        ...{[key]: value}
+        ...{[key]: value},
       }
     }
 
     if (opts.resetValue) {
       properties = {
         ...properties,
-        ...{[key]: this.originalThemeProperties[key]}
+        ...{[key]: this.originalThemeProperties[key]},
       }
       const index = files.findIndex(x => x.variable_name === key)
       if (index !== -1) {
@@ -216,8 +216,8 @@ export default class ThemeEditor extends React.Component {
     this.setState({
       themeStore: {
         properties,
-        files
-      }
+        files,
+      },
     })
   }
 
@@ -237,7 +237,7 @@ export default class ThemeEditor extends React.Component {
   changeSomething = (variableName, newValue, isInvalid) => {
     const changedValues = {
       ...this.state.changedValues,
-      [variableName]: {val: newValue, invalid: isInvalid}
+      [variableName]: {val: newValue, invalid: isInvalid},
     }
     this.setState({changedValues})
   }
@@ -323,7 +323,7 @@ export default class ThemeEditor extends React.Component {
       data: this.processThemeStoreForSubmit(),
       processData: false,
       contentType: false,
-      dataType: 'json'
+      dataType: 'json',
     })
       .pipe(resp => {
         newMd5 = resp.brand_config.md5
@@ -359,7 +359,7 @@ export default class ThemeEditor extends React.Component {
       data: this.processThemeStoreForSubmit(),
       processData: false,
       contentType: false,
-      dataType: 'json'
+      dataType: 'json',
     })
       .pipe(resp => {
         if (!resp.subAccountProgresses || _.isEmpty(resp.subAccountProgresses)) {
@@ -501,9 +501,9 @@ export default class ThemeEditor extends React.Component {
                 __html: I18n.t(
                   'To preview Theme Editor branding, you will need to *turn off High Contrast UI*.',
                   {
-                    wrappers: ['<a href="/profile/settings">$1</a>']
+                    wrappers: ['<a href="/profile/settings">$1</a>'],
                   }
-                )
+                ),
               }}
             />
           </div>

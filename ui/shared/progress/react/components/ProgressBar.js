@@ -25,13 +25,13 @@ export default function ProgressBar(props) {
     <div
       className={classnames({
         'progress-bar__bar-container': true,
-        'almost-done': props.progress === 100
+        'almost-done': props.progress === 100,
       })}
     >
       <div
         className={classnames({
           'progress-bar__bar': true,
-          'almost-done': props.progress === 100
+          'almost-done': props.progress === 100,
         })}
         role="progressbar"
         aria-valuenow={props.progress}
@@ -39,7 +39,7 @@ export default function ProgressBar(props) {
         aria-valuemax="100"
         aria-label={props['aria-label'] || ''}
         style={{
-          width: `${Math.min(props.progress, 100)}%`
+          width: `${Math.min(props.progress, 100)}%`,
         }}
       />
     </div>
@@ -48,5 +48,5 @@ export default function ProgressBar(props) {
 
 ProgressBar.propTypes = {
   'aria-label': string,
-  progress: number.isRequired
+  progress: number.isRequired,
 }

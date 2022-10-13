@@ -33,19 +33,19 @@ export const ChildTopic = {
     id: string,
     _id: string,
     contextName: string,
-    contextId: string
+    contextId: string,
   }),
 
   mock: ({
     id = 'QXNzaWdubWVudC0x22',
     _id = '1',
     contextName = 'Super Group',
-    contextId = '5'
+    contextId = '5',
   } = {}) => ({
     id,
     _id,
     contextId,
     contextName,
-    __typename: 'Discussion'
-  })
+    __typename: 'Discussion',
+  }),
 }

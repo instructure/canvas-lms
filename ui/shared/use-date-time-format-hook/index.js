@@ -30,7 +30,7 @@ const optionsList = {
     hour: 'numeric',
     minute: 'numeric',
     second: 'numeric',
-    timeZoneName: 'short'
+    timeZoneName: 'short',
   },
   'time.formats.medium': {
     // ddd, D MMM YYYY HH:mma
@@ -38,14 +38,14 @@ const optionsList = {
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   },
   'time.formats.short': {
     // ddd, D MMM HH:mma
     month: 'short',
     day: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   },
   'date.formats.full': {
     // MMM D, YYYY h:mma
@@ -53,24 +53,24 @@ const optionsList = {
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   },
   'date.formats.date_at_time': {
     // MMM D [at] h:mma
     dateStyle: 'long',
-    timeStyle: 'short'
+    timeStyle: 'short',
   },
   'date.formats.long': {
     // MMM D, YYYY
     month: 'long',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
   },
   'date.formats.long_with_weekday': {
     // dddd, MMMM D
     weekday: 'long',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   },
   'date.formats.full_with_weekday': {
     // MMM D, YYYY h:mma
@@ -79,37 +79,37 @@ const optionsList = {
     day: 'numeric',
     year: 'numeric',
     hour: 'numeric',
-    minute: 'numeric'
+    minute: 'numeric',
   },
   'date.formats.medium_with_weekday': {
     // ddd MMM D, YYYY
     weekday: 'short',
     month: 'short',
     day: 'numeric',
-    year: 'numeric'
+    year: 'numeric',
   },
   'date.formats.short_with_weekday': {
     // ddd, MMM D
     weekday: 'short',
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   },
   'date.formats.short': {
     // MMM D
     month: 'short',
-    day: 'numeric'
+    day: 'numeric',
   },
   'date.formats.full_compact': {
     // M/D/YY, H:M a
     dateStyle: 'short',
-    timeStyle: 'short'
+    timeStyle: 'short',
   },
   'date.formats.compact': {
     // MM/DD/YYYY
     day: 'numeric',
     month: 'numeric',
-    year: 'numeric'
-  }
+    year: 'numeric',
+  },
 }
 
 Object.keys(optionsList).forEach(x => Object.freeze(optionsList[x]))

@@ -81,7 +81,7 @@ const ImageSearchActions = {
     }
   },
 
-  searchApiGet: _.debounce(function(url, pageDirection, dispatch = null) {
+  searchApiGet: _.debounce(function (url, pageDirection, dispatch = null) {
     this.cancelImageSearch()
     if (url === null) return
     dispatch(this.startImageSearch())
@@ -89,7 +89,7 @@ const ImageSearchActions = {
     const config = {
       method: 'get',
       url,
-      timeout: 60000
+      timeout: 60000,
     }
 
     once(config)
@@ -104,7 +104,7 @@ const ImageSearchActions = {
   composeSearchUrl(term) {
     const per_page = '12'
     return `/api/v1/image_search/?query=${term}&per_page=${per_page}&orientation=landscape`
-  }
+  },
 }
 
 export default ImageSearchActions

@@ -58,7 +58,7 @@ const MessageListActionContainer = props => {
   const hasSelectedConversations = () => props.selectedConversations.length > 0
 
   const {loading, error, data} = useQuery(COURSES_QUERY, {
-    variables: {userID}
+    variables: {userID},
   })
 
   const moreCourses = reduceDuplicateCourses(
@@ -71,13 +71,13 @@ const MessageListActionContainer = props => {
       {
         _id: ALL_COURSES_ID,
         contextName: I18n.t('All Courses'),
-        assetString: 'all_courses'
-      }
+        assetString: 'all_courses',
+      },
     ],
     favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
     moreCourses,
     concludedCourses: [],
-    groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
+    groups: data?.legacyNode?.favoriteGroupsConnection?.nodes,
   }
 
   const doesCourseFilterOptionExist = (id, courseOptions) => {
@@ -117,45 +117,45 @@ const MessageListActionContainer = props => {
         tablet: {
           addressBookContainer: {
             padding: 'x-small',
-            width: '336px'
+            width: '336px',
           },
           courseSelect: {
             padding: 'x-small',
-            itemSize: ''
+            itemSize: '',
           },
           messageActionButtons: {
-            padding: 'x-small'
-          }
+            padding: 'x-small',
+          },
         },
         desktop: {
           addressBookContainer: {
             padding: 'x-small small x-small x-small',
-            width: ''
+            width: '',
           },
           courseSelect: {
             padding: 'x-small',
-            itemSize: ''
+            itemSize: '',
           },
           messageActionButtons: {
-            padding: 'x-small x-small x-small medium'
-          }
+            padding: 'x-small x-small x-small medium',
+          },
         },
         mobile: {
           addressBookContainer: {
             padding: 'x-small',
-            width: ''
+            width: '',
           },
           courseSelect: {
             padding: 'none x-small none x-small',
-            itemSize: '45%'
+            itemSize: '45%',
           },
           messageActionButtons: {
             padding:
               props.activeMailbox === 'submission_comments'
                 ? 'none none none x-small'
-                : 'none x-small none x-small'
-          }
-        }
+                : 'none x-small none x-small',
+          },
+        },
       }}
       render={(responsiveProps, matches) => (
         <View
@@ -175,7 +175,7 @@ const MessageListActionContainer = props => {
               padding={responsiveProps.courseSelect.padding}
             >
               <CourseSelect
-                mainPage
+                mainPage={true}
                 options={courseSelectorOptions}
                 activeCourseFilterID={props.activeCourseFilter}
                 onCourseFilterSelect={contextObject => {
@@ -195,8 +195,8 @@ const MessageListActionContainer = props => {
             </Flex.Item>
             <Flex.Item
               padding={responsiveProps.addressBookContainer.padding}
-              shouldGrow
-              shouldShrink
+              shouldGrow={true}
+              shouldShrink={true}
               justifyItems="space-between"
             >
               <AddressBookContainer
@@ -256,10 +256,10 @@ MessageListActionContainer.propTypes = {
   onDelete: PropTypes.func,
   onReadStateChange: PropTypes.func,
   activeCourseFilter: PropTypes.string,
-  canReply: PropTypes.bool
+  canReply: PropTypes.bool,
 }
 
 MessageListActionContainer.defaultProps = {
   selectedConversations: [],
-  canReply: true
+  canReply: true,
 }

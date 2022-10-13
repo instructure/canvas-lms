@@ -25,18 +25,18 @@ function editorArgs() {
     maxLength: 255,
     position: {
       top: 5,
-      left: 5
+      left: 5,
     },
     column: {
-      field: 'default'
+      field: 'default',
     },
     alt_container: document.getElementById('fixtures'),
     grid: {
       navigatePrev() {},
-      navigateNext() {}
+      navigateNext() {},
     },
     commitChanges() {},
-    cancelChanges() {}
+    cancelChanges() {},
   }
 }
 
@@ -48,7 +48,7 @@ QUnit.module('basic functionality', {
 
   teardown() {
     this.editor.destroy()
-  }
+  },
 })
 
 test('renders a textarea', () => {
@@ -102,48 +102,48 @@ QUnit.module('keyboard navigation', {
 
   teardown() {
     this.editor.destroy()
-  }
+  },
 })
 
-test('when on the textarea, Shift-Tab navigates to the previous cell in the grid', function() {
+test('when on the textarea, Shift-Tab navigates to the previous cell in the grid', function () {
   $('#fixtures textarea').trigger(this.shiftTabEvent())
 
   strictEqual(this.args.grid.navigatePrev.callCount, 1)
 })
 
-test('when on the textarea, Tab does not navigate to the next grid cell', function() {
+test('when on the textarea, Tab does not navigate to the next grid cell', function () {
   $('#fixtures textarea').trigger(this.tabEvent())
 
   strictEqual(this.args.grid.navigateNext.callCount, 0)
 })
 
-test('when on the textarea, Tab focusses the Save button', function() {
+test('when on the textarea, Tab focusses the Save button', function () {
   const saveButton = $('#fixtures button')[0]
   $('#fixtures textarea').trigger(this.tabEvent())
 
   strictEqual(document.activeElement, saveButton)
 })
 
-test('when on the Save button, Shift-Tab focusses the textarea', function() {
+test('when on the Save button, Shift-Tab focusses the textarea', function () {
   $('#fixtures button:first').trigger(this.shiftTabEvent())
 
   strictEqual(document.activeElement, $('#fixtures textarea')[0])
 })
 
-test('when on the Save button, Tab focusses the Cancel button', function() {
+test('when on the Save button, Tab focusses the Cancel button', function () {
   const cancelButton = $('#fixtures button')[1]
   $('#fixtures button:first').trigger(this.tabEvent())
 
   strictEqual(document.activeElement, cancelButton)
 })
 
-test('when on the Cancel button, Shift-Tab focusses the Save button', function() {
+test('when on the Cancel button, Shift-Tab focusses the Save button', function () {
   $('#fixtures button:last').trigger(this.shiftTabEvent())
 
   strictEqual(document.activeElement, $('#fixtures button')[0])
 })
 
-test('when on the Cancel button, Tab navigates to the next grid cell', function() {
+test('when on the Cancel button, Tab navigates to the next grid cell', function () {
   $('#fixtures button:last').trigger(this.tabEvent())
 
   strictEqual(this.args.grid.navigateNext.callCount, 1)

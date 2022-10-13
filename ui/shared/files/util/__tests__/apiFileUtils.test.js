@@ -40,14 +40,14 @@ describe('apiFileUtils', () => {
           upload_params: {
             Filename: 'file',
             key: 'folder/filename',
-            'content-type': 'image/png'
+            'content-type': 'image/png',
           },
-          file_param: 'attachment[uploaded_data]'
-        }
+          file_param: 'attachment[uploaded_data]',
+        },
       })
       moxios.stubRequest('http://new_url', {
         status: 200,
-        response: 'yo'
+        response: 'yo',
       })
       const file = {name: 'file1', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
@@ -71,14 +71,14 @@ describe('apiFileUtils', () => {
           upload_params: {
             Filename: 'file',
             key: 'folder/filename',
-            'content-type': 'image/png'
+            'content-type': 'image/png',
           },
-          file_param: 'attachment[uploaded_data]'
-        }
+          file_param: 'attachment[uploaded_data]',
+        },
       })
       moxios.stubRequest('http://new_url', {
         status: 400,
-        response: 'yo'
+        response: 'yo',
       })
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)
@@ -98,7 +98,7 @@ describe('apiFileUtils', () => {
       const onFail = sinon.spy()
       moxios.stubRequest('/api/v1/folders/1/files', {
         status: 400,
-        response: {data: {formData: 'form', uploadUrl: 'new_url'}}
+        response: {data: {formData: 'form', uploadUrl: 'new_url'}},
       })
       const file = {name: 'file2', size: 0}
       uploadFile(file, '1', onSuccess, onFail)

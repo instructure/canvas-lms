@@ -19,7 +19,7 @@ import _ from 'underscore'
 import Backbone from 'backbone'
 
 // normalize (i.e. I18n) and filter errors we get from the API
-Backbone.Model.prototype.normalizeErrors = function(errors, validationPolicy) {
+Backbone.Model.prototype.normalizeErrors = function (errors, validationPolicy) {
   const result = {}
   let errorMap = this.errorMap || this.constructor.prototype.errorMap || {}
   if (_.isFunction(errorMap)) errorMap = errorMap(validationPolicy)

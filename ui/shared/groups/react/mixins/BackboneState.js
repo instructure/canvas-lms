@@ -75,6 +75,6 @@ const BackboneState = {
   componentWillUnmount() {
     // stop listening to backbone objects in state
     this._listen(this._off, this.state)
-  }
+  },
 }
 export default BackboneState

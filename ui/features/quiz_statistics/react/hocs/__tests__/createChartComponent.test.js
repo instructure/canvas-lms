@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import createChartComponent from '../createChartComponent'
 import assertChange from 'chai-assert-change'
@@ -28,10 +28,10 @@ describe('canvas_quizzes/statistics/createChartComponent', () => {
       createChart: (node, props) => {
         Object.assign(chartNode.style, props.style)
         return chartNode
-      }
+      },
     })
 
-    render(<Chart style={{ width: '10px' }} />)
+    render(<Chart style={{width: '10px'}} />)
 
     expect(chartNode.style.width).toBe('10px')
   })
@@ -42,23 +42,23 @@ describe('canvas_quizzes/statistics/createChartComponent', () => {
     const updateChart = jest.fn()
     const Chart = createChartComponent({
       createChart,
-      updateChart
+      updateChart,
     })
 
-    const { rerender } = render(<Chart style={{ width: '10px' }} />)
+    const {rerender} = render(<Chart style={{width: '10px'}} />)
 
     assertChange({
-      fn: () => rerender(<Chart style={{ width: '15px' }} />),
+      fn: () => rerender(<Chart style={{width: '15px'}} />),
       in: [
         {
           of: () => createChart.mock.calls.length,
-          by: 0
+          by: 0,
         },
         {
           of: () => updateChart.mock.calls.length,
-          by: 1
-        }
-      ]
+          by: 1,
+        },
+      ],
     })
   })
 
@@ -66,15 +66,15 @@ describe('canvas_quizzes/statistics/createChartComponent', () => {
     const removeChart = jest.fn()
     const Chart = createChartComponent({
       createChart: () => document.createElement('svg'),
-      removeChart
+      removeChart,
     })
 
-    const { unmount } = render(<Chart style={{ width: '10px' }} />)
+    const {unmount} = render(<Chart style={{width: '10px'}} />)
 
     assertChange({
       fn: () => unmount(),
       of: () => removeChart.mock.calls.length,
-      by: 1
+      by: 1,
     })
   })
 })

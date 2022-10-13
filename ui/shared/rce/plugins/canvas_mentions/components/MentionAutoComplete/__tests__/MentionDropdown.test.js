@@ -27,8 +27,8 @@ import {nanoid} from 'nanoid'
 
 const mockedEditor = {
   editor: {
-    id: nanoid()
-  }
+    id: nanoid(),
+  },
 }
 
 jest.mock('../getPosition')
@@ -43,72 +43,72 @@ jest.mock('@apollo/react-hooks', () => {
             _id: 'Aa',
             id: 1,
             name: 'Jeffrey Johnson',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ab',
             id: 2,
             name: 'Matthew Lemon',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ac',
             id: 3,
             name: 'Rob Orton',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ad',
             id: 4,
             name: 'Davis Hyer',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ae',
             id: 5,
             name: 'Drake Harper',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Af',
             id: 6,
             name: 'Omar Soto-Fortuño',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ag',
             id: 7,
             name: 'Chawn Neal',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ah',
             id: 8,
             name: 'Mauricio Ribeiro',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Ai',
             id: 9,
             name: 'Caleb Guanzon',
-            __typename: 'MessageableUser'
+            __typename: 'MessageableUser',
           },
           {
             _id: 'Aj',
             id: 10,
             name: 'Jason Gillett',
-            __typename: 'MessageableUser'
-          }
+            __typename: 'MessageableUser',
+          },
         ],
-        __typename: 'MessageableUserConnection'
+        __typename: 'MessageableUserConnection',
       },
-      __typename: 'Discussion'
-    }
+      __typename: 'Discussion',
+    },
   }
 
   return {
     __esModule: true,
-    useQuery: () => ({data})
+    useQuery: () => ({data}),
   }
 })
 
@@ -174,7 +174,7 @@ describe('Mention Dropdown', () => {
     it('should call onFocusedUserChangeMock when user changes', () => {
       const onFocusedUserChangeMock = jest.fn()
       const {getAllByTestId} = setup({
-        onFocusedUserChange: onFocusedUserChangeMock
+        onFocusedUserChange: onFocusedUserChangeMock,
       })
 
       // This number is always double menu count as two menus exist in the same dom
@@ -195,7 +195,7 @@ describe('Mention Dropdown', () => {
       const onActiveDescendantChangeMock = jest.fn()
       const spy = jest.spyOn(ARIA_ID_TEMPLATES, 'activeDescendant')
       const {getAllByTestId} = setup({
-        onActiveDescendantChange: onActiveDescendantChangeMock
+        onActiveDescendantChange: onActiveDescendantChangeMock,
       })
 
       // This number is always double menu count as two menus exist in the same dom

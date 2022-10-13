@@ -44,14 +44,14 @@ const STRINGS = {
   },
   get doneButton() {
     return I18n.t('#buttons.done', 'Done')
-  }
+  },
 }
 
 function renderDatepickerTime($input) {
   const data = {
     hour: ($input.data('time-hour') || '').replace(/'/g, ''),
     minute: ($input.data('time-minute') || '').replace(/'/g, ''),
-    ampm: $input.data('time-ampm') || ''
+    ampm: $input.data('time-ampm') || '',
   }
 
   const label = <label htmlFor="ui-datepicker-time-hour">{STRINGS.timeLabel}</label>

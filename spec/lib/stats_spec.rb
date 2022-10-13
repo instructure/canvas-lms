@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "lib/stats"
-
 describe Stats do
   context Stats::Counter do
     def check_stats_with_matchers(c, empty, size, max, min, sum, mean, var, stddev, histogram)

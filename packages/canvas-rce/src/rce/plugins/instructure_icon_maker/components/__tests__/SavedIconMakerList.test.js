@@ -20,6 +20,8 @@ import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import SavedIconMakerList from '../SavedIconMakerList'
 
+const flushPromises = () => new Promise(setTimeout)
+
 let mockContent = {
   images: {
     Course: {
@@ -39,7 +41,7 @@ let mockContent = {
           unlock_at: null,
           lock_at: null,
           date: '2021-11-03T19:21:27Z',
-          uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
+          uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
         },
         {
           id: 716,
@@ -56,7 +58,7 @@ let mockContent = {
           unlock_at: null,
           lock_at: null,
           date: '2021-10-27T21:49:19Z',
-          uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
+          uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
         },
         {
           id: 715,
@@ -73,21 +75,21 @@ let mockContent = {
           unlock_at: null,
           lock_at: null,
           date: '2021-10-27T21:49:18Z',
-          uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
-        }
+          uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
+        },
       ],
       bookmark: 'bookmark',
       isLoading: false,
-      hasMore: false
-    }
+      hasMore: false,
+    },
   },
   contextType: 'Course',
   fetchInitialImages: jest.fn(),
-  fetchNextImages: jest.fn()
+  fetchNextImages: jest.fn(),
 }
 jest.mock('../../../shared/StoreContext', () => {
   return {
-    useStoreProps: () => mockContent
+    useStoreProps: () => mockContent,
   }
 })
 describe('SavedIconMakerList()', () => {
@@ -96,7 +98,9 @@ describe('SavedIconMakerList()', () => {
 
   beforeEach(() => {
     props = {
-      onImageEmbed: jest.fn()
+      onImageEmbed: jest.fn(),
+      sortBy: {sort: 'alphabetical', order: 'asc'},
+      searchString: '',
     }
   })
 
@@ -108,6 +112,32 @@ describe('SavedIconMakerList()', () => {
     expect(getByTitle('Click to embed image_one.png')).toBeInTheDocument()
     expect(getByTitle('Click to embed image_two.jpg')).toBeInTheDocument()
     expect(getByTitle('Click to embed image_three.jpg')).toBeInTheDocument()
+  })
+
+  describe('fetch icons when', () => {
+    it('sort dropdown changes its value', async () => {
+      const {rerender} = subject()
+      expect(mockContent.fetchInitialImages).toHaveBeenCalledTimes(1)
+      rerender(
+        <SavedIconMakerList
+          {...props}
+          sortBy={{
+            sort: 'date_added',
+            order: 'desc',
+          }}
+        />
+      )
+      await flushPromises()
+      expect(mockContent.fetchInitialImages).toHaveBeenCalledTimes(2)
+    })
+
+    it('search text changes its value', async () => {
+      const {rerender} = subject()
+      expect(mockContent.fetchInitialImages).toHaveBeenCalledTimes(1)
+      rerender(<SavedIconMakerList {...props} searchString="grid" />)
+      await flushPromises()
+      expect(mockContent.fetchInitialImages).toHaveBeenCalledTimes(2)
+    })
   })
 
   describe('when an image is clicked', () => {
@@ -147,12 +177,12 @@ describe('SavedIconMakerList()', () => {
             files: [],
             bookmark: 'bookmark',
             isLoading: false,
-            hasMore: false
-          }
+            hasMore: false,
+          },
         },
         contextType: 'Course',
         fetchInitialImages: jest.fn(),
-        fetchNextImages: jest.fn()
+        fetchNextImages: jest.fn(),
       }
     })
     it('displays No results message', () => {

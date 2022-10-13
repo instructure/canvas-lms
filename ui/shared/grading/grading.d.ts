@@ -23,7 +23,7 @@ import type {
   Submission,
   SubmissionType,
   UserDueDateMap,
-  WorkflowState
+  WorkflowState,
 } from '../../api.d'
 
 export type PartialStudent = {

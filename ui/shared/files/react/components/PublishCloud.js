@@ -30,7 +30,7 @@ const I18n = useI18nScope('publish_cloud')
 // Create a blank dialog window via jQuery, then dump the RestrictedDialogForm into that
 // dialog window. This allows us to do react things inside of this all ready rendered
 // jQueryUI widget
-PublishCloud.openRestrictedDialog = function() {
+PublishCloud.openRestrictedDialog = function () {
   const $dialog = $('<div>').dialog({
     title: I18n.t('Editing permissions for: %{name}', {name: this.props.model.displayName()}),
     width: 800,
@@ -38,7 +38,7 @@ PublishCloud.openRestrictedDialog = function() {
     close() {
       ReactDOM.unmountComponentAtNode(this)
       $(this).remove()
-    }
+    },
   })
 
   import('./RestrictedDialogForm').then(({default: RestrictedDialogForm}) => {
@@ -55,7 +55,7 @@ PublishCloud.openRestrictedDialog = function() {
   })
 }
 
-PublishCloud.render = function() {
+PublishCloud.render = function () {
   const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file')
   if (this.props.userCanEditFilesForContext) {
     if (this.state.published && this.state.restricted) {
@@ -69,7 +69,7 @@ PublishCloud.render = function() {
           title={this.getRestrictedText()}
           aria-label={I18n.t('%{fileName} is %{restricted} - Click to modify', {
             fileName,
-            restricted: this.getRestrictedText()
+            restricted: this.getRestrictedText(),
           })}
         >
           <i className="icon-calendar-month icon-line" />
@@ -87,7 +87,7 @@ PublishCloud.render = function() {
           aria-label={I18n.t(
             '%{fileName} is only available to students with the link - Click to modify',
             {
-              fileName
+              fileName,
             }
           )}
         >
@@ -133,7 +133,7 @@ PublishCloud.render = function() {
         title={this.getRestrictedText()}
         aria-label={I18n.t('%{fileName} is %{restricted}', {
           fileName,
-          restricted: this.getRestrictedText()
+          restricted: this.getRestrictedText(),
         })}
       >
         <i className="icon-calendar-day" />

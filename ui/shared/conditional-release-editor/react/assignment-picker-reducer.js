@@ -27,7 +27,7 @@ const assignmentPickerReducer = combineReducers({
   is_open: handleActions(
     {
       [actions.OPEN_ASSIGNMENT_PICKER]: (_state, _actions) => true,
-      [actions.CLOSE_ASSIGNMENT_PICKER]: (_state, _actions) => false
+      [actions.CLOSE_ASSIGNMENT_PICKER]: (_state, _actions) => false,
     },
     false
   ),
@@ -35,7 +35,7 @@ const assignmentPickerReducer = combineReducers({
   target: handleActions(
     {
       [actions.SET_ASSIGNMENT_PICKER_TARGET]: (state, action) => action.payload,
-      [actions.CLOSE_ASSIGNMENT_PICKER]: () => null
+      [actions.CLOSE_ASSIGNMENT_PICKER]: () => null,
     },
     null
   ),
@@ -47,7 +47,7 @@ const assignmentPickerReducer = combineReducers({
           .get('assignment_set_associations', List())
           .map(a => a.get('assignment_id'))
           .toSet(),
-      [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set()
+      [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set(),
     },
     Set()
   ),
@@ -57,7 +57,7 @@ const assignmentPickerReducer = combineReducers({
       [actions.SELECT_ASSIGNMENT_IN_PICKER]: (state, action) => state.toSet().add(action.payload),
       [actions.UNSELECT_ASSIGNMENT_IN_PICKER]: (state, action) =>
         state.toSet().delete(action.payload),
-      [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set()
+      [actions.CLOSE_ASSIGNMENT_PICKER]: () => Set(),
     },
     Set()
   ),
@@ -65,7 +65,7 @@ const assignmentPickerReducer = combineReducers({
   name_filter: handleActions(
     {
       [actions.FILTER_ASSIGNMENTS_BY_NAME]: (state, action) => action.payload,
-      [actions.CLOSE_ASSIGNMENT_PICKER]: () => ''
+      [actions.CLOSE_ASSIGNMENT_PICKER]: () => '',
     },
     ''
   ),
@@ -73,10 +73,10 @@ const assignmentPickerReducer = combineReducers({
   category_filter: handleActions(
     {
       [actions.FILTER_ASSIGNMENTS_BY_CATEGORY]: (state, action) => action.payload,
-      [actions.CLOSE_ASSIGNMENT_PICKER]: () => ALL_ID
+      [actions.CLOSE_ASSIGNMENT_PICKER]: () => ALL_ID,
     },
     ALL_ID
-  )
+  ),
 })
 
 export default assignmentPickerReducer

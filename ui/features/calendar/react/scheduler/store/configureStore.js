@@ -28,7 +28,7 @@ const middleware = [
     process.env.NODE_ENV !== 'test' &&
     require('redux-logger').logger,
 
-  ReduxThunk
+  ReduxThunk,
 ].filter(Boolean)
 
 const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)

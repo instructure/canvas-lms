@@ -59,7 +59,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup, notifyGro
     rootId,
     selectedGroupId,
     loadedGroups,
-    createGroup
+    createGroup,
   } = useTargetGroupSelector({skipGroupId: groupId, initialGroupId: starterGroupId})
 
   // When pass starterGroupId, call setTargetGroup with the group and it ancestors
@@ -74,7 +74,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup, notifyGro
       const selectedGroupObject = collections[starterGroupId]
       setTargetGroup({
         targetGroup: selectedGroupObject,
-        targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections)
+        targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections),
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -95,7 +95,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup, notifyGro
       queryCollections({id: newGroup.id, parentGroupId: parentId, shouldLoad: false})
       setTargetGroup({
         targetGroup: newGroup,
-        targetAncestorsIds: getAncestorsIds(newGroup, collections)
+        targetAncestorsIds: getAncestorsIds(newGroup, collections),
       })
 
       // notify parent of group creation (if applicable)
@@ -109,7 +109,7 @@ const TargetGroupSelector = ({groupId, starterGroupId, setTargetGroup, notifyGro
     const selectedGroupObject = collections[selectedCollection.id] || selectedCollection
     setTargetGroup({
       targetGroup: selectedGroupObject,
-      targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections)
+      targetAncestorsIds: getAncestorsIds(selectedGroupObject, collections),
     })
   }
 
@@ -174,7 +174,7 @@ TargetGroupSelector.propTypes = {
   groupId: PropTypes.string,
   starterGroupId: PropTypes.string,
   setTargetGroup: PropTypes.func.isRequired,
-  notifyGroupCreated: PropTypes.func
+  notifyGroupCreated: PropTypes.func,
 }
 
 export default TargetGroupSelector

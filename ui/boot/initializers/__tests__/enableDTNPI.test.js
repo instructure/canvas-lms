@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { up as enableDTNPI, down as disableDTNPI } from '../enableDTNPI'
-import { log } from '@canvas/datetime-natural-parsing-instrument'
+import {up as enableDTNPI, down as disableDTNPI} from '../enableDTNPI'
+import {log} from '@canvas/datetime-natural-parsing-instrument'
 import fetchMock from 'fetch-mock'
 
 describe('enableDTNPI', () => {
@@ -34,17 +34,17 @@ describe('enableDTNPI', () => {
   })
 
   it('sets up the persistent event container', async () => {
-    await enableDTNPI({ throttle: 1 })
-    log({ id: 'foo' })
+    await enableDTNPI({throttle: 1})
+    log({id: 'foo'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
     expect(events.length).toEqual(1)
-    expect(events[0]).toMatchObject({ id: 'foo' })
+    expect(events[0]).toMatchObject({id: 'foo'})
   })
 
   it('truncates long values', async () => {
-    await enableDTNPI({ throttle: 1 })
-    log({ value: Array(65).join('*') })
+    await enableDTNPI({throttle: 1})
+    log({value: Array(65).join('*')})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
     expect(events.length).toEqual(1)
@@ -52,33 +52,38 @@ describe('enableDTNPI', () => {
   })
 
   it('does not track too many events', async () => {
-    await enableDTNPI({ throttle: 1, size: 3 })
-    log({ id: '1' })
-    log({ id: '2' })
-    log({ id: '3' })
-    log({ id: '4' })
+    await enableDTNPI({throttle: 1, size: 3})
+    log({id: '1'})
+    log({id: '2'})
+    log({id: '3'})
+    log({id: '4'})
     await new Promise(resolve => setTimeout(resolve, 1))
     const events = JSON.parse(localStorage.getItem('dtnpi'))
     expect(events.length).toEqual(3)
-    expect(events.map(x => x.id)).toEqual(['2','3','4'])
+    expect(events.map(x => x.id)).toEqual(['2', '3', '4'])
   })
 
   it('submits tracked events to the backend', async () => {
     const endpoint = 'https://blahblah/submit'
 
-    localStorage.setItem('dtnpi', JSON.stringify([{
-      id: 'a',
-      locale: 'en',
-      method: 'paste',
-      parsed: '2021-08-18T06:00:00.000Z',
-      value: 'wed aug 18',
-    }]))
+    localStorage.setItem(
+      'dtnpi',
+      JSON.stringify([
+        {
+          id: 'a',
+          locale: 'en',
+          method: 'paste',
+          parsed: '2021-08-18T06:00:00.000Z',
+          value: 'wed aug 18',
+        },
+      ])
+    )
 
     fetchMock.put(endpoint, 200)
 
     expect(fetchMock.called()).toBeFalsy()
 
-    await enableDTNPI({ endpoint })
+    await enableDTNPI({endpoint})
 
     expect(fetchMock.called()).toBeTruthy()
     expect(fetchMock.lastCall()[0]).toEqual(endpoint)

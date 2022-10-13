@@ -24,7 +24,7 @@ import {
   setupAnonymizableId,
   setupAnonymizableUserId,
   setupAnonymizableStudentId,
-  setupAnonymizableAuthorId
+  setupAnonymizableAuthorId,
 } from 'ui/features/speed_grader/jquery/speed_grader.utils'
 import $ from 'jquery'
 
@@ -82,8 +82,8 @@ QUnit.module('SpeedGrader', hooks => {
           similarity_score: 0.8,
           state: 'acceptable',
           report_url: 'http://www.thebrickfan.com',
-          status: 'scored'
-        }
+          status: 'scored',
+        },
       },
       excused: null,
       versioned_attachments: [
@@ -105,13 +105,13 @@ QUnit.module('SpeedGrader', hooks => {
             canvadoc_url: null,
             crocodoc_url: null,
             submitted_to_crocodoc: false,
-            provisional_crocodoc_url: null
-          }
-        }
+            provisional_crocodoc_url: null,
+          },
+        },
       ],
       late: false,
       external_tool_url: null,
-      has_originality_report: true
+      has_originality_report: true,
     }
     const reportContainer = $('#assignment_submission_originality_report_url')
     const defaultContainer = $('#assignment_submission_default_url')
@@ -123,7 +123,7 @@ QUnit.module('SpeedGrader', hooks => {
 QUnit.module('SpeedgraderHelpers#buildIframe', {
   setup() {
     this.buildIframe = SpeedgraderHelpers.buildIframe
-  }
+  },
 })
 
 test('sets src to given src', function () {
@@ -150,9 +150,9 @@ QUnit.module('SpeedgraderHelpers#determineGradeToSubmit', {
     this.grade = {
       val() {
         return '25'
-      }
+      },
     }
-  }
+  },
 })
 
 test('returns grade.val when use_existing_score is false', function () {
@@ -166,7 +166,7 @@ test('returns existing submission when use_existing_score is true', function () 
 QUnit.module('SpeedgraderHelpers#iframePreviewVersion', {
   setup() {
     this.previewVersion = SpeedgraderHelpers.iframePreviewVersion
-  }
+  },
 })
 
 test('returns empty string if submission is null', function () {
@@ -180,7 +180,7 @@ test('returns empty string if submission contains no currentSelectedIndex', func
 test('returns currentSelectedIndex if version is null', function () {
   const submission = {
     currentSelectedIndex: 0,
-    submission_history: [{submission: {version: null}}, {submission: {version: 2}}]
+    submission_history: [{submission: {version: null}}, {submission: {version: 2}}],
   }
   equal(this.previewVersion(submission), '&version=0')
 })
@@ -188,7 +188,7 @@ test('returns currentSelectedIndex if version is null', function () {
 test('returns currentSelectedIndex if version is the same', function () {
   const submission = {
     currentSelectedIndex: 0,
-    submission_history: [{submission: {version: 0}}, {submission: {version: 1}}]
+    submission_history: [{submission: {version: 0}}, {submission: {version: 1}}],
   }
   equal(this.previewVersion(submission), '&version=0')
 })
@@ -196,7 +196,7 @@ test('returns currentSelectedIndex if version is the same', function () {
 test('returns version if its different', function () {
   const submission = {
     currentSelectedIndex: 0,
-    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
+    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}],
   }
   equal(this.previewVersion(submission), '&version=1')
 })
@@ -204,7 +204,7 @@ test('returns version if its different', function () {
 test('returns correct version for a given index', function () {
   const submission = {
     currentSelectedIndex: 1,
-    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
+    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}],
   }
   equal(this.previewVersion(submission), '&version=2')
 })
@@ -212,7 +212,7 @@ test('returns correct version for a given index', function () {
 test("returns '' if a currentSelectedIndex is not a number", function () {
   const submission = {
     currentSelectedIndex: 'one',
-    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}]
+    submission_history: [{submission: {version: 1}}, {submission: {version: 2}}],
   }
   equal(this.previewVersion(submission), '')
 })
@@ -220,7 +220,7 @@ test("returns '' if a currentSelectedIndex is not a number", function () {
 test('returns currentSelectedIndex if version is not a number', function () {
   const submission = {
     currentSelectedIndex: 1,
-    submission_history: [{submission: {version: 'one'}}, {submission: {version: 'two'}}]
+    submission_history: [{submission: {version: 'one'}}, {submission: {version: 'two'}}],
   }
   equal(this.previewVersion(submission), '&version=1')
 })
@@ -236,7 +236,7 @@ QUnit.module('SpeedgraderHelpers#setRightBarDisabled', {
   },
   teardown() {
     this.fixtureNode.innerHTML = ''
-  }
+  },
 })
 
 test('it properly disables the elements we care about in the right bar', function () {
@@ -258,9 +258,9 @@ QUnit.module('SpeedgraderHelpers#classNameBasedOnStudent', {
   setup() {
     this.student = {
       submission_state: null,
-      submission: {submitted_at: '2016-10-13 12:22:39'}
+      submission: {submitted_at: '2016-10-13 12:22:39'},
     }
-  }
+  },
 })
 
 test('returns graded for graded', function () {
@@ -268,7 +268,7 @@ test('returns graded for graded', function () {
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
     raw: 'graded',
-    formatted: 'graded'
+    formatted: 'graded',
   })
 })
 
@@ -277,7 +277,7 @@ test("returns 'not graded' for not_graded", function () {
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
     raw: 'not_graded',
-    formatted: 'not graded'
+    formatted: 'not graded',
   })
 })
 
@@ -286,7 +286,7 @@ test('returns graded for not_gradeable', function () {
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
     raw: 'not_gradeable',
-    formatted: 'graded'
+    formatted: 'graded',
   })
 })
 
@@ -295,7 +295,7 @@ test("returns 'not submitted' for not_submitted", function () {
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
     raw: 'not_submitted',
-    formatted: 'not submitted'
+    formatted: 'not submitted',
   })
 })
 
@@ -304,7 +304,7 @@ test('returns resubmitted data for graded_then_resubmitted', function () {
   const state = SpeedgraderHelpers.classNameBasedOnStudent(this.student)
   deepEqual(state, {
     raw: 'resubmitted',
-    formatted: 'graded, then resubmitted (Oct 13, 2016 at 12:22pm)'
+    formatted: 'graded, then resubmitted (Oct 13, 2016 at 12:22pm)',
   })
 })
 
@@ -312,7 +312,7 @@ QUnit.module('SpeedgraderHelpers#submissionState', {
   setup() {
     this.student = {submission: {grade_matches_current_submission: true}}
     this.grading_role = 'teacher'
-  }
+  },
 })
 
 test('returns graded if grade matches current submission', function () {
@@ -387,13 +387,13 @@ test("prevents the button's default action", () => {
   const ajaxStub = sinon.stub()
   ajaxStub.returns({
     status: 200,
-    data: {}
+    data: {},
   })
   const previousAjaxJson = $.ajaxJSON
   $.ajaxJSON = ajaxStub
   const event = {
     preventDefault: sinon.spy(),
-    target: document.getElementById('resubmit-button')
+    target: document.getElementById('resubmit-button'),
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   ok(event.preventDefault.called)
@@ -405,13 +405,13 @@ test("changes the button's text to 'Resubmitting...'", () => {
   const ajaxStub = sinon.stub()
   ajaxStub.returns({
     status: 200,
-    data: {}
+    data: {},
   })
   const previousAjaxJson = $.ajaxJSON
   $.ajaxJSON = ajaxStub
   const event = {
     preventDefault: sinon.spy(),
-    target: $('#resubmit-button')
+    target: $('#resubmit-button'),
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   equal($('#resubmit-button').text(), 'Resubmitting...')
@@ -423,13 +423,13 @@ test('disables the button', () => {
   const ajaxStub = sinon.stub()
   ajaxStub.returns({
     status: 200,
-    data: {}
+    data: {},
   })
   const previousAjaxJson = $.ajaxJSON
   $.ajaxJSON = ajaxStub
   const event = {
     preventDefault: sinon.spy(),
-    target: $('#resubmit-button')
+    target: $('#resubmit-button'),
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   equal($('#resubmit-button').attr('disabled'), 'disabled')
@@ -442,7 +442,7 @@ test('Posts to the resubmit URL', () => {
   $.ajaxJSON = sinon.spy()
   const event = {
     preventDefault: sinon.spy(),
-    target: document.getElementById('resubmit-button')
+    target: document.getElementById('resubmit-button'),
   }
   SpeedgraderHelpers.plagiarismResubmitHandler(event, 'http://www.test.com')
   ok($.ajaxJSON.called)
@@ -522,7 +522,7 @@ QUnit.module('SpeedgraderHelpers.setupAnonymizableAuthorId', () => {
 QUnit.module('SpeedgraderHelpers.plagiarismResubmitButton', () => {
   test('hides the container if score is present', () => {
     const containerStub = {
-      hide: sinon.spy()
+      hide: sinon.spy(),
     }
 
     SpeedgraderHelpers.plagiarismResubmitButton(true, containerStub)
@@ -531,7 +531,7 @@ QUnit.module('SpeedgraderHelpers.plagiarismResubmitButton', () => {
 
   test('showes the container if score is absent', () => {
     const containerStub = {
-      show: sinon.spy()
+      show: sinon.spy(),
     }
 
     SpeedgraderHelpers.plagiarismResubmitButton(false, containerStub)

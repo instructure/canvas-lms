@@ -17,21 +17,18 @@
 
 import Ember from 'ember'
 import startApp from '../start_app'
-import AGGrades from '../../components/assignment_subtotal_grades_component'
 import fixtures from '../ajax_fixtures'
 
 const {run} = Ember
 
-let originalWeightingScheme = null
-let originalGradingStandard = null
 const groupScores = {
   assignment_group_1: {
     possible: 100,
     score: 54.5,
     submission_count: 1,
     submissions: [],
-    weight: 100
-  }
+    weight: 100,
+  },
 }
 
 QUnit.module('assignment_subtotal_grades_component_letter_grade', {
@@ -40,14 +37,18 @@ QUnit.module('assignment_subtotal_grades_component_letter_grade', {
     const App = startApp()
     this.component = App.AssignmentSubtotalGradesComponent.create()
     this.component.reopen({
-      gradingStandard: function() {
-        originalGradingStandard = this._super
-        return [['A', 0.8], ['B+', 55.5], ['B', 54.5], ['C', 0.05], ['F', 0.0]]
+      gradingStandard: function () {
+        return [
+          ['A', 0.8],
+          ['B+', 55.5],
+          ['B', 54.5],
+          ['C', 0.05],
+          ['F', 0.0],
+        ]
       }.property(),
-      weightingScheme: function() {
-        originalWeightingScheme = this._super
+      weightingScheme: function () {
         return 'percent'
-      }.property()
+      }.property(),
     })
     return run(() => {
       this.assignment_group = Ember.copy(fixtures.assignment_groups, true).findBy('id', '1')
@@ -57,8 +58,8 @@ QUnit.module('assignment_subtotal_grades_component_letter_grade', {
         subtotal: {
           name: this.assignment_group.name,
           key: `assignment_group_${this.assignment_group.id}`,
-          weight: this.assignment_group.group_weight
-        }
+          weight: this.assignment_group.group_weight,
+        },
       })
     })
   },
@@ -68,10 +69,10 @@ QUnit.module('assignment_subtotal_grades_component_letter_grade', {
       this.component.destroy()
       return App.destroy()
     })
-  }
+  },
 })
 
-test('letterGrade', function() {
+test('letterGrade', function () {
   const expected = 'C'
   equal(this.component.get('letterGrade'), expected)
 })

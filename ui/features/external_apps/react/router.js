@@ -86,5 +86,5 @@ export default {
   stop() {
     // we may not be the only thing using page on this page.
     page.stop()
-  }
+  },
 }

@@ -32,19 +32,19 @@ export default class WikiPageRevisionsView extends CollectionView {
       events: {
         'click .prev-button': 'prevPage',
         'click .next-button': 'nextPage',
-        'click .close-button': 'close'
+        'click .close-button': 'close',
       },
       els: {
         '#ticker': '$ticker',
         aside: '$aside',
-        '.revisions-list': '$revisionsList'
-      }
+        '.revisions-list': '$revisionsList',
+      },
     })
 
     this.optionProperty('pages_path')
   }
 
-  initialize(options) {
+  initialize(_options) {
     super.initialize(...arguments)
     this.selectedRevision = null
 
@@ -155,7 +155,7 @@ export default class WikiPageRevisionsView extends CollectionView {
     const json = super.toJSON(...arguments)
     json.CAN = {
       FETCH_PREV: this.collection.canFetch('prev'),
-      FETCH_NEXT: this.collection.canFetch('next')
+      FETCH_NEXT: this.collection.canFetch('next'),
     }
     return json
   }

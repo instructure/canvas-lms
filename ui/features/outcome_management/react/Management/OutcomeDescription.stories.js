@@ -21,17 +21,17 @@ import OutcomeDescription from './OutcomeDescription'
 
 export default {
   title: 'Examples/Outcomes/OutcomeDescription',
-  component: OutcomeDescription
+  component: OutcomeDescription,
 }
 
 const Template = args => <OutcomeDescription {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
-  description: 'Normal Length Description'
+  description: 'Normal Length Description',
 }
 
 export const reallyLongDescription = Template.bind({})
 reallyLongDescription.args = {
-  description: 'Lots of things to learn '.repeat(100)
+  description: 'Lots of things to learn '.repeat(100),
 }

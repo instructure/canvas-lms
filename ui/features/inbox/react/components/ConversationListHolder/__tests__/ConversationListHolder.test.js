@@ -38,12 +38,12 @@ const props = {
               [
                 {user: {name: 'Bob Barker'}},
                 {user: {name: 'Sally Ford'}},
-                {user: {name: 'Russel Franks'}}
-              ]
-            ]
+                {user: {name: 'Russel Franks'}},
+              ],
+            ],
           },
           createdAt: 'November 5, 2020 at 2:25pm',
-          body: 'This is the body text for the message.'
+          body: 'This is the body text for the message.',
         },
         {
           author: {name: 'Sally Ford'},
@@ -51,18 +51,18 @@ const props = {
             nodes: [
               {user: {name: 'Sally Ford'}},
               {user: {name: 'Bob Barker'}},
-              {user: {name: 'Russel Franks'}}
-            ]
+              {user: {name: 'Russel Franks'}},
+            ],
           },
           createdAt: 'November 4, 2020 at 2:25pm',
-          body: 'This is the body text for the message.'
-        }
+          body: 'This is the body text for the message.',
+        },
       ],
       participants: [
         {user: {name: 'Bob Barker'}},
         {user: {name: 'Sally Ford'}},
-        {user: {name: 'Russel Franks'}}
-      ]
+        {user: {name: 'Russel Franks'}},
+      ],
     },
     {
       _id: '2',
@@ -76,13 +76,13 @@ const props = {
         {
           author: {name: 'Todd Martin'},
           conversationParticipantsConnection: {
-            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
           },
           createdAt: 'November 3, 2020 at 8:58am',
-          body: 'This conversation has a much longer body which should be too long to completely display.'
-        }
+          body: 'This conversation has a much longer body which should be too long to completely display.',
+        },
       ],
-      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
       _id: '3',
@@ -95,13 +95,13 @@ const props = {
         {
           author: {name: 'Todd Martin'},
           conversationParticipantsConnection: {
-            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
           },
           createdAt: 'November 3, 2020 at 8:58am',
-          body: 'This conversation has a much longer body which should be too long to completely display.'
-        }
+          body: 'This conversation has a much longer body which should be too long to completely display.',
+        },
       ],
-      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
       _id: '4',
@@ -115,13 +115,13 @@ const props = {
         {
           author: {name: 'Todd Martin'},
           conversationParticipantsConnection: {
-            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
           },
           createdAt: 'November 3, 2020 at 8:58am',
-          body: 'This conversation has a much longer body which should be too long to completely display.'
-        }
+          body: 'This conversation has a much longer body which should be too long to completely display.',
+        },
       ],
-      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
     },
     {
       _id: '5',
@@ -135,25 +135,25 @@ const props = {
         {
           author: {name: 'Todd Martin'},
           conversationParticipantsConnection: {
-            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
+            nodes: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
           },
           createdAt: 'November 3, 2020 at 8:58am',
-          body: 'This conversation has a much longer body which should be too long to completely display.'
-        }
+          body: 'This conversation has a much longer body which should be too long to completely display.',
+        },
       ],
-      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}]
-    }
+      participants: [{user: {name: 'Todd Martin'}}, {user: {name: 'Jim Thompson'}}],
+    },
   ],
   isLoading: false,
   isLoadingMoreMenuData: false,
   hasMoreMenuData: false,
   fetchMoreMenuData: jest.fn(),
-  isError: false
+  isError: false,
 }
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('ConversationListHolder', () => {
@@ -165,19 +165,19 @@ describe('ConversationListHolder', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
   beforeEach(() => {
     window.document.getSelection = () => {
       return {
-        removeAllRanges: () => {}
+        removeAllRanges: () => {},
       }
     }
   })
@@ -218,10 +218,10 @@ describe('ConversationListHolder', () => {
     const conversations = getAllByTestId('conversationListItem-Item')
     fireEvent.click(conversations[0])
     fireEvent.click(conversations[1], {
-      metaKey: true
+      metaKey: true,
     })
     fireEvent.click(conversations[2], {
-      metaKey: true
+      metaKey: true,
     })
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
@@ -232,10 +232,10 @@ describe('ConversationListHolder', () => {
     const conversations = getAllByTestId('conversationListItem-Item')
     fireEvent.click(conversations[1])
     fireEvent.click(conversations[3], {
-      ctrlKey: true
+      ctrlKey: true,
     })
     fireEvent.click(conversations[4], {
-      ctrlKey: true
+      ctrlKey: true,
     })
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')
     expect(checkboxes.filter(c => c.checked === true).length).toBe(3)
@@ -246,10 +246,10 @@ describe('ConversationListHolder', () => {
     const conversations = getAllByTestId('conversationListItem-Item')
     fireEvent.click(conversations[0])
     fireEvent.click(conversations[1], {
-      metaKey: true
+      metaKey: true,
     })
     fireEvent.click(conversations[2], {
-      metaKey: true
+      metaKey: true,
     })
     fireEvent.click(conversations[4])
     const checkboxes = getAllByTestId('conversationListItem-Checkbox')

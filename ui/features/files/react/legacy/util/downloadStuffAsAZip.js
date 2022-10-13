@@ -58,7 +58,7 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
 
   function onProgress(progessAPIResponse) {
     const message = I18n.t('progress_message', 'Preparing download: %{percent}% complete', {
-      percent: progessAPIResponse.completion
+      percent: progessAPIResponse.completion,
     })
     $progressIndicator.appendTo('body').text(message)
     return throttledSRMessage(message)
@@ -68,8 +68,8 @@ export default function downloadStuffAsAZip(filesAndFolders, {contextType, conte
     export_type: 'zip',
     select: {
       files,
-      folders
-    }
+      folders,
+    },
   }
 
   $(window).on(

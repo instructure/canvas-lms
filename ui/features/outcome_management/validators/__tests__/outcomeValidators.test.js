@@ -17,10 +17,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {
-  titleValidator,
-  displayNameValidator
-} from '../outcomeValidators'
+import {titleValidator, displayNameValidator} from '../outcomeValidators'
 
 describe('outcomeValidators', () => {
   describe('titleValidators', () => {

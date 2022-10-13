@@ -36,18 +36,18 @@ QUnit.module('progressable', {
     server.respondWith('GET', progressUrl, [
       200,
       {'Content-Type': 'application/json'},
-      '{"workflow_state": "completed"}'
+      '{"workflow_state": "completed"}',
     ])
     server.respondWith('GET', model.url, [
       200,
       {'Content-Type': 'application/json'},
-      '{"csv": "one,two,three"}'
+      '{"csv": "one,two,three"}',
     ])
   },
   teardown() {
     server.restore()
     clock.restore()
-  }
+  },
 })
 
 test('set progress_url', () => {

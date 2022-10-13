@@ -25,9 +25,7 @@ const I18n = useI18nScope('appt_calendar_event_dialog')
 export default class EditApptCalendarEventDialog {
   constructor(event) {
     this.event = event
-    this.form = $('<div></div>')
-      .html(editApptCalendarEventTemplate(this.event))
-      .appendTo('body')
+    this.form = $('<div></div>').html(editApptCalendarEventTemplate(this.event)).appendTo('body')
 
     const $maxParticipantsOption = this.form.find('[type=checkbox][name=max_participants_option]')
     this.$maxParticipants = this.form.find('[name=max_participants]')
@@ -49,9 +47,9 @@ export default class EditApptCalendarEventDialog {
       buttons: [
         {
           text: I18n.t('update', 'Update'),
-          click: this.save
-        }
-      ]
+          click: this.save,
+        },
+      ],
     })
     this.dialog.submit(event => {
       event.preventDefault()
@@ -93,7 +91,7 @@ export default class EditApptCalendarEventDialog {
     const participants_per_appointment = limit_participants ? max_participants : ''
     this.event.save({
       'calendar_event[description]': formData.description,
-      'calendar_event[participants_per_appointment]': participants_per_appointment
+      'calendar_event[participants_per_appointment]': participants_per_appointment,
     })
 
     this.dialog.dialog('destroy')

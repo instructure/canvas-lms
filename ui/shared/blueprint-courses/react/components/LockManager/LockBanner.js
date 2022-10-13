@@ -31,7 +31,7 @@ const I18n = useI18nScope('blueprint_coursesLockBanner')
 export default class LockBanner extends Component {
   static propTypes = {
     isLocked: PropTypes.bool.isRequired,
-    itemLocks: propTypes.itemLocks
+    itemLocks: propTypes.itemLocks,
   }
 
   static defaultProps = {
@@ -40,8 +40,8 @@ export default class LockBanner extends Component {
       points: false,
       settings: false,
       due_dates: false,
-      availability_dates: false
-    }
+      availability_dates: false,
+    },
   }
 
   static setupRootNode() {

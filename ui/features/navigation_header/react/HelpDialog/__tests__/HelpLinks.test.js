@@ -15,7 +15,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 import HelpLinks from '../HelpLinks'
 
 describe('HelpLinks', () => {
@@ -28,7 +28,7 @@ describe('HelpLinks', () => {
     url: 'https://community.canvaslms.test/t5/Canvas/ct-p/canvas',
     is_featured: true,
     is_new: false,
-    feature_headline: 'Little Lost? Try here first!'
+    feature_headline: 'Little Lost? Try here first!',
   }
   const newLink = {
     id: 'link1',
@@ -38,7 +38,7 @@ describe('HelpLinks', () => {
     type: 'custom',
     available_to: ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
     is_featured: false,
-    is_new: true
+    is_new: true,
   }
   const regularLink = {
     id: 'report_a_problem',
@@ -48,20 +48,39 @@ describe('HelpLinks', () => {
     subtext: 'If Canvas misbehaves, tell us about it',
     url: '#create_ticket',
     is_featured: false,
-    is_new: false
+    is_new: false,
+  }
+  const noWindowLink = {
+    id: 'inline_help_link',
+    type: 'default',
+    no_new_window: true,
+    available_to: ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
+    text: 'Support Centre',
+    subtext: 'Ask ur question',
+    url: '?enjoy=this',
+    is_featured: false,
+    is_new: false,
   }
   const props = {
     links: [featuredLink, newLink, regularLink],
     hasLoaded: true,
-    onClick() {}
+    onClick() {},
   }
+
+  const savedLocation = window.location
+  let mockedReplace
 
   beforeEach(() => {
     window.ENV = {FEATURES: {featured_help_links: true}}
+    mockedReplace = jest.fn()
+    delete global.window.location
+    global.window = Object.create(window)
+    global.window.location = {replace: mockedReplace}
   })
 
   afterEach(() => {
     window.ENV = {}
+    global.window.location = savedLocation
   })
 
   it('renders all the links', () => {
@@ -98,6 +117,14 @@ describe('HelpLinks', () => {
   it('does not render the separator if there is only a featured link', () => {
     const {queryByText} = render(<HelpLinks {...props} links={[featuredLink]} />)
     expect(queryByText('OTHER RESOURCES')).not.toBeInTheDocument()
+  })
+
+  it('tries to load a new URL in place if the no_new_window flag is set', async () => {
+    const links = [...props.links, noWindowLink]
+    const {getByText} = render(<HelpLinks {...props} links={links} />)
+    const link = getByText('Support Centre')
+    fireEvent.click(link)
+    await waitFor(() => expect(mockedReplace).toHaveBeenCalledWith('?enjoy=this'))
   })
 
   it('renders a "NEW" pill when a link is tagged with is_new', () => {

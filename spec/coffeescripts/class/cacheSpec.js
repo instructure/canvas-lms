@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import cache from 'ui/features/assignment_index/cache.js'
+import cache from 'ui/features/assignment_index/cache'
 
 QUnit.module('class/cache', {
   setup() {
@@ -24,28 +24,28 @@ QUnit.module('class/cache', {
     // because cache is meant to be used as a class
     // mixin
     this.cache = cache.cache
-  }
+  },
 })
 
-test('should store strings', function() {
+test('should store strings', function () {
   this.cache.set('key', 'value')
   equal(this.cache.get('key'), 'value')
 })
 
-test('should store arrays and objects', function() {
+test('should store arrays and objects', function () {
   this.cache.set('array', [1, 2, 3])
   this.cache.set('object', {a: 1, b: 2})
   deepEqual(this.cache.get('array'), [1, 2, 3])
   deepEqual(this.cache.get('object'), {a: 1, b: 2})
 })
 
-test('should delete keys', function() {
+test('should delete keys', function () {
   this.cache.set('key', 'value')
   this.cache.remove('key')
   equal(this.cache.get('key'), null)
 })
 
-test('should accept complex keys', function() {
+test('should accept complex keys', function () {
   this.cache.set([1, 2, 3], 'value1')
   this.cache.set({a: 1, b: 1}, 'value2')
   this.cache.set([1, 2], {a: 1}, 'test', 'value3')
@@ -55,13 +55,13 @@ test('should accept complex keys', function() {
   equal(this.cache.get([1, 2], {a: 1}, 'test'), 'value3')
 })
 
-test('should accept a prefix', function() {
+test('should accept a prefix', function () {
   this.cache.prefix = 'prefix-'
   this.cache.set('key', 'value')
   equal(typeof this.cache.store['prefix-"key"'], 'string')
 })
 
-test('should accept local and sessionStorage as stores', function() {
+test('should accept local and sessionStorage as stores', function () {
   this.cache.use('localStorage')
   equal(this.cache.store, localStorage)
 

@@ -25,7 +25,7 @@ const MINUTES = 1000 * 60
 // a fake QR code image, and then a another one after generating a new code
 const loginImageJsons = [
   {png: 'R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='},
-  {png: 'R0lGODlhAQABZZZZZCH5BAEKAAEALZZZZZABAAEAAAICTAEAOn=='}
+  {png: 'R0lGODlhAQABZZZZZCH5BAEKAAEALZZZZZABAAEAAAICTAEAOn=='},
 ]
 
 const route = '/canvas/login.png'
@@ -124,7 +124,7 @@ describe('QRMobileLogin', () => {
 
     it('displays the warning modal and no code', () => {
       fetchMock.post(route, doNotRespond, {overwriteRoutes: true})
-      const {queryByTestId, getByText} = render(<QRMobileLogin withWarning />)
+      const {queryByTestId, getByText} = render(<QRMobileLogin withWarning={true} />)
       expect(getByText(/confirm qr code display/i)).toBeInTheDocument()
       expect(queryByTestId('qr-code-image')).toBeNull()
       expect(getByText(/waiting for confirmation to display/i)).toBeInTheDocument()
@@ -132,7 +132,7 @@ describe('QRMobileLogin', () => {
 
     it('displays the code when the modal is confirmed', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
-      const {getByTestId, findByText} = render(<QRMobileLogin withWarning />)
+      const {getByTestId, findByText} = render(<QRMobileLogin withWarning={true} />)
       const proceedButton = getByTestId('qr-proceed-button')
       fireEvent.click(proceedButton)
       await findByText(/expires in 10 minutes/)
@@ -141,7 +141,7 @@ describe('QRMobileLogin', () => {
 
     it('displays a message instead of a code when modal is canceled', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
-      const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning />)
+      const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
       const cancelButton = getByTestId('qr-cancel-button')
       fireEvent.click(cancelButton)
       await findByText(/qr code display was canceled/i)
@@ -150,7 +150,7 @@ describe('QRMobileLogin', () => {
 
     it('cancels the modal and displays no code when header close button is clicked', async () => {
       fetchMock.post(route, loginImageJsons[0], {overwriteRoutes: true})
-      const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning />)
+      const {getByTestId, findByText, queryByTestId} = render(<QRMobileLogin withWarning={true} />)
       const cancelButton = getByTestId('qr-header-close-button').querySelector('button')
       fireEvent.click(cancelButton)
       await findByText(/qr code display was canceled/i)

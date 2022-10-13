@@ -106,7 +106,7 @@ function QuizEngineModal({setOpen, onDismiss}) {
       ENV.URLS.new_quizzes_selection,
       'PUT',
       {
-        newquizzes_engine_selected: newquizzes_engine
+        newquizzes_engine_selected: newquizzes_engine,
       },
       () => {
         window.location.reload()

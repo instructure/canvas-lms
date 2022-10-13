@@ -44,7 +44,7 @@ function linksToShow() {
 
 const notifyEvents = {
   [SUSPEND]: new CustomEvent(CUSTOM_EVENT, {detail: {action: SUSPEND}}),
-  [REACTIVATE]: new CustomEvent(CUSTOM_EVENT, {detail: {action: REACTIVATE}})
+  [REACTIVATE]: new CustomEvent(CUSTOM_EVENT, {detail: {action: REACTIVATE}}),
 }
 
 export default function UserSuspendLink() {
@@ -71,7 +71,7 @@ export default function UserSuspendLink() {
       await doFetchApi({
         path: `/api/v1/users/${ENV.USER_ID}`,
         method: 'PUT',
-        body: {user: {event: action}}
+        body: {user: {event: action}},
       })
       setShow([action === SUSPEND ? REACTIVATE : SUSPEND]) // show opposite action now
       crossNotify(action)

@@ -34,8 +34,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, sameGroup = false, 
         title: title || `Learning Outcome ${startId + idx}`,
         canUnlink,
         parentGroupId: sameGroup ? 1001 : `${1001 + idx}`,
-        parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`
-      }
+        parentGroupTitle: `Outcome Group ${sameGroup ? 1001 : 1001 + idx}`,
+      },
     }),
     {}
   )
@@ -54,7 +54,7 @@ describe('OutcomeRemoveModal', () => {
     onCleanupHandler: onCleanupHandlerMock,
     onRemoveLearningOutcomesHandler: onRemoveLearningOutcomesHandlerMock,
     removeOutcomes,
-    ...props
+    ...props,
   })
 
   beforeEach(() => {
@@ -94,7 +94,7 @@ describe('OutcomeRemoveModal', () => {
 
     it('calls onCleanupHandler on Remove button click', async () => {
       const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-        mocks: [deleteOutcomeMock()]
+        mocks: [deleteOutcomeMock()],
       })
       fireEvent.click(getByText('Remove Outcome'))
       expect(onCleanupHandlerMock).toHaveBeenCalled()
@@ -121,7 +121,7 @@ describe('OutcomeRemoveModal', () => {
 
     it('renders component with proper text for Course context', () => {
       const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-        contextType: 'Course'
+        contextType: 'Course',
       })
       expect(
         getByText('Are you sure that you want to remove this outcome from this course?')
@@ -131,7 +131,7 @@ describe('OutcomeRemoveModal', () => {
     describe('deletes outcome', () => {
       it('calls onRemoveLearningOutcomesHandler after request succedes', async () => {
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          mocks: [deleteOutcomeMock()]
+          mocks: [deleteOutcomeMock()],
         })
         fireEvent.click(getByText('Remove Outcome'))
 
@@ -147,7 +147,7 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />
       )
@@ -159,7 +159,7 @@ describe('OutcomeRemoveModal', () => {
         <OutcomeRemoveModal
           {...defaultProps({
             isOpen: false,
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />
       )
@@ -170,11 +170,11 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />,
         {
-          mocks: [deleteOutcomeMock()]
+          mocks: [deleteOutcomeMock()],
         }
       )
       fireEvent.click(getByText('Remove Outcomes'))
@@ -185,7 +185,7 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />
       )
@@ -197,7 +197,7 @@ describe('OutcomeRemoveModal', () => {
       const {getAllByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />
       )
@@ -210,7 +210,7 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />
       )
@@ -223,11 +223,11 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2)
+            outcomes: outcomesGenerator(1, 2),
           })}
         />,
         {
-          contextType: 'Course'
+          contextType: 'Course',
         }
       )
       expect(
@@ -241,8 +241,8 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: {
               ...outcomesGenerator(1, 3),
-              ...outcomesGenerator(1, 2, false)
-            }
+              ...outcomesGenerator(1, 2, false),
+            },
           })}
         />
       )
@@ -259,12 +259,12 @@ describe('OutcomeRemoveModal', () => {
           {...defaultProps({
             outcomes: {
               ...outcomesGenerator(1, 3),
-              ...outcomesGenerator(1, 2, false)
-            }
+              ...outcomesGenerator(1, 2, false),
+            },
           })}
         />,
         {
-          contextType: 'Course'
+          contextType: 'Course',
         }
       )
       expect(
@@ -278,7 +278,7 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2, false)
+            outcomes: outcomesGenerator(1, 2, false),
           })}
         />
       )
@@ -293,11 +293,11 @@ describe('OutcomeRemoveModal', () => {
       const {getByText} = render(
         <OutcomeRemoveModal
           {...defaultProps({
-            outcomes: outcomesGenerator(1, 2, false)
+            outcomes: outcomesGenerator(1, 2, false),
           })}
         />,
         {
-          contextType: 'Course'
+          contextType: 'Course',
         }
       )
       expect(
@@ -313,7 +313,7 @@ describe('OutcomeRemoveModal', () => {
         9: sortedOutcomes[9],
         5: sortedOutcomes[5],
         3: sortedOutcomes[3],
-        7: sortedOutcomes[7]
+        7: sortedOutcomes[7],
       }
       const {findAllByText} = render(
         <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
@@ -331,7 +331,7 @@ describe('OutcomeRemoveModal', () => {
         9: sortedOutcomes[9],
         5: sortedOutcomes[5],
         3: sortedOutcomes[3],
-        7: sortedOutcomes[7]
+        7: sortedOutcomes[7],
       }
       const {findAllByText} = render(
         <OutcomeRemoveModal {...defaultProps({outcomes: unsortedOutcomes})} />
@@ -348,11 +348,11 @@ describe('OutcomeRemoveModal', () => {
         const {getByText} = render(
           <OutcomeRemoveModal
             {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
+              outcomes: outcomesGenerator(1, 2, true),
             })}
           />,
           {
-            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
+            mocks: [deleteOutcomeMock({ids: ['1', '2']})],
           }
         )
         fireEvent.click(getByText('Remove Outcomes'))

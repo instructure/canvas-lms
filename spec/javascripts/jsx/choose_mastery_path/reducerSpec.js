@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import actions from 'ui/features/choose_mastery_path/react/actions.js'
-import reducer from 'ui/features/choose_mastery_path/react/reducer.js'
+import actions from 'ui/features/choose_mastery_path/react/actions'
+import reducer from 'ui/features/choose_mastery_path/react/reducer'
 
 QUnit.module('Choose Mastery Path Reducer')
 
@@ -36,10 +36,10 @@ test('sets options', () => {
           name: 'Ch 2 Quiz',
           type: 'quiz',
           points: 10,
-          due_date: 'Aug 20'
-        }
-      ]
-    }
+          due_date: 'Aug 20',
+        },
+      ],
+    },
   ]
   const newState = reduce(actions.setOptions(options))
   deepEqual(newState.options, options, 'options updated')

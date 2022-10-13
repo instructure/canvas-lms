@@ -43,9 +43,7 @@ ready(() => {
 
   $('#account_settings_tabs, #course_details_tabs').on('tabscreate tabsactivate', (event, ui) => {
     const selectedTab = ui.tab || ui.newTab
-    const tabId = $(selectedTab)
-      .find('a')
-      .attr('id')
+    const tabId = $(selectedTab).find('a').attr('id')
     renderReactApps(tabId)
   })
 })

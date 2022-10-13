@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import SpeedGraderSettingsMenu from 'ui/features/speed_grader/react/SpeedGraderSettingsMenu.js'
+import SpeedGraderSettingsMenu from 'ui/features/speed_grader/react/SpeedGraderSettingsMenu'
 
 QUnit.module('SpeedGraderSettingsMenu', hooks => {
   let $container
@@ -41,7 +41,7 @@ QUnit.module('SpeedGraderSettingsMenu', hooks => {
       openOptionsModal() {},
       openKeyboardShortcutsModal() {},
       showHelpMenuItem: false,
-      showModerationMenuItem: false
+      showModerationMenuItem: false,
     }
 
     $container = document.createElement('div')

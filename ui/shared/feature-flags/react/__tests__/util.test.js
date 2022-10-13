@@ -24,8 +24,8 @@ import * as util from '../util'
 const DEFAULT_ENV = {
   PRODUCTION: true,
   ACCOUNT: {
-    site_admin: true
-  }
+    site_admin: true,
+  },
 }
 
 describe('feature_flags:util', () => {
@@ -43,7 +43,7 @@ describe('feature_flags:util', () => {
         expect.objectContaining({
           enabled: 'allowed_on',
           disabled: 'allowed',
-          lock: 'off'
+          lock: 'off',
         })
       )
     })
@@ -53,7 +53,7 @@ describe('feature_flags:util', () => {
         expect.objectContaining({
           enabled: 'allowed_on',
           disabled: 'allowed',
-          lock: 'on'
+          lock: 'on',
         })
       )
     })
@@ -62,7 +62,7 @@ describe('feature_flags:util', () => {
       expect(util.buildTransitions(sampleData.allowedOnFeature.feature_flag, false)).toEqual(
         expect.objectContaining({
           enabled: 'on',
-          disabled: 'off'
+          disabled: 'off',
         })
       )
     })

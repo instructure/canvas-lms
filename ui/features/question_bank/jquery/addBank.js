@@ -18,14 +18,15 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import '@canvas/jquery/jquery.ajaxJSON'/* ajaxJSON */
-import '@canvas/forms/jquery/jquery.instructure_forms'/* formSubmit, getFormData, formErrors */
+import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON */
+import '@canvas/forms/jquery/jquery.instructure_forms' /* formSubmit, getFormData, formErrors */
 import 'jqueryui/dialog'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* replaceTags */
-import '@canvas/jquery/jquery.instructure_misc_plugins'/* confirmDelete, showIf, .dim */
-import '@canvas/keycodes'/* keycodes */
-import '@canvas/loading-image'/* loadingImage */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* replaceTags */
+import '@canvas/jquery/jquery.instructure_misc_plugins' /* confirmDelete, showIf, .dim */
+import '@canvas/keycodes' /* keycodes */
+import '@canvas/loading-image' /* loadingImage */
 import '@canvas/util/templateData'
+
 const I18n = useI18nScope('add_bank')
 /* fillTemplateData, getTemplateData */
 
@@ -35,10 +36,7 @@ export default function addBank(bank) {
     return
   }
   const $dialog = $('#move_question_dialog')
-  const $bank = $dialog
-    .find('li.bank.blank:first')
-    .clone(true)
-    .removeClass('blank')
+  const $bank = $dialog.find('li.bank.blank:first').clone(true).removeClass('blank')
 
   $bank
     .find('input')

@@ -30,7 +30,7 @@ afterEach(() => {
 
 it('deletes pages', done => {
   moxios.stubRequest('/api/v1/courses/1/pages/my_page', {
-    response: {}
+    response: {},
   })
   deletePages('courses', '1', ['my_page'])
     .then(response => {

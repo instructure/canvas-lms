@@ -37,7 +37,7 @@ function setSendToOpen(state, action) {
 const reducer = handleActions(
   {
     [actionTypes.SET_SEND_TO_OPEN]: setSendToOpen,
-    [actionTypes.SET_SEND_TO]: setSendTo
+    [actionTypes.SET_SEND_TO]: setSendTo,
   },
   {open: false, selection: {}}
 )

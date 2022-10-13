@@ -27,7 +27,7 @@ export const DefaultMocks = {
   CreateSubmissionDraftPayload: () => ({errors: null}),
   CreateSubmissionPayload: () => ({errors: null}),
   DeleteSubmissionDraftPayload: () => ({errors: null}),
-  MarkSubmissionCommentsReadPayload: () => ({errors: null})
+  MarkSubmissionCommentsReadPayload: () => ({errors: null}),
 }
 
 export const CREATE_SUBMISSION = gql`

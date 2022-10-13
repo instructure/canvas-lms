@@ -32,8 +32,8 @@ const CyoeApi = {
         .get(`/api/v1/courses/${courseId}/mastery_paths/rules`, {
           params: {
             trigger_assignment_id: triggerAssignmentId,
-            include: ['all']
-          }
+            include: ['all'],
+          },
         })
         .then(res => {
           res.data = res.data.length ? res.data[0] : null
@@ -131,7 +131,7 @@ const CyoeApi = {
         range.upper_bound = numberHelper.parse(range.upper_bound)
       }
     })
-  }
+  },
 }
 
 export default CyoeApi

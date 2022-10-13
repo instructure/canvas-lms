@@ -28,7 +28,7 @@ export default function configStore(initialState) {
     process.env.NODE_ENV !== 'production' &&
       // this is so redux-logger is not included in the test output
       process.env.NODE_ENV !== 'test' &&
-      require('redux-logger').logger
+      require('redux-logger').logger,
   ].filter(Boolean)
   return applyMiddleware(...middleware)(createStore)(rootReducer, initialState)
 }

@@ -48,8 +48,8 @@ QUnit.module('ExternalApps.ReregisterExternalToolButton', {
         enabled: true,
         installed_locally: true,
         name: 'Twitter',
-        reregistration_url: 'http://some.lti/reregister'
-      }
+        reregistration_url: 'http://some.lti/reregister',
+      },
     ]
     store.reset()
     store.setState({externalTools: this.tools})
@@ -57,7 +57,7 @@ QUnit.module('ExternalApps.ReregisterExternalToolButton', {
   teardown() {
     store.reset()
     ReactDOM.unmountComponentAtNode(wrapper)
-  }
+  },
 })
 
 test('open and close modal', function () {

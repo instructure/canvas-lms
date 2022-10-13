@@ -29,8 +29,8 @@ const ScopedHbsPreProcessor = require('@instructure/i18nliner-canvas/scoped_hbs_
 const {readI18nScopeFromJSONFile} = require('@instructure/i18nliner-canvas/scoped_hbs_resolver')
 const nodePath = require('path')
 const loaderUtils = require('loader-utils')
-const { canvasDir } = require('#params')
-const { contriveId, config: brandableCSSConfig } = requireBrandableCSS()
+const {canvasDir} = require('#params')
+const {contriveId, config: brandableCSSConfig} = requireBrandableCSS()
 
 const compileHandlebars = data => {
   const path = data.path
@@ -52,13 +52,7 @@ const compileHandlebars = data => {
   }
 }
 
-const emitTemplate = ({
-  name,
-  template,
-  dependencies,
-  cssRegistration,
-  partialRegistration,
-}) => {
+const emitTemplate = ({name, template, dependencies, cssRegistration, partialRegistration}) => {
   return `
     import _Handlebars from 'handlebars/runtime';
 
@@ -94,8 +88,7 @@ const buildCssReference = (path, name) => {
 
   try {
     bundle = require(`${path}.json`).brandableCSSBundle
-  }
-  catch (_) {
+  } catch (_) {
     bundle = null
   }
 
@@ -146,11 +139,8 @@ function i18nLinerHandlebarsLoader(source) {
 
   const partialRegistration = emitPartialRegistration(this.resourcePath, name)
 
-  const cssRegistration = options.injectBrandableStylesheet !== false ?
-    buildCssReference(this.resourcePath, name) :
-    ''
-  ;
-
+  const cssRegistration =
+    options.injectBrandableStylesheet !== false ? buildCssReference(this.resourcePath, name) : ''
   const partials = findReferencedPartials(source)
   const partialRequirements = partials.map(x => nodePath.resolve(canvasDir, x))
   partialRequirements.forEach(requirement => dependencies.push(requirement))
@@ -178,7 +168,7 @@ function i18nLinerHandlebarsLoader(source) {
 }
 
 function requireBrandableCSS() {
-  const { cwd, chdir } = require('process')
+  const {cwd, chdir} = require('process')
   const oldCWD = cwd()
 
   // it looks for "config/brandable_css.yml" from cwd
@@ -186,8 +176,7 @@ function requireBrandableCSS() {
 
   try {
     return require('@instructure/brandable_css')
-  }
-  finally {
+  } finally {
     process.chdir(oldCWD)
   }
 }
@@ -198,7 +187,7 @@ module.exports.compile = (source, path, query) => {
   const context = {
     cacheable: () => {},
     resourcePath: path,
-    query
+    query,
   }
   return i18nLinerHandlebarsLoader.call(context, source)
 }

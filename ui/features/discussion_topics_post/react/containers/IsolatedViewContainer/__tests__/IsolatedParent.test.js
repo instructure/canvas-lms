@@ -29,7 +29,7 @@ import {AnonymousUser} from '../../../../graphql/AnonymousUser'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 beforeAll(() => {
@@ -39,7 +39,7 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
@@ -52,7 +52,7 @@ describe('IsolatedParent', () => {
     discussionTopic: Discussion.mock(),
     discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
     onToggleUnread: jest.fn(),
-    ...overrides
+    ...overrides,
   })
 
   const setup = (props, mocks) => {
@@ -131,7 +131,7 @@ describe('IsolatedParent', () => {
     it('displays unread and replyCount', async () => {
       const {queryAllByText} = setup(
         defaultProps({
-          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}},
         })
       )
       expect(queryAllByText('2 replies, 1 unread').length).toBe(2)
@@ -140,7 +140,7 @@ describe('IsolatedParent', () => {
     it('does not display unread count if it is 0', async () => {
       const {queryAllByText} = setup(
         defaultProps({
-          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}},
         })
       )
       expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
@@ -150,15 +150,15 @@ describe('IsolatedParent', () => {
 
   it('should render deeply nested alert', () => {
     window.ENV = {
-      should_show_deeply_nested_alert: true
+      should_show_deeply_nested_alert: true,
     }
     const {queryByText} = setup(
       defaultProps({
         discussionEntryOverrides: {
           isolatedEntryId: '77',
-          parentId: '77'
+          parentId: '77',
         },
-        overrides: {RCEOpen: true}
+        overrides: {RCEOpen: true},
       })
     )
 
@@ -171,7 +171,7 @@ describe('IsolatedParent', () => {
 
   it('should not render deeply nested alert', () => {
     window.ENV = {
-      should_show_deeply_nested_alert: false
+      should_show_deeply_nested_alert: false,
     }
     const {queryByText} = setup(defaultProps())
 
@@ -196,9 +196,9 @@ describe('IsolatedParent', () => {
         defaultProps({
           discussionEntryOverrides: {
             entryParticipant: {
-              reportType: 'other'
-            }
-          }
+              reportType: 'other',
+            },
+          },
         })
       )
 
@@ -211,7 +211,7 @@ describe('IsolatedParent', () => {
       const {getByTestId, queryByText} = setup(
         defaultProps(),
         updateDiscussionEntryParticipantMock({
-          reportType: 'other'
+          reportType: 'other',
         })
       )
 
@@ -237,7 +237,7 @@ describe('IsolatedParent', () => {
 
     it('renders name', () => {
       const props = defaultProps({
-        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()}
+        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()},
       })
       const container = setup(props)
       expect(container.queryByText('Sorry, Something Broke')).toBeNull()

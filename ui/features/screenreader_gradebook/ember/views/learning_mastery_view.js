@@ -18,7 +18,7 @@
 import Ember from 'ember'
 
 const LearningMasteryView = Ember.View.extend({
-  templateName: 'learning_mastery'
+  templateName: 'learning_mastery',
 })
 
 export default LearningMasteryView

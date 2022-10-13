@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
-import {IconButton, CondensedButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Tooltip} from '@instructure/ui-tooltip'
@@ -28,8 +28,10 @@ import {
   IconPlusLine,
   IconSettingsLine,
   IconStatsLine,
-  IconPublishLine
+  IconPublishLine,
 } from '@instructure/ui-icons'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
 import axios from '@canvas/axios'
 import {uniqBy} from 'lodash'
 import $ from '@canvas/rails-flash-notifications'
@@ -50,7 +52,7 @@ export default class CoursesListRow extends React.Component {
         size: UserLink.propTypes.size,
         href: UserLink.propTypes.href,
         display_name: UserLink.propTypes.name,
-        avatar_url: UserLink.propTypes.avatar_url
+        avatar_url: UserLink.propTypes.avatar_url,
       })
     ),
     teacher_count: number,
@@ -62,13 +64,13 @@ export default class CoursesListRow extends React.Component {
     can_create_enrollments: bool,
     blueprint: bool,
     template: bool,
-    concluded: bool
+    concluded: bool,
   }
 
   static defaultProps = {
     roles: [],
     can_create_enrollments:
-      window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_enrollments
+      window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_enrollments,
   }
 
   static displayName = 'Row'
@@ -78,7 +80,7 @@ export default class CoursesListRow extends React.Component {
 
     this.state = {
       newlyEnrolledStudents: 0,
-      teachersToShow: this.uniqueTeachers().slice(0, 2)
+      teachersToShow: this.uniqueTeachers().slice(0, 2),
     }
   }
 
@@ -96,15 +98,15 @@ export default class CoursesListRow extends React.Component {
         html: I18n.t(
           {
             one: '%{user_name} successfully enrolled into *%{course_name}*.',
-            other: '%{count} people successfully enrolled into *%{course_name}*.'
+            other: '%{count} people successfully enrolled into *%{course_name}*.',
           },
           {
             count: newEnrollments.length,
             user_name: newEnrollments[0].enrollment.name,
             course_name: this.props.name,
-            wrappers: [`<a href="/courses/${this.props.id}">$1</a>`]
+            wrappers: [`<a href="/courses/${this.props.id}">$1</a>`],
           }
-        )
+        ),
       })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
       this.setState(oldState => {
@@ -132,7 +134,7 @@ export default class CoursesListRow extends React.Component {
             this.handleNewEnrollments(this.addPeopleApp.usersHaveBeenEnrolled())
           },
           inviteUsersURL: `/courses/${this.props.id}/invite_users`,
-          canReadSIS: this.props.showSISIds
+          canReadSIS: this.props.showSISIds,
         })
       this.addPeopleApp.open()
     })
@@ -179,7 +181,7 @@ export default class CoursesListRow extends React.Component {
       showSISIds,
       term,
       blueprint,
-      template
+      template,
     } = this.props
     const {teachersToShow, newlyEnrolledStudents} = this.state
     const url = `/courses/${id}`
@@ -237,9 +239,9 @@ export default class CoursesListRow extends React.Component {
             </div>
           ))}
           {teachers && teachers.length > 2 && teachersToShow.length === 2 && (
-            <CondensedButton size="small" onClick={this.showMoreTeachers}>
-              {I18n.t('Show More')}
-            </CondensedButton>
+            <Link isWithinText={false} as="button" onClick={this.showMoreTeachers}>
+              <Text size="small">{I18n.t('Show More')}</Text>
+            </Link>
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
         </Table.Cell>

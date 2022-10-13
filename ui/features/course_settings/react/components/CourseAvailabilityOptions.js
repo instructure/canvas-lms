@@ -40,13 +40,13 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
     START_DATE: 'course_start_at',
     END_DATE: 'course_conclude_at',
     RESTRICT_FUTURE: 'course_restrict_student_future_view',
-    RESTRICT_PAST: 'course_restrict_student_past_view'
+    RESTRICT_PAST: 'course_restrict_student_past_view',
   }
 
   const TERM_DATES = {
     START_DATE:
       window.ENV.STUDENTS_ENROLLMENT_DATES?.start_at || window.ENV.DEFAULT_TERM_DATES?.start_at,
-    END_DATE: window.ENV.STUDENTS_ENROLLMENT_DATES?.end_at || window.ENV.DEFAULT_TERM_DATES?.end_at
+    END_DATE: window.ENV.STUDENTS_ENROLLMENT_DATES?.end_at || window.ENV.DEFAULT_TERM_DATES?.end_at,
   }
 
   const setFormValue = (id, value) => {
@@ -88,12 +88,12 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
   const participationExplanationText = () => {
     return selectedApplicabilityValue === 'term'
       ? I18n.t('Course participation is limited to *term* start and end dates.', {
-          wrappers: [`<strong>$1</strong>`]
+          wrappers: [`<strong>$1</strong>`],
         })
       : I18n.t(
           'Course participation is limited to *course* start and end dates. Any section dates created in the course may override course dates.',
           {
-            wrappers: [`<strong>$1</strong>`]
+            wrappers: [`<strong>$1</strong>`],
           }
         )
   }
@@ -123,7 +123,7 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
             </ScreenReaderContent>
           }
           interaction={canManage ? 'enabled' : 'disabled'}
-          isInline
+          isInline={true}
           width="350px"
           value={selectedApplicabilityValue}
           onChange={(e, {value}) => {
@@ -277,5 +277,5 @@ export default function CourseAvailabilityOptions({canManage, viewPastLocked, vi
 CourseAvailabilityOptions.propTypes = {
   canManage: bool.isRequired,
   viewPastLocked: bool.isRequired,
-  viewFutureLocked: bool.isRequired
+  viewFutureLocked: bool.isRequired,
 }

@@ -79,13 +79,13 @@ export default function setUsageRights(
     data: {
       folder_ids,
       file_ids,
-      usage_rights: usageRights
+      usage_rights: usageRights,
     },
     success(data) {
       return callback(true, data)
     },
     error(data) {
       return callback(false, data)
-    }
+    },
   })
 }

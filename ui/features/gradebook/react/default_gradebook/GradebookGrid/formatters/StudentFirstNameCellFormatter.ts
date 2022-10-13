@@ -19,11 +19,16 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import '@canvas/jquery/jquery.instructure_misc_helpers' // $.toSentence
 import {getEnrollmentLabel, renderCell} from './StudentCellFormatter.utils'
+import type Gradebook from '../../Gradebook'
 
 const I18n = useI18nScope('gradebook')
 
 export default class StudentFirstNameCellFormatter {
-  constructor(gradebook) {
+  options: {
+    courseId: string
+  }
+
+  constructor(gradebook: Gradebook) {
     this.options = {
       courseId: gradebook.options.context_id,
     }

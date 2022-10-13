@@ -23,15 +23,6 @@
     "align_11050992": {
         "message": "Igazítás"
     },
-    "align_center_ca078feb": {
-        "message": "Középre igazítás"
-    },
-    "align_left_e9f1f93b": {
-        "message": "Balra igazítás"
-    },
-    "align_right_9bad3ac1": {
-        "message": "Jobbra igazítás"
-    },
     "alignment_and_lists_5cebcb69": {
         "message": "Igazítások és listák"
     },
@@ -43,6 +34,9 @@
     },
     "all_items_loaded_aa256183": {
         "message": "Minden elem betöltve"
+    },
+    "alpha_15d59033": {
+        "message": "Alfa"
     },
     "alphabetical_55b5b4e0": {
         "message": "Betűrendben"
@@ -61,6 +55,9 @@
     },
     "an_error_occurred_uploading_your_media_71f1444d": {
         "message": "Hiba történt a médiád feltöltése során."
+    },
+    "and_7fcc2911": {
+        "message": "És"
     },
     "announcement_fb4cb645": {
         "message": "Hirdetmény"
@@ -299,10 +296,7 @@
     "date_time_d9fbf2d7": {
         "message": "Dátum és idő"
     },
-    "decorative_image_3c28aa7d": {
-        "message": "Dekoratív kép"
-    },
-    "decrease_indent_de6343ab": {
+    "decrease_indent_d9cf469d": {
         "message": "Behúzás csökkentése"
     },
     "deep_purple_bb3e2907": {
@@ -319,9 +313,6 @@
     },
     "delimiters_4db4840d": {
         "message": "Elválasztó jelek"
-    },
-    "describe_the_image_e65d2e32": {
-        "message": "(A kép leírása)"
     },
     "describe_the_video_2fe8f46a": {
         "message": "(A videó leírása)"
@@ -445,9 +436,6 @@
     },
     "expand_to_see_types_f5d29352": {
         "message": "Kiterjesztés a(z) { types } megtekintéséhez"
-    },
-    "external_links_3d9f074e": {
-        "message": "Külső linkek"
     },
     "external_tools_6e77821": {
         "message": "Külső eszközök"
@@ -587,11 +575,17 @@
     "i_hold_the_copyright_71ee91b1": {
         "message": "Megtartom a szerzői jogot"
     },
+    "icon_215a1dc6": {
+        "message": "Ikon"
+    },
     "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
         "message": "Ha nem választja ki most a felhasználási jogokat, a fájl nem lesz publikálva a feltöltés után."
     },
     "image_8ad06": {
         "message": "Kép"
+    },
+    "image_c1c98202": {
+        "message": "kép"
     },
     "image_options_5412d02c": {
         "message": "Képbeállítások"
@@ -602,7 +596,7 @@
     "images_7ce26570": {
         "message": "Képek"
     },
-    "increase_indent_6d550a4a": {
+    "increase_indent_6af90f7c": {
         "message": "Behúzás növelése"
     },
     "indigo_2035fc55": {
@@ -667,9 +661,6 @@
     },
     "load_more_a36f9cf9": {
         "message": "Továbbiak betöltése"
-    },
-    "load_more_results_460f49a9": {
-        "message": "További eredmények betöltése"
     },
     "load_prior_dates_f2b0f6f0": {
         "message": "Korábbi dátumok betöltése"
@@ -839,6 +830,9 @@
     "optional_add_course_ef0d70fc": {
         "message": "Opcionális: kurzus hozzáadása"
     },
+    "or_9b70ccaa": {
+        "message": "Vagy"
+    },
     "orange_81386a62": {
         "message": "Narancs"
     },
@@ -941,8 +935,14 @@
     "remove_link_d1f2f4d0": {
         "message": "Link eltávolítása"
     },
+    "replace_e61834a7": {
+        "message": "Csere"
+    },
     "replies_4a8577c8": {
         "message": "Válaszok"
+    },
+    "reset_95a81614": {
+        "message": "Visszaállítás"
     },
     "restore_auto_save_deccd84b": {
         "message": "Visszaállítás automatikus mentésből?"

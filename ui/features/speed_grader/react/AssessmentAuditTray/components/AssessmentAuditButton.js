@@ -27,8 +27,8 @@ const I18n = useI18nScope('speed_grader')
 
 const theme = {
   [Button.theme]: {
-    smallPadding: '0'
-  }
+    smallPadding: '0',
+  },
 }
 
 export default function AssessmentAuditButton(props) {
@@ -42,5 +42,5 @@ export default function AssessmentAuditButton(props) {
 }
 
 AssessmentAuditButton.propTypes = {
-  onClick: func.isRequired
+  onClick: func.isRequired,
 }

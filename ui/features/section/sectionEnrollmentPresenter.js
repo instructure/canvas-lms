@@ -51,7 +51,7 @@ const keys = {
     },
     get StudentEnrollment() {
       return I18n.t('enrolled_as_limited_student', 'enrolled as: Student with section-only access')
-    }
+    },
   },
   standard: {
     get TeacherEnrollment() {
@@ -68,8 +68,8 @@ const keys = {
     },
     get StudentEnrollment() {
       return I18n.t('enrolled_as_student', 'enrolled as: Student')
-    }
-  }
+    },
+  },
 }
 
 // #
@@ -79,10 +79,10 @@ export default data =>
   _.map(data, enrollment => {
     const scope = enrollment.limit_privileges_to_course_section ? 'limited' : 'standard'
     const customLimited = I18n.t('enrolled as: %{enrollment_type} with section-only access', {
-      enrollment_type: `${enrollment.role}`
+      enrollment_type: `${enrollment.role}`,
     })
     const customStandard = I18n.t('enrolled as: %{enrollment_type}', {
-      enrollment_type: `${enrollment.role}`
+      enrollment_type: `${enrollment.role}`,
     })
     const customLabel = scope === 'limited' ? customLimited : customStandard
 

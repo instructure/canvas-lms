@@ -26,10 +26,10 @@ QUnit.module('View', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
-test('defaults', function() {
+test('defaults', function () {
   class SomeView extends Backbone.View {
     static initClass() {
       this.prototype.defaults = {foo: 'bar'}
@@ -43,7 +43,7 @@ test('defaults', function() {
   equal(SomeView.prototype.defaults.foo, 'bar', "doesn't extend prototype")
 })
 
-test('els config', function() {
+test('els config', function () {
   class SomeView extends Backbone.View {
     static initClass() {
       this.prototype.els = {'.foo': '$bar'}
@@ -59,7 +59,7 @@ test('els config', function() {
   equal(view.$bar.html(), 'foo', 'cached element')
 })
 
-test('optionProperty', function() {
+test('optionProperty', function () {
   class SomeView extends Backbone.View {
     static initClass() {
       this.optionProperty('foo')
@@ -72,7 +72,7 @@ test('optionProperty', function() {
   ok(view.foo == null, 'parent class property options not poluted')
 })
 
-test('children should have a list of child views', function() {
+test('children should have a list of child views', function () {
   class SomeView extends Backbone.View {
     static initClass() {
       this.child('test', '.test')
@@ -87,13 +87,13 @@ test('template optionProperty', () => {
   const view = new Backbone.View({
     template() {
       return 'hi'
-    }
+    },
   })
   view.render()
   equal(view.$el.html(), 'hi', 'template rendered with view as option')
 })
 
-test('child views', function() {
+test('child views', function () {
   class ChildView extends Backbone.View {
     template() {
       return 'hi'
@@ -113,7 +113,7 @@ test('child views', function() {
   const child = new ChildView()
   const parent = new ParentView({
     childView: child,
-    fart: 'fart'
+    fart: 'fart',
   })
   parent.render()
   equal(parent.$el.find('#child').html(), 'hi', 'child view rendered')
@@ -125,7 +125,7 @@ test('initialize', () => {
   const collection = new Backbone.Collection()
   const view = new Backbone.View({
     model,
-    collection
+    collection,
   })
   equal(view.$el.data('view'), view, 'view stored on element data')
   equal(model.view, view, 'sets model.view to the view')
@@ -143,12 +143,12 @@ test('render', () => {
   equal(view.$el.html(), 'hi', 'renders template')
 })
 
-test('data-bind', function() {
+test('data-bind', function () {
   class SomeView extends Backbone.View {
     static initClass() {
       this.prototype.els = {
         '#name': '$name',
-        '#title': '$title'
+        '#title': '$title',
       }
     }
 
@@ -184,7 +184,7 @@ test('toJSON', () => {
   let expected = {
     foo: 'bar',
     cid: view.cid,
-    ENV
+    ENV,
   }
   deepEqual(expected, view.toJSON(), 'returns options')
   const collection = new Backbone.Collection()
@@ -193,14 +193,14 @@ test('toJSON', () => {
   expected = {
     foo: 'bar',
     cid: view.cid,
-    ENV
+    ENV,
   }
   deepEqual(expected, view.toJSON(), 'uses @collection.toJSON')
   collection.present = () => ({foo: 'baz'})
   expected = {
     foo: 'baz',
     cid: view.cid,
-    ENV
+    ENV,
   }
   deepEqual(expected, view.toJSON(), 'uses @collection.present over toJSON')
   const model = new Backbone.Model()
@@ -209,30 +209,30 @@ test('toJSON', () => {
   expected = {
     foo: 'qux',
     cid: view.cid,
-    ENV
+    ENV,
   }
   deepEqual(expected, view.toJSON(), 'uses @model.toJSON over @collection')
   model.present = () => ({foo: 'quux'})
   expected = {
     foo: 'quux',
     cid: view.cid,
-    ENV
+    ENV,
   }
   deepEqual(expected, view.toJSON(), 'uses @model.present over toJSON')
 })
 
-test('View.mixin', 3, function() {
+test('View.mixin', 3, function () {
   const mixin1 = {
     events: {'click .foo': 'foo'},
     foo() {
       ok(true, 'called mixin1.foo')
-    }
+    },
   }
   const mixin2 = {
     events: {'click .bar': 'bar'},
     bar() {
       ok(true, 'called mixin2.bar')
-    }
+    },
   }
   class SomeView extends Backbone.View {
     static initClass() {
@@ -249,23 +249,23 @@ test('View.mixin', 3, function() {
   const expectedEvents = {
     'click .foo': 'foo',
     'click .bar': 'bar',
-    'click .baz': 'baz'
+    'click .baz': 'baz',
   }
   deepEqual(view.events, expectedEvents, 'events merged properly')
   view.foo()
   return view.bar()
 })
 
-test('View.mixin initialize, attach and afterRender magic tricks', function() {
+test('View.mixin initialize, attach and afterRender magic tricks', function () {
   const mixin1 = {
     initialize: sinon.spy(),
     attach: sinon.spy(),
-    afterRender: sinon.spy()
+    afterRender: sinon.spy(),
   }
   const mixin2 = {
     initialize: sinon.spy(),
     attach: sinon.spy(),
-    afterRender: sinon.spy()
+    afterRender: sinon.spy(),
   }
   class SomeView extends Backbone.View {
     static initClass() {
@@ -283,7 +283,7 @@ test('View.mixin initialize, attach and afterRender magic tricks', function() {
   ok(mixin2.attach.calledOnce, 'called mixin2 attach')
 })
 
-test('View.mixin does not merge into parent class', function() {
+test('View.mixin does not merge into parent class', function () {
   const mixin = {defaults: {foo: 'bar'}}
   class Foo extends Backbone.View {
     static initClass() {
@@ -295,7 +295,7 @@ test('View.mixin does not merge into parent class', function() {
   equal(Foo.prototype.defaults.foo, 'bar', 'Foo::defaults was appended')
 })
 
-test('View.mixin with compound mixins', function() {
+test('View.mixin with compound mixins', function () {
   const afterRender1 = sinon.spy()
   const mixin1 = {afterRender: afterRender1}
   const afterRender2 = sinon.spy()

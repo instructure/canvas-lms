@@ -26,13 +26,13 @@ describe('GroupCategoryCloneModal', () => {
   const open = true
   const groupCategory = {
     id: '1',
-    name: ''
+    name: '',
   }
 
   beforeAll(() => {
     Object.defineProperty(window, 'location', {
       writable: true,
-      value: {reload: jest.fn()}
+      value: {reload: jest.fn()},
     })
   })
 
@@ -79,11 +79,7 @@ describe('GroupCategoryCloneModal', () => {
           onDismiss={onDismiss}
         />
       )
-      expect(
-        getByText('Submit')
-          .closest('button')
-          .hasAttribute('disabled')
-      ).toBeTruthy()
+      expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeTruthy()
     })
 
     it('enables the submit button if group name is provided', () => {
@@ -96,17 +92,13 @@ describe('GroupCategoryCloneModal', () => {
         />
       )
       userEvent.type(getByPlaceholderText('Name'), 'enabled')
-      expect(
-        getByText('Submit')
-          .closest('button')
-          .hasAttribute('disabled')
-      ).toBeFalsy()
+      expect(getByText('Submit').closest('button').hasAttribute('disabled')).toBeFalsy()
     })
 
     it('creates a clone from current group set and reports status', async () => {
       fetchMock.postOnce(`path:/group_categories/${groupCategory.id}/clone_with_name`, {
         status: 200,
-        group_category: {id: '1'}
+        group_category: {id: '1'},
       })
       const {getByText, getAllByText} = render(
         <GroupCategoryCloneModal
@@ -120,7 +112,7 @@ describe('GroupCategoryCloneModal', () => {
       const [, fetchOptions] = fetchMock.lastCall()
       expect(fetchOptions.method).toBe('POST')
       expect(JSON.parse(fetchOptions.body)).toMatchObject({
-        name: '(Clone) Course Admin View Group Set'
+        name: '(Clone) Course Admin View Group Set',
       })
       expect(getAllByText(/cloning/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))

@@ -59,7 +59,7 @@ const GRADEBOOK_TRANSLATIONS = {
   submission_pass: I18n.t('pass'),
   submission_fail: I18n.t('fail'),
   submission_blank: I18n.t('blank'),
-  submission_excused: I18n.t('excused')
+  submission_excused: I18n.t('excused'),
 }
 
 export default GRADEBOOK_TRANSLATIONS

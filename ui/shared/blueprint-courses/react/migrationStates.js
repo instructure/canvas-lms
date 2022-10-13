@@ -25,10 +25,10 @@ const migrationStates = {
   states: statesList.reduce(
     (map, state) =>
       Object.assign(map, {
-        [state]: state
+        [state]: state,
       }),
     {}
-  )
+  ),
 }
 
 migrationStates.isEndState = state => endStates.includes(state)

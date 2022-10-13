@@ -40,7 +40,7 @@ const ManageGroupDialog = createReactClass({
     return {
       userCollection: this.props.userCollection,
       checked: this.props.checked,
-      name: this.props.name
+      name: this.props.name,
     }
   },
 
@@ -65,7 +65,7 @@ const ManageGroupDialog = createReactClass({
     this.setState({
       checked: isChecked
         ? this.state.checked.concat(user.id)
-        : _.without(this.state.checked, user.id)
+        : _.without(this.state.checked, user.id),
     })
   },
 
@@ -79,7 +79,7 @@ const ManageGroupDialog = createReactClass({
           <span className="screenreader-only" aria-live="polite" aria-atomic="true">
             {I18n.t('%{member_count} members out of maximum of %{max_membership}', {
               member_count: this.state.checked.length,
-              max_membership: this.props.maxMembership
+              max_membership: this.props.maxMembership,
             })}
           </span>
           <span className={className} aria-hidden="true">
@@ -139,7 +139,7 @@ const ManageGroupDialog = createReactClass({
         </form>
       </div>
     )
-  }
+  },
 })
 
 export default ManageGroupDialog

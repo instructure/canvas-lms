@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "lib/package_root"
-
 describe PackageRoot do
   let(:root_path) { File.expand_path(File.join(File.dirname(__FILE__), "../fixtures/importer/unzipped")) }
   let(:subject) { PackageRoot.new(root_path) }

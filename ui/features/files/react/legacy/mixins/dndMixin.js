@@ -72,7 +72,7 @@ export default {
 
     return $(document).on({
       'dragover.MultiDraggableMixin': event => this.renderDragFeedback(event.originalEvent),
-      'dragend.MultiDraggableMixin': this.removeDragFeedback
+      'dragend.MultiDraggableMixin': this.removeDragFeedback,
     })
   },
 
@@ -111,7 +111,7 @@ export default {
         }
       )
       .done(this.clearSelectedItems)
-  }
+  },
 }
 //      @clearSelectedItems()
 //      callback(event) if callback

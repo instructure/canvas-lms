@@ -50,7 +50,7 @@ export default class MigrationOptions extends React.Component {
     enableSendNotification: PropTypes.func.isRequired,
     includeCustomNotificationMessage: PropTypes.func.isRequired,
     includeCourseSettings: PropTypes.func.isRequired,
-    setNotificationMessage: PropTypes.func.isRequired
+    setNotificationMessage: PropTypes.func.isRequired,
   }
 
   componentWillReceiveProps(newProps) {
@@ -61,7 +61,7 @@ export default class MigrationOptions extends React.Component {
       $.screenReaderFlashMessage(
         I18n.t('%{count} of %{max} maximum characters', {
           count: newProps.notificationMessage.length,
-          max: MAX_NOTIFICATION_MESSAGE_LENGTH
+          max: MAX_NOTIFICATION_MESSAGE_LENGTH,
         })
       )
     }
@@ -84,7 +84,7 @@ export default class MigrationOptions extends React.Component {
       setTimeout(() => {
         $.screenReaderFlashMessage(
           I18n.t('You have reached the limit of %{len} characters in the notification message', {
-            len: MAX_NOTIFICATION_MESSAGE_LENGTH
+            len: MAX_NOTIFICATION_MESSAGE_LENGTH,
           })
         )
       }, 600)
@@ -125,7 +125,7 @@ export default class MigrationOptions extends React.Component {
                   <Text
                     aria-label={I18n.t('%{chars} written, max character length %{len}', {
                       chars: this.props.notificationMessage.length,
-                      len: MAX_NOTIFICATION_MESSAGE_LENGTH
+                      len: MAX_NOTIFICATION_MESSAGE_LENGTH,
                     })}
                     color="secondary"
                     size="small"
@@ -134,7 +134,7 @@ export default class MigrationOptions extends React.Component {
                     (
                     {I18n.t('%{len}/%{maxLen}', {
                       len: this.props.notificationMessage.length,
-                      maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH
+                      maxLen: MAX_NOTIFICATION_MESSAGE_LENGTH,
                     })}
                     )
                   </Text>
@@ -142,7 +142,7 @@ export default class MigrationOptions extends React.Component {
               }
               checked={this.props.willIncludeCustomNotificationMessage}
               onChange={this.handleAddAMessageChange}
-              inline
+              inline={true}
               size="small"
               disabled={isDisabled}
             />
@@ -154,7 +154,7 @@ export default class MigrationOptions extends React.Component {
               label={<ScreenReaderContent>{I18n.t('Message text')}</ScreenReaderContent>}
               autoGrow={false}
               resize="vertical"
-              inline
+              inline={true}
               value={this.props.notificationMessage}
               onChange={this.handleChangeMessage}
               disabled={isDisabled}
@@ -172,7 +172,7 @@ const connectState = state =>
     'willSendNotification',
     'willIncludeCustomNotificationMessage',
     'notificationMessage',
-    'willIncludeCourseSettings'
+    'willIncludeCourseSettings',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedMigrationOptions = connect(connectState, connectActions)(MigrationOptions)

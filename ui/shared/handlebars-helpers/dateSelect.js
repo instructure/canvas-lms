@@ -52,7 +52,7 @@ const builders = {
       $result.append($(`<option value="${i}">${i}</option>`))
     }
     return $result
-  }
+  },
 }
 
 // generates something like rails' date_select/select_date
@@ -68,25 +68,25 @@ export default function dateSelect(name, options, htmlOptions = _.clone(options)
   const position = {
     year: 1,
     month: 2,
-    day: 3
+    day: 3,
   }
 
   const order = I18n.lookup('date.order', {
-    defaultValue: ['year', 'month', 'day']
+    defaultValue: ['year', 'month', 'day'],
   })
 
   if (options.type === 'birthdate') {
     _.defaults(options, {
       startYear: year - 1,
       endYear: year - 125,
-      includeBlank: true
+      includeBlank: true,
     })
   }
 
   _.defaults(options, {
     startYear: year - 5,
     endYear: year + 5,
-    order
+    order,
   })
 
   const $result = $('<span>')

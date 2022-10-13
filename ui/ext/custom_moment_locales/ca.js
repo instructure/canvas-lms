@@ -45,9 +45,9 @@ const apply = () => {
         'de Setembre',
         "d'Octubre",
         'de Novembre',
-        'de Desembre'
+        'de Desembre',
       ],
-      isFormat: /D[oD]?(\s)+MMMM/
+      isFormat: /D[oD]?(\s)+MMMM/,
     },
     monthsShort: lookupInCA('date.abbr_month_names').filter(withoutLeadingBlank),
     monthsParseExact: true,
@@ -64,7 +64,7 @@ const apply = () => {
       LLL: 'D MMMM [de] YYYY [a les] H:mm',
       lll: 'D MMM YYYY, H:mm',
       LLLL: 'dddd D MMMM [de] YYYY [a les] H:mm',
-      llll: 'ddd D MMM YYYY, H:mm'
+      llll: 'ddd D MMM YYYY, H:mm',
     },
     calendar: {
       sameDay() {
@@ -82,7 +82,7 @@ const apply = () => {
       lastWeek() {
         return '[el] dddd [passat a ' + (this.hours() !== 1 ? 'les' : 'la') + '] LT'
       },
-      sameElse: 'L'
+      sameElse: 'L',
     },
     relativeTime: {
       future: "d'aquí %s",
@@ -98,7 +98,7 @@ const apply = () => {
       M: 'un mes',
       MM: '%d mesos',
       y: 'un any',
-      yy: '%d anys'
+      yy: '%d anys',
     },
     dayOfMonthOrdinalParse: /\d{1,2}(r|n|t|è|a)/,
     ordinal(number, period) {
@@ -112,8 +112,8 @@ const apply = () => {
     },
     week: {
       dow: 1, // Monday is the first day of the week.
-      doy: 4 // The week that contains Jan 4th is the first week of the year.
-    }
+      doy: 4, // The week that contains Jan 4th is the first week of the year.
+    },
   })
 
   moment.locale(origLocale)

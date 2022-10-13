@@ -96,7 +96,7 @@ DiscussionEntryMessageContainer.propTypes = {
   onSave: PropTypes.func,
   isIsolatedView: PropTypes.bool,
   onOpenIsolatedView: PropTypes.func,
-  padding: PropTypes.string
+  padding: PropTypes.string,
 }
 
 DiscussionEntryMessageContainer.defaultProps = {
@@ -104,7 +104,7 @@ DiscussionEntryMessageContainer.defaultProps = {
   isEditing: false,
   onCancel: () => {},
   onSave: () => {},
-  padding: '0 0 0 0'
+  padding: '0 0 0 0',
 }
 
 export default DiscussionEntryMessageContainer

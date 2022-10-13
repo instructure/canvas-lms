@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import Popup from '../popup'
 
@@ -62,11 +62,11 @@ describe('canvas_quizzes/components/popup', () => {
       }
     }
 
-    render(<Popup content={Content} someContentProp={'one'} />)
+    render(<Popup content={Content} someContentProp="one" />)
 
     expect(document.body.textContent).toMatch('one')
 
-    render(<Popup content={Content} someContentProp={'two'} />)
+    render(<Popup content={Content} someContentProp="two" />)
 
     expect(document.body.textContent).toMatch('two')
   })

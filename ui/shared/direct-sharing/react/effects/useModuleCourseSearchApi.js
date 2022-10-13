@@ -23,7 +23,7 @@ export default function useModuleCourseSearchApi(fetchApiOpts = {}) {
   if (courseId) delete fetchApiOpts.params.contextId
   useFetchApi({
     path: `/api/v1/courses/${courseId}/modules`,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }
 
@@ -36,6 +36,6 @@ export function useCourseModuleItemApi(fetchApiOpts) {
   }
   useFetchApi({
     path: `/api/v1/courses/${courseId}/modules/${moduleId}/items`,
-    ...fetchApiOpts
+    ...fetchApiOpts,
   })
 }

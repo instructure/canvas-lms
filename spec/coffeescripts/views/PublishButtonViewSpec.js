@@ -31,7 +31,7 @@ class Publishable extends Backbone.Model {
       published: false,
       publishable: true,
       publish_at: null,
-      disabledForModeration: false
+      disabledForModeration: false,
     }
   }
 
@@ -61,7 +61,7 @@ QUnit.module('PublishButtonView', {
     this.published = new Publishable({published: true, unpublishable: true})
     this.disabled = new Publishable({published: true, unpublishable: false})
     this.moderationDisabled = new Publishable({disabledForModeration: true})
-  }
+  },
 })
 
 test('initialize publish', function () {
@@ -89,7 +89,7 @@ test('should render the provided publish text when given', function () {
   const testText = 'Test Publish Text'
   const btnView = new PublishButtonView({
     model: this.publish,
-    publishText: testText
+    publishText: testText,
   }).render()
   equal(btnView.$('.screenreader-only.accessible_label').text(), testText)
 })
@@ -98,7 +98,7 @@ test('should render the provided unpublish text when given', function () {
   const testText = 'Test Unpublish Text'
   const btnView = new PublishButtonView({
     model: this.published,
-    unpublishText: testText
+    unpublishText: testText,
   }).render()
   equal(btnView.$('.screenreader-only.accessible_label').text(), testText)
 })
@@ -106,7 +106,7 @@ test('should render the provided unpublish text when given', function () {
 test('should render title in publish text when given', function () {
   const btnView = new PublishButtonView({
     model: this.publish,
-    title: 'My Published Thing'
+    title: 'My Published Thing',
   }).render()
   equal(
     btnView
@@ -120,7 +120,7 @@ test('should render title in publish text when given', function () {
 test('should render title in unpublish test when given', function () {
   const btnView = new PublishButtonView({
     model: this.published,
-    title: 'My Unpublished Thing'
+    title: 'My Unpublished Thing',
   }).render()
   equal(
     btnView
@@ -273,8 +273,10 @@ test('published event callback should transition back to published if rejected',
     this.set('published', true)
     const response = {
       responseText: JSON.stringify({
-        errors: {published: [{message: "Can't unpublish if there are already student submissions"}]}
-      })
+        errors: {
+          published: [{message: "Can't unpublish if there are already student submissions"}],
+        },
+      }),
     }
     const dfrd = $.Deferred()
     dfrd.reject(response)
@@ -316,14 +318,14 @@ QUnit.module('scheduled publish', hooks => {
       unpublishable: true,
       publish_at: '2022-02-22T22:22:22Z',
       title: 'A page',
-      url: 'a-page'
+      url: 'a-page',
     })
     module_item = new Publishable({
       published: false,
       unpublishable: true,
       publish_at: '2022-02-22T22:22:22Z',
       module_item_name: 'A page',
-      id: 'a-page'
+      id: 'a-page',
     })
     dynamic_module_item = new Publishable({
       published: false,
@@ -332,7 +334,7 @@ QUnit.module('scheduled publish', hooks => {
       module_item_name: 'A page',
       id: '100',
       url: 'http://example.com/courses/123/pages/a-page',
-      page_url: 'a-page'
+      page_url: 'a-page',
     })
   })
 

@@ -35,7 +35,7 @@ const middleware = [
   process.env.NODE_ENV !== 'production' &&
     // this is so redux-logger is not included in the test output
     process.env.NODE_ENV !== 'test' &&
-    require('redux-logger').logger
+    require('redux-logger').logger,
 ].filter(Boolean)
 
 const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)
@@ -48,7 +48,7 @@ const developerKeysReducer = combineReducers({
   createOrEditDeveloperKey: createOrEditDeveloperKeyReducer,
   makeVisibleDeveloperKey: makeVisibleDeveloperKeyReducer,
   makeInvisibleDeveloperKey: makeInvisibleDeveloperKeyReducer,
-  listDeveloperKeyScopes: listDeveloperKeyScopesReducer
+  listDeveloperKeyScopes: listDeveloperKeyScopesReducer,
 })
 
 export default (initialStateOverrides = {}) => {

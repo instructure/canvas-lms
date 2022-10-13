@@ -47,7 +47,7 @@ export default class InboxHeaderView extends View {
       '[role=search]': '$search',
       '#conversation-actions': '$conversationActions',
       '#submission-comment-actions': '$submissionCommentActions',
-      '#submission-reply-btn': '$submissionReplyBtn'
+      '#submission-reply-btn': '$submissionReplyBtn',
     }
 
     this.prototype.events = {
@@ -61,7 +61,7 @@ export default class InboxHeaderView extends View {
       'click #mark-read-btn': 'onMarkRead',
       'click #forward-btn': 'onForward',
       'click #star-toggle-btn': 'onStarToggle',
-      'click #submission-reply-btn': 'onSubmissionReply'
+      'click #submission-reply-btn': 'onSubmissionReply',
     }
 
     this.prototype.messages = {
@@ -70,7 +70,7 @@ export default class InboxHeaderView extends View {
       archive: I18n.t('archive', 'Archive'),
       unarchive: I18n.t('unarchive', 'Unarchive'),
       archive_conversation: I18n.t('Archive Selected'),
-      unarchive_conversation: I18n.t('Unarchive Selected')
+      unarchive_conversation: I18n.t('Unarchive Selected'),
     }
 
     this.prototype.spinnerOptions = {
@@ -79,7 +79,7 @@ export default class InboxHeaderView extends View {
       length: 2,
       radius: 2,
       width: 2,
-      left: 0
+      left: 0,
     }
   }
 
@@ -87,7 +87,7 @@ export default class InboxHeaderView extends View {
     super.render()
     this.courseView = new CourseSelectionView({
       el: this.$courseFilter,
-      courses: this.options.courses
+      courses: this.options.courses,
     })
     this.searchView = new SearchView({el: this.$search})
     this.searchView.on('search', this.onSearch, this)
@@ -103,23 +103,23 @@ export default class InboxHeaderView extends View {
     return this.trigger('search', tokens)
   }
 
-  onCompose(e) {
+  onCompose(_e) {
     return this.trigger('compose')
   }
 
-  onReply(e) {
+  onReply(_e) {
     return this.trigger('reply', null, '#reply-btn')
   }
 
-  onReplyAll(e) {
+  onReplyAll(_e) {
     return this.trigger('reply-all', null, '#reply-all-btn')
   }
 
-  onArchive(e) {
+  onArchive(_e) {
     return this.trigger('archive', '#compose-btn', '#archive-btn')
   }
 
-  onDelete(e) {
+  onDelete(_e) {
     return this.trigger('delete', '#compose-btn', '#delete-btn')
   }
 
@@ -144,7 +144,7 @@ export default class InboxHeaderView extends View {
     return this.trigger('star-toggle')
   }
 
-  onSubmissionReply(e) {
+  onSubmissionReply(_e) {
     return this.trigger('submission-reply')
   }
 
@@ -228,7 +228,7 @@ export default class InboxHeaderView extends View {
     }
   }
 
-  onFilterChange(e) {
+  onFilterChange(_e) {
     if (this.searchView != null) {
       this.searchView.autocompleteView.setContext(this.courseView.getCurrentContext())
     }

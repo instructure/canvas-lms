@@ -48,7 +48,7 @@ SearchResults.displayErrors = function (errors) {
         {I18n.t(
           {
             one: 'Your search encountered the following error:',
-            other: 'Your search encountered the following errors:'
+            other: 'Your search encountered the following errors:',
           },
           {count: errors.length}
         )}
@@ -71,7 +71,7 @@ SearchResults.renderFilePreview = function () {
        * As long as ?preview is present in the url.
        */
       <FilePreview
-        isOpen
+        isOpen={true}
         params={this.props.params}
         query={this.props.query}
         collection={this.state.collection}
@@ -86,7 +86,7 @@ SearchResults.renderFilePreview = function () {
 SearchResults.render = function () {
   if (this.state.errors) {
     return this.displayErrors(this.state.errors)
-  } else if (this.state.collection.loadedAll && this.state.collection.length == 0) {
+  } else if (this.state.collection.loadedAll && this.state.collection.length === 0) {
     return <NoResults search_term={this.props.query.search_term} />
   } else {
     return (

@@ -27,40 +27,40 @@ export const template = generateActionTemplates(
       title: I18n.t('Rubrics'),
       description: I18n.t(
         'Determines visibility and management of the Rubrics link in Account Navigation.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to create, edit, and delete rubrics.')
-    }
+      description: I18n.t('Allows user to create, edit, and delete rubrics.'),
+    },
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
         'Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add are enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('Rubrics'),
       description: I18n.t(
         'Determines visibility and management of Rubrics link in Account Navigation.'
-      )
+      ),
     },
     {
-      description: I18n.t('Allows user to view the Rubrics link in Course Navigation.')
+      description: I18n.t('Allows user to view the Rubrics link in Course Navigation.'),
     },
     {
-      description: I18n.t('Allows user to create, edit, and delete course rubrics.')
-    }
+      description: I18n.t('Allows user to create, edit, and delete course rubrics.'),
+    },
   ],
   [
     {
       title: I18n.t('Assignments'),
       description: I18n.t(
         'Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add is enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

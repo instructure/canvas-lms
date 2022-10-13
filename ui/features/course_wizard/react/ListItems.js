@@ -17,6 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
+
 const I18n = useI18nScope('course_wizard')
 /**
  * Returns an array containing all the possible items for the checklist
@@ -40,7 +41,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.content_import
     },
-    iconClass: 'icon-upload'
+    iconClass: 'icon-upload',
   },
   {
     key: 'add_assignments',
@@ -58,7 +59,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.add_assignments
     },
-    iconClass: 'icon-assignment'
+    iconClass: 'icon-assignment',
   },
   {
     key: 'add_students',
@@ -76,7 +77,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.add_students
     },
-    iconClass: 'icon-group-new'
+    iconClass: 'icon-group-new',
   },
   {
     key: 'add_files',
@@ -94,7 +95,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.add_files
     },
-    iconClass: 'icon-note-light'
+    iconClass: 'icon-note-light',
   },
   {
     key: 'select_navigation',
@@ -112,7 +113,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.select_navigation
     },
-    iconClass: 'icon-hamburger'
+    iconClass: 'icon-hamburger',
   },
   {
     key: 'home_page',
@@ -127,7 +128,7 @@ export default [
         "When people visit the course, this is the page they'll see.  You can set it to show an activity stream, the list of course modules, a syllabus, or a custom page you write yourself.  The default is the course activity stream."
       )
     },
-    iconClass: 'icon-home'
+    iconClass: 'icon-home',
   },
   {
     key: 'course_calendar',
@@ -145,7 +146,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.course_calendar
     },
-    iconClass: 'icon-calendar-month'
+    iconClass: 'icon-calendar-month',
   },
   {
     key: 'add_tas',
@@ -163,7 +164,7 @@ export default [
     get url() {
       return ENV.COURSE_WIZARD.urls.add_tas
     },
-    iconClass: 'icon-educators'
+    iconClass: 'icon-educators',
   },
   {
     key: 'publish_course',
@@ -183,6 +184,6 @@ export default [
         "This course is claimed and ready, but you'll need to finish the registration process before you can publish the course.  You should have received an email from Canvas with a link to finish the process.  Be sure to check your spam box."
       )
     },
-    iconClass: 'icon-publish icon-Solid'
-  }
+    iconClass: 'icon-publish icon-Solid',
+  },
 ]

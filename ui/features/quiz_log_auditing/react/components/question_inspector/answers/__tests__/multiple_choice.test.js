@@ -16,23 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import MultipleChoice from '../multiple_choice'
-import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/events/views/question_inspector/answers/multiple_choice', () => {
   it('renders', () => {
-    const { getByTestId } = render(<MultipleChoice
-      question={{
-        answers: [
-          { id: 1, text: 'one' },
-          { id: 2, text: 'two' },
-          { id: 3, text: 'three' }
-        ],
-      }}
-      answer="1"
-    />)
+    const {getByTestId} = render(
+      <MultipleChoice
+        question={{
+          answers: [
+            {id: 1, text: 'one'},
+            {id: 2, text: 'two'},
+            {id: 3, text: 'three'},
+          ],
+        }}
+        answer="1"
+      />
+    )
 
     expect(getByTestId('answer-1').checked).toBe(true)
     expect(getByTestId('answer-2').checked).toBe(false)

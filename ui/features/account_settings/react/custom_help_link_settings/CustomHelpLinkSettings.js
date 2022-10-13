@@ -34,14 +34,14 @@ export default class CustomHelpLinkSettings extends React.Component {
     name: PropTypes.string,
     links: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
     defaultLinks: PropTypes.arrayOf(CustomHelpLinkPropTypes.link),
-    icon: PropTypes.string
+    icon: PropTypes.string,
   }
 
   static defaultProps = {
     name: I18n.t('Help'),
     icon: 'questionMark',
     defaultLinks: [],
-    links: []
+    links: [],
   }
 
   constructor(props) {
@@ -52,14 +52,14 @@ export default class CustomHelpLinkSettings extends React.Component {
         ...link,
         id: link.id || `link${nextIndex++}`,
         available_to: link.available_to || [],
-        state: link.state || 'active'
+        state: link.state || 'active',
       }
     })
 
     this.state = {
       links,
       editing: null, // id of link that is being edited
-      isNameValid: true // so the first blur will trigger the alert even if name is empty now.
+      isNameValid: true, // so the first blur will trigger the alert even if name is empty now.
     }
   }
 
@@ -68,7 +68,7 @@ export default class CustomHelpLinkSettings extends React.Component {
 
     return this.props.defaultLinks.map(link => ({
       ...link,
-      is_disabled: linkTexts.indexOf(link.text) > -1
+      is_disabled: linkTexts.indexOf(link.text) > -1,
     }))
   }
 
@@ -128,7 +128,7 @@ export default class CustomHelpLinkSettings extends React.Component {
   nextFocusable = start => {
     const links = this.state.links
 
-    const nextIndex = function(i) {
+    const nextIndex = function (i) {
       return i > 0 ? i - 1 : null
     }
 
@@ -166,7 +166,7 @@ export default class CustomHelpLinkSettings extends React.Component {
   cancelEdit = link => {
     this.setState(
       {
-        editing: null
+        editing: null,
       },
       this.focus.bind(this, link.id, 'edit')
     )
@@ -175,7 +175,7 @@ export default class CustomHelpLinkSettings extends React.Component {
   edit = link => {
     this.setState(
       {
-        editing: link.id
+        editing: link.id,
       },
       this.focus.bind(this, link.id)
     )
@@ -198,12 +198,12 @@ export default class CustomHelpLinkSettings extends React.Component {
         ...link,
         state: link.type === 'default' ? link.state : 'new',
         id,
-        type: link.type || 'custom'
+        type: link.type || 'custom',
       })
 
       return {
         links,
-        editing: link.type === 'default' ? state.editing : id
+        editing: link.type === 'default' ? state.editing : id,
       }
     }, this.focus.bind(this, id))
   }
@@ -231,7 +231,7 @@ export default class CustomHelpLinkSettings extends React.Component {
 
       links[savedLink.index] = {
         ...savedLink,
-        state: savedLink.text ? 'active' : savedLink.state
+        state: savedLink.text ? 'active' : savedLink.state,
       }
 
       if (savedLink.is_featured && savedLink.index !== 0) {
@@ -242,7 +242,7 @@ export default class CustomHelpLinkSettings extends React.Component {
 
       return {
         links,
-        editing: null
+        editing: null,
       }
     }, this.focus.bind(this, savedLink.id, 'edit'))
   }
@@ -256,7 +256,7 @@ export default class CustomHelpLinkSettings extends React.Component {
 
       return {
         links,
-        editing: editing === link.id ? null : editing
+        editing: editing === link.id ? null : editing,
       }
     }, this.focus.bind(this, this.nextFocusable(link.index), 'remove'))
   }
@@ -352,7 +352,7 @@ export default class CustomHelpLinkSettings extends React.Component {
               id="account_settings_custom_help_link_name"
               type="text"
               className="ic-Input"
-              required
+              required={true}
               aria-required="true"
               aria-invalid={!this.state.isNameValid}
               name="account[settings][help_link_name]"
@@ -370,7 +370,7 @@ export default class CustomHelpLinkSettings extends React.Component {
                   {this.state.links.map((link, index) => {
                     const linkWithIndex = {
                       ...link,
-                      index // this is needed for moving up/down
+                      index, // this is needed for moving up/down
                     }
                     return linkWithIndex.id === this.state.editing
                       ? this.renderForm(linkWithIndex)

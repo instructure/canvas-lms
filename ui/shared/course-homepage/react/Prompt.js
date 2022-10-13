@@ -33,11 +33,11 @@ class HomePagePromptContainer extends React.Component {
     wikiUrl: PropTypes.string.isRequired,
     courseId: PropTypes.string.isRequired,
     forceOpen: PropTypes.bool.isRequired,
-    returnFocusTo: PropTypes.instanceOf(Element).isRequired
+    returnFocusTo: PropTypes.instanceOf(Element).isRequired,
   }
 
   state = {
-    dialogOpen: true
+    dialogOpen: true,
   }
 
   componentDidMount() {
@@ -70,7 +70,7 @@ class HomePagePromptContainer extends React.Component {
         wikiUrl={this.props.wikiUrl}
         onSubmit={this.props.onSubmit}
         returnFocusTo={this.props.returnFocusTo}
-        isPublishing
+        isPublishing={true}
       />
     ) : (
       <></>

@@ -31,11 +31,11 @@ const I18n = useI18nScope('custom_help_link')
 export default class CustomHelpLinkMenu extends React.Component {
   static propTypes = {
     links: PropTypes.arrayOf(CustomHelpLinkPropTypes.link).isRequired,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
   }
 
   static defaultProps = {
-    onChange: () => {}
+    onChange: () => {},
   }
 
   handleChange = (e, link) => {

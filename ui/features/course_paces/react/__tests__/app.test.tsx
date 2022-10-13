@@ -30,13 +30,13 @@ const defaultProps = {
   responsiveSize: 'large' as const,
   setResponsiveSize,
   showLoadingOverlay: false,
-  unpublishedChanges: []
+  unpublishedChanges: [],
 }
 
 beforeAll(() => {
   window.ENV.VALID_DATE_RANGE = {
     end_at: {date: '2021-09-30', date_context: 'course'},
-    start_at: {date: '2021-09-01', date_context: 'course'}
+    start_at: {date: '2021-09-01', date_context: 'course'},
   }
   window.ENV.FEATURES ||= {}
   window.ENV.FEATURES.course_paces_for_sections = true

@@ -52,7 +52,7 @@ export default class RosterView extends Backbone.View {
 
     this.prototype.els = {
       '#addUsers': '$addUsersButton',
-      '#createUsersModalHolder': '$createUsersModalHolder'
+      '#createUsersModalHolder': '$createUsersModalHolder',
     }
   }
 
@@ -90,7 +90,7 @@ export default class RosterView extends Backbone.View {
       sections: ENV.SECTIONS || [],
       onClose: () => this.fetchOnCreateUsersClose(),
       inviteUsersURL: ENV.INVITE_USERS_URL,
-      canReadSIS
+      canReadSIS,
     }))
   }
 

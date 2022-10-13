@@ -33,7 +33,7 @@ export function AssignmentDueDate({...props}) {
   let assignmentDueDate = null
   if (props.dueDate) {
     assignmentDueDate = I18n.t('Due %{date}', {
-      date: DateHelper.formatDatetimeForDiscussions(props.dueDate)
+      date: DateHelper.formatDatetimeForDiscussions(props.dueDate),
     })
   } else {
     assignmentDueDate = I18n.t('No Due Date')
@@ -45,11 +45,11 @@ export function AssignmentDueDate({...props}) {
       query={responsiveQuerySizes({tablet: true, desktop: true})}
       props={{
         tablet: {
-          textSize: 'x-small'
+          textSize: 'x-small',
         },
         desktop: {
-          textSize: 'small'
-        }
+          textSize: 'small',
+        },
       }}
       render={(responsiveProps, matches) => {
         if (matches.includes('tablet') && props.dueDate) {
@@ -63,7 +63,7 @@ export function AssignmentDueDate({...props}) {
               >
                 <Text weight="normal" size={responsiveProps.textSize}>
                   {I18n.t('Due %{date}', {
-                    date: DateHelper.formatDateForDisplay(props.dueDate, 'short')
+                    date: DateHelper.formatDateForDisplay(props.dueDate, 'short'),
                   })}
                 </Text>
               </CondensedButton>
@@ -83,5 +83,5 @@ export function AssignmentDueDate({...props}) {
 
 AssignmentDueDate.propsTypes = {
   dueDate: PropTypes.string,
-  onSetDueDateTrayOpen: PropTypes.func
+  onSetDueDateTrayOpen: PropTypes.func,
 }

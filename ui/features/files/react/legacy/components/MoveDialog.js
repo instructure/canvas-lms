@@ -31,13 +31,13 @@ export default {
     rootFoldersToShow: PropTypes.arrayOf(customPropTypes.folder).isRequired,
     thingsToMove: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
     onClose: PropTypes.func.isRequired,
-    onMove: PropTypes.func.isRequired
+    onMove: PropTypes.func.isRequired,
   },
 
   getInitialState() {
     return {
       destinationFolder: null,
-      isOpen: true
+      isOpen: true,
     }
   },
 
@@ -55,7 +55,7 @@ export default {
               source.collection.parentFolder &&
               source.collection.parentFolder.get('context_id') &&
               source.collection.parentFolder.get('context_id').toString()) ||
-              source.get('context_id').toString()
+              source.get('context_id').toString(),
           ]
 
       return (
@@ -74,7 +74,7 @@ export default {
     } else {
       this.setState({
         destinationFolder: folder,
-        isCopyingFile: !this.contextsAreEqual(folder, this.props.thingsToMove)
+        isCopyingFile: !this.contextsAreEqual(folder, this.props.thingsToMove),
       })
     }
   },
@@ -89,7 +89,7 @@ export default {
   },
 
   closeDialog() {
-    this.setState({isOpen: false}, function() {
+    this.setState({isOpen: false}, function () {
       this.props.onClose()
     })
   },
@@ -99,12 +99,12 @@ export default {
       'move_question',
       {
         one: 'Where would you like to move %{item}?',
-        other: 'Where would you like to move these %{count} items?'
+        other: 'Where would you like to move these %{count} items?',
       },
       {
         count: this.props.thingsToMove.length,
-        item: this.props.thingsToMove[0] && this.props.thingsToMove[0].displayName()
+        item: this.props.thingsToMove[0] && this.props.thingsToMove[0].displayName(),
       }
     )
-  }
+  },
 }

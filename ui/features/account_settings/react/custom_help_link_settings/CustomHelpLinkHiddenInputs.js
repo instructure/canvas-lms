@@ -31,7 +31,7 @@ export default function CustomHelpLinkHiddenInputs(props) {
     id,
     is_featured,
     is_new,
-    feature_headline
+    feature_headline,
   } = props.link
   const namePrefix = `account[custom_help_links][${index}]`
   return (
@@ -58,5 +58,5 @@ export default function CustomHelpLinkHiddenInputs(props) {
 }
 
 CustomHelpLinkHiddenInputs.propTypes = {
-  link: CustomHelpLinkPropTypes.link.isRequired
+  link: CustomHelpLinkPropTypes.link.isRequired,
 }

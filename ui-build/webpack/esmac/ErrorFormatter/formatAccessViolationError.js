@@ -18,17 +18,14 @@
 
 const t = require('./util')
 
-module.exports = (error) => {
-  const { request, source, target } = error
+module.exports = error => {
+  const {request, source, target} = error
 
   let message = ''
   let hint = ''
 
   message += `\n`
-  message += t.wordWrap(
-    `Access to the following module is not allowed from this layer:`,
-    72
-  )
+  message += t.wordWrap(`Access to the following module is not allowed from this layer:`, 72)
   message += `\n \n`
   message += `    ${request}`
   message += `\n \n`
@@ -40,33 +37,39 @@ module.exports = (error) => {
   if (source.startsWith('ui/features/') && target.startsWith('ui/features/')) {
     hint += '<Hint>'
     hint += `\n`
-    hint += t.wordWrap(`
+    hint += t.wordWrap(
+      `
       Feature modules may not access different feature modules. Instead, you
       can extract the common code into a Canvas package under ui/shared/
       or into a generic package under packages/ in case it has no dependency
       on Canvas.
-    `, 60)
-  }
-  else if (source.startsWith('ui/shared') && target.startsWith('ui/features/')) {
+    `,
+      60
+    )
+  } else if (source.startsWith('ui/shared') && target.startsWith('ui/features/')) {
     hint += '<Hint>'
     hint += `\n`
-    hint += t.wordWrap(`
+    hint += t.wordWrap(
+      `
       Canvas package modules may not access feature modules. You can extract
       the desired code into another Canvas package (or your own) and access it
       as you would other Canvas packages.
-    `, 60)
-  }
-  else if (source.startsWith('packages/') && target.startsWith('ui/')) {
+    `,
+      60
+    )
+  } else if (source.startsWith('packages/') && target.startsWith('ui/')) {
     hint += '<Hint>'
     hint += `\n`
-    hint += t.wordWrap(`
+    hint += t.wordWrap(
+      `
       Package modules may not access anything under ui/, including Canvas
       packages. If this dependency is legitimate, you can 1) turn this package
       into a Canvas one where it may access other Canvas packages, or 2) extract
       the desired code into another generic package (or your own.)
-    `, 60)
-  }
-  else if (target.startsWith('ui/boot/')) {
+    `,
+      60
+    )
+  } else if (target.startsWith('ui/boot/')) {
     hint += `<Hint>`
     hint += `\n`
     hint += t.wordWrap(`You don't access ui/boot/, ui/boot/ accesses you.`, 60)

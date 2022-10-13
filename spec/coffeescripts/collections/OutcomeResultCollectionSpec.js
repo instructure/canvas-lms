@@ -29,11 +29,11 @@ QUnit.module('OutcomeResultCollectionSpec', {
     ENV.student_id = '1'
     this.outcome = new Outcome({
       mastery_points: 8,
-      points_possible: 10
+      points_possible: 10,
     })
     this.outcome2 = new Outcome({
       mastery_points: 8,
-      points_possible: 0
+      points_possible: 0,
     })
     this.outcomeResultCollection = new OutcomeResultCollection([], {outcome: this.outcome})
     this.outcomeResultCollection2 = new OutcomeResultCollection([], {outcome: this.outcome2})
@@ -45,70 +45,70 @@ QUnit.module('OutcomeResultCollectionSpec', {
         {
           submitted_or_assessed_at: tz.parse('2015-04-24T19:27:54Z'),
           links: {alignment: 'alignment_1'},
-          percent: 0.4
-        }
+          percent: 0.4,
+        },
       ],
       linked: {
         alignments: [
           {
             id: 'alignment_1',
-            name: this.alignmentName
-          }
-        ]
-      }
+            name: this.alignmentName,
+          },
+        ],
+      },
     }
     this.response2 = {
       outcome_results: [
         {
           submitted_or_assessed_at: tz.parse('2015-04-24T19:27:54Z'),
-          links: {alignment: 'alignment_1'}
+          links: {alignment: 'alignment_1'},
         },
         {
           submitted_or_assessed_at: tz.parse('2015-04-23T19:27:54Z'),
-          links: {alignment: 'alignment_2'}
+          links: {alignment: 'alignment_2'},
         },
         {
           submitted_or_assessed_at: tz.parse('2015-04-25T19:27:54Z'),
-          links: {alignment: 'alignment_3'}
-        }
+          links: {alignment: 'alignment_3'},
+        },
       ],
       linked: {
         alignments: [
           {
             id: 'alignment_1',
-            name: this.alignmentName
+            name: this.alignmentName,
           },
           {
             id: 'alignment_2',
-            name: this.alignmentName2
+            name: this.alignmentName2,
           },
           {
             id: 'alignment_3',
-            name: this.alignmentName3
-          }
-        ]
-      }
+            name: this.alignmentName3,
+          },
+        ],
+      },
     }
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
-test('default params reflect aligned outcome', function() {
+test('default params reflect aligned outcome', function () {
   const collectionModel = new this.outcomeResultCollection.model()
   deepEqual(collectionModel.get('mastery_points'), 8)
   deepEqual(collectionModel.get('points_possible'), 10)
 })
 
-test('#parse', function() {
+test('#parse', function () {
   ok(!this.outcomeResultCollection.alignments, 'precondition')
   ok(this.outcomeResultCollection.parse(this.response))
   ok(this.outcomeResultCollection.alignments instanceof Backbone.Collection)
   ok(this.outcomeResultCollection.alignments.length, 1)
 })
 
-test('#handleAdd', function() {
+test('#handleAdd', function () {
   equal(this.outcomeResultCollection.length, 0, 'precondition')
   this.outcomeResultCollection.alignments = new Backbone.Collection(this.response.linked.alignments)
   ok(this.outcomeResultCollection.add(this.response.outcome_results[0]))
@@ -117,7 +117,7 @@ test('#handleAdd', function() {
   equal(this.outcomeResultCollection.first().get('score'), 4.0)
 })
 
-test('#handleAdd 0 points_possible', function() {
+test('#handleAdd 0 points_possible', function () {
   equal(this.outcomeResultCollection2.length, 0, 'precondition')
   this.outcomeResultCollection2.alignments = new Backbone.Collection(
     this.response.linked.alignments
@@ -127,7 +127,7 @@ test('#handleAdd 0 points_possible', function() {
   equal(this.outcomeResultCollection2.first().get('score'), 3.2)
 })
 
-test('#handleSort', function() {
+test('#handleSort', function () {
   equal(this.outcomeResultCollection.length, 0, 'precondition')
   this.outcomeResultCollection.alignments = new Backbone.Collection(
     this.response2.linked.alignments

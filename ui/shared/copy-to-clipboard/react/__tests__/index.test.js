@@ -23,7 +23,7 @@ import CopyToClipboard from '../index'
 const props = overrides => ({
   name: 'copy-to-clipboard',
   value: 'text to copy',
-  ...overrides
+  ...overrides,
 })
 
 const renderComponent = overrides => {

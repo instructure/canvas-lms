@@ -23,7 +23,7 @@ import {ConversationContext} from '../../../../util/constants'
 
 jest.mock('../../../../util/utils', () => ({
   ...jest.requireActual('../../../../util/utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('MessageDetailHeader', () => {
@@ -35,13 +35,13 @@ describe('MessageDetailHeader', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
 
     // Repsonsive Query Mock Default
     responsiveQuerySizes.mockImplementation(() => ({
-      desktop: {minWidth: '768px'}
+      desktop: {minWidth: '768px'},
     }))
   })
 
@@ -79,7 +79,7 @@ describe('MessageDetailHeader', () => {
 
   describe('sends the selected option to the provided callback function', () => {
     const props = {
-      text: 'Button Test'
+      text: 'Button Test',
     }
     it('sends the selected option to the onReply callback function', () => {
       props.onReply = jest.fn()
@@ -184,7 +184,7 @@ describe('MessageDetailHeader', () => {
     describe('Mobile', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          mobile: {maxWidth: '67'}
+          mobile: {maxWidth: '67'},
         }))
       })
 
@@ -199,7 +199,7 @@ describe('MessageDetailHeader', () => {
     describe('Desktop', () => {
       beforeEach(() => {
         responsiveQuerySizes.mockImplementation(() => ({
-          desktop: {maxWidth: '67'}
+          desktop: {maxWidth: '67'},
         }))
       })
 

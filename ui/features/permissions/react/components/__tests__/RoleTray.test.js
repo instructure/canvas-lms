@@ -40,7 +40,7 @@ function makeDefaultProps() {
     lastChanged: '1/1/1970',
     open: true,
     role,
-    unassignedPermissions: perms
+    unassignedPermissions: perms,
   }
 }
 
@@ -183,7 +183,7 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     editBaseRoleAlertVisible: true,
     editTrayVisible: true,
     editRoleLabelErrorMessages: [{text: 'ERROR', type: 'error'}],
-    newTargetBaseRole: 'banana'
+    newTargetBaseRole: 'banana',
   })
   tree.instance().hideTray() // components hideTray, not props.hideTray method
 
@@ -194,7 +194,7 @@ it('calls props.hideTray() and correctly sets state when hideTray is called', ()
     newTargetBaseRole: null,
     editRoleLabelInput: '',
     editRoleLabelErrorMessages: [],
-    roleDeleted: false
+    roleDeleted: false,
   }
   expect(tree.state()).toEqual(expectedState)
   expect(hideTrayMock).toHaveBeenCalled()

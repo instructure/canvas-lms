@@ -33,14 +33,14 @@ export default class InvitationsView extends DialogBaseView {
       buttons: [
         {
           text: I18n.t('cancel', 'Cancel'),
-          click: this.cancel
+          click: this.cancel,
         },
         {
           text: I18n.t('re_send_invitation', 'Resend Invitation'),
           class: 'btn-primary',
-          click: this.resend.bind(this)
-        }
-      ]
+          click: this.resend.bind(this),
+        },
+      ],
     }
   }
 
@@ -68,17 +68,11 @@ export default class InvitationsView extends DialogBaseView {
   }
 
   showDialogButtons() {
-    return this.$el
-      .parent()
-      .next('.ui-dialog-buttonpane')
-      .show()
+    return this.$el.parent().next('.ui-dialog-buttonpane').show()
   }
 
   hideDialogButtons() {
-    return this.$el
-      .parent()
-      .next('.ui-dialog-buttonpane')
-      .hide()
+    return this.$el.parent().next('.ui-dialog-buttonpane').hide()
   }
 
   resend(e) {

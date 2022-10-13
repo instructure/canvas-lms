@@ -37,7 +37,7 @@ function setCopyToOpen(state, action) {
 const reducer = handleActions(
   {
     [actionTypes.SET_COPY_TO_OPEN]: setCopyToOpen,
-    [actionTypes.SET_COPY_TO]: setCopyTo
+    [actionTypes.SET_COPY_TO]: setCopyTo,
   },
   {open: false, selection: {}}
 )

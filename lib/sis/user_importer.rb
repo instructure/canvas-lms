@@ -432,7 +432,6 @@ module SIS
           end
           maybe_write_roll_back_data
           if is_new_user_with_password_notification
-            pseudo.unique_id = user_row.email
             cc.workflow_state = "unconfirmed"
             if pseudo.save_without_broadcasting && cc.save_without_broadcasting
               pseudo.send_registration_notification!

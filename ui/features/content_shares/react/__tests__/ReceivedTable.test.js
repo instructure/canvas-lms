@@ -24,7 +24,7 @@ import {
   assignmentShare,
   attachmentShare,
   readDiscussionShare,
-  unreadDiscussionShare
+  unreadDiscussionShare,
 } from './test-utils'
 
 describe('content shares table', () => {

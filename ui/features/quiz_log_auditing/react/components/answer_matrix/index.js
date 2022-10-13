@@ -32,19 +32,19 @@ class AnswerMatrix extends React.Component {
     activeEventId: null,
     shouldTruncate: false,
     expandAll: false,
-    invert: false
+    invert: false,
   }
 
   static defaultProps = {
     questions: [],
     events: [],
     submission: {
-      createdAt: new Date().toJSON()
-    }
+      createdAt: new Date().toJSON(),
+    },
   }
 
   render() {
-    const events = this.props.events.filter(function(e) {
+    const events = this.props.events.filter(function (e) {
       return e.type === K.EVT_QUESTION_ANSWERED
     })
 

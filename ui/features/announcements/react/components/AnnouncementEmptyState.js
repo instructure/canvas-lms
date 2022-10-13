@@ -46,11 +46,11 @@ const AnnouncementEmptyState = props => (
 )
 
 AnnouncementEmptyState.propTypes = {
-  canCreate: bool
+  canCreate: bool,
 }
 
 AnnouncementEmptyState.defaultProps = {
-  canCreate: false
+  canCreate: false,
 }
 
 export default AnnouncementEmptyState

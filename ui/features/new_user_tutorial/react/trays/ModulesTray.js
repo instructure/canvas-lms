@@ -31,25 +31,25 @@ const ModulesTray = () => (
     imageWidth="9rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I add a module?'),
-        href: I18n.t('#community.instructor_add_module')
+        href: I18n.t('#community.instructor_add_module'),
       },
       {
         label: I18n.t('How do I publish or unpublish a module as an instructor?'),
-        href: I18n.t('#community.instructor_publish_module')
+        href: I18n.t('#community.instructor_publish_module'),
       },
       {
         label: I18n.t('How do I add assignment types, pages, and files as module items?'),
-        href: I18n.t('#community.instructor_add_module_items')
+        href: I18n.t('#community.instructor_add_module_items'),
       },
       {
         label: I18n.t('How do I move or reorder a module?'),
-        href: I18n.t('#community.instructor_reorder_module')
-      }
+        href: I18n.t('#community.instructor_reorder_module'),
+      },
     ]}
   >
     {I18n.t(`Use modules to organize your content and create a linear flow for

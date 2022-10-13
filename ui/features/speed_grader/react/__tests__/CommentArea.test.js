@@ -27,7 +27,7 @@ describe('CommentArea', () => {
     return {
       getTextAreaRef: getTextAreaRefMock,
       courseId: '1',
-      userId: '1'
+      userId: '1',
     }
   }
 
@@ -48,7 +48,7 @@ describe('CommentArea', () => {
   describe('with the comment library flag enabled', () => {
     beforeEach(() => {
       window.ENV = {
-        assignment_comment_library_feature_enabled: true
+        assignment_comment_library_feature_enabled: true,
       }
     })
 
@@ -61,7 +61,7 @@ describe('CommentArea', () => {
   describe('with the comment library flag disabled', () => {
     beforeEach(() => {
       window.ENV = {
-        assignment_comment_library_feature_enabled: false
+        assignment_comment_library_feature_enabled: false,
       }
     })
 

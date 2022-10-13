@@ -31,10 +31,10 @@ const defaultProps = (props = {}) =>
       hasUpdateableRubrics: false,
       modifiedFields: {
         masteryPoints: false,
-        scoringMethod: false
+        scoringMethod: false,
       },
       parent: () => {},
-      onConfirm: () => {}
+      onConfirm: () => {},
     },
     props
   )
@@ -46,36 +46,21 @@ it('renders the ConfirmOutcomeEditModal component', () => {
 
 it('renders the rubrics text if hasUpdateableRubrics', () => {
   const modal = shallow(<ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true})} />)
-  expect(
-    modal
-      .find(Modal.Body)
-      .render()
-      .text()
-  ).toMatch(/update all rubrics/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/update all rubrics/)
 })
 
 it('renders the masteryPoints text if mastery points modified', () => {
   const modal = shallow(
     <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {masteryPoints: true}})} />
   )
-  expect(
-    modal
-      .find(Modal.Body)
-      .render()
-      .text()
-  ).toMatch(/scoring criteria/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
 
 it('renders the scoring method text if scoring method modified', () => {
   const modal = shallow(
     <ConfirmOutcomeEditModal {...defaultProps({modifiedFields: {scoringMethod: true}})} />
   )
-  expect(
-    modal
-      .find(Modal.Body)
-      .render()
-      .text()
-  ).toMatch(/scoring criteria/)
+  expect(modal.find(Modal.Body).render().text()).toMatch(/scoring criteria/)
 })
 
 it('does not call onConfirm when canceled', () => {
@@ -83,10 +68,7 @@ it('does not call onConfirm when canceled', () => {
   const modal = shallow(
     <ConfirmOutcomeEditModal {...defaultProps({hasUpdateableRubrics: true, onConfirm})} />
   )
-  modal
-    .find(Modal.Footer)
-    .find('#cancel-outcome-edit-modal')
-    .simulate('click')
+  modal.find(Modal.Footer).find('#cancel-outcome-edit-modal').simulate('click')
   expect(modal.state('show')).toBe(false)
   expect(onConfirm).not.toHaveBeenCalled()
 })
@@ -98,10 +80,7 @@ it('calls onConfirm when saved', () => {
   )
 
   jest.useFakeTimers()
-  modal
-    .find(Modal.Footer)
-    .find('#confirm-outcome-edit-modal')
-    .simulate('click')
+  modal.find(Modal.Footer).find('#confirm-outcome-edit-modal').simulate('click')
   jest.runAllTimers()
 
   expect(modal.state('show')).toBe(false)

@@ -35,7 +35,7 @@ export const treeBrowserTheme = {
     hoverBackgroundColor: colors.backgroundLight,
     nameTextColor: colors.textDarkest,
     hoverTextColor: colors.textDarkest,
-    baseSpacingMedium: '2rem'
+    baseSpacingMedium: '2rem',
   },
   [TreeBrowserButton.theme]: {
     hoverBackgroundColor: colors.backgroundLight,
@@ -43,11 +43,11 @@ export const treeBrowserTheme = {
     hoverTextColor: colors.textDarkest,
     baseSpacingMedium: '2rem',
     nameFontSizeMedium: '1rem',
-    focusOutlineStyle: 'none'
-  }
+    focusOutlineStyle: 'none',
+  },
 }
 export const accountListTheme = {
   [View.theme]: {
-    borderColorPrimary: colors.porcelain
-  }
+    borderColorPrimary: colors.porcelain,
+  },
 }

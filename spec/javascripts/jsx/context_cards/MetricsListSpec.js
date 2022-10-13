@@ -49,11 +49,11 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
             enrollments: [
               {
                 grades: {
-                  override_grade: overrideGrade
+                  override_grade: overrideGrade,
                 },
-                sections: []
-              }
-            ]
+                sections: [],
+              },
+            ],
           }}
         />
       )
@@ -72,11 +72,11 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
               {
                 grades: {
                   override_grade: overrideGrade,
-                  current_grade: currentGrade
+                  current_grade: currentGrade,
                 },
-                sections: []
-              }
-            ]
+                sections: [],
+              },
+            ],
           }}
         />
       )
@@ -93,11 +93,11 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
             enrollments: [
               {
                 grades: {
-                  override_score: overrideScore
+                  override_score: overrideScore,
                 },
-                sections: []
-              }
-            ]
+                sections: [],
+              },
+            ],
           }}
         />
       )
@@ -113,11 +113,11 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
             enrollments: [
               {
                 grades: {
-                  current_grade: currentGrade
+                  current_grade: currentGrade,
                 },
-                sections: []
-              }
-            ]
+                sections: [],
+              },
+            ],
           }}
         />
       )
@@ -134,11 +134,11 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
               {
                 grades: {
                   current_grade: null,
-                  current_score: currentScore
+                  current_score: currentScore,
                 },
-                sections: []
-              }
-            ]
+                sections: [],
+              },
+            ],
           }}
         />
       )
@@ -150,7 +150,7 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
       subject = TestUtils.renderIntoDocument(
         <MetricsList
           user={{
-            enrollments: []
+            enrollments: [],
           }}
         />
       )
@@ -166,8 +166,8 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
         <MetricsList
           analytics={{
             tardiness_breakdown: {
-              missing: missingCount
-            }
+              missing: missingCount,
+            },
           }}
         />
       )
@@ -183,8 +183,8 @@ QUnit.module('StudentContextTray/MetricsList', hooks => {
         <MetricsList
           analytics={{
             tardiness_breakdown: {
-              late: lateCount
-            }
+              late: lateCount,
+            },
           }}
         />
       )

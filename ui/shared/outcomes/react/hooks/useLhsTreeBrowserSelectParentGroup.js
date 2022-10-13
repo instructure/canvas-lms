@@ -22,7 +22,7 @@ const useLhsTreeBrowserSelectParentGroup = ({
   selectedParentGroupId,
   selectedGroupId,
   collections,
-  queryCollections
+  queryCollections,
 }) => {
   const parentGroupButtonRef = useRef(null)
   const treeBrowserViewRef = useRef(null)
@@ -72,7 +72,7 @@ const useLhsTreeBrowserSelectParentGroup = ({
 
   return {
     selectParentGroupInLhs,
-    treeBrowserViewRef
+    treeBrowserViewRef,
   }
 }
 

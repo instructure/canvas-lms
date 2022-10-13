@@ -130,7 +130,7 @@ class RequestStub {
         const links = [
           `<${fullUrl}page=1>; rel="first"`,
           `<${fullUrl}page=${index + 1}>; rel="current"`,
-          `<${fullUrl}page=${responseData.length}>; rel="last"`
+          `<${fullUrl}page=${responseData.length}>; rel="last"`,
         ]
         if (index + 1 !== responseData.length) {
           links.push(`<${fullUrl}page=${index + 2}>; rel="next"`)
@@ -143,14 +143,14 @@ class RequestStub {
         this.server.pendingResponses.push({
           afterRespond,
           beforeRespond,
-          response: {url, params, headers, ...responseDatum}
+          response: {url, params, headers, ...responseDatum},
         })
       })
     } else {
       this.server.pendingResponses.push({
         afterRespond,
         beforeRespond,
-        response: {url, params: queryParams, headers: {}, ...responseData}
+        response: {url, params: queryParams, headers: {}, ...responseData},
       })
     }
 

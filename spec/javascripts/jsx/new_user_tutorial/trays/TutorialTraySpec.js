@@ -19,8 +19,8 @@
 /* global QUnit */
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import TutorialTray from 'ui/features/new_user_tutorial/react/trays/TutorialTray.js'
-import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore.js'
+import TutorialTray from 'ui/features/new_user_tutorial/react/trays/TutorialTray'
+import createTutorialStore from 'ui/features/new_user_tutorial/react/util/createTutorialStore'
 
 QUnit.module('TutorialTray Spec', {
   setup() {
@@ -32,7 +32,7 @@ QUnit.module('TutorialTray Spec', {
 
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 let store
@@ -43,11 +43,11 @@ const getDefaultProps = overrides => ({
     return {
       focus() {
         return document.body
-      }
+      },
     }
   },
   store,
-  ...overrides
+  ...overrides,
 })
 
 test('Renders', () => {

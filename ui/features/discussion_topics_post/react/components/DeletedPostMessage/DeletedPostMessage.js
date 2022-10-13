@@ -34,12 +34,12 @@ export function DeletedPostMessage({...props}) {
       props={{
         mobile: {
           deletedByTextSize: 'small',
-          timestampTextSize: 'x-small'
+          timestampTextSize: 'x-small',
         },
         desktop: {
           deletedByTextSize: 'medium',
-          timestampTextSize: 'small'
-        }
+          timestampTextSize: 'small',
+        },
       }}
       render={responsiveProps => (
         <>
@@ -59,7 +59,7 @@ export function DeletedPostMessage({...props}) {
             weight={props.deleterName ? undefined : 'bold'}
           >
             {I18n.t('Deleted %{deletedTimingDisplay}', {
-              deletedTimingDisplay: props.deletedTimingDisplay
+              deletedTimingDisplay: props.deletedTimingDisplay,
             })}
           </Text>
           {props.children}
@@ -87,7 +87,7 @@ DeletedPostMessage.propTypes = {
   /**
    * Display text for the deleted time.
    */
-  deletedTimingDisplay: PropTypes.string.isRequired
+  deletedTimingDisplay: PropTypes.string.isRequired,
 }
 
 export default DeletedPostMessage

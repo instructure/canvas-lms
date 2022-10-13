@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
 import Essay from '../essay'
 import assertChange from 'chai-assert-change'
@@ -28,13 +28,13 @@ describe('canvas_quizzes/events/views/question_inspector/answers/essay', () => {
   })
 
   it('toggles between views', () => {
-    const { getByText } = render(<Essay answer="<span id='custom-el'>yea!</span>" />)
+    const {getByText} = render(<Essay answer="<span id='custom-el'>yea!</span>" />)
 
     assertChange({
       fn: () => fireEvent.click(getByText('View HTML')),
       of: () => !!document.getElementById('custom-el'),
       from: false,
-      to: true
+      to: true,
     })
   })
 })

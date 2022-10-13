@@ -26,7 +26,7 @@ export default function SectionRefreshHeader({
   loadingTitle,
   loading,
   autoRefresh,
-  onRefresh
+  onRefresh,
 }) {
   return (
     <>

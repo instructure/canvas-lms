@@ -25,8 +25,8 @@ describe('useSelectedOutcomes', () => {
       (acc, _val, ind) => ({
         ...acc,
         [`${ind + 1}`]: {
-          linkId: `${ind + 1}`
-        }
+          linkId: `${ind + 1}`,
+        },
       }),
       {}
     )

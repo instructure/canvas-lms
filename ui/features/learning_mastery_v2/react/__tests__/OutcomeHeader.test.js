@@ -23,7 +23,7 @@ import OutcomeHeader from '../OutcomeHeader'
 describe('OutcomeHeader', () => {
   const defaultProps = () => {
     return {
-      title: 'outcome 1'
+      title: 'outcome 1',
     }
   }
 

@@ -99,7 +99,9 @@
   "error_loading_past_items_2881dbb1": { "message": "載入過去項目時發生錯誤" },
   "exciting_discussion_9f67bd0a": { "message": "振奮人心的討論" },
   "excused_cf8792eb": { "message": "已免除" },
+  "extended_9a58dcb6": { "message": "延伸" },
   "failed_getting_course_list_49846a93": { "message": "取得課程表失敗" },
+  "failed_getting_to_do_list_10ce2833": { "message": "取得待辦事項清單失敗" },
   "failed_peeking_into_your_future_e95b9306": { "message": "無法窺視您的未來" },
   "failed_peeking_into_your_past_5bec2323": { "message": "無法窺視您的過去" },
   "failed_saving_changes_on_name_1e100ad": {
@@ -110,6 +112,9 @@
   "failed_to_get_new_activity_17e7ec7c": { "message": "未能取得最新活動" },
   "failed_to_load_opportunities_52ab6404": { "message": "未能載入機會" },
   "failed_to_save_to_do_ddc7503b": { "message": "未能儲存待辦事項" },
+  "failure_loading_the_to_do_list_c61895c8": {
+    "message": "載入待辦事項清單失敗"
+  },
   "feedback_6dcc1991": { "message": "反饋" },
   "fun_quiz_47ab0b0": { "message": "有趣的測驗" },
   "go_to_card_view_dashboard_9d03970e": { "message": "前往卡視圖控制面板" },
@@ -206,6 +211,7 @@
   "starttime_to_endtime_d7cc249d": {
     "message": "{ startTime } 至 { endTime }"
   },
+  "student_to_do_c018c835": { "message": "學生待辦事項" },
   "submitted_318fad53": { "message": "已提交" },
   "success_to_do_created_e34ed395": { "message": "成功：創建待辦事項" },
   "task_16b0ef38": { "message": "任務" },

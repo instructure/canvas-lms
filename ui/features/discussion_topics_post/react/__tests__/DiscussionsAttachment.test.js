@@ -30,7 +30,7 @@ import {DiscussionThreadContainer} from '../containers/DiscussionThreadContainer
 
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
-  responsiveQuerySizes: jest.fn()
+  responsiveQuerySizes: jest.fn(),
 }))
 
 describe('DiscussionThreadAttachment', () => {
@@ -42,7 +42,7 @@ describe('DiscussionThreadAttachment', () => {
     window.open = openMock
     window.ENV = {
       course_id: '1',
-      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id'
+      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -51,7 +51,7 @@ describe('DiscussionThreadAttachment', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -59,11 +59,11 @@ describe('DiscussionThreadAttachment', () => {
   const defaultProps = ({
     discussionEntryOverrides = {},
     discussionOverrides = {},
-    propOverrides = {}
+    propOverrides = {},
   } = {}) => ({
     discussionTopic: Discussion.mock(discussionOverrides),
     discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
-    ...propOverrides
+    ...propOverrides,
   })
 
   const setup = (props, mocks) => {
@@ -81,7 +81,7 @@ describe('DiscussionThreadAttachment', () => {
   describe('mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '750px'}
+        mobile: {maxWidth: '750px'},
       }))
     })
     it('updates the attachment', async () => {
@@ -90,7 +90,7 @@ describe('DiscussionThreadAttachment', () => {
         updateDiscussionEntryMock({
           discussionEntryId: '1',
           message: '<p>This is the parent reply</p>',
-          removeAttachment: true
+          removeAttachment: true,
         })
       )
 

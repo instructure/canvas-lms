@@ -44,7 +44,7 @@ export default function TimeZoneSelect({
       </CanvasSelect.Option>
       {[
         {label: I18n.t('Common Timezones'), timezones: priority_zones},
-        {label: I18n.t('All Timezones'), timezones}
+        {label: I18n.t('All Timezones'), timezones},
       ].map(grouping => (
         <CanvasSelect.Group key={grouping.label} label={grouping.label}>
           {grouping.timezones.map(zone => (
@@ -60,13 +60,13 @@ export default function TimeZoneSelect({
 
 const timezoneShape = shape({
   name: string.isRequired,
-  localized_name: string.isRequired
+  localized_name: string.isRequired,
 }).isRequired
 
 TimeZoneSelect.propTypes = {
   ...CanvasSelect.propTypes, // this accepts any prop you'd pass to InstUI's Select. see it's docs for examples
   timezones: arrayOf(timezoneShape),
-  priority_zones: arrayOf(timezoneShape)
+  priority_zones: arrayOf(timezoneShape),
 }
 
 import(
@@ -78,6 +78,6 @@ import(
     TimeZoneSelect.defaultProps = {
       // TODO: change ENV.LOCALE to process.env.BUILD_LOCALE once we do locale-specific builds so we only pull in that one json file
       ...defaultsJSON,
-      label: I18n.t('Time Zone')
+      label: I18n.t('Time Zone'),
     }
   })

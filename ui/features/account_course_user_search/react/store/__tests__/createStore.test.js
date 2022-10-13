@@ -18,7 +18,7 @@
 
 import createStore from '../createStore'
 import $ from 'jquery'
-import ajaxJSON from '@canvas/jquery/jquery.ajaxJSON'
+import '@canvas/jquery/jquery.ajaxJSON'
 
 describe('account course user search createStore', () => {
   let store
@@ -53,7 +53,7 @@ describe('account course user search createStore', () => {
   test('load sets the error flag on non-abort failures', () => {
     jest.spyOn($, 'ajax').mockImplementation(() => {
       return {
-        then: (success, failure) => failure({}, 'error')
+        then: (success, failure) => failure({}, 'error'),
       }
     })
 

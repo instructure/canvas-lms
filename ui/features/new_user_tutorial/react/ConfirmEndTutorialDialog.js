@@ -59,9 +59,9 @@ ConfirmEndTutorialDialog.onSuccess = () => window.location.reload()
 
 ConfirmEndTutorialDialog.propTypes = {
   isOpen: PropTypes.bool,
-  handleRequestClose: PropTypes.func.isRequired
+  handleRequestClose: PropTypes.func.isRequired,
 }
 
 ConfirmEndTutorialDialog.defaultProps = {
-  isOpen: false
+  isOpen: false,
 }

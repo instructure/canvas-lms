@@ -30,8 +30,8 @@ export default {
     labelInstructions: 'Add New Group',
     titleInstructions: 'Enter new group name',
     showIcon: true,
-    onSaveHandler: () => {}
-  }
+    onSaveHandler: () => {},
+  },
 }
 
 const Template = args => {

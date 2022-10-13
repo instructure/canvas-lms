@@ -32,7 +32,7 @@ class ChecklistItem extends React.Component {
     title: PropTypes.string.isRequired,
     complete: PropTypes.bool.isRequired,
     isSelected: PropTypes.bool.isRequired,
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
   }
 
   state = {classNameString: ''}
@@ -57,8 +57,8 @@ class ChecklistItem extends React.Component {
       classNameString: classnames({
         'ic-wizard-box__content-trigger': true,
         'ic-wizard-box__content-trigger--checked': props.complete,
-        'ic-wizard-box__content-trigger--active': props.isSelected
-      })
+        'ic-wizard-box__content-trigger--active': props.isSelected,
+      }),
     })
   }
 

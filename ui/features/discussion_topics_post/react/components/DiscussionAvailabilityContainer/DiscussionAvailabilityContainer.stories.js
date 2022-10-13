@@ -24,7 +24,7 @@ import {DiscussionAvailabilityContainer} from './DiscussionAvailabilityContainer
 export default {
   title: 'Examples/Discussion Posts/Components/DiscussionAvailabilityContainer',
   component: DiscussionAvailabilityContainer,
-  argTypes: {}
+  argTypes: {},
 }
 
 const mockSections = [
@@ -32,14 +32,14 @@ const mockSections = [
     id: 'U2VjdGlvbi00',
     _id: '1',
     userCount: 5,
-    name: 'section 2'
+    name: 'section 2',
   },
   {
     id: 'U2VjdGlvbi01',
     _id: '2',
     userCount: 1,
-    name: 'section 3'
-  }
+    name: 'section 3',
+  },
 ]
 
 const Template = args => <DiscussionAvailabilityContainer {...args} />
@@ -50,7 +50,7 @@ AllSections.args = {
   anonymousState: null,
   lockAt: null,
   delayedPostAt: null,
-  totalUserCount: 5
+  totalUserCount: 5,
 }
 
 export const AllSectionsWithAvailabilityAnonymous = Template.bind({})
@@ -59,7 +59,7 @@ AllSectionsWithAvailabilityAnonymous.args = {
   anonymousState: 'full_anonymity',
   lockAt: null,
   delayedPostAt: null,
-  totalUserCount: 5
+  totalUserCount: 5,
 }
 
 export const AllSectionsWithPartiallyAnonymousAvailability = Template.bind({})
@@ -68,7 +68,7 @@ AllSectionsWithPartiallyAnonymousAvailability.args = {
   anonymousState: 'partial_anonymity',
   lockAt: null,
   delayedPostAt: null,
-  totalUserCount: 5
+  totalUserCount: 5,
 }
 
 export const TwoSections = Template.bind({})
@@ -77,5 +77,5 @@ TwoSections.args = {
   anonymousState: null,
   lockAt: null,
   delayedPostAt: null,
-  totalUserCount: 5
+  totalUserCount: 5,
 }

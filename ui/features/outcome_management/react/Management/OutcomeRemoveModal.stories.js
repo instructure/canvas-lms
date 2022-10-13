@@ -28,8 +28,8 @@ const outcomesGenerator = (startId, count, canUnlink = true, title = '') =>
         _id: `${idx + 100}`,
         linkId: `${startId + idx}`,
         title: title || `Learning Outcome ${startId + idx}`,
-        canUnlink
-      }
+        canUnlink,
+      },
     }),
     {}
   )
@@ -41,8 +41,8 @@ export default {
     outcomes: outcomesGenerator(1, 5),
     isOpen: true,
     onCloseHandler: () => {},
-    onCleanupHandler: () => {}
-  }
+    onCleanupHandler: () => {},
+  },
 }
 
 const withContext = (children, {contextType = 'Account', contextId = '1'} = {}) => (
@@ -63,25 +63,25 @@ export const inCourseContext = TemplateCourse.bind({})
 
 export const withSingleOutcome = Template.bind({})
 withSingleOutcome.args = {
-  outcomes: outcomesGenerator(1, 1)
+  outcomes: outcomesGenerator(1, 1),
 }
 
 export const withMoreThan10Outcomes = Template.bind({})
 withMoreThan10Outcomes.args = {
-  outcomes: outcomesGenerator(1, 15)
+  outcomes: outcomesGenerator(1, 15),
 }
 
 export const withOnlyNonRemovableOutcomes = Template.bind({})
 withOnlyNonRemovableOutcomes.args = {
-  outcomes: outcomesGenerator(1, 5, false)
+  outcomes: outcomesGenerator(1, 5, false),
 }
 
 export const withRemovableAndNonRemovableOutcomes = Template.bind({})
 withRemovableAndNonRemovableOutcomes.args = {
   outcomes: {
     ...outcomesGenerator(1, 3),
-    ...outcomesGenerator(4, 2, false)
-  }
+    ...outcomesGenerator(4, 2, false),
+  },
 }
 
 export const withLongOutcomeTitles = Template.bind({})
@@ -91,5 +91,5 @@ withLongOutcomeTitles.args = {
     5,
     true,
     'This is a very long outcome title that needs to be truncated to fit the modal width'
-  )
+  ),
 }

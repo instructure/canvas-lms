@@ -59,8 +59,8 @@ export default function RubricTab(props) {
     <div data-testid="rubric-tab">
       <View as="div" margin="none none medium">
         <ToggleDetails
-          defaultExpanded
-          fluidWidth
+          defaultExpanded={true}
+          fluidWidth={true}
           summary={
             <Text weight="bold">
               {props.peerReviewModeEnabled ? I18n.t('Fill Out Rubric') : I18n.t('View Rubric')}

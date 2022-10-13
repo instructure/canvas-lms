@@ -26,13 +26,13 @@ const BLACKOUT_DATES = [
   {
     id: 'blackout_date',
     oldValue: {id: '1', event_title: 'one'},
-    newValue: null
+    newValue: null,
   },
   {
     id: 'blackout_date',
     oldValue: null,
-    newValue: {temp_id: '_foo', event_title: 'new one'}
-  }
+    newValue: {temp_id: '_foo', event_title: 'new one'},
+  },
 ]
 
 describe('summarizeSettingChanges', () => {
@@ -41,13 +41,13 @@ describe('summarizeSettingChanges', () => {
       summarizeSettingChanges([EXCLUDE_WEEKENDS, END_DATE, REQUIRE_COMPLETION]).map(c => c.summary)
     ).toEqual([
       'Skip Weekends was turned on.',
-      'Require Completion by End Date was turned on and set to November 1, 2021.'
+      'Require Completion by End Date was turned on and set to November 1, 2021.',
     ])
   })
 
   it('includes end_date if require_completion was unchanged', () => {
     expect(summarizeSettingChanges([END_DATE]).map(c => c.summary)).toEqual([
-      'End Date was changed from September 1, 2021 to November 1, 2021.'
+      'End Date was changed from September 1, 2021 to November 1, 2021.',
     ])
   })
 
@@ -63,11 +63,11 @@ describe('summarizeSettingChanges', () => {
     const changes = summarizeSettingChanges(BLACKOUT_DATES)
     expect(changes[0]).toMatchObject({
       id: 'blackout_date',
-      summary: 'Blackout date one was deleted.'
+      summary: 'Blackout date one was deleted.',
     })
     expect(changes[1]).toMatchObject({
       id: 'blackout_date',
-      summary: 'Blackout date new one was added.'
+      summary: 'Blackout date new one was added.',
     })
   })
 })
@@ -79,13 +79,13 @@ describe('summarizeItemChanges', () => {
         {
           id: PACE_ITEM_1.id,
           oldValue: PACE_ITEM_1,
-          newValue: {...PACE_ITEM_1, duration: 1}
+          newValue: {...PACE_ITEM_1, duration: 1},
         },
-        {id: PACE_ITEM_2.id, oldValue: PACE_ITEM_2, newValue: {...PACE_ITEM_2, duration: 2000}}
+        {id: PACE_ITEM_2.id, oldValue: PACE_ITEM_2, newValue: {...PACE_ITEM_2, duration: 2000}},
       ]).map(c => c.summary)
     ).toEqual([
       `${PACE_ITEM_1.assignment_title} was changed from 2 days to 1 day.`,
-      `${PACE_ITEM_2.assignment_title} was changed from 5 days to 2,000 days.`
+      `${PACE_ITEM_2.assignment_title} was changed from 5 days to 2,000 days.`,
     ])
   })
 })

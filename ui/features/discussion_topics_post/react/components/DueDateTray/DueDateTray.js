@@ -38,12 +38,12 @@ export function DueDateTray({...props}) {
       props={{
         tablet: {
           layout: 'stacked',
-          textSize: 'small'
+          textSize: 'small',
         },
         desktop: {
           layout: 'fixed',
-          textSize: 'medium'
-        }
+          textSize: 'medium',
+        },
       }}
       render={responsiveProps => (
         <Table
@@ -120,9 +120,9 @@ export function DueDateTray({...props}) {
 DueDateTray.propTypes = {
   assignmentOverrides: PropTypes.arrayOf(AssignmentOverride.shape),
   tableCaption: PropTypes.string,
-  isAdmin: PropTypes.bool
+  isAdmin: PropTypes.bool,
 }
 
 DueDateTray.defaultProps = {
-  isAdmin: true
+  isAdmin: true,
 }

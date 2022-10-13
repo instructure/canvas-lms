@@ -30,8 +30,8 @@ describe('ManageOutcomesFooter', () => {
           _id: (idx + 100).toString(),
           linkId: (idx + 1).toString(),
           title: `Outcome ${idx + 1}`,
-          canUnlink
-        }
+          canUnlink,
+        },
       }),
       {}
     )
@@ -40,7 +40,7 @@ describe('ManageOutcomesFooter', () => {
     selectedCount: numberToGenerate,
     onRemoveHandler: onRemoveHandlerMock,
     onMoveHandler: onMoveHandlerMock,
-    onClearHandler: jest.fn()
+    onClearHandler: jest.fn(),
   })
 
   beforeEach(() => {

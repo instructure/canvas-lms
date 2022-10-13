@@ -38,7 +38,7 @@ const Comment = ({
   shouldFocus,
   id,
   updateComment,
-  setRemovedItemIndex
+  setRemovedItemIndex,
 }) => {
   const deleteButtonRef = useRef(null)
   const editButtonRef = useRef(null)
@@ -97,7 +97,7 @@ const Comment = ({
       data-testid="comment-library"
     >
       <Flex>
-        <Flex.Item as="div" shouldGrow size="80%" shouldShrink>
+        <Flex.Item as="div" shouldGrow={true} size="80%" shouldShrink={true}>
           <FocusedComment
             onClick={onClick}
             comment={comment}
@@ -105,7 +105,7 @@ const Comment = ({
             isExpanded={isExpanded}
           />
         </Flex.Item>
-        <Flex.Item size="20%" shouldGrow align="start" textAlign="end">
+        <Flex.Item size="20%" shouldGrow={true} align="start" textAlign="end">
           <View as="div" display="inline-block" padding="x-small x-small 0 0">
             <IconButton
               screenReaderLabel={I18n.t('Edit comment: %{comment}', {comment})}
@@ -200,7 +200,7 @@ Comment.propTypes = {
   shouldFocus: PropTypes.bool.isRequired,
   id: PropTypes.string.isRequired,
   updateComment: PropTypes.func.isRequired,
-  setRemovedItemIndex: PropTypes.func.isRequired
+  setRemovedItemIndex: PropTypes.func.isRequired,
 }
 
 export default Comment

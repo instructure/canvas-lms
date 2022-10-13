@@ -28,7 +28,7 @@ const createProps = overrides => {
     onCancel: jest.fn(),
     onSend: jest.fn(),
     isSending: false,
-    ...overrides
+    ...overrides,
   }
 }
 

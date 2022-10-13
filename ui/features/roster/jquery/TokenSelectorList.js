@@ -28,7 +28,7 @@ export default class TokenSelectorList extends PaginatedView {
     this.prototype.events = {
       'blur li': 'onBlur',
       'focus li': 'onFocus',
-      'keydown li': 'onKeydown'
+      'keydown li': 'onKeydown',
     }
 
     this.prototype.keyCodes = {
@@ -42,7 +42,7 @@ export default class TokenSelectorList extends PaginatedView {
       38: 'UpArrow',
       39: 'RightArrow',
       40: 'DownArrow',
-      91: 'Command'
+      91: 'Command',
     }
   }
 
@@ -153,12 +153,12 @@ export default class TokenSelectorList extends PaginatedView {
       name: everyoneText,
       user_count: parentData.user_count,
       type: 'context',
-      avatar_url: parentData.avatar_url
+      avatar_url: parentData.avatar_url,
     }
     if (this.selector.options.includeSelectAllOption) {
       $.extend(row, {
         permissions: parentData.permissions,
-        selectAll: parentData.permissions.send_messages_all
+        selectAll: parentData.permissions.send_messages_all,
       })
     }
     return this.addOneRaw(row)
@@ -174,7 +174,7 @@ export default class TokenSelectorList extends PaginatedView {
       avatar_url: parentData.avatar_url,
       permissions: parentData.permissions,
       selectAll: true,
-      noExpand: true
+      noExpand: true,
     }) // just a magic select-all checkbox, you can't drill into it
   }
 
@@ -185,7 +185,7 @@ export default class TokenSelectorList extends PaginatedView {
       type: 'context',
       avatar_url: this.parent.data('user_data').avatar_url,
       subText: filterText,
-      noExpand: true
+      noExpand: true,
     })
   }
 
@@ -204,7 +204,7 @@ export default class TokenSelectorList extends PaginatedView {
     this.populateRow($li, row, {
       level: this.ancestors.length,
       parent: this.parent,
-      ancestors: this.ancestors
+      ancestors: this.ancestors,
     })
     if (row.selectAll) {
       this.$selectAll = $li

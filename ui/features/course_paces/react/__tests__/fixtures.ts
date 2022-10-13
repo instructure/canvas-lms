@@ -32,7 +32,7 @@ import {
   Sections,
   SectionsState,
   UIState,
-  OriginalState
+  OriginalState,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
@@ -45,7 +45,7 @@ export const COURSE: Course = {
   created_at: '2021-09-01T00:00:00-06:00',
   start_at: '2021-09-01T00:00:00-06:00',
   end_at: '2021-12-31T00:00:00-07:00',
-  time_zone: window.ENV.CONTEXT_TIMEZONE
+  time_zone: window.ENV.CONTEXT_TIMEZONE,
 }
 
 export const BLACKOUT_DATES: BlackoutDate[] = [
@@ -54,13 +54,13 @@ export const BLACKOUT_DATES: BlackoutDate[] = [
     course_id: COURSE.id,
     event_title: 'Spring break',
     start_date: moment('2022-03-21'),
-    end_date: moment('2022-03-25')
-  }
+    end_date: moment('2022-03-25'),
+  },
 ]
 
 export const DEFAULT_BLACKOUT_DATE_STATE = {
   syncing: SyncState.SYNCED,
-  blackoutDates: BLACKOUT_DATES
+  blackoutDates: BLACKOUT_DATES,
 }
 
 export const ENROLLMENT_1: Enrollment = {
@@ -70,7 +70,7 @@ export const ENROLLMENT_1: Enrollment = {
   full_name: 'Henry Dorsett Case',
   sortable_name: 'Case, Henry Dorsett',
   start_at: undefined,
-  completed_course_pace_at: undefined
+  completed_course_pace_at: undefined,
 }
 
 export const ENROLLMENT_2: Enrollment = {
@@ -81,7 +81,7 @@ export const ENROLLMENT_2: Enrollment = {
   sortable_name: 'Millions, Molly',
   start_at: undefined,
   completed_course_pace_at: undefined,
-  avatar_url: 'molly_avatar'
+  avatar_url: 'molly_avatar',
 }
 
 export const ENROLLMENTS: Enrollments = keyBy([ENROLLMENT_1, ENROLLMENT_2], 'id')
@@ -93,7 +93,7 @@ export const SECTION_1: Section = {
   course_id: COURSE.id,
   name: 'Hackers',
   start_at: undefined,
-  end_at: undefined
+  end_at: undefined,
 }
 
 export const SECTION_2: Section = {
@@ -101,7 +101,7 @@ export const SECTION_2: Section = {
   course_id: COURSE.id,
   name: 'Mercenaries',
   start_at: undefined,
-  end_at: undefined
+  end_at: undefined,
 }
 
 export const SECTIONS: Sections = keyBy([SECTION_1, SECTION_2], 'id')
@@ -117,7 +117,7 @@ export const PACE_ITEM_1: CoursePaceItem = {
   position: 1,
   module_item_id: '60',
   module_item_type: 'Assignment',
-  published: true
+  published: true,
 }
 
 export const PACE_ITEM_2: CoursePaceItem = {
@@ -129,7 +129,7 @@ export const PACE_ITEM_2: CoursePaceItem = {
   position: 2,
   module_item_id: '61',
   module_item_type: 'Discussion',
-  published: false
+  published: false,
 }
 
 export const PACE_ITEM_3: CoursePaceItem = {
@@ -141,21 +141,21 @@ export const PACE_ITEM_3: CoursePaceItem = {
   position: 1,
   module_item_id: '62',
   module_item_type: 'Quiz',
-  published: true
+  published: true,
 }
 
 export const PACE_MODULE_1: Module = {
   id: '40',
   name: 'How 2 B A H4CK32',
   position: 1,
-  items: [PACE_ITEM_1, PACE_ITEM_2]
+  items: [PACE_ITEM_1, PACE_ITEM_2],
 }
 
 export const PACE_MODULE_2: Module = {
   id: '45',
   name: 'Intro to Corporate Espionage',
   position: 2,
-  items: [PACE_ITEM_3]
+  items: [PACE_ITEM_3],
 }
 
 export const PRIMARY_PACE: CoursePace = {
@@ -175,7 +175,7 @@ export const PRIMARY_PACE: CoursePace = {
   // @ts-ignore
   course: undefined,
   compressed_due_dates: undefined,
-  updated_at: ''
+  updated_at: '',
 }
 
 export const SECTION_PACE: CoursePace = {
@@ -195,7 +195,7 @@ export const SECTION_PACE: CoursePace = {
   // @ts-ignore
   course: undefined,
   compressed_due_dates: undefined,
-  updated_at: ''
+  updated_at: '',
 }
 
 export const STUDENT_PACE: CoursePace = {
@@ -215,7 +215,7 @@ export const STUDENT_PACE: CoursePace = {
   // @ts-ignore
   course: undefined,
   compressed_due_dates: undefined,
-  updated_at: ''
+  updated_at: '',
 }
 
 export const PROGRESS_RUNNING = {
@@ -223,7 +223,7 @@ export const PROGRESS_RUNNING = {
   completion: 25,
   message: undefined,
   workflow_state: 'running',
-  url: '/api/v1/progress/900'
+  url: '/api/v1/progress/900',
 }
 
 export const PROGRESS_FAILED = {
@@ -231,7 +231,7 @@ export const PROGRESS_FAILED = {
   completion: undefined,
   message: 'Something went wrong!',
   workflow_state: 'failed',
-  url: '/api/v1/progress/901'
+  url: '/api/v1/progress/901',
 }
 
 export interface DefaultStoreState {
@@ -250,5 +250,5 @@ export const DEFAULT_STORE_STATE: DefaultStoreState = {
   enrollments: ENROLLMENTS,
   coursePace: {...PRIMARY_PACE},
   sections: SECTIONS,
-  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES}
+  original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES},
 }

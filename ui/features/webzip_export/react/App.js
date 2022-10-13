@@ -38,7 +38,7 @@ class WebZipExportApp extends React.Component {
           link: url,
           workflowState: webZipExport.workflow_state,
           progressId: webZipExport.progress_id,
-          newExport: isNewExport
+          newExport: isNewExport,
         }
       })
       .reverse()
@@ -85,14 +85,14 @@ class WebZipExportApp extends React.Component {
         this.setState({
           loaded: true,
           exports: WebZipExportApp.webZipFormat(response.data, newExportId),
-          errors: []
+          errors: [],
         })
       })
       .catch(response => {
         this.setState({
           exports: [],
           errors: [response],
-          loaded: true
+          loaded: true,
         })
       })
   }

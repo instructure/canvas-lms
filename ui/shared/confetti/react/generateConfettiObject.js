@@ -24,6 +24,6 @@ export default function generateConfettiObject(key) {
     type: 'svg',
     src: assetFactory(key),
     weight: 0.05,
-    size: 40
+    size: 40,
   }
 }

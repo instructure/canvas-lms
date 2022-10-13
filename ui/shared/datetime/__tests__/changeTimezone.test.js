@@ -104,7 +104,7 @@ describe('changeTimezone::', () => {
     const asiaDate = changeTimezone(date, {desiredTZ: chinaTZ})
     const asiaToAustraliaDate = changeTimezone(asiaDate, {
       originTZ: chinaTZ,
-      desiredTZ: australiaTZ
+      desiredTZ: australiaTZ,
     })
     const diff = asiaDate.getTime() - asiaToAustraliaDate.getTime()
     expect(diff).toBeCloseTo((australiaTZOffset - chinaTZOffset) * HRS)

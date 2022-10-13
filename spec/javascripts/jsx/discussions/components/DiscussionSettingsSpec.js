@@ -42,18 +42,18 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
           grading_standard_enabled: false,
           grading_standard_id: null,
           allow_student_organized_groups: true,
-          hide_final_grades: false
+          hide_final_grades: false,
         },
         userSettings: {
           markAsRead: false,
-          collapse_global_nav: false
+          collapse_global_nav: false,
         },
         isSavingSettings: false,
         isSettingsModalOpen: true,
         permissions: {change_settings: false},
         saveSettings() {},
         toggleModalOpen() {},
-        applicationElement: () => document.getElementById('fixtures')
+        applicationElement: () => document.getElementById('fixtures'),
       },
       props
     )
@@ -61,7 +61,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
   suiteHooks.beforeEach(() => {
     ENV = {
       student_reporting_enabled: true,
-      discussion_anonymity_enabled: true
+      discussion_anonymity_enabled: true,
     }
   })
 
@@ -88,8 +88,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
             allow_student_forum_attachments: false,
             allow_student_discussion_editing: false,
             allow_student_discussion_reporting: false,
-            allow_student_anonymous_discussion_topics: false
-          }
+            allow_student_anonymous_discussion_topics: false,
+          },
         })}
       />
     )
@@ -133,8 +133,8 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       courseSettings: {
         allow_student_discussion_topics: true,
         allow_student_forum_attachments: false,
-        allow_student_discussion_editing: false
-      }
+        allow_student_discussion_editing: false,
+      },
     })
     ok(tree.instance().state.studentSettings.includes('allow_student_discussion_topics'))
   })
@@ -146,7 +146,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
         {...makeProps({
           saveSettings: saveSpy,
           isSettingsModalOpen: true,
-          permissions: {change_settings: true}
+          permissions: {change_settings: true},
         })}
       />
     )
@@ -155,11 +155,11 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       allow_student_forum_attachments: true,
       allow_student_discussion_editing: true,
       allow_student_discussion_reporting: true,
-      allow_student_anonymous_discussion_topics: true
+      allow_student_anonymous_discussion_topics: true,
     }
     const userSettings = {
       markAsRead: false,
-      collapse_global_nav: false
+      collapse_global_nav: false,
     }
     tree.setProps({userSettings, courseSettings})
     $('#submit_discussion_settings').click()
@@ -173,7 +173,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
         {...makeProps({
           saveSettings: saveSpy,
           isSettingsModalOpen: true,
-          permissions: {change_settings: true}
+          permissions: {change_settings: true},
         })}
       />
     )
@@ -182,11 +182,11 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
       allow_student_forum_attachments: false,
       allow_student_discussion_editing: true,
       allow_student_discussion_reporting: false,
-      allow_student_anonymous_discussion_topics: false
+      allow_student_anonymous_discussion_topics: false,
     }
     const userSettings = {
       markAsRead: false,
-      collapse_global_nav: false
+      collapse_global_nav: false,
     }
     tree.setProps({userSettings, courseSettings})
     $('#submit_discussion_settings').click()
@@ -199,7 +199,7 @@ QUnit.module('DiscussionSettings component', suiteHooks => {
         {...makeProps({
           isSavingSettings: true,
           isSettingsModalOpen: true,
-          permissions: {change_settings: true}
+          permissions: {change_settings: true},
         })}
       />
     )

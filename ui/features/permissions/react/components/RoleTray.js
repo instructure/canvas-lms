@@ -62,7 +62,7 @@ export default class RoleTray extends Component {
     updateRoleName: PropTypes.func,
     open: PropTypes.bool.isRequired,
     role: permissionPropTypes.role,
-    unassignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired
+    unassignedPermissions: PropTypes.arrayOf(permissionPropTypes.permission).isRequired,
   }
 
   static defaultProps = {
@@ -72,7 +72,7 @@ export default class RoleTray extends Component {
     role: null,
     id: null,
     updateBaseRole: () => {},
-    updateRoleName: () => {}
+    updateRoleName: () => {},
   }
 
   state = {
@@ -81,7 +81,7 @@ export default class RoleTray extends Component {
     editTrayVisible: false,
     newTargetBaseRole: null,
     editRoleLabelErrorMessages: [],
-    roleDeleted: false
+    roleDeleted: false,
   }
 
   // We need this so that if there is an alert displayed inside this tray
@@ -99,13 +99,13 @@ export default class RoleTray extends Component {
     let errorMessages = []
     if (isError) {
       const message = I18n.t('Cannot change role name to %{label}: already in use', {
-        label: trimmedValue
+        label: trimmedValue,
       })
       errorMessages = [{text: message, type: 'error'}]
     }
     this.setState({
       editRoleLabelInput: event.target.value,
-      editRoleLabelErrorMessages: errorMessages
+      editRoleLabelErrorMessages: errorMessages,
     })
   }
 
@@ -137,7 +137,7 @@ export default class RoleTray extends Component {
         editBaseRoleAlertVisible: false,
         newTargetBaseRole: null,
         editRoleLabelInput: this.props.role.label,
-        editRoleLabelErrorMessages: []
+        editRoleLabelErrorMessages: [],
       },
       () => this.closeButton.focus()
     )
@@ -152,7 +152,7 @@ export default class RoleTray extends Component {
         newTargetBaseRole: null,
         editRoleLabelInput: '',
         editRoleLabelErrorMessages: [],
-        roleDeleted: false
+        roleDeleted: false,
       },
       /*
       The setTimeout here is to ensure that the callback gets called AFTER react
@@ -193,7 +193,7 @@ export default class RoleTray extends Component {
       deleteAlertVisible: true,
       editTrayVisible: false,
       editBaseRoleAlertVisible: false,
-      newTargetBaseRole: null
+      newTargetBaseRole: null,
     })
   }
 
@@ -206,7 +206,7 @@ export default class RoleTray extends Component {
       deleteAlertVisible: false,
       editTrayVisible: true,
       editBaseRoleAlertVisible: true,
-      newTargetBaseRole: baseRoleLabel
+      newTargetBaseRole: baseRoleLabel,
     })
   }
 
@@ -216,7 +216,7 @@ export default class RoleTray extends Component {
         deleteAlertVisible: false,
         editTrayVisible: true,
         editBaseRoleAlertVisible: false,
-        newTargetBaseRole: null
+        newTargetBaseRole: null,
       },
       () => this.editRoleInput.focus()
     )
@@ -496,7 +496,7 @@ function mapStateToProps(state, ownProps) {
       lastChanged: '',
       open: false,
       assignedPermissions: [],
-      unassignedPermissions: []
+      unassignedPermissions: [],
     }
     return {...stateProps, ...ownProps}
   }
@@ -535,7 +535,7 @@ function mapStateToProps(state, ownProps) {
     lastChanged: role.last_updated_at,
     open: true,
     role,
-    unassignedPermissions: permissions.filter(p => !p.enabled)
+    unassignedPermissions: permissions.filter(p => !p.enabled),
   }
   return {...ownProps, ...stateProps}
 }
@@ -544,7 +544,7 @@ const mapDispatchToProps = {
   hideTray: actions.hideAllTrays,
   updateRoleName: actions.updateRoleName,
   updateBaseRole: actions.updateBaseRole,
-  deleteRole: actions.deleteRole
+  deleteRole: actions.deleteRole,
 }
 
 export const ConnectedRoleTray = connect(mapStateToProps, mapDispatchToProps)(RoleTray)

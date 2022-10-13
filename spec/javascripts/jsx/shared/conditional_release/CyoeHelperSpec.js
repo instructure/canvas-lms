@@ -27,18 +27,18 @@ const cyoeEnv = () => ({
       {
         trigger_assignment_id: '1',
         trigger_assignment_model: {
-          grading_type: 'percentage'
+          grading_type: 'percentage',
         },
         scoring_ranges: [
           {
             upper_bound: 1,
             lower_bound: 0.7,
-            assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]
-          }
-        ]
-      }
-    ]
-  }
+            assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}],
+          },
+        ],
+      },
+    ],
+  },
 })
 
 const setEnv = env => {
@@ -50,12 +50,12 @@ const testSetup = {
   setup() {
     setEnv({
       CONDITIONAL_RELEASE_SERVICE_ENABLED: false,
-      CONDITIONAL_RELEASE_ENV: null
+      CONDITIONAL_RELEASE_ENV: null,
     })
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 }
 
 QUnit.module('CYOE Helper', () => {

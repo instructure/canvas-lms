@@ -38,10 +38,10 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
     statName = I18n.t(
       {
         one: '%{count} OUTCOME',
-        other: '%{count} OUTCOMES'
+        other: '%{count} OUTCOMES',
       },
       {
-        count: count || 0
+        count: count || 0,
       }
     )
     statType = I18n.t('Coverage')
@@ -50,10 +50,10 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
     statName = I18n.t(
       {
         one: '%{count} ALIGNABLE ARTIFACT',
-        other: '%{count} ALIGNABLE ARTIFACTS'
+        other: '%{count} ALIGNABLE ARTIFACTS',
       },
       {
-        count: count || 0
+        count: count || 0,
       }
     )
     statType = I18n.t('With Alignments')
@@ -75,7 +75,7 @@ const AlignmentStatItem = ({type, count, percent, average}) => {
         <div
           style={{
             fontSize: isMobileView ? '0.75rem' : '1rem',
-            padding: isMobileView ? '0 0 0.15rem 0.2rem' : '0 0 0.2rem 0.3rem'
+            padding: isMobileView ? '0 0 0.15rem 0.2rem' : '0 0 0.2rem 0.3rem',
           }}
         >
           <IconInfoLine tabIndex="0" data-testid="outcome-alignment-stat-info-icon" />
@@ -164,7 +164,7 @@ AlignmentStatItem.propTypes = {
   type: PropTypes.oneOf(['outcome', 'artifact']).isRequired,
   count: PropTypes.number.isRequired,
   percent: PropTypes.number.isRequired,
-  average: PropTypes.number.isRequired
+  average: PropTypes.number.isRequired,
 }
 
 export default AlignmentStatItem

@@ -50,17 +50,15 @@ export default class RosterTabsView extends Backbone.View {
     $tabs.tabs({
       beforeActivate(event, ui) {
         return ui.newTab.hasClass('static')
-      }
+      },
     })
 
     const $groupTabs = $tabs.find('li').not('.static')
     $groupTabs.find('a').unbind()
-    return $groupTabs.on('keydown', function(event) {
+    return $groupTabs.on('keydown', function (event) {
       event.stopPropagation()
       if (event.keyCode === 13 || event.keyCode === 32) {
-        return (window.location.href = $(this)
-          .find('a')
-          .attr('href'))
+        return (window.location.href = $(this).find('a').attr('href'))
       }
     })
   }

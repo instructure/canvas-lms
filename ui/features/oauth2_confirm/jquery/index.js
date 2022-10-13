@@ -18,8 +18,8 @@
 
 import $ from 'jquery'
 
-$(document).ready(function() {
-  $('#oauth2_accept_form').submit(function() {
+$(document).ready(function () {
+  $('#oauth2_accept_form').submit(function () {
     const $btn = $(this).find('input[type="submit"]')
     $btn.val($btn.data('disable-with'))
     $btn.prop('disabled', true)

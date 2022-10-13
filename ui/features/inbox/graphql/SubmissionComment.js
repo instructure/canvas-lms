@@ -57,7 +57,7 @@ export const SubmissionComment = {
     assignment: Assignment.shape,
     comment: string,
     course: Course.shape,
-    read: bool
+    read: bool,
   }),
 
   mock: ({
@@ -70,7 +70,7 @@ export const SubmissionComment = {
     assignment = Assignment.mock(),
     comment = 'Hey!',
     course = Course.mock(),
-    read = true
+    read = true,
   } = {}) => ({
     _id,
     id,
@@ -82,6 +82,6 @@ export const SubmissionComment = {
     comment,
     course,
     read,
-    __typename: 'SubmissionComment'
-  })
+    __typename: 'SubmissionComment',
+  }),
 }

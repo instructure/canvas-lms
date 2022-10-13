@@ -29,10 +29,10 @@ export default {
       context_cache_key: 'users/1-20111116001415',
       PERMISSIONS: {},
       FEATURES: {},
-      ...options
+      ...options,
     }
   },
   teardown() {
     window.ENV = {}
-  }
+  },
 }

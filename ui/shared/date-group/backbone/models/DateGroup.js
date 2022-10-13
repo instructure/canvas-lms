@@ -95,7 +95,7 @@ export default class DateGroup extends Backbone.Model {
       available: this.available(),
       pending: this.pending(),
       open: this.open(),
-      closed: this.closed()
+      closed: this.closed(),
     }
   }
 }
@@ -105,5 +105,5 @@ DateGroup.prototype.defaults = {
   },
   due_at: null,
   unlock_at: null,
-  lock_at: null
+  lock_at: null,
 }

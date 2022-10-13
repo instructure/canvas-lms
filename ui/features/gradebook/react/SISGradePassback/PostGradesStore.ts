@@ -20,9 +20,32 @@ import $ from 'jquery'
 import _ from 'underscore'
 import createStore from '@canvas/util/createStore'
 import assignmentUtils from './assignmentUtils'
+import type {Override} from '../../../../api.d'
 
-const PostGradesStore = state => {
-  const store = $.extend(createStore(state), {
+type State = {
+  course: {
+    id: string
+    sis_id: string
+  }
+  selected: {
+    id: string
+    type: string
+  }
+  sections: {}
+}
+
+type PartialAssignment = {
+  id: string
+  name: string
+  due_at: string
+  needs_grading_count: number
+  overrides: Override[]
+  please_ignore: boolean
+  original_error: boolean
+}
+
+const PostGradesStore = initialState => {
+  const store = $.extend(createStore(initialState), {
     reset() {
       const assignments = this.getAssignments()
       _.each(assignments, a => (a.please_ignore = false))
@@ -34,7 +57,7 @@ const PostGradesStore = state => {
 
     hasAssignments() {
       const assignments = this.getAssignments()
-      if (assignments != undefined && assignments.length > 0) {
+      if (assignments?.length > 0) {
         return true
       } else {
         return false
@@ -46,8 +69,12 @@ const PostGradesStore = state => {
       return sections && sections[section_id] ? sections[section_id].sis_section_id : null
     },
 
-    allOverrideIds(a) {
-      const overrides = []
+    allOverrideIds(a: {
+      overrides: {
+        course_section_id: string
+      }
+    }) {
+      const overrides: string[] = []
       _.each(a.overrides, o => {
         overrides.push(o.course_section_id)
       })
@@ -60,7 +87,7 @@ const PostGradesStore = state => {
       const section_ids_with_no_overrides = $(sections).not(overrides).get()
 
       const section_for_everyone = _.find(section_ids_with_no_overrides, o => {
-        return state.selected.id == o
+        return initialState.selected.id === o
       })
       return section_for_everyone
     },
@@ -70,7 +97,7 @@ const PostGradesStore = state => {
     },
 
     setGradeBookAssignments(gradebookAssignments) {
-      const assignments = []
+      const assignments: PartialAssignment[] = []
       for (const id in gradebookAssignments) {
         const gba = gradebookAssignments[id]
         // Only accept assignments suitable to post, e.g. published, post_to_sis
@@ -92,17 +119,27 @@ const PostGradesStore = state => {
       this.setSelectedSection(this.getState().sectionToShow)
     },
 
-    validCheck(a) {
+    validCheck(a: {
+      due_at: string | null
+      currentlySelected: {
+        id: string
+        type: string
+      }
+      overrideForThisSection: {
+        course_section_id: string
+        due_at: string | null
+      }
+    }) {
       if (
-        a.overrideForThisSection != undefined &&
-        a.currentlySelected.type == 'course' &&
-        a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id
+        typeof a.overrideForThisSection !== 'undefined' &&
+        a.currentlySelected.type === 'course' &&
+        a.currentlySelected.id.toString() === a.overrideForThisSection?.course_section_id
       ) {
         return a.due_at != null
       } else if (
-        a.overrideForThisSection != undefined &&
-        a.currentlySelected.type == 'section' &&
-        a.currentlySelected.id.toString() == a.overrideForThisSection.course_section_id
+        typeof a.overrideForThisSection !== 'undefined' &&
+        a.currentlySelected.type === 'section' &&
+        a.currentlySelected.id.toString() === a.overrideForThisSection?.course_section_id
       ) {
         return a.overrideForThisSection.due_at != null
       } else {
@@ -112,19 +149,25 @@ const PostGradesStore = state => {
 
     getAssignments() {
       const assignments = this.getState().assignments
-      const state = this.getState()
-      if (state.selected.type == 'section') {
+      const state: {
+        selected: {
+          id: string
+          type: string
+        }
+        sections: {}
+      } = this.getState()
+      if (state.selected.type === 'section') {
         _.each(assignments, a => {
           a.recentlyUpdated = false
           a.currentlySelected = state.selected
           a.sectionCount = _.keys(state.sections).length
           a.overrideForThisSection = _.find(a.overrides, override => {
-            return override.course_section_id == state.selected.id
+            return override.course_section_id === state.selected.id
           })
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with a section that does not have any overrides
           // cleanup overrideForThisSection logic
-          if (a.overrideForThisSection == undefined) {
+          if (typeof a.overrideForThisSection === 'undefined') {
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
@@ -140,7 +183,7 @@ const PostGradesStore = state => {
           })
 
           // Handle assignment with overrides and the 'Everyone Else' scenario with the course currentlySelected
-          if (a.overrideForThisSection == undefined) {
+          if (typeof a.overrideForThisSection === 'undefined') {
             a.selectedSectionForEveryone = this.overrideForEveryone(a)
           }
         })
@@ -148,13 +191,13 @@ const PostGradesStore = state => {
       return assignments
     },
 
-    getAssignment(assignment_id) {
+    getAssignment(assignment_id: string) {
       const assignments = this.getAssignments()
-      return _.find(assignments, a => a.id == assignment_id)
+      return _.find(assignments, a => a.id === assignment_id)
     },
 
     setSelectedSection(section) {
-      const state = this.getState()
+      const state: State = this.getState()
       const section_id = parseInt(section, 10)
       let selected
       if (section) {
@@ -174,21 +217,20 @@ const PostGradesStore = state => {
       this.setState({selected, sectionToShow: section})
     },
 
-    updateAssignment(assignment_id, newAttrs) {
+    updateAssignment(assignment_id: string, newAttrs) {
       const assignments = this.getAssignments()
-      const assignment = _.find(assignments, a => a.id == assignment_id)
+      const assignment = _.find(assignments, a => a.id === assignment_id)
       $.extend(assignment, newAttrs)
       this.setState({assignments})
     },
 
-    updateAssignmentDate(assignment_id, date) {
+    updateAssignmentDate(assignment_id: string, date) {
       const assignments = this.getState().assignments
-      const assignment = _.find(assignments, a => a.id == assignment_id)
+      const assignment = _.find(assignments, a => a.id === assignment_id)
       // the assignment has an override and the override being updated is for the section that is currentlySelected update it
       if (
-        assignment.overrideForThisSection != undefined &&
-        assignment.currentlySelected.id.toString() ==
-          assignment.overrideForThisSection.course_section_id
+        assignment.currentlySelected.id.toString() ===
+        assignment.overrideForThisSection?.course_section_id
       ) {
         assignment.overrideForThisSection.due_at = date
         assignment.please_ignore = false
@@ -199,9 +241,9 @@ const PostGradesStore = state => {
 
       // the section override being set from the course level of the sction dropdown
       else if (
-        assignment.overrideForThisSection != undefined &&
-        assignment.currentlySelected.id.toString() !=
-          assignment.overrideForThisSection.course_section_id
+        typeof assignment.overrideForThisSection !== 'undefined' &&
+        assignment.currentlySelected.id.toString() !==
+          assignment.overrideForThisSection?.course_section_id
       ) {
         assignment.overrideForThisSection.due_at = date
         assignment.please_ignore = false
@@ -221,7 +263,7 @@ const PostGradesStore = state => {
     },
 
     assignmentOverrideOrigianlErrorCheck(a) {
-      a.hadOriginalErrors = a.hadOriginalErrors == true
+      a.hadOriginalErrors = a.hadOriginalErrors === true
     },
 
     saveAssignments() {
@@ -246,7 +288,7 @@ const PostGradesStore = state => {
       } else {
         const originals = assignmentUtils.withOriginalErrors(this.getAssignments())
         const withErrorsCount = _.keys(assignmentUtils.withErrors(this.getAssignments())).length
-        if (withErrorsCount == 0 && (state.pleaseShowSummaryPage || originals.length == 0)) {
+        if (withErrorsCount === 0 && (state.pleaseShowSummaryPage || originals.length === 0)) {
           return 'summary'
         } else {
           return 'corrections'

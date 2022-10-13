@@ -24,7 +24,6 @@ import {MARK_SUBMISSION_COMMENT_READ} from '@canvas/assignments/graphql/student/
 import noComments from '../../../images/NoComments.svg'
 import noCommentsPeerReview from '../../../images/noCommentsPeerReview.svg'
 import React, {useContext, useEffect} from 'react'
-import StudentViewContext from '../Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
 import {
@@ -40,7 +39,6 @@ const I18n = useI18nScope('assignments_2')
 
 export default function CommentContent(props) {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {isObserver} = useContext(StudentViewContext)
 
   const [markCommentsRead, {data, called: mutationCalled, error: mutationError}] = useMutation(
     MARK_SUBMISSION_COMMENT_READ,
@@ -120,9 +118,10 @@ export default function CommentContent(props) {
     }
   )
 
+  // Mark unread comments as read when the tray is opened
   useEffect(() => {
     const unreadComments = props.comments.filter(c => !c.read)
-    if (unreadComments.length > 0 && !isObserver) {
+    if (unreadComments.length > 0) {
       const commentIds = props.comments
         .filter(comment => comment.read === false)
         .map(comment => comment._id)
@@ -132,7 +131,7 @@ export default function CommentContent(props) {
 
       return () => clearTimeout(timer)
     }
-  }, [isObserver, markCommentsRead, props.comments, props.submission])
+  }, [markCommentsRead, props.comments, props.submission])
 
   useEffect(() => {
     if (mutationCalled && !mutationError && !data?.markSubmissionCommentsRead?.errors) {

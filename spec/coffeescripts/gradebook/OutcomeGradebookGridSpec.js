@@ -26,7 +26,7 @@ QUnit.module('OutcomeGradebookGrid', {
   },
   teardown() {
     fakeENV.teardown()
-  }
+  },
 })
 
 test('Grid.Math.mean', () => {
@@ -41,7 +41,7 @@ test('Grid.Util._toRow', () => {
   Grid.sections = {1: {}}
   const rollup = {
     links: {section: '1', user: '1'},
-    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}]
+    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}],
   }
   ok(
     isEqual(Grid.Util._toRow([rollup], null).outcome_2, {score: '3', hide_points: true}),
@@ -54,14 +54,14 @@ test('Grid.Util.toRows', () => {
   Grid.sections = {1: {}}
   const rollups = [
     {
-      links: {section: '1', user: '3'}
+      links: {section: '1', user: '3'},
     },
     {
-      links: {section: '1', user: '1'}
+      links: {section: '1', user: '1'},
     },
     {
-      links: {section: '1', user: '2'}
-    }
+      links: {section: '1', user: '2'},
+    },
   ]
   ok(
     isEqual(
@@ -80,7 +80,7 @@ test('Grid.View.masteryDetails', () => {
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
     {points: 5, color: '0000ff', description: 'OK'},
-    {points: 0, color: 'ff0000', description: 'turrable'}
+    {points: 0, color: 'ff0000', description: 'turrable'},
   ]
   ok(
     isEqual(Grid.View.masteryDetails(10, outcome), ['rating_0', '#00ff00', 'great']),
@@ -109,7 +109,7 @@ test('Grid.View.masteryDetails with scaling', () => {
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
     {points: 5, color: '0000ff', description: 'OK'},
-    {points: 0, color: 'ff0000', description: 'turrable'}
+    {points: 0, color: 'ff0000', description: 'turrable'},
   ]
   ok(
     isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
@@ -130,7 +130,7 @@ test('Grid.View.masteryDetails with scaling (points_possible 0)', () => {
   Grid.ratings = [
     {points: 10, color: '00ff00', description: 'great'},
     {points: 5, color: '0000ff', description: 'OK'},
-    {points: 0, color: 'ff0000', description: 'turrable'}
+    {points: 0, color: 'ff0000', description: 'turrable'},
   ]
   ok(
     isEqual(Grid.View.masteryDetails(5, outcome), ['rating_0', '#00ff00', 'great']),
@@ -168,7 +168,7 @@ test('Grid.View.legacyMasteryDetails', () => {
     isEqual(Grid.View.legacyMasteryDetails(1, outcome), [
       'rating_3',
       '#E0061F',
-      'Well Below Mastery'
+      'Well Below Mastery',
     ]),
     'returns "remedial" if less than half of mastery score'
   )
@@ -177,7 +177,7 @@ test('Grid.View.legacyMasteryDetails', () => {
 test('Grid.Util.toColumns for xss', () => {
   const outcome = {
     id: 1,
-    title: '<script>'
+    title: '<script>',
   }
   const columns = Grid.Util.toColumns([outcome], [])
   ok(isEqual(columns[1].name, '&lt;script&gt;'))
@@ -191,15 +191,15 @@ test('Grid.Util._studentColumn does not modify default options', () => {
 test('Grid.Util.toColumns hasResults', () => {
   const outcomes = [
     {
-      id: '1'
+      id: '1',
     },
     {
-      id: '2'
-    }
+      id: '2',
+    },
   ]
   const rollup = {
     links: {section: '1', user: '1'},
-    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}]
+    scores: [{score: '3', hide_points: true, links: {outcome: '2'}}],
   }
   const columns = Grid.Util.toColumns(outcomes, [rollup])
   ok(isEqual(columns[1].hasResults, false))

@@ -48,7 +48,7 @@ export const transformGrades = courses =>
       gradingPeriods: hasGradingPeriods ? course.grading_periods : [],
       hasGradingPeriods,
       isHomeroom: course.homeroom_course,
-      enrollments: course.enrollments
+      enrollments: course.enrollments,
     }
     return getCourseGrades(basicCourseInfo)
   })
@@ -82,7 +82,7 @@ export const getCourseGrades = (course, observedUserId) => {
       : null,
     totalGradeForAllGradingPeriods: showTotalsForAllGradingPeriods
       ? enrollment?.computed_current_grade
-      : null
+      : null,
   }
 }
 
@@ -96,7 +96,7 @@ export const fetchGradesForGradingPeriod = (gradingPeriodId, userId = 'self') =>
     enrollments.map(({course_id, grades}) => ({
       courseId: course_id,
       score: grades && grades.current_score,
-      grade: grades && grades.current_grade
+      grade: grades && grades.current_grade,
     }))
   )
 
@@ -143,7 +143,7 @@ export const readableRoleName = role => {
     DesignerEnrollment: I18n.t('Designer'),
     StudentEnrollment: I18n.t('Student'),
     StudentViewEnrollment: I18n.t('Student'),
-    ObserverEnrollment: I18n.t('Observer')
+    ObserverEnrollment: I18n.t('Observer'),
   }
   // Custom roles return as named
   return ROLES[role] || role
@@ -153,7 +153,7 @@ export const sendMessage = (recipientId, message, subject) =>
   doFetchApi({
     path: '/api/v1/conversations',
     method: 'POST',
-    body: {recipients: [recipientId], body: message, group_conversation: false, subject}
+    body: {recipients: [recipientId], body: message, group_conversation: false, subject},
   })
 
 const getSubmission = (assignment, observedUserId) =>
@@ -176,7 +176,7 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) 
   return data.map(group => {
     const assignments = group.assignments.map(a => ({
       ...a,
-      submission: getSubmission(a, observedUserId)
+      submission: getSubmission(a, observedUserId),
     }))
     const groupScores = AssignmentGroupGradeCalculator.calculate(
       assignments.map(a => {
@@ -184,7 +184,7 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) 
           points_possible: a.points_possible,
           assignment_id: a.id,
           assignment_group_id: a.assignment_group_id,
-          ...a.submission
+          ...a.submission,
         }
       }),
       {...group, assignments},
@@ -198,8 +198,8 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) 
           ? I18n.t('n/a')
           : I18n.n((groupScores.current.score / groupScores.current.possible) * 100, {
               percentage: true,
-              precision: 2
-            })
+              precision: 2,
+            }),
     }
   })
 }
@@ -227,7 +227,7 @@ export const getAssignmentGrades = (data, observedUserId) => {
           late: submission?.late,
           excused: submission?.excused,
           missing: submission?.missing,
-          hasComments: !!submission?.submission_comments?.length
+          hasComments: !!submission?.submission_comments?.length,
         }
       })
     )
@@ -267,13 +267,13 @@ export const fetchImportantInfos = courses =>
       doFetchApi({
         path: `/api/v1/courses/${c.id}`,
         params: {
-          include: ['syllabus_body']
-        }
+          include: ['syllabus_body'],
+        },
       }).then(data => ({
         courseId: c.id,
         courseName: c.shortName,
         canEdit: c.canManage,
-        content: data.json.syllabus_body
+        content: data.json.syllabus_body,
       }))
     )
   ).then(infos => infos.filter(info => info.content))
@@ -286,7 +286,7 @@ export const parseAnnouncementDetails = (announcement, course) => {
     courseUrl: course.href,
     canEdit: course.canManage,
     canReadAnnouncements: course.canReadAnnouncements,
-    published: course.published
+    published: course.published,
   }
   if (announcement) {
     retval.announcement = transformAnnouncement(announcement)
@@ -303,7 +303,7 @@ export const transformAnnouncement = announcement => {
     attachment = {
       display_name: announcement.attachments[0].display_name,
       url: announcement.attachments[0].url,
-      filename: announcement.attachments[0].filename
+      filename: announcement.attachments[0].filename,
     }
   }
 
@@ -313,7 +313,7 @@ export const transformAnnouncement = announcement => {
     message: announcement.message,
     url: announcement.html_url,
     postedDate: announcement.posted_at ? new Date(announcement.posted_at) : undefined,
-    attachment
+    attachment,
   }
 }
 
@@ -337,13 +337,13 @@ export const saveElementaryDashboardPreference = disabled =>
   doFetchApi({
     path: '/api/v1/users/self/settings',
     method: 'PUT',
-    body: {elementary_dashboard_disabled: disabled}
+    body: {elementary_dashboard_disabled: disabled},
   })
 
 export const ignoreTodo = ignoreUrl =>
   doFetchApi({
     path: ignoreUrl,
-    method: 'DELETE'
+    method: 'DELETE',
   })
 
 export const groupImportantDates = (assignments, events, timeZone) => {
@@ -355,7 +355,7 @@ export const groupImportantDates = (assignments, events, timeZone) => {
       context: item.context_name,
       color: item.context_color || DEFAULT_COURSE_COLOR,
       type: item.type === 'event' ? 'event' : item.assignment.submission_types[0],
-      url: item.html_url
+      url: item.html_url,
     }
     const date = item.type === 'event' ? item.start_at : item.assignment.due_at
     const dateBucket = moment(date).tz(timeZone).startOf('day').toISOString()
@@ -367,7 +367,7 @@ export const groupImportantDates = (assignments, events, timeZone) => {
   groups.forEach((items, date) => {
     dates.push({
       date,
-      items: items.sort((a, b) => moment(a.start).diff(moment(b.start)))
+      items: items.sort((a, b) => moment(a.start).diff(moment(b.start))),
     })
   })
   return dates.sort((a, b) => moment(a.date).diff(moment(b.date)))
@@ -377,13 +377,13 @@ export const saveSelectedContexts = selected_contexts =>
   doFetchApi({
     path: `/api/v1/calendar_events/save_selected_contexts`,
     method: 'POST',
-    params: {selected_contexts}
+    params: {selected_contexts},
   }).then(data => data.json)
 
 export const dropCourse = url =>
   doFetchApi({
     path: url,
-    method: 'POST'
+    method: 'POST',
   })
 
 export const TAB_IDS = {
@@ -394,12 +394,12 @@ export const TAB_IDS = {
   RESOURCES: 'tab-resources',
   GROUPS: 'tab-groups',
   MODULES: 'tab-modules',
-  TODO: 'tab-todo'
+  TODO: 'tab-todo',
 }
 
 export const FOCUS_TARGETS = {
   TODAY: 'today',
-  MISSING_ITEMS: 'missing-items'
+  MISSING_ITEMS: 'missing-items',
 }
 
 export const DEFAULT_COURSE_COLOR = '#394B58'
@@ -409,7 +409,7 @@ export const GradingPeriodShape = {
   title: PropTypes.string.isRequired,
   end_date: PropTypes.string,
   start_date: PropTypes.string,
-  workflow_state: PropTypes.string
+  workflow_state: PropTypes.string,
 }
 
 export const MOBILE_NAV_BREAKPOINT_PX = 768

@@ -24,8 +24,8 @@ jest.useFakeTimers()
 describe('useSearch', () => {
   const event = {
     target: {
-      value: '123'
-    }
+      value: '123',
+    },
   }
 
   test('should create custom hook with initial state an empty string', () => {

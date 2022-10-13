@@ -27,7 +27,7 @@ QUnit.module('SelectContentDialog: Dialog options', {
   teardown() {
     $('.ui-dialog').remove()
     $('#fixtures').html('')
-  }
+  },
 })
 
 test('opens a dialog with the width option', () => {
@@ -70,7 +70,7 @@ QUnit.module('SelectContentDialog: deepLinkingListener', {
     const $resourceSelectionDialog = $('#resource_selection_dialog')
     const options = {
       autoOpen: false,
-      modal: true
+      modal: true,
     }
 
     $selectContextContentDialog.dialog(options).dialog('open')
@@ -79,12 +79,12 @@ QUnit.module('SelectContentDialog: deepLinkingListener', {
   teardown() {
     $('.ui-dialog').remove()
     $('#fixtures').html('')
-  }
+  },
 })
 
 const customParams = {
   root_account_id: '$Canvas.rootAccount.id',
-  referer: 'LTI test tool example'
+  referer: 'LTI test tool example',
 }
 
 const deepLinkingEvent = {
@@ -99,12 +99,12 @@ const deepLinkingEvent = {
         custom: customParams,
         iframe: {
           width: 123,
-          height: 456
-        }
-      }
+          height: 456,
+        },
+      },
     ],
-    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
-  }
+    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+  },
 }
 
 const assignmentId = '42'
@@ -117,11 +117,11 @@ const deepLinkingEventWithAssignmentId = {
         url: 'https://www.my-tool.com/launch-url',
         title: 'My Tool',
         new_tab: '0',
-        assignment_id: assignmentId
-      }
+        assignment_id: assignmentId,
+      },
     ],
-    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
-  }
+    ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+  },
 }
 
 test('sets the tool url', async () => {
@@ -210,8 +210,8 @@ test('close all dialogs when content items attribute is empty', async () => {
     data: {
       subject: 'LtiDeepLinkingResponse',
       content_items: [],
-      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
-    }
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking',
+    },
   }
 
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)

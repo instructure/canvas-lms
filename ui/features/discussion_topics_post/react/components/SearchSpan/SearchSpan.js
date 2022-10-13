@@ -37,7 +37,7 @@ export function SearchSpan({...props}) {
     <span
       className="user_content"
       dangerouslySetInnerHTML={{
-        __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView)
+        __html: addSearchHighlighting(props.searchTerm, props.text, props.isIsolatedView),
       }}
     />
   )
@@ -52,5 +52,5 @@ SearchSpan.propTypes = {
    * String containing displayable message
    */
   text: PropTypes.string.isRequired,
-  isIsolatedView: PropTypes.bool
+  isIsolatedView: PropTypes.bool,
 }

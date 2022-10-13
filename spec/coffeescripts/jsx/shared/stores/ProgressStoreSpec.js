@@ -29,21 +29,21 @@ QUnit.module('ProgressStoreSpec', {
       user_id: 1,
       tag: 'epub_export',
       completion: 0,
-      workflow_state: 'queued'
+      workflow_state: 'queued',
     }
     this.server = sinon.fakeServer.create()
   },
   teardown() {
     ProgressStore.clearState()
     return this.server.restore()
-  }
+  },
 })
 
-test('get', function() {
+test('get', function () {
   this.server.respondWith('GET', `/api/v1/progress/${this.progress_id}`, [
     200,
     {'Content-Type': 'application/json'},
-    JSON.stringify(this.progress)
+    JSON.stringify(this.progress),
   ])
   ok(isEmpty(ProgressStore.getState()), 'precondition')
   ProgressStore.get(this.progress_id)

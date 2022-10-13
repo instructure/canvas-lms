@@ -77,7 +77,7 @@ QUnit.module('RichContentEditor - preloading', {
   teardown() {
     fakeENV.teardown()
     editorUtils.resetRCE()
-  }
+  },
 })
 
 test('loads via RCELoader.preload when service enabled', () => {
@@ -100,13 +100,10 @@ QUnit.module('RichContentEditor - loading editor', {
     fixtures.teardown()
     RCELoader.loadOnTarget.restore()
     editorUtils.resetRCE()
-  }
+  },
 })
-test('calls RCELoader.loadOnTarget with target and options', function() {
-  sinon
-    .stub(RichContentEditor, 'freshNode')
-    .withArgs(this.$target)
-    .returns(this.$target)
+test('calls RCELoader.loadOnTarget with target and options', function () {
+  sinon.stub(RichContentEditor, 'freshNode').withArgs(this.$target).returns(this.$target)
   const options = {}
   RichContentEditor.loadNewEditor(this.$target, options)
   ok(RCELoader.loadOnTarget.calledWith(this.$target, sinon.match(options)))
@@ -118,13 +115,13 @@ test('skips instantiation when called with empty target', () => {
   ok(RCELoader.loadOnTarget.notCalled)
 })
 
-test('hides resize handle when called', function() {
+test('hides resize handle when called', function () {
   const $resize = fixtures.create('<div class="mce-resizehandle"></div>')
   RichContentEditor.loadNewEditor(this.$target, {})
   equal($resize.attr('aria-hidden'), 'true')
 })
 
-test('onFocus calls options.onFocus if exists', function() {
+test('onFocus calls options.onFocus if exists', function () {
   const options = {onFocus: sinon.spy()}
   RichContentEditor.loadNewEditor(this.$target, options)
   const {onFocus} = RCELoader.loadOnTarget.firstCall.args[1]
@@ -145,15 +142,12 @@ QUnit.module('RichContentEditor - callOnRCE', {
     fixtures.teardown()
     RceCommandShim.send.restore()
     editorUtils.resetRCE()
-  }
+  },
 })
 
-test('with flag enabled freshens node before passing to RceCommandShim', function() {
+test('with flag enabled freshens node before passing to RceCommandShim', function () {
   const $freshTarget = $(this.$target) // new jquery obj of same node
-  sinon
-    .stub(RichContentEditor, 'freshNode')
-    .withArgs(this.$target)
-    .returns($freshTarget)
+  sinon.stub(RichContentEditor, 'freshNode').withArgs(this.$target).returns($freshTarget)
   equal(RichContentEditor.callOnRCE(this.$target, 'methodName', 'methodArg'), 'methodResult')
   ok(RceCommandShim.send.calledWith($freshTarget, 'methodName', 'methodArg'))
   RichContentEditor.freshNode.restore()

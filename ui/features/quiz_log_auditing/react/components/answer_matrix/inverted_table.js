@@ -32,7 +32,7 @@ const I18n = useI18nScope('quiz_log_auditing.inverted_table_view')
  */
 class InvertedTable extends React.Component {
   state = {
-    activeQuestionId: null
+    activeQuestionId: null,
   }
 
   render() {
@@ -87,7 +87,7 @@ class InvertedTable extends React.Component {
 
   toggleAnswerVisibility(question) {
     this.setState(state => ({
-      activeQuestionId: question.id === state.activeQuestionId ? null : question.id
+      activeQuestionId: question.id === state.activeQuestionId ? null : question.id,
     }))
   }
 }

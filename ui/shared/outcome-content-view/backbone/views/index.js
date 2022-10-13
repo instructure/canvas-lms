@@ -42,7 +42,7 @@ export default class ContentView extends Backbone.View {
     useForScoring,
     instructionsTemplate,
     renderInstructions,
-    inFindDialog
+    inFindDialog,
   }) {
     this.readOnly = readOnly
     this.inFindDialog = inFindDialog
@@ -76,7 +76,7 @@ export default class ContentView extends Backbone.View {
       readOnly: this.readOnly,
       inFindDialog: this.inFindDialog,
       setQuizMastery: this.setQuizMastery,
-      useForScoring: this.useForScoring
+      useForScoring: this.useForScoring,
     }
     if (this.innerView != null) {
       this.innerView.remove()
@@ -125,7 +125,7 @@ export default class ContentView extends Backbone.View {
     const moveDialog = {
       tree: dialogTree,
       window: dialogWindow,
-      model: outcomeItem
+      model: outcomeItem,
     }
 
     $(dialogTree.$el).appendTo('.form-dialog-content')
@@ -159,7 +159,7 @@ export default class ContentView extends Backbone.View {
       onlyShowSubtrees: true,
       onClick() {
         TreeBrowserView.prototype.setActiveTree(this, treeBrowser)
-      }
+      },
     }).render()
     return treeBrowser
   }
@@ -174,7 +174,7 @@ export default class ContentView extends Backbone.View {
       },
       close(e) {
         $(this).remove()
-      }
+      },
     })
     return dialog
   }
@@ -195,7 +195,7 @@ export default class ContentView extends Backbone.View {
           $.raw(
             noOutcomesWarning({
               addOutcomesUrl: `/${this._contextPath()}/outcomes`,
-              noOutcomesLinkLabel
+              noOutcomesLinkLabel,
             })
           )
         )

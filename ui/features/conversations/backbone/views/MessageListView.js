@@ -73,7 +73,7 @@ export default class MessageListView extends PaginatedCollectionView {
     updatedThread.set({
       last_message: thread.last_message,
       last_authored_message_at: new Date().toString(),
-      message_count: I18n.n(updatedThread.get('messages').length)
+      message_count: I18n.n(updatedThread.get('messages').length),
     })
     this.collection.sort()
     this.render()

@@ -109,7 +109,7 @@ function formatPercentageGrade(score, options) {
   return I18n.n(round(percent, 2), {
     percentage: true,
     precision: 2,
-    strip_insignificant_zeros: true
+    strip_insignificant_zeros: true,
   })
 }
 
@@ -272,7 +272,7 @@ const GradeFormatHelper = {
     }
   },
 
-  UNGRADED
+  UNGRADED,
 }
 
 export default GradeFormatHelper

@@ -29,11 +29,11 @@ const I18n = useI18nScope('module_position_picker')
 ModulePositionPicker.propTypes = {
   courseId: string.isRequired,
   moduleId: string.isRequired,
-  setModuleItemPosition: func
+  setModuleItemPosition: func,
 }
 
 ModulePositionPicker.defaultProps = {
-  setModuleItemPosition: () => {}
+  setModuleItemPosition: () => {},
 }
 
 export default function ModulePositionPicker({courseId, moduleId, setModuleItemPosition}) {
@@ -56,7 +56,7 @@ export default function ModulePositionPicker({courseId, moduleId, setModuleItemP
     error: setError,
     loading: setIsLoading,
     fetchAllPages: true,
-    params
+    params,
   })
 
   if (error !== null) throw error
@@ -101,7 +101,7 @@ export default function ModulePositionPicker({courseId, moduleId, setModuleItemP
           ? moduleItems.concat({
               title: I18n.t('Loading additional items...'),
               id: '0',
-              groupId: '0'
+              groupId: '0',
             })
           : moduleItems
       }

@@ -28,19 +28,19 @@ const I18n = useI18nScope('AlignmentSummary')
 const useCourseAlignmentStats = () => {
   const {contextId} = useCanvasContext()
   const variables = {
-    id: contextId
+    id: contextId,
   }
 
   const {loading, error, data} = useQuery(COURSE_ALIGNMENT_STATS, {
     variables,
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'network-only',
   })
 
   useEffect(() => {
     if (error) {
       showFlashAlert({
         message: I18n.t('An error occurred while loading course alignment statistics.'),
-        type: 'error'
+        type: 'error',
       })
     }
   }, [error])
@@ -48,7 +48,7 @@ const useCourseAlignmentStats = () => {
   return {
     loading,
     error,
-    data
+    data,
   }
 }
 

@@ -39,11 +39,11 @@ export default class ChildContent extends Component {
     selectChangeLog: PropTypes.func.isRequired,
     terms: propTypes.termList.isRequired,
     childCourse: propTypes.courseInfo.isRequired,
-    masterCourse: propTypes.courseInfo.isRequired
+    masterCourse: propTypes.courseInfo.isRequired,
   }
 
   static defaultProps = {
-    realRef: () => {}
+    realRef: () => {},
   }
 
   componentDidMount() {
@@ -80,10 +80,10 @@ export default class ChildContent extends Component {
     return (
       <div className="bcc__wrapper">
         <BlueprintModal
-          wide
+          wide={true}
           title={I18n.t('Blueprint Course Information: %{term} - %{course}', {
             term: childTermName,
-            course: childCourse.name
+            course: childCourse.name,
           })}
           isOpen={isChangeLogOpen}
           onCancel={this.clearRoutes}
@@ -106,10 +106,7 @@ const connectState = state => ({
   isChangeLogOpen: !!state.selectedChangeLog,
   childCourse: state.course,
   masterCourse: state.masterCourse,
-  terms: state.terms
+  terms: state.terms,
 })
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedChildContent = connect(
-  connectState,
-  connectActions
-)(ChildContent)
+export const ConnectedChildContent = connect(connectState, connectActions)(ChildContent)

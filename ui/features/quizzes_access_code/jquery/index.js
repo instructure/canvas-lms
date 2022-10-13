@@ -18,18 +18,14 @@
 import $ from 'jquery'
 
 const preventDuplicateSubmissions = () =>
-  $('.access_code_form').submit(function(e) {
+  $('.access_code_form').submit(function (e) {
     e.preventDefault()
-    $(this)
-      .find('button')
-      .prop('disabled', true)
+    $(this).find('button').prop('disabled', true)
     $(this).trigger('submit.rails')
   })
 
 const enableAccessCodeSubmitButton = () =>
-  $('.access_code_form')
-    .find('button')
-    .prop('disabled', false)
+  $('.access_code_form').find('button').prop('disabled', false)
 
 $(document).ready(() => {
   enableAccessCodeSubmitButton()

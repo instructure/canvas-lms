@@ -346,7 +346,12 @@ export default class UploadMedia extends React.Component {
 
   render() {
     const {CLOSE_TEXT, UPLOAD_MEDIA_LABEL} = this.props.uploadMediaTranslations.UploadMediaStrings
-
+    const dataProps = Object.keys(this.props)
+      .filter(p => /^data-/.test(p))
+      .reduce((obj, key) => {
+        obj[key] = this.props[key]
+        return obj
+      }, {})
     return (
       <Modal
         label={UPLOAD_MEDIA_LABEL}
@@ -355,6 +360,7 @@ export default class UploadMedia extends React.Component {
         open={this.props.open}
         shouldCloseOnDocumentClick={false}
         liveRegion={this.props.liveRegion}
+        {...dataProps}
       >
         <Modal.Header>
           <CloseButton

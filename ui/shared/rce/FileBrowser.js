@@ -31,7 +31,7 @@ import {
   IconOpenFolderSolid,
   IconFolderSolid,
   IconUploadSolid,
-  IconImageSolid
+  IconImageSolid,
 } from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {getRootFolder, uploadFile} from '@canvas/files/util/apiFileUtils'
@@ -47,14 +47,14 @@ class FileBrowser extends React.Component {
     contentTypes: PropTypes.arrayOf(PropTypes.string),
     defaultUploadFolderId: PropTypes.string,
     selectFile: PropTypes.func.isRequired,
-    useContextAssets: PropTypes.bool
+    useContextAssets: PropTypes.bool,
   }
 
   static defaultProps = {
     allowUpload: true,
     contentTypes: ['*/*'],
     defaultUploadFolderId: null,
-    useContextAssets: true
+    useContextAssets: true,
   }
 
   constructor(props) {
@@ -65,7 +65,7 @@ class FileBrowser extends React.Component {
       openFolders: [],
       uploadFolder: null,
       uploading: false,
-      loadingCount: 0
+      loadingCount: 0,
     }
   }
 
@@ -235,14 +235,14 @@ class FileBrowser extends React.Component {
       canUpload: apiFolder.can_upload,
       locked: apiFolder.locked_for_user,
       descriptor,
-      ...opts
+      ...opts,
     }
     const existingCollections = this.state.collections[apiFolder.id]
     Object.assign(
       folder,
       existingCollections && {
         collections: existingCollections.collections,
-        items: existingCollections.items
+        items: existingCollections.items,
       }
     )
     return folder
@@ -260,7 +260,7 @@ class FileBrowser extends React.Component {
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
       alt: apiFile.display_name,
-      ...opts
+      ...opts,
     }
     return file
   }

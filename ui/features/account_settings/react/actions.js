@@ -34,12 +34,12 @@ export function setDirtyAction(value) {
     return {
       type: SET_DIRTY,
       payload: new Error('Can only set to Boolean values'),
-      error: true
+      error: true,
     }
   }
   return {
     type: SET_DIRTY,
-    payload: value
+    payload: value,
   }
 }
 
@@ -52,12 +52,12 @@ export function setCspEnabledAction(value, opts = {}) {
     return {
       type,
       payload: new Error('Can only set to Boolean values'),
-      error: true
+      error: true,
     }
   }
   return {
     type,
-    payload: value
+    payload: value,
   }
 }
 
@@ -67,7 +67,7 @@ export function setCspEnabled(context, contextId, value) {
     dispatch(setCspEnabledAction(value, {optimistic: true}))
     return axios
       .put(`/api/v1/${context}/${contextId}/csp_settings`, {
-        status: value ? 'enabled' : 'disabled'
+        status: value ? 'enabled' : 'disabled',
       })
       .then(response => {
         dispatch(setCspEnabledAction(response.data.enabled))
@@ -92,12 +92,12 @@ export function setCspInheritedAction(value, opts = {}) {
     return {
       type,
       payload: new Error('Can only set to Boolean values'),
-      error: true
+      error: true,
     }
   }
   return {
     type,
-    payload: value
+    payload: value,
   }
 }
 
@@ -108,7 +108,7 @@ export function setCspInherited(context, contextId, value) {
     dispatch(setCspInheritedAction(value, {optimistic: true}))
     return axios
       .put(`/api/v1/${context}/${contextId}/csp_settings`, {
-        status: value ? 'inherited' : cspEnabled ? 'enabled' : 'disabled'
+        status: value ? 'inherited' : cspEnabled ? 'enabled' : 'disabled',
       })
       .then(response => {
         // Set the actual inherited status
@@ -122,7 +122,7 @@ export function setCspInherited(context, contextId, value) {
         const addDomainMap = {
           effective: response.data.effective_whitelist || [],
           account: response.data.current_account_whitelist || [],
-          tools: response.data.tools_whitelist || {}
+          tools: response.data.tools_whitelist || {},
         }
         dispatch(addDomainBulkAction(addDomainMap, {reset: !cspInherited && value}))
         // Set the dirty status if needed, this will help us know if
@@ -153,19 +153,19 @@ export function addDomainAction(domain, domainType, opts = {}) {
     return {
       type,
       payload: new Error('Can only set to String values'),
-      error: true
+      error: true,
     }
   }
   if (!DOMAIN_MAP_KEYS.includes(domainType)) {
     return {
       type,
       payload: new Error('domainType is invalid'),
-      error: true
+      error: true,
     }
   }
   return {
     type,
-    payload: {[domainType]: domain}
+    payload: {[domainType]: domain},
   }
 }
 
@@ -174,19 +174,19 @@ export function addDomainBulkAction(domainsMap, opts = {}) {
     return {
       type: ADD_DOMAIN_BULK,
       payload: new Error('Invalid domain type key provided in domainsMap'),
-      error: true
+      error: true,
     }
   }
   if (opts.reset) {
     return {
       type: ADD_DOMAIN_BULK,
       payload: domainsMap,
-      reset: true
+      reset: true,
     }
   }
   return {
     type: ADD_DOMAIN_BULK,
-    payload: domainsMap
+    payload: domainsMap,
   }
 }
 
@@ -196,7 +196,7 @@ export function addDomain(context, contextId, domain, afterAdd = () => {}) {
     dispatch(addDomainAction(domain, 'account', {optimistic: true}))
     return axios
       .post(`/api/v1/${context}/${contextId}/csp_settings/domains`, {
-        domain
+        domain,
       })
       .then(() => {
         // This isn't really necessary but since the allowed domain list is unique,
@@ -214,7 +214,7 @@ export function getCurrentWhitelist(context, contextId) {
       const addDomainMap = {
         effective: response.data.effective_whitelist || [],
         account: response.data.current_account_whitelist || [],
-        tools: response.data.tools_whitelist || {}
+        tools: response.data.tools_whitelist || {},
       }
       dispatch(addDomainBulkAction(addDomainMap))
       dispatch(setWhitelistsLoaded(true))
@@ -230,12 +230,12 @@ export function removeDomainAction(domain, opts = {}) {
     return {
       type,
       payload: new Error('Domain can only set to String values'),
-      error: true
+      error: true,
     }
   }
   return {
     type,
-    payload: domain
+    payload: domain,
   }
 }
 
@@ -260,12 +260,12 @@ export function copyInheritedAction(newWhitelist, error) {
     return {
       type: COPY_INHERITED_FAILURE,
       payload: new Error(error),
-      error: true
+      error: true,
     }
   }
   return {
     type: COPY_INHERITED_SUCCESS,
-    payload: newWhitelist
+    payload: newWhitelist,
   }
 }
 
@@ -282,7 +282,7 @@ export function copyInheritedIfNeeded(context, contextId, modifiedDomainOption =
       }
       return axios
         .post(`/api/v1/${context}/${contextId}/csp_settings/domains/batch_create`, {
-          domains
+          domains,
         })
         .then(response => {
           dispatch(setDirtyAction(false))

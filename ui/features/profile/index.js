@@ -33,7 +33,7 @@ ready(() => {
   }
 
   ReactDOM.render(
-    <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults />,
+    <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults={true} />,
     // There is only one of these
     document.querySelector('.feature-flag-wrapper')
   )

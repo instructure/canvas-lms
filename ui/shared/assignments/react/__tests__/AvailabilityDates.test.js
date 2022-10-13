@@ -75,7 +75,7 @@ it('renders correctly if unlockAt is set and and lockAt is null', async () => {
 
 it('renders correctly if unlockAt and lockAt are set', async () => {
   const assignment = await mockAssignment({
-    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'}
+    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} />,
@@ -91,7 +91,7 @@ it('renders correctly if unlockAt and lockAt are set', async () => {
 
 it('renders correctly if unlockAt and lockAt are set and rendered in short mode', async () => {
   const assignment = await mockAssignment({
-    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'}
+    Assignment: {unlockAt: '2016-07-11T23:00:00-00:00', lockAt: '2016-07-15T23:00:00-00:00'},
   })
   ReactDOM.render(
     <AvailabilityDates assignment={assignment} formatStyle="short" />,

@@ -53,9 +53,9 @@ describe('useCourseAlignments', () => {
             contextType: 'Course',
             contextId: '1',
             rootOutcomeGroup: {
-              id: '1'
-            }
-          }
+              id: '1',
+            },
+          },
         }}
         f={true}
       >
@@ -66,7 +66,7 @@ describe('useCourseAlignments', () => {
 
   it('should load with pagination all outcomes', async () => {
     const {result} = renderHook(() => useCourseAlignments(), {
-      wrapper
+      wrapper,
     })
     expect(result.current.loading).toBe(true)
     expect(result.current.rootGroup).toBe(null)
@@ -83,7 +83,7 @@ describe('useCourseAlignments', () => {
       'Outcome 1 with alignments',
       'Outcome 2',
       'Outcome 3 with alignments',
-      'Outcome 4'
+      'Outcome 4',
     ])
     expect(result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -91,7 +91,7 @@ describe('useCourseAlignments', () => {
   it('should load with pagination only outcomes with alignments', async () => {
     mocks = courseAlignmentMocks({searchFilter: 'WITH_ALIGNMENTS'})
     const hook = renderHook(() => useCourseAlignments(), {
-      wrapper
+      wrapper,
     })
 
     hook.result.current.onFilterChangeHandler('WITH_ALIGNMENTS')
@@ -105,7 +105,7 @@ describe('useCourseAlignments', () => {
     await act(async () => jest.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
-      'Outcome 3 with alignments'
+      'Outcome 3 with alignments',
     ])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -113,7 +113,7 @@ describe('useCourseAlignments', () => {
   it('should load with pagination only outcomes withouts alignments', async () => {
     mocks = courseAlignmentMocks({searchFilter: 'NO_ALIGNMENTS'})
     const hook = renderHook(() => useCourseAlignments(), {
-      wrapper
+      wrapper,
     })
 
     hook.result.current.onFilterChangeHandler('NO_ALIGNMENTS')
@@ -133,13 +133,13 @@ describe('useCourseAlignments', () => {
     it("and return the error when coudn't load outcomes", async () => {
       mocks = courseAlignmentMocks({groupId: '2'})
       const {result} = renderHook(() => useCourseAlignments(), {
-        wrapper
+        wrapper,
       })
 
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'An error occurred while loading outcome alignments.',
-        type: 'error'
+        type: 'error',
       })
       expect(result.current.error).not.toBe(null)
     })
@@ -147,14 +147,14 @@ describe('useCourseAlignments', () => {
     it('when search returns results', async () => {
       mocks = searchMocks
       const hook = renderHook(() => useCourseAlignments(), {
-        wrapper
+        wrapper,
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'Showing Search Results Below',
         type: 'info',
-        srOnly: true
+        srOnly: true,
       })
     })
 
@@ -169,21 +169,21 @@ describe('useCourseAlignments', () => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'More Search Results Have Been Loaded',
         type: 'info',
-        srOnly: true
+        srOnly: true,
       })
     })
 
     it('when search returns zero results', async () => {
       mocks = courseAlignmentMocks({numOfOutcomes: 0, searchQuery: 'TEST'})
       const hook = renderHook(() => useCourseAlignments(), {
-        wrapper
+        wrapper,
       })
       hook.result.current.onSearchChangeHandler({target: {value: 'TEST'}})
       await act(async () => jest.runAllTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message: 'No Search Results Found',
         type: 'info',
-        srOnly: true
+        srOnly: true,
       })
     })
   })
@@ -191,7 +191,7 @@ describe('useCourseAlignments', () => {
   it('should load outcomes if no search string or if search string > 2', async () => {
     mocks = searchMocks
     const hook = renderHook(() => useCourseAlignments(), {
-      wrapper
+      wrapper,
     })
 
     hook.result.current.onSearchChangeHandler({target: {value: ''}})
@@ -210,7 +210,7 @@ describe('useCourseAlignments', () => {
     await act(async () => jest.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
-      'Outcome 2 with alignments'
+      'Outcome 2 with alignments',
     ])
   })
 
@@ -222,7 +222,7 @@ describe('useCourseAlignments', () => {
     await act(async () => jest.runAllTimers())
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments',
-      'Outcome 2 with alignments'
+      'Outcome 2 with alignments',
     ])
 
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(true)
@@ -232,7 +232,7 @@ describe('useCourseAlignments', () => {
       'Outcome 1 with alignments',
       'Outcome 2 with alignments',
       'Outcome 3 with alignments',
-      'Outcome 4 with alignments'
+      'Outcome 4 with alignments',
     ])
     expect(hook.result.current.rootGroup.outcomes.pageInfo.hasNextPage).toBe(false)
   })
@@ -240,7 +240,7 @@ describe('useCourseAlignments', () => {
   it('should refetch data if search with same keyword is run a second time', async () => {
     mocks = [
       ...courseAlignmentMocks({searchQuery: 'abc'}),
-      ...courseAlignmentMocks({searchQuery: 'def'})
+      ...courseAlignmentMocks({searchQuery: 'def'}),
     ]
     const hook = renderHook(() => useCourseAlignments(), {wrapper})
 
@@ -265,7 +265,7 @@ describe('useCourseAlignments', () => {
     expect(hook.result.current.loading).toBe(false)
     expect(outcomeTitles(hook.result)).toEqual([
       'Outcome 1 with alignments - Refetched',
-      'Outcome 2 - Refetched'
+      'Outcome 2 - Refetched',
     ])
   })
 })

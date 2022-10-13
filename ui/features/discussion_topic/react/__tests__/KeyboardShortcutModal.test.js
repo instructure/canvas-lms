@@ -31,8 +31,8 @@ describe(KeyboardShortcutModal, () => {
         shortcuts={[
           {
             keycode: 'j',
-            description: 'this is a test keyboard shortcut'
-          }
+            description: 'this is a test keyboard shortcut',
+          },
         ]}
       />
     )

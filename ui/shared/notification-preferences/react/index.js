@@ -54,7 +54,7 @@ const NotificationPreferences = props => {
             <Checkbox
               data-testid="enable-notifications-toggle"
               label={I18n.t('Enable Notifications for %{contextName}', {
-                contextName: props.contextName
+                contextName: props.contextName,
               })}
               size="small"
               variant="toggle"
@@ -111,7 +111,7 @@ const NotificationPreferences = props => {
         day_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.daily_notification_time,
         weekday: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.weekday,
         start_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.start_time,
-        end_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time
+        end_time: ENV.NOTIFICATION_PREFERENCES_OPTIONS?.weekly_notification_range?.end_time,
       }
     )
     return (
@@ -212,7 +212,7 @@ NotificationPreferences.propTypes = {
   enabled: bool,
   updatePreference: func.isRequired,
   userId: string.isRequired,
-  notificationPreferences: NotificationPreferencesShape
+  notificationPreferences: NotificationPreferencesShape,
 }
 
 export default NotificationPreferences

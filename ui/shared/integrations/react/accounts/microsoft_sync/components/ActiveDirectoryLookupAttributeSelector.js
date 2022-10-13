@@ -60,7 +60,7 @@ const ActiveDirectoryLookupAttributeSelector = ({fieldChangedHandler, selectedLo
 
 ActiveDirectoryLookupAttributeSelector.propTypes = {
   fieldChangedHandler: PropTypes.func,
-  selectedLookupField: PropTypes.string
+  selectedLookupField: PropTypes.string,
 }
 
 export default ActiveDirectoryLookupAttributeSelector

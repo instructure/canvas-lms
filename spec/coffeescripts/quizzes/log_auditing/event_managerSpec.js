@@ -27,7 +27,7 @@ QUnit.module('Quizzes::LogAuditing::EventManager', {
     if (this.evtManager && this.evtManager.isRunning()) {
       return this.evtManager.stop()
     }
-  }
+  },
 })
 
 test('#start and #stop: should work', function () {
@@ -85,13 +85,13 @@ QUnit.module('Quizzes::LogAuditing::EventManager - Event delivery', {
     if (this.evtManager && this.evtManager.isRunning()) {
       return this.evtManager.stop()
     }
-  }
+  },
 })
 
 test('it should deliver events', function () {
   this.evtManager = new EventManager({
     autoDeliver: false,
-    deliveryUrl: '/events'
+    deliveryUrl: '/events',
   })
   this.evtManager.registerTracker(this.TestEventTracker)
   this.evtManager.start()
@@ -119,7 +119,7 @@ test('it should deliver events', function () {
 test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BLURRED', function () {
   this.evtManager = new EventManager({
     autoDeliver: false,
-    deliveryUrl: '/events'
+    deliveryUrl: '/events',
   })
   this.evtManager.registerTracker(this.TestPageFocusEventTracker)
   this.evtManager.registerTracker(this.TestPageBlurredEventTracker)
@@ -158,7 +158,7 @@ test('should ignore EVT_PAGE_FOCUSED events that are not preceded by EVT_PAGE_BL
 test('it should drop trackers', function () {
   this.evtManager = new EventManager({
     autoDeliver: false,
-    deliveryUrl: '/events'
+    deliveryUrl: '/events',
   })
   this.evtManager.start()
   this.evtManager.registerTracker(this.TestEventTracker)

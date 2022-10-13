@@ -24,19 +24,19 @@ const patterns = {
   key: /[a-zA-Z0-9_-]+|(?=\[\])/g,
   push: /^$/,
   fixed: /^\d+$/,
-  named: /^[a-zA-Z0-9_-]+$/
+  named: /^[a-zA-Z0-9_-]+$/,
 }
 
-const build = function(base, key, value) {
+const build = function (base, key, value) {
   base[key] = value
   return base
 }
 
-$.fn.toJSON = function() {
+$.fn.toJSON = function () {
   let json = {},
     push_counters = {}
 
-  const push_counter = function(key, i) {
+  const push_counter = function (key, i) {
     if (push_counters[key] === undefined) {
       push_counters[key] = 0
     }
@@ -47,7 +47,7 @@ $.fn.toJSON = function() {
     }
   }
 
-  $.each($(this).serializeForm(), function() {
+  $.each($(this).serializeForm(), function () {
     // skip invalid keys
     if (!patterns.validate.test(this.name)) {
       return

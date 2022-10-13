@@ -27,6 +27,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {isSubmitted} from '../../helpers/SubmissionHelpers'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import ToolLaunchIframe from '@canvas/external-tools/react/components/ToolLaunchIframe'
 
 const I18n = useI18nScope('assignments_2_external_tool')
 
@@ -35,10 +36,8 @@ const I18n = useI18nScope('assignments_2_external_tool')
 const ContentLaunchView = ({launchURL}) => (
   <>
     <ScreenReaderContent>{I18n.t('The following content is partner provided')}</ScreenReaderContent>
-    <iframe
+    <ToolLaunchIframe
       allow={iframeAllowances()}
-      className="tool_launch"
-      data-lti-launch="true"
       data-testid="lti-launch-frame"
       src={launchURL}
       title={I18n.t('Tool content')}

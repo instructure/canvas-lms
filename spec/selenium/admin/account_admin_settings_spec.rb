@@ -41,6 +41,18 @@ describe "root account basic settings" do
     expect(Account.default.reload.settings[:enable_gravatar]).to eq false
   end
 
+  it "lets admins enable kill_joy on root account settings", ignore_js_errors: true do
+    account.settings[:kill_joy] = false
+    account.save!
+
+    user_session(@admin)
+    get account_settings_url
+    f("#account_settings_kill_joy").click
+    submit_form("#account_settings")
+    wait_for_ajaximations
+    expect(Account.default.reload.settings[:kill_joy]).to eq true
+  end
+
   context "editing slack API key" do
     before :once do
       account_admin_user(account: Account.site_admin)

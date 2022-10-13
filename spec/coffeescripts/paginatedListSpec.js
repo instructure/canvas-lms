@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import PaginatedList from 'ui/features/section/jquery/PaginatedList.js'
+import PaginatedList from 'ui/features/section/jquery/PaginatedList'
 
 const paginatedListFixture = `
   <h3>Paginated List Spec</h3>
@@ -31,7 +31,7 @@ QUnit.module('PaginatedList', {
     this.response = [
       200,
       {'Content-Type': 'application/json'},
-      '[{ "value": "one" }, { "value": "two" }]'
+      '[{ "value": "one" }, { "value": "two" }]',
     ]
 
     // fake template (mimics a handlebars function)
@@ -39,7 +39,7 @@ QUnit.module('PaginatedList', {
     this.fixture = $(paginatedListFixture).appendTo('#fixtures')
     this.el = {
       wrapper: $('#list-wrapper'),
-      list: $('#list-wrapper').find('ul')
+      list: $('#list-wrapper').find('ul'),
     }
     this.clock = sinon.useFakeTimers()
     this.server = sinon.fakeServer.create()
@@ -48,32 +48,32 @@ QUnit.module('PaginatedList', {
     this.clock.restore()
     this.server.restore()
     this.fixture.remove()
-  }
+  },
 })
 
-test('should fetch and display results', function() {
+test('should fetch and display results', function () {
   this.server.respondWith(/.+/, this.response)
   new PaginatedList(this.el.wrapper, {
     template: this.template,
-    url: '/api/v1/test.json'
+    url: '/api/v1/test.json',
   })
   this.server.respond()
   this.clock.tick(500)
   equal(this.el.list.children().length, 2)
 })
 
-test('should display a view more link if next page is available', function() {
+test('should display a view more link if next page is available', function () {
   this.server.respondWith(/.+/, [
     this.response[0],
     {
       'Content-Type': 'application/json',
-      Link: '<http://api?page=bookmarkstuff>; rel="next"'
+      Link: '<http://api?page=bookmarkstuff>; rel="next"',
     },
-    this.response[2]
+    this.response[2],
   ])
   const list = new PaginatedList(this.el.wrapper, {
     template: this.template,
-    url: '/api/v1/test.json'
+    url: '/api/v1/test.json',
   })
   this.server.respond()
   this.clock.tick(500)
@@ -81,22 +81,22 @@ test('should display a view more link if next page is available', function() {
   equal(list.options.requestParams.page, 'bookmarkstuff')
 })
 
-test('should not display a view more link if there is no next page', function() {
+test('should not display a view more link if there is no next page', function () {
   this.server.respondWith(/.+/, this.response)
   new PaginatedList(this.el.wrapper, {
     template: this.template,
-    url: '/api/v1/test.json'
+    url: '/api/v1/test.json',
   })
   this.server.respond()
   this.clock.tick(500)
   ok(this.el.wrapper.find('.view-more-link').length === 0)
 })
 
-test('should accept a template function', function() {
+test('should accept a template function', function () {
   this.server.respondWith(/.+/, this.response)
   new PaginatedList(this.el.wrapper, {
     template: this.template,
-    url: '/api/v1/test.json'
+    url: '/api/v1/test.json',
   })
   this.server.respond()
   this.clock.tick(500)
@@ -104,24 +104,24 @@ test('should accept a template function', function() {
   equal(this.el.list.find('li:last-child').text(), 'two')
 })
 
-test('should accept a presenter function', function() {
+test('should accept a presenter function', function () {
   this.server.respondWith(/.+/, this.response)
   new PaginatedList(this.el.wrapper, {
     presenter: list => list.map(l => ({value: 'changed'})),
     template: this.template,
-    url: '/api/v1/test.json'
+    url: '/api/v1/test.json',
   })
   this.server.respond()
   this.clock.tick(500)
   equal(this.el.list.find('li:first-child').text(), 'changed')
 })
 
-test('should allow user to defer getJSON', function() {
+test('should allow user to defer getJSON', function () {
   sandbox.spy($, 'getJSON')
   new PaginatedList(this.el.wrapper, {
     start: false,
     template: this.template,
-    url: '/api/v1/not-called.json'
+    url: '/api/v1/not-called.json',
   })
   equal($.getJSON.callCount, 0)
 })

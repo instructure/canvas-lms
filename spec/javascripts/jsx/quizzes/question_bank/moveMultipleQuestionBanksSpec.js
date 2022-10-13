@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import moveMultipleQuestionBanks from 'ui/features/question_bank/jquery/moveMultipleQuestionBanks.js'
+import moveMultipleQuestionBanks from 'ui/features/question_bank/jquery/moveMultipleQuestionBanks'
 import $ from 'jquery'
 
 let $modal = null
@@ -36,7 +36,7 @@ QUnit.module('Move Multiple Question Banks', {
 
   teardown() {
     $('#fixtures').empty()
-  }
+  },
 })
 
 test('is an object', () => {

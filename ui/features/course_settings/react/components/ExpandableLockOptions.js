@@ -50,7 +50,7 @@ export default class ExpandableLockOptions extends React.Component {
     objectType: PropTypes.string.isRequired,
     locks: propTypes.itemLocks,
     isOpen: PropTypes.bool,
-    lockableAttributes: propTypes.lockableAttributeList.isRequired
+    lockableAttributes: propTypes.lockableAttributeList.isRequired,
   }
 
   static defaultProps = {
@@ -59,21 +59,21 @@ export default class ExpandableLockOptions extends React.Component {
       content: false,
       points: false,
       due_dates: false,
-      availability_dates: false
-    }
+      availability_dates: false,
+    },
   }
 
   constructor(props) {
     super(props)
     this.state = {
       open: props.isOpen,
-      locks: {...props.locks}
+      locks: {...props.locks},
     }
   }
 
   onChange = locks => {
     this.setState({
-      locks
+      locks,
     })
   }
 
@@ -85,7 +85,7 @@ export default class ExpandableLockOptions extends React.Component {
 
   toggle = () => {
     this.setState({
-      open: !this.state.open
+      open: !this.state.open,
     })
   }
 
@@ -148,7 +148,7 @@ export default class ExpandableLockOptions extends React.Component {
   renderSubList() {
     const viewableClasses = cx({
       'bcs_sub-menu': true,
-      'bcs_sub-menu-viewable': this.state.open
+      'bcs_sub-menu-viewable': this.state.open,
     })
     return (
       <div className={viewableClasses} data-testid="sub-list">

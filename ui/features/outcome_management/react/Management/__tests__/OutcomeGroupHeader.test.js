@@ -31,7 +31,7 @@ describe('OutcomeGroupHeader', () => {
         description: 'Group Description',
         onMenuHandler: onMenuHandlerMock,
         canManage: true,
-        hideOutcomesView: hideOutcomesViewMock
+        hideOutcomesView: hideOutcomesViewMock,
       },
       props
     )

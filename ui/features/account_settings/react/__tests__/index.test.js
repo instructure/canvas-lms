@@ -21,7 +21,7 @@ import {start} from '../index'
 describe('start', () => {
   beforeEach(() => {
     window.ENV = {
-      ACCOUNT: {id: '1234'}
+      ACCOUNT: {id: '1234'},
     }
   })
 
@@ -36,7 +36,7 @@ describe('start', () => {
 
     const fakeAxios = {
       put: jest.fn(() => ({then() {}})),
-      get: jest.fn(() => ({then() {}}))
+      get: jest.fn(() => ({then() {}})),
     }
 
     expect(() => {
@@ -44,7 +44,7 @@ describe('start', () => {
         context: 'account',
         contextId: '1',
         api: fakeAxios,
-        liveRegion: []
+        liveRegion: [],
       })
     }).not.toThrow()
   })

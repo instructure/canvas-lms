@@ -25,7 +25,7 @@ QUnit.module('Custom Axios Tests', {
   },
   teardown() {
     moxios.uninstall()
-  }
+  },
 })
 
 test('Accept headers request stringified ids', assert => {
@@ -33,7 +33,7 @@ test('Accept headers request stringified ids', assert => {
 
   moxios.stubRequest('/some/url', {
     status: 200,
-    responseText: 'hello'
+    responseText: 'hello',
   })
 
   axios.get('/some/url').then(response => {
@@ -49,7 +49,7 @@ test('passes X-Requested-With header', assert => {
 
   moxios.stubRequest('/some/url', {
     status: 200,
-    responseText: 'hello'
+    responseText: 'hello',
   })
 
   axios.get('/some/url').then(response => {

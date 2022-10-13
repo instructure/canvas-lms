@@ -80,8 +80,8 @@ export function AnnotatedDocumentSelector({attachment, defaultUploadFolderId, on
     <FileBrowserWrapper
       defaultUploadFolderId={defaultUploadFolderId}
       selectFile={onSelect}
-      allowUpload
-      useContextAssets
+      allowUpload={true}
+      useContextAssets={true}
     />
   )
 }

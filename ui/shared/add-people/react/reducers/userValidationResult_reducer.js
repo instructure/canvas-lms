@@ -39,7 +39,7 @@ function transformDupeApiResult(apiResult) {
           skip: false,
           createNew: false,
           newUserInfo: undefined,
-          userList: d
+          userList: d,
         }
       }
     })
@@ -60,8 +60,8 @@ function transformMissingApiResult(apiResult) {
         createNew: false,
         newUserInfo: {
           name: d.user_name || '', // if the user entered a name as part of the email, it comes back in user_name
-          email: d.type === 'email' ? d.address : ''
-        }
+          email: d.type === 'email' ? d.address : '',
+        },
       }
     })
   }
@@ -143,7 +143,7 @@ export default handleActions(
       return !action.payload || action.payload.includes('userValidationResult')
         ? defaultState.userValidationResult
         : state
-    }
+    },
   },
   defaultState.userValidationResult
 )

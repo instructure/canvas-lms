@@ -26,9 +26,9 @@ import OutcomesRceField from './OutcomesRceField'
 const LabeledRceField = ({name, validate, label}) => {
   const {
     input,
-    meta: {touched, error, submitError}
+    meta: {touched, error, submitError},
   } = useField(name, {
-    validate
+    validate,
   })
 
   let errorMessages = []
@@ -63,7 +63,7 @@ const LabeledRceField = ({name, validate, label}) => {
 LabeledRceField.propTypes = {
   name: PropTypes.string.isRequired,
   validate: PropTypes.func,
-  label: PropTypes.string.isRequired
+  label: PropTypes.string.isRequired,
 }
 
 export default LabeledRceField

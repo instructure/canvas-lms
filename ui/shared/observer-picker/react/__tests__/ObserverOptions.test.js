@@ -33,11 +33,11 @@ describe('ObserverOptions', () => {
     currentUser: {
       id: userId,
       display_name: 'Zelda',
-      avatarUrl: 'http://avatar'
+      avatarUrl: 'http://avatar',
     },
     handleChangeObservedUser: jest.fn(),
     canAddObservee: false,
-    ...overrides
+    ...overrides,
   })
 
   afterEach(() => {
@@ -113,7 +113,7 @@ describe('ObserverOptions', () => {
   })
 
   it('displays the add student option if the user can add observees', () => {
-    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee />)
+    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee={true} />)
     const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select).toBeInTheDocument()
     act(() => select.click())
@@ -131,7 +131,7 @@ describe('ObserverOptions', () => {
   })
 
   it('opens the add student modal when Add Student option is clicked', () => {
-    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee />)
+    const {getByRole, getByText} = render(<ObserverOptions {...getProps()} canAddObservee={true} />)
     const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select).toBeInTheDocument()
     act(() => select.click())

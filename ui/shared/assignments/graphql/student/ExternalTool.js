@@ -35,14 +35,14 @@ export const ExternalTool = {
     description: string,
     name: string,
     settings: shape({
-      iconUrl: string
-    })
-  })
+      iconUrl: string,
+    }),
+  }),
 }
 
 export const DefaultMocks = {
   ExternalTool: () => ({
     _id: '1',
-    name: 'external tool'
-  })
+    name: 'external tool',
+  }),
 }

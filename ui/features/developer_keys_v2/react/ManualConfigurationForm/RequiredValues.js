@@ -37,7 +37,7 @@ export default class RequiredValues extends React.Component {
     const public_jwk = JSON.stringify(this.props.toolConfiguration.public_jwk || {}, null, 4)
     this.state = {
       toolConfiguration: {...this.props.toolConfiguration, public_jwk},
-      jwkConfig: this.props.toolConfiguration.public_jwk_url ? 'public_jwk_url' : 'public_jwk'
+      jwkConfig: this.props.toolConfiguration.public_jwk_url ? 'public_jwk_url' : 'public_jwk',
     }
   }
 
@@ -115,14 +115,14 @@ export default class RequiredValues extends React.Component {
   handleTargetLinkUriChange = e => {
     const value = e.target.value
     this.setState(state => ({
-      toolConfiguration: {...state.toolConfiguration, target_link_uri: value}
+      toolConfiguration: {...state.toolConfiguration, target_link_uri: value},
     }))
   }
 
   handleOidcInitiationUrlChange = e => {
     const value = e.target.value
     this.setState(state => ({
-      toolConfiguration: {...state.toolConfiguration, oidc_initiation_url: value}
+      toolConfiguration: {...state.toolConfiguration, oidc_initiation_url: value},
     }))
   }
 
@@ -134,7 +134,7 @@ export default class RequiredValues extends React.Component {
   handlePublicJwkUrlChange = e => {
     const value = e.target.value
     this.setState(state => ({
-      toolConfiguration: {...state.toolConfiguration, public_jwk_url: value}
+      toolConfiguration: {...state.toolConfiguration, public_jwk_url: value},
     }))
   }
 
@@ -154,7 +154,7 @@ export default class RequiredValues extends React.Component {
           value={toolConfiguration.public_jwk}
           maxHeight="10rem"
           resize="vertical"
-          autoGrow
+          autoGrow={true}
           onChange={this.handlePublicJwkChange}
           messages={
             showMessages && !toolConfiguration.public_jwk && !toolConfiguration.public_jwk_url
@@ -264,14 +264,14 @@ RequiredValues.propTypes = {
     target_link_uri: PropTypes.string,
     oidc_initiation_url: PropTypes.string,
     public_jwk: PropTypes.object,
-    public_jwk_url: PropTypes.string
+    public_jwk_url: PropTypes.string,
   }),
   flashError: PropTypes.func,
-  showMessages: PropTypes.bool
+  showMessages: PropTypes.bool,
 }
 
 RequiredValues.defaultProps = {
   flashError: msg => {
     $.flashError(msg)
-  }
+  },
 }

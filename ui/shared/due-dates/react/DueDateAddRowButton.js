@@ -24,7 +24,7 @@ const I18n = useI18nScope('assignDueDateAddRowButtonments')
 
 class DueDateAddRowButton extends React.Component {
   static propTypes = {
-    display: PropTypes.bool.isRequired
+    display: PropTypes.bool.isRequired,
   }
 
   render() {

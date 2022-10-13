@@ -19,7 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import {mount} from 'enzyme'
-import ConfigureExternalToolButton from 'ui/features/external_apps/react/components/ConfigureExternalToolButton.js'
+import ConfigureExternalToolButton from 'ui/features/external_apps/react/components/ConfigureExternalToolButton'
 
 let tool
 let event
@@ -31,18 +31,18 @@ QUnit.module('ConfigureExternalToolButton screenreader functionality', {
     tool = {
       name: 'test tool',
       tool_configuration: {
-        url: 'http://example.com/launch'
-      }
+        url: 'http://example.com/launch',
+      },
     }
 
     event = {
-      preventDefault() {}
+      preventDefault() {},
     }
   },
   teardown() {
     $('.ReactModalPortal').remove()
     ENV.LTI_LAUNCH_FRAME_ALLOWANCES = undefined
-  }
+  },
 })
 
 test('uses the tool configuration "url" when present', () => {

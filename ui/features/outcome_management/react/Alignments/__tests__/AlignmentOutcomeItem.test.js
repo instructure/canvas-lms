@@ -33,10 +33,10 @@ describe('AlignmentOutcomeItem', () => {
         moduleTitle: 'Module 1',
         moduleUrl: '/courses/1/modules/1',
         moduleWorkflowState: 'active',
-        assignmentContentType: 'assignment'
-      }
+        assignmentContentType: 'assignment',
+      },
     ],
-    ...props
+    ...props,
   })
 
   it('renders component', () => {

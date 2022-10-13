@@ -71,17 +71,6 @@ shared_examples_for "k5 homeroom announcements" do
       expect(announcement_content_text(current_announcement_content)).to be_displayed
     end
 
-    it "opens up the announcement when announcement title is clicked" do
-      get "/"
-
-      click_announcement_title(current_announcement_title)
-      wait_for_ajaximations
-
-      expect(driver.current_url).to include(
-        "/courses/#{@homeroom_course.id}/discussion_topics/#{@announcement1.id}"
-      )
-    end
-
     it "shows previous and next buttons when there are multiple non-stale announcements" do
       get "/"
 

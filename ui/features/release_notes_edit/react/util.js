@@ -23,24 +23,24 @@ const I18n = useI18nScope('release_notes')
 export const roles = [
   {
     id: 'user',
-    label: I18n.t('Everyone')
+    label: I18n.t('Everyone'),
   },
   {
     id: 'admin',
-    label: I18n.t('Admins')
+    label: I18n.t('Admins'),
   },
   {
     id: 'teacher',
-    label: I18n.t('Teachers')
+    label: I18n.t('Teachers'),
   },
   {
     id: 'student',
-    label: I18n.t('Students')
+    label: I18n.t('Students'),
   },
   {
     id: 'observer',
-    label: I18n.t('Observers')
-  }
+    label: I18n.t('Observers'),
+  },
 ]
 
 export const rolesObject = Object.fromEntries(roles.map(r => [r.id, r.label]))

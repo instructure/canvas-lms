@@ -44,7 +44,7 @@ const AssignmentsView = Ember.View.extend({
         show_message_students_with_observers_dialog:
           ENV.GRADEBOOK_OPTIONS.show_message_students_with_observers_dialog,
         messageAttachmentUploadFolderId: ENV.GRADEBOOK_OPTIONS.message_attachment_upload_folder_id,
-        current_user_id: ENV.current_user.id
+        current_user_id: ENV.current_user.id,
       }
 
       const dialogs = {
@@ -55,7 +55,7 @@ const AssignmentsView = Ember.View.extend({
           return GradebookHeaderMenu.prototype.setDefaultGrade.call(this, {...opts, onClose})
         },
         curve_grades: GradebookHeaderMenu.prototype.curveGrades,
-        submission: SubmissionDetailsDialog.open
+        submission: SubmissionDetailsDialog.open,
       }
 
       switch (dialogType) {
@@ -71,8 +71,8 @@ const AssignmentsView = Ember.View.extend({
         default:
           return dialogs[dialogType] != null ? dialogs[dialogType].call(this, options) : undefined
       }
-    }
-  }
+    },
+  },
 })
 
 export default AssignmentsView

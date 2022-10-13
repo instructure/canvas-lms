@@ -29,7 +29,7 @@ import {useMutation, useQuery} from 'react-apollo'
 import {
   DELETE_CONVERSATIONS,
   UPDATE_CONVERSATION_PARTICIPANTS,
-  UPDATE_SUBMISSIONS_READ_STATE
+  UPDATE_SUBMISSIONS_READ_STATE,
 } from '../../graphql/Mutations'
 import {CONVERSATIONS_QUERY, VIEWABLE_SUBMISSIONS_QUERY} from '../../graphql/Queries'
 import {decodeQueryString} from 'query-string-encoding'
@@ -90,7 +90,7 @@ const CanvasInbox = () => {
         _id: userIdFromUrlData,
         name: userNameFromUrlData,
         commonCoursesInfo: [],
-        itemType: 'user'
+        itemType: 'user',
       })
       setComposeModal(true)
     }
@@ -149,7 +149,7 @@ const CanvasInbox = () => {
     messageOpenEvent,
     setMessageOpenEvent,
     isSubmissionCommentsType,
-    setIsSubmissionCommentsType
+    setIsSubmissionCommentsType,
   }
 
   const updateSelectedConversations = conversations => {
@@ -167,27 +167,27 @@ const CanvasInbox = () => {
 
   const commonQueryVariables = {
     userID: ENV.current_user_id?.toString(),
-    filter: [userFilter, courseFilter]
+    filter: [userFilter, courseFilter],
   }
 
   const conversationsQueryOption = {
     query: CONVERSATIONS_QUERY,
     variables: {
       ...commonQueryVariables,
-      scope
-    }
+      scope,
+    },
   }
 
   const conversationsQuery = useQuery(CONVERSATIONS_QUERY, {
     variables: {...commonQueryVariables, scope},
     fetchPolicy: 'cache-and-network',
-    skip: isSubmissionCommentsType || scope === 'submission_comments'
+    skip: isSubmissionCommentsType || scope === 'submission_comments',
   })
 
   const submissionCommentsQuery = useQuery(VIEWABLE_SUBMISSIONS_QUERY, {
     variables: {...commonQueryVariables, sort: 'desc'},
     fetchPolicy: 'cache-and-network',
-    skip: !isSubmissionCommentsType || !(scope === 'submission_comments')
+    skip: !isSubmissionCommentsType || !(scope === 'submission_comments'),
   })
   const submissionCommentLength =
     submissionCommentsQuery.data?.legacyNode?.viewableSubmissionsConnection?.nodes?.length || 0
@@ -221,7 +221,7 @@ const CanvasInbox = () => {
     const archiveConfirmMsg = I18n.t(
       {
         one: 'Are you sure you want to archive your copy of this conversation?',
-        other: 'Are you sure you want to archive your copy of these conversations?'
+        other: 'Are you sure you want to archive your copy of these conversations?',
       },
       {count: selectedConversations.length}
     )
@@ -231,8 +231,8 @@ const CanvasInbox = () => {
       archiveConversationParticipants({
         variables: {
           conversationIds: selectedConversations.map(convo => convo._id),
-          workflowState: 'archived'
-        }
+          workflowState: 'archived',
+        },
       })
     } else {
       // confirm message was cancelled by user
@@ -244,7 +244,7 @@ const CanvasInbox = () => {
     const unarchiveConfirmMsg = I18n.t(
       {
         one: 'Are you sure you want to unarchive your copy of this conversation?',
-        other: 'Are you sure you want to unarchive your copy of these conversations?'
+        other: 'Are you sure you want to unarchive your copy of these conversations?',
       },
       {count: selectedConversations.length}
     )
@@ -254,8 +254,8 @@ const CanvasInbox = () => {
       unarchiveConversationParticipants({
         variables: {
           conversationIds: selectedConversations.map(convo => convo._id),
-          workflowState: 'read'
-        }
+          workflowState: 'read',
+        },
       })
     } else {
       // confirm message was cancelled by user
@@ -267,7 +267,7 @@ const CanvasInbox = () => {
     const archiveSuccessMsg = I18n.t(
       {
         one: 'Message archived!',
-        other: 'Messages archived!'
+        other: 'Messages archived!',
       },
       {count: selectedConversations.length}
     )
@@ -287,7 +287,7 @@ const CanvasInbox = () => {
     const unarchiveSuccessMsg = I18n.t(
       {
         one: 'Message unarchived!',
-        other: 'Messages unarchived!'
+        other: 'Messages unarchived!',
       },
       {count: selectedConversations.length}
     )
@@ -310,7 +310,7 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Archive operation failed'))
-    }
+    },
   })
 
   const [unarchiveConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -320,7 +320,7 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Unarchive operation failed'))
-    }
+    },
   })
 
   const handleDelete = individualConversation => {
@@ -331,7 +331,7 @@ const CanvasInbox = () => {
       {
         one: 'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
         other:
-          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
+          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.',
       },
       {count: conversationsToDeleteByID.length}
     )
@@ -349,7 +349,7 @@ const CanvasInbox = () => {
     const deletedSuccessMsg = I18n.t(
       {
         one: 'Message Deleted!',
-        other: 'Messages Deleted!'
+        other: 'Messages Deleted!',
       },
       {count: deletedConversationIDs.length}
     )
@@ -398,7 +398,7 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Delete operation failed'))
-    }
+    },
   })
 
   const firstConversation = selectedConversations.length > 0 ? selectedConversations[0] : {}
@@ -415,7 +415,7 @@ const CanvasInbox = () => {
           I18n.t(
             {
               one: 'The conversation has been successfully unstarred.',
-              other: 'The conversations has been successfully unstarred.'
+              other: 'The conversations has been successfully unstarred.',
             },
             {count: selectedConversations.length}
           )
@@ -425,7 +425,7 @@ const CanvasInbox = () => {
           I18n.t(
             {
               one: 'The conversation has been successfully starred.',
-              other: 'The conversations has been successfully starred.'
+              other: 'The conversations has been successfully starred.',
             },
             {count: selectedConversations.length}
           )
@@ -434,15 +434,15 @@ const CanvasInbox = () => {
     },
     onError: () => {
       setOnFailure(I18n.t('There was an unexpected error updating the conversation participants.'))
-    }
+    },
   })
 
   const handleStar = starred => {
     starConversationParticipants({
       variables: {
         conversationIds: selectedConversations.map(convo => convo._id),
-        starred
-      }
+        starred,
+      },
     })
   }
 
@@ -455,7 +455,7 @@ const CanvasInbox = () => {
           I18n.t(
             {
               one: 'Read state Changed!',
-              other: 'Read states Changed!'
+              other: 'Read states Changed!',
             },
             {count: '1000'}
           )
@@ -464,7 +464,7 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Read state change failed'))
-    }
+    },
   })
 
   const [readStateChangeConversationParticipants] = useMutation(UPDATE_CONVERSATION_PARTICIPANTS, {
@@ -476,7 +476,7 @@ const CanvasInbox = () => {
           I18n.t(
             {
               one: 'Read state Changed!',
-              other: 'Read states Changed!'
+              other: 'Read states Changed!',
             },
             {count: '1000'}
           )
@@ -485,7 +485,7 @@ const CanvasInbox = () => {
     },
     onError() {
       setOnFailure(I18n.t('Read state change failed'))
-    }
+    },
   })
 
   const handleReadState = (markAsRead, conversationIds = null) => {
@@ -494,15 +494,15 @@ const CanvasInbox = () => {
       readStateChangeSubmission({
         variables: {
           submissionIds: conversationIds,
-          read: markAsRead === 'read'
-        }
+          read: markAsRead === 'read',
+        },
       })
     } else {
       readStateChangeConversationParticipants({
         variables: {
           conversationIds: conversationIdsToChange,
-          workflowState: markAsRead
-        }
+          workflowState: markAsRead,
+        },
       })
     }
 
@@ -550,12 +550,12 @@ const CanvasInbox = () => {
       props={{
         mobile: {
           conversationListWidth: '100%',
-          messageDetailMargin: '0 0 0 small'
+          messageDetailMargin: '0 0 0 small',
         },
         desktop: {
           conversationListWidth: '400px',
-          messageDetailMargin: undefined
-        }
+          messageDetailMargin: undefined,
+        },
       }}
       render={(responsiveProps, matches) => (
         <ConversationContext.Provider value={conversationContext}>
@@ -606,7 +606,7 @@ const CanvasInbox = () => {
                 />
               </Flex.Item>
             )}
-            <Flex.Item shouldGrow shouldShrink>
+            <Flex.Item shouldGrow={true} shouldShrink={true}>
               <Flex height="100%" as="div" align="center" justifyItems="center">
                 {(matches.includes('desktop') ||
                   (matches.includes('mobile') && !selectedConversations.length) ||
@@ -636,8 +636,8 @@ const CanvasInbox = () => {
                     selectedConversations.length > 0 &&
                     !multiselect)) && (
                   <Flex.Item
-                    shouldGrow
-                    shouldShrink
+                    shouldGrow={true}
+                    shouldShrink={true}
                     height="100%"
                     overflowY="auto"
                     margin={responsiveProps.messageDetailMargin}
@@ -651,7 +651,11 @@ const CanvasInbox = () => {
                             padding="none none none xx-small"
                           >
                             <Flex>
-                              <Flex.Item shouldGrow border padding="medium none medium none">
+                              <Flex.Item
+                                shouldGrow={true}
+                                border={true}
+                                padding="medium none medium none"
+                              >
                                 <CondensedButton
                                   data-testid="message-detail-back-button"
                                   renderIcon={<IconArrowOpenStartLine size="x-small" />}

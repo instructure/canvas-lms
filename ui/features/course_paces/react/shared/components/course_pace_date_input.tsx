@@ -27,7 +27,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import {IconWarningLine} from '@instructure/ui-icons'
 
 import CanvasDateInput, {
-  CanvasDateInputMessageType
+  CanvasDateInputMessageType,
 } from '@canvas/datetime/react/components/DateInput'
 import {BlackoutDate, InputInteraction} from '../types'
 import {coursePaceTimezone, weekendIntegers} from '../api/backend_serializer'
@@ -90,7 +90,7 @@ const CoursePaceDateInput = ({
   weekendsDisabled = false,
   blackoutDates = [],
   startDate,
-  endDate
+  endDate,
 }: CoursePacesDateInputProps) => {
   const [customErrors, setCustomErrors] = useState<string[]>([])
   const formatDateReadonly = useDateTimeFormat(
@@ -173,7 +173,7 @@ const CoursePaceDateInput = ({
         </FlexItem>
         <FlexItem>{e}</FlexItem>
       </Flex>
-    )
+    ),
   }))
   if (messages.length === 0 && message) {
     messages.push({
@@ -185,7 +185,7 @@ const CoursePaceDateInput = ({
           </FlexItem>
           <Text color={message.type}>{message.text}</Text>
         </Flex>
-      )
+      ),
     })
   }
 
@@ -210,7 +210,7 @@ const CoursePaceDateInput = ({
           width={width}
           messages={messages}
           interaction={interaction}
-          withRunningValue
+          withRunningValue={true}
         />
         {messages.length === 0 && helpText && (
           <div style={{whiteSpace: 'nowrap', marginTop: '.5rem'}}>

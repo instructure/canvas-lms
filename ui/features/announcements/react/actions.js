@@ -64,7 +64,7 @@ const types = [
   'DELETE_ANNOUNCEMENTS_START',
   'DELETE_ANNOUNCEMENTS_SUCCESS',
   'DELETE_ANNOUNCEMENTS_FAIL',
-  'SET_ANNOUNCEMENTS_IS_LOCKING'
+  'SET_ANNOUNCEMENTS_IS_LOCKING',
 ]
 
 const actions = Object.assign(createActions(...types), announcementActions.actionCreators)
@@ -84,7 +84,7 @@ actions.searchAnnouncements = function searchAnnouncements(searchOpts) {
   }
 }
 
-actions.getExternalFeeds = function() {
+actions.getExternalFeeds = function () {
   return (dispatch, getState) => {
     dispatch(actions.loadingExternalFeedStart())
     apiClient
@@ -96,14 +96,14 @@ actions.getExternalFeeds = function() {
         dispatch(
           actions.loadingExternalFeedFail({
             message: I18n.t('Failed to Load External Feeds'),
-            err
+            err,
           })
         )
       })
   }
 }
 
-actions.deleteExternalFeed = function({feedId}) {
+actions.deleteExternalFeed = function ({feedId}) {
   return (dispatch, getState) => {
     if (!getState().externalRssFeed.isDeleting) {
       dispatch(actions.deleteExternalFeedStart())
@@ -121,7 +121,7 @@ actions.deleteExternalFeed = function({feedId}) {
           dispatch(
             actions.deleteExternalFeedFail({
               message: failMessage,
-              err
+              err,
             })
           )
         })
@@ -129,58 +129,64 @@ actions.deleteExternalFeed = function({feedId}) {
   }
 }
 
-actions.toggleAnnouncementsLock = (announcements, isLocking = true) => (dispatch, getState) => {
-  dispatch(actions.lockAnnouncementsStart())
-  apiClient
-    .lockAnnouncements(getState(), [].concat(announcements), isLocking)
-    .then(res => {
-      if (res.successes.length) {
-        dispatch(actions.lockAnnouncementsSuccess({res, locked: isLocking}))
-        if (isLocking) {
+actions.toggleAnnouncementsLock =
+  (announcements, isLocking = true) =>
+  (dispatch, getState) => {
+    dispatch(actions.lockAnnouncementsStart())
+    apiClient
+      .lockAnnouncements(getState(), [].concat(announcements), isLocking)
+      .then(res => {
+        if (res.successes.length) {
+          dispatch(actions.lockAnnouncementsSuccess({res, locked: isLocking}))
+          if (isLocking) {
+            dispatch(
+              notificationActions.notifyInfo({message: I18n.t('Announcements locked successfully')})
+            )
+          } else {
+            dispatch(
+              notificationActions.notifyInfo({
+                message: I18n.t('Announcements unlocked successfully'),
+              })
+            )
+          }
+        } else if (res.failures.length) {
           dispatch(
-            notificationActions.notifyInfo({message: I18n.t('Announcements locked successfully')})
-          )
-        } else {
-          dispatch(
-            notificationActions.notifyInfo({message: I18n.t('Announcements unlocked successfully')})
+            actions.lockAnnouncementsFail({
+              err: res.failures,
+              message: I18n.t('An error occurred while updating announcements locked state.'),
+            })
           )
         }
-      } else if (res.failures.length) {
+      })
+      .catch(err => {
         dispatch(
           actions.lockAnnouncementsFail({
-            err: res.failures,
-            message: I18n.t('An error occurred while updating announcements locked state.')
+            err,
+            message: I18n.t('An error occurred while locking announcements.'),
           })
         )
-      }
-    })
-    .catch(err => {
-      dispatch(
-        actions.lockAnnouncementsFail({
-          err,
-          message: I18n.t('An error occurred while locking announcements.')
-        })
-      )
-    })
-}
+      })
+  }
 
-actions.announcementSelectionChangeStart = ({selected, id}) => (dispatch, getState) => {
-  dispatch(actions.setAnnouncementSelection({selected, id}))
-  const state = getState()
-  const {announcements} = state
-  const {items} = announcements.pages[announcements.currentPage]
+actions.announcementSelectionChangeStart =
+  ({selected, id}) =>
+  (dispatch, getState) => {
+    dispatch(actions.setAnnouncementSelection({selected, id}))
+    const state = getState()
+    const {announcements} = state
+    const {items} = announcements.pages[announcements.currentPage]
 
-  const selectedItems = items.filter(item => state.selectedAnnouncements.includes(item.id))
+    const selectedItems = items.filter(item => state.selectedAnnouncements.includes(item.id))
 
-  // if all the selected items are locked, we want to unlock
-  // if any of the selected items are unlocked, we lock everything
-  const hasUnlockedItems = selectedItems.reduce(
-    (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
-    false
-  )
+    // if all the selected items are locked, we want to unlock
+    // if any of the selected items are unlocked, we lock everything
+    const hasUnlockedItems = selectedItems.reduce(
+      (hasAnyUnlocked, item) => hasAnyUnlocked || !item.locked,
+      false
+    )
 
-  dispatch(actions.setAnnouncementsIsLocking(hasUnlockedItems))
-}
+    dispatch(actions.setAnnouncementsIsLocking(hasUnlockedItems))
+  }
 
 actions.toggleSelectedAnnouncementsLock = () => (dispatch, getState) => {
   const state = getState()
@@ -212,7 +218,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         // uncache all pages after this page, as they are no longer correct once you delete items
         dispatch(
           actions.clearAnnouncementsPage({
-            pages: range(pageState.currentPage, pageState.lastPage + 1)
+            pages: range(pageState.currentPage, pageState.lastPage + 1),
           })
         )
 
@@ -226,7 +232,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
         dispatch(
           actions.deleteAnnouncementsFail({
             err: res.failures,
-            message: I18n.t('An error occurred while deleting announcements.')
+            message: I18n.t('An error occurred while deleting announcements.'),
           })
         )
       }
@@ -235,7 +241,7 @@ actions.deleteAnnouncements = announcements => (dispatch, getState) => {
       dispatch(
         actions.deleteAnnouncementsFail({
           err,
-          message: I18n.t('An error occurred while deleting announcements.')
+          message: I18n.t('An error occurred while deleting announcements.'),
         })
       )
     })
@@ -246,7 +252,7 @@ actions.deleteSelectedAnnouncements = () => (dispatch, getState) => {
   actions.deleteAnnouncements(state.selectedAnnouncements)(dispatch, getState)
 }
 
-actions.addExternalFeed = function(payload) {
+actions.addExternalFeed = function (payload) {
   return (dispatch, getState) => {
     dispatch(actions.addExternalFeedStart())
     apiClient
@@ -263,7 +269,7 @@ actions.addExternalFeed = function(payload) {
         dispatch(
           actions.addExternalFeedFail({
             message: failMessage,
-            err
+            err,
           })
         )
       })

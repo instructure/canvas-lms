@@ -62,13 +62,13 @@ function handleCourseClick(e) {
   const $iframe = $('<iframe>', {
     style: 'position:absolute;top:0;left:0;width:100%;height:100%;border:none',
     src: `${link.href}?embedded=1&no_headers=1`,
-    title: I18n.t('Course Catalog')
+    title: I18n.t('Course Catalog'),
   })
   $dialog.append($iframe)
   $dialog.dialog({
     width: 550,
     height: 500,
-    resizable: false
+    resizable: false,
   })
   e.preventDefault()
 }

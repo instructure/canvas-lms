@@ -51,8 +51,8 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
     fetchAllPages: true,
     params: {
       hide_inherited_enabled: true,
-      per_page: 50
-    }
+      per_page: 50,
+    },
   })
 
   const matchesName = name => {
@@ -92,25 +92,25 @@ export default function FeatureFlags({hiddenFlags, disableDefaults}) {
   const categories = [
     {
       id: 'SiteAdmin',
-      title: I18n.t('Site Admin')
+      title: I18n.t('Site Admin'),
     },
     {
       id: 'Account',
-      title: I18n.t('Account')
+      title: I18n.t('Account'),
     },
     {
       id: 'Course',
-      title: I18n.t('Course')
+      title: I18n.t('Course'),
     },
     {
       id: 'User',
-      title: I18n.t('User')
-    }
+      title: I18n.t('User'),
+    },
   ]
 
   const updateSearchQuery = debounce(setSearchQuery, SEARCH_DELAY, {
     leading: false,
-    trailing: true
+    trailing: true,
   })
 
   const acceptSearchInput = (_e, val) => {

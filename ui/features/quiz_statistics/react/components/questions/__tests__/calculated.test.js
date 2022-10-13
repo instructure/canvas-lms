@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import Calculated from '../calculated'
-import assertChange from 'chai-assert-change'
 
 describe('canvas_quizzes/statistics/views/questions/calculated', () => {
   it('renders', () => {
@@ -27,13 +26,11 @@ describe('canvas_quizzes/statistics/views/questions/calculated', () => {
   })
 
   it('does not render a link to speed grader', () => {
-    const { getByText } = render(<Calculated />)
+    const {getByText} = render(<Calculated />)
 
     try {
       getByText('View in SpeedGrader')
       expect(false).toBe(true)
-    }
-    catch (e) {
-    }
+    } catch (e) {}
   })
 })

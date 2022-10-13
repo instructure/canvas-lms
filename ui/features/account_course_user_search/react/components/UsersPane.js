@@ -37,15 +37,15 @@ export default class UsersPane extends React.Component {
     store: shape({
       getState: func.isRequired,
       dispatch: func.isRequired,
-      subscribe: func.isRequired
+      subscribe: func.isRequired,
     }).isRequired,
     roles: UsersToolbar.propTypes.roles,
     onUpdateQueryParams: func.isRequired,
     queryParams: shape({
       page: string,
       search_term: string,
-      role_filter_id: string
-    }).isRequired
+      role_filter_id: string,
+    }).isRequired,
   }
 
   constructor(props) {
@@ -53,7 +53,7 @@ export default class UsersPane extends React.Component {
 
     this.state = {
       userList: props.store.getState().userList,
-      srMessageDisplayed: false
+      srMessageDisplayed: false,
     }
     this.columnHeader = null
     this.debouncedDispatchApplySearchFilter = debounce(

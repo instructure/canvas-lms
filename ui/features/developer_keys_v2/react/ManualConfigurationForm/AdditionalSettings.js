@@ -38,9 +38,9 @@ export default class AdditionalSettings extends React.Component {
     this.state = {
       additionalSettings: {
         ...omit(props.additionalSettings, ['settings']),
-        ...props.additionalSettings.settings
+        ...props.additionalSettings.settings,
       },
-      custom_fields: this.customFieldsToString(props.custom_fields)
+      custom_fields: this.customFieldsToString(props.custom_fields),
     }
   }
 
@@ -63,8 +63,8 @@ export default class AdditionalSettings extends React.Component {
     const extension = {
       platform: 'canvas.instructure.com',
       settings: {
-        ...omitBy(omit(additionalSettings, ['domain', 'tool_id', 'privacy_level']), s => !s)
-      }
+        ...omitBy(omit(additionalSettings, ['domain', 'tool_id', 'privacy_level']), s => !s),
+      },
     }
     if (additionalSettings.domain) {
       extension.domain = additionalSettings.domain
@@ -75,7 +75,7 @@ export default class AdditionalSettings extends React.Component {
     extension.privacy_level = additionalSettings.privacy_level || 'anonymous'
     return {
       extensions: [extension],
-      custom_fields: this.customFieldsToObject(custom_fields)
+      custom_fields: this.customFieldsToObject(custom_fields),
     }
   }
 
@@ -109,15 +109,15 @@ export default class AdditionalSettings extends React.Component {
     this.setState(state => ({
       additionalSettings: {
         ...state.additionalSettings,
-        selection_height: !Number.isNaN(numVal) ? numVal : ''
-      }
+        selection_height: !Number.isNaN(numVal) ? numVal : '',
+      },
     }))
   }
 
   handlePrivacyLevelChange = e => {
     const value = e.target.value
     this.setState(state => ({
-      additionalSettings: {...state.additionalSettings, privacy_level: value}
+      additionalSettings: {...state.additionalSettings, privacy_level: value},
     }))
   }
 
@@ -127,8 +127,8 @@ export default class AdditionalSettings extends React.Component {
     this.setState(state => ({
       additionalSettings: {
         ...state.additionalSettings,
-        selection_width: !Number.isNaN(numVal) ? numVal : ''
-      }
+        selection_width: !Number.isNaN(numVal) ? numVal : '',
+      },
     }))
   }
 
@@ -142,7 +142,7 @@ export default class AdditionalSettings extends React.Component {
 
     return (
       <View as="div" margin="medium 0">
-        <ToggleDetails summary={I18n.t('Additional Settings')} fluidWidth>
+        <ToggleDetails summary={I18n.t('Additional Settings')} fluidWidth={true}>
           <View as="div" margin="small">
             <FormFieldGroup
               description={
@@ -252,13 +252,13 @@ AdditionalSettings.propTypes = {
       icon_url: PropTypes.string,
       text: PropTypes.string,
       selection_height: PropTypes.number,
-      selection_width: PropTypes.number
-    })
+      selection_width: PropTypes.number,
+    }),
   }),
-  custom_fields: PropTypes.object
+  custom_fields: PropTypes.object,
 }
 
 AdditionalSettings.defaultProps = {
   additionalSettings: {},
-  custom_fields: {}
+  custom_fields: {},
 }

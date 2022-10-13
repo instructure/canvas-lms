@@ -53,7 +53,7 @@ class ScoringRange extends React.Component {
       splitAssignmentSet: func.isRequired,
       moveAssignment: func.isRequired,
       setAriaAlert: func.isRequired,
-      setGlobalWarning: func.isRequired
+      setGlobalWarning: func.isRequired,
     }
   }
 
@@ -101,7 +101,7 @@ class ScoringRange extends React.Component {
         <ScoreInput
           score={this.props.range.get('lower_bound')}
           label={I18n.t('Division cutoff %{cutoff_value}', {
-            cutoff_value: this.props.path.range + 1
+            cutoff_value: this.props.path.range + 1,
           })}
           error={this.props.range.get('error')}
           onScoreChanged={this.props.onScoreChanged}
@@ -120,7 +120,7 @@ class ScoringRange extends React.Component {
         this.props.splitAssignmentSet({
           index: path.range,
           assignmentSetIndex: path.set,
-          splitIndex: path.assignment + 1
+          splitIndex: path.assignment + 1,
         })
         this.props.setAriaAlert(I18n.t('Sets are split, click to merge'))
       }
@@ -177,7 +177,7 @@ class ScoringRange extends React.Component {
 
     const rangeTitle = I18n.t('Scoring range %{upperBound} to %{lowerBound}', {
       upperBound,
-      lowerBound
+      lowerBound,
     })
 
     return (

@@ -20,10 +20,10 @@ import React from 'react'
 import K from '../../../../constants'
 import NO_ANSWER from './no_answer'
 
-const FIMB = ({ answer }) => (
+const FIMB = ({answer}) => (
   <table>
     <tbody>
-      {Object.keys(answer).map(function(blank) {
+      {Object.keys(answer).map(function (blank) {
         return (
           <tr key={'blank' + blank}>
             <th scope="row">{blank}</th>

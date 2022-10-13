@@ -26,8 +26,8 @@ export default {
   argTypes: {
     onReply: {action: 'reply'},
     onReplyAll: {action: 'replyAll'},
-    onDelete: {action: 'delete'}
-  }
+    onDelete: {action: 'delete'},
+  },
 }
 
 const Template = args => <MessageDetailActions {...args} />

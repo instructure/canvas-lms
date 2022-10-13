@@ -24,10 +24,10 @@ import _ from 'underscore'
 import FakeXHR from './FakeXHR'
 import authenticity_token from '@canvas/authenticity-token'
 import htmlEscape from 'html-escape'
-import '@canvas/jquery/jquery.ajaxJSON'/* ajaxJSON, defaultAjaxError */
+import '@canvas/jquery/jquery.ajaxJSON' /* ajaxJSON, defaultAjaxError */
 import '@canvas/jquery/jquery.disableWhileLoading'
-import '@canvas/datetime'/* date_field, time_field, datetime_field */
-import '@canvas/jquery/jquery.instructure_misc_helpers'/* /\$\.uniq/ */
+import '@canvas/datetime' /* date_field, time_field, datetime_field */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\$\.uniq/ */
 import '@canvas/rails-flash-notifications'
 import 'jquery-scroll-to-visible/jquery.scrollTo'
 
@@ -214,7 +214,7 @@ $.fn.formSubmit = function (options) {
         formDataTarget: options.formDataTarget,
         success: xhrSuccess,
         error: xhrError,
-        preferFileValueForInputName: options.preferFileValueForInputName
+        preferFileValueForInputName: options.preferFileValueForInputName,
       })
     } else if (doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
       const args = $.extend({}, formData)
@@ -233,7 +233,7 @@ $.fn.formSubmit = function (options) {
           form_data: params.form_data,
           method,
           success: xhrSuccess,
-          error: xhrError
+          error: xhrError,
         })
       })
     } else if (doUploadFile) {
@@ -260,7 +260,7 @@ $.fn.formSubmit = function (options) {
         action,
         ENCTYPE: 'multipart/form-data',
         encoding: 'multipart/form-data',
-        target: 'frame_' + id
+        target: 'frame_' + id,
       })
       // TODO: remove me once we stop proxying file uploads and/or
       // explicitly calling $.ajaxJSONFiles
@@ -286,7 +286,7 @@ $.fn.formSubmit = function (options) {
           $form.attr({
             ENCTYPE: priorEnctype,
             encoding: priorEnctype,
-            target: priorTarget
+            target: priorTarget,
           })
           $('#box_' + id).remove()
         }, 5000)
@@ -357,7 +357,7 @@ $.ajaxJSONPreparedFiles = function (options) {
           'attachment[filename]': item.name,
           'attachment[size]': item.size,
           'attachment[context_code]': options.context_code,
-          'attachment[on_duplicate]': 'rename'
+          'attachment[on_duplicate]': 'rename',
         },
         options.formDataTarget == 'uploadDataUrl' ? options.formData : {}
       )
@@ -399,7 +399,7 @@ $.ajaxJSONFiles = function (url, submit_type, formData, files, success, error, o
     fileUpload: true,
     success,
     onlyGivenParameters: options ? options.onlyGivenParameters : false,
-    error
+    error,
   })
   $newForm.submit()
 }
@@ -443,7 +443,7 @@ $.ajaxFileUpload = function (options) {
           } else {
             $.ajaxJSON.unhandledXHRs.push(request)
           }
-        }
+        },
       },
       options.binary === false
     )
@@ -541,7 +541,7 @@ $.fileData = function (file_object) {
     name: file_object.name || file_object.fileName,
     size: file_object.size || file_object.fileSize,
     type: file_object.type,
-    forced_type: file_object.type || 'application/octet-stream'
+    forced_type: file_object.type || 'application/octet-stream',
   }
 }
 
@@ -579,7 +579,7 @@ $.toMultipartForm = function (params, callback) {
     return
   }
   function sanitizeQuotedString(text) {
-    return text.replace(/\"/g, '');
+    return text.replace(/\"/g, '')
   }
   function finished() {
     result.body = body.substring(0, body.length - 2) + '--'
@@ -975,7 +975,7 @@ $.fn.validateForm = function (options) {
         if (result) {
           if (typeof result !== 'string') {
             result = I18n.t('errors.invalid_entry_for_field', 'Invalid entry: %{field}', {
-              field: name
+              field: name,
             })
           }
           if (!errors[name]) {
@@ -1166,7 +1166,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
       .hide()
       .css({
         top: offset.top - height + 2,
-        left: offset.left + objLeftIndent
+        left: offset.left + objLeftIndent,
       })
       .fadeIn('fast')
 
@@ -1188,7 +1188,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
     $obj
       .data({
         associated_error_box: $box,
-        associated_error_object: $obj
+        associated_error_object: $obj,
       })
       .click(fade)
       .keypress(fade)
@@ -1231,7 +1231,7 @@ $.moveErrorBoxes = function () {
         $box
           .css({
             top: offset.top - height + 2,
-            left: offset.left + objLeftIndent
+            left: offset.left + objLeftIndent,
           })
           .show()
       } else {

@@ -176,7 +176,7 @@ export default class EditCalendarEventView extends Backbone.View {
   render() {
     super.render(...arguments)
     this.$('.date_field').date_field({
-      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))}
+      datepicker: {dateFormat: datePickerFormat(I18n.t('#date.formats.default'))},
     })
     this.$('.time_field').time_field()
     this.$('.date_start_end_row').each((_unused, row) => {
@@ -255,12 +255,12 @@ export default class EditCalendarEventView extends Backbone.View {
           ReactDOM.unmountComponentAtNode(delModalContainer)
           this.redirectWithMessage(
             I18n.t('event_deleted', '%{event_title} deleted successfully', {
-              event_title: this.model.get('title')
+              event_title: this.model.get('title'),
             })
           )
         },
         delUrl: this.model.url(),
-        isRepeating: !!this.model.get('series_uuid')
+        isRepeating: !!this.model.get('series_uuid'),
       })
     } else {
       const msg = I18n.t(
@@ -273,9 +273,9 @@ export default class EditCalendarEventView extends Backbone.View {
             success: () =>
               this.redirectWithMessage(
                 I18n.t('event_deleted', '%{event_title} deleted successfully', {
-                  event_title: this.model.get('title')
+                  event_title: this.model.get('title'),
                 })
-              )
+              ),
           })
         )
       }
@@ -349,11 +349,11 @@ export default class EditCalendarEventView extends Backbone.View {
           this.$el.disableWhileLoading(
             this.model.save(eventData, {
               success: () =>
-                this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully'))
+                this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
             })
           )
           return $dialog.remove()
-        }
+        },
       })
       if (dialog.render()) return
     }
@@ -365,8 +365,8 @@ export default class EditCalendarEventView extends Backbone.View {
         title: conference.conference_type === 'LtiConference' ? eventData.title : conference.title,
         user_settings: {
           ...conference.user_settings,
-          scheduled_date: eventData.start_at ? eventData.start_at.toISOString() : null
-        }
+          scheduled_date: eventData.start_at ? eventData.start_at.toISOString() : null,
+        },
       }
     } else {
       eventData.web_conference = ''
@@ -385,8 +385,8 @@ export default class EditCalendarEventView extends Backbone.View {
           showFlashAlert({
             message: response.responseText,
             err: null,
-            type: 'error'
-          })
+            type: 'error',
+          }),
       })
     )
   }
@@ -459,7 +459,7 @@ export default class EditCalendarEventView extends Backbone.View {
         count: this.$el.find('#duplicate_count').val(),
         interval: this.$el.find('#duplicate_interval').val(),
         frequency: this.$el.find('#duplicate_frequency').val(),
-        append_iterator: this.$el.find('#append_iterator').is(':checked')
+        append_iterator: this.$el.find('#append_iterator').is(':checked'),
       }
     }
 
@@ -495,6 +495,6 @@ EditCalendarEventView.prototype.events = {
   'click .delete_link': 'destroyModel',
   'click .switch_event_description_view': 'toggleHtmlView',
   'change "#duplicate_event': 'duplicateCheckboxChanged',
-  'click .btn[role="button"]': 'cancel'
+  'click .btn[role="button"]': 'cancel',
 }
 EditCalendarEventView.type = 'event'

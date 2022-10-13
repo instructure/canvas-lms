@@ -113,7 +113,7 @@ const speedGraderHelpers = {
       '#add_attachment',
       '#media_comment_button',
       '#comment_submit_button',
-      '#speech_recognition_button'
+      '#speech_recognition_button',
     ]
 
     _.each(elements, element => {
@@ -147,7 +147,7 @@ const speedGraderHelpers = {
         break
       case 'resubmitted':
         formatted = I18n.t('graded_then_resubmitted', 'graded, then resubmitted (%{when})', {
-          when: $.datetimeString(student.submission.submitted_at)
+          when: $.datetimeString(student.submission.submitted_at),
         })
         break
     }
@@ -196,7 +196,7 @@ const speedGraderHelpers = {
 
   plagiarismResubmitUrl(submission, anonymizableUserId) {
     return $.replaceTags($('#assignment_submission_resubmit_to_turnitin_url').attr('href'), {
-      [anonymizableUserId]: submission[anonymizableUserId]
+      [anonymizableUserId]: submission[anonymizableUserId],
     })
   },
 
@@ -219,7 +219,7 @@ const speedGraderHelpers = {
 
   reloadPage() {
     window.location.reload()
-  }
+  },
 }
 
 export default speedGraderHelpers

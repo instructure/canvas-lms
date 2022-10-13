@@ -28,7 +28,7 @@ export default class Lti2Edit extends React.Component {
     tool: PropTypes.object.isRequired,
     handleActivateLti2: PropTypes.func.isRequired,
     handleDeactivateLti2: PropTypes.func.isRequired,
-    handleCancel: PropTypes.func.isRequired
+    handleCancel: PropTypes.func.isRequired,
   }
 
   toggleButton = () => {
@@ -51,8 +51,8 @@ export default class Lti2Edit extends React.Component {
     const p1 = I18n.t('*name* is currently **status**.', {
       wrappers: [
         `<strong>${htmlEscape(this.props.tool.name)}</strong>`,
-        this.props.tool.enabled === false ? 'disabled' : 'enabled'
-      ]
+        this.props.tool.enabled === false ? 'disabled' : 'enabled',
+      ],
     })
     return (
       <div className="Lti2Permissions">

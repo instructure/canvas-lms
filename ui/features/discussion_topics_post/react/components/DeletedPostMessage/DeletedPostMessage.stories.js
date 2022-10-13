@@ -25,7 +25,7 @@ import {ReplyInfo} from '../ReplyInfo/ReplyInfo'
 export default {
   title: 'Examples/Discussion Posts/Components/DeletedPostMessage',
   component: DeletedPostMessage,
-  argTypes: {}
+  argTypes: {},
 }
 
 const Template = args => <DeletedPostMessage {...args} />
@@ -43,5 +43,5 @@ Default.args = {
   ),
   deleterName: 'Rick Sanchez',
   timingDisplay: 'Jan 1 1:00pm',
-  deletedTimingDisplay: 'Feb 2 2:00pm'
+  deletedTimingDisplay: 'Feb 2 2:00pm',
 }

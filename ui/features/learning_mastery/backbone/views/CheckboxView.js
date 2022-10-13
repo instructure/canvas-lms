@@ -35,7 +35,7 @@ class CheckboxView extends View {
     return {
       checked: this.checked.toString(),
       color: this.checked ? this.options.color : 'none',
-      label: this.options.label
+      label: this.options.label,
     }
   }
 }
@@ -53,7 +53,7 @@ CheckboxView.prototype.checked = true
 CheckboxView.prototype.template = template
 
 CheckboxView.prototype.events = {
-  click: 'onClick'
+  click: 'onClick',
 }
 
 export default CheckboxView

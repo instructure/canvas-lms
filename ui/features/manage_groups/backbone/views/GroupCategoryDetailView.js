@@ -42,7 +42,7 @@ export default class GroupCategoryDetailView extends View {
       'click .delete-category': 'deleteCategory',
       'click .add-group': 'addGroup',
       'click .import-groups': 'importGroups',
-      'click .clone-category': 'cloneCategory'
+      'click .clone-category': 'cloneCategory',
     }
 
     this.prototype.els = {
@@ -50,14 +50,14 @@ export default class GroupCategoryDetailView extends View {
       '.al-trigger': '$groupCategoryActions',
       '.edit-category': '$editGroupCategoryLink',
       '.message-all-unassigned': '$messageAllUnassignedLink',
-      '.add-group': '$addGroupButton'
+      '.add-group': '$addGroupButton',
     }
   }
 
   initialize(options) {
     super.initialize(...arguments)
     return (this.randomlyAssignUsersView = new RandomlyAssignMembersView({
-      model: options.model
+      model: options.model,
     }))
   }
 
@@ -106,7 +106,7 @@ export default class GroupCategoryDetailView extends View {
         return $.flashError(
           I18n.t('flash.removeError', 'Unable to remove the group set. Please try again later.')
         )
-      }
+      },
     })
   }
 
@@ -117,7 +117,7 @@ export default class GroupCategoryDetailView extends View {
         groupCategory={{id: this.model.get('id')}}
         group={{
           role: this.model.get('role'),
-          group_limit: this.model.get('group_limit')
+          group_limit: this.model.get('group_limit'),
         }}
         label={I18n.t('Add Group')}
         open={open}
@@ -153,7 +153,7 @@ export default class GroupCategoryDetailView extends View {
     if (this.editCategoryView == null) {
       this.editCategoryView = new GroupCategoryEditView({
         model: this.model,
-        trigger: this.$editGroupCategoryLink
+        trigger: this.$editGroupCategoryLink,
       })
     }
     return this.editCategoryView.open()
@@ -166,7 +166,7 @@ export default class GroupCategoryDetailView extends View {
         // implicitly rendered with openedFromCaution: false
         groupCategory={{
           id: this.model.get('id'),
-          name: this.model.get('name')
+          name: this.model.get('name'),
         }}
         label={I18n.t('Clone Group Set')}
         open={open}

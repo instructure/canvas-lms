@@ -23,13 +23,13 @@ const setFocusReducer = handleActions(
     [actionTypes.FIX_FOCUS]: (_state, action) => ({
       permissionName: action.payload.permissionName,
       roleId: action.payload.roleId,
-      targetArea: action.payload.targetArea
+      targetArea: action.payload.targetArea,
     }),
     [actionTypes.CLEAN_FOCUS]: () => ({
       permissionName: null,
       roleId: null,
-      targetArea: null
-    })
+      targetArea: null,
+    }),
   },
   {permissionName: null, roleId: null, targetArea: null}
 )

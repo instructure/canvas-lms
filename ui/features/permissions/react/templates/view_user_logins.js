@@ -27,47 +27,47 @@ export const template = generateActionTemplates(
       title: I18n.t('People (Account, Course)'),
       description: I18n.t(
         'Allows user to search for other users by Login ID in the account People page.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People (Account, Course)'),
-      description: I18n.t('To access the People page, Users - view list must be enabled.')
+      description: I18n.t('To access the People page, Users - view list must be enabled.'),
     },
     {
       description: I18n.t(
         'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To view login IDs, Users - allow administrative actions in courses must also be enabled.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People'),
       description: I18n.t(
         'Allows user to search for other users by Login ID in the course People page.'
-      )
-    }
+      ),
+    },
   ],
   [
     {
       title: I18n.t('People'),
-      description: I18n.t('To access the People page, Users - view list must be enabled.')
+      description: I18n.t('To access the People page, Users - view list must be enabled.'),
     },
     {
       description: I18n.t(
         'If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs.'
-      )
+      ),
     },
     {
       description: I18n.t(
         'To view login IDs, Users - allow administrative actions in courses must also be enabled.'
-      )
-    }
+      ),
+    },
   ]
 )

@@ -35,7 +35,7 @@ const TIMEOUT = 5000
 
 const linkPropType = shape({
   url: string.isRequired,
-  page: string.isRequired
+  page: string.isRequired,
 }).isRequired
 
 /**
@@ -49,7 +49,7 @@ export default function SRSearchMessage({collection, dataType, getLiveAlertRegio
 
   if (collection.error) {
     return (
-      <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
+      <Alert screenReaderOnly={true} liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {errorLoadingMessage}
       </Alert>
     )
@@ -57,14 +57,14 @@ export default function SRSearchMessage({collection, dataType, getLiveAlertRegio
   if (!collection.data.length) {
     if (dataType === 'Course') {
       return (
-        <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
+        <Alert screenReaderOnly={true} liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
           {noCoursesFoundMessage}
         </Alert>
       )
     }
     if (dataType === 'User') {
       return (
-        <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
+        <Alert screenReaderOnly={true} liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
           {noUsersFoundMessage}
         </Alert>
       )
@@ -73,14 +73,14 @@ export default function SRSearchMessage({collection, dataType, getLiveAlertRegio
 
   if (dataType === 'Course') {
     return (
-      <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
+      <Alert screenReaderOnly={true} liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {courseResultsUpdatedMessage}
       </Alert>
     )
   }
   if (dataType === 'User') {
     return (
-      <Alert screenReaderOnly liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
+      <Alert screenReaderOnly={true} liveRegion={getLiveAlertRegion} timeout={TIMEOUT}>
         {userResultsUpdatedMessage}
       </Alert>
     )
@@ -92,14 +92,14 @@ export default function SRSearchMessage({collection, dataType, getLiveAlertRegio
 SRSearchMessage.propTypes = {
   collection: shape({
     data: array.isRequired,
-    links: shape({current: linkPropType})
+    links: shape({current: linkPropType}),
   }).isRequired,
   dataType: oneOf(['Course', 'User']).isRequired,
-  getLiveAlertRegion: func
+  getLiveAlertRegion: func,
 }
 
 SRSearchMessage.defaultProps = {
   getLiveAlertRegion() {
     return document.getElementById('flash_screenreader_holder')
-  }
+  },
 }

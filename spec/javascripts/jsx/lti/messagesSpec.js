@@ -28,46 +28,46 @@ const ltiToolWrapperFixture = $('#fixtures')
 
 const resizeMessage = {
   subject: 'lti.frameResize',
-  height: finalHeight
+  height: finalHeight,
 }
 
 const fetchWindowSize = {
-  subject: 'lti.fetchWindowSize'
+  subject: 'lti.fetchWindowSize',
 }
 
 const hideRightSideWrapper = {
-  subject: 'lti.hideRightSideWrapper'
+  subject: 'lti.hideRightSideWrapper',
 }
 
 const removeUnloadMessage = {
-  subject: 'lti.removeUnloadMessage'
+  subject: 'lti.removeUnloadMessage',
 }
 
 function showMessage(show = true) {
   return {
     subject: 'lti.showModuleNavigation',
-    show
+    show,
   }
 }
 
 function alertMessage(message = 'Alert message') {
   return {
     subject: 'lti.screenReaderAlert',
-    body: message
+    body: message,
   }
 }
 
 function unloadMessage(message = 'unload message') {
   return {
     subject: 'lti.setUnloadMessage',
-    message
+    message,
   }
 }
 
 function postMessageEvent(data, source) {
   return {
     data: JSON.stringify(data),
-    source
+    source,
   }
 }
 

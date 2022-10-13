@@ -52,12 +52,12 @@ export const RubricAssessment = {
     assessment_type: string,
     assessor: shape({
       _id: string.isRequired,
-      name: string
+      name: string,
     }),
     data: arrayOf(RubricAssessmentRating.shape),
     rubricAssociation: RubricAssociation.shape,
-    score: number
-  })
+    score: number,
+  }),
 }
 
 export const DefaultMocks = {
@@ -66,6 +66,6 @@ export const DefaultMocks = {
     artifactAttempt: '1',
     assessmentType: 'grading',
     assessmentRatings: [{}],
-    score: '10'
-  })
+    score: '10',
+  }),
 }

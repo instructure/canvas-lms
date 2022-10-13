@@ -19,7 +19,7 @@
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
 import _ from 'underscore'
 
-const wikiPageObj = function(options = {}) {
+const wikiPageObj = function (options = {}) {
   return {
     body: '<p>content for the uploading of content</p>',
     created_at: '2013-05-10T13:18:27-06:00',
@@ -31,7 +31,7 @@ const wikiPageObj = function(options = {}) {
     title: 'Front Page-3',
     updated_at: '2013-06-13T10:30:37-06:00',
     url: 'front-page-2',
-    ...options
+    ...options,
   }
 }
 
@@ -69,7 +69,7 @@ QUnit.module('WikiPage:Publishable')
 test('publishable', () => {
   const wikiPage = new WikiPage({
     front_page: false,
-    published: true
+    published: true,
   })
   strictEqual(wikiPage.get('publishable'), true, 'publishable set during construction')
   wikiPage.set('front_page', true)
@@ -79,7 +79,7 @@ test('publishable', () => {
 test('deletable', () => {
   const wikiPage = new WikiPage({
     front_page: false,
-    published: true
+    published: true,
   })
   strictEqual(wikiPage.get('deletable'), true, 'deletable set during construction')
   wikiPage.set('front_page', true)

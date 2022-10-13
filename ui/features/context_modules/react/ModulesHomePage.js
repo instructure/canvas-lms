@@ -18,22 +18,21 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {IconModuleSolid, IconUploadLine} from '@instructure/ui-icons'
+import {IconModuleSolid} from '@instructure/ui-icons'
 import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('modules_home_page')
 
 export default class ModulesHomePage extends React.Component {
   static propTypes = {
-    onCreateButtonClick: PropTypes.func
+    onCreateButtonClick: PropTypes.func,
   }
 
   static defaultProps = {
-    onCreateButtonClick: () => {}
+    onCreateButtonClick: () => {},
   }
 
   render() {
-    const importURL = window.ENV.CONTEXT_URL_ROOT + '/content_migrations'
     return (
       <ul className="ic-EmptyStateList">
         <li className="ic-EmptyStateList__Item">

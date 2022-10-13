@@ -99,14 +99,14 @@ export const DiscussionEntry = {
       rating: bool,
       read: bool,
       forcedReadState: bool,
-      reportType: string
+      reportType: string,
     }),
     rootEntryParticipantCounts: shape({
       unreadCount: number,
-      repliesCount: number
+      repliesCount: number,
     }),
     lastReply: shape({
-      createdAt: string
+      createdAt: string,
     }),
     permissions: DiscussionEntryPermissions.shape,
     rootEntryId: string,
@@ -117,17 +117,17 @@ export const DiscussionEntry = {
       previewMessage: string,
       author: shape({
         shortName: string,
-        id: string
+        id: string,
       }),
       anonymousAuthor: shape({
         shortName: string,
-        id: string
+        id: string,
       }),
       editor: shape({
-        shortName: string
+        shortName: string,
       }),
-      deleted: bool
-    })
+      deleted: bool,
+    }),
   }),
 
   mock: ({
@@ -149,27 +149,27 @@ export const DiscussionEntry = {
       read: true,
       forcedReadState: false,
       reportType: null,
-      __typename: 'EntryParticipant'
+      __typename: 'EntryParticipant',
     },
     rootEntryParticipantCounts = {
       unreadCount: 0,
       repliesCount: 1,
-      __typename: 'DiscussionEntryCounts'
+      __typename: 'DiscussionEntryCounts',
     },
     lastReply = {
       createdAt: '2021-04-05T13:41:42-06:00',
-      __typename: 'DiscussionEntry'
+      __typename: 'DiscussionEntry',
     },
     permissions = DiscussionEntryPermissions.mock(),
     discussionSubentriesConnection = {
       nodes: [],
       pageInfo: PageInfo.mock(),
-      __typename: 'DiscussionSubentriesConnection'
+      __typename: 'DiscussionSubentriesConnection',
     },
     rootEntryId = null,
     isolatedEntryId = null,
     parentId = null,
-    quotedEntry = null
+    quotedEntry = null,
   } = {}) => ({
     id,
     _id,
@@ -193,6 +193,6 @@ export const DiscussionEntry = {
     isolatedEntryId,
     parentId,
     quotedEntry,
-    __typename: 'DiscussionEntry'
-  })
+    __typename: 'DiscussionEntry',
+  }),
 }

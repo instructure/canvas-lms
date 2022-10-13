@@ -72,8 +72,14 @@ QUnit.module('GradeInputHelper', () => {
     hooks.beforeEach(() => {
       options = {
         enterGradesAs: 'points',
-        gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
-        pointsPossible: 10
+        gradingScheme: [
+          ['A', 0.9],
+          ['B', 0.8],
+          ['C', 0.7],
+          ['D', 0.6],
+          ['F', 0.5],
+        ],
+        pointsPossible: 10,
       }
       // cleared grade info
       pendingGradeInfo = {
@@ -81,7 +87,7 @@ QUnit.module('GradeInputHelper', () => {
         excused: false,
         grade: null,
         score: null,
-        valid: true
+        valid: true,
       }
       submission = {enteredGrade: 'A', enteredScore: 10, excused: false, grade: 'B'}
     })
@@ -200,8 +206,14 @@ QUnit.module('GradeInputHelper', () => {
       hooks.beforeEach(() => {
         options = {
           enterGradesAs: 'points',
-          gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
-          pointsPossible: 10
+          gradingScheme: [
+            ['A', 0.9],
+            ['B', 0.8],
+            ['C', 0.7],
+            ['D', 0.6],
+            ['F', 0.5],
+          ],
+          pointsPossible: 10,
         }
       })
 
@@ -259,7 +271,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').grade, '3')
       })
@@ -270,7 +282,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').grade, '8.9')
       })
@@ -369,7 +381,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').score, 3)
       })
@@ -380,7 +392,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').score, 8.9)
       })
@@ -481,7 +493,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').enteredAs, 'points')
       })
@@ -492,7 +504,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').enteredAs, 'gradingScheme')
       })
@@ -534,8 +546,14 @@ QUnit.module('GradeInputHelper', () => {
       hooks.beforeEach(() => {
         options = {
           enterGradesAs: 'percent',
-          gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
-          pointsPossible: 10
+          gradingScheme: [
+            ['A', 0.9],
+            ['B', 0.8],
+            ['C', 0.7],
+            ['D', 0.6],
+            ['F', 0.5],
+          ],
+          pointsPossible: 10,
         }
       })
 
@@ -593,7 +611,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').grade, '3%')
       })
@@ -604,7 +622,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').grade, '85%')
       })
@@ -709,7 +727,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').score, 0.3)
       })
@@ -720,7 +738,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').score, 8.5)
       })
@@ -813,7 +831,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').enteredAs, 'percent')
       })
@@ -824,7 +842,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').enteredAs, 'percent')
       })
@@ -866,8 +884,14 @@ QUnit.module('GradeInputHelper', () => {
       hooks.beforeEach(() => {
         options = {
           enterGradesAs: 'gradingScheme',
-          gradingScheme: [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]],
-          pointsPossible: 10
+          gradingScheme: [
+            ['A', 0.9],
+            ['B', 0.8],
+            ['C', 0.7],
+            ['D', 0.6],
+            ['F', 0.5],
+          ],
+          pointsPossible: 10,
         }
       })
 
@@ -917,7 +941,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').grade, '3.0')
       })
@@ -928,7 +952,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('95%').grade, '95%')
       })
@@ -1033,7 +1057,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').score, 8.9)
       })
@@ -1044,7 +1068,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').score, 8.9)
       })
@@ -1128,7 +1152,7 @@ QUnit.module('GradeInputHelper', () => {
           ['3.0', 0.8],
           ['2.0', 0.7],
           ['1.0', 0.6],
-          ['0.0', 0.5]
+          ['0.0', 0.5],
         ]
         strictEqual(parseTextValue('3.0').enteredAs, 'gradingScheme')
       })
@@ -1139,7 +1163,7 @@ QUnit.module('GradeInputHelper', () => {
           ['85%', 0.8],
           ['75%', 0.7],
           ['65%', 0.6],
-          ['0%', 0.5]
+          ['0%', 0.5],
         ]
         strictEqual(parseTextValue('85%').enteredAs, 'gradingScheme')
       })
@@ -1181,7 +1205,7 @@ QUnit.module('GradeInputHelper', () => {
       hooks.beforeEach(() => {
         options = {
           enterGradesAs: 'passFail',
-          pointsPossible: 10
+          pointsPossible: 10,
         }
       })
 

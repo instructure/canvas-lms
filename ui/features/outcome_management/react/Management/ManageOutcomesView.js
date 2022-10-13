@@ -49,7 +49,7 @@ const ManageOutcomesView = ({
   removeOutcomesStatus,
   scrollContainer,
   isRootGroup,
-  hideOutcomesView
+  hideOutcomesView,
 }) => {
   const {canManage, isMobileView} = useCanvasContext()
   const groupTitle = outcomeGroup?.title
@@ -103,7 +103,7 @@ const ManageOutcomesView = ({
         </View>
         <View as="div" padding={isMobileView ? 'small 0 0' : 'small 0'} borderWidth="0 0 small">
           <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
-            <Flex.Item size="50%" shouldGrow>
+            <Flex.Item size="50%" shouldGrow={true}>
               <SearchBreadcrumb
                 groupTitle={groupTitle}
                 searchString={searchString}
@@ -115,10 +115,10 @@ const ManageOutcomesView = ({
                 {I18n.t(
                   {
                     one: '%{count} Outcome',
-                    other: '%{count} Outcomes'
+                    other: '%{count} Outcomes',
                   },
                   {
-                    count: outcomesCount || 0
+                    count: outcomesCount || 0,
                   }
                 )}
               </Text>
@@ -158,8 +158,8 @@ const ManageOutcomesView = ({
                 ratings,
                 friendlyDescription,
                 contextType,
-                contextId
-              }
+                contextId,
+              },
             }) => (
               <ManageOutcomeItem
                 key={linkId}
@@ -189,7 +189,7 @@ const ManageOutcomesView = ({
 }
 
 ManageOutcomesView.defaultProps = {
-  hideOutcomesView: () => {}
+  hideOutcomesView: () => {},
 }
 
 ManageOutcomesView.propTypes = {
@@ -213,15 +213,15 @@ ManageOutcomesView.propTypes = {
             ratings: ratingsShape,
             canEdit: PropTypes.bool.isRequired,
             contextType: PropTypes.string,
-            contextId: PropTypes.string
-          })
+            contextId: PropTypes.string,
+          }),
         })
       ),
       pageInfo: PropTypes.shape({
         endCursor: PropTypes.string,
-        hasNextPage: PropTypes.bool.isRequired
-      })
-    }).isRequired
+        hasNextPage: PropTypes.bool.isRequired,
+      }),
+    }).isRequired,
   }),
   loading: PropTypes.bool.isRequired,
   selectedOutcomes: PropTypes.object.isRequired,
@@ -235,7 +235,7 @@ ManageOutcomesView.propTypes = {
   removeOutcomesStatus: PropTypes.object.isRequired,
   scrollContainer: PropTypes.instanceOf(Element),
   isRootGroup: PropTypes.bool.isRequired,
-  hideOutcomesView: PropTypes.func
+  hideOutcomesView: PropTypes.func,
 }
 
 export default ManageOutcomesView

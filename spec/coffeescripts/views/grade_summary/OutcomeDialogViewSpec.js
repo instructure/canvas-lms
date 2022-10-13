@@ -24,17 +24,17 @@ import OutcomeLineGraphView from 'ui/features/grade_summary/backbone/views/Outco
 QUnit.module('OutcomeDialogViewSpec', {
   setup() {
     this.outcomeDialogView = new OutcomeDialogView({model: new Outcome()})
-    this.e = function(name, options = {}) {
+    this.e = function (name, options = {}) {
       return $.Event(name, Object.assign(options, {currentTarget: this.outcomeDialogView.el}))
     }
-  }
+  },
 })
 
-test('assign instance of OutcomeLineGraphView on init', function() {
+test('assign instance of OutcomeLineGraphView on init', function () {
   ok(this.outcomeDialogView.outcomeLineGraphView instanceof OutcomeLineGraphView)
 })
 
-test('afterRender', function() {
+test('afterRender', function () {
   const setElementSpy = sandbox.stub(this.outcomeDialogView.outcomeLineGraphView, 'setElement')
   const renderSpy = sandbox.stub(this.outcomeDialogView.outcomeLineGraphView, 'render')
 
@@ -44,7 +44,7 @@ test('afterRender', function() {
   ok(renderSpy.called, 'should render line graph')
 })
 
-test('#show', function() {
+test('#show', function () {
   const renderSpy = sandbox.stub(this.outcomeDialogView, 'render')
   const dialogSpy = sandbox.stub(this.outcomeDialogView.$el, 'dialog')
 
@@ -75,6 +75,6 @@ test('#show', function() {
   dialogSpy.reset()
 })
 
-test('toJSON', function() {
+test('toJSON', function () {
   ok(this.outcomeDialogView.toJSON().dialog, 'should include dialog key')
 })

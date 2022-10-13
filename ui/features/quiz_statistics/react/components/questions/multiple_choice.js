@@ -37,7 +37,7 @@ const MultipleChoice = props => (
 
         <div
           className="question-text"
-          aria-hidden
+          aria-hidden={true}
           dangerouslySetInnerHTML={{__html: props.questionText}}
         />
       </div>
@@ -60,7 +60,7 @@ const MultipleChoice = props => (
       <div className="col-sm-4 question-bottom-right">
         <CorrectAnswerDonut
           correctResponseRatio={calculateResponseRatio(props.answers, props.participantCount, {
-            questionType: props.questionType
+            questionType: props.questionType,
           })}
         />
       </div>

@@ -22,7 +22,7 @@ import {shape, string} from 'prop-types'
 const displayUser = shape({
   id: string.isRequired,
   display_name: string.isRequired,
-  avatar_image_url: string
+  avatar_image_url: string,
 })
 export default displayUser
 
@@ -31,7 +31,7 @@ export const basicUser = shape({
   id: string.isRequired,
   name: string.isRequired,
   avatar_url: string,
-  email: string
+  email: string,
 })
 
 // we might add more comprehensive user shapes in the future
@@ -39,5 +39,5 @@ export const author = shape({
   id: string.isRequired,
   name: string.isRequired,
   avatar_image_url: string,
-  html_url: string.isRequired
+  html_url: string.isRequired,
 })

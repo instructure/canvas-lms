@@ -18,7 +18,7 @@
 
 import {
   determineSubmissionSelection,
-  makeSubmissionUpdateRequest
+  makeSubmissionUpdateRequest,
 } from '../SpeedGraderStatusMenuHelpers'
 import moxios from 'moxios'
 
@@ -29,7 +29,7 @@ describe('determineSubmissionSelection', () => {
     submission = {
       excused: false,
       late: false,
-      missing: false
+      missing: false,
     }
   })
 
@@ -64,7 +64,7 @@ describe('makeSubmissionUpdateRequest', () => {
   function setupMocks() {
     moxios.stubRequest('/api/v1/courses/1/assignments/2/submissions/3', {
       status: 200,
-      response: {}
+      response: {},
     })
   }
 
@@ -74,7 +74,7 @@ describe('makeSubmissionUpdateRequest', () => {
     courseId = 1
     submission = {
       assignment_id: 2,
-      user_id: 3
+      user_id: 3,
     }
 
     moxios.install()
@@ -112,8 +112,8 @@ describe('makeSubmissionUpdateRequest', () => {
       submission: {
         assignment_id: 2,
         late_policy_status: 'none',
-        user_id: 3
-      }
+        user_id: 3,
+      },
     }
 
     makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
@@ -131,8 +131,8 @@ describe('makeSubmissionUpdateRequest', () => {
       submission: {
         assignment_id: 2,
         late_policy_status: 'missing',
-        user_id: 3
-      }
+        user_id: 3,
+      },
     }
 
     makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
@@ -151,8 +151,8 @@ describe('makeSubmissionUpdateRequest', () => {
         assignment_id: 2,
         late_policy_status: 'late',
         seconds_late_override: 100,
-        user_id: 3
-      }
+        user_id: 3,
+      },
     }
 
     makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)
@@ -170,8 +170,8 @@ describe('makeSubmissionUpdateRequest', () => {
       submission: {
         assignment_id: 2,
         excuse: true,
-        user_id: 3
-      }
+        user_id: 3,
+      },
     }
 
     makeSubmissionUpdateRequest(submission, isAnonymous, courseId, data)

@@ -17,7 +17,6 @@
  */
 
 import React, {PureComponent} from 'react'
-import {bool, number, string} from 'prop-types'
 import {Grid} from '@instructure/ui-grid'
 import {Text} from '@instructure/ui-text'
 
@@ -29,14 +28,14 @@ import {Link} from '@instructure/ui-link'
 
 const I18n = useI18nScope('gradebook')
 
-export default class SimilarityScore extends PureComponent {
-  static propTypes = {
-    hasAdditionalData: bool,
-    reportUrl: string,
-    similarityScore: number,
-    status: string.isRequired,
-  }
+type Props = {
+  hasAdditionalData?: boolean
+  reportUrl?: string
+  similarityScore?: number
+  status: string
+}
 
+export default class SimilarityScore extends PureComponent<Props> {
   render() {
     const {hasAdditionalData, reportUrl, similarityScore, status} = this.props
 

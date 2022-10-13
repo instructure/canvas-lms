@@ -39,15 +39,15 @@ describe('ReleaseNotesList', () => {
       title: 'A feature',
       description: 'Makes canvas more featureful',
       url: 'https://google.com/',
-      date: '2021-04-26T08:00:00Z'
+      date: '2021-04-26T08:00:00Z',
     },
     {
       id: '90a42188-0b74-4910-8ca7-4e6c8c9f7abf',
       title: 'An Admin Feature',
       description: 'A really great feature only for admins',
       url: 'https://www.google.com/',
-      date: '2021-04-27T07:30:00Z'
-    }
+      date: '2021-04-27T07:30:00Z',
+    },
   ]
 
   it('renders spinner while loading', () => {
@@ -108,7 +108,7 @@ describe('ReleaseNotesList', () => {
     })
 
     const {queryByText} = render(
-      <ReleaseNotesList badgeDisabled setBadgeDisabled={setBadgeDisabled} />
+      <ReleaseNotesList badgeDisabled={true} setBadgeDisabled={setBadgeDisabled} />
     )
 
     const checkbox = queryByText('Show badges for new release notes')
@@ -120,8 +120,8 @@ describe('ReleaseNotesList', () => {
       method: 'PUT',
       path: '/api/v1/users/self/settings',
       body: {
-        release_notes_badge_disabled: false
-      }
+        release_notes_badge_disabled: false,
+      },
     })
     expect(setBadgeDisabled).toHaveBeenCalledWith(false)
   })

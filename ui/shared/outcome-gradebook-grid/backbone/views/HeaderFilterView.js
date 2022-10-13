@@ -55,11 +55,11 @@ HeaderFilterView.prototype.template = template
 
 HeaderFilterView.prototype.labels = {
   average: I18n.t('course_average', 'Course average'),
-  median: I18n.t('course_median', 'Course median')
+  median: I18n.t('course_median', 'Course median'),
 }
 
 HeaderFilterView.prototype.events = {
-  'click li a': 'onClick'
+  'click li a': 'onClick',
 }
 
 HeaderFilterView.optionProperty('grid')

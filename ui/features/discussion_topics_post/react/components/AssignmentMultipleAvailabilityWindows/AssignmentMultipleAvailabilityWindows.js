@@ -43,16 +43,16 @@ export function AssignmentMultipleAvailabilityWindows({...props}) {
           props={{
             tablet: {
               text: I18n.t('Due Dates (%{dueDateCount})', {
-                dueDateCount: props.assignmentOverrides.length
+                dueDateCount: props.assignmentOverrides.length,
               }),
-              textSize: 'x-small'
+              textSize: 'x-small',
             },
             desktop: {
               text: I18n.t('Show Due Dates (%{dueDateCount})', {
-                dueDateCount: props.assignmentOverrides.length
+                dueDateCount: props.assignmentOverrides.length,
               }),
-              textSize: 'small'
-            }
+              textSize: 'small',
+            },
           }}
           render={responsiveProps => (
             <Text weight="bold" size={responsiveProps.textSize}>
@@ -67,5 +67,5 @@ export function AssignmentMultipleAvailabilityWindows({...props}) {
 
 AssignmentMultipleAvailabilityWindows.propTypes = {
   assignmentOverrides: PropTypes.array,
-  onSetDueDateTrayOpen: PropTypes.func
+  onSetDueDateTrayOpen: PropTypes.func,
 }

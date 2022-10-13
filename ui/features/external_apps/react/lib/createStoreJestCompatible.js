@@ -78,7 +78,7 @@ function createStore(initialState = {}) {
 
     emitChange() {
       Object.values(listeners).forEach(listener => listener())
-    }
+    },
   }
 }
 

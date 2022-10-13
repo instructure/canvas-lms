@@ -33,7 +33,7 @@ const statusesMap = {
   excused: I18n.t('Excused'),
   late: I18n.t('Late'),
   missing: I18n.t('Missing'),
-  none: I18n.t('None')
+  none: I18n.t('None'),
 }
 
 export default function SpeedGraderStatusMenu(props) {
@@ -92,7 +92,7 @@ export default function SpeedGraderStatusMenu(props) {
           <TimeLateInput
             lateSubmissionInterval={props.lateSubmissionInterval}
             locale={props.locale}
-            renderLabelBefore
+            renderLabelBefore={true}
             secondsLate={props.secondsLate}
             onSecondsLateUpdated={props.updateSubmission}
             width="5rem"
@@ -108,5 +108,5 @@ SpeedGraderStatusMenu.propTypes = {
   locale: string.isRequired,
   secondsLate: number.isRequired,
   selection: string.isRequired,
-  updateSubmission: func.isRequired
+  updateSubmission: func.isRequired,
 }

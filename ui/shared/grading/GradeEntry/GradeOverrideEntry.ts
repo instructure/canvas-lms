@@ -56,7 +56,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     return I18n.n(round(grade.percentage, 2), {
       percentage: true,
       precision: 2,
-      strip_insignificant_zeros: true
+      strip_insignificant_zeros: true,
     })
   }
 
@@ -76,7 +76,7 @@ export default class GradeOverrideEntry extends GradeEntry {
     return I18n.n(round(grade.percentage, 2), {
       percentage: true,
       precision: 2,
-      strip_insignificant_zeros: true
+      strip_insignificant_zeros: true,
     })
   }
 
@@ -119,14 +119,14 @@ export default class GradeOverrideEntry extends GradeEntry {
       enteredAs = EnterGradesAs.GRADING_SCHEME
       grade = {
         percentage: gradeToScoreLowerBound(parseResult.value, gradingScheme.data),
-        schemeKey: parseResult.value
+        schemeKey: parseResult.value,
       }
       valid = true
     } else if (parseResult.isPercentage || parseResult.isPoints) {
       enteredAs = EnterGradesAs.PERCENTAGE
       grade = {
         percentage: parseResult.value,
-        schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme)
+        schemeKey: schemeKeyForPercentage(parseResult.value, gradingScheme),
       }
       valid = true
     }

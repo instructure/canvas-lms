@@ -30,7 +30,7 @@ describe('VideoConferenceTypeSelect', () => {
       settings: [],
       free_trial: false,
       lti_settings: null,
-      contexts: null
+      contexts: null,
     },
     {
       name: 'BigBlueButton',
@@ -38,8 +38,8 @@ describe('VideoConferenceTypeSelect', () => {
       settings: [],
       free_trial: false,
       lti_settings: null,
-      contexts: null
-    }
+      contexts: null,
+    },
   ]
 
   const setup = () => {

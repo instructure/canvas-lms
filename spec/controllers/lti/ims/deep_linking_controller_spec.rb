@@ -28,7 +28,9 @@ module Lti
         subject { post :deep_linking_response, params: params }
 
         let(:placement) { "editor_button" }
-        let(:params) { { JWT: deep_linking_jwt, account_id: account.id, placement: placement } }
+        let(:return_url_params) { { placement: placement } }
+        let(:data_token) { Lti::DeepLinkingData.jwt_from(return_url_params) }
+        let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
 
         it { is_expected.to be_ok }
 
@@ -107,7 +109,7 @@ module Lti
           end
 
           context "when context is an account" do
-            let(:params) { { JWT: deep_linking_jwt, account_id: account.id } }
+            let(:params) { { JWT: deep_linking_jwt, account_id: account.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
               let(:context) { account }
@@ -116,7 +118,7 @@ module Lti
 
           context "when context is a course" do
             let(:course) { course_model(account: account) }
-            let(:params) { { JWT: deep_linking_jwt, course_id: course.id } }
+            let(:params) { { JWT: deep_linking_jwt, course_id: course.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
               let(:context) { course }
@@ -125,7 +127,7 @@ module Lti
 
           context "when context is a group" do
             let(:group) { group_model(context: course_model(account: account)) }
-            let(:params) { { JWT: deep_linking_jwt, group_id: group.id } }
+            let(:params) { { JWT: deep_linking_jwt, group_id: group.id, data: data_token } }
 
             it_behaves_like "creates resource links in context" do
               let(:context) { group }
@@ -146,6 +148,39 @@ module Lti
           it "responds with an error" do
             subject
             expect(json_parse["errors"].to_s).to include response_message
+          end
+        end
+
+        context "when the data token is invalid" do
+          context "when it is absent" do
+            let(:data_token) { nil }
+
+            it_behaves_like "errors" do
+              let(:response_message) { "presence_required" }
+            end
+          end
+
+          context "when it is malformed" do
+            let(:data_token) { super()[0...-10] } # remove the last 10 characters of the JWT
+
+            it_behaves_like "errors" do
+              let(:response_message) { "invalid_or_malformed" }
+            end
+          end
+
+          context "when it has been used already" do
+            before do
+              allow(Lti::Security).to receive(:check_and_store_nonce).and_return(false)
+            end
+
+            it_behaves_like "errors" do
+              let(:response_message) { "already_used" }
+            end
+
+            it "checks the nonce again" do
+              subject
+              expect(Lti::Security).to have_received(:check_and_store_nonce).once
+            end
           end
         end
 
@@ -332,7 +367,8 @@ module Lti
             )
           end
           let(:launch_url) { "http://tool.url/launch" }
-          let(:params) { super().merge({ course_id: course.id, placement: "course_assignments_menu" }) }
+          let(:params) { super().merge({ course_id: course.id }) }
+          let(:return_url_params) { super().merge({ placement: "course_assignments_menu" }) }
 
           context "when is empty" do
             let(:content_items) { nil }
@@ -390,7 +426,7 @@ module Lti
 
             context "when context_module_id param is included" do
               let(:context_module) { course.context_modules.create!(name: "Test Module") }
-              let(:params) { super().merge({ context_module_id: context_module.id }) }
+              let(:return_url_params) { super().merge({ context_module_id: context_module.id }) }
 
               context "single item" do
                 let(:content_items) do
@@ -411,7 +447,7 @@ module Lti
                 end
 
                 context "when placement is link_selection" do
-                  let(:params) { super().merge({ placement: :link_selection }) }
+                  let(:return_url_params) { super().merge({ placement: :link_selection }) }
 
                   it "doesn't create a resource link" do
                     # The resource links for these are rather created when the module item is created
@@ -541,7 +577,7 @@ module Lti
             end
 
             context "when placement should create new module" do
-              let(:params) { super().merge({ placement: "module_index_menu_modal" }) }
+              let(:return_url_params) { super().merge({ placement: "module_index_menu_modal" }) }
 
               context "when feature flag is disabled" do
                 it "does not change anything" do
@@ -647,7 +683,7 @@ module Lti
             end
 
             context "when placement is not allowed to create line items" do
-              let(:params) { super().merge({ placement: "homework_submission" }) }
+              let(:return_url_params) { super().merge({ placement: "homework_submission" }) }
 
               it_behaves_like "does nothing"
             end
@@ -784,7 +820,7 @@ module Lti
             end
 
             context "when placement should create new module" do
-              let(:params) { super().merge({ placement: "module_index_menu_modal" }) }
+              let(:return_url_params) { super().merge({ placement: "module_index_menu_modal" }) }
 
               before do
                 course.root_account.enable_feature! :lti_deep_linking_module_index_menu_modal
@@ -818,7 +854,7 @@ module Lti
                 course.root_account.enable_feature! :lti_assignment_page_line_items
               end
 
-              let(:params) { super().merge({ placement: "assignment_selection" }) }
+              let(:return_url_params) { super().merge({ placement: "assignment_selection" }) }
               let(:content_items) do
                 [
                   { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } },
@@ -851,7 +887,7 @@ module Lti
 
             context "when on the edit assignment page" do
               let(:assignment) { assignment_model(course: course, workflow_state: "published") }
-              let(:params) { super().merge({ placement: "assignment_selection", assignment_id: assignment.id }) }
+              let(:return_url_params) { super().merge({ placement: "assignment_selection", assignment_id: assignment.id }) }
               let(:content_items) do
                 [
                   { type: "ltiResourceLink", url: launch_url, title: "Item 1", lineItem: { scoreMaximum: 4 } }
@@ -871,7 +907,7 @@ module Lti
 
             context "when creating a single item in an existing module" do
               let(:context_module) { course.context_modules.create!(name: "Test Module") }
-              let(:params) { super().merge({ context_module_id: context_module.id, placement: "link_selection" }) }
+              let(:return_url_params) { super().merge({ context_module_id: context_module.id, placement: "link_selection" }) }
 
               before do
                 context_module

@@ -35,7 +35,7 @@ const readOnlyConfig = {
   editName: false,
   restrictedDialog: false,
   move: false,
-  deleteLink: false
+  deleteLink: false,
 }
 
 const manageFilesConfig = {
@@ -43,7 +43,7 @@ const manageFilesConfig = {
   editName: true,
   usageRights: true,
   move: true,
-  deleteLink: true
+  deleteLink: true,
 }
 
 const buttonsEnabled = config => {
@@ -69,14 +69,14 @@ const sampleProps = (
   model: new Folder({id: 999}),
   modalOptions: {
     closeModal() {},
-    openModal() {}
+    openModal() {},
   },
   startEditingName() {},
   userCanAddFilesForContext: canAddFiles,
   userCanEditFilesForContext: canEditFiles,
   userCanDeleteFilesForContext: canDeleteFiles,
   userCanRestrictFilesForContext: canRestrictFiles,
-  usageRightsRequiredForContext: true
+  usageRightsRequiredForContext: true,
 })
 
 function renderCog(props) {
@@ -106,7 +106,7 @@ describe('ItemCog', () => {
     expect(ajaxSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         url: '/api/v1/folders/999',
-        data: expect.objectContaining({force: 'true'})
+        data: expect.objectContaining({force: 'true'}),
       })
     )
   })
@@ -126,7 +126,7 @@ describe('ItemCog', () => {
     expect(
       buttonsEnabled({
         ...manageFilesConfig,
-        ...{editName: false, move: false, usageRights: false}
+        ...{editName: false, move: false, usageRights: false},
       })
     ).toStrictEqual(true)
   })
@@ -241,7 +241,7 @@ describe('ItemCog', () => {
         ...sampleProps(),
         model: new File({id: '1'}),
         onSendToClick: onSendToClickStub,
-        userCanEditFilesForContext: true
+        userCanEditFilesForContext: true,
       }
       const {queryByRole} = render(<ItemCog {...props} />)
       queryByRole('menuitem', {hidden: true, name: 'Send To...'}).click()
@@ -294,7 +294,7 @@ describe('ItemCog', () => {
         ...sampleProps(),
         model: new File({id: '1'}),
         onCopyToClick: onCopyToClickStub,
-        userCanEditFilesForContext: true
+        userCanEditFilesForContext: true,
       }
       const {queryByRole} = renderCog(props)
       queryByRole('menuitem', {hidden: true, name: 'Copy To...'}).click()

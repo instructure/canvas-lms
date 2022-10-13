@@ -30,25 +30,25 @@ const PagesTray = () => (
     imageWidth="14.5rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I create a new page in a course?'),
-        href: I18n.t('#community.instructor_create_page')
+        href: I18n.t('#community.instructor_create_page'),
       },
       {
         label: I18n.t('How do I publish or unpublish a page as an instructor?'),
-        href: I18n.t('#community.instructor_publish_page')
+        href: I18n.t('#community.instructor_publish_page'),
       },
       {
         label: I18n.t('How do I use the Pages Index Page?'),
-        href: I18n.t('#community.instructor_use_pages_index')
+        href: I18n.t('#community.instructor_use_pages_index'),
       },
       {
         label: I18n.t('How do I set a Front Page in a course?'),
-        href: I18n.t('#community.instructor_set_front_page')
-      }
+        href: I18n.t('#community.instructor_set_front_page'),
+      },
     ]}
   >
     {I18n.t(`Pages let you create interactive content directly in Canvas,

@@ -31,11 +31,11 @@ describe('Notification Preferences Table', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: {
-          label: 'Some Label Text'
+          label: 'Some Label Text',
         },
-        allowed_push_categories: ['announcement']
+        allowed_push_categories: ['announcement'],
       },
-      current_user_roles: []
+      current_user_roles: [],
     }
   })
 
@@ -43,8 +43,8 @@ describe('Notification Preferences Table', () => {
     window.ENV = {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: null,
-        allowed_push_categories: []
-      }
+        allowed_push_categories: [],
+      },
     }
 
     const {getByTestId, queryByText} = render(

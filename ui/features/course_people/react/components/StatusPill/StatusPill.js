@@ -52,13 +52,13 @@ export const PILL_MAP = {
   [INACTIVE_STATE]: {
     text: I18n.t('inactive'),
     hintText: I18n.t('This user is currently not able to access the course'),
-    color: 'primary'
+    color: 'primary',
   },
   [PENDING_STATE]: {
     text: I18n.t('pending'),
     hintText: I18n.t('This user has not yet accepted the invitation to the course'),
-    color: 'info'
-  }
+    color: 'info',
+  },
 }
 
 const StatusPill = ({state}) => {
@@ -76,7 +76,7 @@ const StatusPill = ({state}) => {
 }
 
 StatusPill.propTypes = {
-  state: string.isRequired
+  state: string.isRequired,
 }
 
 StatusPill.defaultProps = {}

@@ -22,7 +22,7 @@ describe('parseObservedUsersList', () => {
   it('transforms attribute names', () => {
     const users = parseObservedUsersList([
       {id: '4', name: 'Student 4', avatar_url: 'https://url_here'},
-      {id: '6', name: 'Student 6'}
+      {id: '6', name: 'Student 6'},
     ])
     expect(users.length).toBe(2)
     expect(users[0].id).toBe('4')

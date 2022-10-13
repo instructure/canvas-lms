@@ -67,7 +67,7 @@ $(function () {
       }
       $login.fillTemplateData({
         data,
-        hrefValues: ['id', 'account_id']
+        hrefValues: ['id', 'account_id'],
       })
       $login.find('.links').addClass('passwordable')
       $('#login_information .login .delete_pseudonym_link').show()
@@ -86,7 +86,7 @@ $(function () {
         (ENV.PASSWORD_POLICIES && ENV.PASSWORD_POLICIES[accountId]) || ENV.PASSWORD_POLICY
       errors = Pseudonym.prototype.normalizeErrors(errors, policy)
       $(this).formErrors(errors)
-    }
+    },
   })
   $('#edit_pseudonym_form .cancel_button').on('click', () => {
     $form.dialog('close')
@@ -103,20 +103,20 @@ $(function () {
       const data = $(this)
         .parents('.login')
         .getTemplateData({
-          textValues: ['unique_id', 'sis_user_id', 'integration_id', 'can_edit_sis_user_id']
+          textValues: ['unique_id', 'sis_user_id', 'integration_id', 'can_edit_sis_user_id'],
         })
       data.password = ''
       data.password_confirmation = ''
       $form.fillFormData(
         {
-          unique_id: data.unique_id
+          unique_id: data.unique_id,
         },
         {object_name: 'pseudonym'}
       )
       window.canvas_pseudonyms.jqInterface.onEdit({
         canEditSisUserId: data.can_edit_sis_user_id === 'true',
         integrationId: data.integration_id,
-        sisUserId: data.sis_user_id
+        sisUserId: data.sis_user_id,
       })
       const passwordable = $(this).parents('.links').hasClass('passwordable')
       const delegated = passwordable && $(this).parents('.links').hasClass('delegated-auth')
@@ -139,7 +139,7 @@ $(function () {
             $form.data('unique_id_text').parents('.login').remove()
           }
           window.canvas_pseudonyms.jqInterface.onCancel()
-        }
+        },
       })
       $form
         .dialog('option', 'title', I18n.t('titles.update_login', 'Update Login'))
@@ -176,7 +176,7 @@ $(function () {
             if ($('#login_information .login:visible').length < 2) {
               $('#login_information .login .delete_pseudonym_link').hide()
             }
-          }
+          },
         })
     })
     .delegate('.add_pseudonym_link', 'click', function (event) {

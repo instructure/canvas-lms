@@ -33,7 +33,7 @@ class DeleteConfirmation extends React.Component {
       <div className="DeleteConfirmation" tabIndex="0">
         <p className="DeleteConfirmation-message">
           {I18n.t('Remove "%{collaborationTitle}"?', {
-            collaborationTitle: this.props.collaboration.title
+            collaborationTitle: this.props.collaboration.title,
           })}
         </p>
         <div className="DeleteConfirmation-actions">
@@ -52,7 +52,7 @@ class DeleteConfirmation extends React.Component {
 DeleteConfirmation.propTypes = {
   collaboration: PropTypes.object,
   onCancel: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
 }
 
 export default DeleteConfirmation

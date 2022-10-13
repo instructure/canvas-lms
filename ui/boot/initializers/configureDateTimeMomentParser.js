@@ -17,28 +17,24 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import { useI18nFormats } from 'datetime-moment-parser'
+import {useI18nFormats} from 'datetime-moment-parser'
 
 const I18n = useI18nScope('instructure')
 
-const dateFormat = key => () => (
-  I18n.lookup(`date.formats.${key}`)
-)
+const dateFormat = key => () => I18n.lookup(`date.formats.${key}`)
 
-const eventFormat = ({ date, time }) => () => (
-  I18n.t('#time.event', '%{date} at %{time}', {
-    date: I18n.lookup(`date.formats.${date}`),
-    time: I18n.lookup(`time.formats.${time}`)
-  })
-)
+const eventFormat =
+  ({date, time}) =>
+  () =>
+    I18n.t('#time.event', '%{date} at %{time}', {
+      date: I18n.lookup(`date.formats.${date}`),
+      time: I18n.lookup(`time.formats.${time}`),
+    })
 
-const timeFormat = key => () => (
-  I18n.lookup(`time.formats.${key}`)
-)
+const timeFormat = key => () => I18n.lookup(`time.formats.${key}`)
 
-const joinFormats = (separator, formats) => () => (
+const joinFormats = (separator, formats) => () =>
   formats.map(key => I18n.lookup(key)).join(separator)
-)
 
 export function prepareFormats() {
   // examples are from en_US. order is significant since if an input matches
@@ -53,10 +49,10 @@ export function prepareFormats() {
     dateFormat('short_with_weekday'), // %a, %b %-d
     timeFormat('long'), // %B %d, %Y %H:%M
     dateFormat('long'), // %B %-d, %Y
-    eventFormat({ date: 'medium', time: 'tiny' }),
-    eventFormat({ date: 'medium', time: 'tiny_on_the_hour' }),
-    eventFormat({ date: 'short', time: 'tiny' }),
-    eventFormat({ date: 'short', time: 'tiny_on_the_hour' }),
+    eventFormat({date: 'medium', time: 'tiny'}),
+    eventFormat({date: 'medium', time: 'tiny_on_the_hour'}),
+    eventFormat({date: 'short', time: 'tiny'}),
+    eventFormat({date: 'short', time: 'tiny_on_the_hour'}),
     joinFormats(' ', ['date.formats.medium', 'time.formats.tiny']),
     joinFormats(' ', ['date.formats.medium', 'time.formats.tiny_on_the_hour']),
     dateFormat('medium'), // %b %-d, %Y
@@ -68,7 +64,7 @@ export function prepareFormats() {
     timeFormat('tiny'), // %l:%M%P
     timeFormat('tiny_on_the_hour'), // %l%P
     dateFormat('weekday'), // %A
-    dateFormat('short_weekday') // %a
+    dateFormat('short_weekday'), // %a
   ]
 }
 

@@ -37,13 +37,13 @@ const reEscape = str => str.replace(reEscapeMatcher, '\\$1')
 const SearchableSelectOption = () => <div />
 SearchableSelectOption.propTypes = {
   id: string.isRequired,
-  value: string.isRequired
+  value: string.isRequired,
 }
 SearchableSelectOption.displayName = 'Option'
 
 const SearchableSelectGroup = () => <div />
 SearchableSelectGroup.propTypes = {
-  label: string.isRequired
+  label: string.isRequired,
 }
 SearchableSelectGroup.displayName = 'Group'
 /* eslint-enable react/no-unused-prop-types */
@@ -80,7 +80,7 @@ function SearchableSelect(props) {
   const options = flattenOptions(children).map(n => ({
     id: n.props.id,
     value: n.props.value,
-    name: n.props.children
+    name: n.props.children,
   }))
   const matchingOptions = options.filter(i => i.name?.match(matcher))
   const noResults = React.Children.count(children) === 0
@@ -207,7 +207,7 @@ function SearchableSelect(props) {
   function renderChildren() {
     if (isLoading) {
       return (
-        <Select.Option isDisabled id={NO_OPTIONS_OPTION_ID}>
+        <Select.Option isDisabled={true} id={NO_OPTIONS_OPTION_ID}>
           <Spinner renderTitle={I18n.t('Loading options...')} size="small" />
         </Select.Option>
       )
@@ -215,7 +215,7 @@ function SearchableSelect(props) {
 
     if (messages || matchingOptions.length === 0) {
       return (
-        <Select.Option isDisabled id={NO_OPTIONS_OPTION_ID}>
+        <Select.Option isDisabled={true} id={NO_OPTIONS_OPTION_ID}>
           xxx
         </Select.Option>
       )
@@ -237,13 +237,18 @@ function SearchableSelect(props) {
     onRequestShowOptions,
     onRequestHideOptions,
     onRequestHighlightOption,
-    onRequestSelectOption
+    onRequestSelectOption,
   }
 
   return (
     <>
       <Select {...controlProps}>{renderChildren()}</Select>
-      <Alert screenReaderOnly ariaAtomic liveRegion={liveRegion} liveRegionPoliteness="assertive">
+      <Alert
+        screenReaderOnly={true}
+        ariaAtomic={true}
+        liveRegion={liveRegion}
+        liveRegionPoliteness="assertive"
+      >
         {announcement}
       </Alert>
     </>
@@ -259,12 +264,12 @@ SearchableSelect.propTypes = {
   placeholder: string,
   noResultsLabel: string,
   noSearchMatchLabel: string,
-  children: node
+  children: node,
 }
 
 SearchableSelect.defaultProps = {
   isLoading: false,
-  label: <span />
+  label: <span />,
 }
 
 SearchableSelect.Option = SearchableSelectOption

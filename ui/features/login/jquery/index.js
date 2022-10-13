@@ -49,7 +49,7 @@ $('#forgot_password_form').formSubmit({
           'Your password recovery instructions will be sent to *%{email_address}*. This may take up to 30 minutes. Make sure to check your spam box.',
           {
             wrappers: ['<b>$1</b>'],
-            email_address: $(this).find('.email_address').val()
+            email_address: $(this).find('.email_address').val(),
           }
         )
       ),
@@ -60,7 +60,7 @@ $('#forgot_password_form').formSubmit({
   },
   error(_data) {
     $(this).loadingImage('remove')
-  }
+  },
 })
 
 $('#login_form').submit(function (_event) {
@@ -68,12 +68,12 @@ $('#login_form').submit(function (_event) {
   let success = true
   if (!data.unique_id || data.unique_id.length < 1) {
     $(this).formErrors({
-      unique_id: I18n.t('invalid_login', 'Invalid login')
+      unique_id: I18n.t('invalid_login', 'Invalid login'),
     })
     success = false
   } else if (!data.password || data.password.length < 1) {
     $(this).formErrors({
-      password: I18n.t('invalid_password', 'Invalid password')
+      password: I18n.t('invalid_password', 'Invalid password'),
     })
     success = false
   }

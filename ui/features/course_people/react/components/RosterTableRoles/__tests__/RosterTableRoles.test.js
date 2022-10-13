@@ -24,28 +24,28 @@ const studentEnrollment = {
   sisRole: 'student',
   type: 'StudentEnrollment',
   id: '2',
-  associatedUser: null
+  associatedUser: null,
 }
 
 const customStudentEnrollment = {
   sisRole: 'Custom Student',
   type: 'StudentEnrollment',
   id: '3',
-  associatedUser: null
+  associatedUser: null,
 }
 
 const teacherEnrollment = {
   sisRole: 'teacher',
   type: 'TeacherEnrollment',
   id: '4',
-  associatedUser: null
+  associatedUser: null,
 }
 
 const customTeacherEnrollment = {
   sisRole: 'Custom Teacher',
   type: 'TeacherEnrollment',
   id: '5',
-  associatedUser: null
+  associatedUser: null,
 }
 
 const observerEnrollment = {
@@ -54,8 +54,8 @@ const observerEnrollment = {
   id: '4',
   associatedUser: {
     id: studentEnrollment.id,
-    name: 'Student A'
-  }
+    name: 'Student A',
+  },
 }
 
 const customObserverEnrollment = {
@@ -64,12 +64,12 @@ const customObserverEnrollment = {
   id: '4',
   associatedUser: {
     id: customStudentEnrollment.id,
-    name: 'Student B'
-  }
+    name: 'Student B',
+  },
 }
 
 const DEFAULT_PROPS = {
-  enrollments: [studentEnrollment, teacherEnrollment]
+  enrollments: [studentEnrollment, teacherEnrollment],
 }
 
 describe('RosterTableRoles', () => {

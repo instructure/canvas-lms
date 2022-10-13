@@ -29,7 +29,7 @@ const I18n = useI18nScope('quiz_log_auditing')
 class QuestionInspector extends React.Component {
   static defaultProps = {
     question: undefined,
-    events: []
+    events: [],
   }
 
   componentDidMount() {
@@ -52,27 +52,27 @@ class QuestionInspector extends React.Component {
     const currentEventId = this.props.currentEventId
     const answers = []
     this.props.events
-      .filter(function(event) {
+      .filter(function (event) {
         return (
           event.type === K.EVT_QUESTION_ANSWERED &&
-          event.data.some(function(record) {
+          event.data.some(function (record) {
             return record.quizQuestionId === question.id
           })
         )
       })
-      .sort(function(a, b) {
+      .sort(function (a, b) {
         return new Date(a.createdAt) - new Date(b.createdAt)
       })
-      .forEach(function(event) {
-        const records = event.data.filter(function(record) {
+      .forEach(function (event) {
+        const records = event.data.filter(function (record) {
           return record.quizQuestionId === question.id
         })
 
-        records.forEach(function(record) {
+        records.forEach(function (record) {
           answers.push({
             active: event.id === currentEventId,
             value: record.answer,
-            answered: record.answered
+            answered: record.answered,
           })
         })
       })
@@ -81,7 +81,7 @@ class QuestionInspector extends React.Component {
       <div>
         <h1 className="ic-QuestionInspector__QuestionHeader">
           {I18n.t('question_header', 'Question #%{position}', {
-            position: question.position
+            position: question.position,
           })}
 
           <span className="ic-QuestionInspector__QuestionType">
@@ -104,7 +104,7 @@ class QuestionInspector extends React.Component {
             {
               zero: 'This question was never answered.',
               one: 'This question was answered once.',
-              other: 'This question was answered %{count} times.'
+              other: 'This question was answered %{count} times.',
             },
             {count: answers.length}
           )}
@@ -119,7 +119,7 @@ class QuestionInspector extends React.Component {
     let answer
     const className = classSet({
       'ic-QuestionInspector__Answer': true,
-      'ic-QuestionInspector__Answer--is-active': !!record.active
+      'ic-QuestionInspector__Answer--is-active': !!record.active,
     })
 
     if (record.answered) {
@@ -135,7 +135,11 @@ class QuestionInspector extends React.Component {
       answer = <NoAnswer />
     }
 
-    return <li key={'answer-' + index} className={className}>{answer}</li>
+    return (
+      <li key={'answer-' + index} className={className}>
+        {answer}
+      </li>
+    )
   }
 }
 

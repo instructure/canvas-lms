@@ -18,8 +18,6 @@
 
 module DashboardCommon
   def dashboard_observer_setup
-    Account.site_admin.enable_feature!(:observer_picker)
-
     @course1 = course_factory(active_all: true, course_name: "Course 1")
     @course2 = course_factory(active_all: true, course_name: "Course 2")
 

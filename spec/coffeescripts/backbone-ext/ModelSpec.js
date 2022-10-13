@@ -21,14 +21,14 @@ import {Model} from '@canvas/backbone'
 QUnit.module('Backbone.Model', {
   setup() {
     this.model = new Model()
-  }
+  },
 })
 
-test('@mixin', function() {
+test('@mixin', function () {
   const initSpy = sinon.spy()
   const mixable = {
     defaults: {cash: 'money'},
-    initialize: initSpy
+    initialize: initSpy,
   }
   class Mixed extends Model {
     static initClass() {
@@ -58,7 +58,7 @@ test('decrement', () => {
   equal(model.get('count'), 3)
 })
 
-test('#deepGet returns nested attributes', function() {
+test('#deepGet returns nested attributes', function () {
   this.model.attributes = {foo: {bar: {zing: 'cats'}}}
   const value = this.model.deepGet('foo.bar.zing')
   equal(value, 'cats', 'gets a nested attribute')

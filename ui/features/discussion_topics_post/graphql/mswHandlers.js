@@ -45,13 +45,13 @@ export const handlers = [
                 DiscussionEntry.mock({
                   _id: '50',
                   id: '50',
-                  message: '<p>This is an Unread Reply</p>'
-                })
+                  message: '<p>This is an Unread Reply</p>',
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionSubentriesConnection'
-            }
-          })
+              __typename: 'DiscussionSubentriesConnection',
+            },
+          }),
         })
       )
     }
@@ -64,13 +64,13 @@ export const handlers = [
                 DiscussionEntry.mock({
                   _id: '50',
                   id: '50',
-                  message: '<p>This is a Reply asc</p>'
-                })
+                  message: '<p>This is a Reply asc</p>',
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionSubentriesConnection'
-            }
-          })
+              __typename: 'DiscussionSubentriesConnection',
+            },
+          }),
         })
       )
     }
@@ -80,15 +80,15 @@ export const handlers = [
           legacyNode: Discussion.mock({
             author: User.mock({
               courseRoles: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'],
-              id: 'role-user'
-            })
-          })
+              id: 'role-user',
+            }),
+          }),
         })
       )
     }
     return res(
       ctx.data({
-        legacyNode: Discussion.mock()
+        legacyNode: Discussion.mock(),
       })
     )
   }),
@@ -102,13 +102,13 @@ export const handlers = [
                 DiscussionEntry.mock({
                   _id: '51',
                   id: '51',
-                  message: '<p>This is the search result child reply</p>'
-                })
+                  message: '<p>This is the search result child reply</p>',
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionSubentriesConnection'
-            }
-          })
+              __typename: 'DiscussionSubentriesConnection',
+            },
+          }),
         })
       )
     }
@@ -124,13 +124,13 @@ export const handlers = [
                   _id: '50',
                   id: '50',
                   message: '<p>This is the child reply asc</p>',
-                  isolatedEntryId: '77'
-                })
+                  isolatedEntryId: '77',
+                }),
               ],
               pageInfo: PageInfo.mock(),
-              __typename: 'DiscussionSubentriesConnection'
-            }
-          })
+              __typename: 'DiscussionSubentriesConnection',
+            },
+          }),
         })
       )
     }
@@ -143,13 +143,13 @@ export const handlers = [
               DiscussionEntry.mock({
                 _id: '50',
                 id: '50',
-                message: '<p>This is the child reply</p>'
-              })
+                message: '<p>This is the child reply</p>',
+              }),
             ],
             pageInfo: PageInfo.mock(),
-            __typename: 'DiscussionSubentriesConnection'
-          }
-        })
+            __typename: 'DiscussionSubentriesConnection',
+          },
+        }),
       })
     )
   }),
@@ -164,11 +164,11 @@ export const handlers = [
               read: req.body.variables.read,
               rating: req.body.variables.rating === 'liked',
               ratingSum: req.body.variables.rating === 'liked' ? 1 : 0,
-              forcedReadState: req.body.variables.forcedReadState
+              forcedReadState: req.body.variables.forcedReadState,
             }
           ),
-          __typename: 'UpdateDiscussionEntryParticipantPayload'
-        }
+          __typename: 'UpdateDiscussionEntryParticipantPayload',
+        },
       })
     )
   }),
@@ -180,12 +180,12 @@ export const handlers = [
             {...DiscussionEntry.mock()},
             {
               deleted: true,
-              message: null
+              message: null,
             }
           ),
           errors: null,
-          __typename: 'DeleteDiscussionEntryPayload'
-        }
+          __typename: 'DeleteDiscussionEntryPayload',
+        },
       })
     )
   }),
@@ -198,11 +198,11 @@ export const handlers = [
             {
               id: 'RGlzY3Vzc2lvbi0x',
               published: req.body.variables.published,
-              __typename: 'Discussion'
+              __typename: 'Discussion',
             }
           ),
-          __typename: 'UpdateDiscussionTopicPayload'
-        }
+          __typename: 'UpdateDiscussionTopicPayload',
+        },
       })
     )
   }),
@@ -215,11 +215,11 @@ export const handlers = [
             {
               id: 'RGlzY3Vzc2lvbi0x',
               subscribed: req.body.variables.subscribed,
-              __typename: 'Discussion'
+              __typename: 'Discussion',
             }
           ),
-          __typename: 'SubscribeToDiscussionTopicPayload'
-        }
+          __typename: 'SubscribeToDiscussionTopicPayload',
+        },
       })
     )
   }),
@@ -229,8 +229,8 @@ export const handlers = [
         deleteDiscussionTopic: {
           discussionTopicId: req.variables.id,
           errors: null,
-          __typename: 'DeleteDiscussionTopicPayload'
-        }
+          __typename: 'DeleteDiscussionTopicPayload',
+        },
       })
     )
   }),
@@ -242,12 +242,12 @@ export const handlers = [
             {...DiscussionEntry.mock()},
             {
               id: req.body.variables.discussionTopicId,
-              message: req.body.variables.message
+              message: req.body.variables.message,
             }
           ),
           errors: null,
-          __typename: 'CreateDiscussionEntryPayload'
-        }
+          __typename: 'CreateDiscussionEntryPayload',
+        },
       })
     )
   }),
@@ -259,12 +259,12 @@ export const handlers = [
             {...DiscussionEntry.mock()},
             {
               id: req.body.variables.discussionEntryId,
-              message: req.body.variables.message
+              message: req.body.variables.message,
             }
           ),
           errors: null,
-          __typename: 'UpdateDiscussionEntryPayload'
-        }
+          __typename: 'UpdateDiscussionEntryPayload',
+        },
       })
     )
   }),
@@ -272,15 +272,15 @@ export const handlers = [
     const discussionEntries = req.variables.discussionEntryIds.map(id => ({
       ...DiscussionEntry.mock(),
       id,
-      read: req.variables.read
+      read: req.variables.read,
     }))
 
     return res(
       ctx.data({
         updateDiscussionEntriesReadState: {
           discussionEntries,
-          __typename: 'UpdateDiscussionEntriesReadState'
-        }
+          __typename: 'UpdateDiscussionEntriesReadState',
+        },
       })
     )
   }),
@@ -289,9 +289,9 @@ export const handlers = [
       ctx.data({
         updateDiscussionReadState: {
           discussionTopic: Discussion.mock(),
-          __typename: 'UpdateDiscussionReadStatePayload'
-        }
+          __typename: 'UpdateDiscussionReadStatePayload',
+        },
       })
     )
-  })
+  }),
 ]

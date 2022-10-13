@@ -30,33 +30,33 @@ const GradesTray = () => (
     imageWidth="8.5rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: I18n.t('#community.instructor_guide')
+      href: I18n.t('#community.instructor_guide'),
     }}
     links={[
       {
         label: I18n.t('How do I use the Gradebook?'),
-        href: I18n.t('#community.instructor_use_gradebook')
+        href: I18n.t('#community.instructor_use_gradebook'),
       },
       {
         label: I18n.t('How do I enter and edit grades in the Gradebook?'),
-        href: I18n.t('#community.instructor_edit_gradebook')
+        href: I18n.t('#community.instructor_edit_gradebook'),
       },
       {
         label: I18n.t('How do I post grades for an assignment in the Gradebook?'),
-        href: I18n.t('#community.instructor_post_grades')
+        href: I18n.t('#community.instructor_post_grades'),
       },
       {
         label: I18n.t('How do I view assignments or students individually in the Gradebook?'),
-        href: I18n.t('#community.instructor_gradebook_individual_view')
+        href: I18n.t('#community.instructor_gradebook_individual_view'),
       },
       {
         label: I18n.t('How do I use SpeedGrader?'),
-        href: I18n.t('#community.basics_speedgrader')
+        href: I18n.t('#community.basics_speedgrader'),
       },
       {
         label: I18n.t('How do I view the details of a submission for a student in SpeedGrader?'),
-        href: I18n.t('#community.instructor_speedgrader_submission_details')
-      }
+        href: I18n.t('#community.instructor_speedgrader_submission_details'),
+      },
     ]}
   >
     {I18n.t(`Display grades as

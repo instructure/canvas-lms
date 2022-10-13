@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {mount} from 'enzyme'
-import ModeratedGradingFormFieldGroup from 'ui/features/assignment_edit/react/ModeratedGradingFormFieldGroup.js'
+import ModeratedGradingFormFieldGroup from 'ui/features/assignment_edit/react/ModeratedGradingFormFieldGroup'
 
 QUnit.module('ModeratedGradingFormFieldGroup', hooks => {
   let props

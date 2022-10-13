@@ -40,7 +40,7 @@ export default class LinkContentItem extends ContentItem {
       'thumbnail',
       'iframe',
       'custom',
-      'lookup_uuid'
+      'lookup_uuid',
     ])
   }
 

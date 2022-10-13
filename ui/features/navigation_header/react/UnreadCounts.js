@@ -68,7 +68,7 @@ UnreadCounts.propTypes = {
   pollIntervalMs: number,
   allowedAge: number,
   maxTries: number,
-  useSessionStorage: bool
+  useSessionStorage: bool,
 }
 
 UnreadCounts.defaultProps = {
@@ -81,7 +81,7 @@ UnreadCounts.defaultProps = {
   pollIntervalMs: DEFAULT_POLL_INTERVAL,
   allowedAge: DEFAULT_POLL_INTERVAL / 2,
   maxTries: 5,
-  useSessionStorage: true
+  useSessionStorage: true,
 }
 
 export default function UnreadCounts(props) {
@@ -94,7 +94,7 @@ export default function UnreadCounts(props) {
     pollIntervalMs,
     allowedAge,
     maxTries,
-    useSessionStorage
+    useSessionStorage,
   } = props
   const syncState = useRef({msUntilFirstPoll: 0, savedChecked: false})
   const [count, setCount] = useState(NaN) // want to be sure to update at least once
@@ -129,7 +129,7 @@ export default function UnreadCounts(props) {
           try {
             const savedState = JSON.stringify({
               updatedAt: +new Date(),
-              unreadCount
+              unreadCount,
             })
             sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
           } catch (_ex) {

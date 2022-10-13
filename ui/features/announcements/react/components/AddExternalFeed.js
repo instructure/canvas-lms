@@ -42,18 +42,18 @@ const I18n = useI18nScope('announcements_v2')
 const verbosityTypes = [
   {value: 'full', label: I18n.t('Full article')},
   {value: 'truncate', label: I18n.t('Truncated')},
-  {value: 'link_only', label: I18n.t('Link only')}
+  {value: 'link_only', label: I18n.t('Link only')},
 ]
 
 export default class AddExternalFeed extends React.Component {
   static propTypes = {
     defaultOpen: bool,
     isSaving: bool.isRequired,
-    addExternalFeed: func.isRequired
+    addExternalFeed: func.isRequired,
   }
 
   static defaultProps = {
-    defaultOpen: false
+    defaultOpen: false,
   }
 
   state = {
@@ -61,7 +61,7 @@ export default class AddExternalFeed extends React.Component {
     feedURL: null,
     verbosityType: verbosityTypes[0].value,
     phraseChecked: false,
-    phrase: null
+    phrase: null,
   }
 
   focusOnToggleHeader = () => {
@@ -74,7 +74,7 @@ export default class AddExternalFeed extends React.Component {
     this.props.addExternalFeed({
       url: this.state.feedURL,
       verbosity: this.state.verbosityType,
-      header_match: this.state.phrase
+      header_match: this.state.phrase,
     })
     this.clearAddRSS()
   }
@@ -83,7 +83,7 @@ export default class AddExternalFeed extends React.Component {
     $.screenReaderFlashMessage(I18n.t('dropdown changed state to %{expanded}.', {expanded}))
     this.setState(
       {
-        isOpen: expanded
+        isOpen: expanded,
       },
       this.focusOnToggleHeader
     )
@@ -95,31 +95,31 @@ export default class AddExternalFeed extends React.Component {
       feedURL: null,
       verbosityType: verbosityTypes[0].value,
       phraseChecked: false,
-      phrase: null
+      phrase: null,
     })
   }
 
   handleCheckboxPhraseChecked = event => {
     this.setState({
-      phraseChecked: event.target.checked
+      phraseChecked: event.target.checked,
     })
   }
 
   handleTextInputSetPhrase = event => {
     this.setState({
-      phrase: event.target.value
+      phrase: event.target.value,
     })
   }
 
   handleTextInputSetFeedURL = event => {
     this.setState({
-      feedURL: event.target.value
+      feedURL: event.target.value,
     })
   }
 
   handleRadioSelectionSetVerbosity = value => {
     this.setState({
-      verbosityType: value
+      verbosityType: value,
     })
   }
 
@@ -241,7 +241,7 @@ export default class AddExternalFeed extends React.Component {
           >
             <Dialog
               open={this.state.isOpen}
-              shouldReturnFocus
+              shouldReturnFocus={true}
               defaultFocusElement={() => this.toggleBtn}
             >
               {this.renderTextInput(

@@ -32,20 +32,20 @@ const defaultProps = () => ({
       upper_bound: 1.0,
       created_at: null,
       updated_at: null,
-      position: null
+      position: null,
     },
     size: 0,
     students: [
       {
-        user: {name: 'Foo Bar', id: 1}
+        user: {name: 'Foo Bar', id: 1},
       },
       {
-        user: {name: 'Bar Foo', id: 2}
-      }
-    ]
+        user: {name: 'Bar Foo', id: 2},
+      },
+    ],
   },
   loadStudent: () => {},
-  onStudentSelect: () => {}
+  onStudentSelect: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<StudentRange {...props} />)

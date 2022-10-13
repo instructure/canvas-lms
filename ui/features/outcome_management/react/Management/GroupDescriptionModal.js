@@ -34,7 +34,7 @@ const GroupDescriptionModal = ({outcomeGroup, isOpen, onCloseHandler}) => (
     label={outcomeGroup.title}
     open={isOpen}
     onDismiss={onCloseHandler}
-    shouldReturnFocus
+    shouldReturnFocus={true}
   >
     <Modal.Body>
       <View as="div" padding="small 0" maxHeight="330px" tabIndex="0">
@@ -59,7 +59,7 @@ const GroupDescriptionModal = ({outcomeGroup, isOpen, onCloseHandler}) => (
 GroupDescriptionModal.propTypes = {
   outcomeGroup: outcomeGroupShape.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  onCloseHandler: PropTypes.func.isRequired
+  onCloseHandler: PropTypes.func.isRequired,
 }
 
 export default GroupDescriptionModal

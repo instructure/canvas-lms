@@ -19,5 +19,5 @@ import Ember from 'ember'
 import '@canvas/handlebars-helpers'
 
 export default Ember.Application.extend({
-  rootElement: '#content'
+  rootElement: '#content',
 })

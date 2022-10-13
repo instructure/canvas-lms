@@ -22,7 +22,7 @@ const NATIVE_CODE_REGEX = /\[native code\]/
 
 const originalFunctions = {
   addEventListener: window.addEventListener,
-  removeEventListener: window.removeEventListener
+  removeEventListener: window.removeEventListener,
 }
 
 function matchOptionsOrUseCapture(a, b) {
@@ -36,7 +36,7 @@ export default class EventTracker {
   constructor(options) {
     this._options = options
     this._trackers = {
-      eventListeners: []
+      eventListeners: [],
     }
 
     this._options.contextTracker.onContextStart(() => {
@@ -84,8 +84,8 @@ export default class EventTracker {
       logType: this._options.unmanagedListenerStrategy === 'fail' ? 'error' : 'warn',
       message: [
         `${trackersOfType.length} ${type}(s) were not removed before the test completed`,
-        `Event name(s): [${eventNames.join(', ')}]`
-      ]
+        `Event name(s): [${eventNames.join(', ')}]`,
+      ],
     }))
   }
 
@@ -126,10 +126,10 @@ export default class EventTracker {
         optionsOrUseCapture,
         originalListener: listener,
         sourceStack: debugging ? getStack(`"${eventName}" event listener`) : null,
-        type: 'event listener'
+        type: 'event listener',
       }
 
-      tracker.listener = function(...args) {
+      tracker.listener = function (...args) {
         try {
           listener(...args)
         } catch (error) {

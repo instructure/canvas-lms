@@ -24,7 +24,7 @@ import {requiredValidator} from '@canvas/outcomes/react/validators/finalFormVali
 
 export default {
   title: 'Examples/Outcomes/LabeledRceField',
-  component: LabeledRceField
+  component: LabeledRceField,
 }
 
 const withForm = (children, opts = {}) => {
@@ -56,8 +56,8 @@ export const withRequiredValidator = () =>
 export const withInitialValues = () =>
   withForm(<LabeledRceField name="field" label="With Initial Values" />, {
     initialValues: {
-      field: '<p>initial html</p>'
-    }
+      field: '<p>initial html</p>',
+    },
   })
 
 export const Default = Template.bind({})

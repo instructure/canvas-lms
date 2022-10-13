@@ -17,7 +17,7 @@
  */
 
 import _ from 'lodash'
-import ConversationStatusFilter from 'ui/features/conversations/react/ConversationStatusFilter.js'
+import ConversationStatusFilter from 'ui/features/conversations/react/ConversationStatusFilter'
 import React from 'react'
 import {shallow} from 'enzyme'
 
@@ -29,15 +29,15 @@ const makeProps = (props = {}) =>
       router: {
         on: () => {},
         off: () => {},
-        header: {changeTypeFilter: _newState => {}}
+        header: {changeTypeFilter: _newState => {}},
       },
       defaultFilter: 'foo',
       initialFilter: 'foo',
       filters: {
         foo: 'foo',
         bar: 'bar',
-        baz: 'baz'
-      }
+        baz: 'baz',
+      },
     },
     props
   )

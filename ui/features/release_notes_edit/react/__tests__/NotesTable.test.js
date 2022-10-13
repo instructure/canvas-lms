@@ -28,10 +28,10 @@ const exampleNotes = [
       en: {
         title: 'A great note title',
         description: 'A really great note description',
-        url: 'https://example.com/great_url'
-      }
+        url: 'https://example.com/great_url',
+      },
     },
-    show_ats: {}
+    show_ats: {},
   },
   {
     id: '8a8407a1-ed8f-48e6-8fe7-087bac0a8fe2',
@@ -40,11 +40,11 @@ const exampleNotes = [
       en: {
         title: 'A super great note title',
         description: 'An even better note description',
-        url: 'https://example.com/amazing_url'
-      }
+        url: 'https://example.com/amazing_url',
+      },
     },
-    show_ats: {}
-  }
+    show_ats: {},
+  },
 ]
 
 describe('release notes table', () => {

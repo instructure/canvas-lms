@@ -105,8 +105,8 @@ function placeholderCourse(courseId) {
     _id: courseId,
     permissions: {},
     submissionsConnection: {
-      edges: []
-    }
+      edges: [],
+    },
   }
 }
 

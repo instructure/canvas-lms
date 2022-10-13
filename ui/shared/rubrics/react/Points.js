@@ -30,20 +30,20 @@ const I18n = useI18nScope('edit_rubricPoints')
 export const roundIfWhole = n =>
   I18n.toNumber(n, {
     precision: Math.floor(n) === n ? 0 : 2,
-    strip_insignificant_zeros: true
+    strip_insignificant_zeros: true,
   })
 const pointString = points =>
   points.text === null ? roundIfWhole(points.value).toString() : points.text
 
 export const possibleString = possible =>
   I18n.t('%{possible} pts', {
-    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true})
+    possible: I18n.toNumber(possible, {precision: 2, strip_insignificant_zeros: true}),
   })
 
 export const scoreString = (points, possible) =>
   I18n.t('%{points} / %{possible}', {
     points: pointString(points),
-    possible: possibleString(possible)
+    possible: possibleString(possible),
   })
 
 const invalid = () => [{text: I18n.t('Invalid score'), type: 'error'}]
@@ -74,7 +74,7 @@ const Points = props => {
                 renderLabel={<ScreenReaderContent>{I18n.t('Points')}</ScreenReaderContent>}
                 messages={[
                   ...pointError(points),
-                  ...extraCreditError(points, pointsPossible, allowExtraCredit)
+                  ...extraCreditError(points, pointsPossible, allowExtraCredit),
                 ]}
                 onChange={e => onPointChange(e.target.value)}
                 value={pointString(points)}
@@ -95,12 +95,12 @@ Points.propTypes = {
   assessing: PropTypes.bool,
   assessment: PropTypes.shape(assessmentShape),
   onPointChange: PropTypes.func,
-  pointsPossible: PropTypes.number.isRequired
+  pointsPossible: PropTypes.number.isRequired,
 }
 Points.defaultProps = {
   allowExtraCredit: true,
   assessing: false,
-  onPointChange: null
+  onPointChange: null,
 }
 
 export default Points

@@ -56,7 +56,7 @@ export default async function doFetchApi<T = unknown>({
   headers = {},
   params = {},
   body,
-  fetchOpts = {}
+  fetchOpts = {},
 }: DoFetchApiOpts): Promise<DoFetchApiResults<T>> {
   const finalFetchOptions = {...defaultFetchOptions}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')

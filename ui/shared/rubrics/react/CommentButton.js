@@ -36,7 +36,7 @@ const CommentButton = ({onClick}) => (
   </div>
 )
 CommentButton.propTypes = {
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default CommentButton

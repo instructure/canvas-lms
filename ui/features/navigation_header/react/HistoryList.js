@@ -32,11 +32,11 @@ const I18n = useI18nScope('new_nav')
 
 HistoryList.propTypes = {
   history: HistoryShape.isRequired,
-  hasLoaded: bool.isRequired
+  hasLoaded: bool.isRequired,
 }
 
 HistoryList.defaultProps = {
-  history: []
+  history: [],
 }
 
 export default function HistoryList({hasLoaded, history}) {

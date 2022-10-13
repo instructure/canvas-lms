@@ -28,7 +28,7 @@ import StorageAPI from 'graphiql/dist/utility/StorageAPI'
 function fetcher(params) {
   return axios
     .post('/api/graphql', JSON.stringify(params), {
-      headers: {'Content-Type': 'application/json'}
+      headers: {'Content-Type': 'application/json'},
     })
     .then(({data}) => data)
 }
@@ -45,16 +45,16 @@ export default class GraphiQLApp extends React.Component {
 
     this.state = {
       schema: null,
-      explorerIsOpen: explorerPaneOpen
+      explorerIsOpen: explorerPaneOpen,
     }
   }
 
   componentDidMount() {
     return fetcher({
-      query: getIntrospectionQuery()
+      query: getIntrospectionQuery(),
     }).then(result => {
       this.setState({
-        schema: buildClientSchema(result.data)
+        schema: buildClientSchema(result.data),
       })
     })
   }

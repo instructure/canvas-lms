@@ -18,7 +18,7 @@
 
 const initialState = {
   inFindAppointmentMode: false,
-  selectedCourse: {}
+  selectedCourse: {},
 }
 
 export default initialState

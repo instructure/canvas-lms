@@ -51,7 +51,7 @@ const StudentCell = ({courseId, student}) => {
 
 StudentCell.propTypes = {
   courseId: PropTypes.string.isRequired,
-  student: PropTypes.shape(studentShape).isRequired
+  student: PropTypes.shape(studentShape).isRequired,
 }
 
 export default StudentCell

@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require "db/migrate/20150709205405_create_k12_theme"
+require_relative "../../db/migrate/20150709205405_create_k12_theme"
 
 describe BrandConfig do
   it "creates an instance with a parent_md5" do

@@ -30,21 +30,21 @@ beforeAll(() => {
       media: '',
       onchange: null,
       addListener: jest.fn(),
-      removeListener: jest.fn()
+      removeListener: jest.fn(),
     }
   })
 })
 
 beforeEach(() => {
   responsiveQuerySizes.mockImplementation(() => ({
-    desktop: {maxWidth: '1000px'}
+    desktop: {maxWidth: '1000px'},
   }))
 })
 
 const setup = props => {
   return render(
     <Expansion
-      isExpanded
+      isExpanded={true}
       onClick={Function.prototype}
       delimiterKey="expansion"
       expandText=""
@@ -58,7 +58,7 @@ describe('Expansion', () => {
     const onClickMock = jest.fn()
     const {getByText} = setup({
       onClick: onClickMock,
-      expandText: '4 replies'
+      expandText: '4 replies',
     })
     expect(onClickMock.mock.calls.length).toBe(0)
     fireEvent.click(getByText('4 replies'))
@@ -71,7 +71,12 @@ describe('Expansion', () => {
     expect(queryByTestId('reply-expansion-btn-collapse')).toBeFalsy()
 
     rerender(
-      <Expansion onClick={Function.prototype} isExpanded delimiterKey="expansion" expandText="" />
+      <Expansion
+        onClick={Function.prototype}
+        isExpanded={true}
+        delimiterKey="expansion"
+        expandText=""
+      />
     )
 
     expect(queryByTestId('reply-expansion-btn-expand')).toBeFalsy()
@@ -86,7 +91,7 @@ describe('Expansion', () => {
   describe('Mobile', () => {
     beforeEach(() => {
       responsiveQuerySizes.mockImplementation(() => ({
-        mobile: {maxWidth: '1024px'}
+        mobile: {maxWidth: '1024px'},
       }))
     })
 

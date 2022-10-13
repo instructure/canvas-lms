@@ -67,6 +67,20 @@ describe "Account Calendar Settings" do
       expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
     end
 
+    context "with a non root origin account" do
+      it "shows subaccounts and checkboxes properly for subaccount" do
+        get("/accounts/#{@sub1_account.id}/calendar_settings")
+
+        expect(account_folder(@sub1_account.id)).to be_displayed
+        expect(element_exists?(account_folder_selector(@sub2_account.id))).to be_falsey
+
+        sub1_account_checkboxes = account_checkboxes(@sub1_account.id)
+
+        expect(sub1_account_checkboxes[0]).to include_text(@sub1_account.name)
+        expect(sub1_account_checkboxes[1]).to include_text(@sub_sub_account.name)
+      end
+    end
+
     it "expands and hides accounts section" do
       get("/accounts/#{account.id}/calendar_settings")
 

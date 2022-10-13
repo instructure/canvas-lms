@@ -26,6 +26,6 @@ export const HistoryShape = arrayOf(
     asset_readable_category: string,
     visited_url: string.isRequired,
     visited_at: string.isRequired,
-    context_name: string
+    context_name: string,
   })
 )

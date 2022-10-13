@@ -68,7 +68,7 @@ export const overrideCourseGradingPeriods = (
           ...course,
           grade: gradingPeriod.grade,
           score: gradingPeriod.score,
-          showingAllGradingPeriods: selectedGradingPeriodId === ALL_PERIODS_OPTION
+          showingAllGradingPeriods: selectedGradingPeriodId === ALL_PERIODS_OPTION,
         }
       }
       return course
@@ -120,7 +120,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
     'total_scores',
     'current_grading_period_scores',
     'grading_periods',
-    'course_image'
+    'course_image',
   ]
   if (includeObservedUsers) {
     include.push('observed_users')
@@ -149,9 +149,9 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
     params: {
       enrollment_state: 'active',
       per_page: '100',
-      include
+      include,
     },
-    forceResult: visible ? undefined : false
+    forceResult: visible ? undefined : false,
   })
   useEffect(() => {
     if (visible && courses && userRef.current !== observedUserId) {
@@ -165,7 +165,7 @@ export const GradesPage = ({visible, currentUserRoles, observedUserId, currentUs
       const allGrades = coursesByUser.map(course => ({
         courseId: course.courseId,
         score: course.totalScoreForAllGradingPeriods,
-        grade: course.totalGradeForAllGradingPeriods
+        grade: course.totalGradeForAllGradingPeriods,
       }))
       setSpecificPeriodGrades(allGrades)
     } else if (gradingPeriodId) {
@@ -261,8 +261,8 @@ GradesPage.propTypes = {
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,
-    avatar_image_url: PropTypes.string
-  }).isRequired
+    avatar_image_url: PropTypes.string,
+  }).isRequired,
 }
 
 export default GradesPage

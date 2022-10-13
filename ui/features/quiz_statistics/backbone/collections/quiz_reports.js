@@ -44,13 +44,13 @@ export default Backbone.Collection.extend({
         quiz_reports: [
           {
             report_type: reportType,
-            includes_all_versions: config.includesAllVersions
-          }
+            includes_all_versions: config.includesAllVersions,
+          },
         ],
-        include: ['progress', 'file']
-      }
+        include: ['progress', 'file'],
+      },
     }).then(
-      function(payload) {
+      function (payload) {
         const quizReports = this.add(payload, {parse: true, merge: true})
         return quizReports[0]
       }.bind(this)
@@ -59,5 +59,5 @@ export default Backbone.Collection.extend({
 
   comparator(model) {
     return SORT_ORDER.indexOf(model.get('reportType'))
-  }
+  },
 })

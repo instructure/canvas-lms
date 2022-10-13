@@ -33,7 +33,7 @@ import {waitFor} from '@testing-library/dom'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
-  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
+  responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}}),
 }))
 
 describe('DiscussionThreadContainer', () => {
@@ -45,7 +45,7 @@ describe('DiscussionThreadContainer', () => {
     window.open = openMock
     window.ENV = {
       course_id: '1',
-      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id'
+      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id',
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -54,7 +54,7 @@ describe('DiscussionThreadContainer', () => {
         media: '',
         onchange: null,
         addListener: jest.fn(),
-        removeListener: jest.fn()
+        removeListener: jest.fn(),
       }
     })
   })
@@ -68,11 +68,11 @@ describe('DiscussionThreadContainer', () => {
   const defaultProps = ({
     discussionEntryOverrides = {},
     discussionOverrides = {},
-    propOverrides = {}
+    propOverrides = {},
   } = {}) => ({
     discussionTopic: Discussion.mock(discussionOverrides),
     discussionEntry: DiscussionEntry.mock(discussionEntryOverrides),
-    ...propOverrides
+    ...propOverrides,
   })
 
   const setup = (props, mocks) => {
@@ -100,7 +100,7 @@ describe('DiscussionThreadContainer', () => {
   it('should not render reply button if reply permission is false', () => {
     const {queryByTestId} = setup(
       defaultProps({
-        discussionEntryOverrides: {permissions: DiscussionEntryPermissions.mock({reply: false})}
+        discussionEntryOverrides: {permissions: DiscussionEntryPermissions.mock({reply: false})},
       })
     )
     expect(queryByTestId('threading-toolbar-reply')).not.toBeInTheDocument()
@@ -138,7 +138,7 @@ describe('DiscussionThreadContainer', () => {
     it('displays author role if the post is from the author', async () => {
       const props = defaultProps({
         discussionOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})},
-        discussionEntryOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})}
+        discussionEntryOverrides: {author: User.mock({_id: '3', displayName: 'Charles Xavier'})},
       })
       const {queryByTestId} = setup(props)
 
@@ -152,7 +152,7 @@ describe('DiscussionThreadContainer', () => {
         defaultProps(),
         updateDiscussionEntryParticipantMock({
           read: false,
-          forcedReadState: true
+          forcedReadState: true,
         })
       )
 
@@ -172,7 +172,7 @@ describe('DiscussionThreadContainer', () => {
           updateDiscussionEntryParticipantMock({
             read: false,
             forcedReadState: true,
-            shouldError: true
+            shouldError: true,
           })
         )
 
@@ -192,7 +192,7 @@ describe('DiscussionThreadContainer', () => {
       const {getByTestId} = setup(
         defaultProps(),
         updateDiscussionEntryParticipantMock({
-          rating: 'liked'
+          rating: 'liked',
         })
       )
 
@@ -210,7 +210,7 @@ describe('DiscussionThreadContainer', () => {
           defaultProps(),
           updateDiscussionEntryParticipantMock({
             rating: 'liked',
-            shouldError: true
+            shouldError: true,
           })
         )
 
@@ -239,7 +239,7 @@ describe('DiscussionThreadContainer', () => {
     it('Should not be able to open SpeedGrader if is speedGrader permission is false', () => {
       const {getByTestId, queryByTestId} = setup(
         defaultProps({
-          discussionOverrides: {permissions: DiscussionPermissions.mock({speedGrader: false})}
+          discussionOverrides: {permissions: DiscussionPermissions.mock({speedGrader: false})},
         })
       )
 
@@ -271,9 +271,9 @@ describe('DiscussionThreadContainer', () => {
               rootEntryParticipantCounts: {
                 unreadCount: 1,
                 repliesCount: 1,
-                __typename: 'DiscussionEntryCounts'
-              }
-            }
+                __typename: 'DiscussionEntryCounts',
+              },
+            },
           })
         )
         expect(container.getByTestId('is-unread')).toBeInTheDocument()
@@ -282,7 +282,7 @@ describe('DiscussionThreadContainer', () => {
       it('root is unread and child reply is unread', () => {
         const container = setup(
           defaultProps({
-            discussionEntryOverrides: {entryParticipant: {read: false, rating: false}}
+            discussionEntryOverrides: {entryParticipant: {read: false, rating: false}},
           })
         )
         expect(container.getByTestId('is-unread')).toBeInTheDocument()
@@ -296,9 +296,9 @@ describe('DiscussionThreadContainer', () => {
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
-                __typename: 'DiscussionEntryCounts'
-              }
-            }
+                __typename: 'DiscussionEntryCounts',
+              },
+            },
           })
         )
         expect(container.getByTestId('is-unread')).toBeInTheDocument()
@@ -314,9 +314,9 @@ describe('DiscussionThreadContainer', () => {
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
-                __typename: 'DiscussionEntryCounts'
-              }
-            }
+                __typename: 'DiscussionEntryCounts',
+              },
+            },
           })
         )
         expect(container.queryByTestId('is-unread')).not.toBeInTheDocument()
@@ -337,9 +337,9 @@ describe('DiscussionThreadContainer', () => {
             rootEntryParticipantCounts: {
               unreadCount: 1,
               repliesCount: 1,
-              __typename: 'DiscussionEntryCounts'
-            }
-          }
+              __typename: 'DiscussionEntryCounts',
+            },
+          },
         })
       )
       expect(getAllByText('1 reply, 1 unread').length).toBe(2)
@@ -348,7 +348,7 @@ describe('DiscussionThreadContainer', () => {
     it('pluralizes replies message correctly when there are multiple replies', () => {
       const {getAllByText} = setup(
         defaultProps({
-          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}}
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 1, repliesCount: 2}},
         })
       )
       expect(getAllByText('2 replies, 1 unread')).toBeTruthy()
@@ -357,7 +357,7 @@ describe('DiscussionThreadContainer', () => {
     it('does not display unread count if it is 0', () => {
       const {queryAllByText} = setup(
         defaultProps({
-          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}}
+          discussionEntryOverrides: {rootEntryParticipantCounts: {unreadCount: 0, repliesCount: 2}},
         })
       )
       expect(queryAllByText('2 replies, 0 unread').length).toBe(0)
@@ -379,9 +379,9 @@ describe('DiscussionThreadContainer', () => {
         defaultProps({
           discussionEntryOverrides: {
             entryParticipant: {
-              reportType: 'other'
-            }
-          }
+              reportType: 'other',
+            },
+          },
         })
       )
 
@@ -394,7 +394,7 @@ describe('DiscussionThreadContainer', () => {
       const {getByTestId, queryByText} = setup(
         defaultProps(),
         updateDiscussionEntryParticipantMock({
-          reportType: 'other'
+          reportType: 'other',
         })
       )
 
@@ -420,7 +420,7 @@ describe('DiscussionThreadContainer', () => {
 
     it('renders name', () => {
       const props = defaultProps({
-        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()}
+        discussionEntryOverrides: {author: null, anonymousAuthor: AnonymousUser.mock()},
       })
       const container = setup(props)
       expect(container.queryByText('Sorry, Something Broke')).toBeNull()

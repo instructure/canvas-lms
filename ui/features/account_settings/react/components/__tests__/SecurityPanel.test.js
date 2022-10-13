@@ -26,13 +26,13 @@ const defaultProps = {
   accountId: '1',
   contextId: '1',
   maxDomains: 50,
-  liveRegion: []
+  liveRegion: [],
 }
 
 describe('ConnectedSecurityPanel', () => {
   beforeEach(() => {
     window.ENV = {
-      ACCOUNT: {id: '1234'}
+      ACCOUNT: {id: '1234'},
     }
   })
 
@@ -47,7 +47,7 @@ describe('ConnectedSecurityPanel', () => {
   describe('isSubAccount prop', () => {
     it('updates CSP inherited status when the inherit checkbox is clicked', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount />
+        <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')
@@ -57,7 +57,7 @@ describe('ConnectedSecurityPanel', () => {
 
     it('disables the enable checkbox when the inherit option is set to true', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount />
+        <ConnectedSecurityPanel {...defaultProps} isSubAccount={true} />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')

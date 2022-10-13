@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
-import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache.js'
+import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache'
 
 QUnit.module('JQuerySelectorCache', hooks => {
   let selectorCache

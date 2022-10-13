@@ -25,7 +25,7 @@ import $ from 'jquery'
 QUnit.module('InheritedTable', {
   teardown() {
     document.getElementById('fixtures').innerHTML = ''
-  }
+  },
 })
 
 const onDevKeys = [
@@ -33,15 +33,15 @@ const onDevKeys = [
     id: `1`,
     api_key: 'abc12345678',
     created_at: '2012-06-07T20:36:50Z',
-    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false},
   },
   {id: `2`, api_key: 'abc12345671', created_at: '2012-06-09T20:36:50Z'},
   {
     id: `3`,
     api_key: 'abc12345679',
     created_at: '2012-06-08T20:36:50Z',
-    developer_key_account_binding: {workflow_state: 'on', account_owns_binding: false}
-  }
+    developer_key_account_binding: {workflow_state: 'on', account_owns_binding: false},
+  },
 ]
 
 const offDevKeys = [
@@ -49,22 +49,22 @@ const offDevKeys = [
     id: `1`,
     api_key: 'abc12345678',
     created_at: '2012-06-07T20:36:50Z',
-    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false},
   },
   {
     id: `3`,
     api_key: 'abc12345678',
     created_at: '2012-06-07T20:36:50Z',
-    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false},
   },
-  {id: `2`, api_key: 'abc12345671', created_at: '2012-06-09T20:36:50Z'}
+  {id: `2`, api_key: 'abc12345671', created_at: '2012-06-09T20:36:50Z'},
 ]
 
 function devKeyList(numKeys = 10) {
   return [...Array(numKeys).keys()].map(n => ({
     id: `${n}`,
     api_key: 'abc12345678',
-    created_at: '2012-06-07T20:36:50Z'
+    created_at: '2012-06-07T20:36:50Z',
   }))
 }
 
@@ -73,7 +73,7 @@ function disabledDevKeyList(numKeys = 10) {
     id: `${n}`,
     api_key: 'abc12345678',
     created_at: '2012-06-07T20:36:50Z',
-    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false}
+    developer_key_account_binding: {workflow_state: 'off', account_owns_binding: false},
   }))
 }
 
@@ -87,8 +87,8 @@ function component(keyList, props = {}) {
       developerKeysList={keyList || devKeyList()}
       ctx={{
         params: {
-          contextId: ''
-        }
+          contextId: '',
+        },
       }}
       {...props}
     />

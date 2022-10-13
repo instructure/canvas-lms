@@ -116,7 +116,7 @@ export default class MessageView extends View {
   setStarBtnChecked() {
     this.$starBtn.attr({
       'aria-checked': this.model.starred(),
-      title: this.model.starred() ? this.messages.unstar : this.messages.star
+      title: this.model.starred() ? this.messages.unstar : this.messages.star,
     })
     this.$starBtn.toggleClass('active', this.model.starred())
     this.setStarBtnCheckedScreenReaderMessage()
@@ -165,21 +165,21 @@ Object.assign(MessageView.prototype, {
     '.StarButton-LabelContainer': '$starBtnScreenReaderMessage',
     '.read-state': '$readBtn',
     '.read-state-tooltip': '$readStateTooltip',
-    '.select-checkbox': '$selectCheckbox'
+    '.select-checkbox': '$selectCheckbox',
   },
   events: {
     click: 'onSelect',
     'click .open-message': 'onSelect',
     'click .star-btn': 'toggleStar',
     'click .read-state': 'toggleRead',
-    mousedown: 'onMouseDown'
+    mousedown: 'onMouseDown',
   },
   messages: {
     read: I18n.t('Mark as read'),
     unread: I18n.t('Mark as unread'),
     star: I18n.t('Star conversation'),
-    unstar: I18n.t('Unstar conversation')
-  }
+    unstar: I18n.t('Unstar conversation'),
+  },
 })
 
 const ConversationTooltip = props => {

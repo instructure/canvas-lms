@@ -52,7 +52,7 @@ export default class SectionsAutocomplete extends React.Component {
     disabled: PropTypes.bool,
     disableDiscussionOptions: PropTypes.func,
     enableDiscussionOptions: PropTypes.func,
-    flashMessage: PropTypes.func
+    flashMessage: PropTypes.func,
   }
 
   static defaultProps = {
@@ -60,13 +60,13 @@ export default class SectionsAutocomplete extends React.Component {
     disabled: false,
     disableDiscussionOptions: () => {},
     enableDiscussionOptions: () => {},
-    flashMessage: $.screenReaderFlashMessage
+    flashMessage: $.screenReaderFlashMessage,
   }
 
   state = {
     sections: this.props.sections.concat([ALL_SECTIONS_OBJ]).sort(sortSectionName),
     selectedSectionsValue: extractIds(this.props.selectedSections),
-    messages: []
+    messages: [],
   }
 
   UNSAFE_componentWillMount() {
@@ -96,12 +96,12 @@ export default class SectionsAutocomplete extends React.Component {
     if (values.length === 0) {
       this.setState({
         selectedSectionsValue: [],
-        messages: [{text: I18n.t('A section is required'), type: 'error'}]
+        messages: [{text: I18n.t('A section is required'), type: 'error'}],
       })
     } else if (this.state.selectedSectionsValue.includes(ALL_SECTIONS_OBJ.id)) {
       this.setState({
         selectedSectionsValue: values.filter(id => id !== ALL_SECTIONS_OBJ.id),
-        messages: []
+        messages: [],
       })
     } else if (values.includes(ALL_SECTIONS_OBJ.id)) {
       this.setState({selectedSectionsValue: [ALL_SECTIONS_OBJ.id], messages: []})

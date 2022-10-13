@@ -32,7 +32,7 @@ export default class Placements extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-      placements: this.props.placements
+      placements: this.props.placements,
     }
     this.placementRefs = {}
   }
@@ -62,8 +62,8 @@ export default class Placements extends React.Component {
     this.setState({
       placements: [
         ...filter(placements, p => !removed.includes(p.placement)),
-        ...this.newPlacements(added)
-      ]
+        ...this.newPlacements(added),
+      ],
     })
   }
 
@@ -78,7 +78,7 @@ export default class Placements extends React.Component {
   newPlacements(placements) {
     return placements.map(p => {
       return {
-        placement: p
+        placement: p,
       }
     })
   }
@@ -123,12 +123,12 @@ Placements.propTypes = {
   validPlacements: PropTypes.arrayOf(PropTypes.string),
   placements: PropTypes.arrayOf(
     PropTypes.shape({
-      placement: PropTypes.string.isRequired
+      placement: PropTypes.string.isRequired,
     })
-  )
+  ),
 }
 
 Placements.defaultProps = {
   placements: [{placement: 'account_navigation'}, {placement: 'link_selection'}],
-  validPlacements: []
+  validPlacements: [],
 }

@@ -17,10 +17,10 @@
  */
 
 import WikiPage from '@canvas/wiki/backbone/models/WikiPage.coffee'
-import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection.js'
+import WikiPageCollection from 'ui/features/wiki_page_index/backbone/collections/WikiPageCollection'
 
 QUnit.module('WikiPageCollection')
-const checkFrontPage = function(collection) {
+const checkFrontPage = function (collection) {
   const total = collection.reduce((i, model) => (i += model.get('front_page') ? 1 : 0), 0)
   return total <= 1
 }
@@ -41,34 +41,34 @@ test('only a single front_page per collection', () => {
 QUnit.module('WikiPageCollection:sorting', {
   setup() {
     this.collection = new WikiPageCollection()
-  }
+  },
 })
 
-test('default sort is title', function() {
+test('default sort is title', function () {
   equal(this.collection.currentSortField, 'title', 'default sort set correctly')
 })
 
-test('default sort orders', function() {
+test('default sort orders', function () {
   equal(this.collection.sortOrders.title, 'asc', 'default title sort order')
   equal(this.collection.sortOrders.created_at, 'desc', 'default created_at sort order')
   equal(this.collection.sortOrders.updated_at, 'desc', 'default updated_at sort order')
 })
 
-test('sort order toggles (sort on same field)', function() {
+test('sort order toggles (sort on same field)', function () {
   this.collection.currentSortField = 'created_at'
   this.collection.sortOrders.created_at = 'desc'
   this.collection.setSortField('created_at')
   equal(this.collection.sortOrders.created_at, 'asc', 'sort order toggled')
 })
 
-test('sort order does not toggle (sort on different field)', function() {
+test('sort order does not toggle (sort on different field)', function () {
   this.collection.currentSortField = 'title'
   this.collection.sortOrders.created_at = 'desc'
   this.collection.setSortField('created_at')
   equal(this.collection.sortOrders.created_at, 'desc', 'sort order remains')
 })
 
-test('sort order can be forced', function() {
+test('sort order can be forced', function () {
   this.collection.currentSortField = 'title'
   this.collection.setSortField('created_at', 'asc')
   equal(this.collection.currentSortField, 'created_at', 'sort field set')
@@ -78,7 +78,7 @@ test('sort order can be forced', function() {
   equal(this.collection.sortOrders.created_at, 'asc', 'sort order remains')
 })
 
-test('setting sort triggers a sortChanged event', function() {
+test('setting sort triggers a sortChanged event', function () {
   const sortChangedSpy = sinon.spy()
   this.collection.on('sortChanged', sortChangedSpy)
   this.collection.setSortField('created_at')
@@ -89,7 +89,7 @@ test('setting sort triggers a sortChanged event', function() {
   )
 })
 
-test('setting sort sets fetch parameters', function() {
+test('setting sort sets fetch parameters', function () {
   this.collection.setSortField('created_at', 'desc')
   ok(this.collection.options, 'options exists')
   ok(this.collection.options.params, 'params exists')
@@ -97,7 +97,7 @@ test('setting sort sets fetch parameters', function() {
   equal(this.collection.options.params.order, 'desc', 'order param set')
 })
 
-test('sortByField delegates to setSortField', function() {
+test('sortByField delegates to setSortField', function () {
   const setSortFieldStub = sandbox.stub(this.collection, 'setSortField')
   const fetchStub = sandbox.stub(this.collection, 'fetch')
   this.collection.sortByField('created_at', 'desc')
@@ -108,7 +108,7 @@ test('sortByField delegates to setSortField', function() {
   )
 })
 
-test('sortByField triggers a fetch', function() {
+test('sortByField triggers a fetch', function () {
   const fetchStub = sandbox.stub(this.collection, 'fetch')
   this.collection.sortByField('created_at', 'desc')
   ok(fetchStub.calledOnce, 'fetch called once')

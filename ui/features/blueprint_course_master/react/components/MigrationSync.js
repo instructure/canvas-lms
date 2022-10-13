@@ -47,14 +47,14 @@ export default class MigrationSync extends Component {
     stopMigrationStatusPoll: PropTypes.func.isRequired,
     showProgress: PropTypes.bool,
     willSendNotification: PropTypes.bool,
-    onClick: PropTypes.func
+    onClick: PropTypes.func,
   }
 
   static defaultProps = {
     id: 'migration_sync',
     showProgress: true,
     willSendNotification: false,
-    onClick: null
+    onClick: null,
   }
 
   constructor(props) {
@@ -85,7 +85,7 @@ export default class MigrationSync extends Component {
       MigrationStates.isLoadingState(migrationStatus) || this.props.isLoadingBeginMigration
     const iconClasses = cx({
       'bcs__sync-btn-icon': true,
-      'bcs__sync-btn-icon__active': isSyncing
+      'bcs__sync-btn-icon__active': isSyncing,
     })
     return (
       <div id={this.props.id} className="bcs__migration-sync">
@@ -139,7 +139,7 @@ const connectState = state =>
     'migrationStatus',
     'isLoadingBeginMigration',
     'hasCheckedMigration',
-    'willSendNotification'
+    'willSendNotification',
   ])
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
 export const ConnectedMigrationSync = connect(connectState, connectActions)(MigrationSync)

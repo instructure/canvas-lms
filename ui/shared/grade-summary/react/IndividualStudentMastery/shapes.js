@@ -22,7 +22,7 @@ export const assignmentShape = PropTypes.shape({
   id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   name: PropTypes.string.isRequired,
   html_url: PropTypes.string.isRequired,
-  submission_types: PropTypes.string.isRequired
+  submission_types: PropTypes.string.isRequired,
 })
 
 export const outcomeResultShape = PropTypes.shape({
@@ -31,11 +31,11 @@ export const outcomeResultShape = PropTypes.shape({
   score: PropTypes.number,
   percent: PropTypes.number,
   hidden: PropTypes.bool,
-  hide_points: PropTypes.bool
+  hide_points: PropTypes.bool,
 })
 
 export const ratingShape = PropTypes.shape({
-  description: PropTypes.string.isRequired
+  description: PropTypes.string.isRequired,
 })
 
 export const alignmentShape = PropTypes.shape({
@@ -43,7 +43,7 @@ export const alignmentShape = PropTypes.shape({
   learning_outcome_id: PropTypes.number,
   submission_types: PropTypes.oneOfType([PropTypes.string, PropTypes.arrayOf(PropTypes.string)]),
   title: PropTypes.string,
-  url: PropTypes.string
+  url: PropTypes.string,
 })
 
 export const outcomeShape = PropTypes.shape({
@@ -56,25 +56,25 @@ export const outcomeShape = PropTypes.shape({
   mastery_points: PropTypes.number.isRequired,
   points_possible: PropTypes.number.isRequired,
   display_name: PropTypes.string,
-  friendly_description: PropTypes.string
+  friendly_description: PropTypes.string,
 })
 
 export const outcomeLinkShape = PropTypes.shape({
-  outcome: outcomeShape.isRequired
+  outcome: outcomeShape.isRequired,
 })
 
 export const outcomeGroupShape = PropTypes.shape({
   id: PropTypes.number.isRequired,
-  title: PropTypes.string.isRequired
+  title: PropTypes.string.isRequired,
 })
 
 export const outcomeProficiencyRatingShape = PropTypes.shape({
   description: PropTypes.string.isRequired,
   points: PropTypes.number.isRequired,
   mastery: PropTypes.bool.isRequired,
-  color: PropTypes.string.isRequired
+  color: PropTypes.string.isRequired,
 })
 
 export const outcomeProficiencyShape = PropTypes.shape({
-  ratings: PropTypes.arrayOf(outcomeProficiencyRatingShape)
+  ratings: PropTypes.arrayOf(outcomeProficiencyRatingShape),
 })

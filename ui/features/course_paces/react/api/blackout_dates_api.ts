@@ -34,8 +34,8 @@ export const sync = (course_id: string | number) => {
     path,
     method: 'PUT',
     body: {
-      blackout_dates: []
-    }
+      blackout_dates: [],
+    },
   })
     .then(result => {
       if (!result.response.ok) {
@@ -80,8 +80,8 @@ const deleteCalendarEvent = (event: BlackoutDate) => {
     path,
     method: 'DELETE',
     body: {
-      calendar_event: event
-    }
+      calendar_event: event,
+    },
   })
     .then(result => {
       if (!result.response.ok) {
@@ -101,8 +101,8 @@ const addCalendarEvent = (event: BlackoutDate, course_id: string) => {
     path,
     method: 'POST',
     body: {
-      calendar_event: toCalendarEvent(event, course_id)
-    }
+      calendar_event: toCalendarEvent(event, course_id),
+    },
   })
     .then(result => {
       if (!result.response.ok) {
@@ -128,7 +128,7 @@ const toBlackoutDate = (
     is_calendar_event: true,
     title: event_title,
     start_at: start_date,
-    end_at: end_date
+    end_at: end_date,
   }
 }
 
@@ -139,7 +139,7 @@ const toCalendarEvent = (blackoutDate: BlackoutDate, course_id: string) => {
     end_at: blackoutDate.end_date,
     blackout_date: true,
     context_code: `course_${course_id}`,
-    all_day: true
+    all_day: true,
   }
 }
 
@@ -160,7 +160,7 @@ function transformBlackoutDateForApi(blackoutDate: BlackoutDate): ApiFormattedBl
   const formattedBlackoutDate: ApiFormattedBlackoutDate = {
     event_title: blackoutDate.event_title,
     start_date: DateHelpers.formatDate(blackoutDate.start_date),
-    end_date: DateHelpers.formatDate(blackoutDate.end_date)
+    end_date: DateHelpers.formatDate(blackoutDate.end_date),
   }
   return formattedBlackoutDate
 }
@@ -177,7 +177,7 @@ function transformBlackoutDateFromApi(response: ApiFormattedBlackoutDate): Black
   const transformedBlackoutDate: BlackoutDate = {
     ...response,
     start_date: moment(response.start_date),
-    end_date: moment(response.end_date)
+    end_date: moment(response.end_date),
   }
   return transformedBlackoutDate
 }

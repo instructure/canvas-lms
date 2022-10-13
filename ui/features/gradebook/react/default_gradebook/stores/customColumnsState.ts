@@ -47,8 +47,8 @@ export default (
       per_page: get().performanceControls.customColumnsPerPage,
     }
     return dispatch
-      .getDepaginated(url, params)
-      .then((customColumns: CustomColumn[]) => {
+      .getDepaginated<CustomColumn[]>(url, params)
+      .then(customColumns => {
         set({customColumns, isCustomColumnsLoading: false})
       })
       .catch(() => {

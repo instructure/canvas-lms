@@ -28,7 +28,7 @@ function formatObject(tz) {
     minute: '2-digit',
     second: '2-digit',
     hourCycle: 'h23',
-    timeZone: tz
+    timeZone: tz,
   }
 }
 

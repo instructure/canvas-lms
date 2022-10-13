@@ -60,17 +60,17 @@ NewTheme.propTypes = {
   bases: arrayOf(
     shape({
       md5: string.isRequired,
-      label: string.isRequired
+      label: string.isRequired,
     })
-  )
+  ),
 }
 
 const blankConfig = {
   name: I18n.t('Default Template'),
   brand_config: {
     md5: '',
-    variables: {}
-  }
+    variables: {},
+  },
 }
 
 const isSystemTheme = sharedBrandConfig => !sharedBrandConfig.account_id
@@ -81,7 +81,7 @@ export default function CollectionView(props) {
     activeBrandConfig,
     accountID,
     brandableVariableDefaults,
-    baseBrandableVariables
+    baseBrandableVariables,
   } = props
   const [brandConfigBeingDeleted, setBrandConfigBeingDeleted] = useState(null)
 
@@ -117,7 +117,7 @@ export default function CollectionView(props) {
   async function deleteSharedBrandConfig(id) {
     await doFetchApi({
       path: `/api/v1/shared_brand_configs/${id}`,
-      method: 'DELETE'
+      method: 'DELETE',
     })
     window.location.reload()
   }
@@ -156,7 +156,7 @@ export default function CollectionView(props) {
       const cardForActiveBrandConfig = {
         brand_config: activeBrandConfig,
         name: activeBrandConfig.name,
-        account_id: accountID
+        account_id: accountID,
       }
       showableCards.unshift(cardForActiveBrandConfig)
     }
@@ -176,7 +176,7 @@ export default function CollectionView(props) {
       const isReadOnly = isSystemTheme(config)
       startEditing({
         md5ToActivate: config.brand_config.md5,
-        sharedBrandConfigToStartEditing: !isReadOnly && config
+        sharedBrandConfigToStartEditing: !isReadOnly && config,
       })
     }
 
@@ -281,5 +281,5 @@ CollectionView.propTypes = {
   activeBrandConfig: customTypes.brandConfig.isRequired,
   accountID: string.isRequired,
   brandableVariableDefaults: customTypes.brandableVariableDefaults,
-  baseBrandableVariables: customTypes.variables
+  baseBrandableVariables: customTypes.variables,
 }

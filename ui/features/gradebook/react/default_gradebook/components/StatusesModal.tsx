@@ -29,26 +29,16 @@ import type {StatusColors} from '../constants/colors'
 
 const I18n = useI18nScope('gradebook')
 
+const {Body: ModalBody, Footer: ModalFooter} = Modal as any
+
 type Props = {
   onClose: () => void
-  colors: {
-    late: string
-    missing: string
-    excused: string
-    dropped: string
-    resubmitted: string
-  }
+  colors: StatusColors
   afterUpdateStatusColors: (colors: StatusColors, successFn: any, errorFn: any) => Promise<any>
 }
 
 type State = {
-  colors: {
-    late: string
-    missing: string
-    excused: string
-    dropped: string
-    resubmitted: string
-  }
+  colors: StatusColors
   openPopover: null | string
 }
 
@@ -60,6 +50,10 @@ class StatusesModal extends React.Component<Props, State> {
   colorPickerContents: {
     [key: string]: HTMLDivElement
   }
+
+  doneButton: HTMLButtonElement | null = null
+
+  modalContentRef: HTMLDivElement | null = null
 
   constructor(props) {
     super(props)
@@ -134,31 +128,25 @@ class StatusesModal extends React.Component<Props, State> {
   }
 
   render() {
-    const {
-      props: {onClose},
-      bindDoneButton,
-      bindContentRef,
-    } = this
-
     return (
       <Modal
         open={true}
         label={I18n.t('Statuses')}
-        onDismiss={onClose}
-        contentRef={bindContentRef}
+        onDismiss={this.props.onClose}
+        contentRef={this.bindContentRef}
         shouldCloseOnDocumentClick={false}
       >
-        <Modal.Body>
+        <ModalBody>
           <ul className="Gradebook__StatusModalList">
             <Text>{this.renderListItems()}</Text>
           </ul>
-        </Modal.Body>
+        </ModalBody>
 
-        <Modal.Footer>
-          <Button ref={bindDoneButton} color="primary" onClick={() => this.props.onClose()}>
+        <ModalFooter>
+          <Button ref={this.bindDoneButton} color="primary" onClick={() => this.props.onClose()}>
             {I18n.t('Done')}
           </Button>
-        </Modal.Footer>
+        </ModalFooter>
       </Modal>
     )
   }

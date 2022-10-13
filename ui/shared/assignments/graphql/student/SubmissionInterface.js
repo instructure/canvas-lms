@@ -95,8 +95,8 @@ export const SubmissionInterface = {
     feedbackForCurrentAttempt: bool.isRequired,
     unreadCommentCount: number.isRequired,
     url: string,
-    assignedAssessments: arrayOf(AssessmentRequest.shape)
-  })
+    assignedAssessments: arrayOf(AssessmentRequest.shape),
+  }),
 }
 
 export const DefaultMocks = {
@@ -124,6 +124,6 @@ export const DefaultMocks = {
     feedbackForCurrentAttempt: false,
     unreadCommentCount: 0,
     url: null,
-    assignedAssessments: () => []
-  })
+    assignedAssessments: () => [],
+  }),
 }

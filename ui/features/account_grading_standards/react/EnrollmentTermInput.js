@@ -24,7 +24,7 @@ import TokenInput, {Option as ComboboxOption} from 'react-tokeninput'
 
 const I18n = useI18nScope('EnrollmentTermInput')
 
-const groupByTagType = function(options) {
+const groupByTagType = function (options) {
   const now = new Date()
   return _.groupBy(options, option => {
     const noStartDate = !_.isDate(option.startAt)
@@ -47,7 +47,7 @@ class EnrollmentTermInput extends React.Component {
   static propTypes = {
     enrollmentTerms: PropTypes.array.isRequired,
     setSelectedEnrollmentTermIDs: PropTypes.func.isRequired,
-    selectedIDs: PropTypes.array.isRequired
+    selectedIDs: PropTypes.array.isRequired,
   }
 
   handleChange = termIDs => {
@@ -109,7 +109,7 @@ class EnrollmentTermInput extends React.Component {
       undated: I18n.t('Undated'),
       future: I18n.t('Future'),
       past: I18n.t('Past'),
-      none: I18n.t('No unassigned terms')
+      none: I18n.t('No unassigned terms'),
     }[heading]
     return (
       <ComboboxOption className="ic-tokeninput-header" value={heading} key={heading}>
@@ -150,9 +150,9 @@ class EnrollmentTermInput extends React.Component {
             onChange={this.handleChange}
             onSelect={this.handleSelect}
             onRemove={this.handleRemove}
-            onInput={function() {}}
-            value
-            showListOnFocus
+            onInput={function () {}}
+            value={true}
+            showListOnFocus={true}
             ref="input"
           />
         </div>

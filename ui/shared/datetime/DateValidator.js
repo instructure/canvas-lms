@@ -35,7 +35,7 @@ const DATE_RANGE_ERRORS = {
       },
       get term() {
         return I18n.t('Due date cannot be before term start')
-      }
+      },
     },
     end_range: {
       get section() {
@@ -46,8 +46,8 @@ const DATE_RANGE_ERRORS = {
       },
       get term() {
         return I18n.t('Due date cannot be after term end')
-      }
-    }
+      },
+    },
   },
   unlock_at: {
     start_range: {
@@ -59,7 +59,7 @@ const DATE_RANGE_ERRORS = {
       },
       get term() {
         return I18n.t('Unlock date cannot be before term start')
-      }
+      },
     },
     end_range: {
       get due() {
@@ -67,14 +67,14 @@ const DATE_RANGE_ERRORS = {
       },
       get lock() {
         return I18n.t('Unlock date cannot be after lock date')
-      }
-    }
+      },
+    },
   },
   lock_at: {
     start_range: {
       get due() {
         return I18n.t('Lock date cannot be before due date')
-      }
+      },
     },
     end_range: {
       get section() {
@@ -85,9 +85,9 @@ const DATE_RANGE_ERRORS = {
       },
       get term() {
         return I18n.t('Lock date cannot be after term end')
-      }
-    }
-  }
+      },
+    },
+  },
 }
 
 export default class DateValidator {
@@ -114,10 +114,10 @@ export default class DateValidator {
         date: currentDateRange.start_at.date,
         validationDates: {
           due_at: dueAt,
-          unlock_at: unlockAt
+          unlock_at: unlockAt,
         },
         range: 'start_range',
-        type: currentDateRange.start_at.date_context
+        type: currentDateRange.start_at.date_context,
       })
     }
     if (currentDateRange.end_at && currentDateRange.end_at.date && !forIndividualStudents) {
@@ -125,42 +125,42 @@ export default class DateValidator {
         date: currentDateRange.end_at.date,
         validationDates: {
           due_at: dueAt,
-          lock_at: lockAt
+          lock_at: lockAt,
         },
         range: 'end_range',
-        type: currentDateRange.end_at.date_context
+        type: currentDateRange.end_at.date_context,
       })
     }
     if (dueAt) {
       datetimesToValidate.push({
         date: dueAt,
         validationDates: {
-          lock_at: lockAt
+          lock_at: lockAt,
         },
         range: 'start_range',
-        type: 'due'
+        type: 'due',
       })
       datetimesToValidate.push({
         date: dueAt,
         validationDates: {
-          unlock_at: unlockAt
+          unlock_at: unlockAt,
         },
         range: 'end_range',
-        type: 'due'
+        type: 'due',
       })
     }
 
     if (this.dueDateRequired) {
       datetimesToValidate.push({
         date: dueAt,
-        dueDateRequired: this.dueDateRequired
+        dueDateRequired: this.dueDateRequired,
       })
     }
 
     if (this.hasGradingPeriods && !this.userIsAdmin && data.persisted === false) {
       datetimesToValidate.push({
         date: dueAt,
-        range: 'grading_period_range'
+        range: 'grading_period_range',
       })
     }
 
@@ -168,10 +168,10 @@ export default class DateValidator {
       datetimesToValidate.push({
         date: lockAt,
         validationDates: {
-          unlock_at: unlockAt
+          unlock_at: unlockAt,
         },
         range: 'end_range',
-        type: 'lock'
+        type: 'lock',
       })
     }
     const errs = {}
@@ -185,13 +185,13 @@ export default class DateValidator {
     if (section.start_at) {
       dateRange.start_at = {
         date: section.start_at,
-        date_context: 'section'
+        date_context: 'section',
       }
     }
     if (section.end_at) {
       dateRange.end_at = {
         date: section.end_at,
-        date_context: 'section'
+        date_context: 'section',
       }
     }
     return dateRange
@@ -206,7 +206,7 @@ export default class DateValidator {
     if (earliestDate) {
       const formatted = DateHelper.formatDateForDisplay(earliestDate)
       errs.due_at = I18n.t('Please enter a due date on or after %{earliestDate}', {
-        earliestDate: formatted
+        earliestDate: formatted,
       })
     } else {
       errs.due_at = I18n.t('Due date cannot fall in a closed grading period')

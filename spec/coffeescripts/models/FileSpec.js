@@ -28,14 +28,14 @@ QUnit.module('File', {
     const $el = $('<input type="file">')
     model = new File(null, {preflightUrl: '/preflight'})
     model.set({file: $el[0]})
-  }
+  },
 })
 
 test('uploads the file, and sets attributes from response', assert => {
   const done = assert.async()
   const data = {
     id: 123,
-    filename: 'example'
+    filename: 'example',
   }
   const uploadStub = sandbox.stub(uploader, 'uploadFile')
   uploadStub.returns(Promise.resolve(data))

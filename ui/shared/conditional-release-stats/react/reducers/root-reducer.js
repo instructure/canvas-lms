@@ -26,10 +26,10 @@ const studentCache = handleActions(
       const {studentId, data} = action.payload
       state[studentId] = {
         followOnAssignments: data.follow_on_assignments,
-        triggerAssignment: data.trigger_assignment
+        triggerAssignment: data.trigger_assignment,
       }
       return state
-    }
+    },
   },
   {}
 )
@@ -37,7 +37,7 @@ const studentCache = handleActions(
 const isInitialDataLoading = handleActions(
   {
     [actionTypes.LOAD_INITIAL_DATA_START]: () => true,
-    [actionTypes.LOAD_INITIAL_DATA_END]: () => false
+    [actionTypes.LOAD_INITIAL_DATA_END]: () => false,
   },
   false
 )
@@ -45,7 +45,7 @@ const isInitialDataLoading = handleActions(
 const isStudentDetailsLoading = handleActions(
   {
     [actionTypes.LOAD_STUDENT_DETAILS_START]: () => true,
-    [actionTypes.LOAD_STUDENT_DETAILS_END]: () => false
+    [actionTypes.LOAD_STUDENT_DETAILS_END]: () => false,
   },
   false
 )
@@ -54,8 +54,8 @@ const errors = handleActions(
   {
     [actionTypes.SET_ERRORS]: (state, action) => [
       ...Array.from(action.payload),
-      ...Array.from(state)
-    ]
+      ...Array.from(state),
+    ],
   },
   []
 )
@@ -63,14 +63,14 @@ const errors = handleActions(
 const ranges = handleActions(
   {
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.ranges,
-    [actionTypes.SET_SCORING_RANGES]: getPayload
+    [actionTypes.SET_SCORING_RANGES]: getPayload,
   },
   []
 )
 
 const assignment = handleActions(
   {
-    [actionTypes.SET_ASSIGNMENT]: getPayload
+    [actionTypes.SET_ASSIGNMENT]: getPayload,
   },
   {}
 )
@@ -78,7 +78,7 @@ const assignment = handleActions(
 const rule = handleActions(
   {
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.rule,
-    [actionTypes.SET_RULE]: getPayload
+    [actionTypes.SET_RULE]: getPayload,
   },
   {course_id: '', trigger_assignment: ''}
 )
@@ -86,7 +86,7 @@ const rule = handleActions(
 const enrolled = handleActions(
   {
     [actionTypes.SET_INITIAL_DATA]: (state, action) => action.payload.enrolled,
-    [actionTypes.SET_ENROLLED]: getPayload
+    [actionTypes.SET_ENROLLED]: getPayload,
   },
   0
 )
@@ -94,7 +94,7 @@ const enrolled = handleActions(
 const sidebarTrigger = handleActions(
   {
     [actionTypes.OPEN_SIDEBAR]: (state, action) => action.payload,
-    [actionTypes.CLOSE_SIDEBAR]: () => null
+    [actionTypes.CLOSE_SIDEBAR]: () => null,
   },
   null
 )
@@ -103,7 +103,7 @@ const showDetails = handleActions(
   {
     [actionTypes.OPEN_SIDEBAR]: () => true,
     [actionTypes.CLOSE_SIDEBAR]: () => false,
-    [actionTypes.SELECT_RANGE]: (state, action) => action.payload !== null
+    [actionTypes.SELECT_RANGE]: (state, action) => action.payload !== null,
   },
   false
 )
@@ -121,7 +121,7 @@ const selectedPath = handleActions(
     [actionTypes.CLOSE_SIDEBAR]: state => {
       state.student = null
       return state
-    }
+    },
   },
   {range: 0, student: null}
 )
@@ -139,5 +139,5 @@ export default combineReducers({
   enrolled,
   sidebarTrigger,
   showDetails,
-  selectedPath
+  selectedPath,
 })

@@ -38,12 +38,12 @@ export default class ChangeLogRow extends Component {
     col3: string.isRequired,
     col4: string.isRequired,
     isHeading: bool,
-    children: node
+    children: node,
   }
 
   static defaultProps = {
     isHeading: false,
-    children: null
+    children: null,
   }
 
   colIds = [shortId(), shortId(), shortId(), shortId()]
@@ -89,7 +89,7 @@ export default class ChangeLogRow extends Component {
     const classes = cx({
       'bcs__history-item__change': true,
       'bcs__history-item__change-log-row': true,
-      'bcs__history-item__change-log-row__heading': this.props.isHeading
+      'bcs__history-item__change-log-row__heading': this.props.isHeading,
     })
 
     return (
@@ -119,5 +119,5 @@ export const ChangeRow = ({change}) => (
 )
 
 ChangeRow.propTypes = {
-  change: propTypes.migrationChange.isRequired
+  change: propTypes.migrationChange.isRequired,
 }

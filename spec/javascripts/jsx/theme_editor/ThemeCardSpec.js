@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import ThemeCard from 'ui/features/brand_configs/react/ThemeCard.js'
+import ThemeCard from 'ui/features/brand_configs/react/ThemeCard'
 import {shallow} from 'enzyme'
 
 let props
@@ -33,9 +33,9 @@ QUnit.module('ThemeCard Component', {
       startDeleting: sinon.stub(),
       cancelDelete: sinon.stub(),
       onDelete: sinon.stub(),
-      getVariable: sinon.stub()
+      getVariable: sinon.stub(),
     }
-  }
+  },
 })
 
 test('Renders the name', () => {

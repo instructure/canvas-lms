@@ -921,7 +921,7 @@ describe AssignmentsController do
 
         context "peer reviews" do
           before do
-            @assignment.update_attribute(:peer_reviews, true)
+            @assignment.update!(peer_reviews: true, submission_types: "text_entry")
             @reviewee = User.create!(name: "John Connor")
             @course.enroll_user(@reviewee, "StudentEnrollment", enrollment_state: "active")
             @assignment.assign_peer_review(@student, @reviewee)
@@ -1020,6 +1020,18 @@ describe AssignmentsController do
             user_session(@student)
             get "show", params: { course_id: @course.id, id: @assignment.id, anonymous_asset_id: @reviewee_submission.anonymous_id }
             expect(assigns[:js_env][:peer_review_available]).to eq false
+          end
+
+          it "sets peer_review_available to true when the submissions have been graded" do
+            @assignment.submit_homework(@student, submission_type: "online_url", url: "http://www.google.com")
+            @assignment.submit_homework(@reviewee, submission_type: "online_url", url: "http://www.google.com")
+
+            @assignment.grade_student(@student, grade: 10, grader: @teacher)
+            @assignment.grade_student(@reviewee, grade: 10, grader: @teacher)
+
+            user_session(@student)
+            get "show", params: { course_id: @course.id, id: @assignment.id, reviewee_id: @reviewee.id }
+            expect(assigns[:js_env][:peer_review_available]).to eq true
           end
 
           it "sets peer_review_available to true when reviewee_id is present and both submissions have been submitted" do
@@ -1158,17 +1170,11 @@ describe AssignmentsController do
             expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
           end
 
-          context "when observer_picker is enabled" do
-            before :once do
-              Account.site_admin.enable_feature!(:observer_picker)
-            end
-
-            it "sets js_env variables" do
-              get :show, params: { course_id: @course.id, id: @assignment.id }
-              expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
-              expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
-              expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
-            end
+          it "sets js_env variables" do
+            get :show, params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env]).to have_key(:OBSERVER_OPTIONS)
+            expect(assigns[:js_env][:OBSERVER_OPTIONS][:OBSERVED_USERS_LIST].is_a?(Array)).to be true
+            expect(assigns[:js_env][:OBSERVER_OPTIONS][:CAN_ADD_OBSERVEE]).to be false
           end
         end
       end

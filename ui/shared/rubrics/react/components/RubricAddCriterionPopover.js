@@ -28,7 +28,7 @@ const I18n = useI18nScope('RubricAddCriterionPopover')
 class RubricAddCriterionPopover extends React.Component {
   static propTypes = {
     rubric: PropTypes.instanceOf($).isRequired,
-    duplicateFunction: PropTypes.func.isRequired
+    duplicateFunction: PropTypes.func.isRequired,
   }
 
   render() {

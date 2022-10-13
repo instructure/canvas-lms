@@ -24,7 +24,7 @@ import {
   IconAnnouncementLine,
   IconAssignmentLine,
   IconDiscussionLine,
-  IconFolderLine
+  IconFolderLine,
 } from '@instructure/ui-icons'
 
 const I18n = useI18nScope('dashcards')
@@ -37,11 +37,11 @@ class DashboardCardAction extends React.Component {
     iconClass: PropTypes.string,
     linkClass: PropTypes.string,
     path: PropTypes.string,
-    screenReaderLabel: PropTypes.string
+    screenReaderLabel: PropTypes.string,
   }
 
   static defaultProps = {
-    unreadCount: 0
+    unreadCount: 0,
   }
 
   unreadCountLimiter = () => {

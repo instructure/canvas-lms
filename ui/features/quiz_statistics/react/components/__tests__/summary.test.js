@@ -16,14 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {act, render, fireEvent} from '@testing-library/react'
+import {render} from '@testing-library/react'
 import React from 'react'
 import Summary from '../summary/index'
 
 describe('canvas_quizzes/statistics/views/summary', () => {
   it('renders', () => {
-    render(
-      <Summary correctResponseRatio={0.7} />
-    )
+    render(<Summary correctResponseRatio={0.7} />)
   })
 })

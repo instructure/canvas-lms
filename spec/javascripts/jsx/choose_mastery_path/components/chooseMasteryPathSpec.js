@@ -18,7 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
-import ChooseMasterPath from 'ui/features/choose_mastery_path/react/components/choose-mastery-path.js'
+import ChooseMasterPath from 'ui/features/choose_mastery_path/react/components/choose-mastery-path'
 
 QUnit.module('Choose Mastery Path')
 
@@ -35,8 +35,8 @@ const defaultProps = () => ({
           itemId: 1,
           category: {
             id: 'other',
-            label: 'Other'
-          }
+            label: 'Other',
+          },
         },
         {
           name: 'Ch 2 Review',
@@ -46,10 +46,10 @@ const defaultProps = () => ({
           itemId: 1,
           category: {
             id: 'other',
-            label: 'Other'
-          }
-        }
-      ]
+            label: 'Other',
+          },
+        },
+      ],
     },
     {
       setId: 2,
@@ -62,8 +62,8 @@ const defaultProps = () => ({
           itemId: 1,
           category: {
             id: 'other',
-            label: 'Other'
-          }
+            label: 'Other',
+          },
         },
         {
           name: 'Ch 2 Review',
@@ -73,14 +73,14 @@ const defaultProps = () => ({
           itemId: 1,
           category: {
             id: 'other',
-            label: 'Other'
-          }
-        }
-      ]
-    }
+            label: 'Other',
+          },
+        },
+      ],
+    },
   ],
   selectedOption: null,
-  selectOption: () => {}
+  selectOption: () => {},
 })
 
 const renderComponent = props => TestUtils.renderIntoDocument(<ChooseMasterPath {...props} />)

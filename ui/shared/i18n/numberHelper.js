@@ -31,7 +31,7 @@ const helper = {
 
     let num = helper._parseNumber(input.toString(), {
       thousands: I18n.lookup('number.format.delimiter'),
-      decimal: I18n.lookup('number.format.separator')
+      decimal: I18n.lookup('number.format.separator'),
     })
 
     // fallback to default delimiters if invalid with locale specific ones
@@ -49,7 +49,7 @@ const helper = {
 
   validate(input) {
     return !isNaN(helper.parse(input))
-  }
+  },
 }
 
 export default helper

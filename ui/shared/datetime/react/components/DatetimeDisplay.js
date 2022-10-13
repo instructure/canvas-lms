@@ -30,11 +30,11 @@ class DatetimeDisplay extends React.Component {
 
 DatetimeDisplay.propTypes = {
   datetime: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
-  format: PropTypes.string
+  format: PropTypes.string,
 }
 
 DatetimeDisplay.defaultProps = {
-  format: '%c'
+  format: '%c',
 }
 
 export default DatetimeDisplay

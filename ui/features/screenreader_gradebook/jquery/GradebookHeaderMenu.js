@@ -60,7 +60,7 @@ export default class GradebookHeaderMenu {
     this.gradebook = gradebook
     const templateLocals = {
       assignmentUrl: `${this.gradebook.options.context_url}/assignments/${this.assignment.id}`,
-      speedGraderUrl: `${this.gradebook.options.context_url}/gradebook/speed_grader?assignment_id=${this.assignment.id}`
+      speedGraderUrl: `${this.gradebook.options.context_url}/gradebook/speed_grader?assignment_id=${this.assignment.id}`,
     }
     if (!this.gradebook.options.speed_grader_enabled) {
       templateLocals.speedGraderUrl = null
@@ -71,7 +71,7 @@ export default class GradebookHeaderMenu {
     })
     this.$menu = $(gradebookHeaderMenuTemplate(templateLocals)).insertAfter(this.$trigger)
     this.$trigger.kyleMenu({
-      noButton: true
+      noButton: true,
     })
     // need it to be a child of #gradebook_grid (not the header cell) to get over overflow:hidden obstacles.
     this.$menu
@@ -109,7 +109,7 @@ export default class GradebookHeaderMenu {
         return this.gradebook.setAssignmentWarnings()
       },
       {
-        canUnmute: this.canUnmute()
+        canUnmute: this.canUnmute(),
       }
     ).show()
   }
@@ -136,7 +136,7 @@ export default class GradebookHeaderMenu {
           /(online_upload|online_text_entry|online_url)/
         ) && this.assignment.has_submitted_submissions,
       reuploadSubmissions:
-        this.gradebook.options.gradebook_is_editable && this.assignment.submissions_downloads > 0
+        this.gradebook.options.gradebook_is_editable && this.assignment.submissions_downloads > 0,
     }
     const results = []
     for (action in ref) {
@@ -174,7 +174,7 @@ export default class GradebookHeaderMenu {
       students: this.gradebook.studentsThatCanSeeAssignment(
         this.gradebook.students,
         this.assignment
-      )
+      ),
     }
   ) {
     const dialog = new AssignmentDetailsDialog(opts)
@@ -188,7 +188,7 @@ export default class GradebookHeaderMenu {
         this.gradebook.students,
         this.assignment
       ),
-      messageAttachmentUploadFolderId: this.gradebook.options.message_attachment_upload_folder_id
+      messageAttachmentUploadFolderId: this.gradebook.options.message_attachment_upload_folder_id,
     }
   ) {
     let {students} = opts
@@ -208,7 +208,7 @@ export default class GradebookHeaderMenu {
         score: sub != null ? sub.score : undefined,
         // Both gradebooks share the Message Students dialog; prefer New Gradebook's casing
         sortableName: student.sortable_name,
-        submittedAt: sub != null ? sub.submitted_at : undefined
+        submittedAt: sub != null ? sub.submitted_at : undefined,
       }
     })
 
@@ -230,7 +230,7 @@ export default class GradebookHeaderMenu {
           gradingType: assignment.grading_type,
           id: assignment.id,
           name: assignment.name,
-          submissionTypes: assignment.submission_types
+          submissionTypes: assignment.submission_types,
         },
         onClose: () => {
           ReactDOM.unmountComponentAtNode(mountPoint)
@@ -249,7 +249,7 @@ export default class GradebookHeaderMenu {
         },
         messageAttachmentUploadFolderId,
         students,
-        userId: opts.current_user_id
+        userId: opts.current_user_id,
       }
       ReactDOM.render(
         <ApolloProvider client={createClient()}>
@@ -271,7 +271,7 @@ export default class GradebookHeaderMenu {
         this.assignment
       ),
       context_id: this.gradebook.options.context_id,
-      selected_section: this.gradebook.sectionToShow
+      selected_section: this.gradebook.sectionToShow,
     }
   ) {
     if (isAdmin() || !opts.assignment.inClosedGradingPeriod) {
@@ -293,7 +293,7 @@ export default class GradebookHeaderMenu {
         this.gradebook.students,
         this.assignment
       ),
-      context_url: this.gradebook.options.context_url
+      context_url: this.gradebook.options.context_url,
     }
   ) {
     let dialog
@@ -329,7 +329,7 @@ export default class GradebookHeaderMenu {
     let locals
     if (!this.$re_upload_submissions_form) {
       locals = {
-        authenticityToken: authenticity_token()
+        authenticityToken: authenticity_token(),
       }
       GradebookHeaderMenu.prototype.$re_upload_submissions_form = $(
         re_upload_submissions_form(locals)
@@ -338,7 +338,7 @@ export default class GradebookHeaderMenu {
           width: 400,
           modal: true,
           resizable: false,
-          autoOpen: false
+          autoOpen: false,
         })
         .submit(function () {
           const data = $(this).getFormData()
@@ -346,7 +346,7 @@ export default class GradebookHeaderMenu {
             return false
           } else if (!data.submissions_zip.match(/\.zip$/)) {
             $(this).formErrors({
-              submissions_zip: I18n.t('errors.upload_as_zip', 'Please upload files as a .zip')
+              submissions_zip: I18n.t('errors.upload_as_zip', 'Please upload files as a .zip'),
             })
             return false
           }

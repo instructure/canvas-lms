@@ -27,22 +27,22 @@ export default {
       type: 'GOT_USERS',
       payload: {
         users,
-        xhr
-      }
+        xhr,
+      },
     }
   },
 
   gotUserUpdate(user) {
     return {
       type: 'GOT_USER_UPDATE',
-      payload: user
+      payload: user,
     }
   },
 
   updateSearchFilter(filter) {
     return {
       type: 'UPDATE_SEARCH_FILTER',
-      payload: filter
+      payload: filter,
     }
   },
 
@@ -51,15 +51,15 @@ export default {
       type: 'SEARCH_TERM_TOO_SHORT',
       errors: {
         termTooShort: I18n.t('Search term must be at least %{num} characters', {
-          num: minSearchLength
-        })
-      }
+          num: minSearchLength,
+        }),
+      },
     }
   },
 
   loadingUsers() {
     return {
-      type: 'LOADING_USERS'
+      type: 'LOADING_USERS',
     }
   },
 
@@ -80,5 +80,5 @@ export default {
         dispatch(this.displaySearchTermTooShortError(minSearchLength))
       }
     }
-  }
+  },
 }

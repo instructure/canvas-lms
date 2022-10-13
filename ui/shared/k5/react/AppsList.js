@@ -59,7 +59,7 @@ const AppsList = ({isLoading, apps, courseId}) => {
 AppsList.propTypes = {
   isLoading: PropTypes.bool,
   apps: PropTypes.arrayOf(PropTypes.shape(AppShape)).isRequired,
-  courseId: PropTypes.string
+  courseId: PropTypes.string,
 }
 
 export default AppsList

@@ -21,7 +21,7 @@ import ManageOutcomesBillboard from './ManageOutcomesBillboard'
 
 export default {
   title: 'Examples/Outcomes/ManageOutcomesBillboard',
-  component: ManageOutcomesBillboard
+  component: ManageOutcomesBillboard,
 }
 
 const Template = args => <ManageOutcomesBillboard {...args} />

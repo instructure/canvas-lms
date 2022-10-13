@@ -30,6 +30,6 @@ export default {
     index: PropTypes.number,
     state: PropTypes.oneOf(['new', 'active', 'deleted']),
     action: PropTypes.oneOf(['edit', 'focus']),
-    is_disabled: PropTypes.bool
-  })
+    is_disabled: PropTypes.bool,
+  }),
 }

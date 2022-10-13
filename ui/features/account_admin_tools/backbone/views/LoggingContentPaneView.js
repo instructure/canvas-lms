@@ -35,7 +35,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     this.prototype.template = template
   }
 
-  constructor(options) {
+  constructor(_options) {
     super(...arguments)
     this.permissions = this.options.permissions
     this.authentication = this.initAuthLogging()
@@ -65,7 +65,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     }
 
     return new AuthLoggingContentPaneView({
-      users: this.options.users
+      users: this.options.users,
     })
   }
 
@@ -75,7 +75,7 @@ export default class LoggingContentPaneView extends Backbone.View {
     }
 
     return new GradeChangeLoggingContentView({
-      users: this.options.users
+      users: this.options.users,
     })
   }
 

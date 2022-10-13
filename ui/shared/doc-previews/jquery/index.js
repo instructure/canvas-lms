@@ -22,7 +22,7 @@ import $ from 'jquery'
 import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
-import '@canvas/jquery/jquery.instructure_misc_helpers'/*  /\$\.uniq/, capitalize */
+import '@canvas/jquery/jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
 import '@canvas/loading-image'
 import sanitizeUrl from 'sanitize-url'
 
@@ -52,13 +52,13 @@ const previewableMimeTypes = {
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [1, 1],
   'application/postscript': [1, 1],
   'application/pdf': [1, 1],
-  'application/vnd.ms-powerpoint': [1, 1]
+  'application/vnd.ms-powerpoint': [1, 1],
 }
 
 // check to see if a file of a certan mimeType is previewable inline in the browser by either scribd or googleDocs
 // ex: $.isPreviewable("application/mspowerpoint")  -> true
 //     $.isPreviewable("application/rtf", 'google') -> false
-$.isPreviewable = function(mimeType, service) {
+$.isPreviewable = function (mimeType, service) {
   return (
     previewableMimeTypes[mimeType] &&
     (!service ||
@@ -67,13 +67,13 @@ $.isPreviewable = function(mimeType, service) {
   )
 }
 
-$.fn.loadDocPreview = function(options) {
-  return this.each(function() {
+$.fn.loadDocPreview = function (options) {
+  return this.each(function () {
     const $this = $(this),
       opts = $.extend(
         {
           width: '100%',
-          height: '400px'
+          height: '400px',
         },
         $this.data(),
         options
@@ -99,7 +99,7 @@ $.fn.loadDocPreview = function(options) {
         width: opts.width,
         height: opts.height,
         allowfullscreen: '1',
-        id: opts.id
+        id: opts.id,
       })
       iframe.appendTo($this)
       iframe.load(() => {
@@ -120,7 +120,7 @@ $.fn.loadDocPreview = function(options) {
         width: opts.width,
         allowfullscreen: '1',
         css: {border: 0, overflow: 'auto', height: '99%', 'min-height': minHeight},
-        id: opts.id
+        id: opts.id,
       })
       iframe.appendTo(canvadocWrapper)
       iframe.load(() => {
@@ -134,13 +134,13 @@ $.fn.loadDocPreview = function(options) {
       opts.public_url
     ) {
       // else if it's something google docs preview can handle and we can get a public url to this document.
-      const loadGooglePreview = function() {
+      const loadGooglePreview = function () {
         // this handles both ssl and plain http.
         const googleDocPreviewUrl =
           '//docs.google.com/viewer?' +
           $.param({
             embedded: true,
-            url: opts.public_url
+            url: opts.public_url,
           })
         if (!opts.ajax_valid || opts.ajax_valid()) {
           $(
@@ -210,5 +210,5 @@ $.fn.loadDocPreview = function(options) {
         )
       }
     }
-  });
+  })
 }

@@ -29,7 +29,7 @@ const ScoresGrid = ({students, outcomes, rollups, visibleRatings}) => {
     const outcomeRollups = rollups.flatMap(r =>
       r.outcomeRollups.map(or => ({
         studentId: r.studentId,
-        ...or
+        ...or,
       }))
     )
     return keyBy(outcomeRollups, ({studentId, outcomeId}) => `${studentId}_${outcomeId}`)
@@ -70,7 +70,7 @@ ScoresGrid.propTypes = {
   students: PropTypes.arrayOf(PropTypes.shape(studentShape)).isRequired,
   outcomes: PropTypes.arrayOf(PropTypes.shape(outcomeShape)).isRequired,
   rollups: PropTypes.arrayOf(PropTypes.shape(studentRollupsShape)).isRequired,
-  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired
+  visibleRatings: PropTypes.arrayOf(PropTypes.bool).isRequired,
 }
 
 export default ScoresGrid

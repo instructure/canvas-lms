@@ -33,13 +33,13 @@ export default class ExternalToolPlacementButton extends React.Component {
     tool: PropTypes.object.isRequired,
     type: PropTypes.string, // specify "button" if this is not a menu item
     returnFocus: PropTypes.func.isRequired,
-    onToggleSuccess: PropTypes.func.isRequired
+    onToggleSuccess: PropTypes.func.isRequired,
   }
 
   state = {
     tool: this.props.tool,
     modalIsOpen: false,
-    isRetrievingTool: false
+    isRetrievingTool: false,
   }
 
   openModal = e => {
@@ -52,13 +52,13 @@ export default class ExternalToolPlacementButton extends React.Component {
 
     this.setState({
       isRetrievingTool: true,
-      modalIsOpen: true
+      modalIsOpen: true,
     })
 
     store.fetchWithDetails(this.props.tool).then(data => {
       this.setState({
         tool: {...data, ...this.props.tool},
-        isRetrievingTool: false
+        isRetrievingTool: false,
       })
     })
   }

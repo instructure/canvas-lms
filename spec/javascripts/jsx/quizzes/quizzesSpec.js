@@ -48,13 +48,13 @@ define(['jquery'], $ => {
   QUnit.module('isChangeMultiFuncBound', {
     setup() {
       sandbox.stub($, '_data')
-    }
+    },
   })
 
   test('gets events from data on first element', assert => {
     const done = assert.async()
     const $el = [{}]
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({isChangeMultiFuncBound}) => {
       isChangeMultiFuncBound($el)
       ok($._data.calledWithExactly($el[0], 'events'))
       done()
@@ -65,9 +65,9 @@ define(['jquery'], $ => {
     const done = assert.async()
     const $el = [{}]
     const events = {
-      change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
+      change: [{handler: {origFuncNm: 'changeMultiFunc'}}],
     }
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
       ok(isChangeMultiFuncBound($el))
       done()
@@ -78,9 +78,9 @@ define(['jquery'], $ => {
     const done = assert.async()
     const $el = [{}]
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({isChangeMultiFuncBound}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({isChangeMultiFuncBound}) => {
       $._data.returns(events)
       ok(!isChangeMultiFuncBound($el))
       done()
@@ -92,17 +92,17 @@ define(['jquery'], $ => {
       sandbox.stub($questionContent, 'bind')
       sandbox.stub($, '_data')
       $questionContent.bind.returns({change() {}})
-    }
+    },
   })
 
   test('rebinds event on questionContent', assert => {
     const done = assert.async()
     const questionType = 'multiple_dropdowns_question'
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
     $._data.returns(events)
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})
@@ -115,10 +115,10 @@ define(['jquery'], $ => {
     const done = assert.async()
     const questionType = 'multiple_dropdowns_question'
     const events = {
-      change: [{handler: {origFuncNm: 'changeMultiFunc'}}]
+      change: [{handler: {origFuncNm: 'changeMultiFunc'}}],
     }
     $._data.returns(events)
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})
@@ -131,10 +131,10 @@ define(['jquery'], $ => {
     const done = assert.async()
     const questionType = 'other_question'
     const events = {
-      change: [{handler: {name: 'other'}}]
+      change: [{handler: {name: 'other'}}],
     }
     $._data.returns(events)
-    require(['ui/features/quizzes/jquery/quizzes.js'], ({quiz}) => {
+    require(['ui/features/quizzes/jquery/quizzes'], ({quiz}) => {
       sandbox.stub(quiz, 'loadJQueryElemById')
       quiz.loadJQueryElemById.returns($questionContent)
       quiz.rebindMultiChange(questionType, 'question_content_0', {})

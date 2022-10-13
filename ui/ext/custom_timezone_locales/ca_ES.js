@@ -17,64 +17,45 @@
  */
 
 module.exports = {
-  "name": "ca_ES",
-  "day": {
-    "abbrev": [
-      "Dg.",
-      "Dl.",
-      "Dt.",
-      "Dc.",
-      "Dj.",
-      "Dv.",
-      "Ds.",
+  name: 'ca_ES',
+  day: {
+    abbrev: ['Dg.', 'Dl.', 'Dt.', 'Dc.', 'Dj.', 'Dv.', 'Ds.'],
+    full: ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+  },
+  month: {
+    abbrev: [
+      'Gen.',
+      'Febr.',
+      'Març',
+      'Abr.',
+      'Maig',
+      'Juny',
+      'Jul.',
+      'Ag.',
+      'Set.',
+      'Oct.',
+      'Nov.',
+      'Des.',
     ],
-    "full": [
-      "Diumenge",
-      "Dilluns",
-      "Dimarts",
-      "Dimecres",
-      "Dijous",
-      "Divendres",
-      "Dissabte",
+    full: [
+      'Gener',
+      'Febrer',
+      'Març',
+      'Abril',
+      'Maig',
+      'Juny',
+      'Juliol',
+      'Agost',
+      'Setembre',
+      'Octubre',
+      'Novembre',
+      'Desembre',
     ],
   },
-  "month": {
-    "abbrev": [
-      "Gen.",
-      "Febr.",
-      "Març",
-      "Abr.",
-      "Maig",
-      "Juny",
-      "Jul.",
-      "Ag.",
-      "Set.",
-      "Oct.",
-      "Nov.",
-      "Des.",
-    ],
-    "full": [
-      "Gener",
-      "Febrer",
-      "Març",
-      "Abril",
-      "Maig",
-      "Juny",
-      "Juliol",
-      "Agost",
-      "Setembre",
-      "Octubre",
-      "Novembre",
-      "Desembre",
-    ],
-  },
-  "meridiem": [
-    "",
-    ""
-  ],
-  "date": "%d/%m/%Y", // date.formats.default
-  "time24": "%T",
-  "dateTime": "%-d de %b a les %l:%M%P", // date.formats.date_at_time
-  "time12": "",
-  "full": "%-d de %b, %Y %-l:%M%P", // date.formats.full
+  meridiem: ['', ''],
+  date: '%d/%m/%Y', // date.formats.default
+  time24: '%T',
+  dateTime: '%-d de %b a les %l:%M%P', // date.formats.date_at_time
+  time12: '',
+  full: '%-d de %b, %Y %-l:%M%P', // date.formats.full
 }

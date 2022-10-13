@@ -27,7 +27,7 @@ export default class Conference extends Model {
   special_urls() {
     return {
       join_url: `${this.get('url')}/join`,
-      close_url: `${this.get('url')}/close`
+      close_url: `${this.get('url')}/close`,
     }
   }
 
@@ -35,21 +35,21 @@ export default class Conference extends Model {
     return {
       recording: this.get('recordings')[0],
       recordingCount: this.get('recordings').length,
-      multipleRecordings: this.get('recordings').length > 1
+      multipleRecordings: this.get('recordings').length > 1,
     }
   }
 
   permissions_data() {
     return {
       has_actions: this.get('permissions').update || this.get('permissions').delete,
-      show_end: this.get('permissions').close && this.get('started_at') && !this.get('ended_at')
+      show_end: this.get('permissions').close && this.get('started_at') && !this.get('ended_at'),
     }
   }
 
   schedule_data() {
     return {
       scheduled: 'scheduled_date' in this.get('user_settings'),
-      scheduled_at: this.get('user_settings').scheduled_date
+      scheduled_at: this.get('user_settings').scheduled_date,
     }
   }
 

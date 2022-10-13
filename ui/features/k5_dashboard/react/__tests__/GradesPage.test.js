@@ -42,8 +42,8 @@ const defaultCourses = [
       {
         id: '1',
         title: 'The First One',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ],
     enrollments: [
       {
@@ -51,9 +51,9 @@ const defaultCourses = [
         role: 'StudentEnrollment',
         role_id: '19',
         user_id: '1',
-        enrollment_state: 'active'
-      }
-    ]
+        enrollment_state: 'active',
+      },
+    ],
   },
   {
     courseId: '2',
@@ -70,8 +70,8 @@ const defaultCourses = [
       {
         id: '1',
         title: 'The First One',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ],
     enrollments: [
       {
@@ -79,9 +79,9 @@ const defaultCourses = [
         role: 'StudentEnrollment',
         role_id: '19',
         user_id: '1',
-        enrollment_state: 'active'
-      }
-    ]
+        enrollment_state: 'active',
+      },
+    ],
   },
   {
     courseId: '3',
@@ -93,9 +93,9 @@ const defaultCourses = [
       {
         id: '1',
         title: 'The First One',
-        workflow_state: 'active'
-      }
-    ]
+        workflow_state: 'active',
+      },
+    ],
   },
   {
     courseId: '4',
@@ -112,13 +112,13 @@ const defaultCourses = [
       {
         id: '2',
         title: 'The Second One',
-        workflow_state: 'active'
+        workflow_state: 'active',
       },
       {
         id: '3',
         title: 'A Third One!',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ],
     enrollments: [
       {
@@ -126,9 +126,9 @@ const defaultCourses = [
         role: 'StudentEnrollment',
         role_id: '19',
         user_id: '1',
-        enrollment_state: 'active'
-      }
-    ]
+        enrollment_state: 'active',
+      },
+    ],
   },
   {
     courseId: '5',
@@ -145,8 +145,8 @@ const defaultCourses = [
       {
         id: '3',
         title: 'A Third One!',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ],
     enrollments: [
       {
@@ -155,16 +155,16 @@ const defaultCourses = [
         role_id: '23',
         user_id: '1',
         enrollment_state: 'active',
-        associated_user_id: '4'
+        associated_user_id: '4',
       },
       {
         type: 'student',
         role: 'StudentEnrollment',
         role_id: '19',
         user_id: '4',
-        enrollment_state: 'active'
-      }
-    ]
+        enrollment_state: 'active',
+      },
+    ],
   },
   {
     courseId: '6',
@@ -181,8 +181,8 @@ const defaultCourses = [
       {
         id: '3',
         title: 'A Third One!',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ],
     enrollments: [
       {
@@ -191,43 +191,43 @@ const defaultCourses = [
         role_id: '23',
         user_id: '1',
         enrollment_state: 'active',
-        associated_user_id: '4'
+        associated_user_id: '4',
       },
       {
         type: 'student',
         role: 'StudentEnrollment',
         role_id: '19',
         user_id: '4',
-        enrollment_state: 'active'
-      }
-    ]
-  }
+        enrollment_state: 'active',
+      },
+    ],
+  },
 ]
 
 const defaultSpecificPeriodGrades = [
   {
     courseId: '0',
     score: 99,
-    grade: 'A+'
+    grade: 'A+',
   },
   {
     courseId: '1',
     score: 80,
-    grade: 'B-'
+    grade: 'B-',
   },
   {
     courseId: '2',
     score: null,
-    grade: null
-  }
+    grade: null,
+  },
 ]
 
 const defaultProps = {
   visible: true,
   currentUserRoles: ['student', 'user'],
   currentUser: {
-    id: '1'
-  }
+    id: '1',
+  },
 }
 
 const BASE_GRADES_URL =
@@ -298,10 +298,10 @@ describe('GradesPage', () => {
             {
               id: '1',
               title: 'The Only One',
-              workflow_state: 'active'
-            }
-          ]
-        }
+              workflow_state: 'active',
+            },
+          ],
+        },
       ]),
       {overwriteRoutes: true}
     )
@@ -351,12 +351,12 @@ describe('GradesPage', () => {
         {
           id: '7',
           title: 'Summer Make-up',
-          workflow_state: 'active'
-        }
-      ]
+          workflow_state: 'active',
+        },
+      ],
     }
     fetchMock.get(GRADING_PERIODS_URL, JSON.stringify([courseWithoutGrades]), {
-      overwriteRoutes: true
+      overwriteRoutes: true,
     })
     const {getByText, queryByText} = render(<GradesPage {...defaultProps} />)
 
@@ -434,18 +434,18 @@ describe('getGradingPeriodsFromCourse', () => {
       {
         id: '1',
         title: 'The First One',
-        workflow_state: 'active'
+        workflow_state: 'active',
       },
       {
         id: '2',
         title: 'The Second One',
-        workflow_state: 'active'
+        workflow_state: 'active',
       },
       {
         id: '3',
         title: 'A Third One!',
-        workflow_state: 'active'
-      }
+        workflow_state: 'active',
+      },
     ])
   })
 })
@@ -474,13 +474,13 @@ describe('overrideCourseGradingPeriods', () => {
           {
             id: '2',
             title: 'The Second One',
-            workflow_state: 'active'
+            workflow_state: 'active',
           },
           {
             id: '3',
             title: 'A Third One!',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         ],
         enrollments: [
           {
@@ -488,10 +488,10 @@ describe('overrideCourseGradingPeriods', () => {
             role: 'StudentEnrollment',
             role_id: '19',
             user_id: '1',
-            enrollment_state: 'active'
-          }
-        ]
-      }
+            enrollment_state: 'active',
+          },
+        ],
+      },
     ])
   })
 
@@ -513,8 +513,8 @@ describe('overrideCourseGradingPeriods', () => {
           {
             id: '1',
             title: 'The First One',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         ],
         enrollments: [
           {
@@ -522,9 +522,9 @@ describe('overrideCourseGradingPeriods', () => {
             role: 'StudentEnrollment',
             role_id: '19',
             user_id: '1',
-            enrollment_state: 'active'
-          }
-        ]
+            enrollment_state: 'active',
+          },
+        ],
       },
       {
         courseId: '2',
@@ -542,8 +542,8 @@ describe('overrideCourseGradingPeriods', () => {
           {
             id: '1',
             title: 'The First One',
-            workflow_state: 'active'
-          }
+            workflow_state: 'active',
+          },
         ],
         enrollments: [
           {
@@ -551,10 +551,10 @@ describe('overrideCourseGradingPeriods', () => {
             role: 'StudentEnrollment',
             role_id: '19',
             user_id: '1',
-            enrollment_state: 'active'
-          }
-        ]
-      }
+            enrollment_state: 'active',
+          },
+        ],
+      },
     ])
   })
 })
