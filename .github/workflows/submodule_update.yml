@@ -31,4 +31,4 @@ jobs:
         git config --global user.name 'Qwerty Talk'
         git config --global user.email 'qwertytalk@strongmind.com'
         git remote set-url origin https://x-access-token:${{ secrets.CI_TOKEN }}@github.com/${{ github.repository }}
-        git commit && git push || echo "No changes to commit"
+        git commit -am "Auto updated submodule references" && git push || echo "No changes to commit"
