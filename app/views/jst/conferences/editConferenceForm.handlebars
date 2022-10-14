@@ -70,15 +70,11 @@
         </li>
       {{/each}}
     </ul>
-    <label class="checkbox" for="user_all">
-      {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
-      {{#if context_is_group }}
-        {{#t "invite_all.group"}}Invite All Group Members{{/t}}
-      {{else}}
-        {{#t "invite_all.course"}}Invite All Course Members{{/t}}
-      {{/if}}
-    </label>
     <hr>
+    <label class="checkbox" for="user_all" style="margin-left: 10px; padding-bottom: 10px;">
+      {{checkbox "user.all" class="all_users_checkbox"}}
+      Select All
+    </label>
   </div>
   <div>
     <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
@@ -86,11 +82,14 @@
         <li class="member user_{{id}}">
           <label class="checkbox" for="user_{{id}}">
             <input name="user[{{id}}]" type="hidden" value="0">
-            <input id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">
+            <input class="select_user_checkbox" id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">
             {{name}}
           </label>
         </li>
       {{/each}}
     </ul>
   </div>
+  <div hidden> 
+    <input id="checked_users_input" type="hidden">
+  </div> 
 </form>

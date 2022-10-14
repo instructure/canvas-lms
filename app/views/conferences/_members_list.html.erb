@@ -1,9 +1,9 @@
 <% if users.present? %>
     <% users.each do |user| %>
-        <li class="member user_#{user.id}">
-            <label class="checkbox" for="user_#{user.id}">
-                <input name="user[#{user.id}]" type="hidden" value="0">
-                <input id="user_#{user.id}" name="user[#{user.id}]" type="checkbox" value="1">
+        <li class=<%= "member user_#{user.id}" %>>
+            <label class="checkbox" for=<%= "user_#{user.id}" %>>
+                <input name=<%= "user[#{user.id}]" %> type="hidden" value="0">
+                <input class="select_user_checkbox" id=<%= "user_#{user.id}" %> name=<%="user[#{user.id}]" %> type="checkbox" value="1">
                 <%= user.last_name_first %>
             </label>
         </li>
