@@ -157,6 +157,7 @@ window.Jobs = class Jobs extends FlavorGrid {
       case 'tag':
         $('#jobs-search').show()
         $('#jobs-search').attr('placeholder', flavor)
+        break
       default:
         $('#jobs-search').hide()
     }
