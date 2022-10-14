@@ -280,7 +280,7 @@ $(function () {
       }
       $alert.find('.criteria input.editing').each(function () {
         const val = $(this).attr('value')
-        if (!val || isNaN(val) || parseFloat(val) < 0) {
+        if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $(this),
             I18n.t('errors.threshold_should_be_numeric', 'This should be a positive number'),
@@ -298,7 +298,7 @@ $(function () {
       } else {
         const $repetition = $alert.find('input[name="alert[repetition]"]')
         const val = $repetition.attr('value')
-        if (!val || isNaN(val) || parseFloat(val) < 0) {
+        if (!val || Number.isNaN(Number(val)) || parseFloat(val) < 0) {
           errors.push([
             $repetition,
             I18n.t('errors.threshold_should_be_numeric', 'This should be a positive number'),

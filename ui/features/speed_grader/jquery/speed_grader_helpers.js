@@ -89,8 +89,7 @@ const speedGraderHelpers = {
     const select = '&version='
     // check if the version is valid, or matches the index
     const version = submission.submission_history[currentSelectedIndex].submission.version
-    // eslint-disable-next-line no-restricted-globals
-    if (version == null || isNaN(version)) {
+    if (version == null || Number.isNaN(Number(version))) {
       return select + currentSelectedIndex
     }
     return select + version

@@ -134,7 +134,7 @@ class GradingPeriodCollection extends React.Component {
   }
 
   areDatesValid = period => {
-    if (!isNaN(period.startDate) && !isNaN(period.endDate)) {
+    if (!Number.isNaN(Number(period.startDate)) && !Number.isNaN(Number(period.endDate))) {
       return true
     } else {
       $.flashError(I18n.t('All dates fields must be present and formatted correctly'))
