@@ -48,7 +48,7 @@ function submissionLoaded(data) {
     d.push(data)
     data = d
   }
-  for (var jdx in data) {
+  for (const jdx in data) {
     const submission = data[jdx].submission
     const comments = submission.visible_submission_comments || submission.submission_comments
     const anonymizableId = ENV.SUBMISSION.user_id ? 'user_id' : 'anonymous_id'
@@ -75,8 +75,8 @@ function submissionLoaded(data) {
         })
         $comment.find('.comment').empty().append($media_comment_link.show())
       } else {
-        for (var jdx in comment.attachments) {
-          const attachment = comment.attachments[jdx].attachment
+        for (const jdx_ in comment.attachments) {
+          const attachment = comment.attachments[jdx_].attachment
           const $attachment = $('#comment_attachment_blank').clone(true).removeAttr('id')
           attachment.comment_id = comment.id
           $attachment.fillTemplateData({

@@ -164,12 +164,12 @@ $(document).ready(function () {
 
       if (type === 'email' || type === 'sms_email' || type === 'slack') {
         // Make sure it's a valid email address
-        var match = address.match(
+        const match = address.match(
           /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
         )
         if (!match) {
           // Not a valid email address. Show a message on the relevant field, then bail.
-          var errorMessage =
+          const errorMessage =
             address === '' ? I18n.t('Email is required') : I18n.t('Email is invalid!')
           if (type === 'email') {
             $(this).formErrors({communication_channel_email: errorMessage})
@@ -183,9 +183,9 @@ $(document).ready(function () {
         // the address will already have the country code prepended, and this will result in our regex failing always
         // because it's not expecting the leading plus sign (and it can't just be added to the regex because then
         // we can't detect when they entered a blank phone number). libphonenumber plz
-        var match = data.communication_channel_sms_number.match(/^[0-9]+$/)
+        const match = data.communication_channel_sms_number.match(/^[0-9]+$/)
         if (!match) {
-          var errorMessage =
+          const errorMessage =
             address === '' ? I18n.t('Cell Number is required') : I18n.t('Cell Number is invalid!')
           $(this).formErrors({communication_channel_sms_number: errorMessage})
           return false

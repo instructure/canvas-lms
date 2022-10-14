@@ -42,11 +42,10 @@ export default class ConfigurationFormXml extends React.Component {
   }
 
   isValid = () => {
-    var fields = ['name', 'xml'],
-      errors = {},
+    const fields = ['name', 'xml'],
       formErrors = []
 
-    var errors = {}
+    const errors = {}
     fields.forEach(field => {
       const value = this.refs[field].state.value
       if (!value) {

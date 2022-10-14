@@ -191,10 +191,10 @@ jQuery(function ($) {
           $header.find('.collapse_sub_accounts_link, .add_sub_account_link').show()
           $header.parent('.account').children('ul').empty().hide()
           let account = null
-          for (var idx in data) {
+          for (const idx in data) {
             account = data[idx]
           }
-          for (var idx in account.sub_accounts) {
+          for (const idx in account.sub_accounts) {
             let sub_account = null
             for (const jdx in account.sub_accounts[idx]) {
               if (typeof account.sub_accounts[idx][jdx] === 'object') {
