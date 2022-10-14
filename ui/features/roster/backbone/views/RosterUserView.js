@@ -259,7 +259,7 @@ export default class RosterUserView extends Backbone.View {
     )
   }
 
-  removeFromCourse(e) {
+  removeFromCourse(_e) {
     // eslint-disable-next-line no-alert
     if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return

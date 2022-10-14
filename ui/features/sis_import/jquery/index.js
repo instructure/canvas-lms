@@ -26,11 +26,11 @@ import 'jqueryui/progressbar'
 
 const I18n = useI18nScope('sis_import')
 
-$(document).ready(function (event) {
+$(document).ready(function (_event) {
   let state = 'nothing'
 
   $('#batch_mode')
-    .change(function (event) {
+    .change(function (__event) {
       $('#batch_mode_term_id_label').showIf($(this).attr('checked'))
       $('#batch_mode_term_id').showIf($(this).attr('checked'))
     })
@@ -41,7 +41,7 @@ $(document).ready(function (event) {
   const $clear_sis_stickiness = $('#clear_sis_stickiness')
   const $add_sis_stickiness_container = $('#add_sis_stickiness_container')
   const $clear_sis_stickiness_container = $('#clear_sis_stickiness_container')
-  function updateSisCheckboxes(event) {
+  function updateSisCheckboxes(__event) {
     $add_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
     $clear_sis_stickiness_container.showIf($override_sis_stickiness.attr('checked'))
     $add_sis_stickiness.disableIf($clear_sis_stickiness.attr('checked'))

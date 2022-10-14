@@ -102,7 +102,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
     )
   }
 
-  success(data) {
+  success(_data) {
     if (this.action === 'enroll') {
       // they should now be authenticated (either registered or pre_registered)
       let q = window.location.search

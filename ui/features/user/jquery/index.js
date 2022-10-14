@@ -24,10 +24,10 @@ const I18n = useI18nScope('users')
 /* confirmDelete */
 
 $(function () {
-  $('.courses .course,.groups .group').bind('focus mouseover', function (event) {
+  $('.courses .course,.groups .group').bind('focus mouseover', function (_event) {
     $(this).find('.info').addClass('info_hover')
   })
-  $('.courses .course,.groups .group').bind('blur mouseout', function (event) {
+  $('.courses .course,.groups .group').bind('blur mouseout', function (_event) {
     $(this).find('.info').removeClass('info_hover')
   })
   $('#courses .unenroll_link').click(function (event) {

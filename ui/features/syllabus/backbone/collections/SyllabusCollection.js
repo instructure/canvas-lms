@@ -30,7 +30,7 @@ export default class SyllabusCollection extends Backbone.Collection {
     for (const collection of collections) {
       collection.on('add', (model, collection, options) => this.add(model, options))
       collection.on('remove', (model, collection, options) => this.remove(model, options))
-      collection.on('reset', (collection, options) => {
+      collection.on('reset', (collection, _options) => {
         function find_collection_models(memo, model) {
           if (model.get('collection') === collection) {
             return memo.push(model)

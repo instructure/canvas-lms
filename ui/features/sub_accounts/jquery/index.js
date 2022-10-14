@@ -154,7 +154,7 @@ jQuery(function ($) {
               $focusTo.focus()
             })
           },
-          error(data, request, status, error) {
+          error(data) {
             this.undim()
             if (data.hasOwnProperty('message')) {
               alert(data.message)
@@ -261,7 +261,7 @@ jQuery(function ($) {
           $header.parent('.account').children('ul').slideDown()
           $header.find('.collapse_sub_accounts_link').focus()
         },
-        data => {}
+        _data => {}
       )
     }
     return false
