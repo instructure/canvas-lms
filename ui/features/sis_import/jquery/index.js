@@ -60,16 +60,16 @@ $(document).ready(function (event) {
         '<li>' +
         htmlEscape(I18n.t('headers.import_errors', 'Errors that prevent importing')) +
         '\n<ul>'
-      for (var i in batch.processing_errors) {
-        var message = batch.processing_errors[i]
+      for (const i in batch.processing_errors) {
+        const message = batch.processing_errors[i]
         output += '<li>' + htmlEscape(message[0]) + ' - ' + htmlEscape(message[1]) + '</li>'
       }
       output += '</ul>\n</li>'
     }
     if (batch.processing_warnings && batch.processing_warnings.length > 0) {
       output += '<li>' + htmlEscape(I18n.t('headers.import_warnings', 'Warnings')) + '\n<ul>'
-      for (var i in batch.processing_warnings) {
-        var message = batch.processing_warnings[i]
+      for (const i in batch.processing_warnings) {
+        const message = batch.processing_warnings[i]
         output += '<li>' + htmlEscape(message[0]) + ' - ' + htmlEscape(message[1]) + '</li>'
       }
       output += '</ul>\n</li>'
@@ -211,7 +211,7 @@ $(document).ready(function (event) {
     $('.copy_progress').progressbar()
     state = 'nothing'
     let fakeTickCount = 0
-    var tick = function () {
+    const tick = function () {
       if (state === 'nothing') {
         fakeTickCount++
         const progress = ($('.copy_progress').progressbar('option', 'value') || 0) + 0.25
@@ -225,7 +225,7 @@ $(document).ready(function (event) {
         setTimeout(tick, 10000)
       }
     }
-    var checkup = function () {
+    const checkup = function () {
       let lastProgress = null
       let waitTime = 1500
       $.ajaxJSON(
@@ -261,34 +261,40 @@ $(document).ready(function (event) {
             const code = 'sis_batch_' + sis_batch.id
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
-            var message = I18n.t(
-              'errors.import_failed_code',
-              'There was an error importing your SIS data. Please notify your system administrator and give them the following code: "%{code}"',
-              {code}
-            )
-            $('.sis_messages .sis_error_message').text(message)
+            {
+              const message = I18n.t(
+                'errors.import_failed_code',
+                'There was an error importing your SIS data. Please notify your system administrator and give them the following code: "%{code}"',
+                {code}
+              )
+              $('.sis_messages .sis_error_message').text(message)
+            }
             $('.sis_messages').show()
           } else if (sis_batch.workflow_state === 'failed_with_messages') {
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
-            var message = htmlEscape(
-              I18n.t('errors.import_failed_messages', 'The import failed with these messages:')
-            )
-            message += createMessageHtml(sis_batch)
-            $('.sis_messages .sis_error_message').html($.raw(message))
+            {
+              let message = htmlEscape(
+                I18n.t('errors.import_failed_messages', 'The import failed with these messages:')
+              )
+              message += createMessageHtml(sis_batch)
+              $('.sis_messages .sis_error_message').html($.raw(message))
+            }
             $('.sis_messages').show()
           } else if (sis_batch.workflow_state === 'imported_with_messages') {
             $('.progress_bar_holder').hide()
             $('#sis_importer').hide()
-            var message = htmlEscape(
-              I18n.t(
-                'messages.import_complete_warnings',
-                'The SIS data was imported but with these messages:'
+            {
+              let message = htmlEscape(
+                I18n.t(
+                  'messages.import_complete_warnings',
+                  'The SIS data was imported but with these messages:'
+                )
               )
-            )
-            message += createMessageHtml(sis_batch)
-            message += createCountsHtml(sis_batch)
-            $('.sis_messages').show().html($.raw(message))
+              message += createMessageHtml(sis_batch)
+              message += createCountsHtml(sis_batch)
+              $('.sis_messages').show().html($.raw(message))
+            }
           } else {
             if (progress == lastProgress) {
               waitTime = Math.max(waitTime + 500, 30000)
