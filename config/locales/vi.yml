@@ -9425,8 +9425,8 @@ vi:
       submissions_upload: "%{assignment} Tải Lên Bài Nộp"
   graded_25cd3fcd: "Đã Chấm Điểm"
   graded_date_by_grader_e8e1ff75: "%{graded_date} chậm nhất vào %{grader}"
-  graded_quiz_7fabdf1f: "Câu Hỏi Kiểm Tra Đã Chấm Điểm"
-  graded_survey_c0f0c395: "Khảo Sát Đã Chấm Điểm"
+  graded_quiz_7fabdf1f: "Kiểm tra có chấm điểm"
+  graded_survey_c0f0c395: "Khảo sát có chấm điểm"
   grader_comments_visible_to_graders_turned_off_d2af5e9d: "Bình luận của sinh viên hiển thị cho sinh viên đã tắt"
   grader_comments_visible_to_graders_turned_on_dca303c7: "Bình luận của sinh viên hiển thị cho sinh viên đã bật"
   grader_count_cannot_be_0_9228afe4: "Số sinh viên không được bằng 0"
@@ -15480,7 +15480,7 @@ vi:
   powered_by_instructure_504d676d: "Được Cung Cấp Bởi Instructure"
   ppt_534cb87: PPT
   ppt_9393890d: ppt
-  practice_quiz_19a8505d: "Kiểm Tra Thực Hành"
+  practice_quiz_19a8505d: "Kiểm tra luyện tập"
   pre_processing_92865c1d: "Trước xử lý"
   prerequisites_49659f16: "Điều kiện tiên quyết:"
   prerequisites_list_62d66d12: "Điều kiện tiên quyết: %{list}"
@@ -16948,7 +16948,7 @@ vi:
   quizzes_index: 
     headers: 
       assignment_quizzes: "Kiểm Tra Bài Tập"
-      practice_quizzes: "Kiểm Tra Thực Hành"
+      practice_quizzes: "Kiểm tra luyện tập"
       surveys: "Khảo Sát"
     toggle_message: "chuyển đổi chế độ hiển thị kiểm tra"
   quizzes_index_menu_1ce11b54: "Menu Chỉ Mục Kiểm Tra"
@@ -17437,7 +17437,7 @@ vi:
   requested_bbdb5b26: "Đã yêu cầu"
   requeue_job_98b20240: "Xếp Hàng Lại Công Việc"
   requeued_job_id_367324e9: "ID Công Việc Được Xếp Hàng Lại"
-  require_an_access_code_600e06e8: "Yêu một cầu mã truy cập"
+  require_an_access_code_600e06e8: "Yêu cầu một mã truy cập"
   require_assignment_due_date_778b200d: "Yêu cầu ngày đến hạn cho bài tập"
   require_authentication_provider_on_logins_2aeb580e: "Yêu Cầu Nhà Cung Cấp Xác Thực khi Đăng Nhập"
   require_captcha_for_self_registration_b3b2ea02: "Yêu Cầu Captcha để Tự Đăng Ký"
@@ -21238,7 +21238,7 @@ vi:
     one: "Chưa Được Chấm Điểm, 1 Điểm Có Thể Đạt Được"
     other: "Chưa Được Chấm Điểm, %{formattedPoints} Điểm Có Thể Đạt Được"
   ungraded_submissions_44efb0ec: "Bài Nộp Chưa Được Chấm Điểm"
-  ungraded_survey_ad7de790: "Khảo Sát Chưa Được Chấm Điểm"
+  ungraded_survey_ad7de790: "Khảo sát không chấm điểm"
   unique_user_id_dfca1a7f: "ID Người Dùng Độc Nhất"
   united_arab_emirates_971_649b3750: "Các Tiểu Vương Quốc Ả Rập Thống Nhất (+971)"
   united_kingdom_44_880b06ad: "Anh (+44)"
