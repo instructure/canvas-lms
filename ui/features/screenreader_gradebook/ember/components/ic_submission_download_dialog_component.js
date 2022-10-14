@@ -113,7 +113,7 @@ export default register(
 
     downloadCompletedFile: function () {
       if (this.get('percentComplete') === 100) {
-        return (location.href = this.get('url'))
+        return (window.location.href = this.get('url'))
       }
     }.observes('percentComplete'),
 

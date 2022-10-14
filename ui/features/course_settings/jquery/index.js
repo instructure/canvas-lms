@@ -100,7 +100,7 @@ var GradePublishing = {
             'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.'
           )
 
-    if (!confirm(confirmMessage)) {
+    if (!window.confirm(confirmMessage)) {
       return
     }
 

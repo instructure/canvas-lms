@@ -155,7 +155,7 @@ export default class MessageItemView extends View {
     }
     let $toFocus
     e.preventDefault()
-    if (!confirm(this.messages.confirmDelete)) {
+    if (!window.confirm(this.messages.confirmDelete)) {
       $(`.message-item-view[data-id=${this.model.id}] .al-trigger`).focus()
       return
     }

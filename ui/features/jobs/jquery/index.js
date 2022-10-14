@@ -323,7 +323,7 @@ window.Jobs = class Jobs extends FlavorGrid {
             )
         }
       })()
-      if (!confirm(message)) return
+      if (!window.confirm(message)) return
     }
 
     // special case -- if they've selected all, then don't send the ids so that

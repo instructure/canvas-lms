@@ -63,7 +63,7 @@ $(document).ready(function (_event) {
       let lastProgress = null
       let waitTime = 1500
       $.ajaxJSON(
-        location.href + '/' + current_id,
+        window.location.href + '/' + current_id,
         'GET',
         {},
         data => {

@@ -47,7 +47,7 @@ export default function deleteStuff(filesAndFolders, args) {
           name: filesAndFolders[0] && filesAndFolders[0].displayName(),
         }
       )
-  if (!confirm(message)) return
+  if (!window.confirm(message)) return
 
   const promises = filesAndFolders.map(item =>
     item.destroy({

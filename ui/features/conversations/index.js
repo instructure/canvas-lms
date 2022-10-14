@@ -196,7 +196,7 @@ const ConversationsRouter = Backbone.Router.extend({
             },
             {count: this.list.selectedMessages.length}
           )
-    if (!confirm(confirmMessage)) {
+    if (!window.confirm(confirmMessage)) {
       $(trigger).focus()
       return
     }
@@ -228,7 +228,7 @@ const ConversationsRouter = Backbone.Router.extend({
       },
       {count: this.list.selectedMessages.length}
     )
-    if (!confirm(confirmMsg)) {
+    if (!window.confirm(confirmMsg)) {
       $(trigger).focus()
       return
     }

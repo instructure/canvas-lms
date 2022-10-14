@@ -32,11 +32,11 @@ export default class RedirectReturnContainer {
   }
 
   _contentCancel = (_event, _data) => {
-    location.href = this.cancelUrl
+    window.location.href = this.cancelUrl
   }
 
   redirectToSuccessUrl = () => {
-    location.href = this.successUrl
+    window.location.href = this.successUrl
   }
 
   createMigration = file_url => {

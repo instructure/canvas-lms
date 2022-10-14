@@ -65,6 +65,6 @@ $(() => {
   $registration_form.formSubmit({
     disableWhileLoading: 'spin_on_success',
     errorFormatter: registrationErrors,
-    success: data => (location.href = data.url || '/'),
+    success: data => (window.location.href = data.url || '/'),
   })
 })

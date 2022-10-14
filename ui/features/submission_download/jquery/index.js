@@ -71,7 +71,7 @@ INST.downloadSubmissions = function (url, onClose) {
             )
             $('#download_submissions_dialog .status_loader').css('visibility', 'hidden')
 
-            location.href = url
+            window.location.href = url
             return
           } else if (attachment.workflow_state === 'errored') {
             // The only way the backend gets to an "errored" state is if there are no files to add
