@@ -101,6 +101,19 @@ export function insertImage(editor, image) {
     content = renderLinkedImage(editor.selection.getRng().startContainer, image)
   } else {
     // render the image, constraining its size on insertion
+    const imgNode = editor.selection.getNode()
+    // apply selected styles only in course/user images
+    if (isElemImg(imgNode) && !image['data-inst-icon-maker-icon']) {
+      const customStyles = imgNode.style
+      const customWidth = imgNode.getAttribute('width')
+      const parseStyles = {}
+      for (let i = 0; i < customStyles.length; ++i) {
+        const cssAttribute = customStyles.item(i)
+        parseStyles[cssAttribute] = customStyles[cssAttribute]
+      }
+      image.width = customWidth
+      image.style = parseStyles
+    }
     content = renderImage({
       ...image,
     })

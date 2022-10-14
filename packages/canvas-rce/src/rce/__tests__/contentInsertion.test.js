@@ -306,6 +306,29 @@ describe('contentInsertion', () => {
       }
     })
 
+    it('it keeps the original image style when replaced', () => {
+      const imageToReplace = document.createElement('img')
+      imageToReplace.style.cssText = 'float: left;'
+      editor.selection.getNode = () => {
+        return {
+          ...node,
+          nodeName: 'IMG',
+          style: imageToReplace.style,
+          getAttribute: attr => {
+            const imageAttributes = {
+              width: '100px',
+            }
+
+            return imageAttributes[attr]
+          },
+        }
+      }
+      contentInsertion.insertImage(editor, image)
+      expect(editor.content).toEqual(
+        '<img alt="Here Be Images" src="/some/path/preview" width="100px" style="float:left"/>'
+      )
+    })
+
     it('builds image html from image data', () => {
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
