@@ -229,7 +229,7 @@ $(document).ready(function (event) {
       let lastProgress = null
       let waitTime = 1500
       $.ajaxJSON(
-        location.href,
+        window.location.href,
         'GET',
         {},
         data => {
@@ -333,10 +333,9 @@ $(document).ready(function (event) {
 
   function check_if_importing() {
     state = 'checking'
-    $.ajaxJSON(location.href, 'GET', {}, data => {
+    $.ajaxJSON(window.location.href, 'GET', {}, data => {
       state = 'nothing'
       const sis_batch = data
-      const progress = 0
       if (
         sis_batch &&
         (sis_batch.workflow_state === 'importing' || sis_batch.workflow_state === 'created')

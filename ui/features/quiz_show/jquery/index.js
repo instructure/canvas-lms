@@ -257,7 +257,7 @@ $(document).ready(function () {
     },
     success(data) {
       $(this).find('button').text(I18n.t('buttons.already_published', 'Published!'))
-      location.reload()
+      window.location.reload()
     },
   })
 

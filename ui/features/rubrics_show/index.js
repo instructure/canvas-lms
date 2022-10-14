@@ -28,7 +28,7 @@ $(document).ready(() => {
 
   $('#right-side .delete_rubric_link').click(event => {
     event.preventDefault()
-    const callback = () => (location.href = $('.rubrics_url').attr('href'))
+    const callback = () => (window.location.href = $('.rubrics_url').attr('href'))
 
     callback.confirmationMessage = confirmationMessage()
 

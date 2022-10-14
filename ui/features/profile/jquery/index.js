@@ -103,7 +103,7 @@ $update_profile_form
         locale: $("#user_locale option[value='" + user.locale + "']").text(),
       }
       if (templateData.locale != $update_profile_form.find('.locale').text()) {
-        location.reload()
+        window.location.reload()
         return
       }
       if ($default_email_id.length > 0) {
@@ -322,7 +322,7 @@ $('#access_token_form').formSubmit({
   },
 })
 $('#token_details_dialog .regenerate_token').click(function () {
-  const result = confirm(
+  const result = window.confirm(
     I18n.t(
       'confirms.regenerate_token',
       'Are you sure you want to regenerate this token?  Anything using this token will have to be updated.'

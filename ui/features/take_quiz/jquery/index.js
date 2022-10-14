@@ -216,9 +216,9 @@ const quizSubmission = (function () {
               // Connectivity lost?
               const current_user_id = window.ENV.current_user_id || 'none'
               $.ajaxJSON(
-                location.protocol +
+                window.location.protocol +
                   '//' +
-                  location.host +
+                  window.location.host +
                   '/simple_response.json?user_id=' +
                   current_user_id +
                   '&rnd=' +
@@ -231,7 +231,7 @@ const quizSubmission = (function () {
                     I18n.t(
                       'errors.connection_lost',
                       "Connection to %{host} was lost.  Please make sure you're connected to the Internet before continuing.",
-                      {host: location.host}
+                      {host: window.location.host}
                     )
                   )
                 }
@@ -619,14 +619,14 @@ $(function () {
 
       if (!event.isDefaultPrevented()) {
         const url = $(this).attr('href') || ''
-        let hashStripped = location.href
+        let hashStripped = window.location.href
         if (hashStripped.indexOf('#')) {
           hashStripped = hashStripped.substring(0, hashStripped.indexOf('#'))
         }
         if (url.indexOf('#') == 0 || url.indexOf(hashStripped + '#') == 0) {
           return
         }
-        const result = confirm(
+        const result = window.confirm(
           I18n.t(
             'confirms.navigate_away',
             "You're about to navigate away from this page.  Continue anyway?"
@@ -911,7 +911,7 @@ $(function () {
     }
 
     if (warningMessage != undefined && !quizSubmission.submitting) {
-      const result = confirm(warningMessage)
+      const result = window.confirm(warningMessage)
       if (!result) {
         event.preventDefault()
         event.stopPropagation()

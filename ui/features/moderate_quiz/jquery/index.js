@@ -508,7 +508,7 @@ $(document).ready(function (event) {
         data.time_type === 'extend_from_now' &&
         data.time < $dialog.data('row').data('minutes_left')
       ) {
-        const result = confirm(
+        const result = window.confirm(
           I18n.t(
             'confirms.taking_time_away',
             'That would be less time than the student currently has.  Continue anyway?'

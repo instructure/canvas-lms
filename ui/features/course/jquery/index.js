@@ -23,7 +23,7 @@ const I18n = useI18nScope('courses')
 
 $(document).ready(() => {
   $('.reject_button').click(event => {
-    const result = confirm(
+    const result = window.confirm(
       I18n.t(
         'confirm_reject_invitation',
         'Are you sure you want to reject the invitation to participate in this course?'

@@ -105,7 +105,7 @@ export function updateAlignments(alignments) {
 export function attachPageEvents(e) {
   $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function (event) {
     event.preventDefault()
-    const result = confirm(
+    const result = window.confirm(
         I18n.t(
           'remove_outcome_from_bank',
           'Are you sure you want to remove this outcome from the bank?'
@@ -203,7 +203,7 @@ export function attachPageEvents(e) {
           'Are you sure you want to delete this bank of questions?'
         ),
         success() {
-          location.href = $('.assessment_question_banks_url').attr('href')
+          window.location.href = $('.assessment_question_banks_url').attr('href')
         },
       })
   })

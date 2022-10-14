@@ -162,7 +162,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
       ) === 'already_enrolled'
     ) {
       // just reload if already enrolled
-      location.reload(true)
+      window.location.reload(true)
       return []
     }
 
@@ -178,7 +178,7 @@ export default class SelfEnrollmentForm extends Backbone.View {
 
   logOut(refresh = false) {
     return $.ajaxJSON('/logout', 'DELETE', {}, () => {
-      if (refresh) location.reload(true)
+      if (refresh) window.location.reload(true)
     })
   }
 
