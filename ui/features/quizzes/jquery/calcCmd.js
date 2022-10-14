@@ -132,19 +132,14 @@ const calcCmd = {}
     switch (syntax[syntaxIndex].token) {
       case 'add':
         return syntax[syntaxIndex++]
-        break
       case 'subtract':
         return syntax[syntaxIndex++]
-        break
       case 'multiply':
         return syntax[syntaxIndex++]
-        break
       case 'divide':
         return syntax[syntaxIndex++]
-        break
       case 'power':
         return syntax[syntaxIndex++]
-        break
     }
     const value = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].token) || 'value'
     const index = (syntax && syntax[syntaxIndex] && syntax[syntaxIndex].newIndex) || 0
@@ -271,20 +266,16 @@ const calcCmd = {}
     switch (tree.token) {
       case 'number':
         return parseFloat(tree.value)
-        break
       case 'expression':
         return computeExpression(tree)
-        break
       case 'parenthesized_expression':
         return compute(tree.expression)
-        break
       case 'variable_assignment':
         if (tree.variable.value === '_') {
           throw "the variable '_' is reserved"
         }
         variables[tree.variable.value] = compute(tree.assignmentExpression)
         return variables[tree.variable.value]
-        break
       case 'variable':
         if (tree.value === '_') {
           return lastComputedResult || 0
@@ -303,7 +294,6 @@ const calcCmd = {}
           throw 'undefined variable ' + tree.value
         }
         return value
-        break
       case 'method':
         var args = []
         for (const idx in tree.arguments) {
@@ -316,7 +306,6 @@ const calcCmd = {}
         } else {
           throw 'unrecognized method ' + tree.value
         }
-        break
     }
     throw 'Unexpected token type: ' + tree.token
   }

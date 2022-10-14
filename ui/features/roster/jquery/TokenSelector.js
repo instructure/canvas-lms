@@ -175,11 +175,9 @@ export default class TokenSelector {
         }
         this.close()
         return true
-        break
       case 'Shift':
       case 16: // noop, but we don't want to set the mode to input
         return false
-        break
       case 'Esc':
       case 'U+001B':
       case 27:
@@ -189,7 +187,6 @@ export default class TokenSelector {
         } else {
           return false
         }
-        break
       case 'U+0020':
       case 32: // space
         if (this.selectionToggleable() && this.mode === 'menu') {
@@ -212,7 +209,6 @@ export default class TokenSelector {
       case 38:
         this.selectPrev()
         return true
-        break
       case 'Right':
       case 39:
         if (this.input.caret() === this.input.val().length && this.expandSelection()) {
@@ -223,7 +219,6 @@ export default class TokenSelector {
       case 40:
         this.selectNext()
         return true
-        break
       case 'U+002B':
       case 187:
       case 107: // plus
