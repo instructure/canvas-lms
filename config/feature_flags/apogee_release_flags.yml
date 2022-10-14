@@ -132,3 +132,15 @@ originality_reports_for_a2:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
+single_new_quiz_session_in_speedgrader:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Single Quizzes.Next Session in SpeedGrader
+  description: If set, Quizzes.Next will operate using a single launch session in SpeedGrader
+  environments:
+    ci:
+      state: allowed_on # enable for automated testing builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
