@@ -227,6 +227,8 @@ let gradeeLabel
 let sessionTimer
 let isAdmin
 let showSubmissionOverride
+let externalToolLaunchOptions = {singleLtiLaunch: false}
+let externalToolLoaded = false
 let provisionalGraderDisplayNames
 let EG
 const customProvisionalGraderLabel = I18n.t('Custom')
@@ -257,6 +259,8 @@ function setupBeforeLeavingSpeedgrader() {
 }
 
 function teardownBeforeLeavingSpeedgrader() {
+  externalToolLaunchOptions = {singleLtiLaunch: false}
+  externalToolLoaded = false
   window.removeEventListener('beforeunload', EG.beforeLeavingSpeedgrader)
 }
 
@@ -2726,7 +2730,9 @@ EG = {
       this.currentStudent.submission.workflow_state === 'unsubmitted'
     ) {
       $this_student_does_not_have_a_submission.show()
-      this.emptyIframeHolder()
+      if (!ENV.SINGLE_NQ_SESSION_ENABLED || !externalToolLaunchOptions.singleLtiLaunch) {
+        this.emptyIframeHolder()
+      }
     } else if (
       this.currentStudent.submission &&
       this.currentStudent.submission.submitted_at &&
@@ -2737,7 +2743,12 @@ EG = {
     } else if (attachment) {
       this.renderAttachment(attachment)
     } else if (submission && submission.submission_type === 'basic_lti_launch') {
-      this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
+      if (!ENV.SINGLE_NQ_SESSION_ENABLED || !externalToolLoaded || !externalToolLaunchOptions.singleLtiLaunch) {
+        this.renderLtiLaunch($iframe_holder, ENV.lti_retrieve_url, submission)
+        externalToolLoaded = true
+      } else {
+        $iframe_holder.show()
+      }
     } else {
       this.renderSubmissionPreview()
     }
@@ -4257,8 +4268,11 @@ export default {
       EG.setUpAssessmentAuditTray()
     }
 
-    function registerQuizzesNext(overriddenShowSubmission) {
+    function registerQuizzesNext(overriddenShowSubmission, launchOptions) {
       showSubmissionOverride = overriddenShowSubmission
+      if (launchOptions) {
+        externalToolLaunchOptions = launchOptions
+      }
     }
     quizzesNextSpeedGrading(EG, $iframe_holder, registerQuizzesNext, refreshGrades, window)
 

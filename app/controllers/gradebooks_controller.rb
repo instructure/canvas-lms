@@ -895,6 +895,7 @@ class GradebooksController < ApplicationController
         @outer_frame = true
         log_asset_access(["speed_grader", @context], "grades", "other")
         env = {
+          SINGLE_NQ_SESSION_ENABLED: Account.site_admin.feature_enabled?(:single_new_quiz_session_in_speedgrader),
           EMOJIS_ENABLED: @context.feature_enabled?(:submission_comment_emojis),
           EMOJI_DENY_LIST: @context.root_account.settings[:emoji_deny_list],
           MANAGE_GRADES: @context.grants_right?(@current_user, session, :manage_grades),
