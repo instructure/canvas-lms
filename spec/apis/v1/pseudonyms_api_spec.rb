@@ -494,4 +494,41 @@ describe PseudonymsController, type: :request do
       end
     end
   end
+
+  describe "pseudonym password reset" do
+    before :once do
+      @student.pseudonyms.create!(unique_id: "student@example.com")
+      CommunicationChannel.create(user: @student, path: "student@example.com")
+      @path = "/api/v1/users/reset_password"
+      @path_options = { controller: "pseudonyms",
+                        action: "forgot_password", format: "json" }
+    end
+
+    context "an authorized user" do
+      it "is able to request password reset" do
+        json = api_call(:post, @path, @path_options, {
+                          email: "student@example.com"
+                        })
+        expect(json).to eq({ "requested" => true })
+      end
+
+      it "gets 404 response when the user doesn't exist" do
+        raw_api_call(:post, @path, @path_options, {
+                       email: "dummy@example.com"
+                     })
+        expect(response.code).to eql "404"
+      end
+    end
+
+    context "an unauthorized user" do
+      it "returns 401" do
+        @user = @teacher
+        raw_api_call(:post, @path, @path_options, {
+                       email: "student@example.com",
+                       login: { unique_id: "teacher+new@example.com" }
+                     })
+        expect(response.code).to eql "401"
+      end
+    end
+  end
 end

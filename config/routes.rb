@@ -1542,6 +1542,7 @@ CanvasRails::Application.routes.draw do
       post "accounts/:account_id/logins", action: :create
       put "accounts/:account_id/logins/:id", action: :update
       delete "users/:user_id/logins/:id", action: :destroy
+      post "users/reset_password", action: :forgot_password
     end
 
     scope(controller: :accounts) do

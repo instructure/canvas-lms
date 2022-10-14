@@ -78,8 +78,25 @@ class PseudonymsController < ApplicationController
     render json: @pseudonyms.map { |p| pseudonym_json(p, @current_user, session) }
   end
 
+  # @API Kickoff password recovery flow
+  # Given a user email, generate a nonce and email it to the user
+  #
+  # @response_field requested The recovery request status
+  #
+  # @example_response
+  #   {
+  #     "requested": true
+  #   }
   def forgot_password
-    email = params[:pseudonym_session][:unique_id_forgot] if params[:pseudonym_session]
+    if api_request?
+      return unless authorized_action(@current_user.pseudonym.account, @current_user, [:manage_user_logins])
+    end
+
+    email = if api_request?
+              params[:email]
+            elsif params[:pseudonym_session]
+              params[:pseudonym_session][:unique_id_forgot]
+            end
     @ccs = []
     if email.present?
       shards = Set.new
@@ -117,6 +134,18 @@ class PseudonymsController < ApplicationController
         false
       end
     end
+
+    if api_request?
+      @ccs.each do |cc|
+        return unless authorized_action(cc.pseudonym.account, @current_user, [:manage_user_logins])
+      end
+
+      if @ccs.empty?
+        render json: { requested: false }, status: :not_found
+        return
+      end
+    end
+
     respond_to do |format|
       # Whether the email was actually found or not, we display the same
       # message. Otherwise this form could be used to fish for valid
