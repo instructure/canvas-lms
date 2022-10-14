@@ -57,7 +57,7 @@ export default class EditSectionsView extends DialogBaseView {
       placeholder: I18n.t('edit_sections_placeholder', 'Enter a section name'),
       title: I18n.t('edit_sections_title', 'Section name'),
       onNewToken: this.onNewToken.bind(this),
-      added: (data, $token, newToken) => {
+      added: (data, $token, _newToken) => {
         return this.$('#user_sections').append($token)
       },
       selector: {

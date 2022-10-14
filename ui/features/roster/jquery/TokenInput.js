@@ -211,7 +211,7 @@ export default class TokenInput {
     return this.reposition()
   }
 
-  removeLastToken(data) {
+  removeLastToken(_data) {
     this.$tokens.find('li').last().remove()
     if (typeof this.change === 'function') {
       this.change(this.tokenValues())
@@ -260,7 +260,7 @@ export default class TokenInput {
     return Array.from(this.$tokens.find(`[name='${this.nodeName}[]']`)).map(input => input.value)
   }
 
-  inputKeyUp(e) {
+  inputKeyUp(_e) {
     this.reposition()
     return typeof this.keyUpAction === 'function' ? this.keyUpAction() : undefined
   }

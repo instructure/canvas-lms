@@ -89,7 +89,7 @@ export default class TokenSelector {
     return this.select($li)
   }
 
-  mouseDown(e) {
+  mouseDown(_e) {
     // sooper hacky... prevent the menu closing on scrollbar drag
     return setTimeout(() => this.input.focus(), 0)
   }
@@ -254,8 +254,7 @@ export default class TokenSelector {
       this.list.remove()
     }
     for (let i = 0; i < this.stack.length; i++) {
-      let $selection
-      ;[$selection, list] = this.stack[i]
+      ;[, list] = this.stack[i]
       list.remove()
     }
     this.list = null

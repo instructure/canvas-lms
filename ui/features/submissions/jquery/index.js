@@ -151,7 +151,7 @@ function makeRubricAccessible($rubric) {
       if (keyCodes[e.which] === 'esc') $('.hide_rubric_link').click()
     })
   })
-  $(tabBounds).each(function (e) {
+  $(tabBounds).each(function (_e) {
     $(this).bind('keydown', function (e) {
       if (keyCodes[e.which] === 'tab') {
         const isLeavingHolder = $(this).is($(tabBounds).first()) ? e.shiftKey : !e.shiftKey
@@ -248,11 +248,11 @@ export function setup() {
         $('.comments textarea:visible').focus().select()
       })
     })
-    $('.save_comment_button').click(event => {
+    $('.save_comment_button').click(_event => {
       $(document).triggerHandler('comment_change')
     })
     // post new comment but no grade
-    $(document).bind('comment_change', event => {
+    $(document).bind('comment_change', _event => {
       $('.save_comment_button').attr('disabled', 'disabled')
       $('.submission_header').loadingImage()
       const url = $('.update_submission_url').attr('href')
@@ -299,15 +299,15 @@ export function setup() {
         $.ajaxJSON(url, method, formData, submissionLoaded)
       }
     })
-    $('.cancel_comment_button').click(event => {
+    $('.cancel_comment_button').click(_event => {
       $('.grading_comment').val('')
       $('.comments_link').click()
     })
-    $('.grading_value').change(event => {
+    $('.grading_value').change(_event => {
       $(document).triggerHandler('grading_change')
     })
     // post new grade but no comments
-    $(document).bind('grading_change', event => {
+    $(document).bind('grading_change', _event => {
       $('.save_comment_button').attr('disabled', 'disabled')
       $('.submission_header').loadingImage()
       const url = $('.update_submission_url').attr('href')
@@ -469,7 +469,7 @@ export function setup() {
         }
       )
     })
-    $('#media_recorder_container a').live('click', event => {
+    $('#media_recorder_container a').live('click', _event => {
       $('#add_comment_form').show()
       $('#media_media_recording').hide()
     })

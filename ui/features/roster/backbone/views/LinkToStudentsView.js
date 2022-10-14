@@ -102,7 +102,6 @@ export default class LinkToStudentsView extends DialogBaseView {
     const dfds = []
     const enrollments = this.model.allEnrollmentsByType('ObserverEnrollment')
     const enrollment = enrollments[0]
-    const unlinkedEnrolls = _.filter(enrollments, en => !en.associated_user_id) // keep the original observer enrollment around
     const currentLinks = _.compact(_.pluck(enrollments, 'associated_user_id'))
     const newLinks = _.difference(this.students, currentLinks)
     const removeLinks = _.difference(currentLinks, this.students)

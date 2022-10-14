@@ -29,7 +29,7 @@ const I18n = useI18nScope('terms.index')
 const dateOpts = {format: 'full'}
 
 $(document).ready(() => {
-  $('.submit_button').click(function (event) {
+  $('.submit_button').click(function (_event) {
     const $term = $(this).closest('.term')
     return $term.find('.enrollment_term_form').submit()
   })
@@ -96,7 +96,7 @@ $(document).ready(() => {
       return $.extend(permissions, data)
     },
 
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       const $tr = $(this).parents('.term')
       $tr.find('button').attr('disabled', true)
       return $tr.find('.submit_button').text(I18n.t('messages.submitting', 'Submitting...'))

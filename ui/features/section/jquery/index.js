@@ -64,7 +64,7 @@ $(document).ready(function () {
         $('#section_name').text(section.name)
         $('span.sis_source_id').text(section.sis_source_id || '')
       },
-      error(data) {
+      error(_data) {
         $edit_section_form.loadingImage('remove')
         $edit_section_form.show()
       },
@@ -115,7 +115,7 @@ $(document).ready(function () {
     })
   })
   $('#uncrosslist_form .cancel_button')
-    .click(event => {
+    .click(_event => {
       $('#uncrosslist_form').dialog('close')
     })
     .submit(function () {
