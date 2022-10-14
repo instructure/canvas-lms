@@ -76,7 +76,7 @@ export default register(
           new_val += 5
         }
         const state = parseInt(this.get('attachment.file_state'), 10)
-        if (isNaN(state)) {
+        if (Number.isNaN(Number(state))) {
           new_val = 0
         }
       }

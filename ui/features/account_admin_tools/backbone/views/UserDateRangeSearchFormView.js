@@ -155,7 +155,7 @@ export default class UserDateRangeSearchFormView extends Backbone.View {
       return true
     }
     const date = dateField.data('unfudged-date')
-    return date instanceof Date && !isNaN(date.valueOf())
+    return date instanceof Date && !Number.isNaN(Number(date.valueOf()))
   }
 
   datesValidation() {

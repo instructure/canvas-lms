@@ -83,7 +83,7 @@ INST.downloadSubmissions = function (url, onClose) {
             cancelled = true
           } else {
             let progress = parseInt(attachment.file_state, 10)
-            if (isNaN(progress)) {
+            if (Number.isNaN(Number(progress))) {
               progress = 0
             }
             progress += 5

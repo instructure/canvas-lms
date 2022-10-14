@@ -711,7 +711,9 @@ $(function () {
       const $this = $(this)
       if ($this.hasClass('numerical_question_input')) {
         const val = numberHelper.parse($this.val())
-        $this.val(isNaN(val) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true}))
+        $this.val(
+          Number.isNaN(Number(val)) ? '' : I18n.n(val.toFixed(4), {strip_insignificant_zeros: true})
+        )
       }
       if ($this.hasClass('precision_question_input')) {
         const precisionQuestionInputVal = numberHelper.parse($this.val())

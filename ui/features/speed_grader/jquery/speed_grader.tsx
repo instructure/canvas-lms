@@ -3663,14 +3663,15 @@ EG = {
       if (submission.excused) {
         grade.entered = 'EX'
       } else {
-        // eslint-disable-next-line no-restricted-globals
-        if (submission.points_deducted !== '' && !isNaN(submission.points_deducted)) {
+        if (
+          submission.points_deducted !== '' &&
+          !Number.isNaN(Number(submission.points_deducted))
+        ) {
           grade.pointsDeducted = I18n.n(-submission.points_deducted)
         }
 
         if (submission.entered_grade != null) {
-          // eslint-disable-next-line no-restricted-globals
-          if (submission.entered_grade !== '' && !isNaN(submission.entered_grade)) {
+          if (submission.entered_grade !== '' && !Number.isNaN(Number(submission.entered_grade))) {
             grade.entered = GradeFormatHelper.formatGrade(round(submission.entered_grade, 2))
             grade.adjusted = GradeFormatHelper.formatGrade(round(submission.grade, 2))
           } else {
