@@ -62,7 +62,9 @@ export default function deleteStuff(filesAndFolders, args) {
           try {
             const json = $.parseJSON(response.responseText)
             return json && json.message
-          } catch (error) {}
+          } catch (error) {
+            // no-op
+          }
         })()
 
         return $.flashError(

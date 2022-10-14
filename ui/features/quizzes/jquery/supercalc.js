@@ -126,7 +126,9 @@ $.fn.superCalc = function (options, more_options) {
           }
           try {
             calcCmd.compute(lines[idx])
-          } catch (e) {}
+          } catch (e) {
+            // no-op
+          }
         }
       }
       finds.formula_rows.each(function () {

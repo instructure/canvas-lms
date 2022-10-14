@@ -514,7 +514,9 @@ $(document).fragmentChange((event, hash) => {
     let params = null
     try {
       params = JSON.parse(hash.substring(8))
-    } catch (e) {}
+    } catch (e) {
+      // no-op
+    }
     if (params && params.comment) {
       $('.grading_comment').val(params.comment)
     }
