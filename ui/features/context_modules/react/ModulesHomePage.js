@@ -23,31 +23,27 @@ import {useScope as useI18nScope} from '@canvas/i18n'
 
 const I18n = useI18nScope('modules_home_page')
 
-export default class ModulesHomePage extends React.Component {
-  static propTypes = {
-    onCreateButtonClick: PropTypes.func,
-  }
-
-  static defaultProps = {
-    onCreateButtonClick: () => {},
-  }
-
-  render() {
-    return (
-      <ul className="ic-EmptyStateList">
-        <li className="ic-EmptyStateList__Item">
-          <div className="ic-EmptyStateList__BillboardWrapper">
-            <button
-              type="button"
-              className="ic-EmptyStateButton"
-              onClick={this.props.onCreateButtonClick}
-            >
-              <IconModuleSolid className="ic-EmptyStateButton__SVG" />
-              <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
-            </button>
-          </div>
-        </li>
-      </ul>
-    )
-  }
+function ModulesHomePage({onCreateButtonClick}) {
+  return (
+    <ul className="ic-EmptyStateList">
+      <li className="ic-EmptyStateList__Item">
+        <div className="ic-EmptyStateList__BillboardWrapper">
+          <button type="button" className="ic-EmptyStateButton" onClick={onCreateButtonClick}>
+            <IconModuleSolid className="ic-EmptyStateButton__SVG" />
+            <span className="ic-EmptyStateButton__Text">{I18n.t('Create a new Module')}</span>
+          </button>
+        </div>
+      </li>
+    </ul>
+  )
 }
+
+ModulesHomePage.propTypes = {
+  onCreateButtonClick: PropTypes.func,
+}
+
+ModulesHomePage.defaultProps = {
+  onCreateButtonClick: () => {},
+}
+
+export default ModulesHomePage

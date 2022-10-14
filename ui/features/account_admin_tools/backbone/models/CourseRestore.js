@@ -75,6 +75,9 @@ export default class CourseRestore extends Backbone.Model {
     const setTakingTooLong = () => (takingTooLong = true)
     setTimeout(setTakingTooLong, 60000)
 
+    let restoreError
+    let restoreSuccess
+
     const ajaxRequest = (url, method = 'GET') =>
       $.ajax({
         url,
@@ -83,7 +86,7 @@ export default class CourseRestore extends Backbone.Model {
         error: restoreError,
       })
 
-    var restoreError = (_response = {}) => {
+    restoreError = (_response = {}) => {
       $.flashError(
         I18n.t(
           'restore_error',
@@ -93,7 +96,7 @@ export default class CourseRestore extends Backbone.Model {
       return deferred.reject()
     }
 
-    var restoreSuccess = response => {
+    restoreSuccess = response => {
       if (takingTooLong) {
         return restoreError()
       }

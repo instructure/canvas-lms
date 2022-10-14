@@ -54,7 +54,6 @@ export default class CourseSearchResultsView extends Backbone.View {
   }
 
   resultsFound() {
-    this.enableResults
     if (!this.model.get('id') && this.model.get('status')) {
       return $.screenReaderFlashMessage(I18n.t('Course not found'))
     } else if (this.model.get('workflow_state') === 'deleted') {

@@ -46,7 +46,6 @@ export default class MiniCalendar {
           eventRender: this.eventRender,
           droppable: true,
           dragRevertDuration: 0,
-          dropAccept: '*',
           dropAccept: '.fc-event,.undated_event',
           drop: this.drop,
           eventDrop: this.drop,

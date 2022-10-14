@@ -37,7 +37,7 @@ jest.mock('@canvas/observer-picker/react/utils', () => ({
 }))
 
 const currentUserId = defaultProps.currentUser.id
-const moxiosWait = () => new Promise(r => moxios.wait(r))
+const moxiosWait = () => new Promise(resolve => moxios.wait(resolve))
 
 describe('K5Dashboard Schedule Section', () => {
   beforeEach(() => {

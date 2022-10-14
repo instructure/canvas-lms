@@ -95,7 +95,7 @@ export default class TokenInput {
       .keyup(e => this.inputKeyUp(e))
 
     if (this.options.selector) {
-      const type = this.options.selector.type != null ? this.options.selector.type : TokenSelector
+      const Type = this.options.selector.type != null ? this.options.selector.type : TokenSelector
       delete this.options.selector.type
       if ((this.browser = this.options.selector.browser)) {
         delete this.options.selector.browser
@@ -113,7 +113,7 @@ export default class TokenInput {
           .appendTo(this.$fakeInput)
         this.$fakeInput.addClass('browsable')
       }
-      this.selector = new type(this, this.$node.data('finder_url'), this.options.selector)
+      this.selector = new Type(this, this.$node.data('finder_url'), this.options.selector)
     }
 
     this.baseExclude = []

@@ -266,7 +266,7 @@ $(document).ready(function () {
   const view = new PublishButtonView({model, el: $el})
 
   const refresh = function () {
-    location.href = location.href
+    window.location.reload()
   }
   view.on('publish', refresh)
   view.on('unpublish', refresh)
