@@ -418,7 +418,6 @@ export default class Toolbar extends React.Component {
             aria-label={I18n.t('Search for files')}
             type="search"
             ref="searchTerm"
-            role="textbox"
             className="ic-Input"
             defaultValue={this.props.query.search_term}
           />
