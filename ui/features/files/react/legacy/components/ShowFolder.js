@@ -81,7 +81,9 @@ export default {
         let parsedResponse
         try {
           parsedResponse = $.parseJSON(jqXHR.responseText)
-        } catch (error) {}
+        } catch (error) {
+          // no-op
+        }
         if (parsedResponse) {
           this.setState({errorMessages: parsedResponse.errors})
           if (this.props.query.preview != null) {

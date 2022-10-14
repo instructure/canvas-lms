@@ -113,7 +113,9 @@ $(document).ready(function () {
       try {
         $bank.addClass('save_in_progress')
         $bank.find('.bank_name_box').blur()
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
       $bank.fillTemplateData({
         data,
       })
