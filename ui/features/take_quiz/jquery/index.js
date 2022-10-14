@@ -63,7 +63,7 @@ const quizSubmission = (function () {
   // $('.time_running,.time_remaining') is probably not yet loaded at the time
   const $timeRunningFunc = function () {
     if ($timeRunningTimeRemaining.length > 0) return $timeRunningTimeRemaining
-    return ($timeRunningTimeRemaining = $('.time_running,.time_remaining'))
+    return $('.time_running,.time_remaining')
   }
 
   return {

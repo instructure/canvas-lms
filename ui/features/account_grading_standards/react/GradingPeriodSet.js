@@ -108,7 +108,6 @@ export default class GradingPeriodSet extends React.Component {
     terms: array.isRequired,
     readOnly: bool.isRequired,
     expanded: bool,
-    actionsDisabled: bool,
     onEdit: func.isRequired,
     onDelete: func.isRequired,
     onPeriodsChange: func.isRequired,

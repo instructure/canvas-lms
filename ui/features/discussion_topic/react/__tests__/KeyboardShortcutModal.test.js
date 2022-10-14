@@ -20,9 +20,9 @@ import KeyboardShortcutModal from '../KeyboardShortcutModal'
 import {mount} from 'enzyme'
 import React from 'react'
 
-const waitForInstUIModalCssTransitions = () => new Promise(res => setTimeout(res, 1))
+const waitForInstUIModalCssTransitions = () => new Promise(resolve => setTimeout(resolve, 1))
 
-describe(KeyboardShortcutModal, () => {
+describe('KeyboardShortcutModal', () => {
   let component
 
   beforeEach(() => {

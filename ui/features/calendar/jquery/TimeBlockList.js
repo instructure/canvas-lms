@@ -83,7 +83,7 @@ export default class TimeBlockList {
     this.rows.forEach(row => {
       if (row.validate() && !row.incomplete()) {
         if (!row.blank()) {
-          this.blocksManager.add.apply(this.blocksManager, row.getData())
+          this.blocksManager.add.bind(this.blocksManager)(...row.getData())
         }
       } else {
         valid = false

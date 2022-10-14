@@ -36,8 +36,6 @@ const options = [
     {'    four score and seven'}
   </Subject.Option>,
 ]
-/* eslint-enable react/jsx-curly-brace-presence */
-
 function makeProps(isLoading) {
   return {
     id: 'device-under-test',
