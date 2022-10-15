@@ -25,19 +25,21 @@ it('renders load more by default', () => {
 })
 
 it('renders loading when indicated', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingFuture />)
+  const wrapper = shallow(<LoadingFutureIndicator loadingFuture={true} />)
   expect(wrapper).toMatchSnapshot()
 })
 
 it('renders all future items loaded regardless of other props', () => {
-  const wrapper = shallow(<LoadingFutureIndicator loadingFuture allFutureItemsLoaded />)
+  const wrapper = shallow(
+    <LoadingFutureIndicator loadingFuture={true} allFutureItemsLoaded={true} />
+  )
   expect(wrapper).toMatchSnapshot()
 })
 
 it('invokes the callback when the load more button is clicked', () => {
   const mockLoad = jest.fn()
   const wrapper = shallow(<LoadingFutureIndicator onLoadMore={mockLoad} />)
-  wrapper.find('CondensedButton').simulate('click')
+  wrapper.find('Link').simulate('click')
   expect(mockLoad).toHaveBeenCalledWith({loadMoreButtonClicked: true})
 })
 

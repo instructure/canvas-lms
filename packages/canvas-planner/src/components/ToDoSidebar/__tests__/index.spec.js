@@ -19,7 +19,6 @@
 import {shallow, mount} from 'enzyme'
 import React from 'react'
 import moment from 'moment-timezone'
-import {Alert} from '@instructure/ui-alerts'
 import {ToDoSidebar} from '../index'
 
 const defaultProps = {
@@ -28,7 +27,7 @@ const defaultProps = {
   loaded: true,
   items: [],
   courses: [],
-  changeDashboardView: () => {}
+  changeDashboardView: () => {},
 }
 
 it('displays a spinner when the loaded prop is false', () => {
@@ -58,14 +57,14 @@ it('renders out ToDoItems for each item', () => {
       uniqueId: '1',
       type: 'Assignment',
       date: moment('2017-07-15T20:00:00Z'),
-      title: 'Glory to Rome'
+      title: 'Glory to Rome',
     },
     {
       uniqueId: '2',
       type: 'Quiz',
       date: moment('2017-07-15T20:00:00Z'),
-      title: 'Glory to Rome'
-    }
+      title: 'Glory to Rome',
+    },
   ]
   const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
   expect(wrapper.find('ToDoItem')).toHaveLength(2)
@@ -77,56 +76,56 @@ it('initially renders out 7 ToDoItems', () => {
       uniqueId: '1',
       type: 'Assignment',
       date: moment('2017-07-15T20:00:00Z'),
-      title: 'Glory to Rome'
+      title: 'Glory to Rome',
     },
     {
       uniqueId: '2',
       type: 'Quiz',
       date: moment('2017-07-16T20:00:00Z'),
-      title: 'Glory to Orange County'
+      title: 'Glory to Orange County',
     },
     {
       uniqueId: '3',
       type: 'Assignment',
       date: moment('2017-07-17T20:00:00Z'),
-      title: 'Glory to China'
+      title: 'Glory to China',
     },
     {
       uniqueId: '4',
       type: 'Quiz',
       date: moment('2017-07-18T20:00:00Z'),
-      title: 'Glory to Egypt'
+      title: 'Glory to Egypt',
     },
     {
       uniqueId: '5',
       type: 'Assignment',
       date: moment('2017-07-19T20:00:00Z'),
-      title: 'Glory to Sacramento'
+      title: 'Glory to Sacramento',
     },
     {
       uniqueId: '6',
       type: 'Quiz',
       date: moment('2017-07-20T20:00:00Z'),
-      title: 'Glory to Atlantis'
+      title: 'Glory to Atlantis',
     },
     {
       uniqueId: '7',
       type: 'Quiz',
       date: moment('2017-07-21T20:00:00Z'),
-      title: 'Glory to Hoboville'
+      title: 'Glory to Hoboville',
     },
     {
       uniqueId: '8',
       type: 'Quiz',
       date: moment('2017-07-22T20:00:00Z'),
-      title: 'Glory to Big Cottonwood Canyon'
+      title: 'Glory to Big Cottonwood Canyon',
     },
     {
       uniqueId: '9',
       type: 'Quiz',
       date: moment('2017-07-23T20:00:00Z'),
-      title: 'Glory to Small Cottonwood Canyon'
-    }
+      title: 'Glory to Small Cottonwood Canyon',
+    },
   ]
 
   const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
@@ -141,13 +140,13 @@ it('invokes change dashboard view when link is clicked', () => {
       uniqueId: '1',
       type: 'Assignment',
       date: moment('2017-07-15T20:00:00Z'),
-      title: 'Glory to Rome'
-    }
+      title: 'Glory to Rome',
+    },
   ]
   const wrapper = shallow(
     <ToDoSidebar {...defaultProps} items={items} changeDashboardView={changeDashboardView} />
   )
-  wrapper.find('CondensedButton').simulate('click')
+  wrapper.find('Link').simulate('click')
   expect(changeDashboardView).toHaveBeenCalledWith('planner')
 })
 
@@ -158,15 +157,15 @@ it('does not render out items that are completed', () => {
       plannable_type: 'assignment',
       date: moment('2017-07-15T20:00:00Z'),
       completed: true,
-      title: 'Glory to Rome'
+      title: 'Glory to Rome',
     },
     {
       uniqueId: '2',
       plannable_type: 'quiz',
       date: moment('2017-07-15T20:00:00Z'),
       completed: true,
-      title: 'Glory to Rome'
-    }
+      title: 'Glory to Rome',
+    },
   ]
   const wrapper = shallow(<ToDoSidebar {...defaultProps} items={items} />)
   expect(wrapper.find('ToDoItem')).toHaveLength(0)
@@ -186,7 +185,7 @@ it('renders an error message when loading fails', () => {
 })
 
 it('renders additional context title', () => {
-  const wrapper = mount(<ToDoSidebar {...defaultProps} additionalTitleContext />)
+  const wrapper = mount(<ToDoSidebar {...defaultProps} additionalTitleContext={true} />)
 
   expect(wrapper.text()).toContain('Student To Do')
 })
