@@ -18,5 +18,6 @@
       "@canvas/*": ["shared/*"] // lets TS follow an 'import Foo from @canvas/foo' statement
     }
   },
-  "include": ["ui/**/*"]
+  "include": ["ui/**/*"],
+  "exclude": ["**/node_modules", "**/.*/"]
 }
