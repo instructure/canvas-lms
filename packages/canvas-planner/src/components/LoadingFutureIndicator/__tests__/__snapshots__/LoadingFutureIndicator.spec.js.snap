@@ -45,18 +45,15 @@ exports[`renders load more by default 1`] = `
     textAlign="center"
     withVisualDebug={false}
   >
-    <CondensedButton
+    <Link
       as="button"
-      color="primary"
-      cursor="pointer"
-      elementRef={[Function]}
-      margin="0"
+      color="link"
+      iconPlacement="start"
+      isWithinText={false}
       onClick={[Function]}
-      size="medium"
-      type="button"
     >
       Load more
-    </CondensedButton>
+    </Link>
   </View>
 </div>
 `;
@@ -139,18 +136,15 @@ exports[`shows an Alert when there's a query error 1`] = `
         Error loading more items
       </ErrorAlert>
     </div>
-    <CondensedButton
+    <Link
       as="button"
-      color="primary"
-      cursor="pointer"
-      elementRef={[Function]}
-      margin="0"
+      color="link"
+      iconPlacement="start"
+      isWithinText={false}
       onClick={[Function]}
-      size="medium"
-      type="button"
     >
       Load more
-    </CondensedButton>
+    </Link>
   </View>
 </div>
 `;

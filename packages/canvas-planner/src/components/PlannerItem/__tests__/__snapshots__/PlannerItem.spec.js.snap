@@ -81,14 +81,12 @@ exports[`does not render end time if the same as start time 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -96,7 +94,6 @@ exports[`does not render end time if the same as start time 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -108,7 +105,7 @@ exports[`does not render end time if the same as start time 1`] = `
             >
               This Assignment is about awesome stuff
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
@@ -1539,14 +1536,12 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -1554,7 +1549,6 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -1566,7 +1560,7 @@ exports[`renders Calendar Event correctly with an all day date 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={true}
             courseName="A Course about being Diffrient"
@@ -1700,14 +1694,12 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -1715,7 +1707,6 @@ exports[`renders Calendar Event correctly with everything 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -1727,7 +1718,7 @@ exports[`renders Calendar Event correctly with everything 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
@@ -1882,14 +1873,12 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -1897,7 +1886,6 @@ exports[`renders Calendar Event correctly with just date 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -1909,7 +1897,7 @@ exports[`renders Calendar Event correctly with just date 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
@@ -2043,14 +2031,12 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -2058,7 +2044,6 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -2070,7 +2055,7 @@ exports[`renders Calendar Event correctly with start and end time 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
@@ -2205,14 +2190,12 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -2220,7 +2203,6 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -2232,7 +2214,7 @@ exports[`renders Calendar Event correctly without right side content 1`] = `
             >
               I am a Calendar Event
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
@@ -3074,14 +3056,12 @@ exports[`renders Note correctly with everything 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -3089,7 +3069,6 @@ exports[`renders Note correctly with everything 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -3101,7 +3080,7 @@ exports[`renders Note correctly with everything 1`] = `
             >
               I am a Note
             </PresentationContent>
-          </CondensedButton>
+          </Link>
         </div>
       </div>
       <div
@@ -3259,14 +3238,12 @@ exports[`renders Note correctly without Course 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -3274,7 +3251,6 @@ exports[`renders Note correctly without Course 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -3286,7 +3262,7 @@ exports[`renders Note correctly without Course 1`] = `
             >
               I am a Note
             </PresentationContent>
-          </CondensedButton>
+          </Link>
         </div>
       </div>
       <div
@@ -5339,14 +5315,12 @@ exports[`renders the end time if available 1`] = `
             }
           }
         >
-          <CondensedButton
-            as="button"
-            color="primary"
-            cursor="pointer"
+          <Link
+            color="link"
             elementRef={[Function]}
-            margin="0"
+            iconPlacement="start"
+            isWithinText={false}
             onClick={[Function]}
-            size="medium"
             theme={
               Object {
                 "linkColor": undefined,
@@ -5354,7 +5328,6 @@ exports[`renders the end time if available 1`] = `
                 "mediumPaddingHorizontal": "0",
               }
             }
-            type="button"
           >
             <ScreenReaderContent
               as="span"
@@ -5366,7 +5339,7 @@ exports[`renders the end time if available 1`] = `
             >
               This Assignment is about awesome stuff
             </PresentationContent>
-          </CondensedButton>
+          </Link>
           <CalendarEventModal
             allDay={false}
             courseName="A Course about being Diffrient"
