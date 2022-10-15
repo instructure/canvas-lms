@@ -42,7 +42,7 @@ function legacyContentItem(ltiAdvantageContentItem) {
   const legacyType = types[type]
 
   if (!legacyType) {
-    throw `Unknown type: ${type}`
+    throw new Error(`Unknown type: ${type}`)
   }
 
   const contentItem = {

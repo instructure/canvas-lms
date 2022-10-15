@@ -47,7 +47,8 @@ export default class WikiPageCollection extends PaginatedCollection {
   }
 
   setSortField(sortField, sortOrder = null) {
-    if (this.sortOrders[sortField] === undefined) throw `${sortField} is not a valid sort field`
+    if (this.sortOrders[sortField] === undefined)
+      throw new Error(`${sortField} is not a valid sort field`)
 
     // toggle the sort order if no sort order is specified and the sort field is the current sort field
     if (!sortOrder && this.currentSortField === sortField) {
