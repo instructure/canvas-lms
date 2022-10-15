@@ -52,6 +52,7 @@ export default createReactClass({
 
   handleSelectChange(e) {
     e.preventDefault()
+    // eslint-disable-next-line react/no-unused-state
     this.setState({value: e.target.value})
   },
 
