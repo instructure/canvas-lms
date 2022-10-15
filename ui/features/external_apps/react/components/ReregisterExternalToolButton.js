@@ -30,7 +30,6 @@ export default class ReregisterExternalToolButton extends React.Component {
   state = {
     tool: this.props.tool,
     modalIsOpen: false,
-    registrationUpdateModalIsOpen: false,
   }
 
   componentDidUpdate() {
@@ -61,10 +60,6 @@ export default class ReregisterExternalToolButton extends React.Component {
     store.triggerUpdate()
     this.closeModal()
     this.refs.reregModal.openModal(e)
-  }
-
-  reregistrationUpdateCloseHandler = () => {
-    this.setState({reregistrationUpdateModalIsOpen: false})
   }
 
   getModal = () => (

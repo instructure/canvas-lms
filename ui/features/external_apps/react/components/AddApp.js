@@ -42,7 +42,6 @@ export default createReactClass({
   getInitialState() {
     return {
       modalIsOpen: false,
-      isValid: false,
       errorMessage: null,
       fields: {},
     }
@@ -111,7 +110,6 @@ export default createReactClass({
       })
     )
     this.setState({invalidFields})
-    this.setState({isValid: _.isEmpty(invalidFields)})
   },
 
   openModal(e) {
