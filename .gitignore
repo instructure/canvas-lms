@@ -47,6 +47,7 @@ npm-debug.log
 /vendor
 yarn-error.log
 dump.rdb
+.eslintcache
 
 # canvas-gems
 /gems/*/coverage
