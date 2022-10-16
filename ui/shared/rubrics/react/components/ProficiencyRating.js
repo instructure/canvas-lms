@@ -23,7 +23,8 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {CondensedButton, IconButton} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Table} from '@instructure/ui-table'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {IconTrashLine} from '@instructure/ui-icons'
@@ -187,12 +188,12 @@ export default class ProficiencyRating extends React.Component {
               onShowContent={this.handleMenuOpen}
               onHideContent={this.handleMenuClose}
               renderTrigger={
-                <CondensedButton ref={this.setColorRef}>
+                <Link isWithinText={false} as="button" elementRef={this.setColorRef}>
                   <div>
                     <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                     {I18n.t('Change')}
                   </div>
-                </CondensedButton>
+                </Link>
               }
             >
               <ColorPicker
