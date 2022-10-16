@@ -46,7 +46,7 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {Alert} from '@instructure/ui-alerts'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Transition} from '@instructure/ui-motion'
@@ -159,7 +159,9 @@ export default class FlashAlert extends React.Component {
         details = (
           <span>
             <PresentationContent>
-              <CondensedButton onClick={this.showDetails}>{I18n.t('Details')}</CondensedButton>
+              <Link isWithinText={false} as="button" onClick={this.showDetails}>
+                {I18n.t('Details')}
+              </Link>
             </PresentationContent>
             <ScreenReaderContent>{this.renderDetailMessage()}</ScreenReaderContent>
           </span>
