@@ -45,7 +45,7 @@ class CoursePacing::PaceContextsApiController < ApplicationController
   end
 
   def authorize_action
-    authorized_action(@context, @current_user, :manage_content)
+    authorized_action(@context, @current_user, [:manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS])
   end
 
   def load_type
