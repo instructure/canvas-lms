@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import ReactDOM from 'react-dom'
 import BackboneMixin from '@canvas/files/react/mixins/BackboneMixin'

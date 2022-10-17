@@ -58,7 +58,7 @@ $(document)
 
 window.external_tool_dialog = {
   ready(data) {
-    const e = jQuery.Event('selection')
+    const e = $.Event('selection')
     e.contentItems = data
     $('#resource_selection_dialog:visible').triggerHandler(e)
     $('#homework_selection_dialog:visible').triggerHandler(e)

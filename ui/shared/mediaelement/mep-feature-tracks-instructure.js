@@ -27,8 +27,10 @@
 //   ui/shared/mediaelement/mep-feature-tracks-instructure.js
 //
 
+/* eslint-disable no-undef, eqeqeq, prefer-const, promise/catch-or-return */
+/* eslint-disable import/no-cycle, @typescript-eslint/no-unused-vars, no-var, vars-on-top */
+
 import {useScope as useI18nScope} from '@canvas/i18n'
-import htmlEscape from 'html-escape'
 import closedCaptionLanguages from '@canvas/util/closedCaptionLanguages'
 
 const I18n = useI18nScope('mepfeaturetracksinstructure')
