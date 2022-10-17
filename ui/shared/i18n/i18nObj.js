@@ -275,7 +275,9 @@ I18n.pluralize = function (count, scope, options) {
 
   try {
     translation = this.lookup(scope, options)
-  } catch (error) {}
+  } catch (error) {
+    // no-op
+  }
 
   if (!translation) {
     return this.missingTranslation(scope)

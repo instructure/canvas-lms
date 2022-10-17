@@ -56,7 +56,9 @@ $.ajaxJSON = function (url, submit_type, data = {}, success, error, options) {
       data = {message: text}
       try {
         data = $.parseJSON(xhr.responseText)
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
     }
     if (options && options.skipDefaultError) {
       $.ajaxJSON.ignoredXHRs.push(xhr)
@@ -140,7 +142,9 @@ $.ajaxJSON.isUnauthenticated = function (xhr) {
   let json_data
   try {
     json_data = $.parseJSON(xhr.responseText)
-  } catch (e) {}
+  } catch (e) {
+    // no-op
+  }
 
   return !!json_data && json_data.status === 'unauthenticated'
 }
