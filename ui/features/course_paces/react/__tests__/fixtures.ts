@@ -19,22 +19,19 @@
 import moment from 'moment-timezone'
 import {keyBy} from 'lodash'
 
-import {BlackoutDate, BlackoutDateState, SyncState, Course} from '../shared/types'
+import {BlackoutDate, SyncState, Course} from '../shared/types'
 import {
   Enrollment,
   Enrollments,
-  EnrollmentsState,
   Module,
   CoursePace,
   CoursePaceItem,
-  CoursePacesState,
   Section,
   Sections,
-  SectionsState,
   UIState,
-  OriginalState,
   PaceContextsState,
   PaceContextApiresponse,
+  StoreState,
 } from '../types'
 
 window.ENV.TIMEZONE = 'America/Denver'
@@ -359,18 +356,22 @@ export const PROGRESS_FAILED = {
   url: '/api/v1/progress/901',
 }
 
-export interface DefaultStoreState {
-  readonly coursePace?: CoursePacesState
-  readonly enrollments?: EnrollmentsState
-  readonly sections?: SectionsState
-  readonly ui?: UIState
-  readonly course?: Course
-  readonly blackoutDates: BlackoutDateState
-  readonly original: OriginalState
-  readonly paceContexts: PaceContextsState
+export const DEFAULT_UI_STATE: UIState = {
+  autoSaving: false,
+  divideIntoWeeks: true,
+  editingBlackoutDates: false,
+  errors: {},
+  loadingMessage: '',
+  responsiveSize: 'large' as const,
+  selectedContextId: '30',
+  selectedContextType: 'Course' as const,
+  showLoadingOverlay: false,
+  showPaceModal: false,
+  showProjections: true,
+  syncing: 0,
 }
 
-export const DEFAULT_STORE_STATE: DefaultStoreState = {
+export const DEFAULT_STORE_STATE: StoreState = {
   blackoutDates: DEFAULT_BLACKOUT_DATE_STATE,
   course: COURSE,
   enrollments: ENROLLMENTS,
@@ -378,4 +379,5 @@ export const DEFAULT_STORE_STATE: DefaultStoreState = {
   sections: SECTIONS,
   original: {coursePace: PRIMARY_PACE, blackoutDates: BLACKOUT_DATES},
   paceContexts: PACE_CONTEXTS_DEFAULT_STATE,
+  ui: DEFAULT_UI_STATE,
 }

@@ -69,7 +69,7 @@ describe('UnpublishedChangesTrayContents', () => {
 
     const closeButton = getByText('Close')
     act(() => userEvent.click(closeButton))
-    expect(onTrayDismiss).toHaveBeenCalled()
+    expect(onTrayDismiss).toHaveBeenCalledWith(false)
   })
 
   it('disables the reset button if loading', () => {
@@ -111,7 +111,7 @@ describe('UnpublishedChangesTrayContents', () => {
     const cancelButton = getByRole('button', {name: 'Reset'})
     act(() => cancelButton.click())
     expect(onResetPace).toHaveBeenCalledTimes(1)
-    expect(onTrayDismiss).toHaveBeenCalled()
+    expect(onTrayDismiss).toHaveBeenCalledWith(true)
   })
 
   it('does not render the reset all button if the course_paces_redesign flag is disabled', () => {

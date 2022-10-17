@@ -45,6 +45,7 @@ export const getAutoSaving = (state: StoreState) => state.ui.autoSaving
 // begins publishing. use getSyncing to keep the ui consistent in the transition
 export const getSyncing = (state: StoreState): boolean =>
   state.ui.syncing > 0 || getBlackoutDatesSyncing(state) || getPacePublishing(state)
+export const getAnyActiveRequests = (state: StoreState): boolean => state.ui.syncing > 0
 export const getErrors = (state: StoreState) => state.ui.errors
 export const getCategoryError = (state: StoreState, category: string | string[]) => {
   if (Array.isArray(category)) {

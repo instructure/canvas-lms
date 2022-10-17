@@ -19,6 +19,8 @@
 import fetchMock from 'fetch-mock'
 import {screen, waitFor} from '@testing-library/react'
 
+import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
+
 import {actions as uiActions} from '../ui'
 import {coursePaceActions, PUBLISH_STATUS_POLLING_MS} from '../course_paces'
 import {
@@ -66,6 +68,7 @@ afterEach(() => {
   jest.clearAllMocks()
   jest.useRealTimers()
   fetchMock.restore()
+  destroyContainer()
 })
 
 describe('Course paces actions', () => {
@@ -131,13 +134,16 @@ describe('Course paces actions', () => {
 
       const getStateFailed = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: PROGRESS_FAILED},
+        coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: PROGRESS_FAILED},
       })
       coursePaceActions.pollForPublishStatus()(dispatch, getStateFailed)
 
       const getStateCompleted = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_FAILED, workflow_state: 'completed'}},
+        coursePace: {
+          ...DEFAULT_STORE_STATE.coursePace,
+          publishingProgress: {...PROGRESS_FAILED, workflow_state: 'completed'},
+        },
       })
       coursePaceActions.pollForPublishStatus()(dispatch, getStateCompleted)
 
@@ -147,7 +153,7 @@ describe('Course paces actions', () => {
     it('sets a timeout that updates progress status and clears when a terminal status is reached', async () => {
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_RUNNING}},
+        coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: {...PROGRESS_RUNNING}},
       })
       const progressUpdated = {...PROGRESS_RUNNING, completion: 60}
       fetchMock.get(PROGRESS_API, progressUpdated)
@@ -170,14 +176,14 @@ describe('Course paces actions', () => {
         expect(dispatch.mock.calls[4]).toEqual([
           coursePaceActions.coursePaceSaved(getState().coursePace),
         ])
-        expect(screen.getByText('Finished publishing pace')).toBeInTheDocument()
+        expect(screen.getAllByText('Neuromancy 300 updated')[0]).toBeInTheDocument()
       })
     })
 
     it('stops polling and displays an error message if checking the progress API fails', async () => {
       const getState = () => ({
         ...DEFAULT_STORE_STATE,
-        coursePace: {publishingProgress: {...PROGRESS_RUNNING}},
+        coursePace: {...DEFAULT_STORE_STATE.coursePace, publishingProgress: {...PROGRESS_RUNNING}},
       })
       const error = new Error('Progress? What progress?')
       fetchMock.get(PROGRESS_API, {throws: error})

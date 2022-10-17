@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React, {useState, useRef} from 'react'
 import {connect} from 'react-redux'
 
 import {Flex} from '@instructure/ui-flex'
@@ -39,16 +39,20 @@ import UnpublishedChangesTrayContents from './unpublished_changes_tray_contents'
 import UnpublishedWarningModal from './header/unpublished_warning_modal'
 
 import {coursePaceActions} from '../actions/course_paces'
-import {CoursePacesState, ResponsiveSizes, StoreState} from '../types'
-import {getCoursePace} from '../reducers/course_paces'
+import {CoursePace, ResponsiveSizes, StoreState} from '../types'
+import {getCoursePace, getUnappliedChangesExist} from '../reducers/course_paces'
 import {getResponsiveSize} from '../reducers/ui'
 import {SummarizedChange} from '../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_modal')
 
+interface StoreProps {
+  readonly coursePace: CoursePace
+  readonly unappliedChangesExist: boolean
+}
+
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace
-  coursePace: CoursePacesState
 }
 
 interface PassedProps {
@@ -59,11 +63,13 @@ interface PassedProps {
   readonly onClose: () => void
 }
 
-export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
+const {Item: FlexItem} = Flex as any
+
+export const PaceModal: React.FC<PassedProps & DispatchProps & StoreProps> = props => {
   const [isBlueprintLocked, setIsBlueprintLocked] = useState(props.isBlueprintLocked)
   const [pendingContext, setPendingContext] = useState('')
   const [trayOpen, setTrayOpen] = useState(false)
-  const hasChanges = props.changes && props.changes.length > 0
+  const closeButtonRef = useRef<HTMLElement | null>(null)
 
   const modalTitle = () => {
     if (!props.coursePace) {
@@ -80,10 +86,23 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
   }
 
   const handleClose = () => {
-    if (hasChanges) {
+    if (props.unappliedChangesExist) {
       setPendingContext(props.coursePace.context_type)
     } else {
       props.onClose()
+    }
+  }
+
+  const focusOnCloseButton = () => {
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus()
+    }
+  }
+
+  const handleTrayDismiss = resetFocus => {
+    setTrayOpen(false)
+    if (resetFocus) {
+      focusOnCloseButton()
     }
   }
 
@@ -98,20 +117,21 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
     >
       <Modal.Header>
         <Flex>
-          <Flex.Item shouldGrow={true} shouldShrink={true} align="center">
+          <FlexItem shouldGrow={true} shouldShrink={true} align="center">
             <Heading level="h2">
               <TruncateText>{modalTitle()}</TruncateText>
             </Heading>
-          </Flex.Item>
-          <Flex.Item>
+          </FlexItem>
+          <FlexItem>
             <IconButton
               withBackground={false}
               withBorder={false}
               renderIcon={IconXSolid}
               screenReaderLabel={I18n.t('Close')}
               onClick={handleClose}
+              elementRef={e => (closeButtonRef.current = e)}
             />
-          </Flex.Item>
+          </FlexItem>
         </Flex>
       </Modal.Header>
       <Modal.Body padding="large">
@@ -137,14 +157,14 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
           <Tray
             label={I18n.t('Unpublished Changes tray')}
             open={trayOpen}
-            onDismiss={() => setTrayOpen(false)}
+            onDismiss={handleTrayDismiss}
             placement={props.responsiveSize === 'small' ? 'bottom' : 'end'}
             shouldContainFocus={true}
             shouldReturnFocus={true}
             shouldCloseOnDocumentClick={true}
           >
             <UnpublishedChangesTrayContents
-              handleTrayDismiss={() => setTrayOpen(false)}
+              handleTrayDismiss={handleTrayDismiss}
               changes={props.changes}
             />
           </Tray>
@@ -168,6 +188,7 @@ export const PaceModal: React.FC<PassedProps & DispatchProps> = props => {
           handleCancel={handleClose}
           handleDrawerToggle={() => setTrayOpen(!trayOpen)}
           responsiveSize={props.responsiveSize}
+          focusOnClose={focusOnCloseButton}
         />
       </Modal.Footer>
     </Modal>
@@ -178,6 +199,7 @@ const mapStateToProps = (state: StoreState) => {
   return {
     coursePace: getCoursePace(state),
     responsiveSize: getResponsiveSize(state),
+    unappliedChangesExist: getUnappliedChangesExist(state),
   }
 }
 

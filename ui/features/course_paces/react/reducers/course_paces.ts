@@ -92,12 +92,28 @@ export const isStudentPace = (state: StoreState) => state.coursePace.context_typ
 export const isSectionPace = (state: StoreState) => state.coursePace.context_type === 'Section'
 export const isNewPace = (state: StoreState) =>
   !(state.coursePace.id || (isStudentPace(state) && !window.ENV.FEATURES.course_paces_for_students)) // for now, there are no "new" student paces
+export const getIsUnpublishedNewPace = (state: StoreState) => !state.original.coursePace.id
 export const getIsPaceCompressed = (state: StoreState): boolean =>
   !!state.coursePace.compressed_due_dates
 export const getPaceCompressedDates = (state: StoreState): CoursePaceItemDueDates | undefined =>
   state.coursePace.compressed_due_dates
 
 export const getCoursePaceItems = createSelector(getCoursePaceModules, getModuleItems)
+
+export const getPaceName = (state: StoreState): string => {
+  switch (state.coursePace.context_type) {
+    case 'Course':
+      return state.course.name
+    case 'Section':
+      return state.sections[state.coursePace.context_id].name
+    case 'Enrollment':
+      return Object.values(state.enrollments).find(
+        enrollment => enrollment.user_id === state.coursePace.context_id
+      ).full_name
+    default:
+      throw new Error('Unknown context type')
+  }
+}
 
 export const getSettingChanges = createDeepEqualSelector(
   getExcludeWeekends,
@@ -201,6 +217,12 @@ export const getSummarizedChanges = createDeepEqualSelector(
   getSettingChanges,
   getCoursePaceItemChanges,
   summarizeChanges
+)
+
+export const getUnappliedChangesExist = createDeepEqualSelector(
+  getPacePublishing,
+  getUnpublishedChangeCount,
+  (pacePublishing, unpublishedChangeCount) => unpublishedChangeCount > 0 && !pacePublishing
 )
 
 export const getCoursePaceItemPosition = createDeepEqualSelector(
