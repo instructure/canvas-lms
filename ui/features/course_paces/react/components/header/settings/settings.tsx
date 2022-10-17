@@ -162,7 +162,10 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   /* Renderers */
 
   render() {
-    if (this.props.coursePace.context_type === 'Enrollment') {
+    if (
+      this.props.coursePace.context_type === 'Enrollment' &&
+      !window.ENV.FEATURES.course_paces_for_students
+    ) {
       return null
     }
     return (

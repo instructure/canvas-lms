@@ -245,7 +245,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
   }
 
   renderDurationInput = () => {
-    if (this.props.isStudentPace) {
+    if (this.props.isStudentPace && !window.ENV.FEATURES.course_paces_for_students) {
       return (
         <Flex height="2.375rem" alignItems="center" justifyItems="center">
           {this.state.duration}

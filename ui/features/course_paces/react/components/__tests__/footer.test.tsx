@@ -134,6 +134,27 @@ describe('Footer', () => {
     expect(document.activeElement).toBe(pubButton)
   })
 
+  describe('with course paces for students', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_for_students = true
+    })
+
+    it('renders everything for student paces', () => {
+      const {getByRole} = render(<Footer {...defaultProps} studentPace={true} />)
+
+      const cancelButton = getByRole('button', {name: 'Cancel'})
+      expect(cancelButton).toBeInTheDocument()
+      act(() => cancelButton.click())
+      expect(onResetPace).toHaveBeenCalled()
+
+      const publishButton = getByRole('button', {name: 'Publish'})
+      expect(publishButton).toBeInTheDocument()
+      act(() => publishButton.click())
+      expect(syncUnpublishedChanges).toHaveBeenCalled()
+    })
+  })
+
   describe('with course paces redesign', () => {
     beforeAll(() => {
       window.ENV.FEATURES ||= {}

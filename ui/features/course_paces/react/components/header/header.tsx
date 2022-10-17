@@ -230,7 +230,8 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             />
           </FlexItem>
           <FlexItem textAlign="end" margin="0 0 small small">
-            {props.context_type !== 'Enrollment' && (
+            {(props.context_type !== 'Enrollment' ||
+              window.ENV.FEATURES.course_paces_for_students) && (
               <UnpublishedChangesIndicator
                 newPace={props.newPace}
                 onClick={props.handleDrawerToggle}

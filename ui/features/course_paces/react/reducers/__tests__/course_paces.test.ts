@@ -83,6 +83,20 @@ describe('course_paces reducer', () => {
         isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
       ).toBe(false)
     })
+
+    describe('with course paces for students', () => {
+      beforeAll(() => {
+        window.ENV.FEATURES ||= {}
+        window.ENV.FEATURES.course_paces_for_students = true
+      })
+
+      it('is new if it is a student pace', () => {
+        expect(
+          // @ts-ignore
+          isNewPace({coursePace: {id: undefined, context_type: 'Enrollment'}})
+        ).toBe(true)
+      })
+    })
   })
 
   describe('mergeAssignmentsAndBlackoutDates', () => {
