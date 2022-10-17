@@ -161,6 +161,30 @@ describe('AssignmentRow', () => {
     expect(getByText('2')).toBeInTheDocument()
   })
 
+  describe('with course paces for students', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_for_students = true
+    })
+
+    it('renders an input for student paces that updates the duration for that module item', () => {
+      const {getByRole} = renderConnected(
+        <AssignmentRow {...defaultProps} coursePace={STUDENT_PACE} isStudentPace={true} />
+      )
+      const daysInput = getByRole('textbox', {
+        name: 'Duration for assignment Basic encryption/decryption',
+      }) as HTMLInputElement
+      expect(daysInput).toBeInTheDocument()
+      expect(daysInput.value).toBe('2')
+
+      userEvent.type(daysInput, '{selectall}{backspace}4')
+      act(() => daysInput.blur())
+
+      expect(setPaceItemDuration).toHaveBeenCalled()
+      expect(setPaceItemDuration).toHaveBeenCalledWith('60', 4)
+    })
+  })
+
   it("renders an indicator next to duration picker when there's unsaved changes", () => {
     const unsavedChangeText = 'Unsaved change'
     const {queryByText, getByText, rerender} = renderConnected(<AssignmentRow {...defaultProps} />)

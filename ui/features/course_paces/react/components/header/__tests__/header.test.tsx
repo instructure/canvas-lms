@@ -83,6 +83,18 @@ describe('Course paces header', () => {
   })
   // the other messsages are tested with UnpublishedChangesIndicator
 
+  describe('with course paces for students', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_for_students = true
+    })
+
+    it('does render publishing changes for student paces', () => {
+      const {queryByText} = renderConnected(<Header {...defaultProps} context_type="Enrollment" />)
+      expect(queryByText('All changes published')).toBeInTheDocument()
+    })
+  })
+
   describe('with course paces redesign ON', () => {
     beforeAll(() => {
       window.ENV.FEATURES ||= {}

@@ -336,7 +336,7 @@ class CoursePacesController < ApplicationController
 
     if @permitted_params[:context_type] == "Section"
       @permitted_params[:course_section_id] = @permitted_params[:context_id]
-    elsif @permitted_params[:context_type] == "User"
+    elsif @permitted_params[:context_type] == "Enrollment"
       @permitted_params[:user_id] = @permitted_params[:context_id]
     end
     @permitted_params = @permitted_params.except(:context_id, :context_type)

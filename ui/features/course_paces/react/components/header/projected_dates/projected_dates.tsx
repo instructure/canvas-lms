@@ -87,7 +87,7 @@ export const ProjectedDates: React.FC<StoreProps> = ({
   const startDateValue = coursePace.start_date
   const startHelpText = START_DATE_CAPTIONS[coursePace.start_date_context]
   let endDateValue, endHelpText
-  if (enrollmentType) {
+  if (enrollmentType && !window.ENV.FEATURES.course_paces_for_students) {
     endDateValue = plannedEndDate
     endHelpText = END_DATE_CAPTIONS.user
   } else {

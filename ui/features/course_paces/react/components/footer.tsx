@@ -97,7 +97,9 @@ export const Footer: React.FC<ComponentProps> = ({
     syncUnpublishedChanges()
   }, [syncUnpublishedChanges])
 
-  if (studentPace) return null
+  const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
+
+  if (studentPace && !allowStudentPaces) return null
 
   const isCoursePace = !sectionPace && !studentPace
   const useRedesign = window.ENV.FEATURES.course_paces_redesign
@@ -173,7 +175,7 @@ export const Footer: React.FC<ComponentProps> = ({
   const showCondensedView = useRedesign && responsiveSize === 'small'
 
   const renderChangesIndicator = () => {
-    if (useRedesign && !studentPace) {
+    if (useRedesign && (!studentPace || (studentPace && allowStudentPaces))) {
       return <UnpublishedChangesIndicator newPace={newPace} onClick={handleDrawerToggle} />
     }
   }
