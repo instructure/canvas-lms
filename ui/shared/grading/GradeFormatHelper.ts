@@ -212,7 +212,7 @@ const GradeFormatHelper = {
 
     const delocalizedGrade = numberHelper.parse(localizedGrade.replace('%', ''))
 
-    if (isNaN(delocalizedGrade)) {
+    if (Number.isNaN(Number(delocalizedGrade))) {
       return localizedGrade
     }
 
@@ -227,13 +227,13 @@ const GradeFormatHelper = {
     }
 
     const gradeNoPercent = grade.replace('%', '')
-    if ('delocalize' in options && !options.delocalize && !isNaN(gradeNoPercent)) {
+    if ('delocalize' in options && !options.delocalize && !Number.isNaN(Number(gradeNoPercent))) {
       parsedGrade = parseFloat(gradeNoPercent)
     } else {
       parsedGrade = numberHelper.parse(gradeNoPercent)
     }
 
-    if (isNaN(parsedGrade)) {
+    if (Number.isNaN(Number(parsedGrade))) {
       return grade
     }
 

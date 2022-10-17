@@ -19,7 +19,7 @@
 import rubricEditing from './edit_rubric'
 import EditRubricPage from '../backbone/views/EditRubricPage'
 
-document.addEventListener('rubricEditDataReady', e => {
+document.addEventListener('rubricEditDataReady', () => {
   new EditRubricPage()
   rubricEditing.init()
 })

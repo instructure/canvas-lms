@@ -115,7 +115,7 @@ export default class FindDialog extends DialogBaseView {
       this.close()
       return
     }
-    if (confirm(this.confirmText(model))) {
+    if (window.confirm(this.confirmText(model))) {
       let dfd, url
       if (model instanceof OutcomeGroup) {
         url = this.selectedGroup.get('import_url')
@@ -136,7 +136,7 @@ export default class FindDialog extends DialogBaseView {
       }
       this.$el.disableWhileLoading(dfd)
       return $.when(dfd)
-        .done((response, status, deferred) => {
+        .done((response, _status, _deferred) => {
           const importedModel = model.clone()
           if (importedModel instanceof OutcomeGroup) {
             importedModel.set(response)

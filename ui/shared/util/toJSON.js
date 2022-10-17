@@ -33,8 +33,8 @@ const build = function (base, key, value) {
 }
 
 $.fn.toJSON = function () {
-  let json = {},
-    push_counters = {}
+  let json = {}
+  const push_counters = {}
 
   const push_counter = function (key, i) {
     if (push_counters[key] === undefined) {

@@ -151,17 +151,17 @@ $(document).ready(() => {
       data.recipients = ids.join(',')
       return data
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       disableButtons(true)
       $(this).find('.send_button').text(I18n.t('Sending Message...'))
     },
-    success(data) {
+    success(_data) {
       $.flashMessage(I18n.t('Message sent!'))
       disableButtons(false)
       $(this).find('.send_button').text(I18n.t('Send Message'))
       $('#message_students_dialog').dialog('close')
     },
-    error(data) {
+    error(_data) {
       disableButtons(false)
       $(this).find('.send_button').text(I18n.t('Sending Message Failed, please try again'))
     },
@@ -172,7 +172,7 @@ $(document).ready(() => {
     const option = currentSettings.options[optionIdx]
     const studentsHash = $message_students_dialog.data('students_hash')
     let cutoff = numberHelper.parse($message_students_dialog.find('.cutoff_score').val())
-    if (isNaN(cutoff)) {
+    if (Number.isNaN(Number(cutoff))) {
       cutoff = null
     }
 

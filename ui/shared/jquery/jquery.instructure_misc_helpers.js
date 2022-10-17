@@ -37,9 +37,6 @@ $.detect = function (collection, callback) {
 
 $.encodeToHex = function (str) {
   let hex = ''
-  const e = str.length
-  const c = 0
-  let h
   for (let i = 0; i < str.length; i++) {
     let part = str.charCodeAt(i).toString(16)
     while (part.length < 2) {

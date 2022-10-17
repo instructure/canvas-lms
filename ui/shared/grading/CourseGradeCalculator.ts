@@ -41,7 +41,7 @@ function combineAssignmentGroupGrades(assignmentGroupGrades, includeUngraded: bo
     const submissionCount = sumBy(relevantGroupGrades, 'submission_count')
     const possible = submissionCount > 0 || includeUngraded ? 100 : 0
     let score = finalGrade && round(finalGrade, 2)
-    score = isNaN(score) ? null : score
+    score = Number.isNaN(Number(score)) ? null : score
 
     return {score, possible}
   }

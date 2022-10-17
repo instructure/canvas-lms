@@ -58,7 +58,7 @@ export default class CalculationMethodFormView extends Backbone.View {
   }
 
   change(e) {
-    const val = parseInt(numberHelper.parse($(e.target).val()))
+    const val = parseInt(numberHelper.parse($(e.target).val()), 10)
     if (_.isNaN(val)) return
     this.model.set({
       calculation_int: val,
