@@ -3721,6 +3721,16 @@ describe Submission do
 
         expect(@submission.unread?(@student)).to be_truthy
       end
+
+      it "marks submission comments as read" do
+        @assignment.update_submission(@student, { commenter: @teacher, comment: "good!" })
+        @submission.mark_submission_comments_read(@student)
+
+        visible_comment = @submission.visible_submission_comments[0]
+        viewed_comment = visible_comment.viewed_submission_comments[0]
+        expect(viewed_comment.user).to eql @student
+        expect(viewed_comment.submission_comment).to eql visible_comment
+      end
     end
   end
 
