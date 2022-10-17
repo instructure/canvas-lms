@@ -136,8 +136,7 @@ SelectContentDialog.detachDeepLinkingListener = function () {
 }
 
 SelectContentDialog.dialogCancelHandler = function (event) {
-  ;[]
-  const response = confirm(
+  const response = window.confirm(
     I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
   )
   if (!response) {

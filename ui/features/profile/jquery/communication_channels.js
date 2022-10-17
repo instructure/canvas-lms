@@ -325,7 +325,8 @@ $(document).ready(function () {
       let type = 'email address',
         confirm_title = I18n.t('titles.confirm_email_address', 'Confirm Email Address')
       if ($(this).parents('.channel_list').hasClass('other_channels')) {
-        ;(type = 'sms number'), (confirm_title = I18n.t('Confirm Communication Channel'))
+        type = 'sms number'
+        confirm_title = I18n.t('Confirm Communication Channel')
       }
       let $box = $('#confirm_communication_channel')
 
