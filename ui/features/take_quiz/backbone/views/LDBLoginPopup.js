@@ -123,6 +123,7 @@ export default class LDBLoginPopup extends Backbone.View {
     function isStuck() {
       if (whnd) {
         try {
+          // eslint-disable-next-line babel/no-unused-expressions
           whnd.document
         } catch (e) {
           if (/Permission/.test(e.message)) return true

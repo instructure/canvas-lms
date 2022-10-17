@@ -344,7 +344,6 @@ export function attachPageEvents(e) {
                   .remove()
                 $('#question_teaser_' + id).remove()
               }
-              $dialog.find
             }
           }
           $dialog.dialog('close')

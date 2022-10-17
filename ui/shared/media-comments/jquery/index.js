@@ -32,7 +32,6 @@ const I18n = useI18nScope('media_comments_publicjs')
 
 const getDefaultExport = mod => (mod.default ? mod.default : mod)
 
-;('use strict')
 let jsUploader
 
 $.mediaComment = function (command, arg1, arg2) {
