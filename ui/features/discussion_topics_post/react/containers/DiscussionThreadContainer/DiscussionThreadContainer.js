@@ -76,7 +76,7 @@ export const DiscussionThreadContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
-    props.removeDraftFromDiscussionCache(cache, result)
+    if (props.removeDraftFromDiscussionCache) props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
@@ -324,7 +324,11 @@ export const DiscussionThreadContainer = props => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
-        replyFromEntryId: props.discussionEntry._id,
+        replyFromEntryId:
+          props.discussionEntry.rootEntryId &&
+          props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
+            ? props.discussionEntry.parentId
+            : props.discussionEntry._id,
         isAnonymousAuthor,
         message,
         courseID: ENV.course_id,
