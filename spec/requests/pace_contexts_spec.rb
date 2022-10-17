@@ -68,6 +68,12 @@ describe "Pace Contexts API" do
           expect(json["pace_contexts"][0]["applied_pace"]).to eq nil
         end
       end
+
+      it "successfully calls the pace_context api when granular perms on" do
+        Account.root_accounts.first.enable_feature!(:granular_permissions_manage_course_content)
+        get api_v1_pace_contexts_path(course.id), params: { type: "course", format: :json }
+        expect(response.status).to eq 200
+      end
     end
 
     context "when the section type is specified" do
