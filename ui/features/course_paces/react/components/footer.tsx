@@ -28,9 +28,15 @@ import {Tooltip} from '@instructure/ui-tooltip'
 import {View} from '@instructure/ui-view'
 
 import {ResponsiveSizes, StoreState} from '../types'
-import {getAutoSaving, getShowLoadingOverlay, getSyncing} from '../reducers/ui'
+import {
+  getAnyActiveRequests,
+  getAutoSaving,
+  getShowLoadingOverlay,
+  getSyncing,
+} from '../reducers/ui'
 import {coursePaceActions} from '../actions/course_paces'
 import {
+  getIsUnpublishedNewPace,
   getPacePublishing,
   getUnpublishedChangeCount,
   isNewPace,
@@ -56,6 +62,8 @@ interface StoreProps {
   readonly studentPace: boolean
   readonly newPace: boolean
   readonly unpublishedChanges: boolean
+  readonly anyActiveRequests: boolean
+  readonly isUnpublishedNewPace: boolean
 }
 
 interface DispatchProps {
@@ -69,6 +77,7 @@ interface PassedProps {
   readonly handleCancel: () => void
   readonly handleDrawerToggle?: () => void
   readonly responsiveSize: ResponsiveSizes
+  readonly focusOnClose?: () => void
 }
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
@@ -90,23 +99,41 @@ export const Footer: React.FC<ComponentProps> = ({
   handleDrawerToggle,
   responsiveSize,
   removePace,
+  anyActiveRequests,
+  focusOnClose,
+  isUnpublishedNewPace,
 }) => {
   const [isRemovePaceModalOpen, setRemovePaceModalOpen] = useState(false)
+  const useRedesign = window.ENV.FEATURES.course_paces_redesign
+  const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
 
   const handlePublish = useCallback(() => {
     syncUnpublishedChanges()
   }, [syncUnpublishedChanges])
 
-  const allowStudentPaces = window.ENV.FEATURES.course_paces_for_students
-
   if (studentPace && !allowStudentPaces) return null
 
-  const isCoursePace = !sectionPace && !studentPace
-  const useRedesign = window.ENV.FEATURES.course_paces_redesign
+  const handlePublishClicked = () => {
+    handlePublish()
+    if (useRedesign && focusOnClose) {
+      focusOnClose()
+    }
+  }
 
-  const cancelDisabled = autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
-  const pubDisabled = !newPace && (cancelDisabled || (blueprintLocked && isCoursePace))
-  const removeDisabled = autoSaving || isSyncing || showLoadingOverlay
+  const isCoursePace = !sectionPace && !studentPace
+
+  const cancelDisabled = useRedesign
+    ? anyActiveRequests
+    : autoSaving || isSyncing || showLoadingOverlay || !unpublishedChanges
+  const pubDisabled = useRedesign
+    ? !newPace &&
+      (!unpublishedChanges ||
+        autoSaving ||
+        isSyncing ||
+        showLoadingOverlay ||
+        (blueprintLocked && isCoursePace))
+    : !newPace && (cancelDisabled || (blueprintLocked && isCoursePace))
+  const removeDisabled = autoSaving || isSyncing || showLoadingOverlay || pacePublishing
 
   // This wrapper div attempts to roughly match the dimensions of the publish button
   let publishLabel = I18n.t('Publish')
@@ -140,7 +167,7 @@ export const Footer: React.FC<ComponentProps> = ({
   if (pacePublishing || isSyncing) {
     publishLabel = (
       <div style={{display: 'inline-block', margin: '-0.5rem 0.9rem'}}>
-        <Spinner size="x-small" renderTitle={I18n.t('Publishing pace...')} />
+        <Spinner size="x-small" renderTitle={I18n.t('Publishing...')} />
       </div>
     )
   } else if (blackoutDatesSyncing) {
@@ -171,8 +198,12 @@ export const Footer: React.FC<ComponentProps> = ({
   }
 
   const removePaceLabel = I18n.t('Remove Pace')
-  const showRemovePaceButton = useRedesign && !isCoursePace && !newPace
+  const showRemovePaceButton = useRedesign && !isCoursePace && !newPace && !isUnpublishedNewPace
   const showCondensedView = useRedesign && responsiveSize === 'small'
+  const removePaceButtonProps = {
+    onClick: handleRemovePaceClicked,
+    interaction: useRedesign && removeDisabled ? ('disabled' as const) : ('enabled' as const),
+  }
 
   const renderChangesIndicator = () => {
     if (useRedesign && (!studentPace || (studentPace && allowStudentPaces))) {
@@ -198,16 +229,16 @@ export const Footer: React.FC<ComponentProps> = ({
           {showRemovePaceButton && (
             <Tooltip
               renderTip={removeDisabled && removeTip}
-              on={removeDisabled ? ['hover', 'focus'] : []}
+              on={removeDisabled && !useRedesign ? ['hover', 'focus'] : []}
             >
               {showCondensedView ? (
                 <IconButton
                   screenReaderLabel={removePaceLabel}
                   renderIcon={IconTrashLine}
-                  onClick={handleRemovePaceClicked}
+                  {...removePaceButtonProps}
                 />
               ) : (
-                <Button color="secondary" onClick={handleRemovePaceClicked}>
+                <Button color="secondary" {...removePaceButtonProps}>
                   {removePaceLabel}
                 </Button>
               )}
@@ -218,17 +249,29 @@ export const Footer: React.FC<ComponentProps> = ({
           {!showCondensedView && renderChangesIndicator()}
           <Tooltip
             renderTip={cancelDisabled && cancelTip}
-            on={cancelDisabled ? ['hover', 'focus'] : []}
+            on={cancelDisabled && !useRedesign ? ['hover', 'focus'] : []}
           >
-            <Button color="secondary" margin="0 small 0" onClick={handleCancelClick}>
-              {I18n.t('Cancel')}
+            <Button
+              color="secondary"
+              margin="0 small 0"
+              onClick={handleCancelClick}
+              interaction={useRedesign && cancelDisabled ? 'disabled' : 'enabled'}
+            >
+              {useRedesign ? I18n.t('Close') : I18n.t('Cancel')}
             </Button>
           </Tooltip>
-          <Tooltip renderTip={pubDisabled && pubTip} on={pubDisabled ? ['hover', 'focus'] : []}>
+          <Tooltip
+            renderTip={pubDisabled && pubTip}
+            on={pubDisabled && !useRedesign ? ['hover', 'focus'] : []}
+          >
             <Button
               color="primary"
-              disabled={blueprintLocked && isCoursePace}
-              onClick={() => pubDisabled || handlePublish()}
+              onClick={() => pubDisabled || handlePublishClicked()}
+              interaction={
+                (useRedesign && pubDisabled) || (blueprintLocked && isCoursePace)
+                  ? 'disabled'
+                  : 'enabled'
+              }
             >
               {publishLabel}
             </Button>
@@ -251,6 +294,8 @@ const mapStateToProps = (state: StoreState): StoreProps => {
     sectionPace: isSectionPace(state),
     newPace: isNewPace(state),
     unpublishedChanges: getUnpublishedChangeCount(state) !== 0,
+    anyActiveRequests: getAnyActiveRequests(state),
+    isUnpublishedNewPace: getIsUnpublishedNewPace(state),
   }
 }
 

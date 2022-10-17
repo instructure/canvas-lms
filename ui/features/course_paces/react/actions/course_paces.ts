@@ -28,6 +28,7 @@ import {actions as blackoutDateActions} from '../shared/actions/blackout_dates'
 import {getBlackoutDatesUnsynced} from '../shared/reducers/blackout_dates'
 import * as Api from '../api/course_pace_api'
 import {transformBlackoutDatesForApi} from '../api/blackout_dates_api'
+import {getPaceName} from '../reducers/course_paces'
 
 const I18n = useI18nScope('course_paces_actions')
 
@@ -128,6 +129,7 @@ const thunkActions = {
     // Give the thunk function a name so that we can assert on it in tests
     return function pollingThunk(dispatch, getState) {
       const progress = getState().coursePace.publishingProgress
+      const paceName = getPaceName(getState())
       if (!progress || TERMINAL_PROGRESS_STATUSES.includes(progress.workflow_state)) return
 
       const pollingLoop = () =>
@@ -142,18 +144,16 @@ const thunkActions = {
             dispatch(uiActions.clearCategoryError('checkPublishStatus'))
             if (updatedProgress.workflow_state === 'completed') {
               showFlashAlert({
-                message: I18n.t('Finished publishing pace'),
+                message: I18n.t('%{paceName} updated', {paceName}),
                 err: null,
                 type: 'success',
-                srOnly: true,
               })
               dispatch(coursePaceActions.coursePaceSaved(getState().coursePace))
             } else if (updatedProgress.workflow_state === 'failed') {
               showFlashAlert({
-                message: I18n.t('Failed publishing pace'),
+                message: I18n.t('Error updating %{paceName}', {paceName}),
                 err: null,
                 type: 'error',
-                srOnly: true,
               })
               dispatch(uiActions.setCategoryError('publish'))
               console.log(`Error publishing pace: ${updatedProgress.message}`) // eslint-disable-line no-console

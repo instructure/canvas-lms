@@ -28,6 +28,8 @@ const defaultProps = {
   onUnpublishedNavigation,
   pacePublishing: false,
   newPace: false,
+  blackoutDatesSyncing: false,
+  isSyncing: false,
 }
 
 afterEach(() => {
@@ -102,7 +104,7 @@ describe('UnpublishedChangesIndicator', () => {
     const {getAllByText} = render(
       <UnpublishedChangesIndicator {...defaultProps} isSyncing={true} />
     )
-    expect(getAllByText('Publishing pace...')[0]).toBeInTheDocument()
+    expect(getAllByText('Publishing...')[0]).toBeInTheDocument()
   })
 
   it('renders new pace message if pace has not yet been published', () => {
@@ -110,5 +112,17 @@ describe('UnpublishedChangesIndicator', () => {
       <UnpublishedChangesIndicator {...defaultProps} changeCount={0} newPace={true} />
     )
     expect(getByText('Pace is new and unpublished')).toBeInTheDocument()
+  })
+
+  describe('with course_paces_redesign flag enabled', () => {
+    beforeAll(() => {
+      window.ENV.FEATURES ||= {}
+      window.ENV.FEATURES.course_paces_redesign = true
+    })
+
+    it('renders "No pending changes to apply" text', () => {
+      const {getByText} = render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />)
+      expect(getByText('No pending changes to apply')).toBeInTheDocument()
+    })
   })
 })

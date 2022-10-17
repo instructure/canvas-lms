@@ -83,7 +83,7 @@ interface DispatchProps {
 }
 
 interface PassedProps {
-  handleTrayDismiss: () => void
+  handleTrayDismiss: (resetFocus: boolean) => void
 }
 
 type ComponentProps = StoreProps & DispatchProps & PassedProps
@@ -106,7 +106,7 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
 
   const handleResetConfirmed = () => {
     onResetPace()
-    handleTrayDismiss()
+    handleTrayDismiss(true)
   }
 
   return (
@@ -114,7 +114,7 @@ export const UnpublishedChangesTrayContents: React.FC<ComponentProps> = ({
       <CloseButton
         placement="end"
         offset="small"
-        onClick={handleTrayDismiss}
+        onClick={() => handleTrayDismiss(false)}
         screenReaderLabel={I18n.t('Close')}
       />
       <View as="header" margin="0 0 medium">
