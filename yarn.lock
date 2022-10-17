@@ -9659,6 +9659,11 @@ commander@2.11.x:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.11.0.tgz#157152fd1e7a6c8d98a5b715cf376df928004563"
   integrity sha512-b0553uYA5YAEGgyYIGYROzKQ7X5RAqedkfjiZxwi0kL1g3bOaBNNZfYkzt/CL0umgD5wc9Jec2FbB98CjkMRvQ==
 
+commander@9.4.0:
+  version "9.4.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.4.0.tgz#bc4a40918fefe52e22450c111ecd6b7acce6f11c"
+  integrity sha512-sRPT+umqkz90UA8M1yqYfnHlZA7fF6nSphDtxeywPZ49ysjxDQybzk13CL+mXekDRG92skbcqCLVovuCusNmFw==
+
 commander@^2, commander@^2.11.0, commander@^2.19.0, commander@^2.20.0, commander@^2.5.0, commander@^2.8.1:
   version "2.20.3"
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
@@ -22973,6 +22978,15 @@ specificity@^0.4.1:
   resolved "https://registry.yarnpkg.com/specificity/-/specificity-0.4.1.tgz#aab5e645012db08ba182e151165738d00887b019"
   integrity sha512-1klA3Gi5PD1Wv9Q0wUoOQN1IWAuPu0D1U03ThXTr0cJ20+/iq2tHSDnK7Kk/0LXJ1ztUB2/1Os0wKmfyNgUQfg==
 
+speech-rule-engine@^4.1.0-beta.2:
+  version "4.1.0-beta.2"
+  resolved "https://registry.yarnpkg.com/speech-rule-engine/-/speech-rule-engine-4.1.0-beta.2.tgz#715873a76132fbd938b11b5c26300d5a2aac564a"
+  integrity sha512-UrcPmjYqSTNCBmYn45t59HFrs05UYVhuZqUWC+aPvnSaRFOVju5CoOtTLBU+Beb4TY7FCHvabkNTKnCAuZHj6A==
+  dependencies:
+    commander "9.4.0"
+    wicked-good-xpath "1.3.0"
+    xmldom-sre "0.1.31"
+
 spin.js@2.3.2:
   version "2.3.2"
   resolved "https://registry.yarnpkg.com/spin.js/-/spin.js-2.3.2.tgz#6caa56d520673450fd5cfbc6971e6d0772c37a1a"
@@ -25920,6 +25934,11 @@ wicg-inert@3.0.0:
   resolved "https://registry.yarnpkg.com/wicg-inert/-/wicg-inert-3.0.0.tgz#4f5797172fbf7ff01effd3839b52872e35d3cba2"
   integrity sha512-sZsYZ8pk8y6CgDLkTxivfhLDBvZuDWTWBawU8OuDdO0Id6AOd1Gqjkvt9g9Ni7rgHIS7UbRvbLSv1z7MSJDYCA==
 
+wicked-good-xpath@1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/wicked-good-xpath/-/wicked-good-xpath-1.3.0.tgz#81b0e95e8650e49c94b22298fff8686b5553cf6c"
+  integrity sha512-Gd9+TUn5nXdwj/hFsPVx5cuHHiF5Bwuc30jZ4+ronF1qHK5O7HD0sgmXWSEgwKquT3ClLoKPVbO6qGwVwLzvAw==
+
 wide-align@1.1.3:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/wide-align/-/wide-align-1.1.3.tgz#ae074e6bdc0c14a431e804e624549c633b000457"
@@ -26168,6 +26187,11 @@ xmlchars@^2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/xmlchars/-/xmlchars-2.2.0.tgz#060fe1bcb7f9c76fe2a17db86a9bc3ab894210cb"
   integrity sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==
+
+xmldom-sre@0.1.31:
+  version "0.1.31"
+  resolved "https://registry.yarnpkg.com/xmldom-sre/-/xmldom-sre-0.1.31.tgz#10860d5bab2c603144597d04bf2c4980e98067f4"
+  integrity sha512-f9s+fUkX04BxQf+7mMWAp5zk61pciie+fFLC9hX9UVvCeJQfNHRHXpeo5MPcR0EUf57PYLdt+ZO4f3Ipk2oZUw==
 
 xsslint@instructure/xsslint#babel7:
   version "0.1.5"

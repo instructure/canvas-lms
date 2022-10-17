@@ -3,5 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "author": "neme",
-  "main": "./index.js"
+  "main": "./index.js",
+  "dependencies": {
+    "speech-rule-engine": "^4.1.0-beta.2"
+  }
 }
