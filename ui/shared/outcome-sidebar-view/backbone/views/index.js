@@ -77,9 +77,9 @@ export default class SidebarView extends Backbone.View {
       dir = this.cachedDirectories[outcomeGroup.id]
     } else {
       const parent = _.last(this.directories)
-      const directoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
+      const DirectoryClass = outcomeGroup.get('directoryClass') || OutcomesDirectoryView
       const i = _.indexOf(this.directories, this.selectedDir())
-      dir = new directoryClass({
+      dir = new DirectoryClass({
         outcomeGroup,
         parent,
         readOnly: this.readOnly,

@@ -294,8 +294,8 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
   }
 
   // private
-  _viewsFor(models, viewClass) {
-    return _.map(models, model => new viewClass({model, readOnly: this.readOnly, dir: this}))
+  _viewsFor(models, ViewClass) {
+    return _.map(models, model => new ViewClass({model, readOnly: this.readOnly, dir: this}))
   }
 
   // private
