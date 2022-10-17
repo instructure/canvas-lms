@@ -125,6 +125,20 @@ describe "BigBlueButton conferences" do
           new_conference = WebConference.last
           expect(group_participant_and_group_tag_count).to eq new_conference.users.count
         end
+
+        it "succesfully creates a group BBB conference" do
+          get "/groups/#{@group.id}/conferences"
+          group_participant_and_group_tag_count = @group.participating_users_in_context.count + 1
+
+          new_conference_button.click
+          wait_for_ajaximations
+
+          wait_for_new_page_load { f("button[data-testid='submit-button']").click }
+
+          new_conference = WebConference.last
+          expect(new_conference.users.count).to eq group_participant_and_group_tag_count
+          expect(new_conference.context_code).to eq "group_#{@group.id}"
+        end
       end
     end
 
