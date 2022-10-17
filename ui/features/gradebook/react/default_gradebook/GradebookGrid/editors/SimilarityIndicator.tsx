@@ -40,12 +40,12 @@ function tooltipText({similarityScore, status}) {
 export default function SimilarityIndicator({elementRef, similarityInfo}) {
   const {similarityScore, status} = similarityInfo
 
+  const Icon = () => <SimilarityIcon status={status} similarityScore={similarityScore} />
+
   return (
     <div className="Grid__GradeCell__OriginalityScore">
       <Tooltip placement="bottom" renderTip={tooltipText(similarityInfo)} color="primary">
-        <Button elementRef={elementRef} size="small" variant="icon">
-          <SimilarityIcon similarityScore={similarityScore} status={status} />
-        </Button>
+        <Button elementRef={elementRef} size="small" renderIcon={Icon} withBackground={false} />
       </Tooltip>
     </div>
   )

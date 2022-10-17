@@ -215,7 +215,7 @@ describe "Gradebook" do
     expect(f('[aria-label="Gradebook Settings"]')).to be_displayed
 
     f("#gradebook-settings-cancel-button").click
-    expect { driver.switch_to.active_element }.to become(f("#gradebook-settings-button"))
+    expect { driver.switch_to.active_element }.to become(f('[data-test-id="gradebook-settings-button"]'))
   end
 
   it "includes student view student for grading" do

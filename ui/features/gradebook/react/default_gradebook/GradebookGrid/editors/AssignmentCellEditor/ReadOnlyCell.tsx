@@ -19,7 +19,7 @@
 import React, {Component} from 'react'
 import {bool, func, instanceOf, number, oneOf, shape, string} from 'prop-types'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {IconCheckMarkSolid, IconExpandStartLine, IconEndSolid} from '@instructure/ui-icons'
 
@@ -29,7 +29,7 @@ import GradeFormatHelper from '@canvas/grading/GradeFormatHelper'
 const I18n = useI18nScope('gradebook')
 
 const themeOverrides = {
-  [Button.theme]: {
+  [IconButton.theme]: {
     iconPadding: '0 3px',
     smallHeight: '23px',
   },
@@ -160,14 +160,14 @@ export default class ReadOnlyCell extends Component {
 
           <div className="Grid__GradeCell__EndContainer">
             <div className="Grid__GradeCell__Options">
-              <Button
+              <IconButton
                 elementRef={this.bindToggleTrayButtonRef}
                 onClick={this.handleToggleTrayButtonClick}
                 size="small"
-                variant="icon"
-              >
-                <IconExpandStartLine title={I18n.t('Open submission tray')} />
-              </Button>
+                color="secondary"
+                screenReaderLabel={I18n.t('Open submission tray')}
+                renderIcon={IconExpandStartLine}
+              />
             </div>
           </div>
         </div>
