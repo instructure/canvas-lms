@@ -295,7 +295,7 @@ class ContentMigrationsController < ApplicationController
   #   The id of an assignment group in the target course. If provided, all
   #   imported assignments will be moved to the given assignment group.
   #
-  # @argument settings[importer_skips] [Optional,Array,"all_course_settings"]
+  # @argument settings[importer_skips] [Optional,Array,"all_course_settings"|"visibility_settings"]
   #   Set of importers to skip, even if otherwise selected by migration settings.
   #
   # @argument date_shift_options[shift_dates] [Boolean]
