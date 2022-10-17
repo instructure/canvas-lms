@@ -21,11 +21,11 @@ import $ from 'jquery'
 // see also User.name_parts in user.rb
 export function nameParts(name, prior_surname) {
   const SUFFIXES = /^(Sn?r\.?|Senior|Jn?r\.?|Junior|II|III|IV|V|VI|Esq\.?|Esquire)$/i
-  let surname, given, suffix, given_parts, prior_surname_parts, name_parts
+  let surname, given, suffix, given_parts, prior_surname_parts
   if (!name || $.trim(name) === '') {
     return [null, null, null]
   }
-  name_parts = $.map(name.split(','), str => $.trim(str))
+  const name_parts = $.map(name.split(','), str => $.trim(str))
   surname = name_parts[0]
   given = name_parts[1]
   suffix = name_parts.slice(2).join(', ')

@@ -109,7 +109,7 @@ INST.lookupPrerequisites = function () {
       )
       $link.prev('a').hide()
     },
-    data => {
+    _data => {
       spinner.stop()
       $('.module_prerequisites_fallback').show()
     }

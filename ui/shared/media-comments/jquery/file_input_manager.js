@@ -35,7 +35,7 @@ export default class FileInputManager {
   }
 
   setUpInputTrigger(el, mediaType) {
-    $(el).on('click', e => {
+    $(el).on('click', _e => {
       this.allowedMedia = mediaType
       return this.$fileInput.click()
     })

@@ -23,11 +23,11 @@ const inputMethods = {
     const $body = $('body'),
       $inputCover = $('<div />', {class: 'input_cover'})
 
-    $inputCover.on('mouseleave', function (e) {
+    $inputCover.on('mouseleave', function () {
       $(this).remove()
     })
 
-    $(inputs).on('mouseenter', function (e) {
+    $(inputs).on('mouseenter', function () {
       const $el = $(this),
         $cover = $inputCover.clone(true)
 

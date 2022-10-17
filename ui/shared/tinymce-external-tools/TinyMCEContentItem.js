@@ -37,9 +37,9 @@ function exportPropsToSelf(properties, keyMethod) {
     }
   }
 
-  let keys = keyMethod(properties),
-    keyLength = keys.length,
-    prop
+  const keys = keyMethod(properties)
+  let keyLength = keys.length
+  let prop
 
   while (keyLength--) {
     prop = keys[keyLength]
@@ -152,6 +152,7 @@ function TinyMCEContentItem(contentItem) {
   exportPropsToSelf.call(this, contentItem, Object.getOwnPropertyNames)
 
   decorate('isLTI', function () {
+    // eslint-disable-next-line no-bitwise
     return !!~LTI_MIME_TYPES.indexOf(this.mediaType)
   })
 

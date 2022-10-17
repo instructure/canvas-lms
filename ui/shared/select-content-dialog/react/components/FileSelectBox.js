@@ -80,7 +80,8 @@ export default class FileSelectBox extends React.Component {
   isLoading = () => this.fileStore.getState().isLoading || this.folderStore.getState().isLoading
 
   createFolderFileTreeStructure = () => {
-    let {folders, files} = this.state
+    const {files} = this.state
+    let {folders} = this.state
 
     // Put files into the right folders.
     const groupedFiles = _.groupBy(files, 'folder_id')

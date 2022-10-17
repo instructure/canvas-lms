@@ -35,12 +35,12 @@ const helper = {
     })
 
     // fallback to default delimiters if invalid with locale specific ones
-    if (isNaN(num)) {
+    if (Number.isNaN(Number(num))) {
       num = helper._parseNumber(input)
     }
 
     // final fallback to old parseFloat - this allows us to still support scientific 'e' notation
-    if (input.toString().match(/e/) && isNaN(num)) {
+    if (input.toString().match(/e/) && Number.isNaN(Number(num))) {
       num = parseFloat(input)
     }
 
@@ -48,7 +48,7 @@ const helper = {
   },
 
   validate(input) {
-    return !isNaN(helper.parse(input))
+    return !Number.isNaN(Number(helper.parse(input)))
   },
 }
 
