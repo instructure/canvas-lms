@@ -20,6 +20,7 @@ import {mount} from 'enzyme'
 import SubmissionCommentListItem from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentListItem'
 import SubmissionCommentUpdateForm from 'ui/features/gradebook/react/default_gradebook/components/SubmissionCommentUpdateForm'
 import {IconTrashLine, IconEditLine} from '@instructure/ui-icons'
+import {IconButton} from '@instructure/ui-buttons'
 
 QUnit.module('SubmissionCommentListItem', {
   defaultProps() {
@@ -217,7 +218,7 @@ test('clicking the trash icon calls deleteSubmissionComment', function () {
   const confirmStub = sandbox.stub(window, 'confirm').returns(true)
   const deleteSubmissionComment = sinon.stub()
   this.mountComponent({deleteSubmissionComment})
-  this.wrapper.find(IconTrashLine).simulate('click')
+  this.wrapper.find(IconButton).at(1).simulate('click')
   strictEqual(deleteSubmissionComment.callCount, 1)
   confirmStub.restore()
 })
@@ -227,7 +228,7 @@ test('clicking the trash icon calls deleteSubmissionComment with the id', functi
   const deleteSubmissionComment = sinon.stub()
   const id = '42'
   this.mountComponent({id, deleteSubmissionComment})
-  this.wrapper.find(IconTrashLine).simulate('click')
+  this.wrapper.find(IconButton).at(1).simulate('click')
   strictEqual(deleteSubmissionComment.firstCall.args[0], id)
   confirmStub.restore()
 })

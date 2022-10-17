@@ -143,9 +143,8 @@ import * as GradeInputHelper from '@canvas/grading/GradeInputHelper'
 import OutlierScoreHelper from '@canvas/grading/OutlierScoreHelper'
 import {isPostable} from '@canvas/grading/SubmissionHelper'
 import LatePolicyApplicator from '../LatePolicyApplicator'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {IconSettingsSolid} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import ApplyScoreToUngradedModal from './components/ApplyScoreToUngradedModal'
@@ -4771,15 +4770,14 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
         )}
 
         <Portal node={this.props.settingsModalButtonContainer}>
-          <Button
+          <IconButton
             renderIcon={IconSettingsSolid}
             ref={this.gradebookSettingsModalButton}
-            id="gradebook-settings-button"
-            variant="icon"
+            data-test-id="gradebook-settings-button"
+            color="secondary"
             onClick={() => this.gradebookSettingsModal?.current?.open()}
-          >
-            <ScreenReaderContent>{I18n.t('Gradebook Settings')}</ScreenReaderContent>
-          </Button>
+            screenReaderLabel={I18n.t('Gradebook Settings')}
+          />
         </Portal>
         <Portal node={this.props.gradebookMenuNode}>
           <GradebookMenu

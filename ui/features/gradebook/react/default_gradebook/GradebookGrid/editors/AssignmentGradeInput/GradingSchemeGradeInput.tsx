@@ -18,7 +18,7 @@
 
 import React, {Component} from 'react'
 import {arrayOf, bool, element, func, instanceOf, number, shape, string} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {IconButton} from '@instructure/ui-buttons'
 import {Menu} from '@instructure/ui-menu'
 import {TextInput} from '@instructure/ui-text-input'
 import {IconArrowOpenDownLine} from '@instructure/ui-icons'
@@ -226,14 +226,14 @@ export default class GradingSchemeInput extends Component {
             onSelect={this.handleSelect}
             placement="bottom"
             trigger={
-              <Button
+              <IconButton
                 elementRef={this.bindButton}
                 disabled={this.props.disabled}
                 size="small"
-                variant="icon"
-              >
-                <IconArrowOpenDownLine label={I18n.t('Open Grading Scheme menu')} />
-              </Button>
+                color="secondary"
+                renderIcon={IconArrowOpenDownLine}
+                screenReaderLabel={I18n.t('Open Grading Scheme menu')}
+              />
             }
           >
             {this.props.gradingScheme.map(([key]) => (
