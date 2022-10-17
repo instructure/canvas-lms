@@ -49,8 +49,8 @@ const SightedUserContent = ({tagName: Tag = 'span', ...props}) => {
       // content. However, this clearly has the downside of hiding the
       // content from sighted users as well, so we resort to CSS to get the
       // items back into display and we win-win.
-      hidden
-      aria-hidden
+      hidden={true}
+      aria-hidden={true}
       role="presentation"
       className={cx('sighted-user-content', props.className)}
     >

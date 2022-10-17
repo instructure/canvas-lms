@@ -28,6 +28,7 @@ import 'slickgrid/slick.editors' /* global.Slick.Editors */
 import '@canvas/forms/jquery/jquery.instructure_forms' /* errorBox */
 import '@canvas/jquery/jquery.instructure_misc_helpers' /* /\.detect/ */
 import '@canvas/util/templateData'
+
 const I18n = useI18nScope('gradebook_uploads')
 /* fillTemplateData */
 

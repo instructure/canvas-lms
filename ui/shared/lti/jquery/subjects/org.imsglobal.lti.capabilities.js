@@ -25,7 +25,7 @@ export default ({responseMessages}) => {
     if (imsSubjects.includes(subject) && useFrame) {
       return {
         subject,
-        frame: 'post_message_forwarding'
+        frame: 'post_message_forwarding',
       }
     }
 

@@ -69,7 +69,7 @@ describe('ExpandableErrorAlert', () => {
     const {getByText, getByRole} = render(
       <>
         <div id="flash_screenreader_holder" role="alert" />
-        <ExpandableErrorAlert liveRegionText="My error summary" closeable>
+        <ExpandableErrorAlert liveRegionText="My error summary" closeable={true}>
           My error
         </ExpandableErrorAlert>
       </>
@@ -94,7 +94,7 @@ describe('ExpandableErrorAlert', () => {
     expect(getByText('My error')).toBeInTheDocument()
     expect(queryByRole('button', {name: 'Close'})).not.toBeInTheDocument()
 
-    rerender(<ExpandableErrorAlert closeable>My error</ExpandableErrorAlert>)
+    rerender(<ExpandableErrorAlert closeable={true}>My error</ExpandableErrorAlert>)
 
     expect(getByText('My error')).toBeInTheDocument()
     const closeButton = getByRole('button', {name: 'Close'})
