@@ -458,7 +458,9 @@ $.httpSuccess = function (r) {
       r.status == 304 ||
       (jQuery.browser.safari && r.status == undefined)
     )
-  } catch (e) {}
+  } catch (e) {
+    // no-op
+  }
 
   return false
 }
@@ -502,7 +504,9 @@ $.sendFormAsBinary = function (options, not_binary) {
       let json = null
       try {
         json = $.parseJSON(xhr.responseText)
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
       if ($.httpSuccess(xhr)) {
         if (json && !json.errors) {
           if (options.success && $.isFunction(options.success)) {
@@ -769,7 +773,9 @@ $.fn.getFormData = function (options) {
         if ($input.data('rich_text')) {
           val = send($input, 'get_code', false)
         }
-      } catch (e) {}
+      } catch (e) {
+        // no-op
+      }
       const attr = $input.prop('name') || ''
       const multiValue = attr.match(/\[\]$/)
       if (inputType == 'hidden' && !multiValue) {

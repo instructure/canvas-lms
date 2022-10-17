@@ -37,7 +37,9 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
     const a = document.createElement('a')
     a.href = $link.attr('href')
     url = a
-  } catch (error) {}
+  } catch (error) {
+    // no-op
+  }
 
   if (url && deparam(url.search).no_preview) return
 

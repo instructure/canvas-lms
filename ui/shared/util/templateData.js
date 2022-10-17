@@ -77,7 +77,9 @@ $.fn.fillTemplateData = function (options) {
               try {
                 const str = options.data[item].toString()
                 $found.html(htmlEscape(str))
-              } catch (e) {}
+              } catch (e) {
+                // no-op
+              }
             }
           }
         })

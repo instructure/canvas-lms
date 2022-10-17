@@ -799,6 +799,7 @@ window.addEntryComplete = function (entries) {
       if ($('#media_record_tabs').tabs('option', 'selected') == 0) {
         userTitle = $('#video_record_title,#audio_record_title').filter(':visible:first').val()
       } else if ($('#media_record_tabs').tabs('option', 'selected') == 1) {
+        // no-op
       }
       if (entry.entryType == 1 && $('#audio_record_option').hasClass('selected_option')) {
         entry.entryType = 5

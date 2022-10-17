@@ -45,7 +45,9 @@ $(document).ready(function () {
     try {
       status = request.status
       text = request.responseText
-    } catch (e) {}
+    } catch (e) {
+      // no-op
+    }
     $.ajaxJSON(
       location.protocol +
         '//' +
@@ -130,7 +132,9 @@ $(document).ready(function () {
     let username = ''
     try {
       username = $('#identity .user_name').text()
-    } catch (e) {}
+    } catch (e) {
+      // no-op
+    }
     if (INST.ajaxErrorURL) {
       const txt =
         '&Msg=' +

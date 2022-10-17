@@ -2354,7 +2354,9 @@ modules.updateAssignmentData(() => {
     if (window.location.hash && !window.location.hash.startsWith('#!')) {
       try {
         scrollTo($(window.location.hash))
-      } catch (error) {}
+      } catch (error) {
+        // no-op
+      }
     } else {
       const firstContextModuleContent = document
         .querySelector('.context_module')

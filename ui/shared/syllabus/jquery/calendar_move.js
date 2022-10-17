@@ -104,6 +104,7 @@ export function changeMonth($month, change) {
       const class_names = []
       for (let i = 0; i < classes.length; i++) {
         if (classes[i].indexOf('date_') == 0) {
+          // no-op
         } else {
           class_names.push(classes[i])
         }
@@ -173,5 +174,6 @@ export function changeMonth($month, change) {
     idx++
   }
   if (!$month.hasClass('mini_month')) {
+    // no-op
   }
 }
