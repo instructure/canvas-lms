@@ -267,7 +267,6 @@ describe('K5Dashboard Parent Support', () => {
       act(() => getByText('Student 2').click())
       await waitFor(() => expect(reloadMock).toHaveBeenCalled())
     })
-
   })
 
   describe('grades tab', () => {
