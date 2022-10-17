@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React from 'react'
 import {bool, func, shape, string, element, oneOf} from 'prop-types'
 import {Avatar} from '@instructure/ui-avatar'

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 
 export default {

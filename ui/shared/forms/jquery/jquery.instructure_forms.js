@@ -456,7 +456,7 @@ $.httpSuccess = function (r) {
       (!r.status && location.protocol == 'file:') ||
       (r.status >= 200 && r.status < 300) ||
       r.status == 304 ||
-      (jQuery.browser.safari && r.status == undefined)
+      ($.browser.safari && r.status == undefined)
     )
   } catch (e) {
     // no-op
@@ -1028,7 +1028,7 @@ $.fn.formErrors = function (data_errors, options) {
     } else if (
       typeof i === 'number' &&
       val.length == 2 &&
-      val[0] instanceof jQuery &&
+      val[0] instanceof $ &&
       typeof val[1] === 'string'
     ) {
       elementErrors.push(val)

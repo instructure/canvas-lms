@@ -31,14 +31,14 @@ $(function () {
     const sortable_name = $sortable_name.attr('value')
     const sortable_name_parts = nameParts(sortable_name)
     if (
-      jQuery.trim(sortable_name) === '' ||
+      $.trim(sortable_name) === '' ||
       firstNameFirst(sortable_name_parts) === $.trim(prior_name)
     ) {
       const parts = nameParts(name, sortable_name_parts[1])
       $sortable_name.attr('value', lastNameFirst(parts))
     }
     const short_name = $short_name.attr('value')
-    if (jQuery.trim(short_name) === '' || short_name === prior_name) {
+    if ($.trim(short_name) === '' || short_name === prior_name) {
       $short_name.attr('value', name)
     }
     prior_name = $(this).attr('value')
