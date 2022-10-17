@@ -23,8 +23,8 @@ fixture`EnhanceUserContent`.page`./enhanceUserContent.html`
 // const externalLink = Selector(
 //   'a.inline_disabled.external[target="_blank"][rel="noreferrer noopener"]'
 // )
-const externalLinkIcon = Selector('img.external_link_icon')
-const downloadButton = Selector('a.file_download_btn')
+const externalLinkIcon = Selector('span.external_link_icon svg')
+const downloadButton = Selector('a.file_download_btn svg')
 const loadingPreviewSpinner = Selector('.loading_image_holder')
 const autoOpenInlinePreviewLink = Selector('.auto_open.file_preview_link')
 const inlinePreviewContainer = Selector('.preview_container')

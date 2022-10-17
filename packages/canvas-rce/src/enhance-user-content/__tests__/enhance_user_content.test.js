@@ -110,7 +110,7 @@ describe('enhanceUserContent()', () => {
     it('adds the exernal link icon', () => {
       subject('<a href="https://instructure.com/">external link</a>')
       enhanceUserContent()
-      expect(document.querySelector('img.external_link_icon')).toBeInTheDocument()
+      expect(document.querySelector('span.external_link_icon svg')).toBeInTheDocument()
     })
 
     it('adds target=_blank', () => {

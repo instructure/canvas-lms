@@ -26,13 +26,9 @@ import {closest, siblings, show, hide, insertAfter, getData, setData} from './jq
 import {youTubeID, isExternalLink, getTld, showFilePreview} from './instructure_helper'
 import mediaCommentThumbnail from './media_comment_thumbnail'
 
-// we're doing this so we can use the svg in the img src attribute
-// rather than just inlining the svg. This simplified keeping the
-// vertical alignment consistent with how it was with the icon font.
-// The optional chaining to .src is because the icons are undefined
-// in jest tests
-const IconDownloadb64src = window.btoa(IconDownloadLine?.src)
-const IconExternalLinkb64src = window.btoa(IconExternalLinkLine?.src)
+// in jest the es directory doesn't exist so stub the undefined svg
+const IconDownloadSVG = IconDownloadLine?.src || '<svg></svg>'
+const IconExternalLinkSVG = IconExternalLinkLine?.src || '<svg></svg>'
 
 function makeDownloadButton(download_url, filename) {
   const a = document.createElement('a')
@@ -42,11 +38,14 @@ function makeDownloadButton(download_url, filename) {
   a.setAttribute('style', 'margin-inline-start: 5px; text-decoration: none;')
   a.setAttribute('href', download_url)
 
-  const img = document.createElement('img')
-  img.setAttribute('style', 'width:16px; height:16px')
-  img.setAttribute('role', 'presentation')
-  img.setAttribute('src', `data:image/svg+xml;base64,${IconDownloadb64src}`)
-  a.appendChild(img)
+  const $icon = document.createElement('span')
+  $icon.setAttribute('role', 'presentation')
+  $icon.innerHTML = IconDownloadSVG
+  $icon.firstChild.setAttribute(
+    'style',
+    'width:1em; height:1em; vertical-align:middle; fill:currentColor'
+  )
+  a.appendChild($icon)
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
@@ -58,23 +57,22 @@ function makeDownloadButton(download_url, filename) {
 
 function makeExternalLinkIcon(forLink) {
   const dir = (forLink && window.getComputedStyle(forLink).direction) || 'ltr'
-  const span = document.createElement('span')
-  const img = document.createElement('img')
-  img.setAttribute('class', 'external_link_icon')
-  const style = `margin-inline-start: 5px; width:16px; height:16px;${
-    dir === 'rtl' ? 'transform:scale(-1, 1)' : ''
-  }`
-  img.setAttribute('style', style)
-  img.setAttribute('src', `data:image/svg+xml;base64,${IconExternalLinkb64src}`)
-  img.setAttribute('alt', '')
-  img.setAttribute('role', 'presentation')
-  span.appendChild(img)
+  const $icon = document.createElement('span')
+  $icon.setAttribute('class', 'external_link_icon')
+  const style = `margin-inline-start: 5px; ${dir === 'rtl' ? 'transform:scale(-1, 1)' : ''}`
+  $icon.setAttribute('style', style)
+  $icon.setAttribute('role', 'presentation')
+  $icon.innerHTML = IconExternalLinkSVG
+  $icon.firstChild.setAttribute(
+    'style',
+    'width:1em; height:1em; vertical-align:middle; fill:currentColor'
+  )
 
   const srspan = document.createElement('span')
   srspan.setAttribute('class', 'screenreader-only')
   srspan.innerHTML = htmlEscape(formatMessage('Links to an external site.'))
-  span.appendChild(srspan)
-  return span
+  $icon.appendChild(srspan)
+  return $icon
 }
 
 function handleYoutubeLink($link) {
