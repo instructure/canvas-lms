@@ -5036,6 +5036,7 @@ describe "Submissions API", type: :request do
       @user = @student
       raw_api_call(:put, endpoint, params)
       expect(@submission.reload.read_item?(@student, "comment")).to be_truthy
+      expect(@submission.visible_submission_comments[0].viewed_submission_comments[0].user).to eql @student
     end
 
     context "when passing an invalid content item" do
