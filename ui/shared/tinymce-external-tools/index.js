@@ -18,19 +18,12 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import htmlEscape from 'html-escape'
 import ExternalToolsHelper from './ExternalToolsHelper'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
 const I18n = useI18nScope('ExternalToolsPlugin')
-
-const TRANSLATIONS = {
-  get more_external_tools() {
-    return htmlEscape(I18n.t('more_external_tools', 'More External Tools'))
-  },
-}
 
 const ExternalToolsPlugin = {
   init(ed, url, _INST) {
@@ -42,24 +35,31 @@ const ExternalToolsPlugin = {
       // if somehow open gets called early, keep trying until it is ready
       open: (...args) => setTimeout(() => dialog.open(...args), 50),
     }
-    import('./react/components/ExternalToolDialog').then(({default: ExternalToolDialog}) => {
-      const dialogContainer = document.createElement('div')
-      document.body.appendChild(dialogContainer)
-      ReactDOM.render(
-        <ExternalToolDialog
-          win={window}
-          editor={ed}
-          contextAssetString={ENV.context_asset_string}
-          iframeAllowances={iframeAllowances()}
-          resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
-          deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
-        />,
-        dialogContainer,
-        function () {
-          dialog = this
-        }
-      )
-    })
+    import('./react/components/ExternalToolDialog')
+      .then(({default: ExternalToolDialog}) => {
+        const dialogContainer = document.createElement('div')
+        document.body.appendChild(dialogContainer)
+        ReactDOM.render(
+          <ExternalToolDialog
+            win={window}
+            editor={ed}
+            contextAssetString={ENV.context_asset_string}
+            iframeAllowances={iframeAllowances()}
+            resourceSelectionUrl={$('#context_external_tool_resource_selection_url').attr('href')}
+            deepLinkingOrigin={ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN}
+          />,
+          dialogContainer,
+          function () {
+            dialog = this
+          }
+        )
+      })
+      .catch(err => {
+        throw new Error(
+          'Problem loading ui/shared/tinymce-external-tools/react/components/ExternalToolDialog',
+          err
+        )
+      })
 
     const ltiButtons = []
     for (let idx = 0; _INST.editorButtons && idx < _INST.editorButtons.length; idx++) {

@@ -54,9 +54,9 @@ $.fn.toJSON = function () {
     }
 
     let k,
-      keys = this.name.match(patterns.key),
       merge = this.value,
       reverse_key = this.name
+    const keys = this.name.match(patterns.key)
 
     while ((k = keys.pop()) !== undefined) {
       // adjust reverse_key
