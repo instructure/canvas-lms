@@ -39,7 +39,7 @@ export default {
     }
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     // Get the existing Canvas breadcrumbs, store them, and remove them
     this.fixOldCrumbs()
   },

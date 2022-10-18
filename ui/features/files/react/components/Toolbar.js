@@ -52,7 +52,7 @@ export default class Toolbar extends React.Component {
     userCanRestrictFilesForContext: PropTypes.bool,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.downloadTitle = I18n.t('Download as Zip')
     this.tabIndex = null
   }

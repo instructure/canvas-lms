@@ -35,7 +35,7 @@ class LinkValidator extends React.Component {
     showConfetti: false,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setLoadingState()
     this.getResults(true)
   }

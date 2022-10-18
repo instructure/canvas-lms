@@ -47,7 +47,7 @@ export default {
     if (this.props.togglePublishClassOn) this.updatePublishClassElements()
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const setState = model => this.setState(this.extractStateFromModel(model))
     this.props.model.on('change', setState, this)
   },

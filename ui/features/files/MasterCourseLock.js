@@ -37,7 +37,7 @@ class MasterCourseLock extends React.Component {
     this.state = this.extractStateFromModel(props.model)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     const setState = model => this.setState(this.extractStateFromModel(model))
     this.props.model.on('change', setState, this)
   }

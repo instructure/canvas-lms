@@ -59,7 +59,7 @@ class InfoFrame extends React.Component {
     itemShown: courseNotSetUpItem,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (window.ENV.COURSE_WIZARD.checklist_states.publish_step) {
       this.setState({
         itemShown: checklistComplete,

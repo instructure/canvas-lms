@@ -94,7 +94,7 @@ export default {
     )
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.registerListeners(this.props)
     this.getCurrentFolder(this.props)
   },
