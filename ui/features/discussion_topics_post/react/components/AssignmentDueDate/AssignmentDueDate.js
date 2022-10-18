@@ -24,7 +24,7 @@ import {responsiveQuerySizes} from '../../utils/index'
 
 import PropTypes from 'prop-types'
 import {Text} from '@instructure/ui-text'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = useI18nScope('discussion_posts')
@@ -55,7 +55,9 @@ export function AssignmentDueDate({...props}) {
         if (matches.includes('tablet') && props.dueDate) {
           return (
             <span className="discussions-show-due-dates">
-              <CondensedButton
+              <Link
+                isWithinText={false}
+                as="button"
                 data-testid="mobile-due-date-tray-expansion"
                 onClick={() => {
                   props.onSetDueDateTrayOpen(true)
@@ -66,7 +68,7 @@ export function AssignmentDueDate({...props}) {
                     date: DateHelper.formatDateForDisplay(props.dueDate, 'short'),
                   })}
                 </Text>
-              </CondensedButton>
+              </Link>
             </span>
           )
         }

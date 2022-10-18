@@ -23,7 +23,7 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils/index'
 
 import {Text} from '@instructure/ui-text'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {Responsive} from '@instructure/ui-responsive'
 
 const I18n = useI18nScope('discussion_posts')
@@ -31,7 +31,9 @@ const I18n = useI18nScope('discussion_posts')
 export function AssignmentMultipleAvailabilityWindows({...props}) {
   return (
     <span className="discussions-show-multiple-due-dates">
-      <CondensedButton
+      <Link
+        isWithinText={false}
+        as="button"
         onClick={() => {
           props.onSetDueDateTrayOpen(true)
         }}
@@ -60,7 +62,7 @@ export function AssignmentMultipleAvailabilityWindows({...props}) {
             </Text>
           )}
         />
-      </CondensedButton>
+      </Link>
     </span>
   )
 }
