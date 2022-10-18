@@ -772,10 +772,10 @@ $(function () {
       quizSubmission.updateSubmission()
     })
     .delegate('.question_input', 'change', function (event, update, changedMap) {
-      let $this = $(this),
-        tagName = this.tagName.toUpperCase(),
-        id = $this.parents('.question').attr('id'),
-        val = ''
+      const $this = $(this)
+      const tagName = this.tagName.toUpperCase()
+      const id = $this.parents('.question').attr('id')
+      let val = ''
       if (tagName === 'A') return
       if (changedMap) {
         // reduce redundant jquery lookups and other calls
@@ -998,9 +998,7 @@ showDeauthorizedDialog = function () {
 }
 
 if (ENV.LOCKDOWN_BROWSER) {
-  let ldbLoginPopup
-
-  ldbLoginPopup = new LDBLoginPopup()
+  const ldbLoginPopup = new LDBLoginPopup()
   ldbLoginPopup
     .on('login_success.take_quiz', () => {
       $.flashMessage(I18n.t('login_successful', 'Login successful.'))

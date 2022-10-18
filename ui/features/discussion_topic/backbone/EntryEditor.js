@@ -80,20 +80,24 @@ export default class EntryEditor extends EditorToggle {
   }
 
   createCancelButton() {
-    return $('<a/>')
-      .text(I18n.t('Cancel'))
-      .css({marginLeft: '5px'})
-      .attr('href', 'javascript:')
-      .addClass('cancel_button')
-      .click(() => {
-        this.cancel()
-        this.display({cancel: true})
-      })
+    return (
+      $('<a/>')
+        .text(I18n.t('Cancel'))
+        .css({marginLeft: '5px'})
+        // eslint-disable-next-line no-script-url
+        .attr('href', 'javascript:')
+        .addClass('cancel_button')
+        .click(() => {
+          this.cancel()
+          this.display({cancel: true})
+        })
+    )
   }
 
   createDeleteAttachmentButton() {
     return (
       $('<a/>')
+        // eslint-disable-next-line no-script-url
         .attr('href', 'javascript:')
         .text('x')
         .addClass('cancel_button')

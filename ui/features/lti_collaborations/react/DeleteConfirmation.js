@@ -40,7 +40,7 @@ class DeleteConfirmation extends React.Component {
           <button type="button" className="Button Button--danger" onClick={this.props.onDelete}>
             {I18n.t('Yes, remove')}
           </button>
-          <button className="Button" onClick={this.props.onCancel}>
+          <button type="button" className="Button" onClick={this.props.onCancel}>
             {I18n.t('Cancel')}
           </button>
         </div>

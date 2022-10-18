@@ -29,6 +29,7 @@ class FlickrImage extends React.Component {
     }
 
     return (
+      // eslint-disable-next-line no-script-url
       <a className="FlickrImage" onClick={this.handleClick} href="javascript:;" ref="flickrImage">
         <img
           className="FlickrImage__screenreader"

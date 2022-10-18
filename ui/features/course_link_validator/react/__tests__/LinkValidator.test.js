@@ -118,6 +118,7 @@ describe('LinkValidator', () => {
                       link_text: 'foo',
                     },
                     {
+                      // eslint-disable-next-line no-script-url
                       url: 'javascript:alert("lulz")',
                       reason: 'unreachable',
                       link_text: 'hehehh',
