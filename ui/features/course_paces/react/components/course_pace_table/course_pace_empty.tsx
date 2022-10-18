@@ -50,15 +50,15 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
   return (
     <View>
       <Flex
-        wrap={responsiveSize == 'large' ? undefined : 'wrap'}
+        wrap={responsiveSize === 'large' ? undefined : 'wrap'}
         alignItems="end"
-        justifyItems={responsiveSize == 'large' ? 'start' : 'center'}
+        justifyItems={responsiveSize === 'large' ? 'start' : 'center'}
         margin="0 0 medium 0"
       >
         <FlexItem padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
-            textAlign={responsiveSize == 'large' ? 'start' : 'center'}
+            textAlign={responsiveSize === 'large' ? 'start' : 'center'}
             className="course-paces-panda"
             padding="0 0 medium 0"
           >
@@ -81,7 +81,7 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
           </Flex>
         </FlexItem>
 
-        {responsiveSize == 'large' ? (
+        {responsiveSize === 'large' ? (
           <FlexItem margin="0 large small large">
             <IconArrowEndSolid size="small" />
           </FlexItem>
@@ -90,7 +90,7 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
         <FlexItem padding="medium 0 0 0" width="100%" maxWidth="362px" shouldShrink={true}>
           <View
             as="div"
-            textAlign={responsiveSize == 'large' ? 'start' : 'center'}
+            textAlign={responsiveSize === 'large' ? 'start' : 'center'}
             padding="0 0 medium 0"
           >
             <img src={PandaUsingPaces} alt="" />
@@ -116,7 +116,7 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
         color="primary"
         margin="small 0"
         size="large"
-        display={responsiveSize == 'large' ? 'inline-block' : 'block'}
+        display={responsiveSize === 'large' ? 'inline-block' : 'block'}
         onClick={() => {
           setSelectedPaceContext('Course', window.ENV.COURSE_ID)
         }}

@@ -104,8 +104,8 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
 
     const getDurationLabel = planDays => {
       if (!planDays) return false
-      let weeks,
-        durations = []
+      let weeks
+      const durations = []
       if (planDays > 7) {
         weeks = Math.floor(planDays / 7)
         durations.push(I18n.t({one: '1 Week', other: '%{count} Weeks'}, {count: weeks}))
@@ -138,11 +138,11 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
         <View as="div" margin="small 0" borderRadius="medium" borderWidth="small" padding="medium">
           <Flex
             justifyItems="space-between"
-            direction={props.responsiveSize == 'large' ? 'row' : 'column'}
+            direction={props.responsiveSize === 'large' ? 'row' : 'column'}
           >
             <FlexItem>
-              <Flex justifyItems={props.responsiveSize == 'large' ? 'start' : 'center'}>
-                {props.responsiveSize == 'large' ? (
+              <Flex justifyItems={props.responsiveSize === 'large' ? 'start' : 'center'}>
+                {props.responsiveSize === 'large' ? (
                   <FlexItem padding="0 medium 0 0">
                     <IconCoursesLine size="small" />
                   </FlexItem>
@@ -179,7 +179,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             <FlexItem
               fontSize="0.875rem"
               textAlign="center"
-              margin={props.responsiveSize == 'large' ? '0' : 'small 0 0'}
+              margin={props.responsiveSize === 'large' ? '0' : 'small 0 0'}
             >
               <Link
                 isWithinText={false}
@@ -187,7 +187,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                   props.setSelectedPaceContext('Course', window.ENV.COURSE_ID)
                 }}
               >
-                {!props.coursePace.id && props.coursePace.context_type == 'Course'
+                {!props.coursePace.id && props.coursePace.context_type === 'Course'
                   ? I18n.t('Create Default Pace')
                   : I18n.t('Edit Default Pace')}
               </Link>

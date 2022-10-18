@@ -48,7 +48,7 @@ class KalturaAnalytics {
     const data = _.clone(this.defaultData)
     data['event:eventType'] = eventId
     data['event:duration'] = this.mediaElement.duration
-    data['event:currentPoint'] = parseInt(this.mediaElement.currentTime * 1000)
+    data['event:currentPoint'] = parseInt(this.mediaElement.currentTime * 1000, 10)
     data['event:eventTimestamp'] = new Date().getTime()
 
     return this.queueApiCall(this.apiUrl + $.param(data))
@@ -94,11 +94,11 @@ class KalturaAnalytics {
       // there is no reliable way to know when a remote url has loaded in an
       // iframe, so just send them every 4 seconds
       const queue = []
-      const f = ((iframe, queue) =>
+      const f = ((iframe_, queue_) =>
         function () {
           let url
-          if ((url = queue.shift())) {
-            return (iframe.src = url)
+          if ((url = queue_.shift())) {
+            return (iframe_.src = url)
           }
         })(iframe, queue)
       this.iframes[i] = {iframe, queue, pinger: _.throttle(f, 4000)}
@@ -127,7 +127,7 @@ class KalturaAnalytics {
       this.mediaElement.pauseObserved = false
       this.mediaElement.endedObserved = false
       if (this.mediaElement.endedOnce) {
-        this.queueAnalyticEvent(mediaId, 16) // Replay
+        this.queueAnalyticEvent(this.mediaId, 16) // Replay
         this.mediaElement.endedOnce = false
       }
       return this.queueAnalyticEvent(3)
@@ -162,7 +162,7 @@ class KalturaAnalytics {
         setInterval(() => {
           if (
             this.mediaElement.paused ||
-            isNaN(this.mediaElement.duration) ||
+            Number.isNaN(Number(this.mediaElement.duration)) ||
             !this.mediaElement.duration
           )
             return
@@ -183,7 +183,7 @@ class KalturaAnalytics {
             0.98 * this.mediaElement.duration, // :)
           ]
           const {currentTime} = this.mediaElement
-          if (!isNaN(currentTime) && currentTime > 0) {
+          if (!Number.isNaN(Number(currentTime)) && currentTime > 0) {
             let j = stopPoints.length - 1
 
             while (j >= 0) {

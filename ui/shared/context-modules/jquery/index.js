@@ -224,6 +224,7 @@ window.modules = (function () {
               return
             }
             const progression = data.context_module_progression
+            // eslint-disable-next-line eqeqeq
             if (progression.user_id == window.ENV.current_user_id) {
               let $user_progression = $user_progression_list.find(
                 '.progression_' + progression.context_module_id
@@ -375,7 +376,7 @@ window.modules = (function () {
       })
       $form.fillFormData(data, {object_name: 'context_module'})
       let isNew = false
-      if ($module.attr('id') == 'context_module_new') {
+      if ($module.attr('id') === 'context_module_new') {
         isNew = true
         $form.attr('action', $form.find('.add_context_module_url').attr('href'))
         $form.find('.completion_entry').hide()
@@ -392,11 +393,11 @@ window.modules = (function () {
         .find('#require_sequential_progress')
         .attr(
           'checked',
-          data.require_sequential_progress == 'true' || data.require_sequential_progress == '1'
+          data.require_sequential_progress === 'true' || data.require_sequential_progress === '1'
         )
       $form
         .find('#publish_final_grade')
-        .attr('checked', data.publish_final_grade == 'true' || data.publish_final_grade == '1')
+        .attr('checked', data.publish_final_grade === 'true' || data.publish_final_grade === '1')
 
       const has_predecessors =
         $('#context_modules .context_module').length > 1 &&
@@ -411,7 +412,7 @@ window.modules = (function () {
       for (const idx in prerequisites) {
         const pre = prerequisites[idx]
         $form.find('.add_prerequisite_link:first').click()
-        if (pre.type == 'context_module') {
+        if (pre.type === 'context_module') {
           $form
             .find('.prerequisites_list .criteria_list .criterion:last select')
             .val(pre.id)
@@ -505,7 +506,7 @@ window.modules = (function () {
       if (
         remove &&
         $module &&
-        $module.attr('id') == 'context_module_new' &&
+        $module.attr('id') === 'context_module_new' &&
         !$module.hasClass('dont_remove')
       ) {
         $module.remove()
@@ -531,8 +532,8 @@ window.modules = (function () {
       data.title = data.title || data['item[title]']
       data.new_tab = data.new_tab ? '1' : '0'
       data.graded = data.graded ? '1' : '0'
-      let $item,
-        $olditem = data.id !== 'new' ? $('#context_module_item_' + data.id) : []
+      let $item
+      const $olditem = data.id !== 'new' ? $('#context_module_item_' + data.id) : []
       if ($olditem.length) {
         const $admin = $olditem.find('.ig-admin')
         if ($admin.length) {
@@ -685,7 +686,7 @@ window.modules = (function () {
       const id = $module.attr('id').substring('context_module_'.length)
       const res = []
       for (const idx in prerequisites) {
-        if ($.inArray(prerequisites[idx], list[id]) == -1) {
+        if ($.inArray(prerequisites[idx], list[id]) === -1) {
           res.push(prerequisites[idx])
         }
       }
@@ -746,7 +747,7 @@ window.modules = (function () {
         $module.find('.completion_status i:visible').attr('title', progression_state_capitalized)
       }
 
-      if (progression_state == 'completed' && !$module.find('.progression_requirement').length) {
+      if (progression_state === 'completed' && !$module.find('.progression_requirement').length) {
         // this means that there were no requirements so even though the workflow_state says completed, dont show "completed" because there really wasnt anything to complete
         progression_state = ''
       }
@@ -777,12 +778,13 @@ window.modules = (function () {
 
         const completed = _.some(
           reqs_met,
+          // eslint-disable-next-line eqeqeq
           req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement')
         )
         if (completed) {
           $mod_item.addClass('completed_item')
           addIcon($icon_container, 'icon-check', I18n.t('Completed'))
-        } else if (progression_state == 'completed') {
+        } else if (progression_state === 'completed') {
           // if it's already completed then don't worry about warnings, etc
           if ($mod_item.hasClass('progression_requirement')) {
             addIcon($icon_container, 'no-icon', I18n.t('Not completed'))
@@ -792,6 +794,7 @@ window.modules = (function () {
         } else {
           let incomplete_req = null
           for (const idx in incomplete_reqs) {
+            // eslint-disable-next-line eqeqeq
             if (incomplete_reqs[idx].id == mod_id) {
               incomplete_req = incomplete_reqs[idx]
             }
@@ -820,7 +823,7 @@ window.modules = (function () {
           }
         }
       })
-      if (data.collapsed == 'true') {
+      if (data.collapsed === 'true') {
         $module.addClass('collapsed_module')
       }
     },
@@ -939,6 +942,7 @@ const updateOtherPrerequisites = function (id, name) {
   $('div.context_module .prerequisite_criterion .id').each(function (_, idNode) {
     const $id = $(idNode)
     const prereq_id = $id.text()
+    // eslint-disable-next-line eqeqeq
     if (prereq_id == id) {
       const $crit = $id.closest('.prerequisite_criterion')
       $crit.find('.name').text(name)
@@ -1117,7 +1121,7 @@ modules.initModuleManagement = function (duplicate) {
           'items?include[]=content_details'
       )
       $module.data('workflow-state', data.context_module.workflow_state)
-      if (data.context_module.workflow_state == 'unpublished') {
+      if (data.context_module.workflow_state === 'unpublished') {
         $module.find('.workflow-state-action').text('Publish')
         $module
           .find('.workflow-state-icon')
@@ -1144,7 +1148,7 @@ modules.initModuleManagement = function (duplicate) {
           moduleType: 'module',
           id: data.context_module.id,
           courseId: data.context_module.context_id,
-          published: data.context_module.workflow_state == 'published',
+          published: data.context_module.workflow_state === 'published',
           publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
@@ -1190,7 +1194,7 @@ modules.initModuleManagement = function (duplicate) {
     const afters = []
 
     $('#context_modules .context_module').each(function () {
-      if ($(this)[0] == $module[0] || afters.length > 0) {
+      if ($(this)[0] === $module[0] || afters.length > 0) {
         afters.push($(this).attr('id'))
       }
     })
@@ -1288,7 +1292,7 @@ modules.initModuleManagement = function (duplicate) {
       .find('.type option.' + data.type)
       .show()
       .attr('disabled', false)
-    if (data.graded == '1') {
+    if (data.graded === '1') {
       $option.find('.type option.graded').show().attr('disabled', false)
     }
     $option.find('.type').val($option.find('.type option.' + data.criterion_type + ':first').val())
@@ -1298,7 +1302,7 @@ modules.initModuleManagement = function (duplicate) {
     const $option = $(this).parents('.completion_criterion_option')
 
     // Show score text box and do some resizing of drop down to get it to stay on one line
-    $option.find('.min_score_box').showIf($(this).val() == 'min_score')
+    $option.find('.min_score_box').showIf($(this).val() === 'min_score')
 
     const id = $option.find('.id').val()
     const points_possible = $.trim(
@@ -1306,7 +1310,7 @@ modules.initModuleManagement = function (duplicate) {
         .text()
         .split(' ')[0]
     )
-    if (points_possible.length > 0 && $(this).val() == 'min_score') {
+    if (points_possible.length > 0 && $(this).val() === 'min_score') {
       $option.find('.points_possible').text(points_possible)
       $option.find('.points_possible_parent').show()
     } else {
@@ -1428,7 +1432,7 @@ modules.initModuleManagement = function (duplicate) {
           const id = data.context_module.id
           $('.context_module .prerequisites .criterion').each(function () {
             const criterion = $(this).getTemplateData({textValues: ['id', 'type']})
-            if (criterion.type == 'context_module' && criterion.id == id) {
+            if (criterion.type === 'context_module' && criterion.id == id) {
               $(this).remove()
             }
           })
@@ -1895,7 +1899,7 @@ modules.initModuleManagement = function (duplicate) {
       .each(function () {
         if ($(this)[0] != $criterion[0]) {
           const data = $(this).getTemplateData({textValues: ['id', 'type']})
-          const type = data.type == 'context_module' ? 'module' : data.type
+          const type = data.type === 'context_module' ? 'module' : data.type
           prereqs.push(type + '_' + data.id)
         }
       })
@@ -1956,7 +1960,7 @@ modules.initModuleManagement = function (duplicate) {
     $select.find('.' + $module.attr('id')).remove()
     const afters = []
     $('#context_modules .context_module').each(function () {
-      if ($(this)[0] == $module[0] || afters.length > 0) {
+      if ($(this)[0] === $module[0] || afters.length > 0) {
         afters.push($(this).getTemplateData({textValues: ['id']}).id)
       }
     })
@@ -2041,7 +2045,7 @@ modules.initModuleManagement = function (duplicate) {
 
   var initPublishButton = function ($el, data) {
     data = data || $el.data()
-    if (data.moduleType == 'attachment') {
+    if (data.moduleType === 'attachment') {
       // Module isNew if it was created with an ajax request vs being loaded when the page loads
       let moduleItem = {}
 
@@ -2141,13 +2145,13 @@ modules.initModuleManagement = function (duplicate) {
 
   const moduleItems = {}
   const updateModuleItem = function (attrs, model) {
-    let i, items, item, parsedAttrs
-    items = moduleItems[itemContentKey(attrs) || itemContentKey(model)]
+    let i, item, parsedAttrs
+    const items = moduleItems[itemContentKey(attrs) || itemContentKey(model)]
     if (items) {
       for (i = 0; i < items.length; i++) {
         item = items[i]
         parsedAttrs = item.model.parse(attrs)
-        if (parsedAttrs.type == 'File') {
+        if (parsedAttrs.type === 'File') {
           item.model.set({locked: !parsedAttrs.published})
         } else {
           item.model.set({published: parsedAttrs.published})
@@ -2233,22 +2237,22 @@ const content_type_map = {
 function itemContentKey(model) {
   if (model === null) return null
 
-  let attrs = model.attributes || model,
-    content_type = $.underscore(attrs.module_type || attrs.type),
-    content_id = attrs.content_id || attrs.id
+  const attrs = model.attributes || model
+  let content_type = $.underscore(attrs.module_type || attrs.type)
+  let content_id = attrs.content_id || attrs.id
 
   content_type = content_type_map[content_type] || content_type
 
   if (!content_type || content_type === 'module') {
     return null
   } else {
-    if (content_type == 'wiki_page') {
+    if (content_type === 'wiki_page') {
       content_type = 'wiki_page'
       content_id = attrs.page_url || attrs.id
     } else if (
       content_type === 'context_module_sub_header' ||
       content_type === 'external_url' ||
-      content_type == 'context_external_tool'
+      content_type === 'context_external_tool'
     ) {
       content_id = attrs.id
     }
@@ -2335,7 +2339,7 @@ var toggleModuleCollapse = function (event) {
       $module.loadingImage('remove')
     }
   )
-  if (collapse == '1' || !reload_entries) {
+  if (collapse === '1' || !reload_entries) {
     toggle()
   }
 }
@@ -2496,11 +2500,11 @@ $(document).ready(function () {
       const $elem = getClosestModuleOrItem($currentElem)
       const $hasClassItemHover = $elem.hasClass('context_module_item_hover')
 
-      if (event.keyString == 'e') {
+      if (event.keyString === 'e') {
         $hasClassItemHover
           ? $currentElem.find('.edit_item_link:first').click()
           : $currentElem.find('.edit_module_link:first').click()
-      } else if (event.keyString == 'd') {
+      } else if (event.keyString === 'd') {
         if ($hasClassItemHover) {
           $currentElem.find('.delete_item_link:first').click()
           $currentElem = $currentElem.parents('.context_module')
@@ -2508,7 +2512,7 @@ $(document).ready(function () {
           $currentElem.find('.delete_module_link:first').click()
           $currentElem = null
         }
-      } else if (event.keyString == 'space') {
+      } else if (event.keyString === 'space') {
         $hasClassItemHover
           ? $currentElem.find('.move_module_item_link:first').click()
           : $currentElem.find('.move_module_link:first').click()
@@ -2530,11 +2534,11 @@ $(document).ready(function () {
 
       const $currentElemID = $currentElem.attr('id')
 
-      if (event.keyString == 'i') {
+      if (event.keyString === 'i') {
         $currentElem
           .find('.indent_item_link:first')
           .trigger('click', [$currentElem, document.activeElement])
-      } else if (event.keyString == 'o') {
+      } else if (event.keyString === 'o') {
         $currentElem
           .find('.outdent_item_link:first')
           .trigger('click', [$currentElem, document.activeElement])
@@ -2557,7 +2561,7 @@ $(document).ready(function () {
     .find('.expand_module_link,.collapse_module_link')
     .bind('click keyclick', toggleModuleCollapse)
   $(document).fragmentChange((event, hash) => {
-    if (hash == '#student_progressions') {
+    if (hash === '#student_progressions') {
       $('.module_progressions_link').trigger('click')
     } else if (!hash.startsWith('#!')) {
       const module = $(hash.replace(/module/, 'context_module'))
@@ -2723,20 +2727,20 @@ $(document).ready(function () {
     }
 
     const moduleData = []
-    if (launchType == 'module_index_menu') {
+    if (launchType === 'module_index_menu') {
       // include all modules
       moduleData.push({
         course_id: ENV.COURSE_ID,
         type: 'module',
       })
-    } else if (launchType == 'module_group_menu') {
+    } else if (launchType === 'module_group_menu') {
       // just include the one module whose menu we're on
       moduleData.push({
         id: currentModuleId,
         name: currentModule.find('.name').attr('title'),
       })
     }
-    setExternalToolTray(tool, moduleData, launchType == 'module_index_menu', $('.al-trigger')[0])
+    setExternalToolTray(tool, moduleData, launchType === 'module_index_menu', $('.al-trigger')[0])
   }
 
   $('.menu_tray_tool_link').click(openExternalTool)

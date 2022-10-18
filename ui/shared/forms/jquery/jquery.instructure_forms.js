@@ -97,11 +97,11 @@ $.fn.formSubmit = function (options) {
         formData = newData
       }
     }
-    let method =
-        $form.data('method') || $form.find("input[name='_method']").val() || $form.attr('method'),
-      formId = $form.attr('id'),
-      action = $form.attr('action'),
-      submitParam = null
+    const method =
+      $form.data('method') || $form.find("input[name='_method']").val() || $form.attr('method')
+    const formId = $form.attr('id')
+    let action = $form.attr('action')
+    let submitParam = null
     if ($.isFunction(options.beforeSubmit)) {
       submitParam = null
       try {
@@ -138,9 +138,8 @@ $.fn.formSubmit = function (options) {
       $.each(['success', 'error'], function (i, successOrError) {
         oldHandlers[successOrError] = options[successOrError]
         options[successOrError] = function () {
-          loadingPromise[successOrError === 'success' ? 'resolve' : 'reject'].apply(
-            loadingPromise,
-            arguments
+          loadingPromise[successOrError === 'success' ? 'resolve' : 'reject'].bind(loadingPromise)(
+            ...arguments
           )
           if ($.isFunction(oldHandlers[successOrError])) {
             return oldHandlers[successOrError].apply(this, arguments)
@@ -550,11 +549,11 @@ $.fileData = function (file_object) {
 }
 
 $.toMultipartForm = function (params, callback) {
-  let boundary = '-----AaB03x' + _.uniqueId(),
-    result = {content_type: 'multipart/form-data; boundary=' + boundary},
-    body = '--' + boundary + '\r\n',
-    paramsList = [],
-    hasFakeFile = false
+  let body = '--' + boundary + '\r\n'
+  let hasFakeFile = false
+  const boundary = '-----AaB03x' + _.uniqueId()
+  const paramsList = []
+  const result = {content_type: 'multipart/form-data; boundary=' + boundary}
 
   for (var idx in params) {
     paramsList.push([idx, params[idx]])
@@ -594,9 +593,9 @@ $.toMultipartForm = function (params, callback) {
       finished()
       return
     }
-    let param = paramsList.shift(),
-      name = param[0],
-      value = param[1]
+    const param = paramsList.shift()
+    const name = param[0]
+    let value = param[1]
 
     if (window.FileList && value instanceof FileList) {
       value = value[0]
@@ -615,7 +614,7 @@ $.toMultipartForm = function (params, callback) {
         fileList.push(value)
       }
       const finishedFiles = function () {
-        body += '--' + innerBoundary + '--\r\n' + '--' + boundary + '\r\n'
+        body += '--' + innerBoundary + '--\r\n--' + boundary + '\r\n'
         nextParam()
       }
       var nextFile = function () {
@@ -966,7 +965,7 @@ $.fn.validateForm = function (options) {
   if (options.numbers) {
     $.each(options.numbers, (i, name) => {
       const val = parseFloat(data[name])
-      if (isNaN(val)) {
+      if (Number.isNaN(Number(val))) {
         if (!errors[name]) {
           errors[name] = []
         }
