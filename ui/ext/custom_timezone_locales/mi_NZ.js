@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'mi_NZ',
   day: {
     abbrev: ['Ta', 'Ma', 'Tū', 'We', 'Tāi', 'Pa', 'Hā'],

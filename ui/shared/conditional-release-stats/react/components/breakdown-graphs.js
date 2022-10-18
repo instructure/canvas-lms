@@ -56,6 +56,7 @@ class BreakdownGraphs extends React.Component {
     const {ranges, assignment, enrolled, openSidebar, selectRange} = this.props
     return ranges.map(({size, scoring_range}, i) => (
       <BarGraph
+        // eslint-disable-next-line react/no-array-index-key
         key={i}
         rangeIndex={i}
         rangeStudents={size}

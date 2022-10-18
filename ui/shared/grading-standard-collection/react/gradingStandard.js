@@ -205,6 +205,7 @@ class GradingStandard extends React.Component {
     return data.map(function (item, idx, array) {
       return (
         <DataRow
+          // eslint-disable-next-line react/no-array-index-key
           key={idx}
           uniqueId={idx}
           row={item}
@@ -385,7 +386,12 @@ class GradingStandard extends React.Component {
     if (this.standardIsValid()) {
       return (
         <div id="valid_standard" className="alert alert-success">
-          <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>
+          <button
+            type="button"
+            aria-label="Close"
+            className="dismiss_alert close"
+            onClick={this.hideAlert}
+          >
             ×
           </button>
           <div className="alert-message">{I18n.t('Looks great!')}</div>
@@ -394,7 +400,12 @@ class GradingStandard extends React.Component {
     }
     return (
       <div id="invalid_standard" className="alert alert-error">
-        <button aria-label="Close" className="dismiss_alert close" onClick={this.hideAlert}>
+        <button
+          type="button"
+          aria-label="Close"
+          className="dismiss_alert close"
+          onClick={this.hideAlert}
+        >
           ×
         </button>
         {this.renderInvalidStandardMessage()}

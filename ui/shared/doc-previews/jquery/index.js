@@ -108,8 +108,7 @@ $.fn.loadDocPreview = function (options) {
       })
     } else if (opts.canvadoc_session_url) {
       const canvadocWrapper = $(
-        '<div style="overflow: auto; resize: vertical;\
-        border: 1px solid transparent; height: 100%;"/>'
+        `<div style="overflow: auto; resize: vertical; border: 1px solid transparent; height: 100%;"/>`
       )
       canvadocWrapper.appendTo($this)
 
@@ -184,31 +183,29 @@ $.fn.loadDocPreview = function (options) {
           }
         })
       }
-    } else {
       // else fall back with a message that the document can't be viewed inline
-      if (opts.attachment_preview_processing) {
-        $this.html(
-          '<p>' +
-            htmlEscape(
-              I18n.t(
-                'errors.document_preview_processing',
-                'The document preview is currently being processed. Please try again later.'
-              )
-            ) +
-            '</p>'
-        )
-      } else {
-        $this.html(
-          '<p>' +
-            htmlEscape(
-              I18n.t(
-                'errors.cannot_view_document_in_canvas',
-                'This document cannot be displayed within Canvas.'
-              )
-            ) +
-            '</p>'
-        )
-      }
+    } else if (opts.attachment_preview_processing) {
+      $this.html(
+        '<p>' +
+          htmlEscape(
+            I18n.t(
+              'errors.document_preview_processing',
+              'The document preview is currently being processed. Please try again later.'
+            )
+          ) +
+          '</p>'
+      )
+    } else {
+      $this.html(
+        '<p>' +
+          htmlEscape(
+            I18n.t(
+              'errors.cannot_view_document_in_canvas',
+              'This document cannot be displayed within Canvas.'
+            )
+          ) +
+          '</p>'
+      )
     }
   })
 }

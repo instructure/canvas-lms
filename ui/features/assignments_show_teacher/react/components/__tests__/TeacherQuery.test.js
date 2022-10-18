@@ -29,5 +29,4 @@ describe('TeacherQuery', () => {
   })
 
   it.skip('renders a problem screen on a bad graphql query', () => {})
-  /* eslint-enable jest/no-disabled-tests */
 })

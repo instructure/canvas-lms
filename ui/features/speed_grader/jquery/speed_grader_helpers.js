@@ -82,8 +82,7 @@ const speedGraderHelpers = {
     }
     // check if the index is valid (multiple submissions)
     const currentSelectedIndex = submission.currentSelectedIndex
-    // eslint-disable-next-line no-restricted-globals
-    if (currentSelectedIndex == null || isNaN(currentSelectedIndex)) {
+    if (currentSelectedIndex == null || Number.isNaN(Number(currentSelectedIndex))) {
       return ''
     }
     const select = '&version='

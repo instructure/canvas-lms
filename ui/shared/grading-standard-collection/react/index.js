@@ -211,6 +211,7 @@ class GradingStandardCollection extends React.Component {
         <div className="pull-right">
           <button
             ref="addButton"
+            type="button"
             onClick={this.addGradingStandard}
             className={this.getAddButtonCssClasses()}
           >

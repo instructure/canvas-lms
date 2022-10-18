@@ -66,10 +66,10 @@ class ZipFileOptionsForm extends React.Component {
           <p className="modalMessage">{this.buildMessage()}</p>
         </ModalContent>
         <ModalButtons>
-          <button className="btn" onClick={this.handleExpandClick}>
+          <button type="button" className="btn" onClick={this.handleExpandClick}>
             {I18n.t('expand', 'Expand It')}
           </button>
-          <button className="btn btn-primary" onClick={this.handleUploadClick}>
+          <button type="button" className="btn btn-primary" onClick={this.handleUploadClick}>
             {I18n.t('upload', 'Upload It')}
           </button>
         </ModalButtons>

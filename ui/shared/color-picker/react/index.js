@@ -427,7 +427,9 @@ const ColorPicker = createReactClass({
         'with-dark-check': this.props.withDarkCheck,
       })
       return (
+        // TODO: use InstUI button
         <button
+          type="button"
           className={colorBlockStyles}
           ref={ref}
           role="radio"

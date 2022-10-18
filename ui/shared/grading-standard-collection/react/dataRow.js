@@ -62,7 +62,7 @@ class DataRow extends React.Component {
 
     const inputVal = numberHelper.parse(this.state.minScoreInput)
 
-    if (!isNaN(inputVal) && inputVal >= 0 && inputVal <= 100) {
+    if (!Number.isNaN(Number(inputVal)) && inputVal >= 0 && inputVal <= 100) {
       this.props.onRowMinScoreChange(this.props.uniqueId, String(inputVal))
     }
 

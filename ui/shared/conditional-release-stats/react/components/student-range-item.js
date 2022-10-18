@@ -50,7 +50,9 @@ export default class StudentRangeItem extends React.Component {
     return (
       <div className="crs-student-range__item">
         <img src={avatar} className="crs-student__avatar" onClick={this.selectStudent} />
+        {/* TODO: use InstUI button */}
         <button
+          type="button"
           className="crs-student__name crs-link-button"
           onClick={this.selectStudent}
           aria-label={I18n.t('Select student %{name}', {name: this.props.student.user.name})}

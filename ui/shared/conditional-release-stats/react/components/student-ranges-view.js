@@ -61,6 +61,7 @@ export default class StudentRangesView extends React.Component {
         <View as="div" padding="xxx-small">
           <ToggleDetails
             variant="filled"
+            // eslint-disable-next-line react/no-array-index-key
             key={i}
             expanded={expanded}
             summary={rangeTitle}

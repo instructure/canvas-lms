@@ -1285,7 +1285,7 @@ scoreValidation = {
     const value = $('input#quiz_points_possible').val()
     const numVal = numberHelper.parse(value)
 
-    if (value && isNaN(numVal)) {
+    if (value && Number.isNaN(Number(numVal))) {
       $('input#quiz_points_possible').trigger('invalid:not_a_number')
       // valid = false;
     } else if (numVal > 2000000000) {
@@ -1988,7 +1988,7 @@ ready(function () {
       const $item = $('#quiz_allowed_attempts')
       if ($(this).attr('checked')) {
         let val = parseInt($item.data('saved_value') || $item.val() || '2', 10)
-        if (val == -1 || isNaN(val)) {
+        if (val == -1 || Number.isNaN(Number(val))) {
           val = 1
         }
         $item.val(val)
@@ -3672,7 +3672,7 @@ ready(function () {
       const $answer = makeFormAnswer(answer)
       if (answer_selection_type === 'any_answer') {
         $answer.addClass('correct_answer')
-      } else if (answer_selection_type == 'blanks') {
+      } else if (answer_selection_type === 'blanks') {
         $answer.addClass('correct_answer')
         $answer.addClass('fill_in_blank_answer')
       } else if (answer_selection_type === 'matching') {
