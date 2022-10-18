@@ -37,7 +37,7 @@ const sizeByMaximumDimension = {
   200: SMALL,
   320: MEDIUM,
   400: LARGE,
-  640: EXTRA_LARGE
+  640: EXTRA_LARGE,
 }
 
 function parsedOrNull($element, attribute) {
@@ -80,7 +80,7 @@ export function fromImageEmbed($element) {
     usePercentageUnits: !!percentageUnits,
     altText: altText || '',
     isDecorativeImage: altText !== null && altText.replace(/\s/g, '') === '',
-    url: $element.src
+    url: $element.src,
   }
 
   imageOptions.imageSize = imageSizeFromKnownOptions(imageOptions)
@@ -123,7 +123,7 @@ export function fromVideoEmbed($element) {
     appliedWidth: rect.width,
     naturalHeight,
     naturalWidth,
-    source: $videoElem && $videoElem.querySelector('source')
+    source: $videoElem && $videoElem.querySelector('source'),
   }
 
   try {
@@ -159,7 +159,7 @@ export function scaleToSize(imageSize, naturalWidth, naturalHeight) {
   const scaleFactor = dimension / Math.max(naturalWidth, naturalHeight)
   return {
     height: Math.round(naturalHeight * scaleFactor),
-    width: Math.round(naturalWidth * scaleFactor)
+    width: Math.round(naturalWidth * scaleFactor),
   }
 }
 

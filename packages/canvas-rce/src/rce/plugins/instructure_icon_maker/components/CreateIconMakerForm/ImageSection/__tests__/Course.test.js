@@ -45,7 +45,7 @@ const storeProps = {
           unlock_at: null,
           lock_at: null,
           date: '2021-11-03T19:21:27Z',
-          uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b'
+          uuid: 'E6uaQSJaQYl95XaVMnoqYU7bOlt0WepMsTB9MJ8b',
         },
         {
           id: 716,
@@ -62,7 +62,7 @@ const storeProps = {
           unlock_at: null,
           lock_at: null,
           date: '2021-10-27T21:49:19Z',
-          uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt'
+          uuid: '9zLFcMIFlNPVtkTHulDGRS1bhiBg8hsL0ms6VeMt',
         },
         {
           id: 715,
@@ -79,34 +79,34 @@ const storeProps = {
           unlock_at: null,
           lock_at: null,
           date: '2021-10-27T21:49:18Z',
-          uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw'
-        }
+          uuid: 'rIlrdxCJ1h5Ff18Y4C6KJf7HIvCDn5ZAbtnVpNcw',
+        },
       ],
       bookmark: 'bookmark',
       isLoading: false,
-      hasMore: false
-    }
+      hasMore: false,
+    },
   },
   contextType: 'Course',
   fetchInitialImages: jest.fn(),
-  fetchNextImages: jest.fn()
+  fetchNextImages: jest.fn(),
 }
 
 jest.mock('../../../../../shared/StoreContext', () => {
   return {
-    useStoreProps: jest.fn()
+    useStoreProps: jest.fn(),
   }
 })
 
 jest.mock('../compressionUtils', () => ({
   shouldCompressImage: jest.fn().mockReturnValue(false),
   compressImage: jest.fn().mockReturnValue(Promise.resolve('data:image/jpeg;base64,abcdefghijk==')),
-  canCompressImage: jest.fn().mockReturnValue(true)
+  canCompressImage: jest.fn().mockReturnValue(true),
 }))
 
 jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
-  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false)
+  isAnUnsupportedGifPngImage: jest.fn().mockReturnValue(false),
 }))
 
 describe('Course()', () => {
@@ -117,7 +117,7 @@ describe('Course()', () => {
     useStoreProps.mockReturnValue(storeProps)
     props = {
       dispatch: jest.fn(),
-      onChange: jest.fn()
+      onChange: jest.fn(),
     }
   })
 
@@ -136,7 +136,7 @@ describe('Course()', () => {
       const image = new Blob(['somedata'], {type: 'image/png'})
       fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {
         body: image,
-        sendAsJson: false
+        sendAsJson: false,
       })
 
       jest.spyOn(global, 'FileReader').mockImplementation(function () {
@@ -158,20 +158,20 @@ describe('Course()', () => {
 
     it('dispatches a "stop loading" action', () => {
       expect(props.dispatch.mock.calls[0][0]).toEqual({
-        type: 'StopLoading'
+        type: 'StopLoading',
       })
     })
 
     it('dispatches a "set image name" action', () => {
       expect(props.dispatch.mock.calls[1][0]).toEqual({
         type: 'SetImageName',
-        payload: 'grid.png'
+        payload: 'grid.png',
       })
     })
 
     it('dispatches a "loading" action', () => {
       expect(props.dispatch.mock.calls[2][0]).toEqual({
-        type: 'StartLoading'
+        type: 'StartLoading',
       })
     })
 
@@ -179,7 +179,7 @@ describe('Course()', () => {
       await waitFor(() => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetImage',
-          payload: 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ=='
+          payload: 'data:text/png;base64,SGVsbG8sIFdvcmxkIQ==',
         })
       })
     })
@@ -188,7 +188,7 @@ describe('Course()', () => {
       await waitFor(() => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetCropperOpen',
-          payload: true
+          payload: true,
         })
       })
     })
@@ -197,7 +197,7 @@ describe('Course()', () => {
       await waitFor(() =>
         expect(props.dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
-          payload: false
+          payload: false,
         })
       )
     })
@@ -214,7 +214,7 @@ describe('Course()', () => {
       it('dispatches a "clear image" action', async () => {
         await waitFor(() => {
           expect(props.dispatch).toHaveBeenCalledWith({
-            type: 'ClearImage'
+            type: 'ClearImage',
           })
         })
       })
@@ -223,7 +223,7 @@ describe('Course()', () => {
         await waitFor(() => {
           expect(props.onChange).toHaveBeenCalledWith({
             type: 'SetError',
-            payload: 'GIF/PNG format images larger than 250 KB are not currently supported.'
+            payload: 'GIF/PNG format images larger than 250 KB are not currently supported.',
           })
         })
       })
@@ -237,7 +237,7 @@ describe('Course()', () => {
       const image = new Blob(['somedata'], {type: 'image/jpeg', size: 600000})
       fetchMock.mock('http://canvas.docker/files/722/download?download_frd=1', {
         body: image,
-        sendAsJson: false
+        sendAsJson: false,
       })
 
       jest.spyOn(global, 'FileReader').mockImplementation(function () {
@@ -270,20 +270,20 @@ describe('Course()', () => {
 
     it('dispatches a "stop loading" action', () => {
       expect(props.dispatch.mock.calls[0][0]).toEqual({
-        type: 'StopLoading'
+        type: 'StopLoading',
       })
     })
 
     it('dispatches a "set image name" action', () => {
       expect(props.dispatch.mock.calls[1][0]).toEqual({
         type: 'SetImageName',
-        payload: 'grid.png'
+        payload: 'grid.png',
       })
     })
 
     it('dispatches a "loading" action', () => {
       expect(props.dispatch.mock.calls[2][0]).toEqual({
-        type: 'StartLoading'
+        type: 'StartLoading',
       })
     })
 
@@ -297,7 +297,7 @@ describe('Course()', () => {
       await waitFor(() => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetCompressionStatus',
-          payload: true
+          payload: true,
         })
       })
     })
@@ -306,7 +306,7 @@ describe('Course()', () => {
       await waitFor(() => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetImage',
-          payload: 'data:image/jpeg;base64,abcdefghijk=='
+          payload: 'data:image/jpeg;base64,abcdefghijk==',
         })
       })
     })
@@ -315,7 +315,7 @@ describe('Course()', () => {
       await waitFor(() => {
         expect(props.dispatch).toHaveBeenCalledWith({
           type: 'SetCropperOpen',
-          payload: true
+          payload: true,
         })
       })
     })
@@ -324,7 +324,7 @@ describe('Course()', () => {
       await waitFor(() =>
         expect(props.dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
-          payload: false
+          payload: false,
         })
       )
     })
@@ -335,7 +335,7 @@ describe('Course()', () => {
       const onLoading = jest.fn()
       const loadingStoreProps = {
         ...storeProps,
-        images: JSON.parse(JSON.stringify(storeProps.images))
+        images: JSON.parse(JSON.stringify(storeProps.images)),
       }
       loadingStoreProps.images.Course.isLoading = true
       useStoreProps.mockReturnValue(loadingStoreProps)

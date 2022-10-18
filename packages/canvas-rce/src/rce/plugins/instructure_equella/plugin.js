@@ -28,13 +28,13 @@ tinymce.create('tinymce.plugins.InstructureEquella', {
       tooltip: htmlEscape(
         formatMessage({
           default: 'Insert Equella Links',
-          description: 'Title for RCE button to insert links to Equella content'
+          description: 'Title for RCE button to insert links to Equella content',
         })
       ),
       onAction: _ => ed.execCommand('instructureEquella'),
-      icon: 'equella icon-equella'
+      icon: 'equella icon-equella',
     })
-  }
+  },
 })
 
 // Register plugin

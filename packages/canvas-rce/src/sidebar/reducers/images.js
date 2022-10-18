@@ -21,7 +21,7 @@ import {
   REQUEST_INITIAL_IMAGES,
   REQUEST_IMAGES,
   RECEIVE_IMAGES,
-  FAIL_IMAGES_LOAD
+  FAIL_IMAGES_LOAD,
 } from '../actions/images'
 import {CHANGE_CONTEXT, CHANGE_SEARCH_STRING} from '../actions/filter'
 
@@ -33,7 +33,7 @@ export default function imagesReducer(prevState = {}, action) {
       files: [],
       bookmark: null,
       isLoading: false,
-      hasMore: true
+      hasMore: true,
     }
   }
 
@@ -48,8 +48,8 @@ export default function imagesReducer(prevState = {}, action) {
           display_name,
           preview_url,
           thumbnail_url,
-          href: preview_url || href
-        })
+          href: preview_url || href,
+        }),
       }
       return state
     }
@@ -59,7 +59,7 @@ export default function imagesReducer(prevState = {}, action) {
         files: [],
         bookmark: null,
         isLoading: true,
-        hasMore: true
+        hasMore: true,
       }
       return state
 
@@ -76,7 +76,7 @@ export default function imagesReducer(prevState = {}, action) {
           files: state[ctxt].files.concat(action.payload.files),
           isLoading: false,
           bookmark: action.payload.bookmark,
-          hasMore: !!action.payload.bookmark
+          hasMore: !!action.payload.bookmark,
         }
       }
       return state
@@ -85,7 +85,7 @@ export default function imagesReducer(prevState = {}, action) {
       state[ctxt] = {
         isLoading: false,
         error: action.payload.error,
-        files: []
+        files: [],
       }
       if (action.payload.files && action.payload.files.length === 0) {
         state[ctxt].bookmark = null

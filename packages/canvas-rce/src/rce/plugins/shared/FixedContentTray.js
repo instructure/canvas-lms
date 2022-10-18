@@ -52,7 +52,7 @@ export const FixedContentTray = ({
   renderBody,
   renderFooter,
   bodyAs,
-  shouldJoinBodyAndFooter
+  shouldJoinBodyAndFooter,
 }) => {
   return (
     <Tray
@@ -100,7 +100,7 @@ FixedContentTray.propTypes = {
   onDismiss: PropTypes.func,
   onUnmount: PropTypes.func,
   bodyAs: PropTypes.string,
-  shouldJoinBodyAndFooter: PropTypes.bool
+  shouldJoinBodyAndFooter: PropTypes.bool,
 }
 
 FixedContentTray.defaultProps = {
@@ -109,5 +109,5 @@ FixedContentTray.defaultProps = {
   onDismiss: () => {},
   onUnmount: () => {},
   bodyAs: 'div',
-  shouldJoinBodyAndFooter: false
+  shouldJoinBodyAndFooter: false,
 }

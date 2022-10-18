@@ -34,7 +34,7 @@ describe('LinkDisplay', () => {
       Icon: IconBlank,
       placeholderText: 'default placeholder',
       published: true,
-      handleTextChange: jest.fn()
+      handleTextChange: jest.fn(),
     }
   })
 
@@ -100,7 +100,7 @@ describe('LinkDisplay', () => {
     expect(showFlashAlert).toHaveBeenLastCalledWith({
       message: 'Selected Course Link 2',
       srOnly: true,
-      type: 'info'
+      type: 'info',
     })
   })
 })

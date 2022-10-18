@@ -55,5 +55,5 @@ export default combineReducers({
   upload,
   flickr: flickrReducer,
   session,
-  newPageLinkExpanded: newPageLinkReducer
+  newPageLinkExpanded: newPageLinkReducer,
 })

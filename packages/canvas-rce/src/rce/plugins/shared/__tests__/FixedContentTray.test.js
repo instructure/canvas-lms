@@ -30,7 +30,7 @@ describe('RCE Plugins > FixedContentTray', () => {
     onDismiss: jest.fn(),
     onUnmount: jest.fn(),
     bodyAs: 'form',
-    shouldJoinBodyAndFooter: false
+    shouldJoinBodyAndFooter: false,
   }
 
   it('renders header', async () => {
@@ -54,7 +54,7 @@ describe('RCE Plugins > FixedContentTray', () => {
         {...defaults}
         renderBody={() => 'R2D2'}
         renderFooter={() => 'C3PO'}
-        shouldJoinBodyAndFooter
+        shouldJoinBodyAndFooter={true}
       />
     )
     expect(screen.getByText('R2D2', {selector: 'form > div'})).toBeInTheDocument()

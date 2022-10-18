@@ -32,11 +32,11 @@ function getPanelProps(contextType, mediaprops) {
         bookmark: null,
         isLoading: false,
         hasMore: false,
-        ...mediaprops
-      }
+        ...mediaprops,
+      },
     },
     sortBy: {sort: 'alphabetical', order: 'asc'},
-    searchString: 'whereami'
+    searchString: 'whereami',
   }
 }
 
@@ -61,13 +61,13 @@ function makeFiles(override) {
         content_type: 'video/mp4',
         display_name: `file${i}`,
         href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`
+        date: `2019-05-25T13:0${i}:00Z`,
       }
     }),
     bookmark: null,
     hasMore: false,
     isLoading: false,
-    ...override
+    ...override,
   }
 }
 
@@ -102,7 +102,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
         display_name: `pending file`,
         href: `http://the.net/3`,
         date: `2019-05-25T13:03:00Z`,
-        media_entry_id: 'maybe'
+        media_entry_id: 'maybe',
       })
     })
 
@@ -125,7 +125,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
   it('fetches initial data when mounted', () => {
     const fetchInitialMedia = jest.fn()
     renderComponent({
-      fetchInitialMedia
+      fetchInitialMedia,
     })
 
     expect(fetchInitialMedia).toHaveBeenCalled()
@@ -135,7 +135,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     const fetchNextMedia = jest.fn()
     const {getByText} = renderComponent({
       ...getPanelProps('course', makeFiles({hasMore: true, bookmark: 'more.docs'})),
-      fetchNextMedia
+      fetchNextMedia,
     })
 
     const loadMoreBtn = getByText('Load More')
@@ -147,7 +147,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     const fetchNextMedia = jest.fn()
     const {getByText} = renderComponent({
       ...getPanelProps('course', makeFiles({error: 'whoops'})),
-      fetchNextMedia
+      fetchNextMedia,
     })
 
     expect(getByText('Loading failed.')).toBeInTheDocument()
@@ -157,7 +157,7 @@ describe('RCE "Media" Plugin > MediaPanel', () => {
     const fetchInitialMedia = jest.fn()
     const {getByText} = renderComponent({
       ...getPanelProps('course', makeFiles({files: [], isLoading: true})),
-      fetchInitialMedia
+      fetchInitialMedia,
     })
 
     expect(getByText('Loading')).toBeInTheDocument()

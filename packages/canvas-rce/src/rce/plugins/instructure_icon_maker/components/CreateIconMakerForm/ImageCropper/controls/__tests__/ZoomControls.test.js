@@ -27,7 +27,7 @@ jest.mock('../../../../../../../../canvasFileBrowser/FlashAlert')
 jest.mock('@instructure/debounce', () => ({
   debounce: fn => {
     return fn
-  }
+  },
 }))
 
 describe('ZoomControls', () => {
@@ -378,7 +378,7 @@ describe('ZoomControls', () => {
       return {
         message: `${round(ratio) * 100}% Zoom`,
         type: 'info',
-        srOnly: true
+        srOnly: true,
       }
     }
 
@@ -387,7 +387,7 @@ describe('ZoomControls', () => {
 
       props = {
         scaleRatio,
-        onChange: () => {}
+        onChange: () => {},
       }
     })
 

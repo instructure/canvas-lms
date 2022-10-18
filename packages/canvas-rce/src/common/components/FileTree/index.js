@@ -63,7 +63,7 @@ export default class FileTree extends Component {
 
   render() {
     const inlineStyles = {
-      maxHeight: this.props.maxHeight
+      maxHeight: this.props.maxHeight,
     }
     return (
       <div
@@ -80,5 +80,5 @@ export default class FileTree extends Component {
 
 FileTree.propTypes = {
   ...Folder.propTypes,
-  maxHeight: PropTypes.string
+  maxHeight: PropTypes.string,
 }

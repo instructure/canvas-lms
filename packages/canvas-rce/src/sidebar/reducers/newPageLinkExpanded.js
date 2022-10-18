@@ -18,7 +18,7 @@
 
 import {TOGGLE_NEWPAGE_FORM} from '../actions/links'
 
-export default function(state = false, action) {
+export default function (state = false, action) {
   switch (action.type) {
     case TOGGLE_NEWPAGE_FORM:
       return !state

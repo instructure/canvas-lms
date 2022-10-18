@@ -92,7 +92,7 @@ const folderPropType = PropTypes.shape({
   name: PropTypes.string,
   loading: PropTypes.bool,
   fileIds: PropTypes.arrayOf(PropTypes.number),
-  folderIds: PropTypes.arrayOf(PropTypes.number)
+  folderIds: PropTypes.arrayOf(PropTypes.number),
 })
 
 Folder.propTypes = {
@@ -100,10 +100,10 @@ Folder.propTypes = {
   files: PropTypes.objectOf(File.propTypes.file),
   folder: folderPropType.isRequired,
   onToggle: PropTypes.func,
-  onSelect: File.propTypes.onSelect
+  onSelect: File.propTypes.onSelect,
 }
 
 Folder.defaultProps = {
   files: [],
-  folders: []
+  folders: [],
 }

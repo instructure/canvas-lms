@@ -18,7 +18,7 @@
 
 import registerEditToolbar, {
   shouldShowEditButton,
-  EDIT_ALT_TEXT_BUTTON_ID
+  EDIT_ALT_TEXT_BUTTON_ID,
 } from '../registerEditToolbar'
 import {BUTTON_ID, TOOLBAR_ID} from '../svg/constants'
 
@@ -30,9 +30,9 @@ beforeEach(() => {
       registry: {
         addButton: jest.fn(),
         addAltTextButton: jest.fn(),
-        addContextToolbar: jest.fn()
-      }
-    }
+        addContextToolbar: jest.fn(),
+      },
+    },
   }
   onAction = jest.fn()
 })
@@ -48,7 +48,7 @@ describe('registerEditToolbar()', () => {
     expect(editor.ui.registry.addButton).toHaveBeenCalledWith(BUTTON_ID, {
       onAction,
       text: 'Edit Icon',
-      tooltip: 'Edit Existing Icon Maker Icon'
+      tooltip: 'Edit Existing Icon Maker Icon',
     })
   })
 
@@ -56,7 +56,7 @@ describe('registerEditToolbar()', () => {
     expect(editor.ui.registry.addButton).toHaveBeenCalledWith(
       EDIT_ALT_TEXT_BUTTON_ID,
       expect.objectContaining({
-        text: 'Icon Options'
+        text: 'Icon Options',
       })
     )
   })
@@ -66,7 +66,7 @@ describe('registerEditToolbar()', () => {
       items: `${BUTTON_ID} ${EDIT_ALT_TEXT_BUTTON_ID}`,
       position: 'node',
       scope: 'node',
-      predicate: expect.any(Function)
+      predicate: expect.any(Function),
     })
   })
 })

@@ -28,8 +28,8 @@ export default function filesReducer(state = {}, action) {
           name: action.name,
           type: action.fileType,
           url: action.url,
-          embed: action.embed
-        }
+          embed: action.embed,
+        },
       }
     default:
       return state

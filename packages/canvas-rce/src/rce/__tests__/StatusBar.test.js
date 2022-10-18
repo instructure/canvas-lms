@@ -32,7 +32,7 @@ function defaultProps(props = {}) {
     onResize: () => {},
     onKBShortcutModalOpen: () => {},
     onA11yChecker: () => {},
-    ...props
+    ...props,
   }
 }
 
@@ -95,7 +95,7 @@ describe('RCE StatusBar', () => {
     it('defaults to pretty html editor', async () => {
       const onChangeView = jest.fn()
       const {container, getByText} = renderStatusBar({
-        onChangeView
+        onChangeView,
       })
 
       expect(await findDescribedByText(container)).toEqual(
@@ -112,7 +112,7 @@ describe('RCE StatusBar', () => {
       const onChangeView = jest.fn()
       const {container, getByText} = renderStatusBar({
         preferredHtmlEditor: RAW_HTML_EDITOR_VIEW,
-        onChangeView
+        onChangeView,
       })
 
       expect(await findDescribedByText(container)).toEqual(
@@ -134,7 +134,7 @@ describe('RCE StatusBar', () => {
 
     it('a11y checker start set a notification count', () => {
       const props = defaultProps({
-        a11yErrorsCount: 5
+        a11yErrorsCount: 5,
       })
       const {rerender, getByTitle} = renderStatusBar(props)
       const a11yButton = getByTitle('Accessibility Checker')
@@ -147,7 +147,7 @@ describe('RCE StatusBar', () => {
 
     it('a11y checker set max notifications count', () => {
       const props = defaultProps({
-        a11yErrorsCount: 999
+        a11yErrorsCount: 999,
       })
       const {getByTitle} = renderStatusBar(props)
       const a11yButton = getByTitle('Accessibility Checker')
@@ -196,7 +196,7 @@ describe('RCE StatusBar', () => {
   describe('in pretty HTML mode', () => {
     it('cycles focus with right arrow keys', () => {
       const {container, getByTestId} = renderStatusBar({
-        editorView: PRETTY_HTML_EDITOR_VIEW
+        editorView: PRETTY_HTML_EDITOR_VIEW,
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')
@@ -214,7 +214,7 @@ describe('RCE StatusBar', () => {
 
     it('cycles focus with left arrow keys', async () => {
       const {container, getByTestId} = renderStatusBar({
-        editorView: PRETTY_HTML_EDITOR_VIEW
+        editorView: PRETTY_HTML_EDITOR_VIEW,
       })
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('[tabindex]')

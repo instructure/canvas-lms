@@ -31,5 +31,5 @@ export default function MathIcon({command}) {
 }
 
 MathIcon.propTypes = {
-  command: string.isRequired
+  command: string.isRequired,
 }

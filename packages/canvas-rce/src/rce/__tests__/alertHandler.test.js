@@ -25,7 +25,7 @@ describe('AlertHandler', () => {
       expect(() =>
         alerter.handleAlert({
           text: 'Something went wrong uploading, check your connection and try again.',
-          variant: 'error'
+          variant: 'error',
         })
       ).toThrow('Tried to alert without alertFunc being set first')
     })
@@ -34,7 +34,7 @@ describe('AlertHandler', () => {
       alerter.alertFunc = jest.fn()
       alerter.handleAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       expect(alerter.alertFunc).toHaveBeenCalled()
     })

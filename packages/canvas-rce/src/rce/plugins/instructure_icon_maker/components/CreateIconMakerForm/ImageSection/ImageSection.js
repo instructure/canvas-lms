@@ -65,7 +65,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     [modes.courseImages.type]: Course,
     [modes.uploadImages.type]: Upload,
     [modes.singleColorImages.type]: SingleColor,
-    [modes.multiColorImages.type]: MultiColor
+    [modes.multiColorImages.type]: MultiColor,
   }
 
   const metadata = filterSectionStateMetadata(state)
@@ -75,7 +75,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   useEffect(() => {
     dispatch({
       type: actions.SET_CROPPER_SETTINGS.type,
-      payload: {...state.cropperSettings, shape: settings.shape}
+      payload: {...state.cropperSettings, shape: settings.shape},
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.shape])
@@ -87,32 +87,32 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     // TODO: Set these properties based on cropper
     onChange({
       type: svgActions.SET_X,
-      payload: transform.x
+      payload: transform.x,
     })
 
     onChange({
       type: svgActions.SET_Y,
-      payload: transform.y
+      payload: transform.y,
     })
 
     onChange({
       type: svgActions.SET_WIDTH,
-      payload: transform.width
+      payload: transform.width,
     })
 
     onChange({
       type: svgActions.SET_HEIGHT,
-      payload: transform.height
+      payload: transform.height,
     })
 
     onChange({
       type: svgActions.SET_TRANSLATE_X,
-      payload: transform.translateX
+      payload: transform.translateX,
     })
 
     onChange({
       type: svgActions.SET_TRANSLATE_Y,
-      payload: transform.translateY
+      payload: transform.translateY,
     })
   }, [onChange, settings.shape, settings.size])
 
@@ -123,7 +123,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     ) {
       dispatch({
         type: actions.SET_IMAGE.type,
-        payload: settings.encodedImage
+        payload: settings.encodedImage,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -133,7 +133,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     if (editing && !!settings.encodedImageName) {
       dispatch({
         type: actions.SET_IMAGE_NAME.type,
-        payload: settings.encodedImageName
+        payload: settings.encodedImageName,
       })
     }
   }, [editing, settings.encodedImageName])
@@ -141,21 +141,21 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE,
-      payload: state.image
+      payload: state.image,
     })
   }, [onChange, state.image])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_TYPE,
-      payload: state.mode
+      payload: state.mode,
     })
   }, [onChange, state.mode])
 
   useEffect(() => {
     onChange({
       type: svgActions.SET_ENCODED_IMAGE_NAME,
-      payload: state.imageName
+      payload: state.imageName,
     })
   }, [onChange, state.imageName])
 
@@ -165,7 +165,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
       // eslint-disable-next-line promise/catch-or-return
       convertFileToBase64(
         new Blob([SingleColorSVG[state.icon].source(state.iconFillColor)], {
-          type: 'image/svg+xml'
+          type: 'image/svg+xml',
         })
       ).then(base64Image => {
         dispatch({...actions.SET_IMAGE, payload: base64Image})
@@ -183,7 +183,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
       isMetadataLoaded.current = true
       dispatch({
         type: actions.UPDATE_SETTINGS.type,
-        payload: settings.imageSettings
+        payload: settings.imageSettings,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -193,7 +193,7 @@ export const ImageSection = ({settings, onChange, editing, editor, rcsConfig}) =
     if (!_.isEqual(metadata, settings.imageSettings)) {
       onChange({
         type: svgActions.SET_IMAGE_SETTINGS,
-        payload: metadata
+        payload: metadata,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -56,7 +56,7 @@ describe('RCE "Links" Plugin > Link', () => {
       {type: 'quizzes', icon: 'IconQuiz', quiz_type: 'quizzes.next'},
       {type: 'announcements', icon: 'IconAnnouncement'},
       {type: 'wikiPages', icon: 'IconDocument'},
-      {type: 'navigation', icon: 'IconBlank'}
+      {type: 'navigation', icon: 'IconBlank'},
     ]
 
     linkTypes.forEach(lt => {
@@ -64,11 +64,11 @@ describe('RCE "Links" Plugin > Link', () => {
         const link = {
           href: 'the_url',
           title: 'object title',
-          published: true
+          published: true,
         }
         const {container, getByText} = renderComponent({
           type: lt.type,
-          link: {...link, quiz_type: lt.quiz_type}
+          link: {...link, quiz_type: lt.quiz_type},
         })
 
         expect(getByText(link.title)).toBeInTheDocument()
@@ -84,7 +84,7 @@ describe('RCE "Links" Plugin > Link', () => {
         const link = {
           href: 'the_url',
           title: 'object title',
-          published: false
+          published: false,
         }
         const {container, getByText} = renderComponent({type: lt.type, link})
 
@@ -104,7 +104,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: 'multiple',
-        date_type: 'due'
+        date_type: 'due',
       }
       const {getByText} = renderComponent({type: 'assignments', link})
 
@@ -117,7 +117,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'due'
+        date_type: 'due',
       }
       const {getByText} = renderComponent({type: 'assignments', link})
 
@@ -130,7 +130,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'todo'
+        date_type: 'todo',
       }
       const {getByText} = renderComponent({type: 'wikiPages', link})
 
@@ -143,7 +143,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'published'
+        date_type: 'published',
       }
       const {getByText} = renderComponent({type: 'wikiPages', link})
 
@@ -156,7 +156,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'posted'
+        date_type: 'posted',
       }
       const {getByText} = renderComponent({type: 'announcements', link})
 
@@ -169,7 +169,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'delayed_post'
+        date_type: 'delayed_post',
       }
       const {getByText} = renderComponent({type: 'announcements', link})
 
@@ -187,7 +187,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: 'multiple',
-        date_type: 'due'
+        date_type: 'due',
       }
       const {getByText} = renderComponent({type: 'assignments', link})
 
@@ -200,7 +200,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'due'
+        date_type: 'due',
       }
       const {getByText} = renderComponent({type: 'assignments', link})
 
@@ -213,7 +213,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'todo'
+        date_type: 'todo',
       }
       const {getByText} = renderComponent({type: 'wikiPages', link})
 
@@ -226,7 +226,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'published'
+        date_type: 'published',
       }
       const {getByText} = renderComponent({type: 'wikiPages', link})
 
@@ -239,7 +239,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'posted'
+        date_type: 'posted',
       }
       const {getByText} = renderComponent({type: 'announcements', link})
 
@@ -252,7 +252,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         published: true,
         date: value,
-        date_type: 'delayed_post'
+        date_type: 'delayed_post',
       }
       const {getByText} = renderComponent({type: 'announcements', link})
 
@@ -266,7 +266,7 @@ describe('RCE "Links" Plugin > Link', () => {
       const link = {
         href: 'the_url',
         title: 'object title',
-        published: true
+        published: true,
       }
       const {getByText} = renderComponent({link, onClick})
 
@@ -280,7 +280,7 @@ describe('RCE "Links" Plugin > Link', () => {
       const link = {
         href: 'the_url',
         title: 'object title',
-        published: true
+        published: true,
       }
       const {getByText} = renderComponent({link, onClick})
 
@@ -294,7 +294,7 @@ describe('RCE "Links" Plugin > Link', () => {
       const link = {
         href: 'the_url',
         title: 'object title',
-        published: true
+        published: true,
       }
       const {getByText} = renderComponent({link, onClick})
 
@@ -319,8 +319,8 @@ describe('RCE "Links" Plugin > Link', () => {
       link: {
         href: 'the_url',
         title: 'object title',
-        published: true
-      }
+        published: true,
+      },
     }
 
     beforeAll(() => {
@@ -360,7 +360,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         type: 'assignments',
         'data-course-type': 'assignments',
-        'data-published': true
+        'data-published': true,
       })
     })
 
@@ -373,7 +373,7 @@ describe('RCE "Links" Plugin > Link', () => {
         title: 'object title',
         type: 'navigation',
         'data-course-type': 'navigation',
-        'data-published': null
+        'data-published': null,
       })
     })
 

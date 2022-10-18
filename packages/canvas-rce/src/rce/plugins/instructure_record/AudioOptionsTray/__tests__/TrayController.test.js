@@ -118,7 +118,7 @@ describe('RCE "Audios" Plugin > AudioOptionsTray > TrayController', () => {
       trayController.showTrayForEditor(editors[0])
       trayController._applyAudioOptions({
         media_object_id: 'audio_id',
-        updateMediaObject
+        updateMediaObject,
       })
       expect(updateMediaObject).toHaveBeenCalled()
     })

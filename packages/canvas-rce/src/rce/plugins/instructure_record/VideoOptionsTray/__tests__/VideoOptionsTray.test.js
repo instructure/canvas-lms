@@ -43,12 +43,12 @@ describe('RCE "Videos" Plugin > VideoOptionsTray', () => {
         source: {},
         titleText: '',
         type: 'video-embed',
-        videoSize: 'medium'
+        videoSize: 'medium',
       },
       trayOptions: {
         host: 'localhost:3001',
-        jwt: 'someuglyvalue'
-      }
+        jwt: 'someuglyvalue',
+      },
     }
   })
 

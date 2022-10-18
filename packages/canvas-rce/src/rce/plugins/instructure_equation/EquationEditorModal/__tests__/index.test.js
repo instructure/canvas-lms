@@ -34,7 +34,7 @@ const defaultProps = () => {
     onModalDismiss: () => {},
     onModalClose: () => {},
     title: '',
-    mountNode: null
+    mountNode: null,
   }
 }
 
@@ -64,7 +64,7 @@ jest.mock('../mathml', () => {
 
   return {
     ...originalModule,
-    processNewMathInElem: jest.fn()
+    processNewMathInElem: jest.fn(),
   }
 })
 
@@ -72,7 +72,7 @@ jest.mock('../advancedPreference', () => {
   return {
     isSet: jest.fn(),
     set: jest.fn(),
-    clear: jest.fn()
+    clear: jest.fn(),
   }
 })
 
@@ -109,18 +109,18 @@ describe('EquationEditorModal', () => {
         getNode: () => ({
           tagName: 'IMG',
           classList: {
-            contains: str => str === 'equation_image'
+            contains: str => str === 'equation_image',
           },
-          src: 'http://canvas.docker/equation_images/%255Csqrt%257Bx%257D'
+          src: 'http://canvas.docker/equation_images/%255Csqrt%257Bx%257D',
         }),
         getRng: () => ({
           startContainer: {
             wholeText: 'text',
-            nodeValue: '\\\\\\((text)\\\\\\)'
+            nodeValue: '\\\\\\((text)\\\\\\)',
           },
-          startOffset: 0
-        })
-      }
+          startOffset: 0,
+        }),
+      },
     }
     MathfieldElement.prototype.setOptions = jest.fn()
   })
@@ -191,9 +191,9 @@ describe('EquationEditorModal', () => {
         editor.selection.getNode = () => ({
           tagName: 'IMG',
           classList: {
-            contains: str => str === 'equation_image'
+            contains: str => str === 'equation_image',
           },
-          src: 'http://canvas.docker/equation_images/%255Cdisplaystyle%2520x'
+          src: 'http://canvas.docker/equation_images/%255Cdisplaystyle%2520x',
         })
         renderModal({editor})
         await waitFor(() => {
@@ -212,13 +212,13 @@ describe('EquationEditorModal', () => {
         editor.selection.getNode = () => ({
           tagName: 'X',
           classList: {
-            contains: () => false
+            contains: () => false,
           },
-          src: 'http://canvas.docker/equation_images/%255Csqrt%257Bx%257D'
+          src: 'http://canvas.docker/equation_images/%255Csqrt%257Bx%257D',
         })
         document.createRange = () => ({
           setStart: () => {},
-          setEnd: () => {}
+          setEnd: () => {},
         })
       })
 
@@ -226,9 +226,9 @@ describe('EquationEditorModal', () => {
         editor.selection.getRng = () => ({
           startContainer: {
             wholeText: '',
-            nodeValue: null
+            nodeValue: null,
           },
-          startOffset: 0
+          startOffset: 0,
         })
         renderModal({editor})
         await waitFor(() => {
@@ -241,9 +241,9 @@ describe('EquationEditorModal', () => {
         editor.selection.getRng = () => ({
           startContainer: {
             wholeText: 'text',
-            nodeValue: 'text'
+            nodeValue: 'text',
           },
-          startOffset: 0
+          startOffset: 0,
         })
         renderModal({editor})
         await waitFor(() => {
@@ -257,9 +257,9 @@ describe('EquationEditorModal', () => {
           editor.selection.getRng = () => ({
             startContainer: {
               wholeText: 'hello',
-              nodeValue: '$$\\sqrt{x}$$'
+              nodeValue: '$$\\sqrt{x}$$',
             },
-            startOffset: 5
+            startOffset: 5,
           })
           editor.selection.setRng = jest.fn()
           renderModal({editor})
@@ -274,9 +274,9 @@ describe('EquationEditorModal', () => {
           editor.selection.getRng = () => ({
             startContainer: {
               wholeText: 'hello',
-              nodeValue: '\\(&nbsp; &nbsp; \\sqrt{x} &nbsp; &nbsp;\\)'
+              nodeValue: '\\(&nbsp; &nbsp; \\sqrt{x} &nbsp; &nbsp;\\)',
             },
-            startOffset: 5
+            startOffset: 5,
           })
           editor.selection.setRng = jest.fn()
           renderModal({editor})
@@ -291,9 +291,9 @@ describe('EquationEditorModal', () => {
           editor.selection.getRng = () => ({
             startContainer: {
               wholeText: 'hello',
-              nodeValue: '\\(\\sqrt{x}\\)'
+              nodeValue: '\\(\\sqrt{x}\\)',
             },
-            startOffset: 5
+            startOffset: 5,
           })
           editor.selection.setRng = jest.fn()
           renderModal({editor})
@@ -308,9 +308,9 @@ describe('EquationEditorModal', () => {
           editor.selection.getRng = () => ({
             startContainer: {
               wholeText: 'hello',
-              nodeValue: '\\(\\displaystyle x\\)'
+              nodeValue: '\\(\\displaystyle x\\)',
             },
-            startOffset: 5
+            startOffset: 5,
           })
           editor.selection.setRng = jest.fn()
           renderModal({editor})
@@ -465,7 +465,7 @@ describe('EquationEditorModal', () => {
       Object.defineProperty(event, 'target', {
         get: () => {
           return {value: '\\displaystyle x'}
-        }
+        },
       })
 
       basicEditor().dispatchEvent(event)

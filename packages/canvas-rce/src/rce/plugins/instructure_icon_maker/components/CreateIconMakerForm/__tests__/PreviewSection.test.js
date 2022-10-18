@@ -31,7 +31,7 @@ describe('<Preview />', () => {
           outlineColor: '#0f0',
           outlineSize: 'medium',
           shape: 'triangle',
-          size: 'large'
+          size: 'large',
         }}
       />
     )

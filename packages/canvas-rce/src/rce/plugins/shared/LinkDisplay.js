@@ -32,13 +32,13 @@ export const LinkDisplay = ({
   placeholderText,
   linkFileName,
   published,
-  handleTextChange
+  handleTextChange,
 }) => {
   useEffect(() => {
     showFlashAlert({
       message: formatMessage('Selected {linkFileName}', {linkFileName}),
       type: 'info',
-      srOnly: true
+      srOnly: true,
     })
   }, [linkFileName])
 

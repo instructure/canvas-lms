@@ -18,7 +18,7 @@
 
 import * as browser from '../common/browser'
 
-export default function(ev, html) {
+export default function (ev, html) {
   // default data to store
   let format = 'text/html'
   let data = html

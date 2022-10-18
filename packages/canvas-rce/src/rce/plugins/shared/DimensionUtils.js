@@ -36,7 +36,7 @@ function scaleEvenly(width, height, scaleFactor, constraints) {
 
   return {
     height: Math.round(height * minimumScaleFactor),
-    width: Math.round(width * minimumScaleFactor)
+    width: Math.round(width * minimumScaleFactor),
   }
 }
 

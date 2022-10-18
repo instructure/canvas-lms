@@ -29,56 +29,56 @@ describe('imageSection()', () => {
   it('handles "Course" actions', () => {
     expect(subject({type: 'Course'})).toMatchObject({
       ...initialState,
-      mode: 'Course'
+      mode: 'Course',
     })
   })
 
   it('handles "Upload" actions', () => {
     expect(subject({type: 'Upload'})).toMatchObject({
       ...initialState,
-      mode: 'Upload'
+      mode: 'Upload',
     })
   })
 
   it('handles "SingleColor" actions', () => {
     expect(subject({type: 'SingleColor'})).toMatchObject({
       ...initialState,
-      mode: 'SingleColor'
+      mode: 'SingleColor',
     })
   })
 
   it('handles "MultiColor" actions', () => {
     expect(subject({type: 'MultiColor'})).toMatchObject({
       ...initialState,
-      mode: 'MultiColor'
+      mode: 'MultiColor',
     })
   })
 
   it('handles "StartLoading" actions', () => {
     expect(subject({type: 'StartLoading'})).toMatchObject({
       ...initialState,
-      loading: true
+      loading: true,
     })
   })
 
   it('handles "StopLoading" actions', () => {
     expect(subject({type: 'StopLoading'})).toMatchObject({
       ...initialState,
-      loading: false
+      loading: false,
     })
   })
 
   it('handles "SetImage" actions', () => {
     expect(subject({type: 'SetImage', payload: 'img'})).toMatchObject({
       ...initialState,
-      image: 'img'
+      image: 'img',
     })
   })
 
   it('handles "SetImageName" actions', () => {
     expect(subject({type: 'SetImageName', payload: 'name'})).toMatchObject({
       ...initialState,
-      imageName: 'name'
+      imageName: 'name',
     })
   })
 

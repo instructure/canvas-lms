@@ -68,7 +68,7 @@ const UploadFileModal = React.forwardRef(
       accept,
       modalBodyWidth,
       modalBodyHeight,
-      requireA11yAttributes = true
+      requireA11yAttributes = true,
     },
     ref
   ) => {
@@ -81,7 +81,7 @@ const UploadFileModal = React.forwardRef(
     const [usageRightsState, setUsageRightsState] = React.useState({
       usageRight: 'choose',
       ccLicense: '',
-      copyrightHolder: ''
+      copyrightHolder: '',
     })
 
     // Image options props
@@ -122,7 +122,7 @@ const UploadFileModal = React.forwardRef(
       new RceApiSource({
         jwt: trayProps.jwt,
         refreshToken: trayProps.refreshToken,
-        host: trayProps.host
+        host: trayProps.host,
       })
 
     return (
@@ -147,7 +147,7 @@ const UploadFileModal = React.forwardRef(
               theFile,
               unsplashData,
               imageOptions: {altText, isDecorativeImage, displayAs},
-              usageRights: usageRightsState
+              usageRights: usageRightsState,
             },
             contentProps,
             source,
@@ -316,7 +316,7 @@ UploadFileModal.propTypes = {
   accept: oneOfType([arrayOf(string), string]),
   modalBodyWidth: number,
   modalBodyHeight: number,
-  requireA11yAttributes: bool
+  requireA11yAttributes: bool,
 }
 
 export default UploadFileModal

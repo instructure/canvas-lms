@@ -98,6 +98,6 @@ const defaultTinymceConfig = {
   // tiny's external link create/edit dialog config
   target_list: false, // don't show the target list when creating/editing links
   link_title: false, // don't show the title input when creating/editing links
-  default_link_target: '_blank'
+  default_link_target: '_blank',
 }
 export default defaultTinymceConfig

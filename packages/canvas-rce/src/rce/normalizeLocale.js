@@ -41,7 +41,7 @@ const mapping = {
   'tr-TR': 'tr',
   uk: 'uk-UA',
   'zh-CN': 'zh-Hans',
-  'zh-HK': 'zh-Hant'
+  'zh-HK': 'zh-Hant',
 }
 
 // these are the recognized standard and custom locales. remember to extend
@@ -95,7 +95,7 @@ const recognized = [
   'tr',
   'vi',
   'zh-Hans',
-  'zh-Hant'
+  'zh-Hant',
 ]
 
 export default function normalizeLocale(locale) {

@@ -17,7 +17,7 @@ const getSelectedStyleType = editor => {
   if (listElm) {
     return {
       listType: listElm.nodeName,
-      listStyleType: editor.dom.getStyle(listElm, 'listStyleType')
+      listStyleType: editor.dom.getStyle(listElm, 'listStyleType'),
     }
   }
 }
@@ -25,5 +25,5 @@ const getSelectedStyleType = editor => {
 export default {
   isTableCellNode,
   isListNode,
-  getSelectedStyleType
+  getSelectedStyleType,
 }

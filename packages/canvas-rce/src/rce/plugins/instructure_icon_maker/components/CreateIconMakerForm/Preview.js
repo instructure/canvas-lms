@@ -39,7 +39,7 @@ export const Preview = ({settings}) => {
         style={{
           ...checkerboardStyle(SQUARE_SIZE),
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'center',
         }}
         ref={wrapper}
       />

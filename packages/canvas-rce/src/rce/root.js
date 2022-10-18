@@ -26,7 +26,7 @@ if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),
-    missingTranslation: 'ignore'
+    missingTranslation: 'ignore',
   })
 }
 

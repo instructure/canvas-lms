@@ -26,30 +26,30 @@ import {TextInput} from '@instructure/ui-text-input'
 const CONTENT_OPTIONS = [
   {
     display: formatMessage('Choose usage rights...'),
-    value: 'choose'
+    value: 'choose',
   },
   {
     display: formatMessage('I hold the copyright'),
-    value: 'own_copyright'
+    value: 'own_copyright',
   },
   {
     display: formatMessage('I have obtained permission to use this file.'),
-    value: 'used_by_permission'
+    value: 'used_by_permission',
   },
   {
     display: formatMessage('The material is in the public domain'),
-    value: 'public_domain'
+    value: 'public_domain',
   },
   {
     display: formatMessage(
       'The material is subject to an exception - e.g. fair use, the right to quote, or others under applicable copyright laws'
     ),
-    value: 'fair_use'
+    value: 'fair_use',
   },
   {
     display: formatMessage('The material is licensed under Creative Commons'),
-    value: 'creative_commons'
-  }
+    value: 'creative_commons',
+  },
 ]
 
 const ShowCreativeCommonsOptions = ({ccLicense, setCCLicense, licenseOptions}) => {
@@ -93,7 +93,7 @@ const UsageRightsSelectBox = ({
   contextId,
   showMessage: showMessageProp,
   usageRightsState,
-  setUsageRightsState
+  setUsageRightsState,
 }) => {
   const {usageRight, ccLicense, copyrightHolder} = usageRightsState
   const showCreativeCommonsOptions = usageRight === 'creative_commons'
@@ -170,12 +170,12 @@ UsageRightsSelectBox.propTypes = {
   usageRightsState: PropTypes.shape({
     ccLicense: PropTypes.string,
     usageRight: PropTypes.oneOf(Object.values(CONTENT_OPTIONS).map(o => o.value)),
-    copyrightHolder: PropTypes.string
+    copyrightHolder: PropTypes.string,
   }),
   setUsageRightsState: PropTypes.func,
   showMessage: PropTypes.bool,
   contextType: PropTypes.string,
-  contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+  contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 }
 
 export default UsageRightsSelectBox

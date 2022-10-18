@@ -22,7 +22,7 @@ import {cleanUrl} from './contentInsertionUtils'
 import formatMessage from '../format-message'
 import {
   VIDEO_SIZE_DEFAULT,
-  AUDIO_PLAYER_SIZE
+  AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 import {prepEmbedSrc, prepLinkedSrc} from '../common/fileUrl'
@@ -107,7 +107,7 @@ export function renderVideo(video) {
     VIDEO_SIZE_DEFAULT.height
   };display:inline-block;"
       title="${formatMessage('Video player for {title}', {
-        title: video.title || video.name || video.text
+        title: video.title || video.name || video.text,
       })}"></iframe>
   `
     .trim()
@@ -125,7 +125,7 @@ export function renderAudio(audio) {
     AUDIO_PLAYER_SIZE.height
   };display:inline-block;"
       title="${formatMessage('Audio player for {title}', {
-        title: audio.title || audio.name || audio.text
+        title: audio.title || audio.name || audio.text,
       })}"></iframe>
   `
     .trim()

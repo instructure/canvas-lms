@@ -23,7 +23,7 @@ import {waitFor} from '@testing-library/react'
 
 jest.mock('react-dom', () => ({
   ...jest.requireActual('react-dom'),
-  unmountComponentAtNode: jest.fn()
+  unmountComponentAtNode: jest.fn(),
 }))
 
 describe('clickCallback()', () => {

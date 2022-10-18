@@ -195,11 +195,11 @@ Link.propTypes = {
     'quizzes',
     'announcements',
     'wikiPages',
-    'navigation'
+    'navigation',
   ]).isRequired,
   onClick: func.isRequired,
   describedByID: string.isRequired,
   elementRef: func,
   editing: bool,
-  onEditClick: func
+  onEditClick: func,
 }

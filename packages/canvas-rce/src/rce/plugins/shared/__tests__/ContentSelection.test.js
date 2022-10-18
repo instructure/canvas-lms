@@ -31,7 +31,7 @@ import {
   isImageEmbed,
   isVideoElement,
   isAudioElement,
-  findMediaPlayerIframe
+  findMediaPlayerIframe,
 } from '../ContentSelection'
 import FakeEditor from './FakeEditor'
 

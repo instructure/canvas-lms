@@ -26,7 +26,7 @@ import {
   IconQuizLine,
   IconQuizSolid as IconNewQuiz,
   IconAnnouncementLine,
-  IconDocumentLine
+  IconDocumentLine,
 } from '@instructure/ui-icons'
 
 describe('linkUtils', () => {

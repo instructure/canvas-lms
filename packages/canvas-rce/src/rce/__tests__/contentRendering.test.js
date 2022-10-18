@@ -26,7 +26,7 @@ describe('contentRendering', () => {
       link = {
         href: '/users/2/files/17/download?verifier=xyzzy',
         title: 'Here Be Links',
-        text: 'Click On Me'
+        text: 'Click On Me',
       }
     })
 
@@ -77,7 +77,7 @@ describe('contentRendering', () => {
         href: '/users/2/files/17/download?verifier=xyzzy',
         target: '_blank',
         rel: 'noopener',
-        text: 'somefile.pdf'
+        text: 'somefile.pdf',
       }
       const rendered = contentRendering.renderLink(doc, doc.text)
       expect(rendered).toEqual(
@@ -111,7 +111,7 @@ describe('contentRendering', () => {
       image = {
         href: '/users/2/files/17/download?verifier=xyzzy',
         url: '/other/path',
-        title: 'Here Be Images'
+        title: 'Here Be Images',
       }
     })
 
@@ -139,7 +139,7 @@ describe('contentRendering', () => {
       image.foo = 'bar'
       image.style = {
         maxWidth: '100px',
-        maxHeight: '17rem'
+        maxHeight: '17rem',
       }
       const rendered = contentRendering.renderImage(image)
       expect(rendered).toEqual(
@@ -151,7 +151,7 @@ describe('contentRendering', () => {
       const linkElem = {
         getAttribute: () => {
           return 'http://example.com'
-        }
+        },
       }
 
       const rendered = contentRendering.renderLinkedImage(linkElem, image)
@@ -190,7 +190,7 @@ describe('contentRendering', () => {
         id: '17',
         url: '/files/17',
         title: 'filename.mov',
-        type: 'video'
+        type: 'video',
       }
       const html = contentRendering.renderVideo(file)
       expect(html).toEqual(
@@ -221,7 +221,7 @@ describe('contentRendering', () => {
         id: '17',
         url: '/files/17',
         title: 'filename.mp3',
-        type: 'audio'
+        type: 'audio',
       }
       const html = contentRendering.renderAudio(file)
       expect(html).toEqual(
@@ -241,7 +241,7 @@ describe('contentRendering', () => {
             media_id: 'media-id',
             media_entry_id: 'media-entry-id',
             id: 'id',
-            file_id: 'file-id'
+            file_id: 'file-id',
           })
       )
 
@@ -256,7 +256,7 @@ describe('contentRendering', () => {
           (media = {
             media_entry_id: 'media-entry-id',
             id: 'id',
-            file_id: 'file-id'
+            file_id: 'file-id',
           })
       )
 
@@ -270,7 +270,7 @@ describe('contentRendering', () => {
         () =>
           (media = {
             id: 'id',
-            file_id: 'file-id'
+            file_id: 'file-id',
           })
       )
 
@@ -283,7 +283,7 @@ describe('contentRendering', () => {
       beforeEach(
         () =>
           (media = {
-            file_id: 'file-id'
+            file_id: 'file-id',
           })
       )
 

@@ -89,7 +89,7 @@ export function buildSvgWrapper(settings) {
     height: `${base}px`,
     viewBox: `0 0 ${base} ${base}`,
     width: `${base}px`,
-    x: Math.floor((getContainerWidth(settings) - base) * 0.5)
+    x: Math.floor((getContainerWidth(settings) - base) * 0.5),
   })
 }
 
@@ -101,7 +101,7 @@ export function buildSvgContainer(settings, options) {
     width: `${containerWidth}px`,
     height: `${containerHeight}px`,
     viewBox: `0 0 ${containerWidth} ${containerHeight}`,
-    xmlns: 'http://www.w3.org/2000/svg'
+    xmlns: 'http://www.w3.org/2000/svg',
   }
   if (options.isPreview) attributes.style = 'padding: 16px'
   return createSvgElement('svg', attributes)

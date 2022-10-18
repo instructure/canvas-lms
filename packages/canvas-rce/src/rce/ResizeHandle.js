@@ -98,10 +98,10 @@ ResizeHandle.propTypes = {
   onDrag: func,
   onFocus: func,
   tabIndex: string,
-  'data-btn-id': string
+  'data-btn-id': string,
 }
 
 ResizeHandle.defaultProps = {
   onDrag: () => {},
-  tabIndex: '-1'
+  tabIndex: '-1',
 }

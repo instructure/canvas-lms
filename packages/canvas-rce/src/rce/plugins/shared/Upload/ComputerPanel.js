@@ -44,7 +44,7 @@ import {
   useComputerPanelFocus,
   isAudio,
   isPreviewable,
-  sizeMediaPlayer
+  sizeMediaPlayer,
 } from '@instructure/canvas-media'
 
 import formatMessage from '../../../../format-message'
@@ -124,7 +124,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
         setPreview({
           preview: null,
           error: ex.message,
-          isLoading: false
+          isLoading: false,
         })
       }
     }
@@ -255,7 +255,7 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
           setMessages(
             messages.concat({
               text: formatMessage('Invalid file type'),
-              type: 'error'
+              type: 'error',
             })
           )
         }}
@@ -280,12 +280,12 @@ ComputerPanel.propTypes = {
   label: string.isRequired,
   bounds: shape({
     width: number,
-    height: number
-  })
+    height: number,
+  }),
 }
 
 ComputerPanel.defaultProps = {
-  bounds: {}
+  bounds: {},
 }
 
 export const styles = StyleSheet.create({
@@ -294,7 +294,7 @@ export const styles = StyleSheet.create({
     overflow: 'hidden',
     boxSizing: 'border-box',
     margin: '5rem .375rem 0',
-    position: 'relative'
+    position: 'relative',
   },
   previewArea: {
     width: '100%',
@@ -302,6 +302,6 @@ export const styles = StyleSheet.create({
     maxHeight: '250px',
     boxSizing: 'border-box',
     objectFit: 'contain',
-    overflow: 'hidden'
-  }
+    overflow: 'hidden',
+  },
 })

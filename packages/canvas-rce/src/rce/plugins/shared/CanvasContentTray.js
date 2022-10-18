@@ -78,7 +78,7 @@ const thePanels = {
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
   media: React.lazy(() => import('../instructure_record/MediaPanel')),
   all: React.lazy(() => import('./FileBrowser')),
-  unknown: React.lazy(() => import('./UnknownFileTypePanel'))
+  unknown: React.lazy(() => import('./UnknownFileTypePanel')),
 }
 
 // Returns a Suspense wrapped lazy loaded component
@@ -109,7 +109,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'documents',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   course_documents: {
     contextType: 'course',
@@ -117,7 +117,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'documents',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   group_documents: {
     contextType: 'group',
@@ -125,7 +125,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'documents',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   user_images: {
     contextType: 'user',
@@ -133,7 +133,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'images',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   course_images: {
     contextType: 'course',
@@ -141,7 +141,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'images',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   group_images: {
     contextType: 'group',
@@ -149,7 +149,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'images',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   user_media: {
     contextType: 'user',
@@ -157,7 +157,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'media',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   course_media: {
     contextType: 'course',
@@ -165,7 +165,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'media',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   group_media: {
     contextType: 'group',
@@ -173,7 +173,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'media',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   course_links: {
     contextType: 'course',
@@ -181,7 +181,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'all',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   course_link_edit: {
     contextType: 'course',
@@ -189,7 +189,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'edit',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   group_links: {
     contextType: 'group',
@@ -197,7 +197,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'all',
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   list_icon_maker_icons: {
     contextType: 'course',
@@ -205,7 +205,7 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: ICON_MAKER_ICONS,
     sortValue: 'date_added',
     sortDir: 'desc',
-    searchString: ''
+    searchString: '',
   },
   all: {
     contextType: 'course',
@@ -213,8 +213,8 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentSubtype: 'all',
     sortValue: 'alphabetical',
     sortDir: 'asc',
-    searchString: ''
-  }
+    searchString: '',
+  },
 }
 
 function isLoading(cprops) {
@@ -287,7 +287,7 @@ export default function CanvasContentTray(props) {
             title: fileName,
             type: contentType,
             href: url,
-            published
+            published,
           })
           setLinkText(text)
           setPlaceholderText(text)
@@ -299,7 +299,7 @@ export default function CanvasContentTray(props) {
         if (forceClose || hidingTrayOnAction) {
           handleDismissTray()
         }
-      }
+      },
     }
 
     bridge.attachController(controller, editor.id)
@@ -341,7 +341,7 @@ export default function CanvasContentTray(props) {
     const newLink = {
       ...link,
       forceRename: true,
-      text: linkText || placeholderText
+      text: linkText || placeholderText,
     }
 
     bridge.insertLink(newLink)
@@ -561,16 +561,16 @@ const trayPropsMap = {
   containingContext: shape({
     contextType: string.isRequired,
     contextId: string.isRequired,
-    userId: string.isRequired
+    userId: string.isRequired,
   }),
   filesTabDisabled: bool,
   host: requiredWithoutSource,
   jwt: requiredWithoutSource,
   refreshToken: func,
   source: shape({
-    fetchImages: func.isRequired
+    fetchImages: func.isRequired,
   }),
-  themeUrl: string
+  themeUrl: string,
 }
 
 export const trayPropTypes = shape(trayPropsMap)
@@ -580,7 +580,7 @@ CanvasContentTray.propTypes = {
   editor: shape({id: string}).isRequired,
   onTrayClosing: func, // called with true when the tray starts closing, false once closed
   onEditClick: func,
-  ...trayPropsMap
+  ...trayPropsMap,
 }
 
 // the way we define trayProps, eslint doesn't recognize the following as props
@@ -590,6 +590,6 @@ CanvasContentTray.defaultProps = {
   filesTabDisabled: false,
   refreshToken: null,
   source: null,
-  themeUrl: null
+  themeUrl: null,
 }
 /* eslint-enable react/default-props-match-prop-types */

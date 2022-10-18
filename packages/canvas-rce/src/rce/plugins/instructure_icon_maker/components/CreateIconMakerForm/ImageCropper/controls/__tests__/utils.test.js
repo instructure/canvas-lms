@@ -20,7 +20,7 @@ import {
   calculateScaleRatio,
   calculateScalePercentage,
   calculateRotation,
-  getNearestRectAngle
+  getNearestRectAngle,
 } from '../utils'
 
 describe('calculateScaleRatio()', () => {

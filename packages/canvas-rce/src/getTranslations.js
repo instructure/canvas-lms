@@ -258,6 +258,6 @@ export function getLocaleList() {
     'zh',
     'zh-Hans',
     'zh-Hant',
-    'zh-HK'
+    'zh-HK',
   ]
 }

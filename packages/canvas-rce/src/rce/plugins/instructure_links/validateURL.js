@@ -49,7 +49,7 @@ export default function validateURL(url) {
         formatMessage(
           '{p} is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted',
           {
-            p: protocol.replace(/:$/, '')
+            p: protocol.replace(/:$/, ''),
           }
         )
       )

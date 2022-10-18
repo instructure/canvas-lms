@@ -76,5 +76,5 @@ export function Embed({onSubmit, onDismiss}) {
 
 Embed.propTypes = {
   onSubmit: func.isRequired,
-  onDismiss: func.isRequired
+  onDismiss: func.isRequired,
 }

@@ -45,9 +45,9 @@ AlertMessageArea.propTypes = {
     shape({
       id: number,
       variant: string,
-      text: string
+      text: string,
     })
   ).isRequired,
   afterDismiss: func,
-  liveRegion: func.isRequired
+  liveRegion: func.isRequired,
 }

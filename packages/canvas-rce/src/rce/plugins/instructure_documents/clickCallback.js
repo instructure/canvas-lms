@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import formatMessage from '../../../format-message'
 
-export default function(ed, document) {
+export default function (ed, document) {
   return import('../shared/Upload/UploadFile').then(({UploadFile}) => {
     let container = document.querySelector('.canvas-rce-upload-container')
     if (!container) {

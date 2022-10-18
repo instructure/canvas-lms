@@ -74,7 +74,7 @@ export const ColorSection = ({settings, onChange}) => (
         name="icon-outline"
         onChange={outlineColor => onChange({outlineColor})}
         popoverMountNode={getColorSection}
-        requireColor
+        requireColor={true}
       />
     </Flex.Item>
   </Flex>
@@ -84,5 +84,5 @@ const OUTLINE_SIZE_DESCRIPTION = {
   none: formatMessage('None'),
   small: formatMessage('Small'),
   medium: formatMessage('Medium'),
-  large: formatMessage('Large')
+  large: formatMessage('Large'),
 }

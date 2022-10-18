@@ -71,8 +71,8 @@ export const TextSection = ({settings, onChange}) => {
             messages={[
               {
                 text: `${text.length}/${MAX_TOTAL_TEXT_CHARS}`,
-                type: 'hint'
-              }
+                type: 'hint',
+              },
             ]}
           />
         </Flex.Item>
@@ -142,11 +142,11 @@ const TEXT_SIZE_DESCRIPTION = {
   small: formatMessage('Small'),
   medium: formatMessage('Medium'),
   large: formatMessage('Large'),
-  'x-large': formatMessage('Extra Large')
+  'x-large': formatMessage('Extra Large'),
 }
 
 const TEXT_POSITION_DESCRIPTION = {
   middle: formatMessage('Middle'),
   'bottom-third': formatMessage('Bottom Third'),
-  below: formatMessage('Below')
+  below: formatMessage('Below'),
 }

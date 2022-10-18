@@ -67,20 +67,20 @@ class FakeEditor {
   mode = {
     set: mode => {
       this.readonly = mode === 'readonly'
-    }
+    },
   }
 
   setContent(content) {
     this.getElement().value = content
     this._eventHandlers.change?.({
       type: 'change',
-      target: this.getElement()
+      target: this.getElement(),
     })
   }
 
   selection = {
     collapse: () => {},
-    select: () => {}
+    select: () => {},
   }
 
   hide() {

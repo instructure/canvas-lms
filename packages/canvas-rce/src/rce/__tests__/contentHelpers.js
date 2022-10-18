@@ -24,7 +24,7 @@ export function videoFromTray() {
     href: '/media_objects_iframe/17',
     id: 17,
     target: '_blank',
-    title: 'filename.mov'
+    title: 'filename.mov',
   }
 }
 export function videoFromUpload() {
@@ -33,7 +33,7 @@ export function videoFromUpload() {
     embedded_iframe_url: '/url/to/m-media-id',
     media_id: 'm-media-id',
     title: 'filename.mov',
-    type: 'video'
+    type: 'video',
   }
 }
 
@@ -44,7 +44,7 @@ export function audioFromTray() {
     href: 'url/to/course/file',
     id: 29,
     target: '_blank',
-    text: 'filename.mp3'
+    text: 'filename.mp3',
   }
 }
 export function audioFromUpload() {
@@ -53,6 +53,6 @@ export function audioFromUpload() {
     embedded_iframe_url: '/url/to/m-media-id',
     media_id: 'm-media-id',
     title: 'filename.mp3',
-    type: 'audio'
+    type: 'audio',
   }
 }

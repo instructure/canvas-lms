@@ -59,7 +59,7 @@ export default function LinkOptionsDialog(props) {
       href: url,
       userText: props.showText,
       class: 'inline_disabled',
-      forceRename: true
+      forceRename: true,
     })
   }
 
@@ -77,7 +77,7 @@ export default function LinkOptionsDialog(props) {
   return (
     <Modal
       data-testid="RCELinkOptionsDialog"
-      data-mce-component
+      data-mce-component={true}
       as="form"
       label={label}
       onDismiss={props.onRequestClose}
@@ -147,11 +147,11 @@ LinkOptionsDialog.propTypes = {
   onRequestClose: func.isRequired,
   onSave: func.isRequired,
   open: bool.isRequired,
-  showText: bool
+  showText: bool,
 }
 
 LinkOptionsDialog.defaultProps = {
   onEntered: null,
   onExited: null,
-  showText: true
+  showText: true,
 }

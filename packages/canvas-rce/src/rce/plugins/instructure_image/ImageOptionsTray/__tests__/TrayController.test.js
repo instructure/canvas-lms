@@ -68,7 +68,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray > TrayController', () => {
       altText: driver.altText,
       displayAs: driver.displayAs,
       isDecorativeImage: driver.isDecorativeImage,
-      size: driver.size
+      size: driver.size,
     }
   }
 

@@ -29,11 +29,11 @@ const defaultProps = overrides => ({
   onLoading: jest.fn(),
   context: {
     type: 'course',
-    id: '1'
+    id: '1',
   },
   contentTypes: ['**'],
   source: apiSource(),
-  ...overrides
+  ...overrides,
 })
 
 const subject = props => render(<FileBrowser {...props} />)

@@ -24,7 +24,7 @@ import {
   IconMsWordLine,
   IconPdfLine,
   IconVideoLine,
-  IconAudioLine
+  IconAudioLine,
 } from '@instructure/ui-icons'
 
 export function getIconFromType(type) {

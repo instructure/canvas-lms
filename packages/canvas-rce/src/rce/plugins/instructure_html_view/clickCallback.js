@@ -18,6 +18,6 @@
 
 import bridge from '../../../bridge'
 
-export default function() {
+export default function () {
   bridge.activeEditor().toggleView()
 }

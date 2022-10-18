@@ -37,7 +37,7 @@ const getCompressionMessage = () =>
   formatMessage(
     'Your image has been compressed for Icon Maker. Images less than {size} KB will not be compressed.',
     {
-      size: MAX_IMAGE_SIZE_BYTES / 1024
+      size: MAX_IMAGE_SIZE_BYTES / 1024,
     }
   )
 
@@ -124,11 +124,11 @@ export const ImageOptions = ({state, dispatch, rcsConfig, trayDispatch}) => {
             onSubmit={(settings, generatedImage) => {
               dispatch({
                 type: actions.SET_IMAGE.type,
-                payload: generatedImage
+                payload: generatedImage,
               })
               dispatch({
                 type: actions.SET_CROPPER_SETTINGS.type,
-                payload: settings
+                payload: settings,
               })
             }}
             image={image}
@@ -151,9 +151,9 @@ ImageOptions.propTypes = {
     loading: PropTypes.bool.isRequired,
     cropperOpen: PropTypes.bool.isRequired,
     cropperSettings: ImageCropperSettingsPropTypes,
-    compressed: PropTypes.bool.isRequired
+    compressed: PropTypes.bool.isRequired,
   }).isRequired,
   dispatch: PropTypes.func.isRequired,
   rcsConfig: PropTypes.object.isRequired,
-  trayDispatch: PropTypes.func.isRequired
+  trayDispatch: PropTypes.func.isRequired,
 }

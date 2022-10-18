@@ -28,17 +28,17 @@ describe('UploadFileModal', () => {
       trayProps: {
         contextType: 'course',
         contextId: 17,
-        source: {}
+        source: {},
       },
       contentProps: {
         session: {usageRightsRequired: true},
-        loadSession: () => {}
+        loadSession: () => {},
       },
       onSubmit: () => {},
       onDismiss: () => {},
       panels: ['COMPUTER', 'UNSPLASH', 'URL'],
       label: 'Upload Stuff',
-      accept: '*/*'
+      accept: '*/*',
     }
   })
   afterEach(() => {

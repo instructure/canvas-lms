@@ -53,7 +53,7 @@ import alertHandler from './alertHandler'
 import {isFileLink, isImageEmbed} from './plugins/shared/ContentSelection'
 import {
   VIDEO_SIZE_DEFAULT,
-  AUDIO_PLAYER_SIZE
+  AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 
 import styles from '../skins/skin-delta.css'
@@ -78,7 +78,7 @@ const toolbarPropType = PropTypes.arrayOf(
     // items added to the toolbar
     // each is the name of the button some plugin has
     // registered with tinymce
-    items: PropTypes.arrayOf(PropTypes.string).isRequired
+    items: PropTypes.arrayOf(PropTypes.string).isRequired,
   })
 )
 
@@ -92,7 +92,7 @@ const menuPropType = PropTypes.objectOf(
     title: PropTypes.string,
     // items is a space separated list it menu_items
     // some plugin has registered with tinymce
-    items: PropTypes.string.isRequired
+    items: PropTypes.string.isRequired,
   })
 )
 const ltiToolsPropType = PropTypes.arrayOf(
@@ -100,7 +100,7 @@ const ltiToolsPropType = PropTypes.arrayOf(
     // id of the tool
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     // is this a favorite tool?
-    favorite: PropTypes.bool
+    favorite: PropTypes.bool,
   })
 )
 
@@ -121,7 +121,7 @@ export const editorOptionsPropType = PropTypes.shape({
   // register it and any related toolbar or menu entries with tinymce.
   plugins: PropTypes.arrayOf(PropTypes.string),
   // is this RCE readonly?
-  readonly: PropTypes.bool
+  readonly: PropTypes.bool,
 })
 
 const skinCSS = skinCSSBinding.template().replace(/tinymce__oxide--/g, '')
@@ -238,7 +238,7 @@ class RCEWrapper extends React.Component {
   static propTypes = {
     autosave: PropTypes.shape({
       enabled: PropTypes.bool,
-      maxAge: PropTypes.number
+      maxAge: PropTypes.number,
     }),
     defaultContent: PropTypes.string,
     editorOptions: editorOptionsPropType,
@@ -259,7 +259,7 @@ class RCEWrapper extends React.Component {
     languages: PropTypes.arrayOf(
       PropTypes.shape({
         id: PropTypes.string.isRequired,
-        label: PropTypes.string.isRequired
+        label: PropTypes.string.isRequired,
       })
     ),
     readOnly: PropTypes.bool,
@@ -274,7 +274,7 @@ class RCEWrapper extends React.Component {
     use_rce_icon_maker: PropTypes.bool,
     features: PropTypes.objectOf(PropTypes.bool),
     flashAlertTimeout: PropTypes.number,
-    timezone: PropTypes.string
+    timezone: PropTypes.string,
   }
 
   static defaultProps = {
@@ -285,7 +285,7 @@ class RCEWrapper extends React.Component {
     ltiTools: [],
     maxInitRenderedRCEs: -1,
     features: {},
-    timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone
+    timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone,
   }
 
   static skinCssInjected = false
@@ -342,13 +342,13 @@ class RCEWrapper extends React.Component {
       height: ht,
       fullscreenState: {
         headerDisp: 'static',
-        isTinyFullscreen: false
+        isTinyFullscreen: false,
       },
       a11yErrorsCount: 0,
       shouldShowEditor:
         typeof IntersectionObserver === 'undefined' ||
         maxInitRenderedRCEs <= 0 ||
-        currentRCECount < maxInitRenderedRCEs
+        currentRCECount < maxInitRenderedRCEs,
     }
     this.pendingEventHandlers = []
 
@@ -380,7 +380,7 @@ class RCEWrapper extends React.Component {
     const {
       new_equation_editor = false,
       new_math_equation_handling = false,
-      rce_ux_improvements = false
+      rce_ux_improvements = false,
     } = this.props.features
     return {new_equation_editor, new_math_equation_handling, rce_ux_improvements}
   }
@@ -389,7 +389,7 @@ class RCEWrapper extends React.Component {
     return {
       locale: normalizeLocale(this.props.language),
       flashAlertTimeout: this.props.flashAlertTimeout,
-      timezone: this.props.timezone
+      timezone: this.props.timezone,
     }
   }
 
@@ -1109,8 +1109,8 @@ class RCEWrapper extends React.Component {
       )
       this.setState({
         fullscreenState: {
-          fullscreenElem: null
-        }
+          fullscreenElem: null,
+        },
       })
     }
 
@@ -1122,8 +1122,8 @@ class RCEWrapper extends React.Component {
           return {
             fullscreenState: {
               ...state.fullscreenState,
-              fullscreenElem: document[FS_ELEMENT]
-            }
+              fullscreenElem: document[FS_ELEMENT],
+            },
           }
         })
       } else {
@@ -1156,8 +1156,8 @@ class RCEWrapper extends React.Component {
         if (this.announcing !== 1) {
           this.setState({
             announcement: formatMessage('type Control F9 to access image options. {text}', {
-              text: node.getAttribute('alt')
-            })
+              text: node.getAttribute('alt'),
+            }),
           })
           this.announcing = 1
         }
@@ -1165,8 +1165,8 @@ class RCEWrapper extends React.Component {
         if (this.announcing !== 2) {
           this.setState({
             announcement: formatMessage('type Control F9 to access link options. {text}', {
-              text: node.textContent
-            })
+              text: node.textContent,
+            }),
           })
           this.announcing = 2
         }
@@ -1174,14 +1174,14 @@ class RCEWrapper extends React.Component {
         if (this.announcing !== 3) {
           this.setState({
             announcement: formatMessage('type Control F9 to access table options. {text}', {
-              text: node.textContent
-            })
+              text: node.textContent,
+            }),
           })
           this.announcing = 3
         }
       } else {
         this.setState({
-          announcement: null
+          announcement: null,
         })
         this.announcing = 0
       }
@@ -1212,7 +1212,7 @@ class RCEWrapper extends React.Component {
           if (autosavedContent !== editorContent) {
             this.setState({
               confirmAutoSave: true,
-              autoSavedContent: this.patchAutosavedContent(autosaved.content)
+              autoSavedContent: this.patchAutosavedContent(autosaved.content),
             })
           } else {
             this.storage.removeItem(this.autoSaveKey)
@@ -1315,7 +1315,7 @@ class RCEWrapper extends React.Component {
           this.autoSaveKey,
           JSON.stringify({
             autosaveTimestamp: Date.now(),
-            content
+            content,
           })
         )
       } catch (ex) {
@@ -1390,7 +1390,7 @@ class RCEWrapper extends React.Component {
       {
         done: errors => {
           this.setState({a11yErrorsCount: errors.length})
-        }
+        },
       },
       {skip_focus: true}
     )
@@ -1399,7 +1399,7 @@ class RCEWrapper extends React.Component {
   openKBShortcutModal = () => {
     this.setState({
       KBShortcutModalOpen: true,
-      KBShortcutFocusReturn: document.activeElement
+      KBShortcutFocusReturn: document.activeElement,
     })
   }
 
@@ -1451,7 +1451,7 @@ class RCEWrapper extends React.Component {
           'instructure_image',
           'instructure_documents',
           'instructure_equation',
-          'instructure_external_tools'
+          'instructure_external_tools',
         ]
       : ['instructure_links']
     if (rcsExists && !this.props.instRecordDisabled) {
@@ -1489,7 +1489,7 @@ class RCEWrapper extends React.Component {
           `${formatMessage('Heading 3')}=h3`,
           `${formatMessage('Heading 4')}=h4`,
           `${formatMessage('Preformatted')}=pre`,
-          `${formatMessage('Paragraph')}=p`
+          `${formatMessage('Paragraph')}=p`,
         ].join('; '),
 
       setup: editor => {
@@ -1497,7 +1497,7 @@ class RCEWrapper extends React.Component {
         editorWrappers.set(editor, this)
         const trayPropsWithColor = {
           brandColor: this.theme.canvasBrandColor,
-          ...this.props.trayProps
+          ...this.props.trayProps,
         }
         bridge.trayProps?.set(editor, trayPropsWithColor)
         bridge.languages = this.props.languages
@@ -1523,15 +1523,15 @@ class RCEWrapper extends React.Component {
           format: {
             title: formatMessage('Format'),
             items:
-              'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat'
+              'bold italic underline strikethrough superscript subscript codeformat | formats blockformats fontformats fontsizes align directionality | forecolor backcolor | removeformat',
           },
           insert: {
             title: formatMessage('Insert'),
             items:
-              'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr'
+              'instructure_links instructure_image instructure_media instructure_document instructure_icon_maker | instructure_equation inserttable instructure_media_embed | hr',
           },
           tools: {title: formatMessage('Tools'), items: 'wordcount lti_tools_menuitem'},
-          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'}
+          view: {title: formatMessage('View'), items: 'fullscreen instructure_html_view'},
         },
         options.menu
       ),
@@ -1540,7 +1540,7 @@ class RCEWrapper extends React.Component {
         [
           {
             name: formatMessage('Styles'),
-            items: ['fontsizeselect', 'formatselect']
+            items: ['fontsizeselect', 'formatselect'],
           },
           {
             name: formatMessage('Formatting'),
@@ -1551,8 +1551,8 @@ class RCEWrapper extends React.Component {
               'forecolor',
               'backcolor',
               'inst_subscript',
-              'inst_superscript'
-            ]
+              'inst_superscript',
+            ],
           },
           {
             name: formatMessage('Content'),
@@ -1561,21 +1561,21 @@ class RCEWrapper extends React.Component {
               'instructure_image',
               'instructure_record',
               'instructure_documents',
-              'instructure_icon_maker'
-            ]
+              'instructure_icon_maker',
+            ],
           },
           {
             name: formatMessage('External Tools'),
-            items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button']
+            items: [...this.ltiToolFavorites, 'lti_tool_dropdown', 'lti_mru_button'],
           },
           {
             name: formatMessage('Alignment and Lists'),
-            items: ['align', 'bullist', 'inst_indent', 'inst_outdent']
+            items: ['align', 'bullist', 'inst_indent', 'inst_outdent'],
           },
           {
             name: formatMessage('Miscellaneous'),
-            items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
-          }
+            items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed'],
+          },
         ],
         options.toolbar
       ),
@@ -1605,25 +1605,25 @@ class RCEWrapper extends React.Component {
           'instructure_external_tools',
           'a11y_checker',
           'wordcount',
-          ...canvasPlugins
+          ...canvasPlugins,
         ],
         sanitizePlugins(options.plugins)
       ),
       textpattern_patterns: [
         {start: '* ', cmd: 'InsertUnorderedList'},
-        {start: '- ', cmd: 'InsertUnorderedList'}
-      ]
+        {start: '- ', cmd: 'InsertUnorderedList'},
+      ],
     }
 
     if (this.props.trayProps) {
       wrappedOpts.canvas_rce_user_context = {
         type: this.props.trayProps.contextType,
-        id: this.props.trayProps.contextId
+        id: this.props.trayProps.contextId,
       }
 
       wrappedOpts.canvas_rce_containing_context = {
         type: this.props.trayProps.containingContext.contextType,
-        id: this.props.trayProps.containingContext.contextId
+        id: this.props.trayProps.containingContext.contextId,
       }
     }
     return wrappedOpts
@@ -1787,7 +1787,7 @@ class RCEWrapper extends React.Component {
               height: this.state.height,
               display: 'flex',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
             <Spinner renderTitle={renderLoading} size="medium" />
@@ -1819,7 +1819,7 @@ class RCEWrapper extends React.Component {
           ref={this._editorPlaceholderRef}
           style={{
             height: `${this.props.editorOptions.height}px`,
-            border: '1px solid grey'
+            border: '1px solid grey',
           }}
         />
       )
@@ -1991,5 +1991,5 @@ export {
   mergeMenuItems,
   mergeMenu,
   mergeToolbar,
-  mergePlugins
+  mergePlugins,
 }

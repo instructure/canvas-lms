@@ -35,7 +35,7 @@ describe('buildSvg()', () => {
       size: 'large',
       color: '#000',
       outlineColor: '#fff',
-      outlineSize: 'large'
+      outlineSize: 'large',
     }
     options = {}
   })

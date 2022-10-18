@@ -30,7 +30,7 @@ export default function foldersReducer(state = {}, action) {
     case actions.TOGGLE:
       return {
         ...state,
-        [action.id]: folder(state[action.id], action)
+        [action.id]: folder(state[action.id], action),
       }
     default:
       return state

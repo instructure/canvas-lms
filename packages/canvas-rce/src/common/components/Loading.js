@@ -36,23 +36,23 @@ function Loading(props) {
 }
 
 Loading.propTypes = {
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 Loading.defaultProps = {
-  className: ''
+  className: '',
 }
 
 const opacityKeyframes = {
   '0%': {
-    opacity: 0
+    opacity: 0,
   },
   '50%': {
-    opacity: 1
+    opacity: 1,
   },
   '100%': {
-    opacity: 0
-  }
+    opacity: 0,
+  },
 }
 
 const styles = StyleSheet.create({
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     width: '48px',
-    height: '10px'
+    height: '10px',
   },
   dot: {
     animationName: [opacityKeyframes],
@@ -72,17 +72,17 @@ const styles = StyleSheet.create({
     borderRadius: '8px',
     width: '10px',
     height: '10px',
-    flex: 'none'
+    flex: 'none',
   },
   dot0: {
-    animationDelay: '-1.8s'
+    animationDelay: '-1.8s',
   },
   dot1: {
-    animationDelay: '-1.6s'
+    animationDelay: '-1.6s',
   },
   dot2: {
-    animationDelay: '-1.4s'
-  }
+    animationDelay: '-1.4s',
+  },
 })
 
 export default Loading

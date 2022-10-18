@@ -31,9 +31,9 @@ tinymce.create('tinymce.plugins.InstructureHtmlView', {
       onAction: () => ed.execCommand('instructureHtmlView'),
       onSetup(api) {
         api.setDisabled(false)
-      }
+      },
     })
-  }
+  },
 })
 
 // Register plugin

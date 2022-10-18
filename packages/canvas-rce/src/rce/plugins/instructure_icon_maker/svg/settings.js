@@ -25,7 +25,7 @@ import iconsLabels from '../utils/iconsLabels'
 export const statuses = {
   ERROR: 'error',
   LOADING: 'loading',
-  IDLE: 'idle'
+  IDLE: 'idle',
 }
 
 const getImageNode = (editor, editing) => {

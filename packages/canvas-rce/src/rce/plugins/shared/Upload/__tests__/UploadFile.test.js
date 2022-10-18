@@ -32,8 +32,8 @@ describe('UploadFile', () => {
         initializeFlickr() {},
         initializeImages() {},
         initializeDocuments() {},
-        initializeMedia() {}
-      }
+        initializeMedia() {},
+      },
     }
     fakeEditor = {}
   })
@@ -73,11 +73,11 @@ describe('UploadFile', () => {
     )
     // We need to make sure that a file is present, or the submit button will be disabled.
     const fakeFile = new File(['(⌐□_□)'], 'somename.png', {
-      type: 'image/png'
+      type: 'image/png',
     })
     const fileInput = getByLabelText(/click to browse your computer/, {selector: 'input'})
     Object.defineProperty(fileInput, 'files', {
-      value: [fakeFile]
+      value: [fakeFile],
     })
     act(() => {
       fireEvent.change(fileInput)
@@ -211,7 +211,7 @@ describe('UploadFile', () => {
 
   describe('handleSubmit', () => {
     const fakeNode = {
-      addEventListener: jest.fn()
+      addEventListener: jest.fn(),
     }
     const fakeEditor = {
       content: '',
@@ -222,7 +222,7 @@ describe('UploadFile', () => {
           } else {
             return `<img src="${src}" />`
           }
-        }
+        },
       },
       insertContent(content) {
         fakeEditor.content += content
@@ -230,8 +230,8 @@ describe('UploadFile', () => {
       selection: {
         getEnd() {
           return fakeNode
-        }
-      }
+        },
+      },
     }
 
     beforeEach(() => {
@@ -244,7 +244,7 @@ describe('UploadFile', () => {
     it('inserts the image with url source and includes alt text', () => {
       handleSubmit(fakeEditor, 'images/*', 'URL', {
         fileUrl: 'http://fake/path',
-        imageOptions: {altText: '(╯°□°）╯︵ ┻━┻'}
+        imageOptions: {altText: '(╯°□°）╯︵ ┻━┻'},
       })
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" alt="(╯°□°）╯︵ ┻━┻" />')
     })
@@ -255,7 +255,7 @@ describe('UploadFile', () => {
         const fakeFile = {
           name: 'foo.png',
           size: 3000,
-          type: 'image/png'
+          type: 'image/png',
         }
         handleSubmit(
           fakeEditor,
@@ -269,7 +269,7 @@ describe('UploadFile', () => {
           name: 'foo.png',
           size: 3000,
           contentType: 'image/png',
-          domObject: fakeFile
+          domObject: fakeFile,
         })
       })
 
@@ -278,7 +278,7 @@ describe('UploadFile', () => {
         const fakeFile = {
           name: 'foo.mov',
           size: 3000,
-          type: 'video/mov'
+          type: 'video/mov',
         }
         handleSubmit(
           fakeEditor,
@@ -292,7 +292,7 @@ describe('UploadFile', () => {
           name: 'foo.mov',
           size: 3000,
           contentType: 'video/mov',
-          domObject: fakeFile
+          domObject: fakeFile,
         })
       })
       it('called for images when Computer panel is selected and includes image options', () => {
@@ -300,7 +300,7 @@ describe('UploadFile', () => {
         const fakeFile = {
           name: 'foo.png',
           size: 3000,
-          type: 'image/png'
+          type: 'image/png',
         }
         handleSubmit(
           fakeEditor,
@@ -308,7 +308,7 @@ describe('UploadFile', () => {
           'COMPUTER',
           {
             theFile: fakeFile,
-            imageOptions: {altText: '(╯°□°）╯︵ ┻━┻', displayAs: 'embed', isDecorativeImage: true}
+            imageOptions: {altText: '(╯°□°）╯︵ ┻━┻', displayAs: 'embed', isDecorativeImage: true},
           },
           {startMediaUpload: fakeMediaUpload}
         )
@@ -321,7 +321,7 @@ describe('UploadFile', () => {
           name: 'foo.png',
           size: 3000,
           contentType: 'image/png',
-          domObject: fakeFile
+          domObject: fakeFile,
         })
       })
 
@@ -330,7 +330,7 @@ describe('UploadFile', () => {
         const fakeFile = {
           name: 'foo.mp3',
           size: 3000,
-          type: 'audio/mp3'
+          type: 'audio/mp3',
         }
         handleSubmit(
           fakeEditor,
@@ -344,7 +344,7 @@ describe('UploadFile', () => {
           name: 'foo.mp3',
           size: 3000,
           contentType: 'audio/mp3',
-          domObject: fakeFile
+          domObject: fakeFile,
         })
       })
 
@@ -353,7 +353,7 @@ describe('UploadFile', () => {
         const fakeFile = {
           name: 'foo.txt',
           size: 3000,
-          type: 'text/plain'
+          type: 'text/plain',
         }
         handleSubmit(
           fakeEditor,
@@ -367,7 +367,7 @@ describe('UploadFile', () => {
           name: 'foo.txt',
           size: 3000,
           contentType: 'text/plain',
-          domObject: fakeFile
+          domObject: fakeFile,
         })
       })
     })
@@ -376,11 +376,11 @@ describe('UploadFile', () => {
       const fakeUnsplashData = {
         id: '123abc',
         url: 'http://instructure.com/img',
-        alt: 'fake'
+        alt: 'fake',
       }
       it('calls source.pingbackUnsplash', () => {
         const fakeSource = {
-          pingbackUnsplash: jest.fn()
+          pingbackUnsplash: jest.fn(),
         }
         handleSubmit(
           fakeEditor,
@@ -395,7 +395,7 @@ describe('UploadFile', () => {
 
       it('inserts an image tag with the proper URL and alt attributes', () => {
         const fakeSource = {
-          pingbackUnsplash: () => {}
+          pingbackUnsplash: () => {},
         }
         handleSubmit(
           fakeEditor,

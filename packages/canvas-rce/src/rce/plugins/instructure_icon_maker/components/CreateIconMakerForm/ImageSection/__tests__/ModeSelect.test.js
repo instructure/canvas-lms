@@ -63,7 +63,7 @@ describe('ModeSelect', () => {
         expect(defaultProps.dispatch).toHaveBeenCalledWith({type})
         expect(defaultProps.dispatch).toHaveBeenCalledWith({
           ...actions.SET_IMAGE_COLLECTION_OPEN,
-          payload: true
+          payload: true,
         })
       })
     }

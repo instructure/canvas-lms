@@ -67,5 +67,5 @@ function selectedAccordionIndex(state = '', action) {
 export default combineReducers({
   hidden,
   selectedTabIndex,
-  selectedAccordionIndex
+  selectedAccordionIndex,
 })

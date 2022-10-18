@@ -33,14 +33,14 @@ import {
   IconDocumentLine,
   IconAttachMediaLine,
   IconSearchLine,
-  IconXLine
+  IconXLine,
 } from '@instructure/ui-icons'
 
 const DEFAULT_FILTER_SETTINGS = {
   contentSubtype: 'all',
   contentType: 'links',
   sortValue: 'date_added',
-  searchString: ''
+  searchString: '',
 }
 
 export function useFilterSettings(default_settings) {
@@ -71,7 +71,7 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
   const options = [
     <SimpleSelect.Option key="links" id="links" value="links" renderBeforeLabel={IconLinkLine}>
       {formatMessage('Links')}
-    </SimpleSelect.Option>
+    </SimpleSelect.Option>,
   ]
 
   if (userContextType === 'course' && contentType !== 'links' && contentSubtype !== 'all') {
@@ -162,7 +162,7 @@ export default function Filter(props) {
     searchString,
     userContextType,
     isContentLoading,
-    containingContextType
+    containingContextType,
   } = props
   const [pendingSearchString, setPendingSearchString] = useState(searchString)
   const [searchInputTimer, setSearchInputTimer] = useState(0)
@@ -359,5 +359,5 @@ Filter.propTypes = {
   /**
    * Should include Icon Maker?
    */
-  use_rce_icon_maker: bool
+  use_rce_icon_maker: bool,
 }

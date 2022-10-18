@@ -22,21 +22,21 @@ import RCEGlobals from '../../../RCEGlobals'
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
-    extensions: ['autoload-all.js']
+    extensions: ['autoload-all.js'],
   },
   tex2jax: {
-    ignoreClass: 'mathjax_ignore'
+    ignoreClass: 'mathjax_ignore',
   },
   extensions: ['Safe.js'],
   Safe: {
-    safeProtocols: {http: true, https: true, file: false, javascript: false, data: false}
+    safeProtocols: {http: true, https: true, file: false, javascript: false, data: false},
   },
   MathMenu: {
     styles: {
-      '.MathJax_Menu': {'z-index': 2001}
-    }
+      '.MathJax_Menu': {'z-index': 2001},
+    },
   },
-  showMathMenu: true
+  showMathMenu: true,
 }
 
 const mathml = {
@@ -113,7 +113,7 @@ const mathml = {
           // })
           delete window.MathJaxIsLoading
         },
-        dataType: 'script'
+        dataType: 'script',
       })
     } else {
       // Make sure we always call the callback if it is loaded already and make sure we
@@ -235,7 +235,7 @@ const mathml = {
     }
   },
 
-  processNewMathEventName: 'process-new-math'
+  processNewMathEventName: 'process-new-math',
 }
 
 const mathImageHelper = {
@@ -309,7 +309,7 @@ const mathImageHelper = {
         e.setAttribute('style', s)
       }
     })
-  }
+  },
 }
 
 function handleNewMath(event) {

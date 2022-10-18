@@ -56,7 +56,7 @@ export const handleSubmit = (
         isDecorativeImage,
         displayAs,
         usageRights:
-          uploadData?.usageRights?.usageRight === 'choose' ? undefined : uploadData?.usageRights
+          uploadData?.usageRights?.usageRight === 'choose' ? undefined : uploadData?.usageRights,
       }
       let tabContext = 'documents'
       if (isImage(theFile.type)) {
@@ -75,7 +75,7 @@ export const handleSubmit = (
         editorHtml = editor.dom.createHTML('img', {
           src: unsplashData.url,
           alt: altText || unsplashData.alt,
-          role: isDecorativeImage ? 'presentation' : undefined
+          role: isDecorativeImage ? 'presentation' : undefined,
         })
       } else {
         editorHtml = editor.dom.createHTML(
@@ -94,7 +94,7 @@ export const handleSubmit = (
         editorHtml = editor.dom.createHTML('img', {
           src: fileUrl,
           alt: altText,
-          role: isDecorativeImage ? 'presentation' : undefined
+          role: isDecorativeImage ? 'presentation' : undefined,
         })
       } else {
         editorHtml = editor.dom.createHTML('a', {href: fileUrl}, altText || fileUrl)
@@ -118,7 +118,7 @@ export function UploadFile({
   onDismiss,
   requireA11yAttributes = true,
   trayProps,
-  onSubmit = handleSubmit
+  onSubmit = handleSubmit,
 }) {
   const [modalBodyWidth, setModalBodyWidth] = useState(undefined)
   const [modalBodyHeight, setModalBodyHeight] = useState(undefined)
@@ -171,5 +171,5 @@ UploadFile.propTypes = {
   label: string.isRequired,
   panels: arrayOf(oneOf(['COMPUTER', 'UNSPLASH', 'URL'])),
   requireA11yAttributes: bool,
-  trayProps: object
+  trayProps: object,
 }

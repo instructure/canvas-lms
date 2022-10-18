@@ -34,7 +34,7 @@ import {
   DISPLAY_AS_LINK,
   DISPLAY_AS_EMBED,
   DISPLAY_AS_EMBED_DISABLED,
-  DISPLAY_AS_DOWNLOAD_LINK
+  DISPLAY_AS_DOWNLOAD_LINK,
 } from '../../../shared/ContentSelection'
 import {getTrayHeight} from '../../../shared/trayUtils'
 
@@ -76,13 +76,13 @@ export default function LinkOptionsTray(props) {
             type: embedType,
             autoOpenPreview: autoOpenPreview && !disableInlinePreview,
             disableInlinePreview,
-            noPreview: displayOptionSelection === 'disable'
+            noPreview: displayOptionSelection === 'disable',
           }
         : null,
       text,
       href: url,
       id: content.id || null,
-      forceRename: true // A change to "text" should always update the link's text
+      forceRename: true, // A change to "text" should always update the link's text
     }
 
     props.onSave(linkAttrs)
@@ -248,8 +248,8 @@ LinkOptionsTray.propTypes = {
             dispalyAs: oneOf([DISPLAY_AS_LINK, DISPLAY_AS_EMBED]),
             isPreviewable: bool,
             text: string,
-            url: string
-          }).isRequired
+            url: string,
+          }).isRequired,
         },
         props,
         'content',
@@ -261,9 +261,9 @@ LinkOptionsTray.propTypes = {
   onExited: func,
   onRequestClose: func.isRequired,
   onSave: func.isRequired,
-  open: bool.isRequired
+  open: bool.isRequired,
 }
 LinkOptionsTray.defaultProps = {
   onEntered: null,
-  onExited: null
+  onExited: null,
 }

@@ -25,7 +25,7 @@ afterEach(cleanup)
 describe('UploadFile: ComputerPanel', () => {
   it('shows a failure message if the file is rejected', () => {
     const notAnImageFile = new File(['foo'], 'foo.txt', {
-      type: 'text/plain'
+      type: 'text/plain',
     })
     const {getByLabelText, getByText} = render(
       <ComputerPanel
@@ -39,15 +39,15 @@ describe('UploadFile: ComputerPanel', () => {
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
-        files: [notAnImageFile]
-      }
+        files: [notAnImageFile],
+      },
     })
     expect(getByText('Invalid file type')).toBeVisible()
   })
 
   it('accepts file files', () => {
     const aFile = new File(['foo'], 'foo.png', {
-      type: 'image/png'
+      type: 'image/png',
     })
     const {getByLabelText, queryByText} = render(
       <ComputerPanel
@@ -61,18 +61,18 @@ describe('UploadFile: ComputerPanel', () => {
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
-        files: [aFile]
-      }
+        files: [aFile],
+      },
     })
     expect(queryByText('Invalid file type')).toBeNull()
   })
 
   it('clears error messages if a valid file is added', () => {
     const notAnImageFile = new File(['foo'], 'foo.txt', {
-      type: 'text/plain'
+      type: 'text/plain',
     })
     const aFile = new File(['foo'], 'foo.png', {
-      type: 'image/png'
+      type: 'image/png',
     })
     const {getByLabelText, getByText, queryByText} = render(
       <ComputerPanel
@@ -86,14 +86,14 @@ describe('UploadFile: ComputerPanel', () => {
     const dropZone = getByLabelText(/Upload File/, {selector: 'input'})
     fireEvent.change(dropZone, {
       target: {
-        files: [notAnImageFile]
-      }
+        files: [notAnImageFile],
+      },
     })
     expect(getByText('Invalid file type')).toBeVisible()
     fireEvent.change(dropZone, {
       target: {
-        files: [aFile]
-      }
+        files: [aFile],
+      },
     })
 
     expect(queryByText('Invalid file type')).toBeNull()
@@ -102,7 +102,7 @@ describe('UploadFile: ComputerPanel', () => {
   describe('file preview', () => {
     it('shows the image preview when hasUploadedFile is true for an image file', async () => {
       const aFile = new File(['foo'], 'foo.png', {
-        type: 'image/png'
+        type: 'image/png',
       })
       const {getByText, getByLabelText} = render(
         <ComputerPanel
@@ -120,7 +120,7 @@ describe('UploadFile: ComputerPanel', () => {
 
     it('shows the text file preview when hasUploadedFile is true for a text file', async () => {
       const aFile = new File(['foo'], 'foo.txt', {
-        type: 'text/plain'
+        type: 'text/plain',
       })
       const {getByText, getByLabelText} = render(
         <ComputerPanel
@@ -138,7 +138,7 @@ describe('UploadFile: ComputerPanel', () => {
 
     it('shows the generic file preview when hasUploadedFile is true for a file not an image or text', async () => {
       const aFile = new File(['foo'], 'foo.pdf', {
-        type: 'application/pdf'
+        type: 'application/pdf',
       })
       const {getByText, getByLabelText} = render(
         <ComputerPanel
@@ -156,7 +156,7 @@ describe('UploadFile: ComputerPanel', () => {
 
     it('clicking the trash button removes the file preview', async () => {
       const aFile = new File(['foo'], 'foo.txt', {
-        type: 'text/plain'
+        type: 'text/plain',
       })
       const handleSetFile = jest.fn()
       const {getByText} = render(
@@ -182,10 +182,9 @@ describe('UploadFile: ComputerPanel', () => {
     // (that would be the version in canvas-media), and if you do select a video file
     // from "Upload Document", it works.
     // see also packages/canvas-media/src/__tests__/ComputerPanel.test.js
-    // eslint-disable-next-line jest/no-disabled-tests
     it.skip('Renders a video player preview if afile type is a video', async () => {
       const aFile = new File(['foo'], 'foo.mp4', {
-        type: 'video/mp4'
+        type: 'video/mp4',
       })
       const {getByLabelText} = render(
         <ComputerPanel
@@ -204,14 +203,14 @@ describe('UploadFile: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/avi', async () => {
       // because avi videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.avi', {
-        type: 'video/avi'
+        type: 'video/avi',
       })
       const {getByText} = render(
         <ComputerPanel
           theFile={aFile}
           setFile={() => {}}
           setError={() => {}}
-          hasUploadedFile
+          hasUploadedFile={true}
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}
@@ -224,14 +223,14 @@ describe('UploadFile: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/x-ms-wma', async () => {
       // because wma videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.wma', {
-        type: 'video/x-ms-wma'
+        type: 'video/x-ms-wma',
       })
       const {getByText} = render(
         <ComputerPanel
           theFile={aFile}
           setFile={() => {}}
           setError={() => {}}
-          hasUploadedFile
+          hasUploadedFile={true}
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}
@@ -244,14 +243,14 @@ describe('UploadFile: ComputerPanel', () => {
     it('Renders a video icon if afile type is a video/x-ms-wmv', async () => {
       // because wmv videos won't load in the player via a blob url
       const aFile = new File(['foo'], 'foo.wmv', {
-        type: 'video/x-ms-wmv'
+        type: 'video/x-ms-wmv',
       })
       const {getByText} = render(
         <ComputerPanel
           theFile={aFile}
           setFile={() => {}}
           setError={() => {}}
-          hasUploadedFile
+          hasUploadedFile={true}
           label="Upload File"
           accept="avi"
           languages={[{id: 'en', label: 'english'}]}

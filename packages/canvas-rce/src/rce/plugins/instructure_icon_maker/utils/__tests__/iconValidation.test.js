@@ -26,7 +26,7 @@ describe('icon validation', () => {
       color: null,
       encodedImage: '',
       outlineSize: 'none',
-      text: ''
+      text: '',
     }
   })
 
