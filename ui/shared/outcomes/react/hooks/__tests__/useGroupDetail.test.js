@@ -30,6 +30,7 @@ jest.mock('@canvas/alerts/react/FlashAlert')
 
 const flushAllTimersAndPromises = async () => {
   while (jest.getTimerCount() > 0) {
+    // eslint-disable-next-line no-await-in-loop
     await act(async () => {
       jest.runAllTimers()
     })

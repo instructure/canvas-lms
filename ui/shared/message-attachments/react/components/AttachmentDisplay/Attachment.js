@@ -76,6 +76,7 @@ export const attachmentProp = PropTypes.shape({
   display_name: PropTypes.string,
   thumbnail_url: PropTypes.string,
   mime_class: PropTypes.string,
+  isLoading: PropTypes.bool,
 })
 
 Attachment.propTypes = {

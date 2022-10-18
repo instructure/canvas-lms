@@ -29,6 +29,7 @@
 //
 
 export const RCELOADED_EVENT_NAME = 'RceLoaded'
+// eslint-disable-next-line import/no-mutable-exports
 export let tmce
 
 function delaySend($target, methodName, ...args) {
@@ -56,7 +57,6 @@ export function send($target, methodName, ...args) {
   const remoteEditor = $target.data('remoteEditor') || $target[0]?.remoteEditor
 
   if (remoteEditor) {
-    let ret
     if (methodName === 'get_code' && remoteEditor.isHidden()) {
       return $target.val()
     }
@@ -69,7 +69,7 @@ export function send($target, methodName, ...args) {
       const dataAttributes = args[0].dataAttributes
       args[0]['data-preview-alt'] = dataAttributes && dataAttributes['preview-alt']
     }
-    ret = remoteEditor.call(methodName, ...args)
+    const ret = remoteEditor.call(methodName, ...args)
     if (methodName === 'toggle') {
       if ($target.is(':visible')) {
         $target.focus()
@@ -78,19 +78,18 @@ export function send($target, methodName, ...args) {
       }
     }
     return ret
-  } else {
     // we're not set up, so tell the caller that `exists?` is false,
     // `get_code` is the textarea value, and ignore anything else.
-    if (methodName === 'exists?') {
-      return false
-    } else if (methodName === 'get_code') {
-      return $target.val()
-    } else {
-      console.warn(
-        `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`
-      )
-      delaySend($target, methodName, ...args)
-    }
+  } else if (methodName === 'exists?') {
+    return false
+  } else if (methodName === 'get_code') {
+    return $target.val()
+  } else {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `called send('${methodName}') on an RCE instance that hasn't fully loaded, delaying send`
+    )
+    delaySend($target, methodName, ...args)
   }
 }
 
