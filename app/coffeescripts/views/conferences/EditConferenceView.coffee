@@ -211,7 +211,12 @@ define [
           else 
             $(el).show()
         )
-      else 
+        if !($("#members_list li.member:not(:hidden)").length > 0)
+          $('#no_users_error_message').show()
+        else
+          $('#no_users_error_message').hide()
+      else
+        $('#no_users_error_message').hide()
         user_list_items.forEach((el) ->
           $(el).show()
         )
