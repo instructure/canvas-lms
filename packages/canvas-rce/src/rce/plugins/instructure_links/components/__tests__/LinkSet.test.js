@@ -53,9 +53,9 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         isLoading: false,
         links: [
           {href: 'url1', title: 'link1'},
-          {href: 'url2', title: 'link2'}
-        ]
-      }
+          {href: 'url2', title: 'link2'},
+        ],
+      },
     })
 
     expect(getAllByTestId('instructure_links-Link')).toHaveLength(2)
@@ -70,9 +70,9 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         isLoading: false,
         links: [
           {href: 'url1', title: 'link1'},
-          {href: 'url2', title: 'link2'}
-        ]
-      }
+          {href: 'url2', title: 'link2'},
+        ],
+      },
     })
 
     expect(getByText('Load More')).toBeInTheDocument()
@@ -84,9 +84,9 @@ describe('RCE "Links" Plugin > LinkSet', () => {
       collection: {
         hasMore: true,
         isLoading: false,
-        links: []
+        links: [],
       },
-      fetchInitialPage
+      fetchInitialPage,
     })
 
     expect(fetchInitialPage).toHaveBeenCalled()
@@ -100,10 +100,10 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         isLoading: false,
         links: [
           {href: 'url1', title: 'link1'},
-          {href: 'url2', title: 'link2'}
-        ]
+          {href: 'url2', title: 'link2'},
+        ],
       },
-      fetchNextPage
+      fetchNextPage,
     })
 
     const loadMoreBtn = getByText('Load More')
@@ -119,11 +119,11 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         isLoading: false,
         links: [
           {href: 'url1', title: 'link1'},
-          {href: 'url2', title: 'link2'}
+          {href: 'url2', title: 'link2'},
         ],
-        lastError: {}
+        lastError: {},
       },
-      fetchNextPage
+      fetchNextPage,
     })
 
     expect(getByText('Loading failed...')).toBeInTheDocument()
@@ -136,9 +136,9 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         hasMore: true,
         isLoading: true,
         links: [],
-        lastError: {}
+        lastError: {},
       },
-      fetchInitialPage
+      fetchInitialPage,
     })
 
     expect(getByText('Loading')).toBeInTheDocument()
@@ -152,11 +152,11 @@ describe('RCE "Links" Plugin > LinkSet', () => {
         isLoading: true,
         links: [
           {href: 'url1', title: 'link1'},
-          {href: 'url2', title: 'link2'}
+          {href: 'url2', title: 'link2'},
         ],
-        lastError: {}
+        lastError: {},
       },
-      fetchNextPage
+      fetchNextPage,
     })
 
     expect(getByText('Loading')).toBeInTheDocument()

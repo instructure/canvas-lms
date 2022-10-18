@@ -44,13 +44,13 @@ describe('RCE > Plugins > Shared > DimensionsInput', () => {
       appliedPercentage: 70,
       usePercentageUnits: false,
       naturalHeight: 200,
-      naturalWidth: 100
+      naturalWidth: 100,
     }
 
     props = {
       minWidth: 30,
       minHeight: 60,
-      minPercentage: 10
+      minPercentage: 10,
     }
   })
 

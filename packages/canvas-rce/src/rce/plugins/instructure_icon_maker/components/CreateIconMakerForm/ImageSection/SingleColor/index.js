@@ -44,9 +44,9 @@ SingleColor.propTypes = {
   dispatch: PropTypes.func,
   data: PropTypes.shape({
     icon: PropTypes.string.isRequired,
-    iconFillColor: PropTypes.string.isRequired
+    iconFillColor: PropTypes.string.isRequired,
   }),
-  onLoaded: PropTypes.func
+  onLoaded: PropTypes.func,
 }
 
 SingleColor.defaultProps = {
@@ -54,9 +54,9 @@ SingleColor.defaultProps = {
   data: {
     icon: null,
     // Black color in color selector component
-    iconFillColor: '#000000'
+    iconFillColor: '#000000',
   },
-  onLoaded: () => {}
+  onLoaded: () => {},
 }
 
 export default SingleColor

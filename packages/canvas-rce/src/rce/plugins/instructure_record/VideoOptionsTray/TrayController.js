@@ -83,7 +83,7 @@ export default class TrayController {
           width: `${Math.max(
             minWidth,
             isVertical ? videoOptions.appliedHeight : videoOptions.appliedWidth
-          )}px`
+          )}px`,
         }
         this._editor.dom.setStyles($tinymceIframeShim, styl)
         this._editor.dom.setStyles(this.$videoContainer, styl)
@@ -102,7 +102,7 @@ export default class TrayController {
         this._editor.fire('ObjectResized', {
           target: this.$videoContainer,
           width: videoOptions.appliedWidth,
-          height: videoOptions.appliedHeight
+          height: videoOptions.appliedHeight,
         })
       } else {
         const href = this._editor.dom.getAttrib($tinymceIframeShim, 'data-mce-p-src')
@@ -125,7 +125,7 @@ export default class TrayController {
           .updateMediaObject({
             media_object_id: videoOptions.media_object_id,
             title: videoOptions.titleText,
-            subtitles: videoOptions.subtitles
+            subtitles: videoOptions.subtitles,
           })
           .then(_r => {
             if (this.$videoContainer && videoOptions.displayAs === 'embed') {

@@ -32,7 +32,7 @@ if (!process?.env?.BUILD_LOCALE) {
   formatMessage.setup({
     locale: 'en',
     generateId: require('format-message-generate-id/underscored_crc32'),
-    missingTranslation: 'ignore'
+    missingTranslation: 'ignore',
   })
 }
 
@@ -101,8 +101,8 @@ const RCE = forwardRef(function RCE(props, rceRef) {
         ...editorOptions,
         selector: editorOptions.selector || `#${textareaId}`,
         height,
-        language: editorLanguage(props.language)
-      }
+        language: editorLanguage(props.language),
+      },
     }
     wrapInitCb(mirroredAttrs, iProps.editorOptions)
 
@@ -165,7 +165,7 @@ RCE.propTypes = {
       // the id is the locale
       id: string.isRequired,
       // the label to show in the UI
-      label: string.isRequired
+      label: string.isRequired,
     })
   ),
   // function that returns the element where screenreader alerts go
@@ -202,7 +202,7 @@ RCE.propTypes = {
   onFocus: func, // f(RCEWrapper component)
   onBlur: func, // f(event)
   onInit: func, // f(tinymce_editor)
-  onContentChange: func // f(content), don't mistake this as an indication RCE is a controlled component
+  onContentChange: func, // f(content), don't mistake this as an indication RCE is a controlled component
 }
 
 RCE.defaultProps = {
@@ -221,5 +221,5 @@ RCE.defaultProps = {
   onFocus: () => {},
   onBlur: () => {},
   onContentChange: () => {},
-  onInit: () => {}
+  onInit: () => {},
 }

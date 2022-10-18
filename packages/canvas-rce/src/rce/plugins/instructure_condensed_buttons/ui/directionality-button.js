@@ -18,7 +18,7 @@
 
 import formatMessage from '../../../../format-message'
 
-export default function(editor) {
+export default function (editor) {
   function defaultDirectionality() {
     return document.dir
   }
@@ -28,14 +28,14 @@ export default function(editor) {
       name: 'ltr',
       text: formatMessage('Left-to-Right'),
       cmd: 'mceDirectionLTR',
-      icon: 'ltr'
+      icon: 'ltr',
     },
     {
       name: 'rtl',
       text: formatMessage('Right-to-Left'),
       cmd: 'mceDirectionRTL',
-      icon: 'rtl'
-    }
+      icon: 'rtl',
+    },
   ]
 
   if (defaultDirectionality() === 'rtl') directionalityMenuItems.reverse()
@@ -43,13 +43,13 @@ export default function(editor) {
   // Register menu item
   editor.ui.registry.addNestedMenuItem('directionality', {
     text: formatMessage('Directionality'),
-    getSubmenuItems: () => [directionalityMenuItems[0].name, directionalityMenuItems[1].name]
+    getSubmenuItems: () => [directionalityMenuItems[0].name, directionalityMenuItems[1].name],
   })
   directionalityMenuItems.forEach(button => {
     editor.ui.registry.addMenuItem(button.name, {
       text: button.text,
       icon: button.icon,
-      onAction: () => editor.execCommand(button.cmd)
+      onAction: () => editor.execCommand(button.cmd),
     })
   })
 }

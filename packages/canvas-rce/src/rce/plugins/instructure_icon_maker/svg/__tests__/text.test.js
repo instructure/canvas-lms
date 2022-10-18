@@ -345,7 +345,7 @@ describe('buildText()', () => {
           buildText({
             ...settings,
             text: 'Hello World! Hello World! Bye!',
-            textPosition: 'bottom-third'
+            textPosition: 'bottom-third',
           })
         ).toMatchInlineSnapshot(`
           <text
@@ -460,7 +460,7 @@ describe('buildTextBackground()', () => {
           buildTextBackground({
             ...settings,
             text: 'Hello World! Hello World! Bye!',
-            textPosition: 'middle'
+            textPosition: 'middle',
           })
         ).toMatchInlineSnapshot(`
           <path
@@ -483,7 +483,7 @@ describe('buildTextBackground()', () => {
           buildTextBackground({
             ...settings,
             text: 'Hello World! Hello World! Bye!',
-            textPosition: 'bottom-third'
+            textPosition: 'bottom-third',
           })
         ).toMatchInlineSnapshot(`
           <path
@@ -506,7 +506,7 @@ describe('buildTextBackground()', () => {
           buildTextBackground({
             ...settings,
             text: 'Hello World! Hello World! Bye!',
-            textPosition: 'below'
+            textPosition: 'below',
           })
         ).toMatchInlineSnapshot(`
           <path
@@ -532,9 +532,9 @@ describe('getContainerWidth()', () => {
     sinon.stub(document, 'createElement').returns({
       getContext: () => ({
         measureText: text => ({
-          width: text.length * 5
-        })
-      })
+          width: text.length * 5,
+        }),
+      }),
     })
     expect(getContainerWidth({...settings, text: 'This is a long text for testing'})).toBe(125)
     document.createElement.reset()

@@ -29,8 +29,11 @@ function renderComponent(props) {
         assignments: {
           hasMore: false,
           isLoading: false,
-          links: [{href: 'url1', title: 'link1'}, {href: 'url2', title: 'link2'}]
-        }
+          links: [
+            {href: 'url1', title: 'link1'},
+            {href: 'url2', title: 'link2'},
+          ],
+        },
       }}
       collection="assignments"
       label="Assignments"
@@ -61,7 +64,7 @@ describe('RCE "Links" Plugin > CollectionPanel', () => {
 
   it('renders a collapsed collection panel', () => {
     const {getByText, getByTestId, queryByTestId} = renderComponent({
-      selectedAccordionIndex: 'modules'
+      selectedAccordionIndex: 'modules',
     })
 
     expect(getByTestId('instructure_links-AccordionSection')).toBeInTheDocument()

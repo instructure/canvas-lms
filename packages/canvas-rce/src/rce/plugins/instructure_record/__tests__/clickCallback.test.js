@@ -24,9 +24,9 @@ const fauxEditor = {
   settings: {
     canvas_rce_user_context: {
       type: 'course',
-      id: '17'
-    }
-  }
+      id: '17',
+    },
+  },
 }
 
 describe('handleUpload()', () => {
@@ -63,8 +63,8 @@ describe('Instructure Media Plugin: clickCallback', () => {
         initializeFlickr() {},
         initializeImages() {},
         initializeDocuments() {},
-        initializeMedia() {}
-      }
+        initializeMedia() {},
+      },
     }
   })
   afterEach(() => {
@@ -88,7 +88,7 @@ describe('Instructure Media Plugin: clickCallback', () => {
     await clickCallback(fauxEditor, document, trayProps)
     expect(
       getAllByLabelText(document, 'Upload Media', {
-        selector: '[role="dialog"]'
+        selector: '[role="dialog"]',
       })[0]
     ).toBeVisible()
   })

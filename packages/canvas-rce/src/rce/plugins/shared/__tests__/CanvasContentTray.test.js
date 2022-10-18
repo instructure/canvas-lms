@@ -33,8 +33,8 @@ jest.mock('../ContentSelection', () => ({
     contentType: 'wikiPages',
     url: '/pages',
     published: true,
-    text: 'some text'
-  })
+    text: 'some text',
+  }),
 }))
 jest.mock('../../../../bridge', () => {
   const original = jest.requireActual('../../../../bridge')
@@ -56,7 +56,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       contextType: 'course',
       source: fakeSource,
       themeUrl: 'http://localhost/tinymce-theme.swf',
-      ...override
+      ...override,
     }
     return props
   }
@@ -115,7 +115,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
           text: 'some text',
           title: 'some filename',
           type: 'wikiPages',
-          published: true
+          published: true,
         })
       })
     })

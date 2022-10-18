@@ -66,14 +66,14 @@ export default class FlashAlert extends React.Component {
     error: PropTypes.instanceOf(Error),
     variant: PropTypes.oneOf(['info', 'success', 'warning', 'error']),
     timeout: PropTypes.number,
-    screenReaderOnly: PropTypes.bool
+    screenReaderOnly: PropTypes.bool,
   }
 
   static defaultProps = {
     error: null,
     variant: 'info',
     timeout: TIMEOUT,
-    screenReaderOnly: false
+    screenReaderOnly: false,
   }
 
   constructor(props) {
@@ -81,7 +81,7 @@ export default class FlashAlert extends React.Component {
 
     this.state = {
       showDetails: false,
-      isOpen: true
+      isOpen: true,
     }
     this.timerId = 0
   }

@@ -372,7 +372,7 @@ const iconLabels = {
   ไอคอนดนตรี: 'music',
   ไอคอนนาฏศิลป์: 'performingArts',
   ไอคอนพลศึกษา: 'physicalEducation',
-  ไอคอนศาสนา: 'religion'
+  ไอคอนศาสนา: 'religion',
 }
 
 export default iconLabels

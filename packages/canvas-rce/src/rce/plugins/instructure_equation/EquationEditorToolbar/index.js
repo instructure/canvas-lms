@@ -27,7 +27,7 @@ import MathIcon from '../MathIcon'
 const buttonContainerStyle = {
   display: 'inline-block',
   marginBottom: '5px',
-  paddingRight: '5px'
+  paddingRight: '5px',
 }
 
 function EquationEditorToolbar(props) {
@@ -80,7 +80,7 @@ function EquationEditorToolbar(props) {
 }
 
 EquationEditorToolbar.propTypes = {
-  executeCommand: PropTypes.func.isRequired
+  executeCommand: PropTypes.func.isRequired,
 }
 
 const MemoizedEquationEditorToolbar = React.memo(EquationEditorToolbar)

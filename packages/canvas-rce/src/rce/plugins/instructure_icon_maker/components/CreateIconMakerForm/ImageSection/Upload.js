@@ -53,7 +53,7 @@ export const onSubmit = (dispatch, onChange) => (_editor, _accept, _selectedPane
       payload: formatMessage(
         'GIF/PNG format images larger than {size} KB are not currently supported.',
         {size: MAX_GIF_PNG_SIZE_BYTES / 1024}
-      )
+      ),
     })
   }
 
@@ -86,12 +86,12 @@ const Upload = ({editor, dispatch, onChange}) => {
 Upload.propTypes = {
   editor: PropTypes.object.isRequired,
   dispatch: PropTypes.func,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
 }
 
 Upload.defaultProps = {
   dispatch: () => {},
-  onChange: () => {}
+  onChange: () => {},
 }
 
 export default Upload

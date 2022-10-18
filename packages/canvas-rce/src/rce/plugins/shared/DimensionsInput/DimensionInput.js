@@ -43,7 +43,7 @@ export default function DimensionInput(props) {
       onChange={handleChange}
       onDecrement={handleDecrement}
       onIncrement={handleIncrement}
-      isRequired
+      isRequired={true}
       showArrows={false}
       value={inputValue}
     />
@@ -54,7 +54,7 @@ DimensionInput.propTypes = {
   dimensionState: shape({
     addOffset: func.isRequired,
     inputValue: string.isRequired,
-    setInputValue: func.isRequired
+    setInputValue: func.isRequired,
   }),
-  label: string.isRequired
+  label: string.isRequired,
 }

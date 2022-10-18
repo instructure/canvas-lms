@@ -45,7 +45,7 @@ export function buildImage(settings) {
       transform: settings.transform,
       width: settings.width,
       height: settings.height,
-      href: settings.encodedImage
+      href: settings.encodedImage,
     }
   } else {
     // we need to embed the encoded image
@@ -57,7 +57,7 @@ export function buildImage(settings) {
       transform: `translate(${translation}, ${translation})`,
       width: squareHeight,
       height: squareHeight,
-      href: settings.encodedImage
+      href: settings.encodedImage,
     }
   }
 
@@ -117,25 +117,25 @@ function transformForPentagon(size) {
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(40),
-        y: '55%'
+        y: '55%',
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(80),
-        y: '55%'
+        y: '55%',
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(110),
-        y: '55%'
+        y: '55%',
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(140),
-        y: '55%'
+        y: '55%',
       }
   }
 }
@@ -146,25 +146,25 @@ function transformForTriangle(size) {
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(24),
-        y: '65%'
+        y: '65%',
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(50),
-        y: '65%'
+        y: '65%',
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(80),
-        y: '65%'
+        y: '65%',
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(112),
-        y: '65%'
+        y: '65%',
       }
   }
 }
@@ -175,25 +175,25 @@ function transformForStar(size) {
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(8),
-        y: '55%'
+        y: '55%',
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(24),
-        y: '55%'
+        y: '55%',
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(44),
-        y: '55%'
+        y: '55%',
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
         ...dimensionAttrsFor(72),
-        y: '55%'
+        y: '55%',
       }
   }
 }
@@ -203,22 +203,22 @@ function transformForSquare(size) {
     case Size.ExtraSmall:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(60)
+        ...dimensionAttrsFor(60),
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(108)
+        ...dimensionAttrsFor(108),
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(142)
+        ...dimensionAttrsFor(142),
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(200)
+        ...dimensionAttrsFor(200),
       }
   }
 }
@@ -228,22 +228,22 @@ function transformForCircle(size) {
     case Size.ExtraSmall:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(54)
+        ...dimensionAttrsFor(54),
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(100)
+        ...dimensionAttrsFor(100),
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(132)
+        ...dimensionAttrsFor(132),
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(180)
+        ...dimensionAttrsFor(180),
       }
   }
 }
@@ -253,22 +253,22 @@ function transformForHexagon(size) {
     case Size.ExtraSmall:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(28)
+        ...dimensionAttrsFor(28),
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(68)
+        ...dimensionAttrsFor(68),
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(100)
+        ...dimensionAttrsFor(100),
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(160)
+        ...dimensionAttrsFor(160),
       }
   }
 }
@@ -278,22 +278,22 @@ function transformForOctagon(size) {
     case Size.ExtraSmall:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(36)
+        ...dimensionAttrsFor(36),
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(80)
+        ...dimensionAttrsFor(80),
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(110)
+        ...dimensionAttrsFor(110),
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(180)
+        ...dimensionAttrsFor(180),
       }
   }
 }
@@ -303,22 +303,22 @@ function transformForDiamond(size) {
     case Size.ExtraSmall:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(30)
+        ...dimensionAttrsFor(30),
       }
     case Size.Small:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(60)
+        ...dimensionAttrsFor(60),
       }
     case Size.Medium:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(80)
+        ...dimensionAttrsFor(80),
       }
     case Size.Large:
       return {
         ...transformForDefault(size),
-        ...dimensionAttrsFor(120)
+        ...dimensionAttrsFor(120),
       }
   }
 }
@@ -328,13 +328,13 @@ function transformForDefault(size) {
     [Size.ExtraSmall]: 60,
     [Size.Small]: 75,
     [Size.Medium]: 80,
-    [Size.Large]: 110
+    [Size.Large]: 110,
   }
 
   return {
     x: '50%',
     y: '50%',
-    ...dimensionAttrsFor(dimensions[size])
+    ...dimensionAttrsFor(dimensions[size]),
   }
 }
 
@@ -347,6 +347,6 @@ function dimensionAttrsFor(width) {
     width,
     height: width,
     translateX: translationFor(width),
-    translateY: translationFor(width)
+    translateY: translationFor(width),
   }
 }

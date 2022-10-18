@@ -45,7 +45,7 @@ const useDataUrl = () => {
           reader.onloadend = () =>
             resolve({
               result: reader.result,
-              blob
+              blob,
             })
 
           reader.onerror = reject
@@ -74,7 +74,7 @@ const useDataUrl = () => {
     dataUrl,
     dataLoading: loading,
     dataError: error,
-    dataBlob
+    dataBlob,
   }
 }
 

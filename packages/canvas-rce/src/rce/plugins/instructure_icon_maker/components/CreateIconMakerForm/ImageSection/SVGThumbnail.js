@@ -39,14 +39,14 @@ SVGThumbnail.propTypes = {
   source: PropTypes.objectOf(
     PropTypes.shape({
       source: PropTypes.func.isRequired,
-      label: PropTypes.string.isRequired
+      label: PropTypes.string.isRequired,
     }).isRequired
-  ).isRequired
+  ).isRequired,
 }
 
 SVGThumbnail.defaultProps = {
   size: '4rem',
-  fillColor: '#000000'
+  fillColor: '#000000',
 }
 
 export default SVGThumbnail

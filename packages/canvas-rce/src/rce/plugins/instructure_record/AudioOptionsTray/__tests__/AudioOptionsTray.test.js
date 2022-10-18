@@ -32,12 +32,12 @@ describe('RCE "Audios" Plugin > AudioOptionsTray', () => {
       onSave: jest.fn(),
       open: true,
       audioOptions: {
-        id: 'm-audio-id'
+        id: 'm-audio-id',
       },
       trayOptions: {
         host: 'localhost:3001',
-        jwt: 'someuglyvalue'
-      }
+        jwt: 'someuglyvalue',
+      },
     }
   })
 

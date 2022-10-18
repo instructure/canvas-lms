@@ -23,14 +23,14 @@ export const linkShape = shape({
   published: bool,
   date: string,
   date_type: string,
-  has_overrides: bool
+  has_overrides: bool,
 })
 
 export const linksShape = shape({
   hasMore: bool,
   isLoading: bool,
   lastError: object,
-  links: arrayOf(linkShape).isRequired
+  links: arrayOf(linkShape).isRequired,
 })
 
 export const linkType = oneOf([
@@ -40,7 +40,7 @@ export const linkType = oneOf([
   'quizzes',
   'announcements',
   'wikiPages',
-  'navigation'
+  'navigation',
 ])
 
 export const collectionsShape = shape({
@@ -49,5 +49,5 @@ export const collectionsShape = shape({
   discussions: linksShape,
   modules: linksShape,
   quizzes: linksShape,
-  wikiPages: linksShape
+  wikiPages: linksShape,
 })

@@ -51,7 +51,7 @@ export default function ImageOptionsTray(props) {
   const dimensionsState = useDimensionsState(imageOptions, {
     minHeight: MIN_HEIGHT,
     minWidth: MIN_WIDTH,
-    minPercentage: MIN_PERCENTAGE
+    minPercentage: MIN_PERCENTAGE,
   })
 
   function handleUrlChange(newUrl) {
@@ -104,7 +104,7 @@ export default function ImageOptionsTray(props) {
       appliedHeight,
       appliedWidth,
       displayAs,
-      isDecorativeImage
+      isDecorativeImage,
     })
   }
 
@@ -129,7 +129,7 @@ export default function ImageOptionsTray(props) {
   if (imageSize !== CUSTOM) {
     messagesForSize.push({
       text: formatMessage('{width} x {height}px', {height: imageHeight, width: imageWidth}),
-      type: 'hint'
+      type: 'hint',
     })
   }
 
@@ -225,18 +225,18 @@ ImageOptionsTray.propTypes = {
     isDecorativeImage: bool.isRequired,
     isLinked: bool,
     naturalHeight: number.isRequired,
-    naturalWidth: number.isRequired
+    naturalWidth: number.isRequired,
   }).isRequired,
   onEntered: func,
   onExited: func,
   onRequestClose: func.isRequired,
   onSave: func.isRequired,
   open: bool.isRequired,
-  isIconMaker: bool
+  isIconMaker: bool,
 }
 
 ImageOptionsTray.defaultProps = {
   onEntered: null,
   onExited: null,
-  isIconMaker: false
+  isIconMaker: false,
 }

@@ -48,14 +48,14 @@ export default function useDimensionsState(initialDimensions, constraints) {
     appliedPercentage,
     naturalHeight,
     naturalWidth,
-    usePercentageUnits
+    usePercentageUnits,
   } = initialDimensions
   const {minHeight, minWidth, minPercentage} = constraints
 
   const initialNumericValues = {
     height: usePercentageUnits ? naturalHeight : appliedHeight || naturalHeight,
     width: usePercentageUnits ? naturalWidth : appliedWidth || naturalWidth,
-    percentage: appliedPercentage || 100
+    percentage: appliedPercentage || 100,
   }
 
   const [dimensions, setDimensions] = useState({
@@ -65,19 +65,19 @@ export default function useDimensionsState(initialDimensions, constraints) {
     inputPercentage: inputValueFor(initialNumericValues.percentage),
     numericHeight: initialNumericValues.height,
     numericWidth: initialNumericValues.width,
-    numericPercentage: initialNumericValues.percentage
+    numericPercentage: initialNumericValues.percentage,
   })
 
   const currentNumericValues = {
     height: dimensions.numericHeight,
     width: dimensions.numericWidth,
-    percentage: dimensions.numericPercentage
+    percentage: dimensions.numericPercentage,
   }
 
   const dimensionMinimums = {height: minHeight, width: minWidth, percentage: minPercentage}
   const dimensionScaleFns = {
     height: scaleForHeight,
-    width: scaleForWidth
+    width: scaleForWidth,
   }
 
   function updateDimensions(attributes) {
@@ -86,7 +86,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
       ...attributes,
       numericHeight: normalizedNumber(attributes.numericHeight),
       numericWidth: normalizedNumber(attributes.numericWidth),
-      numericPercentage: normalizedNumber(attributes.numericPercentage)
+      numericPercentage: normalizedNumber(attributes.numericPercentage),
     })
   }
 
@@ -115,7 +115,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
       numericPercentage: percentage,
       inputHeight: inputValueFor(height),
       inputWidth: inputValueFor(width),
-      inputPercentage: inputValueFor(percentage)
+      inputPercentage: inputValueFor(percentage),
     })
   }
 
@@ -129,7 +129,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
       numericPercentage: percentage,
       inputHeight: dimensionName === 'height' ? value : inputValueFor(height),
       inputWidth: dimensionName === 'width' ? value : inputValueFor(width),
-      inputPercentage: dimensionName === 'percentage' ? value : inputValueFor(percentage)
+      inputPercentage: dimensionName === 'percentage' ? value : inputValueFor(percentage),
     })
   }
 
@@ -160,7 +160,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
 
     setInputValue(value) {
       setDimensionValue('width', value)
-    }
+    },
   }
 
   const heightState = {
@@ -172,7 +172,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
 
     setInputValue(value) {
       setDimensionValue('height', value)
-    }
+    },
   }
 
   const percentageState = {
@@ -184,7 +184,7 @@ export default function useDimensionsState(initialDimensions, constraints) {
 
     setInputValue(value) {
       setDimensionValue('percentage', value)
-    }
+    },
   }
 
   const handleUsePercentageUnitsChange = value => {
@@ -209,6 +209,6 @@ export default function useDimensionsState(initialDimensions, constraints) {
     percentage: dimensions.numericPercentage,
     usePercentageUnits: dimensions.usePercentageUnits,
     setUsePercentageUnits: handleUsePercentageUnitsChange,
-    isValid: isAtLeastMinimums && isNumeric
+    isValid: isAtLeastMinimums && isNumeric,
   }
 }

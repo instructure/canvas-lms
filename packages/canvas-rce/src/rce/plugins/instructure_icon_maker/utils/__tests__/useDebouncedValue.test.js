@@ -26,7 +26,7 @@ jest.mock('@instructure/debounce', () => ({
     return () => {
       callback()
     }
-  }
+  },
 }))
 
 describe('useDebouncedValue()', () => {
@@ -36,8 +36,8 @@ describe('useDebouncedValue()', () => {
     renderHook(({value, handler}) => useDebouncedValue(value, handler), {
       initialProps: {
         value: currentValue,
-        handler: onChange
-      }
+        handler: onChange,
+      },
     })
 
   beforeEach(() => {

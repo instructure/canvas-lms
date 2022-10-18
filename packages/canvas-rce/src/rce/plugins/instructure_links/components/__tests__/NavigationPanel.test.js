@@ -52,7 +52,7 @@ describe('RCE "Links" Plugin > NavigationPanel', () => {
   it('renders group navigation open', () => {
     const {getByText, getAllByTestId} = renderComponent({
       selectedAccordionIndex: 'navigation',
-      contextType: 'group'
+      contextType: 'group',
     })
 
     expect(getByText('Group Navigation')).toBeInTheDocument()

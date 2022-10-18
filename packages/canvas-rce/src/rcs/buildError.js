@@ -47,7 +47,7 @@ class QuotaError {
   static build(_error) {
     return {
       text: formatMessage('File storage quota exceeded'),
-      variant: 'error'
+      variant: 'error',
     }
   }
 }
@@ -60,9 +60,9 @@ class CaptionSizeError {
   static build(error) {
     return {
       text: formatMessage('Closed caption file must be less than {maxKb} kb', {
-        maxKb: error.maxBytes / 1000 // bytes to kb
+        maxKb: error.maxBytes / 1000, // bytes to kb
       }),
-      variant: 'error'
+      variant: 'error',
     }
   }
 }
@@ -75,7 +75,7 @@ class CaptionCreationError {
   static build(_error) {
     return {
       text: formatMessage('loading closed captions/subtitles failed.'),
-      variant: 'error'
+      variant: 'error',
     }
   }
 }
@@ -91,7 +91,7 @@ class DefaultError {
       text: formatMessage(
         'Something went wrong. Check your connection, reload the page, and try again.'
       ),
-      variant: 'error'
+      variant: 'error',
     }
   }
 }

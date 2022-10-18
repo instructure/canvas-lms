@@ -33,7 +33,7 @@ import {
   IconA11yLine,
   IconKeyboardShortcutsLine,
   IconMiniArrowEndLine,
-  IconFullScreenLine
+  IconFullScreenLine,
 } from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
@@ -56,12 +56,12 @@ StatusBar.propTypes = {
   preferredHtmlEditor: oneOf([PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW]),
   readOnly: bool,
   a11yBadgeColor: string,
-  a11yErrorsCount: number
+  a11yErrorsCount: number,
 }
 
 StatusBar.defaultProps = {
   a11yBadgeColor: '#0374B5',
-  a11yErrorsCount: 0
+  a11yErrorsCount: 0,
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -193,7 +193,7 @@ export default function StatusBar(props) {
     return (
       <ApplyTheme
         theme={{
-          [Badge.theme]: {colorPrimary: props.a11yBadgeColor}
+          [Badge.theme]: {colorPrimary: props.a11yBadgeColor},
         }}
       >
         <Badge count={props.a11yErrorsCount} countUntil={100}>
@@ -383,7 +383,9 @@ export default function StatusBar(props) {
       ref={statusBarRef}
       onKeyDown={handleKey}
     >
-      <Flex.Item shouldGrow>{isHtmlView() ? renderHtmlEditorMessage() : renderPath()}</Flex.Item>
+      <Flex.Item shouldGrow={true}>
+        {isHtmlView() ? renderHtmlEditorMessage() : renderPath()}
+      </Flex.Item>
 
       <Flex.Item role="toolbar" title={formatMessage('Editor Statusbar')}>
         {renderIconButtons()}
@@ -406,6 +408,6 @@ const styles = StyleSheet.create({
     width: '1px',
     height: '1.5rem',
     position: 'relative',
-    top: '.5rem'
-  }
+    top: '.5rem',
+  },
 })

@@ -51,7 +51,7 @@ function buildSquare(dimensionSize) {
     y: 0,
     width: dimensionSize,
     height: dimensionSize,
-    fill: 'black'
+    fill: 'black',
   })
 }
 
@@ -60,13 +60,13 @@ function buildCircle(dimensionSize) {
     cx: dimensionSize / 2,
     cy: dimensionSize / 2,
     r: dimensionSize / 2,
-    fill: 'black'
+    fill: 'black',
   })
 }
 
 function buildTriangle(dimensionSize) {
   return createSvgElement('path', {
-    d: `M${dimensionSize / 2} 0L${dimensionSize} ${dimensionSize}H0L${dimensionSize / 2} 0Z`
+    d: `M${dimensionSize / 2} 0L${dimensionSize} ${dimensionSize}H0L${dimensionSize / 2} 0Z`,
   })
 }
 
@@ -74,7 +74,7 @@ function buildDiamond(dimensionSize) {
   return createSvgElement('path', {
     d: `M${dimensionSize / 2} 0L${dimensionSize} ${dimensionSize / 2}L${
       dimensionSize / 2
-    } ${dimensionSize}L0 ${dimensionSize / 2}L${dimensionSize / 2} 0Z`
+    } ${dimensionSize}L0 ${dimensionSize / 2}L${dimensionSize / 2} 0Z`,
   })
 }
 
@@ -86,7 +86,7 @@ function buildPentagon(dimensionSize) {
   return createSvgElement('path', {
     d: `M${half} 0L${dimensionSize} ${alpha}L${half + beta} ${dimensionSize}H${
       half - beta
-    }L0 ${alpha}L${half} 0L${half} 0Z`
+    }L0 ${alpha}L${half} 0L${half} 0Z`,
   })
 }
 
@@ -95,7 +95,7 @@ function buildHexagon(dimensionSize) {
   return createSvgElement('path', {
     d: `M${dimensionSize - leg} 0L${dimensionSize} ${dimensionSize / 2}L${
       dimensionSize - leg
-    } ${dimensionSize}H${leg}L0 ${dimensionSize / 2}L${leg} 0H${dimensionSize - leg}Z`
+    } ${dimensionSize}H${leg}L0 ${dimensionSize / 2}L${leg} 0H${dimensionSize - leg}Z`,
   })
 }
 
@@ -105,7 +105,7 @@ function buildOctagon(dimensionSize) {
   return createSvgElement('path', {
     d: `M0 ${leg}L${leg} 0H${leg + side}L${dimensionSize} ${leg}V${leg + side}L${
       leg + side
-    } ${dimensionSize}H${leg}L0 ${leg + side}V${leg}Z`
+    } ${dimensionSize}H${leg}L0 ${leg + side}V${leg}Z`,
   })
 }
 
@@ -123,6 +123,6 @@ function buildStar(dimensionSize) {
       half + zeta
     } ${dimensionSize}L${half} ${eta}L${half - zeta} ${dimensionSize}L${
       half - gamma
-    } ${delta}L0 ${beta}H${half - alpha}L${half} 0Z`
+    } ${delta}L0 ${beta}H${half - alpha}L${half} 0Z`,
   })
 }

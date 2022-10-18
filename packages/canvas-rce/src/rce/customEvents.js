@@ -16,4 +16,4 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export const VIEW_CHANGE = "ViewChange" // Emitted when the RCE view changes (example: WYSIWYG -> RAW)
+export const VIEW_CHANGE = 'ViewChange' // Emitted when the RCE view changes (example: WYSIWYG -> RAW)

@@ -26,7 +26,7 @@ describe('contentInsertion', () => {
     node = {
       content: '',
       className: '',
-      id: ''
+      id: '',
     }
 
     editor = {
@@ -51,7 +51,7 @@ describe('contentInsertion', () => {
           return node
         },
         getRng: () => ({}),
-        isCollapsed: () => editor.selectionContent.length === 0
+        isCollapsed: () => editor.selectionContent.length === 0,
       },
       dom: {
         doc: window.document,
@@ -79,7 +79,7 @@ describe('contentInsertion', () => {
           return {
             is: () => {
               return false
-            }
+            },
           }
         },
         createHTML: (tag, attrs, text) => {
@@ -87,10 +87,10 @@ describe('contentInsertion', () => {
           editor.dom.setAttribs(elem, attrs)
           elem.innerHTML = text
           return elem.outerHTML
-        }
+        },
       },
       undoManager: {
-        add: () => {}
+        add: () => {},
       },
       focus: () => {},
       insertContent: content => {
@@ -103,7 +103,7 @@ describe('contentInsertion', () => {
       iframeElement: {
         getBoundingClientRect: () => {
           return {left: 0, top: 0, bottom: 0, right: 0}
-        }
+        },
       },
       execCommand: jest.fn((cmd, ui, value, _args) => {
         if (cmd === 'mceInsertLink') {
@@ -111,7 +111,7 @@ describe('contentInsertion', () => {
         } else if (cmd === 'mceInsertContent') {
           editor.content = value
         }
-      })
+      }),
     }
   })
 
@@ -130,8 +130,8 @@ describe('contentInsertion', () => {
         text: 'Click On Me',
         selectionDetails: {
           node: undefined,
-          range: undefined
-        }
+          range: undefined,
+        },
       }
     })
 
@@ -156,7 +156,7 @@ describe('contentInsertion', () => {
 
       beforeEach(() => {
         anchorElm = {
-          innerText: 'anchor text'
+          innerText: 'anchor text',
         }
 
         editor.dom.getParent = () => anchorElm
@@ -302,7 +302,7 @@ describe('contentInsertion', () => {
       image = {
         href: '/some/path',
         url: '/other/path',
-        title: 'Here Be Images'
+        title: 'Here Be Images',
       }
     })
 
@@ -322,14 +322,14 @@ describe('contentInsertion', () => {
         nodeName: 'A',
         getAttribute: () => {
           return 'http://bogus.edu'
-        }
+        },
       }
       editor.selection.getNode = () => {
         return {...node, nodeName: 'IMG'}
       }
       editor.selection.getRng = () => ({
         startContainer: containerElem,
-        endContainer: containerElem
+        endContainer: containerElem,
       })
       contentInsertion.insertImage(editor, image)
       expect(editor.content).toEqual(
@@ -363,16 +363,16 @@ describe('contentInsertion', () => {
       }
       const link = {
         selectionDetails: {
-          node: undefined
-        }
+          node: undefined,
+        },
       }
       expect(contentInsertion.existingContentToLink(editor, link)).toBe(true)
     })
     it('returns false if content not selected', () => {
       const link = {
         selectionDetails: {
-          node: false
-        }
+          node: false,
+        },
       }
       expect(contentInsertion.existingContentToLink(editor, link)).toBe(false)
     })
@@ -392,7 +392,7 @@ describe('contentInsertion', () => {
           is: () => {
             const item = HTMLCollection.prototype.isPrototypeOf(elem) ? elem[0] : item
             return !!item && item.tagName === 'IMG'
-          }
+          },
         }
       }
       editor.isHidden = () => false
@@ -440,7 +440,7 @@ describe('contentInsertion', () => {
     beforeEach(() => {
       // this is what's returned from editor.selection.getEnd()
       node = {
-        querySelector: () => 'the inserted iframe'
+        querySelector: () => 'the inserted iframe',
       }
     })
 
@@ -481,7 +481,7 @@ describe('contentInsertion', () => {
         id: 17,
         rel: 'noopener noreferrer',
         target: '_blank',
-        title: 'filename.mov'
+        title: 'filename.mov',
       })
     })
   })
@@ -490,7 +490,7 @@ describe('contentInsertion', () => {
     beforeEach(() => {
       // this is what's returned from editor.seletion.getEnd()
       node = {
-        querySelector: () => 'the inserted iframe'
+        querySelector: () => 'the inserted iframe',
       }
     })
 

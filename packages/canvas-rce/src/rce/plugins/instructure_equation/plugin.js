@@ -42,14 +42,14 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
     ed.ui.registry.addMenuItem('instructure_equation', {
       text: formatMessage('Equation'),
       icon: 'equation',
-      onAction: () => ed.execCommand('instructureEquation')
+      onAction: () => ed.execCommand('instructureEquation'),
     })
 
     ed.ui.registry.addToggleButton('instructure_equation', {
       tooltip: htmlEscape(
         formatMessage({
           default: 'Insert Math Equation',
-          description: 'Title for RCE button to insert a math equation'
+          description: 'Title for RCE button to insert a math equation',
         })
       ),
       onAction: () => ed.execCommand('instructureEquation'),
@@ -60,7 +60,7 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
         }
         ed.on('NodeChange', toggleActive)
         return () => ed.off('NodeChange', toggleActive)
-      }
+      },
     })
 
     ed.ui.registry.addButton('instructure-equation-options', {
@@ -68,16 +68,16 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
         ed.execCommand('instructureEquation')
       },
 
-      text: formatMessage('Edit Equation')
+      text: formatMessage('Edit Equation'),
     })
 
     ed.ui.registry.addContextToolbar('instructure-equation-toolbar', {
       items: 'instructure-equation-options',
       position: 'node',
       predicate: isEquationImage,
-      scope: 'node'
+      scope: 'node',
     })
-  }
+  },
 })
 
 // Register plugin

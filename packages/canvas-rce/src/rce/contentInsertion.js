@@ -23,7 +23,7 @@ import {
   cleanUrl,
   getAnchorElement,
   isOnlyTextSelected,
-  isImageFigure
+  isImageFigure,
 } from './contentInsertionUtils'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 
@@ -102,7 +102,7 @@ export function insertImage(editor, image) {
   } else {
     // render the image, constraining its size on insertion
     content = renderImage({
-      ...image
+      ...image,
     })
   }
   return insertContent(editor, content)
@@ -188,7 +188,7 @@ function decorateLinkWithEmbed(link) {
     instructure_audio_link: type === 'audio',
     auto_open: link.embed && link.embed.autoOpenPreview,
     inline_disabled: link.embed && link.embed.disableInlinePreview,
-    no_preview: link.embed && link.embed.noPreview
+    no_preview: link.embed && link.embed.noPreview,
   })
 
   if (link.embed.type == 'video' || link.embed.type == 'audio') {
@@ -234,7 +234,7 @@ function insertUndecoratedLink(editor, linkProps) {
     title: linkProps.title,
     'data-canvas-previewable': linkProps['data-canvas-previewable'],
     'data-course-type': linkProps['data-course-type'],
-    'data-published': linkProps['data-published']
+    'data-published': linkProps['data-published'],
   }
 
   if (linkAttrs.target === '_blank') {

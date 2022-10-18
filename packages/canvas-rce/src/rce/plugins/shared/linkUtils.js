@@ -25,7 +25,7 @@ import {
   IconQuizLine,
   IconQuizSolid as IconNewQuiz,
   IconAnnouncementLine,
-  IconDocumentLine
+  IconDocumentLine,
 } from '@instructure/ui-icons'
 
 export const IconBlank = props => {

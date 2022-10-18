@@ -82,9 +82,9 @@ describe('compressImage()', () => {
       if (tagName === 'canvas') {
         return {
           getContext: () => ({
-            drawImage: jest.fn()
+            drawImage: jest.fn(),
           }),
-          toBlob: fn => fn('data:image/jpeg;base64,xxxxxxx==')
+          toBlob: fn => fn('data:image/jpeg;base64,xxxxxxx=='),
         }
       }
       return createElement(tagName)

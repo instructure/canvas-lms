@@ -30,11 +30,11 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
         text: 'Syllabus.doc',
         url: 'http://example.instructure.com/files/3201/download',
         isPreviewable: true,
-        onlyTextSelected: true
+        onlyTextSelected: true,
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
-      open: true
+      open: true,
     }
   })
   function renderComponent() {

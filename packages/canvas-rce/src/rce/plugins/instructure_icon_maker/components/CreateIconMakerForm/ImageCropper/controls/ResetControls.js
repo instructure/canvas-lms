@@ -34,9 +34,9 @@ export const ResetControls = ({onReset}) => {
 }
 
 ResetControls.propTypes = {
-  onReset: PropTypes.func
+  onReset: PropTypes.func,
 }
 
 ResetControls.defaultProps = {
-  onReset: () => {}
+  onReset: () => {},
 }

@@ -155,7 +155,7 @@ export default class Bridge {
       const {selection} = this.focusedEditor.props.tinymce.get(this.focusedEditor.props.textareaId)
       link.selectionDetails = {
         node: selection.getNode(),
-        range: selection.getRng()
+        range: selection.getRng(),
       }
       if (!link.text) {
         link.text = link.title || link.href
@@ -211,7 +211,7 @@ export default class Bridge {
     if (this.focusedEditor) {
       this.focusedEditor.addAlert({
         text: err.toString(),
-        type: 'error'
+        type: 'error',
       })
     }
   }
@@ -221,7 +221,7 @@ export default class Bridge {
       this.insertLink({
         title: image.display_name,
         href: image.href,
-        embed: {type: 'image'}
+        embed: {type: 'image'},
       })
     } else {
       this.insertImage(image)

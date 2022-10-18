@@ -28,15 +28,15 @@ document.head.appendChild(style)
 
 export default StyleSheet.create({
   mathfieldContainer: {
-    all: 'initial'
+    all: 'initial',
   },
 
   mathFieldContainer: {
     width: '100%',
-    position: 'relative'
+    position: 'relative',
   },
 
   latexToggle: {
-    marginTop: '0.5em'
-  }
+    marginTop: '0.5em',
+  },
 })

@@ -36,7 +36,7 @@ export function useDebouncedNumericValue({
   parseValueCallback,
   processValueCallback,
   formatValueCallback,
-  onChange
+  onChange,
 }) {
   const [inputValue, setInputValue] = useState(formatValueCallback(value))
   const [hasError, setHasError] = useState(false)
@@ -46,7 +46,7 @@ export function useDebouncedNumericValue({
       parseValueCallback,
       processValueCallback,
       formatValueCallback,
-      value: newValue
+      value: newValue,
     })
     if (formattedValue === null || processedValue === null) {
       setHasError(true)
@@ -71,6 +71,7 @@ export function useDebouncedNumericValue({
       setInputValue(newTempValue)
       setHasError(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value])
 
   const digestCurrentValue = () => updateStateAfterDigest(inputValue)

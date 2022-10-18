@@ -5,11 +5,11 @@
  * For commercial licenses see https://www.tiny.cloud/
  */
 
-const applyListFormat = function(editor, listName, styleValue) {
+const applyListFormat = function (editor, listName, styleValue) {
   const cmd = listName === 'UL' ? 'InsertUnorderedList' : 'InsertOrderedList'
   editor.execCommand(cmd, false, styleValue === false ? null : {'list-style-type': styleValue})
 }
 
 export default {
-  applyListFormat
+  applyListFormat,
 }

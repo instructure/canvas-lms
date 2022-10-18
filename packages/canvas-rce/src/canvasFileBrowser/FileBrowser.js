@@ -37,14 +37,14 @@ class FileBrowser extends React.Component {
     onLoading: PropTypes.func.isRequired,
     context: PropTypes.shape({
       type: PropTypes.string.isRequired,
-      id: PropTypes.string.isRequired
-    }).isRequired
+      id: PropTypes.string.isRequired,
+    }).isRequired,
   }
 
   static defaultProps = {
     allowUpload: true,
     contentTypes: ['*/*'],
-    useContextAssets: true
+    useContextAssets: true,
   }
 
   constructor(props) {
@@ -53,7 +53,7 @@ class FileBrowser extends React.Component {
       collections: {0: {id: 0, collections: []}},
       items: {},
       openFolders: [],
-      loadingCount: 0
+      loadingCount: 0,
     }
 
     this.source = props.source
@@ -116,7 +116,7 @@ class FileBrowser extends React.Component {
     this.source
       .fetchRootFolder({
         contextType: context,
-        contextId
+        contextId,
       })
       .then(result => {
         this.populateRootFolder(result.folders[0], opts)
@@ -142,7 +142,7 @@ class FileBrowser extends React.Component {
       this.source.fetchSubFolders.bind(this.source),
       {
         folderId: id,
-        perPage: 50
+        perPage: 50,
       },
       result => {
         this.populateCollectionsList(result.folders)
@@ -162,7 +162,7 @@ class FileBrowser extends React.Component {
       {
         searchString: this.props.searchString,
         perPage: 50,
-        filesUrl: this.state.collections[id]?.api?.filesUrl
+        filesUrl: this.state.collections[id]?.api?.filesUrl,
       },
       result => {
         this.populateItemsList(result.files)
@@ -199,7 +199,7 @@ class FileBrowser extends React.Component {
       folderList.forEach(folder => {
         const collection = this.formatFolderInfo(folder, {
           ...opts,
-          searchString: props.searchString
+          searchString: props.searchString,
         })
         newCollections[collection.id] = collection
         const parentId = folder.parentId || 0
@@ -257,14 +257,14 @@ class FileBrowser extends React.Component {
       canUpload: apiFolder.canUpload,
       locked: apiFolder.lockedForUser,
       descriptor,
-      ...opts
+      ...opts,
     }
     const existingCollections = this.state.collections[apiFolder.id]
     Object.assign(
       folder,
       existingCollections && {
         collections: existingCollections.collections,
-        items: existingCollections.items
+        items: existingCollections.items,
       }
     )
     return folder
@@ -299,7 +299,7 @@ class FileBrowser extends React.Component {
         context.includes('user') ? `?verifier=${apiFile.uuid}` : ''
       }`,
       alt: apiFile.name,
-      ...opts
+      ...opts,
     }
     if (apiFile.iframeUrl) {
       // it's a media_object

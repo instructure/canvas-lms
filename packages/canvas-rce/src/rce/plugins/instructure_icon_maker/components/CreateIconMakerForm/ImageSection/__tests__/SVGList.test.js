@@ -60,7 +60,7 @@ describe('SVGList', () => {
       expect(onSelect).toHaveBeenCalledWith(
         expect.stringContaining('art'),
         expect.objectContaining({
-          label: 'Art Icon'
+          label: 'Art Icon',
         })
       )
     })

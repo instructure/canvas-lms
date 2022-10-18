@@ -30,7 +30,7 @@ function Consumer({children, ...props}) {
     onImageEmbed: bridge.embedImage,
     onMediaEmbed: bridge.embedMedia,
     onFileSelect: bridge.insertFileLink,
-    ...props
+    ...props,
   })
 }
 

@@ -28,7 +28,7 @@ jest.mock('../ImageCropper/imageCropUtils', () => {
   return {
     createCroppedImageSvg: jest
       .fn()
-      .mockImplementation(() => Promise.resolve({outerHTML: '<svg />'}))
+      .mockImplementation(() => Promise.resolve({outerHTML: '<svg />'})),
   }
 })
 
@@ -36,19 +36,19 @@ jest.mock('../../../svg/utils', () => {
   return {
     convertFileToBase64: jest
       .fn()
-      .mockImplementation(() => Promise.resolve('data:image/svg+xml;base64,PHN2Zaaaaaaaaa'))
+      .mockImplementation(() => Promise.resolve('data:image/svg+xml;base64,PHN2Zaaaaaaaaa')),
   }
 })
 
 function selectOption(button, option) {
   userEvent.click(
     screen.getByRole('button', {
-      name: button
+      name: button,
     })
   )
   userEvent.click(
     screen.getByRole('option', {
-      name: option
+      name: option,
     })
   )
 }
@@ -73,8 +73,8 @@ describe('<ShapeSection />', () => {
       ...DEFAULT_SETTINGS,
       shape: 'triangle',
       imageSettings: {
-        cropperSettings: {}
-      }
+        cropperSettings: {},
+      },
     }
 
     it('recrops the embedded image', () => {
@@ -89,7 +89,7 @@ describe('<ShapeSection />', () => {
       await waitFor(() =>
         expect(onChange).toHaveBeenCalledWith({
           payload: 'data:image/svg+xml;base64,PHN2Zaaaaaaaaa',
-          type: 'SetEncodedImage'
+          type: 'SetEncodedImage',
         })
       )
     })

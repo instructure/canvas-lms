@@ -31,7 +31,7 @@ export default function indicate(region, margin = MARGIN) {
     height: region.height + 2 * margin + 'px',
     left: region.left - margin + 'px',
     top: region.top - margin + 'px',
-    pointerEvents: 'none' // so clicking in the indicator doesn't blur the RCE
+    pointerEvents: 'none', // so clicking in the indicator doesn't blur the RCE
   })
 
   // start hidden and animate a fade in
@@ -63,21 +63,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     display: 'block',
     borderRadius: '5px',
-    zIndex: 999999
+    zIndex: 999999,
   },
   enter: {
-    opacity: 0
+    opacity: 0,
   },
   active: {
     transition: 'opacity 0.4s',
-    opacity: 0.8
+    opacity: 0.8,
   },
   leave: {
     transition: 'opacity 0.6s',
-    opacity: 0
+    opacity: 0,
   },
   leaveFast: {
     transition: 'opacity 0.2s',
-    opacity: 0
-  }
+    opacity: 0,
+  },
 })

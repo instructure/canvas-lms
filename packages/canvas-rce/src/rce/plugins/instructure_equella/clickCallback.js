@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-export default function(ed, document) {
+export default function (ed, document) {
   const ev = document.createEvent('CustomEvent')
   ev.initCustomEvent('tinyRCE/initEquella', true, true, {ed})
   document.dispatchEvent(ev)

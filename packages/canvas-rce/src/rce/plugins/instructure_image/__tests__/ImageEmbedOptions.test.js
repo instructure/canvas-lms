@@ -29,19 +29,19 @@ import {
   labelForImageSize,
   scaleImageForHeight,
   scaleImageForWidth,
-  scaleToSize
+  scaleToSize,
 } from '../ImageEmbedOptions'
 
 Object.defineProperty(HTMLImageElement.prototype, 'naturalHeight', {
   get() {
     return this._naturalHeight
-  }
+  },
 })
 
 Object.defineProperty(HTMLImageElement.prototype, 'naturalWidth', {
   get() {
     return this._naturalWidth
-  }
+  },
 })
 
 describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {

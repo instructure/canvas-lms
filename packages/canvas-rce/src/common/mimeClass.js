@@ -99,7 +99,7 @@ export function mimeClass(file) {
         'video/avi': 'video',
         'video/*': 'video',
         video: 'video',
-        'application/x-shockwave-flash': 'flash'
+        'application/x-shockwave-flash': 'flash',
       }[contentType] ||
       file.mime_class ||
       'file'

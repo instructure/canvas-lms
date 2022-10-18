@@ -33,7 +33,7 @@ describe('RCE "Links" Plugin > LinkOptionsDialog', () => {
       operation: 'create',
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
-      open: true
+      open: true,
     }
   })
 

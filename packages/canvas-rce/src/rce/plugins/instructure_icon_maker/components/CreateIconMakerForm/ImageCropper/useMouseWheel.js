@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import {useEffect, useState} from 'react'
 import {debounce} from '@instructure/debounce'
 import {calculateScaleRatio} from './controls/utils'
 import {WHEEL_SCALE_STEP, WHEEL_EVENT_DELAY} from './constants'
@@ -26,7 +26,7 @@ export function useMouseWheel(scaleRatio, dispatch) {
   const [tempScaleRatio, setTempScaleRatio] = useState(scaleRatio)
   const [isScaling, setIsScaling] = useState(false)
 
-  const onWheelCallback = (event) => {
+  const onWheelCallback = event => {
     event.preventDefault()
 
     const newScaleRatio = calculateScaleRatio(tempScaleRatio - event.deltaY * WHEEL_SCALE_STEP)
@@ -36,7 +36,7 @@ export function useMouseWheel(scaleRatio, dispatch) {
     }
   }
 
-  const setScalingRatio = () =>  {
+  const setScalingRatio = () => {
     setIsScaling(false)
   }
 
@@ -44,18 +44,21 @@ export function useMouseWheel(scaleRatio, dispatch) {
     if (!isScaling) {
       setTempScaleRatio(scaleRatio)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scaleRatio])
 
   useEffect(() => {
     if (isScaling) {
       debounce(setScalingRatio, WHEEL_EVENT_DELAY)()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempScaleRatio])
 
   useEffect(() => {
     if (!isScaling) {
       dispatch({type: actions.SET_SCALE_RATIO, payload: tempScaleRatio})
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isScaling])
 
   return [tempScaleRatio, onWheelCallback]

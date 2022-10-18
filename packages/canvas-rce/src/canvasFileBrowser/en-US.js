@@ -41,7 +41,7 @@ Date.CultureInfo = {
     'September',
     'October',
     'November',
-    'December'
+    'December',
   ],
   abbreviatedMonthNames: [
     'Jan',
@@ -55,7 +55,7 @@ Date.CultureInfo = {
     'Sep',
     'Oct',
     'Nov',
-    'Dec'
+    'Dec',
   ],
 
   /* AM/PM Designators */
@@ -95,7 +95,7 @@ Date.CultureInfo = {
     universalSortableDateTime: 'yyyy-MM-dd HH:mm:ssZ',
     rfc1123: 'ddd, dd MMM yyyy HH:mm:ss GMT',
     monthDay: 'MMMM dd',
-    yearMonth: 'MMMM, yyyy'
+    yearMonth: 'MMMM, yyyy',
   },
 
   /**
@@ -171,7 +171,7 @@ Date.CultureInfo = {
     longMeridian: /^(a\.?m?\.?|p\.?m?\.?)/i,
     timezone: /^((e(s|d)t|c(s|d)t|m(s|d)t|p(s|d)t)|((gmt)?\s*(\+|\-)\s*\d\d\d\d?)|gmt|utc)/i,
     ordinalSuffix: /^\s*(st|nd|rd|th)/i,
-    timeContext: /^\s*(\:|a(?!u|p)|p)/i
+    timeContext: /^\s*(\:|a(?!u|p)|p)/i,
   },
 
   timezones: [
@@ -184,8 +184,8 @@ Date.CultureInfo = {
     {name: 'MST', offset: '-0700'},
     {name: 'MDT', offset: '-0600'},
     {name: 'PST', offset: '-0800'},
-    {name: 'PDT', offset: '-0700'}
-  ]
+    {name: 'PDT', offset: '-0700'},
+  ],
 }
 
 /** ******************

@@ -25,12 +25,12 @@ import {TextSection} from '../TextSection'
 function selectOption(button, option) {
   userEvent.click(
     screen.getByRole('button', {
-      name: button
+      name: button,
     })
   )
   userEvent.click(
     screen.getByRole('option', {
-      name: option
+      name: option,
     })
   )
 }
@@ -66,7 +66,7 @@ describe('<TextSection />', () => {
     )
     const input = container.querySelector('#icon-text')
     fireEvent.change(input, {
-      target: {value: 'Hello World!Hello World!Hello World!Hello World!Hello World!'}
+      target: {value: 'Hello World!Hello World!Hello World!Hello World!Hello World!'},
     })
 
     await waitFor(() =>

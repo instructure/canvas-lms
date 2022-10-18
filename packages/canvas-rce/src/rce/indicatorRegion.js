@@ -29,7 +29,7 @@ function box(el) {
     top: b.top,
     left: b.left,
     width: b.right - b.left,
-    height: b.bottom - b.top
+    height: b.bottom - b.top,
   }
 }
 
@@ -45,6 +45,6 @@ export default function indicatorRegion(editor, target, offsetFn = offset) {
     width: innerShape.width,
     height: innerShape.height,
     left: outerShape.left + innerShape.left,
-    top: outerShape.top + innerShape.top
+    top: outerShape.top + innerShape.top,
   }
 }

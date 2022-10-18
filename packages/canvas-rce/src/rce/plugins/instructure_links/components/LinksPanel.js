@@ -119,12 +119,12 @@ LinksPanel.propTypes = {
   onLinkClick: func,
   canCreatePages: bool,
   editing: bool,
-  onEditClick: func
+  onEditClick: func,
 }
 
 LinksPanel.defaultProps = {
   selectedAccordionIndex: '',
-  editing: false
+  editing: false,
 }
 
 export default LinksPanel

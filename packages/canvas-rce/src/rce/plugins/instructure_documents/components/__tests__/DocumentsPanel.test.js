@@ -28,10 +28,10 @@ function getDocumentProps(contextType, docprops) {
         bookmark: null,
         isLoading: false,
         hasMore: false,
-        ...docprops
-      }
+        ...docprops,
+      },
     },
-    contextType
+    contextType,
   }
 }
 
@@ -59,13 +59,13 @@ function makeDocuments(override) {
         content_type: 'text/plain',
         display_name: `file${i}`,
         href: `http://the.net/${i}`,
-        date: `2019-05-25T13:0${i}:00Z`
+        date: `2019-05-25T13:0${i}:00Z`,
       }
     }),
     bookmark: null,
     hasMore: false,
     isLoading: false,
-    ...override
+    ...override,
   }
 }
 
@@ -99,7 +99,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
   it('fetches initial data when mounted', () => {
     const fetchInitialDocs = jest.fn()
     renderComponent({
-      fetchInitialDocs
+      fetchInitialDocs,
     })
 
     expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
@@ -110,7 +110,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     const fetchNextDocs = jest.fn()
     const {getByText} = renderComponent({
       ...getDocumentProps('course', makeDocuments({hasMore: true, bookmark: 'more.docs'})),
-      fetchNextDocs
+      fetchNextDocs,
     })
 
     const loadMoreBtn = getByText('Load More')
@@ -122,7 +122,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     const fetchNextDocs = jest.fn()
     const {getByText} = renderComponent({
       ...getDocumentProps('course', makeDocuments({error: 'whoops'})),
-      fetchNextDocs
+      fetchNextDocs,
     })
 
     expect(getByText('Loading failed.')).toBeInTheDocument()
@@ -132,7 +132,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     const fetchInitialDocs = jest.fn()
     const {getByText} = renderComponent({
       ...getDocumentProps('course', makeDocuments({files: [], isLoading: true})),
-      fetchInitialDocs
+      fetchInitialDocs,
     })
 
     expect(getByText('Loading')).toBeInTheDocument()
@@ -149,7 +149,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
   it('refetches initial docs when sorting changes', () => {
     const fetchInitialDocs = jest.fn()
     const {rerender} = renderComponent({
-      fetchInitialDocs
+      fetchInitialDocs,
     })
     expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
 

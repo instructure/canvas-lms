@@ -21,7 +21,7 @@ export const RECEIVE_SESSION = 'action.session.receive_session'
 function receiveSession(data) {
   return {
     type: RECEIVE_SESSION,
-    data
+    data,
   }
 }
 

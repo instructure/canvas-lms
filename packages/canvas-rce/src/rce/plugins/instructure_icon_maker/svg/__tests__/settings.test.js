@@ -29,7 +29,7 @@ describe('useSvgSettings()', () => {
     rcs = {
       contextType: 'course',
       contextId: 1,
-      canvasUrl: 'https://domain.from.env'
+      canvasUrl: 'https://domain.from.env',
     }
   })
 
@@ -180,7 +180,7 @@ describe('useSvgSettings()', () => {
       mock = fetchMock.mock({
         name: 'icon_metadata',
         matcher: '*',
-        response: () => ({body})
+        response: () => ({body}),
       })
     })
 
@@ -308,14 +308,14 @@ describe('useSvgSettings()', () => {
             imageSettings: {
               cropperSettings: null,
               icon: {
-                label: 'Art Icon'
+                label: 'Art Icon',
               },
               iconFillColor: '#FFFFFF',
               image: 'Art Icon',
-              mode: 'SingleColor'
-            }
+              mode: 'SingleColor',
+            },
           },
-          ...overrideParams
+          ...overrideParams,
         })}`
 
       const overwriteUrl = () =>
@@ -323,7 +323,7 @@ describe('useSvgSettings()', () => {
           name: 'icon_metadata',
           matcher: '*',
           response: () => ({body}),
-          overwriteRoutes: true
+          overwriteRoutes: true,
         }))
 
       beforeEach(() => {
@@ -387,12 +387,12 @@ describe('useSvgSettings()', () => {
             cropperSettings: null,
             icon: {
               // Spanish label
-              label: 'Ícono de arte'
+              label: 'Ícono de arte',
             },
             iconFillColor: '#FFFFFF',
             image: 'Art Icon',
-            mode: 'SingleColor'
-          }
+            mode: 'SingleColor',
+          },
         })
         overwriteUrl()
 
@@ -450,12 +450,12 @@ describe('useSvgSettings()', () => {
             cropperSettings: null,
             icon: {
               // Invalid label
-              label: 'Banana'
+              label: 'Banana',
             },
             iconFillColor: '#FFFFFF',
             image: 'Art Icon',
-            mode: 'SingleColor'
-          }
+            mode: 'SingleColor',
+          },
         })
         overwriteUrl()
 
@@ -631,7 +631,7 @@ describe('useSvgSettings()', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
             "textPosition":"below"
-          }`
+          }`,
       })
 
       fetchMock.mock('begin:https://domain.from.env/api/v1/files/2/icon_metadata', {
@@ -649,7 +649,7 @@ describe('useSvgSettings()', () => {
             "textColor":"#009606",
             "textBackgroundColor":"#06A3B7",
             "textPosition":"below"
-          }`
+          }`,
       })
     })
 
