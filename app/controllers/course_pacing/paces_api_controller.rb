@@ -24,14 +24,6 @@ class CoursePacing::PacesApiController < ApplicationController
 
   include Api::V1::Progress
 
-  def index
-    render json: {
-      paces: pacing_service.paces_in_course(course).map do |p|
-        pacing_presenter.new(p).as_json
-      end
-    }
-  end
-
   def show
     pace = pacing_service.pace_for(context, should_duplicate: true)
     render json: {

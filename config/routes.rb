@@ -2443,7 +2443,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "course_pacing/section_paces_api") do
-      get "courses/:course_id/section_paces", action: :index, as: :section_paces
       get "courses/:course_id/sections/:course_section_id/pace", action: :show, as: :section_pace
       post "courses/:course_id/sections/:course_section_id/paces", action: :create, as: :new_section_pace
       patch "courses/:course_id/sections/:course_section_id/pace", action: :update, as: :patch_section_pace
@@ -2451,7 +2450,6 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: "course_pacing/student_enrollment_paces_api") do
-      get "courses/:course_id/student_enrollment_paces", action: :index, as: :student_enrollment_paces
       get "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :show, as: :student_enrollment_pace
       post "courses/:course_id/student_enrollments/:student_enrollment_id/paces", action: :create, as: :new_student_enrollment_pace
       patch "courses/:course_id/student_enrollments/:student_enrollment_id/pace", action: :update, as: :patch_student_enrollment_pace
