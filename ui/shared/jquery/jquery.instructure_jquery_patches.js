@@ -38,7 +38,7 @@ $.attrHooks.method = $.extend($.attrHooks.method, {
 
 $.fn.originalScrollTop = $.fn.scrollTop
 $.fn.scrollTop = function () {
-  if (this.selector == 'html,body' && arguments.length === 0) {
+  if (this.selector === 'html,body' && arguments.length === 0) {
     console.error(
       "$('html,body').scrollTop() is not cross-browser compatible... use $.windowScrollTop() instead"
     )

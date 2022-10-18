@@ -2721,7 +2721,7 @@ _.resolveNonItalicizedFunctions = function () {
     if (
       single_char ||
       (latex &&
-        raw[0] == '\\' &&
+        raw[0] === '\\' &&
         functions[raw.substring(1)] &&
         functions[(raw + latex).substring(1)])
     ) {

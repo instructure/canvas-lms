@@ -317,7 +317,7 @@ $(document).ready(() => {
     $standard.find('.max_score_cell').removeAttr('tabindex')
     $standard.find('.to_add').remove()
     $standard.find('.to_delete').removeClass('to_delete').show()
-    if ($standard.attr('id') == 'grading_standard_new') {
+    if ($standard.attr('id') === 'grading_standard_new') {
       $standard.remove()
     }
   })
@@ -413,8 +413,8 @@ $(document).ready(() => {
     ).attr('href')
     let method = 'POST'
     if (
-      $standard.attr('id') != 'grading_standard_blank' &&
-      $standard.attr('id') != 'grading_standard_new'
+      $standard.attr('id') !== 'grading_standard_blank' &&
+      $standard.attr('id') !== 'grading_standard_new'
     ) {
       url = $(this).parents('.grading_standard').find('.update_grading_standard_url').attr('href')
       method = 'PUT'

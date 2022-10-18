@@ -253,9 +253,9 @@ $.mediaComment.upload_delegate = {
     setTimeout(() => {
       $('#media_comment_dialog').dialog('close')
     }, 1500)
-    if (type == 'audio') {
+    if (type === 'audio') {
       entry.entryType = 5
-    } else if (type == 'video') {
+    } else if (type === 'video') {
       entry.entryType = 1
     }
     $.mediaComment.entryAdded(entry.entryId, entry.entryType, entry.title)
@@ -328,12 +328,12 @@ $.mediaComment.init = function (mediaType, opts) {
         $('#audio_record').before("<div id='audio_record'/>").remove()
         $('#video_record').before("<div id='video_record'/>").remove()
 
-        if (mediaType == 'video') {
+        if (mediaType === 'video') {
           $('#video_record_option').click()
           $('#media_record_option_holder').hide()
           $('#audio_upload_holder').hide()
           $('#video_upload_holder').show()
-        } else if (mediaType == 'audio') {
+        } else if (mediaType === 'audio') {
           $('#audio_record_option').click()
           $('#media_record_option_holder').hide()
           $('#audio_upload_holder').show()
@@ -735,7 +735,7 @@ $(document).ready(function () {
       .clearQueue()
       .css('width', '')
       .removeClass('with_volume')
-    if ($(this).attr('id') == 'audio_record_option') {
+    if ($(this).attr('id') === 'audio_record_option') {
       $('#video_record_holder_holder').hide()
       $('#audio_record_holder_holder').show()
     } else {

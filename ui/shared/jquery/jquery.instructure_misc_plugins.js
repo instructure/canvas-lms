@@ -283,7 +283,7 @@ $.fn.disableIf = function (bool) {
 $.fn.indicate = function (options) {
   options = options || {}
   let $indicator
-  if (options == 'remove') {
+  if (options === 'remove') {
     $indicator = this.data('indicator')
     if ($indicator) {
       $indicator.remove()
