@@ -196,6 +196,7 @@ const RCELoader = {
       features: ENV?.FEATURES || {},
       flashAlertTimeout: ENV?.flashAlertTimeout || 10000,
       timezone: ENV?.TIMEZONE,
+      canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin || '',
     }
   },
 }

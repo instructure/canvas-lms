@@ -21,13 +21,12 @@ import sinon from 'sinon'
 import Bridge from '../../src/bridge'
 import * as indicateModule from '../../src/common/indicate'
 import * as contentInsertion from '../../src/rce/contentInsertion'
-import * as getCanvasUrl from '../../src/rce/getCanvasUrl'
 
 import RCEWrapper, {
   mergeMenuItems,
   mergeMenu,
   mergeToolbar,
-  mergePlugins
+  mergePlugins,
 } from '../../src/rce/RCEWrapper'
 
 const textareaId = 'myUniqId'
@@ -63,9 +62,9 @@ function createdMountedElement(additionalProps = {}) {
       canUploadFiles: false,
       ...trayProps(),
       features: {
-        new_equation_editor: true
+        new_equation_editor: true,
       },
-      ...additionalProps
+      ...additionalProps,
     })
   )
   return tree
@@ -82,9 +81,9 @@ function trayProps() {
       containingContext: {
         userId: '1',
         contextType: 'course',
-        contextId: '17'
-      }
-    }
+        contextId: '17',
+      },
+    },
   }
 }
 
@@ -100,8 +99,9 @@ function defaultProps() {
     editorOptions: {},
     liveRegion: () => document.getElementById('flash_screenreader_holder'),
     features: {
-      new_equation_editor: true
-    }
+      new_equation_editor: true,
+    },
+    canvasOrigin: 'http://canvas.docker',
   }
 }
 
@@ -109,10 +109,6 @@ describe('RCEWrapper', () => {
   // ====================
   //   SETUP & TEARDOWN
   // ====================
-  before(() => {
-    sinon.stub(getCanvasUrl, 'getCanvasUrl').returns(Promise.resolve('http://canvas.docker'))
-  })
-
   beforeEach(() => {
     document.body.innerHTML = `
       <div id="flash_screenreader_holder" role="alert"/>
@@ -145,7 +141,7 @@ describe('RCEWrapper', () => {
         remove: elem => {
           elem.remove()
         },
-        doc: document
+        doc: document,
       },
       selection: {
         getEnd: () => {
@@ -159,10 +155,10 @@ describe('RCEWrapper', () => {
         getContent: () => {
           return ''
         },
-        collapse: () => undefined
+        collapse: () => undefined,
       },
       undoManager: {
-        ignore: fn => fn()
+        ignore: fn => fn(),
       },
       insertContent: contentToInsert => {
         editor.content += contentToInsert
@@ -170,8 +166,8 @@ describe('RCEWrapper', () => {
       getContainer: () => {
         return {
           style: {
-            height: 300
-          }
+            height: 300,
+          },
         }
       },
       setContent: sinon.spy(c => (editor.content = c)),
@@ -187,7 +183,7 @@ describe('RCEWrapper', () => {
       serializer: {serialize: sinon.stub()},
       ui: {registry: {addIcon: () => {}}},
       isDirty: () => false,
-      fire: () => {}
+      fire: () => {},
     }
 
     fakeTinyMCE = {
@@ -196,12 +192,12 @@ describe('RCEWrapper', () => {
       // plugins
       create: () => {},
       PluginManager: {
-        add: () => {}
+        add: () => {},
       },
       plugins: {
-        AccessibilityChecker: {}
+        AccessibilityChecker: {},
       },
-      editors: [editor]
+      editors: [editor],
     }
     global.tinymce = fakeTinyMCE
 
@@ -219,13 +215,13 @@ describe('RCEWrapper', () => {
   describe('static methods', () => {
     describe('getByEditor', () => {
       it('gets instances by rendered tinymce object reference', () => {
-        const editor = {
-          ui: {registry: {addIcon: () => {}}}
+        const editor_ = {
+          ui: {registry: {addIcon: () => {}}},
         }
         const wrapper = new RCEWrapper({tinymce: fakeTinyMCE, ...trayProps(), ...defaultProps()})
         const options = wrapper.wrapOptions({})
-        options.setup(editor)
-        assert.equal(RCEWrapper.getByEditor(editor), wrapper)
+        options.setup(editor_)
+        assert.equal(RCEWrapper.getByEditor(editor_), wrapper)
       })
     })
   })
@@ -308,9 +304,9 @@ describe('RCEWrapper', () => {
       sinon.stub(instance, 'iframe').value({
         contentDocument: {
           body: {
-            clientWidth: 500
-          }
-        }
+            clientWidth: 500,
+          },
+        },
       })
     })
 
@@ -347,7 +343,7 @@ describe('RCEWrapper', () => {
       const tex = 'y = x^2'
       sinon.stub(contentInsertion, 'insertEquation')
       await instance.insertMathEquation(tex)
-      sinon.assert.calledWith(contentInsertion.insertEquation, editor, tex, 'http://canvas.docker')
+      sinon.assert.calledWith(contentInsertion.insertEquation, editor, tex)
     })
 
     describe('checkReadyToGetCode', () => {
@@ -397,7 +393,7 @@ describe('RCEWrapper', () => {
             src: null,
             width: '10',
             height: '10',
-            ...props
+            ...props,
           }
         }
       }
@@ -412,9 +408,9 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'green_square',
           domObject: {
-            preview: greenSquare
+            preview: greenSquare,
           },
-          contentType: 'image/png'
+          contentType: 'image/png',
         }
 
         const imageMarkup = `
@@ -440,9 +436,9 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'filename "with" quotes',
           domObject: {
-            preview: greenSquare
+            preview: greenSquare,
           },
-          contentType: 'image/png'
+          contentType: 'image/png',
         }
 
         const imageMarkup = `
@@ -468,9 +464,9 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'green_square',
           domObject: {
-            preview: greenSquare
+            preview: greenSquare,
           },
-          contentType: 'image/png'
+          contentType: 'image/png',
         }
 
         const imageMarkup = `
@@ -493,7 +489,7 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'file.txt',
           domObject: {},
-          contentType: 'text/plain'
+          contentType: 'text/plain',
         }
 
         const imageMarkup = `
@@ -515,7 +511,7 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'file.mov',
           domObject: {},
-          contentType: 'video/quicktime'
+          contentType: 'video/quicktime',
         }
         const imageMarkup = `
     <span
@@ -536,7 +532,7 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'file.mp3',
           domObject: {},
-          contentType: 'audio/mp3'
+          contentType: 'audio/mp3',
         }
         const imageMarkup = `
     <span
@@ -560,10 +556,10 @@ describe('RCEWrapper', () => {
         const props = {
           name: 'square.png',
           domObject: {
-            preview: square
+            preview: square,
           },
           contentType: 'image/png',
-          displayAs: 'link'
+          displayAs: 'link',
         }
 
         const imageMarkup = `
@@ -713,7 +709,7 @@ describe('RCEWrapper', () => {
             complete: false,
             tagName: 'IMG',
             naturalWidth: 0,
-            style: {}
+            style: {},
           }
           instance.checkImageLoadError(fakeElement)
           assert.equal(Object.keys(fakeElement.style).length, 0)
@@ -735,7 +731,7 @@ describe('RCEWrapper', () => {
             complete: true,
             tagName: 'IMG',
             naturalWidth: 0,
-            style: {}
+            style: {},
           }
           instance.checkImageLoadError(fakeElement)
           setTimeout(() => {
@@ -758,7 +754,7 @@ describe('RCEWrapper', () => {
       const aliases = {
         set_code: 'setCode',
         get_code: 'getCode',
-        insert_code: 'insertCode'
+        insert_code: 'insertCode',
       }
       Object.keys(aliases).forEach(k => {
         const v = aliases[k]
@@ -826,15 +822,15 @@ describe('RCEWrapper', () => {
     })
 
     it('calls Bridge.focusEditor with editor', () => {
-      const editor = createBasicElement()
-      editor.handleFocus()
-      sinon.assert.calledWith(Bridge.focusEditor, editor)
+      const editor_ = createBasicElement()
+      editor_.handleFocus()
+      sinon.assert.calledWith(Bridge.focusEditor, editor_)
     })
 
     it('calls props.onFocus with editor if exists', () => {
-      const editor = createBasicElement({onFocus: sinon.spy()})
-      editor.handleFocus()
-      sinon.assert.calledWith(editor.props.onFocus, editor)
+      const editor_ = createBasicElement({onFocus: sinon.spy()})
+      editor_.handleFocus()
+      sinon.assert.calledWith(editor_.props.onFocus, editor_)
     })
   })
 
@@ -848,15 +844,15 @@ describe('RCEWrapper', () => {
     })
 
     it('calls Bridge.detachEditor with editor', () => {
-      const editor = createBasicElement()
-      editor.onRemove()
-      sinon.assert.calledWith(Bridge.detachEditor, editor)
+      const editor_ = createBasicElement()
+      editor_.onRemove()
+      sinon.assert.calledWith(Bridge.detachEditor, editor_)
     })
 
-    it('calls props.onRemove with editor if exists', () => {
-      const editor = createBasicElement({onRemove: sinon.spy()})
-      editor.onRemove()
-      sinon.assert.calledWith(editor.props.onRemove, editor)
+    it('calls props.onRemove with editor_ if exists', () => {
+      const editor_ = createBasicElement({onRemove: sinon.spy()})
+      editor_.onRemove()
+      sinon.assert.calledWith(editor_.props.onRemove, editor_)
     })
   })
 
@@ -866,23 +862,23 @@ describe('RCEWrapper', () => {
     beforeEach(() => {
       editorOptions = {
         setup: sinon.spy(),
-        other: {}
+        other: {},
       }
     })
 
     it('registers editor to allow getting wrapper by editor', () => {
-      const editor = {ui: {registry: {addIcon: () => {}}}}
+      const editor_ = {ui: {registry: {addIcon: () => {}}}}
       const tree = createdMountedElement({editorOptions})
-      tree.subTree('Editor').props.init.setup(editor)
-      assert.equal(RCEWrapper.getByEditor(editor), tree.getMountedInstance())
+      tree.subTree('Editor').props.init.setup(editor_)
+      assert.equal(RCEWrapper.getByEditor(editor_), tree.getMountedInstance())
     })
 
     it('it calls original setup from editorOptions', () => {
-      const editor = {ui: {registry: {addIcon: () => {}}}}
+      const editor_ = {ui: {registry: {addIcon: () => {}}}}
       const spy = editorOptions.setup
       const tree = createdMountedElement({editorOptions})
-      tree.subTree('Editor').props.init.setup(editor)
-      sinon.assert.calledWithExactly(spy, editor)
+      tree.subTree('Editor').props.init.setup(editor_)
+      sinon.assert.calledWithExactly(spy, editor_)
     })
 
     it('does not throw if options does not have a setup function', () => {
@@ -938,7 +934,7 @@ describe('RCEWrapper', () => {
       rce.resetAlertId()
       rce.addAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       assert.ok(rce.state.messages[0].id === 0)
       const alertArea = tree.dive(['AlertMessageArea'])
@@ -952,15 +948,15 @@ describe('RCEWrapper', () => {
       rce.resetAlertId()
       rce.addAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Something went wrong uploading 2, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Something went wrong uploading 3, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       const alertArea = tree.dive(['AlertMessageArea'])
       const alerts = alertArea.everySubTree('Alert')
@@ -973,15 +969,15 @@ describe('RCEWrapper', () => {
       rce.resetAlertId()
       rce.addAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Something went wrong uploading, check your connection and try again.',
-        variant: 'error'
+        variant: 'error',
       })
       const alertArea = tree.dive(['AlertMessageArea'])
       const alerts = alertArea.everySubTree('Alert')
@@ -994,15 +990,15 @@ describe('RCEWrapper', () => {
       rce.resetAlertId()
       rce.addAlert({
         text: 'First',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Second',
-        variant: 'error'
+        variant: 'error',
       })
       rce.addAlert({
         text: 'Third',
-        variant: 'error'
+        variant: 'error',
       })
       rce.removeAlert(1)
       const alertArea = tree.dive(['AlertMessageArea'])
@@ -1017,7 +1013,7 @@ describe('RCEWrapper', () => {
         tinymce: fakeTinyMCE,
         ...trayProps(),
         ...defaultProps(),
-        instRecordDisabled: false
+        instRecordDisabled: false,
       })
       const options = wrapper.wrapOptions({})
       assert.ok(options.plugins.indexOf('instructure_record') >= 0)
@@ -1028,7 +1024,7 @@ describe('RCEWrapper', () => {
         tinymce: fakeTinyMCE,
         ...trayProps(),
         ...defaultProps(),
-        instRecordDisabled: true
+        instRecordDisabled: true,
       })
       const options = wrapper.wrapOptions({})
       assert.strictEqual(options.plugins.indexOf('instructure_record'), -1)
@@ -1080,16 +1076,16 @@ describe('RCEWrapper', () => {
         standardMenu = {
           format: {
             items: 'bold italic underline | removeformat',
-            title: 'Format'
+            title: 'Format',
           },
           insert: {
             items: 'instructure_links | inserttable instructure_media_embed | hr',
-            title: 'Insert'
+            title: 'Insert',
           },
           tools: {
             items: 'wordcount',
-            title: 'Tools'
-          }
+            title: 'Tools',
+          },
         }
       })
       it('returns input if no custom menus are provided', () => {
@@ -1101,8 +1097,8 @@ describe('RCEWrapper', () => {
         const a = sleazyDeepCopy(standardMenu)
         const b = {
           tools: {
-            items: 'foo bar'
-          }
+            items: 'foo bar',
+          },
         }
         const result = sleazyDeepCopy(standardMenu)
         result.tools.items = 'wordcount | foo bar'
@@ -1114,13 +1110,13 @@ describe('RCEWrapper', () => {
         const b = {
           new_menu: {
             title: 'New Menu',
-            items: 'foo bar'
-          }
+            items: 'foo bar',
+          },
         }
         const result = sleazyDeepCopy(standardMenu)
         result.new_menu = {
           items: 'foo bar',
-          title: 'New Menu'
+          title: 'New Menu',
         }
         assert.deepStrictEqual(mergeMenu(a, b), result)
       })
@@ -1129,18 +1125,18 @@ describe('RCEWrapper', () => {
         const a = sleazyDeepCopy(standardMenu)
         const b = {
           tools: {
-            items: 'foo bar'
+            items: 'foo bar',
           },
           new_menu: {
             title: 'New Menu',
-            items: 'foo bar'
-          }
+            items: 'foo bar',
+          },
         }
         const result = sleazyDeepCopy(standardMenu)
         result.tools.items = 'wordcount | foo bar'
         result.new_menu = {
           items: 'foo bar',
-          title: 'New Menu'
+          title: 'New Menu',
         }
         assert.deepStrictEqual(mergeMenu(a, b), result)
       })
@@ -1152,12 +1148,12 @@ describe('RCEWrapper', () => {
         standardToolbar = [
           {
             items: ['fontsizeselect', 'formatselect'],
-            name: 'Styles'
+            name: 'Styles',
           },
           {
             items: ['bold', 'italic', 'underline'],
-            name: 'Formatting'
-          }
+            name: 'Formatting',
+          },
         ]
       })
 
@@ -1171,8 +1167,8 @@ describe('RCEWrapper', () => {
         const b = [
           {
             name: 'Formatting',
-            items: ['foo', 'bar']
-          }
+            items: ['foo', 'bar'],
+          },
         ]
         const result = sleazyDeepCopy(standardToolbar)
         result[1].items = ['bold', 'italic', 'underline', 'foo', 'bar']
@@ -1184,13 +1180,13 @@ describe('RCEWrapper', () => {
         const b = [
           {
             name: 'I Am New',
-            items: ['foo', 'bar']
-          }
+            items: ['foo', 'bar'],
+          },
         ]
         const result = sleazyDeepCopy(standardToolbar)
         result[2] = {
           items: ['foo', 'bar'],
-          name: 'I Am New'
+          name: 'I Am New',
         }
         assert.deepStrictEqual(mergeToolbar(a, b), result)
       })
@@ -1200,18 +1196,18 @@ describe('RCEWrapper', () => {
         const b = [
           {
             name: 'Formatting',
-            items: ['foo', 'bar']
+            items: ['foo', 'bar'],
           },
           {
             name: 'I Am New',
-            items: ['foo', 'bar']
-          }
+            items: ['foo', 'bar'],
+          },
         ]
         const result = sleazyDeepCopy(standardToolbar)
         result[1].items = ['bold', 'italic', 'underline', 'foo', 'bar']
         result[2] = {
           items: ['foo', 'bar'],
-          name: 'I Am New'
+          name: 'I Am New',
         }
         assert.deepStrictEqual(mergeToolbar(a, b), result)
       })
@@ -1267,7 +1263,7 @@ describe('RCEWrapper', () => {
             height: 160,
             id: 1,
             name: 'A Tool',
-            width: 340
+            width: 340,
           },
           {
             canvas_icon_class: null,
@@ -1276,7 +1272,7 @@ describe('RCEWrapper', () => {
             height: 600,
             id: 2,
             name: 'Not a favorite tool',
-            width: 560
+            width: 560,
           },
           {
             canvas_icon_class: null,
@@ -1285,7 +1281,7 @@ describe('RCEWrapper', () => {
             height: 600,
             id: 3,
             name: 'Another Tool',
-            width: 560
+            width: 560,
           },
           {
             canvas_icon_class: null,
@@ -1294,14 +1290,14 @@ describe('RCEWrapper', () => {
             height: 600,
             id: 4,
             name: 'Yet Another Tool',
-            width: 560
-          }
-        ]
+            width: 560,
+          },
+        ],
       })
 
       assert.deepStrictEqual(element.ltiToolFavorites, [
         'instructure_external_button_1',
-        'instructure_external_button_3'
+        'instructure_external_button_3',
       ])
     })
   })
@@ -1314,7 +1310,7 @@ describe('RCEWrapper', () => {
       global.IntersectionObserver = function () {
         return {
           observe: () => {},
-          disconnect: () => {}
+          disconnect: () => {},
         }
       }
     })

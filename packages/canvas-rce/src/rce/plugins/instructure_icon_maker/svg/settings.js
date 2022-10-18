@@ -18,7 +18,7 @@
 
 import {useState, useEffect, useReducer} from 'react'
 import {svgSettings as svgSettingsReducer, defaultState} from '../reducers/svgSettings'
-import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR, SVG_XML_TYPE} from './constants'
+import {ICON_MAKER_ATTRIBUTE, ICON_MAKER_DOWNLOAD_URL_ATTR} from './constants'
 import {modes} from '../reducers/imageSection'
 import iconsLabels from '../utils/iconsLabels'
 
@@ -55,14 +55,14 @@ const getImageNode = (editor, editing) => {
   return iconMaker
 }
 
-const buildMetadataUrl = (fileId, rcsConfig) => {
+const buildMetadataUrl = (fileId, canvasOrigin) => {
   // http://canvas.docker/api/v1/files/2169/icon_metadata
 
-  const downloadURL = new URL(`${rcsConfig.canvasUrl}/api/v1/files/${fileId}/icon_metadata`)
+  const downloadURL = new URL(`${canvasOrigin}/api/v1/files/${fileId}/icon_metadata`)
   return downloadURL.toString()
 }
 
-export function useSvgSettings(editor, editing, rcsConfig) {
+export function useSvgSettings(editor, editing, canvasOrigin) {
   const [settings, dispatch] = useReducer(svgSettingsReducer, defaultState)
   const [status, setStatus] = useState(statuses.IDLE)
 
@@ -84,7 +84,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
         // Parse out the file ID from something like
         // /courses/1/files/3/preview?...
         const fileId = urlFromNode.split('files/')[1]?.split('/')[0]
-        const downloadUrl = buildMetadataUrl(fileId, rcsConfig)
+        const downloadUrl = buildMetadataUrl(fileId, canvasOrigin)
 
         // Download icon metadata. If no metadata found, return defaults
         const response = await fetch(downloadUrl)
@@ -124,7 +124,7 @@ export function useSvgSettings(editor, editing, rcsConfig) {
 
     // If we are editing rather than creating, fetch existing settings
     if (editing) fetchSvgSettings()
-  }, [editor, editing, urlFromNode, rcsConfig, altText, customWidth, customHeight, customStyle])
+  }, [editor, editing, urlFromNode, canvasOrigin, altText, customWidth, customHeight, customStyle])
 
   return [settings, status, dispatch]
 }
