@@ -209,7 +209,7 @@ const CalendarEventDetailsForm = ({
     const params = {return_to: window.location.href}
 
     if (title && !event.lockedTitle) params.title = title
-    if (context) params.new_context_code = context.asset_string
+    if (context && event.can_change_context) params.new_context_code = context.asset_string
     if (location) params.location_name = location
     if (date) params.start_date = $.unfudgeDateForProfileTimezone(date).toISOString()
     params.start_time = startTime ? moment.tz(startTime, timezone).format('LT') : ''
