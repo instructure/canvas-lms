@@ -27,7 +27,7 @@ import JobDetails from './components/JobDetails'
 import SearchBox from './components/SearchBox'
 import JobLookup from './components/JobLookup'
 import SectionRefreshHeader from './components/SectionRefreshHeader'
-import JobManager from './components/JobManager'
+import StrandManager from './components/StrandManager'
 import {jobsReducer, initialState} from './reducer'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -207,9 +207,8 @@ export default function JobsIndex() {
         state.group_text &&
         state.jobs?.length > 0 ? (
           <Flex.Item padding="large small small 0">
-            <JobManager
-              groupType={state.group_type}
-              groupText={state.group_text}
+            <StrandManager
+              strand={state.group_text}
               jobs={state.jobs}
               onUpdate={() => dispatch({type: 'REFRESH_ALL'})}
             />

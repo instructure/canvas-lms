@@ -45,7 +45,7 @@ function boundPriority(value) {
   else return value
 }
 
-export default function JobManager({groupType, groupText, jobs, onUpdate}) {
+export default function StrandManager({strand, jobs, onUpdate}) {
   const computedMaxConcurrent = useMemo(() => {
     return Math.max(...jobs.map(job => job.max_concurrent))
   }, [jobs])
@@ -76,7 +76,7 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
       doFetchApi({
         method: 'PUT',
         path: '/api/v1/jobs2/manage',
-        params: {strand: groupText, max_concurrent: maxConcurrent || '', priority},
+        params: {strand, max_concurrent: maxConcurrent || '', priority},
       }),
     ]
     if (numStrands && numStrands !== numStrandsOG) {
@@ -118,8 +118,7 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
     !loading && typeof maxConcurrent === 'number' && typeof priority === 'number'
 
   useQuery(GET_SETTING_QUERY, {
-    skip: groupType !== 'strand',
-    variables: {name: `${groupText}_num_strands`},
+    variables: {name: `${strand}_num_strands`},
     onCompleted: data => {
       const setting = data.internalSetting
       if (setting) {
@@ -132,9 +131,9 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
   })
 
   // presently all we do is update parallelism / priority for entire strands, so don't render an icon otherwise
-  if (groupType !== 'strand' || !groupText || jobs.length === 0) return null
+  if (!strand || jobs.length === 0) return null
 
-  const caption = I18n.t('Manage strand "%{strand}"', {strand: groupText})
+  const caption = I18n.t('Manage strand "%{strand}"', {strand})
   return (
     <>
       <Tooltip renderTip={caption} on={['hover', 'focus']}>
@@ -157,7 +156,7 @@ export default function JobManager({groupType, groupText, jobs, onUpdate}) {
             onClick={handleClose}
             screenReaderLabel={I18n.t('Close')}
           />
-          <Heading>{groupText}</Heading>
+          <Heading>{strand}</Heading>
         </Modal.Header>
         <Modal.Body>
           <Flex direction="column">
