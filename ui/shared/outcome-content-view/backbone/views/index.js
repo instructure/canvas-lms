@@ -172,7 +172,7 @@ export default class ContentView extends Backbone.View {
       open() {
         $(this).show()
       },
-      close(e) {
+      close(_e) {
         $(this).remove()
       },
     })

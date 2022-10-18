@@ -110,7 +110,7 @@ $.fn.confirmDelete = function (options) {
     options.confirmed.call($object)
     if (options.url) {
       if (!options.success) {
-        options.success = function (data) {
+        options.success = function (_data) {
           $object.fadeOut('slow', () => {
             $object.remove()
           })
@@ -260,7 +260,7 @@ $.fn.clickLink = function () {
 // had much success with it.
 $.fn.showIf = function (bool) {
   if ($.isFunction(bool)) {
-    return this.each(function (index) {
+    return this.each(function (_index) {
       $(this).showIf(bool.call(this))
     })
   }

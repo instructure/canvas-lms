@@ -29,7 +29,7 @@ const I18n = useI18nScope('calculator')
 const generateFinds = function ($table) {
   const finds = {}
   finds.formula_rows = $table.find('.formula_row')
-  finds.formula_rows.each(function (i) {
+  finds.formula_rows.each(function (_i) {
     this.formula = $(this).find('.formula')
     this.status = $(this).find('.status')
     $(this).data('formula', $(this).find('.formula'))

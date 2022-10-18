@@ -84,7 +84,7 @@ $.fn.disableWhileLoading = function (deferred, options) {
           $($spinHolder.data().spinner.el).css({'max-width': '100px'})
         }
 
-        $disabledArea.css('opacity', function (i, currentOpacity) {
+        $disabledArea.css('opacity', function (_i, _currentOpacity) {
           $(this).data(dataKey + 'opacityBefore', this.style.opacity || 1)
           return opts.opacity
         })
@@ -119,7 +119,7 @@ $.fn.disableWhileLoading = function (deferred, options) {
             return $(this).data(dataKey + 'opacityBefore') || 1
           })
           $inputsToDisable.prop('disabled', false)
-          $.each(opts.buttons, function (selector, text) {
+          $.each(opts.buttons, function (selector, _text) {
             if (typeof selector === 'number') selector = '' + this // for arrays
             $disabledArea.find(selector).text(function () {
               return $(this).data(dataKey)

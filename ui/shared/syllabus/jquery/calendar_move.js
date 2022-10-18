@@ -32,7 +32,6 @@ function makeDate(date) {
 
 export function changeMonth($month, change) {
   const monthNames = I18n.lookup('date.month_names')
-  const monthData = $month.data('calendar_objects')
   var data = {}
   var current = null
   if (typeof change === 'string') {

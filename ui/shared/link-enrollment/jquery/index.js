@@ -31,7 +31,6 @@ const I18n = useI18nScope('link_enrollment')
 window.link_enrollment = (function () {
   return {
     choose(user_name, enrollment_id, current_user_id, callback) {
-      const $user = $(this).parents('.user')
       const $dialog = $('#link_student_dialog')
       const user_data = {}
       user_data.short_name = user_name
@@ -104,7 +103,7 @@ $(document).ready(function () {
     $('#link_student_dialog').dialog('close')
   })
   $('#link_student_dialog_form').formSubmit({
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('button')
         .attr('disabled', true)
@@ -126,7 +125,7 @@ $(document).ready(function () {
         callback(enrollment)
       }
     },
-    error(data) {
+    error(_data) {
       $(this)
         .find('button')
         .attr('disabled', false)

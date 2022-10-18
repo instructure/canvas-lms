@@ -26,7 +26,7 @@ import '@canvas/util/templateData'
 const I18n = useI18nScope('find_outcome')
 /* fillTemplateData, getTemplateData */
 
-var find_outcome = (function () {
+const find_outcome = (function () {
   return {
     find(callback, options) {
       options = options || {}
@@ -113,7 +113,7 @@ var find_outcome = (function () {
               $dialog.find('.outcomes_select:not(.blank):first').click()
             }
           },
-          data => {
+          _data => {
             $dialog
               .find('.loading_message')
               .text(

@@ -258,12 +258,8 @@ const quizSubmission = (function () {
         currentTimeToDueDate = quizSubmission.timeToDueDate -= quizSubmission.clockInterval
       }
       const now = new Date()
-      const endAt = quizSubmission.endAt.text()
 
       timeMod = (timeMod + 1) % 120
-      if (timeMod == 0 && !endAt && !quizSubmission.twelveHourDeadline) {
-        const end = quizSubmission.endAtParsed
-      }
 
       currentTimeLeft = quizSubmission.floorTimeLeft(currentTimeLeft)
 
@@ -531,11 +527,11 @@ const quizSubmission = (function () {
   }
 })()
 
-$(window).focus(evt => {
+$(window).focus(_evt => {
   quizSubmission.updateSubmission()
 })
 
-$(window).blur(evt => {
+$(window).blur(_evt => {
   quizSubmission.inBackground = true
 })
 
@@ -582,7 +578,7 @@ $(function () {
     })
     window.addEventListener(
       'unload',
-      e => {
+      _e => {
         const data = $('#submit_quiz_form').getFormData()
         const url = $('.backup_quiz_submission_url').attr('href')
 
@@ -704,7 +700,7 @@ $(function () {
         quizSubmission.updateSubmission()
       }
     })
-    .delegate('label.upload-label', 'mouseup', event => {
+    .delegate('label.upload-label', 'mouseup', _event => {
       quizSubmission.updateSubmission()
     })
     .delegate(':text,textarea,select', 'change', function (event, update) {
@@ -853,7 +849,7 @@ $(function () {
     if (e.keyCode === 13) return false
   })
 
-  $('.quiz_submit').click(event => {
+  $('.quiz_submit').click(_event => {
     quizSubmission.finalSubmitButtonClicked = true
   })
 
@@ -962,7 +958,7 @@ $(function () {
   const $submit_buttons = $('#submit_quiz_form button[type=submit]')
 
   // set the form action depending on the button clicked
-  $submit_buttons.click(function (event) {
+  $submit_buttons.click(function (_event) {
     quizSubmission.clearAccessCode = false
     const action = $(this).data('action')
     if (action != undefined) {

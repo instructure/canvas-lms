@@ -217,8 +217,8 @@ $('#show_user_services').change(function () {
     $('#update_profile_form').attr('action'),
     'PUT',
     {'user[show_user_services]': $(this).prop('checked')},
-    data => {},
-    data => {}
+    _data => {},
+    _data => {}
   )
 })
 $('#disable_inbox').change(function () {
@@ -226,8 +226,8 @@ $('#disable_inbox').change(function () {
     '/profile/toggle_disable_inbox',
     'POST',
     {'user[disable_inbox]': $(this).prop('checked')},
-    data => {},
-    data => {}
+    _data => {},
+    _data => {}
   )
 })
 $('.delete_pseudonym_link').click(function (event) {

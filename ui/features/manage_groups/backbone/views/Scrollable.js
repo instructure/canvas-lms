@@ -83,7 +83,7 @@ export default {
   },
 
   _initializeDragAndDropHandling() {
-    this.$el.on('dragstart', (event, ui) => (this._$pointerScrollable = this.$el))
+    this.$el.on('dragstart', (_event, _ui) => (this._$pointerScrollable = this.$el))
 
     this.$el.on('drag', ({pageX, pageY}, ui) => {
       clearTimeout(this._checkScrollTimeout)
@@ -106,6 +106,6 @@ export default {
       return this._checkScroll()
     })
 
-    return this.$el.on('dragstop', (event, ui) => clearTimeout(this._checkScrollTimeout))
+    return this.$el.on('dragstop', (_event, _ui) => clearTimeout(this._checkScrollTimeout))
   },
 }

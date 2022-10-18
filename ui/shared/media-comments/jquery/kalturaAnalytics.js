@@ -156,10 +156,10 @@ class KalturaAnalytics {
     let _isFullScreen = false
     return this.mediaElement.addEventListener(
       'playing',
-      e => {
+      _e => {
         if (this.mediaElement.listeningToPlaying) return
 
-        const interval = setInterval(() => {
+        setInterval(() => {
           if (
             this.mediaElement.paused ||
             isNaN(this.mediaElement.duration) ||

@@ -169,7 +169,7 @@ export default class UnassignedUsersView extends GroupUsersView {
     return this.assignToGroupMenu
   }
 
-  hideAssignToGroup(e) {
+  hideAssignToGroup(_e) {
     if (!this.fromAddButton) {
       if (this.assignToGroupMenu != null) {
         this.assignToGroupMenu.hide()
@@ -229,7 +229,7 @@ export default class UnassignedUsersView extends GroupUsersView {
 
   _initDrag(view) {
     super._initDrag(...arguments)
-    return view.$el.on('dragstart', (event, ui) => (this.elementIndex = -1))
+    return view.$el.on('dragstart', (_event, _ui) => (this.elementIndex = -1))
   }
 }
 UnassignedUsersView.initClass()

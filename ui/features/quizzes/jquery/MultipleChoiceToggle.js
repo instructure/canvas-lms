@@ -65,7 +65,6 @@ Object.assign(MultipleChoiceToggle.prototype, {
   // @api public
   edit() {
     EditorToggle.prototype.edit.apply(this, arguments)
-    const id = this.textArea.attr('id')
     this.answerText.hide()
     if (this.content === '') {
       return send(this.textArea, 'set_code', htmlEscape(this.answerText.val()))

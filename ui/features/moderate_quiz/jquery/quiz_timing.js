@@ -34,7 +34,7 @@ var timing = {
     timing.clientServerDiff = serverNow.getTime() - clientNow.getTime()
     timing.timesReady = true
   },
-  setReferenceDate(started_at, end_at, now) {
+  setReferenceDate(started_at, end_at, _now) {
     if (!timing.timesReady) {
       timing.initTimes()
     }

@@ -152,7 +152,7 @@ window.moderation = {
   studentsCurrentlyTakingQuiz: false,
 }
 
-$(document).ready(function (event) {
+$(document).ready(function (_event) {
   timing.initTimes()
   setInterval(moderation.updateTimes, 500)
   let updateErrors = 0
@@ -202,7 +202,7 @@ $(document).ready(function (event) {
           moderation.updateSubmission(data[idx], true)
         }
       },
-      data => {
+      _data => {
         updating(false)
         updateErrors++
         if (updateErrors > 5) {
@@ -311,17 +311,17 @@ $(document).ready(function (event) {
   })
 
   $('#extension_extra_time')
-    .on('invalid:not_a_number', function (e) {
+    .on('invalid:not_a_number', function (_e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_not_a_number', 'Extra time must be a number.')
       )
     })
-    .on('invalid:greater_than', function (e) {
+    .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
         I18n.t('errors.quiz_submission_extra_time_too_short', 'Extra time must be greater than 0.')
       )
     })
-    .on('invalid:less_than', function (e) {
+    .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_time_too_long',
@@ -331,7 +331,7 @@ $(document).ready(function (event) {
     })
 
   $('#extension_extra_attempts')
-    .on('invalid:not_a_number', function (e) {
+    .on('invalid:not_a_number', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_not_a_number',
@@ -339,7 +339,7 @@ $(document).ready(function (event) {
         )
       )
     })
-    .on('invalid:greater_than', function (e) {
+    .on('invalid:greater_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_short',
@@ -347,7 +347,7 @@ $(document).ready(function (event) {
         )
       )
     })
-    .on('invalid:less_than', function (e) {
+    .on('invalid:less_than', function (_e) {
       $(this).errorBox(
         I18n.t(
           'errors.quiz_submission_extra_attempts_too_long',
@@ -455,7 +455,7 @@ $(document).ready(function (event) {
           moderation.updateSubmission(data)
           checkIfFinished()
         },
-        data => {
+        _data => {
           finished++
           errors++
           checkIfFinished()
@@ -542,7 +542,7 @@ $(document).ready(function (event) {
           moderation.updateSubmission(data)
           $dialog.dialog('close')
         },
-        data => {
+        _data => {
           $dialog
             .find('button')
             .attr('disabled', false)
@@ -643,7 +643,7 @@ $(document).ready(function (event) {
       this.cleanUpEventListeners()
       this.dialog.dialog('close')
     },
-    setFocusOnLoad(event, ui) {
+    setFocusOnLoad(_event, _ui) {
       $('#autosubmit_form').focus()
     },
     showDialog() {

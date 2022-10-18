@@ -19,7 +19,6 @@
 import React, {useState, useCallback} from 'react'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {string, node} from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {Grid} from '@instructure/ui-grid'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'

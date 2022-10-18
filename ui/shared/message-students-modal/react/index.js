@@ -138,7 +138,7 @@ class MessageStudents extends React.Component {
 
   // Event & pseudo-event handlers
 
-  handleAlertClose = e => {
+  handleAlertClose = _e => {
     this.setState({
       hideAlert: true,
     })

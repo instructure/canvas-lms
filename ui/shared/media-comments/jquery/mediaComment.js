@@ -75,7 +75,7 @@ $.extend(mejs.MediaElementDefaults, {
   defaultVideoHeight: VIDEO_HEIGHT,
 })
 
-mejs.MepDefaults.success = function (mediaElement, domObject) {
+mejs.MepDefaults.success = function (mediaElement, _domObject) {
   import('./kalturaAnalytics').then(({default: kalturaAnalytics}) => {
     kalturaAnalytics(this.mediaCommentId, mediaElement, INST.kalturaSettings)
   })

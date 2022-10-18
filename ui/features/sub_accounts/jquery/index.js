@@ -81,7 +81,7 @@ jQuery(function ($) {
         .getTemplateData({textValues: ['id']}).id
       return data
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this).loadingImage({image_size: 'small'}).addClass('saving')
     },
     success(data) {
