@@ -41,7 +41,6 @@ define [
       'change #web_conference_long_running': 'changeLongRunning'
       'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
       'change .role_checkbox': 'filterUsersByRole'
-      'change .select_user_checkbox': "markSelectedUsersForFilter"
 
     render: ->
       super
@@ -190,62 +189,36 @@ define [
       )
 
     toggleAllUsers: ->
+      checkboxes = $("#members_list li.member input[type=checkbox]:not(:disabled):not(:hidden)")
       if(@$('.all_users_checkbox').is(':checked'))
-        checkboxes = $("#members_list li.member input[type=checkbox]")
         checkboxes.each(() -> 
           $(this).attr('checked', true) 
         )
       else
-        checkboxes = $("#members_list li.member input[type=checkbox]")
         checkboxes.each(() -> 
           $(this).attr('checked', false)
         )
 
-    filterUsersByRole: (e) ->
-      context_data = ENV.default_conference
-      context_type = context_data.context_type.toLowerCase() + 's'
-      context_id = context_data.context_id
-      url_string = '/' + context_type + '/' + context_id + '/conferences/filter_users_by_role'
+    filterUsersByRole: ->
+      @resetSelectAllCheckboxOnFilter()
       role_checkboxes = Array.from($('.role_checkbox:checked'))
       ids = role_checkboxes.map((checkbox) -> checkbox.value)
-      $.ajax({
-        type: "POST",
-        url: url_string,
-        data: { role_ids: ids },
-        success: (data) ->
-          $('#members_list').html(data)
-          $('#checked_users_input').val().split(',').map(
-            (id) -> $('#' + id).attr('checked', true)
-          )
-      })
+      user_list_items = Array.from($("#members_list li.member"))
+      if (ids.length > 0)
+        user_list_items.forEach((el) ->
+          if !(ids.includes(el.dataset.role_id))
+            $(el).hide()
+          else 
+            $(el).show()
+        )
+      else 
+        user_list_items.forEach((el) ->
+          $(el).show()
+        )
 
-    markSelectedUsersForFilter: ->
-      @addSelectedUsers()
-      @removeSelectedUsers()
-      
-    addSelectedUsers: ->
-      ###
-      hidden element ids in the DOM so that when the list reloads due to a filter
-      being selected, we can still keep track of the elements that should be checked should
-      the filter become unselected
-      ###
-      hidden_user_ids = $('#checked_users_input').val().split(',').filter((el) -> el != '')
-      checked_user_ids = Array.from($(".select_user_checkbox:checked")).map((el) -> el.id)
-      selected = {}
-      hidden_user_ids.forEach((el) -> selected[el] = 1)
-      checked_user_ids.forEach((el) -> selected[el] = 1)
-      $('#checked_users_input').val(Object.keys(selected).join(','))
-
-    removeSelectedUsers: ->
-      hidden_user_ids = $('#checked_users_input').val().split(',').filter((el) -> el != '')
-      unchecked_user_ids = Array.from($(".select_user_checkbox:not(:checked)")).map((el) -> el.id)
-      selected = {}
-      hidden_user_ids.forEach((el) -> selected[el] = 1)
-      unchecked_user_ids.forEach((el) -> 
-        if (selected[el] != undefined)
-          delete selected[el]
-      )
-      $('#checked_users_input').val(Object.keys(selected).join(','))
+    resetSelectAllCheckboxOnFilter: ->
+      if($('.all_users_checkbox').is(':checked'))
+        $('.all_users_checkbox').attr('checked', false) 
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->

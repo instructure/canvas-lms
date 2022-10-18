@@ -79,7 +79,7 @@
   <div>
     <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
       {{# each users}}
-        <li class="member user_{{id}}">
+        <li class="member user_{{id}}" data-role_id="{{role_id}}">
           <label class="checkbox" for="user_{{id}}">
             <input name="user[{{id}}]" type="hidden" value="0">
             <input class="select_user_checkbox" id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">

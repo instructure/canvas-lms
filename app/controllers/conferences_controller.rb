@@ -143,7 +143,7 @@ class ConferencesController < ApplicationController
   before_action { |c| c.active_tab = "conferences" }
   before_action :require_config
   before_action :reject_student_view_student
-  before_action :get_conference, :except => [:index, :create, :filter_users_by_role]
+  before_action :get_conference, :except => [:index, :create]
 
   # @API List conferences
   # Retrieve the list of conferences for this context
@@ -185,23 +185,26 @@ class ConferencesController < ApplicationController
       conference.ended_at.nil?
     }
     log_asset_access([ "conferences", @context ], "conferences", "other")
+    @roles = Role.where(name: ['TaEnrollment', 'StudentEnrollment', 'TeacherEnrollment', 'ObserverEnrollment'])
     case @context
     when Course
       @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
         order(User.sortable_name_order_by_clause).to_a
+      @enrollments = Enrollment.joins(:user, :role).where(user_id: @users, role_id: @roles.pluck(:id), course_id: @context.id).map{|e| [e.user_id, e.role_id]}.to_h
     when Group
       @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
+      @enrollments = Enrollment.joins(:user, :role).where(user_id: @users, role_id: @roles.pluck(:id), course_id: @context.context_id).map{|e| [e.user_id, e.role_id]}.to_h
     else
       @users = @context.users.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
+      @enrollments = Enrollment.joins(:user, :role).where(user_id: @users, role_id: @roles.pluck(:id), course_id: @context.context_id).map{|e| [e.user_id, e.role_id]}.to_h
     end
-    @roles = Role.where(name: ['TaEnrollment', 'StudentEnrollment', 'TeacherEnrollment', 'ObserverEnrollment' ])
     # exposing the initial data as json embedded on page.
     js_env(
       current_conferences: ui_conferences_json(@new_conferences, @context, @current_user, session),
       concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types),
-      users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+      users: @users.map { |u| {:id => u.id, :name => u.last_name_first, :role_id=>@enrollments[u.id]} },
       roles: @roles.map { |r| {id: r.id, name: (r.name.match?(/Ta/) ? r.name.gsub(/Enrollment/, '').upcase! : r.name.gsub(/Enrollment/, '')) }}
     )
     set_tutorial_js_env
@@ -350,20 +353,6 @@ class ConferencesController < ApplicationController
         format.json { render :json => @conference }
       end
     end
-  end
-
-  def filter_users_by_role
-    @roles = params[:role_ids].present? ? Role.where(id: params[:role_ids]) : Role.where(name: ['TaEnrollment', 'StudentEnrollment', 'TeacherEnrollment', 'ObserverEnrollment' ])
-    case @context
-    when Course
-      @users = User.joins(enrollments: :role).where(:id => @context.current_enrollments.not_fake.active_by_date.where(role_id: @roles.pluck(:id)).where.not(:user_id => @current_user).select(:user_id)).
-        order(User.sortable_name_order_by_clause).to_a
-    when Group
-      @users = @context.participating_users_in_context.joins(enrollments: :role).where("users.id<>?", @current_user).where(enrollments: {role_id: @roles.pluck(:id)}).order(User.sortable_name_order_by_clause).to_a.uniq
-    else
-      @users = @context.users.joins(enrollments: :role).where("users.id<>?", @current_user).where(enrollments: {role_id: @roles.pluck(:id)}).order(User.sortable_name_order_by_clause).to_a.uniq
-    end
-    render partial: 'members_list', locals: {users: @users}
   end
 
   protected
