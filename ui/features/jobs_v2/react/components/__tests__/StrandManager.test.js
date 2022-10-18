@@ -19,7 +19,7 @@
 import React from 'react'
 import {fireEvent} from '@testing-library/react'
 import renderWithMocks, {updateInternalSettingMutation} from './MockSettingsApi'
-import JobManager from '../JobManager'
+import StrandManager from '../StrandManager'
 import doFetchApi from '@canvas/do-fetch-api-effect'
 
 jest.mock('@canvas/do-fetch-api-effect')
@@ -33,7 +33,7 @@ const fakeJob = {
   strand: 'foobar',
 }
 
-describe('JobManager', () => {
+describe('StrandManager', () => {
   beforeAll(() => {
     doFetchApi.mockResolvedValue({status: 'OK', count: 1})
   })
@@ -43,17 +43,10 @@ describe('JobManager', () => {
     updateInternalSettingMutation.mockClear()
   })
 
-  it("doesn't render a button if a strand isn't selected", async () => {
-    const {queryByText} = renderWithMocks(
-      <JobManager groupType="tag" groupText="foobar" jobs={[fakeJob]} onUpdate={jest.fn()} />
-    )
-    expect(queryByText('Manage strand "foobar"', {selector: 'button span'})).not.toBeInTheDocument()
-  })
-
   it('edits priority but not concurrency for normal strand', async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText, queryByLabelText} = renderWithMocks(
-      <JobManager groupType="strand" groupText="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />
+      <StrandManager strand="foobar" jobs={[fakeJob]} onUpdate={onUpdate} />
     )
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
     expect(queryByLabelText('Dynamic concurrency')).not.toBeInTheDocument()
@@ -72,12 +65,7 @@ describe('JobManager', () => {
   it('edits both priority and concurrency for n_strand', async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = renderWithMocks(
-      <JobManager
-        groupType="strand"
-        groupText="foobar"
-        jobs={[{...fakeJob, max_concurrent: 2}]}
-        onUpdate={onUpdate}
-      />
+      <StrandManager strand="foobar" jobs={[{...fakeJob, max_concurrent: 2}]} onUpdate={onUpdate} />
     )
     await flushPromises()
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
@@ -98,12 +86,7 @@ describe('JobManager', () => {
   it("doesn't mutate the num_strands setting if unchanged", async () => {
     const onUpdate = jest.fn()
     const {getByText, getByLabelText} = renderWithMocks(
-      <JobManager
-        groupType="strand"
-        groupText="foobar"
-        jobs={[{...fakeJob, max_concurrent: 2}]}
-        onUpdate={onUpdate}
-      />
+      <StrandManager strand="foobar" jobs={[{...fakeJob, max_concurrent: 2}]} onUpdate={onUpdate} />
     )
     await flushPromises()
     fireEvent.click(getByText('Manage strand "foobar"', {selector: 'button span'}))
