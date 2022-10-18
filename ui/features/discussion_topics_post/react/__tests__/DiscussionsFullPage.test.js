@@ -104,17 +104,16 @@ describe('DiscussionFullPage', () => {
         ...getDiscussionQueryMock(),
         ...getDiscussionSubentriesQueryMock({
           first: 20,
-          sort: 'desc',
         }),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
-      expect(container.queryByText('This is the child reply')).toBeNull()
+      expect(container.queryByText('This is the child reply asc')).toBeNull()
 
       const expandButton = container.getByTestId('expand-button')
       fireEvent.click(expandButton)
 
-      expect(await container.findByText('This is the child reply')).toBeInTheDocument()
+      expect(await container.findByText('This is the child reply asc')).toBeInTheDocument()
     })
 
     it('should allow deleting entries', async () => {
