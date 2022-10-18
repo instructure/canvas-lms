@@ -34,15 +34,15 @@ $.fn.dropdownList = function (options) {
   if (this.length) {
     let $div = $('#instructure_dropdown_list')
     if (
-      options == 'hide' ||
-      options == 'remove' ||
+      options === 'hide' ||
+      options === 'remove' ||
       $div.data('current_dropdown_initiator') == this[0]
     ) {
       $div.remove().data('current_dropdown_initiator', null)
       return
     }
-    var options = $.extend({}, $.fn.dropdownList.defaults, options),
-      $list = $div.children('div.list')
+    options = $.extend({}, $.fn.dropdownList.defaults, options)
+    let $list = $div.children('div.list')
     if (!$list.length) {
       $div = $(
         "<div id='instructure_dropdown_list'><div class='list ui-widget-content'></div></div>"
@@ -87,7 +87,7 @@ $.fn.dropdownList = function (options) {
                 $item.focus()
               }
               return false
-            } else if (event.keyCode == 40) {
+            } else if (event.keyCode === 40) {
               // down
               if (!$current.length) {
                 $div
@@ -107,7 +107,7 @@ $.fn.dropdownList = function (options) {
                   .focus()
               }
               return false
-            } else if (event.keyCode == 13 && $current.length) {
+            } else if (event.keyCode === 13 && $current.length) {
               $current.click()
               return false
             } else {
@@ -116,7 +116,7 @@ $.fn.dropdownList = function (options) {
           }
         })
       $div.find('.option').removeClass('ui-state-hover ui-state-active').addClass('minimal')
-      $div.click(event => {
+      $div.click(_event => {
         $div.hide().data('current_dropdown_initiator', null)
       })
       $list = $div.children('div.list')
@@ -168,8 +168,7 @@ $.fn.dropdownList = function (options) {
       }
     })
     const offset = this.offset(),
-      height = this.outerHeight(),
-      width = this.outerWidth()
+      height = this.outerHeight()
 
     $div
       .css({

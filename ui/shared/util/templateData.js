@@ -71,7 +71,7 @@ $.fn.fillTemplateData = function (options) {
                 $found.removeClass('enhanced')
                 $found.data('unenhanced_content_html', options.data[item].toString())
               }
-            } else if ($found[0].tagName.toUpperCase() == 'INPUT') {
+            } else if ($found[0].tagName.toUpperCase() === 'INPUT') {
               $found.val(options.data[item])
             } else {
               try {
@@ -87,10 +87,8 @@ $.fn.fillTemplateData = function (options) {
     }
     if (options.hrefValues && options.data) {
       this.find('a,span[rel]').each(function () {
-        let $obj = $(this),
-          oldHref,
-          oldRel,
-          oldName
+        let oldHref, oldRel, oldName
+        const $obj = $(this)
         for (const i in options.hrefValues) {
           if (!options.hrefValues.hasOwnProperty(i)) {
             continue
