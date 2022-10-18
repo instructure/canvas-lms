@@ -41,7 +41,7 @@ class GradingPeriodCollection extends React.Component {
     saveDisabled: true,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getPeriods()
   }
 

@@ -53,7 +53,7 @@ export default class FilePreview extends React.PureComponent {
     displayedItem: null,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (this.props.isOpen) {
       this.getItemsToView(this.props, items => this.setState(this.stateProperties(items)))
     }

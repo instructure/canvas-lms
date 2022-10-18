@@ -37,7 +37,7 @@ export default {
     itemsToManage: PropTypes.arrayOf(customPropTypes.filesystemObject).isRequired,
   },
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.copyright = this.defaultCopyright()
     this.use_justification = this.defaultSelectedRight()
     return (this.cc_value = this.defaultCCValue())

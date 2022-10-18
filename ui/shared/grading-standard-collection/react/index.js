@@ -29,7 +29,7 @@ const I18n = useI18nScope('external_toolsgradingStandardCollection')
 class GradingStandardCollection extends React.Component {
   state = {standards: null}
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     $.getJSON(`${ENV.GRADING_STANDARDS_URL}.json`).done(this.gotStandards)
   }
 

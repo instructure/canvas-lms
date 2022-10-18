@@ -44,7 +44,7 @@ export default class ConversationStatusFilter extends React.Component {
     this.props.router.header.changeTypeFilter(props.initialFilter)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.router.on('route', this.handleBackboneHistory)
   }
 

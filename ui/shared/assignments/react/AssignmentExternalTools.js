@@ -39,7 +39,7 @@ class AssignmentExternalTools extends React.Component {
     }
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getTools()
   }
 

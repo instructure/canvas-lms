@@ -50,7 +50,7 @@ class AssignmentConfigurationTools extends React.Component {
     visibilityEnabled: !!this.props.selectedTool,
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.getTools()
   }
 

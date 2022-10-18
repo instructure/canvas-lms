@@ -62,7 +62,7 @@ export default class MigrationSync extends Component {
     this.intId = null
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     if (!this.props.hasCheckedMigration) {
       this.props.checkMigration(true)
     }

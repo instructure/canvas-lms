@@ -41,7 +41,7 @@ class TeacherFeedbackForm extends React.Component {
     courses: [],
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     $.getJSON('/api/v1/courses.json?enrollment_state=active&per_page=100', courses => {
       this.setState({
         coursesLoaded: true,

@@ -38,7 +38,7 @@ export default class FileSelectBox extends React.Component {
 
   isDirty = true
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.refresh()
   }
 
