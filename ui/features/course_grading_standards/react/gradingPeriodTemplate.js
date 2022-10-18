@@ -87,6 +87,7 @@ class GradingPeriodTemplate extends React.Component {
 
       const invalidProps = []
       _.each(requiredProps, (propType, propName) => {
+        // eslint-disable-next-line valid-typeof
         const invalidProp = _.isUndefined(props[propName]) || typeof props[propName] !== propType
         if (invalidProp) invalidProps.push(propName)
       })

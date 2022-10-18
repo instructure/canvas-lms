@@ -374,11 +374,11 @@ $(document).ready(function (event) {
     const formData = $(this).getFormData()
 
     function valid(data) {
-      let extraAttempts = parseInt(data.extra_attempts, 10),
-        extraTime = parseInt(data.extra_time, 10),
-        valid = true
+      const extraAttempts = parseInt(data.extra_attempts, 10)
+      const extraTime = parseInt(data.extra_time, 10)
+      let valid = true
 
-      if (data.extra_attempts && isNaN(extraAttempts)) {
+      if (data.extra_attempts && Number.isNaN(Number(extraAttempts))) {
         $('#extension_extra_attempts').trigger('invalid:not_a_number')
         valid = false
       } else if (extraAttempts > 1000) {
@@ -389,7 +389,7 @@ $(document).ready(function (event) {
         valid = false
       }
 
-      if (data.extra_time && isNaN(extraTime)) {
+      if (data.extra_time && Number.isNaN(Number(extraTime))) {
         $('#extension_extra_time').trigger('invalid:not_a_number')
         valid = false
       } else if (extraTime > 10080) {

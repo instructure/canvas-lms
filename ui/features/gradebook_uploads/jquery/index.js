@@ -413,7 +413,7 @@ const GradebookUploader = {
                     }
                   }
                   break
-                default:
+                default: {
                   // merge
                   const obj = _.find(uploadedGradebook[`${thing}s`], thng => id == thng.id)
                   obj.id = obj.previous_id = val
@@ -450,6 +450,7 @@ const GradebookUploader = {
                       }
                     })
                   }
+                }
               }
             })
 
