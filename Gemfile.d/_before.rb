@@ -23,12 +23,7 @@ if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   raise "Please run `gem update --system` to bring RubyGems to 2.6.9 or newer for use with Bundler 1.14 or newer."
 end
 
-# NOTE: this has to use 1.8.7 hash syntax to not raise a parser exception on 1.8.7
-if RUBY_VERSION >= "2.4.0" && RUBY_VERSION < "2.5"
-  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_VERSION
-else
-  ruby '2.4.0', :engine => 'ruby', :engine_version => '2.4.0'
-end
+ruby '2.5.0', :engine => 'ruby', :engine_version => '2.5.0'
 
 # force a different lockfile for rails 5.1
 unless CANVAS_RAILS5_0
