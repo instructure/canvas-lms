@@ -112,9 +112,9 @@ ShowFolder.render = function () {
   if (currentState.errorMessages) {
     return (
       <div>
-        {currentState.errorMessages.map(error => {
-          ;<div className="muted">{error.message}</div>
-        })}
+        {currentState.errorMessages.map(error => (
+          <div className="muted">{error.message}</div>
+        ))}
       </div>
     )
   }

@@ -129,7 +129,11 @@ const ManageGroupDialog = createReactClass({
             </table>
           </div>
           <div className="form-controls">
-            <button className="btn confirm-dialog-cancel-btn" onClick={this.props.closeDialog}>
+            <button
+              type="button"
+              className="btn confirm-dialog-cancel-btn"
+              onClick={this.props.closeDialog}
+            >
               {I18n.t('Cancel')}
             </button>
             <button className="btn btn-primary confirm-dialog-confirm-btn" type="submit">

@@ -72,7 +72,7 @@ export default createReactClass({
       }
     }
 
-    this.props.app.config_options.map(opt => {
+    this.props.app.config_options.forEach(opt => {
       fields[opt.name] = {
         type: opt.param_type,
         value: opt.default_value,

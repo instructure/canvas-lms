@@ -65,7 +65,9 @@ export default class StudentDetailsView extends React.Component {
     }
     return (
       <header className="crs-student-details__header">
+        {/* TODO: use InstUI button */}
         <button
+          type="button"
           className="crs-breakdown__link crs-back-button"
           ref={e => {
             this.backButton = e
@@ -168,6 +170,7 @@ export default class StudentDetailsView extends React.Component {
       <section>
         {followOnAssignments.map((item, i) => (
           <StudentAssignmentItem
+            // eslint-disable-next-line react/no-array-index-key
             key={i}
             assignment={item.assignment}
             score={item.score}

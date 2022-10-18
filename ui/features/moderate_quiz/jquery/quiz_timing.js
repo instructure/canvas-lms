@@ -23,7 +23,7 @@ import 'date-js'
 const I18n = useI18nScope('quizzes.timing')
 /* Date.parse */
 
-var timing = {
+const timing = {
   initialTime: new Date(),
   initTimes() {
     if (timing.timesReady) {

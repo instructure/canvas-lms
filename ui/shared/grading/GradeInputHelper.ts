@@ -84,8 +84,7 @@ function parseAsGradingScheme(value: string, options) {
 
 function parseAsPercent(value: string, options) {
   const percentage = numberHelper.parse(value.replace(PERCENTAGES, ''))
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(percentage)) {
+  if (Number.isNaN(Number(percentage))) {
     return null
   }
 
@@ -94,8 +93,7 @@ function parseAsPercent(value: string, options) {
 
   if (!options.pointsPossible) {
     points = numberHelper.parse(value)
-    // eslint-disable-next-line no-restricted-globals
-    if (isNaN(points)) {
+    if (Number.isNaN(Number(points))) {
       percent = 0
       points = 0
     }
@@ -111,8 +109,7 @@ function parseAsPercent(value: string, options) {
 
 function parseAsPoints(value: string, options) {
   const points = numberHelper.parse(value)
-  // eslint-disable-next-line no-restricted-globals
-  if (isNaN(points)) {
+  if (Number.isNaN(Number(points))) {
     return null
   }
 

@@ -290,7 +290,7 @@ $(document).ready(() => {
       .each(function () {
         const name = $(this).find('.name').text()
         let val = numberHelper.parse($(this).find('.next_value').text()) / 100.0
-        if (isNaN(val)) {
+        if (Number.isNaN(Number(val))) {
           val = ''
         }
         data.push([name, val])
@@ -544,7 +544,7 @@ $(document).ready(() => {
     val = round(val, 2)
     $(this).parents('.grading_standard_row').find('.standard_value').val(I18n.n(val))
 
-    if (isNaN(val)) {
+    if (Number.isNaN(Number(val))) {
       val = null
     }
 
@@ -568,7 +568,7 @@ $(document).ready(() => {
       // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
@@ -582,7 +582,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(lastVal) - 1
+        points = parseInt(lastVal, 10) - 1
       }
 
       $row.find('.standard_value').val(I18n.n(points))
@@ -601,7 +601,7 @@ $(document).ready(() => {
       // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
@@ -615,7 +615,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(prevVal) + 1
+        points = parseInt(prevVal, 10) + 1
       }
 
       prevVal = points
@@ -634,7 +634,7 @@ $(document).ready(() => {
       let points = numberHelper.parse($(this).find('.standard_value').val())
 
       var idx = $list.index(this)
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
@@ -648,7 +648,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point less
          * than the minimum point value of the next-higher row.
          */
-        points = parseInt(lastVal) - 1
+        points = parseInt(lastVal, 10) - 1
       }
 
       $(this).find('.standard_value').val(I18n.n(points))
@@ -668,7 +668,7 @@ $(document).ready(() => {
       // Parse the given point value from the input of the current row.
       var points = numberHelper.parse($row.find('.standard_value').val())
 
-      if (isNaN(points)) {
+      if (Number.isNaN(Number(points))) {
         points = null
       }
 
@@ -682,7 +682,7 @@ $(document).ready(() => {
          * previous value), change the minimum point value to be one point more
          * than the minimum point value of the next-lower row.
          */
-        points = parseInt(prevVal) + 1
+        points = parseInt(prevVal, 10) + 1
       }
 
       prevVal = points
@@ -694,7 +694,7 @@ $(document).ready(() => {
       let min_score = 0
       if ($prev && $prev.length > 0) {
         min_score = numberHelper.parse($prev.find('.standard_value').val())
-        if (isNaN(min_score)) {
+        if (Number.isNaN(Number(min_score))) {
           min_score = 0
         }
         $(this)

@@ -351,7 +351,7 @@ $.fn.timepicker = function () {
         }
         if ($current.length === 0) {
           idx = parseInt(time, 10) - 1
-          if (isNaN(idx)) {
+          if (Number.isNaN(Number(idx))) {
             idx = 0
           }
           $('#time_picker .time_slot').eq(idx).triggerHandler('mouseover')

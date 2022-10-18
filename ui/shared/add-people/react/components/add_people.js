@@ -69,7 +69,7 @@ function arePeopleValidationIssuesResolved(props) {
 
 export default class AddPeople extends React.Component {
   // TODO: deal with defaut props after the warmfix to keep this change small
-  /* eslint-disable react/require-default-props */
+
   static propTypes = {
     isOpen: bool,
     validateUsers: func.isRequired,
@@ -89,7 +89,7 @@ export default class AddPeople extends React.Component {
     enqueueNewForMissing: func,
     resolveValidationIssues: func,
     reset: func,
-    // eslint-disable-next-line react/no-unused-prop-types
+
     usersEnrolled: oneOfType([
       bool,
       arrayOf(
@@ -99,7 +99,6 @@ export default class AddPeople extends React.Component {
       ),
     ]), // it IS used in componentWillReceiveProps.
   }
-  /* eslint-enable */
 
   constructor(props) {
     super(props)

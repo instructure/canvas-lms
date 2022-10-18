@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'ar_SA',
   day: {
     abbrev: ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'],

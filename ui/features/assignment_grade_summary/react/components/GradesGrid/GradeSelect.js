@@ -99,7 +99,6 @@ function reducer(prevState, action) {
       throw new RangeError('bad event passed to dispatcher')
   }
 }
-/* eslint-enable prettier/prettier */
 
 function buildCustomGradeOption(gradeInfo, fmtr) {
   return {

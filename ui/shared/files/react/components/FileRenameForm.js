@@ -74,6 +74,7 @@ FileRenameForm.buildButtons = function () {
   if (this.state.fileOptions.cannotOverwrite) {
     buildButtonsToRender = [
       <button
+        type="button"
         key="commitChangeBtn"
         ref="commitChangeBtn"
         className="btn btn-primary"
@@ -85,6 +86,7 @@ FileRenameForm.buildButtons = function () {
   } else if (!this.state.isEditing) {
     buildButtonsToRender = [
       <button
+        type="button"
         key="renameBtn"
         ref="renameBtn"
         className="btn btn-default"
@@ -93,6 +95,7 @@ FileRenameForm.buildButtons = function () {
         {I18n.t('Change Name')}
       </button>,
       <button
+        type="button"
         key="replaceBtn"
         ref="replaceBtn"
         className="btn btn-primary"
@@ -104,6 +107,7 @@ FileRenameForm.buildButtons = function () {
     if (this.props.allowSkip) {
       buildButtonsToRender.unshift(
         <button
+          type="button"
           key="skipBtn"
           ref="skipBtn"
           className="btn btn-default"
@@ -116,6 +120,7 @@ FileRenameForm.buildButtons = function () {
   } else {
     buildButtonsToRender = [
       <button
+        type="button"
         key="backBtn"
         ref="backBtn"
         className="btn btn-default"
@@ -124,6 +129,7 @@ FileRenameForm.buildButtons = function () {
         {I18n.t('Back')}
       </button>,
       <button
+        type="button"
         key="commitChangeBtn"
         ref="commitChangeBtn"
         className="btn btn-primary"

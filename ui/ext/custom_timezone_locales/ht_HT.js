@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'ht_HT',
   day: {
     abbrev: ['dim', 'len', 'mad', 'mèk', 'jed', 'van', 'sam'],

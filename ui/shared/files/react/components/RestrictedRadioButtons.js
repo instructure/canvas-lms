@@ -47,9 +47,9 @@ class RestrictedRadioButtons extends React.Component {
 
   constructor(props) {
     super(props)
-    let initialState, permissionAttributes
+    let initialState
 
-    permissionAttributes = ['hidden', 'locked', 'lock_at', 'unlock_at']
+    const permissionAttributes = ['hidden', 'locked', 'lock_at', 'unlock_at']
     initialState = {}
     if (allAreEqual(props.models, permissionAttributes)) {
       initialState = props.models[0].pick(permissionAttributes)
@@ -156,6 +156,7 @@ class RestrictedRadioButtons extends React.Component {
       </label>
       <div>
         {this.permissionOptions.map((option, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <div className="radio" key={index}>
             <label>
               <input

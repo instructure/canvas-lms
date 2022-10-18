@@ -17,7 +17,6 @@
  */
 
 module.exports = {
-  // eslint-disable-line import/no-commonjs
   name: 'he_IL',
   day: {
     abbrev: ["א'", "ב'", "ג'", "ד'", "ה'", "ו'", "ש'"],

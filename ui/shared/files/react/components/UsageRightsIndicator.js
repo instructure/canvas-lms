@@ -86,6 +86,7 @@ export default class UsageRightsIndicator extends React.Component {
       if (this.props.userCanEditFilesForContext) {
         return (
           <button
+            type="submit"
             className="UsageRightsIndicator__openModal btn-link"
             onClick={this.handleClick}
             title={this.props.suppressWarning ? I18n.t('Manage usage rights') : this.warningMessage}
@@ -107,6 +108,7 @@ export default class UsageRightsIndicator extends React.Component {
 
       return (
         <button
+          type="submit"
           className="UsageRightsIndicator__openModal btn-link"
           onClick={this.handleClick}
           disabled={!this.props.userCanEditFilesForContext}

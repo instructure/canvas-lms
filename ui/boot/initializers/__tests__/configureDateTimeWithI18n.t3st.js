@@ -45,7 +45,6 @@ import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser
 import fs from 'fs'
 import I18n, {useTranslations} from '@canvas/i18n'
 import path from 'path'
-import timezone from 'timezone'
 import YAML from 'yaml'
 import {parse, format, hasMeridiem} from 'datetime'
 
@@ -102,6 +101,7 @@ const tzLocaleData = tzLocales.reduce((acc, locale) => {
 const dates = createDateSamples()
 
 for (const locale of locales) {
+  // eslint-disable-next-line jest/valid-describe
   describe(locale.key, () => {
     beforeAll(() => {
       I18n.locale = locale.key

@@ -231,6 +231,7 @@ export default class SyllabusView extends Backbone.View {
         events[0].override = null
       } else {
         for (const event of Array.from(events)) {
+          // eslint-disable-next-line no-bitwise
           overrides_present |= event.override !== null
         }
       }
