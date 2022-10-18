@@ -35,7 +35,6 @@ import indicatorRegion from './indicatorRegion'
 import editorLanguage from './editorLanguage'
 import normalizeLocale from './normalizeLocale'
 import {sanitizePlugins} from './sanitizePlugins'
-import {getCanvasUrl} from './getCanvasUrl'
 import RCEGlobals from './RCEGlobals'
 import defaultTinymceConfig from '../defaultTinymceConfig'
 
@@ -240,6 +239,7 @@ class RCEWrapper extends React.Component {
       enabled: PropTypes.bool,
       maxAge: PropTypes.number,
     }),
+    canvasOrigin: PropTypes.string,
     defaultContent: PropTypes.string,
     editorOptions: editorOptionsPropType,
     handleUnmount: PropTypes.func,
@@ -286,6 +286,7 @@ class RCEWrapper extends React.Component {
     maxInitRenderedRCEs: -1,
     features: {},
     timezone: Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone,
+    canvasOrigin: '',
   }
 
   static skinCssInjected = false
@@ -394,17 +395,7 @@ class RCEWrapper extends React.Component {
   }
 
   getCanvasUrl() {
-    if (!this.canvasUrl) this.canvasUrl = getCanvasUrl(this.props.trayProps)
-
-    return this.canvasUrl.then(url => {
-      if (!url) {
-        console.warn(
-          'Could not determine Canvas base URL.',
-          'Content will be referenced by relative URL.'
-        )
-      }
-      return url
-    })
+    return this.props.canvasOrigin
   }
 
   // getCode and setCode naming comes from tinyMCE
@@ -635,7 +626,7 @@ class RCEWrapper extends React.Component {
 
   insertMathEquation(tex) {
     const editor = this.mceInstance()
-    return this.getCanvasUrl().then(domain => contentInsertion.insertEquation(editor, tex, domain))
+    contentInsertion.insertEquation(editor, tex)
   }
 
   removePlaceholders(name) {
@@ -1482,6 +1473,8 @@ class RCEWrapper extends React.Component {
 
       language: editorLanguage(this.language),
 
+      document_base_url: this.props.canvasOrigin,
+
       block_formats:
         options.block_formats ||
         [
@@ -1501,6 +1494,7 @@ class RCEWrapper extends React.Component {
         }
         bridge.trayProps?.set(editor, trayPropsWithColor)
         bridge.languages = this.props.languages
+        bridge.canvasOrigin = this.props.canvasOrigin
         if (typeof setupCallback === 'function') {
           setupCallback(editor)
         }

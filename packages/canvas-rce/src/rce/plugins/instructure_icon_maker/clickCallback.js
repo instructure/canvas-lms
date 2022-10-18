@@ -57,6 +57,7 @@ export default function (ed, document, type) {
             editing={type === EDIT_ICON_MAKER}
             onUnmount={handleUnmount}
             rcsConfig={trayProps}
+            canvasOrigin={bridge.canvasOrigin}
           />
         )}
       </StoreProvider>,

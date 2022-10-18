@@ -46,7 +46,6 @@ export default function getRCSProps() {
     jwt: ENV.JWT,
     refreshToken: refreshToken(ENV.JWT),
     themeUrl: ENV.active_brand_config_json_url,
-    canvasUrl: ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN,
     features: {
       // This feature was re-named to match the updated name "Buttons and Icons" => "Icon Maker"
       // But the feature flag was NOT renamed so it's still "buttons_and_icons_cropper"

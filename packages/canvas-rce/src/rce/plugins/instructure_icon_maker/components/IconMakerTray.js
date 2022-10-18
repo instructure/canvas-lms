@@ -139,7 +139,7 @@ function renderFooter(
   )
 }
 
-export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
+export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrigin}) {
   const nameRef = useRef()
   const applyRef = useRef()
 
@@ -148,7 +148,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig}) {
 
   const title = editing ? formatMessage('Edit Icon') : formatMessage('Create Icon')
 
-  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, rcsConfig)
+  const [settings, settingsStatus, dispatch] = useSvgSettings(editor, editing, canvasOrigin)
   const [status, setStatus] = useState(statuses.IDLE)
 
   const [initialSettings, setInitialSettings] = useState({...defaultState})
@@ -336,6 +336,7 @@ IconMakerTray.propTypes = {
   onUnmount: PropTypes.func,
   editing: PropTypes.bool,
   rcsConfig: PropTypes.object.isRequired,
+  canvasOrigin: PropTypes.string.isRequired,
 }
 
 IconMakerTray.defaultProps = {

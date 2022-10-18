@@ -42,6 +42,7 @@ if (!process?.env?.BUILD_LOCALE) {
 const RCE = forwardRef(function RCE(props, rceRef) {
   const {
     autosave,
+    canvasOrigin,
     defaultContent,
     editorOptions, // tinymce config
     height,
@@ -87,6 +88,7 @@ const RCE = forwardRef(function RCE(props, rceRef) {
   const [initOnlyProps] = useState(() => {
     const iProps = {
       autosave,
+      canvasOrigin,
       defaultContent,
       highContrastCSS,
       instRecordDisabled,
@@ -136,6 +138,8 @@ RCE.propTypes = {
   // If autosave is enabled, call yourRef.RCEClosed() if the user
   // exits the page normally (e.g. via Cancel or Save)
   autosave: shape({enabled: bool, maxAge: number}),
+  // the protocol://domain:port for this RCE's canvas
+  canvasOrigin: string,
   // the initial content
   defaultContent: string,
   // tinymce configuration. See defaultTinymceConfig for all the defaults

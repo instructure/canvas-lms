@@ -33,6 +33,7 @@ export default class Bridge {
     this._languages = []
     this._controller = {}
     this._uploadMediaTranslations = null
+    this._canvasOrigin = ''
   }
 
   get editorRendered() {
@@ -88,6 +89,14 @@ export default class Bridge {
 
   set languages(langs) {
     this._languages = langs
+  }
+
+  get canvasOrigin() {
+    return this._canvasOrigin
+  }
+
+  set canvasOrigin(origin) {
+    this._canvasOrigin = origin
   }
 
   // we have to defer importing mediaTranslations until they are asked for

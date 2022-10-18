@@ -22,18 +22,14 @@ import {useSvgSettings, statuses} from '../settings'
 import Editor from '../../../shared/__tests__/FakeEditor'
 
 describe('useSvgSettings()', () => {
-  let editing, ed, rcs
+  let editing, ed
+  const canvasOrigin = 'https://domain.from.env'
 
   beforeEach(() => {
     ed = new Editor()
-    rcs = {
-      contextType: 'course',
-      contextId: 1,
-      canvasUrl: 'https://domain.from.env',
-    }
   })
 
-  const subject = () => renderHook(() => useSvgSettings(ed, editing, rcs)).result
+  const subject = () => renderHook(() => useSvgSettings(ed, editing, canvasOrigin)).result
 
   describe('when a new icon is being created (not editing)', () => {
     beforeEach(() => {
@@ -247,7 +243,9 @@ describe('useSvgSettings()', () => {
     })
 
     it('parses the SVG settings from the icon metadata', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+      const {result, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, canvasOrigin)
+      )
 
       await waitForValueToChange(() => {
         return result.current[0]
@@ -333,7 +331,9 @@ describe('useSvgSettings()', () => {
       })
 
       it('replaces icon type from object to string for single-color images', async () => {
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -396,7 +396,9 @@ describe('useSvgSettings()', () => {
         })
         overwriteUrl()
 
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -459,7 +461,9 @@ describe('useSvgSettings()', () => {
         })
         overwriteUrl()
 
-        const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+        const {result, waitForValueToChange} = renderHook(() =>
+          useSvgSettings(ed, editing, canvasOrigin)
+        )
 
         await waitForValueToChange(() => {
           return result.current[0]
@@ -508,7 +512,9 @@ describe('useSvgSettings()', () => {
     })
 
     it('returns the status to "idle"', async () => {
-      const {result, waitForValueToChange} = renderHook(() => useSvgSettings(ed, editing, rcs))
+      const {result, waitForValueToChange} = renderHook(() =>
+        useSvgSettings(ed, editing, canvasOrigin)
+      )
 
       await waitForValueToChange(() => {
         return result.current[1]
@@ -657,7 +663,7 @@ describe('useSvgSettings()', () => {
 
     it('loads the correct metadata', async () => {
       const {result, rerender, waitForValueToChange} = renderHook(() =>
-        useSvgSettings(ed, editing, rcs)
+        useSvgSettings(ed, editing, canvasOrigin)
       )
 
       ed.setSelectedNode(ed.dom.select('#test-image-1')[0])
