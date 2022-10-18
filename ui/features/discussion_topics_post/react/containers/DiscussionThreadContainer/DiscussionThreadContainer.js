@@ -533,11 +533,10 @@ export default DiscussionThreadContainer
 
 const DiscussionSubentries = props => {
   const {setOnFailure} = useContext(AlertManagerContext)
-  const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
     first: ENV.per_page,
-    sort,
+    sort: 'asc',
     courseID: window.ENV?.course_id,
   }
   const subentries = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
