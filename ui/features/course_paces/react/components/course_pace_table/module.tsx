@@ -59,7 +59,6 @@ export const Module: React.FC<ComponentProps> = props => {
   const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
   const [datesVisible, setDatesVisible] = useState(props.showProjections)
   const wasExpanded = useRef(props.showProjections)
-  const isStudentPace = props.coursePace.context_type === 'Enrollment'
   const isTableStacked = props.responsiveSize === 'small'
 
   useEffect(() => {

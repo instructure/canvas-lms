@@ -34,14 +34,13 @@ const getDefaultExport = mod => (mod.default ? mod.default : mod)
 
 let jsUploader
 
-$.mediaComment = function (command, arg1, arg2) {
+$.mediaComment = function (_command, _arg1, _arg2) {
   const $container = $('<div/>')
   $('body').append($container.hide())
   $.fn.mediaComment.apply($container, arguments)
 }
 
-let domainRootAccountId
-$.mediaComment.partnerData = function (params) {
+$.mediaComment.partnerData = function (_params) {
   const hash = {
     context_code: $.mediaComment.contextCode(),
     root_account_id: ENV.DOMAIN_ROOT_ACCOUNT_ID,
@@ -186,7 +185,7 @@ $.mediaComment.upload_delegate = {
       $('#' + type + '_upload')[0].removeFiles(0, files.length - 2)
     }
     files = $('#' + type + '_upload')[0].getFiles()
-    if (files.length == 0) {
+    if (files.length === 0) {
       return
     }
     $('#media_upload_progress').css('visibility', 'visible').progressbar({value: 1})
@@ -196,9 +195,10 @@ $.mediaComment.upload_delegate = {
     $('#' + type + '_upload')[0].upload()
   },
   selectHandler(type) {
+    let files
     $.mediaComment.upload_delegate.currentType = type
     try {
-      var files = $('#' + type + '_upload')[0].getFiles()
+      files = $('#' + type + '_upload')[0].getFiles()
     } catch (e) {
       $.mediaComment.upload_delegate.setupErrorHandler()
       return
@@ -239,7 +239,7 @@ $.mediaComment.upload_delegate = {
     // $("#media_upload_title").focus().select();
     $('#media_upload_submit').click()
   },
-  singleUploadCompleteHandler(type, entries) {
+  singleUploadCompleteHandler(_type, _entries) {
     $('#media_upload_progress').progressbar('option', 'value', 100)
   },
   allUploadsCompleteHandler(type) {
@@ -260,7 +260,7 @@ $.mediaComment.upload_delegate = {
     }
     $.mediaComment.entryAdded(entry.entryId, entry.entryType, entry.title)
   },
-  progressHandler(type, loaded_bytes, total_bytes, entry) {
+  progressHandler(type, loaded_bytes, total_bytes, _entry) {
     const pct = (100.0 * loaded_bytes) / total_bytes
     $('#media_upload_progress').progressbar('option', 'value', pct)
   },
@@ -492,11 +492,9 @@ $.mediaComment.init = function (mediaType, opts) {
         // Audio meters for audio and video recording
         // **********************************************************************
         let $audio_record_holder, $audio_record, $audio_record_meter
-        let audio_record_counter, current_audio_level, audio_has_volume
+        let audio_record_counter, current_audio_level
         let $video_record_holder, $video_record, $video_record_meter
-        let video_record_counter,
-          current_video_level,
-          video_has_volume = false
+        let video_record_counter, current_video_level
         reset_selectors = true
         setInterval(() => {
           if (reset_selectors) {
@@ -653,7 +651,7 @@ $.mediaComment.init = function (mediaType, opts) {
         // **********************************************************************
         // Load dialog html
         // **********************************************************************
-        var checkForKS = function () {
+        const checkForKS = function () {
           if ($div.data('ks')) {
             const mediaCommentsTemplate = getDefaultExport(
               require('../jst/MediaComments.handlebars')
@@ -718,7 +716,7 @@ $(document).ready(function () {
       $('#video_upload')[0].removeFiles(0, files.length - 1)
     }
   })
-  $('#media_upload_submit').live('click', event => {
+  $('#media_upload_submit').live('click', _event => {
     $.mediaComment.upload_delegate.submit()
   })
   $('#video_record_option,#audio_record_option').live('click', function (event) {

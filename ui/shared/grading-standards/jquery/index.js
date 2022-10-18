@@ -406,7 +406,7 @@ $(document).ready(() => {
       $standard.find('.remove_grading_standard_link').addClass('read_only')
     }
   })
-  $('.grading_standard .save_button').click(function (event) {
+  $('.grading_standard .save_button').click(function (_event) {
     const $standard = $(this).parents('.grading_standard')
     let url = $(
       '#edit_letter_grades_form .create_grading_standard_url,#create_grading_standard_url'
@@ -459,7 +459,7 @@ $(document).ready(() => {
       }
     )
   })
-  $('.grading_standard thead').mouseover(function (event) {
+  $('.grading_standard thead').mouseover(function (_event) {
     if (!$(this).parents('.grading_standard').hasClass('editing')) {
       return
     }
@@ -480,7 +480,7 @@ $(document).ready(() => {
       $(this).prev('.insert_grading_standard').show()
     }
   })
-  $('.grading_standard *').focus(function (event) {
+  $('.grading_standard *').focus(function (_event) {
     $(this).trigger('mouseover')
     if ($(this).hasClass('delete_row_link')) {
       $(this)

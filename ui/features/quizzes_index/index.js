@@ -118,7 +118,7 @@ const QuizzesIndexRouter = Backbone.Router.extend({
 
 ready(() => {
   // Start up the page
-  const router = new QuizzesIndexRouter()
+  new QuizzesIndexRouter()
   Backbone.history.start()
 
   vddTooltip()

@@ -65,7 +65,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     super.initialize(...arguments)
     if (!this.WIKI_RIGHTS) this.WIKI_RIGHTS = {}
     if (!this.PAGE_RIGHTS) this.PAGE_RIGHTS = {}
-    this.on('success', args => (window.location.href = this.model.get('html_url')))
+    this.on('success', _args => (window.location.href = this.model.get('html_url')))
     this.lockedItems = options.lockedItems || {}
     const todoDate = this.model.get('todo_date')
     return (this.studentTodoAtDateValue = todoDate ? new Date(todoDate) : '')
@@ -132,7 +132,7 @@ export default class WikiPageEditView extends ValidatedFormView {
   }
 
   // handles the toggling of the student todo date picker
-  toggleStudentTodo(e) {
+  toggleStudentTodo(_e) {
     return this.$studentTodoAtContainer.toggle()
   }
 

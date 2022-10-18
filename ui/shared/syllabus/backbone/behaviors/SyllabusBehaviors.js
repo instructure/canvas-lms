@@ -266,7 +266,7 @@ const bindToEditSyllabus = function (course_summary_enabled) {
       return data
     },
 
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $edit_course_syllabus_form.triggerHandler('hide_edit')
       $course_syllabus_details.hide()
       $course_syllabus.loadingImage()

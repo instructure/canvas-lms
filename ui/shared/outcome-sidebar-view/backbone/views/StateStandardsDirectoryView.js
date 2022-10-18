@@ -22,7 +22,7 @@ import OutcomeCollection from '@canvas/outcomes/backbone/collections/OutcomeColl
 
 // for working with State Standards in the import dialog
 export default class StateStandardsDirectoryView extends OutcomesDirectoryView {
-  initialize(opts) {
+  initialize(_opts) {
     this.outcomes = new OutcomeCollection() // empty - not needed
     return super.initialize(...arguments)
   }

@@ -18,9 +18,6 @@
 
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import find_outcome from '@canvas/outcomes/find_outcome'
-import moveQuestionTemplate from '../jst/move_question.handlebars'
-import htmlEscape from 'html-escape'
 import moveMultipleQuestionBanks from './moveMultipleQuestionBanks'
 import loadBanks from './loadBanks'
 import addBank from './addBank'
@@ -94,7 +91,7 @@ export function updateAlignments(alignments) {
         $outcomes.append($outcome.show())
       }
     },
-    data => {
+    _data => {
       $('.add_outcome_text')
         .text(I18n.t('update_outcomes_fail', 'Updating Outcomes Failed'))
         .attr('disabled', false)
@@ -102,7 +99,7 @@ export function updateAlignments(alignments) {
   )
 }
 
-export function attachPageEvents(e) {
+export function attachPageEvents(_e) {
   $('#aligned_outcomes_list').delegate('.delete_outcome_link', 'click', function (event) {
     event.preventDefault()
     const result = window.confirm(
@@ -143,7 +140,7 @@ export function attachPageEvents(e) {
           $teaser.data('question', question)
         }
       },
-      data => {}
+      _data => {}
     )
   }
   $('.more_questions_link').click(function (event) {
@@ -215,7 +212,7 @@ export function attachPageEvents(e) {
       $(this).attr('href'),
       'POST',
       {},
-      data => {
+      _data => {
         $link.find('.message').text(I18n.t('already_bookmarked', 'Already Bookmarked'))
         $link.attr('disabled', true)
       },
@@ -330,7 +327,7 @@ export function attachPageEvents(e) {
         url,
         'POST',
         data,
-        data => {
+        _data => {
           $dialog.find('button').attr('disabled', false)
           $dialog.find('.submit_button').text('Move/Copy Question')
           if (move) {
@@ -348,7 +345,7 @@ export function attachPageEvents(e) {
           }
           $dialog.dialog('close')
         },
-        data => {
+        _data => {
           $dialog.find('button').attr('disabled', false)
           let failedText = null
           if (move) {
@@ -386,7 +383,7 @@ export function attachPageEvents(e) {
           $dialog.find('.new_question_bank_name').hide()
           save(data)
         },
-        data => {
+        _data => {
           $dialog.find('button').attr('disabled', false)
           let submitAgainText = null
           if (move) {

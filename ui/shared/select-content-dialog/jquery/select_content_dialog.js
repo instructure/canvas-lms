@@ -28,9 +28,7 @@ import splitAssetString from '@canvas/util/splitAssetString'
 import FilesystemObject from '@canvas/files/backbone/models/FilesystemObject.coffee'
 import BaseUploader from '@canvas/files/react/modules/BaseUploader'
 import UploadQueue from '@canvas/files/react/modules/UploadQueue'
-import _ from 'underscore'
 import htmlEscape from 'html-escape'
-import {uploadFile} from '@canvas/upload-file'
 import iframeAllowances from '@canvas/external-apps/iframeAllowances'
 import SelectContent from '../select_content'
 import setDefaultToolValues from '../setDefaultToolValues'
@@ -721,7 +719,7 @@ $(document).ready(function () {
       })
     }
   })
-  const initEvents = SelectContentDialog.Events.init.bind(SelectContentDialog.Events)()
+  SelectContentDialog.Events.init.bind(SelectContentDialog.Events)()
   const $tool_template = $('#context_external_tools_select .tools .tool:first').detach()
   $('#add_module_item_select').change(function () {
     // Don't disable the form button for these options
@@ -800,7 +798,7 @@ $(document).ready(function () {
               $select.find('.tools').append($tool.show())
             }
           },
-          data => {
+          _data => {
             $select.find('.message').text(I18n.t('errors.loading_failed', 'Loading Failed'))
           }
         )

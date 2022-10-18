@@ -80,8 +80,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
     this.loadDfd = $.Deferred()
 
     if (this.outcomeGroup) {
-      let dfd
-      this.$el.disableWhileLoading((dfd = this.groups.fetch()))
+      this.$el.disableWhileLoading(this.groups.fetch())
     }
 
     if (opts.selectFirstItem) return this.loadDfd.done(this.selectFirstOutcome.bind(this))
@@ -127,7 +126,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
     const disablingDfd = new $.Deferred()
     this.$el.disableWhileLoading(disablingDfd)
 
-    function onFail(m, r) {
+    function onFail(_m, _r) {
       disablingDfd.reject()
       return $.flashError(
         I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')
@@ -154,7 +153,7 @@ export default class OutcomesDirectoryView extends PaginatedView {
   moveGroup(group, newGroup) {
     const disablingDfd = new $.Deferred()
 
-    function onFail(m, r) {
+    function onFail(_m, _r) {
       disablingDfd.reject()
       return $.flashError(
         I18n.t('flash.error', 'An error occurred. Please refresh the page and try again.')

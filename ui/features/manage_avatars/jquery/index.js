@@ -75,7 +75,7 @@ $(document).ready(function () {
         $td.parents('tr').attr('class', data.avatar_state)
         $td.find('.progress').css('visibility', 'hidden')
       },
-      data => {
+      _data => {
         $td
           .find('.progress')
           .text(I18n.t('errors.update_failed', 'Update failed, please try again'))

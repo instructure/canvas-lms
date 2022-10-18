@@ -45,7 +45,7 @@ $(document).ready(function () {
     QuizLogAuditingEventDumper(true)
   }
 
-  $('#preview_quiz_button').click(e => {
+  $('#preview_quiz_button').click(_e => {
     $('#js-sequential-warning-dialogue div a').attr('href', $('#preview_quiz_button').attr('href'))
   })
 
@@ -249,13 +249,13 @@ $(document).ready(function () {
   }
 
   $('#publish_quiz_form').formSubmit({
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('button')
         .attr('disabled', true)
         .text(I18n.t('buttons.publishing', 'Publishing...'))
     },
-    success(data) {
+    success(_data) {
       $(this).find('button').text(I18n.t('buttons.already_published', 'Published!'))
       window.location.reload()
     },

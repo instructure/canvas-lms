@@ -21,25 +21,6 @@ import {render} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CreateEditModal from '../CreateEditModal'
 
-const fancyNote = {
-  id: '8a8407a1-ed8f-48e6-8fe7-087bac0a8fe2',
-  target_roles: ['student', 'observer'],
-  langs: {
-    en: {
-      title: 'A super great note title',
-      description: 'An even better note description',
-      url: 'https://example.com/amazing_url',
-    },
-    es: {
-      title: 'A super great note title (spanish)',
-      description: 'An even better note description (spanish)',
-      url: 'https://es.example.com/amazing_url',
-    },
-  },
-  show_ats: {},
-  published: true,
-}
-
 describe('create modal', () => {
   it('It renders reasonable defaults', () => {
     const {getByText} = render(

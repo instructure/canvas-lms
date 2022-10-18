@@ -17,7 +17,6 @@
  */
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'lodash'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import htmlEscape from 'html-escape'
@@ -42,7 +41,7 @@ window.rubricAssessment = {
     const $rubric_criterion_comments_dialog = $('#rubric_criterion_comments_dialog')
 
     $('.rubric')
-      .delegate('.rating', 'click', function (event) {
+      .delegate('.rating', 'click', function (_event) {
         $(this)
           .parents('.criterion')
           .find('.criterion_points')
@@ -111,7 +110,7 @@ window.rubricAssessment = {
         const $obj = $(event.target)
         if ($obj.parents('.rubric').hasClass('assessing')) {
           let val = numberHelper.parse($obj.val())
-          if (isNaN(val)) {
+          if (Number.isNaN(Number(val))) {
             val = null
           }
           const $criterion = $obj.parents('.criterion')
@@ -128,7 +127,7 @@ window.rubricAssessment = {
             .find('.criterion:visible:not(.ignore_criterion_for_scoring) .criterion_points')
             .each(function () {
               let criterionPoints = numberHelper.parse($(this).val(), 10)
-              if (isNaN(criterionPoints)) {
+              if (Number.isNaN(Number(criterionPoints))) {
                 criterionPoints = 0
               }
               total += criterionPoints
@@ -173,7 +172,7 @@ window.rubricAssessment = {
       $rubric_criterion_comments_dialog.dialog('close')
     })
 
-    $rubric_criterion_comments_dialog.find('.cancel_button').click(event => {
+    $rubric_criterion_comments_dialog.find('.cancel_button').click(_event => {
       $rubric_criterion_comments_dialog.dialog('close')
     })
 
@@ -278,7 +277,7 @@ window.rubricAssessment = {
         const id = $(this).attr('id')
         const pre = 'rubric_assessment[' + id + ']'
         const points = numberHelper.parse($(this).find('.criterion_points').val())
-        data[pre + '[points]'] = !isNaN(points) ? points : undefined
+        data[pre + '[points]'] = !Number.isNaN(Number(points)) ? points : undefined
         if ($(this).find('.rating.selected')) {
           data[pre + '[description]'] = $(this).find('.rating.selected .description').text()
           data[pre + '[comments]'] = $(this).find('.custom_rating').text()
@@ -380,7 +379,6 @@ window.rubricAssessment = {
 
   populateRubric($rubric, data, submitted_data = null) {
     $rubric = rubricAssessment.findRubric($rubric)
-    const id = $rubric.attr('id').substring(7)
     if (ENV.RUBRIC_ASSESSMENT.assessment_user_id || data.user_id) {
       $rubric.find('.user_id').text(ENV.RUBRIC_ASSESSMENT.assessment_user_id || data.user_id)
     } else {
@@ -422,12 +420,13 @@ window.rubricAssessment = {
       const assessment = data
       let total = 0
       for (const idx in assessment.data) {
-        var rating = assessment.data[idx]
+        const rating = assessment.data[idx]
         const comments = rating.comments_enabled ? rating.comments : rating.description
+        let comments_html
         if (rating.comments_enabled && rating.comments_html) {
-          var comments_html = rating.comments_html
+          comments_html = rating.comments_html
         } else {
-          var comments_html = htmlEscape(comments)
+          comments_html = htmlEscape(comments)
         }
         const $criterion = $rubric.find('#criterion_' + rating.criterion_id)
         if (!rating.id) {

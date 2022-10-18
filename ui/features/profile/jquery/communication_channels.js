@@ -32,7 +32,7 @@ const I18n = useI18nScope('profile')
 
 $(document).ready(function () {
   $('#communication_channels').tabs()
-  $('#communication_channels').bind('tabsshow', function (event) {
+  $('#communication_channels').bind('tabsshow', function (_event) {
     let channelInputField
     if ($(this).css('display') !== 'none') {
       // TODO: This is always undefined - where did this come from?
@@ -69,7 +69,6 @@ $(document).ready(function () {
   )
   $('.add_email_link,.add_contact_link').click(function (event) {
     event.preventDefault()
-    let view = 'email'
     $('#communication_channels')
       .show()
       .dialog({
@@ -80,7 +79,6 @@ $(document).ready(function () {
       })
     if ($(this).hasClass('add_contact_link')) {
       $('#communication_channels').tabs('select', '#register_sms_number')
-      view = 'sms'
     } else {
       $('#communication_channels').tabs('select', '#register_email_address')
     }
@@ -299,7 +297,7 @@ $(document).ready(function () {
       .parents('.channel')
       .confirmDelete({
         url: $(this).attr('href'),
-        success(data) {
+        success(_data) {
           const $list = $(this).parents('.channel_list')
           manageAfterDeletingAnEmailFocus(this)
           $(this).remove()
@@ -309,13 +307,13 @@ $(document).ready(function () {
   })
   $('.channel_list .channel .reset_bounce_count_link').click(function (event) {
     event.preventDefault()
-    $.ajaxJSON($(this).attr('href'), 'POST', {}, data => {
+    $.ajaxJSON($(this).attr('href'), 'POST', {}, _data => {
       $(this).parents('.channel').find('.bouncing-channel').remove()
       $(this).remove()
       $.flashMessage(I18n.t('Bounce count reset!'))
     })
   })
-  $('#confirm_communication_channel .cancel_button').click(event => {
+  $('#confirm_communication_channel .cancel_button').click(_event => {
     $('#confirm_communication_channel').dialog('close')
   })
   $('.email_channels .channel .path,.other_channels .channel .path').click(function (event) {
@@ -391,7 +389,7 @@ $(document).ready(function () {
       url = $.replaceTags(url, 'code', data.code)
       $(this).attr('action', url)
     },
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('.status_message')
         .text(I18n.t('confirming_contact', 'Confirming...'))
@@ -405,7 +403,7 @@ $(document).ready(function () {
       $('#confirm_communication_channel').dialog('close')
       $.flashMessage(I18n.t('notices.contact_confirmed', 'Contact successfully confirmed!'))
     },
-    error(data) {
+    error(_data) {
       $(this).find('.status_message').css('visibility', 'hidden')
       $.flashError(I18n.t('Confirmation failed.  Please try again.'))
     },
@@ -441,15 +439,15 @@ $(document).ready(function () {
       $link.attr('href'),
       'POST',
       {},
-      data => {
+      _data => {
         $link.text(I18n.t('links.resent_confirmation', 'Done! Message may take a few minutes.'))
       },
-      data => {
+      _data => {
         $link.text(I18n.t('links.resend_confirmation_failed', 'Request failed. Try again.'))
       }
     )
   })
-  $('#communication_channels .cancel_button').click(event => {
+  $('#communication_channels .cancel_button').click(_event => {
     $('#communication_channels').dialog('close')
   })
   $('#confirm_email_channel .cancel_button').click(() => {

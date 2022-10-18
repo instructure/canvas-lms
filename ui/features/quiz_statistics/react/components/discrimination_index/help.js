@@ -17,7 +17,6 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import K from '../../../constants'
 import React from 'react'
 import PropTypes from 'prop-types'
 
