@@ -273,7 +273,7 @@ $.fn.formSubmit = function (options) {
       $frame.bind('form_response_loaded', function () {
         const i = $frame[0],
           doc = i.contentDocument || i.contentWindow.document
-        if (doc.location.href == 'about:blank') return
+        if (doc.location.href === 'about:blank') return
 
         request.setResponse($(doc).text())
         if ($.httpSuccess(request)) {
@@ -313,7 +313,7 @@ $.ajaxJSONPreparedFiles = function (options) {
   }
   const attachments = []
   const ready = function () {
-    let data = options.formDataTarget == 'url' ? options.formData : {}
+    let data = options.formDataTarget === 'url' ? options.formData : {}
     if (options.handle_files) {
       let result = attachments
       if (options.single_file) {
@@ -359,7 +359,7 @@ $.ajaxJSONPreparedFiles = function (options) {
           'attachment[context_code]': options.context_code,
           'attachment[on_duplicate]': 'rename',
         },
-        options.formDataTarget == 'uploadDataUrl' ? options.formData : {}
+        options.formDataTarget === 'uploadDataUrl' ? options.formData : {}
       )
       if (item.files.length === 1) {
         attrs['attachment[content_type]'] = item.files[0].type
@@ -453,7 +453,7 @@ $.ajaxFileUpload = function (options) {
 $.httpSuccess = function (r) {
   try {
     return (
-      (!r.status && location.protocol == 'file:') ||
+      (!r.status && location.protocol === 'file:') ||
       (r.status >= 200 && r.status < 300) ||
       r.status == 304 ||
       ($.browser.safari && r.status == undefined)
@@ -725,9 +725,9 @@ $.fn.fillFormData = function (data, opts) {
       const inputType = $obj.attr('type')
       if (name in data) {
         if (name) {
-          if (inputType == 'hidden' && $obj.next('input:checkbox').attr('name') == name) {
+          if (inputType === 'hidden' && $obj.next('input:checkbox').attr('name') == name) {
             // do nothing
-          } else if (inputType != 'checkbox' && inputType != 'radio') {
+          } else if (inputType !== 'checkbox' && inputType !== 'radio') {
             let val = data[name]
             if (typeof val === 'undefined' || val === null) {
               val = ''
@@ -764,7 +764,7 @@ $.fn.getFormData = function (options) {
     .each(function () {
       const $input = $(this),
         inputType = $input.attr('type')
-      if ((inputType == 'radio' || inputType == 'checkbox') && !$input.attr('checked')) return
+      if ((inputType === 'radio' || inputType === 'checkbox') && !$input.attr('checked')) return
       let val = $input.val()
       if ($input.hasClass('datetime_field_enabled')) {
         val = $input.data('iso8601')
@@ -778,7 +778,7 @@ $.fn.getFormData = function (options) {
       }
       const attr = $input.prop('name') || ''
       const multiValue = attr.match(/\[\]$/)
-      if (inputType == 'hidden' && !multiValue) {
+      if (inputType === 'hidden' && !multiValue) {
         if (
           $form
             .find("[name='" + attr + "']")
@@ -792,7 +792,7 @@ $.fn.getFormData = function (options) {
       if (
         attr &&
         attr !== '' &&
-        (inputType == 'checkbox' || typeof result[attr] === 'undefined' || multiValue)
+        (inputType === 'checkbox' || typeof result[attr] === 'undefined' || multiValue)
       ) {
         if (!options.values || $.inArray(attr, options.values) != -1) {
           if (multiValue) {
@@ -1096,10 +1096,10 @@ $.fn.formErrors = function (data_errors, options) {
         }
       }
     }
-    if (!$obj || $obj.length === 0 || name == 'general') {
+    if (!$obj || $obj.length === 0 || name === 'general') {
       $obj = $form
     }
-    if ($obj[0].tagName == 'TEXTAREA' && $obj.next('.mceEditor').length) {
+    if ($obj[0].tagName === 'TEXTAREA' && $obj.next('.mceEditor').length) {
       $obj = $obj.next().find('.mceIframeContainer')
     }
     errorDetails[name] = {object: $obj, message: msg}
@@ -1165,7 +1165,7 @@ $.fn.errorBox = function (message, scroll, override_position) {
     const offset = $obj.offset()
     const height = $box.outerHeight()
     let objLeftIndent = Math.round($obj.outerWidth() / 5)
-    if ($obj[0].tagName == 'FORM') {
+    if ($obj[0].tagName === 'FORM') {
       objLeftIndent = Math.min(objLeftIndent, 50)
     }
     $box
@@ -1231,7 +1231,7 @@ $.moveErrorBoxes = function () {
         const offset = $obj.offset()
         const height = $box.outerHeight()
         let objLeftIndent = Math.round($obj.outerWidth() / 5)
-        if ($obj[0].tagName == 'FORM') {
+        if ($obj[0].tagName === 'FORM') {
           objLeftIndent = Math.min(objLeftIndent, 50)
         }
         $box
@@ -1301,7 +1301,7 @@ $.fn.markRequired = function (options) {
         return
       }
       // Added the if statement to prevent the JS from adding the asterisk to the forgot password placeholder.
-      if (this.id != 'pseudonym_session_unique_id_forgot') {
+      if (this.id !== 'pseudonym_session_unique_id_forgot') {
         label.append(
           $('<span aria-hidden="true" />')
             .text('*')

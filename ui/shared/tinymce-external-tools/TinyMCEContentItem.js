@@ -182,13 +182,13 @@ function TinyMCEContentItem(contentItem) {
       return JSON.stringify(this.placementAdvice)
     }
 
-    return this.placementAdvice.presentationDocumentTarget.toLowerCase() == 'window'
+    return this.placementAdvice.presentationDocumentTarget.toLowerCase() === 'window'
       ? '_blank'
       : null
   })
 
   decorate('docTarget', function () {
-    if (this.placementAdvice.presentationDocumentTarget == 'embed' && !this.isImage) {
+    if (this.placementAdvice.presentationDocumentTarget === 'embed' && !this.isImage) {
       return 'text'
     } else if (this.isOverriddenForThumbnail) {
       return 'link'

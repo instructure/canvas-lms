@@ -164,7 +164,7 @@ export default class StudentContextTray extends React.Component {
         {
           // only include analytics 1 link if analytics 2 is not among the external tool links
           this.props.externalTools &&
-          this.props.externalTools.some(t => t.tool_id == 'fd75124a-140e-470f-944c-114d2d93bb40')
+          this.props.externalTools.some(t => t.tool_id === 'fd75124a-140e-470f-944c-114d2d93bb40')
             ? null
             : StudentContextTray.renderQuickLink(
                 'analytics',
@@ -280,7 +280,7 @@ export default class StudentContextTray extends React.Component {
                       </Text>
                     </div>
                     {course.permissions.send_messages &&
-                    user.enrollments.some(e => e.state == 'active') ? (
+                    user.enrollments.some(e => e.state === 'active') ? (
                       <div className="StudentContextTray-Header__Actions">
                         <Button
                           ref={b => (this.messageStudentsButton = b)}
