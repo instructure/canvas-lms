@@ -85,7 +85,7 @@ describe('Expansion', () => {
 
   it('displays as readonly if isReadOnly is true', () => {
     const {getByText} = setup({isExpanded: false, isReadOnly: true, expandText: '4 replies'})
-    expect(getByText('4 replies').closest('button').hasAttribute('disabled')).toBeTruthy()
+    expect(getByText('4 replies').closest('button').hasAttribute('aria-disabled')).toBe(true)
   })
 
   describe('Mobile', () => {

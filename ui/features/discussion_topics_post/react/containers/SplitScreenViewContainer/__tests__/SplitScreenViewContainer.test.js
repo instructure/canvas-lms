@@ -437,7 +437,8 @@ describe('SplitScreenViewContainer', () => {
     )
 
     expect(await findByTestId('DiscussionEdit-container')).toBeInTheDocument()
-    expect(await findByTestId('threading-toolbar-reply')).toBeDisabled()
+    const reply = await findByTestId('threading-toolbar-reply')
+    expect(reply.hasAttribute('aria-disabled')).toBe(true)
     expect(await findByTestId('expand-button')).toBeEnabled()
   })
 
@@ -454,7 +455,7 @@ describe('SplitScreenViewContainer', () => {
     const replyButtons = await findAllByTestId('threading-toolbar-reply')
     expect(replyButtons[0]).toBeEnabled()
     const expandButtons = await findAllByTestId('expand-button')
-    expect(expandButtons[0]).toBeDisabled()
+    expect(expandButtons[0].hasAttribute('aria-disabled')).toBe(true)
     expect(queryByTestId('DiscussionEdit-container')).toBe(null)
   })
 

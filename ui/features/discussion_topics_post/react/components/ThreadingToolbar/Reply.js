@@ -22,7 +22,7 @@ import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {IconEditLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
@@ -49,10 +49,10 @@ export function Reply({...props}) {
       }}
       render={responsiveProps => (
         <span className="discussion-reply-btn">
-          <CondensedButton
+          <Link
+            isWithinText={false}
+            as="button"
             onClick={props.onClick}
-            withBackground={props.withBackground}
-            color="primary"
             data-testid="threading-toolbar-reply"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
             margin={responsiveProps.itemSpacing}
@@ -69,7 +69,7 @@ export function Reply({...props}) {
                 {replyButtonText}
               </Text>
             </AccessibleContent>
-          </CondensedButton>
+          </Link>
         </span>
       )}
     />

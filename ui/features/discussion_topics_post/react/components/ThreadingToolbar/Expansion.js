@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive'
@@ -43,10 +43,10 @@ export function Expansion({...props}) {
       }}
       render={responsiveProps => (
         <span className="discussion-expand-btn">
-          <CondensedButton
+          <Link
+            isWithinText={false}
+            as="button"
             onClick={props.onClick}
-            withBackground={false}
-            color="primary"
             data-testid="expand-button"
             interaction={props.isReadOnly ? 'disabled' : 'enabled'}
           >
@@ -70,7 +70,7 @@ export function Expansion({...props}) {
             >
               {props.expandText}
             </Text>
-          </CondensedButton>
+          </Link>
         </span>
       )}
     />
