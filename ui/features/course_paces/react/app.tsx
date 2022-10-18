@@ -107,7 +107,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
                 handleDrawerToggle={() => setTrayOpen(!trayOpen)}
                 responsiveSize={responsiveSize}
               />
-              {!coursePace.id && coursePace.context_type == 'Course' ? (
+              {!coursePace.id && coursePace.context_type === 'Course' ? (
                 <CoursePaceEmpty responsiveSize={responsiveSize} />
               ) : (
                 <PacePicker />

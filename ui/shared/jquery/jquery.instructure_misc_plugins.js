@@ -400,44 +400,44 @@ $.fn.autoGrowInput = function (o) {
   )
 
   this.filter('input:text').each(function () {
-    let minWidth = o.minWidth || $(this).width(),
-      val = '',
-      input = $(this),
-      testSubject = $('<tester/>').css({
-        position: 'absolute',
-        top: -9999,
-        left: -9999,
-        width: 'auto',
-        fontSize: input.css('fontSize'),
-        fontFamily: input.css('fontFamily'),
-        fontWeight: input.css('fontWeight'),
-        letterSpacing: input.css('letterSpacing'),
-        whiteSpace: 'nowrap',
-      }),
-      check = function () {
-        setTimeout(() => {
-          if (val === (val = input.val())) {
-            return
-          }
+    let val = ''
+    const minWidth = o.minWidth || $(this).width()
+    const input = $(this)
+    const testSubject = $('<tester/>').css({
+      position: 'absolute',
+      top: -9999,
+      left: -9999,
+      width: 'auto',
+      fontSize: input.css('fontSize'),
+      fontFamily: input.css('fontFamily'),
+      fontWeight: input.css('fontWeight'),
+      letterSpacing: input.css('letterSpacing'),
+      whiteSpace: 'nowrap',
+    })
+    const check = function () {
+      setTimeout(() => {
+        if (val === (val = input.val())) {
+          return
+        }
 
-          // Enter new content into testSubject
-          testSubject.text(val)
+        // Enter new content into testSubject
+        testSubject.text(val)
 
-          // Calculate new width + whether to change
-          const testerWidth = testSubject.width(),
-            newWidth =
-              testerWidth + o.comfortZone >= minWidth ? testerWidth + o.comfortZone : minWidth,
-            currentWidth = input.width(),
-            isValidWidthChange =
-              (newWidth < currentWidth && newWidth >= minWidth) ||
-              (newWidth > minWidth && newWidth < o.maxWidth)
+        // Calculate new width + whether to change
+        const testerWidth = testSubject.width(),
+          newWidth =
+            testerWidth + o.comfortZone >= minWidth ? testerWidth + o.comfortZone : minWidth,
+          currentWidth = input.width(),
+          isValidWidthChange =
+            (newWidth < currentWidth && newWidth >= minWidth) ||
+            (newWidth > minWidth && newWidth < o.maxWidth)
 
-          // Animate width
-          if (isValidWidthChange) {
-            input.width(newWidth)
-          }
-        })
-      }
+        // Animate width
+        if (isValidWidthChange) {
+          input.width(newWidth)
+        }
+      })
+    }
 
     testSubject.insertAfter(input)
 
