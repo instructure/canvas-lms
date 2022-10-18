@@ -85,7 +85,6 @@ function CanvasMultiSelect(props) {
 
   function renderChildren() {
     function renderOption(child) {
-      // eslint-disable-next-line no-shadow
       const {id, children, ...optionProps} = child.props
       return (
         <Select.Option

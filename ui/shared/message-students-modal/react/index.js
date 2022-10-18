@@ -145,7 +145,8 @@ class MessageStudents extends React.Component {
   }
 
   handleChange(field, value) {
-    let {data, errors} = this.state
+    let {data} = this.state
+    const {errors} = this.state
     const newData = {}
     newData[field] = value
     data = {...data, ...newData}

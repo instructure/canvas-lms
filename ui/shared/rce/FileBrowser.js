@@ -333,6 +333,7 @@ class FileBrowser extends React.Component {
     const folderKey = Object.keys(collections).find(key => {
       const items = collections[key].items
       if (items && items.includes(file.id)) return key
+      return false
     })
     return collections[folderKey]
   }
