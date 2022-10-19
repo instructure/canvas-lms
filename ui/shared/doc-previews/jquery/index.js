@@ -19,7 +19,6 @@
 import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import $ from 'jquery'
-import _ from 'underscore'
 import htmlEscape from 'html-escape'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/jquery/jquery.instructure_misc_helpers' /*  /\$\.uniq/, capitalize */
@@ -79,7 +78,7 @@ $.fn.loadDocPreview = function (options) {
         options
       )
 
-    function tellAppIViewedThisInline(serviceUsed) {
+    function tellAppIViewedThisInline(_serviceUsed) {
       // if I have a url to ping back to the app that I viewed this file inline, ping it.
       if (opts.attachment_view_inline_ping_url) {
         $.ajaxJSON(

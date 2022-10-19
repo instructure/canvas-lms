@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
+import {mount} from 'enzyme'
 import {render, within} from '@testing-library/react'
 import {Set} from 'immutable'
 import IndividualStudentMastery from '../index'

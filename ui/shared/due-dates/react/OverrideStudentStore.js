@@ -119,13 +119,13 @@ OverrideStudentStore.allStudentsFetched = function () {
   return this.getState().allStudentsFetched
 }
 
-OverrideStudentStore._fetchStudentsByNameSuccessHandler = function (opts, items, status, xhr) {
+OverrideStudentStore._fetchStudentsByNameSuccessHandler = function (opts, items, _status, _xhr) {
   this.doneSearching()
   this.markNameSearched(opts.nameString)
   this.addStudents(items)
 }
 
-OverrideStudentStore._fetchStudentsByNameErrorHandler = function (opts) {
+OverrideStudentStore._fetchStudentsByNameErrorHandler = function (_opts) {
   this.doneSearching()
 }
 

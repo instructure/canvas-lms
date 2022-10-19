@@ -48,7 +48,7 @@ function allowAction(element) {
   return confirm(message)
 }
 
-$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function (event) {
+$(document).delegate('a[data-confirm], a[data-method], a[data-remove]', 'click', function (_event) {
   const $link = $(this)
 
   if ($link.data('handled') || !allowAction($link)) return false

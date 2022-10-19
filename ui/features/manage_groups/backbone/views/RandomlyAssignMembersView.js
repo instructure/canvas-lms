@@ -105,7 +105,6 @@ export default class RandomlyAssignMembersView extends DialogFormView {
       .attr('data-tooltip', 'top')
       .data('tooltip', {disabled: false})
       .attr('title', message)
-    const label = box.parent()
     return this.checkboxAccessibleAdvisory(box).text(message)
   }
 

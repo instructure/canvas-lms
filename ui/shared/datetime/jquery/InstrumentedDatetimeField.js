@@ -112,7 +112,7 @@ function trackTypingEvents(datetimeField) {
   )
 }
 
-function trackPickingEvents(datetimeField, updateQueue) {
+function trackPickingEvents(datetimeField, _updateQueue) {
   const node = datetimeField.$field[0]
   const picker = datetimeField.$field.data('datepicker')
   const {onClose = NOOP, onSelect = NOOP} = picker.settings

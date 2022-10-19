@@ -39,16 +39,12 @@ import UnpublishedChangesTrayContents from './unpublished_changes_tray_contents'
 import UnpublishedWarningModal from './header/unpublished_warning_modal'
 
 import {coursePaceActions} from '../actions/course_paces'
-import {CoursePace, ResponsiveSizes, StoreState} from '../types'
+import {ResponsiveSizes, StoreState} from '../types'
 import {getCoursePace} from '../reducers/course_paces'
 import {getResponsiveSize, getShowPaceModal} from '../reducers/ui'
 import {SummarizedChange} from '../utils/change_tracking'
 
 const I18n = useI18nScope('course_paces_modal')
-
-interface StoreProps {
-  readonly coursePace: CoursePace
-}
 
 interface DispatchProps {
   onResetPace: typeof coursePaceActions.onResetPace

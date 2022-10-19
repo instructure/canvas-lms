@@ -293,7 +293,6 @@ $.fn.timepicker = function () {
             width: 'auto',
           })
           .show()
-        const pickerOffset = $picker.offset()
         const pickerHeight = $picker.outerHeight()
         const pickerWidth = $picker.outerWidth()
         $picker

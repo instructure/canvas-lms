@@ -26,7 +26,7 @@ import '@canvas/rails-flash-notifications' // flashError
 const I18n = useI18nScope('ajax_errors')
 
 INST.errorCount = 0
-window.onerror = function (msg, url, line, column, errorObj) {
+window.onerror = function (_msg, _url, _line, _column, _errorObj) {
   INST.errorCount += 1
 }
 
@@ -90,7 +90,7 @@ $(document).ready(function () {
       {skipDefaultError: true}
     )
     const $obj = $(this)
-    var ajaxErrorFlash = function (message, xhr) {
+    var ajaxErrorFlash = function (message, _xhr) {
       const i = $obj[0]
       if (!i) {
         return
@@ -107,7 +107,6 @@ $(document).ready(function () {
       )
       $body.append(htmlEscape(text))
       $('#instructure_ajax_error_box').hide()
-      const pre = ''
       message = htmlEscape(message)
       if (debugOnly) {
         message += "<br/><span style='font-size: 0.7em;'>(Development Only)</span>"

@@ -127,7 +127,7 @@ class FileOptionsCollection {
     return ReactDOM.findDOMNode(this.refs.addFileInput).click()
   }
 
-  handleFilesInputChange(e) {
+  handleFilesInputChange(_e) {
     const selectedFiles = this.toFilesOptionArray(
       ReactDOM.findDOMNode(this.refs.addFileInput).files
     )

@@ -75,7 +75,7 @@ export default {
 
     if (this.props.model)
       return this.props.model.fetch({
-        success: (model, response, options) =>
+        success: (model, response, _options) =>
           setTimeout(() => {
             if (response && response.thumbnail_url) {
               this.setState({thumbnail_url: response.thumbnail_url})

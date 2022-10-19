@@ -28,7 +28,6 @@ export default class FilesCollection extends PaginatedCollection {
   }
 
   fetch(options = {}) {
-    let res
     options.data = _.extend(
       {content_types: this.parentFolder != null ? this.parentFolder.contentTypes : undefined},
       options.data || {}
@@ -36,7 +35,7 @@ export default class FilesCollection extends PaginatedCollection {
     if (this.parentFolder != null ? this.parentFolder.useVerifiers : undefined) {
       options.data.use_verifiers = 1
     }
-    return (res = super.fetch(options))
+    return super.fetch(options)
   }
 
   parse(response) {

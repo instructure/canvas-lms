@@ -611,7 +611,7 @@ $.toMultipartForm = function (params, callback) {
         'Content-Type: multipart/mixed; boundary=' +
         innerBoundary +
         '\r\n\r\n'
-      for (const jdx in value) {
+      for (const _jdx in value) {
         fileList.push(value)
       }
       const finishedFiles = function () {
@@ -993,7 +993,7 @@ $.fn.validateForm = function (options) {
     })
   }
   let hasErrors = false
-  for (const err in errors) {
+  for (const _err in errors) {
     hasErrors = true
     break
   }
