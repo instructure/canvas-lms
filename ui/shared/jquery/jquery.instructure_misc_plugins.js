@@ -90,7 +90,7 @@ $.fn.undim = function (speed) {
 //  dialog: If present, do a jquery.ui.dialog instead of a confirm(). If an
 //    object, it will be merged into the dialog options.
 $.fn.confirmDelete = function (options) {
-  var options = $.extend({}, $.fn.confirmDelete.defaults, options)
+  options = $.extend({}, $.fn.confirmDelete.defaults, options)
   const $object = this
   let $dialog = null
   let result = true
@@ -122,12 +122,12 @@ $.fn.confirmDelete = function (options) {
         options.url,
         'DELETE',
         data,
-        data => {
-          options.success.call($object, data)
+        data_ => {
+          options.success.call($object, data_)
         },
-        (data, request, status, error) => {
+        (data_, request, status, error) => {
           if (options.error && $.isFunction(options.error)) {
-            options.error.call($object, data, request, status, error)
+            options.error.call($object, data_, request, status, error)
           } else {
             $.ajaxJSON.unhandledXHRs.push(request)
           }
@@ -177,7 +177,8 @@ $.fn.confirmDelete = function (options) {
       )
       return
     } else {
-      result = confirm(options.message)
+      // eslint-disable-next-line no-alert
+      result = window.confirm(options.message)
     }
   }
   onContinue()
@@ -199,7 +200,7 @@ $.fn.fragmentChange = function (fn) {
     // actually shown in the hash by specifying a query
     // parameter, hash=some_hash
     let query_hash = null
-    for (var i = 0; i < query.length; i++) {
+    for (let i = 0; i < query.length; i++) {
       const item = query[i]
       if (item && item.indexOf('hash=') === 0) {
         query_hash = '#' + item.substring(5)
@@ -210,9 +211,9 @@ $.fn.fragmentChange = function (fn) {
     let found = false
     // Can only be used on the root document,
     // will not work on an iframe, for example.
-    for (var i = 0; i < $._checkFragments.fragmentList.length; i++) {
+    for (let i = 0; i < $._checkFragments.fragmentList.length; i++) {
       const obj = $._checkFragments.fragmentList[i]
-      if (obj.doc[0] == $doc[0]) {
+      if (obj.doc[0] === $doc[0]) {
         found = true
       }
     }
@@ -240,7 +241,7 @@ $._checkFragments = function () {
   for (let idx = 0; idx < list.length; idx++) {
     const obj = list[idx]
     const $doc = obj.doc
-    if ($doc[0].location.hash != obj.fragment) {
+    if ($doc[0].location.hash !== obj.fragment) {
       $doc.triggerHandler('document_fragment_change', $doc[0].location.hash)
       obj.fragment = $doc[0].location.hash
       $._checkFragments.fragmentList[idx] = obj
@@ -355,6 +356,7 @@ $.fn.hasScrollbar = function () {
 }
 
 $.fn.log = function (msg) {
+  // eslint-disable-next-line no-console
   console.log('%s: %o', msg, this)
   return this
 }
