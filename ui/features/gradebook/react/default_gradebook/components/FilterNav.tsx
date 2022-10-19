@@ -17,7 +17,7 @@
  */
 
 import React, {useState} from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import uuid from 'uuid'
 import {useScope as useI18nScope} from '@canvas/i18n'
@@ -325,9 +325,9 @@ export default function FilterNav({
 
       <FlexItem>
         {activeFilterComponents.length > 0 && (
-          <CondensedButton color="primary" margin="0" onClick={handleClearFilters}>
+          <Link isWithinText={false} as="button" margin="0" onClick={handleClearFilters}>
             {I18n.t('Clear All Filters')}
-          </CondensedButton>
+          </Link>
         )}
       </FlexItem>
 
