@@ -18,7 +18,7 @@
 
 import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import DateHelper from '../../../../../shared/datetime/dateHelper'
+import DateHelper from '@canvas/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../graphql/DiscussionEntry'
 import {Flex} from '@instructure/ui-flex'
