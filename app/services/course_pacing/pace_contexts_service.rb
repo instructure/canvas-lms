@@ -24,14 +24,20 @@ class CoursePacing::PaceContextsService
     @course = course
   end
 
-  def contexts_of_type(type)
+  def contexts_of_type(type, sort: nil, order: nil)
     case type
     when "course"
       [course]
     when "section"
-      course.active_course_sections
+      sections = course.active_course_sections
+      sections = sections.order(sort) if sort == "name"
+      sections = sections.reverse_order if order == "desc"
+      sections
     when "student_enrollment"
-      course.student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*").to_a
+      student_enrollments = course.student_enrollments.order(:user_id, created_at: :desc).select("DISTINCT ON(enrollments.user_id) enrollments.*")
+      student_enrollments = student_enrollments.joins(:user).order("users.sortable_name") if sort == "name"
+      student_enrollments = student_enrollments.reverse_order if order == "desc"
+      student_enrollments.to_a
     else
       Canvas::Errors.capture_exception(
         :pace_contexts_service,

@@ -267,5 +267,108 @@ describe "Pace Contexts API" do
         expect(response.status).to eq 404
       end
     end
+
+    context "when an order is specified" do
+      context "sections" do
+        let(:default_section) { course.default_section }
+        let!(:section_one) { add_section("Section One", course: course) }
+        let!(:section_two) { add_section("Section Two", course: course) }
+        let!(:section_three) { add_section("Section Three", course: course) }
+
+        it "orders the results in descending order with desc specified" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", order: "desc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [section_three.id, section_two.id, section_one.id, default_section.id]
+        end
+
+        it "orders the results in ascending order with asc specified" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", order: "asc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [default_section.id, section_one.id, section_two.id, section_three.id]
+        end
+
+        it "orders the results in ascending order by default" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [default_section.id, section_one.id, section_two.id, section_three.id]
+        end
+      end
+
+      context "student enrollments" do
+        let!(:first_student_enrollment) { course.enroll_student(user_model(name: "Foo Bar"), enrollment_state: "active") }
+        let!(:second_student_enrollment) { course.enroll_student(user_model(name: "Bar Foo"), enrollment_state: "active") }
+
+        it "orders the results in descending order with desc specified" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", order: "desc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [second_student_enrollment.id, first_student_enrollment.id]
+        end
+
+        it "orders the results in ascending order with asc specified" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", order: "asc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [first_student_enrollment.id, second_student_enrollment.id]
+        end
+
+        it "orders the results in ascending order by default" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("item_id")).to eq [first_student_enrollment.id, second_student_enrollment.id]
+        end
+      end
+    end
+
+    context "when a sort is specified" do
+      context "sections" do
+        before do
+          add_section("Section C", course: course)
+          add_section("Section A", course: course)
+          add_section("Section B", course: course)
+        end
+
+        it "sorts by the section name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", sort: "name", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Section A", "Section B", "Section C", "Unnamed Course"]
+        end
+
+        it "sorts by the section name and respects descending order" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "section", sort: "name", order: "desc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Unnamed Course", "Section C", "Section B", "Section A"]
+        end
+      end
+
+      context "student enrollments" do
+        before do
+          student = user_model(name: "Foo Bar", sortable_name: "A, Foo")
+          student_two = user_model(name: "Bar Foo", sortable_name: "B, Foo")
+          course.enroll_student(student, enrollment_state: "active")
+          course.enroll_student(student_two, enrollment_state: "active")
+        end
+
+        it "sorts by the sortable user name" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", sort: "name", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Foo Bar", "Bar Foo"]
+        end
+
+        it "sorts by the sortable user name and respects descending order" do
+          get api_v1_pace_contexts_path(course.id), params: { type: "student_enrollment", sort: "name", order: "desc", format: :json }
+          expect(response.status).to eq 200
+          json = JSON.parse(response.body)
+          expect(json["pace_contexts"].pluck("name")).to eq ["Bar Foo", "Foo Bar"]
+        end
+      end
+    end
   end
 end
