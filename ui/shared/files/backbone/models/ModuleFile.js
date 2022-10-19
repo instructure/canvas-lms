@@ -18,7 +18,7 @@
 import FilesystemObject from './FilesystemObject.coffee'
 
 export default class ModuleFile extends FilesystemObject {
-  initialize(attributes, options) {
+  initialize(_attributes, _options) {
     return super.initialize(...arguments)
   }
 }

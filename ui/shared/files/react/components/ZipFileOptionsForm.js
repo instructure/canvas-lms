@@ -40,7 +40,7 @@ class ZipFileOptionsForm extends React.Component {
     this.props.onZipOptionsResolved({file: this.props.fileOptions.file, expandZip: false})
   }
 
-  buildMessage = fileOptions => {
+  buildMessage = _fileOptions => {
     let message
     if (this.props.fileOptions) {
       const name = this.props.fileOptions.file.name

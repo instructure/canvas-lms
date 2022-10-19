@@ -88,7 +88,7 @@ Object.assign(Assignment.prototype, {
     )
   },
 
-  save(params, success, error) {
+  save(_params, _success, _error) {
     publish('CommonEvent/assignmentSaved', this)
     return Assignment.__super__.save.apply(this, arguments)
   },

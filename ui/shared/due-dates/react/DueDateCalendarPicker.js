@@ -25,7 +25,6 @@ import tz from '@canvas/timezone'
 import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import cx from 'classnames'
-import {format, parse} from 'datetime'
 
 function DueDateCalendarPicker(props) {
   const dateInput = useRef(null)

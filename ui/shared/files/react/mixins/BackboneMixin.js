@@ -80,7 +80,7 @@ export default function BackboneMixin(optionsOrPropName, customChangeOptions) {
       if (typeof this.componentWillChangeModel === 'function') this.componentWillChangeModel()
     },
 
-    componentDidUpdate(prevProps, prevState) {
+    componentDidUpdate(prevProps, _prevState) {
       if (modelOrCollection(this.props) === modelOrCollection(prevProps)) return
       if (typeof this.componentDidChangeModel === 'function') this.componentDidChangeModel()
     },

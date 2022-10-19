@@ -29,7 +29,6 @@ export default class StudentRange extends React.Component {
   }
 
   render() {
-    const students = this.props.range.students
     return (
       <div className="crs-student-range">
         {this.props.range.students.map((student, i) => {

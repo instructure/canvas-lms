@@ -17,7 +17,6 @@
  */
 
 import {parse, format} from 'datetime'
-import timezone from 'timezone'
 import fr_FR from 'timezone/fr_FR'
 import zh_CN from 'timezone/zh_CN'
 import en_US from 'timezone/en_US'
@@ -29,7 +28,7 @@ import {
   down as resetDateTimeMomentParser,
 } from '../configureDateTimeMomentParser'
 
-const equal = (a, b, message) => expect(a).toEqual(b)
+const equal = (a, b, _message) => expect(a).toEqual(b)
 
 let TIMEZONE, BIGEASY_LOCALE, MOMENT_LOCALE, __PRELOADED_TIMEZONE_DATA__
 

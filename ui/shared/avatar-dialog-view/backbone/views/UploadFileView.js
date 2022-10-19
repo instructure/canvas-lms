@@ -46,7 +46,7 @@ export default class UploadFileView extends BaseView {
     return this.loadPreview(e.target.files[0])
   }
 
-  onDragLeave(e) {
+  onDragLeave(_e) {
     return this.toggleOverStyle(false)
   }
 
@@ -116,18 +116,17 @@ export default class UploadFileView extends BaseView {
   }
 
   imageDimensions($preview, $fullSize) {
-    let dimensions
     const heightRatio = $fullSize.height() / $preview.height()
     const widthRatio = $fullSize.width() / $preview.width()
 
-    return (dimensions = {
+    return {
       heightRatio,
       widthRatio,
       x: Math.floor(this.currentCoords.x * widthRatio),
       y: Math.floor(this.currentCoords.y * heightRatio),
       w: Math.floor(this.currentCoords.w * widthRatio),
       h: Math.floor(this.currentCoords.h * heightRatio),
-    })
+    }
   }
 
   getImage() {

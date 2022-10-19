@@ -435,7 +435,7 @@ describe('CreateOutcomeModal', () => {
       })
 
       it('sets focus on create button after creation of a new group', async () => {
-        const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+        jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText, getByTestId} = render(
           <CreateOutcomeModal {...defaultProps()} />,
           {

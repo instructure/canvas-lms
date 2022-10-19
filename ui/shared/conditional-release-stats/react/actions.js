@@ -50,7 +50,7 @@ actions.closeSidebar = () => {
   }
 }
 
-actions.loadInitialData = assignment => {
+actions.loadInitialData = _assignment => {
   return (dispatch, getState) => {
     dispatch(actions.loadInitialDataStart())
 

@@ -51,14 +51,14 @@ class GradingStandard extends React.Component {
     if (this.props.justAdded) ReactDOM.findDOMNode(this.refs.title).focus()
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps, _prevState) {
     if (this.props.editing !== prevProps.editing) {
       ReactDOM.findDOMNode(this.refs.title).focus()
       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
     }
   }
 
-  triggerEditGradingStandard = event => {
+  triggerEditGradingStandard = _event => {
     this.props.onSetEditingStatus(this.props.uniqueId, true)
   }
 
@@ -110,7 +110,6 @@ class GradingStandard extends React.Component {
 
   changeRowMinScore = (index, inputVal) => {
     const newEditingStandard = $.extend(true, {}, this.state.editingStandard)
-    const lastChar = inputVal.substr(inputVal.length - 1)
     newEditingStandard.data[index][1] = inputVal
     this.setState({editingStandard: newEditingStandard})
   }
