@@ -1942,7 +1942,25 @@ describe Enrollment do
       describe "enrollment_dates_override dates" do
         before do
           @term = @course.enrollment_term
-          @override = @term.enrollment_dates_overrides.create!(enrollment_type: @enrollment.type, enrollment_term: @term, context: @term.root_account)
+          @override = @term.enrollment_dates_overrides.create!(
+            enrollment_type: @enrollment.type,
+            enrollment_term: @term,
+            context: @term.root_account
+          )
+        end
+
+        it "infers root account by default" do
+          expect(@override.root_account).to eq @term.root_account
+        end
+
+        it "allows setting the root account" do
+          new_override = @term.enrollment_dates_overrides.create!(
+            enrollment_type: @enrollment.type,
+            enrollment_term: @term,
+            context: @term.root_account,
+            root_account: @course.root_account
+          )
+          expect(new_override.root_account).to eq @course.root_account
         end
 
         it "returns active" do

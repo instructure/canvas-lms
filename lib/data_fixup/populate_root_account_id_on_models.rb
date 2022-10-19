@@ -219,7 +219,7 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   # tables that have been filled for a while already
-  DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentDatesOverride, EnrollmentTerm, Group].freeze
+  DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentTerm, Group].freeze
 
   def self.send_later_backfill_strand(job, *args)
     delay_if_production(priority: Delayed::MAX_PRIORITY,
