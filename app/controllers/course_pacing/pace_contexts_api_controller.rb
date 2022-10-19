@@ -26,8 +26,27 @@ class CoursePacing::PaceContextsApiController < ApplicationController
 
   PERMITTED_CONTEXT_TYPES = %w[course section student_enrollment].freeze
 
+  # @API List all pace contexts
+  #
+  # Returns a paginated list of pace contexts for the given course and context type.
+  #
+  # @argument type [String]
+  #   The type of pace context to return. Must be one of "course", "section", or "student_enrollment". Each type will
+  #   return the corresponding set of items that can be paced.
+  #
+  # @argument sort [Optional, String, "name"]
+  #   When included, sorts all pace contexts by the given field. "name" is the only supported sort field and will sort
+  #   sections by their section name and student enrollments by their user's sortable name.
+  #
+  # @argument order [Optional, String, "asc"|"desc"]
+  #   When included, orders the results in the given order. "asc" is the default order and to reverse the order pass
+  #   "desc". Works in conjunction with the "sort" argument.
+  #
+  # @example_request
+  #   curl https://<canvas>/api/v1/courses/1/pace_contexts?type=course \
+  #     -H 'Authorization: Bearer <token>'
   def index
-    contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type)
+    contexts = CoursePacing::PaceContextsService.new(@context).contexts_of_type(@type, sort: params[:sort], order: params[:order])
     paginated_contexts = Api.paginate(contexts, self, api_v1_pace_contexts_url, total_entries: contexts.count)
     render json: {
       pace_contexts: paginated_contexts.map { |c| CoursePacing::PaceContextsPresenter.as_json(c) }
