@@ -44,7 +44,7 @@ class HomePagePromptContainer extends React.Component {
     this.flashScreenReaderAlert()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.forceOpen) {
       this.setState({dialogOpen: true})
       this.flashScreenReaderAlert()

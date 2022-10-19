@@ -100,7 +100,7 @@ export class DiscussionsContainer extends Component {
     }
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     if (this.props.discussions === props.discussions) {
       return
     }

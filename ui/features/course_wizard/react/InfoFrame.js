@@ -67,7 +67,7 @@ class InfoFrame extends React.Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.getWizardItem(newProps.itemToShow)
   }
 

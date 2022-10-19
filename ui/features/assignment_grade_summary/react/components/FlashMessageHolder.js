@@ -106,7 +106,7 @@ class FlashMessageHolder extends Component {
     unmuteAssignmentStatus: null,
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const changes = Object.keys(nextProps).reduce(
       (changeMap, prop) => ({...changeMap, [prop]: nextProps[prop] !== this.props[prop]}),
       {}

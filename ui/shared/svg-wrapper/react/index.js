@@ -33,7 +33,7 @@ class SVGWrapper extends React.Component {
     this.fetchSVG()
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.url !== this.props.url) {
       this.fetchSVG()
     }

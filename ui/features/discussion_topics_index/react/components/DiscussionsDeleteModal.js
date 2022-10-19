@@ -40,7 +40,7 @@ export default class DiscussionDeleteModal extends Component {
     open: this.props.defaultOpen,
   }
 
-  componentWillReceiveProps(props) {
+  UNSAFE_componentWillReceiveProps(props) {
     this.setState({open: props.defaultOpen})
   }
 

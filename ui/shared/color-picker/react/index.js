@@ -238,7 +238,7 @@ const ColorPicker = createReactClass({
     $(window).off('scroll', this.handleScroll)
   },
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState(
       {
         isOpen: nextProps.isOpen,

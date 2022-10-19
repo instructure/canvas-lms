@@ -35,7 +35,7 @@ class DataRow extends React.Component {
 
   state = {showBottomBorder: false}
 
-  componentWillReceiveProps() {
+  UNSAFE_componentWillReceiveProps() {
     this.setState({showBottomBorder: false})
   }
 

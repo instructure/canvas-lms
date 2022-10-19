@@ -114,7 +114,7 @@ export default class AddPeople extends React.Component {
     this.manageFocus()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.usersEnrolled) this.close()
     if (nextProps.apiState && nextProps.apiState.error) {
       this.setState({
