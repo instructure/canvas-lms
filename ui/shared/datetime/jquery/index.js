@@ -285,7 +285,7 @@ $.fn.timepicker = function () {
         const offset = $(this).offset()
         const height = $(this).outerHeight()
         const width = $(this).outerWidth()
-        const $picker = $('#time_picker')
+        $picker = $('#time_picker')
         $picker
           .css({
             left: -1000,
@@ -356,8 +356,9 @@ $.fn.timepicker = function () {
           $('#time_picker .time_slot').eq(idx).triggerHandler('mouseover')
           return
         }
+        let $parent
         if (event.keyString === 'ctrl+up') {
-          var $parent = $current.parent('.widget_group')
+          $parent = $current.parent('.widget_group')
           idx = $parent.children('.time_slot').index($current)
           if ($parent.hasClass('ampm_group')) {
             idx = min / 15

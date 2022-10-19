@@ -37,6 +37,7 @@ $(document).ready(function () {
     if ($(this).css('display') !== 'none') {
       // TODO: This is always undefined - where did this come from?
       const idx = $(this).data('selected.tabs')
+      // eslint-disable-next-line eqeqeq
       if (idx == 0) {
         channelInputField = $('#register_email_address').find(':text:first')
       } else {
@@ -84,7 +85,7 @@ $(document).ready(function () {
     }
   })
 
-  var formatTabs = function (tabs) {
+  const formatTabs = function (tabs) {
     const $form = $(tabs).parents('#register_sms_number')
     const sms_number = $form.find('.sms_number').val().replace(/[^\d]/g, '')
 
@@ -92,7 +93,7 @@ $(document).ready(function () {
       !ENV.INTERNATIONAL_SMS_ENABLED || $form.find('.country option:selected').data('useEmail')
 
     // Don't show the 10-digit warning if we're not expecting a U.S. number
-    $form.find('.should_be_10_digits').showIf(useEmail && sms_number && sms_number.length != 10)
+    $form.find('.should_be_10_digits').showIf(useEmail && sms_number && sms_number.length !== 10)
 
     // Show the "international text messaging rates may apply" warning if international SMS is enabled, the user has
     // selected a country, and that country is not the U.S.
@@ -338,8 +339,8 @@ $(document).ready(function () {
         `/confirmations/${data.user_id}/limit_reached/${data.channel_id}`,
         'GET',
         {},
-        data => {
-          if (data.confirmation_limit_reached) {
+        data_ => {
+          if (data_.confirmation_limit_reached) {
             $box.find('.re_send_confirmation_link').css('visibility', 'hidden')
           } else {
             $box.find('.re_send_confirmation_link').css('visibility', 'visible')
@@ -417,12 +418,12 @@ $(document).ready(function () {
       default_email_id: channel_id,
     }
     $.ajaxJSON($(this).attr('href'), 'PUT', formData, data => {
-      const channel_id = data.user.communication_channel.id
+      const channel_id_ = data.user.communication_channel.id
       $('.channel.default')
         .removeClass('default')
         .find('a.default_link span.screenreader-only.default_label')
         .remove()
-      $('.channel#channel_' + channel_id)
+      $('.channel#channel_' + channel_id_)
         .addClass('default')
         .find('a.default_link')
         .append(

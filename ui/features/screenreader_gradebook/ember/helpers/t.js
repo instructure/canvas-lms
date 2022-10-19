@@ -25,7 +25,7 @@ Ember.Handlebars.registerHelper('t', (...args1) => {
     hbsOptions = args1[adjustedLength - 1]
   const {hash, hashTypes, hashContexts} = hbsOptions
   const options = {}
-  for (var key of Object.keys(hash || {})) {
+  for (const key of Object.keys(hash || {})) {
     const value = hash[key]
     const type = hashTypes[key]
     if (type === 'ID') {
@@ -36,6 +36,7 @@ Ember.Handlebars.registerHelper('t', (...args1) => {
   }
 
   const wrappers = []
+  let key
   while ((key = `w${wrappers.length}`) && options[key]) {
     wrappers.push(options[key])
     delete options[key]
