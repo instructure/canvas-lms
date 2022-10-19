@@ -189,12 +189,17 @@ describe UserSearch do
           before do
             pseudonym.sis_user_id = "SOME_SIS_ID"
             pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
+            pseudonym.integration_id = "ACME_123"
             pseudonym.current_login_at = Time.utc(2019, 11, 11)
             pseudonym.save!
           end
 
           it "will match against an sis id" do
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
+          end
+
+          it "will match against an integration id" do
+            expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
           end
 
           describe "will match against a suspended user" do
@@ -207,6 +212,10 @@ describe UserSearch do
               expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq [user]
             end
 
+            it "by integrtion id" do
+              expect(UserSearch.for_user_in_context("ACME", course, user)).to eq [user]
+            end
+
             it "by user name" do
               expect(UserSearch.for_user_in_context("admin", course, user)).to eq [user]
             end
@@ -216,6 +225,12 @@ describe UserSearch do
             RoleOverride.create!(context: Account.default, role: teacher_role,
                                  permission: "read_sis", enabled: false)
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
+          end
+
+          it "will not match against an integration id without :read_sis permission" do
+            RoleOverride.create!(context: Account.default, role: teacher_role,
+                                 permission: "read_sis", enabled: false)
+            expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
           end
 
           it "will match against an sis id and regular id" do
@@ -262,6 +277,15 @@ describe UserSearch do
             User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
                                                                    sis_user_id: "1tyler", account_id: course.root_account_id)
             users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "sis_id")
+            expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
+          end
+
+          it "sorts by integration id" do
+            User.find_by(name: "Rose Tyler").pseudonyms.create!(unique_id: "rose.tyler@example.com",
+                                                                integration_id: "25rose", account_id: course.root_account_id)
+            User.find_by(name: "Tyler Pickett").pseudonyms.create!(unique_id: "tyler.pickett@example.com",
+                                                                   integration_id: "1tyler", account_id: course.root_account_id)
+            users = UserSearch.for_user_in_context("Tyler", course, user, nil, sort: "integration_id")
             expect(users.map(&:name)).to eq ["Tyler Pickett", "Rose Tyler", "Tyler Teacher"]
           end
 
@@ -425,6 +449,14 @@ describe UserSearch do
         pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
         pseudonym.save!
         expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
+      end
+
+      it "does not match against integration ids" do
+        pseudonym = user.pseudonyms.build
+        pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
+        pseudonym.integration_id = "ACME_123"
+        pseudonym.save!
+        expect(UserSearch.for_user_in_context("ACME", course, user)).to eq []
       end
 
       it "does not match against emails" do
