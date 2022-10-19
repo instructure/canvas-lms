@@ -183,12 +183,14 @@ class GradingStandardCollection extends React.Component {
     if (!this.state.standards) {
       return null
     } else if (this.state.standards.length === 0) {
-      return <h3 ref="noSchemesMessage">{I18n.t('No grading schemes to display')}</h3>
+      return (
+        <h3 ref={c => (this.noSchemesMessageRef = c)}>{I18n.t('No grading schemes to display')}</h3>
+      )
     }
     return this.state.standards.map(function (s) {
       return (
         <GradingStandard
-          ref={`gradingStandard${s.grading_standard.id}`}
+          ref={c => (this[`gradingStandard${s.grading_standard.id}Ref`] = c)}
           key={s.grading_standard.id}
           uniqueId={s.grading_standard.id}
           standard={s.grading_standard}
@@ -210,7 +212,7 @@ class GradingStandardCollection extends React.Component {
       <div>
         <div className="pull-right">
           <button
-            ref="addButton"
+            ref={c => (this.addButtonRef = c)}
             type="button"
             onClick={this.addGradingStandard}
             className={this.getAddButtonCssClasses()}
