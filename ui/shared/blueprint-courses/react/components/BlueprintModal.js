@@ -59,7 +59,7 @@ export default class BlueprintModal extends Component {
     this.fixBodyScroll(this.props.isOpen)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (nextProps.isOpen !== this.props.isOpen) {
       this.fixBodyScroll(nextProps.isOpen)
     }

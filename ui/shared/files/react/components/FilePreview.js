@@ -63,7 +63,7 @@ export default class FilePreview extends React.PureComponent {
     return codeToRemoveLater.hideFileTreeFromPreviewInJaws()
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (newProps.isOpen) {
       this.getItemsToView(newProps, items => this.setState(this.stateProperties(items)))
     }

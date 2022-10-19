@@ -37,7 +37,7 @@ class Checklist extends React.Component {
     selectedItem: this.props.selectedItem || '',
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     this.setState({
       selectedItem: newProps.selectedItem,
     })

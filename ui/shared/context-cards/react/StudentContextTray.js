@@ -96,7 +96,7 @@ export default class StudentContextTray extends React.Component {
    * Lifecycle
    */
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.state.isOpen) {
       this.setState({isOpen: true})
     }

@@ -43,7 +43,7 @@ class ChecklistItem extends React.Component {
     this.setClassName(this.props)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setClassName(nextProps)
   }
 

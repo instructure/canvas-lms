@@ -75,7 +75,7 @@ export default class BlueprintAssociations extends React.Component {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (!this.props.isSavingAssociations && nextProps.isSavingAssociations) {
       $.screenReaderFlashMessage(I18n.t('Saving associations started'))
     }

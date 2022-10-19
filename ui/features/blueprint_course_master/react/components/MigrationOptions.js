@@ -53,7 +53,7 @@ export default class MigrationOptions extends React.Component {
     setNotificationMessage: PropTypes.func.isRequired,
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (
       newProps.notificationMessage !== this.props.notificationMessage &&
       newProps.notificationMessage.length > WARNING_MESSAGE_LENGTH

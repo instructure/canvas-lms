@@ -118,7 +118,7 @@ export default class CourseItemRow extends Component {
     this.onFocusManage(this.props)
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.onFocusManage(nextProps)
   }
 

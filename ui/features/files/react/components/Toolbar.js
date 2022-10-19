@@ -74,7 +74,7 @@ export default class Toolbar extends React.Component {
     })
   }
 
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     this.showingButtons = nextProps.selectedItems.length
   }
 

@@ -39,7 +39,7 @@ class GradingStandard extends React.Component {
     showAlert: false,
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       editingStandard: $.extend(true, {}, this.props.standard),
       saving: nextProps.saving,
