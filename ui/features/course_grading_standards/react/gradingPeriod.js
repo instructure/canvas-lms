@@ -94,7 +94,7 @@ class GradingPeriod extends React.Component {
     return (
       <GradingPeriodTemplate
         key={this.props.id}
-        ref="template"
+        ref={c => (this.templateRef = c)}
         id={this.props.id}
         title={this.props.title}
         weight={this.props.weight}

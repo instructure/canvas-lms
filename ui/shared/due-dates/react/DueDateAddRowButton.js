@@ -35,7 +35,7 @@ class DueDateAddRowButton extends React.Component {
     return (
       <button
         id="add_due_date"
-        ref="addButton"
+        ref={c => (this.addButtonRef = c)}
         className="Button Button--add-row"
         onClick={this.props.handleAdd}
         type="button"

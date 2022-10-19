@@ -176,14 +176,14 @@ export default createReactClass({
   },
 
   onSaveSuccess(tool) {
-    $(this.refs.addButton).removeAttr('disabled')
+    $(this.addButtonRef).removeAttr('disabled')
     tool.off('sync', this.onSaveSuccess)
     this.setState({errorMessage: null})
     this.closeModal(this.props.handleToolInstalled)
   },
 
   onSaveFail(_tool) {
-    $(this.refs.addButton).removeAttr('disabled')
+    $(this.addButtonRef).removeAttr('disabled')
     this.setState({
       errorMessage: I18n.t('There was an error in processing your request'),
     })

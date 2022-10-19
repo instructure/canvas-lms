@@ -29,9 +29,9 @@ class Group extends React.Component {
   toggleOpen = () => {
     this.setState({open: !this.state.open}, () => {
       if (this.state.open) {
-        this.refs.memberList.focus()
+        this.memberListRef.focus()
       } else {
-        this.refs.groupTitle.focus()
+        this.groupTitleRef.focus()
       }
     })
   }
@@ -148,7 +148,7 @@ class Group extends React.Component {
     const body = (
       <div id={studentGroupId} className={`student-group-body${showBody ? '' : ' hidden'}`}>
         <ul
-          ref="memberList"
+          ref={c => (this.memberListRef = c)}
           className="student-group-list clearfix"
           aria-label={I18n.t('group members')}
           tabIndex="0"
@@ -232,7 +232,7 @@ class Group extends React.Component {
         onClick={this.toggleOpen}
       >
         <div className="student-group-header align-items-center clearfix">
-          <div ref="groupTitle" className="student-group-title">
+          <div ref={c => (this.groupTitleRef = c)} className="student-group-title">
             <h2 aria-label={groupName}>
               {this.props.group.name}
               <small>&nbsp;{this.props.group.group_category.name}</small>

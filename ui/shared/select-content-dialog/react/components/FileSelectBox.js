@@ -139,7 +139,9 @@ export default class FileSelectBox extends React.Component {
     return (
       <div>
         <select
-          ref="selectBox"
+          ref={c => {
+            this.selectBoxRef = c
+          }}
           aria-busy={this.isLoading()}
           className="module_item_select"
           aria-label={ariaLabel}

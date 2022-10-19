@@ -121,7 +121,7 @@ class DataRow extends React.Component {
     if (this.props.onlyDataRowRemaining) return null
     return (
       <button
-        ref="deleteButton"
+        ref={c => (this.deleteButtonRef = c)}
         className="Button Button--icon-action delete_row_button"
         onClick={this.triggerDeleteRow}
         type="button"

@@ -286,7 +286,7 @@ class GradingStandard extends React.Component {
             <i className="icon-edit" />
           </button>
           <button
-            ref="deleteButton"
+            ref={c => (this.deleteButtonRef = c)}
             className="Button Button--icon-action delete_grading_standard_button"
             onClick={this.triggerDeleteGradingStandard}
             type="button"

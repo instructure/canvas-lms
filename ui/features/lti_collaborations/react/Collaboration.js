@@ -45,7 +45,7 @@ class Collaboration extends React.Component {
         deleteConfirmationOpen: false,
       },
       () => {
-        ReactDOM.findDOMNode(this.refs.deleteButton).focus()
+        ReactDOM.findDOMNode(this.deleteButtonRef).focus()
       }
     )
   }
@@ -91,7 +91,7 @@ class Collaboration extends React.Component {
           {collaboration.permissions.delete && (
             <button
               type="button"
-              ref="deleteButton"
+              ref={c => (this.deleteButtonRef = c)}
               className="btn btn-link"
               onClick={this.openConfirmation}
             >

@@ -49,8 +49,8 @@ const InfiniteScroll = {
   }, 100),
 
   attachScroll() {
-    if (this.refs.scrollElement) {
-      this.scrollElement = this.refs.scrollElement
+    if (this.scrollElementRef) {
+      this.scrollElement = this.scrollElementRef
     }
     this.detached = false
     ;(this.scrollElement || window).addEventListener('scroll', this.loadMoreIfNeeded)
