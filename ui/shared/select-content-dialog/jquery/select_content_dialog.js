@@ -134,6 +134,7 @@ SelectContentDialog.detachDeepLinkingListener = function () {
 }
 
 SelectContentDialog.dialogCancelHandler = function (event) {
+  // eslint-disable-next-line no-alert
   const response = window.confirm(
     I18n.t('Are you sure you want to cancel? Changes you made may not be saved.')
   )
@@ -205,11 +206,11 @@ SelectContentDialog.Events = {
         (tool.placements.resource_selection && 'resource_selection') ||
         (tool.placements.assignment_selection && 'assignment_selection') ||
         (tool.placements.link_selection && 'link_selection')
-      var placement = tool.placements[placement_type]
+      const placement = tool.placements[placement_type]
       const width = placement.selection_width
       const height = placement.selection_height
       let $dialog = $('#resource_selection_dialog')
-      if ($dialog.length == 0) {
+      if ($dialog.length === 0) {
         $dialog = $('<div/>', {
           id: 'resource_selection_dialog',
           style: 'padding: 0; overflow-y: hidden;',
@@ -332,7 +333,8 @@ SelectContentDialog.Events = {
             if (item['@type'] === 'LtiLinkItem' && item.url) {
               SelectContentDialog.handleContentItemResult(item, tool)
             } else {
-              alert(SelectContent.errorForUrlItem(item))
+              // eslint-disable-next-line no-alert
+              window.alert(SelectContent.errorForUrlItem(item))
 
               SelectContentDialog.resetExternalToolFields()
             }
@@ -364,7 +366,7 @@ SelectContentDialog.Events = {
       $(window).on('beforeunload', SelectContentDialog.beforeUnloadHandler)
     } else {
       const placements = $tool.data('tool').placements
-      var placement = placements.assignment_selection || placements.link_selection
+      const placement = placements.assignment_selection || placements.link_selection
       $('#external_tool_create_url').val(placement.url || '')
       $('#context_external_tools_select .domain_message')
         .showIf($tool.data('tool').domain)
@@ -415,7 +417,7 @@ $(document).ready(function () {
   const external_services = null
   const $dialog = $('#select_context_content_dialog')
   INST.selectContentDialog = function (options) {
-    var options = options || {}
+    options = options || {}
     const for_modules = options.for_modules
     const select_button_text = options.select_button_text || I18n.t('buttons.add_item', 'Add Item')
     const holder_name = options.holder_name || 'module'
@@ -447,9 +449,9 @@ $(document).ready(function () {
           $service.append($img)
           $service.click(function (event) {
             event.preventDefault()
-            findLinkForService($(this).data('service').service, data => {
-              $('#content_tag_create_url').val(data.url)
-              $('#content_tag_create_title').val(data.title)
+            findLinkForService($(this).data('service').service, data_ => {
+              $('#content_tag_create_url').val(data_.url)
+              $('#content_tag_create_title').val(data_.title)
             })
           })
           $services.append($service)
@@ -479,7 +481,7 @@ $(document).ready(function () {
       '#select_context_content_dialog .module_item_select:visible'
     )[0]
     if (visibleModuleItemSelect) {
-      if (visibleModuleItemSelect.selectedIndex != -1) {
+      if (visibleModuleItemSelect.selectedIndex !== -1) {
         $('.add_item_button').removeClass('disabled').attr('aria-disabled', false)
       } else {
         $('.add_item_button').addClass('disabled').attr('aria-disabled', true)
@@ -515,9 +517,10 @@ $(document).ready(function () {
     }
 
     const item_type = $('#add_module_item_select').val()
+    let item_data
 
-    if (item_type == 'external_url') {
-      var item_data = {
+    if (item_type === 'external_url') {
+      item_data = {
         'item[type]': $('#add_module_item_select').val(),
         'item[id]': $(
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
@@ -536,8 +539,8 @@ $(document).ready(function () {
       } else {
         submit(item_data)
       }
-    } else if (item_type == 'context_external_tool') {
-      var item_data = SelectContentDialog.extractContextExternalToolItemData()
+    } else if (item_type === 'context_external_tool') {
+      item_data = SelectContentDialog.extractContextExternalToolItemData()
       if (item_data['item[assignment_id]']) {
         // don't keep fields populated after an assignment was created
         // since assignment creation via deep link requires another tool launch
@@ -559,8 +562,8 @@ $(document).ready(function () {
       } else {
         submit(item_data)
       }
-    } else if (item_type == 'context_module_sub_header') {
-      var item_data = {
+    } else if (item_type === 'context_module_sub_header') {
+      item_data = {
         'item[type]': $('#add_module_item_select').val(),
         'item[id]': $(
           '#select_context_content_dialog .module_item_option:visible:first .module_item_select'
@@ -584,7 +587,7 @@ $(document).ready(function () {
           quiz_type = $('input[name=quiz_engine_selection]:checked').val()
         }
         const quiz_lti = quiz_type === 'assignment'
-        const item_data = {
+        item_data = {
           'item[type]': quiz_type || item_type,
           'item[id]': item_id,
           'item[title]': $option.text(),
@@ -635,20 +638,20 @@ $(document).ready(function () {
               ).val()
               item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             }
-            const $option = $(document.createElement('option'))
+            const $option_ = $(document.createElement('option'))
             const obj_id = item_type === 'quiz' ? `${quiz_type || 'quiz'}_${obj.id}` : obj.id
-            $option.val(obj_id).text(item_data['item[title]'])
+            $option_.val(obj_id).text(item_data['item[title]'])
             $('#' + item_type + 's_select')
               .find('.module_item_select option:last')
-              .after($option)
+              .after($option_)
             submit(item_data, done)
           }
 
-          if (item_data['item[type]'] == 'assignment') {
+          if (item_data['item[type]'] === 'assignment') {
             data['assignment[post_to_sis]'] = ENV.DEFAULT_POST_TO_SIS
           }
 
-          if (item_data['item[type]'] == 'attachment') {
+          if (item_data['item[type]'] === 'attachment') {
             BaseUploader.prototype.onUploadPosted = attachment => {
               let file_matches = false
               // if the uploaded file replaced and existing file that already has a module item, don't create a new item
@@ -656,6 +659,7 @@ $(document).ready(function () {
               if (
                 !Object.keys(ENV.MODULE_FILE_DETAILS).find(fdkey => {
                   file_matches =
+                    // eslint-disable-next-line eqeqeq
                     ENV.MODULE_FILE_DETAILS[fdkey].content_id == attachment.replacingFileId &&
                     ENV.MODULE_FILE_DETAILS[fdkey].module_id == adding_to_module_id // eslint-disable-line eqeqeq
                   if (file_matches) ENV.MODULE_FILE_DETAILS[fdkey].content_id = attachment.id
@@ -689,18 +693,12 @@ $(document).ready(function () {
               url,
               'POST',
               data,
-              data => {
-                process_upload(data)
+              data_ => {
+                process_upload(data_)
               },
-              data => {
+              data_ => {
                 $('#select_context_content_dialog').loadingImage('remove')
-                if (
-                  data &&
-                  data.errors &&
-                  data.errors.title[0] &&
-                  data.errors.title[0].message &&
-                  data.errors.title[0].message === 'blank'
-                ) {
+                if (data_?.errors?.title?.[0]?.message === 'blank') {
                   $('#select_context_content_dialog').errorBox(
                     I18n.t('errors.assignment_name_blank', 'Assignment name cannot be blank.')
                   )
@@ -761,7 +759,7 @@ $(document).ready(function () {
       .show()
       .find('.module_item_select')
       .change()
-    if ($(this).val() == 'context_external_tool') {
+    if ($(this).val() === 'context_external_tool') {
       const $select = $('#context_external_tools_select')
       if (!$select.hasClass('loaded')) {
         $select.find('.message').text('Loading...')
