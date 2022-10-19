@@ -113,20 +113,41 @@ describe Types::DiscussionEntryType do
   end
 
   describe "quoted entry" do
-    before do
-      allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
+    context "split screen view" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(false)
+      end
+
+      it "returns the reply preview data" do
+        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+        parent.message = message * 5 # something longer than the default 150 chars
+        parent.save
+        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+        sub_entry.update!(include_reply_preview: true)
+        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
+        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
+        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
+        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
+      end
     end
 
-    it "returns the reply preview data" do
-      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
-      parent.message = message * 5 # something longer than the default 150 chars
-      parent.save
-      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
-      sub_entry.update!(include_reply_preview: true)
-      expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
-      expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
-      expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
-      expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
+    context "isolated view" do
+      before do
+        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
+      end
+
+      it "returns the reply preview data" do
+        message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+        parent.message = message * 5 # something longer than the default 150 chars
+        parent.save
+        type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+        sub_entry.update!(include_reply_preview: true)
+        expect(type.resolve("quotedEntry { author { shortName } }")).to eq parent.user.short_name
+        expect(type.resolve("quotedEntry { createdAt }")).to eq parent.created_at.iso8601
+        expect(type.resolve("quotedEntry { previewMessage }")).to eq parent.summary(500) # longer than the message
+        expect(type.resolve("quotedEntry { previewMessage }").length).to eq 235
+      end
     end
   end
 
@@ -262,24 +283,49 @@ describe Types::DiscussionEntryType do
       let(:anon_discussion_student_quoted) { @anon_discussion.discussion_entries.create!(message: "quoting student", parent_id: @anon_student_discussion_entry.id, user: @student, include_reply_preview: true) }
       let(:anon_student_quoted_type) { GraphQLTypeTester.new(anon_discussion_student_quoted, current_user: @teacher) }
 
-      before do
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
+      context "split screen view flag" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:split_screen_view).and_return(true)
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(false)
+        end
+
+        it "returns the author information of a teacher post" do
+          expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
+        end
+
+        it "returns the author information of a ta post" do
+          expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
+        end
+
+        it "returns the author information of a designer post" do
+          expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
+        end
+
+        it "does not return author of anonymous student" do
+          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
+        end
       end
 
-      it "returns the author information of a teacher post" do
-        expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
-      end
+      context "isolated view flag" do
+        before do
+          allow(Account.site_admin).to receive(:feature_enabled?).with(:isolated_view).and_return(true)
+        end
 
-      it "returns the author information of a ta post" do
-        expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
-      end
+        it "returns the author information of a teacher post" do
+          expect(anon_teacher_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_teacher_discussion_entry.user.short_name
+        end
 
-      it "returns the author information of a designer post" do
-        expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
-      end
+        it "returns the author information of a ta post" do
+          expect(anon_ta_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_ta_discussion_entry.user.short_name
+        end
 
-      it "does not return author of anonymous student" do
-        expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
+        it "returns the author information of a designer post" do
+          expect(anon_designer_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq @anon_designer_discussion_entry.user.short_name
+        end
+
+        it "does not return author of anonymous student" do
+          expect(anon_student_quoted_type.resolve("quotedEntry { author { shortName } }")).to eq nil
+        end
       end
     end
 

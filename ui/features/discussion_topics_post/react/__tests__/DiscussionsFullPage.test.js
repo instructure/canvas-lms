@@ -98,6 +98,21 @@ describe('DiscussionFullPage', () => {
     expect(container).toBeTruthy()
   })
 
+  it('should render split screen view if enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
+  it('should render isolated view if enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
+  it('should render isolated view if both isolated view and split screen view are enabled', () => {
+    const {container} = setup(getDiscussionQueryMock())
+    expect(container).toBeTruthy()
+  })
+
   describe('discussion entries', () => {
     it('should render', async () => {
       const mocks = [

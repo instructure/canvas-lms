@@ -212,7 +212,7 @@ export const DiscussionThreadContainer = props => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
 
-          if (ENV.isolated_view) {
+          if (ENV.isolated_view || ENV.split_screen_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -253,7 +253,7 @@ export const DiscussionThreadContainer = props => {
           />
         }
         onClick={() => {
-          if (ENV.isolated_view) {
+          if (ENV.isolated_view || ENV.split_screen_view) {
             props.onOpenIsolatedView(
               props.discussionEntry._id,
               props.discussionEntry.isolatedEntryId,
@@ -466,7 +466,7 @@ export const DiscussionThreadContainer = props => {
             </div>
           </Highlight>
           <div style={{marginLeft: replyMarginDepth}}>
-            {editorExpanded && !ENV.isolated_view && (
+            {editorExpanded && !(ENV.isolated_view || ENV.split_screen_view) && (
               <View
                 display="block"
                 background="primary"

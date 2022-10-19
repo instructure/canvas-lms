@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 - present Instructure, Inc.
+ * Copyright (C) 2022 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,7 +18,6 @@
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
-  createDiscussionEntryMock,
   getDiscussionQueryMock,
   getDiscussionSubentriesQueryMock,
   updateDiscussionEntryMock,
@@ -38,7 +37,7 @@ jest.mock('../utils/constants', () => ({
   SEARCH_TERM_DEBOUNCE_DELAY: 0,
 }))
 
-describe('DiscussionsIsolatedView', () => {
+describe('DiscussionsSplitScreenView', () => {
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
 
@@ -49,7 +48,7 @@ describe('DiscussionsIsolatedView', () => {
       current_page: 0,
       discussion_topic_id: '1',
       course_id: '1',
-      isolated_view: true,
+      split_screen_view: true,
       current_user: {
         id: '2',
         avatar_image_url:
@@ -84,55 +83,23 @@ describe('DiscussionsIsolatedView', () => {
     )
   }
 
-  it('should render isolated view container', async () => {
+  it('should render split screen view view container', async () => {
     const mocks = [...getDiscussionQueryMock()]
     const container = setup(mocks)
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
-    expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
+    expect(container.queryByTestId('isolated-view-container')).toBeNull()
+    expect(container.queryByTestId('split-screen-view-container')).not.toBeNull()
   })
 
   it('should render isolated view container if split screen view is also enabled', async () => {
-    window.ENV.split_screen_view = true
+    window.ENV.isolated_view = true
     const mocks = [...getDiscussionQueryMock()]
     const container = setup(mocks)
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
     expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
-  })
-
-  it.skip('should be able to post a reply to an entry', async () => {
-    const mocks = [
-      ...getDiscussionQueryMock(),
-      ...getDiscussionSubentriesQueryMock({
-        includeRelativeEntry: false,
-        last: 5,
-      }),
-      ...getDiscussionSubentriesQueryMock({
-        beforeRelativeEntry: false,
-        first: 0,
-        includeRelativeEntry: false,
-      }),
-      ...createDiscussionEntryMock({
-        includeReplyPreview: false,
-        replyFromEntryId: '1',
-      }),
-    ]
-    const {findByText, findByTestId, queryByTestId} = setup(mocks)
-
-    const replyButton = await findByTestId('threading-toolbar-reply')
-    fireEvent.click(replyButton)
-
-    expect(await findByText('Thread')).toBeTruthy()
-
-    const doReplyButton = await findByTestId('DiscussionEdit-submit')
-    fireEvent.click(doReplyButton)
-
-    await waitFor(() => expect(queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument())
-
-    await waitFor(() =>
-      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
-    )
+    expect(container.queryByTestId('split-screen-view-container')).toBeNull()
   })
 
   it('should be able to edit a root entry', async () => {

@@ -33,6 +33,7 @@ import {NoResultsFound} from './components/NoResultsFound/NoResultsFound'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
 import {useMutation, useQuery} from 'react-apollo'
+import {SplitScreenViewContainer} from './containers/SplitScreenViewContainer/SplitScreenViewContainer'
 
 const I18n = useI18nScope('discussion_topics_post')
 
@@ -311,6 +312,24 @@ const DiscussionTopicManager = props => {
           setRCEOpen={setEditorExpanded}
           onClose={closeIsolatedView}
           onOpenIsolatedView={openIsolatedView}
+          goToTopic={goToTopic}
+          highlightEntryId={highlightEntryId}
+          setHighlightEntryId={setHighlightEntryId}
+        />
+      )}
+      {ENV.split_screen_view && !ENV.isolated_view && isolatedEntryId && (
+        <SplitScreenViewContainer
+          relativeEntryId={relativeEntryId}
+          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
+          updateDraftCache={updateDraftCache}
+          discussionTopic={discussionTopicQuery.data.legacyNode}
+          discussionEntryId={isolatedEntryId}
+          replyFromId={replyFromId}
+          open={isolatedViewOpen}
+          RCEOpen={editorExpanded}
+          setRCEOpen={setEditorExpanded}
+          onClose={closeIsolatedView}
+          onOpenSplitScreenView={openIsolatedView}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
           setHighlightEntryId={setHighlightEntryId}
