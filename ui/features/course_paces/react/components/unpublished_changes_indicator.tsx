@@ -17,7 +17,7 @@
  */
 
 import React, {useEffect} from 'react'
-import {CondensedButton} from '@instructure/ui-buttons'
+import {Link} from '@instructure/ui-link'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import {getPacePublishing, getUnpublishedChangeCount} from '../reducers/course_paces'
 import {getBlackoutDatesSyncing} from '../shared/reducers/blackout_dates'
@@ -42,7 +42,7 @@ type StateProps = {
 type PassedProps = {
   onClick?: () => void
   onUnpublishedNavigation?: (e: BeforeUnloadEvent) => void
-  margin?: any // type from CondensedButtonProps; passed through
+  margin?: any // type from Link props; passed through
   readonly newPace: boolean
 }
 
@@ -125,9 +125,15 @@ export const UnpublishedChangesIndicator = ({
   }
 
   return changeCount ? (
-    <CondensedButton data-testid="publish-status-button" onClick={onClick} margin={margin}>
+    <Link
+      isWithinText={false}
+      as="button"
+      data-testid="publish-status-button"
+      onClick={onClick}
+      margin={margin}
+    >
       {text(changeCount)}
-    </CondensedButton>
+    </Link>
   ) : (
     <View margin={margin} data-testid="publish-status">
       {text(changeCount)}
