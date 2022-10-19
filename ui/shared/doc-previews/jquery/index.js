@@ -93,7 +93,7 @@ $.fn.loadDocPreview = function (options) {
 
     if (opts.crocodoc_session_url) {
       const sanitizedUrl = sanitizeUrl(opts.crocodoc_session_url)
-      var iframe = $('<iframe/>', {
+      const iframe = $('<iframe/>', {
         src: sanitizedUrl,
         width: opts.width,
         height: opts.height,
@@ -113,7 +113,7 @@ $.fn.loadDocPreview = function (options) {
 
       const minHeight = opts.iframe_min_height !== undefined ? opts.iframe_min_height : '800px'
       const sanitizedUrl = sanitizeUrl(opts.canvadoc_session_url)
-      var iframe = $('<iframe/>', {
+      const iframe = $('<iframe/>', {
         src: sanitizedUrl,
         width: opts.width,
         allowfullscreen: '1',

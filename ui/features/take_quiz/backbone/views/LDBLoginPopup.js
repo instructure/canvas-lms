@@ -170,7 +170,7 @@ export default class LDBLoginPopup extends Backbone.View {
     // Lift the restriction on user input in the background.
     //
     // See #reset()
-    var unlockBackground = () => $inputSink.detach()
+    const unlockBackground = () => $inputSink.detach()
 
     const login = e => {
       const consumptionRc = consume(e)
@@ -179,6 +179,7 @@ export default class LDBLoginPopup extends Backbone.View {
 
       const authenticate = this.authenticate(credentials)
 
+      // eslint-disable-next-line promise/catch-or-return
       authenticate.then(rc => {
         $delegate.triggerHandler('login_success')
         whnd.close()

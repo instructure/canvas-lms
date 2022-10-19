@@ -89,7 +89,7 @@ export default class EditSectionsView extends DialogBaseView {
     return (() => {
       const result = []
       for (const e of Array.from(this.model.sectionEditableEnrollments())) {
-        var section
+        let section
         if ((section = ENV.CONTEXTS.sections[e.course_section_id])) {
           result.push(
             $sections.append(
