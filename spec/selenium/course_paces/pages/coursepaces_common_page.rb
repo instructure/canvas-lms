@@ -155,4 +155,8 @@ module CoursePacesCommonPageObject
     @course.restrict_enrollments_to_course_dates = true
     @course.save!
   end
+
+  def visit_course_paces_page(course_id_override: false)
+    get "/courses/#{course_id_override || @course.id}/course_pacing"
+  end
 end

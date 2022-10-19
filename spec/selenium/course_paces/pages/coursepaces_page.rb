@@ -259,6 +259,11 @@ module CoursePacesPageObject
     "[data-testid='unpublished-warning-modal']"
   end
 
+  #------------------------- Redesign Selectors ----------------------
+
+  def course_pace_settings_button_selector
+    "[data-testid='course-pace-settings']"
+  end
   #------------------------- Elements --------------------------------
 
   def assignment_due_date
@@ -481,11 +486,11 @@ module CoursePacesPageObject
     f(unpublished_warning_modal_selector)
   end
 
-  #----------------------- Actions & Methods -------------------------
-  def visit_course_paces_page(course_id_override: false)
-    get "/courses/#{course_id_override || @course.id}/course_pacing"
+  #------------------------- Redesign Elements -----------------------
+  def course_pace_settings_button
+    f(course_pace_settings_button_selector)
   end
-
+  #----------------------- Actions & Methods -------------------------
   #----------------------- Click Items -------------------------------
 
   def click_blackout_dates_add_button

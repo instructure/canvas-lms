@@ -118,7 +118,11 @@ export class Settings extends React.Component<ComponentProps, LocalState> {
   menuButton = () => {
     if (window.ENV.FEATURES.course_paces_redesign) {
       return (
-        <Button margin={this.props.margin} renderIcon={IconSettingsLine}>
+        <Button
+          data-testid="course-pace-settings"
+          margin={this.props.margin}
+          renderIcon={IconSettingsLine}
+        >
           {I18n.t('Settings')}
         </Button>
       )

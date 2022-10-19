@@ -151,6 +151,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                   <span className="course-paces-metrics-heading">
                     <MetricGroup>
                       <Metric
+                        data-testid="number-of-students"
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Students')}
@@ -158,6 +159,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         isGroupChild={true}
                       />
                       <Metric
+                        data-testid="number-of-sections"
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Sections')}
@@ -165,6 +167,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
                         isGroupChild={true}
                       />
                       <Metric
+                        data-testid="default-pace-duration"
                         theme={metricTheme}
                         textAlign="start"
                         renderLabel={I18n.t('Duration')}
@@ -183,6 +186,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
             >
               <Link
                 isWithinText={false}
+                data-testid="go-to-default-pace"
                 onClick={() => {
                   props.setSelectedPaceContext('Course', window.ENV.COURSE_ID)
                 }}

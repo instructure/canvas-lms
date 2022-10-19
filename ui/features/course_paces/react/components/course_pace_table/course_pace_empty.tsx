@@ -113,6 +113,7 @@ export const CoursePaceEmpty: React.FC<DispatchProps & PassedProps> = ({
         </FlexItem>
       </Flex>
       <Button
+        data-testid="get-started-button"
         color="primary"
         margin="small 0"
         size="large"
