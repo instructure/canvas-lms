@@ -95,7 +95,12 @@ def computeTestCount() {
   def jqAddCommand = []
 
   specUnique.each { x ->
-    jqAddCommand.add(".[\"./${x}\"]")
+    def globMatcher = x =~ /^(.+)\*spec\.rb$/
+    if (globMatcher.matches()) {
+      jqAddCommand.add("([with_entries(select(.key | match(\"${globMatcher.group(1)}\"))) | to_entries[] | .value] | add)")
+    } else {
+      jqAddCommand.add(".[\"./${x}\"]")
+    }
   }
 
   def specTimings = sh(script: """#!/usr/bin/env bash
