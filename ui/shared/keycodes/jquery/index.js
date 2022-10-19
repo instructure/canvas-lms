@@ -93,7 +93,7 @@ $.fn.keycodes = function (options, fn) {
   if (this.filter(':input,object,embed').length > 0) {
     options.ignore = ''
   }
-  var options = $.extend({}, $.fn.keycodes.defaults, options)
+  options = $.extend({}, $.fn.keycodes.defaults, options)
 
   const keyCodes = []
   const originalCodes = []
@@ -127,16 +127,16 @@ $.fn.keycodes = function (options, fn) {
     code = code.sort().join('+').toLowerCase()
     event.keyMatches = function (checkCode) {
       checkCode = checkCode.split('+').sort().join('+').toLowerCase()
-      return checkCode == code
+      return checkCode === code
     }
     const idx = $.inArray(code, keyCodes)
     const picker = $(document).data('last_datepicker')
-    if (picker && picker[0] == this && event.keyCode == 27) {
+    if (picker && picker[0] === this && event.keyCode === 27) {
       event.preventDefault()
       return false
     }
 
-    if (idx != -1) {
+    if (idx !== -1) {
       event.keyString = originalCodes[idx]
       fn.call(this, event)
     }

@@ -33,10 +33,11 @@ export default class OutcomeGroupView extends OutcomeContentBase {
       case 'loading':
         this.$el.empty()
         break
-      default:
+      default: {
         // show
-        var canManage = !this.readOnly() && this.model.get('can_edit')
+        const canManage = !this.readOnly() && this.model.get('can_edit')
         this.$el.html(outcomeGroupTemplate(_.extend(data, {canManage})))
+      }
     }
     this.$('input:first').focus()
     return this

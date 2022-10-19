@@ -49,13 +49,13 @@ window.link_enrollment = (function () {
           data => {
             for (const idx in data) {
               const user = data[idx]
-              var $option = $('<option/>')
+              const $option = $('<option/>')
               if (user.id && user.name) {
                 $option.val(user.id).text(user.name)
                 $dialog.find('.student_options').append($option)
               }
             }
-            var $option = $('<option/>')
+            const $option = $('<option/>')
             $option.val('none').text(I18n.t('options.no_link', '[ No Link ]'))
             $dialog.find('.student_options').append($option)
 

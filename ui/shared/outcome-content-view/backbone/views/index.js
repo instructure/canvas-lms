@@ -152,7 +152,7 @@ export default class ContentView extends Backbone.View {
   }
 
   createTree() {
-    var treeBrowser = new TreeBrowserView({
+    const treeBrowser = new TreeBrowserView({
       rootModelsFinder: new RootOutcomesFinder(),
       focusStyleClass: 'MoveDialog__folderItem--focused',
       selectedStyleClass: 'MoveDialog__folderItem--selected',

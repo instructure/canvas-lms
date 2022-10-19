@@ -208,7 +208,7 @@ $(document).ready(function () {
       let path = data['communication_channel[address]']
       $(this).data('email', path)
       $list.find('.channel .path').each(function () {
-        if ($(this).text() == path) {
+        if ($(this).text() === path) {
           path = ''
         }
       })

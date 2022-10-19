@@ -353,9 +353,13 @@ $.mediaComment.init = function (mediaType, opts) {
         // **********************************************************************
         // Flash audio video record (and upload)
         // **********************************************************************
+        let recordVars
+        let params
+        let width
+        let height
         setTimeout(() => {
-          var recordVars = {
-            host: location.protocol + '//' + INST.kalturaSettings.domain,
+          recordVars = {
+            host: window.location.protocol + '//' + INST.kalturaSettings.domain,
             rtmpHost: 'rtmp://' + (INST.kalturaSettings.rtmp_domain || INST.kalturaSettings.domain),
             kshowId: '-1',
             pid: INST.kalturaSettings.partner_id,
@@ -377,7 +381,7 @@ $.mediaComment.init = function (mediaType, opts) {
             autoPreview: '0',
           }
 
-          var params = {
+          params = {
             align: 'middle',
             quality: 'high',
             bgcolor: '#ffffff',
@@ -401,8 +405,8 @@ $.mediaComment.init = function (mediaType, opts) {
             params
           )
 
-          var params = $.extend({}, params, {name: 'KRecordVideo'})
-          var recordVars = $.extend({}, recordVars, {useCamera: '1'})
+          params = $.extend({}, params, {name: 'KRecordVideo'})
+          recordVars = $.extend({}, recordVars, {useCamera: '1'})
           $('#video_record').html('Flash required for recording video.')
           swfobject.embedSWF(
             '/media_record/KRecord.swf',
@@ -423,7 +427,7 @@ $.mediaComment.init = function (mediaType, opts) {
         // Flash uploaders
         // **********************************************************************
         let flashVars = {
-          host: location.protocol + '//' + INST.kalturaSettings.domain,
+          host: window.location.protocol + '//' + INST.kalturaSettings.domain,
           partnerId: INST.kalturaSettings.partner_id,
           subPId: INST.kalturaSettings.subpartner_id,
           uid,
@@ -439,7 +443,7 @@ $.mediaComment.init = function (mediaType, opts) {
           jsDelegate: '$.mediaComment.audio_delegate',
         }
 
-        const params = {
+        params = {
           align: 'middle',
           quality: 'high',
           bgcolor: '#ffffff',
@@ -452,8 +456,8 @@ $.mediaComment.init = function (mediaType, opts) {
         $('#audio_upload').text(
           I18n.t('messages.flash_required_upload_audio', 'Flash required for uploading audio.')
         )
-        var width = '180'
-        var height = '50'
+        width = '180'
+        height = '50'
         swfobject.embedSWF(
           '//' +
             INST.kalturaSettings.domain +
@@ -472,8 +476,8 @@ $.mediaComment.init = function (mediaType, opts) {
         $('#video_upload').text(
           I18n.t('messages.flash_required_upload_video', 'Flash required for uploading video.')
         )
-        var width = '180'
-        var height = '50'
+        width = '180'
+        height = '50'
         swfobject.embedSWF(
           '//' +
             INST.kalturaSettings.domain +
@@ -547,7 +551,7 @@ $.mediaComment.init = function (mediaType, opts) {
             if (audio_record_counter > 4) {
               current_audio_level = 0
               audio_record_counter = 0
-              var band = (audio_level - (audio_level % 10)) / 10
+              const band = (audio_level - (audio_level % 10)) / 10
               $audio_record_meter.attr('class', 'volume_meter band_' + band)
             } else {
               current_audio_level = audio_level
@@ -566,7 +570,7 @@ $.mediaComment.init = function (mediaType, opts) {
             if (video_record_counter > 4) {
               current_video_level = 0
               video_record_counter = 0
-              var band = (video_level - (video_level % 10)) / 10
+              const band = (video_level - (video_level % 10)) / 10
               $video_record_meter.attr('class', 'volume_meter band_' + band)
             } else {
               current_video_level = video_level
@@ -588,17 +592,21 @@ $.mediaComment.init = function (mediaType, opts) {
           (currentBrowser.name === 'Chrome' && Number(currentBrowser.version) >= 68) ||
           (currentBrowser.name === 'Firefox' && Number(currentBrowser.version) >= 61)
         ) {
-          import('@canvas/media-recorder').then(({default: renderCanvasMediaRecorder}) => {
-            let tryToRenderInterval
-            const renderFunc = () => {
-              const e = document.getElementById('record_media_tab')
-              if (e) {
-                renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
-                clearInterval(tryToRenderInterval)
+          import('@canvas/media-recorder')
+            .then(({default: renderCanvasMediaRecorder}) => {
+              let tryToRenderInterval
+              const renderFunc = () => {
+                const e = document.getElementById('record_media_tab')
+                if (e) {
+                  renderCanvasMediaRecorder(e, jsUploader.doUploadByFile)
+                  clearInterval(tryToRenderInterval)
+                }
               }
-            }
-            tryToRenderInterval = setInterval(renderFunc, 10)
-          })
+              tryToRenderInterval = setInterval(renderFunc, 10)
+            })
+            .catch(() => {
+              throw new Error('Failed to load @canvas/media-recorder')
+            })
         }
       }
 
@@ -608,8 +616,8 @@ $.mediaComment.init = function (mediaType, opts) {
       }
       lastInit = now
 
-      var $dialog = $('#media_comment_dialog')
-      if ($dialog.length == 0 && !INST.kalturaSettings.js_uploader) {
+      let $dialog = $('#media_comment_dialog')
+      if ($dialog.length === 0 && !INST.kalturaSettings.js_uploader) {
         const $div = $('<div/>').attr('id', 'media_comment_dialog')
         $div.text(I18n.t('messages.loading', 'Loading...'))
         $div.dialog({
@@ -632,7 +640,7 @@ $.mediaComment.init = function (mediaType, opts) {
             $div.data('uid', data.uid)
           },
           data => {
-            if (data.logged_in == false) {
+            if (!data.logged_in) {
               $div.data(
                 'ks-error',
                 I18n.t('errors.must_be_logged_in', 'You must be logged in to record media.')
@@ -772,6 +780,7 @@ window.beforeAddEntry = function () {
   const attemptId = Math.random()
   $.mediaComment.lastAddAttemptId = attemptId
   setTimeout(() => {
+    // eslint-disable-next-line eqeqeq
     if ($.mediaComment.lastAddAttemptId == attemptId) {
       $(document).triggerHandler('media_recording_error')
     }
@@ -794,20 +803,24 @@ window.addEntryComplete = function (entries) {
     }
     for (let idx = 0; idx < entries.length; idx++) {
       const entry = entries[idx]
+      // eslint-disable-next-line eqeqeq
       if ($('#media_record_tabs').tabs('option', 'selected') == 0) {
         userTitle = $('#video_record_title,#audio_record_title').filter(':visible:first').val()
+        // eslint-disable-next-line eqeqeq
       } else if ($('#media_record_tabs').tabs('option', 'selected') == 1) {
         // no-op
       }
-      if (entry.entryType == 1 && $('#audio_record_option').hasClass('selected_option')) {
+      if (entry.entryType === 1 && $('#audio_record_option').hasClass('selected_option')) {
         entry.entryType = 5
       }
       $.mediaComment.entryAdded(entry.entryId, entry.entryType, entry.entryName, userTitle)
       $('#media_comment_dialog').dialog('close')
     }
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log(e)
-    alert(I18n.t('errors.save_failed_try_again', 'Entry failed to save.  Please try again.'))
+    // eslint-disable-next-line no-alert
+    window.alert(I18n.t('errors.save_failed_try_again', 'Entry failed to save.  Please try again.'))
   }
 }
 

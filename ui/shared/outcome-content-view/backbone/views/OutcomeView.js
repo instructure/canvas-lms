@@ -287,7 +287,7 @@ export default class OutcomeView extends OutcomeContentBase {
       case 'loading':
         this.$el.empty()
         break
-      default:
+      default: {
         // show
         if (!data.points_possible) {
           data.points_possible = 0
@@ -310,9 +310,9 @@ export default class OutcomeView extends OutcomeContentBase {
           }
         }
 
-        var can_manage = !this.readOnly() && this.model.canManage()
-        var can_edit = can_manage && this.model.isNative()
-        var can_unlink = can_manage && this.model.outcomeLink.can_unlink
+        const can_manage = !this.readOnly() && this.model.canManage()
+        const can_edit = can_manage && this.model.isNative()
+        const can_unlink = can_manage && this.model.outcomeLink.can_unlink
 
         this.$el.html(
           outcomeTemplate(
@@ -332,6 +332,7 @@ export default class OutcomeView extends OutcomeContentBase {
             })
           )
         )
+      }
     }
 
     this.$('input:first').focus()
