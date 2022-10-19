@@ -23,6 +23,7 @@
 # is switched to Psych. Otherwise we
 # won't have access to (safe|unsafe)_load.
 require 'yaml'
+require 'date' if RUBY_VERSION >= "2.5.0"
 require 'safe_yaml'
 
 module FixSafeYAMLNullMerge
@@ -59,7 +60,6 @@ SafeYAML::OPTIONS.merge!(
         !ruby/hash:ActionController::Parameters
         !ruby/object:Class
         !ruby/object:OpenStruct
-        !ruby/object:Scribd::Document
         !ruby/object:Mime::Type
         !ruby/object:Mime::NullType
         !ruby/object:URI::HTTP
@@ -74,13 +74,6 @@ SafeYAML::OPTIONS.merge!(
 
 module Syckness
   TAG = "#GETDOWNWITHTHESYCKNESS\n"
-end
-
-[Object, Hash, Struct, Array, Exception, String, Symbol, Range, Regexp, Time,
-  Date, Integer, Float, Rational, Complex, TrueClass, FalseClass, NilClass].each do |klass|
-  klass.class_eval do
-    alias :to_yaml :psych_to_yaml
-  end
 end
 
 SafeYAML::PsychResolver.class_eval do
@@ -231,7 +224,7 @@ module FloatScannerFix
     end
   end
 end
-Psych::ScalarScanner.prepend(FloatScannerFix)
+Psych::ScalarScanner.prepend(FloatScannerFix) unless RUBY_VERSION >= '2.5' # got pulled into psych for later rubies
 
 module ScalarTransformFix
   def to_guessed_type(value, quoted=false, options=nil)
@@ -246,3 +239,16 @@ module ScalarTransformFix
   end
 end
 SafeYAML::Transform.singleton_class.prepend(ScalarTransformFix)
+
+module YAMLSingletonFix
+  def revive(klass, node)
+    if klass < Singleton
+      klass.instance
+    elsif klass == Set
+      super.tap{|s| s.instance_variable_get(:@hash).default = false}
+    else
+      super
+    end
+  end
+end
+Psych::Visitors::ToRuby.prepend(YAMLSingletonFix)

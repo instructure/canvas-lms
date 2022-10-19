@@ -182,7 +182,7 @@ module CanvasRails
 
     # safe_yaml can't whitelist specific instances of scalar values, so just override the loading
     # here, and do a weird check
-    YAML.add_ruby_type("object:Class") do |_type, val|
+    Psych.add_domain_type("ruby/object", "Class") do |_type, val|
       if SafeYAML.safe_parsing && !Canvas::Migration.valid_converter_classes.include?(val)
         raise "Cannot load class #{val} from YAML"
       end
