@@ -42,8 +42,10 @@ import '../../../ext/custom_moment_locales/sl'
 import $ from '@canvas/datetime'
 import * as configureDateTime from '../configureDateTime'
 import * as configureDateTimeMomentParser from '../configureDateTimeMomentParser'
+// eslint-disable-next-line import/no-nodejs-modules
 import fs from 'fs'
 import I18n, {useTranslations} from '@canvas/i18n'
+// eslint-disable-next-line import/no-nodejs-modules
 import path from 'path'
 import YAML from 'yaml'
 import {parse, format, hasMeridiem} from 'datetime'

@@ -61,14 +61,14 @@ describe('processSingleContentItem', () => {
   })
 
   it('extracts the first content item', () => {
-    processSingleContentItem({data: data()}).then(result => {
+    return processSingleContentItem({data: data()}).then(result => {
       expect(result).toEqual(content_items[0])
     })
   })
 
   describe('when no content items are provided', () => {
     it('returns "undefined"', () => {
-      processSingleContentItem({data: data({content_items: []})}).then(result => {
+      return processSingleContentItem({data: data({content_items: []})}).then(result => {
         expect(result).toBeUndefined()
       })
     })

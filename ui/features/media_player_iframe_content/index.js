@@ -18,6 +18,8 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+// TODO: use URL() in browser to parse URL
+// eslint-disable-next-line import/no-nodejs-modules
 import {parse} from 'url'
 import ready from '@instructure/ready'
 import CanvasMediaPlayer from '@canvas/canvas-media-player'

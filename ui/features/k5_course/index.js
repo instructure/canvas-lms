@@ -17,6 +17,7 @@
  */
 import React from 'react'
 import ReactDOM from 'react-dom'
+// eslint-disable-next-line import/no-named-as-default
 import K5Course from './react/K5Course'
 import k5Theme from '@canvas/k5/react/k5-theme'
 import ready from '@instructure/ready'

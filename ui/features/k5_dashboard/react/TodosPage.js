@@ -122,5 +122,3 @@ TodosPage.propTypes = {
   visible: PropTypes.bool.isRequired,
   openTodosInNewTab: PropTypes.bool.isRequired,
 }
-
-export default TodosPage

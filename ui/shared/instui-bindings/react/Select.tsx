@@ -122,6 +122,7 @@ class CanvasSelect extends React.Component<Props, State> {
   }
 
   render(): ReactElement {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const {id, label, value, onChange, children, noOptionsLabel = '---', ...otherProps} = this.props
 
     return (

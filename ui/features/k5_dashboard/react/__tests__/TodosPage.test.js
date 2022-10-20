@@ -23,7 +23,7 @@ import fetchMock from 'fetch-mock'
 import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 import {MOCK_TODOS} from './mocks'
-import TodosPage, {sortTodos} from '../TodosPage'
+import {TodosPage, sortTodos} from '../TodosPage'
 
 const FETCH_TODOS_URL = /\/api\/v1\/users\/self\/todo.*/
 

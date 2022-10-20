@@ -264,5 +264,3 @@ GradesPage.propTypes = {
     avatar_image_url: PropTypes.string,
   }).isRequired,
 }
-
-export default GradesPage

@@ -105,7 +105,6 @@ export default class RequestDispatch {
       return pagesEnqueuedCallback(deferreds)
     }
 
-    /* eslint-disable promise/catch-or-return */
     request.start = () => {
       /*
        * Update the request as "active" so that it is counted as an active
@@ -126,8 +125,6 @@ export default class RequestDispatch {
           this.clearRequest(request)
         })
     }
-    /* eslint-enable promise/catch-or-return */
-
     this.addRequest(request)
 
     return request.deferred.promise

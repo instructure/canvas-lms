@@ -27,6 +27,7 @@ const I18n = useI18nScope('canvas_async_search_selesct')
 const noOptionsId = '~~empty-option~~'
 
 const {Option} = Select as any
+// eslint-disable-next-line react/forbid-foreign-prop-types
 const {propTypes: selectPropTypes} = Select as any
 
 CanvasAsyncSelect.Option = Option
@@ -52,6 +53,7 @@ CanvasAsyncSelect.propTypes = {
 }
 
 export default function CanvasAsyncSelect({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   options = [],
   inputValue,
   isLoading = false,
