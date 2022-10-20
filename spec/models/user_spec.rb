@@ -744,6 +744,24 @@ describe User do
     end
   end
 
+  describe "#alternate_account_for_course_creation?" do
+    let(:sub_account) { Account.create!(parent_account: Account.default) }
+    let(:sub_sub_account) { Account.create!(parent_account: sub_account) }
+    let(:sub_sub_admin) { account_admin_user(account: sub_sub_account) }
+
+    it "return appropriately for lower level admins" do
+      expect(sub_sub_admin.alternate_account_for_course_creation).to eq sub_sub_account
+    end
+
+    it "caches the account properly" do
+      enable_cache(:redis_cache_store) do
+        @user = sub_sub_admin
+        expect(@user).to receive(:account_users).and_return(double(active: [])).once
+        2.times { @user.alternate_account_for_course_creation }
+      end
+    end
+  end
+
   describe "#courses_with_primary_enrollment" do
     it "returns appropriate courses with primary enrollment" do
       user_factory
@@ -3999,7 +4017,7 @@ describe User do
       expect(@user.create_courses_right(@account)).to be_nil
       @account.settings[:no_enrollments_can_create_courses] = true
       @account.save!
-      expect(@user.create_courses_right(@account)).to be(:no_enrollments)
+      expect(@user.create_courses_right(@account.manually_created_courses_account)).to be(:no_enrollments)
     end
 
     it "does not count deleted teacher enrollments" do

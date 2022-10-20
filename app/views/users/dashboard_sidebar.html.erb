@@ -43,7 +43,7 @@
 <%= render :partial => "shared/event_list", :object => @recent_feedback, :locals => {:title => t('recent_feedback', "Recent Feedback"), :period => :two_weeks, :show_context => true, :is_recent_feedback => true} %>
 <% end %>
 <div>
-  <% if show_user_create_course_button(@current_user) %>
+  <% if show_user_create_course_button(@current_user) || (@current_user.alternate_account_for_course_creation && @domain_root_account.feature_enabled?(:create_course_subaccount_picker)) %>
     <button type="button"
             id="start_new_course"
             class="element_toggler btn button-sidebar-wide"
