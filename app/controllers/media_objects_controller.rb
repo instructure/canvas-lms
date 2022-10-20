@@ -281,6 +281,12 @@ class MediaObjectsController < ApplicationController
     return nil unless params[:media_object_id].present?
 
     @media_object = MediaObject.by_media_id(params[:media_object_id]).first
+
+    if @media_object && (@attachment = Attachment.joins(:media_object).where(media_object: { id: @media_object.id }).first)
+      return render_unauthorized_action unless @attachment.grants_right?(@current_user, :read)
+      return redirect_to("/images/svg-icons/icon_lock.svg") if @attachment.locked_for?(@current_user, check_policies: true)
+    end
+
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
