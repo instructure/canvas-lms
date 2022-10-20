@@ -54,8 +54,11 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
   function handleChange(_, input) {
     if (Number.isNaN(Number(input))) {
       setGroupLimit('')
-      return setMessages([{text: `'${input}' is not a valid number.`, type: 'error'}])
+      return setMessages([
+        {text: I18n.t('${INPUT} is not a valid number.', {INPUT: input}), type: 'error'},
+      ])
     }
+
     if (input === '') return input
     return validateAndSetGroupLimit(Math.round(input))
   }
@@ -72,7 +75,10 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
     if (v < MIN || v > MAX) {
       setGroupLimit('')
       return setMessages([
-        {text: `Number must be between ${MIN} and ${I18n.n(MAX)}`, type: 'error'},
+        {
+          text: I18n.t('Number must be between %{min} and %{max}', {min: MIN, max: I18n.n(MAX)}),
+          type: 'error',
+        },
       ])
     } else {
       return setGroupLimit(v)
@@ -90,7 +96,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
       onKeyDown={handleKeyDown}
       onIncrement={handleIncrement}
       onDecrement={handleDecrement}
-      placeholder="Number"
+      placeholder={I18n.t('Number')}
     />
   )
 }
