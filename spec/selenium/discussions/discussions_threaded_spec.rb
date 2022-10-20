@@ -48,7 +48,7 @@ describe "threaded discussions" do
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
       editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
-      if editor_switch_button.text == "Raw HTML Editor"
+      if editor_switch_button.text == "Switch to raw HTML Editor"
         editor_switch_button.click
       end
       wait_for_ajaximations
@@ -299,7 +299,7 @@ describe "threaded discussions" do
       wait_for_ajaximations
       f('[data-btn-id="rce-edit-btn"]').click
       editor_switch_button = f('[data-btn-id="rce-editormessage-btn"]')
-      if editor_switch_button.text == "Raw HTML Editor"
+      if editor_switch_button.text == "Switch to raw HTML Editor"
         editor_switch_button.click
       end
       wait_for_ajaximations

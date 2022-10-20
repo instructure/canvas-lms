@@ -336,7 +336,7 @@ module WikiAndTinyCommon
       # Switch to HTML
       f("button[data-btn-id='rce-edit-btn']").click
       button = f('button[data-btn-id="rce-editormessage-btn"]')
-      if button.text == "Raw HTML Editor"
+      if button.text == "Switch to raw HTML Editor"
         button.click
       end
       in_frame tiny_rce_ifr_id do
