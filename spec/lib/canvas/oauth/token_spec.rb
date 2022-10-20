@@ -195,14 +195,14 @@ module Canvas::OAuth
       end
 
       it "does not put anything else into the json" do
-        expect(json.keys.sort).to match_array(%w[access_token refresh_token user expires_in token_type])
+        expect(json.keys.sort).to match_array(%w[access_token refresh_token user expires_in token_type canvas_region])
       end
 
       it "does not put expires_in in the json when auto_expire_tokens is false" do
         key = token.key
         key.auto_expire_tokens = false
         key.save!
-        expect(json.keys.sort).to match_array(%w[access_token refresh_token user token_type])
+        expect(json.keys.sort).to match_array(%w[access_token refresh_token user token_type canvas_region])
       end
 
       it "puts real_user in the json when masquerading" do
@@ -218,6 +218,24 @@ module Canvas::OAuth
 
       it "does not put real_user in the json when not masquerading" do
         expect(json["real_user"]).to be_nil
+      end
+
+      context "when region is configured" do
+        let(:region) { "us-east-1" }
+
+        before do
+          allow(Shard.current.database_server).to receive(:config).and_return({ region: region })
+        end
+
+        it "includes aws region" do
+          expect(json["canvas_region"]).to eq region
+        end
+      end
+
+      context "when region is absent" do
+        it "uses default value" do
+          expect(json["canvas_region"]).to eq "unknown"
+        end
       end
     end
 
