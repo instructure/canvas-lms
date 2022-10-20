@@ -225,6 +225,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 body: new URLSearchParams(payload),
                 headers: {
                   'X-CSRF-Token': getCookie('_csrf_token'),
+                  Accept: 'application/json',
                 },
               }
 
@@ -424,6 +425,7 @@ const ConferencesRouter = Backbone.Router.extend({
               body: new URLSearchParams(payload),
               headers: {
                 'X-CSRF-Token': getCookie('_csrf_token'),
+                Accept: 'application/json',
               },
             }
 
