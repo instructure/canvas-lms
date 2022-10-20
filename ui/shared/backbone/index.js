@@ -20,6 +20,8 @@
 // if you want Backbone, import 'Backbone' (this file). It will give you
 // back a Backbone with all of our instructure specific patches to it.
 
+/* eslint-disable import/no-commonjs */
+
 // Get the unpatched Backbone
 const Backbone = require('backbone')
 
