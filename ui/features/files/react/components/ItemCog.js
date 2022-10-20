@@ -292,6 +292,7 @@ class ItemCog extends React.Component {
 
     return (
       // without the stopPropagation(), using the cog menu causes the file's invisible selection checkbox to be toggled as well
+      // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
       <div
         className="al-dropdown__container"
         style={{minWidth: '45px', display: 'inline-block'}}

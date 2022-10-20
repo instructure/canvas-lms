@@ -115,6 +115,7 @@ export default class LinkToStudentsView extends DialogBaseView {
 
     // create new links
     for (const id of newLinks) {
+      // eslint-disable-next-line no-loop-func
       this.getUserData(id).done(user => {
         const udfds = []
         const sections = _.map(user.enrollments, en => en.course_section_id)

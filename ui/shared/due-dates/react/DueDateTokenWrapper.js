@@ -385,6 +385,7 @@ class DueDateTokenWrapper extends React.Component {
 
   render() {
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div
         className="ic-Form-control"
         data-row-identifier={this.rowIdentifier()}

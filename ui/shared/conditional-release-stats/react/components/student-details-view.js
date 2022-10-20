@@ -103,6 +103,7 @@ export default class StudentDetailsView extends React.Component {
             src={studentAvatar}
             aria-hidden={true}
             className="crs-student-details__profile-image"
+            alt=""
           />
           <h3 className="crs-student-details__name">{student.name}</h3>
           <a

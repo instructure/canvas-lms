@@ -65,7 +65,7 @@ export default class AppDetails extends React.Component {
 
   render() {
     if (!this.state.app) {
-      return <img src="/images/ajax-loader-linear.gif" />
+      return <img src="/images/ajax-loader-linear.gif" alt={I18n.t('Loading')} />
     }
 
     return (
@@ -87,7 +87,12 @@ export default class AppDetails extends React.Component {
               <tr>
                 <td className="individual-app-left" valign="top">
                   <div className="app">
-                    <img className="img-polaroid" src={this.state.app.banner_image_url} />
+                    <img
+                      aria-hidden={true}
+                      alt=""
+                      className="img-polaroid"
+                      src={this.state.app.banner_image_url}
+                    />
                     {this.alreadyInstalled()}
                   </div>
                   <AddApp

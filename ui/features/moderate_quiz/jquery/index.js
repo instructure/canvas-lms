@@ -450,11 +450,13 @@ $(document).ready(function (_event) {
         url,
         'POST',
         formData,
+        // eslint-disable-next-line no-loop-func
         data => {
           finished++
           moderation.updateSubmission(data)
           checkIfFinished()
         },
+        // eslint-disable-next-line no-loop-func
         _data => {
           finished++
           errors++

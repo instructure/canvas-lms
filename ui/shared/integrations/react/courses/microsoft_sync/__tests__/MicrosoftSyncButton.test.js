@@ -92,7 +92,10 @@ describe('MicrosoftSyncButton', () => {
 
   describe('when the sync request fails', () => {
     beforeEach(() =>
-      doFetchApi.mockImplementationOnce(() => Promise.reject({message: 'test error'}))
+      doFetchApi.mockImplementationOnce(() =>
+        // eslint-disable-next-line prefer-promise-reject-errors
+        Promise.reject({message: 'test error'})
+      )
     )
 
     it('calls the error handler, but allows trying to sync again', async () => {
