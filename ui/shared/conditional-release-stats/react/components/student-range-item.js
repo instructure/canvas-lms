@@ -49,7 +49,8 @@ export default class StudentRangeItem extends React.Component {
 
     return (
       <div className="crs-student-range__item">
-        <img src={avatar} className="crs-student__avatar" onClick={this.selectStudent} />
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-noninteractive-element-interactions */}
+        <img src={avatar} className="crs-student__avatar" onClick={this.selectStudent} alt="" />
         {/* TODO: use InstUI button */}
         <button
           type="button"

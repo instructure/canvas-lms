@@ -459,6 +459,7 @@ export default class GradingPeriodSet extends React.Component {
     const arrow = this.props.expanded ? 'down' : 'right'
     return (
       <div className={`GradingPeriodSet--${setStateSuffix}`}>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <div
           className="ItemGroup__header"
           ref={ref => {

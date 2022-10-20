@@ -92,6 +92,7 @@ export default class ExpandableLockOptions extends React.Component {
   renderIndicatorIcon() {
     const Icon = this.state.open ? IconArrowOpenDownSolid : IconArrowOpenEndSolid
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div className="bcs_tab_indicator-icon" onKeyDown={this.onKeyDown}>
         <IconButton
           withBorder={false}
@@ -165,6 +166,7 @@ export default class ExpandableLockOptions extends React.Component {
   render() {
     return (
       <div className="bcs__object-tab">
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
         <div onClick={this.toggle} data-testid="toggle">
           <Grid>
             <Grid.Row>

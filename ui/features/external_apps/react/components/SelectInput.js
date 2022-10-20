@@ -45,6 +45,7 @@ export default createReactClass({
       </option>
     ))
     if (this.props.allowBlank) {
+      // eslint-disable-next-line jsx-a11y/control-has-associated-label
       options.unshift(<option key="NO_VALUE" value={null} />)
     }
     return options

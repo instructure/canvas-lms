@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import {omit, map} from 'lodash'
+import {omit} from 'lodash'
 import CoursesList from '../CoursesList'
 import CoursesListRow from '../CoursesListRow'
 
@@ -144,88 +144,85 @@ describe('Account Course User Search CoursesList Sorting', () => {
     onChangeSort: () => {},
   }
 
-  map(
-    {
-      course_name: 'Course',
-      sis_course_id: 'SIS ID',
-      term: 'Term',
-      teacher: 'Teacher',
-      subaccount: 'Sub-Account',
-    },
-    (label, columnID) => {
-      test(`sorting by ${columnID} asc puts up-arrow on ${label} only`, () => {
-        const wrapper = mount(
-          <CoursesList
-            {...{
-              ...coursesProps,
-              sort: columnID,
-              order: 'asc',
-            }}
-          />
-        )
+  Object.entries({
+    course_name: 'Course',
+    sis_course_id: 'SIS ID',
+    term: 'Term',
+    teacher: 'Teacher',
+    subaccount: 'Sub-Account',
+  }).forEach(([columnID, label]) => {
+    test(`sorting by ${columnID} asc puts up-arrow on ${label} only`, () => {
+      const wrapper = mount(
+        <CoursesList
+          {...{
+            ...coursesProps,
+            sort: columnID,
+            order: 'asc',
+          }}
+        />
+      )
 
-        expect(wrapper.find('IconMiniArrowDownSolid')).toHaveLength(0)
-        const upArrow = wrapper.find('IconMiniArrowUpSolid')
-        expect(upArrow).toHaveLength(1)
-        const header = upArrow.closest('CourseListHeader')
+      expect(wrapper.find('IconMiniArrowDownSolid')).toHaveLength(0)
+      const upArrow = wrapper.find('IconMiniArrowUpSolid')
+      expect(upArrow).toHaveLength(1)
+      const header = upArrow.closest('CourseListHeader')
 
-        const expectedTip =
-          {
-            course_name: 'Click to sort by name descending',
-            total_students: 'Click to sort by number of students descending',
-          }[columnID] || `Click to sort by ${label} descending`
+      const expectedTip =
+        {
+          course_name: 'Click to sort by name descending',
+          total_students: 'Click to sort by number of students descending',
+        }[columnID] || `Click to sort by ${label} descending`
 
-        expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
-        expect(header.text()).toMatch(label)
-      })
+      expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
+      expect(header.text()).toMatch(label)
+    })
 
-      test(`sorting by ${columnID} desc puts down-arrow on ${label} only`, () => {
-        const wrapper = mount(
-          <CoursesList
-            {...{
-              ...coursesProps,
-              sort: columnID,
-              order: 'desc',
-            }}
-          />
-        )
+    test(`sorting by ${columnID} desc puts down-arrow on ${label} only`, () => {
+      const wrapper = mount(
+        <CoursesList
+          {...{
+            ...coursesProps,
+            sort: columnID,
+            order: 'desc',
+          }}
+        />
+      )
 
-        expect(wrapper.find('IconMiniArrowUpSolid')).toHaveLength(0)
-        const downArrow = wrapper.find('IconMiniArrowDownSolid')
-        expect(downArrow).toHaveLength(1)
-        const header = downArrow.closest('CourseListHeader')
+      expect(wrapper.find('IconMiniArrowUpSolid')).toHaveLength(0)
+      const downArrow = wrapper.find('IconMiniArrowDownSolid')
+      expect(downArrow).toHaveLength(1)
+      const header = downArrow.closest('CourseListHeader')
 
-        const expectedTip =
-          {
-            course_name: 'Click to sort by name ascending',
-            total_students: 'Click to sort by number of students ascending',
-          }[columnID] || `Click to sort by ${label} ascending`
+      const expectedTip =
+        {
+          course_name: 'Click to sort by name ascending',
+          total_students: 'Click to sort by number of students ascending',
+        }[columnID] || `Click to sort by ${label} ascending`
 
-        expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
-        expect(header.text()).toMatch(label)
-      })
+      expect(header.find('Tooltip').first().prop('renderTip')).toMatch(RegExp(expectedTip, 'i'))
+      expect(header.text()).toMatch(label)
+    })
 
-      test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
-        const onChangeSort = jest.fn()
-        const wrapper = mount(
-          <CoursesList
-            {...{
-              ...coursesProps,
-              onChangeSort,
-            }}
-          />
-        )
+    test(`clicking the ${label} column header calls onChangeSort with ${columnID}`, () => {
+      const onChangeSort = jest.fn()
+      const wrapper = mount(
+        <CoursesList
+          {...{
+            ...coursesProps,
+            onChangeSort,
+          }}
+        />
+      )
 
-        wrapper
-          .find(`CourseListHeader`)
-          .filterWhere(w => w.text().match(label))
-          .find('button')
-          .simulate('click')
-        expect(onChangeSort).toHaveBeenCalledTimes(1)
-        expect(onChangeSort).toHaveBeenCalledWith(columnID)
-      })
-    }
-  )
+      wrapper
+        .find(`CourseListHeader`)
+        .filterWhere(w => w.text().match(label))
+        .find('button')
+        .simulate('click')
+      expect(onChangeSort).toHaveBeenCalledTimes(1)
+      expect(onChangeSort).toHaveBeenCalledWith(columnID)
+    })
+  })
 
   test('displays SIS ID column if any course has one', () => {
     const wrapper = shallow(<CoursesList {...coursesProps} />)

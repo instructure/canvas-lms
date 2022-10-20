@@ -135,7 +135,9 @@ class EnrollmentTermInput extends React.Component {
 
   render() {
     return (
+      // eslint-disable-next-line jsx-a11y/no-static-element-interactions
       <div className="ic-Form-control" onKeyDown={this.suppressKeys}>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label
           className="ic-Label"
           title={I18n.t('Attach terms')}
