@@ -40,6 +40,7 @@ define [
       'click .all_users_checkbox': 'toggleAllUsers'
       'change #web_conference_long_running': 'changeLongRunning'
       'change #web_conference_conference_type': 'renderConferenceFormUserSettings'
+      'change .role_checkbox': 'filterUsersByRole'
 
     render: ->
       super
@@ -90,7 +91,6 @@ define [
       conferenceData = super
       is_editing = !@model.isNew()
       is_adding = !is_editing
-      invite_all = is_adding
       @updateConferenceUserSettingDetailsForConference(conferenceData)
       conferenceData['http_method'] = if is_adding then 'POST' else 'PUT'
       if (conferenceData.duration == null)
@@ -114,11 +114,11 @@ define [
           auth_token: authenticity_token()
         conferenceData: conferenceData
         users: ENV.users
+        roles: ENV.roles
         context_is_group: ENV.context_asset_string.split("_")[0] == "group"
         conferenceTypes: ENV.conference_type_details.map((type) ->
           {name: type.name, type: type.type, selected: (conferenceData.conference_type == type.type)}
         )
-        inviteAll: invite_all
 
     updateConferenceUserSettingDetailsForConference: (conferenceData) ->
       # make handlebars comparisons easy
@@ -189,10 +189,41 @@ define [
       )
 
     toggleAllUsers: ->
+      checkboxes = $("#members_list li.member input[type=checkbox]:not(:disabled):not(:hidden)")
       if(@$('.all_users_checkbox').is(':checked'))
-        $("#members_list").hide()
+        checkboxes.each(() -> 
+          $(this).attr('checked', true) 
+        )
       else
-        $("#members_list").slideDown()
+        checkboxes.each(() -> 
+          $(this).attr('checked', false)
+        )
+
+    filterUsersByRole: ->
+      @resetSelectAllCheckboxOnFilter()
+      role_checkboxes = Array.from($('.role_checkbox:checked'))
+      ids = role_checkboxes.map((checkbox) -> checkbox.value)
+      user_list_items = Array.from($("#members_list li.member"))
+      if (ids.length > 0)
+        user_list_items.forEach((el) ->
+          if !(ids.includes(el.dataset.role_id))
+            $(el).hide()
+          else 
+            $(el).show()
+        )
+        if !($("#members_list li.member:not(:hidden)").length > 0)
+          $('#no_users_error_message').show()
+        else
+          $('#no_users_error_message').hide()
+      else
+        $('#no_users_error_message').hide()
+        user_list_items.forEach((el) ->
+          $(el).show()
+        )
+
+    resetSelectAllCheckboxOnFilter: ->
+      if($('.all_users_checkbox').is(':checked'))
+        $('.all_users_checkbox').attr('checked', false) 
 
     markInvitedUsers: ->
       _.each(@model.get('user_ids'), (id) ->

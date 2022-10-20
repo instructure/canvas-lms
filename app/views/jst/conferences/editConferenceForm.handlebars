@@ -58,25 +58,43 @@
   </div>
   <legend>{{#t "members"}}Members{{/t}}</legend>
   <div class="web_conference_member_user_settings"></div>
-  <label class="checkbox" for="user_all">
-    {{checkbox "user.all" class="all_users_checkbox" checked=inviteAll}}
-    {{#if context_is_group }}
-      {{#t "invite_all.group"}}Invite All Group Members{{/t}}
-    {{else}}
-      {{#t "invite_all.course"}}Invite All Course Members{{/t}}
-    {{/if}}
-  </label>
-  <div>
-    <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
-      {{# each users}}
-        <li class="member user_{{id}}">
-          <label class="checkbox" for="user_{{id}}">
-            <input name="user[{{id}}]" type="hidden" value="0">
-            <input id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">
-            {{name}}
+    <div id="filter_div">
+    <h4 style="font-weight: bold;">Filter by Role:</h4>
+    <ul style="list-style-type: none;" id="role_select_filter" multiple="multiple">
+      {{# each roles}}
+        <li>
+          <label class="checkbox">
+            <input id="role_id_{{id}}" name="role[{{id}}]" type="checkbox" value="{{id}}" class="role_checkbox">
+            {{name}}            
           </label>
         </li>
       {{/each}}
     </ul>
+    <hr>
+    <label class="checkbox" for="user_all" style="margin-left: 10px; padding-bottom: 10px;">
+      {{checkbox "user.all" class="all_users_checkbox"}}
+      Select All
+    </label>
   </div>
+  <div>
+    <ul id="members_list" style="border: 1px solid #333; padding: 10px; overflow-y: auto; max-height: 150px;">
+      {{# each users}}
+        <li class="member user_{{id}}" data-role_id="{{role_id}}">
+          <label class="checkbox" for="user_{{id}}">
+            <input name="user[{{id}}]" type="hidden" value="0">
+            <input class="select_user_checkbox" id="user_{{id}}" name="user[{{id}}]" type="checkbox" value="1">
+            {{name}}
+          </label>
+        </li>
+      {{/each}}
+      <li id="no_users_error_message" style="display: none;">
+        <label>
+          No users match the selected roles.
+        </label>
+      </li>
+    </ul>
+  </div>
+  <div hidden> 
+    <input id="checked_users_input" type="hidden">
+  </div> 
 </form>
