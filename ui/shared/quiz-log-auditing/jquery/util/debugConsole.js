@@ -21,12 +21,12 @@
 // @return {Object}
 //   An object that has an API similar to `console` and responds to the methods:
 //   "debug", "info", "log", "warn", "error"
-if (`${location.search}`.match(/[?&]debug_js=1/)) {
-  module.exports = console
-} else {
-  function sink() {}
-  module.exports = ['debug', 'info', 'log', 'warn', 'error'].reduce((logger, logLevel) => {
-    logger[logLevel] = sink
-    return logger
-  }, {})
-}
+
+function sink() {}
+
+export default `${window.location.search}`.match(/[?&]debug_js=1/)
+  ? console
+  : ['debug', 'info', 'log', 'warn', 'error'].reduce((logger, logLevel) => {
+      logger[logLevel] = sink
+      return logger
+    }, {})
