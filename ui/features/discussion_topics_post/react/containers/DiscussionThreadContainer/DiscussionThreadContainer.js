@@ -57,7 +57,7 @@ import {ReportReply} from '../../components/ReportReply/ReportReply'
 const I18n = useI18nScope('discussion_topics_post')
 
 export const DiscussionThreadContainer = props => {
-  const {searchTerm, sort, filter} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -72,13 +72,14 @@ export const DiscussionThreadContainer = props => {
     const variables = {
       discussionEntryID: newDiscussionEntry.parentId,
       first: ENV.per_page,
-      sort,
+      sort: 'asc',
       courseID: window.ENV?.course_id,
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
     if (props.removeDraftFromDiscussionCache) props.removeDraftFromDiscussionCache(cache, result)
-    addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+    const foundParentEntryQuery = addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
+    if (props.refetchDiscussionEntries && !foundParentEntryQuery) props.refetchDiscussionEntries()
     props.setHighlightEntryId(newDiscussionEntry._id)
   }
 
@@ -86,6 +87,7 @@ export const DiscussionThreadContainer = props => {
     update: updateCache,
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
+      setExpandReplies(true)
       props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry._id)
     },
     onError: () => {
@@ -514,6 +516,7 @@ export const DiscussionThreadContainer = props => {
 DiscussionThreadContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionEntry: PropTypes.object.isRequired,
+  refetchDiscussionEntries: PropTypes.func,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
@@ -556,6 +559,7 @@ const DiscussionSubentries = props => {
     <DiscussionThreadContainer
       key={`discussion-thread-${entry.id}`}
       depth={props.depth}
+      refetchDiscussionEntries={subentries.refetch || null}
       discussionEntry={entry}
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
