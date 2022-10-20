@@ -190,6 +190,10 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
         <td class="mono">expires_in</td>
         <td>Seconds until the access token expires.</td>
       </tr>
+      <tr>
+        <td class="mono">canvas_region</td>
+        <td>For hosted Canvas, the AWS region (e.g. us-east-1) in which the institution that provided this token resides. For local or open source Canvas, this will have a value of "unknown". This field is safe to ignore.</td>
+      </tr>
     </tbody>
   </table>
 
@@ -201,7 +205,8 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
     "token_type": "Bearer",
     "user": {"id":42, "name": "Jimi Hendrix"},
     "refresh_token": "tIh2YBWGiC0GgGRglT9Ylwv2MnTvy8csfGyfK2PqZmkFYYqYZ0wui4tzI7uBwnN2",
-    "expires_in": 3600
+    "expires_in": 3600,
+    "canvas_region": "us-east-1"
   }
   </pre>
   
