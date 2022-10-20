@@ -433,32 +433,6 @@ describe "dashboard" do
         expect(f("#content")).not_to contain_css(".to-do-list > li")
       end
     end
-
-    context "start course button" do
-      before :once do
-        course_with_teacher(active_all: true)
-        Account.default.settings[:teachers_can_create_courses] = true
-        Account.default.save!
-      end
-
-      before do
-        user_session(@teacher)
-      end
-
-      it "launches classic new course modal" do
-        get "/"
-        f("#start_new_course").click
-        expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
-      end
-
-      it "launches improved new course modal if create_course_subaccount_picker is enabled" do
-        Account.default.enable_feature!(:create_course_subaccount_picker)
-
-        get "/"
-        f("#start_new_course").click
-        expect(fj('h2:contains("Create Course")')).to be_displayed
-      end
-    end
   end
 
   context "as an observer" do
@@ -496,6 +470,186 @@ describe "dashboard" do
         expect(card_container).to include_text("Course 2")
         expect(card_container).not_to include_text("Course 1")
         expect(element_value_for_attr(observed_student_dropdown, "value")).to eq("Student 2")
+      end
+    end
+  end
+
+  context "start course button" do
+    context "as a teacher" do
+      before :once do
+        course_with_teacher(active_all: true)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "does not show" do
+        get "/"
+        expect(f("body")).not_to contain_jqcss("#start_new_course")
+      end
+
+      it "launches classic 'create course modal' if teachers can create courses" do
+        Account.default.update_attribute(:settings, { teachers_can_create_courses: true })
+        get "/"
+        f("#start_new_course").click
+        expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
+      end
+    end
+
+    context "as a sub-admin" do
+      before :once do
+        sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
+        @sub_admin = account_admin_user(account: sub_acc)
+      end
+
+      before do
+        user_session(@sub_admin)
+      end
+
+      it "does not show" do
+        get "/"
+        expect(f("body")).not_to contain_jqcss("#start_new_course")
+      end
+    end
+
+    context "as teacher who is also a sub-admin" do
+      before :once do
+        course_with_teacher(active_all: true)
+        sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
+        @teacher.account.account_users.create!(user: @teacher, account: sub_acc)
+      end
+
+      before do
+        user_session(@teacher)
+      end
+
+      it "launches classic 'create course modal'" do
+        get "/"
+        f("#start_new_course").click
+        expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
+      end
+    end
+
+    context "as a student" do
+      before :once do
+        student_in_course(active_all: true, course: @course)
+      end
+
+      before do
+        user_session(@student)
+      end
+
+      it "does not show" do
+        get "/"
+        expect(f("body")).not_to contain_jqcss("#start_new_course")
+      end
+    end
+
+    context "with create_course_subaccount_picker enabled" do
+      before :once do
+        Account.default.enable_feature!(:create_course_subaccount_picker)
+      end
+
+      context "as a teacher" do
+        before :once do
+          course_with_teacher(active_all: true)
+        end
+
+        before do
+          user_session(@teacher)
+        end
+
+        it "does not show" do
+          get "/"
+          expect(f("body")).not_to contain_jqcss("#start_new_course")
+        end
+
+        it "launches new 'create course modal' if teachers can create courses" do
+          Account.default.update_attribute(:settings, { teachers_can_create_courses_anywhere: false, teachers_can_create_courses: true })
+          get "/"
+          f("#start_new_course").click
+          expect(fj('h2:contains("Create Course")')).to be_displayed
+          expect(f("body")).not_to contain_jqcss("span:contains('Which account will this course be associated with?')")
+          expect(f("body")).not_to contain_jqcss(".flashalert-message")
+        end
+      end
+
+      context "as a sub-admin" do
+        before :once do
+          sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
+          @sub_admin = account_admin_user(account: sub_acc)
+        end
+
+        before do
+          user_session(@sub_admin)
+        end
+
+        it "launches new 'create course modal' if teachers can create courses" do
+          get "/"
+          f("#start_new_course").click
+          expect(fj('h2:contains("Create Course")')).to be_displayed
+          expect(f("body")).not_to contain_jqcss(".flashalert-message")
+        end
+      end
+
+      context "as teacher who is also a sub-admin" do
+        before :once do
+          sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
+          sub_acc_admin = account_admin_user(account: sub_acc)
+          course_with_teacher(user: sub_acc_admin, active_all: true)
+        end
+
+        before do
+          user_session(@teacher)
+        end
+
+        it "launches new 'create course modal'" do
+          get "/"
+          f("#start_new_course").click
+          expect(fj('h2:contains("Create Course")')).to be_displayed
+          expect(f("body")).not_to contain_jqcss(".flashalert-message")
+        end
+
+        it "ignores teacher mcc restrictions" do
+          Account.default.update_attribute(:settings, { teachers_can_create_courses_anywhere: false, teachers_can_create_courses: true })
+          get "/"
+          f("#start_new_course").click
+          expect(fj('h2:contains("Create Course")')).to be_displayed
+          expect(f("body")).to contain_jqcss("span:contains('Which account will this course be associated with?')")
+          expect(f("body")).not_to contain_jqcss(".flashalert-message")
+        end
+      end
+
+      context "as a restricted root admin who is also a sub-admin" do
+        it "show the proper picker regardless of lack of root permissions" do
+          Account.default.update_attribute(:settings, { no_enrollments_can_create_courses: true })
+          Account.default.enable_feature!(:granular_permissions_manage_courses)
+          acc_admin = account_admin_user_with_role_changes(account: Account.default, role_changes: { manage_courses_add: false })
+          sub_acc = Account.create!(name: "sub_account", parent_account: Account.default)
+          account_with_role_changes(account: sub_acc, role_changes: { manage_courses_add: true })
+          acc_admin.account_users.create!(account: sub_acc)
+          user_session(acc_admin)
+          get "/"
+          f("#start_new_course").click
+          expect(fj('h2:contains("Create Course")')).to be_displayed
+          expect(f("body")).to contain_jqcss("span:contains('Which account will this course be associated with?')")
+        end
+      end
+
+      context "as a student" do
+        before :once do
+          student_in_course(active_all: true, course: @course)
+        end
+
+        before do
+          user_session(@student)
+        end
+
+        it "does not show" do
+          get "/"
+          expect(f("body")).not_to contain_jqcss("#start_new_course")
+        end
       end
     end
   end
