@@ -1275,8 +1275,8 @@ class Attachment < ActiveRecord::Base
     @associated_with_submission ||= attachment_associations.where(context_type: "Submission").exists?
   end
 
-  def user_can_read_through_context?(user, session)
-    return true if context.is_a?(AssessmentQuestion) && context.user_can_see_through_quiz_question?(user, session)
+  def user_can_read_through_context?(user, session, through_assessment: true)
+    return true if through_assessment && context.is_a?(AssessmentQuestion) && context.user_can_see_through_quiz_question?(user, session)
 
     if supports_visibility?
       (computed_visibility_level == "public") ||
@@ -1310,7 +1310,9 @@ class Attachment < ActiveRecord::Base
     given { public? }
     can :read and can :download
 
-    given { |user, session| context&.grants_right?(user, session, :read) } # students.include? user }
+    given do |user, session|
+      user_can_read_through_context?(user, session, through_assessment: false)
+    end
     can :read
 
     given { |user, session| context&.grants_right?(user, session, :read_as_admin) }
