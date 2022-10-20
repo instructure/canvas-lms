@@ -3,3 +3,4 @@ lib
 public
 locales
 coverage
+src/getTranslations.js
