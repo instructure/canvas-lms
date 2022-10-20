@@ -266,25 +266,4 @@ describe('HeaderInputs', () => {
     expect(container.findAllByTestId('address-book-tag')).toBeTruthy()
     expect(props.onSelectedIdsChange.mock.calls[0][0][0]._id).toBe('1')
   })
-
-  describe('Media Comments', () => {
-    it('does not render a media comment if one is not provided', () => {
-      const container = setup(defaultProps())
-      expect(container.queryByTestId('media-attachment')).toBeNull()
-    })
-
-    it('does render a media comment if one is provided', () => {
-      const container = setup(defaultProps({mediaAttachmentTitle: 'I am Lord Lemon'}))
-      expect(container.getByTestId('media-attachment')).toBeInTheDocument()
-      expect(container.getByText('I am Lord Lemon')).toBeInTheDocument()
-    })
-
-    it('calls the onRemoveMediaComment callback when the remove media button is clicked', () => {
-      const props = defaultProps({mediaAttachmentTitle: 'No really I am Lord Lemon'})
-      const container = setup(props)
-      const removeMediaButton = container.getByTestId('remove-media-attachment')
-      fireEvent.click(removeMediaButton)
-      expect(props.onRemoveMediaComment).toHaveBeenCalled()
-    })
-  })
 })
