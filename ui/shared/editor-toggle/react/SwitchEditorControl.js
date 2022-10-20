@@ -69,6 +69,8 @@ class SwitchEditorControl extends React.Component {
   render() {
     return (
       <div style={{float: 'right'}}>
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           ref={c => (this.switchLink = c)}
           href="#"

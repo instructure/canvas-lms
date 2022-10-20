@@ -41,6 +41,8 @@ export default class ManageUpdateExternalToolButton extends React.Component {
     const cssClassName = this.props.tool.has_update ? '' : ' hide'
     return (
       <li role="presentation" className={`EditExternalToolButton ui-menu-item${cssClassName}`}>
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           ref="updateButton"

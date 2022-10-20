@@ -122,6 +122,8 @@ export default class FlickrSearch extends React.Component {
         {photos && (
           <span className="FlickrSearch__pageNavigation">
             {this.state.page > 1 && !this.state.searching && (
+              // TODO: use InstUI button
+              // eslint-disable-next-line jsx-a11y/anchor-is-valid
               <a
                 className="FlickrSearch__control"
                 ref="flickrSearchControlPrev"
@@ -132,6 +134,8 @@ export default class FlickrSearch extends React.Component {
               </a>
             )}
             {this.state.page < photos.pages && !this.state.searching && (
+              // TODO: use InstUI button
+              // eslint-disable-next-line jsx-a11y/anchor-is-valid
               <a
                 className="FlickrSearch__control"
                 ref="flickrSearchControlNext"

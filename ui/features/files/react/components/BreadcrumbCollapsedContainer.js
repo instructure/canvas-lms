@@ -66,6 +66,8 @@ class BreadcrumbCollapsedContainer extends React.Component {
         onBlur={this.close}
         style={{position: 'relative'}}
       >
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a href="#">…</a>
         <div className={divClasses}>
           <div className="arrow" />

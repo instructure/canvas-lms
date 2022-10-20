@@ -156,6 +156,8 @@ export default class EditExternalToolButton extends React.Component {
 
       return (
         <li role="presentation" className="EditExternalToolButton">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             href="#"
             ref={this.editButton}

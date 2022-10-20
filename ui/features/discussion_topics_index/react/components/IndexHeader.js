@@ -99,6 +99,8 @@ export default class IndexHeader extends Component {
     if (this.props.discussionTopicIndexMenuTools?.length > 0) {
       return (
         <div className="inline-block">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a
             className="al-trigger btn"
             id="discussion_menu_link"
@@ -113,6 +115,8 @@ export default class IndexHeader extends Component {
           <ul className="al-options" role="menu">
             {this.props.discussionTopicIndexMenuTools.map(tool => (
               <li key={tool.id} role="menuitem">
+                {/* TODO: use InstUI button */}
+                {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
                 <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
                   {this.iconForTrayTool(tool)}
                   {tool.title}
