@@ -108,8 +108,8 @@ describe "master courses - add and remove course associations" do
     minions = current_associations
     expect(minions.length).to eq(2)
 
-    # remove course0
-    the_x = f("form[data-course-id='#{@course0.id}'] button") # click 'x' next to course0
+    # "I still see the X" ... click it to remove the course 0 association
+    the_x = f(".bca-associations-table button[data-course-id='#{@course0.id}']")
     the_x.click
     open_courses_list
 
