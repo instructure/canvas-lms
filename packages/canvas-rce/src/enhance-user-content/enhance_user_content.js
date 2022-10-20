@@ -16,9 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ReactDOM from 'react-dom'
-import React from 'react'
-import {Link} from '@instructure/ui-link'
 import htmlEscape from 'escape-html'
 import {IconDownloadLine, IconExternalLinkLine} from '@instructure/ui-icons/es/svg'
 import formatMessage from '../format-message'
@@ -141,33 +138,6 @@ function buildUrl(url) {
   }
 }
 
-// Rendering a temporary Link element so we can copy its classnames to anchors with images inside,
-// since '@instructure/ui-link' doesn't provide a way to use its CSS themed classes directly.
-//
-// This does what the jquery version did, but I don't believe it's doing all that was intended
-// it gets the right focus ring theme color, but not rounded corners, but then
-// the other links do not have the right focus ring color
-// see https://gerrit.instructure.com/c/canvas-lms/+/288887
-function handleAnchorsWithImage() {
-  const temp = document.createElement('div')
-  const tempLinkComponent = React.createElement(
-    Link,
-    {
-      elementRef: e => {
-        document.querySelectorAll('.user_content a').forEach(anchor => {
-          const img = anchor.querySelector('img')
-          if (img && !img.classList.contains('external_link_icon')) {
-            anchor.classList.add(...e.className.split(/\s+/))
-          }
-        })
-      },
-    },
-    // Children prop is required
-    React.createElement('img')
-  )
-  ReactDOM.render(tempLinkComponent, temp)
-}
-
 export function enhanceUserContent(container, customEnhanceFunc) {
   if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
     return
@@ -208,8 +178,6 @@ export function enhanceUserContent(container, customEnhanceFunc) {
       childLink.appendChild(externalLinkIcon)
     })
   })
-
-  handleAnchorsWithImage()
 
   content
     .querySelectorAll('a.instructure_file_link, a.instructure_scribd_file')
