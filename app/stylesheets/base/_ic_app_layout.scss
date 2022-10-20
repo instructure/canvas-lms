@@ -21,7 +21,9 @@
 /// we needed to ensure we share the right styles with these sections, but
 /// still enforce different breakpoints when needed
 
-@mixin shared-main-content {display: flex;}
+@mixin shared-main-content {
+  display: flex;
+}
 @mixin shared-primary {
   flex: 1;
   // Fix Firefox and IE Edge issues with contents breaking out of flex container
@@ -29,10 +31,10 @@
 }
 @mixin shared-secondary {
   width: $ic-right-side-width;
-  padding-#{direction(left)}: $ic-sp*2;
+  padding-#{direction(left)}: $ic-sp * 2;
 }
 
-$ic-left-side-width: $ic-sp*16;
+$ic-left-side-width: $ic-sp * 16;
 
 body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   box-sizing: border-box;
@@ -46,15 +48,19 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 }
 
 .ic-Layout-contentMain {
-  padding: $ic-sp*2;
+  &:focus {
+    outline-color: var(--ic-link-color);
+    outline-width: 2px;
+    outline-offset: -2px;
+    outline-style: solid;
+  }
+  padding: $ic-sp * 2;
   @include mobile-only {
     & {
       padding-#{direction(left)}: $ic-sp;
       padding-#{direction(right)}: $ic-sp;
     }
   }
-
-
 
   body.is-inside-submission-frame & {
     padding-#{direction(left)}: $ic-sp;
@@ -70,13 +76,13 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
   }
 
   body.ic-framed-lti-tool & {
-    padding: 0 $ic-sp*2;
+    padding: 0 $ic-sp * 2;
 
     @include lti-min-size {
       iframe.tool_launch {
         width: 100vw;
         min-width: 100vw;
-        margin-#{direction(left)}: - 2 * $ic-sp;
+        margin-#{direction(left)}: -2 * $ic-sp;
         overflow-x: auto;
       }
     }
@@ -90,7 +96,7 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 .ic-app-main-content__secondary {
   box-sizing: border-box;
   min-width: 1px;
-  padding: $ic-sp*2;
+  padding: $ic-sp * 2;
   @include mobile-only {
     & {
       padding-#{direction(left)}: $ic-sp;
@@ -106,7 +112,9 @@ body:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
 /// Layout when the course nav IS OPEN
 body.course-menu-expanded {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
-    @include breakpoint(desktop--nav-open) { @include shared-main-content; }
+    @include breakpoint(desktop--nav-open) {
+      @include shared-main-content;
+    }
   }
   &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop--nav-open) {
@@ -123,9 +131,11 @@ body.course-menu-expanded {
 /// Layout when the course nav IS CLOSED
 body:not(.course-menu-expanded) {
   &:not(.ic-no-flex-layout):not(.embedded) .ic-app-main-content {
-    @include breakpoint(desktop) { @include shared-main-content; }
+    @include breakpoint(desktop) {
+      @include shared-main-content;
+    }
   }
-  &:not(.ic-no-flex-layout):not(.embedded)  .ic-Layout-contentWrapper {
+  &:not(.ic-no-flex-layout):not(.embedded) .ic-Layout-contentWrapper {
     @include breakpoint(desktop) {
       @include shared-primary;
     }
@@ -150,7 +160,7 @@ body:not(.course-menu-expanded) {
   }
   box-sizing: border-box;
   padding: $ic-sp 0;
-  margin: 0 $ic-sp*2;
+  margin: 0 $ic-sp * 2;
   border-top: 1px solid $ic-border-light;
   @include breakpoint(desktop) {
     display: flex;
@@ -158,7 +168,7 @@ body:not(.course-menu-expanded) {
   }
   body.modal & {
     margin: 0;
-    padding: $ic-sp $ic-sp*2;
+    padding: $ic-sp $ic-sp * 2;
   }
 }
 .ic-app-footer__links {
@@ -175,9 +185,14 @@ body:not(.course-menu-expanded) {
   }
   @include breakpoint(desktop) {
     justify-content: flex-end;
-    a { margin-#{direction(right)}: 0; margin-#{direction(left)}: $ic-sp; }
+    a {
+      margin-#{direction(right)}: 0;
+      margin-#{direction(left)}: $ic-sp;
+    }
   }
-  @include mobile-only { display: block; }
+  @include mobile-only {
+    display: block;
+  }
 }
 
 .ic-app {
@@ -227,7 +242,8 @@ body:not(.course-menu-expanded) {
   }
 
   @include desktop-only {
-    body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame) & {
+    body.course-menu-expanded:not(.ic-no-flex-layout):not(.embedded):not(.is-inside-submission-frame)
+      & {
       margin-#{direction(left)}: $ic-left-side-width;
 
       .ic-Layout-watermark {
@@ -269,16 +285,17 @@ body:not(.course-menu-expanded) {
 .ic-app-course-menu {
   transition: transform 1s ease-in-out;
   transition-delay: 0.75s;
-  transform: translate3d(0,0,0);
+  transform: translate3d(0, 0, 0);
   box-sizing: border-box;
   position: absolute;
-  top: 0; #{direction(right)}: 100%;
+  top: 0;
+  #{direction(right)}: 100%;
   width: $ic-left-side-width;
-  padding: direction-sides($ic-sp*2 $ic-sp $ic-sp $ic-sp*2);
+  padding: direction-sides($ic-sp * 2 $ic-sp $ic-sp $ic-sp * 2);
   opacity: 0;
   body.course-menu-expanded & {
     opacity: 1;
-    transform: translate3d(0,0,0);
+    transform: translate3d(0, 0, 0);
   }
   &.ic-sticky-on {
     bottom: 0;
@@ -294,16 +311,16 @@ body:not(.course-menu-expanded) {
   position: sticky;
   top: 0;
   max-height: 100vh;
-  padding: direction-sides($ic-sp*2 $ic-sp $ic-breadcrumbs-height $ic-sp*2);
+  padding: direction-sides($ic-sp * 2 $ic-sp $ic-breadcrumbs-height $ic-sp * 2);
   box-sizing: border-box;
   overflow-y: auto;
   overscroll-behavior-y: contain;
 }
 
 .ic-sticky-frame.has-scrollbar {
-  padding: direction-sides($ic-sp*2 $ic-sp*0.2 $ic-breadcrumbs-height $ic-sp*2);
-  & .nav-icon{
-      padding: 0 3px;
+  padding: direction-sides($ic-sp * 2 $ic-sp * 0.2 $ic-breadcrumbs-height $ic-sp * 2);
+  & .nav-icon {
+    padding: 0 3px;
   }
 }
 
@@ -311,7 +328,7 @@ body:not(.course-menu-expanded) {
   display: flex;
   align-items: center;
   border-bottom: 1px solid $ic-border-light;
-  margin: 0 $ic-sp*2;
+  margin: 0 $ic-sp * 2;
   min-height: $ic-breadcrumbs-height;
   box-sizing: border-box;
 
@@ -329,9 +346,13 @@ body:not(.course-menu-expanded) {
 .ic-app-course-nav-toggle {
   margin-#{direction(right)}: $ic-sp;
   padding: 0;
-  width: $ic-sp*3; height: ($ic-sp*3) - ($ic-sp*0.5);
+  width: $ic-sp * 3;
+  height: ($ic-sp * 3) - ($ic-sp * 0.5);
   @include overwrite-default-icon-size(1.5rem);
-  i[class*=icon-], i[class^=icon-] { margin-#{direction(right)}: 0; }
+  i[class*='icon-'],
+  i[class^='icon-'] {
+    margin-#{direction(right)}: 0;
+  }
 }
 
 .ic-app-crumbs {
