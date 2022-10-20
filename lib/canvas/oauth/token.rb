@@ -128,7 +128,8 @@ module Canvas::OAuth
           "name" => user.name,
           "global_id" => user.global_id.to_s,
           "effective_locale" => I18n.locale&.to_s
-        }
+        },
+        "canvas_region" => Shard.current.database_server.config[:region] || "unknown"
       }
 
       unless real_user == user
