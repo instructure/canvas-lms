@@ -122,23 +122,25 @@ const ConferencesRouter = Backbone.Router.extend({
           }
         })
 
-        const availableSectionsList = ENV.sections.map(({id, name}) => {
-          return {
-            displayName: name,
-            id,
-            type: 'section',
-            assetCode: `section-${id}`,
-          }
-        })
+        const availableSectionsList =
+          ENV.sections?.map(({id, name}) => {
+            return {
+              displayName: name,
+              id,
+              type: 'section',
+              assetCode: `section-${id}`,
+            }
+          }) || []
 
-        const availableGroupsList = ENV.groups.map(({id, name}) => {
-          return {
-            displayName: name,
-            id,
-            type: 'group',
-            assetCode: `group-${id}`,
-          }
-        })
+        const availableGroupsList =
+          ENV.groups?.map(({id, name}) => {
+            return {
+              displayName: name,
+              id,
+              type: 'group',
+              assetCode: `group-${id}`,
+            }
+          }) || []
 
         const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
         ReactDOM.render(
@@ -223,6 +225,7 @@ const ConferencesRouter = Backbone.Router.extend({
                 body: new URLSearchParams(payload),
                 headers: {
                   'X-CSRF-Token': getCookie('_csrf_token'),
+                  Accept: 'application/json',
                 },
               }
 
@@ -274,23 +277,25 @@ const ConferencesRouter = Backbone.Router.extend({
         }
       })
 
-      const availableSectionsList = ENV.sections.map(({id, name}) => {
-        return {
-          displayName: name,
-          id,
-          type: 'section',
-          assetCode: `section-${id}`,
-        }
-      })
+      const availableSectionsList =
+        ENV.sections?.map(({id, name}) => {
+          return {
+            displayName: name,
+            id,
+            type: 'section',
+            assetCode: `section-${id}`,
+          }
+        }) || []
 
-      const availableGroupsList = ENV.groups.map(({id, name}) => {
-        return {
-          displayName: name,
-          id,
-          type: 'group',
-          assetCode: `group-${id}`,
-        }
-      })
+      const availableGroupsList =
+        ENV.groups?.map(({id, name}) => {
+          return {
+            displayName: name,
+            id,
+            type: 'group',
+            assetCode: `group-${id}`,
+          }
+        }) || []
 
       const menuData = availableAttendeesList.concat(availableSectionsList, availableGroupsList)
       if (attributes.long_running === 1) {
@@ -420,6 +425,7 @@ const ConferencesRouter = Backbone.Router.extend({
               body: new URLSearchParams(payload),
               headers: {
                 'X-CSRF-Token': getCookie('_csrf_token'),
+                Accept: 'application/json',
               },
             }
 
