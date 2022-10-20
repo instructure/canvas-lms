@@ -332,8 +332,8 @@ $.ajaxJSONPreparedFiles = function (options) {
     parameters.no_redirect = true
     file = file.files[0]
     import('@canvas/upload-file')
-      .then(({uploadFile}) =>
-        uploadFile(uploadUrl, parameters, file, undefined, options.onProgress)
+      .then(({uploadFile: uploadFile_}) =>
+        uploadFile_(uploadUrl, parameters, file, undefined, options.onProgress)
       )
       .then(data => {
         attachments.push(data)
@@ -456,6 +456,7 @@ $.httpSuccess = function (r) {
       (!r.status && window.location.protocol === 'file:') ||
       (r.status >= 200 && r.status < 300) ||
       r.status === 304 ||
+      // eslint-disable-next-line eqeqeq
       ($.browser.safari && r.status == undefined)
     )
   } catch (e) {
@@ -533,6 +534,7 @@ $.sendFormAsBinary = function (options, not_binary) {
     if (not_binary) {
       xhr.send(body)
     } else if (!xhr.sendAsBinary) {
+      // eslint-disable-next-line no-console
       console.log('xhr.sendAsBinary not supported')
     } else {
       xhr.sendAsBinary(body)
@@ -611,6 +613,7 @@ $.toMultipartForm = function (params, callback) {
         'Content-Type: multipart/mixed; boundary=' +
         innerBoundary +
         '\r\n\r\n'
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       for (const _jdx in value) {
         fileList.push(value)
       }
@@ -733,6 +736,7 @@ $.fn.fillFormData = function (data, opts) {
               val = ''
             }
             $obj.val(val.toString())
+            // eslint-disable-next-line eqeqeq
           } else if ($obj.val() == data[name]) {
             $obj.attr('checked', true)
           } else {
@@ -780,11 +784,10 @@ $.fn.getFormData = function (options) {
       const multiValue = attr.match(/\[\]$/)
       if (inputType === 'hidden' && !multiValue) {
         if (
-          $form
-            .find("[name='" + attr + "']")
-            .filter(
-              'textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden'
-            )[0] != $input[0]
+          $form.find("[name='" + attr + "']").filter(
+            'textarea,:radio:checked,:checkbox:checked,:text,:password,select,:hidden'
+            // eslint-disable-next-line eqeqeq
+          )[0] != $input[0]
         ) {
           return
         }
@@ -993,6 +996,7 @@ $.fn.validateForm = function (options) {
     })
   }
   let hasErrors = false
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const _err in errors) {
     hasErrors = true
     break
@@ -1028,13 +1032,13 @@ $.fn.formErrors = function (data_errors, options) {
       val = newval
     } else if (
       typeof i === 'number' &&
-      val.length == 2 &&
+      val.length === 2 &&
       val[0] instanceof $ &&
       typeof val[1] === 'string'
     ) {
       elementErrors.push(val)
       return
-    } else if (typeof i === 'number' && val.length == 2 && typeof val[1] === 'string') {
+    } else if (typeof i === 'number' && val.length === 2 && typeof val[1] === 'string') {
       newval = []
       newval.push(val[1])
       i = val[0]
@@ -1262,12 +1266,12 @@ $.fn.hideErrors = function (_options) {
       this.data('associated_error_box', null)
     }
     this.find(':input').each(function () {
-      const $obj = $(this),
-        $oldBox = $obj.data('associated_error_box')
-      if ($oldBox) {
-        $oldBox.remove()
+      const $obj = $(this)
+      const $oldBox_ = $obj.data('associated_error_box')
+      if ($oldBox_) {
+        $oldBox_.remove()
         $obj.data('associated_error_box', null)
-        const srError = _.find($screenReaderErrors, node => $(node).text() === $oldBox.text())
+        const srError = _.find($screenReaderErrors, node => $(node).text() === $oldBox_.text())
         if (srError) {
           $(srError).remove()
         }

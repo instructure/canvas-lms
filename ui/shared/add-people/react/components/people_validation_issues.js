@@ -19,7 +19,7 @@
 import {useScope as useI18nScope} from '@canvas/i18n'
 import React from 'react'
 import PropTypes from 'prop-types'
-import shapes from './shapes'
+import {duplicatesShape, missingsShape} from './shapes'
 import DuplicateSection from './duplicate_section'
 import MissingPeopleSection from './missing_people_section'
 import {Alert} from '@instructure/ui-alerts'
@@ -30,8 +30,8 @@ class PeopleValidationIssues extends React.Component {
   static propTypes = {
     searchType: PropTypes.string.isRequired,
     inviteUsersURL: PropTypes.string,
-    duplicates: PropTypes.shape(shapes.duplicatesShape),
-    missing: PropTypes.shape(shapes.missingsShape),
+    duplicates: PropTypes.shape(duplicatesShape),
+    missing: PropTypes.shape(missingsShape),
     onChangeDuplicate: PropTypes.func.isRequired,
     onChangeMissing: PropTypes.func.isRequired,
   }
@@ -49,7 +49,6 @@ class PeopleValidationIssues extends React.Component {
     super(props)
 
     this.state = {
-      newUsersForMissing: {},
       focusElem: null,
     }
   }

@@ -24,6 +24,7 @@ import ready from '@instructure/ready'
 
 import '@canvas/rails-flash-notifications'
 import '@canvas/jquery/jquery.disableWhileLoading'
+// eslint-disable-next-line import/no-named-as-default
 import DashboardHeader from './react/DashboardHeader'
 
 ready(() => {

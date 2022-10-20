@@ -25,7 +25,7 @@ const I18n = useI18nScope('cyoe_assignment_sidebar_score')
 // stack overflow suggests this implementation
 const isNumeric = n => {
   const parsed = numberHelper.parse(n)
-  return !isNaN(parsed) && isFinite(parsed)
+  return !Number.isNaN(Number(parsed)) && Number.isFinite(Number(parsed))
 }
 
 const haveGradingScheme = assignment => (assignment ? !!assignment.grading_scheme : false)
@@ -125,7 +125,7 @@ export const i18nGrade = (grade, assignment) => {
     assignment.grading_type !== GradingTypes.gpa_scale.key
   ) {
     const number = numberHelper.parse(grade.replace(/%$/, ''))
-    if (!isNaN(number)) {
+    if (!Number.isNaN(Number(number))) {
       return formatScore(number, assignment)
     }
   }

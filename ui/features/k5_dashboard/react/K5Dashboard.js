@@ -40,9 +40,9 @@ import {Tray} from '@instructure/ui-tray'
 import {View} from '@instructure/ui-view'
 
 import K5Tabs, {scrollElementIntoViewIfCoveredByHeader} from '@canvas/k5/react/K5Tabs'
-import GradesPage from './GradesPage'
+import {GradesPage} from './GradesPage'
 import HomeroomPage from './HomeroomPage'
-import TodosPage from './TodosPage'
+import {TodosPage} from './TodosPage'
 import K5DashboardContext from '@canvas/k5/react/K5DashboardContext'
 import {CardDashboardLoader} from '@canvas/dashboard-card'
 import {mapStateToProps} from '@canvas/k5/redux/redux-helpers'
@@ -141,7 +141,7 @@ const getWindowSize = () => ({
   height: window.innerHeight,
 })
 
-export const K5Dashboard = ({
+const K5Dashboard = ({
   assignmentsDueToday,
   assignmentsMissing,
   assignmentsCompletedForToday,

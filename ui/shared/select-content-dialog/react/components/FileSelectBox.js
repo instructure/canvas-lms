@@ -123,6 +123,7 @@ export default class FileSelectBox extends React.Component {
           </optgroup>
         )
       }
+      return undefined
     })
   }
 

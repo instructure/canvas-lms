@@ -28,7 +28,7 @@ const TEN_E_8 = 10e8
 // stack overflow suggests this implementation
 export const isNumeric = n => {
   n = numberHelper.parse(n)
-  return !isNaN(n) && isFinite(n) // eslint-disable-line no-restricted-globals
+  return !Number.isNaN(Number(n)) && Number.isFinite(Number(n))
 }
 
 const haveGradingScheme = assignment => {

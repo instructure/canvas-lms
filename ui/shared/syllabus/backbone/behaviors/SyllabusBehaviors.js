@@ -96,6 +96,7 @@ function bindToSyllabus() {
         if (c.substr(0, 8) === 'related-') {
           return (related_id = c.substr(8))
         }
+        return false
       })
     }
 

@@ -49,22 +49,27 @@ $.fn.fillTemplateData = function (options) {
     }
     let contentChange = false
     if (options.data) {
-      for (var item in options.data) {
-        if (options.except && $.inArray(item, options.except) != -1) {
+      for (const item in options.data) {
+        if (options.except && $.inArray(item, options.except) !== -1) {
           continue
         }
-        if (options.data[item] && options.dataValues && $.inArray(item, options.dataValues) != -1) {
+        if (
+          options.data[item] &&
+          options.dataValues &&
+          $.inArray(item, options.dataValues) !== -1
+        ) {
           this.data(item, options.data[item].toString())
         }
         const $found_all = this.find('.' + item)
-        var avoid = options.avoid || ''
+        const avoid = options.avoid || ''
+        // eslint-disable-next-line no-loop-func
         $found_all.each(function () {
           const $found = $(this)
           if ($found.length > 0 && $found.closest(avoid).length === 0) {
             if (typeof options.data[item] === 'undefined' || options.data[item] === null) {
               options.data[item] = ''
             }
-            if (options.htmlValues && $.inArray(item, options.htmlValues) != -1) {
+            if (options.htmlValues && $.inArray(item, options.htmlValues) !== -1) {
               $found.html($.raw(options.data[item].toString()))
               if ($found.hasClass('user_content')) {
                 contentChange = true
@@ -128,14 +133,12 @@ $.fn.getTemplateData = function (options) {
   if (!this.length || !options) {
     return {}
   }
-  var result = {},
-    item,
-    val
+  const result = {}
   if (options.textValues) {
     const _this = this
     options.textValues.forEach(item => {
       const $item = _this.find('.' + item.replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ':first')
-      val = $.trim($item.text())
+      let val = $.trim($item.text())
       if ($item.html() === '&nbsp;') {
         val = ''
       }
@@ -146,19 +149,19 @@ $.fn.getTemplateData = function (options) {
     })
   }
   if (options.dataValues) {
-    for (item in options.dataValues) {
-      var val = this.data(options.dataValues[item])
-      if (val) {
-        result[options.dataValues[item]] = val
+    for (const item in options.dataValues) {
+      const val_ = this.data(options.dataValues[item])
+      if (val_) {
+        result[options.dataValues[item]] = val_
       }
     }
   }
   if (options.htmlValues) {
-    for (item in options.htmlValues) {
+    for (const item in options.htmlValues) {
       const $elem = this.find(
         '.' + options.htmlValues[item].replace(/\[/g, '\\[').replace(/\]/g, '\\]') + ':first'
       )
-      val = null
+      let val = null
       if ($elem.hasClass('user_content') && $elem.data('unenhanced_content_html')) {
         val = $elem.data('unenhanced_content_html')
       } else {
