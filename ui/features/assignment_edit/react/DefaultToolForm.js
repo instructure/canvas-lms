@@ -106,6 +106,8 @@ const DefaultToolForm = props => {
         <div style={{display: 'none'}}>
           <ul className="tools">
             <li id="default-tool" className="tool resource_selection">
+              {/* TODO: use InstUI button */}
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a href="#" className="name">
                 {defaultToolData.name}
               </a>

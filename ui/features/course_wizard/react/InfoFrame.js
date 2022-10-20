@@ -117,7 +117,10 @@ class InfoFrame extends React.Component {
   renderButton = () => {
     if (this.state.itemShown.key === 'home_page') {
       return (
+        // TODO: use InstUI button
+        // eslint-disable-next-line jsx-a11y/anchor-is-valid, jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
         <a
+          role="button"
           ref={e => (this.callToAction = e)}
           onClick={this.chooseHomePage}
           className="Button Button--primary"

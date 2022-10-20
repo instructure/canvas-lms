@@ -115,6 +115,8 @@ class Group extends React.Component {
       ) : null
 
     const manageLink = isLeader ? (
+      // TODO: use InstUI button
+      // eslint-disable-next-line jsx-a11y/anchor-is-valid
       <a
         href="#"
         className="manage-link"

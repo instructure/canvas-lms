@@ -69,6 +69,8 @@ class ChecklistItem extends React.Component {
 
     return (
       <li>
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           id={this.props.id}

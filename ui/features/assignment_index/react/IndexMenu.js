@@ -120,6 +120,8 @@ export default class IndexMenu extends React.Component {
   renderTools = () =>
     this.state.externalTools.map(tool => (
       <li key={tool.definition_id} role="menuitem">
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a aria-label={tool.name} href="#" onClick={this.onLaunchTool(tool)}>
           <i className="icon-import" />
           {tool.name}
@@ -131,6 +133,8 @@ export default class IndexMenu extends React.Component {
     if (ENV.assignment_index_menu_tools) {
       return ENV.assignment_index_menu_tools.map(tool => (
         <li key={tool.id} role="menuitem">
+          {/* TODO: use InstUI button */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a aria-label={tool.title} href="#" onClick={this.onLaunchTrayTool(tool)}>
             {this.iconForTrayTool(tool)}
             {tool.title}
@@ -206,6 +210,8 @@ export default class IndexMenu extends React.Component {
         <ul className="al-options" role="menu">
           {this.props.requestBulkEdit && (
             <li role="menuitem">
+              {/* TODO: use InstUI button */}
+              {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
               <a
                 href="#"
                 tabIndex="0"
@@ -221,6 +227,8 @@ export default class IndexMenu extends React.Component {
             </li>
           )}
           <li role="menuitem">
+            {/* TODO: use InstUI button */}
+            {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
             <a
               ref="trigger"
               href="#"

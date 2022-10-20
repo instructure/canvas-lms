@@ -215,6 +215,8 @@ export default createReactClass({
   render() {
     return (
       <div className="AddApp">
+        {/* TODO: use InstUI button */}
+        {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
         <a
           href="#"
           ref="addTool"
