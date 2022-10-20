@@ -35,7 +35,7 @@ QUnit.module('Message', () => {
       const wrapper = shallow(<Message variant="warning" message={message} />)
       strictEqual(
         wrapper.contains(
-          <Text color="warning" size="small">
+          <Text color="danger" size="small">
             {message}
           </Text>
         ),
