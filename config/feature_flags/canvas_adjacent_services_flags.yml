@@ -1,0 +1,5 @@
+docviewer_enable_iwork_files:
+  state: hidden
+  applies_to: RootAccount
+  display_name: "Docviewer Apple iWork file support"
+  description: "Allows Canvas to send iWork files to docviewer."
