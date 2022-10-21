@@ -714,6 +714,90 @@ describe Types::UserType do
     end
   end
 
+  context "recipients_observers" do
+    let(:student_type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    let(:teacher_type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    before do
+      student = @student
+      @third_student = student_in_course(active_all: true).user
+      @fourth_student = student_in_course(active_all: true).user
+      @student = student
+
+      observer = observer_in_course(active_all: true, associated_user_id: @student).user
+      observer_enrollment_2 = @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+      observer_enrollment_2.update_attribute(:associated_user_id, @other_student.id)
+
+      observer_enrollment_3 = @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active")
+      observer_enrollment_3.update_attribute(:associated_user_id, @third_student.id)
+
+      second_observer = observer_in_course(active_all: true, associated_user_id: @fourth_student).user
+
+      @observer = observer
+      @second_observer = second_observer
+    end
+
+    it "returns nil if the user is not the current user" do
+      result = teacher_type.resolve('recipientsObservers(contextCode: "course_1", recipientIds: ["1"]) { nodes { _id } } ')
+      expect(result).to be nil
+    end
+
+    it "returns nil if invalid course is given" do
+      result = teacher_type.resolve('recipientsObservers(contextCode: "fake_2", recipientIds: ["1"]) { nodes { _id } } ')
+      expect(result).to be nil
+    end
+
+    it "returns a users observers as messageable user" do
+      recipients = [@student.id.to_s]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).to eq [@observer.id.to_s]
+    end
+
+    it "does not return observers that are not active" do
+      inactive_observer = User.create
+      inactive_observer_enrollment = @course.enroll_user(inactive_observer, "ObserverEnrollment", enrollment_state: "completed")
+      inactive_observer_enrollment.update_attribute(:associated_user_id, @student.id)
+      recipients = [@student.id.to_s]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).not_to include(inactive_observer.id.to_s)
+    end
+
+    it "does not return duplicate observers if an observer is observing multiple students in the course" do
+      recipients = [@student, @other_student, @third_student].map(&:id).map(&:to_s)
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result).to eq [@observer.id.to_s]
+    end
+
+    it "returns observers for all students in a course if the entire course is a recipient and current user can send observers messages" do
+      recipients = ["course_#{@course.id}"]
+      result = teacher_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @teacher)
+      expect(result.length).to eq 2
+      expect(result).to include(@observer.id.to_s, @second_observer.id.to_s)
+    end
+
+    it "does not return observers that the current user is unable to message" do
+      recipients = ["course_#{@course.id}"]
+      result = student_type.resolve("recipientsObservers(contextCode: \"course_#{@course.id}\", recipientIds: #{recipients}) { nodes { _id } } ", current_user: @student)
+      expect(result.length).to eq 1
+      expect(result).to include(@student.observee_enrollments.first.user.id.to_s)
+    end
+  end
+
   context "favorite_courses" do
     before(:once) do
       @course1 = @course
