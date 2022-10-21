@@ -46,6 +46,7 @@ class NewCollaborationsDropDown extends React.Component {
             >
               {I18n.t('+ Collaboration')}
             </button>
+            {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
             <ul
               className="al-options"
               role="menu"

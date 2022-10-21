@@ -54,6 +54,7 @@ class GradingStandard extends React.Component {
   componentDidUpdate(prevProps, _prevState) {
     if (this.props.editing !== prevProps.editing) {
       ReactDOM.findDOMNode(this.refs.title).focus()
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({editingStandard: $.extend(true, {}, this.props.standard)})
     }
   }

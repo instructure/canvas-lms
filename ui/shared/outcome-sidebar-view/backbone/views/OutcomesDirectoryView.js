@@ -261,7 +261,8 @@ ${htmlEscape(I18n.t('Loading more results'))}</span></li>`
   }
 
   clearOutcomeSelection() {
-    if (this.selectedModel instanceof Outcome) {
+    // eslint-disable-next-line no-undef
+    if (typeof Outcome !== 'undefined' && this.selectedModel instanceof Outcome) {
       return this.clearSelection()
     }
   }

@@ -69,6 +69,7 @@ export default class RangeInput extends Component {
     const {labelText, formatValue, onChange, value, ...props} = this.props
 
     return (
+      // eslint-disable-next-line jsx-a11y/label-has-associated-control
       <label className="RangeInput">
         <div className="RangeInput__label">{labelText}</div>
         <div className="RangeInput__control">

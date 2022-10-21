@@ -79,6 +79,7 @@ UsageRightsDialog.renderFolderTooltip = function (folders) {
     return (
       <span
         className="UsageRightsDialog__andMore"
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex="0"
         ref={e => (this.folderTooltip = e)}
         data-html-tooltip-title={renderedNames}

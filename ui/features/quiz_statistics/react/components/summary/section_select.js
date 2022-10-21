@@ -79,6 +79,7 @@ class SectionSelect extends React.Component {
           <i className="icon-mini-arrow-down" aria-hidden="true" />
           <span className="screenreader-only">{I18n.t('Section Filter')}</span>
         </button>
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
         <ul
           id="toolbar-1"
           className="al-options"

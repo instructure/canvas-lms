@@ -158,6 +158,7 @@ class RestrictedRadioButtons extends React.Component {
         {this.permissionOptions.map((option, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <div className="radio" key={index}>
+            {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
             <label>
               <input
                 ref={e => (this[option.ref] = e)}
@@ -183,11 +184,15 @@ class RestrictedRadioButtons extends React.Component {
 
     return (
       <div style={styleObj}>
-        <label className="control-label dialog-adapter-form-calendar-label">
+        <label
+          htmlFor="dateSelectInput"
+          className="control-label dialog-adapter-form-calendar-label"
+        >
           {I18n.t('Available From')}
         </label>
         <div className="dateSelectInputContainer controls">
           <input
+            id="dateSelectInput"
             ref={e => (this.unlock_at = e)}
             defaultValue={this.state.unlock_at ? $.datetimeString(this.state.unlock_at) : ''}
             className="form-control dateSelectInput"
@@ -198,7 +203,7 @@ class RestrictedRadioButtons extends React.Component {
           />
         </div>
         <div>
-          <label className="control-label dialog-adapter-form-calendar-label">
+          <label htmlFor="lockDate" className="control-label dialog-adapter-form-calendar-label">
             {I18n.t('Available Until')}
           </label>
           <div className="dateSelectInputContainer controls">

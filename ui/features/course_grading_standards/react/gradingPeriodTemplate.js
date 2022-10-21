@@ -245,6 +245,7 @@ class GradingPeriodTemplate extends React.Component {
               {this.renderEndDate()}
             </div>
             <div className="col-xs-12 col-md-8 col-lg-2">
+              {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
               <label className="ic-Label" id={postfixId('period_close_date_', this)}>
                 {I18n.t('Close Date')}
               </label>

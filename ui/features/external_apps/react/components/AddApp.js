@@ -31,6 +31,7 @@ import {Button} from '@instructure/ui-buttons'
 
 const I18n = useI18nScope('external_tools')
 
+// eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
   displayName: 'AddApp',
 
@@ -81,6 +82,7 @@ export default createReactClass({
       }
     })
 
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({fields}, this.validateConfig)
       this.refs.addTool.focus()
@@ -114,6 +116,7 @@ export default createReactClass({
 
   openModal(e) {
     e.preventDefault()
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({modalIsOpen: true})
     }

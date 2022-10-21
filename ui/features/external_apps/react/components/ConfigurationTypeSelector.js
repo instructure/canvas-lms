@@ -40,12 +40,12 @@ export default class ConfigurationTypeSelector extends React.Component {
     return (
       <div className="ConfigurationsTypeSelector">
         <div className="form-group">
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label>
             {I18n.t('Configuration Type')}
             <select
               id="configuration_type_selector"
               ref="configurationType"
-              aria-haspopup="true"
               defaultValue={this.props.configurationType}
               className="input-block-level show-tick"
             >

@@ -17,7 +17,7 @@
  */
 
 import {useScope as useI18nScope} from '@canvas/i18n'
-import {useI18nFormats} from 'datetime-moment-parser'
+import {loadI18nFormats} from 'datetime-moment-parser'
 
 const I18n = useI18nScope('instructure')
 
@@ -69,9 +69,9 @@ export function prepareFormats() {
 }
 
 export function up() {
-  useI18nFormats(prepareFormats())
+  loadI18nFormats(prepareFormats())
 }
 
 export function down() {
-  useI18nFormats([])
+  loadI18nFormats([])
 }

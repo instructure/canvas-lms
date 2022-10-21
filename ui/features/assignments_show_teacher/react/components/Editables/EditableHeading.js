@@ -143,6 +143,7 @@ export default class EditableHeading extends React.Component {
   }
 
   renderView = () => {
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     return (
       <div>
@@ -160,6 +161,7 @@ export default class EditableHeading extends React.Component {
   }
 
   renderEditor = ({onBlur, editorRef}) => {
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableHeading.propTypes, ['mode'])
     // move it a bit so it doesn't move on edit
     const sty = {

@@ -142,7 +142,7 @@ export default class EntriesView extends Backbone.View {
         setTimeout(() => $el.addClass('highlight'), 200)
         setTimeout(() => $el.removeClass('highlight'), 400)
         setTimeout(() => $el.addClass('highlight'), 600)
-        var once = () => {
+        const once = () => {
           $el.removeClass('highlight')
           this.$window.off('scroll', once)
           return this.trigger('scrollAwayFromEntry')

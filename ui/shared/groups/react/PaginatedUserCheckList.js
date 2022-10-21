@@ -30,6 +30,7 @@ class PaginatedUserCheckList extends React.Component {
   render() {
     const permanentListItems = this.props.permanentUsers.map(u => (
       <li key={u.id}>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label className="checkbox">
           <input checked="true" type="checkbox" disabled="true" readOnly="true" />
           {u.name || u.display_name}
@@ -39,6 +40,7 @@ class PaginatedUserCheckList extends React.Component {
 
     const listItems = this.props.users.map(u => (
       <li key={u.id}>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label className="checkbox">
           <input
             checked={this._isChecked(u.id)}

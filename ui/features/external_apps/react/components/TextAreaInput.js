@@ -21,6 +21,7 @@ import createReactClass from 'create-react-class'
 import PropTypes from 'prop-types'
 import InputMixin from '../mixins/InputMixin'
 
+// eslint-disable-next-line react/prefer-es6-class
 export default createReactClass({
   displayName: 'TextAreaInput',
 
@@ -39,6 +40,7 @@ export default createReactClass({
   render() {
     return (
       <div className={this.getClassNames()}>
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
           {this.props.label}
           <textarea

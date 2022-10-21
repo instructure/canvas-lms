@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import PaginatedCollection from '@canvas/pagination/backbone/collections/PaginatedCollection.coffee'
 import _ from 'underscore'
+import deparam from 'deparam'
 import File from '../models/File.coffee'
 
 export default class FilesCollection extends PaginatedCollection {

@@ -33,6 +33,7 @@ export default {
   displayName: 'ShowFolder',
 
   debouncedForceUpdate: _.debounce(function () {
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) this.forceUpdate()
   }, 0),
 

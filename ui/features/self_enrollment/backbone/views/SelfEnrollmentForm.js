@@ -41,17 +41,20 @@ export default class SelfEnrollmentForm extends Backbone.View {
     if (ENV.ACCOUNT.recaptcha_key) {
       const that = this
       $(window).on('load', function () {
-        that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
-          sitekey: ENV.ACCOUNT.recaptcha_key,
-          callback: () => {
-            that.recaptchaPassed = true
-            that.$el.find('#submit_button').prop('disabled', false)
-          },
-          'expired-callback': () => {
-            that.recaptchaPassed = false
-            that.$el.find('#submit_button').prop('disabled', true)
-          },
-        })
+        if (typeof grecaptcha !== 'undefined') {
+          // eslint-disable-next-line no-undef
+          that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
+            sitekey: ENV.ACCOUNT.recaptcha_key,
+            callback: () => {
+              that.recaptchaPassed = true
+              that.$el.find('#submit_button').prop('disabled', false)
+            },
+            'expired-callback': () => {
+              that.recaptchaPassed = false
+              that.$el.find('#submit_button').prop('disabled', true)
+            },
+          })
+        }
       })
       if (this.action === 'create') {
         this.$el.find('#submit_button').prop('disabled', true)
@@ -130,7 +133,10 @@ export default class SelfEnrollmentForm extends Backbone.View {
 
   clearCaptcha() {
     if (ENV.ACCOUNT.recaptcha_key) {
-      grecaptcha.reset(this.dataCaptchaId)
+      if (typeof grecaptcha !== 'undefined') {
+        // eslint-disable-next-line no-undef
+        grecaptcha.reset(this.dataCaptchaId)
+      }
       this.$el.find('#submit_button').prop('disabled', true)
     }
   }

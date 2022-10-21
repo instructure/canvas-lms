@@ -111,7 +111,7 @@ $(document).ready(() => {
       $(this).attr('action', url)
       $(this).attr('method', 'PUT')
       for (const idx in term.enrollment_dates_overrides) {
-        var start_string
+        let start_string
         const override = term.enrollment_dates_overrides[idx].enrollment_dates_override
         const type_string = $.underscore(override.enrollment_type)
         // Student enrollments without an overridden start date get the term's overall start date, while teacher, ta,

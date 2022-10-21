@@ -86,6 +86,7 @@ export const Header: React.FC<HeaderProps> = (props: HeaderProps) => {
     // to the default pace / course context
 
     // TODO: alter hook usage when contexts have their own actions and reducers
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     useEffect(() => {
       doFetchApi({
         path: `/api/v1/courses/${window.ENV?.COURSE_ID}/pace_contexts?type=course`,

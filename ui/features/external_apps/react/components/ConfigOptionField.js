@@ -34,6 +34,7 @@ export default class ConfigOptionField extends React.Component {
     return (
       <div className="grid-row">
         <div className="col-xs-12">
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="checkbox">
             <input
               type="checkbox"
@@ -52,6 +53,7 @@ export default class ConfigOptionField extends React.Component {
   text = () => (
     <div className="grid-row">
       <div className="col-xs-12">
+        {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
         <label>
           {this.props.description}
           <input

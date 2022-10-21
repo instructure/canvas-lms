@@ -339,7 +339,7 @@ test('renders button text correctly on already selected contexts', () => {
   props.appointmentGroup = {context_codes: ['course_1', 'course_section_1']}
   const component = TestUtils.renderIntoDocument(<ContextSelector {...props} />)
   const contextSelector = TestUtils.findRenderedDOMComponentWithClass(component, 'ContextSelector')
-  ok(contextSelector.childNodes[0].textContent === 'Select Calendars')
-  component.componentWillReceiveProps(props)
-  ok(contextSelector.childNodes[0].textContent === 'testcourse and 1 other')
+  strictEqual(contextSelector.childNodes[0].textContent, 'Select Calendars')
+  component.UNSAFE_componentWillReceiveProps(props)
+  strictEqual(contextSelector.childNodes[0].textContent, 'testcourse and 1 other')
 })
