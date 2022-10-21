@@ -242,7 +242,7 @@ END
       display_name: -> { I18n.t('Recurring Calendar Events') },
       description: -> { I18n.t("Allows the scheduling of recurring calendar events") },
       applies_to: 'Course',
-      state: 'on',
+      state: 'allowed',
       root_opt_in: false,
       beta: false
     },
