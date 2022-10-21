@@ -106,6 +106,7 @@ class TeacherFeedbackForm extends React.Component {
       <form ref={c => (this.form = c)} action="/api/v1/conversations" method="POST">
         <fieldset className="ic-Form-group ic-HelpDialog__form-fieldset">
           <legend className="screenreader-only">{I18n.t('Ask your instructor a question')}</legend>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Which course is this question about?')}</span>
             <select
@@ -124,6 +125,7 @@ class TeacherFeedbackForm extends React.Component {
               )}
             </span>
           </label>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ic-Form-control">
             <span className="ic-Label">{I18n.t('Message')}</span>
             <textarea className="ic-Input" required={true} aria-required="true" name="body" />

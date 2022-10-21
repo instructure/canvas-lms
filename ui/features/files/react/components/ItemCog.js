@@ -309,6 +309,7 @@ class ItemCog extends React.Component {
         >
           <i className="icon-more" />
         </button>
+        {/* eslint-disable-next-line jsx-a11y/role-supports-aria-props */}
         <ul
           className="al-options"
           role="menu"

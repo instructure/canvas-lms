@@ -45,7 +45,7 @@ $(document).ready(function (_event) {
     $('.export_progress').progressbar()
     state = 'nothing'
     let fakeTickCount = 0
-    var tick = function () {
+    const tick = function () {
       if (state === 'nothing') {
         fakeTickCount++
         const progress = ($('.export_progress').progressbar('option', 'value') || 0) + 0.25
@@ -59,7 +59,7 @@ $(document).ready(function (_event) {
         setTimeout(tick, 10000)
       }
     }
-    var checkup = function () {
+    const checkup = function () {
       let lastProgress = null
       let waitTime = 1500
       $.ajaxJSON(

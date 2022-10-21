@@ -329,6 +329,7 @@ class EditPage extends React.Component {
                   name="limitUsersPerSlot"
                   onChange={this.handleCheckboxChange}
                 />
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label
                   className="ic-Label"
                   htmlFor="limit_users_per_slot"
@@ -356,6 +357,7 @@ class EditPage extends React.Component {
                   name="limitSlotsPerUser"
                   onChange={this.handleCheckboxChange}
                 />
+                {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
                 <label
                   className="ic-Label"
                   htmlFor="limit_slots_per_user"

@@ -91,6 +91,7 @@ class CollaborationsToolLaunch extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={beforeAlertStyles}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
         >
           <div className="ic-flash-info">
@@ -111,6 +112,7 @@ class CollaborationsToolLaunch extends React.Component {
           onFocus={this.handleAlertFocus}
           onBlur={this.handleAlertBlur}
           className={afterAlertStyles}
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex="0"
         >
           <div className="ic-flash-info">

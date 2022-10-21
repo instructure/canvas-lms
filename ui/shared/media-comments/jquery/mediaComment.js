@@ -219,7 +219,7 @@ const mediaCommentActions = {
             width,
           })
           $mediaTag.appendTo(holder.html(''))
-          const player = new MediaElementPlayer($mediaTag, mediaPlayerOptions)
+          const player = new mejs.MediaElementPlayer($mediaTag, mediaPlayerOptions)
           $mediaTag.data('mediaelementplayer', player)
         } else {
           holder.text(
@@ -318,7 +318,7 @@ const mediaCommentActions = {
             $mediaTag.appendTo($dialog.html(''))
 
             $this.data({
-              mediaelementplayer: new MediaElementPlayer($mediaTag, mediaPlayerOptions),
+              mediaelementplayer: new mejs.MediaElementPlayer($mediaTag, mediaPlayerOptions),
               media_comment_dialog: $dialog,
             })
           } else {

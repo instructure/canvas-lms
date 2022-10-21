@@ -48,49 +48,9 @@ $(document).ready(function () {
     } catch (e) {
       // no-op
     }
-    $.ajaxJSON(
-      location.protocol +
-        '//' +
-        location.host +
-        '/simple_response.json?rnd=' +
-        Math.round(Math.random() * 9999999),
-      'GET',
-      {},
-      () => {
-        if ($.ajaxJSON.isUnauthenticated(request)) {
-          let message = htmlEscape(
-            I18n.t(
-              'errors.logged_out',
-              'You are not currently logged in, possibly due to a long period of inactivity.'
-            )
-          )
-          message +=
-            "<br/><a href='/login' id='inactivity_login_link' target='_new'>" +
-            htmlEscape(I18n.t('links.login', 'Login')) +
-            '</a>'
-          $.flashError({html: message}, 30000)
-          $('#inactivity_login_link').focus()
-        } else if (status != 409) {
-          ajaxErrorFlash(
-            I18n.t('errors.unhandled', "Oops! The last request didn't work out."),
-            request
-          )
-        }
-      },
-      () => {
-        ajaxErrorFlash(
-          I18n.t(
-            'errors.connection_lost',
-            "Connection to %{host} was lost.  Please make sure you're connected to the Internet and try again.",
-            {host: location.host}
-          ),
-          request
-        )
-      },
-      {skipDefaultError: true}
-    )
+
     const $obj = $(this)
-    var ajaxErrorFlash = function (message, _xhr) {
+    const ajaxErrorFlash = function (message, _xhr) {
       const i = $obj[0]
       if (!i) {
         return
@@ -111,7 +71,7 @@ $(document).ready(function () {
       if (debugOnly) {
         message += "<br/><span style='font-size: 0.7em;'>(Development Only)</span>"
       }
-      if (debugOnly || INST.environment != 'production') {
+      if (debugOnly || INST.environment !== 'production') {
         message +=
           "<br/><a href='#' class='last_error_details_link'>" +
           htmlEscape(I18n.t('links.details', 'details...')) +
@@ -119,6 +79,49 @@ $(document).ready(function () {
       }
       $.flashError({html: message})
     }
+
+    $.ajaxJSON(
+      window.location.protocol +
+        '//' +
+        window.location.host +
+        '/simple_response.json?rnd=' +
+        Math.round(Math.random() * 9999999),
+      'GET',
+      {},
+      () => {
+        if ($.ajaxJSON.isUnauthenticated(request)) {
+          let message = htmlEscape(
+            I18n.t(
+              'errors.logged_out',
+              'You are not currently logged in, possibly due to a long period of inactivity.'
+            )
+          )
+          message +=
+            "<br/><a href='/login' id='inactivity_login_link' target='_new'>" +
+            htmlEscape(I18n.t('links.login', 'Login')) +
+            '</a>'
+          $.flashError({html: message}, 30000)
+          $('#inactivity_login_link').focus()
+          // eslint-disable-next-line eqeqeq
+        } else if (status != 409) {
+          ajaxErrorFlash(
+            I18n.t('errors.unhandled', "Oops! The last request didn't work out."),
+            request
+          )
+        }
+      },
+      () => {
+        ajaxErrorFlash(
+          I18n.t(
+            'errors.connection_lost',
+            "Connection to %{host} was lost.  Please make sure you're connected to the Internet and try again.",
+            {host: window.location.host}
+          ),
+          request
+        )
+      },
+      {skipDefaultError: true}
+    )
     window.ajaxErrorFlash = ajaxErrorFlash
     let data = $.ajaxJSON.findRequest(request)
     data = data || {}
@@ -143,7 +146,7 @@ $(document).ready(function () {
         '&URL=' +
         escape(data.url || 'unknown') +
         '&Page=' +
-        escape(location.href) +
+        escape(window.location.href) +
         '&Method=' +
         escape(data.submit_type || 'unknown') +
         '&UserName=' +

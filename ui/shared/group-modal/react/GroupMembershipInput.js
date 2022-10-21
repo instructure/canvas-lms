@@ -55,7 +55,7 @@ export default function GroupMembershipInput({onChange, value, ...props}) {
     if (Number.isNaN(Number(input))) {
       setGroupLimit('')
       return setMessages([
-        {text: I18n.t('${INPUT} is not a valid number.', {INPUT: input}), type: 'error'},
+        {text: I18n.t('%{INPUT} is not a valid number.', {INPUT: input}), type: 'error'},
       ])
     }
 

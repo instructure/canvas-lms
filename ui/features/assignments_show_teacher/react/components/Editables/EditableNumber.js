@@ -142,6 +142,7 @@ export default class EditableNumber extends React.Component {
   }
 
   renderView = () => {
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
     const color = this.props.value ? 'primary' : 'secondary'
     return (
@@ -173,6 +174,7 @@ export default class EditableNumber extends React.Component {
   }
 
   renderEditor = ({onBlur, editorRef}) => {
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     const p = omitProps(this.props, EditableNumber.propTypes, ['mode'])
     return (
       <NumberInput

@@ -135,6 +135,7 @@ export default class ThemeEditorFileUpload extends Component {
             name={!this.props.userInput.val && this.props.name}
             value={this.props.userInput.val === '' ? '' : this.props.currentValue}
           />
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="ThemeEditorFileUpload__file-chooser">
             <span className="screenreader-only">{this.props.label}</span>
             <input

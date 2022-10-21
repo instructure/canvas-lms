@@ -30,6 +30,7 @@ class DeleteConfirmation extends React.Component {
 
   render() {
     return (
+      // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       <div className="DeleteConfirmation" tabIndex="0">
         <p className="DeleteConfirmation-message">
           {I18n.t('Remove "%{collaborationTitle}"?', {

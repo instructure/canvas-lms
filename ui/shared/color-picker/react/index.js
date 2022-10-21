@@ -137,6 +137,7 @@ function shouldApplySelectedStyle(color) {
   return this.state.currentColor === color.hexcode
 }
 
+// eslint-disable-next-line react/prefer-es6-class
 const ColorPicker = createReactClass({
   // ===============
   //     CONFIG
@@ -266,6 +267,7 @@ const ColorPicker = createReactClass({
   // ===============
 
   closeModal() {
+    // eslint-disable-next-line react/no-is-mounted
     if (this.isMounted()) {
       this.setState({
         isOpen: false,
@@ -343,6 +345,7 @@ const ColorPicker = createReactClass({
 
   onApply(color, _event) {
     const doneSaving = () => {
+      // eslint-disable-next-line react/no-is-mounted
       if (this.isMounted()) {
         this.setState({saveInProgress: false})
       }

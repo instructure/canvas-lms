@@ -81,12 +81,13 @@ class ContextSelectorItem {
     this.state = state
     switch (this.state) {
       case 'on':
-      case 'off':
-        var checked = this.state === 'on'
+      case 'off': {
+        const checked = this.state === 'on'
         this.$contentCheckbox.prop('checked', checked)
         this.$contentCheckbox.prop('indeterminate', false)
         this.$sectionCheckboxes.prop('checked', checked)
         break
+      }
       case 'partial':
         this.$contentCheckbox.prop('checked', true)
         this.$contentCheckbox.prop('indeterminate', true)

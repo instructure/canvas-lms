@@ -33,6 +33,7 @@ export const Submission = {
   `,
 
   shape: shape({
+    // eslint-disable-next-line react/forbid-foreign-prop-types
     ...SubmissionInterface.shape.propTypes,
     _id: string.isRequired,
     id: string.isRequired,

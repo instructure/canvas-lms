@@ -278,7 +278,8 @@ export default class WikiPageEditView extends ValidatedFormView {
     this.checkUnsavedOnLeave = false
     if (this.reloadPending) {
       if (
-        !confirm(
+        // eslint-disable-next-line no-alert
+        !window.confirm(
           I18n.t(
             'warnings.overwrite_changes',
             'You are about to overwrite other changes that have been made since you started editing.\n\nOverwrite these changes?'
@@ -340,7 +341,8 @@ export default class WikiPageEditView extends ValidatedFormView {
     if (event != null) {
       event.preventDefault()
     }
-    if (!this.hasUnsavedChanges() || confirm(this.unsavedWarning())) {
+    // eslint-disable-next-line no-alert
+    if (!this.hasUnsavedChanges() || window.confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
       RichContentEditor.closeRCE(this.$wikiPageBody)
       return this.trigger('cancel')

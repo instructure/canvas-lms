@@ -84,7 +84,8 @@ $.fn.dropdownList = function (options) {
                   .find('span')
                   .focus()
               } else {
-                $item.focus()
+                // eslint-disable-next-line no-undef
+                $item?.focus()
               }
               return false
             } else if (event.keyCode === 40) {

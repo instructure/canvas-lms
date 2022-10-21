@@ -39,7 +39,7 @@ import 'jqueryui/tabs'
 
 const I18n = useI18nScope('course_settings')
 
-var GradePublishing = {
+const GradePublishing = {
   status: null,
   checkup() {
     $.ajaxJSON($('#publish_to_sis_form').attr('action'), 'GET', {}, data => {
@@ -100,6 +100,7 @@ var GradePublishing = {
             'Are you sure you want to sync these grades to the student information system? You should only do this if all your grades have been finalized.'
           )
 
+    // eslint-disable-next-line no-alert
     if (!window.confirm(confirmMessage)) {
       return
     }
@@ -236,7 +237,8 @@ $(document).ready(function () {
     },
   })
   $('.cant_delete_section_link').click(function (_event) {
-    alert($(this).attr('title'))
+    // eslint-disable-next-line no-alert
+    window.alert($(this).attr('title'))
     return false
   })
   $edit_section_form
@@ -422,6 +424,7 @@ $(document).ready(function () {
       enrollment_data.associated_user_id,
       enrollment => {
         if (enrollment) {
+          // eslint-disable-next-line @typescript-eslint/no-shadow
           const $user = $('.observer_enrollments .user_' + enrollment.user_id)
           const $enrollment_link = $user.find('.enrollment_link.enrollment_' + enrollment.id)
           $enrollment_link.find('.associated_user.associated').showIf(enrollment.associated_user_id)
@@ -599,6 +602,7 @@ $(document).ready(function () {
 
       let found_current = false
       visibility_options.each((_index, item) => {
+        // eslint-disable-next-line eqeqeq
         const isCourseSel = item == course_visibility[0]
         if (isCourseSel) found_current = true
         if (isCourseSel || (allow_tighter && !found_current) || (allow_looser && found_current)) {

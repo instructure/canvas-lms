@@ -90,6 +90,7 @@ export default {
       !_.isEqual(this.props.query.search_term, props.query && props.query.search_term)
     ) {
       const forceUpdate = () => {
+        // eslint-disable-next-line react/no-is-mounted
         if (this.isMounted()) {
           this.setState({errors: null})
           this.forceUpdate()

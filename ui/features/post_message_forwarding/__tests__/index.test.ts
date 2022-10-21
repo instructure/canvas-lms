@@ -24,6 +24,7 @@ describe('post_message_forwarding', () => {
     let origin: string
     let parentDomain: string
     let windowReferences: object
+    // eslint-disable-next-line no-undef
     let source: MessageEventSource
     let parentWindow: Window
 

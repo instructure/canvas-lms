@@ -59,6 +59,7 @@ FileRenameForm.buildContent = function () {
       <div ref="bodyContent">
         <p>{renameMessage}</p>
         <form onSubmit={this.handleFormSubmit}>
+          {/* eslint-disable-next-line jsx-a11y/label-has-associated-control */}
           <label className="file-rename-form__form-label">{I18n.t('Name')}</label>
           <input className="input-block-level" type="text" defaultValue={nameToUse} ref="newName" />
         </form>

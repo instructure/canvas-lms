@@ -123,6 +123,7 @@ class StepItem extends Component {
       <span
         className={classNames(classes)}
         data-testid="step-item-step"
+        // eslint-disable-next-line react/forbid-foreign-prop-types
         {...omitProps(this.props, StepItem.propTypes)}
       >
         <span

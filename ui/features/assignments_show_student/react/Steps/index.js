@@ -93,6 +93,7 @@ class Steps extends Component {
 
     return (
       <View
+        // eslint-disable-next-line react/forbid-foreign-prop-types
         {...omitProps(this.props, {...Steps.propTypes, ...View.propTypes})}
         margin={this.props.margin}
         data-test-id="assignment-2-step-index"

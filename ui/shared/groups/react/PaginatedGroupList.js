@@ -24,6 +24,7 @@ import Group from './Group'
 
 const I18n = useI18nScope('student_groups')
 
+// eslint-disable-next-line react/prefer-es6-class
 const PaginatedGroupList = createReactClass({
   displayName: 'PaginatedGroupList',
   mixins: [InfiniteScroll],
