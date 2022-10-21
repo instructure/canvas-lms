@@ -48,7 +48,7 @@ class Loaders::OutcomeAlignmentLoader < GraphQL::Batch::Loader
                     .select("context_modules.id as module_id, context_modules.name as module_name, context_modules.workflow_state as module_workflow_state, content_tags.content_id as assignment_content_id, content_tags.content_type as assignment_content_type")
                     .where(context: @context)
                     .left_joins(:content_tags)
-                    .where(content_tags: { workflow_state: "active" })
+                    .where.not(content_tags: { workflow_state: "deleted" })
 
       # map alignment id to assignment/quiz/discussion ids
       alignments_sub = outcome
