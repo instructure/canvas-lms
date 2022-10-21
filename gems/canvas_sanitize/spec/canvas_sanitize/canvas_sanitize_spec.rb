@@ -55,6 +55,13 @@ describe CanvasSanitize do
     expect(cleaned).to eq("<p data-item-id=\"1234\">Item1234</p>")
   end
 
+  it "does strip the specific data-method attribute" do
+    input_html = "<a data-method='post'>Data-Method Attr</a>"
+    expected_html = "<a>Data-Method Attr</a>"
+    cleaned = Sanitize.clean(input_html, CanvasSanitize::SANITIZE)
+    expect(cleaned).to eq(expected_html)
+  end
+
   it "does not strip track elements" do
     cleaned = Sanitize.clean("<track src=\"http://google.com\"></track>", CanvasSanitize::SANITIZE)
     expect(cleaned).to eq("<track src=\"http://google.com\">")
