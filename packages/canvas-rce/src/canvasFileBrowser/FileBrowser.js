@@ -24,8 +24,8 @@ import {Spinner} from '@instructure/ui-spinner'
 import {IconOpenFolderSolid, IconFolderSolid, IconImageLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import {getIconFromType, isImage} from '../rce/plugins/shared/fileTypeUtils'
-import {showFlashError} from './FlashAlert'
-import natcompare from './natcompare'
+import {showFlashError} from '../common/FlashAlert'
+import natcompare from '../common/natcompare'
 
 class FileBrowser extends React.Component {
   static propTypes = {

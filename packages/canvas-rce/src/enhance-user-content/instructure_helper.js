@@ -18,7 +18,7 @@
 
 import htmlEscape from 'escape-html'
 import formatMessage from '../format-message'
-import {showFlashAlert} from '../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../common/FlashAlert'
 import {isPreviewable, loadDocPreview, showLoadingImage, removeLoadingImage} from './doc_previews'
 import {show} from './jqueryish_funcs'
 
