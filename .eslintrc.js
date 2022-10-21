@@ -269,6 +269,15 @@ module.exports = {
         'import/order': 'off', // because it thinks 'jsx/whatever' and 'compiled/baz' should go in their groups. we don't want to encourage people to do that just so they move them back together once  those everything is in same dir
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off',
+
+        // TODO: resolve and remove these overrides
+        'react/no-string-refs': 'warn',
+        'react/no-this-in-sfc': 'warn',
+        'react/prop-types': 'warn',
+        'react/no-access-state-in-setstate': 'warn',
+        'react/no-find-dom-node': 'warn',
+        'react/no-unused-prop-types': 'warn',
+        'react/prefer-stateless-function': 'warn',
       },
     },
     {
