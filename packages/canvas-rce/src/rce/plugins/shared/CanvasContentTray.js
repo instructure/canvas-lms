@@ -77,7 +77,7 @@ const thePanels = {
   images: React.lazy(() => import('../instructure_image/Images')),
   documents: React.lazy(() => import('../instructure_documents/components/DocumentsPanel')),
   media: React.lazy(() => import('../instructure_record/MediaPanel')),
-  all: React.lazy(() => import('./FileBrowser')),
+  all: React.lazy(() => import('./RceFileBrowser')),
   unknown: React.lazy(() => import('./UnknownFileTypePanel')),
 }
 

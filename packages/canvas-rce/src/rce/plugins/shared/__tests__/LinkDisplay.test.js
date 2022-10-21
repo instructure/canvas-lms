@@ -20,9 +20,9 @@ import React from 'react'
 import {LinkDisplay} from '../LinkDisplay'
 import {render, fireEvent} from '@testing-library/react'
 import {IconBlank} from '../linkUtils'
-import {showFlashAlert} from '../../../../canvasFileBrowser/FlashAlert'
+import {showFlashAlert} from '../../../../common/FlashAlert'
 
-jest.mock('../../../../canvasFileBrowser/FlashAlert')
+jest.mock('../../../../common/FlashAlert')
 
 describe('LinkDisplay', () => {
   let props
