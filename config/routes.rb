@@ -2481,6 +2481,8 @@ CanvasRails::Application.routes.draw do
       post "jobs2/:id/requeue", action: :requeue
       put "jobs2/manage", action: :manage
       put "jobs2/unstuck", action: :unstuck
+      get "jobs2/throttle/check", action: :throttle_check
+      put "jobs2/throttle", action: :throttle
       get "jobs2/stuck/strands", action: :stuck_strands, as: :jobs_stuck_strands
       get "jobs2/stuck/singletons", action: :stuck_singletons, as: :jobs_stuck_singletons
     end
