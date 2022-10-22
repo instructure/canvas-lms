@@ -1129,6 +1129,19 @@ da:
           description: 
             text: "Denne rapport viser studerendes endelige karakterer for alle studerende i et fastsat semester. Den resulterende csv-fil har en række pr. tilmelding og viser den nuværende og endelige karakter, som vises i fagets karakteroversigt."
     group_type: Gruppe
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Fag
+              order: 
+                label: Rækkefølge
+              outcome: 
+                radio: Læringsudbytter
+              user: 
+                radio: Brugere
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1490,6 +1503,7 @@ da:
         help_link_text: "Tekst som vises til link"
         help_link_url: URL
         include_students_in_global_survey: "Inkluder studerende i generelle spørgeundersøgelser"
+        kill_joy: "Fjern skjult spil fra 404-siden"
         limit_parent_app_web_access: "Begræns adgangen til Canvas-web fra Canvas Parent-appen"
         lock_all_announcements: "Deaktiver kommentarer på beskeder"
         locked: "Lås denne indstilling for underkonto og fag"
@@ -1800,7 +1814,7 @@ da:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: Fag-ID'er
+                header: "Fag SIS-ID’er"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -3136,6 +3150,7 @@ da:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Der opstod en fejl under oprettelse af dette læringsudbytte: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Der opstod en fejl under oprettelse af dette læringsudbytte. Prøv igen."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Der opstod en fejl under sletning af beskeder"
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Der opstod en fejl under sletning af gruppen for denne aftale"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Der opstod en fejl under redigering af denne gruppe. Prøv igen."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Der opstod en fejl under redigering af dette læringsudbytte. Prøv igen."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Der opstod en fejl under import af disse læringsudbytter."
@@ -3193,6 +3208,7 @@ da:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Der opstod en fejl, da kontoens færdighedsbedømmelser skulle gemmes: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Der opstod en fejl under lagring af associationer"
   an_error_occurred_while_saving_changes_b42c9b84: "Der opstod en fejl ved forsøg på at gemme ændringer"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "Der opstod en fejl under lagring af gruppen for denne aftale"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Der opstod en fejl, da opslagspolitikken for opgaver skulle gemmes"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Der opstod en fejl, da politikken for opslag for faget skulle gemmes"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Der opstod en fejl ved forsøg på at gemme skalaen for opfyldelse af læringsmål: %{message}"
@@ -4633,6 +4649,7 @@ da:
   attempt_3dd42b18: forsøg
   attempt_attempt_d3911720: "Forsøg %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Forsøg %{attempt} Feedback"
+  attempt_attempt_feedback_549683ba: "Forsøg %{attempt} Feedback:"
   attempt_attempt_grade_c01f45df: "Forsøg %{attempt} %{grade}"
   attempt_attempt_score_2a973edc: "Forsøg %{attempt} Resultat:"
   attempt_count_267a4fc5: "Forsøg %{count}"
@@ -4933,6 +4950,7 @@ da:
       En ny, simplere, mere bruervenlig fil browsing interface. Du kan aktivere det på kursusniveau,
       så alle brugere i det kusus kan se det nye interface. For at få det til at vise sig, når nogle
       går til den personlige fil side for en bruger  ('/filer') skal du aktivere det for den konto, de er medlem af.
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Bedre LTI AGS-svarkoder for afsluttede fag"
   between_1_and_10_7118bf2d: "Mellem 1 og 10"
   between_1_and_5_f2a74bcf: "Mellem 1 og 5"
   between_1_and_99_d421a4c0: "Mellem 1 % og 99 %"
@@ -5860,6 +5878,7 @@ da:
       indstilling opdaterer, hvordan URL-omskrivning finder sted for at lette forhåndsvisning af
       filer i Canvas i stedet for at downloade.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: Canvas-supportcenter
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas mener, at svaret er gyldigt"
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
@@ -6280,6 +6299,7 @@ da:
   collapse_discussion_thread_from_author_34f9cd18: "Skjul diskussionstråd fra %{author}"
   collapse_group_c2af7cad: "Skjul gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Skjul listen over gruppemedlemmer for %{groupName}"
+  collapse_name_fdea035c: "Skjul %{name}"
   collapse_outcome_description_de471564: "Skjul beskrivelsen af læringsudbyttet"
   collapse_replies_20f2faf7: "Skjul svar"
   collapse_replies_ef4fc36b: "Skjul svar"
@@ -6307,6 +6327,7 @@ da:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommenter ved at besvare denne besked, eller deltag i diskussionen ved hjælp af dette link: %{link}. Når det er tilladt skal du logge ind på Canvas og svare på diskussionen, hvis du vil inkludere en vedhæftet fil."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommenter ved at besvare denne besked, eller deltag i diskussionen ved hjælp af dette link: %{link}Når det er tilladt skal du logge ind på Canvas og svare på beskeden, hvis du vil inkludere en vedhæftet fil."
   comment_destroyed_5cfc922d: "Kommentar ødelagt"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Kommentar blev ikke sendt! Prøv igen senere."
   comment_input_box_b8c7e58b: Kommentarfelt
   comment_library_84735835: Kommentarbibliotek
@@ -9003,6 +9024,7 @@ da:
   create_new_group_set_13b1f62a: "Opret nyt gruppesæt"
   create_number_of_groups_groups_now_f89f220e: "Opret %{number_of_groups} grupper nu"
   create_outcome_4dac05a0: "Opret læringsudbytte"
+  create_pace_4ff3e9c: "Opret tempo"
   create_pages_581a4d59: "Opret sider"
   create_slots_71dbb2f8: "Opret tidsrum"
   create_subject_86de5618: "Opret emne"
@@ -10237,6 +10259,7 @@ da:
   discussions_redesign_b505952d: "Diskussioner gen-design"
   discussions_redesign_isolated_view_78626c74: "Diskussioner - nyt design - isoleret visning"
   discussions_redesign_reporting_f4abcc37: "Diskussioner - nyt design - Rapportering"
+  discussions_redesign_split_screen_view_d1b88d0e: "Diskussioner - nyt design - Opdelt skærm-visning"
   discussions_tutorial_tray_4ef79bcc: "Selvstudiumområde for diskussioner"
   discussions_view_c6818792: "Diskussioner - vis"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskussioner med grupper kan ikke være sektionsspecifikke"
@@ -10258,6 +10281,7 @@ da:
             sene afleveringer, og skjul let karakterer, indtil du er klar til, at de studerende
             får dem at se. For forenklet karaktergivning kan du bruge SpeedGrader for at se og vurdere afleveringer.
   display_historical_view_of_achievements_of_users_53db5938: "Vis historisk oversigt over brugernes fremskridt"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Vis navn:"
   display_name_b80c243e: "Vis navn"
   display_student_filter_options_ab034cfa: "Vis filterindstillinger for studerende"
@@ -10266,6 +10290,7 @@ da:
   display_total_grades_when_the_all_grading_periods__4e6add83: "Viser samlede karakterer, når muligheden \"Alle karakterperioder\" i dropdown-menuen vælges (karakterperioder skal eksistere)."
   display_totals_for_all_grading_periods_ad1ea050: "Viser samlede antal for \"Alle karakterperioder\""
   display_totals_for_all_grading_periods_option_4a72586: "Vis muligheden for samlet resultat for alle karakterperioder"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Vis værdier"
   displaying_to_students_b1e92058: "Vises til studerende"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -10466,6 +10491,7 @@ da:
   duplication_failed_3351ffb1: "Duplikering mislykkedes"
   duplication_of_title_succeeded_2e0bd645: "Duplikering af %{title} lykkedes"
   duration_1_minute_29c7d5ab: "Varighed: 1 minut"
+  duration_for_assignment_name_851ca365: "Varighed for opgaven %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Varighed: %{hours} timer og %{minutes} minutter"
   duration_in_minutes_8959f63e: "Varighed i minutter"
   duration_minutes_minutes_d7b9182b: "Varighed: %{minutes} minutter"
@@ -11516,6 +11542,7 @@ da:
   expand_global_navigation_2c28d5d4: "Udvid global navigation"
   expand_group_53765272: "Udvid gruppe"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Udvid listen over gruppemedlemmer for %{groupName}"
+  expand_name_71d944fd: "Udvid %{name}"
   expand_or_collapse_calendars_9854b0d0: "Udfold eller sammenfold kalendere"
   expand_or_collapse_undated_items_b901de09: "Udfold eller sammenfold udaterede elementer"
   expand_outcome_description_c5bdd70b: "Udvid beskrivelsen af læringsudbyttet"
@@ -11908,6 +11935,7 @@ da:
   federated_attributes_are_information_sent_from_you_2116fb61: "Samlede attributter er information sendt fra din autentifikationsudbyder, som kan bruges til automatisk at opdatere tilhørende information for brugere i Canvas, hver gang de logger ind."
   feed_url_8a433438: "Feed url"
   feed_url_is_required_253fda4e: "Feed URL er nødvendig"
+  feedback_6dcc1991: Feedback
   feeds_9f1c5c76: Feeds
   field_9ec0ec01: Felt
   field_cannot_be_blank_afb5b332: "Feltet må ikke være tomt."
@@ -12380,6 +12408,7 @@ da:
   grade_history_9c51ad49: "Karakteroversigt ..."
   grade_history_ccc09fde: Karakteroversigt
   grade_info_19fb9875: Karakterinformation
+  grade_loading_bc1ad721: "Karakterer indlæses"
   grade_low_to_high_1678b713: "Karakter - lav til høj"
   grade_out_of_percentage_1972bf52: "Karakter ud af %{percentage}"
   grade_out_of_points_d401b79d: "Karakter ud af %{points}"
@@ -13394,6 +13423,7 @@ da:
   group_membership_count_is_invalid_cc6b2d47: "Antallet af gruppemedlemskaber er ugyldigt"
   group_membership_limit_54e165b: "Grænse for gruppemedlemskab"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Gruppemedlemskabsgrænsen skal være lig med eller større end antallet af nuværende medlemmer."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Grænsen for gruppemedlemskab skal være større end 1."
   group_name_b69c144: Gruppenavn
   group_name_e4066daa: gruppenavn
   group_name_group_announcements_5ce81c6d: "%{group_name} - Gruppebeskeder"
@@ -13821,6 +13851,7 @@ da:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Har Turnitin-score"
   has_ungraded_submissions_2bff87df: "Har ikke-bedømte afleveringer"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Har du et spørgsmål om Canvas? Spørg om det her."
   have_not_been_graded_df2a5fd2: "Er ikke blevet bedømt"
   have_not_yet_submitted_57e6a58b: "Er ikke blevet indsendt"
   haven_t_been_graded_d7dee5bb: "Er ikke blevet bedømt"
@@ -14294,6 +14325,12 @@ da:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Hvis aktiveret, er synkronisering af fagtilmeldinger til Microsoft Groups
       tilgængelig. Kontoadministratorer kan aktivere dette i kontoindstillinger.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Hvis aktiveret, vil AGS API returnere en mere nyttig svarkode, hver gang et LTI
+      -værktøj forsøger at få adgang til eller ændre data i et fag, der allerede er afsluttet.
+      I stedet for at give en generisk 404 - Ikke fundet, giver API'en i stedet fejlbeskeden 422
+      sammen med en nyttig besked, som angiver, at værktøjet ikke kan få adgang til afsluttede
+      fag.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Hvis aktiveret, vil OAuth 2.0 nu returnere 4xx-statuskoder korrekt til
       klienten, der anmoder, i stedet for at omdirigere dem til sig selv
@@ -19882,6 +19919,7 @@ da:
   pace_plans_4bb9c5ff: Tempoplaner
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Tempoplaner tilføjer support til rullende tilmeldinger til Canvas, hvilket gør magisk fordeling af forfaldsdatoer muligt for studerende med forskellige startdatoer baseret på en instruktørs definerede tempo. Lær mere, og giv feedback ved at deltage i brugergruppen for Tempoplaner."
   pace_plans_is_in_active_development_f6c20046: "Tempoplaner er i aktiv udvikling."
+  pace_removed_8e625df7: "Tempo fjernet"
   package_error: "Fejl under identificering af pakketype: %{error}"
   package_export_from_d6e2b073: "Pakke-eksport fra"
   page_50c4823d: Side
@@ -20414,6 +20452,7 @@ da:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Tilføj link til hjælpemenuen"
         default_domain: "Domæne (standard)"
         default_key: "Nøgle (standard)"
         tier_1_domain: "Domæne (niveau 1 support)"
@@ -23198,6 +23237,7 @@ da:
   remove_outcomes_9abcc8fd: 
     one: "Fjern læringsudbytte?"
     other: "Fjern læringsudbytter?"
+  remove_pace_97381e05: "Fjern tempo"
   remove_placement_90862c13: "Fjern %{placement}"
   remove_points_from_rubric_dcd4b585: "Fjern point fra rubrik"
   remove_pronouns_5ff760ff: "Fjern pronomener"
@@ -23223,12 +23263,15 @@ da:
   remove_this_item_from_the_module_4b2ceab7: "Slet dette element fra modulet"
   remove_this_rubric_from_my_list_c7d80704: "Fjern denne rubrik fra min liste"
   remove_this_section_9a88ca43: "Slet denne sektion"
+  remove_this_section_pace_ba87ad3c: "Fjern dette tempo for sektioner?"
+  remove_this_student_pace_a5e7b3c5: "Fjern dette tempo for studerende?"
   remove_user_from_section_5556f465: "Slet bruger fra sektion"
   remove_webcam_image_count_efee4a11: "Fjern webkameraets billede %{count}"
   removed_assignment_assignment_name_835cc776: "Fjern opgave %{assignment_name}"
   removed_course_association_course_a233342c: "Fjernet fag-associationer %{course}"
   removed_filename_a8634af3: "Fjernet %{filename}"
   removed_user_as_group_leader_bb69330f: "Fjern %{user} som gruppeleder"
+  removing_pace_9493910c: "Fjerner tempo ..."
   rename_45608f54: Omdøb
   rename_c_name_section_e0e92c97: "Omdøb %{c.name} sektion"
   rename_filter_c6cc8efc: "Omdøb filter"
@@ -24021,6 +24064,7 @@ da:
   section_level_calendar_permissions_6aff8cdb: "Kalendertilladelser på sektionsniveau"
   section_name_b6d82574: Sektionsnavn
   section_name_edb51b2: sektionsnavn
+  section_pace_989d2856: "Tempo for sektioner"
   section_removed_2ac72a79: "%{section} fjernet"
   section_section_names_98f172e6: "Sektion: %{section_names}"
   section_sis_2a80d2fa: "Sektion Sis"
@@ -24095,6 +24139,7 @@ da:
   security_7a7e8808: Sikkerhed
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Sikkerhedsindstilling for at begrænse tilslutning af webadresser til en konference"
   security_tab_failed_to_load_2d2242a: "Fanen Sikkerhed kunne ikke indlæses"
+  see_comments_details_44f460d9: "Se detaljer om kommentarer"
   see_example_below_to_see_how_different_calculation_618de98d: "Se eksemplet nedenfor for at se, hvordan forskellige beregningsparametre påvirker de studerendes beregning af opfyldelse af læringsmål."
   see_more_in_canvas_guides_fc90a457: "Se mere i Canvas-vejledningerne"
   see_other_users_primary_email_address_59c8473f: "Se andre brugers primære e-mailadresse"
@@ -25440,6 +25485,7 @@ da:
   size_b30e1077: Størrelse
   size_f1873a2: ", størrelse: "
   size_size_a77bd760: "størrelse: %{size}"
+  skillcode_685526a6: færdighedskode
   skip_bcb86160: "Spring over"
   skip_to_content_22ad1d00: "Spring til indhold"
   skip_weekends_13cbd889: "Spring weekender over"
@@ -25852,6 +25898,7 @@ da:
       på læringsudbyttet i faget. Læringsudbytterne præsenteres i et Karakteroversigt-lignende
       format, og fremskridt vises både som en numerisk resultat og som behersker / nær
       beherskelse / middelmådig.
+  student_pace_2200bf85: "Tempo for studerende"
   student_page_history_ce86b3c2: "Studerendes sidehistorik"
   student_page_history_pages_update_ae55fa03: "Studerendes sidehistorik (Sider - opdater)"
   student_paired_successfully_a88def61: "Studerende blev parret"
@@ -25999,6 +26046,7 @@ da:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Afleveringskommentarer: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Kommentarer vdr. aflevering"
   submission_comments_b6d65841: Afleveringskommentarer
+  submission_comments_tray_290fad59: "Afleveringskommentarer - bakke"
   submission_completed_ba0e552e: "Indsendelse fuldført"
   submission_data_88085815: Afleveringsoplysninger
   submission_date_8f659c0c: Afleveringsdato
@@ -26327,6 +26375,7 @@ da:
   sync_to_posttosisname_9837a8bf: "Synkroniser til %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synkroniser til %{postToSISName}"
   sync_to_sisname_f343e59: "Synkroniser til %{sisName}"
+  sync_uris_50c59540: "Synkroniser URI'er"
   synced_97764882: Synkroniseret
   synced_message_20469c8f: "Synkroniseret: %{message}"
   syncing_3061cc8d: "Synkroniserer ..."
@@ -26946,6 +26995,7 @@ da:
   there_was_an_error_fetching_custom_columns_542014ef: "Der opstod en fejl under hentning brugerdefinerede kolonner."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Der opstod en fejl under hentning af data til karakteroversigten"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Der opstod en fejl under hentning af karakteroversigtsfiltre."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Der opstod en fejl under hentning af dataene for opgaver for karakterperioden."
   there_was_an_error_fetching_modules_8ee451bb: "Der opstod en fejl under hentning af moduler."
   there_was_an_error_fetching_outcome_results_45c57590: "Der opstod en fejl under hentning af læringsudbytteresultater"
   there_was_an_error_fetching_student_data_87463510: "Der opstod en fejl under hentning dataene for studerende."
@@ -27141,6 +27191,9 @@ da:
       Dette funktionsflag muliggør isoleret visning i det nye
       Diskussioner - nyt design.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Dette funktionsflag aktiverer sideopgraderingen React/InstUI og GraphQL People."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Dette funktionsflag muliggør Opdelt skærm-visning i det nye
+      Diskussioner - nyt design.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Dette funktionsflag muliggør brugen af den opdaterede
       side til at oprette/redigere diskussioner
@@ -27345,9 +27398,11 @@ da:
   this_report_shows_the_student_final_grade_results__5a508b55: "Denne rapport viser de studerendes endelige karakterresultater for alle studerende i et givet semester. Den resulterende CSV-fil har én række pr. tilmelding og viser den aktuelle og endelige karakter, der vises i fagets karakteroversigt."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne eksempelside inkluderer almindelige elementer til brugergrænsefladen i Canvas, som hjælper dig med at oprette brugertilpasset branding. Når du begynder at foretage ændringer til farveværdierne og billederne i venstre sidepanel, vil du se knappen *Vis dine ændringer*. Klik på den for at opdatere siden og se, hvordan dine ændringer ser ud."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Denne eksempelside inkluderer almindelige brugergrænsefladeelementer i Canvas til at hjælpe dig med at opbygge din egen branding. Når du begynder at ændre farveværdier og billeder, ser du knappen *Preview Your Changes* (Vis dine ændringer). Klik på den for at opdatere denne side og se, hvordan dine ændringer ser ud."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Dette tempo for sektioner vil blive fjernet, og tempoet vender tilbage til standardtempoet."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Denne indstilling påvirker kun din visning af de studerendes karakterer og viser karakterer, som om alle ikke-bedømte opgaver fik et resultat på nul. Denne indstilling er kun en visuel ændring og påvirker ikke karakterer for studerende eller andre brugere af denne karakteroversigt. Når denne indstilling er aktiveret, udfylder Canvas ikke nuller i karakteroversigten over studerendes afleveringer for individuelle opgaver. Kun opgavegrupper og samlede kolonner indregner automatisk resultater på nul i de samlede procenter for hver studerende."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Denne indstilling ændrer markant Canvas-oplevelsen for studerende og lærere."
   this_settings_only_impact_enrollments_this_include_7f51358: "Disse indstillinger påvirker kun tilmeldinger. Dette omfatter objekter med et last_activity_at tidsstempel større end parameteren Opdateret efter. Som standard slukket"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Dette tempo for studerende vil blive fjernet, og tempoet vender tilbage til standardtempoet."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Denne studerendes tilmelding er afsluttet."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Denne studerendes tilmelding er afsluttet"
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Denne studerendes svar er skjult fordi denne opgave er anonym."
@@ -28649,6 +28704,7 @@ da:
   unregister_service_985238e9: "Annuller tjenestens registrering"
   unreserved_e86b7425: "Ikke reserveret"
   unsafe_file_link_8a18eceb: "usikkert fillink"
+  unsaved_change_eb23d452: "Ændring, der ikke er blevet gemt"
   unselected_all_courses_99a9d35c: "Fjernet markering for alle fag"
   unselected_course_course_89995a83: "Ikke valgt fag %{course}"
   unselected_external_tool_tool_1bd68403: "Fravalgt eksternt værktøj %{tool}"
@@ -30059,6 +30115,9 @@ da:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Du kan ikke offentliggøre, mens tempoet indlæses"
   you_cannot_publish_while_loading_the_plan_685405e5: "Du kan ikke offentliggøre, mens planen indlæses"
   you_cannot_publish_while_publishing_2f65264b: "Du kan ikke offentliggøre, mens du offentliggør"
+  you_cannot_remove_a_locked_pace_150675e9: "Du kan ikke fjerne et låst tempo"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Du kan ikke fjerne tempoet, mens det stadig indlæses"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Du kan ikke fjerne tempoet, mens du offentliggør"
   you_cannot_remove_this_enrollment_c87be1cb: "Du kan ikke fjerne denne tilmelding."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikke fjerne din standard e-mailadresse"
   you_cannot_save_while_there_are_errors_b86585e9: "Du kan ikke gemme, mens der er fejl"
