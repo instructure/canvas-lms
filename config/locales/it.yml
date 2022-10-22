@@ -1059,6 +1059,19 @@ it:
           description: 
             text: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato trimestre. Il file CSV risultante avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
     group_type: gruppo
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Corsi
+              order: 
+                label: Ordine
+              outcome: 
+                radio: Esiti
+              user: 
+                radio: Utenti
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1382,6 +1395,7 @@ it:
         equella_teaser: "Commenti EQUELLA"
         global_includes: "Override CSS/JavaScript personalizzati"
         include_students_in_global_survey: "Includi studenti nei sondaggi globali"
+        kill_joy: "Rimuovi gioco nascosto da pagina 404"
         limit_parent_app_web_access: "Limita l’acceso al sito web Canvas dall’app Canvas Parent"
         locked: "Blocca questa impostazione per subaccount e corsi"
         login_handle_name: "Etichetta di accesso"
@@ -1670,7 +1684,7 @@ it:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: "ID corsi"
+                header: "ID SIS corso"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -2985,6 +2999,7 @@ it:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Si è verificato un errore durante la creazione di questo risultato: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Si è verificato un errore durante la creazione di questo risultato. Riprova."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Si è verificato un errore durante l'eliminazione degli annunci."
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Si è verificato un errore durante l'eliminazione del gruppo di appuntamenti"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Si è verificato un errore durante la modifica di questo gruppo. Riprova."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Si è verificato un errore durante la modifica di questo risultato. Riprova."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Si è verificato un errore durante lo l’importazione di questi risultati."
@@ -3042,6 +3057,7 @@ it:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Si è verificato un errore durante il salvataggio delle valutazioni del livello di preparazione dell'account: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Si è verificato un errore durante il salvataggio delle associazioni"
   an_error_occurred_while_saving_changes_b42c9b84: "Si è verificato un errore durante il salvataggio delle modifiche"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "Si è verificato un errore durante il salvataggio del gruppo di appuntamenti"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Si è verificato un errore durante il salvataggio della politica di pubblicazione compito."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Si è verificato un errore durante il salvataggio della politica di pubblicazione corso"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Si è verificato un errore durante il salvataggio della scala di padronanza: %{message}"
@@ -4329,6 +4345,7 @@ it:
   attempt_3dd42b18: tentativo
   attempt_attempt_d3911720: "Tentativo %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Tentativo %{attempt} Feedback"
+  attempt_attempt_feedback_549683ba: "Feedback %{attempt} tentativi:"
   attempt_attempt_grade_c01f45df: "Tentativo %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Punteggio tentativi %{attempt}:"
   attempt_count_267a4fc5: "Tentativo %{count}"
@@ -4607,6 +4624,7 @@ it:
   beta_lti_launch_c200ffdf: "Avvio Beta LTI:"
   beta_url_3c7b88ec: "URL beta:"
   better_error_handling_for_file_uploads_in_the_ags__9bb4fb28: "Migliore gestione degli errori per caricamenti file nell’API punteggi AGS"
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Codici di risposta LTI AGS migliore per corsi conclusi"
   between_1_and_10_7118bf2d: "Tra 1 e 10"
   between_1_and_5_f2a74bcf: "Tra 1 e 5"
   between_1_and_99_d421a4c0: "Tra 1% e 99%"
@@ -5479,6 +5497,7 @@ it:
       impostazione aggiorna il modo in cui avviene la riscrittura dell’URL per per facilitare l’anteprima
       dei file in Canvas e senza il download.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: "Centro di assistenza Canvas"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas ritiene che la risposta sia valida"
   canvas_ticketing_email_connector_27e253ae: "Connettore email di creazione ticket Canvas"
   canvas_ticketing_web_post_connector_11158897: "Connettore post web di creazione ticket Canvas"
@@ -5867,6 +5886,7 @@ it:
   collapse_discussion_thread_52bab65a: "Comprimi thread di discussione"
   collapse_discussion_thread_from_author_34f9cd18: "Comprimi discussione da %{author}"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Comprimi elenco dei membri del gruppo per %{groupName}"
+  collapse_name_fdea035c: "Comprimi %{name}"
   collapse_outcome_description_de471564: "Comprimi descrizione risultato"
   collapse_replies_20f2faf7: "Comprimi risposte"
   collapse_replies_ef4fc36b: "Comprimi risposte"
@@ -5893,6 +5913,7 @@ it:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Commenta rispondendo a questo messaggio oppure partecipa alla conversazione utilizzando questo link: %{link}. Quando consentito, se è necessario includere un allegato, accedi a Canvas e rispondi alla discussione."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Commenta rispondendo a questo messaggio oppure partecipa alla conversazione utilizzando questo link: %{link}. Quando consentito, se è necessario includere un allegato, accedi a Canvas e rispondi all'annuncio."
   comment_destroyed_5cfc922d: "Commento distrutto"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Impossibile pubblicare commento! Riprova in seguito."
   comment_input_box_b8c7e58b: "Casella inserimento commento"
   comment_library_84735835: "Commenta libreria"
@@ -8286,6 +8307,7 @@ it:
   create_new_group_set_13b1f62a: "Crea nuovo set di gruppi"
   create_number_of_groups_groups_now_f89f220e: "Crea %{number_of_groups} gruppi ora"
   create_outcome_4dac05a0: "Crea risultato"
+  create_pace_4ff3e9c: "Crea ritmo"
   create_pages_581a4d59: "Crea pagine"
   create_slots_71dbb2f8: "Crea fasce orarie"
   create_subject_86de5618: "Crea oggetto"
@@ -9439,6 +9461,7 @@ it:
   discussions_redesign_b505952d: "Riprogettazione discussioni"
   discussions_redesign_isolated_view_78626c74: "Riprogettazione discussioni - Visualizzazione isolata"
   discussions_redesign_reporting_f4abcc37: "Riprogettazione discussioni - Segnalazione"
+  discussions_redesign_split_screen_view_d1b88d0e: "Riprogettazione discussioni - Visualizzazione schermo diviso"
   discussions_tutorial_tray_4ef79bcc: "Riquadro tutorial discussioni"
   discussions_view_c6818792: "Discussioni - visualizza"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Le discussioni con gruppi non possono essere specifiche della sezione"
@@ -9459,11 +9482,13 @@ it:
             tardive, e nascondi facilmente i voti finché non sei pronto a farli visualizzare
             agli studenti. Per una votazione semplificata, usa SpeedGrader per visualizzare e valutare le consegne.
   display_historical_view_of_achievements_of_users_53db5938: "Visualizza la visione storica dei risultati ottenuti dagli utenti"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Nome visualizzato:"
   display_name_b80c243e: "Nome visualizzato"
   display_student_filter_options_ab034cfa: "Mostra opzioni di filtro studenti"
   display_to_students_e1301f99: "Mostra agli studenti"
   display_totals_for_all_grading_periods_option_4a72586: "Visualizza totali per l'opzione Tutti i periodi di valutazione"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Visualizza valori"
   displaying_to_students_b1e92058: "Visualizzazione agli studenti"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -9651,6 +9676,7 @@ it:
   duplication_failed_3351ffb1: "Duplicazione non riuscita"
   duplication_of_title_succeeded_2e0bd645: "Duplicazione di %{title} riuscita"
   duration_1_minute_29c7d5ab: "Durata: 1 minuto"
+  duration_for_assignment_name_851ca365: "Durata per il compito %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Durata: %{hours} ore e %{minutes} minuti"
   duration_in_minutes_8959f63e: "Durata in minuti"
   duration_minutes_minutes_d7b9182b: "Durata: %{minutes} minuti"
@@ -10645,6 +10671,7 @@ it:
   expand_discussion_thread_from_author_829cfae1: "Espandi discussione da %{author}"
   expand_global_navigation_2c28d5d4: "Espandi navigazione globale"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Espandi elenco dei membri del gruppo per %{groupName}"
+  expand_name_71d944fd: "Espandi %{name}"
   expand_outcome_description_c5bdd70b: "Espandi descrizione risultato"
   expand_permission_b45bf097: "Espandi %{permission}"
   expand_permission_c61d5958: "Espandi autorizzazione"
@@ -10934,6 +10961,7 @@ it:
   federated_attributes_are_information_sent_from_you_2116fb61: "Gli attributi federati sono informazioni inviate dal tuo provider di autenticazione che possono essere utilizzate per aggiornare automaticamente le informazioni corrispondenti per gli utenti Canvas a ogni accesso."
   feed_url_8a433438: "URL feed"
   feed_url_is_required_253fda4e: "L'URL del feed è obbligatorio"
+  feedback_6dcc1991: Feedback
   feeds_9f1c5c76: Feed
   field_9ec0ec01: Campo
   field_cannot_be_blank_afb5b332: "Il campo non può essere vuoto."
@@ -11345,6 +11373,7 @@ it:
   grade_high_to_low_1cea0381: "Voto - da alto a basso"
   grade_history_9c51ad49: "Cronologia voti…"
   grade_info_19fb9875: "Informazioni voti"
+  grade_loading_bc1ad721: "Caricamento voti"
   grade_low_to_high_1678b713: "Voto - da basso ad alto"
   grade_out_of_percentage_1972bf52: "Voto in %{percentage}"
   grade_out_of_points_d401b79d: "Voto in %{points}"
@@ -12020,6 +12049,7 @@ it:
   group_membership_count_is_invalid_cc6b2d47: "Il numero di iscrizione al gruppo non è valido"
   group_membership_limit_54e165b: "Limite di partecipazione a gruppi"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Il limite di iscrizione al gruppo deve essere uguale o superiore al numero di membri attuali."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Il limite di partecipazione al gruppo deve essere maggiore di 1."
   group_name_b69c144: "Nome del gruppo"
   group_name_e4066daa: "nome gruppo"
   group_name_group_announcements_5ce81c6d: "%{group_name} - Annunci gruppo"
@@ -12303,6 +12333,7 @@ it:
   has_submissions_6c12ef4c: "Ha delle consegne"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Ha delle consegne non valutate"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Hai una domanda su Canvas? Chiedi qui."
   have_not_been_graded_df2a5fd2: "Non sono stati valutati"
   have_not_yet_submitted_57e6a58b: "Non sono ancora stati inviati"
   haven_t_been_graded_d7dee5bb: "Non è stato valutato"
@@ -12760,6 +12791,12 @@ it:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Se abilitata, sarà disponibile la sincronizzazione delle iscrizioni ai corsi con i
       gruppi Microsoft. Gli amministratori dell'account possono abilitarla nelle impostazioni dell'account.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Se abilitata, l’API AGS riporterà un codice di risposta più utile ogniqualvolta uno strumento
+      LTI tenta di accedere o modificare i dati in un corso che è già concluso.
+      Anziché riportare un errore generico 404 Non trovato, l’API riporterà invece 422
+      insieme a un messaggio utile che indica che lo strumento non può accedere ai corsi
+      conclusi.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Se abilitato, OAuth 2.0 ora riporterà correttamente i codici stato 4xx al
       cliente richiedente anziché reindirizzarli a se stessi
@@ -17861,6 +17898,7 @@ it:
   pace_plans_4bb9c5ff: "Programmi di velocità"
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "I Programmi di velocità offrono assistenza per le registrazioni continue in Canvas; ciò permette la distribuzione magica delle date di scadenza per gli studenti, con date di inizio diverse alla velocità definita dall'istruttore. Impara di più e fornisci feedback iscrivendoti al Gruppo utenti programmi di velocità."
   pace_plans_is_in_active_development_f6c20046: "I programmi di velocità sono in continua evoluzione."
+  pace_removed_8e625df7: "Ritmo rimosso"
   package_error: "Errore durante l'identificazione del tipo di pacchetto: %{error}"
   package_export_from_d6e2b073: "Esportazione pacchetto da"
   page_50c4823d: Pagina
@@ -18357,6 +18395,7 @@ it:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Aggiungi link a menu Guida"
         default_domain: "Dominio (predefinito)"
         default_key: "Chiave (predefinita)"
         tier_1_domain: "Dominio (supporto livello 1)"
@@ -20816,6 +20855,7 @@ it:
   remove_outcomes_9abcc8fd: 
     one: "Rimuovere il risultato?"
     other: "Rimuovere risultato?"
+  remove_pace_97381e05: "Rimuovi ritmo"
   remove_placement_90862c13: "Rimuovi %{placement}"
   remove_points_from_rubric_dcd4b585: "Rimuovi punti dalla rubrica"
   remove_pronouns_5ff760ff: "Rimuovi pronomi"
@@ -20839,12 +20879,15 @@ it:
   remove_these_dates_48453a81: "Rimuovi queste date"
   remove_this_item_from_the_module_4b2ceab7: "Rimuovi questo elemento dal modulo"
   remove_this_rubric_from_my_list_c7d80704: "Rimuovi questa rubrica dal mio elenco"
+  remove_this_section_pace_ba87ad3c: "Rimuovere questo ritmo di sezione?"
+  remove_this_student_pace_a5e7b3c5: "Rimuovere questo ritmo studente?"
   remove_user_from_section_5556f465: "Rimuovi utente da sezione"
   remove_webcam_image_count_efee4a11: "Rimuovi immagine webcam %{count}"
   removed_assignment_assignment_name_835cc776: "Compito rimosso %{assignment_name}"
   removed_course_association_course_a233342c: "Associazione corso rimossa %{course}"
   removed_filename_a8634af3: "rimosso %{filename}"
   removed_user_as_group_leader_bb69330f: "%{user} rimosso come leader del gruppo"
+  removing_pace_9493910c: "Rimozione ritmo in corso..."
   rename_45608f54: Rinomina
   rename_filter_c6cc8efc: "Rinomina filtro"
   rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Rinomina o riordina una pagina tramite il menu delle impostazioni accanto al nome della pagina. In alternativa, fai clic sul nome di una pagina per rinominarla o trascina il nome di una pagina per riordinarla."
@@ -21589,6 +21632,7 @@ it:
   section_level_calendar_permissions_6aff8cdb: "Autorizzazioni calendario di livello sezione"
   section_name_b6d82574: "Nome sezione"
   section_name_edb51b2: "nome sezione"
+  section_pace_989d2856: "Ritmo sezione"
   section_removed_2ac72a79: "%{section} rimosso"
   section_section_names_98f172e6: "Sezione: %{section_names}"
   section_sis_2a80d2fa: "SIS sezione"
@@ -21662,6 +21706,7 @@ it:
   security_7a7e8808: Sicurezza
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Impostazione di sicurezza per limitare gli URL di partecipazione ad una conferenza"
   security_tab_failed_to_load_2d2242a: "Impossibile caricare scheda Sicurezza"
+  see_comments_details_44f460d9: "Visualizza dettagli commenti"
   see_example_below_to_see_how_different_calculation_618de98d: "Guarda gli esempi seguenti per scoprire come differenti parametri di calcolo hanno effetto sul calcolo padronanza studente."
   see_more_in_canvas_guides_fc90a457: "Consulta altre risorse nelle Guide Canvas"
   see_other_users_primary_email_address_59c8473f: "Vedi l'indirizzo email di altri utenti"
@@ -22827,6 +22872,7 @@ it:
   size_b30e1077: Dimensioni
   size_f1873a2: ", dimensione: "
   size_size_a77bd760: "dimensione: %{size}"
+  skillcode_685526a6: "codice competenze"
   skip_bcb86160: Ignora
   skip_weekends_13cbd889: "Salta week-end"
   skipped_file_filename_due_to_error_94f0194: "File %{filename} ignorato a causa di un errore"
@@ -23207,6 +23253,7 @@ it:
       nei risultati di apprendimento del corso. I risultati vengono presentati sotto forma di
       registro dei voti e il progresso viene visualizzato sia come punteggio numerico sia come padronanza
       raggiunta/padronanza quasi raggiunta/recupero.
+  student_pace_2200bf85: "Ritmo studente"
   student_page_history_ce86b3c2: "Cronologia pagine studente"
   student_page_history_pages_update_ae55fa03: "Cronologia pagine studente (Pagine - Aggiorna)"
   student_paired_successfully_a88def61: "Studente accoppiato correttamente"
@@ -23349,6 +23396,7 @@ it:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Commento consegna: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Commenti consegna"
   submission_comments_b6d65841: "Commenti consegna"
+  submission_comments_tray_290fad59: "Barra dei commenti consegna"
   submission_completed_ba0e552e: "Consegna completata"
   submission_data_88085815: "Dati di invio"
   submission_date_8f659c0c: "Data di invio"
@@ -23652,6 +23700,7 @@ it:
   sync_to_posttosisname_9837a8bf: "Sincronizza con %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Sincronizza con %{postToSISName}"
   sync_to_sisname_f343e59: "Sincronizza con %{sisName}"
+  sync_uris_50c59540: "Sincronizza URI"
   synced_97764882: Sincronizzato
   synced_message_20469c8f: "Sincronizzato: %{message}"
   syncing_3061cc8d: "Sincronizzazione in corso..."
@@ -24245,6 +24294,7 @@ it:
   there_was_an_error_fetching_custom_columns_542014ef: "Si è verificato un errore durante il recupero delle colonne personalizzate."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Si è verificato un errore durante il riporto dei dati nel Registro dei voti"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Si è verificato un errore durante il riporto dei filtri per registro dei voti."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Si è verificato un errore durante il recupero dei dati sui compiti del periodo di valutazione."
   there_was_an_error_fetching_modules_8ee451bb: "Si è verificato un errore durante il riporto dei moduli."
   there_was_an_error_fetching_outcome_results_45c57590: "Si è verificato un errore durante il recupero dei risultati degli esiti"
   there_was_an_error_fetching_student_data_87463510: "Si è verificato un errore durante il recupero dei dati studente."
@@ -24435,6 +24485,9 @@ it:
       Questa flag funzionalità consente una visualizzazione isolata all’interno del nuovo lavoro
       Riprogettazione discussioni.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Questo flag funzione abilita l’aggiornamento della pagina Persone React/InstUI e GraphQL."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Questa flag funzionalità consente una visualizzazione a schermo diviso all’interno del nuovo lavoro
+      Riprogettazione discussioni.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Questo flag funzione consente l’utilizzo della pagina di creazione/modifica
       discussione aggiornata
@@ -24635,9 +24688,11 @@ it:
   this_report_shows_the_student_final_grade_results__5a508b55: "Questo report mostra i risultati dei voti finali per tutti gli studenti in un determinato trimestre. Il file CSV generato avrà una riga per ciascuna iscrizione e mostrerà il voto attuale e quello finale visualizzati nel registro dei voti del corso."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Questa pagina di esempio include gli elementi UI comuni in Canvas per semplificare la creazione del tuo branding personalizzato. Una volta iniziato ad apportare modifiche ai valori dei colori e alle immagini nella barra laterale di sinistra, vedrai il pulsante *Anteprima delle modifiche*. Fai clic per aggiornare questa pagina e visualizzare l'aspetto delle tue modifiche."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Questa pagina di esempio include gli elementi UI comuni in Canvas per semplificare la creazione del tuo branding personalizzato. Una volta iniziato ad apportare modifiche ai valori dei colori e alle immagini, vedrai il pulsante *Anteprima delle modifiche*. Fai clic per aggiornare questa pagina e visualizzare l'aspetto delle tue modifiche."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Questo ritmo sezione sarà rimosso e il ritmo tornerà al ritmo predefinito."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Questa impostazione interessa solo la visualizzazione dei voti studente e mostra i voti come se a tutti i compiti non valutati venisse assegnato il punteggio zero. Questa impostazione è solo una modifica visiva e non interessa i voti degli studenti o altri utenti di questo registro dei voti. Quando si abilita questa impostazione, Canvas non popolerà il registro dei voti con gli zeri per le consegne degli studenti all’interno dei singoli compiti. Solo i gruppi di compiti e le colonne dei totali fattorizzeranno automaticamente i punteggi di zero nelle percentuali complessive per ciascuno studente."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Questa impostazione cambia notevolmente l’esperienza Canvas per gli studenti e gli insegnanti."
   this_settings_only_impact_enrollments_this_include_7f51358: "Queste impostazioni interesseranno solo le iscrizioni. Ciò include argomenti con un timestamp last_activity_at maggiore del parametro Aggiornato dopo. L’impostazione predefinita è off"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Questo ritmo studente sarà rimosso e il ritmo tornerà al ritmo precedentemente assegnato."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "L'iscrizione di questo studente è stata conclusa."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "La registrazione di questo studente è stata conclusa"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Questo studente ha appena ottenuto un voto incredibilmente alto."
@@ -25916,6 +25971,7 @@ it:
   unregister_service_985238e9: "Annulla registrazione servizio"
   unreserved_e86b7425: "Non prenotato"
   unsafe_file_link_8a18eceb: "link al file non sicuro"
+  unsaved_change_eb23d452: "Modifica non salvata"
   unselected_all_courses_99a9d35c: "Tutti i corsi non selezionati"
   unselected_course_course_89995a83: "Corso non selezionato %{course}"
   unselected_external_tool_tool_1bd68403: "Strumento esterno non selezionato %{tool}"
@@ -27217,6 +27273,9 @@ it:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Non puoi pubblicare durante il caricamento della velocità"
   you_cannot_publish_while_loading_the_plan_685405e5: "Non puoi pubblicare durante il caricamento del piano"
   you_cannot_publish_while_publishing_2f65264b: "Non puoi pubblicare durante la pubblicazione"
+  you_cannot_remove_a_locked_pace_150675e9: "Non puoi rimuovere un ritmo bloccato"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Non puoi rimuovere il ritmo mentre è ancora in caricamento"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Non puoi rimuovere il ritmo durante la pubblicazione"
   you_cannot_remove_this_enrollment_c87be1cb: "Non puoi rimuovere questa iscrizione."
   you_cannot_remove_your_default_email_address_8ed68e52: "Non puoi rimuovere il tuo indirizzo email predefinito"
   you_cannot_save_while_there_are_errors_b86585e9: "Impossibile salvare in presenza di errori"
