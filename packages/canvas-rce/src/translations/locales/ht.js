@@ -467,6 +467,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Siperyè Enbrike" },
   "nested_less_than_27d17e58": { "message": "Enferyè Enbrike" },
   "next_page_d2a39853": { "message": "Pwochen Paj" },
+  "no_changes_to_save_d29f6e91": { "message": "Pa gen chanjman pou sovgade." },
   "no_e16d9132": { "message": "Non" },
   "no_file_chosen_9a880793": { "message": "Pa gen fichye chwazi" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -544,7 +545,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Presedan" },
   "precedes_equal_20701e84": { "message": "Presedan Egalite" },
   "preformatted_d0670862": { "message": "Prefòmate" },
-  "pretty_html_editor_28748756": { "message": "Bèl editè HTML" },
   "preview_53003fd2": { "message": "Apèsi" },
   "preview_in_overlay_ed772c46": { "message": "Apèsi an sipèpozisyon" },
   "preview_inline_9787330": { "message": "Apèsi an liy" },
@@ -564,7 +564,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Kwatènè" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "rational_numbers_80ddaa4a": { "message": "Nonm Rasyonèl" },
-  "raw_html_editor_e3993e41": { "message": "Editè HTML Brit" },
   "real_numbers_7c99df94": { "message": "Nonm Reyèl" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Pòsyon Reyèl (yon Nonm Konplèks)"
@@ -835,7 +834,6 @@ const locale = {
   "view_ba339f93": { "message": "Afiche" },
   "view_description_30446afc": { "message": "Afiche deskripsyon" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Afiche rakousi klavye" },
-  "view_predefined_colors_92f5db39": { "message": "Afiche koulè predefini yo" },
   "view_title_description_67940918": {
     "message": "Afiche { title } deskripsyon"
   },

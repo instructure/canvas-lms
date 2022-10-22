@@ -484,6 +484,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
   "next_page_d2a39853": { "message": "Next Page" },
+  "no_changes_to_save_d29f6e91": { "message": "No changes to save." },
   "no_e16d9132": { "message": "No" },
   "no_file_chosen_9a880793": { "message": "No file chosen" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -561,7 +562,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Precedes" },
   "precedes_equal_20701e84": { "message": "Precedes Equal" },
   "preformatted_d0670862": { "message": "Preformatted" },
-  "pretty_html_editor_28748756": { "message": "Pretty HTML Editor" },
   "preview_53003fd2": { "message": "Preview" },
   "preview_in_overlay_ed772c46": { "message": "Preview in overlay" },
   "preview_inline_9787330": { "message": "Preview inline" },
@@ -581,7 +581,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Quaternions" },
   "quizzes_7e598f57": { "message": "Quizzes" },
   "rational_numbers_80ddaa4a": { "message": "Rational Numbers" },
-  "raw_html_editor_e3993e41": { "message": "Raw HTML Editor" },
   "real_numbers_7c99df94": { "message": "Real Numbers" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Real Portion (of Complex Number)"
@@ -854,7 +853,6 @@ const locale = {
   "view_ba339f93": { "message": "View" },
   "view_description_30446afc": { "message": "View description" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "View keyboard shortcuts" },
-  "view_predefined_colors_92f5db39": { "message": "View predefined colours" },
   "view_title_description_67940918": {
     "message": "View { title } description"
   },

@@ -504,6 +504,9 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Aninhado maior que" },
   "nested_less_than_27d17e58": { "message": "Aninhado menos de" },
   "next_page_d2a39853": { "message": "Próxima página" },
+  "no_changes_to_save_d29f6e91": {
+    "message": "Não há alterações para salvar."
+  },
   "no_e16d9132": { "message": "Não" },
   "no_file_chosen_9a880793": { "message": "Nenhum arquivo escolhido" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -581,7 +584,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Precede" },
   "precedes_equal_20701e84": { "message": "Precede igual" },
   "preformatted_d0670862": { "message": "Pré-formatado" },
-  "pretty_html_editor_28748756": { "message": "Editor de HTML aprimorado" },
   "preview_53003fd2": { "message": "Pré-visualização" },
   "preview_in_overlay_ed772c46": {
     "message": "Pré-visualizar na sobreposição"
@@ -603,7 +605,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Quaternions" },
   "quizzes_7e598f57": { "message": "Testes" },
   "rational_numbers_80ddaa4a": { "message": "Números racionais" },
-  "raw_html_editor_e3993e41": { "message": "Editor HTML não processado" },
   "real_numbers_7c99df94": { "message": "Numeros reais" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Parcela real (de número complexo)"
@@ -894,7 +895,6 @@ const locale = {
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "Visualizar atalhos de teclado"
   },
-  "view_predefined_colors_92f5db39": { "message": "Ver cores predefinidas" },
   "view_title_description_67940918": { "message": "Ver { title } descrição" },
   "white_87fa64fd": { "message": "Branco" },
   "width_492fec76": { "message": "Largura" },

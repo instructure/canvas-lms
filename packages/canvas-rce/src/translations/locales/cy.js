@@ -504,6 +504,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Nythu’n Fwy Na" },
   "nested_less_than_27d17e58": { "message": "Nythu’n Llai Na" },
   "next_page_d2a39853": { "message": "Tudalen Nesaf" },
+  "no_changes_to_save_d29f6e91": { "message": "Dim newidiadau i’w cadw." },
   "no_e16d9132": { "message": "Na" },
   "no_file_chosen_9a880793": { "message": "Dim ffeil wedi’i dewis" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -581,7 +582,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Cyn" },
   "precedes_equal_20701e84": { "message": "Cyn Hafalnod" },
   "preformatted_d0670862": { "message": "Wedi''i fformatio’n barod" },
-  "pretty_html_editor_28748756": { "message": "Golygydd HTML Hardd" },
   "preview_53003fd2": { "message": "Rhagolwg" },
   "preview_in_overlay_ed772c46": { "message": "Rhagolwg mewn troshaen" },
   "preview_inline_9787330": { "message": "Rhagolwg mewn llinell" },
@@ -601,7 +601,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Cwaternion" },
   "quizzes_7e598f57": { "message": "Cwisiau" },
   "rational_numbers_80ddaa4a": { "message": "Rhifau Rhesymegol" },
-  "raw_html_editor_e3993e41": { "message": "Golygydd HTML Crai" },
   "real_numbers_7c99df94": { "message": "Rhifau Go Iawn" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Cyfran Go Iawn (o Rif Cymhleth)"
@@ -884,9 +883,6 @@ const locale = {
   "view_ba339f93": { "message": "Gweld" },
   "view_description_30446afc": { "message": "Gweld disgrifiad" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Gweld bysellau hwylus" },
-  "view_predefined_colors_92f5db39": {
-    "message": "Gweld lliwiau wedi’u diffinio ymlaen llaw"
-  },
   "view_title_description_67940918": {
     "message": "Gweld disgrifiad { title }"
   },

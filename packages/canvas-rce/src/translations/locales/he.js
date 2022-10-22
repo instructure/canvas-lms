@@ -107,11 +107,16 @@ const locale = {
   "light_blue_5374f600": { "message": "כחול בהיר" },
   "link_7262adec": { "message": "קישור" },
   "links_14b70841": { "message": "קישורים" },
+  "links_to_an_external_site_de74145d": { "message": "קישורים לאתר חיצוני" },
   "loading_25990131": { "message": "בטעינה... " },
   "loading_bde52856": { "message": "טוען" },
   "loading_failed_b3524381": { "message": "טעינה נכשלה..." },
   "locked_762f138b": { "message": "נעול" },
   "media_af190855": { "message": "מדיה" },
+  "minimize_file_preview_da911944": {
+    "message": "מיזעור חלון תצוגה מקדימה של קובץ"
+  },
+  "minimize_video_20aa554b": { "message": "מיזעור וידאו" },
   "misc_3b692ea7": { "message": "אחר" },
   "modules_c4325335": { "message": "מודולים" },
   "my_files_2f621040": { "message": "הקבצים שלי" },
@@ -149,11 +154,17 @@ const locale = {
   "submit_a3cc6859": { "message": "הגשה" },
   "syllabus_f191f65b": { "message": "תכנית לימודים" },
   "teal_f729a294": { "message": "ירוק-כחלחל" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "התצוגה המוקדמת של מסמך זה מעובדת כעת. יש לנסות מאוחר יותר"
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "החומר הנו ברשות הציבור"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "זכויות היוצרים של החומר במסגרת כללי נחלת הכלל - Creative Commons"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "מסמך זה לא ניתן להצגה בתוך קנבס."
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "נוסחה זו לא ניתנת להצגה בתצוגה בסיסית"
