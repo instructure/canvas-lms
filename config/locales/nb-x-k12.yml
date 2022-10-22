@@ -1050,6 +1050,19 @@ nb-x-k12:
           description: 
             text: "Denne rapporten viser elevens endelige vurderinger for alle elever i en gitt termin. Den resulterende CSV-filen har én rad per påmelding, og viser gjeldende og endelig vurdering som vises i vurderingsoversikten for faget."
     group_type: gruppe
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Fag
+              order: 
+                label: Rekkefølge
+              outcome: 
+                radio: Mål
+              user: 
+                radio: Brukere
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1373,6 +1386,7 @@ nb-x-k12:
         equella_teaser: Equella-kommentarer
         global_includes: "Tilpasset CSS/overstyring JavaScript"
         include_students_in_global_survey: "Inkluder elever i globale spørreundersøkelser"
+        kill_joy: "Fjern skjult spill fra 404-siden"
         limit_parent_app_web_access: "Begrense tilgang til Canvas-web fra Canvas Parent-app"
         locked: "Lås denne innstillingen for underkonti og fag"
         login_handle_name: "Logg inn etikett"
@@ -1661,7 +1675,7 @@ nb-x-k12:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: "Fag ID-er"
+                header: "SIS-ID-er for fag"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -2958,6 +2972,7 @@ nb-x-k12:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Det oppsto en feil under opprettelsen av dette målet: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Det oppsto en feil under opprettelsen av dette målet. Prøv på nytt."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Det oppsto en feil under sletting av beskjeder."
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "En feil oppsto under sletting av avtalegruppen"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Det oppsto en feil under redigeringen av denne gruppen. Prøv på nytt."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Det oppsto en feil under redigeringen av dette målet. Prøv på nytt."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Det oppsto en feil under importering av disse målene."
@@ -3015,6 +3030,7 @@ nb-x-k12:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Det oppsto en feil ved lagring av kontoens ferdighetsvurderinger: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Det oppsto en feil ved lagring av foreninger"
   an_error_occurred_while_saving_changes_b42c9b84: "Det oppsto en feil ved lagring av endringer"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "En feil oppsto under lagring av avtalegruppen"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "En feil oppsto under lagring av oppgavens retningslinjer for publisering"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "En feil oppsto under lagring av retningslinjer for fagpubliseringer"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Det oppsto en feil ved lasting av mestringsskalaen: %{message}"
@@ -4273,6 +4289,7 @@ nb-x-k12:
   attempt_3dd42b18: forsøk
   attempt_attempt_d3911720: "Forsøk %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Forsøk %{attempt} tilbakemelding"
+  attempt_attempt_feedback_549683ba: "Forsøk %{attempt} Tilbakemelding:"
   attempt_attempt_grade_c01f45df: "Forsøk %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Forsøk %{attempt} Poengsum:"
   attempt_count_267a4fc5: "Forsøk %{count}"
@@ -4550,6 +4567,7 @@ nb-x-k12:
   beta_lti_launch_c200ffdf: "Beta LTI-start:"
   beta_url_3c7b88ec: "Beta URL:"
   better_error_handling_for_file_uploads_in_the_ags__9bb4fb28: "Bedre feilhåndtering for filopplastinger i AGS Scores API"
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Bedre LTI AGS-responskoder for Avsluttede fag"
   between_1_and_10_7118bf2d: "Mellom 1 og 10"
   between_1_and_5_f2a74bcf: "Mellom 1 og 5"
   between_1_and_99_d421a4c0: "Mellom 1% og 99%"
@@ -5410,6 +5428,7 @@ nb-x-k12:
       innstillingen oppdaterer hvordan omskriving av URL-er skjer for å gjøre det lettere å forhåndsvise
       filer i Canvas og ikke laste dem ned.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: "Canvas kundestøttesenter"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas oppfatter responsen som gyldig"
   canvas_ticketing_email_connector_27e253ae: "Canvas ticketing e-posttilkobler"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post-tilkobler"
@@ -5784,6 +5803,7 @@ nb-x-k12:
   collapse_discussion_thread_52bab65a: "Skjul diskusjonstråd"
   collapse_discussion_thread_from_author_34f9cd18: "Skjul diskusjonstråd fra %{author}"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
+  collapse_name_fdea035c: "Skjul %{name}"
   collapse_outcome_description_de471564: "Trekk inn målbeskrivelse"
   collapse_replies_20f2faf7: "Skjul svar"
   collapse_replies_ef4fc36b: "Kollaps svar"
@@ -5809,6 +5829,7 @@ nb-x-k12:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Kommentér ved å svare på denne meldingen, eller bli med i samtalen med denne lenken: %{link}. Når det er tillatt og du må legge til et vedlegg, logg inn i Canvas og svar på samtalen."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Kommentér ved å svare på denne meldingen, eller bli med i samtalen med denne lenken: %{link}.Når det er tillatt og du må legge til et vedlegg, logg inn i Canvas og svar på beskjeden."
   comment_destroyed_5cfc922d: "Kommentar slettet"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Kunne ikke publisere kommentar! Prøv igjen senere."
   comment_input_box_b8c7e58b: Kommentarboks
   comment_library_84735835: Kommentarbibliotek
@@ -8152,6 +8173,7 @@ nb-x-k12:
   create_new_group_set_13b1f62a: "Lag nye gruppeinnstillinger"
   create_number_of_groups_groups_now_f89f220e: "Lag %{number_of_groups} grupper nå"
   create_outcome_4dac05a0: "Opprette mål"
+  create_pace_4ff3e9c: "Opprett Tempo"
   create_pages_581a4d59: "Opprette sider"
   create_slots_71dbb2f8: "Opprett tidsluker"
   create_subject_86de5618: "Opprett tittel"
@@ -8668,6 +8690,7 @@ nb-x-k12:
   delete_this_section_380338: "Slett dette avsnittet"
   delete_this_submission_type_37a0809c: "Slett denne innleveringstypen"
   delete_this_theme_46d95edc: "Slette dette temaet?"
+  delete_time_range_e14461a0: "Slett tidsintervallet"
   delete_title_6c18eba5: "Slett %{title}"
   delete_tool_90ca44da: Sletteverktøy
   delete_tool_app_9c9f6d35: "Slett %{tool} App?"
@@ -9292,6 +9315,7 @@ nb-x-k12:
   discussions_redesign_b505952d: "Nytt design av diskusjoner"
   discussions_redesign_isolated_view_78626c74: "Nytt design av diskusjoner - Isolert visning"
   discussions_redesign_reporting_f4abcc37: "Redesign av diskusjoner - Rapportering"
+  discussions_redesign_split_screen_view_d1b88d0e: "Nytt design av diskusjoner – Delt skjerm-visning"
   discussions_tutorial_tray_4ef79bcc: "Diskusjoner Tutorial Tray"
   discussions_view_c6818792: "Diskusjoner - vis"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskusjoner med grupper kan ikke være seksjonspesifikk"
@@ -9311,11 +9335,13 @@ nb-x-k12:
             for sent innleverte oppgaver til du er klar for at eleven
             kan se dem. For forenklet vurdering, bruk SpeedGrader for å vise og vurdere innleveringer.
   display_historical_view_of_achievements_of_users_53db5938: "Vis historisk visning av brukeres prestasjoner"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Vis navn:"
   display_name_b80c243e: "Navn som skal vises"
   display_student_filter_options_ab034cfa: "Vis elevfilteralternativer"
   display_to_students_e1301f99: "Vis til elever"
   display_totals_for_all_grading_periods_option_4a72586: "Vis summer for alternativet Alle Vurderingsperioder"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Vis verdier"
   displaying_to_students_b1e92058: "Viser til elever"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -9503,6 +9529,7 @@ nb-x-k12:
   duplication_failed_3351ffb1: "Kunne ikke duplisere"
   duplication_of_title_succeeded_2e0bd645: "Duplisering av %{title} var vellykket"
   duration_1_minute_29c7d5ab: "Varighet : 1 minutt"
+  duration_for_assignment_name_851ca365: "Varighet for oppgave %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Varighet : %{hours} timer og %{minutes} minutter"
   duration_in_minutes_8959f63e: "Varighet i minutter"
   duration_minutes_minutes_d7b9182b: "Varighet : %{minutes} minutter"
@@ -10483,6 +10510,7 @@ nb-x-k12:
   expand_discussion_thread_from_author_829cfae1: "Utvid diskusjonstråd fra %{author}"
   expand_global_navigation_2c28d5d4: "Utvid global navigasjon"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvid listen over gruppemedlemmer for %{groupName}"
+  expand_name_71d944fd: "Utvid %{name}"
   expand_outcome_description_c5bdd70b: "Utvid målbeskrivelse"
   expand_permission_b45bf097: "Utvid %{permission}"
   expand_permission_c61d5958: "Utvid rettigheter"
@@ -10764,6 +10792,7 @@ nb-x-k12:
   federated_attributes_are_information_sent_from_you_2116fb61: "Samlede egenskaper er informasjon sendt fra din autentiseringsleverandør som kan brukes til automatisk oppdatering av korresponderende informasjon i Canvas, hver gang de logger på."
   feed_url_8a433438: Strøm-URL
   feed_url_is_required_253fda4e: "Strømnings-URL er påkrevd"
+  feedback_6dcc1991: Tilbakemelding
   feeds_9f1c5c76: Strøm
   field_9ec0ec01: Felt
   field_cannot_be_blank_afb5b332: "Feltet kan ikke være tomt."
@@ -11169,6 +11198,7 @@ nb-x-k12:
   grade_grade_7e52dd1c: "Vurdering: %{grade}"
   grade_high_to_low_1cea0381: "Vurdering – Høy til Lav"
   grade_info_19fb9875: Vurderinginfo
+  grade_loading_bc1ad721: "Vurdering lastes inn"
   grade_low_to_high_1678b713: "Vurdering – lav til høy"
   grade_out_of_percentage_1972bf52: "Vurdering av %{percentage}"
   grade_out_of_points_d401b79d: "Vurdering av %{points}"
@@ -11834,6 +11864,7 @@ nb-x-k12:
   group_membership_count_is_invalid_cc6b2d47: "Gruppemedlemskapstall er ugyldig"
   group_membership_limit_54e165b: "Medlemskapsgrense for grupper"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Gruppemedlemskapsgrensen må være lik eller større enn gruppens nåværende medlemstall."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Grensen for gruppemedlemskap må være større enn 1."
   group_name_b69c144: Gruppenavn
   group_name_e4066daa: gruppenavn
   group_name_group_announcements_5ce81c6d: "%{group_name} - Gruppe-beskjeder"
@@ -12111,6 +12142,7 @@ nb-x-k12:
   has_submissions_6c12ef4c: "Har innleveringer"
   has_syllabus_body_6f250277: has_syllabus_body
   has_ungraded_submissions_2bff87df: "Har ikke-vurderte innleveringer"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Har du spørsmål om Canvas? Still det her."
   have_not_been_graded_df2a5fd2: "Har ikke blitt vurdert"
   have_not_yet_submitted_57e6a58b: "Er ikke sendt inn ennå"
   haven_t_been_graded_d7dee5bb: "Har ikke blitt vurdert"
@@ -12550,6 +12582,12 @@ nb-x-k12:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Hvis aktivert, vil synkronisering av fagpåmeldinger til Microsoft Grupper være
       tilgjengelig. Kontoadministratorer kan bare aktivere dette i kontoinnstillinger.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Hvis aktivert, vil AGS API returnere en mer nyttig svarkode hver gang et LTI
+      -verktøy forsøker å få tilgang til eller endre data i en fag som allerede er avsluttet.
+      I stedet for å returnere en generisk 404 Ikke funnet, vil API i stedet returnere en 422
+      sammen med en nyttig melding som indikerer at verktøyet ikke får tilgang til avsluttede
+      fag.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Hvis aktivert, vil OAuth 2.0 nå returnere 4xx-statuskoder på riktig måte til den
       spørrende klienten i stedet for å omdirigere dem til seg selv.
@@ -17603,6 +17641,7 @@ nb-x-k12:
   pace_plans_4bb9c5ff: "Pace Plans"
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Pace Plans legger til støtte for løpende påmeldinger til Canvas, noe som tillater magisk fordeling av forfallsdatoer for elever med ulike startdatoer basert på en faglærers definerte tempo. Lær mer og gi tilbakemelding ved å bli med i Pace Plans brukergruppe."
   pace_plans_is_in_active_development_f6c20046: "Pace Plans er i aktiv utvikling."
+  pace_removed_8e625df7: "Tempo fjernet"
   package_error: "Feil ved identifisering av pakketype: %{error}"
   package_export_from_d6e2b073: "Eksport av pakke fra"
   page_50c4823d: Side
@@ -18091,6 +18130,7 @@ nb-x-k12:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Legg til lenke i hjelpemenyen"
         default_domain: "Domene (standard)"
         default_key: "Nøkkel (standard)"
         tier_1_domain: "Domene (Nivå 1 støtte)"
@@ -20527,6 +20567,7 @@ nb-x-k12:
   remove_outcomes_9abcc8fd: 
     one: "Fjerne mål?"
     other: "Fjerne mål?"
+  remove_pace_97381e05: "Fjern Tempo"
   remove_placement_90862c13: "Fjern %{placement}"
   remove_points_from_rubric_dcd4b585: "Fjern poeng fra vurderingskriterier"
   remove_pronouns_5ff760ff: "Fjerne pronomen"
@@ -20550,12 +20591,15 @@ nb-x-k12:
   remove_these_dates_48453a81: "Fjern disse datoene"
   remove_this_item_from_the_module_4b2ceab7: "Fjern dette elementet fra modulen"
   remove_this_rubric_from_my_list_c7d80704: "Fjern disse vurderingskriteriene fra listen min"
+  remove_this_section_pace_ba87ad3c: "Vil du fjerne dette Seksjonstempoet?"
+  remove_this_student_pace_a5e7b3c5: "Vil du fjerne dette Elevtempoet?"
   remove_user_from_section_5556f465: "Fjern brukeren fra seksjon"
   remove_webcam_image_count_efee4a11: "Fjern webkamera-bilde %{count}"
   removed_assignment_assignment_name_835cc776: "Fjernet oppgave %{assignment_name}"
   removed_course_association_course_a233342c: "Fjernet fag-assosiering %{course}"
   removed_filename_a8634af3: "fjernet %{filename}"
   removed_user_as_group_leader_bb69330f: "Fjernet %{user} som gruppeleder"
+  removing_pace_9493910c: "Fjerner tempo …"
   rename_45608f54: "Gi nytt navn"
   rename_filter_c6cc8efc: "Endre navn på filter"
   rename_or_reorder_a_page_via_the_settings_menu_nex_f4aff39f: "Endre navn eller endre rekkefølge på siden gjennom innstillingsmenyen ved siden av navnet på siden. Alternativt, klikk på navnet til siden for å endre navnet eller dra i navnet til siden for å endre rekkefølgen."
@@ -21287,6 +21331,7 @@ nb-x-k12:
   section_level_calendar_permissions_6aff8cdb: "Kalendertillatelser på seksjonsnivå"
   section_name_b6d82574: Seksjonsnavn
   section_name_edb51b2: klassenavn
+  section_pace_989d2856: Seksjonstempo
   section_removed_2ac72a79: "%{section} fjernet"
   section_section_names_98f172e6: "Avsnitt: %{section_names}"
   section_sis_2a80d2fa: Seksjon-SIS
@@ -21360,6 +21405,7 @@ nb-x-k12:
   security_7a7e8808: Sikkerhet
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Sikkerhetsinnstilling for å begrense URL-adresser til et videomøte"
   security_tab_failed_to_load_2d2242a: "Sikkerhetsfane mislyktes ved opplasting"
+  see_comments_details_44f460d9: "Se kommentardetaljer"
   see_example_below_to_see_how_different_calculation_618de98d: "Se eksempel nedenfor for å se hvordan forskjellige beregningsparametere påvirker elevens mestringsberegning."
   see_more_in_canvas_guides_fc90a457: "Les mer i Canvas-guider"
   see_other_users_primary_email_address_59c8473f: "Se andre brukeres hoved epost-adresse"
@@ -22490,6 +22536,7 @@ nb-x-k12:
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Kun sideadmin. Send til 1 / %{denominator} brukere med aktive kontoer hver måned."
   size_b30e1077: Størrelse
   size_size_a77bd760: "størrelse: %{size}"
+  skillcode_685526a6: ferdighetskode
   skip_bcb86160: "Hopp over"
   skip_weekends_13cbd889: "Hopp over helger"
   skipped_file_filename_due_to_error_94f0194: "Hoppet over fil %{filename} på grunn av en feil"
@@ -22863,6 +22910,7 @@ nb-x-k12:
       på læringsutbytte for fag. Mål vises i et vurderingsoversikt-lignende
       format og fremgangen vises både som numerisk og som mestret/nær
       mestring/utbedret.
+  student_pace_2200bf85: Elevtempo
   student_page_history_ce86b3c2: Elevsidehistorikk
   student_page_history_pages_update_ae55fa03: "Elevsidelogg (Sider - Oppdater)"
   student_paired_successfully_a88def61: "Eleven ble paret"
@@ -23004,6 +23052,7 @@ nb-x-k12:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Innleveringskommentar: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: Innleveringskommentarer
   submission_comments_b6d65841: Innleveringskommentarer
+  submission_comments_tray_290fad59: "Skuff for innleveringskommentarer"
   submission_completed_ba0e552e: "Innsending fullført"
   submission_data_88085815: Innleveringsdata
   submission_date_8f659c0c: Innleveringsdato
@@ -23304,6 +23353,7 @@ nb-x-k12:
   sync_to_posttosisname_9837a8bf: "Synkronisering med %{postToSISName}"
   sync_to_posttosisname_dffd5c9: "Synkronisering med %{postToSISName}"
   sync_to_sisname_f343e59: "Synkronisering med %{sisName}"
+  sync_uris_50c59540: "Synkroniser URI-er"
   synced_97764882: Synkronisert
   synced_message_20469c8f: "Synkronisert: %{message}"
   syncing_3061cc8d: Synkroniserer…
@@ -23891,6 +23941,7 @@ nb-x-k12:
   there_was_an_error_fetching_custom_columns_542014ef: "Det oppsto en feil under henting av tilpassede kolonner."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Det oppsto en feil ved henting av data for Vurderingsoversikt"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Det oppsto en feil under henting av Vurderingsoversiktfiltre."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Det oppsto en feil ved henting av oppgavedatata for vurderingsperioden."
   there_was_an_error_fetching_modules_8ee451bb: "Det oppsto en feil under henting av moduler."
   there_was_an_error_fetching_outcome_results_45c57590: "Det oppsto en feil under heting av oppnåelse av mål"
   there_was_an_error_fetching_student_data_87463510: "Det oppsto en feil ved henting av elevdata."
@@ -24063,6 +24114,9 @@ nb-x-k12:
       Dette funksjonsflagget aktiverer isolert visning i det nye
       designet av diskusjoner.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Dette funksjonsflagget aktiverer React/InstUI- og GraphQL-oppgraderingen av Folk-siden."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Dette funksjonsflagget aktiverer Delt skjerm-visning i det nye
+      designet av diskusjoner.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Dette funksjonsflagget muliggjør bruk av den oppdaterte
       siden for opprett/rediger diskusjoner
@@ -24257,9 +24311,11 @@ nb-x-k12:
   this_report_shows_the_student_final_grade_results__5a508b55: "Denne rapporten viser elevens endelige vurderinger for alle elever i en gitt termin. Den resulterende CSV-filen har én rad per påmelding, og viser gjeldende og endelig vurdering som vises i vurderingsoversikten for faget."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Denne testsiden inneholder vanlige UI elementer i Canvas for å hjelpe deg å bygge din egendefinerte merkevare. Når du begynner å gjøre endringer i fargeverdiene og bilder i venstre sidemeny, vil du se en * forhåndsvise endringene * knapp. Klikk på den for å oppdatere denne siden og se hvordan endringene ser ut."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Denne eksempelsiden inkluderer noen vanlige UI-elementer i Canvas for å hjelpe deg å bygge din tilpassede merkevare. Når du begynner å gjøre endringer av fargeverdier og bilder, ser du en *Forhåndsvis dine endringer*-knapp. Klikk på denne for å oppdatere siden og se hvordan endringene dine ser ut."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Dette seksjonstempoet vil bli fjernet og tempoet tilbakestilles til standard tempo."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Denne innstillingen påvirker bare din visning av elevvurderinger og viser vurderinger som om alle ikke vurderte oppgaver har vurderingen 0. Innstillingen er en visuell endring og påvirker ikke vurderingene til elever eller andre brukere i denne Vurderingsoversikten. Når denne innstillingen er aktivert, vil ikke Canvas ikke fylle ut nuller i Vurderingsoversikten for elevinnleveringer i individuelle oppgaver. Bare oppgavegruppene og de totale kolonnene vil automatisk faktorere inn nuller i den totale prosenten for hver elev."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Denne innstillingen endrer Canvas-opplevelsen for elever og lærere."
   this_settings_only_impact_enrollments_this_include_7f51358: "Denne innstillingen påvirker bare påmeldinger. Dette inkluderer objekter med et last_activity_at tidsstempel som er større enn parameteren Oppdatert etter. Er av som standard"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Dette elevtempoet vil bli fjernet og tempoet tilbakestilles til tidligere tildelt tempo."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Denne studentens innmelding har blitt fullført."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Denne elevens påmelding er avsluttet"
   this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: "Denne eleven fikk akkurat en uvanlig høy vurdering."
@@ -25525,6 +25581,7 @@ nb-x-k12:
   unregister_service_985238e9: "Fjern tjenesten"
   unreserved_e86b7425: Avreservert
   unsafe_file_link_8a18eceb: "usikker fil-lenke"
+  unsaved_change_eb23d452: "Ulagret endring"
   unselected_all_courses_99a9d35c: "Opphev alle åpne fag"
   unselected_course_course_89995a83: "Fag ikke valgt %{course}"
   unselected_external_tool_tool_1bd68403: "Ikke valgteeksterne verktøy %{tool}"
@@ -26807,6 +26864,9 @@ nb-x-k12:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Du kan ikke publisere mens du laster inn tempo"
   you_cannot_publish_while_loading_the_plan_685405e5: "Du kan ikke publisere mens du laster inn planen"
   you_cannot_publish_while_publishing_2f65264b: "Du kan ikke publisere mens du publiserer"
+  you_cannot_remove_a_locked_pace_150675e9: "Du kan ikke fjerne et låst tempo"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Du kan ikke fjerne tempoet mens det fremdeles lastes inn"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Du kan ikke fjerne tempoet mens det publiseres"
   you_cannot_remove_this_enrollment_c87be1cb: "Du  kan ikke fjerne denne fagpåmeldingen."
   you_cannot_remove_your_default_email_address_8ed68e52: "Du kan ikke fjerne din standard e-postadresse"
   you_cannot_save_while_there_are_errors_b86585e9: "Du kan ikke lagre når det er feil"
