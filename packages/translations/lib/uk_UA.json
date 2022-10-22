@@ -440,6 +440,9 @@
     "links_14b70841": {
         "message": "Посилання"
     },
+    "links_to_an_external_site_de74145d": {
+        "message": "Посилання на зовнішній сайт."
+    },
     "load_more_a36f9cf9": {
         "message": "Завантажити більше"
     },
@@ -481,6 +484,12 @@
     },
     "media_af190855": {
         "message": "Носій інформації"
+    },
+    "minimize_file_preview_da911944": {
+        "message": "Згорнути попередній перегляд файлу"
+    },
+    "minimize_video_20aa554b": {
+        "message": "Зменшити відео"
     },
     "misc_3b692ea7": {
         "message": "Різне"
@@ -716,6 +725,9 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Дата та час, до якого це потрібно виконати"
     },
+    "the_document_preview_is_currently_being_processed__7d9ea135": {
+        "message": "Попередній перегляд документа в даний момент обробляється. Будь-ласка спробуйте пізніше."
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Матеріал в публічному домені"
     },
@@ -724,6 +736,9 @@
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "З цим елементом не пов''язані бали"
+    },
+    "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+        "message": "Цей документ не може бути показаний в Canvas."
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Це рівняння не можна перетворити у базовому режимі перегляду"

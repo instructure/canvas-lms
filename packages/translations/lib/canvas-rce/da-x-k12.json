@@ -471,6 +471,7 @@
   "nested_greater_than_d852e60d": { "message": "Indlejret større end" },
   "nested_less_than_27d17e58": { "message": "Indlejret mindre end" },
   "next_page_d2a39853": { "message": "Næste side" },
+  "no_changes_to_save_d29f6e91": { "message": "Ingen ændringer at gemme." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil valgt" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -546,7 +547,6 @@
   "precedes_196b9aef": { "message": "Kommer før" },
   "precedes_equal_20701e84": { "message": "Kommer før lig med" },
   "preformatted_d0670862": { "message": "Præformatteret" },
-  "pretty_html_editor_28748756": { "message": "Pænt HTML-redigeringsværktøj" },
   "preview_53003fd2": { "message": "Eksempel" },
   "preview_in_overlay_ed772c46": { "message": "Overlejret forhåndsvisning" },
   "preview_inline_9787330": { "message": "Indbygget forhåndsvisning" },
@@ -566,7 +566,6 @@
   "quaternions_877024e0": { "message": "Kvaternioner" },
   "quizzes_7e598f57": { "message": "Quizzer" },
   "rational_numbers_80ddaa4a": { "message": "Rationelle tal" },
-  "raw_html_editor_e3993e41": { "message": "Rå HTML-editor" },
   "real_numbers_7c99df94": { "message": "Reelle tal" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Reel del (af komplekst tal)"
@@ -847,7 +846,6 @@
   "view_ba339f93": { "message": "Vis" },
   "view_description_30446afc": { "message": "Vis beskrivelse" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Se tastaturgenveje" },
-  "view_predefined_colors_92f5db39": { "message": "Se foruddefinerede farver" },
   "view_title_description_67940918": { "message": "Vis { title } beskrivelse" },
   "white_87fa64fd": { "message": "Hvid" },
   "width_492fec76": { "message": "Bredde" },

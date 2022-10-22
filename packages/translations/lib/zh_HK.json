@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "下一頁"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "沒有要儲存的變更。"
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "無指定截止日期"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "已預先格式化"
     },
-    "pretty_html_editor_28748756": {
-        "message": "美觀 HTML 編輯器"
-    },
     "preview_53003fd2": {
         "message": "預覽"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "有理數"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "原始 HTML 編輯器"
     },
     "real_numbers_7c99df94": {
         "message": "實數"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "檢視下一周"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "檢視預定義的顏色"
     },
     "view_previous_week_6f83849f": {
         "message": "檢視上一周"

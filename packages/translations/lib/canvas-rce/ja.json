@@ -463,6 +463,7 @@
   "nested_greater_than_d852e60d": { "message": "ネストされた＞" },
   "nested_less_than_27d17e58": { "message": "ネストされた＜" },
   "next_page_d2a39853": { "message": "次のページ" },
+  "no_changes_to_save_d29f6e91": { "message": "保存する変更はありません。" },
   "no_e16d9132": { "message": "いいえ" },
   "no_file_chosen_9a880793": { "message": "ファイルが選択されていません" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -542,7 +543,6 @@
   "precedes_196b9aef": { "message": "優先・先導する" },
   "precedes_equal_20701e84": { "message": "優先・同等" },
   "preformatted_d0670862": { "message": "フォーマット済み" },
-  "pretty_html_editor_28748756": { "message": "Pretty HTML エディタ" },
   "preview_53003fd2": { "message": "プレビュー" },
   "preview_in_overlay_ed772c46": { "message": "オーバーレイでのプレビュー" },
   "preview_inline_9787330": { "message": "インラインでのプレビュー" },
@@ -562,7 +562,6 @@
   "quaternions_877024e0": { "message": "四元数" },
   "quizzes_7e598f57": { "message": "小テスト" },
   "rational_numbers_80ddaa4a": { "message": "有理数" },
-  "raw_html_editor_e3993e41": { "message": "無変換の HTML エディタ" },
   "real_numbers_7c99df94": { "message": "実数" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "（複素数の）実数部分"
@@ -831,7 +830,6 @@
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "キーボードのショートカットを見る"
   },
-  "view_predefined_colors_92f5db39": { "message": "定義済みカラーの表示" },
   "view_title_description_67940918": { "message": "{ title }説明の表示" },
   "white_87fa64fd": { "message": "ホワイト" },
   "width_492fec76": { "message": "幅" },

@@ -97,6 +97,9 @@
   "light_blue_5374f600": { "message": "آبی روشن" },
   "link_7262adec": { "message": "پیوند" },
   "links_14b70841": { "message": "پیوندها" },
+  "links_to_an_external_site_de74145d": {
+    "message": "به یک تارنمای بیرونی پیوند می شود."
+  },
   "loading_25990131": { "message": "در حال بارگذاری..." },
   "loading_bde52856": { "message": "در حال بارگذاری" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
@@ -104,6 +107,8 @@
   "locked_762f138b": { "message": "قفل شده" },
   "magenta_4a65993c": { "message": "ارغوانی" },
   "media_af190855": { "message": "رسانه" },
+  "minimize_file_preview_da911944": { "message": "کمینه کردن پیش نمایش فایل" },
+  "minimize_video_20aa554b": { "message": "کمینه کردن تصویر" },
   "misc_3b692ea7": { "message": "متفرقه" },
   "modules_c4325335": { "message": "ماژول ها" },
   "my_files_2f621040": { "message": "فایل های من" },
@@ -126,6 +131,7 @@
   "people_b4ebb13c": { "message": "افراد" },
   "percentage_34ab7c2c": { "message": "درصد" },
   "pink_68ad45cb": { "message": "صورتی" },
+  "play_media_comment_35257210": { "message": "پخش نظر رسانه ای" },
   "preview_53003fd2": { "message": "پیش‌نمایش" },
   "previous_page_928fc112": { "message": "صفحه قبل" },
   "published_c944a23d": { "message": "منتشر شده" },
@@ -151,14 +157,23 @@
   "syllabus_f191f65b": { "message": "سرفصل" },
   "teal_f729a294": { "message": "سبز مایل به آبی" },
   "text_7f4593da": { "message": "متن" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "پیش نمایش سند در حال پردازش است. لطفا بعدا دوباره تلاش کنید."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "مطلب در دامنه عمومی است"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "مطلب تحت مجوز کریتیو کامنز است"
   },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "این سند نمی تواند در کانواس نمایش داده شود."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "این معادله را نمی توان در نمای اصلی ارائه داد."
+  },
+  "this_image_is_currently_unavailable_25c68857": {
+    "message": "این تصویر در حال حاضر در دسترس نیست"
   },
   "title_ee03d132": { "message": "عنوان" },
   "toggle_tooltip_d3b7cb86": { "message": "تغییر ابزار راهنما" },

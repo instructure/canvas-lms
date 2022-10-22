@@ -55,11 +55,16 @@
   "keyboard_shortcuts_ed1844bd": { "message": "키보드 단축키" },
   "link_7262adec": { "message": "Link" },
   "links_14b70841": { "message": "링크" },
+  "links_to_an_external_site_de74145d": {
+    "message": "외부 사이트로 연결합니다."
+  },
   "loading_25990131": { "message": "로드하는 중..." },
   "loading_bde52856": { "message": "로드 중" },
   "loading_failed_b3524381": { "message": "Loading failed..." },
   "locked_762f138b": { "message": "잠김" },
   "media_af190855": { "message": "미디어" },
+  "minimize_file_preview_da911944": { "message": "파일 미리 보기 최소화" },
+  "minimize_video_20aa554b": { "message": "비디오 최소화" },
   "misc_3b692ea7": { "message": "기타" },
   "modules_c4325335": { "message": "모듈" },
   "my_files_2f621040": { "message": "내 파일" },
@@ -83,6 +88,9 @@
   "star_8d156e09": { "message": "별표 표시" },
   "submit_a3cc6859": { "message": "제출" },
   "syllabus_f191f65b": { "message": "요강" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "문서 미리 보기를 처리 중입니다. 나중에 다시 시도하시기 바랍니다."
+  },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "이 수식은 기본 뷰에 렌더링할 수 없습니다."
   },

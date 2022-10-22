@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Pwochen Paj"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Pa gen chanjman pou sovgade."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Pa gen Delè"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Prefòmate"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Bèl editè HTML"
-    },
     "preview_53003fd2": {
         "message": "Apèsi"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Nonm Rasyonèl"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Editè HTML Brit"
     },
     "real_numbers_7c99df94": {
         "message": "Nonm Reyèl"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Afiche semenn pwochen"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Afiche koulè predefini yo"
     },
     "view_previous_week_6f83849f": {
         "message": "Afiche semenn pase"
