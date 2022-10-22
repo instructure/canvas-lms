@@ -16,21 +16,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import _ from 'underscore'
-import ModuleFile from '@canvas/files/backbone/models/ModuleFile'
-import PublishCloud from '@canvas/files/react/components/PublishCloud'
+import $ from 'jquery'
 import ModuleDuplicationSpinner from '../react/ModuleDuplicationSpinner'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {reorderElements, renderTray} from '@canvas/move-item-tray'
-import PublishableModuleItem from '../backbone/models/PublishableModuleItem'
-import PublishIconView from '@canvas/publish-icon-view'
 import LockIconView from '@canvas/lock-icon'
 import MasterCourseModuleLock from '../backbone/models/MasterCourseModuleLock'
 import ModuleFileDrop from '@canvas/context-module-file-drop'
 import INST from 'browser-sniffer'
 import {useScope as useI18nScope} from '@canvas/i18n'
-import $ from 'jquery'
 import Helper from './context_modules_helper'
 import CyoeHelper from '@canvas/conditional-release-cyoe-helper'
 import ContextModulesView from '../backbone/views/context_modules.coffee' /* handles the publish/unpublish state */
@@ -64,29 +59,18 @@ import DirectShareUserModal from '@canvas/direct-sharing/react/components/Direct
 import mathml from 'mathml'
 import {addDeepLinkingListener} from '@canvas/deep-linking/DeepLinking'
 import ExternalToolModalLauncher from '@canvas/external-tools/react/components/ExternalToolModalLauncher'
+import {
+  initPublishButton,
+  onContainerOverlapped,
+  overrideModel,
+  prerequisitesMessage,
+  refreshDuplicateLinkStatus,
+  scrollTo,
+  setExpandAllButton,
+  updateProgressionState,
+} from './utils'
 
 const I18n = useI18nScope('context_modulespublic')
-
-function scrollTo($thing, time = 500) {
-  if (!$thing || $thing.length === 0) return
-  $('html, body').animate(
-    {
-      scrollTop: $thing.offset().top,
-    },
-    time
-  )
-}
-
-function refreshDuplicateLinkStatus($module) {
-  if (
-    !$module.find('.context_module_item.quiz').length &&
-    !$module.find('.cannot-duplicate').length
-  ) {
-    $module.find('.duplicate_module_menu_item').removeAttr('hidden')
-  } else {
-    $module.find('.duplicate_module_menu_item').attr('hidden', true)
-  }
-}
 
 // TODO: AMD don't export global, use as module
 /* global modules */
@@ -100,7 +84,7 @@ window.modules = (function () {
       for (let idx = 0; idx < classes.length; idx++) {
         if (classes[idx].match(/^indent_/)) {
           const new_indent = parseInt(classes[idx].substring(7), 10)
-          if (!isNaN(new_indent)) {
+          if (!Number.isNaN(Number(new_indent))) {
             indent = new_indent
           }
         }
@@ -140,7 +124,7 @@ window.modules = (function () {
             $('#context_module_' + module.context_module.id).triggerHandler('update', module)
           }
         },
-        data => {
+        _data => {
           $('#context_modules').loadingImage('remove')
         }
       )
@@ -171,7 +155,7 @@ window.modules = (function () {
             }
             $module.find('.context_module_items.ui-sortable').sortable('enable')
           },
-          data => {
+          _data => {
             $module.find('.content').loadingImage('remove')
             $module
               .find('.content')
@@ -209,7 +193,7 @@ window.modules = (function () {
           const progressionsFinished = function () {
             if (!$('#context_modules').hasClass('editable')) {
               $('#context_modules .context_module').each(function () {
-                modules.updateProgressionState($(this))
+                updateProgressionState($(this))
               })
             }
             if (callback) {
@@ -217,7 +201,7 @@ window.modules = (function () {
             }
           }
           let progressionCnt = 0
-          var nextProgression = function () {
+          const nextProgression = function () {
             const data = progressions.shift()
             if (!data) {
               progressionsFinished()
@@ -441,7 +425,7 @@ window.modules = (function () {
       const no_items = $module.find('.content .context_module_item').length === 0
       $form
         .find('.prerequisites_list .criteria_list')
-        .showIf(prerequisites.length != 0)
+        .showIf(prerequisites.length !== 0)
         .end()
         .find('.add_prerequisite_link')
         .showIf(has_predecessors)
@@ -728,105 +712,6 @@ window.modules = (function () {
       delete result.visited
       return result
     },
-    updateProgressionState($module) {
-      const id = $module.attr('id').substring(15)
-      const $progression = $('#current_user_progression_list .progression_' + id)
-      const data = $progression.getTemplateData({
-        textValues: ['context_module_id', 'workflow_state', 'collapsed', 'current_position'],
-      })
-      var $module = $('#context_module_' + data.context_module_id)
-      let progression_state = data.workflow_state
-      const progression_state_capitalized =
-        progression_state &&
-        progression_state.charAt(0).toUpperCase() + progression_state.substring(1)
-
-      $module.addClass(progression_state)
-
-      // Locked tooltip title is added in _context_module_next.html.erb
-      if (progression_state != 'locked' && progression_state != 'unlocked') {
-        $module.find('.completion_status i:visible').attr('title', progression_state_capitalized)
-      }
-
-      if (progression_state === 'completed' && !$module.find('.progression_requirement').length) {
-        // this means that there were no requirements so even though the workflow_state says completed, dont show "completed" because there really wasnt anything to complete
-        progression_state = ''
-      }
-      $module.fillTemplateData({data: {progression_state}})
-
-      let reqs_met = $progression.data('requirements_met')
-      if (reqs_met == null) {
-        reqs_met = []
-      }
-
-      let incomplete_reqs = $progression.data('incomplete_requirements')
-      if (incomplete_reqs == null) {
-        incomplete_reqs = []
-      }
-
-      $module.find('.context_module_item').each(function () {
-        const $mod_item = $(this)
-        const position = parseInt(
-          $mod_item.getTemplateData({textValues: ['position']}).position,
-          10
-        )
-        if (data.current_position && position && data.current_position < position) {
-          $mod_item.addClass('after_current_position')
-        }
-        // set the status icon
-        const $icon_container = $mod_item.find('.module-item-status-icon')
-        const mod_id = $mod_item.getTemplateData({textValues: ['id']}).id
-
-        const completed = _.some(
-          reqs_met,
-          // eslint-disable-next-line eqeqeq
-          req => req.id == mod_id && $mod_item.hasClass(req.type + '_requirement')
-        )
-        if (completed) {
-          $mod_item.addClass('completed_item')
-          addIcon($icon_container, 'icon-check', I18n.t('Completed'))
-        } else if (progression_state === 'completed') {
-          // if it's already completed then don't worry about warnings, etc
-          if ($mod_item.hasClass('progression_requirement')) {
-            addIcon($icon_container, 'no-icon', I18n.t('Not completed'))
-          }
-        } else if ($mod_item.data('past_due') != null) {
-          addIcon($icon_container, 'icon-minimize', I18n.t('This assignment is overdue'))
-        } else {
-          let incomplete_req = null
-          for (const idx in incomplete_reqs) {
-            // eslint-disable-next-line eqeqeq
-            if (incomplete_reqs[idx].id == mod_id) {
-              incomplete_req = incomplete_reqs[idx]
-            }
-          }
-          if (incomplete_req) {
-            if (incomplete_req.score != null) {
-              // didn't score high enough
-              addIcon(
-                $icon_container,
-                'icon-minimize',
-                I18n.t('You scored a %{score}.', {score: incomplete_req.score}) +
-                  ' ' +
-                  criterionMessage($mod_item) +
-                  '.'
-              )
-            } else {
-              // hasn't been scored yet
-              addIcon(
-                $icon_container,
-                'icon-info',
-                I18n.t('Your submission has not been graded yet')
-              )
-            }
-          } else if ($mod_item.hasClass('progression_requirement')) {
-            addIcon($icon_container, 'icon-mark-as-read', criterionMessage($mod_item))
-          }
-        }
-      })
-      if (data.collapsed === 'true') {
-        $module.addClass('collapsed_module')
-      }
-    },
     sortable_module_options: {
       connectWith: '.context_module_items',
       handle: '.move_item_link',
@@ -870,30 +755,6 @@ window.modules = (function () {
     },
   }
 })()
-
-var addIcon = function ($icon_container, css_class, message) {
-  const $icon = $('<i data-tooltip></i>')
-  $icon.attr('class', css_class).attr('title', message).attr('aria-label', message)
-  $icon_container.empty().append($icon)
-}
-
-var criterionMessage = function ($mod_item) {
-  if ($mod_item.hasClass('must_submit_requirement')) {
-    return I18n.t('Must submit the assignment')
-  } else if ($mod_item.hasClass('must_mark_done_requirement')) {
-    return I18n.t('Must mark as done')
-  } else if ($mod_item.hasClass('must_view_requirement')) {
-    return I18n.t('Must view the page')
-  } else if ($mod_item.hasClass('min_contribute_requirement')) {
-    return I18n.t('Must contribute to the page')
-  } else if ($mod_item.hasClass('min_score_requirement')) {
-    return I18n.t('Must score at least a %{score}', {
-      score: $mod_item.getTemplateData({textValues: ['min_score']}).min_score,
-    })
-  } else {
-    return I18n.t('Not yet completed')
-  }
-}
 
 const updatePrerequisites = function ($module, prereqs) {
   const $prerequisitesDiv = $module.find('.prerequisites')
@@ -954,11 +815,6 @@ const updateOtherPrerequisites = function (id, name) {
     }
   })
 }
-
-var prerequisitesMessage = function (list) {
-  return I18n.t('Prerequisites: %{list}', {list})
-}
-
 const newPillMessage = function ($module, requirement_count) {
   const $message = $module.find('.requirements_message')
 
@@ -974,8 +830,10 @@ const newPillMessage = function ($module, requirement_count) {
 }
 
 modules.initModuleManagement = function (duplicate) {
+  const moduleItems = {}
+
   // Create the context modules backbone view to manage the publish button.
-  const context_modules_view = new ContextModulesView({
+  new ContextModulesView({
     el: $('#content'),
     modules,
   })
@@ -1152,7 +1010,7 @@ modules.initModuleManagement = function (duplicate) {
           publishable: true,
         }
         const view = initPublishButton($publishIcon, publishData)
-        overrideModel(view.model, view)
+        overrideModel(moduleItems, relock_modules_dialog, view.model, view)
       }
       relock_modules_dialog.renderIfNeeded(data.context_module)
       $module.triggerHandler('update', data)
@@ -1227,7 +1085,7 @@ modules.initModuleManagement = function (duplicate) {
     const $select = $option.find('select.id')
     const $pre = $form.find('#criterion_blank_req').clone(true).removeAttr('id')
     $pre.find('.prereq_desc').remove()
-    const prereqs = modules.prerequisites()
+    modules.prerequisites()
     const $optgroups = {}
     $module
       .find('.content .context_module_item')
@@ -1484,7 +1342,7 @@ modules.initModuleManagement = function (duplicate) {
         $module.find('.context_module_items.ui-sortable').sortable('refresh')
         modules.updateAssignmentData()
       },
-      data => {}
+      _data => {}
     ).done(() => {
       if (elemID) {
         setTimeout(() => {
@@ -1526,7 +1384,7 @@ modules.initModuleManagement = function (duplicate) {
       })
       .fixDialogButtons()
   })
-  $('#edit_item_form .cancel_button').click(event => {
+  $('#edit_item_form .cancel_button').click(_event => {
     $('#edit_item_form').dialog('close')
   })
   $('#edit_item_form').formSubmit({
@@ -1540,7 +1398,7 @@ modules.initModuleManagement = function (duplicate) {
     success(data) {
       $(this).loadingImage('remove')
       const $module = $('#context_module_' + data.content_tag.context_module_id)
-      const $item = modules.addItemToModule($module, data.content_tag)
+      modules.addItemToModule($module, data.content_tag)
       $module.find('.context_module_items.ui-sortable').sortable('refresh')
       if (
         data.content_tag.content_id != 0 &&
@@ -1978,7 +1836,7 @@ modules.initModuleManagement = function (duplicate) {
       width: 400,
     })
   })
-  $('#add_context_module_form .cancel_button').click(event => {
+  $('#add_context_module_form .cancel_button').click(_event => {
     modules.hideEditModule(true)
   })
   requestAnimationFrame(function () {
@@ -1986,7 +1844,7 @@ modules.initModuleManagement = function (duplicate) {
     $('#context_modules .context_module_items').each(function () {
       $items.push($(this))
     })
-    var next = function () {
+    const next = function () {
       if ($items.length > 0) {
         const $item = $items.shift()
         const opts = modules.sortable_module_options
@@ -2028,99 +1886,7 @@ modules.initModuleManagement = function (duplicate) {
     }
 
     const view = initPublishButton($item.find('.publish-icon'), publishData)
-    overrideModel(view.model, view)
-  }
-
-  var onContainerOverlapped = function (event, sortableContainer, overlappingElement) {
-    const sortableContainerStart = sortableContainer?.position().top
-    const overlappingElementEnd = overlappingElement?.position().top + overlappingElement.height()
-    const isOverlapped = sortableContainerStart < overlappingElementEnd
-    // if the sortable container is overlapped by another element, the scroll should move when
-    // the draggable item is getting closer to the overlapping element
-    if (isOverlapped && event.pageY < overlappingElementEnd + 30) {
-      const scrollTo = window.scrollY - event.clientY * 0.05
-      $('html, body').scrollTop(scrollTo)
-    }
-  }
-
-  var initPublishButton = function ($el, data) {
-    data = data || $el.data()
-    if (data.moduleType === 'attachment') {
-      // Module isNew if it was created with an ajax request vs being loaded when the page loads
-      let moduleItem = {}
-
-      if (data.isNew) {
-        // Data will have content_details on the object
-        moduleItem = data || {}
-
-        // make sure styles are applied to new module items
-        $el.attr('data-module-type', 'attachment')
-      } else {
-        // retrieve preloaded content details for the file item
-        moduleItem = ENV.MODULE_FILE_DETAILS[parseInt(data.moduleItemId, 10)]
-      }
-
-      // Make sure content_details isn't empty. You don't want to break something.
-      moduleItem.content_details = moduleItem.content_details || {}
-
-      const file = new ModuleFile({
-        type: 'file',
-        id: moduleItem.content_id || moduleItem.id,
-        locked: moduleItem.content_details.locked,
-        hidden: moduleItem.content_details.hidden,
-        unlock_at: moduleItem.content_details.unlock_at,
-        lock_at: moduleItem.content_details.lock_at,
-        display_name: moduleItem.content_details.display_name,
-        thumbnail_url: moduleItem.content_details.thumbnail_url,
-        usage_rights: moduleItem.content_details.usage_rights,
-      })
-
-      file.url = function () {
-        return '/api/v1/files/' + this.id
-      }
-
-      const props = {
-        model: file,
-        togglePublishClassOn: $el.parents('.ig-row')[0],
-        userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files_edit,
-        usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
-        fileName: file.displayName(),
-      }
-
-      const Cloud = <PublishCloud {...props} />
-      ReactDOM.render(Cloud, $el[0])
-      return {model: file} // Pretending this is a backbone view
-    }
-
-    const model = new PublishableModuleItem({
-      module_type: data.moduleType,
-      content_id: data.contentId,
-      id: data.id,
-      module_id: data.moduleId,
-      module_item_id: data.moduleItemId,
-      module_item_name: data.moduleItemName,
-      course_id: data.courseId,
-      published: data.published,
-      publishable: data.publishable,
-      unpublishable: data.unpublishable,
-      publish_at: data.publishAt,
-    })
-
-    const viewOptions = {
-      model,
-      title: data.publishTitle,
-      el: $el[0],
-    }
-
-    const view = new PublishIconView(viewOptions)
-    const row = $el.closest('.ig-row')
-
-    if (data.published) {
-      row.addClass('ig-published')
-    }
-    // TODO: need to go find this item in other modules and update their state
-    view.render()
-    return view
+    overrideModel(moduleItems, relock_modules_dialog, view.model, view)
   }
 
   const initNewItemDirectShare = ($item, data) => {
@@ -2143,77 +1909,13 @@ modules.initModuleManagement = function (duplicate) {
     }
   }
 
-  const moduleItems = {}
-  const updateModuleItem = function (attrs, model) {
-    let i, item, parsedAttrs
-    const items = moduleItems[itemContentKey(attrs) || itemContentKey(model)]
-    if (items) {
-      for (i = 0; i < items.length; i++) {
-        item = items[i]
-        parsedAttrs = item.model.parse(attrs)
-        if (parsedAttrs.type === 'File') {
-          item.model.set({locked: !parsedAttrs.published})
-        } else {
-          item.model.set({published: parsedAttrs.published})
-          item.model.view.render()
-        }
-      }
-    }
-  }
-
-  const overrideModuleModel = function (model) {
-    const publish = model.publish,
-      unpublish = model.unpublish
-    model.publish = function () {
-      return publish.apply(model, arguments).done(data => {
-        if (data.publish_warning) {
-          $.flashWarning(I18n.t('Some module items could not be published'))
-        }
-
-        relock_modules_dialog.renderIfNeeded(data)
-        model.fetch({data: {include: 'items'}}).done(attrs => {
-          for (let i = 0; i < attrs.items.length; i++) updateModuleItem(attrs.items[i], model)
-        })
-      })
-    }
-    model.unpublish = function () {
-      return unpublish.apply(model, arguments).done(() => {
-        model.fetch({data: {include: 'items'}}).done(attrs => {
-          for (let i = 0; i < attrs.items.length; i++) updateModuleItem(attrs.items[i], model)
-        })
-      })
-    }
-  }
-  const overrideItemModel = function (model) {
-    const publish = model.publish,
-      unpublish = model.unpublish
-    model.publish = function () {
-      return publish.apply(model, arguments).done(attrs => {
-        updateModuleItem($.extend({published: true}, attrs), model)
-      })
-    }
-    model.unpublish = function () {
-      return unpublish.apply(model, arguments).done(attrs => {
-        updateModuleItem($.extend({published: false}, attrs), model)
-      })
-    }
-  }
-  var overrideModel = function (model, view) {
-    const contentKey = itemContentKey(model)
-    if (contentKey === null) overrideModuleModel(model)
-    else overrideItemModel(model)
-
-    moduleItems[contentKey] || (moduleItems[contentKey] = [])
-    moduleItems[contentKey].push({model, view})
-  }
-
   const parent = duplicate || $('#context_modules')
 
   parent.find('.publish-icon').each((index, el) => {
     const $el = $(el)
     if ($el.data('id')) {
       const view = initPublishButton($el)
-      overrideModel(view.model, view)
+      overrideModel(moduleItems, relock_modules_dialog, view.model, view)
     }
   })
 
@@ -2228,56 +1930,7 @@ modules.initModuleManagement = function (duplicate) {
   })
 }
 
-const content_type_map = {
-  page: 'wiki_page',
-  discussion: 'discussion_topic',
-  external_tool: 'context_external_tool',
-  sub_header: 'context_module_sub_header',
-}
-function itemContentKey(model) {
-  if (model === null) return null
-
-  const attrs = model.attributes || model
-  let content_type = $.underscore(attrs.module_type || attrs.type)
-  let content_id = attrs.content_id || attrs.id
-
-  content_type = content_type_map[content_type] || content_type
-
-  if (!content_type || content_type === 'module') {
-    return null
-  } else {
-    if (content_type === 'wiki_page') {
-      content_type = 'wiki_page'
-      content_id = attrs.page_url || attrs.id
-    } else if (
-      content_type === 'context_module_sub_header' ||
-      content_type === 'external_url' ||
-      content_type === 'context_external_tool'
-    ) {
-      content_id = attrs.id
-    }
-
-    return content_type + '_' + content_id
-  }
-}
-
-const setExpandAllButton = function () {
-  let someVisible = false
-  $('#context_modules .context_module .content').each(function () {
-    if ($(this).css('display') === 'block') {
-      someVisible = true
-    }
-  })
-  $('#expand_collapse_all').text(someVisible ? I18n.t('Collapse All') : I18n.t('Expand All'))
-  $('#expand_collapse_all').attr(
-    'aria-label',
-    someVisible ? I18n.t('Collapse All Modules') : I18n.t('Expand All Modules')
-  )
-  $('#expand_collapse_all').data('expand', !someVisible)
-  $('#expand_collapse_all').attr('aria-expanded', someVisible ? 'true' : 'false')
-}
-
-var toggleModuleCollapse = function (event) {
+function toggleModuleCollapse(event) {
   event.preventDefault()
   const expandCallback = null
   const collapse = $(this).hasClass('collapse_module_link') ? '1' : '0'
@@ -2332,10 +1985,10 @@ var toggleModuleCollapse = function (event) {
         }
         $module.find('.context_module_items.ui-sortable').sortable('refresh')
         toggle()
-        modules.updateProgressionState($module)
+        updateProgressionState($module)
       }
     },
-    data => {
+    _data => {
       $module.loadingImage('remove')
     }
   )
@@ -2343,6 +1996,7 @@ var toggleModuleCollapse = function (event) {
     toggle()
   }
 }
+
 // THAT IS THE END
 
 function moduleContentIsHidden(contentEl) {
@@ -2457,7 +2111,7 @@ $(document).ready(function () {
   // "k" and "up arrow" move the focus up between modules and module items
   if (!ENV.disable_keyboard_shortcuts) {
     const $document = $(document)
-    $document.keycodes('k up', event => {
+    $document.keycodes('k up', _event => {
       const params = {
         selectWhenModuleFocused: {
           item:
@@ -2475,7 +2129,7 @@ $(document).ready(function () {
     })
 
     // "j" and "down arrow" move the focus down between modules and module items
-    $document.keycodes('j down', event => {
+    $document.keycodes('j down', _event => {
       const params = {
         selectWhenModuleFocused: {
           item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
@@ -2572,7 +2226,6 @@ $(document).ready(function () {
   })
 
   // from context_modules/_content
-  const foundExpanded = false
   const collapsedModules = ENV.COLLAPSED_MODULES
   for (const idx in collapsedModules) {
     $('#context_module_' + collapsedModules[idx]).addClass('collapsed_module')
@@ -2585,7 +2238,7 @@ $(document).ready(function () {
     $('#context_modules_sortable_container').addClass('item-group-container--is-empty')
   }
   $contextModules.each(function () {
-    modules.updateProgressionState($(this))
+    updateProgressionState($(this))
   })
 
   setExpandAllButton()
