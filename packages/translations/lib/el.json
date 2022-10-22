@@ -266,6 +266,9 @@
     "links_14b70841": {
         "message": "Σύνδεσμοι"
     },
+    "links_to_an_external_site_de74145d": {
+        "message": "Σύνδεσμοι σε εξωτερική ιστοσελίδα."
+    },
     "load_more_a36f9cf9": {
         "message": "Φόρτωση περισσότερων"
     },
@@ -289,6 +292,12 @@
     },
     "media_af190855": {
         "message": "Δεδομένα"
+    },
+    "minimize_file_preview_da911944": {
+        "message": "Ελαχιστοποίηση Προεπισκόπησης Αρχείου"
+    },
+    "minimize_video_20aa554b": {
+        "message": "Ελαχιστοποίηση Βίντεο"
     },
     "misc_3b692ea7": {
         "message": "Διάφορα"
@@ -413,11 +422,17 @@
     "teal_f729a294": {
         "message": "Γαλαζοπράσινο"
     },
+    "the_document_preview_is_currently_being_processed__7d9ea135": {
+        "message": "<mrk mid=\"5994\" mtype=\"seg\">Η προεπισκόπηση του εγγράφου δημιουργείται αυτή τη στιγμή.</mrk> <mrk mid=\"5995\" mtype=\"seg\">Παρακαλώ δοκιμάστε ξανά αργότερα.</mrk>"
+    },
     "the_material_is_in_the_public_domain_279c39a3": {
         "message": "Το υλικό βρίσκεται στο δημόσιο domain"
     },
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
         "message": "Το υλικό φέρει άδεια Creative Commons"
+    },
+    "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+        "message": "Αυτό το έγγραφο δεν μπορεί να εμφανιστεί μέσα στο Canvas."
     },
     "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
         "message": "Αυτή η εξίσωση δεν είναι δυνατό να αναπαραχθεί στην Βασική Μορφή"

@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "Tudalen Nesaf"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "Dim newidiadau i’w cadw."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "Does dim Dyddiadau Erbyn wedi’u neilltuo"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "Wedi''i fformatio’n barod"
     },
-    "pretty_html_editor_28748756": {
-        "message": "Golygydd HTML Hardd"
-    },
     "preview_53003fd2": {
         "message": "Rhagolwg"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "Rhifau Rhesymegol"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "Golygydd HTML Crai"
     },
     "real_numbers_7c99df94": {
         "message": "Rhifau Go Iawn"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "Gweld yr wythnos nesaf"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "Gweld lliwiau wedi’u diffinio ymlaen llaw"
     },
     "view_previous_week_6f83849f": {
         "message": "Gweld yr wythnos flaenorol"

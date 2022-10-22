@@ -20,10 +20,25 @@
     "increase_indent_6af90f7c": {
         "message": "Увеличить отступ"
     },
+    "links_to_an_external_site_de74145d": {
+        "message": "Ссылки на внешний сайт."
+    },
+    "minimize_file_preview_da911944": {
+        "message": "Уменьшить просмотр файла"
+    },
+    "minimize_video_20aa554b": {
+        "message": "Уменьшить видео"
+    },
     "replace_e61834a7": {
         "message": "Заменить"
     },
     "reset_95a81614": {
         "message": "Сброс"
+    },
+    "the_document_preview_is_currently_being_processed__7d9ea135": {
+        "message": "Предварительный просмотр документа в данный момент обрабатывается. Повторите попытку позже."
+    },
+    "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+        "message": "Этот документ нельзя отобразить внутри Canvas."
     }
 }

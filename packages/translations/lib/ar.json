@@ -1352,6 +1352,9 @@
     "next_page_d2a39853": {
         "message": "الصفحة التالية"
     },
+    "no_changes_to_save_d29f6e91": {
+        "message": "لا توجد تغييرات للحفظ."
+    },
     "no_due_dates_assigned_e8f5bac8": {
         "message": "لم يتم تعيين تواريخ الاستحقاق"
     },
@@ -1574,9 +1577,6 @@
     "preformatted_d0670862": {
         "message": "منسق مسبقًا"
     },
-    "pretty_html_editor_28748756": {
-        "message": "محرر HTML الأنيق"
-    },
     "preview_53003fd2": {
         "message": "معاينة"
     },
@@ -1636,9 +1636,6 @@
     },
     "rational_numbers_80ddaa4a": {
         "message": "أعداد جذرية"
-    },
-    "raw_html_editor_e3993e41": {
-        "message": "محرر HTML الأولي"
     },
     "real_numbers_7c99df94": {
         "message": "أعداد حقيقية"
@@ -2290,9 +2287,6 @@
     },
     "view_next_week_7f61f755": {
         "message": "عرض الأسبوع القادم"
-    },
-    "view_predefined_colors_92f5db39": {
-        "message": "عرض الألوان المحددة مسبقًا"
     },
     "view_previous_week_6f83849f": {
         "message": "عرض الأسبوع السابق"
