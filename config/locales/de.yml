@@ -85,7 +85,7 @@ de:
     move_to: "Verschieben in"
   EditRubricPage: 
     titles: 
-      find_outcomes: "Lernziele suchen"
+      find_outcomes: "Lernergebnisse suchen"
   EditorToggle: 
     done: 
       title: "Klicken, um die Bearbeitung des Rich-Text-Bereichs abzuschließen"
@@ -317,7 +317,7 @@ de:
     tab_grading_standards: Benotung
     tab_jobs: Aufträge
     tab_jobs_v2: "Jobs v2"
-    tab_outcomes: Lernziele
+    tab_outcomes: Lernergebnisse
     tab_permissions: Berechtigungen
     tab_plugins: Plug-ins
     tab_question_banks: Fragenpools
@@ -1102,6 +1102,19 @@ de:
           description: 
             text: "Dieser Bericht zeigt die abschließenden Notenergebnisse für alle Studierende in einem bestimmten Semester. Die daraus resultierende CSV-Datei enthält jeweils eine Zeile pro Einschreibung und zeigt die aktuelle und die Abschlussnote, die im Kursnotenbuch angezeigt wird."
     group_type: Gruppe
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Kurse
+              order: 
+                label: Auftrag
+              outcome: 
+                radio: Lernergebnisse
+              user: 
+                radio: Benutzer\*innen
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1201,7 +1214,7 @@ de:
           order: 
             label: Reihenfolge
           outcome: 
-            radio: Lernziele
+            radio: Lernergebnisse
           user: 
             radio: Benutzer\*innen
     ph_student_grades_csv_parameters: 
@@ -1463,6 +1476,7 @@ de:
         help_link_text: "Text, der statt des Links angezeigt wird"
         help_link_url: URL
         include_students_in_global_survey: "Studierenden in globale Umfragen einbeziehen"
+        kill_joy: "Verstecktes Spiel von der 404-Seite entfernen"
         limit_parent_app_web_access: "Beschränken des Zugriffs auf das Canvas-Netz in der übergeordneten Canvas-App"
         lock_all_announcements: "Kommentare zu Ankündigungen deaktivieren"
         locked: "Diese Einstellung für Sub-Accounts und Kurse sperren"
@@ -1774,7 +1788,7 @@ de:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: Kurs-IDs
+                header: Kurs-SIS-IDs
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -1931,7 +1945,7 @@ de:
   add_additional_comments_ec34a62f: "Zusätzliche Kommentare hinzufügen"
   add_alert_b2729c99: "Warnung hinzufügen"
   add_all_other_course_content_97c552b2: "Alle sonstigen Kursinhalte hinzufügen"
-  add_all_outcomes_6a12d08e: "Alle Lernziele hinzufügen"
+  add_all_outcomes_6a12d08e: "Alle Lernergebnisse hinzufügen"
   add_an_assignment_fb73942e: "Eine Aufgabe hinzufügen"
   add_an_attachment_b2e9092f: "Anhang hinzufügen"
   add_an_identity_provider_to_this_account_c2644478: "Zu diesem Konto einen Identitätsanbieter hinzufügen:"
@@ -2036,11 +2050,11 @@ de:
   add_old_quiz_f4c546a: "Altes Quiz hinzufügen"
   add_other_calendar_c958e761: "Anderen Kalender hinzufügen"
   add_outcome_597054ad: "Lernziel hinzufügen"
-  add_outcome_title_ce9dff87: "Lernziel %{title} hinzufügen"
-  add_outcomes_36272787: "Lernziele hinzufügen"
-  add_outcomes_to_account_4647776f: "Lernziele zum Konto hinzufügen"
-  add_outcomes_to_course_88ba09be: "Lernziele zum Kurs hinzufügen"
-  add_outcomes_to_groupname_8c33d118: "Lernziele zu %{groupName} hinzufügen"
+  add_outcome_title_ce9dff87: "Lernergebnis %{title} hinzufügen"
+  add_outcomes_36272787: "Lernergebnisse hinzufügen"
+  add_outcomes_to_account_4647776f: "Lernergebnisse zum Konto hinzufügen"
+  add_outcomes_to_course_88ba09be: "Lernergebnisse zum Kurs hinzufügen"
+  add_outcomes_to_groupname_8c33d118: "Lernergebnisse zu %{groupName} hinzufügen"
   add_override_da70f198: "Außerkraftsetzen hinzufügen"
   add_people_7948b7da: "Personen hinzufügen"
   add_people_7ee4b2ec: "Personen hinzufügen"
@@ -2096,7 +2110,7 @@ de:
   added_e8a39b2: Hinzugefügt
   added_mastery_level_dd4792d1: "Leistungszielstufe hinzugefügt"
   added_new_proficiency_rating_e30cab8a: "Neue Kompetenzeinstufung hinzugefügt"
-  added_outcome_title_3c258a9: "Lernziel %{title} hingefügt"
+  added_outcome_title_3c258a9: "Lernergebnis %{title} hingefügt"
   adding_rss_feed_f1202567: "RSS-Feed hinzufügen"
   adding_to_library_b552868: "Hinzufügen zur Bibliothek"
   additional_comments_9aed10bb: "Zusätzliche Kommentare"
@@ -2207,8 +2221,8 @@ de:
       recipients: "Warnung senden an"
       repetition_description: "Warnung alle %{count} Tage bis zur Lösung senden."
     alerts: 
-      alerts_description_account: "Für jede\\*n Studierende\\*n, der alle Kriterien erfüllt, wird eine Warnung generiert. Die Überprüfung erfolgt täglich und bis zur Behebung des Problems werden Benachrichtigungen an die/den Studierende\\*n, die/den Lehrende\\*n und/oder den/die Kontoadministrator\\*in versendet."
-      alerts_description_course: "Für jede\\*n Studierende\\*n, der alle Kriterien erfüllt, wird eine Warnung generiert. Sie werden jeden Tag abgefragt, und Studierenden und/oder Lehrenden werden Benachrichtigungen gesendet, bis das auslösende Problem gelöst ist."
+      alerts_description_account: "Für jede\\*n Studierende\\*n, der/die alle Kriterien erfüllt, wird eine Warnung generiert. Die Überprüfung erfolgt täglich und bis zur Behebung des Problems werden Benachrichtigungen an die/den Studierende\\*n, die/den Lehrende\\*n und/oder den/die Kontoadministrator\\*in versendet."
+      alerts_description_course: "Für jede\\*n Studierende\\*n, der/die alle Kriterien erfüllt, wird eine Warnung generiert. Sie werden jeden Tag abgefragt, und Studierenden und/oder Lehrenden werden Benachrichtigungen gesendet, bis das auslösende Problem gelöst ist."
       buttons: 
         add_alert: Warnung
       description: "Ein/e Lehrende\\*r hat mit der/dem Studierenden seit %{count} Tagen nicht interagiert."
@@ -2268,7 +2282,7 @@ de:
   all_grading_periods_must_have_a_title_a1a38d87: "Alle Benotungszeiträume müssen einen Titel haben"
   all_group_outcomes_25936010: "Alle Gruppenlernziele"
   all_groups_cea25817: "Alle Gruppen"
-  all_grouptitle_outcomes_dcc565d1: "Alle %{groupTitle}-Lernziele"
+  all_grouptitle_outcomes_dcc565d1: "Alle %{groupTitle}-Lernergebnisse"
   all_image_types_allowed_9c65004d: "Alle zulässigen Bildtypen"
   all_in_e5ddaee0: Alles
   all_items_a49b66c7: "Alle Elemente"
@@ -2278,10 +2292,10 @@ de:
   all_modules_20c9a1c8: "Alle Module"
   all_my_files_a0213441: "Alle meine Dateien"
   all_my_sections_375248b3: "Alle meine Abschnitte"
-  all_outcomes_9f338636: "Alle Lernziele"
-  all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle %{groupTitle} Lernziele wurden zu diesem Kurs hinzugefügt."
-  all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle Lernziele von %{groupTitle} wurden zu %{targetGroupTitle} hinzugefügt."
-  all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle Lernziele von %{groupTitle} wurden zu diesem Konto hinzugefügt."
+  all_outcomes_9f338636: "Alle Lernergebnisse"
+  all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "Alle %{groupTitle} Lernergebnisse wurden zu diesem Kurs hinzugefügt."
+  all_outcomes_from_grouptitle_have_been_successfull_6267efe4: "Alle Lernergebnisse von %{groupTitle} wurden zu %{targetGroupTitle} hinzugefügt."
+  all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "Alle Lernergebnisse von %{groupTitle} wurden zu diesem Konto hinzugefügt."
   all_quiz_submissions_9519d342: "Alle Testabgaben"
   all_quiz_submissions_report_72a6d2fa: "Bericht über alle Quiz-Abgaben"
   all_roles_f3bba14d: "Alle Rollen"
@@ -2401,10 +2415,10 @@ de:
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Ermöglicht es, Hilfelinks als Ausgewählt oder Neu zu markieren und zeigt die ausgewählten Hilfelinks im Hilfe-Menü an prominenter Stelle an."
   allows_instructors_to_apply_scores_to_ungraded_sub_7e772795: "Ermöglicht Kursleitern, unbenotete Abgaben massenhaft zu benoten."
   allows_instructors_to_apply_scores_to_ungraded_sub_999e34dd: "Ermöglicht es Lehrenden, unbenotete Abgaben in den Spaltenmenüs „Aufgabengruppe“ und „Gesamt“ im Notenbuch gemeinsam zu bewerten."
-  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Ermöglicht die Auswahl von Lernzielen bei der Migration von Kursinhalten"
+  allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Ermöglicht die Auswahl von Lernergebnissen bei der Migration von Kursinhalten"
   allows_modifying_notification_settings_for_any_cou_5004ac71: "Ermöglicht die Änderung der Einstellungen für Benachrichtigungen für jeden Kurs auf der Seite der Benachrichtigungseinstellungen auf Kontoebene."
-  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Ermöglicht die Anzeige von im Lernziele-Service gespeicherten Ergebnisdaten in Canvas-Berichten (LMGB-, sLMGB- und ergebnisbezogene Administratorberichte)."
-  allows_setting_account_course_level_mastery_scales_1939e0fd: "Ermöglicht, Leistungszielmaßstäbe und Berechnungsmethoden auf Konto- und Kursebene festzulegen, die die lernzielbezogenen Einstufungen und Berechnungsmethoden nach Lernzielkriterium ersetzen"
+  allows_result_data_stored_in_the_outcomes_service__69c12c18: "Ermöglicht die Anzeige von im Lernergebnisse-Service gespeicherten Ergebnisdaten in Canvas-Berichten (LMGB-, sLMGB- und ergebnisbezogene Administratorberichte)."
+  allows_setting_account_course_level_mastery_scales_1939e0fd: "Ermöglicht, Leistungszielmaßstäbe und Berechnungsmethoden auf Konto- und Kursebene festzulegen, die die lernergebnisbezogenen Einstufungen und Berechnungsmethoden nach Lernergebniskriterium ersetzen"
   allows_setting_criterion_ratings_and_calculation_m_24542321: "Erlaubt die Einstellung von Kriterieneinstufungen und Optionen der Berechnungsmethoden für einzelne Lernziele."
   allows_students_to_access_other_student_groups_wit_43918810: "Erlaubt Teilnehmern, innerhalb eines Gruppensets mit einem direkten Link auf andere studentische Gruppen zuzugreifen."
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Ermöglicht die Synchronisierung von Canvas-Kursteilnehmern mit einem Microsoft-Team"
@@ -2615,7 +2629,7 @@ de:
       Erlaubt dem Benutzer, von Studenten erstellte Kursgruppen anzuzeigen, zu bearbeiten und zu löschen.
   allows_user_to_create_edit_and_delete_course_rubri_493ac58f: "Erlaubt dem/der Benutzer\\*in, Bewertungsschemata für den Kurs zu erstellen, zu bearbeiten und zu löschen."
   allows_user_to_create_edit_and_delete_course_rubri_92b58f29: "Erlaubt dem Benutzer, Kurs-Bewertungsschemata im Link „Bewertungsschemata“ zu erstellen, zu bearbeiten und zu löschen."
-  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: "Erlaubt dem/der Benutzer\\*in, auf der Konto und der Kursebene, Lernziele und Lernzielgruppen zu erstellen, zu ändern und zu löschen."
+  allows_user_to_create_edit_and_delete_outcomes_and_162c9ece: "Erlaubt dem/der Benutzer\\*in, auf der Konto und der Kursebene, Lernergebnisse und Lernergebnisgruppen zu erstellen, zu ändern und zu löschen."
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: "Erlaubt dem/der Benutzer\\*in, auf Kursebene Ergebnisse und Ergebnisgruppen zu erstellen, zu bearbeiten und zu löschen."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "Erlaubt dem/der Benutzer\\*in, Bewertungsschemata zu erstellen, zu bearbeiten und zu löschen."
   allows_user_to_create_import_edit_and_delete_outco_472c842e: |-
@@ -2723,9 +2737,9 @@ de:
   allows_user_to_generate_login_logout_activity_repo_bba62f2: "Erlaubt dem/der Benutzer\\*in, in Admin-Tools einen An-/Abmeldebericht zu generieren."
   allows_user_to_generate_login_logout_activity_repo_e03fb94f: "Erlaubt dem Benutzer, in Admin-Tools einen An-/Abmeldebericht zu generieren. (Auf der Unterkontoebene nicht verfügbar.)"
   allows_user_to_import_a_zip_file_97bd7db2: "Erlaubt dem/der Benutzer\\*in, eine Zip-Datei zu importieren."
-  allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Erlaubt dem/der Benutzer\\*in, Lernziele des Kontos zu importieren."
+  allows_user_to_import_account_learning_outcomes_f6f6d0b9: "Erlaubt dem/der Benutzer\\*in, Lernergebnisse des Kontos zu importieren."
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "Erlaubt dem/der Benutzer\\*in, mit dem Kursimport-Tool Inhalte zu importieren."
-  allows_user_to_import_course_learning_outcomes_2ca3f18f: "Erlaubt dem/der Benutzer\\*in, Lernziele des Kurses zu importieren."
+  allows_user_to_import_course_learning_outcomes_2ca3f18f: "Erlaubt dem/der Benutzer\\*in, Lernergebnisse des Kurses zu importieren."
   allows_user_to_import_learning_outcomes_17fce84a: "Erlaubt dem Benutzer, Lernergebnisse zu importieren."
   allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "Erlaubt dem Benutzer, Lernergebnisse in Bewertungsschemata zu importieren."
   allows_user_to_import_resources_from_commons_into__255ad23: |-
@@ -2994,9 +3008,9 @@ de:
   allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Erlaubt dem/der Benutzer\\*in, die Schaltfläche „Neue Ankündigungen“ auf der Startseite zu sehen."
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Erlaubt dem Benutzer, die Schaltfläche „Neue Ankündigungen“ auf der Startseite zu sehen. Erlaubt dem Benutzer, Ankündigungen auf der Ankündigungsseite hinzuzufügen."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Erlaubt dem Benutzer, das neue Notenbuch zu sehen."
-  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernzieleberechnung“ anzuzeigen und die Berechnungen des Kenntnisstands auf Kursebene festzulegen."
-  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernzieleberechnung“ anzuzeigen und die Berechnungen des Kenntnisstands auf Konto- und Kursebene festzulegen."
-  allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernzieleberechnung“ auf Konto- und Kursebene anzuzeigen."
+  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernergebnisseberechnung“ anzuzeigen und die Berechnungen des Kenntnisstands auf Kursebene festzulegen."
+  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernergebnisseberechnung“ anzuzeigen und die Berechnungen des Kenntnisstands auf Konto- und Kursebene festzulegen."
+  allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Lernergebnisseberechnung“ auf Konto- und Kursebene anzuzeigen."
   allows_user_to_view_the_outcomes_mastery_tab_and_s_a93a23d2: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Kenntnisstand“ anzuzeigen und die Kenntnisstandsskalen auf Konto- und Kursebene festzulegen."
   allows_user_to_view_the_outcomes_mastery_tab_and_s_d9626906: "Erlaubt dem/der Benutzer\\*in, die Registerkarte „Kenntnisstand“ anzuzeigen und die Kenntnisstandsskalen auf Kursebene festzulegen."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Erlaubt dem/der Benutzer\\*in, den Teilnehmer-Link in der Kursnavigation zu sehen."
@@ -3014,7 +3028,7 @@ de:
   allows_user_to_view_user_sis_ids_68a9d218: "Erlaubt dem/der Benutzer\\*in, die SIS-IDs von Benutzern anzuzeigen."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Erlaubt einem/einer Benutzer\\*in, die Benutzer-SIS-IDs auf der Seite „Kursteilnehmer\\*innen“ anzuzeigen."
   allows_user_to_weight_assignment_groups_95cb11b2: "Erlaubt dem Benutzer, Aufgabengruppen zu gewichten."
-  allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Erlaubt es Benutzern, in der Ansicht „Persönliches Leistungsziel-Notenbuch“ eine freundliche Beschreibung zu Lernzielen für Studierende und Eltern hinzuzufügen."
+  allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Erlaubt es Benutzern, in der Ansicht „Persönliches Leistungsziel-Notenbuch“ eine freundliche Beschreibung zu Lernergebnissen für Studierende und Eltern hinzuzufügen."
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Ermöglicht es Benutzern, Konferenzen aus dem Kalender hinzuzufügen"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Ermöglicht Benutzern das Hinzufügen von LTI-Werkzeugen conference_selection mit Platzierungstyp"
   allows_users_to_edit_conferences_2d3c960c: "Erlaubt es Benutzern, Konferenzen zu ändern."
@@ -3030,7 +3044,7 @@ de:
       Benutzern erlauben, Pronomen zu wählen, die nach
       Ihrem Namen auf der Benutzeroberfläche angezeigt werden.
   allows_users_to_save_and_search_frequently_used_fe_806f8999: "Ermöglicht Benutzern häufig verwendetes Feedback zur Verwendung in SpeedGrader in einer Kommentarbibliothek zu speichern und zu suchen."
-  allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Ermöglicht Benutzern die Verwendung des Durchschnitts als Berechnungsmethode für ein bestimmtes Lernziel."
+  allows_users_to_use_average_as_a_calulcation_metho_e5031470: "Ermöglicht Benutzern die Verwendung des Durchschnitts als Berechnungsmethode für ein bestimmtes Lernergebnis."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Erlaubt Benutzern mit int. Telefonnummern, Textnachrichten von Canvas zu erhalten."
   already_have_a_canvas_account_c4368ac9: "Sie haben bereits ein Canvas-Konto?"
   also_note_that_microsoft_teams_is_unable_to_suppor_20d8f753: "Beachten Sie auch, dass Microsoft Teams Kurse mit mehr als %{max_enrollments} Anmeldungen oder mehr als %{max_owners} Eigentümern nicht unterstützt. Falls Sie einen großen Kurs haben, können Synchronisationsprobleme auftreten, wenn diese Grenzwerte erreicht werden."
@@ -3107,30 +3121,31 @@ de:
   an_error_occurred_while_creating_this_outcome_54842fbd: "Beim Erstellen dieses Lernziels trat ein Fehler auf."
   an_error_occurred_while_creating_this_outcome_mess_31cdd04: "Beim Erstellen dieses Lernziels trat ein Fehler auf: %{message}"
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "Beim Erstellen dieses Lernziels trat ein Fehler auf: %{message}."
-  an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Beim Erstellen dieses Lernziels trat ein Fehler auf. Bitte versuchen Sie es noch einmal."
+  an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "Beim Erstellen dieses Lernergebniss trat ein Fehler auf. Bitte versuchen Sie es noch einmal."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Fehler beim Löschen von Ankündigungen"
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "Beim Löschen der Termingruppe ist ein Fehler aufgetreten"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "Bei der Bearbeitung dieser Gruppe ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
-  an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Bei der Bearbeitung dieses Lernziels ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
-  an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Beim Importieren dieser Lernziele trat ein Fehler auf."
-  an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "Beim Importieren dieser Lernziele trat ein Fehler auf: %{message}."
+  an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "Bei der Bearbeitung dieses Lernergebniss ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+  an_error_occurred_while_importing_these_outcomes_d4e6f13e: "Beim Importieren dieser Lernergebnisse trat ein Fehler auf."
+  an_error_occurred_while_importing_these_outcomes_m_6a8052d1: "Beim Importieren dieser Lernergebnisse trat ein Fehler auf: %{message}."
   an_error_occurred_while_importing_this_group_9aef7c30: "Beim Importieren dieser Gruppe trat ein Fehler auf."
   an_error_occurred_while_importing_this_group_messa_e0d98e2d: "Beim Importieren dieser Gruppe trat ein Fehler auf: %{message}."
-  an_error_occurred_while_importing_this_outcome_2ce488af: "Beim Importieren dieses Lernziels trat ein Fehler auf."
-  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Beim Importieren dieses Lernziels trat ein Fehler auf: %{message}."
-  an_error_occurred_while_loading_account_learning_o_29a11066: "Fehler beim Laden der Konto-Lernzielgruppen."
+  an_error_occurred_while_importing_this_outcome_2ce488af: "Beim Importieren dieses Lernergebniss trat ein Fehler auf."
+  an_error_occurred_while_importing_this_outcome_mes_25106dea: "Beim Importieren dieses Lernergebniss trat ein Fehler auf: %{message}."
+  an_error_occurred_while_loading_account_learning_o_29a11066: "Fehler beim Laden der Konto-Lernergebnisgruppen."
   an_error_occurred_while_loading_account_outcomes_8f337857: "Fehler beim Laden der Konto-Lernziele."
-  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Fehler beim Laden der Konto-Lernziele: %{error}"
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Fehler beim Laden der Konto-Lernergebnisse: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "Fehler beim Laden der Konto-Kompetenzeinstufungen: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "Fehler beim Laden der Konto-Kompetenzeinstufungen"
   an_error_occurred_while_loading_associations_9699b3ee: "Fehler beim Laden von Verknüpfungen"
   an_error_occurred_while_loading_changes_9851b56f: "Fehler beim Laden von Änderungen"
   an_error_occurred_while_loading_course_alignment_s_c1b9c33a: "Beim Laden der Ausrichtungsstatistik ist ein Fehler aufgetreten."
-  an_error_occurred_while_loading_course_learning_ou_c4053b06: "Fehler beim Laden der Kurs-Lernzielgruppen."
+  an_error_occurred_while_loading_course_learning_ou_c4053b06: "Fehler beim Laden der Kurs-Lernergebnisgruppen."
   an_error_occurred_while_loading_course_outcomes_320ccc44: "Fehler beim Laden der Kurs-Lernziele."
-  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Fehler beim Laden der Kurs-Lernziele: %{error}"
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Fehler beim Laden der Kurs-Lernergebnisse: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Fehler beim Laden von Kursen"
   an_error_occurred_while_loading_late_policies_c415f676: "Fehler beim Laden der Richlinien bei Verspätungen"
-  an_error_occurred_while_loading_outcome_alignments_5442d2d7: "Beim Laden der Lernzielausrichtungen ist ein Fehler aufgetreten."
+  an_error_occurred_while_loading_outcome_alignments_5442d2d7: "Beim Laden der Lernergebnisausrichtungen ist ein Fehler aufgetreten."
   an_error_occurred_while_loading_selected_group_8b80d3d5: "Fehler beim Laden der ausgewählten Gruppe."
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Fehler beim Laden der Leistungszielberechnung: %{error}"
   an_error_occurred_while_loading_the_mastery_scale__871f3531: "Fehler beim Laden des Leistungszielmaßstabs: %{error}"
@@ -3140,8 +3155,8 @@ de:
   an_error_occurred_while_making_a_network_request_544e2b7: "Während einer Netzwerkanforderung ist ein Fehler aufgetreten."
   an_error_occurred_while_migrating_405ac0b5: "Während der Migration ist ein Fehler aufgetreten."
   an_error_occurred_while_moving_these_outcomes_plea_208f372: 
-    one: "Beim Verschieben dieses Lernziels ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
-    other: "Beim Verschieben dieser Lernziele ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+    one: "Beim Verschieben dieses Lernergebniss ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+    other: "Beim Verschieben dieser Lernergebnisse ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
   an_error_occurred_while_moving_this_group_please_t_4f3baa9f: "Beim Verschieben dieser Gruppe ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
   an_error_occurred_while_performingsometask_errorme_d87d8197: "Ein Fehler ist aufgetreten, während %{performingSomeTask}: %{errorMessage}"
   an_error_occurred_while_removing_count_outcomes_15db8ce8: 
@@ -3154,10 +3169,10 @@ de:
   an_error_occurred_while_removing_the_outcome_e47c9553: "Beim Entfernen des Lernziels trat ein Fehler auf."
   an_error_occurred_while_removing_the_outcome_messa_1c9674a: "Fehler beim Entfernen des Lernziels: %{message}"
   an_error_occurred_while_removing_these_outcomes_pl_21f22da0: 
-    one: "Beim Entfernen dieses Lernziels ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
-    other: "Beim Entfernen dieser Lernziele ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+    one: "Beim Entfernen dieses Lernergebniss ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+    other: "Beim Entfernen dieser Lernergebnisse ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
   an_error_occurred_while_removing_this_group_97c8a9c: "Beim Entfernen dieser Gruppe trat ein Fehler auf."
-  an_error_occurred_while_removing_this_group_groupt_2c343304: "Beim Entfernen dieser Gruppe trat ein Fehler auf: „%{groupTitle}“ enthält ein oder mehrere Lernziele, die derzeit auf den Inhalt ausgerichtet sind."
+  an_error_occurred_while_removing_this_group_groupt_2c343304: "Beim Entfernen dieser Gruppe trat ein Fehler auf: „%{groupTitle}“ enthält ein oder mehrere Lernergebnisse, die derzeit auf den Inhalt ausgerichtet sind."
   an_error_occurred_while_removing_this_group_messag_19809d9a: "Beim Entfernen dieser Gruppe trat ein Fehler auf: %{message}"
   an_error_occurred_while_removing_this_group_messag_c15e0830: "Beim Entfernen dieser Gruppe trat ein Fehler auf: %{message}."
   an_error_occurred_while_removing_this_group_please_bd9407ff: "Beim Entfernen dieser Gruppe trat ein Fehler auf. Bitte versuchen Sie es noch einmal."
@@ -3166,6 +3181,7 @@ de:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "Fehler beim Speichern der Konto-Kompetenzeinstufungen: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Fehler beim Speichern von Verknüpfungen"
   an_error_occurred_while_saving_changes_b42c9b84: "Beim Speichern der Änderungen ist ein Fehler aufgetreten."
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "Beim Speichern der Termingruppe ist ein Fehler aufgetreten"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Fehler beim Speichern der Vergaberichtlinie für die Aufgabe."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Fehler beim Speichern der Vergaberichtlinie für den Kurs."
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Fehler beim Speichern des Leistungszielmaßstabs: %{message}"
@@ -3509,11 +3525,11 @@ de:
   archived_de543437: Archiviert
   are_you_sure_26795d3c: "Sind Sie sicher?"
   are_you_sure_that_you_want_to_remove_these_count_o_67ef2d6c: 
-    one: "Wollen Sie dieses Lernziel wirklich von Ihrem Konto entfernen?"
-    other: "Wollen Sie diese %{count} Lernziele wirklich von Ihrem Konto entfernen?"
+    one: "Wollen Sie dieses Lernergebnis wirklich von Ihrem Konto entfernen?"
+    other: "Wollen Sie diese %{count} Lernergebnisse wirklich von Ihrem Konto entfernen?"
   are_you_sure_that_you_want_to_remove_these_count_o_8ad349c4: 
-    one: "Wollen Sie dieses Lernziel wirklich aus dem Kurs entfernen?"
-    other: "Wollen Sie diese %{count} Lernziele wirklich aus dem Kurs entfernen?"
+    one: "Wollen Sie dieses Lernergebnis wirklich aus dem Kurs entfernen?"
+    other: "Wollen Sie diese %{count} Lernergebnisse wirklich aus dem Kurs entfernen?"
   are_you_sure_that_you_want_to_remove_this_group_an_2122c9ec: "Wollen Sie wirklich diese Gruppe und alle ihre Inhalte aus Ihrem Kurs entfernen?"
   are_you_sure_that_you_want_to_remove_this_group_an_ff69dcff: "Wollen Sie wirklich diese Gruppe und alle ihre Inhalte von Ihrem Konto entfernen?"
   are_you_sure_that_you_want_to_remove_this_outcome__38cdb682: "Wollen Sie dieses Lernziel wirklich von Ihrem Konto entfernen?"
@@ -4597,6 +4613,7 @@ de:
   attempt_3dd42b18: Versuch
   attempt_attempt_d3911720: "Versuch %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Feedback zu Versuch %{attempt}"
+  attempt_attempt_feedback_549683ba: "Feedback für Versuch %{attempt}:"
   attempt_attempt_grade_c01f45df: "Versuch %{attempt} %{grade}"
   attempt_attempt_score_2a973edc: "Versuch %{attempt} Punktzahl:"
   attempt_count_267a4fc5: "Versuch %{count}"
@@ -4829,10 +4846,10 @@ de:
   avatar_for_studentname_8ea511ae: "Avatar für %{studentName}"
   avatar_for_user_name_61f6be17: "Avatar für %{user_name}"
   average_49c63f9b: Durchschnitt
-  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Der Durchschnitt passt nicht gut zu den meisten lernzielorientierten oder leistungszielorientierten Anwendungsfällen, da die Studierenden möglicherweise Zeit benötigen, um ein das Leistungsziel eines Lernziels zu erreichen, und eine frühzeitig schlechtere Leistung den Durchschnitt senken kann."
+  average_is_not_a_good_fit_for_most_outcomes_based__f351ed94: "Der Durchschnitt passt nicht gut zu den meisten Lernergebnisorientierten oder leistungszielorientierten Anwendungsfällen, da die Studierenden möglicherweise Zeit benötigen, um ein das Leistungsziel eines Lernergebniss zu erreichen, und eine frühzeitig schlechtere Leistung den Durchschnitt senken kann."
   average_score_15cd7c3c: Punktedurchschnitt
   avg_alignments_per_artifact_5573d99c: "Durchschn. Ausrichtungen pro Artefakt"
-  avg_alignments_per_outcome_4daf75cd: "Durchschn. Ausrichtungen pro Lernziel"
+  avg_alignments_per_outcome_4daf75cd: "Durchschn. Ausrichtungen pro Lernergebnis"
   avi_2d8cc99f: AVI
   back_2900f52a: Zurück
   back_to_announcements_1036e43e: "Zurück zu den Ankündigungen"
@@ -4897,6 +4914,7 @@ de:
       Eine neue, einfachere und bedienungsfreundlichere Benutzeroberfläche zum Durchsuchen von Dateien. Wenn Sie diese auf Kursebene aktivieren,
       wird die neue Benutzeroberfläche allen Benutzern des Kurses angezeigt. Damit die Oberfläche angezeigt wird, wenn jemand
       zur Seite mit persönlichen Dateien für einen Benutzer wechselt ('/files'), müssen Sie sie für das Konto des Benutzers aktivieren.
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Bessere LTI-AGS-Antwort-Codes für abgeschlossene Kurse"
   between_1_and_10_7118bf2d: "Zwischen 1 und 10"
   between_1_and_5_f2a74bcf: "Zwischen 1 und 5"
   between_1_and_99_d421a4c0: "Zwischen 1 % und 99 %"
@@ -5035,7 +5053,7 @@ de:
   breadcrumb_1_cb3c504: "Ariadnepfad 1"
   breadcrumb_2_95ba94be: "Ariadnepfad 2"
   brick_f2656265: Ziegelrot
-  bridgerland_outcomes_report_76cb7c68: "Bridgerland Lernzielebericht"
+  bridgerland_outcomes_report_76cb7c68: "Bridgerland Lernergebnissebericht"
   bring_existing_content_from_another_course_or_cour_6e740692: |-
       Vorhandenen Content aus einem anderen Kurs oder
                 Kursverwaltungssystem in Ihren Canvas-Kurs holen
@@ -5139,7 +5157,7 @@ de:
       uploading_button: "CSV Datei wird hochgeladen ..."
   bundles_quesiton_bank: 
     titles: 
-      find_outcomes: "Lernziele suchen"
+      find_outcomes: "Lernergebnisse suchen"
   button: 
     submit_assignment: "Aufgabe abgeben"
   button_a1577211: Schaltfläche
@@ -5823,6 +5841,7 @@ de:
       Einstellung aktualisiert, wie das Umschreiben von URLs zur erleichtern Vorschau von
       Dateien innerhalb von Canvas erfolgt, statt sie herunterzuladen.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: "Canvas Support Center"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas hält die Antwort für gültig"
   canvas_ticketing_email_connector_27e253ae: Canvas-Ticketing-E-Mail-Konnektor
   canvas_ticketing_web_post_connector_11158897: Canvas-Ticketing-Web-Post-Konnektor
@@ -5879,7 +5898,7 @@ de:
   change_image_14ad465b: "Bild ändern"
   change_image_d56c695f: "Bild ändern"
   change_mastery_f4d43c07: "Leistungsziel ändern"
-  change_mastery_points_c4f68a36: "Lernzielpunkte ändern"
+  change_mastery_points_c4f68a36: "Lernergebnispunkte ändern"
   change_name_c8cce76c: "Name ändern"
   change_name_to_568374c8: "„%{name}“ ändern in"
   change_points_9e5104ac: "Punkte ändern"
@@ -6227,11 +6246,12 @@ de:
   collaborations_tutorial_tray_9219d9d: Collaborations-Übungsfach
   collapse_all_50275533: "Alle minimieren"
   collapse_all_modules_e092807c: "Alle Module reduzieren"
-  collapse_description_for_outcome_title_bcd9b8c9: "Beschreibung für Lernziel %{title} einklappen"
+  collapse_description_for_outcome_title_bcd9b8c9: "Beschreibung für Lernergebnis %{title} einklappen"
   collapse_discussion_thread_52bab65a: "Diskussions-Thread ausblenden"
   collapse_discussion_thread_from_author_34f9cd18: "Diskussions-Thread von %{author} ausblenden"
   collapse_group_c2af7cad: "Gruppe minimieren"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Liste der Gruppenmitglieder für %{groupName} reduzieren"
+  collapse_name_fdea035c: "%{name} ausblenden"
   collapse_outcome_description_de471564: "Beschreibung des Ergebnisses einklappen"
   collapse_replies_20f2faf7: "Antworten ausblenden"
   collapse_replies_ef4fc36b: "Antworten ausblenden"
@@ -6259,6 +6279,7 @@ de:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Geben Sie einen Kommentar ab, indem Sie auf diese Nachricht antworten, oder nutzen Sie diesen Link, um an der Konversation teilzunehmen: %{link}. Falls Sie einen Anhang verwenden müssen und dies dürfen, melden Sie sich bitte bei Canvas an, und antworten Sie auf die Diskussion."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Geben Sie einen Kommentar ab, indem Sie auf diese Nachricht antworten, oder nutzen Sie diesen Link, um an der Konversation teilzunehmen: %{link}Falls Sie einen Anhang verwenden müssen und dies dürfen, melden Sie sich bitte bei Canvas an, und antworten Sie auf die Ankündigung."
   comment_destroyed_5cfc922d: "Kommentar gelöscht"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Veröffentlichung des Kommentars fehlgeschlagen! Bitte versuchen Sie es später noch einmal."
   comment_input_box_b8c7e58b: Kommentareingabefeld
   comment_library_84735835: Kommentarbibliothek
@@ -7556,11 +7577,11 @@ de:
   costa_rica_97d66afe: "Costa Rica"
   could_not_duplicate_discussion_953ed67f: "Diskussion konnte nicht dupliziert werden"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Konnte für Client-ID %{clientId} keine LTI-Konfiguration finden"
-  could_not_find_associated_outcome_in_this_context_1f7425b: "Assoziiertes Lernziel konnte in diesem Kontext nicht gefunden werden"
+  could_not_find_associated_outcome_in_this_context_1f7425b: "Assoziiertes Lernergebnis konnte in diesem Kontext nicht gefunden werden"
   could_not_find_file_to_upload_2af12953: "Datei zum Hochladen wurde nicht gefunden"
   could_not_find_file_to_upload_d8a0b228: "Hochzuladende Datei wurde nicht gefunden."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Der/die existierende Benutzer\\*in für die Anmeldung mit der SIS-ID %{user_id} wurde nicht gefunden, überspringen"
-  could_not_import_learning_outcome_outcome_id_becau_662152b8: "Das Lernziel %{outcome_id} konnte nicht importiert werden, weil es keiner Gruppe angehört."
+  could_not_import_learning_outcome_outcome_id_becau_662152b8: "Das Lernergebnis %{outcome_id} konnte nicht importiert werden, weil es keiner Gruppe angehört."
   could_not_reactivate_this_user_s_access_c5c6d232: "Der Zugang dieses Benutzers konnte nicht reaktiviert werden."
   could_not_save_chosencolor_741b74ce: "„%{chosenColor}“ konnte nicht gespeichert werden."
   could_not_suspend_this_user_s_access_13f2ac: "Der Zugang dieses Benutzers konnte nicht ausgesetzt werden."
@@ -7707,14 +7728,14 @@ de:
     other: "%{count} Optionen verfügbar"
   count_options_loaded_cd59cc3b: "%{count} Optionen geladen."
   count_outcomes_3af5e3e: 
-    one: "%{count} Lernziel"
-    other: "%{count} Lernziele"
+    one: "%{count} Lernergebnis"
+    other: "%{count} Lernergebnisse"
   count_outcomes_3ceaa024: 
-    one: "%{count} LERNZIEL"
-    other: "%{count} LERNZIELE"
+    one: "%{count} LERNERGEBNIS"
+    other: "%{count} LERNERGEBNISSE"
   count_outcomes_have_been_moved_to_newgrouptitle_3018f532: 
     one: "„%{outcomeTitle}“ Wurde nach „%{newGroupTitle}“ verschoben."
-    other: "%{count} Lernziele wurden nach „%{newGroupTitle}“ verschoben."
+    other: "%{count} Lernergebnisse wurden nach „%{newGroupTitle}“ verschoben."
   count_outcomes_have_been_successfully_added_to_thi_7d0efc5b: 
     one: "1 Lernziel wurde zu diesem Kurs hinzugefügt."
     other: "%{count} Lernziele wurden zu diesem Kurs hinzugefügt."
@@ -7722,11 +7743,11 @@ de:
     one: "1 Lernziel wurde zu diesem Konto hinzugefügt."
     other: "%{count} Lernziele wurde zu diesem Konto hinzugefügt."
   count_outcomes_selected_55902958: 
-    one: "1 Lernziel ausgewählt"
-    other: "%{count} Lernziele ausgewählt"
+    one: "1 Lernergebnis ausgewählt"
+    other: "%{count} Lernergebnisse ausgewählt"
   count_outcomes_were_successfully_removed_ea0ca83e: 
-    one: "Das Lernziel wurde erfolgreich entfernt."
-    other: "%{count} Lernziele wurden erfolgreich entfernt"
+    one: "Das Lernergebnis wurde erfolgreich entfernt."
+    other: "%{count} Lernergebnisse wurden erfolgreich entfernt"
   count_outcomes_were_successfully_removed_from_this_ae093b07: 
     one: "Dieses Lernziel wurde erfolgreich von diesem Konto entfernt."
     other: "%{count} Lernziele wurden erfolgreich von diesem Konto entfernt."
@@ -8424,7 +8445,7 @@ de:
       buttons: 
         link: "Link zu Studierende\\*n"
       details: |-
-          Wenn ein/eine Beobachter\*in mit einer/einem Studierenden verknüpft wurde, hat er Zugang zu dessen Noten und Kursinteraktionen. *Zurzeit ist dieser/diese Beobachter\*in dem Studenten %{student} zugeordnet.*
+          Wenn ein/eine Beobachter\*in mit einer/einem Studierenden verknüpft wurde, hat er/sie Zugang zu dessen/deren Noten und Kursinteraktionen. *Zurzeit ist dieser/diese Beobachter\*in dem Studenten %{student} zugeordnet.*
           
           Um den/die Kursbeobachter*in %{user} einer/einem Studierenden zuzuordnen, wählen Sie den Namen der/des Studierenden in der unten stehenden Liste aus.
       labels: 
@@ -8509,7 +8530,7 @@ de:
         student_invitation_unaccepted_available: "%{name} hat die Einladung zum Kurs noch nicht angenommen. Die Einladung wurde um %{time} gesendet."
         student_invitation_unaccepted_unavailable: "%{name} wurde um %{time} zum Kurs hinzugefügt."
       link_to_students_view: 
-        link_student_desc: "Wenn ein/eine Beobachter\\*in mit einer/einem Studierenden verknüpft wurde, hat er Zugang zu dessen Noten und Kursinteraktionen."
+        link_student_desc: "Wenn ein/eine Beobachter\\*in mit einer/einem Studierenden verknüpft wurde, hat er/sie Zugang zu dessen/deren Noten und Kursinteraktionen."
       resend_invitations: 
         pending_invitation: "1 Einladung wurde nicht akzeptiert."
         pending_invitations: "%{pendingInvitationsCount} Einladungen wurden nicht angenommen."
@@ -8954,7 +8975,8 @@ de:
   create_new_group_fca5cc73: "Neue Gruppe einrichten"
   create_new_group_set_13b1f62a: "Ein neues Gruppenset erstellen"
   create_number_of_groups_groups_now_f89f220e: "Jetzt %{number_of_groups} Gruppen erstellen"
-  create_outcome_4dac05a0: "Eine Lernziel erstellen"
+  create_outcome_4dac05a0: "Eine Lernergebnis erstellen"
+  create_pace_4ff3e9c: "Schritt erstellen"
   create_pages_581a4d59: "Seiten erstellen"
   create_slots_71dbb2f8: "Zeitfenster einrichten"
   create_subject_86de5618: "Thema erstellen"
@@ -9025,7 +9047,7 @@ de:
     media: Medien
     messages: Nachrichten
     modules: Module
-    outcomes: Lernziele
+    outcomes: Lernergebnisse
     people: Teilnehmer\*innen
     plugins: Plug-ins
     prior_users: "Vorherige Benutzer\\*innen"
@@ -9152,7 +9174,7 @@ de:
   custom_link_details_35fd38fc: "Details zu eigenem Link"
   custom_links_to_include_in_the_help_dialog_popup_e48ff8b6: "Im Hilfe-Dialog Popup mit einzuschliessende angepasste Links"
   custom_lti_usage_uwf_b63978a5: "Benutzerdefinierte LTI-Nutzung – UWF"
-  custom_outcomes_31a741f5: "Benutzerdefinierte Lernziele"
+  custom_outcomes_31a741f5: "Benutzerdefinierte Lernergebnisse"
   custom_reports_experimental_features_40bbfe7c: "Benutzerdefinierte Berichte: Experimentelle Funktionen"
   customize_configuration_69c22ef3: "Konfiguration anpassen"
   customize_course_details_26fd4afe: "Kursdetails anpassen"
@@ -9461,8 +9483,8 @@ de:
   delete_name_94088f7c: "„%{name}“ löschen"
   delete_name_calendar_ed00f8be: "Kalender %{name} löschen"
   delete_operation_failed_3db8cd19: "Löschvorgang fehlgeschlagen"
-  delete_outcome_cc6546f1: "Lernziel löschen"
-  delete_outcome_group_6b399d34: "Lernzielgruppe löschen"
+  delete_outcome_cc6546f1: "Lernergebnis löschen"
+  delete_outcome_group_6b399d34: "Lernergebnisgruppe löschen"
   delete_pages_ab60f58: "Seiten löschen"
   delete_prerequisite_5e97bdf4: "Voraussetzung löschen"
   delete_prerequisite_title_19741947: "Voraussetzung %{title} löschen"
@@ -9652,7 +9674,7 @@ de:
   determines_visibility_and_management_of_rubrics_ta_e5dad169: "Bestimmt die Sichtbarkeit und Verwaltung der Registerkarte „Bewertungsschema“ in der Kontonavigation. Erlaubt dem Benutzer, Bewertungsschemata zu verwalten."
   determines_visibility_and_management_of_sis_import_a91ed255: "Bestimmt die Sichtbarkeit und Verwaltung der Registerkarte „SIS-Import“ in der Kontonavigation."
   determines_visibility_and_management_of_sis_import_bf386823: "Bestimmt die Sichtbarkeit und Verwaltung des  SIS-Import-Links in der Kontonavigation."
-  determines_visibility_and_management_of_the_outcom_aace9659: "Bestimmt die Sichtbarkeit und Verwaltung des Lernziele-Links in der Kontonavigation."
+  determines_visibility_and_management_of_the_outcom_aace9659: "Bestimmt die Sichtbarkeit und Verwaltung des Lernergebnisse-Links in der Kontonavigation."
   determines_visibility_and_management_of_the_questi_c57c5b31: "Bestimmt die Sichtbarkeit und Verwaltung des Links zum Fragenpool in der Kontonavigation."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "Bestimmt die Sichtbarkeit und Verwaltung des Links „Fragenpool“ in der Kontonavigation."
   determines_visibility_and_management_of_the_rubric_533da0b8: "Bestimmt die Sichtbarkeit und Verwaltung des Links zum Bewertungsschemata in der Kontonavigation."
@@ -10189,6 +10211,7 @@ de:
   discussions_redesign_b505952d: "Umgestaltung von Diskussionen"
   discussions_redesign_isolated_view_78626c74: "Neudesign von Diskussionen - Isolierte Ansicht"
   discussions_redesign_reporting_f4abcc37: "Diskussionen Redesign – Berichterstattung"
+  discussions_redesign_split_screen_view_d1b88d0e: "Neudesign von Diskussionen – Ansicht mit geteiltem Bildschirm"
   discussions_tutorial_tray_4ef79bcc: Diskussionen-Übungsfach
   discussions_view_c6818792: "Diskussionen – Anzeigen"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Diskussionen mit Gruppen dürfen nicht abschnittsspezifisch sein."
@@ -10210,6 +10233,7 @@ de:
             oder verspätete Abgaben und blenden Sie die Noten einfach aus,
             bis die Studierenden sie sehen können. Für eine vereinfachte Benotung verwenden SpeedGrader Sie die Funktion zum Anzeigen und Benoten von Abgaben.
   display_historical_view_of_achievements_of_users_53db5938: "Historische Ansicht der Leistungen der Benutzer anzeigen"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Anzeigename:"
   display_name_b80c243e: Anzeigename
   display_student_filter_options_ab034cfa: "Studierendenfilteroptionen anzeigen"
@@ -10218,6 +10242,7 @@ de:
   display_total_grades_when_the_all_grading_periods__4e6add83: "Gesamtnoten anzeigen, wenn die Dropdown-Option „Alle Benotungszeiträume“ ausgewählt ist (Benotungszeiträume müssen vorhanden sein)."
   display_totals_for_all_grading_periods_ad1ea050: "Gesamtzahl anzeigen für \"Alle Benotungszeiträume\""
   display_totals_for_all_grading_periods_option_4a72586: "Option zur Anzeige der Summen für alle Benotungszeiträume"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Werte anzeigen"
   displaying_to_students_b1e92058: "Den Studenten anzeigen"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -10276,7 +10301,7 @@ de:
   don_t_miss_notifications_from_your_students_900e9e30: "Verpassen Sie keine Benachrichtigungen von Ihren Studierenden."
   don_t_move_lti_query_params_to_post_body_21744487: "LTI-Anfrageparameter nicht in den POST-Körper verschieben"
   don_t_move_lti_query_params_to_post_body_5c80e037: "LTI-Abfrageparameter nicht in den POST-Text verschieben"
-  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Keine Ergebnisse in das Lernziele-Notenbuch schreiben"
+  don_t_post_outcomes_results_to_learning_mastery_gr_d0b85a19: "Keine Ergebnisse in das Lernergebnisse-Notenbuch schreiben"
   don_t_show_again_15d8253e: "Nicht mehr anzeigen"
   don_t_show_again_8c7b7297: "Nicht mehr anzeigen"
   done_54e3d4b6: Fertig
@@ -10417,6 +10442,7 @@ de:
   duplication_failed_3351ffb1: "Duplizierung fehlgeschlagen"
   duplication_of_title_succeeded_2e0bd645: "Duplizierung von %{title} gelungen"
   duration_1_minute_29c7d5ab: "Dauer: 1 Minute"
+  duration_for_assignment_name_851ca365: "Dauer für Aufgabe %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Dauer: %{hours} Stunden und %{minutes} Minuten"
   duration_in_minutes_8959f63e: "Dauer in Minuten"
   duration_minutes_minutes_d7b9182b: "Dauer: %{minutes} Minuten"
@@ -10499,8 +10525,8 @@ de:
   edit_name_cbdef0c2: "%{name} bearbeiten"
   edit_new_internal_setting_name_ce308469: "Namen für neue interne Einstellung ändern"
   edit_new_internal_setting_value_f618a7f4: "Wert für neue interne Einstellung ändern"
-  edit_outcome_867a0381: "Lernziel bearbeiten"
-  edit_outcome_group_f82e0210: "Lernzielgruppe bearbeiten"
+  edit_outcome_867a0381: "Lernergebnis bearbeiten"
+  edit_outcome_group_f82e0210: "Lernergebnisgruppe bearbeiten"
   edit_pagetitle_cd8abab9: "%{pageTitle} ändern"
   edit_permissions_for_count_items_d65e3855: 
     one: "Berechtigungen bearbeiten für: %{itemName}"
@@ -10529,7 +10555,7 @@ de:
       read_only_rubric: "Sie dürfen dieses Bewertungsschema nicht bearbeiten, da Sie entweder nicht über die erforderliche Berechtigung verfügen oder das Bewertungsschema an mehr als einem Ort verwendet wird. Alle vorgenommenen Änderungen ergeben ein neues Bewertungsschema, das auf dem alten basiert. Möchten Sie trotzdem fortfahren?"
     rubric: 
       import_outcome: 
-        duplicated_outcome: "Dieses Lernziel wurde nicht hinzugefügt, da es bereits in diesem Bewertungsschema vorhanden ist."
+        duplicated_outcome: "Dieses Lernergebnis wurde nicht hinzugefügt, da es bereits in diesem Bewertungsschema vorhanden ist."
     titles: 
       criterion_long_description: "Ausführliche Kriteriumsbeschreibung"
       edit_rubric_rating: "Bewertung bearbeiten"
@@ -11234,7 +11260,7 @@ de:
   error_exporting_gradebook_msg_6ea31e2f: "Fehler beim Exportieren der Notenbuchs: %{msg}"
   error_fetching_access_token_1445a9e3: "Fehler beim Abrufen des Zugriffs-Token"
   error_fetching_user_details_7c85d23: "Fehler beim Abrufen der Benutzerdaten"
-  error_importing_outcomes_59a4fe81: "Fehler beim Import der Lernziele"
+  error_importing_outcomes_59a4fe81: "Fehler beim Import der Lernergebnisse"
   error_in_mastery_paths_range_index_7d17ddac: "%{error} im Bereich der Leistungsziel-Pfade %{index}"
   error_loading_comment_library_db6c9045: "Fehler beim Laden der Kommentarbibliothek"
   error_loading_course_data_f056172b: "Fehler beim Laden der Kursdaten"
@@ -11456,12 +11482,13 @@ de:
   expand_collapse_lang_73edc33c: "Erweitern/Reduzieren %{lang}"
   expand_collapse_title_outcome_group_239f0a9d: "Ergebnisgruppe %{title} maximieren/minimieren"
   expand_collapse_title_outcome_group_student_meets__46ffef48: "%{title}-Ergebnisgruppe erweitern/reduzieren, Studierende\\*r hat das Leistungsziel unter %{mastery_count} von %{count}-Ergebnisse erreicht"
-  expand_description_for_outcome_title_abc8f30: "Beschreibung für Lernziel %{title} ausklappen"
+  expand_description_for_outcome_title_abc8f30: "Beschreibung für Lernergebnis %{title} ausklappen"
   expand_discussion_thread_fcbb2bcc: "Diskussions-Thread einblenden"
   expand_discussion_thread_from_author_829cfae1: "Diskussions-Thread von %{author} einblenden"
   expand_global_navigation_2c28d5d4: "Globale Navigation erweitern"
   expand_group_53765272: "Gruppe aufklappen"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Liste der Gruppenmitglieder für %{groupName} erweitern"
+  expand_name_71d944fd: "%{name} einblenden"
   expand_or_collapse_calendars_9854b0d0: "Kalender maximieren oder minimieren"
   expand_or_collapse_undated_items_b901de09: "Nicht datierte Elemente maximieren oder minimieren"
   expand_outcome_description_c5bdd70b: "Beschreibung des Ergebnisses erweitern"
@@ -11853,6 +11880,7 @@ de:
   federated_attributes_are_information_sent_from_you_2116fb61: "Föderierte Attribute sind Informationen, die von Ihrem Authentifizierungsanbieter gesendet werden und jedes Mal, wenn Benutzer sich anmelden, zur automatischen Aktualisierung entsprechender Benutzerdaten in Canvas verwendet werden können."
   feed_url_8a433438: Feed-URL
   feed_url_is_required_253fda4e: "Feed-URL erforderlich"
+  feedback_6dcc1991: Feedback
   feeds_9f1c5c76: Feeds
   field_9ec0ec01: Feld
   field_cannot_be_blank_afb5b332: "Feld darf nicht leer sein."
@@ -11952,7 +11980,7 @@ de:
     errors: 
       empty_file: "Diese Datei ist leer. Bitte laden Sie eine andere Datei hoch."
       missing_field: "Upload fehlgeschlagen. Erwartetes Formularfeld fehlt."
-      not_found: "Offenbar ist beim Hochladen dieser Datei ein Fehler aufgetreten und die Datei kann nicht gefunden werden.  Informieren Sie gegebenenfalls den/die Besitzer\\*in der Datei und bitte Sie ihn, die Datei erneut hochzuladen."
+      not_found: "Offenbar ist beim Hochladen dieser Datei ein Fehler aufgetreten und die Datei kann nicht gefunden werden.  Informieren Sie gegebenenfalls den/die Besitzer\\*in der Datei und bitte Sie ihn/sie, die Datei erneut hochzuladen."
       server_error: "Upload wegen Serverfehlers fehlgeschlagen. Bitte erneut versuchen"
       too_large: "Die Datei ist zu groß zum Bearbeiten."
       upload_failed: "Upload fehlgeschlagen. Bitte erneut versuchen"
@@ -12023,7 +12051,7 @@ de:
   filter_jobs_by_date_202eb267: "Jobs nach Datum filtern"
   filter_messages_by_course_21a53fc4: "Nachrichten nach Kurs filtern"
   filter_observer_dashboard_by_student_5705ff33: "Beobachter-Dashboard nach Studierenden filtern"
-  filter_outcomes_e91aa331: "Lernziele filtern"
+  filter_outcomes_e91aa331: "Lernergebnisse filtern"
   filter_preset_name_9ce8f057: "Name der Filtervoreinstellung"
   filter_recent_user_accesses_by_term_30812659: "Letzte Benutzerzugriffe nach Semester filtern."
   filter_replies_by_unread_342e8e90: "Antworten nach „Ungelesen“ filtern"
@@ -12063,7 +12091,7 @@ de:
       bookmark_search: "Lesezeichensuche: %{service_name}"
   find_8d605019: Suchen
   find_an_existing_grading_scheme_d836ea: "Ein vorhandenes Benotungssystem suchen"
-  find_an_outcome_919328e6: "Ein Lernziel suchen"
+  find_an_outcome_919328e6: "Ein Lernergebnis suchen"
   find_appointment_85d6922e: "Termin finden"
   find_flickr_image_view: 
     find_cc_on_flickr: "Nach Creative Commons-Bildern auf Flickr suchen"
@@ -12078,8 +12106,8 @@ de:
       no_outcomes_found: "Keine Resultate gefunden"
       no_rubric_outcomes_found: "Keine gemäß Bewertungsschema konfigurierten Resultate gefunden"
     titles: 
-      find_outcome: "Lernziel suchen"
-  find_outcome_746cc57e: "Lernziel suchen"
+      find_outcome: "Lernergebnis suchen"
+  find_outcome_746cc57e: "Lernergebnis suchen"
   find_questions_4930b38f: "Fragen suchen"
   find_training_resources_and_more_help_f148612c: "Schulungsressourcen suchen sowie weitere Hilfen"
   find_your_canvas_institution_45af99af: "Suchen Sie Ihre %{canvas}-Institution"
@@ -12321,6 +12349,7 @@ de:
   grade_high_to_low_1cea0381: "Note – von hoch zu gering"
   grade_history_9c51ad49: Benotungsverlauf ...
   grade_info_19fb9875: Noteninfo
+  grade_loading_bc1ad721: "Note wird geladen"
   grade_low_to_high_1678b713: "Note – von gering bis hoch"
   grade_out_of_percentage_1972bf52: "Note aus %{percentage}"
   grade_out_of_points_d401b79d: "Note aus %{points}"
@@ -12625,7 +12654,7 @@ de:
     errors: 
       upload_as_zip: "Bitte laden Sie die Dateien im ZIP-Format hoch."
   gradebookOutcomeGradebookGrid: 
-    learning_outcome: Lernziel
+    learning_outcome: Lernergebnis
   gradebookSectionMenuView: 
     all_sections: "Alle Abschnitte"
   gradebook_1620a0aa: Notenbuch
@@ -13330,6 +13359,7 @@ de:
   group_membership_count_is_invalid_cc6b2d47: "Die Anzahl der Gruppenmitgliedschaften ist ungültig"
   group_membership_limit_54e165b: Gruppenmitgliedschaftsbegrenzung
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Die Gruppenmitgliedschaftsbegrenzung muss darf nicht kleiner als die aktuelle Mitgliederzahl sein."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Die Anzahl der Gruppenmitglieder muss größer als 1 sein."
   group_name_b69c144: Gruppenname
   group_name_e4066daa: Gruppenname
   group_name_group_announcements_5ce81c6d: "%{group_name} – Gruppenankündigungen"
@@ -13749,6 +13779,7 @@ de:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Hat einen Turnitin-Score"
   has_ungraded_submissions_2bff87df: "Hat unbenotete Abgaben"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Haben Sie eine Frage zu Canvas? Stellen Sie sie hier."
   have_not_been_graded_df2a5fd2: "Wurden nicht bewertet"
   have_not_yet_submitted_57e6a58b: "Wurden noch nicht abgegeben"
   haven_t_been_graded_d7dee5bb: "Wurden nicht benotet"
@@ -13891,7 +13922,7 @@ de:
       create: "%{model} erstellen"
       submit: "%{model} speichern"
       update: "%{model} aktualisieren"
-  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Administratoren und Lehrende treffen sinnvollere Entscheidungen beim Importieren, organisieren und Ändern von Lernzielen in ihren Konten und Kursen."
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Administratoren und Lehrende treffen sinnvollere Entscheidungen beim Importieren, organisieren und Ändern von Lernergebnissen in ihren Konten und Kursen."
   here_are_the_first_100_errors_that_occurred_d6e46739: "Hier sind die ersten 100 Fehler, die aufgetreten sind:"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Hier sind Ihre Aufgaben, nach Fälligkeitsdatum aufgelistet."
   here_f44564ee: hier.
@@ -13930,7 +13961,7 @@ de:
   hide_name_details_23814c37: "%{name}-Details ausblenden"
   hide_navigation_menu_f0b3e90: "Navigationsmenü ausblenden"
   hide_notes_column_7749f408: "Anmerkungsspalte ausblenden"
-  hide_outcomes_statistics_7d3bac45: "Lernziel-Statistik ausblenden"
+  hide_outcomes_statistics_7d3bac45: "Lernergebnis-Statistik ausblenden"
   hide_outcomes_with_no_results_7e4ce06f: "Resultate ohne Ergebnisse ausblenden"
   hide_params_eadf0961: "Parameter ausblenden"
   hide_projections_9d4ed1e1: "Projektionen verbergen"
@@ -13993,7 +14024,7 @@ de:
   how_do_i_add_users_to_a_course_4a88efaf: "Wie füge ich Benutzer\\*innen zu einem Kurs hinzu?"
   how_do_i_add_zoom_to_a_course_31300d74: "Wie füge ich Zoom zu einem Kurs hinzu?"
   how_do_i_adjust_events_and_due_dates_in_a_course_i_4647c50b: "Wie passe ich Veranstaltungen und Fälligkeitsdaten in einem Kursimport an?"
-  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Wie passe ich ein Lernziel für einen Kurs an ein Bewertungsschema an?"
+  how_do_i_align_an_outcome_with_a_rubric_in_a_cours_d9c8f009: "Wie passe ich ein Lernergebnis für einen Kurs an ein Bewertungsschema an?"
   how_do_i_bulk_upload_files_to_a_course_b145d8cc: "Wie lade ich massenhafte Dateien zu einem Kurs hoch?"
   how_do_i_change_a_course_name_and_course_code_23b41292: "Wie ändere ich den Kursnamen und den Kurscode?"
   how_do_i_change_the_course_home_page_326cee50: "Wie kann ich die Kurs-Startseite ändern?"
@@ -14008,8 +14039,8 @@ de:
   how_do_i_create_a_quiz_with_individual_questions_4a68ce0d: "Wie erstelle ich ein Quiz mit individuellen Fragen?"
   how_do_i_create_an_assessment_using_new_quizzes_801b0146: "Wie erstelle ich eine Bewertung mit Hilfe der Funktion Neue Quizze?"
   how_do_i_create_an_assignment_35532b59: "Wie kann ich eine Aufgabe erstellen?"
-  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Wie erstelle ich ein Lernziel für einen Kurs?"
-  how_do_i_create_outcome_groups_for_a_course_362429a0: "Wie erstelle ich Lernzielgruppen für einen Kurs?"
+  how_do_i_create_an_outcome_for_a_course_cf0ea2b3: "Wie erstelle ich ein Lernergebnis für einen Kurs?"
+  how_do_i_create_outcome_groups_for_a_course_362429a0: "Wie erstelle ich Lernergebnisgruppen für einen Kurs?"
   how_do_i_download_the_student_app_4a4b8a63: "Wie lade ich die Studierenden-App herunter?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Wie lade ich die Studierenden-App herunter und erhalte zusätzliche Hilfe?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Wie kann ich eine Ankündigung in einem Kurs bearbeiten?"
@@ -14017,7 +14048,7 @@ de:
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Wie kann ich Noten im Notenbuch eingeben und bearbeiten?"
   how_do_i_find_my_courses_b826e4ce: "Wie finde ich meine Kurse?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Wie importiere ich ein Canvas-Kursexportpaket?"
-  how_do_i_import_outcomes_for_a_course_8eced1a: "Wie importiere ich Lernziele für einen Kurs?"
+  how_do_i_import_outcomes_for_a_course_8eced1a: "Wie importiere ich Lernergebnisse für einen Kurs?"
   how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "Wie kann ich andere zu einem Meeting einladen?"
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Wie erfahre ich, ob Studierende an der Konferenz teilgenommen haben?"
   how_do_i_manage_and_share_the_recording_52fc2993: "Wie verwalte und teile ich die Aufzeichnung?"
@@ -14053,7 +14084,7 @@ de:
   how_do_i_use_the_course_home_page_as_an_instructor_af32848e: "Wie benutze ich die Kurs-Startseite als Lehrende\\*r?"
   how_do_i_use_the_gradebook_622395dc: "Wie benutze ich das Notenbuch?"
   how_do_i_use_the_learning_mastery_gradebook_to_vie_c555acf2: "Wie verwende ich das Notenbuch für Lernleistungsziele, um die Ergebnisse eines Kurses aus dem Gradebook anzuzeigen?"
-  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Wie verwende ich die Lernziel-Seite in einem Kurs?"
+  how_do_i_use_the_outcomes_page_in_a_course_a37e0231: "Wie verwende ich die Lernergebnis-Seite in einem Kurs?"
   how_do_i_use_the_pages_index_page_dafb986c: "Wie verwende ich die Seitenindexseite?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Wie benutze ich als Lehrende\\*r die Teilnehmerseite in einem Kurs?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Wie benutze ich die Quizz-Indexseite?"
@@ -14150,8 +14181,8 @@ de:
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Wenn sowohl „Noten – ändern“ als auch „Noten – alle Noten anzeigen“ deaktiviert sind, wird das Notenbuch in der Kursnavigation ausgeblendet."
   if_commons_is_installed_allows_importing_favorited_eff368f: "Wenn Commons installiert ist, können Sie bevorzugte Inhaltselemente innerhalb von Canvas importieren."
-  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studierendenkooperationen – erstellen“ deaktiviert ist, kann der/die Benutzer\\*in keine neuen Arbeitsgruppen gründen, aber er kann alle Arbeitsgruppen anzeigen, ändern oder löschen."
-  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studierendenkooperationen – erstellen“ deaktiviert ist, kann der/die Benutzer\\*in keine neuen Arbeitsgruppen erstellen, aber er kann alle Arbeitsgruppen anzeigen, ändern oder löschen."
+  if_course_content_add_edit_delete_is_enabled_and_s_e85a8208: "Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studierendenkooperationen – erstellen“ deaktiviert ist, kann der/die Benutzer\\*in keine neuen Arbeitsgruppen gründen, aber er/sie kann alle Arbeitsgruppen anzeigen, ändern oder löschen."
+  if_course_content_add_edit_delete_is_enabled_and_s_ef307329: "Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studierendenkooperationen – erstellen“ deaktiviert ist, kann der/die Benutzer\\*in keine neuen Arbeitsgruppen erstellen, aber er/sie kann alle Arbeitsgruppen anzeigen, ändern oder löschen."
   if_course_visibility_is_limited_to_users_enrolled__ab1b1517: "Falls die Sichtbarkeit des Kurses auf Benutzer\\*in beschränkt ist, die im Kurs eingeschrieben sind, erlaubt diese Berechtigung dem/der Benutzer\\*in, Kursinhalte anzuzeigen, ohne im Kurs eingeschrieben zu sein."
   if_courses_add_edit_delete_and_courses_undelete_ar_2949051: "Wenn „Kurse - Hinzufügen/Bearbeiten/Löschen“ und „Kurse - Löschen rückgängig machen“ ebenfalls aktiviert sind, kann ein Benutzer auf Kontoebene gelöschte Kurse in den Admin-Tools wiederherstellen."
   if_courses_add_is_enabled_and_courses_view_list_is_a7ad801f: "Falls „Kurse – hinzufügen“ aktiviert und „Kurse – Liste anzeigen“ deaktiviert ist, können Benutzer in den Kontoeinstellungen mit der Schaltfläche „Neuen Kurs hinzufügen“ einen neuen Kurs hinzufügen."
@@ -14223,6 +14254,12 @@ de:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       Falls diese Option aktiviert ist, können Kursanmeldungen mit Microsoft-Gruppen synchronisiert
       werden. Konto-Administratoren können dies in den Kontoeinstellungen aktivieren.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      Wenn diese Funktion aktiviert ist, gibt die AGS-API einen hilfreicheren Antwort-Code zurück, wenn ein LTI-Tool
+      versucht, auf Daten in einem bereits abgeschlossenen Kurs zuzugreifen oder diese zu ändern.
+      Statt des allgemeinen Codes „404 Not Found“ gibt die API stattdessen den Code „422“
+      zurück, zusammen mit einer hilfreichen Meldung, die besagt, dass das Tool nicht auf abgeschlossene
+      Kurse zugreifen kann.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       Wenn diese Option aktiviert ist, gibt OAuth 2.0 nun 4xx-Statuscodes korrekt an den
       anfragenden Client zurück, anstatt ihn an sich selbst zurückzuverweisen.
@@ -14260,7 +14297,7 @@ de:
       das RCE Ihre Arbeit automatisch speichern, wenn Sie gehen
   if_set_allows_submission_status_to_be_changed_from_156f57f: "Falls aktiviert, kann der Abgabestatus innerhalb von Speedgrader geändert werden."
   if_set_displays_originality_reports_with_assignmen_c5d0276f: "Wenn diese Option eingestellt ist, werden Originalitätsberichte mit Aufgabenerweiterungen aktiviert."
-  if_set_displays_updated_mastery_connect_icon_b6a93002: "Wenn festgelegt, wird das Symbol für die Verbindung zum Lernziel aktualisiert"
+  if_set_displays_updated_mastery_connect_icon_b6a93002: "Wenn festgelegt, wird das Symbol für die Verbindung zum Lernergebnis aktualisiert"
   if_set_removes_the_delay_that_normally_occurs_when_f0a6f530: "Bei Aktivierung wird die Verzögerung beseitigt, die normalerweise bei der Suche nach Studenten auftritt."
   if_set_removes_the_missing_status_from_submissions_43fba750: "Entfernt den fehlenden Status von Abgaben bei der Benotung"
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Wenn diese Option aktiviert ist, ignoriert der Notenrechner nicht gebuchte anonyme Aufgabenlisten bei der Berechnung der Gesamtergebnisse."
@@ -14273,11 +14310,11 @@ de:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Falls „Statistik – anzeigen“ oder „Benutzer\\*innen – Anmeldedetails verwalten“ aktiviert ist, kann ein/e Benutzer\\*in in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
-  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Wenn die Option „Kenntnisstandsskalen auf Konto- und Kursebene“ aktiviert ist, zeigt die Registerkarte „Verwalten“ eine aktualisierte Benutzeroberfläche. Außerdem zeigt die Seite „Lernziele“ zwei weitere Registerkarten, die Kenntnisstandsskalen und -berechnungen von der Verwaltung der Lernziele entkoppeln."
+  if_the_account_and_course_level_outcome_mastery_sc_95307d59: "Wenn die Option „Kenntnisstandsskalen auf Konto- und Kursebene“ aktiviert ist, zeigt die Registerkarte „Verwalten“ eine aktualisierte Benutzeroberfläche. Außerdem zeigt die Seite „Lernergebnisse“ zwei weitere Registerkarten, die Kenntnisstandsskalen und -berechnungen von der Verwaltung der Lernergebnisse entkoppeln."
   if_the_account_and_course_level_outcome_mastery_sc_a59cef30: "Falls die Vorschau der Funktion „Kenntnisstandsskalen auf Konto- und Kursebene aktiviert ist, zeigt die Registerkarte „Verwalten“ eine aktualisierte Benutzeroberfläche. Außerdem zeigt die Seite „Lernziele“ zwei weitere Registerkarten, die Kenntnisstandsskalen und -berechnungen von der Verwaltung der Lernziele entkoppeln."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "Falls die zusätzlichen Berechtigungen aktiviert sind, diese Berechtigung jedoch nicht aktiviert ist, können die Sperreinstellungen einzelner Diskussionen geändert werden."
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "Falls die Kurs-Content-Berechtigung aktiviert ist und „Webkonferenzen – erstellen“ deaktiviert ist, kann der/die Benutzer\\*in immer noch Konferenzen verwalten."
-  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Falls die Option und diese Berechtigung aktiviert sind, verfügt die Seite „Lernziele“ über drei Registerkarten: Verwalten, Beherrschung und Berechnung."
+  if_the_feature_option_is_enabled_and_this_permissi_3f9424e2: "Falls die Option und diese Berechtigung aktiviert sind, verfügt die Seite „Lernergebnisse“ über drei Registerkarten: Verwalten, Beherrschung und Berechnung."
   if_the_feature_preview_is_enabled_and_this_permiss_e79925a7: "Falls die Funktionsvorschau und diese Berechtigung aktiviert sind, enthält die Seite „Lernziele“ drei Registerkarten: Verwalten, Beherrschung und Berechnung."
   if_the_open_registration_account_setting_is_enable_10b1965c: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, dürfen Benutzer\\*innen mit dieser Berechtigung von der Seite „Kurse“ aus per E-Mail-Adresse oder Anmelde-ID Designer zu einem Kurs hinzufügen, auch wenn diese noch kein Canvas-Konto haben."
   if_the_open_registration_account_setting_is_enable_1994a971: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung TAs über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der TA noch kein Canvas-Konto hat."
@@ -14362,7 +14399,7 @@ de:
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "Falls diese Berechtigung aktiviert ist und „Kurse – Liste anzeigen“ deaktiviert ist, können die Benutzer\\*innen anhand der Schaltfläche „Neuen Kurs hinzufügen“ in den Kontoeinstellungen einen neuen Kurs hinzufügen."
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "Falls diese Berechtigung aktiviert ist und „Benutzer\\*innen – primäre E-Mail-Adresse anzeigen“ deaktiviert ist, sehen die Benutzer E-Mail-Adressen als Login-IDs."
   if_this_permission_is_enabled_but_blueprint_course_ccc15486: "Falls diese Berechtigung aktiviert, „Musterkurse – hinzufügen/bearbeiten/verknüpfen/löschen“ jedoch nicht aktiviert ist, können Benutzer immer noch Musterkurse synchronisieren und den Synchronisierungsverlauf anzeigen."
-  if_this_permission_is_enabled_the_learning_mastery_af45b0ca: "Falls diese Berechtigung aktiviert ist, zeigt die Registerkarte „Lernleistungsziel“ auf der Seite „Lernziele“ an Stelle der Seite „Bewertungsschemata“."
+  if_this_permission_is_enabled_the_learning_mastery_af45b0ca: "Falls diese Berechtigung aktiviert ist, zeigt die Registerkarte „Lernleistungsziel“ auf der Seite „Lernergebnisse“ an Stelle der Seite „Bewertungsschemata“."
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "Falls diese Berechtigung aktiviert ist, benötigen die Benutzer nicht die Berechtigung „SIS-Daten – lesen“. Die Kontoberechtigung setzt die Kursberechtigung außer Kraft. Wenn Benutzern die Verwaltung der SIS-IDs auf Kursebene verboten werden soll, müssen die Optionen „SIS-Daten – verwalten“ und „SIS-Daten – lesen“ deaktiviert werden. Um Benutzer über die SIS-ID zu Kursen hinzuzufügen, muss mindestens eine der Optionen „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ und „Benutzer – Lehrer, Kursdesigner oder TAs zu Kursen hinzufügen oder daraus entfernen“ ebenfalls aktiviert sein."
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       Falls diese Berechtigung aktiviert ist, benötigen die Benutzer nicht die Aktivierung der Berechtigung SIS-Daten – Lesen. Die Kontoberechtigung setzt die Kursberechtigung außer Kraft. Um zu verhindern, dass Benutzer die SIS-IDs auf Kursebene verwalten, müssen sowohl SIS-Daten – verwalten als auch SIS-Daten – lesen deaktiviert werden.
@@ -14455,7 +14492,7 @@ de:
   import_groups_3a2ae14b: "Gruppen importieren"
   import_learning_outcomes_36d28a2b: "Importieren von Lernergebnissen"
   import_outcomes_7dda186b: "Ergebnisse importieren"
-  import_outcomes_to_groupname_d0a3264d: "Lernziele importieren nach „%{groupName}“"
+  import_outcomes_to_groupname_d0a3264d: "Lernergebnisse importieren nach „%{groupName}“"
   import_override_scores_in_gradebook_80d51a72: "Punktzahlkorrekturen in das Notenbuch importieren"
   import_sis_data_428cc803: "SIS-Daten importieren"
   import_started_successfully_a3467411: "Import erfolgreich gestartet"
@@ -14508,7 +14545,7 @@ de:
   improved_interface_with_ongoing_updates_7316bdef: "Verbesserte Oberfläche mit laufenden Updates"
   improved_learning_mastery_gradebook_8628d06a: "Verbessertes Notenbuch für das Lernleistungsziel"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Verbesserte Unterstützung für neue Quizze mit Modulen, einschließlich der Erstellung neuer Quizze aus Modulen"
-  improved_outcomes_management_4692f886: "Verbesserte Lernzieleverwaltung"
+  improved_outcomes_management_4692f886: "Verbesserte Lernergebnisseverwaltung"
   improved_support_for_taking_new_quizzes_from_withi_4dbc794e: "Verbesserte Unterstützung für die Teilnahme an neuen Quizzen innerhalb von Modulen"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbesserte visuelle Erinnerungen, um Kursleiter zur Veröffentlichung von Kurse zu ermutigen"
   improvements_made_to_enhance_the_user_experience_w_5d07cd73: "Verbesserungen, um die Benutzererfahrung im Notenbuch für das Lernleistungsziel zu verbessern"
@@ -14577,7 +14614,7 @@ de:
   included_messages_not_for_this_conversation_986a60bf: "included_messages nicht für diese Conversation"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Nimmt einen Link auf SpeedGrader in das Aufgaben-Header-Menü im Notenbuch auf."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Fügt Notenwerte in Admin-Bewertungsberichte ein."
-  includes_outcomes_service_alignments_when_exportin_6c578a35: "Umfasst Serviceausrichtungen für Lernziele beim Export und Import von Kursinhalten"
+  includes_outcomes_service_alignments_when_exportin_6c578a35: "Umfasst Serviceausrichtungen für Lernergebnisse beim Export und Import von Kursinhalten"
   includes_overridden_course_grades_in_the_gradebook_d58cffb: "Schließt überschriebene Kursnoten im Notenbuchverlauf ein"
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Bezieht Bewertungsschemata in die Kursnavigation auf der Seitenleiste ein"
   includes_the_equation_editor_in_the_instructure_ca_19a4be71: "Enthält den Gleichungseditor im Paket @instructure/canvas-rce"
@@ -14598,10 +14635,10 @@ de:
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Individuelle Notenvergabe für Aufgaben"
   individual_gradebook_c7de9821: "Individuelles Notenbuch ..."
-  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Einzelne Lernzielberechnungswerte können nicht geändert werden."
-  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Einzelne Lernziel-Punkte können nicht geändert werden."
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Einzelne Lernergebnisberechnungswerte können nicht geändert werden."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Einzelne Lernergebnis-Punkte können nicht geändert werden."
   individual_outcome_rating_and_calculation_method_o_f0eae85f: "Bewertung der einzelnen Ergebnisse und Optionen der Berechnungsmethode"
-  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Einzelne Lernzielbewertungen können nicht geändert werden."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Einzelne Lernergebnisbewertungen können nicht geändert werden."
   individual_ratings_data_input_with_acount_level_ma_2c23f844: "Eingabe individueller Bewertungsdaten mit acount_level_mastery_scale-FF aktiviert"
   individual_ratings_data_input_with_invidual_outcom_1152d59e: "Eingabe individueller Bewertungsdaten mit invidual_outcome_rating_and_calculation-FF deaktiviert"
   individual_view_81c2f124: Einzelansicht
@@ -14826,7 +14863,7 @@ de:
   invalid_fields_after_ratings_fields_815ff223: "Ungültige Felder nach der Einstufung: %{fields}"
   invalid_fields_fields_8698284: "Ungültige Felder: %{fields}"
   invalid_fields_for_a_group_invalid_f440b733: "Ungültige Felder für eine Gruppe: %{invalid}"
-  invalid_fields_for_an_outcome_invalid_fafdf0df: "Ungültige Felder für ein Lernziel: %{invalid}"
+  invalid_fields_for_an_outcome_invalid_fafdf0df: "Ungültige Felder für ein Lernergebnis: %{invalid}"
   invalid_file_type_881cc9b2: "Ungültiger Dateityp"
   invalid_freq_freq_84b0427d: "FREQ %{freq} ungültig"
   invalid_grade_9726cbc6: "Ungültige Note"
@@ -15209,7 +15246,7 @@ de:
   learning_mastery_grade_book_59c90e6a: Lernleistungsziel-Notenbuch
   learning_mastery_gradebook_description: |-
       Das Lernleistungsziel-Notenbuch bietet eine Möglichkeit für Lehrende, schnell 
-      Fortschritte von Studierenden und Kursen bei den Kurslernzielen anzuzeigen. Die Ergebnisse werden in einem notenbuchähnlichen
+      Fortschritte von Studierenden und Kursen bei den Kurs-Lernergebnissen anzuzeigen. Die Ergebnisse werden in einem notenbuchähnlichen
       Format präsentiert, und die Studierendenfortschritte werden als Punktzahl angezeigt und als „Erreicht“, „Fast
       erreicht“ und „Zu fördern“.
   learning_mastery_gradebook_redesign_9ca88020: "Neugestaltung des Notenbuchs für das Lernleistungsziel"
@@ -15219,7 +15256,7 @@ de:
     no_description: "Keine Beschreibung"
   learning_outcome_and_assignment_type_b7e752fb: "Lernergebnis und Aufgabentyp"
   learning_outcome_friendly_name_bde2c4fb: "Freundlicher Name für Lernergebnis"
-  learning_outcome_gradebook_for_coursename_4634781b: "Lernziel-Notenbuch für %{courseName}"
+  learning_outcome_gradebook_for_coursename_4634781b: "Lernergebnis-Notenbuch für %{courseName}"
   learning_outcome_id_88ff198c: Lernergebnis-ID
   learning_outcome_mastered_7b30ef43: "Erreichtes Lernergebnis"
   learning_outcome_mastery_score_c96330b8: "Erforderliche Punktezahl für Leistungsziel"
@@ -15230,11 +15267,11 @@ de:
   learning_outcomes_add_edit_delete_b686457a: "Lernergebnisse – hinzufügen/bearbeiten/löschen"
   learning_outcomes_can_be_included_in_assignment_ru_a48bb903: |-
       
-      Lernziele können in das Bewertungsschema für Aufgaben einbezogen werden als einfache Möglichkeit zur Beurteilung der 
-      Beherrschung der Lernziele, ausgerichtet an spezifischen Aufgaben.  Beim Definieren eines Lernziels 
+      Lernergebnisse können in das Bewertungsschema für Aufgaben einbezogen werden als einfache Möglichkeit zur Beurteilung der 
+      Beherrschung der Lernergebnisse, ausgerichtet an spezifischen Aufgaben.  Beim Definieren eines Lernergebniss 
       sollten Sie auch ein Kriterium definieren, das für das Einrichten des 
       Bewertungsschemas für die Aufgabe verwendet werden kann.  Definieren Sie so viele Bewertungsschemaspalten, wie Sie benötigen, und geben Sie die 
-      Punktzahl an, die benötigt wird, um das Lernziel zu erreichen.
+      Punktzahl an, die benötigt wird, um das Lernergebnis zu erreichen.
   learning_outcomes_csv_d2e9f936: "CSV-Datei mit den Lernergebnissen"
   learning_outcomes_import_eca3a09c: "Lernergebnisse – importieren"
   leave_5e852989: Verlassen
@@ -15293,7 +15330,7 @@ de:
           da für die Aufgabe keine Punkte vergeben werden können.
       no_points_possible: "Für die Aufgabe können keine Punkte vergeben werden."
       no_score: "Kein Punktestand"
-      no_submission_created: "Für diese Lernzielanforderung wurde keine neue Hausaufgabenabgabe erstellt."
+      no_submission_created: "Für diese Lernergebnisanforderung wurde keine neue Hausaufgabenabgabe erstellt."
     canvas: 
       migration: 
         announcements: Ankündigungen
@@ -15306,7 +15343,7 @@ de:
         discussion_topics: Diskussionsthemen
         external_tools: "Externe Tools"
         groups: Studierendegruppen
-        learning_outcomes: Lernziele
+        learning_outcomes: Lernergebnisse
         quizzes: Quizze
         rubrics: Bewertungsschemata
         syllabus_body: Kursplan-Textkörper
@@ -15516,7 +15553,7 @@ de:
   loading_jobs_12f0609d: "Jobs werden geladen ..."
   loading_last_attended_date_5a42463: "Letztes Anwesenheitsdatum laden"
   loading_latest_announcement_link_f1746190: "Aktueller Ankündigungs-Link wird geladen"
-  loading_learning_outcome_groups_599d259c: "Lernzielgruppen werden geladen"
+  loading_learning_outcome_groups_599d259c: "Lernergebnisgruppen werden geladen"
   loading_mastery_paths_c558a766: "Leistungsziel-Pfade werden geladen..."
   loading_media_32847745: "Medien werden geladen"
   loading_message_list_226a131e: "Nachrichtenliste laden"
@@ -16067,7 +16104,7 @@ de:
     my_courses: "Meine Kurse"
   menu_39cb0e8e: Menü
   menu_for_group_title_fbf60567: "Menü für Gruppe %{title}"
-  menu_for_outcome_title_1d93378d: "Menü für Lernziel %{title}"
+  menu_for_outcome_title_1d93378d: "Menü für Lernergebnis %{title}"
   menu_of_options_for_this_permission_77f50c31: "Optionsmenü für diese Berechtigung"
   menu_options_9b6b0b5c: Menüoptionen
   mesa_public_course_syllabus_52282dd3: "Mesa Öffentlicher Kursplan"
@@ -18027,7 +18064,7 @@ de:
     file_type: Datei
     grading_standard_type: Benotungsstandard
     group_type: Gruppe
-    learning_outcome_type: Lernziel
+    learning_outcome_type: Lernergebnis
     module_type: Modul
     quiz_question_type: Quizfrage
     quiz_type: Quiz
@@ -18323,7 +18360,7 @@ de:
   more_modules_d9a9f003: "Weitere Module"
   more_options_272b4953: "Weitere Optionen"
   more_options_e89670cf: "Weitere Optionen"
-  more_outcomes_have_been_loaded_9acafe9c: "Es wurden mehr Lernziele geladen"
+  more_outcomes_have_been_loaded_9acafe9c: "Es wurden mehr Lernergebnisse geladen"
   more_people_options_730e9686: "Weitere Personenoptionen"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Am Ende der Seite wurden weitere Ergebnisse hinzugefügt."
   more_search_results_have_been_loaded_13f3872a: "Es wurden mehr Suchergebnisse geladen"
@@ -18349,7 +18386,7 @@ de:
   move_contents_into_f3e4fd9d: "Inhalte verschieben nach"
   move_count_outcomes_c0ca2b30: 
     one: "„%{outcomeTitle}“ verschieben?"
-    other: "%{count} Lernziele verschieben?"
+    other: "%{count} Lernergebnisse verschieben?"
   move_dialog: 
     cancel: Abbrechen
     save: Speichern
@@ -18376,8 +18413,8 @@ de:
   move_module_item_before_13e940eb: "Modulelement verschieben vor"
   move_module_item_f525d6c8: "Modulelement verschieben"
   move_navigation_item_f034cd8a: "Navigationselement verschieben"
-  move_outcome_ce497e6c: "Lernziel verschieben"
-  move_outcome_group_cfa1a505: "Lernzielgruppe verschieben"
+  move_outcome_ce497e6c: "Lernergebnis verschieben"
+  move_outcome_group_cfa1a505: "Lernergebnisgruppe verschieben"
   move_page_e25b123d: "Seite verschieben"
   move_right_e4ddc6bf: "Nach rechts verschieben"
   move_section_d3866941: "Abschnitt verschieben"
@@ -18638,8 +18675,8 @@ de:
   new_mention_in_a_discussion_post_235706f7: "Neue Erwähnung in einem Diskussionsbeitrag."
   new_module_4e9287e4: "Neues Modul"
   new_note_5f05cb20: "Neue Anmerkung"
-  new_outcome_7fba8c7d: "Neues Lernziel"
-  new_outcome_group_af59f145: "Neue Lernzielgruppe"
+  new_outcome_7fba8c7d: "Neues Lernergebnis"
+  new_outcome_group_af59f145: "Neue Lernergebnisgruppe"
   new_post_policy_icons_da13a62c: "Neue Post-Policy-Symbole"
   new_question_9107c469: "Neue Frage"
   new_question_group_d9306280: "Neue Fragengruppe"
@@ -18838,7 +18875,7 @@ de:
   no_submissions_have_been_uploaded_2fb02710: "Es wurden keine Abgaben hochgeladen."
   no_submissions_to_zip_please_try_again_after_stude_7e0f478: "Keine Abgaben zum Packen. Bitte versuchen Sie es noch einmal nach den Abgaben der Studierenden."
   no_such_context_for_context_type_context_id_f5d22c6d: "Kein solcher Kontext für %{context_type}#%{context_id}"
-  no_such_outcome_for_id_id_873a9c4c: "Keine solchen Lernziele für ID %{id}"
+  no_such_outcome_for_id_id_873a9c4c: "Keine solchen Lernergebnisse für ID %{id}"
   no_such_source_context_80a659ba: "kein solcher Quellenkontext"
   no_such_target_context_21158b9: "kein solcher Zielkontext"
   no_such_target_group_7e183d46: "keine solche Zielgruppe"
@@ -19569,9 +19606,9 @@ de:
   out_of_pointspossible_pts_b2b73373: "von %{pointsPossible} Pkten."
   outcome_alignment_summary_tab_431f4253: "Registerkarte „Zusammenfassung der Ergebnisausrichtung“"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Ergebnisausrichtung an Inhalten ohne Bewertung"
-  outcome_average_calculation_method_54514372: "Methode zur Berechnung des Lernzieldurchschnitts"
+  outcome_average_calculation_method_54514372: "Methode zur Berechnung des Lernergebnisdurchschnitts"
   outcome_cannot_be_removed_because_it_is_aligned_to_bb8b5b03: "Lernziel kann nicht entfernt werden, da es Content zugeordnet ist"
-  outcome_da397d20: Lernziel
+  outcome_da397d20: Lernergebnis
   outcome_details_ce254e89: Ergebnisdetails
   outcome_export_89229eb4: Ergebnisexport
   outcome_group_39fae76f: Ergebnisgruppe
@@ -19580,17 +19617,17 @@ de:
   outcome_group_menu_2fffeb71: "Menü Lernzielgruppe"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Ergebnisgruppe mit Canvas-ID %{id} nicht gefunden"
   outcome_groups: 
-    invalid_file: "Ungültige Lernzielgruppendatei"
-  outcome_groups_3bc3b150: Lernzielgruppen
+    invalid_file: "Ungültige Lernergebnisgruppendatei"
+  outcome_groups_3bc3b150: Lernergebnisgruppen
   outcome_groups_api: 
-    account_group_description: "Lernzielgruppe auf Kontoebene"
+    account_group_description: "Lernergebnisgruppe auf Kontoebene"
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Das Ergebnis „%{guid}“ befindet sich bereits in diesem Import."
   outcome_guid_not_in_visible_context_36269663: "Ergebnis „%{guid}“ nicht in sichtbarem Kontext"
-  outcome_imports_c496a81f: Lernzielimporte
+  outcome_imports_c496a81f: Lernergebnisimporte
   outcome_mastery_scales_8c3a814d: Lernziel-Leistungszielmaßstäbe
   outcome_mastery_scales_add_edit_171551c: "Leistungszielmaßstäbe – hinzufügen/bearbeiten"
   outcome_menu_4fe5813: "Menü Lernziele"
-  outcome_outcome_id_is_not_available_in_context_con_2143db54: "Lernziel %{outcome_id} ist im Kontext %{context_type}#%{context_id} nicht verfügbar"
+  outcome_outcome_id_is_not_available_in_context_con_2143db54: "Lernergebnis %{outcome_id} ist im Kontext %{context_type}#%{context_id} nicht verfügbar"
   outcome_path_mastery_points: "%{path}-Leistungszielpunkte"
   outcome_path_result: "%{path}-Ergebnis"
   outcome_proficiency_calculations_5959b681: "Berechnungen des Kenntnisstands"
@@ -19598,16 +19635,16 @@ de:
   outcome_proficiency_scales_a316bd83: Kenntnisstandsskalen
   outcome_proficiency_scales_add_edit_58da6a3: "Kenntnisstandsskalen – hinzufügen/bearbeiten"
   outcome_results: 
-    outcomes_filename: Lernziele
-  outcome_results_23a0a117: Lernzielergebnisse
-  outcome_results_title: Lernzielergebnisse
+    outcomes_filename: Lernergebnisse
+  outcome_results_23a0a117: Lernergebnisse
+  outcome_results_title: Lernergebnisse
   outcome_score_141cf00a: "Punktzahl für Ergebnis"
-  outcome_service_results_to_canvas_reporting_749667bc: "Lernziele-Service-Ergebnisse in Canvas-Berichte"
-  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Lernziel: %{title} hat den Status %{statusTooltip}"
+  outcome_service_results_to_canvas_reporting_749667bc: "Lernergebnisse-Service-Ergebnisse in Canvas-Berichte"
+  outcome_title_has_a_status_of_statustooltip_82d1e6d9: "Lernergebnis: %{title} hat den Status %{statusTooltip}"
   outcome_title_was_successfully_created_a4094d6c: "Lernziel „%{title}“ wurde erfolgreich erstellt."
   outcome_title_was_successfully_created_be3a408: "Lernziel „%{title}“ wurde erfolgreich erstellt."
   outcome_with_canvas_id_id_not_found_215c5227: "Ergebnis mit Canvas-ID „%{id}“ nicht gefunden"
-  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Ein Lernziel mit der ID %{guid} existiert bereits in einem anderen unabhängigen Kurs oder Konto (%{name})."
+  outcome_with_id_guid_already_exists_in_another_unr_ee551c9d: "Ein Lernergebnis mit der ID %{guid} existiert bereits in einem anderen unabhängigen Kurs oder Konto (%{name})."
   outcomes: 
     account_standards: Kontostandards
     account_standards_description: "Links sehen Sie die Standards, die Ihre Institution zur Verwendung in Ihren Kursen erstellt hat."
@@ -19642,13 +19679,13 @@ de:
       insert_criterion_rating: "Bewertung dieses Kriteriums einfügen"
       insert_rating: Einfügen
     dont_import: "Diese Gruppe kann nicht importiert werden."
-    failed_outcome_creation: "Lernzielerstellung fehlgeschlagen"
-    failed_outcome_update: "Lernzielaktualisierung fehlgeschlagen"
+    failed_outcome_creation: "Lernergebnisserstellung fehlgeschlagen"
+    failed_outcome_update: "Lernergebnisaktualisierung fehlgeschlagen"
     find_instructions: 
       instructions: 
         find: 
-          description: "*Auf die von Ihrer Institution oder Ihrem Bundesland erstellten Lernziele kann hier zugegriffen werden. Wie bei Ihrem Kurs können Sie im linken Bereich zwischen den vorhandenen Lernzielen navigieren. Wenn Sie das gewünschte Lernziel oder die gewünschte Lernzielgruppe gefunden haben, klicken Sie unten auf die Schaltfläche „Importieren“, um das Lernziel bzw. die Lernzielgruppe zu Ihrem Kurs hinzuzufügen.*"
-          title: "Nach Lernzielen suchen"
+          description: "*Auf die von Ihrer Institution oder Ihrem Bundesland erstellten Lernergebnisse kann hier zugegriffen werden. Wie bei Ihrem Kurs können Sie im linken Bereich zwischen den vorhandenen Lernergebnissen navigieren. Wenn Sie das gewünschte Lernergebnis oder die gewünschte Lernergebnisgruppe gefunden haben, klicken Sie unten auf die Schaltfläche „Importieren“, um das Lernergebnis bzw. die Lernergebnisgruppe zu Ihrem Kurs hinzuzufügen.*"
+          title: "Nach Lernergebnissen suchen"
     flash: 
       addSuccess: "Erstellung erfolgreich"
       deleteError: "Ein Fehler ist aufgetreten. Löschen derzeit nicht möglich"
@@ -19664,9 +19701,9 @@ de:
         main: 
           manage: 
             description: "*Lernziele werden hier erstellt, um das Leistungsziel in einem Kurs zu verfolgen. Sehen Sie sich zu Beginn die Menüleiste am oberen Rand an. Klicken Sie auf die Schaltfläche „Neu“, um ein neues Lernziel zu erstellen, oder auf „Neue Gruppe“, um eine neue Gruppe zu erstellen, in der Sie Ihre Lernziele organisieren können. Mithilfe der Schaltfläche „Suchen“ können Sie Lernziele nutzen, die von Ihrem Bundesland oder Ihrer Institution erstellt wurden. Wenn Sie neue Lernziele erstellen und nutzen, können Sie im linken Bereich zwischen Ihren Lernzielen navigieren. Sie können Lernziele auf andere Ebenen ziehen, um eine Struktur zu erstellen.* *Was noch wichtiger ist: Mit Canvas können Sie Lernziele zu Ihren Benotungs-Bewertungsschemata hinzufügen, sodass Sie beim Benoten von Aufgaben die Leistungsziele beurteilen können. Wenn Sie die Lernziele eingerichtet haben, klicken Sie auf „Bewertungsschemata verwalten“, um die Lernziele für die Benotung zu verwenden.*"
-            title: "Lernziele einrichten"
+            title: "Lernergebnisse einrichten"
     mastery_error: "Muss größer als oder gleich 0 sein"
-    missing_outcome: "Lernziel konnte nicht gefunden werden"
+    missing_outcome: "Lernergebnis konnte nicht gefunden werden"
     new_outcome_group: "Neue Ergebnisgruppe"
     outcome: 
       links: 
@@ -19685,11 +19722,11 @@ de:
       criterion: "Bewertungen dieses Kriteriums"
       criterion_dialog: "Lernziele lassen sich in Aufgabenbewertungsschemata einfügen und erleichtern die Beurteilung des Erreichens der Leistungsziele an einer bestimmten Aufgabe. Wenn Sie ein Lernziel definieren, sollten Sie außerdem ein Kriterium festlegen, das als Grundlage für Aufgabenbewertungsschemata verwendet werden kann. Definieren Sie so viele Aufgabenbewertungsschemaspalten, wie Sie benötigen, und bestimmen Sie den Punkteschwellenwert, der das vollständige Erreichen des Leistungsziels definiert."
       criterion_info_link: "Klicken Sie, um Informationen über Kriteriumsbewertungen zu erhalten."
-      description: "Dieses Lernziel beschreiben"
+      description: "Dieses Lernergebnis beschreiben"
       display_name: "Anzeigename (optional)"
       mastery: "Leistungsziel erreicht bei"
       points: "%{points_possible} Punkte"
-      title: "Dieses Lernziel benennen"
+      title: "Dieses Lernergebnis benennen"
       total_points: Gesamtpunkte
     outcome_group: 
       links: 
@@ -19702,20 +19739,20 @@ de:
       mastery_set_at: "Leistungsziel festgelegt bei"
       no_results: "(keine Ergebnisse)"
     outcome_result: 
-      all_outcomes: "alle Lernzielresultate für diese\\*n Studierende\\*n"
+      all_outcomes: "alle Lernergebnisresultate für diese\\*n Studierende\\*n"
       attempt_info: "Versuch Nr. %{attempt_number}, %{attempt_date}"
       outcome_mastered: erreicht
       scoring: "%{points} von insgesamt %{possible_points}"
-    outcomes_for: "Lernziele für %{user_name}"
+    outcomes_for: "Lernergebnisse für %{user_name}"
     show: 
       no_aligned_items: "Keine ausgerichteten Elemente"
       no_artifacts: "Keine Artefakte"
     state_standards: Landesstandards
     state_standards_description: "Links sehen Sie Ordner für die einzelnen Bundesländer mit den aktualisierten Länderstandards. So können Sie auf einfache Weise Standards für die Benotung in Ihrem Kurs verwenden."
-    successful_outcome_creation: "Lernziel erfolgreich erstellt!"
-    successful_outcome_delete: "Lernziel erfolgreich gelöscht"
-    successful_outcome_removal: "Lernziel erfolgreich entfernt"
-    successful_outcome_update: "Lernziel erfolgreich aktualisiert!"
+    successful_outcome_creation: "Lernergebnis erfolgreich erstellt!"
+    successful_outcome_delete: "Lernergebnis erfolgreich gelöscht"
+    successful_outcome_removal: "Lernergebnis erfolgreich entfernt"
+    successful_outcome_update: "Lernergebnis erfolgreich aktualisiert!"
     titles: 
       find_outcomes: "Lernziele suchen"
     top_level: "Oberste %{context}-Ebene"
@@ -19731,17 +19768,17 @@ de:
         see_results: "%{user_name}s Resultate anzeigen für"
       mastery: "Leistungsziel bei letztem Versuch erreicht"
       no_mastery: "Leistungsziel bei letztem Versuch nicht erreicht"
-      outcomes_for: "Lernziele für %{user_name}"
+      outcomes_for: "Lernergebnisse für %{user_name}"
       score_out_of_possible: "%{score}* von insgesamt %{possible}*"
       short_title: 
         attempts: Versuche
         average_percent: "Durchschn. Prozentzahl"
         latest_score: "Letzte Punktzahl"
-        outcome: Lernziel
+        outcome: Lernergebnis
   outcomesFindDialog: 
     confirm: 
       import_group: "Gruppe „%{group}“ in Gruppe „%{target}“ importieren?"
-      import_outcome: "Lernziel „%{outcome}“ in Gruppe „%{target}“ importieren?"
+      import_outcome: "Lernergebnis „%{outcome}“ in Gruppe „%{target}“ importieren?"
     dont_import: "Diese Gruppe kann nicht importiert werden."
     flash: 
       importError: "Fehler beim Import Versuchen Sie es später noch einmal."
@@ -19756,24 +19793,24 @@ de:
     state_standards_description: "Links sehen Sie einen Ordner für jeden Bundesstaat mit seinen aktualisierten Standards. Auf diese Weise können Sie problemlos Bundesstaatsstandards für die Benotung in Ihrem Kurs hinzuziehen."
   outcomesSidebarView: 
     titles: 
-      find_outcomes: "Lernziele suchen"
+      find_outcomes: "Lernergebnisse suchen"
   outcomes_and_rubrics_account_course_68d0bf1d: "Leistungsziele und Bewertungsschemata (Konto/Kurs)"
   outcomes_and_rubrics_account_course_f0d23419: "Leistungsziele und Bewertungsschemata (Konto, Kurs)"
   outcomes_and_rubrics_f893d141: "Leistungsziele und Bewertungsschemata"
   outcomes_are_created_here_to_track_mastery_in_a_co_2f487549: "Die Ergebnisse werden hier erzielt, um das Leistungsziel in einem Kurs zu verfolgen. Sehen Sie sich als Erstes die obere Menüleiste an. Klicken Sie auf die Schaltfläche „Neues Ergebnis“, um ein neues Ergebnis zu erstellen, oder auf „Neue Gruppe“ für eine neue Gruppe zum Organisieren ihrer Ergebnisse. Mit der Schaltfläche „Suchen“ können Sie Ergebnisse verwenden, die durch den Bundesstaat oder die Institution erzeugt wurden. Während Sie Ergebnisse erstellen und verwenden können Sie den Bereich auf der linken Seite nutzen, um zwischen Ihren Ergebnissen zu navigieren. Sie können Ergebnisse zwischen den verschiedenen Ebenen verschieben, um eine Struktur zu erstellen."
   outcomes_csv_format_9005acfb: "Ergebnisse im CSV-Format"
-  outcomes_d1b18d33: Lernziele
+  outcomes_d1b18d33: Lernergebnisse
   outcomes_for_student_9f91d4d: "Ergebnisse für Studenten"
-  outcomes_friendly_description_9792b2f3: "Lernzielfreundliche Beschreibung"
+  outcomes_friendly_description_9792b2f3: "Lernergebnisfreundliche Beschreibung"
   outcomes_have_not_been_added_to_this_account_yet_908ade88: "Die Lernziele wurden noch nicht zu diesem Konto hinzugefügt."
   outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Die Lernziele wurden noch nicht zu diesem Kurs hinzugefügt."
   outcomes_import_completed_baff5cb0: "Ergebnisimport abgeschlossen"
   outcomes_import_failed_77efcdf4: "Ergebnisimport fehlgeschlagen"
-  outcomes_may_be_aligned_to_rubrics_and_quizzes_24e5c4d7: "Lernziele können an Bewertungsschemata und Tests ausgerichtet werden."
-  outcomes_report_8887bd49: Lernziele-Bericht
-  outcomes_selected_e9f87772: "Ausgewählte Lernziele"
-  outcomes_service_alignment_migration_5b4391ad: "Migration für Serviceausrichtung für Lernziele"
-  outcomes_tutorial_tray_ebfce995: "Fach für Lernziel-Tutorials"
+  outcomes_may_be_aligned_to_rubrics_and_quizzes_24e5c4d7: "Lernergebnisse können an Bewertungsschemata und Tests ausgerichtet werden."
+  outcomes_report_8887bd49: Lernergebnisse-Bericht
+  outcomes_selected_e9f87772: "Ausgewählte Lernergebnisse"
+  outcomes_service_alignment_migration_5b4391ad: "Migration für Serviceausrichtung für Lernergebnisse"
+  outcomes_tutorial_tray_ebfce995: "Fach für Lernergebnis-Tutorials"
   over_time_bee1a733: "im Lauf der Zeit"
   override_3de65b2c: "Außer Kraft setzen"
   override_grade_385adf30: "Note überschreiben"
@@ -19799,6 +19836,7 @@ de:
   pace_plans_4bb9c5ff: "Pace Plans"
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Pace Plans sorgt für zusätzliche Unterstützung für laufende Anmeldungen bei Canvas, wodurch eine magische Verteilung der Fälligkeitsdaten für Studenten mit verschiedenen Startdaten auf der Basis eines vom Kursleiter definierten Tempos ermöglicht wird. Sammeln Sie weitere Erfahrungen und geben Sie Feedback, indem Sie der Benutzergruppe „Pace Plans“ betreten."
   pace_plans_is_in_active_development_f6c20046: "Pace Plans ist aktiv in Entwicklung."
+  pace_removed_8e625df7: "Schritt entfernt"
   package_error: "Fehler bei der Identifizierung des Pakettyps: %{error}"
   package_export_from_d6e2b073: "Paketexport von"
   page_50c4823d: Seite
@@ -19985,7 +20023,7 @@ de:
   percent_of_students_scoring_1239d948: "Prozent der Studierenden erhielten Punkte"
   percent_to_deduct_for_missing_submission_4ad01f41: "Prozentualer Abzug für fehlende Abgabe"
   percentage_34ab7c2c: Prozentsatz
-  percentdone_percent_edd66f1b: "%{percentDone} Prozent"
+  percentdone_percent_edd66f1b: "%{percentDone} Prozent"
   percentused_of_bytesavailable_used_894e2327: "%{percentUsed}% von %{bytesAvailable} verwendet"
   percentused_of_bytesavailable_used_a859a40d: "%{percentUsed} von %{bytesAvailable} verwendet"
   performance_ac5f9e70: Performance
@@ -20324,6 +20362,7 @@ de:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Link zum Hilfemenü hinzufügen"
         default_domain: "Domäne (Standard)"
         default_key: "Schlüssel (Standard)"
         tier_1_domain: "Domäne (Tier 1-Support)"
@@ -21134,7 +21173,7 @@ de:
   provides_a_button_which_navigates_straight_to_the__5891d96a: "Enthält eine Schaltfläche, die direkt zu dem Bildschirm „Erstellen“ im Kebab-Menü für neue Quizelemente auf der Seite „Module“ navigiert."
   provides_a_button_which_navigates_straight_to_the__ec46e3b7: "Enthält eine Schaltfläche, die Sie direkt zu dem Bildschirm „Erstellen“ im Kebab-Menü für „Neue Quizze“ auf den Seiten „Module“, „Aufgaben“ und „Quizze“ navigiert."
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Stellt ein Flag für den Entwicklerschlüssel zur Unterstützung von Include-Parametern bei API-Anfragen bereit"
-  provides_a_list_of_alignments_for_each_outcome_in__685afc60: "Enthält eine Ausrichtungsliste für jedes Lernziel in einem Kurs."
+  provides_a_list_of_alignments_for_each_outcome_in__685afc60: "Enthält eine Ausrichtungsliste für jedes Lernergebnis in einem Kurs."
   provides_users_with_a_planner_dashboard_option_1e8d234d: "Bietet Benutzern eine Planer-Dashboard-Option"
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Bietet Benutzern eine Aufgabenlisten-Dashboard-Option"
   provision_a_catalog_account_8cea67f6: "Ein Catalog-Konto bereitstellen"
@@ -21282,7 +21321,7 @@ de:
   question_9121487: Frage
   question_answered: Beantwortet
   question_bank: 
-    align_outcomes: "Lernziele anpassen"
+    align_outcomes: "Lernergebnisse anpassen"
     already_bookmarked: "Lesezeichen existiert bereits"
     bookmark_failed: "Hinzufügen des Lesezeichens fehlgeschlagen"
     bookmarking: "Lesezeichen wird hinzugefügt ..."
@@ -21312,11 +21351,11 @@ de:
     move_questions: "Fragen verschieben"
     multiple_questions: "Mehrere Fragen"
     question_bank: Fragenpool
-    remove_outcome_from_bank: "Möchten Sie dieses Lernziel wirklich aus dem Pool entfernen?"
+    remove_outcome_from_bank: "Möchten Sie dieses Lernergebnis wirklich aus dem Pool entfernen?"
     title: 
       move_copy_questions: "Fragen verschieben/kopieren"
-    update_outcomes_fail: "Aktualisierung der Lernziele fehlgeschlagen"
-    updating_outcomes: "Lernziele werden aktualisiert ..."
+    update_outcomes_fail: "Aktualisierung der Lernergebnisse fehlgeschlagen"
+    updating_outcomes: "Lernergebnisse werden aktualisiert ..."
   question_bank_f6c44d62: Fragenpool
   question_banks: 
     bank_fail: "Der Fragenpool konnte nicht erstellt werden."
@@ -21361,14 +21400,14 @@ de:
         move_questions: "Mehrere Fragen verschieben"
       edit_warning: "Bedenken Sie, dass Änderungen an Fragenvorlagen nicht automatisch zur Aktualisierung der Quizze führen, die diese Fragen verwenden."
       headings: 
-        aligned_outcomes: "Angepasste Lernziele"
+        aligned_outcomes: "Angepasste Lernergebnisse"
       labels: 
         keep_copy: "Belassen Sie auch eine Kopie in diesem Fragenpool"
         new_bank_name: "Neuer Pool-Name"
         new_question_bank: "Neuer Fragenpool"
         title: Pool-Name
       links: 
-        align_outcome: "Lernziel anpassen"
+        align_outcome: "Lernergebnis anpassen"
         more_questions: "weitere Fragen"
       loading_banks: "Pools werden geladen ..."
       mastery_threshold: "Leistungsziel bei %{threshold_percentage}"
@@ -22110,7 +22149,7 @@ de:
         end_quiz_reference_time_current_end: "derzeitiges Zeitlimit"
         end_quiz_reference_time_now: jetzt
         end_the_quiz: "Quiz beenden"
-        extended_quiz_time_explanation: "Sie können dieser/diesem Studierenden mehr Zeit für ihren/seinen derzeitigen Quizversuch einräumen. Wie viel Zeit möchten Sie ihm geben?"
+        extended_quiz_time_explanation: "Sie können dieser/diesem Studierenden mehr Zeit für ihren/seinen derzeitigen Quizversuch einräumen. Wie viel Zeit möchten Sie ihm/ihr geben?"
         extra_time_on_every_attempt: "Zusätzliche Zeit für jeden Versuch:"
         finished_in: "abgeschlossen in %{duration}"
         global_extra_attempt_time: "jeder erhält bereits %{count} Minuten"
@@ -23098,17 +23137,18 @@ de:
   remove_outcome_20e16da7: "Lernziel entfernen?"
   remove_outcome_2feaf5fd: "Lernziel entfernen"
   remove_outcomes_5f8b601c: 
-    one: "Lernziel entfernen"
-    other: "Lernziele entfernen"
+    one: "Lernergebnis entfernen"
+    other: "Lernergebnisse entfernen"
   remove_outcomes_9abcc8fd: 
-    one: "Lernziel entfernen?"
-    other: "Lernziele entfernen?"
+    one: "Lernergebnis entfernen?"
+    other: "Lernergebnisse entfernen?"
+  remove_pace_97381e05: "Schritt entfernen"
   remove_placement_90862c13: "%{placement} entfernen"
   remove_points_from_rubric_dcd4b585: "Punkte aus dem Bewertungsschema entfernen"
   remove_pronouns_5ff760ff: "Pronomen entfernen"
   remove_pronouns_pronoun_c8b03d78: "Pronomen %{pronoun} entfernen"
   remove_recipient_name_a6b83cef: "Empfänger %{name} entfernen"
-  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "%{removableCount} von %{totalCount} Lernzielen entfernen?"
+  remove_removablecount_out_of_totalcount_outcomes_3270d9c0: "%{removableCount} von %{totalCount} Lernergebnissen entfernen?"
   remove_role_filter_label_a27b6797: "Rollenfilter entfernen %{label}"
   remove_row_c198da5a: "Zeile entfernen"
   remove_row_f9d59cba: "Zeile entfernen"
@@ -23128,12 +23168,15 @@ de:
   remove_this_item_from_the_module_4b2ceab7: "Dieses Element aus dem Modul entfernen"
   remove_this_rubric_from_my_list_c7d80704: "Dieses Bewertungsschema aus meiner Liste entfernen"
   remove_this_section_9a88ca43: "Diesen Abschnitt entfernen"
+  remove_this_section_pace_ba87ad3c: "Diesen Schritt für Abschnitt entfernen?"
+  remove_this_student_pace_a5e7b3c5: "Diesen Schritt für Studenten entfernen?"
   remove_user_from_section_5556f465: "Benutzer\\*in aus Kursabschnitt entfernen"
   remove_webcam_image_count_efee4a11: "Webcam-Bild %{count} entfernen"
   removed_assignment_assignment_name_835cc776: "Aufgabe %{assignment_name} entfernt"
   removed_course_association_course_a233342c: "Entfernte Kurszugehörigkeit %{course}"
   removed_filename_a8634af3: "%{filename} entfernt"
   removed_user_as_group_leader_bb69330f: "%{user} wurde als Gruppenleitung entfernt."
+  removing_pace_9493910c: "Schritt wird entfernt ..."
   rename_45608f54: Umbenennen
   rename_c_name_section_e0e92c97: "%{c.name} Abschnitt umbenennen"
   rename_filter_c6cc8efc: "Filter umbenennen"
@@ -23377,13 +23420,13 @@ de:
       manage_feature_flags: "Funktionen auf Kontoebene aktivieren oder deaktivieren"
       manage_files: "Kursdateien verwalten (hinzufügen/bearbeiten/löschen)"
       manage_frozen_assignment: "temporär gesperrte Aufgaben verwalten (bearbeiten/löschen)"
-      manage_global_outcomes: "Globale Lernziele verwalten"
+      manage_global_outcomes: "Globale Lernergebnisse verwalten"
       manage_grades: "Noten bearbeiten"
       manage_groups: "Gruppen verwalten (hinzufügen/bearbeiten/löschen)"
       manage_interaction_alerts: "Benachrichtigungen verwalten"
       manage_internal_settings: "Umgebungsbezogene interne Einstellungen verwalten"
       manage_links: "Rolle und vertrauenswürdige Links verwalten"
-      manage_outcomes: "Lernziele verwalten"
+      manage_outcomes: "Lernergebnisse verwalten"
       manage_proficiency_calculations: "Verwalten von Berechnungen des Kenntnisstands"
       manage_proficiency_scales: "Leistungszielmaßstäbe verwalten"
       manage_role_overrides: "Berechtigungen verwalten"
@@ -23493,7 +23536,7 @@ de:
   root_account_3fb3aacf: root_account
   root_account_id_e8d75734: Root-Konto-ID
   root_accounts_cc035dcf: Root-Konten
-  root_learning_outcome_groups_4eb5a030: Basis-Lernzielgruppen
+  root_learning_outcome_groups_4eb5a030: Basis-Lernergebnisgruppen
   roster: 
     delete_confirm: "Möchten Sie diesen Benutzer wirklich entfernen?"
     error_sending_invitations: "Fehler beim Senden der Einladung. Versuchen Sie es erneut."
@@ -23520,7 +23563,7 @@ de:
   rtf_9165aba5: RTF
   rubric: 
     alignments: 
-      duplicated_outcome: "In diesem Bewertungsschema sind die Lernziele mehrfach ausgerichtet"
+      duplicated_outcome: "In diesem Bewertungsschema sind die Lernergebnisse mehrfach ausgerichtet"
     context_name_rubric: "%{course_name}-Bewertungsschema"
     no_description: "Keine Beschreibung"
     unknown_details: "Unbekannte Details"
@@ -23587,7 +23630,7 @@ de:
           und wie sie entsprechend bewertet werden. Bewertungsschema können mit
           Aufgaben, Diskussionen und Quizfragen verknüpft werden. Verwenden Sie ein Bewertungsschema ausschließlich für die Benotung
           oder erstellen Sie ein nicht bewertendes Bewertungsschema speziell für die auf der Bewertung basierende und
-          ergebnisorientierte Benotung ohne Punkte. Lernziele können als Kriterien in
+          ergebnisorientierte Benotung ohne Punkte. Lernergebnisse können als Kriterien in
           Bewertungsschemata hinzugefügt werden.
   rubrics_export_report_76d30288: "Exportbericht von Bewertungsschemata"
   rubrics_in_course_navigation_539ea536: "Bewertungsschemata in der Kursnavigation"
@@ -23636,7 +23679,7 @@ de:
   save_these_conditions_as_a_filter_a31bbbf8: "Speichern Sie diese Bedingungen als Filter"
   save_this_comment_for_reuse_5eda0b70: "Diesen Kommentar zur Wiederverwendung speichern"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Ihren %{type} speichern, um mit der Festlegung des vorläufigen Inhalts zu beginnen."
-  save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Sparen Sie sich eine Menge Zeit, indem Sie nur die Lernziele hinzufügen, die für Ihren Kursinhalt spezifisch sind."
+  save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Sparen Sie sich eine Menge Zeit, indem Sie nur die Lernergebnisse hinzufügen, die für Ihren Kursinhalt spezifisch sind."
   saved_3cd67a7c: Gespeichert
   saved_comments_2f6ba95: "Gespeicherte Kommentare"
   saved_discussion_settings_successfully_ebd46a57: "Diskussionseinstellungen erfolgreich gespeichert"
@@ -23741,7 +23784,7 @@ de:
       header: 
         content_selection: Inhaltsauswahl
       outcome: 
-        select_outcome: "Lernziel auswählen"
+        select_outcome: "Lernergebnis auswählen"
       student: 
         select_student: "Eine/n Studierende\\*n auswählen"
     grading: 
@@ -23761,7 +23804,7 @@ de:
     learning_mastery: 
       download_results: "Ergebnisse herunterladen (.csv)"
       empty_student_selection: "Wählen Sie eine/n Studierende\\*n aus, um hier zusätzliche Informationen anzuzeigen."
-      empty_submission_selection: "Wählen Sie eine/n Studierende\\*n und ein Lernziel aus, um Ergebnisse anzuzeigen."
+      empty_submission_selection: "Wählen Sie eine/n Studierende\\*n und ein Lernergebnis aus, um Ergebnisse anzuzeigen."
       hide_student_names_label: "Namen der Studierenden ausblenden"
       result: Ergebnis
       result_for: "Ergebnis für:"
@@ -23771,10 +23814,10 @@ de:
       student_info: "Informationen zu der/dem Studierenden"
     outcome_information: 
       avg_score: Punktedurchschnitt
-      empty_outcome_selection: "Wählen Sie ein Lernziel aus, um hier zusätzliche Informationen anzuzeigen."
+      empty_outcome_selection: "Wählen Sie ein Lernergebnis aus, um hier zusätzliche Informationen anzuzeigen."
       high_score: "Höchste Punktzahl"
       low_score: "Niedrigste Punktzahl"
-      outcome_info: "Informationen zum Lernziel"
+      outcome_info: "Informationen zum Lernergebnis"
       result_sub_count: "Gesamtergebnisse:"
     screenreader_gradebook: 
       assignments: Aufgaben
@@ -23925,6 +23968,7 @@ de:
   section_level_calendar_permissions_6aff8cdb: "Kalenderberechtigungen auf Abschnittsebene"
   section_name_b6d82574: "Name des Abschnitts"
   section_name_edb51b2: Abschnittsname
+  section_pace_989d2856: "Schritt – Abschnitt"
   section_removed_2ac72a79: "%{section} entfernt"
   section_section_names_98f172e6: "Abschnitt: %{section_names}"
   section_sis_2a80d2fa: "SIS für Abschnitt"
@@ -23999,6 +24043,7 @@ de:
   security_7a7e8808: Sicherheit
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Sicherheitseinstellung zur Einschränkung von Beitritts-URLs zu einer Konferenz"
   security_tab_failed_to_load_2d2242a: "Registerkarte „Sicherheit“ konnte nicht geladen werden."
+  see_comments_details_44f460d9: "Kommentardetails ansehen"
   see_example_below_to_see_how_different_calculation_618de98d: "Siehe im Beispiel unten, wie unterschiedlich Berechnungsparameter die Leistungsziel-Berechnung für Studierende beeinflussen."
   see_more_in_canvas_guides_fc90a457: "Weitere Informationen finden Sie in den Canvas-Anleitungen"
   see_other_users_primary_email_address_59c8473f: "Siehe primäre E-Mail-Adressen anderer Benutzer\\*innen"
@@ -24014,7 +24059,7 @@ de:
   select_a_grading_period_5ea50f1: "Einen Benotungszeitraum wählen ..."
   select_a_grading_period_aab25483: "Einen Benotungszeitraum wählen"
   select_a_group_category_295f7a34: "Gruppenkategorie auswählen"
-  select_a_group_to_reveal_outcomes_here_91883028: "Wählen Sie eine Gruppe aus, um hier Lernziele offenzulegen."
+  select_a_group_to_reveal_outcomes_here_91883028: "Wählen Sie eine Gruppe aus, um hier Lernergebnisse offenzulegen."
   select_a_homeroom_bd9ec5d5: "Auswählen einer Organisationsstunde"
   select_a_location_4eb17e4b: "Einen Standort auswählen"
   select_a_log_type_to_search_247fc6b4: "Wählen Sie einen Protokolltyp aus, nach dem gesucht werden soll."
@@ -24030,7 +24075,7 @@ de:
     other: "Alle (%{count}) Kurse auswählen"
   select_all_students_7c2c34b3: "Alle Studenten auswählen"
   select_an_edit_operation_ec1467d: "Wählen Sie einen Bearbeitungsvorgang"
-  select_an_outcome_group_6edb08a7: "Eine Lernzielgruppe auswählen"
+  select_an_outcome_group_6edb08a7: "Eine Lernergebnisgruppe auswählen"
   select_another_group_24773e5f: "Eine andere Gruppe auswählen"
   select_assignment_title_4571ffcb: "Aufgabe auswählen: %{title}"
   select_audio_file_7d905cce: "Audio-Datei auswählen"
@@ -24090,7 +24135,7 @@ de:
   select_one_b647b384: "Eine auswählen"
   select_one_of_the_options_c8b0c6e4: "Eine der Optionen auswählen:"
   select_outcome_7e6e2562: "Lernziel auswählen"
-  select_outcome_title_b99b3ca0: "Lernziel %{title} auswählen"
+  select_outcome_title_b99b3ca0: "Lernergebnis %{title} auswählen"
   select_page_e93fc123: "Seite wählen"
   select_placements_type_or_use_arrow_keys_to_naviga_a6bfd561: "Platzierungen auswählen Tippen Sie etwas oder verwenden Sie die Pfeiltasten, um zu navigieren. Eine Mehrfachauswahl ist zulässig."
   select_prerequisite_module_57894963: "Erforderliches Modul auswählen"
@@ -24124,7 +24169,7 @@ de:
   select_video_file_35b61d4e: "Video-Datei auswählen"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Wählen Sie die auf der Startseite anzuzeigenden Inhalte aus."
   select_whether_to_post_for_all_submissions_or_only_b18d681f: "Wählen Sie, ob Sie für alle Abgaben oder nur für benotete posten möchten."
-  selectable_outcomes_during_course_content_migratio_3f108a1a: "Wählbare Lernziele bei der Migration von Kursinhalten"
+  selectable_outcomes_during_course_content_migratio_3f108a1a: "Wählbare Lernergebnisse bei der Migration von Kursinhalten"
   selected_274ce24f: Ausgewählt
   selected_all_courses_9cfef57f: "Alle Kurse ausgewählt"
   selected_answer: "Sie haben diese Antwort gewählt."
@@ -24278,7 +24323,7 @@ de:
   set_the_due_date_in_course_pacing_after_the_assign_b4016cb7: "Legen Sie das Fälligkeitsdatum im Kurs-Pacing fest, nachdem die Aufgabe erstellt wurde."
   set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Stellen Sie die Leistungszielskala so ein, dass sie für alle Kurse in diesem Konto verwendet wird."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
-      \x20           Legen Sie fest, wie Ihre Kompetenzeinstufungen im von Lernzielnotenbuch erscheinen.\n\
+      \x20           Legen Sie fest, wie Ihre Kompetenzeinstufungen im von Lernergebnisnotenbuch erscheinen.\n\
       \x20           Passen Sie die Anzahl der Einstufungen, Leistungszielebenen, Punkte und Farben an.\n\
       \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Einrichten wie Ihre Kompetenzeinstufungen im Lernziele-Notenbuch erscheinen sollen. Anpassen der Anzahl Einstufungen, Ebene der Zielerfüllung, Punkte und Farben"
@@ -24288,10 +24333,10 @@ de:
             Beurteilen Sie den Fortschritt der Studenten mit Hilfe von Berechnungsmethoden und messen Sie den Fortschritt direkt im Notenbuch für Lernleistungsziele.
             Importieren Sie Lernziele von bestehenden Konten, Staaten und Common Core Standards in Ihren Kurs. Sie können Lernziele auch in Kurs-Bewertungsschemata anpassen.
   set_up_outcomes_in_your_course_as_measured_by_peda_78eb842e: |-
-      Richten Sie Lernziele in Ihrem Kurs ein, die an pädagogischen oder gewünschten Zielen gemessen werden.
+      Richten Sie Lernergebnisse in Ihrem Kurs ein, die an pädagogischen oder gewünschten Zielen gemessen werden.
             Helfen Sie den Studierenden beim Erlernen von Fertigkeiten und Aktivitäten, anstatt sich nur auf Noten als Maß ihres Erfolgs zu konzentrieren.
             Beurteilen Sie den Fortschritt der Studierenden mit Hilfe von Berechnungsmethoden und messen Sie den Fortschritt direkt im Notenbuch für Lernleistungsziele.
-            Importieren Sie vorhandene Konto- und Bundeslandlernziele in Ihren Kurs. Sie können Lernziele auch in Kurs-Bewertungsschemata anpassen.
+            Importieren Sie vorhandene Konto- und Bundeslandlernergebnisse in Ihren Kurs. Sie können Lernergebnisse auch in Kurs-Bewertungsschemata anpassen.
   set_up_video_conferencing_and_other_tools_1a94a350: "Einrichten von Videokonferenzen und anderen Tools"
   set_up_video_conferencing_c0049abe: "Einrichten von Videokonferenzen"
   set_up_your_canvas_course_in_30_minutes_or_less_94817b6d: "Richten Sie Ihren Canvas-Kurs in höchstens 30 Minuten ein."
@@ -24370,11 +24415,11 @@ de:
   share_microphone_55dfeddd: "Mikrofon freigeben"
   share_the_following_pairing_code_with_an_observer__44f50f99: |-
       Geben Sie den folgenden Pairing-Code an eine/n Beobachter\*in weiter, damit
-          er sich mit %{name} verbinden kann. Dieser Code verfällt nach 7 Tagen
+          er/sie sich mit %{name} verbinden kann. Dieser Code verfällt nach 7 Tagen
           oder nach der erstmaligen Verwendung.
   share_the_following_pairing_code_with_an_observer__9b7c3667: |-
       Geben Sie den folgenden Pairing-Code an eine/n Beobachter\*in weiter,
-          damit er sich mit Ihnen verbinden kann. Dieser Code verfällt nach 7 Tagen
+          damit er/sie sich mit Ihnen verbinden kann. Dieser Code verfällt nach 7 Tagen
           oder nach der erstmaligen Verwendung.
   share_the_following_pairing_code_with_an_observer__9cd44f7e: |-
       Geben Sie den folgenden Pairing-Code an einen Beobachter weiter, damit
@@ -24565,7 +24610,7 @@ de:
         events: Ereignisse
     find_outcome: 
       buttons: 
-        add_outcome: "Lernziel hinzufügen"
+        add_outcome: "Lernergebnis hinzufügen"
       labels: 
         criterion_ratings: "Bewertungen dieses Kriteriums"
         master_level: "Leistungsziel erreicht bei einer Punktzahl ab"
@@ -25186,7 +25231,7 @@ de:
   show_only_disabled_calendars_cb8e2bdc: "Nur deaktivierte Kalender anzeigen"
   show_only_enabled_calendars_8caef0df: "Nur aktivierte Kalender anzeigen"
   show_originality_report_to_students_be22f5ee: "Den Studenten den Originalitätsbericht zeigen"
-  show_outcomes_statistics_3c2b34eb: "Lernziel-Statistik anzeigen"
+  show_outcomes_statistics_3c2b34eb: "Lernergebnis-Statistik anzeigen"
   show_params_3401895b: "Parameter anzeigen"
   show_past_account_level_announcements_to_users_3b8208e2: "Vergangene Ankündigungen auf Kontoebene für Benutzer anzeigen"
   show_past_account_level_announcements_to_users_all_36b50d74: |-
@@ -25233,7 +25278,7 @@ de:
   singleton_46df7e3b: Singleton
   singleton_name_has_no_next_in_strand_653b83b8: "Singleton „%{name}“ hat keine next_in_strand."
   singletons_99a47787: Singletons
-  sioux_city_outcomes_report_710baf47: "Sioux City Lernzielbericht"
+  sioux_city_outcomes_report_710baf47: "Sioux City Lernergebnisbericht"
   sis_2164965: SIS
   sis_agent_token_authentication_2a0b29e3: "Authentifizierung des SIS-Agent-Token"
   sis_batch: 
@@ -25339,6 +25384,7 @@ de:
   size_b30e1077: Größe
   size_f1873a2: ", Größe: "
   size_size_a77bd760: "Größe: %{size}"
+  skillcode_685526a6: skillcode
   skip_bcb86160: Überspringen
   skip_to_content_22ad1d00: "Direkt zum Inhalt"
   skip_weekends_13cbd889: "Wochenenden überspringen"
@@ -25384,8 +25430,8 @@ de:
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "Einige Konferenzen auf dieser Seite sind verborgen, da bei der Abfrage ihres Status Fehler aufgetreten sind."
   some_custom_columns_could_not_be_changed_because_t_88abc9be: "Einige benutzerdefinierte Spalten konnte nicht geändert werden, da sie schreibgeschützt sind. Die Änderungen für diese Spalten wurden ignoriert."
   some_module_items_could_not_be_published_e4be3c0: "Einige Modulelemente konnten nicht veröffentlicht werden."
-  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Einige der von Ihnen ausgewählten Lernziele können nicht entfernt werden, da sie auf Inhalt in diesem Konto abgestimmt sind. Möchten Sie fortfahren mit dem Entfernen von Lernzielen ohne Ausrichtung?"
-  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Einige der von Ihnen ausgewählten Lernziele können nicht entfernt werden, da sie auf Inhalt in diesem Kurs abgestimmt sind. Möchten Sie fortfahren mit dem Entfernen von Lernzielen ohne Ausrichtung?"
+  some_of_the_outcomes_that_you_have_selected_cannot_4a42634a: "Einige der von Ihnen ausgewählten Lernergebnisse können nicht entfernt werden, da sie auf Inhalt in diesem Konto abgestimmt sind. Möchten Sie fortfahren mit dem Entfernen von Lernergebnissen ohne Ausrichtung?"
+  some_of_the_outcomes_that_you_have_selected_cannot_c417625: "Einige der von Ihnen ausgewählten Lernergebnisse können nicht entfernt werden, da sie auf Inhalt in diesem Kurs abgestimmt sind. Möchten Sie fortfahren mit dem Entfernen von Lernergebnissen ohne Ausrichtung?"
   some_settings_have_been_administratively_locked_9e3ee880: "Einige Einstellungen wurden von dem/der Administrator\\*in gesperrt."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "Einige Einstellungen wurden deaktiviert, da die Aufgabe in einen abgeschlossenen Benotungszeitraum fällt."
   some_submissions_are_not_gradeable_grade_changes_f_f8bf44e2: "Einige Abgaben sind nicht benotbar; Notenänderungen für diese Abgaben wurden ignoriert."
@@ -25428,7 +25474,7 @@ de:
   sort_by_72dbba9c: "Sortieren nach"
   sort_by_e75f9e3e: "Sortieren nach"
   sort_courses_cf94b8d4: "Kurse sortieren"
-  sort_outcome_column_c53702ed: "Lernzielspalte sortieren"
+  sort_outcome_column_c53702ed: "Lernergebnisspalte sortieren"
   sort_students_1a561e98: "Studierende sortieren"
   sortable_name_73f707cf: "Sortierbarer Name"
   sortable_name_e25fe66c: "Sortierbarer Name:"
@@ -25555,7 +25601,7 @@ de:
     media_recordin: Medienaufzeichnung
     next_object: "Nächster %{type}"
     no_assignment: "Keine Aufgabe ausgewählt"
-    no_outcome: "Kein Lernziel ausgewählt"
+    no_outcome: "Kein Lernergebnis ausgewählt"
     no_student: "Kein/e Studierende\\*r ausgewählt"
     none: Keine
     notes: Anmerkungen
@@ -25566,7 +25612,7 @@ de:
     online_url: Online-URL
     previous_object: "Vorheriger %{type}"
     student_hidden_name: "Studierende\\*r %{position}"
-  srsd_student_outcome_results_rollups_3cf58a5c: "SRSD Studierendenlernziel-Rollups"
+  srsd_student_outcome_results_rollups_3cf58a5c: "SRSD Studierendenlernergebnis-Rollups"
   sso_settings_ebf98263: SSO-Einstellungen
   stable_features_84154e5d: "Stabile Funktionen"
   staff_contact_info_2f7a6603: Mitarbeiterkontakt-Info
@@ -25751,6 +25797,7 @@ de:
       bei den Kurslernergebnissen anzuzeigen. Die Ergebnisse werden in einem notenbuchähnlichen
       Format, und die Fortschritte werden als Punktzahl angezeigt und als „Erreicht“, „Fast
       erreicht“ und „Zu fördern“.
+  student_pace_2200bf85: "Schritt – Studierende"
   student_page_history_ce86b3c2: "Verlauf der Studierendenseite"
   student_page_history_pages_update_ae55fa03: "Studenten-Seitenverlauf (Seiten - Aktualisieren)"
   student_paired_successfully_a88def61: "Studierende\\*n erfolgreich verbunden"
@@ -25898,6 +25945,7 @@ de:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Abgabekommentar: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: Abgabekommentare
   submission_comments_b6d65841: Abgabekommentare
+  submission_comments_tray_290fad59: "Fach für Einreichungskommentare"
   submission_completed_ba0e552e: "Abgabe abgeschlossen"
   submission_data_88085815: Abgabedaten
   submission_date_8f659c0c: Abgabedatum
@@ -26223,6 +26271,7 @@ de:
   sync_to_posttosisname_9837a8bf: "Synchronisieren nach %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Synchronisieren nach %{postToSISName}"
   sync_to_sisname_f343e59: "Synchronisieren mit %{sisName}"
+  sync_uris_50c59540: "URIs synchronisieren"
   synced_97764882: Synchronisiert
   synced_message_20469c8f: "Synchronisiert: %{message}"
   syncing_3061cc8d: "Wird synchronisiert ..."
@@ -26264,7 +26313,7 @@ de:
     logout: Abmelden
     modules: Module
     observees: Beobachten
-    outcomes: Lernziele
+    outcomes: Lernergebnisse
     pace_plans: Pace-Plans
     pages: Seiten
     past_global_announcements: "Globale Ankündigungen"
@@ -26659,18 +26708,18 @@ de:
   the_microsoft_365_group_created_by_sync_no_longer__106b74a7: "Die durch Synchronisation erstellte Microsoft 365 Group existiert nicht mehr. In der Regel bedeutet das, dass die Gruppe Microsoft-seitig gelöscht wurde (z. B. durch eine/n Administrator\\*in). Eine manuelle Neusynchronisierung sollte das Problem beheben und die Gruppe bei Bedarf neu erstellen."
   the_microsoft_365_tenant_provided_in_account_setti_7be0b625: "Der in den Kontoeinstellungen bereitgestellte Microsoft 365-Mandant ist kein Schulungs-Mandant, also nicht verwendbar mit der Integration der Microsoft Teams-Synchronisation."
   the_module_item_is_locked_27fe420b: "Das Modulelement ist gesperrt."
-  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Die letzten Punkte für den/die Benutzer\\*in %{current_user_name} sowie das Lernziel %{outcome_name}"
+  the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Die letzten Punkte für den/die Benutzer\\*in %{current_user_name} sowie das Lernergebnis %{outcome_name}"
   the_next_available_appointment_in_this_course_is_o_da10316c: "Der nächste verfügbare Termin in diesem Kurs ist am *%{date}*"
   the_original_quizzes_interface_fcda53bc: "Die ursprüngliche Quiz-Oberfläche"
   the_outcome_group_was_successfully_imported_into_t_9c80a6fb: "Die Lernzielgruppe wurde erfolgreich in diesen Kurs importiert."
   the_outcome_group_was_successfully_imported_into_t_cf19e3d1: "Die Lernzielgruppe wurde erfolgreich in dieses Konto importiert."
-  the_outcome_to_report_on_7d30886d: "Das Lernziel, über das berichtet wird"
+  the_outcome_to_report_on_7d30886d: "Das Lernergebnis, über das berichtet wird"
   the_outcomes_that_you_have_selected_cannot_be_remo_6d259ee0: 
-    one: "Das von Ihnen ausgewählte Lernziel kann nicht entfernt werden, da es auf Inhalt in diesem Konto abgestimmt ist."
-    other: "Die von Ihnen ausgewählten Lernziele können nicht entfernt werden, da sie auf Inhalt in diesem Konto abgestimmt sind."
+    one: "Das von Ihnen ausgewählte Lernergebnis kann nicht entfernt werden, da es auf Inhalt in diesem Konto abgestimmt ist."
+    other: "Die von Ihnen ausgewählten Lernergebnisse können nicht entfernt werden, da sie auf Inhalt in diesem Konto abgestimmt sind."
   the_outcomes_that_you_have_selected_cannot_be_remo_fc7244f2: 
-    one: "Das von Ihnen ausgewählte Lernziel kann nicht entfernt werden, da es auf Inhalt in diesem Kurs abgestimmt ist."
-    other: "Die von Ihnen ausgewählten Lernziele können nicht entfernt werden, da sie auf Inhalt in diesem Kurs abgestimmt sind."
+    one: "Das von Ihnen ausgewählte Lernergebnis kann nicht entfernt werden, da es auf Inhalt in diesem Kurs abgestimmt ist."
+    other: "Die von Ihnen ausgewählten Lernergebnisse können nicht entfernt werden, da sie auf Inhalt in diesem Kurs abgestimmt sind."
   the_plagiarism_platform_settings_can_t_be_changed__629adec6: "Die Einstellungen der Plagiatsplattform können nicht geändert werden, da Studierende bereits diese Aufgabe abgegeben haben."
   the_preceding_content_is_partner_provided_d753928c: "Der vorhergehende Inhalt stammt von einem Partner."
   the_previous_sis_batch_was_aborted_d7d89955: "Der vorherige SIS-Stapel wurde abgebrochen."
@@ -26748,11 +26797,11 @@ de:
   the_topic_was_successfully_deleted_a4980cad: "Das Thema wurde erfolgreich gelöscht."
   the_unique_id_used_for_representing_the_specific_r_3bdf5870: "Die eindeutige ID des spezifischen Anfrage/Antwort-Zyklus verwendet wird, in dessen Zusammenhang dieser Fehlerbericht stattfand"
   the_url_a_sufficiently_priviledged_user_could_use__e6b02c56: "Der URL, den ein/e ausreichend berechtigte/r Benutzer\\*in verwenden konnte, um sich als der/die berichtende Benutzer\\*in auf derselben Seite auszugeben und das Problem zu melden und zu reproduzieren"
-  the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Der URL der Seite, auf der der/die Benutzer\\*in war, als er den Fehler meldete"
+  the_url_of_the_page_the_user_was_on_when_they_repo_11dfa92f: "Der URL der Seite, auf der der/die Benutzer\\*in war, als er/sie den Fehler meldete"
   the_user_id_s_of_the_admin_s_making_submissions_5432b2ce: "Die user_id(s) des/r Admin(s), der Abgaben macht"
   the_user_id_to_report_on_b1de2577: "Die Benutzer-ID, über die zu berichten ist"
   the_user_must_also_be_enrolled_as_an_instructor_in_e7e22eea: "Der Benutzer muss auch als Lehrer in den Kursen angemeldet sein, die sie über Kreuz listen wollen."
-  the_user_to_report_on_820dea8a: "Der/die Benutzer\\*in, über den zu berichten ist"
+  the_user_to_report_on_820dea8a: "Der/die Benutzer\\*in, über den/sie zu berichten ist"
   the_value_of_possible_points_for_this_assignment_c_42396e3: "Der Wert der möglichen Punkte für diese Aufgabe darf nicht größer als 999999999 sein."
   their_grade_for_the_assignment_c36a60ef: "Ihre Note für die Aufgabe"
   theme_52404e51: Design
@@ -26780,7 +26829,7 @@ de:
   there_are_no_configured_ltis_that_interact_with_co_8c780ce6: "Es gibt keine konfigurierten LTIs zur Interaktion mit Arbeitsgruppen."
   there_are_no_discussions_to_show_in_this_section_e8f04ebd: "In diesem Abschnitt gibt es keine Diskussionen."
   there_are_no_outcomes_in_the_course_1d36d9c6: "Es gibt keine Ergebnisse in dem Kurs."
-  there_are_no_outcomes_in_this_group_9a70fa8a: "In dieser Gruppe gibt es keine Lernziele."
+  there_are_no_outcomes_in_this_group_9a70fa8a: "In dieser Gruppe gibt es keine Lernergebnisse."
   there_are_no_pending_changes_to_cancel_244389fe: "Es gibt keine ausstehenden Änderungen zum Stornieren."
   there_are_no_pending_changes_to_publish_b4ffc6a7: "Es gibt keine ausstehenden Änderungen zum Veröffentlichen."
   there_are_no_reports_for_you_to_view_b716717a: "Sie können keine Berichte anzeigen."
@@ -26841,6 +26890,7 @@ de:
   there_was_an_error_fetching_custom_columns_542014ef: "Es gab einen Fehler beim Abrufen von benutzerdefinierten Spalten."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "Beim Abrufen der Daten vom Notenbuch ist ein Fehler aufgetreten."
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "Beim Abrufen der Notenbuchfilter ist ein Fehler aufgetreten."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "Es ist ein Fehler beim Abrufen der Aufgabendaten des Bewertungszeitraums aufgetreten."
   there_was_an_error_fetching_modules_8ee451bb: "Beim Abrufen der Module ist ein Fehler aufgetreten."
   there_was_an_error_fetching_outcome_results_45c57590: "Fehler beim Holen der Ergebnisse"
   there_was_an_error_fetching_student_data_87463510: "Es ist ein Fehler beim Abrufen der Daten von Studierenden aufgetreten."
@@ -26986,7 +27036,7 @@ de:
   this_course_is_claimed_and_ready_but_you_ll_need_t_25b95a0a: "Dieser Kurs wurde angefordert und ist einsatzbereit. Sie müssen jedoch den Registrierungsvorgang abschließen, bevor der Kurs veröffentlicht werden kann. Sie sollten eine E-Mail von Canvas mit einem Link zum Abschließen des Vorgangs erhalten haben. Überprüfen Sie Ihren Spam-Ordner."
   this_course_is_using_course_pacing_go_to_course_pa_4de4cc38: "In diesem Kurs wird Kurs-Pacing verwendet. Gehen Sie zum Kurs-Pacing, um die Fälligkeitsdaten zu verwalten."
   this_course_is_visible_only_to_teachers_until_it_i_ce972f0: "Dieser Kurs ist für Lehrende\\*n nur bis zur Veröffentlichung sichtbar."
-  this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Dieses Kriterium ist an ein Lernziel gebunden."
+  this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: "Dieses Kriterium ist an ein Lernergebnis gebunden."
   this_due_date_is_managed_by_cfbb698c: "Dieses Fälligkeitsdatum wird verwaltet von"
   this_due_date_is_managed_by_course_pacing_d9f9ce1d: "Dieses Fälligkeitsdatum wird von Kurs-Pacing verwaltet."
   this_element_is_a_more_accessible_alternative_to_d_e17b4e51: "Dieses Element stellt eine benutzerfreundlichere Alternative zur Neuordnung mit der Funktion zum Ziehen und Ablegen dar. Um die Frage zu verschieben, drücken Sie entweder die Eingabe- oder die Leertaste."
@@ -27036,6 +27086,9 @@ de:
       Diese Funktionsmarkierung aktiviert die Isolierte Ansicht innerhalb des neuen
       Diskussions-Redesigns.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "Dieses Funktions-Flag aktiviert das Upgrade für die Teilnehmerseite „React/InstUI und GraphQL“."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      Diese Funktionsmarkierung ermöglicht die geteilte Bildschirmansicht innerhalb des neuen
+      Diskussions-Redesigns.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       Dieses Funktions-Flag ermöglicht die Verwendung der aktualisierten
       Seite zum Erstellen/Bearbeiten von Diskussionen.
@@ -27154,7 +27207,7 @@ de:
   this_outcome_has_been_used_to_assess_a_student_and_5a925169: "Dieses Lernziel wurde zur Bewertung eines Studenten verwendet und kann weder bearbeite noch gelöscht werden."
   this_outcome_has_been_used_to_assess_a_student_and_a3a48511: "Dieses Ergebnis wurde verwendet, um eine/n Studierende\\*n zu beurteilen, und einige Änderungen werden Auswirkungen auf Studierendenergebnisse haben."
   this_outcome_has_been_used_to_assess_a_student_onl_4b4c1e95: "Dieses Ergebnis wurde zur Beurteilung eines Studenten verwendet. Nur Textfelder können aktualisiert werden."
-  this_outcome_has_not_been_aligned_320b20c2: "Dieses Lernziel wurde nicht abgestimmt."
+  this_outcome_has_not_been_aligned_320b20c2: "Dieses Lernergebnis wurde nicht abgestimmt."
   this_outcome_was_successfully_removed_from_this_ac_ed855bcd: "Dieses Lernziel wurde erfolgreich von diesem Konto entfernt."
   this_outcome_was_successfully_removed_from_this_co_da04ca85: "Dieses Lernziel wurde erfolgreich aus diesem Kurs entfernt."
   this_outcome_was_successfully_updated_b323e27c: "Das Lernziel wurde erfolgreich aktualisiert.."
@@ -27240,9 +27293,11 @@ de:
   this_report_shows_the_student_final_grade_results__5a508b55: "Dieser Bericht zeigt die abschließenden Notenergebnisse für alle Studierenden in einem bestimmten Semester. Die daraus resultierende CSV-Datei enthält jeweils eine Zeile pro Einschreibung und zeigt die aktuelle und die Abschlussnote, die im Kursnotenbuch angezeigt wird."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Diese Beispielseite enthält geläufige UI-Elemente in Canvas, um Ihnen beim Aufbau Ihres individuell angepassten Brandings zu helfen. Sobald Sie die Farbwerte und Bilder in der linken Seitenleiste verändern, erscheint eine Schaltfläche *Vorschau Ihrer Änderungen*. Klicken Sie darauf, um Ihre Seite zu aktualisieren, und sehen Sie sich die Änderungen an."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Diese Beispielseite enthält häufige Elemente der Benutzeroberfläche in Canvas, die Ihnen helfen, ein eigenes benutzerdefiniertes Branding zu erstellen. Sobald Sie beginnen, Farbwerte und Bilder zu ändern, sehen Sie eine Schaltfläche *Vorschau Ihrer Änderungen*. Klicken Sie darauf, um diese Seite zu aktualisieren und zu schauen, wie Ihre Änderungen aussehen."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "Der Schritt für diesen Abschnitt wird entfernt und der Schritt wird auf den Standardschritt zurückgesetzt."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Diese Einstellung wirkt sich nur auf Ihre Ansicht der Studierendennoten aus und zeigt die Noten so an, als ob alle nicht benoteten Aufgaben mit null Punkten bewertet würden. Diese Einstellung ist nur eine visuelle Änderung und hat keine Auswirkungen auf die Noten für Studierende oder andere Benutzer\\*innen dieses Notenbuchs. Wenn diese Einstellung aktiviert ist, fügt Canvas keine Nullen in das Bewertungsbuch für Studierendeneinsendungen innerhalb einzelner Aufgaben ein. Nur in den Aufgabengruppen und den Gesamtspalten werden Nullen automatisch in die Gesamtprozentsätze für jede/n Studierende\\*n einbezogen."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "Diese Einstellung verändert die Canvas-Erfahrung für Studierende und Lehrende erheblich."
   this_settings_only_impact_enrollments_this_include_7f51358: "Diese Einstellungen betreffen nur Einschreibungen. Enthalten sind Objekte mit einem last_activity_at Zeitstempel, der größer ist als der Parameter „Aktualisiert nach“. Die Standardeinstellung ist „Aus“."
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "Der Schritt für diesen Studierenden wird entfernt und der Schritt wird auf den Standardschritt zurückgesetzt."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Die Einschreibung dieses Studenten wurde abgeschlossen."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Die Einschreibung dieser/dieses Studierenden wurde abgeschlossen."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Die Antworten des Studenten werden verborgen, da diese Aufgabe anonym ist."
@@ -27286,7 +27341,7 @@ de:
   this_will_set_next_in_strand_on_the_appropriate_nu_42be1d07: "Dadurch wird next_in_strand auf die entsprechende Anzahl von Aufträgen eingestellt, um den Strang oder das Singleton zu entsperren."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Dies aktualisiert alle Konto- und Kursstufen-Bewertungsschemata, die an Leistungszielmaßstäbe auf Kontoebene gebunden sind und noch nicht bewertet wurden."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Dies aktualisiert alle Bewertungsschemata auf Konto- und Kursebene, die an Leistungszielmaßstäbe auf Kontoebene gebunden sind und noch nicht bewertet wurden."
-  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Dies aktualisiert alle Bewertungsschemata, die auf Lernziele innerhalb dieses Kurses ausgerichtet sind, die noch nicht bewertet wurden."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Dies aktualisiert alle Bewertungsschemata, die auf Lernergebnisse innerhalb dieses Kurses ausgerichtet sind, die noch nicht bewertet wurden."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dies aktualisiert alle Rubriken mit diesem Ergebnis, die noch nicht bewertet wurden."
   this_will_update_all_student_mastery_results_tied__a52301e5: "Dies aktualisiert alle Leistungszielergebnisse der Studierenden, die an die Leistungszielberechnung auf Kontoebene gebunden sind."
   this_will_update_all_student_mastery_results_withi_934580d1: "Dies aktualisiert alle Leistungszielergebnisse der Studierenden in diesem Kurs."
@@ -27533,7 +27588,7 @@ de:
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Der Name muss kürzer als %{length} Zeichen sein."
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} ist entsperrt Zum Sperren klicken"
   title_no_due_date_bbbd3b53: "%{title}: Kein Abgabetermin"
-  title_outcomes_7adbd9cc: "%{title} Lernziele"
+  title_outcomes_7adbd9cc: "%{title} Lernergebnisse"
   title_required_3ff5969: "Titel erforderlich"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} Fach"
@@ -27548,9 +27603,9 @@ de:
     discussion: Diskussion
     discussions: Diskussionen
     error_reports: Fehlerberichte
-    learning_outcomes: Lernziele
+    learning_outcomes: Lernergebnisse
     messages: Nachrichten
-    outcome_artifacts: Lernziel-Artefakte
+    outcome_artifacts: Lernergebnis-Artefakte
     people: Personen
     topic: Thema
     view_in_separate_window: "In neuem Fenster anzeigen"
@@ -27572,7 +27627,7 @@ de:
   to_access_the_account_settings_tab_account_level_s_9676d44b: "Für den Zugriff auf die Registerkarte „Kontoeinstellungen“ muss „Einstellungen auf Kontoebene – verwalten“ ebenfalls aktiviert sein."
   to_access_the_assignments_index_page_course_conten_49d884f2: "Für den Zugriff auf die Aufgabenlisten-Indexseite muss „Kurs-Inhalt – anzeigen“ aktiviert sein."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "Für den Zugriff auf die Aufgabenlisten-Indexseite muss „Kurs-Content – anzeigen“ aktiviert sein. Um Aufgaben für einzelne Studenten zu differenzieren, muss „Benutzer – Liste anzeigen“​ebenfalls aktiviert sein."
-  to_access_the_calculation_tab_the_outcome_proficie_cdd40cdf: "Um auf die Registerkarte „Berechnung“ zugreifen zu können, muss die Berechtigung „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ ebenfalls aktiviert sein. Um auf die Registerkarte „Verwalten“ zugreifen zu können, muss die Berechtigung „Lernziele – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
+  to_access_the_calculation_tab_the_outcome_proficie_cdd40cdf: "Um auf die Registerkarte „Berechnung“ zugreifen zu können, muss die Berechtigung „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ ebenfalls aktiviert sein. Um auf die Registerkarte „Verwalten“ zugreifen zu können, muss die Berechtigung „Lernergebnisse – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
   to_access_the_courses_link_in_account_navigation_c_4f4a7ffc: "Um in der Kontonavigation auf den Link „Kurse“ zugreifen zu können, muss „Kurse – Liste anzeigen“ ebenfalls aktiviert sein."
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "Um in der Kontonavigation auf den Link „Kurse“ zugreifen zu können, muss „Kurse – Liste anzeigen“ aktiviert sein."
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
@@ -27584,7 +27639,7 @@ de:
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "Zugreifen auf den Kurse-Link in der Kursnavigation, Kurse verwalten: „Admin – verwalten/aktualisieren“ und „Kurse – Liste anzeigen“ müssen aktiviert sein."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "Um auf einer Kursquizindexseite auf den Link „Fragenpools verwalten“ zugreifen zu können, müssen „Kurs-Content – anzeigen“ und „Aufgaben und Quizze – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
   to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "Um auf einer Kursquizindexseite auf den Link „Fragenpools verwalten“ zugreifen zu können, müssen die Berechtigungen „Kurs-Inhalt – anzeigen“ und „Aufgaben und Quizze – verwalten/bearbeiten“ ebenfalls aktiviert sein."
-  to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "Um auf die Registerkarte „Beherrschung“ zugreifen zu können, muss die Berechtigung „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ ebenfalls aktiviert sein. Um auf die Registerkarte „Verwalten“ zugreifen zu können, muss die Berechtigung „Lernziele – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
+  to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "Um auf die Registerkarte „Beherrschung“ zugreifen zu können, muss die Berechtigung „Berechnungen des Kenntnisstands – hinzufügen/bearbeiten“ ebenfalls aktiviert sein. Um auf die Registerkarte „Verwalten“ zugreifen zu können, muss die Berechtigung „Lernergebnisse – hinzufügen/bearbeiten/löschen“ ebenfalls aktiviert sein."
   to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "Um auf die Seite „Teilnehmer\\*innen“ zugreifen und Kursgruppen anzeigen zu können, muss die Berechtigung „Benutzer – Liste anzeigen“ aktiviert sein."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "Um die Seite „Teilnehmer“ zu öffnen und „Gruppen“ anzeigen zu können, muss die Option „Benutzer – Liste anzeigen“ ebenfalls aktiviert sein."
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "Für den Zugriff auf die Seite „Teilnehmer“ muss „Benutzer – Liste anzeigen“ aktiviert sein. Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten über die E-Mail-Adresse zu einem Kurs hinzufügen, auch wenn der Benutzer noch kein Canvas-Konto hat. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Studenten zu bearbeiten, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein."
@@ -27666,7 +27721,7 @@ de:
       Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert ist und „Webkonferenzen – erstellen“ deaktiviert ist, kann der Benutzer immer noch Konferenzen verwalten.
       Diese Berechtigung steuert die Fähigkeit eines Benutzers, Konferenzen in Kursen und Gruppen einzuberufen.
   to_allow_other_users_to_create_courses_in_an_accou_1f2c70a4: "Wenn Sie zulassen möchten, dass andere Benutzer\\*innen Kurse in einem Konto erstellen, wählen Sie die entsprechende Benutzerrolle auf der Seite „Kontoeinstellungen: Lehrende, Studierende und/oder Benutzer\\*innen ohne Anmeldung“."
-  to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "Um die Seite „Lernziele“ schreibgeschützt anzuzeigen, kann diese Berechtigung deaktiviert werden, aber „Kurs-Inhalt – anzeigen“ muss aktiviert sein."
+  to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "Um die Seite „Lernergebnisse“ schreibgeschützt anzuzeigen, kann diese Berechtigung deaktiviert werden, aber „Kurs-Inhalt – anzeigen“ muss aktiviert sein."
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "Um die Seite „Lernziele“ schreibgeschützt anzuzeigen, kann diese Berechtigung deaktiviert werden, aber „Kurs-Content – anzeigen“ muss aktiviert sein. Um Lernziele zu importieren, muss auch „Lernziele - Import“ aktiviert sein."
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "Um Benutzern zu erlauben, Noten zu moderieren, muss „Noten – Abschlussnote für Moderation auswählen“ ebenfalls aktiviert sein."
   to_allow_view_edit_and_delete_functionality_of_col_17533079: |-
@@ -27835,7 +27890,7 @@ de:
   to_import_assignments_and_quizzes_using_the_course_86c5bdbb: "Um Aufgaben und Quizze mit dem Course Import Tool zu importieren, muss „Kurs-Inhalt – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_files_using_the_course_import_tool_cours_a0c2db0c: "Um Dateien mit dem Course Import Tool zu importieren, muss „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert sein."
   to_import_files_using_the_course_import_tool_cours_eb0ce4e1: "Um Dateien mit dem Kursimport-Tool zu importieren,müssen „Kursdateien – hinzufügen“ und „Kurs-Inhalt – hinzufügen/bearbeiten/ löschen“ aktiviert sein."
-  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Um Lernziele zu importieren, muss auch „Lernziele - Import“ aktiviert sein."
+  to_import_learning_outcomes_learning_outcomes_impo_5abbd2fb: "Um Lernergebnisse zu importieren, muss auch „Lernergebnisse - Import“ aktiviert sein."
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "Um SIS-Daten zu importieren, muss „SIS-Daten – importieren“ ebenfalls aktiviert sein."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "Um SIS-Daten zu importieren, muss „SIS-Daten – importieren“ ebenfalls aktiviert sein."
   to_join_the_canvas_community_you_must_first_have_a_6fe1b7d8: "Für die Teilnahme an der Canvas-Community benötigen Sie zunächst ein Canvas-Konto."
@@ -27849,10 +27904,10 @@ de:
       Um einen Beobachter mit einem Student zu verknüpfen, müssen die Optionen „Benutzer – Anmeldedetails verwalten“ und „Gespräche – an einzelne Kursteilnehmer senden“ aktiviert sein.
               Um einen Pairing-Code für einen Studenten zu generieren, um ihn mit einem Beobachter zu teilen, muss „Benutzer – Beobachter-Pairing-Code für einen Studenten generieren“ ebenfalls aktiviert sein.
   to_link_an_observer_to_a_student_users_manage_logi_cc370c29: "Um einen/eine Beobachter\\*in mit einer/einem Studierenden zu verknüpfen, müssen „Benutzer\\*innen – Anmeldedetails verwalten“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ aktiviert sein."
-  to_link_the_course_observer_name_to_a_student_star_f993c826: "Um den/die Kursbeobachter\\*in *%{name}* mit einer/einem Studierenden zu verknüpfen, geben Sie den Namen der/des Studierenden unten ein, um ihn zu suchen und klicken dann auf „Aktualisieren“."
+  to_link_the_course_observer_name_to_a_student_star_f993c826: "Um den/die Kursbeobachter\\*in *%{name}* mit einer/einem Studierenden zu verknüpfen, geben Sie den Namen der/des Studierenden unten ein, um ihn/sie zu suchen und klicken dann auf „Aktualisieren“."
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "Um sich unterwegs in Ihr Canvas-Konto einzuloggen, scannen Sie diesen QR-Code aus der Canvas-Studentenanwendung."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "Falls Sie sich unterwegs bei Ihrem Canvas-Konto anmelden müssen, scannen Sie diesen QR-Code aus jeder Canvas-Mobile-App."
-  to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "Um die Ausrichtung der Lernziele zu erleichtern, fügen Sie nur Lernziele hinzu, dauerhaft für diesen Kurs gelten."
+  to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "Um die Ausrichtung der Lernergebnisse zu erleichtern, fügen Sie nur Lernergebnisse hinzu, dauerhaft für diesen Kurs gelten."
   to_manage_associated_courses_courses_view_list_and_26f4c15c: "Um verknüpfte Kurse verwalten zu können, müssen die Berechtigungen „Kurse – Liste anzeigen“ und „Kurse – hinzufügen“ ebenfalls aktiviert sein."
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: "Um assoziierte Kurse zu verwalten, müssen „Kurse – Liste anzeigen“ und „Kurse verwalten – hinzufügen“ ebenfalls aktiviert sein."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "Um Musterkurseinstellungen in den Kurseinstellungen zu verwalten, muss „Kurse – hinzufügen / bearbeiten / löschen“ ebenfalls aktiviert sein."
@@ -28368,8 +28423,8 @@ de:
   unable_to_read_file_2d04b0c: "Die Datei konnte nicht gelesen werden."
   unable_to_remove_app_4293cb53: "Die App kann nicht entfernt werden."
   unable_to_remove_outcomes_f682e68f: 
-    one: "Lernziel kann nicht entfernt werden."
-    other: "Lernziele können nicht entfernt werden."
+    one: "Lernergebnis kann nicht entfernt werden."
+    other: "Lernergebnisse können nicht entfernt werden."
   unable_to_remove_sftp_key_selected_if_it_continues_f99a7a22: |-
       Ausgewählter SFTP-Schlüssel konnte nicht entfernt werden.
                                     Falls das Problem weiterhin besteht, kontaktieren Sie bitte #Canvas-SRE in Slack.
@@ -28536,6 +28591,7 @@ de:
   unregister_service_985238e9: "Service deregistrieren"
   unreserved_e86b7425: Frei
   unsafe_file_link_8a18eceb: "Unsichere Dateiverknüpfung"
+  unsaved_change_eb23d452: "Nicht gespeicherte Änderung"
   unselected_all_courses_99a9d35c: "Alle Kurse nicht ausgewählt"
   unselected_course_course_89995a83: "Kurs nicht ausgewählt %{course}"
   unselected_external_tool_tool_1bd68403: "Nicht ausgewähltes externes Tool %{tool}"
@@ -28767,7 +28823,7 @@ de:
   user_access_tokens_title: Benutzerzugangs-Token
   user_avatars_e4fc4ed3: Benutzer-Avatare
   user_c95de254: Benutzer\*in
-  user_can_opt_in_to_mfa_canvas_will_only_challenge__649cd2a: "Benutzer\\*in kann sich für MFA entscheiden *Canvas verlangt von dem/der Benutzer\\*in nur MFA, falls er sie zuvor konfiguriert hat.*"
+  user_can_opt_in_to_mfa_canvas_will_only_challenge__649cd2a: "Benutzer\\*in kann sich für MFA entscheiden *Canvas verlangt von dem/der Benutzer\\*in nur MFA, falls er/sie sie zuvor konfiguriert hat.*"
   user_cannot_manage_individual_course_content_witho_d7b65fd4: "Die Benutzer\\*innen können ohne die entsprechende Berechtigung für diese Inhalte einzelne Inhalte nicht verwalten."
   user_content_aaf0fb5a: Benutzer-Inhalt
   user_count_respondents_e30a8593: "%{user_count} Befragte"
@@ -28986,7 +29042,7 @@ de:
       merge_result_explanation: "Möchten Sie wirklich die Benutzerkonten %{source_user_name} (%{source_user_email}) und %{target_user_name} (%{target_user_email}) zusammenführen? Dieser Vorgang wird zu folgendem Ergebnis führen:"
       merge_result_explanation_again: "Sie haben sich entschieden, den/die Benutzer\\*in %{user_name} (%{user_email}) mit dem Konto %{pending_other_user_name} (%{pending_other_user_email}) zusammenzuführen. Dieser Vorgang wird zu folgendem Ergebnis führen:"
       merge_somone_else: "Eine/n andere/n Benutzer\\*in mit %{user_name} zusammenführen"
-      merge_user_initial_instructions: "Sie haben sich entschieden, den/die Benutzer\\*in %{user_name} (%{user_email}) mit einem anderen Konto zusammenzuführen. Mithilfe des unten stehenden Formulars können Sie nach dem/der Benutzer\\*in suchen, den Sie mit diesem/dieser Benutzer\\*in zusammenführen möchten."
+      merge_user_initial_instructions: "Sie haben sich entschieden, den/die Benutzer\\*in %{user_name} (%{user_email}) mit einem anderen Konto zusammenzuführen. Mithilfe des unten stehenden Formulars können Sie nach dem/der Benutzer\\*in suchen, den/die Sie mit diesem/dieser Benutzer\\*in zusammenführen möchten."
       no_merge_undo: "Dieser Vorgang ist unwiderruflich – bitte vergewissern Sie sich, bevor Sie fortfahren."
       no_permission: "Sie sind nicht berechtigt, Konten zu suchen."
       prepare_to_merge: "Zusammenführen von Benutzerkonten vorbereiten"
@@ -29186,7 +29242,7 @@ de:
       none_yet: "Noch nicht."
       page_header_title: Benutzerprofil
       page_views: Seitenaufrufe
-      see_outcomes: "Lernzielergebnisse für %{user} anzeigen"
+      see_outcomes: "Lernergebnisse für %{user} anzeigen"
     teacher_activity: 
       crumbs: 
         interaction_report: Studierendeninteraktionsbericht
@@ -29321,8 +29377,8 @@ de:
   view_canvas_insights_beta_fe446d71: "Canvas Insights (Beta) anzeigen"
   view_conditional_content_settings_a2dca270: "Einstellungen für vorläufigen Inhalt ansehen"
   view_count_outcomes_9609792: 
-    one: "1 Lernziel anzeigen"
-    other: "%{count} Lernziele anzeigen"
+    one: "1 Lernergebnis anzeigen"
+    other: "%{count} Lernergebnisse anzeigen"
   view_course_analytics_eefe6b2: "Kursanalysen anzeigen"
   view_coursename_gradebook_8b3a6240: "%{courseName}-Notenbuch anzeigen"
   view_coursename_s_assignment_group_totals_bd4b707: "%{courseName}-Aufgabengruppensummen anzeigen"
@@ -29446,7 +29502,7 @@ de:
   we_re_sending_your_message_d586da: "Wir senden deine Nachricht ..."
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: "Leider ist bei der Anmeldung ein Fehler aufgetreten. Überprüfen Sie die Angaben Ihres Kindes und versuchen es noch einmal."
   we_sent_a_four_character_confirmation_code_to_sms__a1123db0: "Wir haben Ihnen einen vierstelligen Bestätigungscode an %{sms_number} geschickt. Geben Sie den Code unten ein, um diese SMS-Nummer zu aktivieren."
-  we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Wir benachrichtigen Ihren Kursleiter, damit er diesen Link so bald wie möglich überprüfen kann."
+  we_ve_let_your_instructor_know_to_review_this_link_f8d56088: "Wir benachrichtigen Ihre/n Lehrende*n, damit er/sie diesen Link so bald wie möglich überprüfen kann."
   we_were_unable_to_activate_the_app_578defe7: "Die Anwendung konnte nicht aktiviert werden."
   we_were_unable_to_add_the_access_token_1f471fe6: "Das Zugangs-Token konnte nicht hinzugefügt werden."
   we_were_unable_to_add_the_app_418877ef: "Die Anwendung konnte nicht hinzugefügt werden."
@@ -29576,8 +29632,8 @@ de:
   where_can_students_create_courses_fd0c8a00: "Wo können Studierende Kurse erstellen?"
   where_can_teachers_create_courses_d87eaff2: "Wo können Lehrende Kurse erstellen?"
   where_would_you_like_to_move_these_outcomes_6f9a8cf9: 
-    one: "Wohin möchten Sie dieses Lernziel verschieben?"
-    other: "Wohin würden Sie diese Lernziele gerne verschieben?"
+    one: "Wohin möchten Sie dieses Lernergebnis verschieben?"
+    other: "Wohin würden Sie diese Lernergebnisse gerne verschieben?"
   where_would_you_like_to_move_this_group_e4ddd778: "Wohin möchten Sie diese Gruppe verschieben?"
   where_would_you_like_to_move_this_outcome_b38588e6: "Wohin möchten Sie dieses Lernziel verschieben?"
   where_would_you_like_to_move_title_fabd6e8f: "Wohin möchten Sie %{title} verschieben?"
@@ -29828,8 +29884,8 @@ de:
   yo_e4ee15a4: Yo
   you_1e52ca6a: Sie
   you_are_about_to_add_count_outcomes_to_this_course_de7e2b1d: 
-    one: "Sie sind im Begriff, 1 Lernziel zu diesem Kurs hinzuzufügen."
-    other: "Sie sind im Begriff, %{count} Lernziele zu diesem Kurs hinzuzufügen."
+    one: "Sie sind im Begriff, 1 Lernergebnis zu diesem Kurs hinzuzufügen."
+    other: "Sie sind im Begriff, %{count} Lernergebnisse zu diesem Kurs hinzuzufügen."
   you_are_about_to_delete_count_announcements_are_yo_96a2b383: 
     one: "Sie sind im Begriff, 1 Ankündigung zu löschen. Sind Sie sicher?"
     other: "Sie sind im Begriff, %{count} Ankündigungen zu löschen. Sind Sie sicher?"
@@ -29915,8 +29971,8 @@ de:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Sie können ein Unterkonto, das Kurse enthält, nicht löschen."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Unterkonten mit Unterkonten können nicht gelöscht werden."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "%{account_name} kann nicht gelöscht werden, weil es noch Kurse enthält."
-  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernzielkriterien werden die Skala für das Kurs-Leistungsziel verwenden. Trotzdem fortfahren?"
-  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernzielkriterien werden die Skala für das Konto-Leistungsziel verwenden. Trotzdem fortfahren?"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernergebniskriterien werden die Skala für das Kurs-Leistungsziel verwenden. Trotzdem fortfahren?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernergebniskriterien werden die Skala für das Konto-Leistungsziel verwenden. Trotzdem fortfahren?"
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik, die auf der alten Rubrik basiert. Trotzdem fortfahren?"
   you_can_t_submit_an_assignment_when_it_is_unpublis_6c2c0b2f: "Sie können eine Aufgabe nicht abgeben, wenn sie nicht veröffentlicht ist."
   you_can_try_to_log_in_again_2b23ef0f: "Sie können versuchen, sich *erneut anzumelden*."
@@ -29942,6 +29998,9 @@ de:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "Sie können nicht veröffentlichen, während Sie das Tempo laden"
   you_cannot_publish_while_loading_the_plan_685405e5: "Sie dürfen, während der Plan geladen wird, nicht publizieren."
   you_cannot_publish_while_publishing_2f65264b: "Sie dürfen während der Veröffentlichung nicht publizieren."
+  you_cannot_remove_a_locked_pace_150675e9: "Sie können einen gesperrten Schritt nicht entfernen"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "Sie können den Schritt nicht entfernen, während er noch geladen wird"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "Sie können den Schritt nicht entfernen, während er veröffentlicht wird"
   you_cannot_remove_this_enrollment_c87be1cb: "Sie können diese Einschreibung nicht entfernen."
   you_cannot_remove_your_default_email_address_8ed68e52: "Sie können Ihre Standard E-Mail-Adresse nicht entfernen."
   you_cannot_save_while_there_are_errors_b86585e9: "Solange es Fehler gibt, können Sie nicht speichern."
@@ -29985,8 +30044,8 @@ de:
   you_have_no_courses_favorited_reloading_this_page__a2bae9de: "Sie haben keine Kurse favorisiert. Wenn Sie diese Seite neu laden, werden alle\n\
       \x20     Ihre aktiven Kurse angezeigt. Um Favoriten hinzuzufügen, gehen Sie zu "
   you_have_no_ltis_configured_to_create_collaboratio_5cad28dd: "Sie haben keine LTIs zum Anlegen von Arbeitsgruppen konfiguriert. Sprechen Sie mit Ihrem Dozenten, damit einige eingerichtet werden."
-  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Es liegen keine Lernziele für Sie vor. *Klicken Sie hier*, um eines zu erstellen."
-  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Es liegen keine Lernziele für Sie vor. Klicken Sie hier, um zur Seite „Lernziele“ zu wechseln."
+  you_have_no_outcomes_click_here_to_create_one_ebf262a3: "Es liegen keine Lernergebnisse für Sie vor. *Klicken Sie hier*, um eines zu erstellen."
+  you_have_no_outcomes_click_here_to_go_to_the_outco_574bd0af: "Es liegen keine Lernergebnisse für Sie vor. Klicken Sie hier, um zur Seite „Lernergebnisse“ zu wechseln."
   you_have_reached_the_domain_limit_if_you_wish_to_a_587db18: "Sie haben die Domänenobergrenze erreicht. Falls Sie weitere zu ihrer Whitelist hinzufügen möchten, entfernen Sie bitte zuerst andere."
   you_have_reached_the_domain_limit_you_can_add_more_1143333a: "Sie haben die Höchstzahl Domänen erreicht. Sie können weitere Domänen hinzufügen, indem Sie vorhandene Domänen aus ihrer Liste „erlaubt“ löschen."
   you_have_reached_the_domain_limit_you_can_add_more_e5ccc070: "Sie haben die Höchstzahl Domänen erreicht.  Sie können weitere Domänen hinzufügen, indem Sie vorhandene Domänen aus ihrer Whitelist löschen."
