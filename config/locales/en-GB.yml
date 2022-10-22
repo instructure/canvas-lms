@@ -1132,6 +1132,19 @@ en-GB:
           description: 
             text: "This report shows the student final grade results for all students in a given term. The resulting csv file will have one row per enrolment, and will show the current and final grade that is displayed in the course gradebook."
     group_type: group
+    gsd: 
+      student_outcome_results: 
+        parameters: 
+          account_reports: 
+            outcomes: 
+              course: 
+                radio: Courses
+              order: 
+                label: Order
+              outcome: 
+                radio: Outcomes
+              user: 
+                radio: Users
     ilumno: 
       grade_export: 
         course_date_picker_parameter: 
@@ -1493,6 +1506,7 @@ en-GB:
         help_link_text: "Text to display for link"
         help_link_url: URL
         include_students_in_global_survey: "Include students in global surveys"
+        kill_joy: "Remove hidden game from 404 page"
         limit_parent_app_web_access: "Limit access to Canvas web from the Canvas Parent app"
         lock_all_announcements: "Disable comments on announcements"
         locked: "Lock this setting for sub-accounts and courses"
@@ -1804,7 +1818,7 @@ en-GB:
           custom_reports: 
             course_ids: 
               parameters: 
-                header: "Course IDs"
+                header: "Course SIS IDs"
     tempe_grade_export_csv_parameters: 
       account_reports: 
         tempe: 
@@ -3144,6 +3158,7 @@ en-GB:
   an_error_occurred_while_creating_this_outcome_mess_f03af2d5: "An error occurred while creating this outcome: %{message}."
   an_error_occurred_while_creating_this_outcome_plea_f1c69d92: "An error occurred while creating this outcome. Please try again."
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "An error occurred while deleting announcements."
+  an_error_occurred_while_deleting_the_appointment_g_aad99e47: "An error occurred while deleting the appointment group"
   an_error_occurred_while_editing_this_group_please__8f4eeefe: "An error occurred while editing this group. Please try again."
   an_error_occurred_while_editing_this_outcome_pleas_f0e403a9: "An error occurred while editing this outcome. Please try again."
   an_error_occurred_while_importing_these_outcomes_d4e6f13e: "An error occurred while importing these outcomes."
@@ -3201,6 +3216,7 @@ en-GB:
   an_error_occurred_while_saving_account_proficiency_9f0f9208: "An error occurred while saving account proficiency ratings: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "An error occurred while saving associations"
   an_error_occurred_while_saving_changes_b42c9b84: "An error occurred while saving changes"
+  an_error_occurred_while_saving_the_appointment_gro_556801a8: "An error occurred while saving the appointment group"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "An error occurred while saving the assignment post policy"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "An error occurred while saving the course post policy"
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "An error occurred while saving the mastery scale: %{message}"
@@ -4644,6 +4660,7 @@ en-GB:
   attempt_3dd42b18: attempt
   attempt_attempt_d3911720: "Attempt %{attempt}"
   attempt_attempt_feedback_1b042ff5: "Attempt %{attempt} Feedback"
+  attempt_attempt_feedback_549683ba: "Attempt %{attempt} Feedback:"
   attempt_attempt_grade_c01f45df: "Attempt %{attempt}: %{grade}"
   attempt_attempt_score_2a973edc: "Attempt %{attempt} Score:"
   attempt_count_267a4fc5: "Attempt %{count}"
@@ -4945,6 +4962,7 @@ en-GB:
       A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
       then all of the users in that course will see the new interface.  To get it to show up when someone
       goes to the personal files page for a user ('/files') then you need to turn it on for the account they are a member of.
+  better_lti_ags_response_codes_for_concluded_course_3f31c313: "Better LTI AGS Response Codes for Concluded Courses"
   between_1_and_10_7118bf2d: "Between 1 and 10"
   between_1_and_5_f2a74bcf: "Between 1 and 5"
   between_1_and_99_d421a4c0: "Between 1% and 99%"
@@ -5873,6 +5891,7 @@ en-GB:
       setting updates how URL rewriting takes place to facilitate previewing
       files within Canvas and not downloading.
   canvas_student_id_c74f57bf: canvas_student_id
+  canvas_support_center_6bd07a43: "Canvas Support Centre"
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas thinks response is valid"
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
   canvas_ticketing_web_post_connector_11158897: "Canvas Ticketing Web Post Connector"
@@ -6293,6 +6312,7 @@ en-GB:
   collapse_discussion_thread_from_author_34f9cd18: "Collapse discussion thread from %{author}"
   collapse_group_c2af7cad: "Collapse group"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Collapse list of group members for %{groupName}"
+  collapse_name_fdea035c: "Collapse %{name}"
   collapse_outcome_description_de471564: "Collapse outcome description"
   collapse_replies_20f2faf7: "Collapse Replies"
   collapse_replies_ef4fc36b: "Collapse replies"
@@ -6320,6 +6340,7 @@ en-GB:
   comment_by_replying_to_this_message_or_join_the_co_52b5ac1c: "Comment by replying to this message, or join the conversation using this link: %{link}. When allowed, if you need to include an attachment, please log in to Canvas and reply to the discussion."
   comment_by_replying_to_this_message_or_join_the_co_886bc612: "Comment by replying to this message, or join the conversation using this link: %{link}When allowed, if you need to include an attachment, please log in to Canvas and reply to the announcement."
   comment_destroyed_5cfc922d: "Comment destroyed"
+  comment_df1a66c: "%{comment}"
   comment_failed_to_post_please_try_again_later_e2d19a0a: "Comment failed to post! Please try again later."
   comment_input_box_b8c7e58b: "Comment input box"
   comment_library_84735835: "Comment Library"
@@ -9025,6 +9046,7 @@ en-GB:
   create_new_submission_e6b7c18d: "Create New Submission"
   create_number_of_groups_groups_now_f89f220e: "Create %{number_of_groups} groups now"
   create_outcome_4dac05a0: "Create Outcome"
+  create_pace_4ff3e9c: "Create Pace"
   create_pages_581a4d59: "Create pages"
   create_slots_71dbb2f8: "Create Slots"
   create_subject_86de5618: "Create Subject"
@@ -10261,6 +10283,7 @@ en-GB:
   discussions_redesign_b505952d: "Discussions Redesign"
   discussions_redesign_isolated_view_78626c74: "Discussions Redesign - Isolated View"
   discussions_redesign_reporting_f4abcc37: "Discussions Redesign - Reporting"
+  discussions_redesign_split_screen_view_d1b88d0e: "Discussions Redesign - Split Screen View"
   discussions_tutorial_tray_4ef79bcc: "Discussions tutorial tray"
   discussions_view_c6818792: "Discussions - view"
   discussions_with_groups_cannot_be_section_specific_1146d29: "Discussions with groups cannot be section-specific"
@@ -10282,6 +10305,7 @@ en-GB:
             late submissions, and easily hide grades until you're ready for students
             to view them. For simplified grading, use SpeedGrader to view and grade submissions.
   display_historical_view_of_achievements_of_users_53db5938: "Display historical view of achievements of users"
+  display_name_36e114d3: "%{display_name}"
   display_name_6c2cfc58: "Display name:"
   display_name_b80c243e: "Display name"
   display_student_filter_options_ab034cfa: "Display Student Filter Options"
@@ -10290,6 +10314,7 @@ en-GB:
   display_total_grades_when_the_all_grading_periods__4e6add83: "Display total grades when the \"all grading periods\" dropdown option is selected (grading periods must exist)."
   display_totals_for_all_grading_periods_ad1ea050: "Display totals for 'All Grading Periods'"
   display_totals_for_all_grading_periods_option_4a72586: "Display totals for all grading periods option"
+  display_updated_at_d5b25d7b: "%{display_updated_at}"
   display_values_f517c73c: "Display Values"
   displaying_to_students_b1e92058: "Displaying to students"
   displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
@@ -10490,6 +10515,7 @@ en-GB:
   duplication_failed_3351ffb1: "Duplication failed"
   duplication_of_title_succeeded_2e0bd645: "Duplication of %{title} succeeded"
   duration_1_minute_29c7d5ab: "Duration: 1 minute"
+  duration_for_assignment_name_851ca365: "Duration for assignment %{name}"
   duration_hours_hours_and_minutes_minutes_d5da8c3: "Duration: %{hours} hours and %{minutes} minutes"
   duration_in_minutes_8959f63e: "Duration in Minutes"
   duration_minutes_minutes_d7b9182b: "Duration: %{minutes} minutes"
@@ -11539,6 +11565,7 @@ en-GB:
   expand_global_navigation_2c28d5d4: "Expand global navigation"
   expand_group_53765272: "Expand group"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Expand list of group members for %{groupName}"
+  expand_name_71d944fd: "Expand %{name}"
   expand_or_collapse_calendars_9854b0d0: "Expand or collapse calendars"
   expand_or_collapse_undated_items_b901de09: "Expand or collapse undated items"
   expand_outcome_description_c5bdd70b: "Expand outcome description"
@@ -11930,6 +11957,7 @@ en-GB:
   federated_attributes_are_information_sent_from_you_2116fb61: "Federated attributes -- information sent from your authentication provider -- to be used automatically to update corresponding information for users in Canvas each time they log in."
   feed_url_8a433438: "Feed URL"
   feed_url_is_required_253fda4e: "Feed URL is required"
+  feedback_6dcc1991: Feedback
   feeds_9f1c5c76: Feeds
   field_9ec0ec01: Field
   field_cannot_be_blank_afb5b332: "Field cannot be blank."
@@ -12401,6 +12429,7 @@ en-GB:
   grade_history_9c51ad49: "Grade history…"
   grade_history_ccc09fde: "Grade History"
   grade_info_19fb9875: "Grade info"
+  grade_loading_bc1ad721: "Grade Loading"
   grade_low_to_high_1678b713: "Grade - low to high"
   grade_out_of_percentage_1972bf52: "Grade out of %{percentage}"
   grade_out_of_points_d401b79d: "Grade out of %{points}"
@@ -13415,6 +13444,7 @@ en-GB:
   group_membership_count_is_invalid_cc6b2d47: "Group membership count is invalid"
   group_membership_limit_54e165b: "Group Membership Limit"
   group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Group membership limit must be equal to or greater than current members count."
+  group_membership_limit_must_be_greater_than_1_5e95fc69: "Group membership limit must be greater than 1."
   group_name_b69c144: "Group Name"
   group_name_e4066daa: "group name"
   group_name_group_announcements_5ce81c6d: "%{group_name} - Group announcements"
@@ -13843,6 +13873,7 @@ en-GB:
   has_syllabus_body_6f250277: has_syllabus_body
   has_turnitin_score_3e1cacf6: "Has Turnitin score"
   has_ungraded_submissions_2bff87df: "Has ungraded submissions"
+  have_a_question_about_canvas_ask_it_here_5781cce: "Have a question about Canvas? Ask it here."
   have_not_been_graded_df2a5fd2: "Have not been graded"
   have_not_yet_submitted_57e6a58b: "Have not yet submitted"
   haven_t_been_graded_d7dee5bb: "Haven't been graded"
@@ -14318,6 +14349,12 @@ en-GB:
   if_enabled_syncing_course_enrollments_to_microsoft_6f4f2bf9: |-
       If enabled, syncing course enrolments to Microsoft Groups will be
       available. Account admins may enable this in account settings.
+  if_enabled_the_ags_api_will_return_a_more_helpful__7c140c60: |-
+      If enabled, the AGS API will return a more helpful response code whenever an LTI
+      tool attempts to access or modify data in a course that has already concluded.
+      Rather than returning a generic 404 Not Found, the API will instead return a 422
+      along with a helpful message indicating that the tool cannot access concluded
+      courses.
   if_enabled_the_oauth_2_0_will_now_correctly_return_e33cca64: |-
       If enabled, the OAuth 2.0 will now correctly return 4xx status codes to the
       requesting client instead of redirecting them to themselves
@@ -19927,6 +19964,7 @@ en-GB:
   pace_plans_4bb9c5ff: "Pace Plans"
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Pace Plans adds support for rolling enrolments to Canvas; allowing magical distribution of due dates for students with different start dates based on an instructor's defined pace. Learn more and give feedback by joining the Pace Plans User Group."
   pace_plans_is_in_active_development_f6c20046: "Pace Plans is in active development."
+  pace_removed_8e625df7: "Pace removed"
   package_error: "Error identifying package type: %{error}"
   package_export_from_d6e2b073: "Package export from"
   page_50c4823d: Page
@@ -20459,6 +20497,7 @@ en-GB:
       name: I18n
     impact_settings: 
       labels: 
+        add_help_link: "Add link to help menu"
         default_domain: "Domain (default)"
         default_key: "Key (default)"
         tier_1_domain: "Domain (Tier 1 support)"
@@ -23251,6 +23290,7 @@ en-GB:
   remove_outcomes_9abcc8fd: 
     one: "Remove Outcome?"
     other: "Remove Outcomes?"
+  remove_pace_97381e05: "Remove Pace"
   remove_placement_90862c13: "Remove %{placement}"
   remove_points_from_rubric_dcd4b585: "Remove points from rubric"
   remove_pronouns_5ff760ff: "Remove Pronouns"
@@ -23276,12 +23316,15 @@ en-GB:
   remove_this_item_from_the_module_4b2ceab7: "Remove this item from the module"
   remove_this_rubric_from_my_list_c7d80704: "Remove this rubric from my list"
   remove_this_section_9a88ca43: "Remove this section"
+  remove_this_section_pace_ba87ad3c: "Remove this Section Pace?"
+  remove_this_student_pace_a5e7b3c5: "Remove this Student Pace?"
   remove_user_from_section_5556f465: "Remove User from section"
   remove_webcam_image_count_efee4a11: "Remove webcam image %{count}"
   removed_assignment_assignment_name_835cc776: "Removed assignment %{assignment_name}"
   removed_course_association_course_a233342c: "Removed course association %{course}"
   removed_filename_a8634af3: "removed %{filename}"
   removed_user_as_group_leader_bb69330f: "Removed %{user} as group leader"
+  removing_pace_9493910c: "Removing pace..."
   rename_45608f54: Rename
   rename_c_name_section_e0e92c97: "Rename %{c.name} section"
   rename_filter_c6cc8efc: "Rename filter"
@@ -24075,6 +24118,7 @@ en-GB:
   section_level_calendar_permissions_6aff8cdb: "Section-level calendar permissions"
   section_name_b6d82574: "Section name"
   section_name_edb51b2: "section name"
+  section_pace_989d2856: "Section Pace"
   section_removed_2ac72a79: "%{section} removed"
   section_section_names_98f172e6: "Section: %{section_names}"
   section_sis_2a80d2fa: "Section SIS"
@@ -24149,6 +24193,7 @@ en-GB:
   security_7a7e8808: Security
   security_setting_to_restrict_join_urls_to_a_confer_258d3605: "Security setting to restrict join URLs to a conference"
   security_tab_failed_to_load_2d2242a: "Security Tab failed to load"
+  see_comments_details_44f460d9: "See comments details"
   see_example_below_to_see_how_different_calculation_618de98d: "See example below to see how different calculation parameters affect student mastery calculation."
   see_more_in_canvas_guides_fc90a457: "See more in Canvas Guides"
   see_other_users_primary_email_address_59c8473f: "See other users' primary email address"
@@ -25498,6 +25543,7 @@ en-GB:
   size_b30e1077: Size
   size_f1873a2: ", size: "
   size_size_a77bd760: "size: %{size}"
+  skillcode_685526a6: skillcode
   skip_bcb86160: Skip
   skip_to_content_22ad1d00: "Skip to content"
   skip_weekends_13cbd889: "Skip Weekends"
@@ -25912,6 +25958,7 @@ en-GB:
       on course learning outcomes. Outcomes are presented in a Gradebook-like
       format and progress is displayed both as a numerical score and as mastered/near
       mastery/remedial.
+  student_pace_2200bf85: "Student Pace"
   student_page_history_ce86b3c2: "Student Page History"
   student_page_history_pages_update_ae55fa03: "Student Page History (Pages - Update)"
   student_paired_successfully_a88def61: "Student paired successfully"
@@ -26063,6 +26110,7 @@ en-GB:
   submission_comment_user_name_assignment_title_cour_d88ba875: "Submission Comment: %{user_name}, %{assignment_title}, %{course_name}"
   submission_comments_4fa03a17: "Submission Comments"
   submission_comments_b6d65841: "Submission comments"
+  submission_comments_tray_290fad59: "Submission Comments tray"
   submission_completed_ba0e552e: "Submission Completed"
   submission_data_88085815: "Submission Data"
   submission_date_8f659c0c: "Submission Date"
@@ -26391,6 +26439,7 @@ en-GB:
   sync_to_posttosisname_9837a8bf: "Sync to %{postToSISName}:"
   sync_to_posttosisname_dffd5c9: "Sync to %{postToSISName}"
   sync_to_sisname_f343e59: "Sync to %{sisName}"
+  sync_uris_50c59540: "Sync URIs"
   synced_97764882: Synced
   synced_message_20469c8f: "Synced: %{message}"
   syncing_3061cc8d: Syncing...
@@ -27009,6 +27058,7 @@ en-GB:
   there_was_an_error_fetching_custom_columns_542014ef: "There was an error fetching custom columns."
   there_was_an_error_fetching_data_for_gradebook_174e82f9: "There was an error fetching data for Gradebook"
   there_was_an_error_fetching_gradebook_filters_3b4607ac: "There was an error fetching gradebook filters."
+  there_was_an_error_fetching_grading_period_assignm_179dce2e: "There was an error fetching grading period assignments data."
   there_was_an_error_fetching_modules_8ee451bb: "There was an error fetching modules."
   there_was_an_error_fetching_outcome_results_45c57590: "There was an error fetching outcome results"
   there_was_an_error_fetching_student_data_87463510: "There was an error fetching student data."
@@ -27204,6 +27254,9 @@ en-GB:
       This feature flag enables Isolated View inside the new
       Discussions Redesign work.
   this_feature_flag_enables_the_react_instui_and_gra_ec5ad0da: "This feature flag enables the React/InstUI and GraphQL People page upgrade."
+  this_feature_flag_enables_the_split_screen_view_in_57377cbc: |-
+      This feature flag enables the Split Screen View inside the new
+      Discussions Redesign work.
   this_feature_flag_enables_the_use_of_the_updated_d_b78aa2b8: |-
       This feature flag enables the use of the updated
       discussion create/edit page
@@ -27408,9 +27461,11 @@ en-GB:
   this_report_shows_the_student_final_grade_results__5a508b55: "This report shows the student final grade results for all students in a given term. The resulting CSV file will have one row per enrolment, and will show the current and final grade that is displayed in the course gradebook."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to the colour values and images in the left sidebar, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "This sample page includes common UI elements in Canvas to help you build your custom branding. Once you start making changes to color values and images, you will see a *Preview Your Changes* button. Click it to refresh this page and see how your changes look."
+  this_section_pace_will_be_removed_and_the_pace_wil_86093c26: "This section pace will be removed, and the pace will revert back to the default pace."
   this_setting_only_affects_your_view_of_student_gra_8f58eb33: "This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student."
   this_setting_significantly_changes_the_canvas_expe_a9e07674: "This setting significantly changes the Canvas experience for students and teachers."
   this_settings_only_impact_enrollments_this_include_7f51358: "This settings only impact enrolments. This includes objects with a last_activity_at timestamp greater than Updated After parameter. The default is off"
+  this_student_pace_will_be_removed_and_the_pace_wil_c4f7c06c: "This student pace will be removed, and the pace will revert back to the previously assigned pace."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "This student's enrolment has been concluded."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "This student's enrolment has been concluded"
   this_student_s_responses_are_hidden_because_this_a_252e8335: "The student's responses are hidden because this assignment is anonymous."
@@ -28712,6 +28767,7 @@ en-GB:
   unregister_service_985238e9: "Unregister service"
   unreserved_e86b7425: Unreserved
   unsafe_file_link_8a18eceb: "unsafe file link"
+  unsaved_change_eb23d452: "Unsaved change"
   unselected_all_courses_99a9d35c: "Unselected all courses"
   unselected_course_course_89995a83: "Unselected course %{course}"
   unselected_external_tool_tool_1bd68403: "Unselected external tool %{tool}"
@@ -30137,6 +30193,9 @@ en-GB:
   you_cannot_publish_while_loading_the_pace_c5682dbc: "You cannot publish while loading the pace"
   you_cannot_publish_while_loading_the_plan_685405e5: "You cannot publish while loading the plan"
   you_cannot_publish_while_publishing_2f65264b: "You cannot publish while publishing"
+  you_cannot_remove_a_locked_pace_150675e9: "You cannot remove a locked pace"
+  you_cannot_remove_the_pace_while_it_is_still_loadi_887e92ac: "You cannot remove the pace while it is still loading"
+  you_cannot_remove_the_pace_while_publishing_e25eb076: "You cannot remove the pace while publishing"
   you_cannot_remove_this_enrollment_c87be1cb: "You cannot remove this enrolment."
   you_cannot_remove_your_default_email_address_8ed68e52: "You cannot remove your default email address"
   you_cannot_save_while_there_are_errors_b86585e9: "You cannot save while there are errors"
