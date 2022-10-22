@@ -478,6 +478,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Nested Greater Than" },
   "nested_less_than_27d17e58": { "message": "Nested Less Than" },
   "next_page_d2a39853": { "message": "الصفحة التالية" },
+  "no_changes_to_save_d29f6e91": { "message": "لا توجد تغييرات للحفظ." },
   "no_e16d9132": { "message": "لا" },
   "no_file_chosen_9a880793": { "message": "لم يتم اختيار ملف" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -553,7 +554,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Precedes" },
   "precedes_equal_20701e84": { "message": "Precedes Equal" },
   "preformatted_d0670862": { "message": "منسق مسبقًا" },
-  "pretty_html_editor_28748756": { "message": "محرر HTML الأنيق" },
   "preview_53003fd2": { "message": "معاينة" },
   "preview_in_overlay_ed772c46": { "message": "المعاينة بشكل متراكب" },
   "preview_inline_9787330": { "message": "معاينة مضمّنة" },
@@ -573,7 +573,6 @@ const locale = {
   "quaternions_877024e0": { "message": "الرباعيات" },
   "quizzes_7e598f57": { "message": "الاختبارات الموجزة" },
   "rational_numbers_80ddaa4a": { "message": "أعداد جذرية" },
-  "raw_html_editor_e3993e41": { "message": "محرر HTML الأولي" },
   "real_numbers_7c99df94": { "message": "أعداد حقيقية" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "الجزء الحقيقي (من العدد المركب)"
@@ -837,9 +836,6 @@ const locale = {
   "view_description_30446afc": { "message": "عرض الوصف" },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "عرض اختصارات لوحة المفاتيح"
-  },
-  "view_predefined_colors_92f5db39": {
-    "message": "عرض الألوان المحددة مسبقًا"
   },
   "view_title_description_67940918": { "message": "عرض وصف { title }" },
   "white_87fa64fd": { "message": "أبيض" },

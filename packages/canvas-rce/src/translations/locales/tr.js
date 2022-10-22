@@ -163,12 +163,17 @@ const locale = {
   "link_7262adec": { "message": "Bağlantı" },
   "link_options_a16b758b": { "message": "Bağlantı Seçenekleri" },
   "links_14b70841": { "message": "Bağlantılar" },
+  "links_to_an_external_site_de74145d": {
+    "message": "Harici bir siteye bağlantılar."
+  },
   "load_more_35d33c7": { "message": "Daha Fazla Yükle" },
   "loading_25990131": { "message": "Yükleniyor..." },
   "loading_bde52856": { "message": "Yükleniyor" },
   "loading_failed_b3524381": { "message": "Yükleme Başarısız..." },
   "locked_762f138b": { "message": "Kilitli" },
   "media_af190855": { "message": "Medya" },
+  "minimize_file_preview_da911944": { "message": "Dosya Ön İzlemesini Küçült" },
+  "minimize_video_20aa554b": { "message": "Video''yu Küçült" },
   "misc_3b692ea7": { "message": "Çeşitli" },
   "modules_c4325335": { "message": "Modüller" },
   "my_files_2f621040": { "message": "Dosyalarım" },
@@ -205,11 +210,17 @@ const locale = {
   "star_8d156e09": { "message": "Yıldız" },
   "submit_a3cc6859": { "message": "Gönder" },
   "syllabus_f191f65b": { "message": "Ders Programı" },
+  "the_document_preview_is_currently_being_processed__7d9ea135": {
+    "message": "Döküman ön izlemesi hala işleniyor. Lütfen daha sonra tekrar deneyin."
+  },
   "the_material_is_in_the_public_domain_279c39a3": {
     "message": "Bu malzeme genel kullanıma açık"
   },
   "the_material_is_licensed_under_creative_commons_3242cb5e": {
     "message": "Bu malzeme Creative Commons a göre lisanslı"
+  },
+  "this_document_cannot_be_displayed_within_canvas_7aba77be": {
+    "message": "Bu belge Canvas içinde görüntülenemez."
   },
   "this_equation_cannot_be_rendered_in_basic_view_9b6c07ae": {
     "message": "Bu denklem Temel Görünümde işlenemez."

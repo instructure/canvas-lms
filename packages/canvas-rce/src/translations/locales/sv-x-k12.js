@@ -500,6 +500,7 @@ const locale = {
   "nested_greater_than_d852e60d": { "message": "Kapslade större än" },
   "nested_less_than_27d17e58": { "message": "Kapslad mindre än" },
   "next_page_d2a39853": { "message": "Nästa sida" },
+  "no_changes_to_save_d29f6e91": { "message": "Inga ändringar att spara." },
   "no_e16d9132": { "message": "Nej" },
   "no_file_chosen_9a880793": { "message": "Ingen fil har valts" },
   "no_preview_is_available_for_this_file_f940114a": {
@@ -579,7 +580,6 @@ const locale = {
   "precedes_196b9aef": { "message": "Föregår" },
   "precedes_equal_20701e84": { "message": "Föregår lika med" },
   "preformatted_d0670862": { "message": "Förformaterad" },
-  "pretty_html_editor_28748756": { "message": "Nätt HTML-redigerare" },
   "preview_53003fd2": { "message": "Förhandsgranska" },
   "preview_in_overlay_ed772c46": { "message": "Förhandsgranskning i överlägg" },
   "preview_inline_9787330": { "message": "Inbäddad förhandsgranskning" },
@@ -599,7 +599,6 @@ const locale = {
   "quaternions_877024e0": { "message": "Kvarternion" },
   "quizzes_7e598f57": { "message": "Quiz" },
   "rational_numbers_80ddaa4a": { "message": "Rationellt tal" },
-  "raw_html_editor_e3993e41": { "message": "Raw HTML Editor" },
   "real_numbers_7c99df94": { "message": "Reella tal" },
   "real_portion_of_complex_number_7dad33b5": {
     "message": "Imaginärdel (av komplexa nummer)"
@@ -880,9 +879,6 @@ const locale = {
   "view_ba339f93": { "message": "Visa" },
   "view_description_30446afc": { "message": "Visa beskrivning" },
   "view_keyboard_shortcuts_34d1be0b": { "message": "Visa kortkommandon" },
-  "view_predefined_colors_92f5db39": {
-    "message": "Visa fördefinierade färger"
-  },
   "view_title_description_67940918": {
     "message": "Visa beskrivning för { title }"
   },
