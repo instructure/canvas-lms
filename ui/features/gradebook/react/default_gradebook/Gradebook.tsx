@@ -4226,7 +4226,7 @@ class Gradebook extends React.Component<GradebookProps, GradebookState> {
     const assignment = this.getAssignment(assignmentId)
     const manager = new SetDefaultGradeDialogManager(
       assignment,
-      this.studentsThatCanSeeAssignment(assignmentId),
+      this.visibleStudentsThatCanSeeAssignment(assignmentId),
       this.options.context_id,
       this.getFilterRowsBySetting('sectionId'),
       isAdmin(),
