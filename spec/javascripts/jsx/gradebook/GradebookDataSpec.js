@@ -479,6 +479,12 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       const students = gradebook.visibleStudentsThatCanSeeAssignment('2302')
       notOk(Object.keys(students).includes('1102'))
     })
+
+    test('used in default grade dialog', () => {
+      sinon.stub(gradebook, 'visibleStudentsThatCanSeeAssignment')
+      gradebook.getSetDefaultGradeAction('2302')
+      equal(gradebook.visibleStudentsThatCanSeeAssignment.callCount, 1)
+    })
   })
 })
 
