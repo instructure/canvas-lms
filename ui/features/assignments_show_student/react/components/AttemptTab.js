@@ -303,7 +303,7 @@ export default class AttemptTab extends Component {
             url: file.url,
             name: file.text,
             content_type: file.mediaType,
-            submit_assignment: true,
+            submit_assignment: false,
           },
           null,
           axios,
