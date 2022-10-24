@@ -887,7 +887,7 @@ describe('ContentTabs', () => {
         url: 'http://localhost/some-lti-file',
         name: 'x.pdf',
         content_type: 'plain/txt',
-        submit_assignment: true,
+        submit_assignment: false,
       })
     })
   })
