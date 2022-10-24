@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {getByText, render} from '@testing-library/react'
 import {DEFAULT_SETTINGS} from '../../../svg/constants'
 import {Preview} from '../Preview'
 
@@ -84,5 +84,25 @@ describe('<Preview />', () => {
         </svg>
       </svg>
     `)
+  })
+
+  it('renders Preview div with screen reader only content and sibling div with aria-hidden="true"', () => {
+    const {container} = render(
+      <Preview
+        settings={{
+          ...DEFAULT_SETTINGS,
+          color: null,
+          outlineColor: '#0f0',
+          outlineSize: 'medium',
+          shape: 'triangle',
+          size: 'large',
+        }}
+      />
+    )
+
+    const ariaLabelDiv = getByText(container, 'Icon Preview')
+    const ariaHiddenDiv = container.querySelector('div[aria-hidden="true"]')
+    expect(ariaLabelDiv).toBeInTheDocument()
+    expect(ariaHiddenDiv).toBeInTheDocument()
   })
 })
