@@ -140,9 +140,22 @@ describe "Services API", type: :request do
     it "test the urls are enhanced with the base url when CDN is not configured" do
       json = rce_config_api_call
 
-      expect(json[:url_for_high_contrast_tinymce_editor_css]).to all(starting_with("http://localhost/dist"))
-      expect(json[:url_to_what_gets_loaded_inside_the_tinymce_editor_css]).to all(starting_with("http://localhost/dist"))
-      expect(json[:active_brand_config_json_url]).to starting_with("http://localhost/dist")
+      expected_starting = "http://localhost/dist"
+      expect(json[:url_for_high_contrast_tinymce_editor_css]).to all(starting_with(expected_starting))
+      expect(json[:url_to_what_gets_loaded_inside_the_tinymce_editor_css]).to all(starting_with(expected_starting))
+      expect(json[:active_brand_config_json_url]).to starting_with(expected_starting)
+    end
+
+    it "test the urls use the CDN if it is configured" do
+      cdn_url = "http://cdn"
+      allow(Canvas::Cdn.config).to receive(:host).and_return(cdn_url)
+
+      json = rce_config_api_call
+
+      expected_starting = "#{cdn_url}/dist"
+      expect(json[:url_for_high_contrast_tinymce_editor_css]).to all(starting_with(expected_starting))
+      expect(json[:url_to_what_gets_loaded_inside_the_tinymce_editor_css]).to all(starting_with(expected_starting))
+      expect(json[:active_brand_config_json_url]).to starting_with(expected_starting)
     end
 
     it "test the contract of the RCE configuration" do
