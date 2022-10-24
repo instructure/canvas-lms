@@ -42,6 +42,12 @@ describe('MediaAttachment', () => {
     expect(getByRole('button', {name: 'Remove media comment'})).toBeInTheDocument()
   })
 
+  it('does not show the remove button when there onRemoveMediaComment is not defined', () => {
+    const mediaProps = {...props, onRemoveMediaComment: undefined}
+    const {queryByTestId} = render(<MediaAttachment {...mediaProps} />)
+    expect(queryByTestId('removable-item')).not.toBeInTheDocument()
+  })
+
   it('calls onRemoveMediaComment when the button is clicked', () => {
     const {getByTestId, getByRole} = render(<MediaAttachment {...props} />)
     fireEvent.mouseOver(getByTestId('removable-item'))

@@ -100,5 +100,11 @@ describe('ModelBody', () => {
       fireEvent.click(getByTestId('remove-button'))
       expect(props.removeAttachment).toHaveBeenCalledTimes(1)
     })
+
+    it('renders user entered title when submitted', () => {
+      const props = {...defaultProps, user_entered_title: 'renamed video'}
+      const {queryByText} = render(<ModalBody {...props} />)
+      expect(queryByText('renamed video')).not.toBeInTheDocument()
+    })
   })
 })
