@@ -2612,7 +2612,7 @@ describe UsersController do
       end
     end
 
-    context "with canvas for elementary feature account setting" do
+    context "with canvas for elementary account setting" do
       before(:once) do
         @account = Account.default
       end
@@ -2716,6 +2716,21 @@ describe UsersController do
             @course.enroll_student(@user1)
             get "user_dashboard"
             expect(controller.instance_variable_get(:@cards_prefetch_observed_param)).to be_nil
+          end
+        end
+
+        context "ENV.SELECTED_CONTEXT_CODES" do
+          it "is set to an array with the user's selected context codes" do
+            contexts = %w[course_1 course_2]
+            @user.set_preference(:selected_calendar_contexts, contexts)
+            get "user_dashboard"
+            expect(assigns[:js_env][:SELECTED_CONTEXT_CODES]).to eq(contexts)
+          end
+
+          it "is set to an empty array if the user has unselected all of their calendars" do
+            @user.set_preference(:selected_calendar_contexts, "[]")
+            get "user_dashboard"
+            expect(assigns[:js_env][:SELECTED_CONTEXT_CODES]).to eq([])
           end
         end
       end
