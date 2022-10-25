@@ -676,6 +676,191 @@ describe "Outcome Reports" do
           expect(results[0]["outcome score"]).to eq 5.0
         end
 
+        it "will use submitted_at instead of created_at if present" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
+                                          { id: 1,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            submitted_at: "2022-08-20T12:00:00.0Z", # This date will be used to compare with other attempt
+                                            created_at: "2023-08-19T12:00:00.0Z", # This date will be ignored
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "1",
+                                                  quiz_item_title: "Attempt 1 Question 1",
+                                                  points: 0.0,
+                                                  points_possible: 1.0
+                                                },
+                                                {
+                                                  quiz_item_id: "2",
+                                                  quiz_item_title: "Attempt 1 Question 2",
+                                                  points: 1.0,
+                                                  points_possible: 2.0
+                                                }
+                                              ]
+                                            } },
+                                          { id: 2,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            submitted_at: "2022-08-19T12:00:00.0Z", # This date will be used to compare with other attempt
+                                            created_at: "2023-08-20T12:00:00.0Z", # This date will be ignored
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "3",
+                                                  quiz_item_title: "Attempt 2 Question 1",
+                                                  points: 2.0,
+                                                  points_possible: 3.0
+                                                },
+                                                {
+                                                  quiz_item_id: "4",
+                                                  quiz_item_title: "Attempt 2 Question 2",
+                                                  points: 3.0,
+                                                  points_possible: 4.0
+                                                }
+                                              ]
+                                            } }
+                                        ])
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          expect(results.length).to eq(2)
+          results.each_index do |i|
+            expect(results[i]["student uuid"]).to eq @user1.uuid
+            expect(results[i]["student name"]).to eq @user1.sortable_name
+            expect(results[i]["assignment id"]).to eq @new_quiz.id
+            expect(results[i]["assessment title"]).to eq @new_quiz.title
+            expect(results[i]["assessment id"]).to eq @new_quiz.id
+            expect(results[i]["submission date"]).to eq @new_quiz_submission.submitted_at
+            expect(results[i]["submission score"]).to eq @new_quiz_submission&.grade&.to_f
+            expect(results[i]["learning outcome name"]).to eq @outcome.short_description
+            expect(results[i]["learning outcome id"]).to eq @outcome.id
+            expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
+            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+
+            # 2 attempts were returned so we are looking at 1st attempt
+            expect(results[i]["attempt"]).to eq(2)
+            expect(results[i]["learning outcome points hidden"]).to be_nil
+
+            # These equation just make sure we are looking at data from 1st attempt
+            expect(results[i]["outcome score"]).to eq i
+            expect(results[i]["learning outcome points possible"]).to eq(i + 1)
+            expect(results[i]["assessment question id"]).to eq((i + 1).to_s)
+            expect(results[i]["assessment question"]).to eq "Attempt 1 Question #{i + 1}"
+
+            expect(results[i]["total percent outcome score"]).to eq 1.0
+            expect(results[i]["course name"]).to eq @course1.name
+            expect(results[i]["course id"]).to eq @course1.id
+            expect(results[i]["course sis id"]).to eq @course1.sis_source_id
+            expect(results[i]["assessment type"]).to eq "quiz"
+            expect(results[i]["section name"]).to eq @section.name
+            expect(results[i]["section id"]).to eq @section.id
+            expect(results[i]["section sis id"]).to eq @section.sis_source_id
+            expect(results[i]["enrollment state"]).to eq @enrollment1.workflow_state
+            expect(results[i]["account id"]).to eq @root_account.id
+            expect(results[i]["account name"]).to eq @root_account.name
+          end
+        end
+
+        it "will use submitted_at or created_at if inconsistently populated" do
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+          mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
+                                          { id: 1,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            submitted_at: "2023-08-20T12:00:00.0Z", # This date will be used to compare with other attempt
+                                            created_at: "2022-08-19T12:00:00.0Z", # This date will be ignored
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "1",
+                                                  quiz_item_title: "Attempt 1 Question 1",
+                                                  points: 0.0,
+                                                  points_possible: 1.0
+                                                },
+                                                {
+                                                  quiz_item_id: "2",
+                                                  quiz_item_title: "Attempt 1 Question 2",
+                                                  points: 1.0,
+                                                  points_possible: 2.0
+                                                }
+                                              ]
+                                            } },
+                                          { id: 2,
+                                            authoritative_result_id: 2,
+                                            points: 2.0,
+                                            points_possible: 2.0,
+                                            created_at: "2022-08-20T12:00:00.0Z", # This date will be used to compare with other attempt
+                                            metadata: {
+                                              question_metadata: [
+                                                {
+                                                  quiz_item_id: "3",
+                                                  quiz_item_title: "Attempt 2 Question 1",
+                                                  points: 2.0,
+                                                  points_possible: 3.0
+                                                },
+                                                {
+                                                  quiz_item_id: "4",
+                                                  quiz_item_title: "Attempt 2 Question 2",
+                                                  points: 3.0,
+                                                  points_possible: 4.0
+                                                }
+                                              ]
+                                            } }
+                                        ])
+          expect(outcome_reports).to receive(:get_lmgb_results)
+            .with(@course1, assignment_ids, "canvas.assignment.quizzes", outcome_ids, uuids)
+            .and_return(mock_results)
+
+          results = outcome_reports.send(:outcomes_new_quiz_scope)
+
+          expect(results.length).to eq(2)
+          results.each_index do |i|
+            expect(results[i]["student uuid"]).to eq @user1.uuid
+            expect(results[i]["student name"]).to eq @user1.sortable_name
+            expect(results[i]["assignment id"]).to eq @new_quiz.id
+            expect(results[i]["assessment title"]).to eq @new_quiz.title
+            expect(results[i]["assessment id"]).to eq @new_quiz.id
+            expect(results[i]["submission date"]).to eq @new_quiz_submission.submitted_at
+            expect(results[i]["submission score"]).to eq @new_quiz_submission&.grade&.to_f
+            expect(results[i]["learning outcome name"]).to eq @outcome.short_description
+            expect(results[i]["learning outcome id"]).to eq @outcome.id
+            expect(results[i]["learning outcome friendly name"]).to eq @outcome.display_name
+            expect(results[i]["learning outcome mastered"]).to eq false
+            expect(results[i]["learning outcome data"]).to eq @outcome.data.to_yaml
+
+            # 2 attempts were returned so we are looking at 1st attempt
+            expect(results[i]["attempt"]).to eq(2)
+            expect(results[i]["learning outcome points hidden"]).to be_nil
+
+            # These equation just make sure we are looking at data from 1st attempt
+            expect(results[i]["outcome score"]).to eq i
+            expect(results[i]["learning outcome points possible"]).to eq(i + 1)
+            expect(results[i]["assessment question id"]).to eq((i + 1).to_s)
+            expect(results[i]["assessment question"]).to eq "Attempt 1 Question #{i + 1}"
+
+            expect(results[i]["total percent outcome score"]).to eq 1.0
+            expect(results[i]["course name"]).to eq @course1.name
+            expect(results[i]["course id"]).to eq @course1.id
+            expect(results[i]["course sis id"]).to eq @course1.sis_source_id
+            expect(results[i]["assessment type"]).to eq "quiz"
+            expect(results[i]["section name"]).to eq @section.name
+            expect(results[i]["section id"]).to eq @section.id
+            expect(results[i]["section sis id"]).to eq @section.sis_source_id
+            expect(results[i]["enrollment state"]).to eq @enrollment1.workflow_state
+            expect(results[i]["account id"]).to eq @root_account.id
+            expect(results[i]["account name"]).to eq @root_account.name
+          end
+        end
+
         it "returns row for each question on latest attempt" do
           @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
           mock_results = mock_os_result(@user1, @outcome, @new_quiz, "2022-09-19T12:00:00.0Z", [
