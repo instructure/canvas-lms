@@ -88,6 +88,22 @@ describe CommunicationChannelsController do
         JSON.parse(response.body)["errors"]["type"]
       ).to eq "Maximum number of communication channels reached"
     end
+
+    it "does not create if user cannot manage comm channels" do
+      user_with_pseudonym(active_user: true)
+      user_session(@user, @pseudonym)
+      @user.account.settings[:users_can_edit_comm_channels] = false
+      @user.account.save!
+
+      post "create", params: {
+        user_id: @user.id,
+        communication_channel: {
+          address: "cc2@test.com", type: "email"
+        }
+      }
+      expect(response).not_to be_successful
+      expect(response.code).to eq "401"
+    end
   end
 
   describe "GET 'confirm'" do
@@ -1353,6 +1369,16 @@ describe CommunicationChannelsController do
     ensure
       User.record_timestamps = true
     end
+  end
+
+  it "does not delete if user cannot manage comm channels" do
+    user_session(@user, @pseudonym)
+    @pseudonym.account.settings[:users_can_edit_comm_channels] = false
+    @pseudonym.account.save!
+
+    delete "destroy", params: { id: @pseudonym.communication_channel.id }
+
+    expect(response.code).to eq "401"
   end
 
   it "does not delete a required institutional channel" do

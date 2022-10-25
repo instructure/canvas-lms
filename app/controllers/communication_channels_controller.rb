@@ -621,7 +621,7 @@ class CommunicationChannelsController < ApplicationController
   end
 
   def has_api_permissions?
-    @user == @current_user ||
+    (@user == @current_user && @current_user&.user_can_edit_comm_channels?) ||
       @user.grants_right?(@current_user, session, :manage_user_details)
   end
 

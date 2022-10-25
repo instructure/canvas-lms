@@ -25,6 +25,7 @@ describe "profile/profile" do
     course_with_student(active_user: true)
     view_context
 
+    assign(:user_data, { can_edit_channels: true, can_edit: true, can_edit_name: true })
     assign(:user, @user)
     assign(:email_channels, [])
     assign(:other_channels, [])
@@ -42,6 +43,7 @@ describe "profile/profile" do
     account_admin_user_with_role_changes(active_user: true, role_changes: { manage_sis: false })
     view_context
 
+    assign(:user_data, { can_edit_channels: true, can_edit: true, can_edit_name: true })
     assign(:user, @user)
     assign(:email_channels, [])
     assign(:other_channels, [])
@@ -62,6 +64,7 @@ describe "profile/profile" do
     course_with_student(active_user: true)
     view_context
 
+    assign(:user_data, { can_edit_channels: true, can_edit: true, can_edit_name: true })
     assign(:user, @user)
     assign(:email_channels, [])
     assign(:other_channels, [])

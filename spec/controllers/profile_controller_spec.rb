@@ -223,6 +223,22 @@ describe ProfileController do
       expect(@user.profile.title).to eql old_title
     end
 
+    it "does not let you change your profile information if you are not allowed" do
+      account = Account.default
+      account.settings = { users_can_edit_profile: false }
+      account.save!
+
+      old_bio = @user.profile.bio
+      put "update_profile",
+          params: { user: { short_name: "Monsturd", name: "Jenkins" },
+                    user_profile: { bio: "...", title: "!!!" } },
+          format: "json"
+      expect(response).to be_successful
+
+      @user.reload
+      expect(@user.profile.bio).to eql old_bio
+    end
+
     it "lets you set visibility on user_services" do
       @user.user_services.create! service: "skype", service_user_name: "user", service_user_id: "user", visible: true
       @user.user_services.create! service: "twitter", service_user_name: "user", service_user_id: "user", visible: false

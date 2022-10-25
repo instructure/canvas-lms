@@ -423,13 +423,13 @@ class ProfileController < ApplicationController
 
     short_name = params[:user] && params[:user][:short_name]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
-    if params[:user_profile]
+    if params[:user_profile] && @user.user_can_edit_profile?
       user_profile_params = params[:user_profile].permit(:title, :bio)
       user_profile_params.delete(:title) unless @user.user_can_edit_name?
       @profile.attributes = user_profile_params
     end
 
-    if params[:link_urls] && params[:link_titles]
+    if params[:link_urls] && params[:link_titles] && @user.user_can_edit_profile?
       @profile.links = []
       params[:link_urls].zip(params[:link_titles])
                         .reject { |url, title| url.blank? && title.blank? }

@@ -2653,8 +2653,9 @@ class ApplicationController < ActionController::Base
     extend Api::V1::Group
     includes ||= []
     data = user_profile_json(profile, viewer, session, includes, profile)
-    data[:can_edit] = viewer == profile.user
-    data[:can_edit_name] = data[:can_edit] && profile.user.user_can_edit_name?
+    data[:can_edit] = viewer == profile.user && profile.user.user_can_edit_profile?
+    data[:can_edit_channels] = viewer == profile.user && profile.user.user_can_edit_comm_channels?
+    data[:can_edit_name] = viewer == profile.user && profile.user.user_can_edit_name?
     data[:can_edit_avatar] = data[:can_edit] && profile.user.avatar_state != :locked
     data[:known_user] = viewer.address_book.known_user(profile.user)
     if data[:known_user] && viewer != profile.user
