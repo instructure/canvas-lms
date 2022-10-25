@@ -563,7 +563,6 @@ describe "context modules" do
       tag = mod.add_item(title: "Example text header", type: "sub_header")
       get "/courses/#{@course.id}/modules"
       expect(f("#context_module_item_#{tag.id}")).not_to contain_css(".item_link")
-      expect(f("#context_module_item_#{tag.id}")).not_to contain_css("a.for-nvda")
     end
 
     it "renders links for wiki page type items", priority: "1" do
@@ -574,7 +573,6 @@ describe "context modules" do
       tag = mod.add_item({ id: page.id, type: "wiki_page" })
       get "/courses/#{@course.id}/modules"
       expect(f("#context_module_item_#{tag.id}")).to contain_css(".item_link")
-      expect(f("#context_module_item_#{tag.id}")).to contain_css("a.for-nvda")
     end
 
     context "expanding/collapsing modules" do
