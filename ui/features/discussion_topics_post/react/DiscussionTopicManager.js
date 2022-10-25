@@ -43,6 +43,7 @@ const I18n = useI18nScope('discussion_topics_post')
 const DiscussionTopicManager = props => {
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
+  const [unreadBefore, setUnreadBefore] = useState('')
   const [sort, setSort] = useState('desc')
   const [pageNumber, setPageNumber] = useState(ENV.current_page)
   const [searchPageNumber, setSearchPageNumber] = useState(0)
@@ -86,6 +87,16 @@ const DiscussionTopicManager = props => {
     replyFromId,
     setReplyFromId,
   }
+
+  // Unread filter
+  // This introduces a double query for DISCUSSION_QUERY when filter changes
+  useEffect(() => {
+    if (filter === 'unread' && !unreadBefore) {
+      setUnreadBefore(new Date(Date.now()).toISOString())
+    } else if (filter !== 'unread') {
+      setUnreadBefore('')
+    }
+  }, [filter, unreadBefore])
 
   // Reset search to 0 when inactive
   useEffect(() => {
@@ -144,13 +155,21 @@ const DiscussionTopicManager = props => {
     filter,
     sort,
     courseID: window.ENV?.course_id,
+    unreadBefore,
   }
+
+  // Unread and unreadBefore both useState and trigger useQuery. We need to wait until both are set.
+  // Also when switching from unread the same issue causes 2 queries when unreadBefore switches to '',
+  // but unreadBefore only applies to unread filter. So we dont need the extra query.
+  const waitForUnreadFilter =
+    (filter === 'unread' && !unreadBefore) || (filter !== 'unread' && unreadBefore)
 
   // in some cases, we want to refresh the results rather that use the current cache:
   // in the case: 'isUserMissingInitialPost' the cache is empty so we need to get the entries.
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
     fetchPolicy: isUserMissingInitialPost || searchTerm ? 'network-only' : 'cache-and-network',
+    skip: waitForUnreadFilter,
   })
 
   const updateDraftCache = (cache, result) => {
@@ -246,7 +265,16 @@ const DiscussionTopicManager = props => {
     },
   })
 
-  if (discussionTopicQuery.loading && !searchTerm && filter === 'all') {
+  // why || waitForUnreadFilter: when waitForUnreadFilter, discussionTopicQuery is skipped, but this does not set loading.
+  // why && !searchTerm: this is for the search if you type it triggers useQuery and you lose the search.
+  // why not just discussionTopicQuery.loading, it doesnt play nice with search term.
+  if (
+    (discussionTopicQuery.loading && !searchTerm) ||
+    waitForUnreadFilter ||
+    (discussionTopicQuery.loading &&
+      discussionTopicQuery?.data &&
+      Object.keys(discussionTopicQuery.data).length === 0)
+  ) {
     return <LoadingIndicator />
   }
 

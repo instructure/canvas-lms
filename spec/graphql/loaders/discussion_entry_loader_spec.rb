@@ -260,6 +260,25 @@ describe Loaders::DiscussionEntryLoader do
       end
     end
 
+    context "search term" do
+      it "by unread workflow state" do
+        # explicit and implicit read states
+        @de1.change_read_state("read", @teacher)
+        @de2.change_read_state("unread", @teacher)
+        @de4.discussion_entry_participants.where(user_id: @teacher).delete_all
+
+        GraphQL::Batch.batch do
+          Loaders::DiscussionEntryLoader.for(
+            current_user: @teacher,
+            filter: "unread",
+            search_term: "touch"
+          ).load(@discussion).then do |discussion_entries|
+            expect(discussion_entries).to match_array([@de2])
+          end
+        end
+      end
+    end
+
     it "by deleted workflow state" do
       GraphQL::Batch.batch do
         Loaders::DiscussionEntryLoader.for(
