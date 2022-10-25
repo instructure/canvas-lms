@@ -116,7 +116,7 @@ describe('enhanceUserContent()', () => {
         )
         enhanceUserContent()
         const aTag = document.querySelector('a')
-        expect(aTag.classList.value).toEqual('file_preview_link')
+        expect(aTag.classList.contains('file_preview_link')).toBeTruthy()
         expect(aTag).toHaveAttribute('target')
       })
     })
@@ -133,22 +133,6 @@ describe('enhanceUserContent()', () => {
       subject('<a href="https://instructure.com/">external link</a>')
       enhanceUserContent()
       expect(document.querySelector('a.external').getAttribute('target')).toEqual('_blank')
-    })
-  })
-
-  describe('ENV.SKIP_ENHANCING_USER_CONTENT', () => {
-    beforeAll(() => {
-      window.ENV = {}
-    })
-    afterAll(() => {
-      window.ENV = {}
-    })
-
-    it('does not enhance user content if true', () => {
-      window.ENV.SKIP_ENHANCING_USER_CONTENT = true
-      subject(`<div class="user_content"><a href="https://instructure.com/">external</a></div>`)
-      enhanceUserContent()
-      expect(document.querySelector('img.external_link_icon')).not.toBeInTheDocument()
     })
   })
 

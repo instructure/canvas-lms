@@ -333,6 +333,10 @@ function openDialogsWhenClicked() {
 
 let enhanceUserContentTimeout
 function enhanceUserContentWhenAsked() {
+  if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
+    return
+  }
+
   clearTimeout(enhanceUserContentTimeout)
   enhanceUserContentTimeout = setTimeout(
     () =>
