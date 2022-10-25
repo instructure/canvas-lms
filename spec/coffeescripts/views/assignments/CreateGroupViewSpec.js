@@ -17,12 +17,11 @@
  */
 
 import {isEmpty, keys} from 'lodash'
-import Backbone from '@canvas/backbone'
 import AssignmentGroupCollection from '@canvas/assignments/backbone/collections/AssignmentGroupCollection'
 import AssignmentGroup from '@canvas/assignments/backbone/models/AssignmentGroup.coffee'
 import Assignment from '@canvas/assignments/backbone/models/Assignment.coffee'
 import Course from '@canvas/courses/backbone/models/Course.coffee'
-import CreateGroupView from 'ui/features/assignment_index/backbone/views/CreateGroupView.coffee'
+import CreateGroupView from 'ui/features/assignment_index/backbone/views/CreateGroupView'
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
 import assertions from 'helpers/assertions'
@@ -141,7 +140,6 @@ test('it should only allow positive numbers for drop rules', () => {
 
 test('it should only allow less than the number of assignments for drop rules', () => {
   const view = createView()
-  const assignments = view.assignmentGroup.get('assignments')
   const data = {
     name: 'Assignments',
     rules: {drop_highest: 5},
@@ -151,9 +149,19 @@ test('it should only allow less than the number of assignments for drop rules', 
   equal(keys(errors).length, 1)
 })
 
+test('it should only allow integer values for rules', () => {
+  const view = createView()
+  const data = {
+    name: 'Assignments',
+    rules: {drop_highest: 2.5},
+  }
+  const errors = view.validateFormData(data)
+  ok(errors)
+  equal(keys(errors).length, 1)
+})
+
 test('it should not allow assignment groups with no name', () => {
   const view = createView()
-  const assignments = view.assignmentGroup.get('assignments')
   const data = {name: ''}
   const errors = view.validateFormData(data)
   ok(errors)
@@ -162,7 +170,6 @@ test('it should not allow assignment groups with no name', () => {
 
 test('it should not allow NaN values for group weight', () => {
   const view = createView()
-  const assignments = view.assignmentGroup.get('assignments')
   const data = {
     name: 'Assignments',
     drop_highest: '0',
