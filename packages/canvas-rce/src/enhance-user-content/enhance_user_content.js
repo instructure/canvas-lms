@@ -138,7 +138,10 @@ function buildUrl(url) {
   }
 }
 
-export function enhanceUserContent(container, customEnhanceFunc) {
+export function enhanceUserContent(container = document, opts = {}) {
+  const customEnhanceFunc = opts.customEnhanceFunc
+  const canvasOrigin = opts.canvasOrigin || window.location?.origin
+
   if (ENV?.SKIP_ENHANCING_USER_CONTENT) {
     return
   }
@@ -162,6 +165,21 @@ export function enhanceUserContent(container, customEnhanceFunc) {
       }
     })
     setData(unenhanced_elem, 'unenhanced_content_html', unenhanced_elem.innerHTML)
+
+    // guarantee relative links point to canvas
+    if (canvasOrigin) {
+      unenhanced_elem.querySelectorAll('a').forEach(link => {
+        try {
+          const href = link.getAttribute('href')
+          if (href[0] !== '#') {
+            const url = new URL(href, canvasOrigin)
+            link.setAttribute('href', url.href)
+          }
+        } catch (_ignore) {
+          // canvasOrigin probably isn't a valid base url
+        }
+      })
+    }
 
     unenhanced_elem.querySelectorAll('a:not(.not_external, .external)').forEach(childLink => {
       if (!isExternalLink(childLink)) return

@@ -335,7 +335,11 @@ let enhanceUserContentTimeout
 function enhanceUserContentWhenAsked() {
   clearTimeout(enhanceUserContentTimeout)
   enhanceUserContentTimeout = setTimeout(
-    () => enhanceUserContent(document, enhanceUserJQueryWidgetContent),
+    () =>
+      enhanceUserContent(document, {
+        customEnhanceFunc: enhanceUserJQueryWidgetContent,
+        canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
+      }),
     50
   )
 }

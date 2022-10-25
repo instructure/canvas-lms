@@ -39,6 +39,22 @@ describe('enhanceUserContent()', () => {
   })
 
   describe('when a link has an href that matches a canvas file path', () => {
+    it('makes relative links absolute', () => {
+      subject(
+        '<a id="relative_link" class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1">file</a>'
+      )
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+      expect(document.getElementById('relative_link').getAttribute('href')).toEqual(
+        'https://canvas.is.here:2000/courses/1/files/1'
+      )
+    })
+
+    it('does not make internal links absolute', () => {
+      subject('<a id="internal_link" href="#tabs-1">this happens for jquery tags</a>')
+      enhanceUserContent(document, {canvasOrigin: 'https://canvas.is.here:2000/'})
+      expect(document.getElementById('internal_link').getAttribute('href')).toEqual('#tabs-1')
+    })
+
     it('enhances the link', () => {
       subject(
         '<a class="instructure_file_link instructure_scribd_file" href="/courses/1/files/1">file</a>'
@@ -175,6 +191,15 @@ describe('enhanceUserContent()', () => {
         expect(document.querySelector('.instructure_inline_media_comment')).toBeInTheDocument()
         expect(document.querySelector('.instructure_video_link')).toBeInTheDocument()
       })
+    })
+  })
+
+  describe('customEnhanceFunc', () => {
+    it('is called if provided', () => {
+      subject('<p>hello world</p>')
+      const customFunc = jest.fn()
+      enhanceUserContent(document, {customEnhanceFunc: customFunc})
+      expect(customFunc).toHaveBeenCalledTimes(1)
     })
   })
 })
