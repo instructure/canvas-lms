@@ -81,7 +81,7 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
 
-      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state]
+      insert_columns = %w[discussion_entry_id user_id root_account_id workflow_state read_at]
       update_columns = []
       update_values = []
 
@@ -128,6 +128,10 @@ class DiscussionEntryParticipant < ActiveRecord::Base
       if new_state
         update_columns << "workflow_state"
         update_values << connection.quote(new_state)
+
+        read_at_datetime = (new_state&.to_s == "read") ? Time.now : nil
+        update_columns << "read_at"
+        update_values << connection.quote(read_at_datetime)
       end
 
       # if there are no values in the update_columns, there is no point to
@@ -162,11 +166,13 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.row_values(batch_entry, user_id, root_account_id, default_state, update_values)
+    read_at_datetime = (default_state&.to_s == "read") ? Time.now : nil
     [
       connection.quote(batch_entry.is_a?(ActiveRecord::Base) ? batch_entry.id_for_database : batch_entry),
       connection.quote(user_id),
       connection.quote(root_account_id),
       connection.quote(default_state),
+      connection.quote(read_at_datetime),
     ] + update_values
   end
 

@@ -47,6 +47,7 @@ export const getDiscussionQueryMock = ({
   sort = 'desc',
   shouldError = false,
   isGroup = true,
+  unreadBefore = '',
 } = {}) => [
   {
     request: {
@@ -61,6 +62,7 @@ export const getDiscussionQueryMock = ({
         rootEntries,
         searchTerm,
         sort,
+        unreadBefore,
       },
     },
     result: {
@@ -129,6 +131,7 @@ export const getAnonymousDiscussionQueryMock = ({
   searchTerm = '',
   sort = 'desc',
   shouldError = false,
+  unreadBefore = '',
 } = {}) => [
   {
     request: {
@@ -143,6 +146,7 @@ export const getAnonymousDiscussionQueryMock = ({
         rootEntries,
         searchTerm,
         sort,
+        unreadBefore,
       },
     },
     result: {

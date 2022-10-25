@@ -183,7 +183,16 @@ describe('DiscussionFullPage', () => {
     })
 
     it('updates discussion entry', async () => {
-      const mocks = [...getDiscussionQueryMock(), ...updateDiscussionEntryMock()]
+      const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+      jest
+        .spyOn(global.Date, 'now')
+        .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+
+      const mocks = [
+        ...getDiscussionQueryMock({unreadBefore: unreadTime}),
+        ...getDiscussionQueryMock(),
+        ...updateDiscussionEntryMock(),
+      ]
       const container = setup(mocks)
       expect(await container.findByText('This is the parent reply')).toBeInTheDocument()
 
@@ -208,9 +217,14 @@ describe('DiscussionFullPage', () => {
 
   describe('searchFilter', () => {
     it('filters by unread', async () => {
+      const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+      jest
+        .spyOn(global.Date, 'now')
+        .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+
       const mocks = [
         ...getDiscussionQueryMock(),
-        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false}),
+        ...getDiscussionQueryMock({filter: 'unread', rootEntries: false, unreadBefore: unreadTime}),
       ]
       const container = setup(mocks)
       expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
@@ -373,7 +387,16 @@ describe('DiscussionFullPage', () => {
     // For some reason when we add a reply to a discussion topic we end up performing
     // 2 additional discussion queries. Until we address that issue we need to specify
     // these queries in our mocks we provide to MockedProvider
-    const mocks = [...getDiscussionQueryMock(), ...createDiscussionEntryMock()]
+
+    const unreadTime = new Date('2019-05-14T11:01:58.135Z').toISOString()
+    jest
+      .spyOn(global.Date, 'now')
+      .mockImplementation(() => new Date('2019-05-14T11:01:58.135Z').valueOf())
+    const mocks = [
+      ...getDiscussionQueryMock({unreadBefore: ''}),
+      ...getDiscussionQueryMock({unreadBefore: unreadTime}),
+      ...createDiscussionEntryMock(),
+    ]
     const container = setup(mocks)
 
     const replyButton = await container.findByTestId('discussion-topic-reply')
