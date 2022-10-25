@@ -60,10 +60,12 @@
           <% if c.state == :unconfirmed && (c.grants_right?(@current_user, :force_confirm) || (@real_current_user && c.grants_right?(@real_current_user, :force_confirm))) %>
               <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover" aria-label="<%= t('titles.confirm_email_address_aria_label', "Confirm Email Address") %>"><i class="icon-check standalone-icon" alt="<%= t('titles.confirm_email_address_alt', "Confirm Email Address") %>" title="<%= t('titles.confirm_email_address', "Confirm Email Address") %>"></i></a>
           <% end %>
-          <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
-            <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label="<%= t("Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t("Remove email address") %>"></i></a>
+          <% if @user_data[:can_edit_channels] %>
+            <% unless !@domain_root_account.edit_institution_email? && c.imported? %>
+              <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover" aria-label="<%= t("Remove email address") %>" ><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t("Remove email address") %>"></i></a>
+            <% end %>
+            <span class="screenreader-only cant_delete_default_text"><%= t("You cannot remove your default email address") %></span>
           <% end %>
-          <span class="screenreader-only cant_delete_default_text"><%= t("You cannot remove your default email address") %></span>
           <% if c.active? && @domain_root_account.feature_enabled?(:self_service_user_merge) && c.has_merge_candidates? %>
             <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="merge_users_link no-hover" aria-label="<%= t('titles.merge_users_aria_label', "Another user has the same email address.  Click here to combine user accounts.") %>"><i class="icon-group-new standalone-icon" alt="<%= t('titles.merge_users_alt', "Another user has the same email address.  Click here to combine user accounts.") %>" title="<%= t('titles.merge_users', "Another user has the same email address.  Click here to combine user accounts.") %>"></i></a>
           <% end %>
@@ -91,17 +93,21 @@
       <span class="screenreader-only unconfirmed_text"><%= t("This email address is unconfirmed") %></span>
     </td>
     <td class="email_actions hidden_for_single">
-      <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover" aria-label="<%= t('Remove email address') %>"><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t('Remove email address') %>"></i></a>
+      <% if @user_data[:can_edit_channels] %>
+        <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover" aria-label="<%= t('Remove email address') %>"><i class="icon-trash standalone-icon" alt="<%= t("Remove email address") %>" title="<%= t('Remove email address') %>"></i></a>
+      <% end %>
       <span class="pseudonym_id" style="display: none;">&nbsp;</span>
       <span class="channel_id" style="display: none;">&nbsp;</span>
       <span class="user_id" style="display: none;">&nbsp;</span>
     </td>
   </tr>
-  <tr>
-    <td colspan="3" style="text-align: center;">
-      <a href="#" class="add_email_link icon-add" title="<%= t("Add Email Address") %>" aria-label="<%= t("Add Email Address") %>"><%= t('links.add_email_address', "Email Address") %></a>
-    </td>
-  </tr>
+  <% if @user_data[:can_edit_channels] %>
+    <tr>
+      <td colspan="3" style="text-align: center;">
+        <a href="#" class="add_email_link icon-add" title="<%= t("Add Email Address") %>" aria-label="<%= t("Add Email Address") %>"><%= t('links.add_email_address', "Email Address") %></a>
+      </td>
+    </tr>
+  <% end %>
 </table>
 <div class="content-box-mini">
   <table class="channel_list other_channels ic-Table ic-Table--condensed">
@@ -134,8 +140,10 @@
           <% if c.state == :unconfirmed && (@user.grants_right?(@current_user, :manage_user_details) || (@real_current_user && @user.grants_right?(@real_current_user, :manage_user_details))) %>
               <a href="<%= registration_confirmation_url(c.confirmation_code) %>" class="confirm_channel_link no-hover"><i class="icon-check standalone-icon" aria-hidden="true" title="<%= t('Confirm contact method') %>"></i><span class="screenreader-only"><%= t("Confirm contact method") %></span></a>
           <% end %>
-          <% unless c.id == c.user.otp_communication_channel_id %>
-            <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t("Remove contact method") %>" aria-hidden="true"></i><span class="screenreader-only"><%= t("Remove contact method") %></span></a>
+          <% if @user_data[:can_edit_channels] %>
+            <% unless c.id == c.user.otp_communication_channel_id %>
+              <a href="<%= communication_channel_url(c.id) %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon" title="<%= t("Remove contact method") %>" aria-hidden="true"></i><span class="screenreader-only"><%= t("Remove contact method") %></span></a>
+            <% end %>
           <% end %>
           <span class="pseudonym_id" style="display: none;"><%= c.pseudonym_id %></span>
           <span class="channel_id" style="display: none;"><%= c.id %></span>
@@ -147,20 +155,24 @@
       <td><a href="#" class="path">&nbsp;</a></td>
       <td><span id="communication_text_type"><%= t("sms") %></span></td>
       <td style="padding: 0; text-align: center;">
-        <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
+        <% if @user_data[:can_edit_channels] %>
+          <a href="<%= communication_channel_url("{{ channel_id }}") %>" class="delete_channel_link no-hover"><i class="icon-trash standalone-icon"></i></a>
+        <% end %>
         <span class="pseudonym_id" style="display: none;">&nbsp;</span>
         <span class="channel_id" style="display: none;">&nbsp;</span>
         <span class="user_id" style="display: none;">&nbsp;</span>
       </td>
     </tr>
     </tbody>
-    <tfoot>
-    <tr>
-      <td colspan="3" style="text-align: center;">
-        <a href="#" class="add_contact_link icon-add" title="<%= t("Add Contact Method") %>" aria-label="<%= t("Add Contact Method") %>"><%= t('links.add_contact_method', "Contact Method") %></a>
-      </td>
-    </tr>
-    </tfoot>
+    <% if @user_data[:can_edit_channels] %>
+      <tfoot>
+        <tr>
+          <td colspan="3" style="text-align: center;">
+            <a href="#" class="add_contact_link icon-add" title="<%= t("Add Contact Method") %>" aria-label="<%= t("Add Contact Method") %>"><%= t('links.add_contact_method', "Contact Method") %></a>
+          </td>
+        </tr>
+      </tfoot>
+    <% end %>
   </table>
 </div>
 </div>

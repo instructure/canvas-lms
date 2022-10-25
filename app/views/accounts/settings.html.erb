@@ -645,6 +645,14 @@
                 <%= settings.check_box :users_can_edit_name, :checked => @account.users_can_edit_name? %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
               </div>
+              <div>
+                <%= settings.check_box :users_can_edit_profile, :checked => @account.users_can_edit_profile? %>
+                <%= settings.label :users_can_edit_profile, :en => "Users can edit their profile" %>
+              </div>
+              <div>
+                <%= settings.check_box :users_can_edit_comm_channels, :checked => @account.users_can_edit_comm_channels? %>
+                <%= settings.label :users_can_edit_comm_channels, :en => "Users can edit their communication channels" %>
+              </div>
 
               <div>
                 <%= settings.check_box :edit_institution_email, :checked => @account.edit_institution_email? %>

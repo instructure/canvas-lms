@@ -254,6 +254,16 @@ describe "admin settings tab" do
       check_box_verifier("#account_settings_users_can_edit_name", :users_can_edit_name)
     end
 
+    it "unchecks users_can_edit_profile and check it again" do
+      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile, false)
+      check_box_verifier("#account_settings_users_can_edit_profile", :users_can_edit_profile)
+    end
+
+    it "unchecks users_can_edit_comm_channels and check it again" do
+      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels, false)
+      check_box_verifier("#account_settings_users_can_edit_comm_channels", :users_can_edit_comm_channels)
+    end
+
     describe "equella settings" do
       def add_equella_feature
         equella_url = "http://oer.equella.com/signon.do"

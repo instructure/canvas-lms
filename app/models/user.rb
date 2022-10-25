@@ -2785,6 +2785,20 @@ class User < ActiveRecord::Base
     accounts.any?(&:users_can_edit_name?)
   end
 
+  def user_can_edit_profile?
+    accounts = pseudonyms.shard(self).active.map(&:account)
+    return true if accounts.empty?
+
+    accounts.any?(&:users_can_edit_profile?)
+  end
+
+  def user_can_edit_comm_channels?
+    accounts = pseudonyms.shard(self).active.map(&:account)
+    return true if accounts.empty?
+
+    accounts.any?(&:users_can_edit_comm_channels?)
+  end
+
   def limit_parent_app_web_access?
     pseudonyms.shard(self).active.map(&:account).any?(&:limit_parent_app_web_access?)
   end
