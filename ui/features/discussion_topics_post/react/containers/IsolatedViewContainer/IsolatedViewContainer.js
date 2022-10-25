@@ -22,7 +22,7 @@ import {
   addReplyToDiscussionEntry,
   getSpeedGraderUrl,
   getOptimisticResponse,
-  getDisplayName,
+  buildQuotedReply,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -339,23 +339,6 @@ export const IsolatedViewContainer = props => {
         }
       },
     })
-  }
-
-  const buildQuotedReply = (nodes, previewId) => {
-    if (!nodes) return ''
-    let preview = {}
-    nodes.every(reply => {
-      if (reply._id === previewId) {
-        preview = {
-          author: {shortName: getDisplayName(reply)},
-          createdAt: reply.createdAt,
-          previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
-        }
-        return false
-      }
-      return true
-    })
-    return preview
   }
 
   const entriesAreLoading = useCallback(() => {

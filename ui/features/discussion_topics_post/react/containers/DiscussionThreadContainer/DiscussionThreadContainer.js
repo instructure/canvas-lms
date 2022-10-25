@@ -23,6 +23,7 @@ import {
   responsiveQuerySizes,
   isTopicAuthor,
   getDisplayName,
+  buildQuotedReply,
 } from '../../utils'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {
@@ -39,7 +40,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Highlight} from '../../components/Highlight/Highlight'
 import {useScope as useI18nScope} from '@canvas/i18n'
 import LoadingIndicator from '@canvas/loading-indicator'
-import {SearchContext} from '../../utils/constants'
+import {SearchContext, DiscussionManagerUtilityContext} from '../../utils/constants'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState, useCallback} from 'react'
@@ -59,6 +60,7 @@ const I18n = useI18nScope('discussion_topics_post')
 export const DiscussionThreadContainer = props => {
   const {searchTerm, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {replyFromId, setReplyFromId} = useContext(DiscussionManagerUtilityContext)
   const [expandReplies, setExpandReplies] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [editorExpanded, setEditorExpanded] = useState(false)
@@ -323,7 +325,7 @@ export const DiscussionThreadContainer = props => {
     }
   }, [threadRefCurrent, props.discussionEntry.entryParticipant.read, props])
 
-  const onReplySubmit = (message, isAnonymousAuthor) => {
+  const onReplySubmit = (message, isAnonymousAuthor, includeReplyPreview) => {
     createDiscussionEntry({
       variables: {
         discussionTopicId: ENV.discussion_topic_id,
@@ -333,6 +335,7 @@ export const DiscussionThreadContainer = props => {
             ? props.discussionEntry.parentId
             : props.discussionEntry._id,
         isAnonymousAuthor,
+        includeReplyPreview,
         message,
         courseID: ENV.course_id,
       },
@@ -399,6 +402,14 @@ export const DiscussionThreadContainer = props => {
                               : null
                           }
                           isReported={props.discussionEntry?.entryParticipant?.reportType != null}
+                          onQuoteReply={
+                            !(ENV.isolated_view || ENV.split_screen_view)
+                              ? () => {
+                                  setReplyFromId(props.discussionEntry._id)
+                                  setEditorExpanded(true)
+                                }
+                              : null
+                          }
                         />
                       ) : null
                     }
@@ -431,6 +442,7 @@ export const DiscussionThreadContainer = props => {
                     )}
                     updateDraftCache={props.updateDraftCache}
                     attachment={props.discussionEntry.attachment}
+                    quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
@@ -478,10 +490,11 @@ export const DiscussionThreadContainer = props => {
                 <DiscussionEdit
                   discussionAnonymousState={props.discussionTopic?.anonymousState}
                   canReplyAnonymously={props.discussionTopic?.canReplyAnonymously}
-                  onSubmit={(message, _includeReplyPreview, _fileId, anonymousAuthorState) => {
-                    onReplySubmit(message, anonymousAuthorState)
+                  onSubmit={(message, includeReplyPreview, _fileId, anonymousAuthorState) => {
+                    onReplySubmit(message, anonymousAuthorState, includeReplyPreview)
                   }}
                   onCancel={() => setEditorExpanded(false)}
+                  quotedEntry={buildQuotedReply([props.discussionEntry], replyFromId)}
                   value={
                     props.discussionEntry.rootEntryId &&
                     props.discussionEntry.rootEntryId !== props.discussionEntry.parentId
