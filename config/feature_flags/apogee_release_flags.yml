@@ -154,3 +154,16 @@ new_quizzes_grade_by_question_in_speedgrader:
       state: allowed_on
     development:
       state: allowed_on
+proxy_file_uploads:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Submit on Behalf of Student
+  description: Allows teachers with the proper permissions to submit file upload assignments
+    on behalf of their students.
+  environments:
+    ci:
+      state: allowed_on # enable for automated testings builds and local testing
+    development:
+      state: allowed_on # enable for local development
+    test:
+      state: allowed_on # enable for the deployed 'test' environment
