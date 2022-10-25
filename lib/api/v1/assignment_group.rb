@@ -177,6 +177,7 @@ module Api::V1::AssignmentGroup
     rules = params.delete("rules")
     if rules
       assignment_group.rules_hash = rules
+      assignment_group.validate_rules = true
     end
 
     assignment_group.integration_data = assignment_group.integration_data.to_h.merge(

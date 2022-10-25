@@ -920,6 +920,7 @@ describe AssignmentGroupsApiController, type: :request do
     end
 
     it "updates rules properly" do
+      @course.assignments.create!(title: "test", assignment_group: @assignment_group)
       rules = { "never_drop" => ["1", "2"], "drop_lowest" => 1, "drop_highest" => 1 }
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       params = { "rules" => rules }
