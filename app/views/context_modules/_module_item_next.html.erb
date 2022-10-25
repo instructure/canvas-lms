@@ -63,16 +63,6 @@
   "
 >
   <div class="ig-row <%= 'with-completion-requirements' if criterion %> <%= 'ig-published' if module_item && module_item.published? %> <%= 'student-view' if @is_student %>">
-    <% if module_item && module_item.content_type != 'ContextModuleSubHeader' %>
-      <a
-        aria-label='<%= module_item && module_item.title %>'
-        tabindex="-1"
-        class="for-nvda"
-        href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>">
-        <%= module_item && module_item.title %>
-      </a>
-    <% end %>
-
     <% if @can_edit || module_item.nil? %>
     <div aria-hidden="true" class="ig-handle">
       <span
