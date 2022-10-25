@@ -39,6 +39,7 @@
     "@instructure/ui-checkbox": "^7",
     "@instructure/ui-date-input": "^7",
     "@instructure/ui-decorator": "^7",
+    "@instructure/ui-drawer-layout": "7",
     "@instructure/ui-editable": "^7",
     "@instructure/ui-file-drop": "^7",
     "@instructure/ui-flex": "^7",
