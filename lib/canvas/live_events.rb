@@ -801,6 +801,7 @@ module Canvas::LiveEvents
       learning_outcome_id: outcome.id,
       context_type: outcome.context_type,
       context_id: outcome.context_id,
+      context_uuid: outcome.context&.uuid,
       display_name: outcome.display_name,
       short_description: outcome.short_description,
       description: outcome.description,
@@ -825,6 +826,7 @@ module Canvas::LiveEvents
     {
       learning_outcome_group_id: group.id,
       context_id: group.context_id,
+      context_uuid: group.context&.uuid,
       context_type: group.context_type,
       title: group.title,
       description: group.description,

@@ -1739,6 +1739,7 @@ describe Canvas::LiveEvents do
           learning_outcome_id: @outcome.id.to_s,
           context_type: @outcome.context_type,
           context_id: @outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           display_name: @outcome.display_name,
           short_description: @outcome.short_description,
           description: @outcome.description,
@@ -1752,6 +1753,28 @@ describe Canvas::LiveEvents do
 
         Canvas::LiveEvents.learning_outcome_created(@outcome)
       end
+
+      it "triggers a learning_outcome_created live event for a global outcome" do
+        @global_outcome = outcome_model(global: true, title: "global outcome")
+
+        expect_event("learning_outcome_created", {
+          learning_outcome_id: @global_outcome.id.to_s,
+          context_type: nil,
+          context_id: nil,
+          context_uuid: nil,
+          display_name: @global_outcome.display_name,
+          short_description: @global_outcome.short_description,
+          description: @global_outcome.description,
+          vendor_guid: @global_outcome.vendor_guid,
+          calculation_method: @global_outcome.calculation_method,
+          calculation_int: @global_outcome.calculation_int,
+          rubric_criterion: @global_outcome.rubric_criterion,
+          title: @global_outcome.title,
+          workflow_state: @global_outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_created(@global_outcome)
+      end
     end
 
     context "updated" do
@@ -1764,6 +1787,7 @@ describe Canvas::LiveEvents do
           learning_outcome_id: @outcome.id.to_s,
           context_type: @outcome.context_type,
           context_id: @outcome.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           display_name: @outcome.display_name,
           short_description: @outcome.short_description,
           description: @outcome.description,
@@ -1777,6 +1801,31 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_updated(@outcome)
+      end
+
+      it "triggers a learning_outcome_updated live event for a global outcome" do
+        @global_outcome = outcome_model(global: true, title: "global outcome")
+
+        @global_outcome.update!(short_description: "this is new")
+
+        expect_event("learning_outcome_updated", {
+          learning_outcome_id: @global_outcome.id.to_s,
+          context_type: nil,
+          context_id: nil,
+          context_uuid: nil,
+          display_name: @global_outcome.display_name,
+          short_description: @global_outcome.short_description,
+          description: @global_outcome.description,
+          vendor_guid: @global_outcome.vendor_guid,
+          calculation_method: @global_outcome.calculation_method,
+          calculation_int: @global_outcome.calculation_int,
+          rubric_criterion: @global_outcome.rubric_criterion,
+          title: @global_outcome.title,
+          updated_at: @global_outcome.updated_at,
+          workflow_state: @global_outcome.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_updated(@global_outcome)
       end
     end
   end
@@ -1793,6 +1842,7 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_group_created", {
           learning_outcome_group_id: @outcome_group.id.to_s,
           context_id: @outcome_group.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           context_type: @outcome_group.context_type,
           title: @outcome_group.title,
           description: @outcome_group.description,
@@ -1802,6 +1852,24 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_group_created(@outcome_group)
+      end
+
+      it "triggers a learning_outcome_group_created live event for a global outcome group" do
+        @global_outcome_group = LearningOutcomeGroup.create(title: "global")
+
+        expect_event("learning_outcome_group_created", {
+          learning_outcome_group_id: @global_outcome_group.id.to_s,
+          context_id: nil,
+          context_uuid: nil,
+          context_type: nil,
+          title: @global_outcome_group.title,
+          description: @global_outcome_group.description,
+          vendor_guid: @global_outcome_group.vendor_guid,
+          parent_outcome_group_id: nil,
+          workflow_state: @global_outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_created(@global_outcome_group)
       end
     end
 
@@ -1814,6 +1882,7 @@ describe Canvas::LiveEvents do
         expect_event("learning_outcome_group_updated", {
           learning_outcome_group_id: @outcome_group.id.to_s,
           context_id: @outcome_group.context_id.to_s,
+          context_uuid: @context.uuid.to_s,
           context_type: @outcome_group.context_type,
           title: @outcome_group.title,
           description: @outcome_group.description,
@@ -1824,6 +1893,27 @@ describe Canvas::LiveEvents do
         }.compact).once
 
         Canvas::LiveEvents.learning_outcome_group_updated(@outcome_group)
+      end
+
+      it "triggers a learning_outcome_group_updated live event for a global outcome group" do
+        @global_outcome_group = LearningOutcomeGroup.create(title: "global")
+
+        @global_outcome_group.update!(title: "this is new")
+
+        expect_event("learning_outcome_group_updated", {
+          learning_outcome_group_id: @global_outcome_group.id.to_s,
+          context_id: nil,
+          context_uuid: nil,
+          context_type: nil,
+          title: @global_outcome_group.title,
+          description: @global_outcome_group.description,
+          vendor_guid: @global_outcome_group.vendor_guid,
+          parent_outcome_group_id: nil,
+          updated_at: @global_outcome_group.updated_at,
+          workflow_state: @global_outcome_group.workflow_state
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_group_updated(@global_outcome_group)
       end
     end
   end
