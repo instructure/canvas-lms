@@ -28,6 +28,7 @@ import SearchBox from './components/SearchBox'
 import JobLookup from './components/JobLookup'
 import SectionRefreshHeader from './components/SectionRefreshHeader'
 import StrandManager from './components/StrandManager'
+import TagThrottle from './components/TagThrottle'
 import {jobsReducer, initialState} from './reducer'
 import {Heading} from '@instructure/ui-heading'
 import {Flex} from '@instructure/ui-flex'
@@ -203,15 +204,25 @@ export default function JobsIndex() {
         </Flex.Item>
         {ENV.manage_jobs &&
         state.bucket !== 'failed' &&
-        state.group_type === 'strand' &&
         state.group_text &&
         state.jobs?.length > 0 ? (
           <Flex.Item padding="large small small 0">
-            <StrandManager
-              strand={state.group_text}
-              jobs={state.jobs}
-              onUpdate={() => dispatch({type: 'REFRESH_ALL'})}
-            />
+            {state.group_type === 'strand' ? (
+              <StrandManager
+                strand={state.group_text}
+                jobs={state.jobs}
+                onUpdate={() => dispatch({type: 'REFRESH_ALL'})}
+              />
+            ) : (
+              <TagThrottle
+                tag={state.group_text}
+                jobs={state.jobs}
+                onUpdate={result => {
+                  dispatch({type: 'CHANGE_GROUP_TYPE', payload: 'strand'})
+                  dispatch({type: 'CHANGE_GROUP_TEXT', payload: result.new_strand})
+                }}
+              />
+            )}
           </Flex.Item>
         ) : null}
         <Flex.Item size="33%" shouldGrow={true} padding="large 0 small 0">
