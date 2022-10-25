@@ -59,12 +59,12 @@ describe "user_content post processing" do
       # the file link w/o /download
       file_link1 = f("a#link1")
       expect(file_link1).to be_displayed
-      expect(file_link1.attribute("class")).to eq("file_preview_link")
+      expect(file_link1.attribute("class")).to include("file_preview_link")
       expect(file_link1.attribute("href")).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
 
       file_link2 = f("a#link2")
       expect(file_link2).to be_displayed
-      expect(file_link2.attribute("class")).to eq("file_preview_link")
+      expect(file_link2.attribute("class")).to include("file_preview_link")
       expect(
         file_link2.attribute("href")
       ).to end_with "#{@file_url}/download?wrap=1&verifier=#{@file.uuid}"

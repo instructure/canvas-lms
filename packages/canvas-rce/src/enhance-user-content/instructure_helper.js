@@ -51,9 +51,9 @@ export function isExternalLink(element) {
   )
 }
 
-export function showFilePreview(event) {
+export function showFilePreview(canvasOrigin, event) {
   let target = null
-  if (event.target.href) {
+  if (event.target?.href) {
     target = event.target
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
@@ -68,15 +68,15 @@ export function showFilePreview(event) {
     target.classList.contains('inline_disabled') ||
     target.classList.contains('preview_in_overlay')
   ) {
-    showFilePreviewInOverlay(event)
+    showFilePreviewInOverlay(canvasOrigin, event)
   } else {
     showFilePreviewInline(event)
   }
 }
 
-export function showFilePreviewInOverlay(event) {
+export function showFilePreviewInOverlay(canvasOrigin, event) {
   let target = null
-  if (event.target.href) {
+  if (event.target?.href) {
     target = event.target
   } else if (event.currentTarget?.href) {
     target = event.currentTarget
@@ -95,10 +95,7 @@ export function showFilePreviewInOverlay(event) {
     // 1. what window should be be using
     // 2. is that the right origin?
     // 3. this is temporary until we can decouple the file previewer from canvas
-    window.top.postMessage(
-      {subject: 'preview_file', file_id, verifier},
-      ENV.DEEP_LINKING_POST_MESSAGE_ORIGIN
-    )
+    window.top.postMessage({subject: 'preview_file', file_id, verifier}, canvasOrigin)
   }
 }
 
