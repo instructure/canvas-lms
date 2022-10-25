@@ -248,7 +248,7 @@ export function IconMakerTray({editor, onUnmount, editing, rcsConfig, canvasOrig
       // React wants this to be an object but we are just
       // passing along a string here. Using the style attribute
       // with all caps makes React ignore this fact
-      STYLE: externalStyle,
+      style: externalStyle,
       width: externalWidth,
     }
 

@@ -523,6 +523,7 @@ export default function CanvasContentTray(props) {
                         sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
                         searchString={filterSettings.searchString}
                         source={props.source}
+                        canvasOrigin={props.canvasOrigin}
                         jwt={props.jwt}
                         host={props.host}
                         refreshToken={props.refreshToken}

@@ -17,9 +17,43 @@
  */
 
 import {ok, strictEqual} from 'assert'
-import {downloadToWrap, fixupFileUrl, prepEmbedSrc, prepLinkedSrc} from '../../src/common/fileUrl'
+import {
+  absoluteToRelativeUrl,
+  downloadToWrap,
+  fixupFileUrl,
+  prepEmbedSrc,
+  prepLinkedSrc,
+} from '../../src/common/fileUrl'
 
 describe('Common file url utils', () => {
+  describe('absoluteToRelativeUrl', () => {
+    const canvasOrigin = 'http://mycanvas.com:3000'
+
+    it('turns an absolute URL into a relative URL', () => {
+      const absoluteUrl = 'https://mycanvas.com:3000/some/path/download?download_frd=1#hash_thing'
+      strictEqual(
+        absoluteToRelativeUrl(absoluteUrl, canvasOrigin),
+        '/some/path/download?download_frd=1#hash_thing'
+      )
+    })
+
+    it('leaves a relative URL as is', () => {
+      const relativeUrl = '/some/path/download?download_frd=1#hash_thing'
+      strictEqual(
+        absoluteToRelativeUrl(relativeUrl, canvasOrigin),
+        '/some/path/download?download_frd=1#hash_thing'
+      )
+    })
+
+    it('leaves non-Canvas absolute URLs as absolute', () => {
+      const absoluteUrl = 'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
+      strictEqual(
+        absoluteToRelativeUrl(absoluteUrl, canvasOrigin),
+        'https://yodawg.com:3001/some/path/download?download_frd=1#hash_thing'
+      )
+    })
+  })
+
   describe('downloadToWrap', () => {
     let url
 

@@ -545,7 +545,7 @@ class RCEWrapper extends React.Component {
 
   insertImage(image) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertImage(editor, image)
+    const element = contentInsertion.insertImage(editor, image, this.getCanvasUrl())
 
     // Removes TinyMCE's caret &nbsp; text if exists.
     if (element?.nextSibling?.data?.trim() === '') {
@@ -614,13 +614,13 @@ class RCEWrapper extends React.Component {
 
   insertVideo(video) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertVideo(editor, video)
+    const element = contentInsertion.insertVideo(editor, video, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
   insertAudio(audio) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertAudio(editor, audio)
+    const element = contentInsertion.insertAudio(editor, audio, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
@@ -643,7 +643,7 @@ class RCEWrapper extends React.Component {
 
   insertLink(link) {
     const editor = this.mceInstance()
-    const element = contentInsertion.insertLink(editor, link)
+    const element = contentInsertion.insertLink(editor, link, this.getCanvasUrl())
     this.contentInserted(element)
   }
 
@@ -1878,6 +1878,7 @@ class RCEWrapper extends React.Component {
         {this.props.trayProps && this.props.trayProps.containingContext && (
           <CanvasContentTray
             key={this.id}
+            canvasOrigin={this.getCanvasUrl()}
             bridge={bridge}
             editor={this}
             onTrayClosing={this.handleContentTrayClosing}

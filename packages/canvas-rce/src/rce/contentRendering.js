@@ -25,14 +25,14 @@ import {
   AUDIO_PLAYER_SIZE,
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
 import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
-import {prepEmbedSrc, prepLinkedSrc} from '../common/fileUrl'
+import {prepEmbedSrc, prepLinkedSrc, absoluteToRelativeUrl} from '../common/fileUrl'
 
-export function renderLink(data, contents) {
+export function renderLink(data, contents, canvasOrigin) {
   const linkAttrs = {...data}
   linkAttrs.href = prepLinkedSrc(linkAttrs.href || linkAttrs.url)
   delete linkAttrs.url
   if (linkAttrs.href) {
-    linkAttrs.href = cleanUrl(linkAttrs.href)
+    linkAttrs.href = absoluteToRelativeUrl(cleanUrl(linkAttrs.href), canvasOrigin)
   }
   linkAttrs.title = linkAttrs.title || formatMessage('Link')
   const children = contents || linkAttrs.text || linkAttrs.title
@@ -49,27 +49,30 @@ export function renderLink(data, contents) {
   return renderToStaticMarkup(<a {...linkAttrs}>{children}</a>)
 }
 
-export function renderDoc(doc) {
-  return `<a target="_blank" rel="noopener noreferrer" href="${doc.href}">${
-    doc.display_name || doc.filename
-  }</a>`
-}
-
-export function renderLinkedImage(linkElem, image) {
+export function renderLinkedImage(linkElem, image, canvasOrigin) {
   const linkHref = linkElem.getAttribute('href')
   image.href = prepEmbedSrc(image.href)
 
   return renderToStaticMarkup(
-    <a href={linkHref} data-mce-href={linkHref}>
-      {constructJSXImageElement(image, {doNotLink: true})}
+    <a href={absoluteToRelativeUrl(linkHref, canvasOrigin)} data-mce-href={linkHref}>
+      {constructJSXImageElement(image, canvasOrigin, {doNotLink: true})}
     </a>
   )
 }
 
-export function constructJSXImageElement(image, opts = {}) {
-  const {href, url, title, display_name, alt_text, isDecorativeImage, link, ...otherAttributes} =
-    image
-  const src = href || url
+export function constructJSXImageElement(image, canvasOrigin, opts = {}) {
+  const {
+    href,
+    url,
+    src,
+    title,
+    display_name,
+    alt_text,
+    isDecorativeImage,
+    link,
+    ...otherAttributes
+  } = image
+  const imageSrc = absoluteToRelativeUrl(href || url || src, canvasOrigin)
   let altText = alt_text || title || display_name || ''
   if (isDecorativeImage) {
     altText = ''
@@ -77,11 +80,17 @@ export function constructJSXImageElement(image, opts = {}) {
   }
 
   const ret = (
-    <img alt={altText} src={src} width={image.width} height={image.height} {...otherAttributes} />
+    <img
+      alt={altText}
+      src={imageSrc}
+      width={image.width}
+      height={image.height}
+      {...otherAttributes}
+    />
   )
   if (link && !opts.doNotLink) {
     return (
-      <a href={link} target="_blank" rel="noopener noreferrer">
+      <a href={absoluteToRelativeUrl(link, canvasOrigin)} target="_blank" rel="noopener noreferrer">
         {ret}
       </a>
     )
@@ -89,13 +98,13 @@ export function constructJSXImageElement(image, opts = {}) {
   return ret
 }
 
-export function renderImage(image, opts) {
+export function renderImage(image, canvasOrigin, opts) {
   image.href = prepEmbedSrc(image.href)
-  return renderToStaticMarkup(constructJSXImageElement(image, opts))
+  return renderToStaticMarkup(constructJSXImageElement(image, canvasOrigin, opts))
 }
 
-export function renderVideo(video) {
-  const src = mediaPlayerURLFromFile(video)
+export function renderVideo(video, canvasOrigin) {
+  const src = mediaPlayerURLFromFile(video, canvasOrigin)
   return `
   <iframe
       allow="fullscreen"
@@ -114,8 +123,8 @@ export function renderVideo(video) {
     .replace(/\s+/g, ' ')
 }
 
-export function renderAudio(audio) {
-  const src = mediaPlayerURLFromFile(audio)
+export function renderAudio(audio, canvasOrigin) {
+  const src = mediaPlayerURLFromFile(audio, canvasOrigin)
   return `
   <iframe
       data-media-id="${getMediaId(audio)}"
@@ -136,4 +145,15 @@ export function getMediaId(media) {
   if (!media) return
 
   return media.media_id || media.media_entry_id || media.id || media.file_id
+}
+
+export function updateImage(editor, img, attrs) {
+  // Workaround: When passing empty string to editor.dom.setAttribs it removes the attribute
+  img.setAttribute('alt', attrs.altText)
+  editor.dom.setAttribs(img, {
+    src: absoluteToRelativeUrl(attrs.url, editor.rceWrapper?.getCanvasUrl()),
+    role: attrs.isDecorativeImage ? 'presentation' : null,
+    width: attrs.appliedWidth,
+    height: attrs.appliedHeight,
+  })
 }
