@@ -377,9 +377,14 @@ describe CanvasOutcomesHelper do
             @course.enable_feature!(:outcome_service_results_to_canvas)
           end
 
+          it "throws OSFetchError if call fails" do
+            expect(CanvasHttp).to receive(:get).and_raise("failed call").exactly(3).times
+            expect { subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid) }.to raise_error(CanvasOutcomesHelper::OSFetchError)
+          end
+
           it "raises error on non 2xx response" do
             stub_get_lmgb_results("associated_asset_id_list=1&associated_asset_type=assign.type&external_outcome_id_list=1&user_uuid_list=#{one_user_uuid}").to_return(status: 401, body: '{"valid_jwt":false}')
-            expect { subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid) }.to raise_error(RuntimeError, /Error retrieving results from Outcomes Service:/)
+            expect { subject.get_lmgb_results(@course, "1", "assign.type", "1", one_user_uuid) }.to raise_error(CanvasOutcomesHelper::OSFetchError, /Error retrieving results from Outcomes Service:/)
           end
 
           it "returns results with one assignment id" do
