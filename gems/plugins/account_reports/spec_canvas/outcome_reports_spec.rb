@@ -525,6 +525,82 @@ describe "Outcome Reports" do
         end
       end
 
+      context ":outcome_service_results_to_canvas - when outcomes service fails" do
+        before do
+          settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+          @root_account.settings[:provision] = { "outcomes" => settings }
+          @root_account.save!
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+        end
+
+        after do
+          @root_account.settings[:provision] = nil
+          @root_account.save!
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+        end
+
+        it "errors the report" do
+          expect(CanvasHttp).to receive(:get).and_raise("failed call").exactly(3).times
+          report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
+          expect(report_record.workflow_state).to eq "error"
+          expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
+          expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+        end
+      end
+
+      context ":outcome_service_results_to_canvas - json parsing" do
+        before do
+          settings = { consumer_key: "key", jwt_secret: "secret", domain: "domain" }
+          @root_account.settings[:provision] = { "outcomes" => settings }
+          @root_account.save!
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "on")
+        end
+
+        after do
+          @root_account.settings[:provision] = nil
+          @root_account.save!
+          @root_account.set_feature_flag!(:outcome_service_results_to_canvas, "off")
+        end
+
+        def json_string_null_metadata
+          {
+            results: [
+              {
+                attempts: [
+                  {
+                    points: 1,
+                    points_possible: 2
+                  }
+                ]
+              }
+            ]
+          }.to_json
+        end
+
+        it "can handle null metadata" do
+          response = Net::HTTPSuccess.new(1.1, 200, "OK")
+          expect(response).to receive(:body).and_return(json_string_null_metadata)
+          expect(CanvasHttp).to receive(:get).with(any_args).and_return(response).once
+
+          report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
+          expect(report_record.workflow_state).to eq "complete"
+          expect(report_record.message).to eq "Outcome Results report successfully generated with the following settings. Account: New Account; Term: All Terms; Include Deleted Objects;"
+          expect(report_record.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
+        end
+
+        it "errors if not valid json" do
+          response = Net::HTTPSuccess.new(1.1, 200, "OK")
+          # once for parsing and then once for throwing the error
+          expect(response).to receive(:body).and_return("not_valid_json").twice
+          expect(CanvasHttp).to receive(:get).with(any_args).and_return(response).once
+
+          report_record = run_report(report_type, account: @root_account, params: { "include_deleted" => true })
+          expect(report_record.workflow_state).to eq "error"
+          expect(report_record.message).to start_with "Generating the report, Outcome Results CSV, failed."
+          expect(report_record.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
+        end
+      end
+
       context ":outcome_service_results_to_canvas" do
         # Column indexes
         student_name = 0

@@ -19,6 +19,10 @@
 #
 
 module CanvasOutcomesHelper
+  MAX_RETRIES = 3
+
+  class OSFetchError < StandardError; end
+
   def get_outcome_alignments(context, outcome_ids, additional_params = nil)
     return if outcome_ids.blank? || context.blank? || !context.feature_enabled?(:outcome_service_results_to_canvas)
 
@@ -68,25 +72,36 @@ module CanvasOutcomesHelper
     return if domain.nil? || jwt.nil?
 
     protocol = ENV.fetch("OUTCOMES_SERVICE_PROTOCOL", Rails.env.production? ? "https" : "http")
-    response = CanvasHttp.get(
-      build_request_url(protocol, domain, "api/authoritative_results", params),
-      {
-        "Authorization" => jwt
-      }
-    )
+    retry_count = 0
+    begin
+      response = CanvasHttp.get(
+        build_request_url(protocol, domain, "api/authoritative_results", params),
+        {
+          "Authorization" => jwt
+        }
+      )
+    rescue
+      retry_count += 1
+      retry if retry_count < MAX_RETRIES
+      raise OSFetchError, "Failed to fetch results for context #{context.id} #{params}"
+    end
 
     if /^2/.match?(response.code.to_s)
-      results = JSON.parse(response.body).deep_symbolize_keys[:results]
-      results.each do |result|
-        next if result[:attempts].nil?
+      begin
+        results = JSON.parse(response.body).deep_symbolize_keys[:results]
+        results.each do |result|
+          next if result[:attempts].nil?
 
-        result[:attempts].each do |attempt|
-          attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys
+          result[:attempts].each do |attempt|
+            attempt[:metadata] = JSON.parse(attempt[:metadata]).deep_symbolize_keys unless attempt[:metadata].nil?
+          end
         end
+        results
+      rescue
+        raise OSFetchError, "Error parsing JSON results from Outcomes Service: #{response.body}"
       end
-      results
     else
-      raise "Error retrieving results from Outcomes Service: #{response.body}"
+      raise OSFetchError, "Error retrieving results from Outcomes Service: #{response.body}"
     end
   end
 
