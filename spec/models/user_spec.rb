@@ -4113,4 +4113,37 @@ describe User do
       expect(@user.reload.get_preference(:visited_tabs)).to eq ["tab_4"]
     end
   end
+
+  describe "account_calendars" do
+    before :once do
+      Account.site_admin.enable_feature! :account_calendar_events
+      user_factory(active_all: true)
+      @root_account = Account.default
+      @root_account.account_calendar_visible = false
+      @root_account.save!
+      @associated_subaccount = @root_account.sub_accounts.create!(account_calendar_visible: true)
+      @random_subaccount = @root_account.sub_accounts.create!(account_calendar_visible: true)
+      course_with_student(account: @root_account, user: @user)
+      course_with_student(account: @associated_subaccount, user: @user)
+    end
+
+    it "returns only accounts associated to the user where the calendar is visible" do
+      expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id)
+    end
+
+    describe "sharding" do
+      specs_require_sharding
+
+      before :once do
+        @shard2.activate do
+          @account2 = Account.create!(account_calendar_visible: true)
+        end
+        course_with_student(account: @account2, user: @user)
+      end
+
+      it "includes cross-shard accounts" do
+        expect(@user.account_calendars.pluck(:id)).to contain_exactly(@associated_subaccount.id, @account2.id)
+      end
+    end
+  end
 end

@@ -3283,4 +3283,8 @@ class User < ActiveRecord::Base
 
     nil
   end
+
+  def account_calendars
+    unordered_associated_accounts.shard(in_region_associated_shards).active.where(account_calendar_visible: true)
+  end
 end
