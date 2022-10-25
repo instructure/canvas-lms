@@ -275,6 +275,23 @@ export const getOptimisticResponse = ({
   }
 }
 
+export const buildQuotedReply = (nodes, previewId) => {
+  if (!nodes) return ''
+  let preview = {}
+  nodes.every(reply => {
+    if (reply._id === previewId) {
+      preview = {
+        author: {shortName: getDisplayName(reply)},
+        createdAt: reply.createdAt,
+        previewMessage: reply.message.replace(/<[^>]*>?/gm, ''),
+      }
+      return false
+    }
+    return true
+  })
+  return preview
+}
+
 export const isAnonymous = discussionEntry =>
   ENV.discussion_anonymity_enabled &&
   discussionEntry.anonymousAuthor !== null &&

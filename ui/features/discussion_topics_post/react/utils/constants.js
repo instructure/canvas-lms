@@ -34,3 +34,10 @@ const searchFilter = {
   setPageNumber: () => {},
 }
 export const SearchContext = React.createContext(searchFilter)
+
+const discussionManagerUtilityContext = {
+  replyFromId: '',
+  setReplyFromId: () => {},
+}
+
+export const DiscussionManagerUtilityContext = React.createContext(discussionManagerUtilityContext)

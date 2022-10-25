@@ -448,7 +448,7 @@ describe('DiscussionFullPage', () => {
   it('should be able to post a reply to an entry', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock({replyFromEntryId: '1'}),
+      ...createDiscussionEntryMock({replyFromEntryId: '1', includeReplyPreview: false}),
     ]
     const container = setup(mocks)
 
@@ -471,7 +471,49 @@ describe('DiscussionFullPage', () => {
 
     // expect the highlight to exist for a while
     jest.advanceTimersByTime(3000)
-    expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
+
+    // expect the highlight to disappear
+    jest.advanceTimersByTime(3000)
+    await waitFor(() => expect(container.queryByTestId('isHighlighted')).toBeNull())
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The discussion entry was successfully created.')
+    )
+  })
+
+  it('should show reply preview when replying to an entry', async () => {
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...createDiscussionEntryMock({replyFromEntryId: '1', includeReplyPreview: true}),
+    ]
+    const container = setup(mocks)
+
+    const kebabMenu = await container.findByTestId('thread-actions-menu')
+    fireEvent.click(kebabMenu)
+
+    const quoteReplyMenuItem = await container.findByText('Quote Reply')
+    fireEvent.click(quoteReplyMenuItem)
+
+    await waitFor(() => {
+      expect(tinymce.editors[0]).toBeDefined()
+    })
+
+    const rce = await container.findByTestId('DiscussionEdit-container')
+    expect(rce.style.display).toBe('')
+
+    expect(await container.findByTestId('reply-preview')).toBeTruthy()
+
+    const doReplyButton = await container.findByTestId('DiscussionEdit-submit')
+    fireEvent.click(doReplyButton)
+
+    await waitFor(() =>
+      expect(container.queryByTestId('DiscussionEdit-container')).not.toBeInTheDocument()
+    )
+
+    // expect the highlight to exist for a while
+    jest.advanceTimersByTime(3000)
+    // expect(await container.findByTestId('isHighlighted')).toBeInTheDocument()
 
     // expect the highlight to disappear
     jest.advanceTimersByTime(3000)
