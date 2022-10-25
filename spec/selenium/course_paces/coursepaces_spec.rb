@@ -50,13 +50,6 @@ describe "course pace page" do
 
       expect(driver.current_url).to include("/courses/#{@course.id}/course_pacing")
     end
-
-    it "is not shown when disabled" do
-      disable_course_paces_in_course
-      get "/courses/#{@course.id}/modules"
-
-      expect(course_paces_nav_exists?).to be_falsey
-    end
   end
 
   context "course paces modules" do

@@ -2792,6 +2792,32 @@ describe Course do
         end
       end
 
+      describe "TAB_COURSE_PACES" do
+        it "is included when course paces is enabled" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).to include(Course::TAB_COURSE_PACES)
+        end
+
+        it "is not included if the flag is off" do
+          @course.account.disable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
+
+        it "is not included if the course has it disabled" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = false
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
+      end
+
       it "returns the defaults if nothing specified" do
         tab_ids = @course.tabs_available(@user).pluck(:id)
         expect(tab_ids).to eql(default_tab_ids)
@@ -3162,6 +3188,16 @@ describe Course do
     context "students" do
       before do
         course_with_student(active_all: true)
+      end
+
+      describe "TAB_COURSE_PACES" do
+        it "is not included" do
+          @course.account.enable_feature!(:course_paces)
+          @course.enable_course_paces = true
+          @course.save!
+          tabs = @course.tabs_available(@user).pluck(:id)
+          expect(tabs).not_to include(Course::TAB_COURSE_PACES)
+        end
       end
 
       it "returns K-6 tabs if feature flag is enabled for students" do

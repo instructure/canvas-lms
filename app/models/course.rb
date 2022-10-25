@@ -3012,6 +3012,7 @@ class Course < ActiveRecord::Base
   TAB_COLLABORATIONS_NEW = 17
   TAB_RUBRICS = 18
   TAB_SCHEDULE = 19
+  TAB_COURSE_PACES = 20
 
   CANVAS_K6_TAB_IDS = [TAB_HOME, TAB_ANNOUNCEMENTS, TAB_GRADES, TAB_MODULES].freeze
   COURSE_SUBJECT_TAB_IDS = [TAB_HOME, TAB_SCHEDULE, TAB_MODULES, TAB_GRADES, TAB_GROUPS].freeze
@@ -3179,6 +3180,16 @@ class Course < ActiveRecord::Base
                    else
                      Course.default_tabs
                    end
+
+    if account.feature_enabled?(:course_paces) && enable_course_paces && grants_any_right?(user, :manage_content, *RoleOverride::GRANULAR_MANAGE_COURSE_CONTENT_PERMISSIONS)
+      default_tabs.insert(default_tabs.index { |t| t[:id] == TAB_MODULES } + 1, {
+                            id: TAB_COURSE_PACES,
+                            label: t("#tabs.course_paces", "Course Pacing"),
+                            css_class: "course_paces",
+                            href: :course_course_pacing_path
+                          })
+    end
+
     opts[:include_external] = false if elementary_homeroom_course?
 
     GuardRail.activate(:secondary) do
