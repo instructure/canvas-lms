@@ -320,15 +320,12 @@ module AccountReports
       )
 
       # If there are no attempts, do not include the result in the report. If there are multiple attempts, we only
-      # include the most recent one in the report. Using the created_at is technically not correct, but is the best
-      # we currently have. We need to at a submission date to the attempt in order to get the correct attempt. See
-      #  - https://instructure.atlassian.net/browse/OUT-5289
-      #  - https://instructure.atlassian.net/browse/OUT-5290
-      #  - https://instructure.atlassian.net/browse/OUT-5291
-      # As part of OSSOT Phase 2, we will make outcome service return only a single attempt with all the relevant
-      # data on it.
+      # include the most recent one in the report. To determine the most recent attempt, we use the submitted_At
+      # attribute, but historically, that field was not populated in outcome service. We will use it if we have it,
+      # but if it is missing, we will fallback to created_at. Using the created_at is technically not correct, but
+      # is the better than nothing. submitted
       results = []
-      attempt = authoritative_results[:attempts]&.max_by { |a| a[:created_at] }
+      attempt = authoritative_results[:attempts]&.max_by { |a| a[:submitted_at] || a[:created_at] }
       return results if attempt.nil?
 
       meta_data = attempt[:metadata]
