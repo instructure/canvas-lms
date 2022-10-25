@@ -46,7 +46,6 @@ import {SplitScreenParent} from './SplitScreenParent'
 import LoadingIndicator from '@canvas/loading-indicator'
 import PropTypes from 'prop-types'
 import React, {useCallback, useContext, useEffect, useMemo, useState} from 'react'
-import {Tray} from '@instructure/ui-tray'
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
@@ -524,61 +523,39 @@ export const SplitScreenViewContainer = props => {
   }
 
   return (
-    <Tray
-      data-testid="split-screen-view-container"
-      open={props.open}
-      placement="end"
-      size="medium"
-      offset="large"
-      label="Splitscreen View"
-      shouldCloseOnDocumentClick={true}
-      onDismiss={e => {
-        // When the RCE is open, it steals the mouse position when using it and we do this trick
-        // to avoid the whole Tray getting closed because of a click inside the RCE area.
-        if (e.clientY - e.target.offsetTop === 0) {
-          return
-        }
-
-        // don't close if the user clicks on a modal presented over the Tray
-        if (e.target.closest('.ui-dialog')) {
-          return
-        }
-
-        if (props.onClose) {
-          props.onClose()
-        }
-      }}
+    <span
+      className="discussions-split-screen-view-content"
+      data-testid="discussions-split-screen-view-content"
     >
-      <span className="discussions-split-screen-view-content">
-        <Flex>
-          <Flex.Item shouldGrow={true} shouldShrink={true}>
-            <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
-              Thread
-            </Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <CloseButton
-              placement="end"
-              offset="small"
-              screenReaderLabel="Close"
-              onClick={() => {
-                if (props.onClose) {
-                  props.onClose()
-                }
-              }}
-            />
-          </Flex.Item>
-        </Flex>
-        {contentIsReady ? renderSplitScreenView() : renderErrorOrLoading}
-      </span>
-    </Tray>
+      <Flex>
+        <Flex.Item width="480px" shouldGrow={true} shouldShrink={true}>
+          <Heading margin="medium medium none" theme={{h2FontWeight: 700}}>
+            Thread
+          </Heading>
+        </Flex.Item>
+        <Flex.Item>
+          <CloseButton
+            margin="small auto none"
+            placement="end"
+            offset="small"
+            screenReaderLabel="Close"
+            data-testid="splitscreen-container-close-button"
+            onClick={() => {
+              if (props.onClose) {
+                props.onClose()
+              }
+            }}
+          />
+        </Flex.Item>
+      </Flex>
+      {contentIsReady ? renderSplitScreenView() : renderErrorOrLoading}
+    </span>
   )
 }
 
 SplitScreenViewContainer.propTypes = {
   discussionTopic: Discussion.shape,
   discussionEntryId: PropTypes.string,
-  open: PropTypes.bool,
   onClose: PropTypes.func,
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,

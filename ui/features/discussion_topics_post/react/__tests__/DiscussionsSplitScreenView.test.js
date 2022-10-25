@@ -89,7 +89,7 @@ describe('DiscussionsSplitScreenView', () => {
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
     expect(container.queryByTestId('isolated-view-container')).toBeNull()
-    expect(container.queryByTestId('split-screen-view-container')).not.toBeNull()
+    expect(container.queryByTestId('discussions-split-screen-view-content')).toBeTruthy()
   })
 
   it('should render isolated view container if split screen view is also enabled', async () => {
@@ -99,7 +99,7 @@ describe('DiscussionsSplitScreenView', () => {
     const replyButton = await container.findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
     expect(container.queryByTestId('isolated-view-container')).not.toBeNull()
-    expect(container.queryByTestId('split-screen-view-container')).toBeNull()
+    expect(container.queryByTestId('discussions-split-screen-view-content')).toBeNull()
   })
 
   it('should be able to edit a root entry', async () => {
