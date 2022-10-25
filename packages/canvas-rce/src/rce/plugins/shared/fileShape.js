@@ -36,7 +36,7 @@ export const fileShape = {
 export const mediaObjectShape = {
   content_type: string.isRequired,
   date: string.isRequired,
-  embedded_iframe_url: string.isRequired,
+  embedded_iframe_url: string,
   id: oneOfType([number, string]).isRequired,
   title: string.isRequired,
   published: bool,

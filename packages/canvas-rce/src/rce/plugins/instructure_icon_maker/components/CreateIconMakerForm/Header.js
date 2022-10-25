@@ -27,7 +27,6 @@ import {View} from '@instructure/ui-view'
 import {IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {IconQuestionLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {FormFieldLabel} from '@instructure/ui-form-field'
 import {decode} from '../../svg/utils'
 import useDebouncedValue from '../../utils/useDebouncedValue'
@@ -42,12 +41,9 @@ const getAltTextLabel = () => (
         on={['hover', 'focus']}
         placement="top"
         renderTip={
-          <>
-            <ScreenReaderContent>{formatMessage('Toggle tooltip')}</ScreenReaderContent>
-            <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
-              {formatMessage('Used by screen readers to describe the content of an image')}
-            </View>
-          </>
+          <View display="block" id="alt-text-label-tooltip" maxWidth="14rem">
+            {formatMessage('Used by screen readers to describe the content of an image')}
+          </View>
         }
       >
         <IconButton
@@ -55,6 +51,7 @@ const getAltTextLabel = () => (
           withBackground={false}
           withBorder={false}
           size="small"
+          screenReaderLabel={formatMessage('Toggle tooltip')}
         />
       </Tooltip>
     </Flex.Item>
@@ -92,6 +89,7 @@ export const Header = ({settings, onChange, allowNameChange, nameRef, editing}) 
           <Flex.Item padding="small">
             {getAltTextLabel()}
             <TextArea
+              aria-label={formatMessage('Alt Text')}
               id="icon-alt-text"
               height="4rem"
               disabled={settings.isDecorative}

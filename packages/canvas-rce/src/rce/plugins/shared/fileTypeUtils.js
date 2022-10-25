@@ -17,6 +17,7 @@
  */
 
 import {parse} from 'url'
+import {absoluteToRelativeUrl} from '../../../common/fileUrl'
 import {
   IconDocumentLine,
   IconMsExcelLine,
@@ -70,13 +71,13 @@ export function isText(type) {
   return /^text/.test(type)
 }
 
-export function mediaPlayerURLFromFile(file) {
+export function mediaPlayerURLFromFile(file, canvasOrigin) {
   // why oh why aren't we consistent?
   const content_type = file['content-type'] || file.content_type || file.type
   const type = content_type.replace(/\/.*$/, '')
 
   if (file.embedded_iframe_url) {
-    return `${file.embedded_iframe_url}?type=${type}`
+    return `${absoluteToRelativeUrl(file.embedded_iframe_url, canvasOrigin)}?type=${type}`
   }
 
   if (isAudioOrVideo(content_type)) {

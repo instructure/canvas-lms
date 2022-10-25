@@ -40,8 +40,15 @@ function isEmpty(images) {
 }
 
 export default function Images(props) {
-  const {fetchInitialImages, fetchNextImages, contextType, sortBy, searchString, isIconMaker} =
-    props
+  const {
+    fetchInitialImages,
+    fetchNextImages,
+    contextType,
+    sortBy,
+    searchString,
+    isIconMaker,
+    canvasOrigin,
+  } = props
   const images = props.images[contextType]
   const {hasMore, isLoading, error, files} = images
   const lastItemRef = useRef(null)
@@ -67,6 +74,7 @@ export default function Images(props) {
             lastItemRef={lastItemRef}
             onImageClick={props.onImageEmbed}
             isIconMaker={isIconMaker}
+            canvasOrigin={canvasOrigin}
           />
         </Flex.Item>
 
@@ -120,6 +128,7 @@ Images.propTypes = {
   searchString: string,
   onImageEmbed: func.isRequired,
   isIconMaker: bool,
+  canvasOrigin: string.isRequired,
 }
 
 Images.defaultProps = {
