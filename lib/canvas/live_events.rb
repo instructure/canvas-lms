@@ -764,9 +764,15 @@ module Canvas::LiveEvents
     }
   end
 
+  def self.get_learning_outcome_context_uuid(outcome_id)
+    out = LearningOutcome.find_by(id: outcome_id)
+    out&.context&.uuid
+  end
+
   def self.get_learning_outcome_result_data(result)
     {
       learning_outcome_id: result.learning_outcome_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(result.learning_outcome_id),
       mastery: result.mastery,
       score: result.score,
       created_at: result.created_at,
@@ -840,6 +846,7 @@ module Canvas::LiveEvents
     {
       learning_outcome_link_id: link.id,
       learning_outcome_id: link.content_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(link.content_id),
       learning_outcome_group_id: link.associated_asset_id,
       context_id: link.context_id,
       context_type: link.context_type,
@@ -973,6 +980,7 @@ module Canvas::LiveEvents
       description: description.description,
       workflow_state: description.workflow_state,
       learning_outcome_id: description.learning_outcome_id,
+      learning_outcome_context_uuid: get_learning_outcome_context_uuid(description.learning_outcome_id),
       root_account_id: description.root_account_id
     }
   end

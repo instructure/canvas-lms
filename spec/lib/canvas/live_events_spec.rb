@@ -1613,6 +1613,7 @@ describe Canvas::LiveEvents do
       it "includes result in created live event" do
         expect_event("learning_outcome_result_created", {
           learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
           mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
@@ -1636,6 +1637,31 @@ describe Canvas::LiveEvents do
         result.update!(attempt: 1)
         expect_event("learning_outcome_result_updated", {
           learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
+          mastery: result.mastery,
+          score: result.score,
+          created_at: result.created_at,
+          updated_at: result.updated_at,
+          attempt: result.attempt,
+          possible: result.possible,
+          original_score: result.original_score,
+          original_possible: result.original_possible,
+          original_mastery: result.original_mastery,
+          assessed_at: result.assessed_at,
+          title: result.title,
+          percent: result.percent,
+          workflow_state: result.workflow_state
+        }.compact!).once
+
+        Canvas::LiveEvents.learning_outcome_result_updated(result)
+      end
+
+      it "includes result in updated live event when outcome is deleted" do
+        outcome = LearningOutcome.find(result.learning_outcome_id)
+        outcome.destroy
+        expect_event("learning_outcome_result_updated", {
+          learning_outcome_id: result.learning_outcome_id.to_s,
+          learning_outcome_context_uuid: @course.uuid,
           mastery: result.mastery,
           score: result.score,
           created_at: result.created_at,
@@ -1818,6 +1844,7 @@ describe Canvas::LiveEvents do
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
           learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state
@@ -1839,6 +1866,28 @@ describe Canvas::LiveEvents do
           learning_outcome_link_id: link.id.to_s,
           learning_outcome_id: @outcome.id.to_s,
           learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
+          context_id: link.context_id.to_s,
+          context_type: link.context_type,
+          workflow_state: link.workflow_state,
+          updated_at: link.updated_at
+        }.compact).once
+
+        Canvas::LiveEvents.learning_outcome_link_updated(link)
+      end
+
+      it "triggers a learning_outcome_link_updated live event when outcome is deleted" do
+        outcome_model
+        outcome_group_model
+
+        link = @outcome_group.add_outcome(@outcome)
+        @outcome.destroy
+
+        expect_event("learning_outcome_link_updated", {
+          learning_outcome_link_id: link.id.to_s,
+          learning_outcome_id: @outcome.id.to_s,
+          learning_outcome_group_id: @outcome_group.id.to_s,
+          learning_outcome_context_uuid: @outcome.context.uuid.to_s,
           context_id: link.context_id.to_s,
           context_type: link.context_type,
           workflow_state: link.workflow_state,
@@ -1953,10 +2002,10 @@ describe Canvas::LiveEvents do
   describe "outcome friendly description" do
     before do
       @context = course_model
-      outcome = @context.created_learning_outcomes.create!({ title: "new outcome" })
+      @outcome = @context.created_learning_outcomes.create!({ title: "new outcome" })
       description = "A friendly description"
       @friendlyDescription = OutcomeFriendlyDescription.create!(
-        learning_outcome: outcome,
+        learning_outcome: @outcome,
         context: @context,
         description: description
       )
@@ -1971,6 +2020,7 @@ describe Canvas::LiveEvents do
                        description: @friendlyDescription.description,
                        workflow_state: @friendlyDescription.workflow_state,
                        learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
                        root_account_id: @friendlyDescription.root_account_id.to_s
                      }).once
 
@@ -1989,8 +2039,26 @@ describe Canvas::LiveEvents do
                        context_id: @friendlyDescription.context_id.to_s,
                        workflow_state: @friendlyDescription.workflow_state,
                        learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
                        root_account_id: @friendlyDescription.root_account_id.to_s,
                        description: new_description,
+                       updated_at: @friendlyDescription.updated_at,
+                     }).once
+
+        Canvas::LiveEvents.outcome_friendly_description_updated(@friendlyDescription)
+      end
+
+      it "triggers an outcome_friendly_description_udpated live event when the outcome is deleted" do
+        @outcome.destroy
+        expect_event("outcome_friendly_description_updated", {
+                       outcome_friendly_description_id: @friendlyDescription.id.to_s,
+                       context_type: @friendlyDescription.context_type,
+                       context_id: @friendlyDescription.context_id.to_s,
+                       workflow_state: @friendlyDescription.workflow_state,
+                       learning_outcome_id: @friendlyDescription.learning_outcome_id.to_s,
+                       learning_outcome_context_uuid: @context.uuid,
+                       root_account_id: @friendlyDescription.root_account_id.to_s,
+                       description: @friendlyDescription.description,
                        updated_at: @friendlyDescription.updated_at,
                      }).once
 
