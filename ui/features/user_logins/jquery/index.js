@@ -218,7 +218,8 @@ $(function () {
 
   function setSuspend(id) {
     const icon = document.querySelector(`.sso-icon[data-pseudonym-id="${id}"]`)
-    const login = pseuds.find(p => p.id === id).unique_id
+    const login = pseuds.find(p => p.id === id)?.unique_id
+    if (typeof login === 'undefined') return
     if (typeof savedSSOIcons[id] === 'undefined') savedSSOIcons[id] = icon.cloneNode(true)
     const innerDiv = document.createElement('div')
     icon.replaceChildren(innerDiv)
