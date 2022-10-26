@@ -2124,7 +2124,9 @@ class UsersController < ApplicationController
       @user.avatar_state = "submitted"
     end
 
-    if session[:require_terms]
+    # For api requests we don't set session[:require_terms], but if the user needs terms
+    # re-accepted and is trying to do it we should let them (used by the mobile app)
+    if session[:require_terms] || (api_request? && user_params[:terms_of_use] && @domain_root_account.require_acceptance_of_terms?(@user))
       @user.require_acceptance_of_terms = true
     end
 
