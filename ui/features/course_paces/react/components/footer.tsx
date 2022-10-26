@@ -238,7 +238,11 @@ export const Footer: React.FC<ComponentProps> = ({
                   {...removePaceButtonProps}
                 />
               ) : (
-                <Button color="secondary" {...removePaceButtonProps}>
+                <Button
+                  data-testid="remove-pace-button"
+                  color="secondary"
+                  {...removePaceButtonProps}
+                >
                   {removePaceLabel}
                 </Button>
               )}
