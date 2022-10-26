@@ -1400,4 +1400,8 @@ module ApplicationHelper
   def append_default_due_time_js_env(context, hash)
     hash[:DEFAULT_DUE_TIME] = context.default_due_time if context&.default_due_time.present? && context.root_account.feature_enabled?(:default_due_time)
   end
+
+  def find_heap_application_id
+    DynamicSettings.find(tree: :private)[:heap_app_id]
+  end
 end
