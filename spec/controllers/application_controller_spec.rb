@@ -187,12 +187,14 @@ RSpec.describe ApplicationController do
         it "sets the env var to true when the user can use it" do
           course_with_teacher(active_all: true)
           controller.instance_variable_set(:@current_user, @teacher)
+          controller.instance_variable_set(:@context, @course)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_truthy
         end
 
         it "sets the env var to false when the user can't use it" do
           course_with_student(active_all: true)
           controller.instance_variable_set(:@current_user, @student)
+          controller.instance_variable_set(:@context, @course)
           expect(controller.js_env[:DIRECT_SHARE_ENABLED]).to be_falsey
         end
 

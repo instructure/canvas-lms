@@ -439,9 +439,6 @@ class DiscussionTopicsController < ApplicationController
         conditional_release_js_env(includes: :active_rules)
         append_sis_data(hash)
         js_env(hash)
-        js_env({
-                 DIRECT_SHARE_ENABLED: @context.is_a?(Course) && (hash[:permissions][:manage_content] || (@context.concluded? && hash[:permissions][:read_as_admin]))
-               }, true)
         set_tutorial_js_env
 
         if user_can_edit_course_settings?

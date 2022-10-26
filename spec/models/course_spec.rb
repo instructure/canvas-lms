@@ -5952,6 +5952,42 @@ describe Course do
         end
       end
     end
+
+    describe "direct_share permission" do
+      it "returns false for a student in an active course" do
+        student_in_course(active_all: true)
+        expect(@course.grants_right?(@student, :direct_share)).to be(false)
+      end
+
+      it "returns false for a student in a concluded course" do
+        @course.complete!
+        student_in_course(active_all: true)
+        expect(@course.grants_right?(@student, :direct_share)).to be(false)
+      end
+
+      it "returns true for an account admin" do
+        account_admin_user(active_all: true, account: @course.account)
+        expect(@course.grants_right?(@user, :direct_share)).to be(true)
+      end
+
+      it "returns true for teacher with manage_content" do
+        teacher_in_course(active_all: true)
+        expect(@course.grants_right?(@teacher, :direct_share)).to be(true)
+      end
+
+      it "returns false for teacher in active course without manage_content" do
+        RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+        teacher_in_course(active_all: true)
+        expect(@course.grants_right?(@teacher, :direct_share)).to be(false)
+      end
+
+      it "returns true for teacher in concluded course without manage_content" do
+        RoleOverride.create!(context: @course.account, permission: "manage_content", role: teacher_role, enabled: false)
+        @course.complete!
+        teacher_in_course
+        expect(@course.grants_right?(@teacher, :direct_share)).to be(true)
+      end
+    end
   end
 
   context "sharding" do

@@ -26,7 +26,7 @@ describe('GlobalNavigation', () => {
     unreadComponent.mockClear()
     window.ENV.current_user_id = 10
     window.ENV.current_user_disabled_inbox = false
-    window.ENV.DIRECT_SHARE_ENABLED = true
+    window.ENV.CAN_VIEW_CONTENT_SHARES = true
     window.ENV.SETTINGS = {release_notes_badge_disabled: false}
     window.ENV.FEATURES = {embedded_release_notes: true}
   })
@@ -49,8 +49,8 @@ describe('GlobalNavigation', () => {
       )
     })
 
-    it('does not render the shares unread component when the FF is off', () => {
-      ENV.DIRECT_SHARE_ENABLED = false
+    it('does not render the shares unread component when the user does not have permission', () => {
+      ENV.CAN_VIEW_CONTENT_SHARES = false
       render(<Navigation unreadComponent={unreadComponent} />)
       expect(unreadComponent).toHaveBeenCalledTimes(2)
       const urls = unreadComponent.mock.calls.map(parms => parms[0].dataUrl)

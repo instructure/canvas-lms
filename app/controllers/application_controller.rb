@@ -268,12 +268,8 @@ class ApplicationController < ActionController::Base
 
         cached_features = cached_js_env_account_features
 
-        direct_share_enabled = !@context.is_a?(Group) && @current_user&.can_content_share?
-        if @context.is_a?(Course)
-          direct_share_enabled = @context.grants_right?(@current_user, session, :manage_content) ||
-                                 (@context.concluded? && @context.grants_right?(@current_user, :read_as_admin))
-        end
-        @js_env[:DIRECT_SHARE_ENABLED] = direct_share_enabled
+        @js_env[:DIRECT_SHARE_ENABLED] = @context.respond_to?(:grants_right?) && @context.grants_right?(@current_user, session, :direct_share)
+        @js_env[:CAN_VIEW_CONTENT_SHARES] = @current_user&.can_view_content_shares?
         @js_env[:FEATURES] = cached_features.merge(
           canvas_k6_theme: @context.try(:feature_enabled?, :canvas_k6_theme)
         )
