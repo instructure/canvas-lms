@@ -6147,7 +6147,7 @@ de:
         collaboration_members: Arbeitsgruppenmitglieder
         groups: Gruppen
         loading: "Wird geladen"
-        people: Teilnehmer\*innen
+        people: Personen
         remove_all: "Alle entfernen"
       member_instructions: "Klicken bzw. tippen Sie auf eine/n Benutzer\\*in oder eine Gruppe in der linken Spalte, um Arbeitsgruppenmitglieder hinzuzufügen."
     delete_button: 
@@ -7394,7 +7394,7 @@ de:
     all_in_context: "Alle in %{context}"
     archive: Archivieren
     autocomplete_result: 
-      group_people: "Teilnehmer\\*innen: %{people}"
+      group_people: "Personen: %{people}"
       no_results: "Keine Ergebnisse"
     back: Zurück
     cannot_add_to_private: "Sie können zu einer privaten Konversation keine Teilnehmer\\*in hinzufügen."
@@ -8519,7 +8519,7 @@ de:
         cannot_add_users: "Es können keine neuen Benutzer\\*in hinzugefügt werden, da der Kurs abgeschlossen wurde."
         filter_field_description: "Personen suchen. Wenn Sie Text in dieses Feld eingeben, wird die Liste der Personen automatisch gefiltert, um nur diejenigen anzuzeigen, deren Namen mit Ihrer Eingabe übereinstimmen."
         group_set: Gruppenset
-        people: Teilnehmer\*innen
+        people: Personen
         role_to_search: "Suche auf Rolle beschränken"
         search_people: "Personen suchen"
         title_add_people: "Personen hinzufügen"
@@ -9048,7 +9048,7 @@ de:
     messages: Nachrichten
     modules: Module
     outcomes: Lernergebnisse
-    people: Teilnehmer\*innen
+    people: Personen
     plugins: Plug-ins
     prior_users: "Vorherige Benutzer\\*innen"
     question_banks: Fragenpools
@@ -13286,7 +13286,7 @@ de:
       files: Dateien
       home: Start
       pages: Seiten
-      people: Teilnehmer\*innen
+      people: Personen
   group_a8f5ed9c: Gruppe
   group_add_permission_is_needed_to_create_a_new_gro_3cd0d1b5: "Die Berechtigung „Gruppe hinzufügen“ ist erforderlich, um eine neue Gruppenkategorie einzurichten."
   group_announcements_f6e0fc8c: Gruppendurchsagen
@@ -20002,7 +20002,7 @@ de:
   people_account_30bbffec: "Personen (Konto)"
   people_account_course_305043bb: "Personen (Konto/Kurs)"
   people_account_course_97b2bbb6: "Personen (Konto, Kurs)"
-  people_b4ebb13c: Teilnehmer\*innen
+  people_b4ebb13c: Personen
   people_body_3ce556e3: "Menschen und Körper"
   people_course_ddd9a66: "Menschen (Kurs)"
   people_groups_tab_b245a614: "Personen (Registerkarte „Gruppen“)"
@@ -26317,7 +26317,7 @@ de:
     pace_plans: Pace-Plans
     pages: Seiten
     past_global_announcements: "Globale Ankündigungen"
-    people: Teilnehmer\*innen
+    people: Personen
     profile: Profil
     qr_mobile_login: "QR für die mobile Anmeldung"
     quizzes: Quizze
