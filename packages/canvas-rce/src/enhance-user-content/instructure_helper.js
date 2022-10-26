@@ -51,7 +51,8 @@ export function isExternalLink(element) {
   )
 }
 
-export function showFilePreview(canvasOrigin, event) {
+export function showFilePreview(event, opts = {}) {
+  const {canvasOrigin, disableGooglePreviews} = {...opts}
   let target = null
   if (event.target?.href) {
     target = event.target
@@ -68,13 +69,13 @@ export function showFilePreview(canvasOrigin, event) {
     target.classList.contains('inline_disabled') ||
     target.classList.contains('preview_in_overlay')
   ) {
-    showFilePreviewInOverlay(canvasOrigin, event)
+    showFilePreviewInOverlay(event, canvasOrigin)
   } else {
-    showFilePreviewInline(event)
+    showFilePreviewInline(event, disableGooglePreviews)
   }
 }
 
-export function showFilePreviewInOverlay(canvasOrigin, event) {
+export function showFilePreviewInOverlay(event, canvasOrigin) {
   let target = null
   if (event.target?.href) {
     target = event.target
@@ -99,7 +100,7 @@ export function showFilePreviewInOverlay(canvasOrigin, event) {
   }
 }
 
-export function showFilePreviewInline(event) {
+export function showFilePreviewInline(event, disableGooglePreviews) {
   if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
     // if any modifier keys are pressed, do the browser default thing
     return
@@ -134,7 +135,8 @@ export function showFilePreviewInline(event) {
       removeLoadingImage($link)
       if (
         attachment &&
-        (isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
+        ((!disableGooglePreviews && isPreviewable(attachment.content_type)) ||
+          attachment.canvadoc_session_url)
       ) {
         $link.setAttribute('aria-expanded', 'true')
 
@@ -147,6 +149,7 @@ export function showFilePreviewInline(event) {
           attachment_preview_processing:
             attachment.workflow_state === 'pending_upload' ||
             attachment.workflow_state === 'processing',
+          disableGooglePreviews,
         })
         const $minimizeLink = document.createElement('a')
         $minimizeLink.setAttribute('href', '#')

@@ -21,53 +21,59 @@ import ReactDOM from 'react-dom'
 import formatMessage from '../format-message'
 import {Spinner} from '@instructure/ui-spinner'
 import htmlEscape from 'escape-html'
-import {capitalize, getData, setData} from './jqueryish_funcs'
+import {getData, setData} from './jqueryish_funcs'
 
-// first element in array is if scribd can handle it, second is if google can
-export const previewableMimeTypes = {
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.template': [1, 1],
-  'application/vnd.oasis.opendocument.spreadsheet': [1, 1],
-  'application/vnd.sun.xml.writer': [1, 1],
-  'application/excel': [1, 1],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [1, 1],
-  'text/rtf': [1, 1],
-  'application/vnd.openxmlformats-officedocument.spreadsheetml.template': [1, 1],
-  'application/vnd.sun.xml.impress': [1, 1],
-  'application/vnd.sun.xml.calc': [1, 1],
-  'application/vnd.ms-excel': [1, 1],
-  'application/msword': [1, 1],
-  'application/mspowerpoint': [1, 1],
-  'application/rtf': [1, 1],
-  'application/vnd.oasis.opendocument.presentation': [1, 1],
-  'application/vnd.oasis.opendocument.text': [1, 1],
-  'application/vnd.openxmlformats-officedocument.presentationml.template': [1, 1],
-  'application/vnd.openxmlformats-officedocument.presentationml.slideshow': [1, 1],
-  'text/plain': [1, 1],
-  'application/vnd.openxmlformats-officedocument.presentationml.presentation': [1, 1],
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [1, 1],
-  'application/postscript': [1, 1],
-  'application/pdf': [1, 1],
-  'application/vnd.ms-powerpoint': [1, 1],
-}
+export const previewableMimeTypes = [
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+  'application/vnd.oasis.opendocument.spreadsheet',
+  'application/vnd.sun.xml.writer',
+  'application/excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/rtf',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.template',
+  'application/vnd.sun.xml.impress',
+  'application/vnd.sun.xml.calc',
+  'application/vnd.ms-excel',
+  'application/msword',
+  'application/mspowerpoint',
+  'application/rtf',
+  'application/vnd.oasis.opendocument.presentation',
+  'application/vnd.oasis.opendocument.text',
+  'application/vnd.openxmlformats-officedocument.presentationml.template',
+  'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+  'text/plain',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/postscript',
+  'application/pdf',
+  'application/vnd.ms-powerpoint',
+]
 
-// check to see if a file of a certan mimeType is previewable inline in the browser by either scribd or googleDocs
+// check to see if a file of a certan mimeType is previewable inline in the browser
 // ex: isPreviewable("application/mspowerpoint")  -> true
-//     isPreviewable("application/rtf", 'google') -> false
-export function isPreviewable(mimeType, service) {
-  return (
-    previewableMimeTypes[mimeType] &&
-    (!service ||
-      (!INST['disable' + capitalize(service) + 'Previews'] &&
-        previewableMimeTypes[mimeType][{scribd: 0, google: 1}[service]]))
-  )
+export function isPreviewable(mimeType) {
+  return previewableMimeTypes.includes(mimeType)
 }
 
-export function showLoadingImage($link) {
+// Show a loading spinner
+// The typical use is to show the spinner next to a canvas file link
+// while the inline preview is loading. It's also used when previewing
+// student submitted files in speedgrader, in which case $link is really
+// the div containing the preview iframe. We handle these 2 cases by
+// telling the function to put the spinner adjacent to $link,
+// or to put it in the center of the preview container.
+//
+// $link: the DOM node that serves as the reference for locating the spinner
+// position: one of 'adjacent' or 'centered'
+export function showLoadingImage($link, position = 'adjacent') {
   const dir = ($link && window.getComputedStyle($link).direction) || 'ltr'
   const boundingBox = $link.getBoundingClientRect()
-  const paddingLeft = dir === 'ltr' ? boundingBox.width + 5 : -5 - 24
+  const offsetLeft =
+    boundingBox.left +
+    (position === 'adjacent' ? (dir === 'ltr' ? boundingBox.width : -24) : boundingBox.width / 2)
   $link.style.marginInlineEnd = '28px'
-
+  const imageMarginInlineStart = position === 'adjacent' ? '5px' : '-12px'
+  const imageMarginTop = position === 'adjacent' ? 0 : '-12px'
   const zIndex = parseInt($link.style.zIndex || 0, 10) + 1
   const $imageHolder = document.createElement('div')
   $imageHolder.setAttribute('class', 'loading_image_holder')
@@ -76,18 +82,22 @@ export function showLoadingImage($link) {
   setData($link, 'loading_images', list)
 
   if (!$link.style.position || $link.style.position === 'static') {
-    const top = `${boundingBox.top + window.scrollY}px`,
-      left = `${boundingBox.left + paddingLeft}px`
+    const top = `${
+      boundingBox.top + window.scrollY + (position === 'adjacent' ? 0 : boundingBox.height / 2)
+    }px`
+    const left = `${offsetLeft}px`
 
     $imageHolder.setAttribute(
       'style',
-      `z-index: ${zIndex}; position: absolute; top: ${top}; left: ${left}`
+      `z-index: ${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start: ${imageMarginInlineStart}; margin-top: ${imageMarginTop}`
     )
     document.body.appendChild($imageHolder)
   } else {
+    const top = `${position === 'adjacent' ? 0 : boundingBox.height / 2}px`
+    const left = `${offsetLeft}px`
     $imageHolder.setAttribute(
       'style',
-      `z-index:${zIndex}; position: absolute; top: 0; left: ${paddingLeft}`
+      `z-index:${zIndex}; position: absolute; top: ${top}; left: ${left}; margin-inline-start:${imageMarginInlineStart}; margin-top: ${imageMarginTop}`
     )
     $link.appendChild($imageHolder)
   }
@@ -115,6 +125,8 @@ export function loadDocPreview($container, options) {
     ...getData($container),
     ...options,
   }
+
+  if (!$container) return // an issue in specs
 
   function tellAppIViewedThisInline() {
     // if I have a url to ping back to the app that I viewed this file inline, ping it.
@@ -161,8 +173,8 @@ export function loadDocPreview($container, options) {
     iframe.id = opts.id
     canvadocWrapper.appendChild(iframe)
   } else if (
-    (!INST.disableGooglePreviews &&
-      (!opts.mimetype || isPreviewable(opts.mimetype, 'google')) &&
+    (!opts.disableGooglePreviews &&
+      (!opts.mimetype || isPreviewable(opts.mimetype)) &&
       opts.attachment_id) ||
     opts.public_url
   ) {
@@ -203,7 +215,7 @@ export function loadDocPreview($container, options) {
           url += `${opts.submission_id ? '&' : '?'}verifier=${ver}`
         }
       }
-      $container.loadingImage()
+      showLoadingImage($container, 'centered')
       fetch(url)
         .then(response => {
           if (!response.ok) throw new Error(`${response.status}: ${response.statusText}`)
@@ -228,21 +240,17 @@ export function loadDocPreview($container, options) {
     // else fall back with a message that the document can't be viewed inline
     // eslint-disable-next-line no-lonely-if
     if (opts.attachment_preview_processing) {
-      $container.html(
-        '<p>' +
-          htmlEscape(
+      $container.innerHTML = `<p>
+          ${htmlEscape(
             formatMessage(
               'The document preview is currently being processed. Please try again later.'
             )
-          ) +
-          '</p>'
-      )
+          )}
+          </p>`
     } else {
-      $container.html(
-        '<p>' +
-          htmlEscape(formatMessage('This document cannot be displayed within Canvas.')) +
-          '</p>'
-      )
+      $container.innerHTML = `<p>${htmlEscape(
+        formatMessage('This document cannot be displayed within Canvas.')
+      )}</p>`
     }
   }
 }

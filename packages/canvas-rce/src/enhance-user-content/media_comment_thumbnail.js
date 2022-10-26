@@ -17,7 +17,7 @@
  */
 
 import formatMessage from '../format-message'
-import {closest} from './jqueryish_funcs'
+import {closest, getData, setData} from './jqueryish_funcs'
 import htmlEscape from 'escape-html'
 
 const MEDIA_COMMENT_THUMBNAIL_SIZES = {
@@ -25,9 +25,11 @@ const MEDIA_COMMENT_THUMBNAIL_SIZES = {
   small: {width: 70, height: 50},
 }
 
-function createMediaCommentThumbnail(elem, size, keepOriginalText) {
+function createMediaCommentThumbnail(elem, size, keepOriginalText, kalturaSettings) {
+  // a lot of places in canvas rely on INST.kalturaSettings. Fallback if they are not provided
+  const kalturaSettings_ = kalturaSettings || window.INST?.kalturaSettings
   // eslint-disable-next-line no-console
-  if (!INST.kalturaSettings) return console.log('Kaltura has not been enabled for this account')
+  if (!kalturaSettings_) return console.log('Kaltura has not been enabled for this account')
   let idAttr, url
   const $link = elem
 
@@ -47,13 +49,14 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
 
   const dimensions = MEDIA_COMMENT_THUMBNAIL_SIZES[size] || MEDIA_COMMENT_THUMBNAIL_SIZES.normal
   const id =
+    getData($link, 'media_comment_id') ||
     $link.getAttribute('data-media_comment_id') ||
     $link.querySelector('.media_comment_id')?.textContent ||
     ((idAttr = $link.id) && idAttr.match(/^media_comment_/) && idAttr.substring(14)) ||
     $link.parentElement.querySelector('.media_comment_id')?.textContent?.trim()
 
-  const authorName = $link.getAttribute('data-author')
-  const createdAt = $link.getAttribute('data-created_at')
+  const authorName = getData($link, 'author') || $link.getAttribute('data-author')
+  const createdAt = getData($link, 'created_at') || $link.getAttribute('data-created_at')
   let altText
 
   if (authorName && createdAt) {
@@ -66,10 +69,10 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
   }
 
   if (id) {
-    const domain = `https://${INST.kalturaSettings.resource_domain}`
+    const domain = `https://${kalturaSettings_.resource_domain}`
 
     const backgroundUrl =
-      `${domain}/p/${INST.kalturaSettings.partner_id}/thumbnail/entry_id/${id}/width/` +
+      `${domain}/p/${kalturaSettings_.partner_id}/thumbnail/entry_id/${id}/width/` +
       `${dimensions.width}/height/${dimensions.height}/bgcolor/000000/type/2/vid_sec/5`
 
     const $thumbnail = document.createElement('span')
@@ -113,8 +116,22 @@ function createMediaCommentThumbnail(elem, size, keepOriginalText) {
 }
 
 // public API
-export default function mediaCommentThumbnail(comment_element, size = 'normal', keepOriginalText) {
+export default function mediaCommentThumbnail(
+  comment_element,
+  size = 'normal',
+  keepOriginalText,
+  kalturaSettings,
+  jqueryData = undefined
+) {
   // defer each thumbnail generation till the next time through the event loop to not kill browser rendering,
   // has the effect of saying "only work on thumbnailing these while the browser is not doing something else"
-  window.setTimeout(createMediaCommentThumbnail, 1, comment_element, size, keepOriginalText)
+  return new Promise(resolve =>
+    window.setTimeout(() => {
+      if (jqueryData) {
+        Object.keys(jqueryData).forEach(k => setData(comment_element, k, jqueryData[k]))
+      }
+      createMediaCommentThumbnail(comment_element, size, keepOriginalText, kalturaSettings)
+      resolve()
+    }, 1)
+  )
 }

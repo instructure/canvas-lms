@@ -139,15 +139,14 @@ function buildUrl(url) {
 }
 
 export function enhanceUserContent(container = document, opts = {}) {
-  const customEnhanceFunc = opts.customEnhanceFunc
-  const canvasOrigin = opts.canvasOrigin || window.location?.origin
+  const {customEnhanceFunc, canvasOrigin, kalturaSettings, disableGooglePreviews} = opts
 
   const content =
     (container instanceof HTMLElement && container) ||
     document.getElementById('content') ||
     document
 
-  const showFilePreviewEx = showFilePreview.bind(window, canvasOrigin)
+  const showFilePreviewEx = event => showFilePreview(event, {canvasOrigin, disableGooglePreviews})
 
   content
     .querySelectorAll('.user_content:not(.enhanced)')
@@ -292,11 +291,11 @@ export function enhanceUserContent(container = document, opts = {}) {
 
     if ($anchor.matches('.instructure_inline_media_comment')) {
       $anchor.classList.remove('no-underline')
-      mediaCommentThumbnail($anchor, 'normal')
+      mediaCommentThumbnail($anchor, 'normal', false, kalturaSettings)
     }
 
     if ($anchor.matches('.instructure_video_link, .instructure_audio_link')) {
-      mediaCommentThumbnail($anchor, 'normal', true)
+      mediaCommentThumbnail($anchor, 'normal', true, kalturaSettings)
     }
 
     if (!$anchor.matches('.youtubed')) {

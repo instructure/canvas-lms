@@ -2365,7 +2365,7 @@ EG = {
       if (
         attachment.crocodoc_url ||
         attachment.canvadoc_url ||
-        $.isPreviewable(attachment.content_type, 'google')
+        $.isPreviewable(attachment.content_type)
       ) {
         inlineableAttachments.push(attachment)
       }

@@ -343,6 +343,8 @@ function enhanceUserContentWhenAsked() {
       enhanceUserContent(document, {
         customEnhanceFunc: enhanceUserJQueryWidgetContent,
         canvasOrigin: ENV?.DEEP_LINKING_POST_MESSAGE_ORIGIN || window.location?.origin,
+        kalturaSettings: INST.kalturaSettings,
+        disableGooglePreviews: !!INST.disableGooglePreviews,
       }),
     50
   )
