@@ -419,6 +419,42 @@ describe Assignment do
       end
     end
 
+    describe "#supports_grade_by_question?" do
+      it "returns false when the assignment is not a quiz" do
+        assignment = @course.assignments.create!(submission_types: "online_text_entry")
+        expect(assignment.supports_grade_by_question?).to be false
+      end
+
+      it "returns true when the assignment is a classic quiz" do
+        assignment = @course.assignments.create!(submission_types: "online_quiz")
+        expect(assignment.reload.supports_grade_by_question?).to be true
+      end
+
+      context "Quizzes.Next quizzes" do
+        before do
+          @assignment = @course.assignments.build(submission_types: "external_tool")
+          tool = @course.context_external_tools.create!(
+            name: "Quizzes.Next",
+            consumer_key: "test_key",
+            shared_secret: "test_secret",
+            tool_id: "Quizzes 2",
+            url: "http://example.com/launch"
+          )
+          @assignment.external_tool_tag_attributes = { content: tool }
+          @assignment.save!
+        end
+
+        it "returns false when new_quizzes_grade_by_question_in_speedgrader is disabled" do
+          Account.site_admin.disable_feature!(:new_quizzes_grade_by_question_in_speedgrader)
+          expect(@assignment.supports_grade_by_question?).to be false
+        end
+
+        it "returns true when new_quizzes_grade_by_question_in_speedgrader is enabled" do
+          expect(@assignment.supports_grade_by_question?).to be true
+        end
+      end
+    end
+
     describe "#submitted?" do
       before do
         @assignment = @course.assignments.create!(submission_types: "online_text_entry")

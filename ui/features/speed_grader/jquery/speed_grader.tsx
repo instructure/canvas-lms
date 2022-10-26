@@ -299,6 +299,10 @@ const utils = {
     const settingVal = userSettings.get('eg_hide_student_names')
     return settingVal === true || settingVal === 'true' || ENV.force_anonymous_grading
   },
+  sortByCriteria() {
+    const settingVal = userSettings.get('eg_sort_by')
+    return settingVal || 'alphabetically'
+  },
 }
 
 function sectionSelectionOptions(
@@ -671,21 +675,36 @@ function setupHeader() {
     submitSettingsForm(e) {
       e.preventDefault()
 
-      userSettings.set('eg_sort_by', $('#eg_sort_by').val())
+      const sortBy = $('#eg_sort_by').val()
+      const sortByChanged = sortBy !== utils.sortByCriteria()
+      userSettings.set('eg_sort_by', sortBy)
+
+      let hideNamesChanged = false
       if (!ENV.force_anonymous_grading) {
-        userSettings.set('eg_hide_student_names', $('#hide_student_names').prop('checked'))
+        const hideNames = $('#hide_student_names').prop('checked')
+        hideNamesChanged = hideNames !== utils.shouldHideStudentNames()
+        userSettings.set('eg_hide_student_names', hideNames)
       }
 
-      $(e.target)
-        .find('.submit_button')
-        .attr('disabled', 'true')
-        .text(I18n.t('buttons.saving_settings', 'Saving Settings...'))
+      const isClassicQuiz = !!window.jsonData.context.quiz
+      const needsReload = hideNamesChanged || sortByChanged || isClassicQuiz
+      if (needsReload) {
+        $(e.target)
+          .find('.submit_button')
+          .attr('disabled', 'true')
+          .text(I18n.t('buttons.saving_settings', 'Saving Settings...'))
+      } else {
+        this.elements.settings.form.dialog('close')
+      }
+
       const gradeByQuestion = $('#enable_speedgrader_grade_by_question').prop('checked')
       // eslint-disable-next-line promise/catch-or-return
       $.post(ENV.settings_url, {
         enable_speedgrader_grade_by_question: gradeByQuestion,
       }).then(() => {
-        SpeedgraderHelpers.reloadPage()
+        if (needsReload) {
+          SpeedgraderHelpers.reloadPage()
+        }
       })
     },
 

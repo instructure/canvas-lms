@@ -3445,6 +3445,12 @@ class Assignment < ActiveRecord::Base
     @new_record = new_record if @simply_versioned_version_model
   end
 
+  def supports_grade_by_question?
+    return true if quiz.present?
+
+    Account.site_admin.feature_enabled?(:new_quizzes_grade_by_question_in_speedgrader) && quiz_lti?
+  end
+
   def quiz?
     submission_types == "online_quiz" && quiz.present?
   end
