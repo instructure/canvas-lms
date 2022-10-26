@@ -698,6 +698,54 @@ describe Types::UserType do
     end
   end
 
+  context "observerEnrollmentsConnection" do
+    let(:teacher_type) do
+      GraphQLTypeTester.new(
+        @teacher,
+        current_user: @teacher,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    let(:student_type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    before do
+      @student1 = student_in_course(active_all: true).user
+      @student2 = student_in_course(active_all: true).user
+
+      @student1_observer = observer_in_course(active_all: true, associated_user_id: @student1).user
+      @student2_observer = observer_in_course(active_all: true, associated_user_id: @student2).user
+    end
+
+    it "returns associatedUser ids" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"course_#{@course.id}\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([[@student1.id.to_s], [@student2.id.to_s]])
+    end
+
+    it "returns empty associatedUser ids" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"course_#{@course.id}\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([[], [], [], []])
+    end
+
+    it "returns nil when context is empty" do
+      result = teacher_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([nil, nil])
+    end
+
+    it "returns nil when not teacher" do
+      result = student_type.resolve("recipients(context: \"course_#{@course.id}_observers\") { usersConnection { nodes { observerEnrollmentsConnection(contextCode: \"\") { nodes { associatedUser { _id } } } } } }")
+      expect(result).to match_array([nil])
+    end
+  end
+
   context "total_recipients" do
     let(:type) do
       GraphQLTypeTester.new(

@@ -39,6 +39,19 @@ module Types
                   ]).then { object.enrollments.where(course_id: object.common_courses.keys) }
     end
 
+    field :observer_enrollments_connection, Types::EnrollmentType.connection_type, null: true do
+      argument :context_code, String, required: true
+    end
+    def observer_enrollments_connection(context_code: nil)
+      course_context = Context.find_by_asset_string(context_code)
+      return nil unless course_context.is_a?(Course)
+      return nil unless course_context.user_is_instructor?(current_user)
+
+      load_association(:observer_enrollments).then do |observer_enrollments|
+        observer_enrollments.active_by_date.where.not(associated_user_id: nil).where(course: course_context).distinct
+      end
+    end
+
     field :common_groups_connection, Types::GroupType.connection_type, null: true
     def common_groups_connection
       load_association(:groups).then { object.groups.where(id: object.common_groups.keys) }
