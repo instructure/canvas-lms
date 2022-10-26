@@ -86,7 +86,7 @@ describe('PaceContextsContent', () => {
     const sectionPaceContext = PACE_CONTEXTS_SECTIONS_RESPONSE.pace_contexts[0]
     const {findByText, getByText, getAllByText} = renderConnected(<PaceContent />)
     expect(await findByText(sectionPaceContext.name)).toBeInTheDocument()
-    headers.map(header => {
+    headers.forEach(header => {
       expect(getAllByText(header)[0]).toBeInTheDocument()
     })
     expect(getByText(`${sectionPaceContext.associated_student_count} Students`)).toBeInTheDocument()
@@ -100,7 +100,7 @@ describe('PaceContextsContent', () => {
     const studentsTab = getByRole('tab', {name: 'Students'})
     act(() => studentsTab.click())
     expect(await findByText(studentPaceContext.name)).toBeInTheDocument()
-    headers.map(header => {
+    headers.forEach(header => {
       expect(getAllByText(header)[0]).toBeInTheDocument()
     })
     expect(getByText(studentPaceContext.applied_pace.name)).toBeInTheDocument()

@@ -5,20 +5,12 @@ require_relative "./linter"
 
 linter_options = {
   linter_name: "eslint",
-  # ignore packages subdirectory
-  file_regex: %r{^(?!(?:packages/)).*\.js$},
   format: "eslint",
-  command: "node_modules/.bin/eslint",
+  command: "node_modules/.bin/eslint ui --quiet --ext '.js,.ts,.tsx'",
   campsite_mode: false,
   boyscout_mode: false,
-  append_files_to_command: true,
-  comment_post_processing: proc do |comments|
-    # This section should be removed when we start -2ing patchsets
-    comments.each do |comment|
-      comment[:severity] = "warn"
-    end
-  end,
-  severe_anywhere: false
+  append_files_to_command: false,
+  severe_anywhere: true
 }
 
 eslint = Linter.new(linter_options)
@@ -28,12 +20,14 @@ puts "Linting sub-packages"
 
 linter_options[:command] = "yarn lint"
 linter_options[:base_dir] = "../../"
+linter_options[:append_files_to_command] = true
+
 package_dirs = `ls -1 packages/*/package.json 2> /dev/null`.split("\n").map { |d| d.sub("/package.json", "") }
 cwd = Dir.pwd
 package_dirs.each do |d|
   puts "working sub-package dir #{d}"
   Dir.chdir d
-  linter_options[:file_regex] = %r{#{d}/.*\.js$}
+  linter_options[:file_regex] = %r{#{d}/.*\.(?:js|ts|tsx)$}
   eslint = Linter.new(linter_options)
   eslint.run
   Dir.chdir cwd

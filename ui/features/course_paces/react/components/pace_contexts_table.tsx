@@ -130,7 +130,7 @@ const PaceContextsTable = ({
     const appliedPace = paceContext?.applied_pace
     const appliedPaceType = paceContext?.applied_pace?.type || ''
     switch (contextType) {
-      case 'section':
+      case 'section': {
         const studentCountText = I18n.t(
           {
             one: '1 Student',
@@ -145,6 +145,7 @@ const PaceContextsTable = ({
           formatDate(appliedPace?.last_modified || ''),
         ]
         break
+      }
       case 'student_enrollment':
         values = [
           renderContextLink(paceContext),
@@ -165,6 +166,7 @@ const PaceContextsTable = ({
         {headers.map((headerTitle, i) => (
           <TableColHeader
             id={`header-table-${i}`}
+            // eslint-disable-next-line react/no-array-index-key
             key={`contexts-header-table-${i}`}
             width={headerTitle.width}
             theme={{padding: '0.75rem'}}
@@ -183,6 +185,7 @@ const PaceContextsTable = ({
     return (
       <TableRow key={paceContext.item_id}>
         {rowCells.map((cell, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <TableCell key={`contexts-table-cell-${index}`} theme={{padding: '0.75rem'}}>
             {cell}
           </TableCell>
@@ -202,6 +205,7 @@ const PaceContextsTable = ({
         margin="none none small none"
       >
         {headers.map(({text: title}, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <Flex key={`mobile-context-row-${index}`} as="div" width="100%" margin="medium 0">
             <FlexItem size="50%">
               <Text weight="bold">{title}</Text>
