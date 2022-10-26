@@ -16,4 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import mediaCommentThumbnail from './media_comment_thumbnail'
+
 export * from './enhance_user_content'
+export {isPreviewable, loadDocPreview} from './doc_previews'
+export {mediaCommentThumbnail}

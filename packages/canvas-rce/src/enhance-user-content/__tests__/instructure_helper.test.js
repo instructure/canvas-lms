@@ -113,7 +113,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       const link = document.createElement('a')
       link.href = 'http://localhost/courses/1/files/2'
       const event = makeEvent({target: link})
-      showFilePreviewInOverlay(canvasOrigin, event)
+      showFilePreviewInOverlay(event, canvasOrigin)
       expect(window.postMessage).toHaveBeenCalledWith(
         {
           subject: 'preview_file',
@@ -128,7 +128,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       const link = document.createElement('a')
       link.href = 'http://localhost/courses/1/files/2?verifier=xyzzy'
       const event = makeEvent({target: link})
-      showFilePreviewInOverlay(canvasOrigin, event)
+      showFilePreviewInOverlay(event, canvasOrigin)
       expect(window.postMessage).toHaveBeenCalledWith(
         {
           subject: 'preview_file',
@@ -143,7 +143,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       const link = document.createElement('a')
       link.href = 'http://localhost/notafile'
       const event = makeEvent({target: link})
-      showFilePreviewInOverlay(canvasOrigin, event)
+      showFilePreviewInOverlay(event, canvasOrigin)
       expect(window.postMessage).not.toHaveBeenCalled()
     })
 
@@ -151,7 +151,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       const link = document.createElement('a')
       link.href = 'http://localhost/courses/1/files/2'
       const event = makeEvent({target: link, ctrlKey: true})
-      showFilePreviewInOverlay(canvasOrigin, event)
+      showFilePreviewInOverlay(event, canvasOrigin)
       expect(window.postMessage).not.toHaveBeenCalled()
     })
   })
@@ -181,6 +181,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
   })
 
   describe('showFilePreview', () => {
+    const opts = {canvasOrigin, disableGooglePreviews: false}
     beforeEach(() => {
       jest.spyOn(window, 'postMessage')
     })
@@ -192,7 +193,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
     it('does nothing if the link has no href', () => {
       const link = document.createElement('a')
       mockFetchPreview('*')
-      showFilePreview(canvasOrigin, makeEvent({target: link}))
+      showFilePreview(makeEvent({target: link}), opts)
       expect(window.postMessage).not.toHaveBeenCalled()
       expect(fetchMock.called('*')).toEqual(false)
     })
@@ -203,7 +204,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       link.className = 'no_preview'
       mockFetchPreview(link.href)
       const event = makeEvent({target: link})
-      showFilePreview(canvasOrigin, event)
+      showFilePreview(event, opts)
       expect(window.postMessage).not.toHaveBeenCalled()
       expect(fetchMock.called(link.href)).toEqual(false)
     })
@@ -214,7 +215,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       link.className = 'inline_disabled'
       mockFetchPreview(link.href)
       const event = makeEvent({target: link})
-      showFilePreview(canvasOrigin, event)
+      showFilePreview(event, opts)
       expect(window.postMessage).toHaveBeenCalled()
     })
 
@@ -224,7 +225,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       link.className = 'preview_in_overlay'
       mockFetchPreview(link.href)
       const event = makeEvent({target: link})
-      showFilePreview(canvasOrigin, event)
+      showFilePreview(event, opts)
       expect(window.postMessage).toHaveBeenCalled()
     })
 
@@ -233,7 +234,7 @@ describe('enhanced_user_content/instructure_helpers', () => {
       link.href = 'http://localhost/files/17'
       mockFetchPreview(link.href)
       const event = makeEvent({target: link})
-      showFilePreview(canvasOrigin, event)
+      showFilePreview(event, opts)
       expect(window.postMessage).not.toHaveBeenCalled()
       expect(fetchMock.called(link.href)).toEqual(true)
     })
