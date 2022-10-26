@@ -67,7 +67,12 @@ export const RemovePaceWarningModal: React.FC<ComponentProps> = ({
     <ModalFooter>
       <View>
         <Button onClick={onCancel}>{I18n.t('Cancel')}</Button>
-        <Button margin="0 x-small" onClick={onConfirm} color="danger">
+        <Button
+          data-testid="remove-pace-confirm"
+          margin="0 x-small"
+          onClick={onConfirm}
+          color="danger"
+        >
           {I18n.t('Remove')}
         </Button>
       </View>

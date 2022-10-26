@@ -264,6 +264,32 @@ module CoursePacesPageObject
   def course_pace_settings_button_selector
     "[data-testid='course-pace-settings']"
   end
+
+  def remove_pace_button_selector
+    "[data-testid='remove-pace-button']"
+  end
+
+  def remove_pace_modal_cancel_selector
+    "button:contains('Cancel')"
+  end
+
+  def remove_pace_modal_remove_selector
+    "[data-testid='remove-pace-confirm']"
+  end
+
+  def remove_pace_modal_x_selector
+    "[data-testid='instui-modal-close'] button"
+  end
+
+  def remove_pace_modal_selector(pace_type)
+    case pace_type
+    when :student
+      "[aria-label='Remove this Student Pace?']"
+    when :section
+      "[aria-label='Remove this Section Pace?']"
+    end
+  end
+
   #------------------------- Elements --------------------------------
 
   def assignment_due_date
@@ -490,6 +516,27 @@ module CoursePacesPageObject
   def course_pace_settings_button
     f(course_pace_settings_button_selector)
   end
+
+  def remove_pace_button
+    f(remove_pace_button_selector)
+  end
+
+  def remove_pace_modal(pace_type)
+    f(remove_pace_modal_selector(pace_type))
+  end
+
+  def remove_pace_modal_cancel
+    fj(remove_pace_modal_cancel_selector)
+  end
+
+  def remove_pace_modal_remove
+    f(remove_pace_modal_remove_selector)
+  end
+
+  def remove_pace_modal_x
+    f(remove_pace_modal_x_selector)
+  end
+
   #----------------------- Actions & Methods -------------------------
   #----------------------- Click Items -------------------------------
 
@@ -590,6 +637,23 @@ module CoursePacesPageObject
 
   def click_weekends_checkbox
     skip_weekends_checkbox.click
+  end
+
+  #------------------------- Redesign Elements -----------------------
+  def click_remove_pace_button
+    remove_pace_button.click
+  end
+
+  def click_remove_pace_modal_cancel
+    remove_pace_modal_cancel.click
+  end
+
+  def click_remove_pace_modal_remove
+    remove_pace_modal_remove.click
+  end
+
+  def click_remove_pace_modal_x
+    remove_pace_modal_x.click
   end
 
   #------------------------------Retrieve Text------------------------

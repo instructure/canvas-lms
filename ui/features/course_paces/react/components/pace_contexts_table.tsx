@@ -186,7 +186,7 @@ const PaceContextsTable = ({
       <TableRow key={paceContext.item_id}>
         {rowCells.map((cell, index) => (
           // eslint-disable-next-line react/no-array-index-key
-          <TableCell key={`contexts-table-cell-${index}`} theme={{padding: '0.75rem'}}>
+          <TableCell data-testid="course-pace-item" key={`contexts-table-cell-${index}`} theme={{padding: '0.75rem'}}>
             {cell}
           </TableCell>
         ))}
