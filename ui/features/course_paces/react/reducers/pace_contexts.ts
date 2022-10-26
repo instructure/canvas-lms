@@ -33,7 +33,7 @@ export const paceContextsReducer = (
   action
 ): PaceContextsState => {
   switch (action.type) {
-    case PaceContextsConstants.SET_PACE_CONTEXTS:
+    case PaceContextsConstants.SET_PACE_CONTEXTS: {
       const pageCount = Math.ceil(action.payload.result.total_entries / state.entriesPerRequest)
       return {
         ...state,
@@ -42,6 +42,7 @@ export const paceContextsReducer = (
         isLoading: false,
         pageCount,
       }
+    }
     case PaceContextsConstants.SET_PAGE:
       return {
         ...state,
