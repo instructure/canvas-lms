@@ -144,3 +144,13 @@ single_new_quiz_session_in_speedgrader:
       state: allowed_on # enable for local development
     test:
       state: allowed_on # enable for the deployed 'test' environment
+new_quizzes_grade_by_question_in_speedgrader:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Quizzes.Next Grade by Question in SpeedGrader
+  description: Adds the option to grade by question in SpeedGrader for Quizzes.Next Quizzes
+  environments:
+    ci:
+      state: allowed_on
+    development:
+      state: allowed_on
