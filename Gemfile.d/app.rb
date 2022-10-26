@@ -170,3 +170,4 @@ gem 'bootsnap', require: false
 gem 'jquery-rails'
 gem 'rails-ujs'
 gem 'rb-readline'
+gem 'launchdarkly-server-sdk', '~> 6.0.0'
